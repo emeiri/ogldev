@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="84">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="FreeTypeGL" projectFiles="true">
+      <itemPath>FreetypeGL/font-manager.c</itemPath>
+      <itemPath>FreetypeGL/font-manager.h</itemPath>
+      <itemPath>FreetypeGL/font_shader.cpp</itemPath>
+      <itemPath>FreetypeGL/font_shader.h</itemPath>
+      <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
+      <itemPath>FreetypeGL/freetypeGL.h</itemPath>
+      <itemPath>FreetypeGL/markup.h</itemPath>
+      <itemPath>FreetypeGL/texture-atlas.c</itemPath>
+      <itemPath>FreetypeGL/texture-atlas.h</itemPath>
+      <itemPath>FreetypeGL/texture-font.c</itemPath>
+      <itemPath>FreetypeGL/texture-font.h</itemPath>
+      <itemPath>FreetypeGL/texture-glyph.c</itemPath>
+      <itemPath>FreetypeGL/texture-glyph.h</itemPath>
+      <itemPath>FreetypeGL/vector.c</itemPath>
+      <itemPath>FreetypeGL/vector.h</itemPath>
+      <itemPath>FreetypeGL/vertex-buffer.c</itemPath>
+      <itemPath>FreetypeGL/vertex-buffer.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>callbacks.h</itemPath>
+      <itemPath>camera.h</itemPath>
+      <itemPath>glut_backend.h</itemPath>
+      <itemPath>math_3d.h</itemPath>
+      <itemPath>mesh.h</itemPath>
+      <itemPath>ogldev_types.h</itemPath>
+      <itemPath>pipeline.h</itemPath>
+      <itemPath>skinning_technique.h</itemPath>
+      <itemPath>technique.h</itemPath>
+      <itemPath>texture.h</itemPath>
+      <itemPath>util.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
+      <itemPath>shaders/skinning.glsl</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>camera.cpp</itemPath>
+      <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>math_3d.cpp</itemPath>
+      <itemPath>mesh.cpp</itemPath>
+      <itemPath>pipeline.cpp</itemPath>
+      <itemPath>skinning_technique.cpp</itemPath>
+      <itemPath>technique.cpp</itemPath>
+      <itemPath>texture.cpp</itemPath>
+      <itemPath>tutorial38.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <incDir>
+            <pElem>/usr/include/freetype2</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/include/assimp</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>FreetypeGL</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial38</output>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibFileItem>/usr/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/include/freetype2</pElem>
+          </incDir>
+          <warningLevel>3</warningLevel>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/local/include/assimp</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>FreetypeGL</pElem>
+          </incDir>
+          <warningLevel>3</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibFileItem>/usr/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>

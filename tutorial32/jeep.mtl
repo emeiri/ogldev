@@ -1,0 +1,20 @@
+# Material file for jeep.obj
+
+newmtl jeep_army.jpg
+	Ns 0
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 0.2 0.2 0.2
+	map_Kd jeep_army.jpg
+
+newmtl jeep_rood.jpg
+	Ns 0
+	d 1
+	illum 2
+	Kd 0.8 0.8 0.8
+	Ks 0.0 0.0 0.0
+	Ka 0.2 0.2 0.2
+	map_Kd jeep_rood.jpg
+

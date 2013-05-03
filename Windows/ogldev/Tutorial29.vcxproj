@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\tutorial29\callbacks.h" />
+    <ClInclude Include="..\..\tutorial29\camera.h" />
+    <ClInclude Include="..\..\tutorial29\engine_common.h" />
+    <ClInclude Include="..\..\tutorial29\glut_backend.h" />
+    <ClInclude Include="..\..\tutorial29\lighting_technique.h" />
+    <ClInclude Include="..\..\tutorial29\math_3d.h" />
+    <ClInclude Include="..\..\tutorial29\mesh.h" />
+    <ClInclude Include="..\..\tutorial29\picking_technique.h" />
+    <ClInclude Include="..\..\tutorial29\picking_texture.h" />
+    <ClInclude Include="..\..\tutorial29\pipeline.h" />
+    <ClInclude Include="..\..\tutorial29\render_callbacks.h" />
+    <ClInclude Include="..\..\tutorial29\simple_color_technique.h" />
+    <ClInclude Include="..\..\tutorial29\technique.h" />
+    <ClInclude Include="..\..\tutorial29\texture.h" />
+    <ClInclude Include="..\..\tutorial29\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\tutorial29\camera.cpp" />
+    <ClCompile Include="..\..\tutorial29\glut_backend.cpp" />
+    <ClCompile Include="..\..\tutorial29\lighting_technique.cpp" />
+    <ClCompile Include="..\..\tutorial29\math_3d.cpp" />
+    <ClCompile Include="..\..\tutorial29\mesh.cpp" />
+    <ClCompile Include="..\..\tutorial29\picking_technique.cpp" />
+    <ClCompile Include="..\..\tutorial29\picking_texture.cpp" />
+    <ClCompile Include="..\..\tutorial29\pipeline.cpp" />
+    <ClCompile Include="..\..\tutorial29\simple_color_technique.cpp" />
+    <ClCompile Include="..\..\tutorial29\technique.cpp" />
+    <ClCompile Include="..\..\tutorial29\texture.cpp" />
+    <ClCompile Include="..\..\tutorial29\tutorial29.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1F575449-9D48-4823-AC15-BFA2E5929A21}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ogldev</RootNamespace>
+    <ProjectName>Tutorial29</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="workdir.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="workdir.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\ImageMagick;$(SolutionDir)\..\..\Include\Assimp;$(IncludePath)</IncludePath>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\ImageMagick;$(SolutionDir)\..\..\Include\Assimp;$(IncludePath)</IncludePath>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glew32.lib;assimp.lib;CORE_DB_Magick++_.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);NDEBUG,_CONSOLE,_VISUALC_,NeedFunctionPrototypes,_DLL,_MAGICKMOD_</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\..\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glew32.lib;assimp.lib;CORE_RL_Magick++_.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

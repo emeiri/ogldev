@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="69">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true"
+                   kind="SOURCE_LOGICAL_FOLDER">
+      <itemPath>callbacks.h</itemPath>
+      <itemPath>camera.h</itemPath>
+      <itemPath>glut_backend.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
+      <itemPath>math_3d.h</itemPath>
+      <itemPath>pipeline.h</itemPath>
+      <itemPath>technique.h</itemPath>
+      <itemPath>texture.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true"
+                   kind="SOURCE_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true"
+                   kind="SOURCE_LOGICAL_FOLDER">
+      <itemPath>camera.cpp</itemPath>
+      <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>lighting_technique.cpp</itemPath>
+      <itemPath>math_3d.cpp</itemPath>
+      <itemPath>pipeline.cpp</itemPath>
+      <itemPath>technique.cpp</itemPath>
+      <itemPath>texture.cpp</itemPath>
+      <itemPath>tutorial17.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>

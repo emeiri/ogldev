@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="88">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>callbacks.h</itemPath>
+      <itemPath>camera.h</itemPath>
+      <itemPath>glut_backend.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
+      <itemPath>math_3d.h</itemPath>
+      <itemPath>pipeline.h</itemPath>
+      <itemPath>technique.h</itemPath>
+      <itemPath>texture.h</itemPath>
+      <itemPath>util.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>camera.cpp</itemPath>
+      <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>lighting_technique.cpp</itemPath>
+      <itemPath>math_3d.cpp</itemPath>
+      <itemPath>pipeline.cpp</itemPath>
+      <itemPath>technique.cpp</itemPath>
+      <itemPath>texture.cpp</itemPath>
+      <itemPath>tutorial20.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial20.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="util.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+      </compileType>
+      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial20.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="util.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

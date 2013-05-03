@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="80">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>callbacks.h</itemPath>
+      <itemPath>camera.h</itemPath>
+      <itemPath>engine_common.h</itemPath>
+      <itemPath>glut_backend.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
+      <itemPath>math_3d.h</itemPath>
+      <itemPath>mesh.h</itemPath>
+      <itemPath>pipeline.h</itemPath>
+      <itemPath>render_callbacks.h</itemPath>
+      <itemPath>technique.h</itemPath>
+      <itemPath>texture.h</itemPath>
+      <itemPath>util.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>camera.cpp</itemPath>
+      <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>lighting_technique.cpp</itemPath>
+      <itemPath>math_3d.cpp</itemPath>
+      <itemPath>mesh.cpp</itemPath>
+      <itemPath>pipeline.cpp</itemPath>
+      <itemPath>technique.cpp</itemPath>
+      <itemPath>texture.cpp</itemPath>
+      <itemPath>tutorial31.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/local/include/assimp</pElem>
+          </incDir>
+          <commandLine>-Wall</commandLine>
+          <warningLevel>3</warningLevel>
+        </ccTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial31</output>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+      </toolsSet>
+      <compileType>
+        <ccTool>
+          <developmentMode>6</developmentMode>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/local/include/assimp</pElem>
+          </incDir>
+          <commandLine>-Wall</commandLine>
+          <warningLevel>3</warningLevel>
+        </ccTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial31</output>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+    </conf>
+  </confs>
+</configurationDescriptor>
