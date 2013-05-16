@@ -220,10 +220,10 @@ bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
 
         m_Textures[i] = NULL;
 
-        if (pMaterial->GetTextureCount(aiTextureType_UNKNOWN) > 0) {
+        if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
             aiString Path;
 
-            if (pMaterial->GetTexture(aiTextureType_UNKNOWN, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
                 string p(Path.data);
                 
                 if (p.substr(0, 2) == ".\\") {                    

@@ -59,7 +59,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++
+LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lGL
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

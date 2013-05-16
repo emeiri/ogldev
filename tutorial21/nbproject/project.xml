@@ -12,8 +12,14 @@
             <make-dep-projects/>
             <sourceRootList/>
             <confList>
-                <confElem>Debug</confElem>
-                <confElem>Release</confElem>
+                <confElem>
+                    <name>Debug</name>
+                    <type>1</type>
+                </confElem>
+                <confElem>
+                    <name>Release</name>
+                    <type>1</type>
+                </confElem>
             </confList>
         </data>
     </configuration>

@@ -103,6 +103,7 @@
             <linkerLibLibItem>glfx</linkerLibLibItem>
             <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

@@ -85,6 +85,8 @@ public:
 
     LightingTechnique();
 
+    virtual ~LightingTechnique() {}
+    
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);

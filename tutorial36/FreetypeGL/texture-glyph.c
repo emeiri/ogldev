@@ -30,11 +30,6 @@
  * those of the authors and should not be interpreted as representing official
  * policies, either expressed or implied, of Nicolas P. Rougier.
  * ========================================================================= */
-#if defined(__APPLE__)
-    #include <Glut/glut.h>
-#else
-    #include <GL/glut.h>
-#endif
 #include <assert.h>
 #include <stdlib.h>
 #include "texture-font.h"

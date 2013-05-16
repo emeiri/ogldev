@@ -60,7 +60,7 @@ public:
     }
     
 
-    ~Tutorial25()
+    virtual ~Tutorial25()
     {
         SAFE_DELETE(m_pLightingTechnique);
         SAFE_DELETE(m_pGameCamera);        

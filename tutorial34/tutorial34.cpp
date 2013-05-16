@@ -116,10 +116,21 @@ public:
         m_pEffect->SetMatSpecularIntensity(0.0f);
         m_pEffect->SetMatSpecularPower(0);
 
-        if (!m_mesh[0].LoadMesh("/home/cl/hacking/graphics/models/Studnia.obj")) {
+        if (!m_mesh[0].LoadMesh("models/g.obj")) {
             return false;            
         }
 
+        if (!m_mesh[1].LoadMesh("models/l.obj")) {
+            return false;            
+        }
+
+        if (!m_mesh[2].LoadMesh("models/f.obj")) {
+            return false;            
+        }
+
+        if (!m_mesh[3].LoadMesh("models/x.obj")) {
+            return false;            
+        }
 
 #ifndef WIN32
         if (!m_fontRenderer.InitFontRenderer()) {
@@ -158,7 +169,7 @@ public:
         Pipeline p;
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);           
-    //    p.Scale(0.1f, 0.1f, 0.1f);                
+        p.Scale(0.1f, 0.1f, 0.1f);                
 
         Matrix4f WVPMatrics[1];
         Matrix4f WorldMatrices[1];
@@ -241,7 +252,7 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
-    Mesh m_mesh[1];
+    Mesh m_mesh[4];
     Vector3f m_positions[4];            
     float m_velocity[4];    
     Vector4f m_colors[4];

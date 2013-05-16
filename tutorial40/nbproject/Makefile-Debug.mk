@@ -70,7 +70,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lglfx -lfreetype -lfontconfig
+LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lglfx -lfreetype -lfontconfig -lGL
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

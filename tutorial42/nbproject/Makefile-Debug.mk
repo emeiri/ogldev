@@ -35,8 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/2079778815/depth_technique.o \
-	${OBJECTDIR}/_ext/2079778815/lighting_technique.o \
 	${OBJECTDIR}/FreetypeGL/font-manager.o \
 	${OBJECTDIR}/FreetypeGL/font_shader.o \
 	${OBJECTDIR}/FreetypeGL/freetypeGL.o \
@@ -46,8 +44,10 @@ OBJECTFILES= \
 	${OBJECTDIR}/FreetypeGL/vector.o \
 	${OBJECTDIR}/FreetypeGL/vertex-buffer.o \
 	${OBJECTDIR}/camera.o \
+	${OBJECTDIR}/depth_technique.o \
 	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/intermediate_buffer.o \
+	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/motion_blur_technique.o \
@@ -80,16 +80,6 @@ LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lGL -lfreetype -lfontconfig -lg
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial42: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial42 ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/_ext/2079778815/depth_technique.o: /home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/2079778815
-	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/include/glfx -I/usr/local/include/assimp -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/2079778815/depth_technique.o /home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.cpp
-
-${OBJECTDIR}/_ext/2079778815/lighting_technique.o: /home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/2079778815
-	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/include/glfx -I/usr/local/include/assimp -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/2079778815/lighting_technique.o /home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.cpp
 
 ${OBJECTDIR}/FreetypeGL/font-manager.o: FreetypeGL/font-manager.c 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
@@ -136,6 +126,11 @@ ${OBJECTDIR}/camera.o: camera.cpp
 	${RM} $@.d
 	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/include/glfx -I/usr/local/include/assimp -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/camera.o camera.cpp
 
+${OBJECTDIR}/depth_technique.o: depth_technique.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/include/glfx -I/usr/local/include/assimp -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/depth_technique.o depth_technique.cpp
+
 ${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
@@ -145,6 +140,11 @@ ${OBJECTDIR}/intermediate_buffer.o: intermediate_buffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/include/glfx -I/usr/local/include/assimp -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/intermediate_buffer.o intermediate_buffer.cpp
+
+${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/include/glfx -I/usr/local/include/assimp -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/math_3d.o: math_3d.cpp 
 	${MKDIR} -p ${OBJECTDIR}

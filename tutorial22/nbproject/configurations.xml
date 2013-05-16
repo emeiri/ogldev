@@ -67,6 +67,7 @@
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

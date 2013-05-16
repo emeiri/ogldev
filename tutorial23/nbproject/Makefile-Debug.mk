@@ -62,7 +62,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp
+LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lGL
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -75,57 +75,57 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial23: ${OBJECTFILES}
 ${OBJECTDIR}/camera.o: camera.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/camera.o camera.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/camera.o camera.cpp
 
 ${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/math_3d.o: math_3d.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/math_3d.o math_3d.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/math_3d.o math_3d.cpp
 
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/mesh.o mesh.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/pipeline.o: pipeline.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/shadow_map_fbo.o: shadow_map_fbo.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/shadow_map_fbo.o shadow_map_fbo.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/shadow_map_fbo.o shadow_map_fbo.cpp
 
 ${OBJECTDIR}/shadow_map_technique.o: shadow_map_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/shadow_map_technique.o shadow_map_technique.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/shadow_map_technique.o shadow_map_technique.cpp
 
 ${OBJECTDIR}/technique.o: technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/technique.o technique.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/technique.o technique.cpp
 
 ${OBJECTDIR}/texture.o: texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/texture.o texture.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/texture.o texture.cpp
 
 ${OBJECTDIR}/tutorial23.o: tutorial23.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/tutorial23.o tutorial23.cpp
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -MMD -MP -MF $@.d -o ${OBJECTDIR}/tutorial23.o tutorial23.cpp
 
 # Subprojects
 .build-subprojects:

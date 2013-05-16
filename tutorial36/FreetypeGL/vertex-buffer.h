@@ -32,11 +32,10 @@
  * ========================================================================= */
 #ifndef __VERTEX_BUFFER_H__
 #define __VERTEX_BUFFER_H__
-#if defined(__APPLE__)
-    #include <Glut/glut.h>
-#else
-    #include <GL/glut.h>
-#endif
+
+#include <GL/glew.h>
+#include <GL/freeglut.h>
+
 #include "vector.h"
 
 #define MAX_VERTEX_ATTRIBUTE 64

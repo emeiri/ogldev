@@ -78,7 +78,7 @@ public:
 
         m_pMesh = new Mesh();
 
-        return m_pMesh->LoadMesh("/home/cl/Downloads/spacestation/space-station.3DS");
+        return m_pMesh->LoadMesh("phoenix_ugv.md2");
     }
 
     void Run()

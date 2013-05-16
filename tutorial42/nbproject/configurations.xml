@@ -25,11 +25,11 @@
                    projectFiles="true">
       <itemPath>callbacks.h</itemPath>
       <itemPath>camera.h</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.h</itemPath>
-      <itemPath>../../../../../../tutorials/ogldev/tutorial41/engine_common.h</itemPath>
+      <itemPath>depth_technique.h</itemPath>
+      <itemPath>engine_common.h</itemPath>
       <itemPath>glut_backend.h</itemPath>
       <itemPath>intermediate_buffer.h</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
       <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>motion_blur_technique.h</itemPath>
@@ -40,18 +40,18 @@
       <itemPath>util.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/shaders/depth.glsl</itemPath>
-      <itemPath>../../../../../../tutorials/ogldev/tutorial41/shaders/lighting.glsl</itemPath>
+      <itemPath>shaders/depth.glsl</itemPath>
+      <itemPath>shaders/lighting.glsl</itemPath>
       <itemPath>shaders/motion_blur.glsl</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>camera.cpp</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.cpp</itemPath>
+      <itemPath>depth_technique.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
       <itemPath>intermediate_buffer.cpp</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.cpp</itemPath>
+      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>motion_blur_technique.cpp</itemPath>
@@ -112,41 +112,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="../../../../../../tutorials/ogldev/tutorial41/engine_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../../../../../../tutorials/ogldev/tutorial41/shaders/lighting.glsl"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/shaders/depth.glsl"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
@@ -187,6 +152,12 @@
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="depth_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="depth_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="engine_common.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
@@ -194,6 +165,10 @@
       <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -212,6 +187,10 @@
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/depth.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/motion_blur.glsl" ex="false" tool="3" flavor2="0">
       </item>
@@ -272,41 +251,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="../../../../../../tutorials/ogldev/tutorial41/engine_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="../../../../../../tutorials/ogldev/tutorial41/shaders/lighting.glsl"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/depth_technique.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/lighting_technique.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev/tutorial42/shaders/depth.glsl"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
@@ -347,6 +291,12 @@
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="depth_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="depth_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="engine_common.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
@@ -354,6 +304,10 @@
       <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -372,6 +326,10 @@
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/depth.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/motion_blur.glsl" ex="false" tool="3" flavor2="0">
       </item>

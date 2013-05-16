@@ -242,7 +242,7 @@ struct PointLight                                                               
                                                                                             \n\
 struct SpotLight                                                                            \n\
 {                                                                                           \n\
-    struct PointLight Base;                                                                 \n\
+    PointLight Base;                                                                 \n\
     vec3 Direction;                                                                         \n\
     float Cutoff;                                                                           \n\
 };                                                                                          \n\
@@ -286,7 +286,7 @@ vec4 CalcDirectionalLight(vec3 Normal)                                          
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);  \n\
 }                                                                                           \n\
                                                                                             \n\
-vec4 CalcPointLight(struct PointLight l, vec3 Normal)                                       \n\
+vec4 CalcPointLight(PointLight l, vec3 Normal)                                       \n\
 {                                                                                           \n\
     vec3 LightDirection = WorldPos_FS_in - l.Position;                                      \n\
     float Distance = length(LightDirection);                                                \n\
@@ -300,7 +300,7 @@ vec4 CalcPointLight(struct PointLight l, vec3 Normal)                           
     return Color / Attenuation;                                                             \n\
 }                                                                                           \n\
                                                                                             \n\
-vec4 CalcSpotLight(struct SpotLight l, vec3 Normal)                                         \n\
+vec4 CalcSpotLight(SpotLight l, vec3 Normal)                                         \n\
 {                                                                                           \n\
     vec3 LightToPixel = normalize(WorldPos_FS_in - l.Base.Position);                        \n\
     float SpotFactor = dot(LightToPixel, l.Direction);                                      \n\

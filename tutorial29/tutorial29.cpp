@@ -58,7 +58,7 @@ public:
         m_persProjInfo.zFar = 100.0f;  
     }
 
-    ~Tutorial29()
+    virtual ~Tutorial29()
     {
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh);

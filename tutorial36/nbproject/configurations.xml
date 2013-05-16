@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="80">
+<configurationDescriptor version="88">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="f1" displayName="FreeTypeGL" projectFiles="true">
       <itemPath>FreetypeGL/font-manager.c</itemPath>
@@ -78,6 +78,8 @@
       <toolsSet>
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -91,6 +93,7 @@
             <pElem>/usr/local/include/assimp</pElem>
             <pElem>/usr/include/freetype2</pElem>
             <pElem>FreetypeGL</pElem>
+            <pElem>/usr/local/include/glfx</pElem>
           </incDir>
         </ccTool>
         <linkerTool>
@@ -100,15 +103,114 @@
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
             <linkerLibLibItem>glfx</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/markup.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_dir_light_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_dir_light_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_geom_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_geom_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_light_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_light_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_point_light_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_point_light_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lights_common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/geometry_pass.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/light_pass.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial36.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="util.h" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
         <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -144,6 +246,100 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/markup.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_dir_light_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_dir_light_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_geom_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_geom_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_light_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_light_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ds_point_light_pass_tech.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ds_point_light_pass_tech.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lights_common.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/geometry_pass.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/light_pass.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial36.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="util.h" ex="false" tool="3" flavor2="0">
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>

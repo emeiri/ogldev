@@ -56,7 +56,7 @@ public:
         m_isWireframe = false;
     }
 
-    ~Tutorial31()
+    virtual ~Tutorial31()
     {
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh);

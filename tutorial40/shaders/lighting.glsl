@@ -65,7 +65,7 @@ struct PointLight
                                                                                             
 struct SpotLight                                                                            
 {                                                                                           
-    struct PointLight Base;                                                                 
+    PointLight Base;                                                                 
     vec3 Direction;                                                                         
     float Cutoff;                                                                           
 };                                                                                          
@@ -109,7 +109,7 @@ vec4 CalcDirectionalLight(VSOutput1 In)
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, In);  
 }                                                                                           
                                                                                             
-vec4 CalcPointLight(struct PointLight l, VSOutput1 In)                                       
+vec4 CalcPointLight(PointLight l, VSOutput1 In)                                       
 {                                                                                           
     vec3 LightDirection = In.WorldPos - l.Position;                                           
     float Distance = length(LightDirection);                                                
@@ -123,7 +123,7 @@ vec4 CalcPointLight(struct PointLight l, VSOutput1 In)
     return Color / Attenuation;                                                             
 }                                                                                           
                                                                                             
-vec4 CalcSpotLight(struct SpotLight l, VSOutput1 In)                                         
+vec4 CalcSpotLight(SpotLight l, VSOutput1 In)                                         
 {                                                                                           
     vec3 LightToPixel = normalize(In.WorldPos - l.Base.Position);                             
     float SpotFactor = dot(LightToPixel, l.Direction);                                      

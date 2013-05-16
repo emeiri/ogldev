@@ -85,6 +85,11 @@ public:
     static const unsigned int MAX_SPOT_LIGHTS = 2;
 
     LightingTechnique();
+    
+    virtual ~LightingTechnique()
+    {
+        
+    }
 
     virtual bool Init();
 
