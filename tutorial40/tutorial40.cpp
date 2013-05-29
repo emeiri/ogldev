@@ -401,7 +401,7 @@ int main(int argc, char** argv)
 {
     GLUTBackendInit(argc, argv);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, true, "Tutorial 40")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 40")) {
         return 1;
     }
     
