@@ -2,5 +2,6 @@
 
 rm -rf ogldev-source
 rm -f ogldev-source.zip
-svn export http://ogldev.googlecode.com/svn/trunk/ ogldev-source
+git clone https://etay.meiri@code.google.com/p/ogldev/ ogldev-source
+rm -rf ogldev-source/.git
 zip -r ogldev-source ogldev-source

@@ -68,13 +68,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp /usr/lib/libglfx.so
+LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp /usr/local/lib/libglfx.so -lfreetype -lfontconfig
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: /usr/lib/libglfx.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: /usr/local/lib/libglfx.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -88,12 +88,12 @@ ${OBJECTDIR}/FreetypeGL/font-manager.o: FreetypeGL/font-manager.c
 ${OBJECTDIR}/FreetypeGL/font_shader.o: FreetypeGL/font_shader.cpp 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/FreetypeGL/font_shader.o FreetypeGL/font_shader.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/FreetypeGL/font_shader.o FreetypeGL/font_shader.cpp
 
 ${OBJECTDIR}/FreetypeGL/freetypeGL.o: FreetypeGL/freetypeGL.cpp 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/FreetypeGL/freetypeGL.o FreetypeGL/freetypeGL.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/FreetypeGL/freetypeGL.o FreetypeGL/freetypeGL.cpp
 
 ${OBJECTDIR}/FreetypeGL/texture-atlas.o: FreetypeGL/texture-atlas.c 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
@@ -123,47 +123,47 @@ ${OBJECTDIR}/FreetypeGL/vertex-buffer.o: FreetypeGL/vertex-buffer.c
 ${OBJECTDIR}/camera.o: camera.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/camera.o camera.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/camera.o camera.cpp
 
 ${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/math_3d.o: math_3d.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/math_3d.o math_3d.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/math_3d.o math_3d.cpp
 
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/mesh.o mesh.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/pipeline.o: pipeline.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/technique.o: technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/technique.o technique.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/technique.o technique.cpp
 
 ${OBJECTDIR}/texture.o: texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/texture.o texture.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/texture.o texture.cpp
 
 ${OBJECTDIR}/tutorial34.o: tutorial34.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -MMD -MP -MF $@.d -o ${OBJECTDIR}/tutorial34.o tutorial34.cpp
+	$(COMPILE.cc) -O2 -Werror -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/tutorial34.o tutorial34.cpp
 
 # Subprojects
 .build-subprojects:

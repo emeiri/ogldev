@@ -41,6 +41,7 @@
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>../../../../../../tutorials/ogldev/tutorial41/shaders/lighting.glsl</itemPath>
       <itemPath>shaders/motion_blur.glsl</itemPath>
+      <itemPath>shaders/skinning.glsl</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -105,7 +106,7 @@
             <linkerLibLibItem>GL</linkerLibLibItem>
             <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibLibItem>fontconfig</linkerLibLibItem>
-            <linkerLibLibItem>glfx</linkerLibLibItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -186,6 +187,8 @@
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/motion_blur.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/skinning.glsl" ex="false" tool="3" flavor2="0">
       </item>
       <item path="skinning_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -325,6 +328,8 @@
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/motion_blur.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/skinning.glsl" ex="false" tool="3" flavor2="0">
       </item>
       <item path="skinning_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

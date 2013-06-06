@@ -69,11 +69,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lglfx -lGL -lfontconfig -lfreetype
+LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lGL -lfontconfig -lfreetype /usr/local/lib/libglfx.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial35
+
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial35: /usr/local/lib/libglfx.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial35: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}

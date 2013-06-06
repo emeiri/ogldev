@@ -95,10 +95,10 @@
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
-            <linkerLibLibItem>glfx</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
             <linkerLibLibItem>fontconfig</linkerLibLibItem>
             <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -219,7 +219,7 @@
             <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
-            <linkerLibLibItem>glfx</linkerLibLibItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
