@@ -213,9 +213,9 @@
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
-            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
             <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

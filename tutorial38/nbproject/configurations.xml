@@ -200,6 +200,7 @@
             <pElem>/usr/local/include/assimp</pElem>
             <pElem>/usr/include/freetype2</pElem>
             <pElem>FreetypeGL</pElem>
+            <pElem>/usr/local/include/glfx</pElem>
           </incDir>
           <warningLevel>3</warningLevel>
         </ccTool>

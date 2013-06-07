@@ -218,6 +218,7 @@
             <pElem>/usr/local/include/assimp</pElem>
             <pElem>/usr/include/freetype2</pElem>
             <pElem>FreetypeGL</pElem>
+            <pElem>/usr/local/include/glfx</pElem>
           </incDir>
           <warningLevel>3</warningLevel>
         </ccTool>
@@ -233,7 +234,9 @@
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
-            <linkerLibFileItem>/usr/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

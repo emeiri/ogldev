@@ -68,7 +68,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp /usr/local/lib/libglfx.so -lfreetype -lfontconfig
+LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lfreetype -lfontconfig /usr/local/lib/libglfx.so
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
