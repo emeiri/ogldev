@@ -1,10 +1,3 @@
-struct VSInput 
-{
-    vec3 Position;                                             
-    vec2 TexCoord;                                             
-    vec3 Normal;                                               
-};
-
 interface VSOutput
 {                                                                                    
     vec2 TexCoord;                                                                 
@@ -19,24 +12,21 @@ struct VSOutput1
     vec3 WorldPos;                                                                 
 };
 
-
 uniform mat4 gWVP;                                                  
 uniform mat4 gWorld;                                                
                                                                                     
-shader VSmain(in VSInput VSin:0, out VSOutput VSout)                                                                         
+shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out VSOutput VSout)                                                                         
 {                                                                                   
-    gl_Position      = gWVP * vec4(VSin.Position, 1.0);                                        
-    VSout.TexCoord   = VSin.TexCoord;                                                         
-    VSout.Normal     = (gWorld * vec4(VSin.Normal, 0.0)).xyz;                                  
-    VSout.WorldPos   = (gWorld * vec4(VSin.Position, 1.0)).xyz;                                
+    gl_Position      = gWVP * vec4(Position, 1.0);                                        
+    VSout.TexCoord   = TexCoord;                                                         
+    VSout.Normal     = (gWorld * vec4(Normal, 0.0)).xyz;                                  
+    VSout.WorldPos   = (gWorld * vec4(Position, 1.0)).xyz;                                
 }
-
-
-                                                                                   
+                                                                                 
 const int MAX_POINT_LIGHTS = 2;                                                     
 const int MAX_SPOT_LIGHTS = 2;                                                      
                                                                                                                                                                       
-                                                                                    
+                                                                                   
 struct BaseLight                                                                    
 {                                                                                   
     vec3 Color;                                                                     
