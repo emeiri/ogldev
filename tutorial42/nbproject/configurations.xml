@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="89">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="FreeTypeGL" projectFiles="true">
+      <itemPath>FreetypeGL/font-manager.c</itemPath>
+      <itemPath>FreetypeGL/font-manager.h</itemPath>
+      <itemPath>FreetypeGL/font_shader.cpp</itemPath>
+      <itemPath>FreetypeGL/font_shader.h</itemPath>
+      <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
+      <itemPath>FreetypeGL/freetypeGL.h</itemPath>
+      <itemPath>FreetypeGL/markup.h</itemPath>
+      <itemPath>FreetypeGL/texture-atlas.c</itemPath>
+      <itemPath>FreetypeGL/texture-atlas.h</itemPath>
+      <itemPath>FreetypeGL/texture-font.c</itemPath>
+      <itemPath>FreetypeGL/texture-font.h</itemPath>
+      <itemPath>FreetypeGL/texture-glyph.c</itemPath>
+      <itemPath>FreetypeGL/texture-glyph.h</itemPath>
+      <itemPath>FreetypeGL/vector.c</itemPath>
+      <itemPath>FreetypeGL/vector.h</itemPath>
+      <itemPath>FreetypeGL/vertex-buffer.c</itemPath>
+      <itemPath>FreetypeGL/vertex-buffer.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>callbacks.h</itemPath>
+      <itemPath>camera.h</itemPath>
+      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/engine_common.h</itemPath>
+      <itemPath>glut_backend.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
+      <itemPath>math_3d.h</itemPath>
+      <itemPath>mesh.h</itemPath>
+      <itemPath>pipeline.h</itemPath>
+      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.h</itemPath>
+      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.h</itemPath>
+      <itemPath>technique.h</itemPath>
+      <itemPath>texture.h</itemPath>
+      <itemPath>util.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
+      <itemPath>shaders/lighting.glsl</itemPath>
+      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shaders/shadow_map.glsl</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>camera.cpp</itemPath>
+      <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>lighting_technique.cpp</itemPath>
+      <itemPath>math_3d.cpp</itemPath>
+      <itemPath>mesh.cpp</itemPath>
+      <itemPath>pipeline.cpp</itemPath>
+      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.cpp</itemPath>
+      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.cpp</itemPath>
+      <itemPath>technique.cpp</itemPath>
+      <itemPath>texture.cpp</itemPath>
+      <itemPath>tutorial42.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <incDir>
+            <pElem>/usr/include/freetype2</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/local/include/assimp</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>FreetypeGL</pElem>
+            <pElem>/usr/local/include/glfx</pElem>
+          </incDir>
+        </ccTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial42</output>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/engine_common.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shaders/shadow_map.glsl"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/markup.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial42.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="util.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/include/freetype2</pElem>
+          </incDir>
+          <warningLevel>3</warningLevel>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/local/include/assimp</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>FreetypeGL</pElem>
+            <pElem>/usr/local/include/glfx</pElem>
+          </incDir>
+          <warningLevel>3</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/engine_common.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shaders/shadow_map.glsl"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.cpp"
+            ex="false"
+            tool="1"
+            flavor2="0">
+      </item>
+      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/font_shader.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FreetypeGL/freetypeGL.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/markup.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-atlas.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-font.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/texture-glyph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vector.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="camera.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="texture.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial42.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="util.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
