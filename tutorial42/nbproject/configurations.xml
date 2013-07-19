@@ -25,21 +25,21 @@
                    projectFiles="true">
       <itemPath>callbacks.h</itemPath>
       <itemPath>camera.h</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/engine_common.h</itemPath>
+      <itemPath>engine_common.h</itemPath>
       <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>pipeline.h</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.h</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.h</itemPath>
+      <itemPath>shadow_map_fbo.h</itemPath>
+      <itemPath>shadow_map_technique.h</itemPath>
       <itemPath>technique.h</itemPath>
       <itemPath>texture.h</itemPath>
       <itemPath>util.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/lighting.glsl</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shaders/shadow_map.glsl</itemPath>
+      <itemPath>shaders/shadow_map.glsl</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -50,8 +50,8 @@
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.cpp</itemPath>
-      <itemPath>/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.cpp</itemPath>
+      <itemPath>shadow_map_fbo.cpp</itemPath>
+      <itemPath>shadow_map_technique.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
       <itemPath>texture.cpp</itemPath>
       <itemPath>tutorial42.cpp</itemPath>
@@ -106,32 +106,32 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/engine_common.h"
+      <item path="engine_common.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shaders/shadow_map.glsl"
+      <item path="shaders/shadow_map.glsl"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.cpp"
+      <item path="shadow_map_fbo.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.h"
+      <item path="shadow_map_fbo.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.cpp"
+      <item path="shadow_map_technique.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.h"
+      <item path="shadow_map_technique.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -255,32 +255,32 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/engine_common.h"
+      <item path="engine_common.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shaders/shadow_map.glsl"
+      <item path="shadow_map.glsl"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.cpp"
+      <item path="shadow_map_fbo.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_fbo.h"
+      <item path="shadow_map_fbo.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.cpp"
+      <item path="shadow_map_technique.cpp"
             ex="false"
             tool="1"
             flavor2="0">
       </item>
-      <item path="/home/cl/hacking/graphics/opengl/Tutorials/ogldev_git/ogldev/tutorial42/shadow_map_technique.h"
+      <item path="shadow_map_technique.h"
             ex="false"
             tool="3"
             flavor2="0">

@@ -84,3 +84,5 @@
 /tutorial31/dist/
 *.o
 *.gz
+/Tutorial42/build/
+/Tutorial42/dist/
