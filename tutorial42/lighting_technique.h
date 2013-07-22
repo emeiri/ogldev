@@ -98,6 +98,7 @@ public:
     void SetEyeWorldPos(const Vector3f& EyeWorldPos);
     void SetMatSpecularIntensity(float Intensity);
     void SetMatSpecularPower(float Power);
+    void SetShadowMapSize(float Width, float Height);
 
 private:
     
@@ -111,6 +112,7 @@ private:
     GLuint m_matSpecularPowerLocation;
     GLuint m_numPointLightsLocation;
     GLuint m_numSpotLightsLocation;
+    GLuint m_shadowMapSizeLocation;
 
     struct {
         GLuint Color;

@@ -72,9 +72,12 @@ uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             
 uniform sampler2D gColorMap;                                                                
 uniform sampler2D gShadowMap;
-uniform vec3 gEyeWorldPos;                                                                  
-uniform float gMatSpecularIntensity;                                                        
-uniform float gSpecularPower;                                                               
+uniform vec3 gEyeWorldPos;
+uniform float gMatSpecularIntensity;
+uniform float gSpecularPower;
+uniform vec2 gMapSize;
+
+#define EPSILON 0.001
 
 float CalcShadowFactor(vec4 LightSpacePos)
 {
@@ -83,11 +86,61 @@ float CalcShadowFactor(vec4 LightSpacePos)
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;
     float z = 0.5 * ProjCoords.z + 0.5;
-    float Depth = texture(gShadowMap, UVCoords).x;
-    if (Depth < z + 0.00001)
-        return 0.5;
-    else
-        return 1.0;
+  
+    float xOffset = 1.0/gMapSize.x;
+    float yOffset = 1.0/gMapSize.y;
+
+    vec2 Offsets = vec2(-xOffset, 0);        
+    float Depth = texture(gShadowMap, UVCoords/* + Offsets*/).x;   
+    float r0 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+
+    Offsets = vec2(+xOffset, 0);        
+    Depth = texture(gShadowMap, UVCoords/* + Offsets*/).x;   
+    float r1 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+
+    vec2 TexelCoords = vec2(UVCoords * gMapSize);
+    TexelCoords = fract(TexelCoords);
+
+    float l0 = mix(r0, r1, TexelCoords.x);
+
+    float LightFactor = l0;
+
+    return LightFactor;
+
+#if 0
+    vec2 Offsets = vec2(0,0);        
+    //vec2 Offsets = vec2(-xOffset, -yOffset);        
+    float Depth = texture(gShadowMap, UVCoords + Offsets).x;   
+    float r0 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+
+    Offsets = vec2(xOffset, 0);        
+    //Offsets = vec2(+xOffset, -yOffset);        
+    Depth = texture(gShadowMap, UVCoords + Offsets).x;   
+    float r1 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+
+    Offsets = vec2(0, yOffset);        
+    //Offsets = vec2(-xOffset, +yOffset);        
+    Depth = texture(gShadowMap, UVCoords + Offsets).x;   
+    float r2 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+
+    Offsets = vec2(+xOffset, +yOffset);        
+    Depth = texture(gShadowMap, UVCoords + Offsets).x;   
+    float r3 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+
+    //vec2 TexelCoords(UVCoords.x * gMapSize.x, 
+      //               UVCoords.y * gMapSize.y);
+
+    TexelCoords = fract(TexelCoords);
+
+    float l0 = mix(r0, r1, TexelCoords.x);
+    float l1 = mix(r2, r3, TexelCoords.x);
+
+    float l2 = mix(l0, l1, TexelCoords.y);
+
+    float LightFactor = 0.5 + l2 * 0.5;
+
+    return LightFactor;
+#endif
 }
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In, float ShadowFactor)           

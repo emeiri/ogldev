@@ -38,8 +38,9 @@
 #endif
 using namespace std;
 
-#define WINDOW_WIDTH  1280  
-#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH  1000
+#define WINDOW_HEIGHT 1000
+
 
 #ifndef WIN32
 Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
@@ -110,6 +111,7 @@ public:
         m_pLightingEffect->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_pLightingEffect->SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
         m_pLightingEffect->SetSpotLights(1, &m_spotLight);
+        m_pLightingEffect->SetShadowMapSize((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 
         m_pShadowMapEffect = new ShadowMapTechnique();
 

@@ -54,6 +54,7 @@ bool LightingTechnique::Init()
     m_matSpecularPowerLocation = GetUniformLocation("gSpecularPower");
     m_numPointLightsLocation = GetUniformLocation("gNumPointLights");
     m_numSpotLightsLocation = GetUniformLocation("gNumSpotLights");
+    m_shadowMapSizeLocation = GetUniformLocation("gMapSize");
 
     if (m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
@@ -68,8 +69,9 @@ bool LightingTechnique::Init()
         m_matSpecularIntensityLocation == INVALID_UNIFORM_LOCATION ||
         m_matSpecularPowerLocation == INVALID_UNIFORM_LOCATION ||
         m_numPointLightsLocation == INVALID_UNIFORM_LOCATION ||
-        m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
-        return false;
+        m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION ||
+        m_shadowMapSizeLocation == INVALID_UNIFORM_LOCATION) {
+    //    return false;
     }
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
@@ -244,4 +246,10 @@ void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
         glUniform1f(m_spotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
         glUniform1f(m_spotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
+}
+
+
+void LightingTechnique::SetShadowMapSize(float Width, float Height)
+{
+    glUniform2f(m_shadowMapSizeLocation, Width, Height);
 }

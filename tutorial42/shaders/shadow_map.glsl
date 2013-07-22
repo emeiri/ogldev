@@ -11,7 +11,7 @@ uniform sampler2D gShadowMap;
 shader FSmain(in vec2 TexCoordOut, out vec4 FragColor)
 {
     float Depth = texture(gShadowMap, TexCoordOut).x;
-    Depth = 1.0 - (1.0 - Depth) * 25.0;
+//    Depth = 1.0 - (1.0 - Depth) * 25.0;
     FragColor = vec4(Depth);
 }
 
