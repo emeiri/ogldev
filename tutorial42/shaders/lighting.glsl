@@ -77,7 +77,14 @@ uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
 uniform vec2 gMapSize;
 
-#define EPSILON 0.001
+#define EPSILON 0.00001
+
+float CalcShadowFactorInternal(vec2 UVCoords, float z)
+{
+    float Depth = texture(gShadowMap, UVCoords).x;   
+    float f = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+    return f;
+}
 
 float CalcShadowFactor(vec4 LightSpacePos)
 {
@@ -90,57 +97,16 @@ float CalcShadowFactor(vec4 LightSpacePos)
     float xOffset = 1.0/gMapSize.x;
     float yOffset = 1.0/gMapSize.y;
 
-    vec2 Offsets = vec2(-xOffset, 0);        
-    float Depth = texture(gShadowMap, UVCoords/* + Offsets*/).x;   
-    float r0 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
+    float Factor = 0.0;
 
-    Offsets = vec2(+xOffset, 0);        
-    Depth = texture(gShadowMap, UVCoords/* + Offsets*/).x;   
-    float r1 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
-
-    vec2 TexelCoords = vec2(UVCoords * gMapSize);
-    TexelCoords = fract(TexelCoords);
-
-    float l0 = mix(r0, r1, TexelCoords.x);
-
-    float LightFactor = l0;
-
-    return LightFactor;
-
-#if 0
-    vec2 Offsets = vec2(0,0);        
-    //vec2 Offsets = vec2(-xOffset, -yOffset);        
-    float Depth = texture(gShadowMap, UVCoords + Offsets).x;   
-    float r0 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
-
-    Offsets = vec2(xOffset, 0);        
-    //Offsets = vec2(+xOffset, -yOffset);        
-    Depth = texture(gShadowMap, UVCoords + Offsets).x;   
-    float r1 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
-
-    Offsets = vec2(0, yOffset);        
-    //Offsets = vec2(-xOffset, +yOffset);        
-    Depth = texture(gShadowMap, UVCoords + Offsets).x;   
-    float r2 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
-
-    Offsets = vec2(+xOffset, +yOffset);        
-    Depth = texture(gShadowMap, UVCoords + Offsets).x;   
-    float r3 = (Depth >= z + EPSILON) ? 1.0 : 0.0;
-
-    //vec2 TexelCoords(UVCoords.x * gMapSize.x, 
-      //               UVCoords.y * gMapSize.y);
-
-    TexelCoords = fract(TexelCoords);
-
-    float l0 = mix(r0, r1, TexelCoords.x);
-    float l1 = mix(r2, r3, TexelCoords.x);
-
-    float l2 = mix(l0, l1, TexelCoords.y);
-
-    float LightFactor = 0.5 + l2 * 0.5;
-
-    return LightFactor;
-#endif
+    for (int y = -1 ; y <= 1 ; y++) {
+        for (int x = -1 ; x <= 1 ; x++) {
+            vec2 Offsets = vec2(x * xOffset, y * yOffset);
+            Factor += CalcShadowFactorInternal(UVCoords + Offsets, z);
+        }
+    }
+    
+    return (0.5 + (Factor / 18.0));
 }
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In, float ShadowFactor)           

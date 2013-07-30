@@ -177,6 +177,7 @@ public:
 
         m_pShadowMapEffect->Enable();
 
+        glCullFace(GL_FRONT);
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
         p.Rotate(0.0f, m_scale, 0.0f);
@@ -194,6 +195,8 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pLightingEffect->Enable();
+        
+        glCullFace(GL_BACK);
        
         m_shadowMapFBO.BindForReading(GL_TEXTURE1);
 
