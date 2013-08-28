@@ -79,13 +79,6 @@ uniform vec2 gMapSize;
 
 #define EPSILON 0.00001
 
-float CalcShadowFactorInternal(vec2 UVCoords, float z)
-{
-    vec3 uvc = vec3(UVCoords.x, UVCoords.y, z + EPSILON);
-    float f = texture(gShadowMap, uvc);   
-    return f;
-}
-
 float CalcShadowFactor(vec4 LightSpacePos)
 {
     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
@@ -102,7 +95,8 @@ float CalcShadowFactor(vec4 LightSpacePos)
     for (int y = -1 ; y <= 1 ; y++) {
         for (int x = -1 ; x <= 1 ; x++) {
             vec2 Offsets = vec2(x * xOffset, y * yOffset);
-            Factor += CalcShadowFactorInternal(UVCoords + Offsets, z);
+            vec3 UVC = vec3(UVCoords + Offsets, z + EPSILON);
+            Factor += texture(gShadowMap, UVC);
         }
     }
     
@@ -183,9 +177,11 @@ shader FSmain(in VSOutput FSin, out vec4 FragColor)
                                                                                             
     for (int i = 0 ; i < gNumSpotLights ; i++) {                                            
         TotalLight += CalcSpotLight(gSpotLights[i], In);                                
-    }                                                                                       
+    }    
+	
+	vec4 SampledColor = texture(gColorMap, In.TexCoord.xy);
                                                                                             
-    FragColor = texture(gColorMap, In.TexCoord.xy) * TotalLight;     
+    FragColor = SampledColor * TotalLight;     
 }
 
 program ShadowsPCF
