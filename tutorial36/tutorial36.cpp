@@ -285,7 +285,7 @@ private:
     {
         float MaxChannel = fmax(fmax(Light.Color.x, Light.Color.y), Light.Color.z);
         
-        float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear - 4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel))) 
+        float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear - 4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel * Light.DiffuseIntensity))) 
                     /
                     2 * Light.Attenuation.Exp;
         
@@ -313,21 +313,21 @@ private:
         m_pointLight[0].Position = Vector3f(0.0f, 1.5f, 5.0f);
 		m_pointLight[0].Attenuation.Constant = 0.0f;
         m_pointLight[0].Attenuation.Linear = 0.0f;
-        m_pointLight[0].Attenuation.Exp = 1.0f;
+        m_pointLight[0].Attenuation.Exp = 0.3f;
 
 		m_pointLight[1].DiffuseIntensity = 0.2f;
 		m_pointLight[1].Color = COLOR_RED;
         m_pointLight[1].Position = Vector3f(2.0f, 0.0f, 5.0f);
 		m_pointLight[1].Attenuation.Constant = 0.0f;
         m_pointLight[1].Attenuation.Linear = 0.0f;
-        m_pointLight[1].Attenuation.Exp = 0.01f;
+        m_pointLight[1].Attenuation.Exp = 0.3f;
         
 		m_pointLight[2].DiffuseIntensity = 0.2f;
 		m_pointLight[2].Color = COLOR_BLUE;
         m_pointLight[2].Position = Vector3f(0.0f, 0.0f, 3.0f);
 		m_pointLight[2].Attenuation.Constant = 0.0f;
         m_pointLight[2].Attenuation.Linear = 0.0f;        
-        m_pointLight[2].Attenuation.Exp = 1.0f;
+        m_pointLight[2].Attenuation.Exp = 0.3f;
     }
     
       
