@@ -228,8 +228,7 @@ public:
 		for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLight); i++) {
             m_DSPointLightPassTech.SetPointLight(m_pointLight[i]);            
             p.WorldPos(m_pointLight[i].Position);
-            float BSphereScale = CalcPointLightBSphere(m_pointLight[i].Color, 
-                                                       m_pointLight[i].DiffuseIntensity);
+            float BSphereScale = CalcPointLightBSphere(m_pointLight[i]);
             p.Scale(BSphereScale, BSphereScale, BSphereScale);		
             m_DSPointLightPassTech.SetWVP(p.GetWVPTrans());
             m_bsphere.Render();                   
@@ -281,11 +280,16 @@ public:
 
 private:
     
-    float CalcPointLightBSphere(const Vector3f& Color, float Intensity)
+    // The calculation solves a quadratic equation (see http://en.wikipedia.org/wiki/Quadratic_equation)
+    float CalcPointLightBSphere(const PointLight& Light)
     {
-        float MaxChannel = fmax(fmax(Color.x, Color.y), Color.z);
-        float c = MaxChannel * Intensity;
-        return (8.0f * sqrtf(c) + 1.0f);
+        float MaxChannel = fmax(fmax(Light.Color.x, Light.Color.y), Light.Color.z);
+        
+        float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear - 4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel))) 
+                    /
+                    2 * Light.Attenuation.Exp;
+        
+        return ret;
     }    
     
         
@@ -316,7 +320,7 @@ private:
         m_pointLight[1].Position = Vector3f(2.0f, 0.0f, 5.0f);
 		m_pointLight[1].Attenuation.Constant = 0.0f;
         m_pointLight[1].Attenuation.Linear = 0.0f;
-        m_pointLight[1].Attenuation.Exp = 1.0f;
+        m_pointLight[1].Attenuation.Exp = 0.01f;
         
 		m_pointLight[2].DiffuseIntensity = 0.2f;
 		m_pointLight[2].Color = COLOR_BLUE;

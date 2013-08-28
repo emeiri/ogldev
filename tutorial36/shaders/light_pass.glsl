@@ -98,7 +98,7 @@ vec4 CalcPointLight(vec3 WorldPos, vec3 Normal)
                          gPointLight.Atten.Linear * Distance +
                          gPointLight.Atten.Exp * Distance * Distance;
 
-    Attenuation = min(1.0, Attenuation);
+    Attenuation = max(1.0, Attenuation);
 
     return Color / Attenuation;
 }

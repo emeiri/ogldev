@@ -207,7 +207,7 @@ public:
 		Pipeline p;
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);        
-        //p.Rotate(0.0f, m_scale, 0.0f);
+        p.Rotate(0.0f, m_scale, 0.0f);
         
         for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_boxPositions) ; i++) {
             p.WorldPos(m_boxPositions[i]);
@@ -242,8 +242,9 @@ public:
 
 		Pipeline p;
 		p.WorldPos(m_pointLight[PointLightIndex].Position);
-        float BBoxScale = CalcPointLightBSphere(m_pointLight[PointLightIndex].Color, 
-                                             m_pointLight[PointLightIndex].DiffuseIntensity);
+        //float BBoxScale = CalcPointLightBSphere(m_pointLight[PointLightIndex].Color, 
+          //                                   m_pointLight[PointLightIndex].DiffuseIntensity);
+        float BBoxScale = CalcPointLightBSphere(m_pointLight[PointLightIndex]);
 		p.Scale(BBoxScale, BBoxScale, BBoxScale);		
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
@@ -272,8 +273,7 @@ public:
 
         Pipeline p;
         p.WorldPos(m_pointLight[PointLightIndex].Position);
-        float BBoxScale = CalcPointLightBSphere(m_pointLight[PointLightIndex].Color, 
-                                                m_pointLight[PointLightIndex].DiffuseIntensity);
+        float BBoxScale = CalcPointLightBSphere(m_pointLight[PointLightIndex]);        
 		p.Scale(BBoxScale, BBoxScale, BBoxScale);		
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);               
@@ -345,14 +345,18 @@ public:
     }
 
 private:
-    
-    float CalcPointLightBSphere(const Vector3f& Color, float Intensity)
+
+    // The calculation solves a quadratic equation (see http://en.wikipedia.org/wiki/Quadratic_equation)
+    float CalcPointLightBSphere(const PointLight& Light)
     {
-        float MaxChannel = fmax(fmax(Color.x, Color.y), Color.z);
-        float c = MaxChannel * Intensity;
-        return (8.0f * sqrtf(c) + 1.0f);
+        float MaxChannel = fmax(fmax(Light.Color.x, Light.Color.y), Light.Color.z);
+        
+        float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear - 4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel))) 
+                    /
+                    2 * Light.Attenuation.Exp;
+        
+        return ret;
     }    
-    
         
     void InitLights()
     {
@@ -394,11 +398,11 @@ private:
       
     void InitBoxPositions()
     {
-        m_boxPositions[0] = Vector3f(0.0f, 0.0f, 1.0f);
+        m_boxPositions[0] = Vector3f(0.0f, 0.0f, 5.0f);
         m_boxPositions[1] = Vector3f(6.0f, 1.0f, 10.0f);
         m_boxPositions[2] = Vector3f(-5.0f, -1.0f, 12.0f);
         m_boxPositions[3] = Vector3f(4.0f, 4.0f, 15.0f);
-        m_boxPositions[4] = Vector3f(-4.0f, 2.0f, 7.0f);
+        m_boxPositions[4] = Vector3f(-4.0f, 2.0f, 20.0f);
     }
     
     void CalcFPS()
