@@ -237,8 +237,8 @@ public:
 		// to succeed always. Only the depth test matters.
 		glStencilFunc(GL_ALWAYS, 0, 0);
 
-		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR, GL_KEEP);
-		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR, GL_KEEP);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 
 		Pipeline p;
 		p.WorldPos(m_pointLight[PointLightIndex].Position);
