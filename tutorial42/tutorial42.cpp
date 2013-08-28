@@ -165,6 +165,8 @@ public:
 
         ShadowMapPass();
         RenderPass();
+        
+        RenderFPS();
 
         glutSwapBuffers();
     }
@@ -305,6 +307,7 @@ private:
 
 int main(int argc, char** argv)
 {
+    Magick::InitializeMagick(*argv);
     GLUTBackendInit(argc, argv);
 
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 42")) {
@@ -313,15 +316,13 @@ int main(int argc, char** argv)
     
     SRANDOM;
     
-    Tutorial42* pApp = new Tutorial42();
+    Tutorial42 App;
 
-    if (!pApp->Init()) {
+    if (!App.Init()) {
         return 1;
     }
-    
-    pApp->Run();
+        
+    App.Run();
 
-    delete pApp;
- 
     return 0;
 }

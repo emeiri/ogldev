@@ -235,6 +235,7 @@ private:
 
 int main(int argc, char** argv)
 {
+    Magick::InitializeMagick(*argv);
     GLUTBackendInit(argc, argv);
 
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 35")) {

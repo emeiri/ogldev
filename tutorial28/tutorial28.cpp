@@ -220,6 +220,8 @@ public:
 
 int main(int argc, char** argv)
 {
+    Magick::InitializeMagick(*argv);
+    
     SRANDOM;
        
     GLUTBackendInit(argc, argv);

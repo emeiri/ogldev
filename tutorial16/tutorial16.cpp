@@ -245,6 +245,7 @@ static void CompileShaders()
 
 int main(int argc, char** argv)
 {
+    Magick::InitializeMagick(*argv);    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
