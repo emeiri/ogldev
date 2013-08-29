@@ -118,7 +118,7 @@ static void CreateIndexBuffer()
     unsigned int Indices[] = { 0, 3, 1,
                                1, 3, 2,
                                2, 3, 0,
-                               0, 2, 1 };
+                               0, 1, 2 };
 
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);

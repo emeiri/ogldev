@@ -167,7 +167,7 @@ static void CreateIndexBuffer()
     unsigned int Indices[] = { 0, 3, 1,
                                1, 3, 2,
                                2, 3, 0,
-                               1, 2, 0 };
+                               0, 1, 2 };
 
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -252,7 +252,7 @@ int main(int argc, char** argv)
     glutInitWindowPosition(100, 100);
     glutCreateWindow("Tutorial 16");
     glutGameModeString("1280x1024@32");
-    glutEnterGameMode();
+  //  glutEnterGameMode();
 
     InitializeGlutCallbacks();
 
