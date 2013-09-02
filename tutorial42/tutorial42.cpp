@@ -90,7 +90,7 @@ public:
     bool Init()
     {
         Vector3f Pos(3.0f, 8.0f, -10.0f);
-        Vector3f Target(0.0f, -0.2f, 1.0f);
+        Vector3f Target(0.0f, -0.5f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         if (!m_shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
@@ -173,13 +173,14 @@ public:
 
     void ShadowMapPass()
     {
+        glCullFace(GL_FRONT);
+        
         m_shadowMapFBO.BindForWriting();
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
         m_pShadowMapEffect->Enable();
 
-        glCullFace(GL_FRONT);
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
         p.Rotate(0.0f, m_scale, 0.0f);
@@ -192,14 +193,14 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
         
-    virtual void RenderPass()
+    void RenderPass()
     {
+        glCullFace(GL_BACK);
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pLightingEffect->Enable();
-        
-        glCullFace(GL_BACK);
-       
+             
         m_shadowMapFBO.BindForReading(GL_TEXTURE1);
 
         Pipeline p;
@@ -313,9 +314,7 @@ int main(int argc, char** argv)
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 42")) {
         return 1;
     }
-    
-    SRANDOM;
-    
+      
     Tutorial42 App;
 
     if (!App.Init()) {
