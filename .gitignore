@@ -86,3 +86,13 @@
 *.gz
 /Tutorial42/build/
 /Tutorial42/dist/
+*.ilk
+*.pdb
+*.tlog
+*.manifest
+*.res
+*.user
+*.lastbuildstate
+*.sdf
+*.suo
+*.rc
