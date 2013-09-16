@@ -1,42 +1,32 @@
-uniform mat4 gWVP;
+uniform mat4 gWVP[6];
                   
-shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec2 TexCoordOut)
+shader VSmain(in vec3 Position)
 {
-    gl_Position = gWVP * vec4(Position, 1.0);
-    TexCoordOut = TexCoord;
+    gl_Position = vec4(Position, 1.0);
 }
-
-in vec2 GSTexCoordIn[3];
 
 shader GSmain(out vec2 TexCoord)
 {
-    gl_Position = gl_in[0].gl_Position;
-    TexCoord = GSTexCoordIn[0];
-    EmitVertex();
+    for (int layer = 0 ; layer < 6 ; layer++) {
+        for (int vertex = 0 ; vertex < 3 ; vertex++) {
+            gl_Layer = layer;
+            gl_Position = gWVP[layer] * gl_in[vertex].gl_Position;
+            EmitVertex();            
+        }
 
-    gl_Position = gl_in[1].gl_Position;
-    TexCoord = GSTexCoordIn[1];
-    EmitVertex();
-
-    gl_Position = gl_in[2].gl_Position;
-    TexCoord = GSTexCoordIn[2];
-    EmitVertex();
-
-    EndPrimitive();
+        EndPrimitive();
+    }
 }
 
-uniform sampler2D gShadowMap;
-
-shader FSmain(in vec2 TexCoordOut, out vec4 FragColor)
+shader FSmain(out vec4 FragColor)
 {
-    float Depth = texture(gShadowMap, TexCoordOut).x;
-    FragColor = vec4(Depth);
+    FragColor = vec4(1.0f);
 }
 
 
 program ShadowMap
 {
     vs(330)=VSmain();
-    gs(330)=GSmain() : in(triangles) , out(triangle_strip,max_vertices = 3);
+    gs(330)=GSmain() : in(triangles) , out(triangle_strip,max_vertices = 18);
     fs(330)=FSmain();
 };

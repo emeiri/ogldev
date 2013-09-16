@@ -18,37 +18,6 @@
 
 #include "shadow_map_technique.h"
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec2 TexCoord;                                             \n\
-layout (location = 2) in vec3 Normal;                                               \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-out vec2 TexCoordOut;                                                               \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-    TexCoordOut = TexCoord;                                                         \n\
-}";
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-in vec2 TexCoordOut;                                                                \n\
-uniform sampler2D gShadowMap;                                                       \n\
-                                                                                    \n\
-out vec4 FragColor;                                                                 \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    float Depth = texture(gShadowMap, TexCoordOut).x;                               \n\
-    Depth = 1.0 - (1.0 - Depth) * 25.0;                                             \n\
-    FragColor = vec4(Depth);                                                        \n\
-}";
 
 static const char* pEffectFile = "shaders/shadow_map.glsl";
 
@@ -62,23 +31,49 @@ bool ShadowMapTechnique::Init()
         return false;
     }
 
-    m_WVPLocation = GetUniformLocation("gWVP");
-    m_textureLocation = GetUniformLocation("gShadowMap");
-
-    if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-        m_textureLocation == INVALID_UNIFORM_LOCATION) {
-        return false;
+    for (uint i = 0 ; i < NUM_OF_LAYERS ; i++)
+    {
+        char buf[20];
+        ZERO_MEM(buf);
+        snprintf(buf, sizeof(buf), "gWVP[%d]", i);
+        m_WVPLocation[i] = GetUniformLocation(buf);
+        if (m_WVPLocation[i] == INVALID_UNIFORM_LOCATION) {            
+            return false;
+        }        
     }
-
+    
     return true;
 }
 
-void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
+void ShadowMapTechnique::SetWVP(GLenum Layer, const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+    uint Index;
+    
+    switch (Layer)
+    {
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+            Index = 0;
+            break;
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+            Index = 1;
+            break;
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+            Index = 2;
+            break;
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+            Index = 3;
+            break;
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+            Index = 4;
+            break;
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+            Index = 5;
+            break;
+        default:
+            printf("Invalid layer 0x%x\n", Layer);
+            exit(0);
+    }
+    
+    glUniformMatrix4fv(m_WVPLocation[Index], 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
-void ShadowMapTechnique::SetTextureUnit(unsigned int TextureUnit)
-{
-    glUniform1i(m_textureLocation, TextureUnit);
-}

@@ -33,6 +33,7 @@ public:
 
     void BindForReading(GLenum TextureUnit);
 
+    void Dump();
 private:
     GLuint m_fbo;
     GLuint m_shadowMap;
