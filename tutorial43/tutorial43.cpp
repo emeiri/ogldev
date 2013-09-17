@@ -49,6 +49,15 @@ struct CameraDirection
     Vector3f Up;
 };
 
+CameraDirection gCameraDirections[NUM_OF_LAYERS] = 
+{
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f),  Vector3f(0.0f, 1.0f, 0.0f) }
+};
 
 #ifndef WIN32
 Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
@@ -74,8 +83,8 @@ public:
         m_spotLight.DiffuseIntensity = 0.9f;
         m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_spotLight.Attenuation.Linear = 0.01f;
-        m_spotLight.Position  = Vector3f(-20.0, 20.0, 1.0f);
-        m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
+        m_spotLight.Position  = Vector3f(0.0, 0.0, 0.0f);
+        m_spotLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
         m_spotLight.Cutoff =  20.0f;
 
         m_persProjInfo.FOV = 60.0f;
@@ -185,20 +194,23 @@ public:
     {
         glCullFace(GL_FRONT);
         
-        m_shadowMapFBO.BindForWriting();
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-
         m_pShadowMapEffect->Enable();
 
         Pipeline p;
-        p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, m_scale, 0.0f);
-        p.WorldPos(0.0f, 0.0f, 3.0f);
-        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_persProjInfo);
-        m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
-        m_mesh.Render();
+        p.SetPerspectiveProj(m_persProjInfo);                   
+        p.Scale(0.05f, 0.05f, 0.05f);
+        p.Rotate(0.0f, 0.0f, 0.0f);
+        p.WorldPos(0.0f, 10.0f, 0.0f);
+                       
+        for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
+            p.SetCamera(m_spotLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
+            m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
+            GLExitIfError();        
+
+            m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            m_mesh.Render();
+        }
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         

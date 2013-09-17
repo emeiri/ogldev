@@ -29,7 +29,7 @@ public:
 
     bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
 
-    void BindForWriting();
+    void BindForWriting(GLenum CubeFace);
 
     void BindForReading(GLenum TextureUnit);
 

@@ -21,6 +21,7 @@
 
 #include "shadow_map_fbo.h"
 #include "util.h"
+#include "shadow_map_technique.h"
 
 ShadowMapFBO::ShadowMapFBO()
 {
@@ -78,9 +79,10 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 }
 
 
-void ShadowMapFBO::BindForWriting()
+void ShadowMapFBO::BindForWriting(GLenum CubeFace)
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, CubeFace, m_shadowMap, 0);
 }
 
 
@@ -95,7 +97,6 @@ void ShadowMapFBO::Dump()
 {
     float Pixels[1000][1000];
     
-  //  glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
     
     bmpfile_t* pBMP = bmp_create(1000, 1000, 4);
@@ -105,10 +106,9 @@ void ShadowMapFBO::Dump()
         exit(0);
     }
     
-    for (int j = 0 ; j < 1 ; j++) {
+    for (int j = 0 ; j < NUM_OF_LAYERS ; j++) {
         ZERO_MEM(Pixels);
-       // glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, GL_RGB, GL_UNSIGNED_BYTE, Pixels);
-         glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_DEPTH_COMPONENT, GL_FLOAT, Pixels);
+        glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, GL_DEPTH_COMPONENT, GL_FLOAT, Pixels);
         GLExitIfError();
        
         char filename[10];

@@ -21,6 +21,8 @@
 #include "technique.h"
 #include "math_3d.h"
 
+#define NUM_OF_LAYERS 6
+
 class ShadowMapTechnique : public Technique {
 
 public:
