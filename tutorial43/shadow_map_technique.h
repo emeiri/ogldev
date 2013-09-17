@@ -21,8 +21,6 @@
 #include "technique.h"
 #include "math_3d.h"
 
-#define NUM_OF_LAYERS 6
-
 class ShadowMapTechnique : public Technique {
 
 public:
@@ -31,11 +29,12 @@ public:
 
     virtual bool Init();
 
-    void SetWVP(GLenum Layer, const Matrix4f& WVP);
-
+    void SetWVP(const Matrix4f& WVP);
+    void SetTextureUnit(unsigned int TextureUnit);
 private:
 
-    GLuint m_WVPLocation[NUM_OF_LAYERS];
+    GLuint m_WVPLocation;
+    GLuint m_textureLocation;
 };
 
 

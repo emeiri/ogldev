@@ -1,32 +1,23 @@
-uniform mat4 gWVP[6];
+uniform mat4 gWVP;
                   
-shader VSmain(in vec3 Position)
+shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec2 TexCoordOut)
 {
-    gl_Position = vec4(Position, 1.0);
+    gl_Position = gWVP * vec4(Position, 1.0);
+    TexCoordOut = TexCoord;
 }
 
-shader GSmain(out vec2 TexCoord)
-{
-    for (int layer = 0 ; layer < 6 ; layer++) {
-        for (int vertex = 0 ; vertex < 3 ; vertex++) {
-            gl_Layer = layer;
-            gl_Position = gWVP[layer] * gl_in[vertex].gl_Position;
-            EmitVertex();            
-        }
+uniform sampler2D gShadowMap;
 
-        EndPrimitive();
-    }
-}
-
-shader FSmain(out vec4 FragColor)
+shader FSmain(in vec2 TexCoordOut, out vec4 FragColor)
 {
-    FragColor = vec4(1.0f);
+    float Depth = texture(gShadowMap, TexCoordOut).x;
+//    Depth = 1.0 - (1.0 - Depth) * 25.0;
+    FragColor = vec4(Depth);
 }
 
 
 program ShadowMap
 {
     vs(330)=VSmain();
-    gs(330)=GSmain() : in(triangles) , out(triangle_strip,max_vertices = 18);
     fs(330)=FSmain();
 };

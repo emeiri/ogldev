@@ -103,6 +103,7 @@
             <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
             <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibLibItem>bmp</linkerLibLibItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

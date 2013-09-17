@@ -31,49 +31,23 @@ bool ShadowMapTechnique::Init()
         return false;
     }
 
-    for (uint i = 0 ; i < NUM_OF_LAYERS ; i++)
-    {
-        char buf[20];
-        ZERO_MEM(buf);
-        snprintf(buf, sizeof(buf), "gWVP[%d]", i);
-        m_WVPLocation[i] = GetUniformLocation(buf);
-        if (m_WVPLocation[i] == INVALID_UNIFORM_LOCATION) {            
-            return false;
-        }        
+    m_WVPLocation = GetUniformLocation("gWVP");
+    m_textureLocation = GetUniformLocation("gShadowMap");
+
+    if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
+        m_textureLocation == INVALID_UNIFORM_LOCATION) {
+        return false;
     }
-    
+
     return true;
 }
 
-void ShadowMapTechnique::SetWVP(GLenum Layer, const Matrix4f& WVP)
+void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
 {
-    uint Index;
-    
-    switch (Layer)
-    {
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-            Index = 0;
-            break;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-            Index = 1;
-            break;
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-            Index = 2;
-            break;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-            Index = 3;
-            break;
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-            Index = 4;
-            break;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-            Index = 5;
-            break;
-        default:
-            printf("Invalid layer 0x%x\n", Layer);
-            exit(0);
-    }
-    
-    glUniformMatrix4fv(m_WVPLocation[Index], 1, GL_TRUE, (const GLfloat*)WVP.m);
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
+void ShadowMapTechnique::SetTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_textureLocation, TextureUnit);
+}
