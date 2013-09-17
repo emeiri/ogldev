@@ -49,15 +49,6 @@ struct CameraDirection
     Vector3f Up;
 };
 
-CameraDirection gCameraDirections[NUM_OF_LAYERS] = 
-{
-    { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
-    { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f),  Vector3f(0.0f, 1.0f, 0.0f) }
-};
 
 #ifndef WIN32
 Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
@@ -79,11 +70,13 @@ public:
         m_pLightingEffect = NULL;
         m_pShadowMapEffect = NULL;
         m_scale = 0.0f;
-        m_pointLight.AmbientIntensity = 0.1f;
-        m_pointLight.DiffuseIntensity = 0.9f;
-        m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLight.Attenuation.Linear = 0.01f;
-        m_pointLight.Position  = Vector3f(0.0, 1.0, 1.0f);
+        m_spotLight.AmbientIntensity = 0.1f;
+        m_spotLight.DiffuseIntensity = 0.9f;
+        m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_spotLight.Attenuation.Linear = 0.01f;
+        m_spotLight.Position  = Vector3f(-20.0, 20.0, 1.0f);
+        m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
+        m_spotLight.Cutoff =  20.0f;
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -125,7 +118,7 @@ public:
 
         m_pLightingEffect->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_pLightingEffect->SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
-        m_pLightingEffect->SetPointLights(1, &m_pointLight);
+        m_pLightingEffect->SetSpotLights(1, &m_spotLight);
         m_pLightingEffect->SetShadowMapSize((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 
         m_pShadowMapEffect = new ShadowMapTechnique();
@@ -161,6 +154,8 @@ public:
         
         m_time = glutGet(GLUT_ELAPSED_TIME);
         
+        glEnable(GL_TEXTURE_CUBE_MAP);
+        
         return true;
     }
 
@@ -188,33 +183,24 @@ public:
 
     void ShadowMapPass()
     {
-        GLExitIfError();        
         glCullFace(GL_FRONT);
-        glDisable(GL_CULL_FACE);
-GLExitIfError();        
+        
         m_shadowMapFBO.BindForWriting();
-GLExitIfError();        
-        //glClear(GL_DEPTH_BUFFER_BIT);
-glClear(GL_COLOR_BUFFER_BIT);
-GLExitIfError();        
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+
         m_pShadowMapEffect->Enable();
-GLExitIfError();        
+
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
         p.Rotate(0.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
-        p.SetPerspectiveProj(m_persProjInfo);        
-GLExitIfError();                
-        for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
-            p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
-            m_pShadowMapEffect->SetWVP(gCameraDirections[i].CubemapFace, p.GetWVPTrans());
-            GLExitIfError();        
-        }
-        
+        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
+        p.SetPerspectiveProj(m_persProjInfo);
+        m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
         m_mesh.Render();
-        GLExitIfError();        
+        
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        GLExitIfError();        
         
         m_shadowMapFBO.Dump();
         
@@ -320,7 +306,7 @@ private:
     ShadowMapTechnique* m_pShadowMapEffect;
     Camera* m_pGameCamera;
     float m_scale;
-    PointLight m_pointLight;
+    SpotLight m_spotLight;
     Mesh m_mesh;
     Mesh m_quad;	
     PersProjInfo m_persProjInfo;
