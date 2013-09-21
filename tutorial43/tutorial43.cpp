@@ -79,13 +79,11 @@ public:
         m_pLightingEffect = NULL;
         m_pShadowMapEffect = NULL;
         m_scale = 0.0f;
-        m_spotLight.AmbientIntensity = 0.1f;
-        m_spotLight.DiffuseIntensity = 0.9f;
-        m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_spotLight.Attenuation.Linear = 0.01f;
-        m_spotLight.Position  = Vector3f(0.0, 0.0, 0.0f);
-        m_spotLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
-        m_spotLight.Cutoff =  20.0f;
+        m_pointLight.AmbientIntensity = 0.1f;
+        m_pointLight.DiffuseIntensity = 0.9f;
+        m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLight.Attenuation.Linear = 0.0f;
+        m_pointLight.Position  = Vector3f(0.0, 0.0, .0f);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -111,6 +109,7 @@ public:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         if (!m_shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+            printf("Error initializing the shadow map FBO\n");
             return false;
         }
 
@@ -127,7 +126,7 @@ public:
 
         m_pLightingEffect->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_pLightingEffect->SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
-        m_pLightingEffect->SetSpotLights(1, &m_spotLight);
+        m_pLightingEffect->SetPointLights(1, &m_pointLight);
         m_pLightingEffect->SetShadowMapSize((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 
         m_pShadowMapEffect = new ShadowMapTechnique();
@@ -147,7 +146,9 @@ public:
             return false;
         }
 
-		if (!m_mesh.LoadMesh("models/phoenix_ugv.md2")) {
+        
+        if (!m_mesh.LoadMesh("../tutorial25/sphere.obj")) {
+	//	if (!m_mesh.LoadMesh("models/phoenix_ugv.md2")) {
 			return false;
 		}
 
@@ -183,7 +184,7 @@ public:
         m_pGameCamera->OnRender();
 
         ShadowMapPass();
-      //  RenderPass();
+    //    RenderPass();
         
    //     RenderFPS();
 
@@ -195,67 +196,80 @@ public:
         glCullFace(GL_FRONT);
         
         m_pShadowMapEffect->Enable();
-
+        GLExitIfError();        
         Pipeline p;
-        p.SetPerspectiveProj(m_persProjInfo);                   
-        p.Scale(0.05f, 0.05f, 0.05f);
+        
+        PersProjInfo Info;
+        Info.FOV = 90.0f;
+        Info.Height = WINDOW_HEIGHT;
+        Info.Width = WINDOW_WIDTH;
+        Info.zNear = 1.0f;
+        Info.zFar = 100.0f;  
+
+        p.SetPerspectiveProj(Info);
+        p.Scale(1.0f);
         p.Rotate(0.0f, 0.0f, 0.0f);
-        p.WorldPos(0.0f, 10.0f, 0.0f);
+        p.WorldPos(0.0f, 2.0f, 5.0f);
                        
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
-            p.SetCamera(m_spotLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
+            p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
             m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
             GLExitIfError();        
 
             m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
             glClear(GL_DEPTH_BUFFER_BIT);
             m_mesh.Render();
-        }
+        }        
         
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        GLExitIfError();        
         
-        m_shadowMapFBO.Dump();
-        
-        exit(0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+                GLExitIfError();        
+     //   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                GLExitIfError();        
+        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);        
+//        m_shadowMapFBO.Dump();
+                GLExitIfError();        
+     //   glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+         //       GLExitIfError();        
+                
+                exit(0);
     }
         
     void RenderPass()
     {
         glCullFace(GL_BACK);
         
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pLightingEffect->Enable();
              
-        m_shadowMapFBO.BindForReading(GL_TEXTURE1);
+        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         Pipeline p;
-        p.SetPerspectiveProj(m_persProjInfo);           
-        p.Scale(10.0f, 10.0f, 10.0f);
+        p.SetPerspectiveProj(m_persProjInfo);
+        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
+        
+        // Render the quad
+        p.Scale(10.0f);
         p.WorldPos(0.0f, 0.0f, 1.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-
+        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());                
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
-        assert(0);
-        //p.SetCamera(m_pointLight.Position, m_pointLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
-        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
-        m_pGroundTex->Bind(GL_TEXTURE0);
+        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
- 
-        p.Scale(0.1f, 0.1f, 0.1f);
+        GLExitIfError();        
+             
+        // Render the object
+        p.Scale(1.0f);
         p.Rotate(0.0f, m_scale, 0.0f);
-        p.WorldPos(0.0f, 0.0f, 3.0f);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        p.WorldPos(0.0f, 2.0f, 5.0f);
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
-        assert(0);
-        //p.SetCamera(m_pointLight.Position, m_pointLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
-
         m_mesh.Render();        
+        GLExitIfError();        
     }
     virtual void IdleCB()
     {
@@ -318,7 +332,7 @@ private:
     ShadowMapTechnique* m_pShadowMapEffect;
     Camera* m_pGameCamera;
     float m_scale;
-    SpotLight m_spotLight;
+    PointLight m_pointLight;
     Mesh m_mesh;
     Mesh m_quad;	
     PersProjInfo m_persProjInfo;

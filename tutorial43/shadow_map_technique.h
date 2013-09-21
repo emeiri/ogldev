@@ -32,11 +32,9 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetTextureUnit(unsigned int TextureUnit);
 private:
 
     GLuint m_WVPLocation;
-    GLuint m_textureLocation;
 };
 
 

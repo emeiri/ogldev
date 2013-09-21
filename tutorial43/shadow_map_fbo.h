@@ -36,7 +36,7 @@ public:
     void Dump();
 private:
     GLuint m_fbo;
-    GLuint m_shadowMap;
+    //GLuint m_shadowMap;
     GLuint m_depth;
 };
 

@@ -3,7 +3,6 @@ interface VSOutput
     vec2 TexCoord;
     vec3 Normal;
     vec3 WorldPos;
-    vec4 ClipSpacePos;
 };
 
 struct VSOutput1
@@ -11,7 +10,6 @@ struct VSOutput1
     vec2 TexCoord;
     vec3 Normal;
     vec3 WorldPos;
-    vec4 ClipSpacePos;
 };
 
 uniform mat4 gWVP;
@@ -23,7 +21,6 @@ shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out VSOutput V
     VSout.TexCoord = TexCoord;
     VSout.Normal   = (gWorld * vec4(Normal, 0.0)).xyz;
     VSout.WorldPos = (gWorld * vec4(Position, 1.0)).xyz;
-    VSout.ClipSpacePos = gl_Position;
 }
 
 const int MAX_POINT_LIGHTS = 2;
@@ -78,12 +75,6 @@ uniform vec2 gMapSize;
 
 #define EPSILON 0.00001
 
-float CalcShadowFactor(vec3 LightDirection, vec4 ClipSpacePos)
-{
-    //float zNDC = ClipSpacePos.z / ClipSpacePos.w;
-return 1.0f;
-}
-
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In, float ShadowFactor)           
 {                                                                                           
     vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;                   
@@ -111,19 +102,33 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In, float
 vec4 CalcDirectionalLight(VSOutput1 In)                                                      
 {                                                                                           
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, In, 1.0);
-}                                                                                           
+}                                  
+
+
+float CalcShadowFactor(vec3 LightDirection)
+{
+    float z = 1.0f;//LightDirection.z / 100.0f - 1.8;
+    vec4 TexCoord = vec4(LightDirection, z /*+ EPSILON*/);
+    float factor = texture(gShadowMap, TexCoord);
+    if (factor == 0.0)
+        return 0.0;
+    else
+        return 1.0;
+}
                                                                                             
 vec4 CalcPointLight(PointLight l, VSOutput1 In)                       
 {                                                                                           
     vec3 LightDirection = In.WorldPos - l.Position;
     float Distance = length(LightDirection);
     LightDirection = normalize(LightDirection);
-    float ShadowFactor = CalcShadowFactor(LightDirection, In.ClipSpacePos);
+    float ShadowFactor = CalcShadowFactor(LightDirection);
                                                                                             
     vec4 Color = CalcLightInternal(l.Base, LightDirection, In, ShadowFactor);
     float Attenuation =  l.Atten.Constant +                                                 
                          l.Atten.Linear * Distance +                                        
-                         l.Atten.Exp * Distance * Distance;                                 
+                         l.Atten.Exp * Distance * Distance;  
+
+    Attenuation = 1.0;                         
                                                                                             
     return Color / Attenuation;                                                             
 }                                                                                           
@@ -148,7 +153,6 @@ shader FSmain(in VSOutput FSin, out vec4 FragColor)
     In.TexCoord     = FSin.TexCoord;
     In.Normal       = normalize(FSin.Normal);
     In.WorldPos     = FSin.WorldPos;                                                                 
-    In.ClipSpacePos = FSin.ClipSpacePos;
   
     vec4 TotalLight = CalcDirectionalLight(In);                                         
                                                                                             

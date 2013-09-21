@@ -26,7 +26,7 @@
 ShadowMapFBO::ShadowMapFBO()
 {
     m_fbo = 0;
-    m_shadowMap = 0;
+    m_depth = 0;
 }
 
 ShadowMapFBO::~ShadowMapFBO()
@@ -35,8 +35,8 @@ ShadowMapFBO::~ShadowMapFBO()
         glDeleteFramebuffers(1, &m_fbo);
     }
 
-    if (m_shadowMap != 0) {
-        glDeleteTextures(1, &m_shadowMap);
+    if (m_depth != 0) {
+        glDeleteTextures(1, &m_depth);
     }
 }
 
@@ -46,8 +46,8 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     glGenFramebuffers(1, &m_fbo);
 
     // Create the depth buffer
-    glGenTextures(1, &m_shadowMap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
+    glGenTextures(1, &m_depth);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_depth);
     
     for (uint i = 0 ; i < 6 ; i++) {
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -60,13 +60,17 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, m_shadowMap, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, m_depth, 0);
 
     // Disable writes to the color buffer
     glDrawBuffer(GL_NONE);
+    
+    GLExitIfError();
        
     // Disable reads from the color buffer
     glReadBuffer(GL_NONE);
+    
+    GLExitIfError();
 
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -75,29 +79,69 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
         return false;
     }
 
-    return true;
+    return GLCheckError();
 }
 
 
 void ShadowMapFBO::BindForWriting(GLenum CubeFace)
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, CubeFace, m_shadowMap, 0);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, CubeFace, m_depth, 0);
 }
+
+
+/*void ShadowMapFBO::BindForReading(GLenum TextureUnit)
+{
+    glActiveTexture(TextureUnit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
+}*/
 
 
 void ShadowMapFBO::BindForReading(GLenum TextureUnit)
 {
-    glActiveTexture(TextureUnit);
-    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
-}
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);    
+    GLExitIfError();        
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, m_depth, 0);    
+    GLExitIfError();        
+   /// glReadBuffer(GL_DEPTH_ATTACHMENT);
+     //       GLExitIfError();        
+    float Pixels[1000][1000];
+    ZERO_MEM(Pixels);
+    
+    glReadPixels(0, 0, 1000, 1000, GL_DEPTH_COMPONENT, GL_FLOAT, Pixels);
+    GLExitIfError();
+    
+    bmpfile_t* pBMP = bmp_create(1000, 1000, 4);
+    
+    if (!pBMP) {
+        printf("Error creating bmp\n");
+        exit(0);
+    }
 
+    for (int y = 0 ; y < 1000 ; y++ ) {
+        for (int x = 0 ; x < 1000 ; x++) {
+            float f;
+            if (Pixels[x][y] == 1.0f)
+                f = 0.0f;
+            else
+                f = 1.0f;//Pixels[x][y] * 255.0f;                
+            rgb_pixel_t pixel;
+            pixel.red = f;
+            pixel.green = f;
+            pixel.blue = f;
+
+            bmp_set_pixel(pBMP, x, y, pixel);
+        }
+    }
+        
+    bmp_save(pBMP, "depth.bmp");       
+}
 
 void ShadowMapFBO::Dump()
 {
     float Pixels[1000][1000];
     
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_depth);
     
     bmpfile_t* pBMP = bmp_create(1000, 1000, 4);
     

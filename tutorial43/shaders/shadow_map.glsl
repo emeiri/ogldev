@@ -1,18 +1,13 @@
 uniform mat4 gWVP;
                   
-shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec2 TexCoordOut)
+shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal)
 {
     gl_Position = gWVP * vec4(Position, 1.0);
-    TexCoordOut = TexCoord;
 }
 
-uniform sampler2D gShadowMap;
 
-shader FSmain(in vec2 TexCoordOut, out vec4 FragColor)
+shader FSmain()
 {
-    float Depth = texture(gShadowMap, TexCoordOut).x;
-//    Depth = 1.0 - (1.0 - Depth) * 25.0;
-    FragColor = vec4(Depth);
 }
 
 
