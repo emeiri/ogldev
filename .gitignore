@@ -96,3 +96,12 @@
 *.sdf
 *.suo
 *.rc
+
+/Windows/ogldev/Debug/*.exe
+
+/Windows/ogldev/Debug/Tutorial01/*.log
+/Windows/ogldev/Debug/Tutorial01/*.cache
+
+/Windows/ogldev/Debug/Tutorial01/*.idb
+
+/Windows/ogldev/Debug/Tutorial42/*.log
