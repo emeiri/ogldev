@@ -32,9 +32,11 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
+	void SetWV(const Matrix4f& WV);
 private:
 
     GLuint m_WVPLocation;
+	GLuint m_WVLocation;
 };
 
 

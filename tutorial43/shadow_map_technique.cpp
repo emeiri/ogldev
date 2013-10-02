@@ -32,16 +32,24 @@ bool ShadowMapTechnique::Init()
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
+	m_WVLocation = GetUniformLocation("gWV");
 
-    if (m_WVPLocation == INVALID_UNIFORM_LOCATION) {
+    if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
+		m_WVLocation == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
     return true;
 }
 
+
 void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
+
+void ShadowMapTechnique::SetWV(const Matrix4f& WV)
+{
+	glUniformMatrix4fv(m_WVLocation, 1, GL_TRUE, (const GLfloat*)WV.m);
+}

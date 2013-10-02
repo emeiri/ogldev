@@ -83,7 +83,7 @@ public:
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.Attenuation.Linear = 0.0f;
-        m_pointLight.Position  = Vector3f(0.0, 0.0, .0f);
+        m_pointLight.Position  = Vector3f(0.0, 0.0, 0.0f);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -184,7 +184,7 @@ public:
         m_pGameCamera->OnRender();
 
         ShadowMapPass();
-    //    RenderPass();
+        RenderPass();
         
    //     RenderFPS();
 
@@ -210,30 +210,24 @@ public:
         p.Scale(1.0f);
         p.Rotate(0.0f, 0.0f, 0.0f);
         p.WorldPos(0.0f, 2.0f, 5.0f);
+
+		glClearDepth(1.0f);
                        
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
             p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
+            m_pShadowMapEffect->SetWV(p.GetWVTrans());
             m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
             GLExitIfError();        
 
             m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
-            glClear(GL_DEPTH_BUFFER_BIT);
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             m_mesh.Render();
         }        
         
         GLExitIfError();        
         
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-                GLExitIfError();        
-     //   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                GLExitIfError();        
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);        
-//        m_shadowMapFBO.Dump();
-                GLExitIfError();        
-     //   glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-         //       GLExitIfError();        
-                
-                exit(0);
+        GLExitIfError();        
     }
         
     void RenderPass()

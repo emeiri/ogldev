@@ -51,4 +51,18 @@ const Matrix4f& Pipeline::GetWVPTrans()
     return m_WVPtransformation;
 }
 
+const Matrix4f& Pipeline::GetWVTrans()
+{
+	GetWorldTrans();
+	
+	Matrix4f CameraTranslationTrans, CameraRotateTrans;
+
+	CameraTranslationTrans.InitTranslationTransform(-m_camera.Pos.x, -m_camera.Pos.y, -m_camera.Pos.z);
+	CameraRotateTrans.InitCameraTransform(m_camera.Target, m_camera.Up);
+	
+	m_WVtransformation = CameraRotateTrans * CameraTranslationTrans * m_WorldTransformation;
+	return m_WVtransformation;
+}
+
+
 
