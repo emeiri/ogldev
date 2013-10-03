@@ -67,7 +67,7 @@ uniform DirectionalLight gDirectionalLight;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];                                          
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             
 uniform sampler2D gColorMap;                                                                
-uniform samplerCubeShadow gShadowMap;
+uniform samplerCube gShadowMap;
 uniform vec3 gEyeWorldPos;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
@@ -107,13 +107,17 @@ vec4 CalcDirectionalLight(VSOutput1 In)
 
 float CalcShadowFactor(vec3 LightDirection)
 {
-    float z = 1.0f;//LightDirection.z / 100.0f - 1.8;
-    vec4 TexCoord = vec4(LightDirection, z /*+ EPSILON*/);
-    float factor = texture(gShadowMap, TexCoord);
-    if (factor == 0.0)
-        return 0.0;
-    else
+    float SampledDistance = texture(gShadowMap, LightDirection).r;
+
+//    if (SampledDistance == 0.0)
+//                 return 1.0;
+
+    float Distance = length(LightDirection);
+
+    if (Distance <= SampledDistance + EPSILON)
         return 1.0;
+    else
+        return 0.0;
 }
                                                                                             
 vec4 CalcPointLight(PointLight l, VSOutput1 In)                       

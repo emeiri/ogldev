@@ -12,7 +12,7 @@ out vec4 FragColor;
 
 shader FSmain(in vec3 ViewPos)
 {
-    FragColor = vec4(length(ViewPos));
+    FragColor = vec4(1.0 + length(ViewPos));
 }
 
 

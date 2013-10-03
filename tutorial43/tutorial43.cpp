@@ -83,7 +83,7 @@ public:
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.Attenuation.Linear = 0.0f;
-        m_pointLight.Position  = Vector3f(0.0, 0.0, 0.0f);
+        m_pointLight.Position  = Vector3f(0.0, 100.0, 5.0f);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -182,9 +182,9 @@ public:
         m_scale += 0.05f;
 
         m_pGameCamera->OnRender();
-
+//
         ShadowMapPass();
-        RenderPass();
+  //      RenderPass();
         
    //     RenderFPS();
 
@@ -207,21 +207,29 @@ public:
         Info.zFar = 100.0f;  
 
         p.SetPerspectiveProj(Info);
-        p.Scale(1.0f);
-        p.Rotate(0.0f, 0.0f, 0.0f);
-        p.WorldPos(0.0f, 2.0f, 5.0f);
 
 		glClearDepth(1.0f);
                        
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
+            m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
+        //    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
+            p.Scale(1.0f);
+            p.Rotate(90.0f, 0.0f, 0.0f);
+            p.WorldPos(0.0f, 2.0f, 5.0f);
             m_pShadowMapEffect->SetWV(p.GetWVTrans());
             m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
+            m_quad.Render();
             GLExitIfError();        
 
-            m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
-            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            m_mesh.Render();
+            p.Scale(10.0f);
+            p.WorldPos(0.0f, 0.0f, 0.0f);
+            p.Rotate(90.0f, 0.0f, 0.0f);
+            m_pShadowMapEffect->SetWV(p.GetWVTrans());
+            m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
+         //   m_quad.Render();
+            
+            GLExitIfError();        
         }        
         
         GLExitIfError();        
@@ -247,7 +255,7 @@ public:
         
         // Render the quad
         p.Scale(10.0f);
-        p.WorldPos(0.0f, 0.0f, 1.0f);
+        p.WorldPos(0.0f, 0.0f, 0.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());                
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
@@ -258,11 +266,11 @@ public:
              
         // Render the object
         p.Scale(1.0f);
-        p.Rotate(0.0f, m_scale, 0.0f);
+        p.Rotate(90.0f, 0.0f, 0.0f);
         p.WorldPos(0.0f, 2.0f, 5.0f);
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
-        m_mesh.Render();        
+        m_quad.Render();        
         GLExitIfError();        
     }
     virtual void IdleCB()
