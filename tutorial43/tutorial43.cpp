@@ -83,7 +83,7 @@ public:
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.Attenuation.Linear = 0.0f;
-        m_pointLight.Position  = Vector3f(0.0, 100.0, 5.0f);
+        m_pointLight.Position  = Vector3f(0.0, 2.0, 0.0f);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -208,18 +208,20 @@ public:
 
         p.SetPerspectiveProj(Info);
 
-		glClearDepth(1.0f);
+		//glClearDepth(1.0f);
+        
+        //glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
                        
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
             m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
-        //    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
             p.Scale(1.0f);
-            p.Rotate(90.0f, 0.0f, 0.0f);
+        //    p.Rotate(90.0f, 0.0f, 0.0f);
             p.WorldPos(0.0f, 2.0f, 5.0f);
             m_pShadowMapEffect->SetWV(p.GetWVTrans());
             m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
-            m_quad.Render();
+            m_mesh.Render();
             GLExitIfError();        
 
             p.Scale(10.0f);
@@ -227,12 +229,14 @@ public:
             p.Rotate(90.0f, 0.0f, 0.0f);
             m_pShadowMapEffect->SetWV(p.GetWVTrans());
             m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
-         //   m_quad.Render();
+            m_quad.Render();
             
             GLExitIfError();        
         }        
         
         GLExitIfError();        
+        
+        m_shadowMapFBO.ShowColorBuffer(GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
         
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);        
         GLExitIfError();        

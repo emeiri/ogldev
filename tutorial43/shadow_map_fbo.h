@@ -32,6 +32,8 @@ public:
     void BindForWriting(GLenum CubeFace);
 
     void BindForReading(GLenum TextureUnit);
+    
+    void ShowColorBuffer(GLenum CubeFace);
 
     void Dump();
 private:

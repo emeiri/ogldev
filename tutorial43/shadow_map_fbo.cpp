@@ -67,18 +67,17 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, m_shadowMap, 0);
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, m_shadowMap, 0);
-
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     
     GLExitIfError();
        
-   // glReadBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
     
     GLExitIfError();
 
@@ -107,6 +106,17 @@ void ShadowMapFBO::BindForReading(GLenum TextureUnit)
 }
 
 
+void ShadowMapFBO::ShowColorBuffer(GLenum CubeFace)
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+    GLExitIfError();
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, 1000, 1000, 0, 0, 1000, 1000, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glReadBuffer(GL_NONE);
+    GLExitIfError();       
+}
 /*void ShadowMapFBO::BindForReading(GLenum TextureUnit)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);    
