@@ -8,11 +8,13 @@ shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec3 ViewP
     ViewPos = (gWV * Pos4).xyz;
 }
 
-out vec4 FragColor;
+out float FragColor;
 
 shader FSmain(in vec3 ViewPos)
 {
-    FragColor = vec4(1.0 + length(ViewPos));
+    float LightToPixelDistance = length(ViewPos);
+
+    FragColor = LightToPixelDistance;
 }
 
 

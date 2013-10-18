@@ -22,6 +22,10 @@
 #include <list>
 #include <GL/glew.h>
 
+#include "math_3d.h"
+#include "mesh.h"
+#include "camera.h"
+
 class Technique
 {
 public:
@@ -32,6 +36,20 @@ public:
 
     void Enable();
 
+    void SetWVP(const Matrix4f& WVP);
+    
+	void SetWV(const Matrix4f& WV);
+    
+    void SetWorldMatrix(const Matrix4f& WVP);
+ 
+    virtual bool Init();
+    
+    void ApplyOrientation(const Orientation& orientation, 
+                          const Vector3f& CameraPos, 
+                          const Vector3f& CameraTarget, 
+                          const Vector3f& CameraUp, 
+                          PersProjInfo& ProjInfo);
+    
 protected:
     
     bool CompileProgram(const char* pProgram);
@@ -39,6 +57,10 @@ protected:
     GLint GetUniformLocation(const char* pUniformName);
     
     GLint GetProgramParam(GLint param);
+    
+    GLuint m_WVPLocation;
+	GLuint m_WVLocation;
+    GLuint m_WorldMatrixLocation;
 
 private:    
     GLint m_effect;    

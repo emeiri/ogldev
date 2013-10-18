@@ -83,7 +83,7 @@ public:
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.Attenuation.Linear = 0.0f;
-        m_pointLight.Position  = Vector3f(0.0, 2.0, 0.0f);
+        m_pointLight.Position  = Vector3f(0.0, 10.0, 5.0f);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -151,6 +151,8 @@ public:
 	//	if (!m_mesh.LoadMesh("models/phoenix_ugv.md2")) {
 			return false;
 		}
+        
+        m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 2.0f, 5.0f);
 
 #ifndef WIN32
         if (!m_fontRenderer.InitFontRenderer()) {
@@ -184,7 +186,7 @@ public:
         m_pGameCamera->OnRender();
 //
         ShadowMapPass();
-  //      RenderPass();
+        RenderPass();
         
    //     RenderFPS();
 
@@ -193,50 +195,37 @@ public:
 
     void ShadowMapPass()
     {
-        glCullFace(GL_FRONT);
+    //    glCullFace(GL_FRONT);
         
         m_pShadowMapEffect->Enable();
         GLExitIfError();        
-        Pipeline p;
         
-        PersProjInfo Info;
-        Info.FOV = 90.0f;
-        Info.Height = WINDOW_HEIGHT;
-        Info.Width = WINDOW_WIDTH;
-        Info.zNear = 1.0f;
-        Info.zFar = 100.0f;  
+        PersProjInfo ProjInfo;
+        ProjInfo.FOV = 90.0f;
+        ProjInfo.Height = WINDOW_HEIGHT;
+        ProjInfo.Width = WINDOW_WIDTH;
+        ProjInfo.zNear = 1.0f;
+        ProjInfo.zFar = 100.0f;  
 
-        p.SetPerspectiveProj(Info);
-
-		//glClearDepth(1.0f);
+		glClearDepth(1.0f);
         
         //glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
                        
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
             m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
-            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
-            p.Scale(1.0f);
-        //    p.Rotate(90.0f, 0.0f, 0.0f);
-            p.WorldPos(0.0f, 2.0f, 5.0f);
-            m_pShadowMapEffect->SetWV(p.GetWVTrans());
-            m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);                       
+            m_pShadowMapEffect->ApplyOrientation(m_mesh.GetOrientation(), 
+                                                 m_pointLight.Position, 
+                                                 gCameraDirections[i].Target, 
+                                                 gCameraDirections[i].Up, 
+                                                 ProjInfo);
             m_mesh.Render();
-            GLExitIfError();        
-
-            p.Scale(10.0f);
-            p.WorldPos(0.0f, 0.0f, 0.0f);
-            p.Rotate(90.0f, 0.0f, 0.0f);
-            m_pShadowMapEffect->SetWV(p.GetWVTrans());
-            m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
-            m_quad.Render();
-            
             GLExitIfError();        
         }        
         
         GLExitIfError();        
         
-        m_shadowMapFBO.ShowColorBuffer(GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+      //  m_shadowMapFBO.ShowColorBuffer(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
         
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);        
         GLExitIfError();        
@@ -244,7 +233,7 @@ public:
         
     void RenderPass()
     {
-        glCullFace(GL_BACK);
+      //  glCullFace(GL_BACK);
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -274,7 +263,7 @@ public:
         p.WorldPos(0.0f, 2.0f, 5.0f);
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
-        m_quad.Render();        
+        m_mesh.Render();        
         GLExitIfError();        
     }
     virtual void IdleCB()
@@ -346,7 +335,7 @@ private:
     ShadowMapFBO m_shadowMapFBO;
     int m_time;
     int m_frameCount;
-    float m_fps;    
+    float m_fps;        
 #ifndef WIN32
     FontRenderer m_fontRenderer;
     FontRenderer m_fontRenderer2;

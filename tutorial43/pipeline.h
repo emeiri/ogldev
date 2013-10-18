@@ -32,7 +32,13 @@ public:
 
     void Scale(float s)
     {
-        m_scale.x = m_scale.y = m_scale.z = s;
+        Scale(s, s, s);
+    }
+    
+    
+    void Scale(const Vector3f& scale)
+    {
+        Scale(scale.x, scale.y, scale.z);
     }
     
     void Scale(float ScaleX, float ScaleY, float ScaleZ)

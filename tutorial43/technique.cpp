@@ -23,6 +23,7 @@
 
 #include "technique.h"
 #include "util.h"
+#include "pipeline.h"
 
 using namespace std;
 
@@ -43,6 +44,34 @@ Technique::~Technique()
     }
     
     glfxDeleteEffect(m_effect);
+}
+
+
+bool Technique::Init()
+{
+    m_WVPLocation = GetUniformLocation("gWVP");
+	m_WVLocation = GetUniformLocation("gWV");
+    m_WorldMatrixLocation = GetUniformLocation("gWorld");
+    
+    return true;
+}
+
+
+void Technique::ApplyOrientation(const Orientation& orientation, 
+                                 const Vector3f& CameraPos, 
+                                 const Vector3f& CameraTarget, 
+                                 const Vector3f& CameraUp, 
+                                 PersProjInfo& ProjInfo)
+{
+    Pipeline p;
+    
+    p.SetPerspectiveProj(ProjInfo);    
+    p.SetCamera(CameraPos, CameraTarget, CameraUp);
+    p.Scale(orientation.m_scale);
+    p.WorldPos(orientation.m_pos);
+    
+    SetWV(p.GetWVTrans());
+    SetWVP(p.GetWVPTrans());
 }
 
 bool Technique::CompileProgram(const char* pProgram)
@@ -89,3 +118,25 @@ GLint Technique::GetProgramParam(GLint param)
     glGetProgramiv(m_shaderProg, param, &ret);
     return ret;
 }
+
+
+void Technique::SetWVP(const Matrix4f& WVP)
+{
+    assert(m_WVPLocation != INVALID_OGL_VALUE);
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+}
+
+
+void Technique::SetWV(const Matrix4f& WV)
+{
+    assert(m_WVLocation != INVALID_OGL_VALUE);
+	glUniformMatrix4fv(m_WVLocation, 1, GL_TRUE, (const GLfloat*)WV.m);
+}
+
+
+void Technique::SetWorldMatrix(const Matrix4f& World)
+{
+    assert(m_WorldMatrixLocation != INVALID_OGL_VALUE);
+    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World.m);
+}
+

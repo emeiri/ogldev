@@ -109,8 +109,8 @@ float CalcShadowFactor(vec3 LightDirection)
 {
     float SampledDistance = texture(gShadowMap, LightDirection).r;
 
-//    if (SampledDistance == 0.0)
-//                 return 1.0;
+   // if (SampledDistance == 0.0)
+         //        return 1.0;
 
     float Distance = length(LightDirection);
 

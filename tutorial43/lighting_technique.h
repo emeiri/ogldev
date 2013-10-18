@@ -86,9 +86,7 @@ public:
     LightingTechnique();
 
     virtual bool Init();
-
-    void SetWVP(const Matrix4f& WVP);
-    void SetWorldMatrix(const Matrix4f& WVP);
+    
     void SetColorTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& Light);
@@ -100,9 +98,7 @@ public:
     void SetShadowMapSize(float Width, float Height);
 
 private:
-    
-    GLuint m_WVPLocation;
-    GLuint m_WorldMatrixLocation;
+        
     GLuint m_samplerLocation;
     GLuint m_shadowMapLocation;
     GLuint m_eyeWorldPosLocation;

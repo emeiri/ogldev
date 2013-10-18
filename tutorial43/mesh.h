@@ -47,6 +47,21 @@ struct Vertex
 };
 
 
+struct Orientation
+{
+    Vector3f m_scale;
+    Vector3f m_rotation;
+    Vector3f m_pos;       
+    
+    Orientation()
+    {
+        m_scale    = Vector3f(1.0f, 1.0f, 1.0f);
+        m_rotation = Vector3f(0.0f, 0.0f, 0.0f);
+        m_pos      = Vector3f(0.0f, 0.0f, 0.0f);
+    }
+};
+
+
 class Mesh
 {
 public:
@@ -59,6 +74,8 @@ public:
     void Render();
 	
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
+    
+    Orientation& GetOrientation() { return m_orientation; }
 
 private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
@@ -100,6 +117,7 @@ private:
     
     std::vector<MeshEntry> m_Entries;
     std::vector<Texture*> m_Textures;
+    Orientation m_orientation;
 };
 
 

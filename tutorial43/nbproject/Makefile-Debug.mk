@@ -53,7 +53,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/shadow_map_technique.o \
 	${OBJECTDIR}/technique.o \
 	${OBJECTDIR}/texture.o \
-	${OBJECTDIR}/tutorial43.o
+	${OBJECTDIR}/tutorial43.o \
+	${OBJECTDIR}/util.o
 
 
 # C Compiler Flags
@@ -70,7 +71,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lMagick++ -lassimp -lfontconfig -lfreetype -lGL /usr/local/lib/libglfx.so -lbmp
+LDLIBSOPTIONS=-lglut -lMagick++ -lassimp -lfontconfig -lfreetype -lGL /usr/local/lib/libglfx.so -lbmp -lGLEW
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -176,6 +177,11 @@ ${OBJECTDIR}/tutorial43.o: tutorial43.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/tutorial43.o tutorial43.cpp
+
+${OBJECTDIR}/util.o: util.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF $@.d -o ${OBJECTDIR}/util.o util.cpp
 
 # Subprojects
 .build-subprojects:
