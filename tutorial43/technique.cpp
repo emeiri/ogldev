@@ -29,7 +29,7 @@ using namespace std;
 
 Technique::Technique(const char* pEffectFile)
 {
-    m_pEffectFile = pEffectFile;
+    m_effectFileName = pEffectFile;
     m_shaderProg = 0;
     m_effect = glfxGenEffect();
 }
@@ -85,9 +85,9 @@ void Technique::ApplyOrientation(const Orientation& orientation, const Camera& c
 
 bool Technique::CompileProgram(const char* pProgram)
 {
-    if (!glfxParseEffectFromFile(m_effect, m_pEffectFile)) {
+    if (!glfxParseEffectFromFile(m_effect, m_effectFileName.c_str())) {
         string log = glfxGetEffectLog(m_effect);
-        printf("Error creating effect from file '%s':\n", m_pEffectFile);
+        printf("Error creating effect from file '%s':\n", m_effectFileName.c_str());
         printf("%s\n", log.c_str());
         return false;
     }
@@ -96,7 +96,7 @@ bool Technique::CompileProgram(const char* pProgram)
     
     if (m_shaderProg < 0) {
         string log = glfxGetEffectLog(m_effect);
-        printf("Error compiling program '%s' in effect file '%s':\n", pProgram, m_pEffectFile);
+        printf("Error compiling program '%s' in effect file '%s':\n", pProgram, m_effectFileName.c_str());
         printf("%s\n", log.c_str());
         return false;
     }
@@ -115,7 +115,7 @@ GLint Technique::GetUniformLocation(const char* pUniformName)
     GLuint Location = glGetUniformLocation(m_shaderProg, pUniformName);
 
     if (Location == INVALID_OGL_VALUE) {
-        fprintf(stderr, "Warning! Unable to get the location of uniform '%s'\n", pUniformName);
+        fprintf(stderr, "Warning! Unable to get the location of uniform '%s' in effect file '%s'\n", pUniformName, m_effectFileName.c_str());
     }
 
     return Location;

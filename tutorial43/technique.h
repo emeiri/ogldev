@@ -20,6 +20,7 @@
 #define	TECHNIQUE_H
 
 #include <list>
+#include <string>
 #include <GL/glew.h>
 
 #include "math_3d.h"
@@ -69,7 +70,7 @@ protected:
 private:    
     GLint m_effect;    
     GLint m_shaderProg;
-    const char* m_pEffectFile;
+    std::string m_effectFileName;
 };
 
 #define INVALID_UNIFORM_LOCATION 0xFFFFFFFF
