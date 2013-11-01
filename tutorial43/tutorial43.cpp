@@ -85,7 +85,7 @@ public:
         m_pointLight.Attenuation.Linear = 0.0f;
         m_pointLight.Position  = Vector3f(0.0, 10.0, 5.0f);
 
-        m_persProjInfo.FOV = 60.0f;
+        m_persProjInfo.FOV = 90.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
@@ -139,6 +139,9 @@ public:
 		if (!m_quad.LoadMesh("models/quad.obj")) {
             return false;
         }
+
+        m_quad.GetOrientation().m_scale = Vector3f(10.0f, 10.0f, 10.0f);
+        m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
 
 		m_pGroundTex = new Texture(GL_TEXTURE_2D, "models/checkers.png");
 
@@ -221,19 +224,26 @@ public:
                                                  ProjInfo);
             m_mesh.Render();
             GLExitIfError();        
+            
+       /*      m_pShadowMapEffect->ApplyOrientation(m_quad.GetOrientation(), m_pointLight.Position, gCameraDirections[i].Target, 
+                                                 gCameraDirections[i].Up, 
+                                                 ProjInfo);*/
+        
+        // Render the quad
+     //   m_quad.Render();
         }        
+        
+       
+        
         
         GLExitIfError();        
         
       //  m_shadowMapFBO.ShowColorBuffer(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
-        
-        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);        
-        GLExitIfError();        
     }
         
     void RenderPass()
     {
-      //  glCullFace(GL_BACK);
+    //    glCullFace(GL_BACK);
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -241,28 +251,18 @@ public:
         m_pLightingEffect->Enable();
              
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
-
-        Pipeline p;
-        p.SetPerspectiveProj(m_persProjInfo);
+                
         m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
         
+        m_pLightingEffect->ApplyOrientation(m_quad.GetOrientation(), *m_pGameCamera, m_persProjInfo);
+         
         // Render the quad
-        p.Scale(10.0f);
-        p.WorldPos(0.0f, 0.0f, 0.0f);
-        p.Rotate(90.0f, 0.0f, 0.0f);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());                
-        m_pLightingEffect->SetWVP(p.GetWVPTrans());
-        m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
         GLExitIfError();        
-             
+
         // Render the object
-        p.Scale(1.0f);
-        p.Rotate(90.0f, 0.0f, 0.0f);
-        p.WorldPos(0.0f, 2.0f, 5.0f);
-        m_pLightingEffect->SetWVP(p.GetWVPTrans());
-        m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
+        m_pLightingEffect->ApplyOrientation(m_mesh.GetOrientation(), *m_pGameCamera, m_persProjInfo);         
         m_mesh.Render();        
         GLExitIfError();        
     }

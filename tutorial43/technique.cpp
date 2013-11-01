@@ -68,11 +68,20 @@ void Technique::ApplyOrientation(const Orientation& orientation,
     p.SetPerspectiveProj(ProjInfo);    
     p.SetCamera(CameraPos, CameraTarget, CameraUp);
     p.Scale(orientation.m_scale);
-    p.WorldPos(orientation.m_pos);
+    p.Rotate(orientation.m_rotation);
+    p.WorldPos(orientation.m_pos);    
     
+    SetWorldMatrix(p.GetWorldTrans());
     SetWV(p.GetWVTrans());
     SetWVP(p.GetWVPTrans());
 }
+
+
+void Technique::ApplyOrientation(const Orientation& orientation, const Camera& camera, PersProjInfo& ProjInfo)
+{
+    ApplyOrientation(orientation, camera.GetPos(), camera.GetTarget(), camera.GetUp(), ProjInfo);
+}
+
 
 bool Technique::CompileProgram(const char* pProgram)
 {
@@ -122,21 +131,24 @@ GLint Technique::GetProgramParam(GLint param)
 
 void Technique::SetWVP(const Matrix4f& WVP)
 {
-    assert(m_WVPLocation != INVALID_OGL_VALUE);
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+    if (m_WVPLocation != INVALID_OGL_VALUE) {
+        glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+    }
 }
 
 
 void Technique::SetWV(const Matrix4f& WV)
-{
-    assert(m_WVLocation != INVALID_OGL_VALUE);
-	glUniformMatrix4fv(m_WVLocation, 1, GL_TRUE, (const GLfloat*)WV.m);
+{   
+    if (m_WVLocation != INVALID_OGL_VALUE) {
+        glUniformMatrix4fv(m_WVLocation, 1, GL_TRUE, (const GLfloat*)WV.m);
+    }
 }
 
 
 void Technique::SetWorldMatrix(const Matrix4f& World)
 {
-    assert(m_WorldMatrixLocation != INVALID_OGL_VALUE);
-    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World.m);
+    if (m_WorldMatrixLocation != INVALID_OGL_VALUE) {
+        glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World.m);
+    }
 }
 

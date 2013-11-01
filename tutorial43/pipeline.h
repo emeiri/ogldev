@@ -66,6 +66,11 @@ public:
         m_rotateInfo.y = RotateY;
         m_rotateInfo.z = RotateZ;
     }
+    
+    void Rotate(const Vector3f& r)
+    {
+        Rotate(r.x, r.y, r.z);
+    }
 
     void SetPerspectiveProj(const PersProjInfo& p)
     {

@@ -49,6 +49,10 @@ public:
                           const Vector3f& CameraTarget, 
                           const Vector3f& CameraUp, 
                           PersProjInfo& ProjInfo);
+
+    void ApplyOrientation(const Orientation& orientation, 
+                          const Camera& camera, 
+                          PersProjInfo& ProjInfo);
     
 protected:
     
