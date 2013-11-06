@@ -107,10 +107,14 @@ vec4 CalcDirectionalLight(VSOutput1 In)
 
 float CalcShadowFactor(vec3 LightDirection)
 {
-    float SampledDistance = texture(gShadowMap, LightDirection).r;
+    vec3 LookupVec = vec3(LightDirection.x, LightDirection.y, LightDirection.z);
+LookupVec = normalize(LookupVec);
+    float SampledDistance = texture(gShadowMap, LookupVec).r;
 
    // if (SampledDistance == 0.0)
-         //        return 1.0;
+   //     return 0.0;
+   // else
+    //    return 1.0;
 
     float Distance = length(LightDirection);
 
@@ -124,9 +128,9 @@ vec4 CalcPointLight(PointLight l, VSOutput1 In)
 {                                                                                           
     vec3 LightDirection = In.WorldPos - l.Position;
     float Distance = length(LightDirection);
-    LightDirection = normalize(LightDirection);
+    
     float ShadowFactor = CalcShadowFactor(LightDirection);
-                                                                                            
+LightDirection = normalize(LightDirection);                                                                                            
     vec4 Color = CalcLightInternal(l.Base, LightDirection, In, ShadowFactor);
     float Attenuation =  l.Atten.Constant +                                                 
                          l.Atten.Linear * Distance +                                        

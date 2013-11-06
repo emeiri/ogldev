@@ -30,6 +30,11 @@ public:
     ShadowMapTechnique();
 
     virtual bool Init();
+    
+    void SetLightWorldPos(const Vector3f& Pos);
+    
+private:
+    GLint m_lightWorldPosLoc;
 };
 
 

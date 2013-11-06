@@ -1,18 +1,18 @@
 uniform mat4 gWVP;
-uniform mat4 gWV;
+uniform mat4 gWorld;
+uniform vec3 gLightWorldPos;
                   
-shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec3 ViewPos)
+shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec3 LightToVertex)
 {
     vec4 Pos4 = vec4(Position, 1.0);
     gl_Position = gWVP * Pos4;
-    ViewPos = (gWV * Pos4).xyz;
+    vec4 WorldPos = gWorld * Pos4;
+    LightToVertex = gLightWorldPos - WorldPos.xyz;
 }
 
-out float FragColor;
-
-shader FSmain(in vec3 ViewPos)
+shader FSmain(in vec3 LightToVertex,out float FragColor)
 {
-    float LightToPixelDistance = length(ViewPos);
+    float LightToPixelDistance = length(LightToVertex);
 
     FragColor = LightToPixelDistance;
 }
