@@ -28,7 +28,7 @@ public:
 
     Technique();
 
-    ~Technique();
+    virtual ~Technique();
 
     virtual bool Init();
 
