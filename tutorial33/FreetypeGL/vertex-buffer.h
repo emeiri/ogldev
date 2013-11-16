@@ -359,7 +359,7 @@ vertex_attribute_new( GLuint index,
  * @return       GL enum type
  */
   GLenum
-  GL_TYPE( char ctype );
+  GL_TYPE_( char ctype );
 
 
 /**
