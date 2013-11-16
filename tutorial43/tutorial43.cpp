@@ -54,8 +54,8 @@ CameraDirection gCameraDirections[NUM_OF_LAYERS] =
 {
     { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, -1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
     { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f),  Vector3f(0.0f, -1.0f, 0.0f) }
 };
@@ -82,7 +82,7 @@ public:
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.Attenuation.Linear = 0.0f;
-        m_pointLight.Position  = Vector3f(0.0, 10.0, -3.0f);
+        m_pointLight.Position  = Vector3f(2.0, 8.0, 0.0f);
 
         m_persProjInfo.FOV = 90.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -121,7 +121,7 @@ public:
 
         m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
-        m_lightingEffect.SetPointLights(1, &m_pointLight);
+        m_lightingEffect.SetPointLight(m_pointLight);
      //   m_lightingEffect.SetShadowMapSize((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
         GLExitIfError;
         if (!m_shadowMapEffect.Init()) {
