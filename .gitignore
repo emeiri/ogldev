@@ -19,3 +19,4 @@
 *.idb
 Makefile-Debug.mk
 Makefile-Release.mk
+*.obj
