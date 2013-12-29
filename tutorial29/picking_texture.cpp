@@ -49,7 +49,7 @@ bool PickingTexture::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 {
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);    
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     // Create the texture object for the primitive information buffer
     glGenTextures(1, &m_pickingTexture);
@@ -62,6 +62,9 @@ bool PickingTexture::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     glBindTexture(GL_TEXTURE_2D, m_depthTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);    
+
+	glReadBuffer(GL_NONE);
+	glDrawBuffer(GL_NONE);
 
     // Verify that the FBO is correct
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

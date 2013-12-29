@@ -19,7 +19,7 @@
 #include "util.h"
 
 static const char* pVS = "                                                          \n\
-#version 410                                                                        \n\
+#version 330                                                                        \n\
                                                                                     \n\
 layout (location = 0) in vec3 Position;                                             \n\
                                                                                     \n\
@@ -32,7 +32,7 @@ void main()                                                                     
 
 
 static const char* pFS = "                                                          \n\
-#version 410                                                                        \n\
+#version 330                                                                        \n\
                                                                                     \n\
 #extension GL_EXT_gpu_shader4 : enable                                              \n\
                                                                                     \n\
