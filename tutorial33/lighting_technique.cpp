@@ -24,7 +24,7 @@
 #include "util.h"
 
 static const char* pVS = "                                                          \n\
-#version 410                                                                        \n\
+#version 330                                                                        \n\
                                                                                     \n\
 layout (location = 0) in vec3 Position;                                             \n\
 layout (location = 1) in vec2 TexCoord;                                             \n\
@@ -47,7 +47,7 @@ void main()                                                                     
 }";
 
 static const char* pFS = "                                                          \n\
-#version 410                                                                        \n\
+#version 330                                                                        \n\
                                                                                     \n\
 const int MAX_POINT_LIGHTS = 2;                                                     \n\
 const int MAX_SPOT_LIGHTS = 2;                                                      \n\
