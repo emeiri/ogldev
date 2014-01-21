@@ -22,30 +22,14 @@
 #include <string.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+
+#include "ogldev_util.h"
 #include "math_3d.h"
 
 GLuint VBO;
 
-
-static const char* pVS = "                                                    \n\
-#version 330                                                                  \n\
-                                                                              \n\
-layout (location = 0) in vec3 Position;                                       \n\
-                                                                              \n\
-void main()                                                                   \n\
-{                                                                             \n\
-    gl_Position = vec4(0.5 * Position.x, 0.5 * Position.y, Position.z, 1.0);  \n\
-}";
-
-static const char* pFS = "                                                    \n\
-#version 330                                                                  \n\
-                                                                              \n\
-out vec4 FragColor;                                                           \n\
-                                                                              \n\
-void main()                                                                   \n\
-{                                                                             \n\
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);                                     \n\
-}";
+const char* pVSFileName = "shader.vs";
+const char* pFSFileName = "shader.fs";
 
 static void RenderSceneCB()
 {
@@ -115,9 +99,21 @@ static void CompileShaders()
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
+    
+    string vs, fs;
 
-    AddShader(ShaderProgram, pVS, GL_VERTEX_SHADER);
-    AddShader(ShaderProgram, pFS, GL_FRAGMENT_SHADER);
+    if (!ReadFile(pVSFileName, vs)) {
+        fprintf(stderr, "Error reading '%s' - make sure you execute the tutorial from its root directory", pVSFileName);
+        exit(1);
+    };
+
+    if (!ReadFile(pFSFileName, fs)) {
+        fprintf(stderr, "Error reading '%s' - make sure you execute the tutorial from its root directory", pFSFileName);
+        exit(1);
+    };
+
+    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
+    AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
     GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };
