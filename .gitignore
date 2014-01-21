@@ -1,5 +1,6 @@
 */build/*
 */dist/*
+*/nbproject/private/*
 /.project
 *.o
 *.gz
