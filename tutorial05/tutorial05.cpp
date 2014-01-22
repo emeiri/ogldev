@@ -80,7 +80,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
 
     if (ShaderObj == 0) {
         fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(0);
+        exit(1);
     }
 
     const GLchar* p[1];
@@ -113,12 +113,10 @@ static void CompileShaders()
     string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
-        fprintf(stderr, "Error reading '%s' - make sure you execute the tutorial from its root directory", pVSFileName);
         exit(1);
     };
 
     if (!ReadFile(pFSFileName, fs)) {
-        fprintf(stderr, "Error reading '%s' - make sure you execute the tutorial from its root directory", pFSFileName);
         exit(1);
     };
 

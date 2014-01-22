@@ -52,15 +52,21 @@
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Common"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../Common"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="../Common/ogldev_util.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
@@ -68,8 +74,6 @@
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial04.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="util.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -92,12 +96,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="../Common/ogldev_util.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
@@ -105,8 +103,6 @@
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial04.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="util.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

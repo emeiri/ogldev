@@ -103,12 +103,10 @@ static void CompileShaders()
     string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
-        fprintf(stderr, "Error reading '%s' - make sure you execute the tutorial from its root directory", pVSFileName);
         exit(1);
     };
 
     if (!ReadFile(pFSFileName, fs)) {
-        fprintf(stderr, "Error reading '%s' - make sure you execute the tutorial from its root directory", pFSFileName);
         exit(1);
     };
 
