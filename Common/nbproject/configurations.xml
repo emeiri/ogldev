@@ -41,6 +41,7 @@
           <incDir>
             <pElem>../Include</pElem>
           </incDir>
+          <warningLevel>2</warningLevel>
         </ccTool>
         <archiverTool>
         </archiverTool>

@@ -117,6 +117,7 @@ static void CompileShaders()
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
+	
     string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
