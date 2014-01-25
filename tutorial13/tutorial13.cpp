@@ -25,6 +25,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include "ogldev_util.h"
 #include "pipeline.h"
 
 #define WINDOW_WIDTH 1024
@@ -34,33 +35,9 @@ GLuint VBO;
 GLuint IBO;
 GLuint gWVPLocation;
 
+const char* pVSFileName = "shader.vs";
+const char* pFSFileName = "shader.fs";
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-out vec4 Color;                                                                     \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-    Color = vec4(clamp(Position, 0.0, 1.0), 1.0);                                   \n\
-}";
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-in vec4 Color;                                                                      \n\
-                                                                                    \n\
-out vec4 FragColor;                                                                 \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    FragColor = Color;                                                              \n\
-}";
 
 static void RenderSceneCB()
 {
@@ -131,7 +108,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
 
     if (ShaderObj == 0) {
         fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(0);
+        exit(1);
     }
 
     const GLchar* p[1];
@@ -160,9 +137,19 @@ static void CompileShaders()
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
+	
+    string vs, fs;
 
-    AddShader(ShaderProgram, pVS, GL_VERTEX_SHADER);
-    AddShader(ShaderProgram, pFS, GL_FRAGMENT_SHADER);
+    if (!ReadFile(pVSFileName, vs)) {
+        exit(1);
+    };
+
+    if (!ReadFile(pFSFileName, fs)) {
+        exit(1);
+    };
+
+    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
+    AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
     GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };
@@ -205,6 +192,8 @@ int main(int argc, char** argv)
       fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
       return 1;
     }
+    
+    printf("GL version: %s\n", glGetString(GL_VERSION));
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
