@@ -8,84 +8,201 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial03", "Tutorial03.vcxproj", "{22BADDD0-A309-4038-9E72-C791D68C945D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial04", "Tutorial04.vcxproj", "{4F681095-37FE-4566-A5E7-ADD850DEB7B9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial05", "Tutorial05.vcxproj", "{DC24D494-5BBF-4424-950F-9254F7E9867E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial06", "Tutorial06.vcxproj", "{E6270476-F262-40D4-BDAD-E94D83699326}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial07", "Tutorial07.vcxproj", "{1925B463-3BB9-41DF-A56A-8409DA5C814C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial08", "Tutorial08.vcxproj", "{D32B07BC-5BF2-4E65-81FA-70687D2EE4AB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial09", "Tutorial09.vcxproj", "{6423FB2D-B7D2-40FC-9076-82F7393202EA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10", "Tutorial10.vcxproj", "{77878E9B-3D85-43C2-8B8D-5F61542A999F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11", "Tutorial11.vcxproj", "{FD0E5571-B021-4EF8-B7D8-BA6C58EB0228}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12", "Tutorial12.vcxproj", "{4AA0EE62-DDA3-40DF-AD26-6E1785ACD5CC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13", "Tutorial13.vcxproj", "{F1BEE0FD-A789-4029-9B94-F7027C34BEFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial14", "Tutorial14.vcxproj", "{5182440C-1003-4F7C-A13D-C2901DEB1390}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15", "Tutorial15.vcxproj", "{DB017DC7-C52A-475C-B437-7BF98983128A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial16", "Tutorial16.vcxproj", "{44D3A15F-CBAF-4BB8-AADE-A9769DE3BC69}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17", "Tutorial17.vcxproj", "{38192B55-5C31-4369-8F99-42CEE62B6001}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial18", "Tutorial18.vcxproj", "{7C0FC91B-F304-4132-847E-6F903C71EDE6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19", "Tutorial19.vcxproj", "{3A883B18-79AF-4715-9B41-3089A0A17D47}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial20", "Tutorial20.vcxproj", "{ADA1A4F9-EBDA-4C18-860D-F4EDEDDCD49E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial21", "Tutorial21.vcxproj", "{04DFD9D5-2855-42A9-9405-9AFA6D301751}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial22", "Tutorial22.vcxproj", "{88F0C4B4-98CA-4416-9485-B69D09629E5B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial23", "Tutorial23.vcxproj", "{9D3508AA-8A65-4B95-B3CE-C4513B5FA766}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial24", "Tutorial24.vcxproj", "{7E2A08C9-D999-47BE-A9CF-4904FC5A0A8D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial25", "Tutorial25.vcxproj", "{E8AC76D8-F203-4826-A7B3-0F2F6766F6D1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial26", "Tutorial26.vcxproj", "{CC6EFF6F-A2A3-4AD1-B711-14FDDA3C2C50}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial27", "Tutorial27.vcxproj", "{98800B61-7EA1-46F3-B1D5-CC66FD4988D7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial28", "Tutorial28.vcxproj", "{C0F77A67-97EE-432C-A90D-25FE87DD7327}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial29", "Tutorial29.vcxproj", "{1F575449-9D48-4823-AC15-BFA2E5929A21}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30", "Tutorial30.vcxproj", "{3030BB00-B240-4B1F-977B-3E9558B9FB2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial31", "Tutorial31.vcxproj", "{7E8A02E7-4D90-477D-9B4F-A2A2F3562085}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial32", "Tutorial32.vcxproj", "{A0C2A4EB-1EE1-4366-83E0-6A2B4293C07B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial33", "Tutorial33.vcxproj", "{9118B6B5-586B-409C-81E8-394DBA44AD61}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial34", "Tutorial34.vcxproj", "{A0B2B84D-F26D-4BA2-BB2B-A99301525EA0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial35", "Tutorial35.vcxproj", "{DBE97882-EDF6-4263-A3F1-1E7C133F67A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial36", "Tutorial36.vcxproj", "{CDCFEE6D-9EF5-408F-B5D2-19B44FD530C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial37", "Tutorial37.vcxproj", "{CA3953A4-EC20-47B6-B28D-72996389F8B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial38", "Tutorial38.vcxproj", "{AE5705EB-385D-4634-BF5F-FC7C85022ED2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial39", "Tutorial39.vcxproj", "{88C73F5D-7111-473C-A22A-B3AD91423B2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial40", "Tutorial40.vcxproj", "{41EE717A-446C-44F9-88DF-2E4896159829}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial41", "Tutorial41.vcxproj", "{7CB821A7-A444-4249-AB47-1CA8AC1508D7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial42", "Tutorial42.vcxproj", "{FBBF19B3-1A89-434E-9EE8-FD0E7956EDD9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690} = {A964CC6D-D87F-405C-9EB7-9659B2C76690}
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial43", "Tutorial43.vcxproj", "{000502DE-50B1-45B7-B722-B22FB489C7B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common.vcxproj", "{A964CC6D-D87F-405C-9EB7-9659B2C76690}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -261,10 +378,10 @@ Global
 		{FBBF19B3-1A89-434E-9EE8-FD0E7956EDD9}.Debug|Win32.Build.0 = Debug|Win32
 		{FBBF19B3-1A89-434E-9EE8-FD0E7956EDD9}.Release|Win32.ActiveCfg = Release|Win32
 		{FBBF19B3-1A89-434E-9EE8-FD0E7956EDD9}.Release|Win32.Build.0 = Release|Win32
-		{000502DE-50B1-45B7-B722-B22FB489C7B1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{000502DE-50B1-45B7-B722-B22FB489C7B1}.Debug|Win32.Build.0 = Debug|Win32
-		{000502DE-50B1-45B7-B722-B22FB489C7B1}.Release|Win32.ActiveCfg = Release|Win32
-		{000502DE-50B1-45B7-B722-B22FB489C7B1}.Release|Win32.Build.0 = Release|Win32
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690}.Debug|Win32.Build.0 = Debug|Win32
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690}.Release|Win32.ActiveCfg = Release|Win32
+		{A964CC6D-D87F-405C-9EB7-9659B2C76690}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
