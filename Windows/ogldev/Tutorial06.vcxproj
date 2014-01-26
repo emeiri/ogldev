@@ -16,6 +16,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\tutorial06\tutorial06.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial06\shader.fs" />
+    <None Include="..\..\tutorial06\shader.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E6270476-F262-40D4-BDAD-E94D83699326}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

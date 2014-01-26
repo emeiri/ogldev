@@ -19,6 +19,10 @@
     <ClInclude Include="..\..\tutorial13\math_3d.h" />
     <ClInclude Include="..\..\tutorial13\pipeline.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial13\shader.fs" />
+    <None Include="..\..\tutorial13\shader.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F1BEE0FD-A789-4029-9B94-F7027C34BEFA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

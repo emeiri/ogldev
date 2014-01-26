@@ -18,6 +18,10 @@
     <ClCompile Include="..\..\tutorial11\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial11\tutorial11.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial11\shader.fs" />
+    <None Include="..\..\tutorial11\shader.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FD0E5571-B021-4EF8-B7D8-BA6C58EB0228}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
