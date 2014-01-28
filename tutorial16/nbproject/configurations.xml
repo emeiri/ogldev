@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="88">
+<configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -12,6 +12,8 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>shader.fs</itemPath>
+      <itemPath>shader.vs</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -38,7 +40,6 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -46,16 +47,29 @@
       <compileType>
         <ccTool>
           <incDir>
-            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>../Include</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags ImageMagick++`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibLibItem>GLEW</linkerLibLibItem>
-            <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Common"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../Common"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs ImageMagick++`</commandLine>
         </linkerTool>
       </compileType>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
@@ -70,6 +84,10 @@
       </item>
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="shader.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shader.vs" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="texture.h" ex="false" tool="3" flavor2="0">
@@ -79,7 +97,6 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -109,6 +126,10 @@
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shader.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shader.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="texture.cpp" ex="false" tool="1" flavor2="0">
       </item>

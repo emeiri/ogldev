@@ -25,6 +25,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -54,35 +55,8 @@ GLuint gSampler;
 Texture* pTexture = NULL;
 Camera* pGameCamera = NULL;
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec2 TexCoord;                                             \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-out vec2 TexCoord0;                                                                 \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-    TexCoord0 = TexCoord;                                                           \n\
-}";
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-in vec2 TexCoord0;                                                                  \n\
-                                                                                    \n\
-out vec4 FragColor;                                                                 \n\
-                                                                                    \n\
-uniform sampler2D gSampler;                                                         \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    FragColor = texture2D(gSampler, TexCoord0.xy);                                  \n\
-}";
+const char* pVSFileName = "shader.vs";
+const char* pFSFileName = "shader.fs";
 
 static void RenderSceneCB()
 {
@@ -181,7 +155,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
 
     if (ShaderObj == 0) {
         fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(0);
+        exit(1);
     }
 
     const GLchar* p[1];
@@ -211,9 +185,19 @@ static void CompileShaders()
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
+	
+    string vs, fs;
 
-    AddShader(ShaderProgram, pVS, GL_VERTEX_SHADER);
-    AddShader(ShaderProgram, pFS, GL_FRAGMENT_SHADER);
+    if (!ReadFile(pVSFileName, vs)) {
+        exit(1);
+    };
+
+    if (!ReadFile(pFSFileName, fs)) {
+        exit(1);
+    };
+
+    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
+    AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
     GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };
@@ -277,7 +261,7 @@ int main(int argc, char** argv)
 
     glUniform1i(gSampler, 0);
 
-    pTexture = new Texture(GL_TEXTURE_2D, "test.png");
+    pTexture = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
     if (!pTexture->Load()) {
         return 1;
