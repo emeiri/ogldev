@@ -22,6 +22,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -85,7 +86,7 @@ public:
 
         m_pEffect->SetTextureUnit(0);
 
-        m_pTexture = new Texture(GL_TEXTURE_2D, "test.png");
+        m_pTexture = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pTexture->Load()) {
             return false;

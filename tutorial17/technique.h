@@ -36,7 +36,7 @@ public:
 
 protected:
 
-    bool AddShader(GLenum ShaderType, const char* pShaderText);
+    bool AddShader(GLenum ShaderType, const char* pFilename);
 
     bool Finalize();
 
