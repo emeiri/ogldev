@@ -17,9 +17,7 @@
     <ClInclude Include="..\..\tutorial18\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial18\math_3d.h" />
     <ClInclude Include="..\..\tutorial18\pipeline.h" />
-    <ClInclude Include="..\..\tutorial18\technique.h" />
     <ClInclude Include="..\..\tutorial18\texture.h" />
-    <ClInclude Include="..\..\tutorial18\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial18\camera.cpp" />
@@ -27,7 +25,6 @@
     <ClCompile Include="..\..\tutorial18\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial18\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial18\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial18\technique.cpp" />
     <ClCompile Include="..\..\tutorial18\texture.cpp" />
     <ClCompile Include="..\..\tutorial18\tutorial18.cpp" />
   </ItemGroup>
@@ -79,6 +76,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

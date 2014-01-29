@@ -20,3 +20,7 @@
 *.idb
 Makefile-Release.mk
 *.obj
+
+*.log
+
+*.ipch
