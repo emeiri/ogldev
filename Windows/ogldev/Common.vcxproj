@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\ogldev_util.h" />
+    <ClInclude Include="..\..\Include\technique.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A964CC6D-D87F-405C-9EB7-9659B2C76690}</ProjectGuid>

@@ -18,9 +18,15 @@
     <ClCompile Include="..\..\Common\ogldev_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Common\technique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include\ogldev_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

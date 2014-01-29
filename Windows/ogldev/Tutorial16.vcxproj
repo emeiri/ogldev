@@ -23,6 +23,10 @@
     <ClInclude Include="..\..\tutorial16\pipeline.h" />
     <ClInclude Include="..\..\tutorial16\texture.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial16\shader.fs" />
+    <None Include="..\..\tutorial16\shader.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{44D3A15F-CBAF-4BB8-AADE-A9769DE3BC69}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -71,6 +75,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
