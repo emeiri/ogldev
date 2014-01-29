@@ -31,5 +31,14 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 
 #define OGLDEV_FILE_ERROR(FileError) OgldevFileError(__FILE__, __LINE__, FileError);
 
+#define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+
+#ifdef WIN32
+#define SNPRINTF _snprintf_s
+#else
+#define SNPRINTF snprintf
+#endif
+
+
 #endif	/* OGLDEV_UTIL_H */
 

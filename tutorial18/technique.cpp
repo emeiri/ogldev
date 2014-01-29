@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ogldev_util.h"
 #include "technique.h"
 
 Technique::Technique()
@@ -58,8 +59,14 @@ bool Technique::Init()
 }
 
 // Use this method to add shaders to the program. When finished - call finalize()
-bool Technique::AddShader(GLenum ShaderType, const char* pShaderText)
+bool Technique::AddShader(GLenum ShaderType, const char* pFilename)
 {
+    string s;
+    
+    if (!ReadFile(pFilename, s)) {
+        return false;
+    }
+    
     GLuint ShaderObj = glCreateShader(ShaderType);
 
     if (ShaderObj == 0) {
@@ -71,9 +78,9 @@ bool Technique::AddShader(GLenum ShaderType, const char* pShaderText)
     m_shaderObjList.push_back(ShaderObj);
 
     const GLchar* p[1];
-    p[0] = pShaderText;
-    GLint Lengths[1];
-    Lengths[0]= strlen(pShaderText);
+    p[0] = s.c_str();
+    GLint Lengths[1] = { s.size() };
+
     glShaderSource(ShaderObj, 1, p, Lengths);
 
     glCompileShader(ShaderObj);
@@ -84,7 +91,7 @@ bool Technique::AddShader(GLenum ShaderType, const char* pShaderText)
     if (!success) {
         GLchar InfoLog[1024];
         glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
-        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
+        fprintf(stderr, "Error compiling '%s': '%s'\n", pFilename, InfoLog);
         return false;
     }
 

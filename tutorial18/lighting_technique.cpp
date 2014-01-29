@@ -18,68 +18,6 @@
 
 #include "lighting_technique.h"
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-layout (location = 1) in vec2 TexCoord;                                             \n\
-layout (location = 2) in vec3 Normal;                                               \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-uniform mat4 gWorld;                                                                \n\
-                                                                                    \n\
-out vec2 TexCoord0;                                                                 \n\
-out vec3 Normal0;                                                                   \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-    TexCoord0 = TexCoord;                                                           \n\
-    Normal0 = (gWorld * vec4(Normal, 0.0)).xyz;                                     \n\
-}";
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-in vec2 TexCoord0;                                                                  \n\
-in vec3 Normal0;                                                                    \n\
-                                                                                    \n\
-out vec4 FragColor;                                                                 \n\
-                                                                                    \n\
-struct DirectionalLight                                                             \n\
-{                                                                                   \n\
-    vec3 Color;                                                                     \n\
-    float AmbientIntensity;                                                         \n\
-    float DiffuseIntensity;                                                         \n\
-    vec3 Direction;                                                                 \n\
-};                                                                                  \n\
-                                                                                    \n\
-uniform DirectionalLight gDirectionalLight;                                         \n\
-uniform sampler2D gSampler;                                                         \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    vec4 AmbientColor = vec4(gDirectionalLight.Color, 1.0f) *                       \n\
-                        gDirectionalLight.AmbientIntensity;                         \n\
-                                                                                    \n\
-    float DiffuseFactor = dot(normalize(Normal0), -gDirectionalLight.Direction);    \n\
-                                                                                    \n\
-    vec4 DiffuseColor;                                                              \n\
-                                                                                    \n\
-    if (DiffuseFactor > 0) {                                                        \n\
-        DiffuseColor = vec4(gDirectionalLight.Color, 1.0f) *                        \n\
-                       gDirectionalLight.DiffuseIntensity *                         \n\
-                       DiffuseFactor;                                               \n\
-    }                                                                               \n\
-    else {                                                                          \n\
-        DiffuseColor = vec4(0, 0, 0, 0);                                            \n\
-    }                                                                               \n\
-                                                                                    \n\
-    FragColor = texture2D(gSampler, TexCoord0.xy) *                                 \n\
-                (AmbientColor + DiffuseColor);                                      \n\
-}";
-
-
 LightingTechnique::LightingTechnique()
 {   
 }
@@ -90,11 +28,11 @@ bool LightingTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, pVS)) {
+    if (!AddShader(GL_VERTEX_SHADER, "lighting.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, pFS)) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "lighting.fs")) {
         return false;
     }
 
