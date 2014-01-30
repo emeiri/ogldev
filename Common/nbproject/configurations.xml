@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
+      <itemPath>../Include/technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -15,6 +16,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>ogldev_util.cpp</itemPath>
+      <itemPath>technique.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -50,7 +52,11 @@
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="3">
@@ -79,7 +85,11 @@
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

@@ -28,7 +28,7 @@ public:
 
     Technique();
 
-    ~Technique();
+    virtual ~Technique();
 
     virtual bool Init();
 
@@ -41,15 +41,18 @@ protected:
     bool Finalize();
 
     GLint GetUniformLocation(const char* pUniformName);
-
+    
+    GLint GetProgramParam(GLint param);
+    
+    GLuint m_shaderProg;    
+    
 private:
-
-    GLuint m_shaderProg;
 
     typedef std::list<GLuint> ShaderObjList;
     ShaderObjList m_shaderObjList;
 };
 
+#define INVALID_UNIFORM_LOCATION -1
 
 #endif	/* TECHNIQUE_H */
 

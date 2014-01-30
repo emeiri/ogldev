@@ -22,7 +22,7 @@
 #include <string>
 
 #include <GL/glew.h>
-#include <ImageMagick/Magick++.h>
+#include <ImageMagick-6/Magick++.h>
 
 class Texture
 {

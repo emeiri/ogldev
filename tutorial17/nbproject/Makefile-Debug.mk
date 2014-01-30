@@ -40,7 +40,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/pipeline.o \
-	${OBJECTDIR}/technique.o \
 	${OBJECTDIR}/texture.o \
 	${OBJECTDIR}/tutorial17.o
 
@@ -95,11 +94,6 @@ ${OBJECTDIR}/pipeline.o: pipeline.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
-
-${OBJECTDIR}/technique.o: technique.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/technique.o technique.cpp
 
 ${OBJECTDIR}/texture.o: texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
