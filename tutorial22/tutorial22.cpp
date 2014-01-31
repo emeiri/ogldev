@@ -22,7 +22,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -78,7 +78,7 @@ public:
 
         m_pMesh = new Mesh();
 
-        return m_pMesh->LoadMesh("phoenix_ugv.md2");
+        return m_pMesh->LoadMesh("../Content/phoenix_ugv.md2");
     }
 
     void Run()

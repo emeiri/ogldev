@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="88">
+<configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -11,13 +11,13 @@
       <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>pipeline.h</itemPath>
-      <itemPath>technique.h</itemPath>
       <itemPath>texture.h</itemPath>
-      <itemPath>util.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
-                   displayName="Resource Files"
+                   displayName="Shader Files"
                    projectFiles="true">
+      <itemPath>lighting.fs</itemPath>
+      <itemPath>lighting.vs</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -28,7 +28,6 @@
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
-      <itemPath>technique.cpp</itemPath>
       <itemPath>texture.cpp</itemPath>
       <itemPath>tutorial22.cpp</itemPath>
     </logicalFolder>
@@ -48,7 +47,6 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -56,19 +54,31 @@
       <compileType>
         <ccTool>
           <incDir>
-            <pElem>/usr/include/ImageMagick</pElem>
             <pElem>/usr/local/include/assimp</pElem>
+            <pElem>../Include</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags glew ImageMagick++`</commandLine>
         </ccTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial22</output>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibLibItem>GLEW</linkerLibLibItem>
-            <linkerLibLibItem>Magick++</linkerLibLibItem>
             <linkerLibLibItem>assimp</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Common"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../Common"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
         </linkerTool>
       </compileType>
       <item path="callbacks.h" ex="false" tool="3" flavor2="0">
@@ -80,6 +90,10 @@
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -97,22 +111,15 @@
       </item>
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="technique.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="texture.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial22.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="util.h" ex="false" tool="3" flavor2="0">
-      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -141,6 +148,10 @@
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
@@ -157,17 +168,11 @@
       </item>
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="technique.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="texture.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial22.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="util.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>
