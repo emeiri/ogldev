@@ -28,7 +28,7 @@
 #include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
-#include "texture.h"
+#include "ogldev_texture.h"
 
 #define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024

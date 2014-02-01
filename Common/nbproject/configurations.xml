@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
       <itemPath>../Include/technique.h</itemPath>
@@ -15,6 +16,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
     </logicalFolder>
@@ -43,16 +45,21 @@
           <incDir>
             <pElem>../Include</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags ImageMagick++`</commandLine>
           <warningLevel>2</warningLevel>
         </ccTool>
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_texture.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -81,11 +88,15 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_texture.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -7,7 +7,6 @@
       <itemPath>camera.h</itemPath>
       <itemPath>math_3d.h</itemPath>
       <itemPath>pipeline.h</itemPath>
-      <itemPath>texture.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -21,7 +20,6 @@
       <itemPath>camera.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
-      <itemPath>texture.cpp</itemPath>
       <itemPath>tutorial16.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -88,10 +86,6 @@
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="texture.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial16.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -130,10 +124,6 @@
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="texture.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="texture.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial16.cpp" ex="false" tool="1" flavor2="0">
       </item>

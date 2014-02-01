@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/pipeline.o \
-	${OBJECTDIR}/texture.o \
 	${OBJECTDIR}/tutorial22.o
 
 
@@ -100,11 +99,6 @@ ${OBJECTDIR}/pipeline.o: pipeline.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/local/include/assimp -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
-
-${OBJECTDIR}/texture.o: texture.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/assimp -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/texture.o texture.cpp
 
 ${OBJECTDIR}/tutorial22.o: tutorial22.cpp 
 	${MKDIR} -p ${OBJECTDIR}
