@@ -22,7 +22,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -90,19 +90,19 @@ public:
               
         m_pTankMesh = new Mesh();
         
-		if (!m_pTankMesh->LoadMesh("phoenix_ugv.md2")) {
+		if (!m_pTankMesh->LoadMesh("../Content/phoenix_ugv.md2")) {
             return false;
         }
         
         m_pSkyBox = new SkyBox(m_pGameCamera, m_persProjInfo);
 
 		if (!m_pSkyBox->Init(".",
-			"sp3right.jpg",
-			"sp3left.jpg",
-			"sp3top.jpg",
-			"sp3bot.jpg",
-			"sp3front.jpg",
-			"sp3back.jpg")) {
+			"../Content/sp3right.jpg",
+			"../Content/sp3left.jpg",
+			"../Content/sp3top.jpg",
+			"../Content/sp3bot.jpg",
+			"../Content/sp3front.jpg",
+			"../Content/sp3back.jpg")) {
             return false;
         }
         

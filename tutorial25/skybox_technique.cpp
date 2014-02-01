@@ -20,38 +20,7 @@
 #include <string.h>
 
 #include "skybox_technique.h"
-#include "util.h"
-
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-out vec3 TexCoord0;                                                                 \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    vec4 WVP_Pos = gWVP * vec4(Position, 1.0);                                      \n\
-    gl_Position = WVP_Pos.xyww;                                                     \n\
-    TexCoord0   = Position;                                                         \n\
-}";
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-in vec3 TexCoord0;                                                                  \n\
-                                                                                    \n\
-out vec4 FragColor;                                                                 \n\
-                                                                                    \n\
-uniform samplerCube gCubemapTexture;                                                \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    FragColor = texture(gCubemapTexture, TexCoord0);                                \n\
-}";
-
+#include "ogldev_util.h"
 
 
 SkyboxTechnique::SkyboxTechnique()
@@ -64,11 +33,11 @@ bool SkyboxTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, pVS)) {
+    if (!AddShader(GL_VERTEX_SHADER, "skybox.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, pFS)) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "skybox.fs")) {
         return false;
     }
 

@@ -18,7 +18,7 @@
 
 #include "skybox.h"
 #include "pipeline.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 SkyBox::SkyBox(const Camera* pCamera,
                const PersProjInfo& p)
@@ -72,7 +72,7 @@ bool SkyBox::Init(const string& Directory,
         
     m_pMesh = new Mesh();
 
-    return m_pMesh->LoadMesh("sphere.obj"); 
+    return m_pMesh->LoadMesh("../Content/sphere.obj"); 
 }
 
 
