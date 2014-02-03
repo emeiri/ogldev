@@ -23,7 +23,7 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -85,7 +85,7 @@ public:
         m_lightingEffect.SetDirectionalLight(m_directionalLight);
         m_pMesh = new Mesh();
 
-        return m_pMesh->LoadMesh("monkey.obj");
+        return m_pMesh->LoadMesh("../Content/monkey.obj");
     }
 
     void Run()
