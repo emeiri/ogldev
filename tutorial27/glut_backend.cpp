@@ -20,7 +20,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "glut_backend.h"
 
 // Points to the object implementing the ICallbacks interface which was delivered to

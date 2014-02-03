@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "engine_common.h"
 #include "billboard_list.h"
 

@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include "texture.h"
+#include "ogldev_texture.h"
 #include "billboard_technique.h"
 
 class BillboardList
