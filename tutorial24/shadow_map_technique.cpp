@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ogldev_util.h"
 #include "shadow_map_technique.h"
 
 

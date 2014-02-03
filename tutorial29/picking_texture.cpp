@@ -20,7 +20,7 @@
 
 #include "picking_texture.h"
 #include "picking_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 PickingTexture::PickingTexture()
 {
@@ -100,10 +100,25 @@ PickingTexture::PixelInfo PickingTexture::ReadPixel(unsigned int x, unsigned int
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
     PixelInfo Pixel;
-    glReadPixels(x, y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &Pixel);
-
+    glReadPixels(x, y, 1, 1, GL_RGB_INTEGER, GL_INT, &Pixel);
+    GLExitIfError;
+    Pixel.ObjectID = ~Pixel.ObjectID;
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     
     return Pixel;
 }
+
+struct foo
+{
+    uint a,b,c;
+};
+
+/*void PickingTexture::Dump()
+{
+    foo f[1680*1050];
+    
+    glBindTexture(GL_TEXTURE_2D, m_pickingTexture);
+    
+    glGetTexture(GL_TEXTURE_2D, 0, GL_RGB_INTEGER, GL_UNSIGNED_INT, &f);
+}*/

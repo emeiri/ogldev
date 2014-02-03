@@ -126,8 +126,7 @@ bool Technique::Finalize()
     }
 
     // Delete the intermediate shader objects that have been added to the program
-    for (ShaderObjList::iterator it = m_shaderObjList.begin() ; it != m_shaderObjList.end() ; it++)
-    {
+    for (ShaderObjList::iterator it = m_shaderObjList.begin() ; it != m_shaderObjList.end() ; it++) {
         glDeleteShader(*it);
     }
 

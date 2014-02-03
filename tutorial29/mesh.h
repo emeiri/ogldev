@@ -26,9 +26,9 @@
 #include <scene.h>       // Output data structure
 #include <postprocess.h> // Post processing flags
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "math_3d.h"
-#include "texture.h"
+#include "ogldev_texture.h"
 #include "render_callbacks.h"
 
 struct Vertex

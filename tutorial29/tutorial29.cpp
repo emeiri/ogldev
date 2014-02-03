@@ -21,8 +21,10 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <assert.h>
 
-#include "util.h"
+#include "engine_common.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -88,14 +90,14 @@ public:
         if (!m_pickingEffect.Init()) {
             return false;
         }
-        
+               
         if (!m_simpleColorEffect.Init()) {
             return false;
         }
         
         m_pMesh = new Mesh();
 
-        return m_pMesh->LoadMesh("spider.obj");
+        return m_pMesh->LoadMesh("../Content/spider.obj");
     }
 
     void Run()
@@ -123,12 +125,12 @@ public:
         p.SetPerspectiveProj(m_persProjInfo);
 
         m_pickingTexture.EnableWriting();
-        
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         m_pickingEffect.Enable();
-        
-        for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
+
+        for (uint i = 0 ; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
             p.WorldPos(m_worldPos[i]);
             m_pickingEffect.SetObjectIndex(i);
             m_pickingEffect.SetWVP(p.GetWVPTrans());    
@@ -153,9 +155,10 @@ public:
         // and color it red
         if (m_leftMouseButton.IsPressed) {
             PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
-            
+            GLExitIfError;
             if (Pixel.PrimID != 0) {                
                 m_simpleColorEffect.Enable();
+                assert(Pixel.ObjectID < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
                 p.WorldPos(m_worldPos[Pixel.ObjectID]);
                 m_simpleColorEffect.SetWVP(p.GetWVPTrans());
                 // Must compensate for the decrement in the FS!

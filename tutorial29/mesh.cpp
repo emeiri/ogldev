@@ -203,7 +203,7 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    
+GLExitIfError;    
     for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, m_Entries[i].VB);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
@@ -211,17 +211,17 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);
-
+GLExitIfError;
         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
-
+GLExitIfError;
         if (MaterialIndex < m_Textures.size() && m_Textures[MaterialIndex]) {
             m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
         }
-
+GLExitIfError;
         if (pRenderCallbacks) {
             pRenderCallbacks->DrawStartCB(i);
         }
-        
+GLExitIfError;        
         glDrawElements(GL_TRIANGLES, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);
     }
 

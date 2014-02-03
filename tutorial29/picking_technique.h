@@ -21,6 +21,7 @@
 #include "technique.h"
 #include "math_3d.h"
 #include "render_callbacks.h"
+#include "ogldev_types.h"
 
 class PickingTechnique : public Technique, public IRenderCallbacks
 {
@@ -32,9 +33,9 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
 
-    void SetObjectIndex(unsigned int ObjectIndex);
+    void SetObjectIndex(uint ObjectIndex);
     
-    void DrawStartCB(unsigned int DrawIndex);
+    void DrawStartCB(uint DrawIndex);
     
 private:
     

@@ -16,30 +16,8 @@
 */
 
 #include "simple_color_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-}";
-
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout(location = 0) out vec4 FragColor;                                            \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    FragColor = vec4(1.0, 0.0, 0.0, 1.0);                                           \n\
-}";
 
 
 
@@ -53,11 +31,11 @@ bool SimpleColorTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, pVS)) {
+    if (!AddShader(GL_VERTEX_SHADER, "simple_color.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, pFS)) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "simple_color.fs")) {
         return false;
     }
     

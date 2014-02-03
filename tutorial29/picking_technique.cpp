@@ -16,35 +16,8 @@
 */
 
 #include "picking_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
-static const char* pVS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-layout (location = 0) in vec3 Position;                                             \n\
-                                                                                    \n\
-uniform mat4 gWVP;                                                                  \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    gl_Position = gWVP * vec4(Position, 1.0);                                       \n\
-}";
-
-
-static const char* pFS = "                                                          \n\
-#version 330                                                                        \n\
-                                                                                    \n\
-#extension GL_EXT_gpu_shader4 : enable                                              \n\
-                                                                                    \n\
-out uvec3 FragColor;                                                                \n\
-                                                                                    \n\
-uniform uint gDrawIndex;                                                            \n\
-uniform uint gObjectIndex;                                                          \n\
-                                                                                    \n\
-void main()                                                                         \n\
-{                                                                                   \n\
-    FragColor = uvec3(gObjectIndex, gDrawIndex,gl_PrimitiveID + 1);                 \n\
-}";
 
 
 
@@ -58,11 +31,11 @@ bool PickingTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, pVS)) {
+    if (!AddShader(GL_VERTEX_SHADER, "picking.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, pFS)) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "picking.fs")) {
         return false;
     }
     
@@ -90,13 +63,15 @@ void PickingTechnique::SetWVP(const Matrix4f& WVP)
 }
 
 
-void PickingTechnique::DrawStartCB(unsigned int DrawIndex)
+void PickingTechnique::DrawStartCB(uint DrawIndex)
 {
     glUniform1ui(m_drawIndexLocation, DrawIndex);
 }
 
 
-void PickingTechnique::SetObjectIndex(unsigned int ObjectIndex)
+void PickingTechnique::SetObjectIndex(uint ObjectIndex)
 {
+    GLExitIfError;
     glUniform1ui(m_objectIndexLocation, ObjectIndex);
+//    GLExitIfError;
 }

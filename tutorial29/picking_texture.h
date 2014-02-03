@@ -48,6 +48,8 @@ public:
 
     PixelInfo ReadPixel(unsigned int x, unsigned int y);
 
+    //void Dump();
+    
 private:
     GLuint m_fbo;
     GLuint m_pickingTexture;
