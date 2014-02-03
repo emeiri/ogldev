@@ -23,7 +23,7 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -83,7 +83,7 @@ public:
         //glPatchParameteri(GL_PATCH_VERTICES, 3);
      
         glActiveTexture(GL_TEXTURE4);
-        m_pDisplacementMap = new Texture(GL_TEXTURE_2D, "heightmap.jpg");
+        m_pDisplacementMap = new Texture(GL_TEXTURE_2D, "../Content/heightmap.jpg");
         
         if (!m_pDisplacementMap->Load()) {
             return false;
@@ -92,7 +92,7 @@ public:
         m_pDisplacementMap->Bind(DISPLACEMENT_TEXTURE_UNIT);
                 
         glActiveTexture(GL_TEXTURE0);
-        m_pColorMap = new Texture(GL_TEXTURE_2D, "diffuse.jpg");
+        m_pColorMap = new Texture(GL_TEXTURE_2D, "../Content/diffuse.jpg");
         
         if (!m_pColorMap->Load()) {
             return false;
@@ -101,16 +101,14 @@ public:
         m_pColorMap->Bind(COLOR_TEXTURE_UNIT);
 
         m_lightingEffect.Enable();
-                GLExitIfError();
+
         m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetDisplacementMapTextureUnit(DISPLACEMENT_TEXTURE_UNIT_INDEX);
-                GLExitIfError();
         m_lightingEffect.SetDirectionalLight(m_directionalLight);
-                       GLExitIfError();
         m_lightingEffect.SetDispFactor(m_dispFactor);                        
         m_pMesh = new Mesh();
 
-        return m_pMesh->LoadMesh("quad2.obj");
+        return m_pMesh->LoadMesh("../Content/quad2.obj");
     }
 
     void Run()
@@ -130,15 +128,15 @@ public:
         p.SetPerspectiveProj(m_persProjInfo);
         
         // render the objects as usual
-        //m_lightingEffect.Enable();
-        GLExitIfError();       
+        m_lightingEffect.Enable();
+
         m_lightingEffect.SetEyeWorldPos(m_pGameCamera->GetPos());        
         m_lightingEffect.SetVP(p.GetVPTrans());
         m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());                
         m_lightingEffect.SetDispFactor(m_dispFactor);
-        GLExitIfError();       
+
         m_pMesh->Render(NULL);
-        GLExitIfError();
+
         glutSwapBuffers();
     }
 
