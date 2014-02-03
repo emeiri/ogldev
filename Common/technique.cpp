@@ -145,9 +145,9 @@ void Technique::Enable()
 
 GLint Technique::GetUniformLocation(const char* pUniformName)
 {
-    GLint Location = glGetUniformLocation(m_shaderProg, pUniformName);
+    GLuint Location = glGetUniformLocation(m_shaderProg, pUniformName);
 
-    if (Location == INVALID_OGL_VALUE) {
+    if (Location == INVALID_UNIFORM_LOCATION) {
         fprintf(stderr, "Warning! Unable to get the location of uniform '%s'\n", pUniformName);
     }
 

@@ -18,7 +18,7 @@
 
 #include "random_texture.h"
 #include "math_3d.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 
 RandomTexture::RandomTexture()

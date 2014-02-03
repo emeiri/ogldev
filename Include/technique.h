@@ -52,7 +52,5 @@ private:
     ShaderObjList m_shaderObjList;
 };
 
-#define INVALID_UNIFORM_LOCATION -1
-
 #endif	/* TECHNIQUE_H */
 

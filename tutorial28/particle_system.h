@@ -24,7 +24,7 @@
 #include "ps_update_technique.h"
 #include "random_texture.h"
 #include "billboard_technique.h"
-#include "texture.h"
+#include "ogldev_texture.h"
 
 class ParticleSystem
 {

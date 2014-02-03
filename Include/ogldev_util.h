@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
-
+#include <string.h>
 #include "ogldev_types.h"
 
 using namespace std;
@@ -48,7 +48,8 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define RANDOM random
 #define SRANDOM srandom(getpid())
 #endif
-#define INVALID_OGL_VALUE -1
+#define INVALID_UNIFORM_LOCATION 0xffffffff
+#define INVALID_OGL_VALUE 0xffffffff
 
 #define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
 
@@ -63,5 +64,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 }
 
 #define GLCheckError() (glGetError() == GL_NO_ERROR)
+
+long long GetCurrentTimeMillis();
 #endif	/* OGLDEV_UTIL_H */
 

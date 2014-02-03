@@ -20,15 +20,12 @@
 
 #include <stdlib.h>
 #include <math.h>
-#ifndef WIN32
-#include <sys/time.h>
-#endif
 #include <assert.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "util.h"
 #include "engine_common.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -40,21 +37,6 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
-#ifdef WIN32
-static long long GetCurrentTimeMillis()
-{
-	return GetTickCount();
-}
-#else
-static long long GetCurrentTimeMillis()
-{
-	timeval t;
-	gettimeofday(&t, NULL);
-
-	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-	return ret;
-}
-#endif
 
 class Tutorial28 : public ICallbacks
 {
@@ -119,7 +101,7 @@ public:
             return false;
         }
                        
-        m_pTexture = new Texture(GL_TEXTURE_2D, "bricks.jpg");
+        m_pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
         
         if (!m_pTexture->Load()) {
             return false;
@@ -127,7 +109,7 @@ public:
         
         m_pTexture->Bind(COLOR_TEXTURE_UNIT);
 
-        m_pNormalMap = new Texture(GL_TEXTURE_2D, "normal_map.jpg");
+        m_pNormalMap = new Texture(GL_TEXTURE_2D, "../Content/normal_map.jpg");
         
         if (!m_pNormalMap->Load()) {
             return false;
