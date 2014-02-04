@@ -18,9 +18,9 @@
 
 #include <stdio.h>
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "gbuffer.h"
-#include "texture.h"
+#include "ogldev_texture.h"
 
 GBuffer::GBuffer()
 {

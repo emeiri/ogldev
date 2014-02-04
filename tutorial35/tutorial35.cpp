@@ -24,7 +24,7 @@
 #include <string>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -83,7 +83,7 @@ public:
 		m_DSGeomPassTech.Enable();
 		m_DSGeomPassTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 
-        if (!m_mesh.LoadMesh("phoenix_ugv.md2")) {
+        if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
 			return false;
 		}
 
