@@ -21,15 +21,14 @@
 #include <string>
 #include <glfx.h>
 
-
 #include "lighting_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 using namespace std;
 
 static const char* pEffectFile = "shaders/lighting.glsl";
 
-LightingTechnique::LightingTechnique() : Technique(pEffectFile)
+LightingTechnique::LightingTechnique() : GLFXTechnique(pEffectFile)
 {   
 }
 

@@ -409,7 +409,7 @@ vertex_attribute_parse( int index, char *format )
         int size;
         char ctarget, ctype;
         sscanf( format, "%c%d%c", &ctarget, &size, &ctype );
-        GLenum type = GL_TYPE( ctype );
+        GLenum type = _GL_TYPE( ctype );
         return vertex_attribute_new( index, size, type, GL_FALSE, 0, 0 );
     }
 
@@ -452,7 +452,7 @@ vertex_attribute_new( GLuint index,
 
 // ----------------------------------------------------------------------------
 GLenum
-GL_TYPE( char ctype )
+_GL_TYPE( char ctype )
 {
     switch( ctype )
     {

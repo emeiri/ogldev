@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="89">
+<configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="f1" displayName="FreeTypeGL" projectFiles="true">
       <itemPath>FreetypeGL/font-manager.c</itemPath>
@@ -72,7 +72,6 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -103,39 +102,21 @@
             <linkerLibLibItem>freetype</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
             <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Common"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../Common"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="engine_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="shaders/shadow_map.glsl"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_technique.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_technique.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
@@ -176,6 +157,8 @@
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="engine_common.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
@@ -198,6 +181,16 @@
       </item>
       <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="shaders/shadow_map.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shadow_map_fbo.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shadow_map_fbo.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="technique.h" ex="false" tool="3" flavor2="0">
@@ -213,7 +206,6 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -255,36 +247,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="engine_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="shaders/shadow_map.glsl"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_technique.cpp"
-            ex="false"
-            tool="1"
-            flavor2="0">
-      </item>
-      <item path="shadow_map_technique.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.h" ex="false" tool="3" flavor2="0">
@@ -325,6 +287,8 @@
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="engine_common.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
@@ -346,6 +310,16 @@
       <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/shadow_map.glsl" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shadow_map_fbo.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shadow_map_fbo.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

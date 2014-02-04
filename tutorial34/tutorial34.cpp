@@ -24,10 +24,10 @@
 #include <string>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
-#include "texture.h"
+#include "ogldev_texture.h"
 #include "lighting_technique.h"
 #include "glut_backend.h"
 #include "mesh.h"

@@ -11,7 +11,7 @@ shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out vec3 World
 
 shader FSmain(in vec3 WorldPos,out float FragColor)
 {
-	vec3 LightToVertex = WorldPos - gLightWorldPos;
+    vec3 LightToVertex = WorldPos - gLightWorldPos;
 
     float LightToPixelDistance = length(LightToVertex);
 

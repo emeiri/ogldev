@@ -18,7 +18,7 @@
 #ifndef LIGHTING_TECHNIQUE_H
 #define	LIGHTING_TECHNIQUE_H
 
-#include "technique.h"
+#include "glfx_technique.h"
 #include "math_3d.h"
 
 struct BaseLight
@@ -77,7 +77,7 @@ struct SpotLight : public PointLight
     }
 };
 
-class LightingTechnique : public Technique {
+class LightingTechnique : public GLFXTechnique {
 public:
 
     static const unsigned int MAX_POINT_LIGHTS = 2;

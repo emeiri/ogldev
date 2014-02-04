@@ -163,14 +163,14 @@ bool FontShader::InitFontShader()
     //
     m_transLoc = glGetUniformLocation(m_shaderProg, "gTrans");
 
-    if (m_transLoc == -1) {
+    if (m_transLoc == 0xffffffff) {
         fprintf(stderr, "%s:%d - error getting uniform location of 'gTrans'\n", __FILE__, __LINE__);
         goto exit_error;
     }
     
     m_fontMapLoc = glGetUniformLocation(m_shaderProg, "gFontMap");
    
-    if (m_fontMapLoc == -1) {
+    if (m_fontMapLoc == 0xffffffff) {
         fprintf(stderr, "%s:%d - error getting the uniform location of 'gFontMap'\n", __FILE__, __LINE__);
         return false;
     }
