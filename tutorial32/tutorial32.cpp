@@ -23,7 +23,7 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -92,19 +92,19 @@ public:
 
         m_pMesh1 = new Mesh();
 
-        if (!m_pMesh1->LoadMesh("phoenix_ugv.md2")) {
+        if (!m_pMesh1->LoadMesh("../Content/phoenix_ugv.md2")) {
             return false;            
         }
         
         m_pMesh2 = new Mesh();
 
-        if (!m_pMesh2->LoadMesh("jeep.obj")) {
+        if (!m_pMesh2->LoadMesh("../Content/jeep.obj")) {
             return false;            
         }
 
         m_pMesh3 = new Mesh();
 
-        if (!m_pMesh3->LoadMesh("hheli.obj")) {
+        if (!m_pMesh3->LoadMesh("../Content/hheli.obj")) {
             return false;            
         }
         
