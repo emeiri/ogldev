@@ -19,15 +19,11 @@
 */
 
 #include <math.h>
-
 #include <GL/glew.h>
-#ifndef WIN32
-#include <GL/glxew.h>
-#endif
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -106,7 +102,7 @@ public:
 
         m_pMesh = new Mesh();
 
-        if (!m_pMesh->LoadMesh("spider.obj")) {
+        if (!m_pMesh->LoadMesh("../Content/spider.obj")) {
             return false;            
         }
         
