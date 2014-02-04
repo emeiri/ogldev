@@ -21,18 +21,9 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#ifdef WIN32
-float fmax(float a, float b)
-{
-    if (a > b)
-        return a;
-    else
-        return b;
-}
-#endif
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -121,15 +112,15 @@ public:
 		m_DSDirLightPassTech.SetDirectionalLight(m_dirLight);
         m_DSDirLightPassTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         
-        if (!m_quad.LoadMesh("quad.obj")) {
+        if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
-        if (!m_box.LoadMesh("box.obj")) {
+        if (!m_box.LoadMesh("../Content/box.obj")) {
 			return false;
 		}
 
-        if (!m_bsphere.LoadMesh("sphere.obj")) {
+        if (!m_bsphere.LoadMesh("../Content/sphere.obj")) {
 			return false;
 		}
 

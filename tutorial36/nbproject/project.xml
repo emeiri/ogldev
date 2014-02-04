@@ -5,7 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
             <name>Tutorial36</name>
             <make-project-type>0</make-project-type>
-            <c-extensions>c</c-extensions>
+            <c-extensions/>
             <cpp-extensions>cpp</cpp-extensions>
             <header-extensions>h</header-extensions>
             <sourceEncoding>UTF-8</sourceEncoding>

@@ -20,16 +20,29 @@
 #include <string.h>
 
 #include "ds_geom_pass_tech.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 
-DSGeomPassTech::DSGeomPassTech() : Technique("shaders/geometry_pass.glsl")
+DSGeomPassTech::DSGeomPassTech()
 {   
 }
 
 bool DSGeomPassTech::Init()
 {
-    if (!CompileProgram("GeometryPass")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/geometry_pass.vs")) {
+        return false;
+    }
+
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/geometry_pass.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
 

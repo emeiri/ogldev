@@ -72,3 +72,13 @@ long long GetCurrentTimeMillis()
 	return ret;
 #endif    
 }
+
+#ifdef WIN32
+float fmax(float a, float b)
+{
+    if (a > b)
+        return a;
+    else
+        return b;
+}
+#endif

@@ -20,10 +20,10 @@
 #include <string.h>
 
 #include "ds_light_pass_tech.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 
-DSLightPassTech::DSLightPassTech() : Technique("shaders/light_pass.glsl")
+DSLightPassTech::DSLightPassTech()
 {   
 }
 

@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "ds_point_light_pass_tech.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 
 DSPointLightPassTech::DSPointLightPassTech()
@@ -29,14 +29,23 @@ DSPointLightPassTech::DSPointLightPassTech()
 
 bool DSPointLightPassTech::Init()
 {
-    if (!CompileProgram("PointLightPass")) {
+    if (!Technique::Init()) {
         return false;
     }
-    
-    if (!DSLightPassTech::Init()) {
-        return false;
-    }   
 
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/light_pass.vs")) {
+        return false;
+    }
+
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/point_light_pass.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
+        return false;
+    }
+   
     m_pointLightLocation.Color = GetUniformLocation("gPointLight.Base.Color");
     m_pointLightLocation.AmbientIntensity = GetUniformLocation("gPointLight.Base.AmbientIntensity");
     m_pointLightLocation.Position = GetUniformLocation("gPointLight.Position");
@@ -55,7 +64,7 @@ bool DSPointLightPassTech::Init()
         return false;
     }
 
-	return true;
+	return DSLightPassTech::Init();
 }
 
 

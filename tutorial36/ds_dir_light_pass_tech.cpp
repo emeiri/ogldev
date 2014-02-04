@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "ds_dir_light_pass_tech.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 
 DSDirLightPassTech::DSDirLightPassTech()
@@ -29,14 +29,22 @@ DSDirLightPassTech::DSDirLightPassTech()
 
 bool DSDirLightPassTech::Init()
 {
-    if (!CompileProgram("DirLightPass")) {
-        return false;
-    }
-    
-    if (!DSLightPassTech::Init()) {
+    if (!Technique::Init()) {
         return false;
     }
 
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/light_pass.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/dir_light_pass.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
+        return false;
+    }
+    
     m_dirLightLocation.Color = GetUniformLocation("gDirectionalLight.Base.Color");
     m_dirLightLocation.AmbientIntensity = GetUniformLocation("gDirectionalLight.Base.AmbientIntensity");
     m_dirLightLocation.Direction = GetUniformLocation("gDirectionalLight.Direction");
@@ -49,7 +57,7 @@ bool DSDirLightPassTech::Init()
         return false;
     }
 
-	return true;
+	return DSLightPassTech::Init();
 }
 
 
