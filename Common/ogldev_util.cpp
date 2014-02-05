@@ -19,7 +19,9 @@
 
 #include <iostream>
 #include <fstream>
-#ifndef WIN32
+#ifdef WIN32
+#include <Windows.h>
+#else
 #include <sys/time.h>
 #endif
 
@@ -53,7 +55,9 @@ bool ReadFile(const char* pFileName, string& outFile)
 void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 {
 #ifdef WIN32
-    MessageBox
+	char msg[1000];
+	_snprintf_s(msg, sizeof(msg), "%s:%d: unable to open file `%s`", pFileName, line, pFileError);
+    MessageBoxA(NULL, msg, NULL, 0);
 #else
     fprintf(stderr, "%s:%d: unable to open file `%s`\n", pFileName, line, pFileError);
 #endif    

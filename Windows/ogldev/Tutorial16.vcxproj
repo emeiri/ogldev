@@ -14,14 +14,12 @@
     <ClCompile Include="..\..\tutorial16\camera.cpp" />
     <ClCompile Include="..\..\tutorial16\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial16\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial16\texture.cpp" />
     <ClCompile Include="..\..\tutorial16\tutorial16.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial16\camera.h" />
     <ClInclude Include="..\..\tutorial16\math_3d.h" />
     <ClInclude Include="..\..\tutorial16\pipeline.h" />
-    <ClInclude Include="..\..\tutorial16\texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\tutorial16\shader.fs" />

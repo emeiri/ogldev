@@ -21,8 +21,6 @@
     <ClInclude Include="..\..\tutorial24\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial24\shadow_map_technique.h" />
     <ClInclude Include="..\..\tutorial24\technique.h" />
-    <ClInclude Include="..\..\tutorial24\texture.h" />
-    <ClInclude Include="..\..\tutorial24\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial24\camera.cpp" />
@@ -33,8 +31,6 @@
     <ClCompile Include="..\..\tutorial24\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial24\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial24\shadow_map_technique.cpp" />
-    <ClCompile Include="..\..\tutorial24\technique.cpp" />
-    <ClCompile Include="..\..\tutorial24\texture.cpp" />
     <ClCompile Include="..\..\tutorial24\tutorial24.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -85,6 +81,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

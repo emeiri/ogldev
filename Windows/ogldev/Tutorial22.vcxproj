@@ -18,9 +18,6 @@
     <ClInclude Include="..\..\tutorial22\math_3d.h" />
     <ClInclude Include="..\..\tutorial22\mesh.h" />
     <ClInclude Include="..\..\tutorial22\pipeline.h" />
-    <ClInclude Include="..\..\tutorial22\technique.h" />
-    <ClInclude Include="..\..\tutorial22\texture.h" />
-    <ClInclude Include="..\..\tutorial22\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial22\camera.cpp" />
@@ -29,8 +26,6 @@
     <ClCompile Include="..\..\tutorial22\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial22\mesh.cpp" />
     <ClCompile Include="..\..\tutorial22\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial22\technique.cpp" />
-    <ClCompile Include="..\..\tutorial22\texture.cpp" />
     <ClCompile Include="..\..\tutorial22\tutorial22.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -81,6 +76,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -17,7 +17,6 @@
     <ClInclude Include="..\..\tutorial17\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial17\math_3d.h" />
     <ClInclude Include="..\..\tutorial17\pipeline.h" />
-    <ClInclude Include="..\..\tutorial17\texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial17\camera.cpp" />
@@ -25,7 +24,6 @@
     <ClCompile Include="..\..\tutorial17\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial17\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial17\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial17\texture.cpp" />
     <ClCompile Include="..\..\tutorial17\tutorial17.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\tutorial25\pipeline.h" />
     <ClInclude Include="..\..\tutorial25\skybox.h" />
     <ClInclude Include="..\..\tutorial25\skybox_technique.h" />
-    <ClInclude Include="..\..\tutorial25\technique.h" />
-    <ClInclude Include="..\..\tutorial25\texture.h" />
-    <ClInclude Include="..\..\tutorial25\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial25\camera.cpp" />
@@ -35,8 +32,6 @@
     <ClCompile Include="..\..\tutorial25\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial25\skybox.cpp" />
     <ClCompile Include="..\..\tutorial25\skybox_technique.cpp" />
-    <ClCompile Include="..\..\tutorial25\technique.cpp" />
-    <ClCompile Include="..\..\tutorial25\texture.cpp" />
     <ClCompile Include="..\..\tutorial25\tutorial25.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -87,6 +82,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
