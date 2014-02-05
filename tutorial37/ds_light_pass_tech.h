@@ -28,7 +28,7 @@ public:
 
     DSLightPassTech();
 
-    virtual bool Init();
+    virtual bool Init();    
 
     void SetWVP(const Matrix4f& WVP);
     void SetPositionTextureUnit(unsigned int TextureUnit);
