@@ -22,20 +22,30 @@
 #include <assert.h>
 
 #include "skinning_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 using namespace std;
 
-static const char* pEffectFile = "shaders/skinning.glsl";
-
-SkinningTechnique::SkinningTechnique() : Technique(pEffectFile)
+SkinningTechnique::SkinningTechnique()
 {   
 }
 
 
 bool SkinningTechnique::Init()
 {
-    if (!CompileProgram("Lighting")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/skinning.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/skinning.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
     
