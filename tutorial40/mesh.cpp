@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include "mesh.h"
+#include "engine_common.h"
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
@@ -389,14 +390,12 @@ void Mesh::Render()
         assert(MaterialIndex < m_Textures.size());
         
         if (m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+            m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
         }                
         
 		glDrawElementsBaseVertex(Topology, 
-                               //  6,
                                  m_Entries[i].NumIndices, 
                                  GL_UNSIGNED_INT, 
-                               // (void*)(sizeof(uint) * 18), 
                                  (void*)(sizeof(uint) * m_Entries[i].BaseIndex), 
                                  m_Entries[i].BaseVertex);
     }

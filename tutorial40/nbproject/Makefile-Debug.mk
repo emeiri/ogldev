@@ -35,14 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/FreetypeGL/font-manager.o \
-	${OBJECTDIR}/FreetypeGL/font_shader.o \
-	${OBJECTDIR}/FreetypeGL/freetypeGL.o \
-	${OBJECTDIR}/FreetypeGL/texture-atlas.o \
-	${OBJECTDIR}/FreetypeGL/texture-font.o \
-	${OBJECTDIR}/FreetypeGL/texture-glyph.o \
-	${OBJECTDIR}/FreetypeGL/vector.o \
-	${OBJECTDIR}/FreetypeGL/vertex-buffer.o \
 	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/lighting_technique.o \
@@ -51,8 +43,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/null_technique.o \
 	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/shadow_volume_technique.o \
-	${OBJECTDIR}/technique.o \
-	${OBJECTDIR}/texture.o \
 	${OBJECTDIR}/tutorial40.o
 
 
@@ -81,46 +71,6 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial40: /usr/local/lib/libglfx.so
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial40: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial40 ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/FreetypeGL/font-manager.o: FreetypeGL/font-manager.c 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/include/freetype2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/font-manager.o FreetypeGL/font-manager.c
-
-${OBJECTDIR}/FreetypeGL/font_shader.o: FreetypeGL/font_shader.cpp 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/font_shader.o FreetypeGL/font_shader.cpp
-
-${OBJECTDIR}/FreetypeGL/freetypeGL.o: FreetypeGL/freetypeGL.cpp 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/freetypeGL.o FreetypeGL/freetypeGL.cpp
-
-${OBJECTDIR}/FreetypeGL/texture-atlas.o: FreetypeGL/texture-atlas.c 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/include/freetype2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/texture-atlas.o FreetypeGL/texture-atlas.c
-
-${OBJECTDIR}/FreetypeGL/texture-font.o: FreetypeGL/texture-font.c 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/include/freetype2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/texture-font.o FreetypeGL/texture-font.c
-
-${OBJECTDIR}/FreetypeGL/texture-glyph.o: FreetypeGL/texture-glyph.c 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/include/freetype2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/texture-glyph.o FreetypeGL/texture-glyph.c
-
-${OBJECTDIR}/FreetypeGL/vector.o: FreetypeGL/vector.c 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/include/freetype2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/vector.o FreetypeGL/vector.c
-
-${OBJECTDIR}/FreetypeGL/vertex-buffer.o: FreetypeGL/vertex-buffer.c 
-	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
-	${RM} "$@.d"
-	$(COMPILE.c) -g -I/usr/include/freetype2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/vertex-buffer.o FreetypeGL/vertex-buffer.c
 
 ${OBJECTDIR}/camera.o: camera.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -161,16 +111,6 @@ ${OBJECTDIR}/shadow_volume_technique.o: shadow_volume_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/shadow_volume_technique.o shadow_volume_technique.cpp
-
-${OBJECTDIR}/technique.o: technique.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/technique.o technique.cpp
-
-${OBJECTDIR}/texture.o: texture.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/texture.o texture.cpp
 
 ${OBJECTDIR}/tutorial40.o: tutorial40.cpp 
 	${MKDIR} -p ${OBJECTDIR}

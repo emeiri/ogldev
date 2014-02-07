@@ -28,7 +28,7 @@
 #endif
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -51,22 +51,6 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    {.1,1.0,1.0,.5}, {1,1,1,0},
                    0, {1,0,0,1}, 0, {1,0,0,1},
                    0, {0,0,0,1}, 0, {0,0,0,1} };
-#endif
-
-#ifdef WIN32
-static long long GetCurrentTimeMillis()
-{
-	return GetTickCount();
-}
-#else
-static long long GetCurrentTimeMillis()
-{
-	timeval t;
-	gettimeofday(&t, NULL);
-
-	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-	return ret;
-}
 #endif
 
 class Tutorial40 : public ICallbacks
@@ -127,7 +111,7 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);        
 
-        if (!m_box.LoadMesh("models/box.obj", true)) {
+        if (!m_box.LoadMesh("../Content/box.obj", true)) {
             printf("Mesh load failed\n");
             return false;            
         }
@@ -140,11 +124,11 @@ public:
         m_glutTime = glutGet(GLUT_ELAPSED_TIME);
         m_startTime = GetCurrentTimeMillis();
                
-        if (!m_quad.LoadMesh("models/quad.obj", false)) {
+        if (!m_quad.LoadMesh("../Content/quad.obj", false)) {
             return false;
         }
 
-        m_pGroundTex = new Texture(GL_TEXTURE_2D, "models/test.png");
+        m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
@@ -289,9 +273,7 @@ private:
         m_pointLight.DiffuseIntensity = 0.8f;
 
         m_LightingTech.SetPointLights(1, &m_pointLight);
-        
-        m_pGroundTex->Bind(GL_TEXTURE0);
-                              
+                                     
         Pipeline p;
         p.SetPerspectiveProj(m_persProjInfo);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
@@ -306,8 +288,8 @@ private:
         p.WorldPos(0.0f, 0.0f, 0.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
         m_LightingTech.SetWVP(p.GetWVPTrans());
-        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
-        
+        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
+        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();        
     }    
     
@@ -328,7 +310,7 @@ private:
 
         m_LightingTech.SetPointLights(1, &m_pointLight);
 
-        m_pGroundTex->Bind(GL_TEXTURE0);
+        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
                               
         Pipeline p;
         p.SetPerspectiveProj(m_persProjInfo);

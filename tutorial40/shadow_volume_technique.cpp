@@ -25,16 +25,30 @@
 
 using namespace std;
 
-static const char* pEffectFile = "shaders/shadow_volume.glsl";
-
-ShadowVolumeTechnique::ShadowVolumeTechnique() : Technique(pEffectFile)
+ShadowVolumeTechnique::ShadowVolumeTechnique()
 {   
 }
 
 
 bool ShadowVolumeTechnique::Init()
 {
-    if (!CompileProgram("ShadowVolume")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/shadow_volume.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_GEOMETRY_SHADER, "shaders/shadow_volume.gs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/shadow_volume.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
     

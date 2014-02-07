@@ -20,17 +20,27 @@
 #include <string.h>
 
 #include "null_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
-static const char* pEffectFile = "shaders/null_technique.glsl";
-
-NullTechnique::NullTechnique() : Technique(pEffectFile)
+NullTechnique::NullTechnique()
 {   
 }
 
 bool NullTechnique::Init()
 {
-    if (!CompileProgram("NullTechnique")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/null_technique.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/null_technique.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
 
