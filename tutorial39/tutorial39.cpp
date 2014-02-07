@@ -28,7 +28,7 @@
 #endif
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -52,21 +52,6 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-#ifdef WIN32
-static long long GetCurrentTimeMillis()
-{
-	return GetTickCount();
-}
-#else
-static long long GetCurrentTimeMillis()
-{
-	timeval t;
-	gettimeofday(&t, NULL);
-
-	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-	return ret;
-}
-#endif
 class Tutorial39 : public ICallbacks
 {
 public:
@@ -122,7 +107,7 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);        
 
-        if (!m_mesh.LoadMesh("models/box.obj", true)) {
+        if (!m_mesh.LoadMesh("../Content/box.obj", true)) {
             printf("Mesh load failed\n");
             return false;            
         }

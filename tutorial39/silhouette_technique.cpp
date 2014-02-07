@@ -22,20 +22,34 @@
 #include <assert.h>
 
 #include "silhouette_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 using namespace std;
 
-static const char* pEffectFile = "shaders/silhouette.glsl";
-
-SilhouetteTechnique::SilhouetteTechnique() : Technique(pEffectFile)
+SilhouetteTechnique::SilhouetteTechnique()
 {   
 }
 
 
 bool SilhouetteTechnique::Init()
 {
-    if (!CompileProgram("Silhouette")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/silhouette.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_GEOMETRY_SHADER, "shaders/silhouette.gs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/silhouette.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
     
