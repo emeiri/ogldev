@@ -19,8 +19,6 @@
     <ClCompile Include="..\..\tutorial27\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial27\mesh.cpp" />
     <ClCompile Include="..\..\tutorial27\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial27\technique.cpp" />
-    <ClCompile Include="..\..\tutorial27\texture.cpp" />
     <ClCompile Include="..\..\tutorial27\tutorial27.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,9 +32,13 @@
     <ClInclude Include="..\..\tutorial27\math_3d.h" />
     <ClInclude Include="..\..\tutorial27\mesh.h" />
     <ClInclude Include="..\..\tutorial27\pipeline.h" />
-    <ClInclude Include="..\..\tutorial27\technique.h" />
-    <ClInclude Include="..\..\tutorial27\texture.h" />
-    <ClInclude Include="..\..\tutorial27\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial27\billboard.fs" />
+    <None Include="..\..\tutorial27\billboard.gs" />
+    <None Include="..\..\tutorial27\billboard.vs" />
+    <None Include="..\..\tutorial27\lighting.fs" />
+    <None Include="..\..\tutorial27\lighting.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98800B61-7EA1-46F3-B1D5-CC66FD4988D7}</ProjectGuid>
@@ -86,6 +88,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

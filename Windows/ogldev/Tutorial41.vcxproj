@@ -20,14 +20,6 @@
     <ClInclude Include="..\..\tutorial41\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial41\pipeline.h" />
     <ClInclude Include="..\..\tutorial41\skinning_technique.h" />
-    <ClInclude Include="..\..\tutorial41\technique.h" />
-    <ClInclude Include="..\..\tutorial41\texture.h" />
-    <ClInclude Include="..\..\tutorial41\util.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\tutorial41\shaders\lighting.glsl" />
-    <None Include="..\..\tutorial41\shaders\motion_blur.glsl" />
-    <None Include="..\..\tutorial41\shaders\skinning.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial41\camera.cpp" />
@@ -38,9 +30,13 @@
     <ClCompile Include="..\..\tutorial41\motion_blur_technique.cpp" />
     <ClCompile Include="..\..\tutorial41\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial41\skinning_technique.cpp" />
-    <ClCompile Include="..\..\tutorial41\technique.cpp" />
-    <ClCompile Include="..\..\tutorial41\texture.cpp" />
     <ClCompile Include="..\..\tutorial41\tutorial41.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial41\shaders\motion_blur.fs" />
+    <None Include="..\..\tutorial41\shaders\motion_blur.vs" />
+    <None Include="..\..\tutorial41\shaders\skinning.fs" />
+    <None Include="..\..\tutorial41\shaders\skinning.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7CB821A7-A444-4249-AB47-1CA8AC1508D7}</ProjectGuid>
@@ -90,6 +86,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

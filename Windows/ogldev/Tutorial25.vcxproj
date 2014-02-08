@@ -34,6 +34,12 @@
     <ClCompile Include="..\..\tutorial25\skybox_technique.cpp" />
     <ClCompile Include="..\..\tutorial25\tutorial25.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial25\lighting.fs" />
+    <None Include="..\..\tutorial25\lighting.vs" />
+    <None Include="..\..\tutorial25\skybox.fs" />
+    <None Include="..\..\tutorial25\skybox.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E8AC76D8-F203-4826-A7B3-0F2F6766F6D1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

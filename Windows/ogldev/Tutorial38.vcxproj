@@ -20,9 +20,6 @@
     <ClInclude Include="..\..\tutorial38\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial38\pipeline.h" />
     <ClInclude Include="..\..\tutorial38\skinning_technique.h" />
-    <ClInclude Include="..\..\tutorial38\technique.h" />
-    <ClInclude Include="..\..\tutorial38\texture.h" />
-    <ClInclude Include="..\..\tutorial38\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial38\camera.cpp" />
@@ -31,12 +28,11 @@
     <ClCompile Include="..\..\tutorial38\mesh.cpp" />
     <ClCompile Include="..\..\tutorial38\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial38\skinning_technique.cpp" />
-    <ClCompile Include="..\..\tutorial38\technique.cpp" />
-    <ClCompile Include="..\..\tutorial38\texture.cpp" />
     <ClCompile Include="..\..\tutorial38\tutorial38.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial38\shaders\skinning.glsl" />
+    <None Include="..\..\tutorial38\shaders\skinning.fs" />
+    <None Include="..\..\tutorial38\shaders\skinning.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AE5705EB-385D-4634-BF5F-FC7C85022ED2}</ProjectGuid>
@@ -86,6 +82,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

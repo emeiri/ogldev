@@ -19,9 +19,6 @@
     <ClInclude Include="..\..\tutorial32\math_3d.h" />
     <ClInclude Include="..\..\tutorial32\mesh.h" />
     <ClInclude Include="..\..\tutorial32\pipeline.h" />
-    <ClInclude Include="..\..\tutorial32\technique.h" />
-    <ClInclude Include="..\..\tutorial32\texture.h" />
-    <ClInclude Include="..\..\tutorial32\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial32\camera.cpp" />
@@ -30,9 +27,11 @@
     <ClCompile Include="..\..\tutorial32\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial32\mesh.cpp" />
     <ClCompile Include="..\..\tutorial32\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial32\technique.cpp" />
-    <ClCompile Include="..\..\tutorial32\texture.cpp" />
     <ClCompile Include="..\..\tutorial32\tutorial32.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial32\lighting.fs" />
+    <None Include="..\..\tutorial32\lighting.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A0C2A4EB-1EE1-4366-83E0-6A2B4293C07B}</ProjectGuid>
@@ -82,6 +81,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

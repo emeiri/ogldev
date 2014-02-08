@@ -24,9 +24,6 @@
     <ClInclude Include="..\..\tutorial36\math_3d.h" />
     <ClInclude Include="..\..\tutorial36\mesh.h" />
     <ClInclude Include="..\..\tutorial36\pipeline.h" />
-    <ClInclude Include="..\..\tutorial36\technique.h" />
-    <ClInclude Include="..\..\tutorial36\texture.h" />
-    <ClInclude Include="..\..\tutorial36\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial36\camera.cpp" />
@@ -39,13 +36,14 @@
     <ClCompile Include="..\..\tutorial36\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial36\mesh.cpp" />
     <ClCompile Include="..\..\tutorial36\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial36\technique.cpp" />
-    <ClCompile Include="..\..\tutorial36\texture.cpp" />
     <ClCompile Include="..\..\tutorial36\tutorial36.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial36\shaders\geometry_pass.glsl" />
-    <None Include="..\..\tutorial36\shaders\light_pass.glsl" />
+    <None Include="..\..\tutorial36\shaders\dir_light_pass.fs" />
+    <None Include="..\..\tutorial36\shaders\geometry_pass.fs" />
+    <None Include="..\..\tutorial36\shaders\geometry_pass.vs" />
+    <None Include="..\..\tutorial36\shaders\light_pass.vs" />
+    <None Include="..\..\tutorial36\shaders\point_light_pass.fs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CDCFEE6D-9EF5-408F-B5D2-19B44FD530C7}</ProjectGuid>
@@ -95,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

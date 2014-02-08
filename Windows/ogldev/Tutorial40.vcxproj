@@ -22,9 +22,6 @@
     <ClInclude Include="..\..\tutorial40\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial40\pipeline.h" />
     <ClInclude Include="..\..\tutorial40\shadow_volume_technique.h" />
-    <ClInclude Include="..\..\tutorial40\technique.h" />
-    <ClInclude Include="..\..\tutorial40\texture.h" />
-    <ClInclude Include="..\..\tutorial40\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial40\camera.cpp" />
@@ -35,14 +32,16 @@
     <ClCompile Include="..\..\tutorial40\null_technique.cpp" />
     <ClCompile Include="..\..\tutorial40\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial40\shadow_volume_technique.cpp" />
-    <ClCompile Include="..\..\tutorial40\technique.cpp" />
-    <ClCompile Include="..\..\tutorial40\texture.cpp" />
     <ClCompile Include="..\..\tutorial40\tutorial40.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial40\shaders\lighting.glsl" />
-    <None Include="..\..\tutorial40\shaders\null_technique.glsl" />
-    <None Include="..\..\tutorial40\shaders\shadow_volume.glsl" />
+    <None Include="..\..\tutorial40\shaders\lighting.fs" />
+    <None Include="..\..\tutorial40\shaders\lighting.vs" />
+    <None Include="..\..\tutorial40\shaders\null_technique.fs" />
+    <None Include="..\..\tutorial40\shaders\null_technique.vs" />
+    <None Include="..\..\tutorial40\shaders\shadow_volume.fs" />
+    <None Include="..\..\tutorial40\shaders\shadow_volume.gs" />
+    <None Include="..\..\tutorial40\shaders\shadow_volume.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{41EE717A-446C-44F9-88DF-2E4896159829}</ProjectGuid>
@@ -92,6 +91,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

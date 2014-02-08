@@ -19,11 +19,9 @@
 #include <limits.h>
 #include <string.h>
 
-#include "ogldev_util.h"
 #include "math_3d.h"
+#include "ogldev_util.h"
 #include "lighting_technique.h"
-
-
 
 LightingTechnique::LightingTechnique()
 {   

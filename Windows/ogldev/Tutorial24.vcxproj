@@ -33,6 +33,12 @@
     <ClCompile Include="..\..\tutorial24\shadow_map_technique.cpp" />
     <ClCompile Include="..\..\tutorial24\tutorial24.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial24\lighting.fs" />
+    <None Include="..\..\tutorial24\lighting.vs" />
+    <None Include="..\..\tutorial24\shadow_map.fs" />
+    <None Include="..\..\tutorial24\shadow_map.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7E2A08C9-D999-47BE-A9CF-4904FC5A0A8D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

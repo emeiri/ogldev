@@ -26,6 +26,10 @@
     <ClCompile Include="..\..\tutorial17\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial17\tutorial17.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial17\lighting.fs" />
+    <None Include="..\..\tutorial17\lighting.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{38192B55-5C31-4369-8F99-42CEE62B6001}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

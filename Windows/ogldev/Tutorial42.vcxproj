@@ -22,13 +22,6 @@
     <ClInclude Include="..\..\tutorial42\pipeline.h" />
     <ClInclude Include="..\..\tutorial42\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial42\shadow_map_technique.h" />
-    <ClInclude Include="..\..\tutorial42\technique.h" />
-    <ClInclude Include="..\..\tutorial42\texture.h" />
-    <ClInclude Include="..\..\tutorial42\util.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\tutorial42\shaders\lighting.glsl" />
-    <None Include="..\..\tutorial42\shaders\shadow_map.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial42\camera.cpp" />
@@ -39,9 +32,13 @@
     <ClCompile Include="..\..\tutorial42\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial42\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial42\shadow_map_technique.cpp" />
-    <ClCompile Include="..\..\tutorial42\technique.cpp" />
-    <ClCompile Include="..\..\tutorial42\texture.cpp" />
     <ClCompile Include="..\..\tutorial42\tutorial42.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial42\shaders\lighting.fs" />
+    <None Include="..\..\tutorial42\shaders\lighting.vs" />
+    <None Include="..\..\tutorial42\shaders\shadow_map.fs" />
+    <None Include="..\..\tutorial42\shaders\shadow_map.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FBBF19B3-1A89-434E-9EE8-FD0E7956EDD9}</ProjectGuid>
@@ -91,6 +88,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

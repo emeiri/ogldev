@@ -42,26 +42,6 @@
     <ClInclude Include="..\..\tutorial41\skinning_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial41\technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial41\texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial41\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\tutorial41\shaders\lighting.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\tutorial41\shaders\motion_blur.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\tutorial41\shaders\skinning.glsl">
-      <Filter>Shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial41\camera.cpp">
@@ -88,14 +68,22 @@
     <ClCompile Include="..\..\tutorial41\skinning_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial41\technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial41\texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial41\tutorial41.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial41\shaders\motion_blur.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial41\shaders\motion_blur.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial41\shaders\skinning.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial41\shaders\skinning.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

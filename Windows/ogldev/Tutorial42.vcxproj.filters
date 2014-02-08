@@ -48,23 +48,6 @@
     <ClInclude Include="..\..\tutorial42\shadow_map_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial42\technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial42\texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial42\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\tutorial42\shaders\lighting.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\tutorial42\shaders\shadow_map.glsl">
-      <Filter>Shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial42\camera.cpp">
@@ -91,14 +74,22 @@
     <ClCompile Include="..\..\tutorial42\shadow_map_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial42\technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial42\texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial42\tutorial42.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial42\shaders\lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial42\shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial42\shaders\shadow_map.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial42\shaders\shadow_map.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

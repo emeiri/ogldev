@@ -25,9 +25,6 @@
     <ClInclude Include="..\..\tutorial37\mesh.h" />
     <ClInclude Include="..\..\tutorial37\null_technique.h" />
     <ClInclude Include="..\..\tutorial37\pipeline.h" />
-    <ClInclude Include="..\..\tutorial37\technique.h" />
-    <ClInclude Include="..\..\tutorial37\texture.h" />
-    <ClInclude Include="..\..\tutorial37\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial37\camera.cpp" />
@@ -41,14 +38,16 @@
     <ClCompile Include="..\..\tutorial37\mesh.cpp" />
     <ClCompile Include="..\..\tutorial37\null_technique.cpp" />
     <ClCompile Include="..\..\tutorial37\pipeline.cpp" />
-    <ClCompile Include="..\..\tutorial37\technique.cpp" />
-    <ClCompile Include="..\..\tutorial37\texture.cpp" />
     <ClCompile Include="..\..\tutorial37\tutorial37.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial37\shaders\geometry_pass.glsl" />
-    <None Include="..\..\tutorial37\shaders\light_pass.glsl" />
-    <None Include="..\..\tutorial37\shaders\null_technique.glsl" />
+    <None Include="..\..\tutorial37\shaders\dir_light_pass.fs" />
+    <None Include="..\..\tutorial37\shaders\geometry_pass.fs" />
+    <None Include="..\..\tutorial37\shaders\geometry_pass.vs" />
+    <None Include="..\..\tutorial37\shaders\light_pass.vs" />
+    <None Include="..\..\tutorial37\shaders\null_technique.fs" />
+    <None Include="..\..\tutorial37\shaders\null_technique.vs" />
+    <None Include="..\..\tutorial37\shaders\point_light_pass.fs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CA3953A4-EC20-47B6-B28D-72996389F8B6}</ProjectGuid>
@@ -98,6 +97,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

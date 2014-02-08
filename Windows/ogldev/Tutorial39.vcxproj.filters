@@ -45,15 +45,6 @@
     <ClInclude Include="..\..\tutorial39\silhouette_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial39\technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial39\texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial39\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial39\camera.cpp">
@@ -77,21 +68,24 @@
     <ClCompile Include="..\..\tutorial39\silhouette_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial39\technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial39\texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial39\tutorial39.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial39\shaders\lighting.glsl">
+    <None Include="..\..\tutorial39\shaders\lighting.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\tutorial39\shaders\silhouette.glsl">
+    <None Include="..\..\tutorial39\shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial39\shaders\silhouette.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial39\shaders\silhouette.gs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial39\shaders\silhouette.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

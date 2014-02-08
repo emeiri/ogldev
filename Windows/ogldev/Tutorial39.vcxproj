@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\tutorial39\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial39\pipeline.h" />
     <ClInclude Include="..\..\tutorial39\silhouette_technique.h" />
-    <ClInclude Include="..\..\tutorial39\technique.h" />
-    <ClInclude Include="..\..\tutorial39\texture.h" />
-    <ClInclude Include="..\..\tutorial39\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial39\camera.cpp" />
@@ -33,13 +30,14 @@
     <ClCompile Include="..\..\tutorial39\mesh.cpp" />
     <ClCompile Include="..\..\tutorial39\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial39\silhouette_technique.cpp" />
-    <ClCompile Include="..\..\tutorial39\technique.cpp" />
-    <ClCompile Include="..\..\tutorial39\texture.cpp" />
     <ClCompile Include="..\..\tutorial39\tutorial39.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial39\shaders\lighting.glsl" />
-    <None Include="..\..\tutorial39\shaders\silhouette.glsl" />
+    <None Include="..\..\tutorial39\shaders\lighting.fs" />
+    <None Include="..\..\tutorial39\shaders\lighting.vs" />
+    <None Include="..\..\tutorial39\shaders\silhouette.fs" />
+    <None Include="..\..\tutorial39\shaders\silhouette.gs" />
+    <None Include="..\..\tutorial39\shaders\silhouette.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{88C73F5D-7111-473C-A22A-B3AD91423B2E}</ProjectGuid>
@@ -89,6 +87,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

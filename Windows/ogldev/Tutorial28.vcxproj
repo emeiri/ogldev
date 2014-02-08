@@ -21,8 +21,6 @@
     <ClCompile Include="..\..\tutorial28\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial28\ps_update_technique.cpp" />
     <ClCompile Include="..\..\tutorial28\random_texture.cpp" />
-    <ClCompile Include="..\..\tutorial28\technique.cpp" />
-    <ClCompile Include="..\..\tutorial28\texture.cpp" />
     <ClCompile Include="..\..\tutorial28\tutorial28.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -38,9 +36,15 @@
     <ClInclude Include="..\..\tutorial28\pipeline.h" />
     <ClInclude Include="..\..\tutorial28\ps_update_technique.h" />
     <ClInclude Include="..\..\tutorial28\random_texture.h" />
-    <ClInclude Include="..\..\tutorial28\technique.h" />
-    <ClInclude Include="..\..\tutorial28\texture.h" />
-    <ClInclude Include="..\..\tutorial28\util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial28\billboard.fs" />
+    <None Include="..\..\tutorial28\billboard.gs" />
+    <None Include="..\..\tutorial28\billboard.vs" />
+    <None Include="..\..\tutorial28\lighting.fs" />
+    <None Include="..\..\tutorial28\lighting.vs" />
+    <None Include="..\..\tutorial28\ps_update.gs" />
+    <None Include="..\..\tutorial28\ps_update.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C0F77A67-97EE-432C-A90D-25FE87DD7327}</ProjectGuid>
@@ -90,6 +94,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251;4819</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
