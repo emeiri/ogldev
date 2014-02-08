@@ -21,22 +21,31 @@
 #include <string>
 #include <glfx.h>
 
-
 #include "lighting_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 using namespace std;
 
-static const char* pEffectFile = "shaders/lighting.glsl";
-
-LightingTechnique::LightingTechnique() : Technique(pEffectFile)
+LightingTechnique::LightingTechnique()
 {   
 }
 
 
 bool LightingTechnique::Init()
 {
-    if (!CompileProgram("ShadowsPCF")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/lighting.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/lighting.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
     

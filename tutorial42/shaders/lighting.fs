@@ -1,35 +1,20 @@
-interface VSOutput
-{                                                                                    
-    vec2 TexCoord;                                                                 
-    vec3 Normal;                                                                   
-    vec3 WorldPos;                                                                 
-    vec4 LightSpacePos;
-};
+#version 330
 
-struct VSOutput1
+const int MAX_POINT_LIGHTS = 2;                                                     
+const int MAX_SPOT_LIGHTS = 2;                                                      
+
+in vec2 TexCoord0;
+in vec3 Normal0;
+in vec3 WorldPos0;
+in vec4 LightSpacePos0;
+
+struct VSOutput
 {                                                                                    
     vec2 TexCoord;                                                                 
     vec3 Normal;                                                                   
     vec3 WorldPos;
 	vec4 LightSpacePos;
-};
-
-uniform mat4 gWVP;                                                  
-uniform mat4 gLightWVP;
-uniform mat4 gWorld;                                                
-                                                                                    
-shader VSmain(in vec3 Position, in vec2 TexCoord, in vec3 Normal, out VSOutput VSout)
-{                                                                                   
-    gl_Position      = gWVP * vec4(Position, 1.0);                                        
-    VSout.TexCoord      = TexCoord;                                                         
-    VSout.Normal        = (gWorld * vec4(Normal, 0.0)).xyz;                                  
-    VSout.WorldPos      = (gWorld * vec4(Position, 1.0)).xyz;                                
-	VSout.LightSpacePos = gLightWVP * vec4(Position, 1.0);
-}
-                                                                                 
-const int MAX_POINT_LIGHTS = 2;                                                     
-const int MAX_SPOT_LIGHTS = 2;                                                      
-                                                                                                                                                                      
+};                                                                                                                                                                     
                                                                                    
 struct BaseLight                                                                    
 {                                                                                   
@@ -103,23 +88,23 @@ float CalcShadowFactor(vec4 LightSpacePos)
     return (0.5 + (Factor / 18.0));
 }
 
-vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In, float ShadowFactor)           
+vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput In, float ShadowFactor)           
 {                                                                                           
-    vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;                   
+    vec4 AmbientColor = vec4(Light.Color, 1.0) * Light.AmbientIntensity;                   
     float DiffuseFactor = dot(In.Normal, -LightDirection);                                     
                                                                                             
     vec4 DiffuseColor  = vec4(0, 0, 0, 0);                                                  
     vec4 SpecularColor = vec4(0, 0, 0, 0);                                                  
                                                                                             
-    if (DiffuseFactor > 0) {                                                                
-        DiffuseColor = vec4(Light.Color, 1.0f) * Light.DiffuseIntensity * DiffuseFactor;    
+    if (DiffuseFactor > 0.0) {                                                                
+        DiffuseColor = vec4(Light.Color, 1.0) * Light.DiffuseIntensity * DiffuseFactor;    
                                                                                             
         vec3 VertexToEye = normalize(gEyeWorldPos - In.WorldPos);                             
         vec3 LightReflect = normalize(reflect(LightDirection, In.Normal));                     
         float SpecularFactor = dot(VertexToEye, LightReflect);                              
         SpecularFactor = pow(SpecularFactor, gSpecularPower);                               
-        if (SpecularFactor > 0) {                                                           
-            SpecularColor = vec4(Light.Color, 1.0f) *                                       
+        if (SpecularFactor > 0.0) {                                                           
+            SpecularColor = vec4(Light.Color, 1.0) *                                       
                             gMatSpecularIntensity * SpecularFactor;                         
         }                                                                                   
     }                                                                                       
@@ -127,12 +112,12 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In, float
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor));                                   
 }                                                                                           
                                                                                             
-vec4 CalcDirectionalLight(VSOutput1 In)                                                      
+vec4 CalcDirectionalLight(VSOutput In)                                                      
 {                                                                                           
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, In, 1.0);
 }                                                                                           
                                                                                             
-vec4 CalcPointLight(PointLight l, VSOutput1 In)                       
+vec4 CalcPointLight(PointLight l, VSOutput In)                       
 {                                                                                           
     vec3 LightDirection = In.WorldPos - l.Position;                                           
     float Distance = length(LightDirection);                                                
@@ -147,7 +132,7 @@ vec4 CalcPointLight(PointLight l, VSOutput1 In)
     return Color / Attenuation;                                                             
 }                                                                                           
                                                                                             
-vec4 CalcSpotLight(SpotLight l, VSOutput1 In)
+vec4 CalcSpotLight(SpotLight l, VSOutput In)
 {                                                                                           
     vec3 LightToPixel = normalize(In.WorldPos - l.Base.Position);                             
     float SpotFactor = dot(LightToPixel, l.Direction);                                      
@@ -159,15 +144,17 @@ vec4 CalcSpotLight(SpotLight l, VSOutput1 In)
     else {                                                                                  
         return vec4(0,0,0,0);                                                               
     }                                                                                       
-}                                                                                           
+}                               
+
+out vec4 FragColor;                                                           
                                                                                             
-shader FSmain(in VSOutput FSin, out vec4 FragColor)
+void main()
 {                                    
-    VSOutput1 In;
-    In.TexCoord      = FSin.TexCoord;
-    In.Normal        = normalize(FSin.Normal);
-    In.WorldPos      = FSin.WorldPos;                                                                 
-    In.LightSpacePos = FSin.LightSpacePos;
+    VSOutput In;
+    In.TexCoord      = TexCoord0;
+    In.Normal        = normalize(Normal0);
+    In.WorldPos      = WorldPos0;
+    In.LightSpacePos = LightSpacePos0;
   
     vec4 TotalLight = CalcDirectionalLight(In);                                         
                                                                                             
@@ -179,13 +166,7 @@ shader FSmain(in VSOutput FSin, out vec4 FragColor)
         TotalLight += CalcSpotLight(gSpotLights[i], In);                                
     }    
 	
-	vec4 SampledColor = texture(gColorMap, In.TexCoord.xy);
+	vec4 SampledColor = texture(gColorMap, TexCoord0.xy);
                                                                                             
     FragColor = SampledColor * TotalLight;     
 }
-
-program ShadowsPCF
-{
-    vs(330)=VSmain();
-    fs(330)=FSmain();
-};

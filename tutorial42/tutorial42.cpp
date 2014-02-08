@@ -24,7 +24,7 @@
 #include <string>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -120,17 +120,17 @@ public:
             return false;
         }        
 
-		if (!m_quad.LoadMesh("models/quad.obj")) {
+		if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
-		m_pGroundTex = new Texture(GL_TEXTURE_2D, "models/checkers.png");
+		m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
         }
 
-		if (!m_mesh.LoadMesh("models/phoenix_ugv.md2")) {
+		if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
 			return false;
 		}
 

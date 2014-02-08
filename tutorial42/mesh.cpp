@@ -25,8 +25,6 @@ using namespace std;
 #define POSITION_LOCATION 0
 #define TEX_COORD_LOCATION 1
 #define NORMAL_LOCATION 2
-#define WVP_LOCATION 3
-#define WORLD_LOCATION 7
 
 Mesh::Mesh()
 {
@@ -147,22 +145,6 @@ bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
-    
-    for (unsigned int i = 0; i < 4 ; i++) {
-        glEnableVertexAttribArray(WVP_LOCATION + i);
-        glVertexAttribPointer(WVP_LOCATION + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4f), (const GLvoid*)(sizeof(GLfloat) * i * 4));
-        glVertexAttribDivisor(WVP_LOCATION + i, 1);
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WORLD_MAT_VB]);
-
-    for (unsigned int i = 0; i < 4 ; i++) {
-        glEnableVertexAttribArray(WORLD_LOCATION + i);
-        glVertexAttribPointer(WORLD_LOCATION + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4f), (const GLvoid*)(sizeof(GLfloat) * i * 4));
-        glVertexAttribDivisor(WORLD_LOCATION + i, 1);
-    }
-    
     return GLCheckError();
 }
 
