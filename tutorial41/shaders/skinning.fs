@@ -1,64 +1,22 @@
-struct VSInput 
-{
-    vec3  Position;                                             
-    vec2  TexCoord;                                             
-    vec3  Normal;    
-    ivec4 BoneIDs;
-    vec4  Weights;
-};
-
-interface VSOutput
-{                                                                                    
-    vec2 TexCoord;                                                                 
-    vec3 Normal;                                                                   
-    vec3 WorldPos;                                                                 
-    vec4 ClipSpacePos;
-    vec4 PrevClipSpacePos;
-};
-
-struct VSOutput1
-{                                                                                    
-    vec2 TexCoord;                                                                 
-    vec3 Normal;                                                                   
-    vec3 WorldPos;                                                                 
-};
-
-const int MAX_BONES = 100;
-
-uniform mat4 gWVP;
-uniform mat4 gWorld;
-uniform mat4 gBones[MAX_BONES];
-uniform mat4 gPrevBones[MAX_BONES];
-
-shader VSmain(in VSInput VSin:0, out VSOutput VSout)
-{       
-    mat4 BoneTransform = gBones[VSin.BoneIDs[0]] * VSin.Weights[0];
-    BoneTransform     += gBones[VSin.BoneIDs[1]] * VSin.Weights[1];
-    BoneTransform     += gBones[VSin.BoneIDs[2]] * VSin.Weights[2];
-    BoneTransform     += gBones[VSin.BoneIDs[3]] * VSin.Weights[3];
-
-    vec4 PosL      = BoneTransform * vec4(VSin.Position, 1.0);
-    vec4 ClipSpacePos = gWVP * PosL;
-    gl_Position    = ClipSpacePos;
-    VSout.TexCoord = VSin.TexCoord;
-    vec4 NormalL   = BoneTransform * vec4(VSin.Normal, 0.0);
-    VSout.Normal   = (gWorld * NormalL).xyz;
-    VSout.WorldPos = (gWorld * PosL).xyz;                                
-
-    mat4 PrevBoneTransform = gPrevBones[VSin.BoneIDs[0]] * VSin.Weights[0];
-    PrevBoneTransform     += gPrevBones[VSin.BoneIDs[1]] * VSin.Weights[1];
-    PrevBoneTransform     += gPrevBones[VSin.BoneIDs[2]] * VSin.Weights[2];
-    PrevBoneTransform     += gPrevBones[VSin.BoneIDs[3]] * VSin.Weights[3];
-
-    VSout.ClipSpacePos = ClipSpacePos;
-    vec4 PrevPosL      = PrevBoneTransform * vec4(VSin.Position, 1.0);
-    VSout.PrevClipSpacePos = gWVP * PrevPosL;
-}
-
-
+#version 330
 
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
+
+in vec2 TexCoord0;
+in vec3 Normal0;                                                                   
+in vec3 WorldPos0;           
+in vec4 ClipSpacePos0;
+in vec4 PrevClipSpacePos0;                                                                
+                                                      
+
+struct VSOutput
+{
+    vec2 TexCoord;
+    vec3 Normal;                                                                   
+    vec3 WorldPos;                                                                 
+};
+
 
 struct BaseLight
 {
@@ -105,23 +63,23 @@ uniform float gMatSpecularIntensity;
 uniform float gSpecularPower; 
 
 
-vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In)            
+vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput In)            
 {                                                                                           
-    vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;                   
+    vec4 AmbientColor = vec4(Light.Color, 1.0) * Light.AmbientIntensity;                   
     float DiffuseFactor = dot(In.Normal, -LightDirection);                                     
                                                                                             
     vec4 DiffuseColor  = vec4(0, 0, 0, 0);                                                  
     vec4 SpecularColor = vec4(0, 0, 0, 0);                                                  
                                                                                             
-    if (DiffuseFactor > 0) {                                                                
-        DiffuseColor = vec4(Light.Color, 1.0f) * Light.DiffuseIntensity * DiffuseFactor;    
+    if (DiffuseFactor > 0.0) {                                                                
+        DiffuseColor = vec4(Light.Color, 1.0) * Light.DiffuseIntensity * DiffuseFactor;    
                                                                                             
         vec3 VertexToEye = normalize(gEyeWorldPos - In.WorldPos);                             
         vec3 LightReflect = normalize(reflect(LightDirection, In.Normal));                     
         float SpecularFactor = dot(VertexToEye, LightReflect);                              
         SpecularFactor = pow(SpecularFactor, gSpecularPower);                               
-        if (SpecularFactor > 0) {                                                           
-            SpecularColor = vec4(Light.Color, 1.0f) *                                       
+        if (SpecularFactor > 0.0) {                                                           
+            SpecularColor = vec4(Light.Color, 1.0) *                                       
                             gMatSpecularIntensity * SpecularFactor;                         
         }                                                                                   
     }                                                                                       
@@ -129,12 +87,12 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In)
     return (AmbientColor + DiffuseColor + SpecularColor);                                   
 }                                                                                           
                                                                                             
-vec4 CalcDirectionalLight(VSOutput1 In)                                                      
+vec4 CalcDirectionalLight(VSOutput In)                                                      
 {                                                                                           
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, In);  
 }                                                                                           
                                                                                             
-vec4 CalcPointLight(PointLight l, VSOutput1 In)                                       
+vec4 CalcPointLight(PointLight l, VSOutput In)                                       
 {                                                                                           
     vec3 LightDirection = In.WorldPos - l.Position;                                           
     float Distance = length(LightDirection);                                                
@@ -148,7 +106,7 @@ vec4 CalcPointLight(PointLight l, VSOutput1 In)
     return Color / Attenuation;                                                             
 }                                                                                           
                                                                                             
-vec4 CalcSpotLight(SpotLight l, VSOutput1 In)                                         
+vec4 CalcSpotLight(SpotLight l, VSOutput In)                                         
 {                                                                                           
     vec3 LightToPixel = normalize(In.WorldPos - l.Base.Position);                             
     float SpotFactor = dot(LightToPixel, l.Direction);                                      
@@ -160,21 +118,17 @@ vec4 CalcSpotLight(SpotLight l, VSOutput1 In)
     else {                                                                                  
         return vec4(0,0,0,0);                                                               
     }                                                                                       
-} 
-
-struct FSOutput
-{
-    vec3 Color;
-    vec2 MotionVector;
-};
-                                                                                          
-                                                                                            
-shader FSmain(in VSOutput FSin, out FSOutput FSOut)
+}                                                                                           
+                            
+layout (location = 0) out vec3 FragColor;
+layout (location = 1) out vec2 MotionVector;
+                                                                
+void main()
 {                                    
-    VSOutput1 In;
-    In.TexCoord = FSin.TexCoord;
-    In.Normal = normalize(FSin.Normal);
-    In.WorldPos = FSin.WorldPos;                                                                 
+    VSOutput In;
+    In.TexCoord = TexCoord0;
+    In.Normal   = normalize(Normal0);
+    In.WorldPos = WorldPos0;
   
     vec4 TotalLight = CalcDirectionalLight(In);                                         
                                                                                             
@@ -185,16 +139,10 @@ shader FSmain(in VSOutput FSin, out FSOutput FSOut)
     for (int i = 0 ; i < gNumSpotLights ; i++) {                                            
         TotalLight += CalcSpotLight(gSpotLights[i], In);                                
     }                                                                                       
-         
-    vec4 Color = texture(gColorMap, In.TexCoord) * TotalLight;
-    FSOut.Color = Color.xyz;     
-    vec3 NDCPos = (FSin.ClipSpacePos / FSin.ClipSpacePos.w).xyz;
-    vec3 PrevNDCPos = (FSin.PrevClipSpacePos / FSin.PrevClipSpacePos.w).xyz;
-    FSOut.MotionVector = (NDCPos - PrevNDCPos).xy;
+                                                                                            
+    vec4 Color = texture(gColorMap, TexCoord0) * TotalLight;
+    FragColor = Color.xyz;
+    vec3 NDCPos = (ClipSpacePos0 / ClipSpacePos0.w).xyz;
+    vec3 PrevNDCPos = (PrevClipSpacePos0 / PrevClipSpacePos0.w).xyz;
+    MotionVector = (NDCPos - PrevNDCPos).xy;
 }
-
-program Skinning
-{
-    vs(410)=VSmain();
-    fs(410)=FSmain();
-};

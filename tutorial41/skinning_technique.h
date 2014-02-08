@@ -150,4 +150,4 @@ private:
 };
 
 
-#endif	/* MOTION_BLUR_TECHNIQUE_H */
+#endif	/* SKINNING_TECHNIQUE_H */

@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIGHTING_TECHNIQUE_H
-#define	LIGHTING_TECHNIQUE_H
+#ifndef SKINNING_TECHNIQUE_H
+#define	SKINNING_TECHNIQUE_H
 
 #include "technique.h"
 #include "math_3d.h"
@@ -147,4 +147,4 @@ private:
 };
 
 
-#endif	/* LIGHTING_TECHNIQUE_H */
+#endif	/* SKINNING_TECHNIQUE_H */

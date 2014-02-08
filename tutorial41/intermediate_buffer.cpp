@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "engine_common.h"
 #include "intermediate_buffer.h"
 

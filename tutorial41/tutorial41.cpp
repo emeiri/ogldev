@@ -29,7 +29,7 @@
 #include <sys/types.h>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -53,24 +53,6 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {1,0,0,1}, 0, {1,0,0,1},
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
-
-#ifdef WIN32
-static long long GetCurrentTimeMillis()
-{
-	return GetTickCount();
-}
-#else
-static long long GetCurrentTimeMillis()
-{
-	timeval t;
-	gettimeofday(&t, NULL);
-
-	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-
-	return ret;
-}
-#endif
-
 
 class Tutorial41 : public ICallbacks
 {
@@ -143,7 +125,7 @@ public:
         m_pMotionBlurTech->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_pMotionBlurTech->SetMotionTextureUnit(MOTION_TEXTURE_UNIT_INDEX);
 
-        if (!m_mesh.LoadMesh("models/boblampclean.md5mesh")) {
+        if (!m_mesh.LoadMesh("../Content/boblampclean.md5mesh")) {
             printf("Mesh load failed\n");
             return false;            
         }

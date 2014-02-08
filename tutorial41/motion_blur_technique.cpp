@@ -18,18 +18,28 @@
 
 
 #include "motion_blur_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
-static const char* pEffectFile = "shaders/motion_blur.glsl";
-
-MotionBlurTechnique::MotionBlurTechnique() : Technique(pEffectFile)
-{   
+MotionBlurTechnique::MotionBlurTechnique()
+{
+    
 }
-
 
 bool MotionBlurTechnique::Init()
 {
-    if (!CompileProgram("MotionBlur")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/motion_blur.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/motion_blur.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
     

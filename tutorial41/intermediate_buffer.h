@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GBUFFER_H
-#define	GBUFFER_H
+#ifndef INTERMEDIATE_BUFFER_H
+#define	INTERMEDIATE_BUFFER_H
 
 #include <GL/glew.h>
 
@@ -43,5 +43,5 @@ private:
 	GLuint m_depthBuffer;
 };
 
-#endif	/* SHADOWMAPFBO_H */
+#endif	
 
