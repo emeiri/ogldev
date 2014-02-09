@@ -109,5 +109,8 @@
     <None Include="..\..\tutorial28\ps_update.vs">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="..\..\tutorial28\ps_update.fs">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

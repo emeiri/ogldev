@@ -43,6 +43,7 @@
     <None Include="..\..\tutorial28\billboard.vs" />
     <None Include="..\..\tutorial28\lighting.fs" />
     <None Include="..\..\tutorial28\lighting.vs" />
+    <None Include="..\..\tutorial28\ps_update.fs" />
     <None Include="..\..\tutorial28\ps_update.gs" />
     <None Include="..\..\tutorial28\ps_update.vs" />
   </ItemGroup>

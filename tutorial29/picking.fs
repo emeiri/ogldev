@@ -1,7 +1,7 @@
 #version 330                                                                        
                                                                                                                                                                                                                                                         
-uniform unsigned int gDrawIndex;                                                            
-uniform unsigned int gObjectIndex;                                                          
+uniform uint gDrawIndex;                                                            
+uniform uint gObjectIndex;                                                          
                                                                                     
 out vec3 FragColor;
 
