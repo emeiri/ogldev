@@ -39,6 +39,14 @@ bool PSUpdateTechnique::Init()
         return false;
     }
 
+	if (!AddShader(GL_FRAGMENT_SHADER, "ps_update.fs")) {
+		return false;
+	}
+
+	if (!Finalize()) {
+		return false;
+	}
+
     const GLchar* Varyings[4];    
     Varyings[0] = "Type1";
     Varyings[1] = "Position1";
