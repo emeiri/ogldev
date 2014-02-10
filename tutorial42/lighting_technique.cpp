@@ -80,7 +80,7 @@ bool LightingTechnique::Init()
         m_numPointLightsLocation == INVALID_UNIFORM_LOCATION ||
         m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION ||
         m_shadowMapSizeLocation == INVALID_UNIFORM_LOCATION) {
-    //    return false;
+        return false;
     }
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
