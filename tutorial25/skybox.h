@@ -21,7 +21,7 @@
 
 #include "camera.h"
 #include "skybox_technique.h"
-#include "cubemap_texture.h"
+#include "ogldev_cubemap_texture.h"
 #include "mesh.h"
 
 class SkyBox
