@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>callbacks.h</itemPath>
       <itemPath>camera.h</itemPath>
-      <itemPath>cubemap_texture.h</itemPath>
       <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>math_3d.h</itemPath>
@@ -27,7 +26,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>camera.cpp</itemPath>
-      <itemPath>cubemap_texture.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
@@ -94,10 +92,6 @@
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="cubemap_texture.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
@@ -162,10 +156,6 @@
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="cubemap_texture.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>

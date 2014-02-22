@@ -8,6 +8,7 @@
       <itemPath>FreetypeGL/font_shader.h</itemPath>
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>FreetypeGL/markup.h</itemPath>
+      <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
@@ -25,6 +26,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>cubemap_texture.cpp</itemPath>
       <itemPath>FreetypeGL/font-manager.c</itemPath>
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
@@ -93,6 +95,11 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_cubemap_texture.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
@@ -132,6 +139,8 @@
       <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -162,6 +171,11 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_cubemap_texture.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
@@ -201,6 +215,8 @@
       <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
