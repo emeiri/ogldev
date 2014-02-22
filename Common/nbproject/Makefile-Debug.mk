@@ -43,6 +43,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/FreetypeGL/texture-glyph.o \
 	${OBJECTDIR}/FreetypeGL/vector.o \
 	${OBJECTDIR}/FreetypeGL/vertex-buffer.o \
+	${OBJECTDIR}/cubemap_texture.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
 	${OBJECTDIR}/technique.o
@@ -113,6 +114,11 @@ ${OBJECTDIR}/FreetypeGL/vertex-buffer.o: FreetypeGL/vertex-buffer.c
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/vertex-buffer.o FreetypeGL/vertex-buffer.c
+
+${OBJECTDIR}/cubemap_texture.o: cubemap_texture.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cubemap_texture.o cubemap_texture.cpp
 
 ${OBJECTDIR}/ogldev_texture.o: ogldev_texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
