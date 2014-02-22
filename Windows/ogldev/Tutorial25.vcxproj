@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\tutorial25\callbacks.h" />
     <ClInclude Include="..\..\tutorial25\camera.h" />
-    <ClInclude Include="..\..\tutorial25\cubemap_texture.h" />
     <ClInclude Include="..\..\tutorial25\glut_backend.h" />
     <ClInclude Include="..\..\tutorial25\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial25\math_3d.h" />
@@ -24,7 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial25\camera.cpp" />
-    <ClCompile Include="..\..\tutorial25\cubemap_texture.cpp" />
     <ClCompile Include="..\..\tutorial25\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial25\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial25\math_3d.cpp" />
@@ -51,6 +49,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

@@ -24,3 +24,7 @@ Makefile-Release.mk
 *.log
 
 *.ipch
+
+*.unsuccessfulbuild
+
+*.opensdf

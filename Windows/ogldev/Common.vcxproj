@@ -11,11 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\ogldev_cubemap_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />
@@ -31,6 +33,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
