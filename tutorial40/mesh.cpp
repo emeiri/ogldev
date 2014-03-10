@@ -195,7 +195,9 @@ static uint GetOppositeIndex(const aiFace& Face, const Edge& e)
         }
     }
        
-    assert(0);                
+    assert(0);      
+
+    return 0;
 }
 
 

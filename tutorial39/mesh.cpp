@@ -19,12 +19,14 @@
 #include <assert.h>
 
 #include "mesh.h"
+#include "engine_common.h"
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
 #define NORMAL_LOCATION      2
 #define BONE_ID_LOCATION     3
 #define BONE_WEIGHT_LOCATION 4
+
 
 void Mesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
 {
@@ -203,11 +205,31 @@ void Mesh::FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices)
 {       
     // Step 1 - find the two triangles that share every edge
     for (uint i = 0 ; i < paiMesh->mNumFaces ; i++) {
-        const aiFace& Face = paiMesh->mFaces[i];
+        const aiFace& face = paiMesh->mFaces[i];
 
-        Edge e1(Face.mIndices[0], Face.mIndices[1]);
-        Edge e2(Face.mIndices[1], Face.mIndices[2]);
-        Edge e3(Face.mIndices[2], Face.mIndices[0]);
+        Face Unique;
+        
+        // If a position vector is duplicated in the VB we fetch the 
+        // index of the first occurrence.
+        for (uint j = 0 ; j < 3 ; j++) {            
+            uint Index = face.mIndices[j];
+            aiVector3D& v = paiMesh->mVertices[Index];
+            
+            if (m_posMap.find(v) == m_posMap.end()) {
+                m_posMap[v] = Index;
+            }
+            else {
+                Index = m_posMap[v];
+            }           
+            
+            Unique.Indices[j] = Index;
+        }
+        
+        m_uniqueFaces.push_back(Unique);
+        
+        Edge e1(Unique.Indices[0], Unique.Indices[1]);
+        Edge e2(Unique.Indices[1], Unique.Indices[2]);
+        Edge e3(Unique.Indices[2], Unique.Indices[0]);
         
         m_indexMap[e1].AddNeigbor(i);
         m_indexMap[e2].AddNeigbor(i);
@@ -216,22 +238,21 @@ void Mesh::FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices)
 
     // Step 2 - build the index buffer with the adjacency info
     for (uint i = 0 ; i < paiMesh->mNumFaces ; i++) {        
-        const aiFace& Face = paiMesh->mFaces[i];
+        const Face& face = m_uniqueFaces[i];
         
         for (uint j = 0 ; j < 3 ; j++) {            
-            Edge e(Face.mIndices[j], Face.mIndices[(j + 1) % 3]);
+            Edge e(face.Indices[j], face.Indices[(j + 1) % 3]);
             assert(m_indexMap.find(e) != m_indexMap.end());
             Neighbors n = m_indexMap[e];
             uint OtherTri = n.GetOther(i);
             
-            if (OtherTri == -1)
-                OtherTri = 0;
-            
-            const aiFace& OtherFace = paiMesh->mFaces[OtherTri];
-            uint OppositeIndex = GetOppositeIndex(OtherFace, e);
+            assert(OtherTri != -1);
+
+            const Face& OtherFace = m_uniqueFaces[OtherTri];
+            uint OppositeIndex = OtherFace.GetOppositeIndex(e);
          
-            Indices.push_back(Face.mIndices[j]);
-            Indices.push_back(OppositeIndex);            
+            Indices.push_back(face.Indices[j]);
+            Indices.push_back(OppositeIndex);             
         }
     }    
 }
@@ -371,7 +392,7 @@ void Mesh::Render()
         assert(MaterialIndex < m_Textures.size());
         
         if (m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+            m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
         }                
         
 		glDrawElementsBaseVertex(Topology, 

@@ -21,7 +21,6 @@
       <itemPath>shaders/dir_light_pass.fs</itemPath>
       <itemPath>shaders/geometry_pass.fs</itemPath>
       <itemPath>shaders/geometry_pass.vs</itemPath>
-      <itemPath>shaders/light_pass.glsl</itemPath>
       <itemPath>shaders/light_pass.vs</itemPath>
       <itemPath>shaders/point_light_pass.fs</itemPath>
     </logicalFolder>
@@ -144,8 +143,6 @@
       </item>
       <item path="shaders/geometry_pass.vs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="shaders/light_pass.glsl" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/light_pass.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/point_light_pass.fs" ex="false" tool="3" flavor2="0">
@@ -242,8 +239,6 @@
       <item path="shaders/geometry_pass.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/geometry_pass.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/light_pass.glsl" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/light_pass.vs" ex="false" tool="3" flavor2="0">
       </item>
