@@ -56,11 +56,12 @@ uniform DirectionalLight gDirectionalLight;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];                                          
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             
 uniform sampler2D gColorMap;                                                                
-uniform sampler2DShadow gShadowMap;
 uniform vec3 gEyeWorldPos;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
 uniform vec2 gMapSize;
+
+uniform sampler2DShadow gShadowMap;
 
 #define EPSILON 0.00001
 
