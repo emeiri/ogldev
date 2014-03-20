@@ -19,6 +19,7 @@
 #define	PIPELINE_H
 
 #include "math_3d.h"
+#include "camera.h"
 
 class Pipeline
 {
@@ -82,6 +83,11 @@ public:
         m_camera.Pos = Pos;
         m_camera.Target = Target;
         m_camera.Up = Up;
+    }
+    
+    void SetCamera(const Camera& camera)
+    {
+        SetCamera(camera.GetPos(), camera.GetTarget(), camera.GetUp());
     }
 
 	const Matrix4f& GetWVTrans();

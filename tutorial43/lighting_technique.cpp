@@ -23,31 +23,40 @@
 
 
 #include "lighting_technique.h"
-#include "util.h"
+#include "ogldev_util.h"
 
 using namespace std;
 
-static const char* pEffectFile = "shaders/lighting.glsl";
-
-LightingTechnique::LightingTechnique() : Technique(pEffectFile)
+LightingTechnique::LightingTechnique()
 {   
 }
 
 
 bool LightingTechnique::Init()
 {
-    if (!CompileProgram("ShadowsPCF")) {
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/lighting.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/lighting.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
         return false;
     }
     
-    Technique::Init();
-    
+    m_WVPLocation = GetUniformLocation("gWVP");
+    m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_samplerLocation = GetUniformLocation("gColorMap");
     m_shadowMapLocation = GetUniformLocation("gShadowMap");
     m_eyeWorldPosLocation = GetUniformLocation("gEyeWorldPos");
     m_matSpecularIntensityLocation = GetUniformLocation("gMatSpecularIntensity");
     m_matSpecularPowerLocation = GetUniformLocation("gSpecularPower");
-    m_shadowMapSizeLocation = GetUniformLocation("gMapSize");
 
     if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
         m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
@@ -55,8 +64,7 @@ bool LightingTechnique::Init()
         m_shadowMapLocation == INVALID_UNIFORM_LOCATION ||
         m_eyeWorldPosLocation == INVALID_UNIFORM_LOCATION ||
         m_matSpecularIntensityLocation == INVALID_UNIFORM_LOCATION ||
-        m_matSpecularPowerLocation == INVALID_UNIFORM_LOCATION/* ||
-        m_shadowMapSizeLocation == INVALID_UNIFORM_LOCATION*/) {
+        m_matSpecularPowerLocation == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -79,6 +87,16 @@ bool LightingTechnique::Init()
     }
 
     return true;
+}
+
+void LightingTechnique::SetWVP(const Matrix4f& WVP)
+{
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
+}
+
+void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
+{
+    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
 }
 
 
@@ -124,8 +142,3 @@ void LightingTechnique::SetPointLight(const PointLight& Light)
     glUniform1f(m_pointLightLocation.Atten.Exp, Light.Attenuation.Exp);
 }
 
-
-void LightingTechnique::SetShadowMapSize(float Width, float Height)
-{
-    glUniform2f(m_shadowMapSizeLocation, Width, Height);
-}
