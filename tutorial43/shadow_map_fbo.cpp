@@ -20,7 +20,7 @@
 
 
 #include "shadow_map_fbo.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "shadow_map_technique.h"
 
 ShadowMapFBO::ShadowMapFBO()
