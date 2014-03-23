@@ -13,7 +13,7 @@ struct VSOutput
     vec2 TexCoord;                                                                 
     vec3 Normal;                                                                   
     vec3 WorldPos;
-	vec4 LightSpacePos;
+    vec4 LightSpacePos;
 };                                                                                                                                                                     
                                                                                    
 struct BaseLight                                                                    
@@ -147,7 +147,7 @@ vec4 CalcSpotLight(SpotLight l, VSOutput In)
     }                                                                                       
 }                               
 
-out vec4 FragColor;                                                           
+out vec4 FragColor;
                                                                                             
 void main()
 {                                    
@@ -167,7 +167,7 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], In);                                
     }    
 	
-	vec4 SampledColor = texture(gColorMap, TexCoord0.xy);
+    vec4 SampledColor = texture(gColorMap, TexCoord0.xy);
                                                                                             
     FragColor = SampledColor * TotalLight;     
 }
