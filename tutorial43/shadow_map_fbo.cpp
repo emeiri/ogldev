@@ -16,8 +16,6 @@
 */
 
 #include <stdio.h>
-#include "bmpfile.h"
-
 
 #include "shadow_map_fbo.h"
 #include "ogldev_util.h"
@@ -26,6 +24,7 @@
 ShadowMapFBO::ShadowMapFBO()
 {
     m_fbo = 0;
+    m_shadowMap = 0;	
     m_depth = 0;
 }
 
@@ -35,9 +34,13 @@ ShadowMapFBO::~ShadowMapFBO()
         glDeleteFramebuffers(1, &m_fbo);
     }
 
+    if (m_shadowMap != 0) {
+        glDeleteTextures(1, &m_shadowMap);
+    }	
+
     if (m_depth != 0) {
         glDeleteTextures(1, &m_depth);
-    }
+    }	
 }
 
 bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
@@ -106,69 +109,4 @@ void ShadowMapFBO::BindForReading(GLenum TextureUnit)
     glActiveTexture(TextureUnit);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
 }
-
-
-void ShadowMapFBO::ShowColorBuffer(GLenum CubeFace)
-{
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
-    GLExitIfError;
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, 1000, 1000, 0, 0, 1000, 1000, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    glReadBuffer(GL_NONE);
-    GLExitIfError;
-}
-/*void ShadowMapFBO::BindForReading(GLenum TextureUnit)
-{
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);    
-    GLExitIfError();        
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, m_shadowMap, 0);    
-    GLExitIfError();        
-
-	float* pPixels = new float[1000000];
-	memset(pPixels, 0, 4000000);
-    
-    glReadPixels(0, 0, 1000, 1000, GL_RED, GL_FLOAT, pPixels);
-    GLExitIfError();
-    
-    bmpfile_t* pBMP = bmp_create(1000, 1000, 4);
-    
-    if (!pBMP) {
-        printf("Error creating bmp\n");
-        exit(0);
-    }
-
-	float fMax = 0.0f;
-
-	for (int y = 0 ; y < 1000 ; y++ ) {
-		for (int x = 0 ; x < 1000 ; x++) {
-			float f = pPixels[y * 1000 + x];
-			if (f > fMax) fMax = f;
-		}
-	}
-
-
-
-    for (int y = 0 ; y < 1000 ; y++ ) {
-        for (int x = 0 ; x < 1000 ; x++) {
-            float f = pPixels[y * 1000 + x];
-			int t = (int)(f / fMax * 16777216.0f);
-        //    if (pPixels[y * 1000 + x] == 1.0f)
-        //        f = 0.0f;
-        //    else
-          //      f = 1.0f;//Pixels[x][y] * 255.0f;                
-            rgb_pixel_t pixel;
-            pixel.red = t >> 16;
-            pixel.green = t >> 8;
-            pixel.blue = t;
-
-            bmp_set_pixel(pBMP, x, y, pixel);
-        }
-    }
-        
-    bmp_save(pBMP, "depth.bmp");       
-
-	delete [] pPixels;
-}*/
 

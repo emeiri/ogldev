@@ -201,7 +201,6 @@ public:
         glCullFace(GL_FRONT);
         
         m_shadowMapEffect.Enable();
-        GLExitIfError;        
         
         PersProjInfo ProjInfo;
         ProjInfo.FOV = 90.0f;

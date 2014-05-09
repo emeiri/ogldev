@@ -33,9 +33,6 @@ public:
 
     void BindForReading(GLenum TextureUnit);
     
-    void ShowColorBuffer(GLenum CubeFace);
-
-    void Dump();
 private:
     GLuint m_fbo;
     GLuint m_shadowMap;
