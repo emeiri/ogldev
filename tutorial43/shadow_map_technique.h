@@ -34,12 +34,12 @@ public:
     virtual bool Init();
     
     void SetWVP(const Matrix4f& WVP);	
-	void SetWorld(const Matrix4f& World);	
+    void SetWorld(const Matrix4f& World);	
     void SetLightWorldPos(const Vector3f& Pos);
     
 private:
 
-	GLint m_WVPLocation;
+    GLint m_WVPLocation;
     GLint m_WorldMatrixLocation;
     GLint m_lightWorldPosLoc;
 };

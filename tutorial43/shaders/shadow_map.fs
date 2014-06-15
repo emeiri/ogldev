@@ -2,8 +2,6 @@
 
 in vec3 WorldPos;
 
-uniform mat4 gWVP;
-uniform mat4 gWorld;
 uniform vec3 gLightWorldPos;
           
 out float FragColor;

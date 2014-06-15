@@ -112,7 +112,6 @@ void LightingTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
 }
 
 
-
 void LightingTechnique::SetEyeWorldPos(const Vector3f& EyeWorldPos)
 {
     glUniform3f(m_eyeWorldPosLocation, EyeWorldPos.x, EyeWorldPos.y, EyeWorldPos.z);

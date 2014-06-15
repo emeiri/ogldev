@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2013 Etay Meiri
+    Copyright 2014 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ using namespace std;
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
-
 struct CameraDirection
 {
     GLenum CubemapFace;
@@ -55,9 +54,9 @@ CameraDirection gCameraDirections[NUM_OF_LAYERS] =
     { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, -1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f) },
     { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f),  Vector3f(0.0f, -1.0f, 0.0f) }
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, -1.0f, 0.0f) }
 };
 
 #ifndef WIN32
@@ -94,11 +93,13 @@ public:
         m_fps = 0.0f;
     }
 
+           
     ~Tutorial43()
     {
         SAFE_DELETE(m_pGameCamera);
     }    
 
+    
     bool Init()
     {
         Vector3f Pos(0.0f, 8.0f, -10.0f);
@@ -131,7 +132,7 @@ public:
         m_shadowMapEffect.Enable();
         m_shadowMapEffect.SetLightWorldPos(m_pointLight.Position);
 
-		if (!m_quad.LoadMesh("../Content/quad.obj")) {
+	if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
@@ -142,20 +143,18 @@ public:
         m_quad2Orientation.m_scale = Vector3f(10.0f, 10.0f, 10.0f);
         m_quad2Orientation.m_pos = Vector3f(0.0f, 0.0f, 7.0f);
         
-		m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
+	m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
         }
         
         if (!m_mesh.LoadMesh("../Content/sphere.obj")) {
-		//if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
-			return false;
-		}
+            return false;
+	}
         
         m_mesh1Orientation.m_pos = Vector3f(0.0f, 3.0f, 0.0f);
         m_mesh2Orientation.m_pos = Vector3f(0.0f, 5.0f, 3.0f);
-    //    m_mesh.GetOrientation().m_scale = Vector3f(0.05f, 0.05f, 0.05f);
         
 #ifndef WIN32
         if (!m_fontRenderer.InitFontRenderer()) {
@@ -174,6 +173,7 @@ public:
         return true;
     }
 
+    
     void Run()
     {
         GLUTBackendRun(this);
@@ -191,11 +191,12 @@ public:
         ShadowMapPass();
         RenderPass();
         
-   //     RenderFPS();
+        RenderFPS();
 
         glutSwapBuffers();
     }
 
+    
     void ShadowMapPass()
     {
         glCullFace(GL_FRONT);
@@ -208,11 +209,11 @@ public:
         ProjInfo.Width = WINDOW_WIDTH;
         ProjInfo.zNear = 1.0f;
         ProjInfo.zFar = 100.0f;  
-
-        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
         
         Pipeline p;
         p.SetPerspectiveProj(m_persProjInfo);                           
+        
+        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
         
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
             m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
@@ -229,12 +230,10 @@ public:
             m_shadowMapEffect.SetWorld(p.GetWorldTrans());
             m_shadowMapEffect.SetWVP(p.GetWVPTrans());
             m_mesh.Render();
-                
-        // Render the quad
-     //   m_quad.Render();
         }        
     }
-        
+    
+    
     void RenderPass()
     {
         glCullFace(GL_BACK);
@@ -257,12 +256,13 @@ public:
         m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
         m_lightingEffect.SetWVP(p.GetWVPTrans());        
         m_quad.Render();
+        
         p.Orient(m_quad2Orientation);
         m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
         m_lightingEffect.SetWVP(p.GetWVPTrans());        
         m_quad.Render();        
 
-        // Render the object
+        // Render the meshes
         p.Orient(m_mesh1Orientation);
         m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
         m_lightingEffect.SetWVP(p.GetWVPTrans());       
@@ -273,11 +273,14 @@ public:
         m_lightingEffect.SetWVP(p.GetWVPTrans());       
         m_mesh.Render();                
     }
+
+    
     virtual void IdleCB()
     {
         RenderSceneCB();
     }
 
+    
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
         m_pGameCamera->OnKeyboard(Key);

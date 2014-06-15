@@ -47,7 +47,7 @@ bool ShadowMapTechnique::Init()
     m_lightWorldPosLoc = GetUniformLocation("gLightWorldPos");
 
     if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-		m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
+	m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
         m_lightWorldPosLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
@@ -69,7 +69,5 @@ void ShadowMapTechnique::SetWorld(const Matrix4f& World)
 
 void ShadowMapTechnique::SetLightWorldPos(const Vector3f& Pos)
 {
-    GLExitIfError;
-    glUniform3f(m_lightWorldPosLoc, Pos.x, Pos.y, Pos.z);
-    
+    glUniform3f(m_lightWorldPosLoc, Pos.x, Pos.y, Pos.z);    
 }

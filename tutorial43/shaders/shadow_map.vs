@@ -6,7 +6,6 @@ layout (location = 2) in vec3 Normal;
 
 uniform mat4 gWVP;
 uniform mat4 gWorld;
-uniform vec3 gLightWorldPos;
 
 out vec3 WorldPos;
                   
