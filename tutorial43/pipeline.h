@@ -19,6 +19,22 @@
 #define	PIPELINE_H
 
 #include "math_3d.h"
+#include "camera.h"
+
+struct Orientation
+{
+    Vector3f m_scale;
+    Vector3f m_rotation;
+    Vector3f m_pos;       
+    
+    Orientation()
+    {
+        m_scale    = Vector3f(1.0f, 1.0f, 1.0f);
+        m_rotation = Vector3f(0.0f, 0.0f, 0.0f);
+        m_pos      = Vector3f(0.0f, 0.0f, 0.0f);
+    }
+};
+
 
 class Pipeline
 {
@@ -82,6 +98,18 @@ public:
         m_camera.Pos = Pos;
         m_camera.Target = Target;
         m_camera.Up = Up;
+    }
+    
+    void SetCamera(const Camera& camera)
+    {
+        SetCamera(camera.GetPos(), camera.GetTarget(), camera.GetUp());
+    }
+    
+    void Orient(const Orientation& o)
+    {
+        m_scale      = o.m_scale;
+        m_worldPos   = o.m_pos;
+        m_rotateInfo = o.m_rotation;
     }
 
 	const Matrix4f& GetWVTrans();

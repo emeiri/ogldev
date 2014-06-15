@@ -17,37 +17,57 @@
 */
 
 #include "shadow_map_technique.h"
+#include "pipeline.h"
 
 
-static const char* pEffectFile = "shaders/shadow_map.glsl";
-
-ShadowMapTechnique::ShadowMapTechnique(): Technique(pEffectFile)
+ShadowMapTechnique::ShadowMapTechnique()
 {
 }
 
 bool ShadowMapTechnique::Init()
 {
-    if (!CompileProgram("ShadowMap")) {
+    if (!Technique::Init()) {
         return false;
     }
-    
-    Technique::Init();
-    
+
+    if (!AddShader(GL_VERTEX_SHADER, "shaders/shadow_map.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/shadow_map.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
+        return false;
+    }
+
+    m_WVPLocation = GetUniformLocation("gWVP");
+    m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_lightWorldPosLoc = GetUniformLocation("gLightWorldPos");
 
     if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-		m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
+	m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
         m_lightWorldPosLoc == INVALID_UNIFORM_LOCATION) {
-        //return false;
+        return false;
     }
 
     return true;
 }
 
 
+void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
+{
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+}
+
+
+void ShadowMapTechnique::SetWorld(const Matrix4f& World)
+{
+    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World.m);
+}
+
 void ShadowMapTechnique::SetLightWorldPos(const Vector3f& Pos)
 {
-    GLExitIfError;
-    glUniform3f(m_lightWorldPosLoc, Pos.x, Pos.y, Pos.z);
-    
+    glUniform3f(m_lightWorldPosLoc, Pos.x, Pos.y, Pos.z);    
 }

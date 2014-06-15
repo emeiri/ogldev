@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2013 Etay Meiri
+    Copyright 2014 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include <float.h>
 
 #include "engine_common.h"
-#include "util.h"
+#include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
 #include "texture.h"
@@ -42,7 +42,6 @@ using namespace std;
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
-
 struct CameraDirection
 {
     GLenum CubemapFace;
@@ -55,9 +54,9 @@ CameraDirection gCameraDirections[NUM_OF_LAYERS] =
     { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, -1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f) },
     { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f),  Vector3f(0.0f, -1.0f, 0.0f) }
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, -1.0f, 0.0f) }
 };
 
 #ifndef WIN32
@@ -82,7 +81,7 @@ public:
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.Attenuation.Linear = 0.0f;
-        m_pointLight.Position  = Vector3f(2.0, 8.0, 0.0f);
+        m_pointLight.Position  = Vector3f(0.0, 5.0, 0.0f);
 
         m_persProjInfo.FOV = 90.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -94,11 +93,13 @@ public:
         m_fps = 0.0f;
     }
 
+           
     ~Tutorial43()
     {
         SAFE_DELETE(m_pGameCamera);
     }    
 
+    
     bool Init()
     {
         Vector3f Pos(0.0f, 8.0f, -10.0f);
@@ -122,37 +123,39 @@ public:
         m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
         m_lightingEffect.SetPointLight(m_pointLight);
-     //   m_lightingEffect.SetShadowMapSize((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
-        GLExitIfError;
+
         if (!m_shadowMapEffect.Init()) {
             printf("Error initializing the shadow map technique\n");
             return false;
         }     
-        GLExitIfError;
+
         m_shadowMapEffect.Enable();
         m_shadowMapEffect.SetLightWorldPos(m_pointLight.Position);
-        GLExitIfError;
-		if (!m_quad.LoadMesh("models/quad.obj")) {
+
+	if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
-        m_quad.GetOrientation().m_scale = Vector3f(10.0f, 10.0f, 10.0f);
-        m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
+        // Set the orientation of the two quads
+        m_quad1Orientation.m_scale = Vector3f(10.0f, 10.0f, 10.0f);
+        m_quad1Orientation.m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
 
-		m_pGroundTex = new Texture(GL_TEXTURE_2D, "models/checkers.png");
+        m_quad2Orientation.m_scale = Vector3f(10.0f, 10.0f, 10.0f);
+        m_quad2Orientation.m_pos = Vector3f(0.0f, 0.0f, 7.0f);
+        
+	m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
         }
-
         
-        if (!m_mesh.LoadMesh("../tutorial25/sphere.obj")) {
-	//	if (!m_mesh.LoadMesh("models/phoenix_ugv.md2")) {
-			return false;
-		}
+        if (!m_mesh.LoadMesh("../Content/sphere.obj")) {
+            return false;
+	}
         
-        m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 3.0f, 0.0f);
-
+        m_mesh1Orientation.m_pos = Vector3f(0.0f, 3.0f, 0.0f);
+        m_mesh2Orientation.m_pos = Vector3f(0.0f, 5.0f, 3.0f);
+        
 #ifndef WIN32
         if (!m_fontRenderer.InitFontRenderer()) {
             return false;
@@ -170,6 +173,7 @@ public:
         return true;
     }
 
+    
     void Run()
     {
         GLUTBackendRun(this);
@@ -183,21 +187,21 @@ public:
         m_scale += 0.05f;
 
         m_pGameCamera->OnRender();
-//
+
         ShadowMapPass();
         RenderPass();
         
-   //     RenderFPS();
+        RenderFPS();
 
         glutSwapBuffers();
     }
 
+    
     void ShadowMapPass()
     {
         glCullFace(GL_FRONT);
         
         m_shadowMapEffect.Enable();
-        GLExitIfError;        
         
         PersProjInfo ProjInfo;
         ProjInfo.FOV = 90.0f;
@@ -205,29 +209,31 @@ public:
         ProjInfo.Width = WINDOW_WIDTH;
         ProjInfo.zNear = 1.0f;
         ProjInfo.zFar = 100.0f;  
-
+        
+        Pipeline p;
+        p.SetPerspectiveProj(m_persProjInfo);                           
+        
         glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
-                       
+        
         for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
             m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);                       
-            m_shadowMapEffect.ApplyOrientation(m_mesh.GetOrientation(), 
-                                                 m_pointLight.Position, 
-                                                 gCameraDirections[i].Target, 
-                                                 gCameraDirections[i].Up, 
-                                                 ProjInfo);
-            m_mesh.Render();
-            GLExitIfError;        
+                    
+            p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);
             
-       /*      m_pShadowMapEffect->ApplyOrientation(m_quad.GetOrientation(), m_pointLight.Position, gCameraDirections[i].Target, 
-                                                 gCameraDirections[i].Up, 
-                                                 ProjInfo);*/
-        
-        // Render the quad
-     //   m_quad.Render();
+            p.Orient(m_mesh1Orientation);
+            m_shadowMapEffect.SetWorld(p.GetWorldTrans());
+            m_shadowMapEffect.SetWVP(p.GetWVPTrans());
+            m_mesh.Render();
+    
+            p.Orient(m_mesh2Orientation);
+            m_shadowMapEffect.SetWorld(p.GetWorldTrans());
+            m_shadowMapEffect.SetWVP(p.GetWVPTrans());
+            m_mesh.Render();
         }        
     }
-        
+    
+    
     void RenderPass()
     {
         glCullFace(GL_BACK);
@@ -237,28 +243,44 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_lightingEffect.Enable();
-             
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
-                
         m_lightingEffect.SetEyeWorldPos(m_pGameCamera->GetPos());
         
-        m_lightingEffect.ApplyOrientation(m_quad.GetOrientation(), *m_pGameCamera, m_persProjInfo);
-         
-        // Render the quad
+        Pipeline p;
+        p.SetPerspectiveProj(m_persProjInfo);    
+        p.SetCamera(*m_pGameCamera);
+        
+        // Render the quads
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
+        p.Orient(m_quad1Orientation);
+        m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
+        m_lightingEffect.SetWVP(p.GetWVPTrans());        
         m_quad.Render();
-        GLExitIfError;        
+        
+        p.Orient(m_quad2Orientation);
+        m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
+        m_lightingEffect.SetWVP(p.GetWVPTrans());        
+        m_quad.Render();        
 
-        // Render the object
-        m_lightingEffect.ApplyOrientation(m_mesh.GetOrientation(), *m_pGameCamera, m_persProjInfo);         
+        // Render the meshes
+        p.Orient(m_mesh1Orientation);
+        m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
+        m_lightingEffect.SetWVP(p.GetWVPTrans());       
         m_mesh.Render();        
-        GLExitIfError;        
+        
+        p.Orient(m_mesh2Orientation);
+        m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
+        m_lightingEffect.SetWVP(p.GetWVPTrans());       
+        m_mesh.Render();                
     }
+
+    
     virtual void IdleCB()
     {
         RenderSceneCB();
     }
 
+    
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
         m_pGameCamera->OnKeyboard(Key);
@@ -317,7 +339,11 @@ private:
     float m_scale;
     PointLight m_pointLight;
     Mesh m_mesh;
-    Mesh m_quad;	
+    Mesh m_quad;
+    Orientation m_quad1Orientation;
+    Orientation m_quad2Orientation;
+    Orientation m_mesh1Orientation;
+    Orientation m_mesh2Orientation;
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;

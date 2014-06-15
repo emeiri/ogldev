@@ -26,9 +26,10 @@
 #include <scene.h>       // Output data structure
 #include <postprocess.h> // Post processing flags
 
-#include "util.h"
+#include "ogldev_util.h"
 #include "math_3d.h"
-#include "texture.h"
+#include "ogldev_texture.h"
+#include "pipeline.h"
 
 struct Vertex
 {
@@ -43,21 +44,6 @@ struct Vertex
         m_pos    = pos;
         m_tex    = tex;
         m_normal = normal;
-    }
-};
-
-
-struct Orientation
-{
-    Vector3f m_scale;
-    Vector3f m_rotation;
-    Vector3f m_pos;       
-    
-    Orientation()
-    {
-        m_scale    = Vector3f(1.0f, 1.0f, 1.0f);
-        m_rotation = Vector3f(0.0f, 0.0f, 0.0f);
-        m_pos      = Vector3f(0.0f, 0.0f, 0.0f);
     }
 };
 
