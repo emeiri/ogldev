@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial41\engine_common.h" />
-    <ClInclude Include="..\..\tutorial41\glut_backend.h" />
     <ClInclude Include="..\..\tutorial41\intermediate_buffer.h" />
     <ClInclude Include="..\..\tutorial41\math_3d.h" />
     <ClInclude Include="..\..\tutorial41\mesh.h" />
@@ -23,7 +22,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial41\camera.cpp" />
-    <ClCompile Include="..\..\tutorial41\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial41\intermediate_buffer.cpp" />
     <ClCompile Include="..\..\tutorial41\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial41\mesh.cpp" />

@@ -34,7 +34,7 @@
 #include "texture.h"
 #include "silhouette_technique.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #ifndef WIN32
 #include "freetypeGL.h"
@@ -249,13 +249,15 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 39")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 39")) {
         return 1;
     }
+
+    glDepthFunc(GL_LEQUAL);
     
-    SRANDOM;
+	SRANDOM;
     
     Tutorial39* pApp = new Tutorial39();
 

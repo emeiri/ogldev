@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial37\callbacks.h" />
     <ClInclude Include="..\..\tutorial37\camera.h" />
     <ClInclude Include="..\..\tutorial37\ds_dir_light_pass_tech.h" />
     <ClInclude Include="..\..\tutorial37\ds_geom_pass_tech.h" />
@@ -19,7 +18,6 @@
     <ClInclude Include="..\..\tutorial37\ds_point_light_pass_tech.h" />
     <ClInclude Include="..\..\tutorial37\engine_common.h" />
     <ClInclude Include="..\..\tutorial37\gbuffer.h" />
-    <ClInclude Include="..\..\tutorial37\glut_backend.h" />
     <ClInclude Include="..\..\tutorial37\lights_common.h" />
     <ClInclude Include="..\..\tutorial37\math_3d.h" />
     <ClInclude Include="..\..\tutorial37\mesh.h" />
@@ -33,7 +31,6 @@
     <ClCompile Include="..\..\tutorial37\ds_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial37\ds_point_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial37\gbuffer.cpp" />
-    <ClCompile Include="..\..\tutorial37\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial37\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial37\mesh.cpp" />
     <ClCompile Include="..\..\tutorial37\null_technique.cpp" />
