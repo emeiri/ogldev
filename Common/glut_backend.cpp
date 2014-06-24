@@ -24,11 +24,14 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 
 // Points to the object implementing the ICallbacks interface which was delivered to
 // GLUTBackendRun(). All events are forwarded to this object.
 static ICallbacks* s_pCallbacks = NULL;
+
+static bool sWithDepth = false;
+static bool sWithStencil = false;
 
 static void SpecialKeyboardCB(int Key, int x, int y)
 {
@@ -77,18 +80,34 @@ static void InitCallbacks()
 }
 
 
-void GLUTBackendInit(int argc, char** argv)
+void GLUTBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
+	sWithDepth = WithDepth;
+	sWithStencil = WithStencil;
+
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
+	
+	uint DisplayMode = GLUT_DOUBLE|GLUT_RGBA;
+	
+	if (WithDepth) {
+		DisplayMode |= GLUT_DEPTH;
+	}
+
+	if (WithStencil) {
+		DisplayMode |= GLUT_STENCIL;
+	}
+
+    glutInitDisplayMode(DisplayMode);
+
     glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 }
 
 
-bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned int bpp, bool isFullScreen, const char* pTitle)
+bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, bool isFullScreen, const char* pTitle)
 {
     if (isFullScreen) {
         char ModeString[64] = { 0 };
+		int bpp = 32;
         SNPRINTF(ModeString, sizeof(ModeString), "%dx%d@%d", Width, Height, bpp);
         glutGameModeString(ModeString);
         glutEnterGameMode();
@@ -119,7 +138,10 @@ void GLUTBackendRun(ICallbacks* pCallbacks)
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
+
+	if (sWithDepth) {
+		glEnable(GL_DEPTH_TEST);
+	}
 
     s_pCallbacks = pCallbacks;
     InitCallbacks();

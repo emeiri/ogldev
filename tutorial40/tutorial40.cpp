@@ -389,6 +389,9 @@ int main(int argc, char** argv)
     }
     
     SRANDOM;
+
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_DEPTH_CLAMP);
     
     Tutorial40* pApp = new Tutorial40();
 

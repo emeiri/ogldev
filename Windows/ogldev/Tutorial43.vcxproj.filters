@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial43\callbacks.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial43\camera.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -59,9 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial43\camera.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial43\glut_backend.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial43\lighting_technique.cpp">

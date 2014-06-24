@@ -120,8 +120,6 @@ void GLUTBackendRun(ICallbacks* pCallbacks)
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);  
 	glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-    glEnable(GL_DEPTH_CLAMP);
 
     s_pCallbacks = pCallbacks;
     InitCallbacks();

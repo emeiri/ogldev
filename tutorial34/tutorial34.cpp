@@ -277,6 +277,8 @@ int main(int argc, char** argv)
     }
     
     SRANDOM;
+
+	glFrontFace(GL_CCW);
     
     Tutorial34* pApp = new Tutorial34();
 

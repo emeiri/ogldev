@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial43\callbacks.h" />
     <ClInclude Include="..\..\tutorial43\camera.h" />
     <ClInclude Include="..\..\tutorial43\engine_common.h" />
     <ClInclude Include="..\..\tutorial43\glut_backend.h" />
@@ -30,7 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial43\camera.cpp" />
-    <ClCompile Include="..\..\tutorial43\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial43\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial43\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial43\mesh.cpp" />
@@ -38,6 +36,11 @@
     <ClCompile Include="..\..\tutorial43\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial43\shadow_map_technique.cpp" />
     <ClCompile Include="..\..\tutorial43\tutorial43.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Common.vcxproj">
+      <Project>{a964cc6d-d87f-405c-9eb7-9659b2c76690}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C57E84B8-9DCE-4764-9C40-0A675301BFE3}</ProjectGuid>
