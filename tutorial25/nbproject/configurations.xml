@@ -46,6 +46,17 @@
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
   </logicalFolder>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -85,15 +96,9 @@
           <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -150,15 +155,9 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>

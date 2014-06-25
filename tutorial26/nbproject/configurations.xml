@@ -79,17 +79,11 @@
           <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -134,17 +128,11 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>

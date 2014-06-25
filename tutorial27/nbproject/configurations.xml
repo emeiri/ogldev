@@ -6,10 +6,8 @@
                    projectFiles="true">
       <itemPath>billboard_list.h</itemPath>
       <itemPath>billboard_technique.h</itemPath>
-      <itemPath>callbacks.h</itemPath>
       <itemPath>camera.h</itemPath>
       <itemPath>engine_common.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
@@ -30,12 +28,33 @@
       <itemPath>billboard_list.cpp</itemPath>
       <itemPath>billboard_technique.cpp</itemPath>
       <itemPath>camera.cpp</itemPath>
-      <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial27.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -100,17 +119,11 @@
       </item>
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -169,17 +182,11 @@
       </item>
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
