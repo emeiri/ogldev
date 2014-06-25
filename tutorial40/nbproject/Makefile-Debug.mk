@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/camera.o \
-	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
@@ -76,11 +75,6 @@ ${OBJECTDIR}/camera.o: camera.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
-${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

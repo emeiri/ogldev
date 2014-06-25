@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -9,6 +9,7 @@
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>FreetypeGL/markup.h</itemPath>
       <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
+      <itemPath>../Include/ogldev_glut_backend.h</itemPath>
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
@@ -19,6 +20,10 @@
       <itemPath>FreetypeGL/vector.h</itemPath>
       <itemPath>FreetypeGL/vertex-buffer.h</itemPath>
     </logicalFolder>
+    <logicalFolder name="ResourceFiles"
+                   displayName="Resource Files"
+                   projectFiles="true">
+    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
@@ -26,6 +31,7 @@
       <itemPath>FreetypeGL/font-manager.c</itemPath>
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
+      <itemPath>glut_backend.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
@@ -34,6 +40,105 @@
       <itemPath>FreetypeGL/texture-glyph.c</itemPath>
       <itemPath>FreetypeGL/vector.c</itemPath>
       <itemPath>FreetypeGL/vertex-buffer.c</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -96,6 +201,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
@@ -137,6 +244,8 @@
       <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -172,6 +281,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
@@ -213,6 +324,8 @@
       <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>

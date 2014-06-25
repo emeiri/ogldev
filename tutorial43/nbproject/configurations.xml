@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -87,17 +87,11 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -177,17 +171,11 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/camera.o \
-	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/pipeline.o \
@@ -74,11 +73,6 @@ ${OBJECTDIR}/camera.o: camera.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
-${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/math_3d.o: math_3d.cpp 
 	${MKDIR} -p ${OBJECTDIR}
