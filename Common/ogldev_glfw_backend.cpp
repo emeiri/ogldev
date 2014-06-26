@@ -24,6 +24,25 @@
 
 #include "ogldev_glfw_backend.h"
 
+// Points to the object implementing the ICallbacks interface which was delivered to
+// GLUTBackendRun(). All events are forwarded to this object.
+static ICallbacks* s_pCallbacks = NULL;
+
+static bool sWithDepth = false;
+static bool sWithStencil = false;
+static GLFWwindow* sWindow = NULL;
+
+
+static void InitCallbacks()
+{
+	/*glutDisplayFunc(RenderSceneCB);
+	glutIdleFunc(IdleCB);
+	glutSpecialFunc(SpecialKeyboardCB);
+	glutPassiveMotionFunc(PassiveMouseCB);
+	glutKeyboardFunc(KeyboardCB);
+	glutMouseFunc(MouseCB);*/
+}
+
 void GLFWErrorCallback(int error, const char* description)
 {
 #ifdef WIN32
@@ -36,9 +55,12 @@ void GLFWErrorCallback(int error, const char* description)
 
 }
 
-bool GLFWBackendInit()
+bool GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
 	bool ret = false;
+
+	sWithDepth = WithDepth;
+	sWithStencil = WithStencil;
 
 	if (glfwInit() == 1) {
 		glfwSetErrorCallback(GLFWErrorCallback);
@@ -51,25 +73,46 @@ bool GLFWBackendInit()
 
 void GLFWBackendTerminate()
 {
+	glfwDestroyWindow(sWindow);
 	glfwTerminate();
 }
 
 
-bool GLFWBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned int bpp, bool isFullScreen, const char* pTitle)
+bool GLFWBackendCreateWindow(unsigned int Width, unsigned int Height, bool isFullScreen, const char* pTitle)
 {
 	GLFWmonitor* pMonitor = isFullScreen ? glfwGetPrimaryMonitor() : NULL;
 
-	GLFWwindow* pWindow = glfwCreateWindow(Width, Height, pTitle, pMonitor, NULL);
+	sWindow = glfwCreateWindow(Width, Height, pTitle, pMonitor, NULL);
 
-	if (pWindow) {
-		glfwMakeContextCurrent(pWindow);
-
-		while (!glfwWindowShouldClose(pWindow))
-		{
-			glfwSwapBuffers(pWindow);
-			glfwPollEvents();
-		}
+	if (sWindow) {
+		glfwMakeContextCurrent(sWindow);
 	}
 
-	return pWindow != NULL;
+	return sWindow != NULL;
+}
+
+
+void GLFWBackendRun(ICallbacks* pCallbacks)
+{
+	if (!pCallbacks) {
+		fprintf(stderr, "%s : callbacks not specified!\n", __FUNCTION__);
+		return;
+	}
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glFrontFace(GL_CW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+
+	if (sWithDepth) {
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	s_pCallbacks = pCallbacks;
+	InitCallbacks();
+
+	while (!glfwWindowShouldClose(sWindow)) {
+		glfwSwapBuffers(sWindow);
+		glfwPollEvents();
+	}
 }
