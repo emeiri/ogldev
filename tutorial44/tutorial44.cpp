@@ -15,7 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+<<<<<<< HEAD
     Tutorial 44 - GLFW
+=======
+    Tutorial 41 - Motion Blur
+>>>>>>> bff0ebcef6a0c37759b4e61572d9bafe055e7db3
 */
 
 #include <math.h>
@@ -34,7 +38,6 @@
 #include "texture.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
-#include "ogldev_glut_backend.h"
 #include "ogldev_glfw_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
@@ -157,7 +160,6 @@ public:
     virtual void RenderSceneCB()
     {   
         CalcFPS();
-             
         m_pGameCamera->OnRender();
 
         RenderPass();

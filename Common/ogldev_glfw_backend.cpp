@@ -55,6 +55,7 @@ void GLFWErrorCallback(int error, const char* description)
 
 }
 
+
 bool GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
 	bool ret = false;
