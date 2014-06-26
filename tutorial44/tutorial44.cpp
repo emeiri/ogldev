@@ -15,12 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 41 - Motion Blur
+    Tutorial 44 - GLFW
 */
 
 #include <math.h>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 #include <string>
 #ifndef WIN32
 #include <sys/time.h>
@@ -35,7 +34,7 @@
 #include "texture.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "ogldev_glfw_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
@@ -143,7 +142,7 @@ public:
             return false;
         }
 #endif        	
-        m_glutTime = glutGet(GLUT_ELAPSED_TIME);
+        m_glutTime = glfwGetTime();
         m_startTime = GetCurrentTimeMillis();
        
         return true;
@@ -151,14 +150,14 @@ public:
 
     void Run()
     {
-        GLUTBackendRun(this);
+        GLFWBackendRun(this);
     }
     
 
     virtual void RenderSceneCB()
     {   
         CalcFPS();
-              
+             
         m_pGameCamera->OnRender();
 
         RenderPass();
@@ -166,8 +165,6 @@ public:
         MotionBlurPass();
                               
         RenderFPS();       
-        
-        glutSwapBuffers();
     }
     
     void RenderPass()
@@ -256,10 +253,10 @@ private:
     {
         m_frameCount++;
         
-        int time = glutGet( GLUT_ELAPSED_TIME );
+        int time = glfwGetTime();
 
-        if (time - m_glutTime > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_glutTime);
+        if (time - m_glutTime > 1) {
+            m_fps = (float)m_frameCount / (time - m_glutTime);
             m_glutTime = time;
             m_frameCount = 0;
         }
@@ -301,13 +298,12 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
- //   GLUTBackendInit(argc, argv);
 
-	if (!GLFWBackendInit()) {
+	if (!GLFWBackendInit(argc, argv, true, false)) {
 		return 1;
 	}
 
-    if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 44")) {
+    if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 44")) {
         return 1;
     }
     

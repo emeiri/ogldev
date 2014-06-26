@@ -19,10 +19,17 @@
 #ifndef OGLDEV_GLFW_BACKEND_H
 #define	OGLDEV_GLFW_BACKEND_H
 
-bool GLFWBackendInit();
+#include <GLFW/glfw3.h>
+
+#include "ogldev_types.h"
+#include "ogldev_callbacks.h"
+
+bool GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil);
 
 void GLFWBackendTerminate();
 
-bool GLFWBackendCreateWindow(unsigned int Width, unsigned int Height, unsigned int bpp, bool isFullScreen, const char* pTitle);
+bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle);
+
+void GLFWBackendRun(ICallbacks* pCallbacks);
 
 #endif
