@@ -30,7 +30,7 @@
 #include "camera.h"
 #include "texture.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "particle_system.h"
 
@@ -206,9 +206,9 @@ int main(int argc, char** argv)
     
     SRANDOM;
        
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 28")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 28")) {
         return 1;
     }
 

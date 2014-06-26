@@ -11,16 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial18\callbacks.h" />
     <ClInclude Include="..\..\tutorial18\camera.h" />
-    <ClInclude Include="..\..\tutorial18\glut_backend.h" />
     <ClInclude Include="..\..\tutorial18\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial18\math_3d.h" />
     <ClInclude Include="..\..\tutorial18\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial18\camera.cpp" />
-    <ClCompile Include="..\..\tutorial18\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial18\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial18\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial18\pipeline.cpp" />
