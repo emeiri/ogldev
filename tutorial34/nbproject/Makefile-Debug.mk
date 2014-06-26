@@ -37,7 +37,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/glfx_technique.o \
-	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
@@ -82,11 +81,6 @@ ${OBJECTDIR}/glfx_technique.o: glfx_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glfx_technique.o glfx_technique.cpp
-
-${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

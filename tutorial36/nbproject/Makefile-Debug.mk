@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ds_light_pass_tech.o \
 	${OBJECTDIR}/ds_point_light_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
-	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/pipeline.o \
@@ -103,11 +102,6 @@ ${OBJECTDIR}/gbuffer.o: gbuffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/gbuffer.o gbuffer.cpp
-
-${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/math_3d.o: math_3d.cpp 
 	${MKDIR} -p ${OBJECTDIR}
