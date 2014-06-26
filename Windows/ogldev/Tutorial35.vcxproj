@@ -11,12 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial35\callbacks.h" />
     <ClInclude Include="..\..\tutorial35\camera.h" />
     <ClInclude Include="..\..\tutorial35\ds_geom_pass_tech.h" />
     <ClInclude Include="..\..\tutorial35\engine_common.h" />
     <ClInclude Include="..\..\tutorial35\gbuffer.h" />
-    <ClInclude Include="..\..\tutorial35\glut_backend.h" />
     <ClInclude Include="..\..\tutorial35\math_3d.h" />
     <ClInclude Include="..\..\tutorial35\mesh.h" />
     <ClInclude Include="..\..\tutorial35\pipeline.h" />
@@ -25,7 +23,6 @@
     <ClCompile Include="..\..\tutorial35\camera.cpp" />
     <ClCompile Include="..\..\tutorial35\ds_geom_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial35\gbuffer.cpp" />
-    <ClCompile Include="..\..\tutorial35\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial35\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial35\mesh.cpp" />
     <ClCompile Include="..\..\tutorial35\pipeline.cpp" />

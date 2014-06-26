@@ -11,10 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial32\callbacks.h" />
     <ClInclude Include="..\..\tutorial32\camera.h" />
     <ClInclude Include="..\..\tutorial32\engine_common.h" />
-    <ClInclude Include="..\..\tutorial32\glut_backend.h" />
     <ClInclude Include="..\..\tutorial32\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial32\math_3d.h" />
     <ClInclude Include="..\..\tutorial32\mesh.h" />
@@ -22,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial32\camera.cpp" />
-    <ClCompile Include="..\..\tutorial32\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial32\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial32\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial32\mesh.cpp" />

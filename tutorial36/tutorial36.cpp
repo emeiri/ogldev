@@ -30,7 +30,7 @@
 #include "ds_geom_pass_tech.h"
 #include "ds_point_light_pass_tech.h"
 #include "ds_dir_light_pass_tech.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #ifndef WIN32
 #include "freetypeGL.h"
@@ -380,9 +380,9 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 36")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 36")) {
         return 1;
     }
     
