@@ -55,12 +55,12 @@ bool IntermediateBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeigh
 {
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);    
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
     // Create the buffers
     glGenTextures(1, &m_colorBuffer);
-	glGenTextures(1, &m_motionBuffer);
-	glGenTextures(1, &m_depthBuffer);
+    glGenTextures(1, &m_motionBuffer);
+    glGenTextures(1, &m_depthBuffer);
 
     // color buffer
     glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
@@ -81,9 +81,9 @@ bool IntermediateBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeigh
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
-    
-   	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
+
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
     glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
 
@@ -94,8 +94,8 @@ bool IntermediateBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeigh
         return false;
     }
 
-	// restore default FBO
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    // restore default FBO
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
     return true;
 }
@@ -109,11 +109,11 @@ void IntermediateBuffer::BindForWriting()
 
 void IntermediateBuffer::BindForReading()
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-	glActiveTexture(COLOR_TEXTURE_UNIT);		
-	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);    
-    
-	glActiveTexture(MOTION_TEXTURE_UNIT);		
-	glBindTexture(GL_TEXTURE_2D, m_motionBuffer);    
+    glActiveTexture(COLOR_TEXTURE_UNIT);		
+    glBindTexture(GL_TEXTURE_2D, m_colorBuffer);    
+
+    glActiveTexture(MOTION_TEXTURE_UNIT);		
+    glBindTexture(GL_TEXTURE_2D, m_motionBuffer);    
 }

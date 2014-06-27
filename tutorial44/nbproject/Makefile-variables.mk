@@ -12,16 +12,16 @@ CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux-x86
 CND_ARTIFACT_NAME_Debug=tutorial41
 CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux-x86/tutorial41
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Debug=tutorial41.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/tutorial41.tar
+CND_PACKAGE_NAME_Debug=tutorial44.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/tutorial44.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux-x86
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux-x86
-CND_ARTIFACT_NAME_Release=tutorial41
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/tutorial41
+CND_ARTIFACT_NAME_Release=tutorial44
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/tutorial44
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Release=tutorial41.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/tutorial41.tar
+CND_PACKAGE_NAME_Release=tutorial44.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/tutorial44.tar
 #
 # include compiler specific variables
 #

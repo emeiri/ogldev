@@ -36,22 +36,21 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/camera.o \
-	${OBJECTDIR}/glut_backend.o \
 	${OBJECTDIR}/intermediate_buffer.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/motion_blur_technique.o \
 	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/skinning_technique.o \
-	${OBJECTDIR}/tutorial41.o
+	${OBJECTDIR}/tutorial44.o
 
 
 # C Compiler Flags
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` 
-CXXFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` 
+CCFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig glfw3` 
+CXXFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig glfw3` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -70,17 +69,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial41: ../Common/dist/Debug/GNU-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial41: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial41 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl`
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial41 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
 
 ${OBJECTDIR}/camera.o: camera.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
-${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
 ${OBJECTDIR}/intermediate_buffer.o: intermediate_buffer.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -112,10 +106,10 @@ ${OBJECTDIR}/skinning_technique.o: skinning_technique.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/skinning_technique.o skinning_technique.cpp
 
-${OBJECTDIR}/tutorial41.o: tutorial41.cpp 
+${OBJECTDIR}/tutorial44.o: tutorial44.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial41.o tutorial41.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial44.o tutorial44.cpp
 
 # Subprojects
 .build-subprojects:

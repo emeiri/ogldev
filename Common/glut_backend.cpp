@@ -82,20 +82,20 @@ static void InitCallbacks()
 
 void GLUTBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
-	sWithDepth = WithDepth;
-	sWithStencil = WithStencil;
+    sWithDepth = WithDepth;
+    sWithStencil = WithStencil;
 
     glutInit(&argc, argv);
 	
-	uint DisplayMode = GLUT_DOUBLE|GLUT_RGBA;
-	
-	if (WithDepth) {
-		DisplayMode |= GLUT_DEPTH;
-	}
+    uint DisplayMode = GLUT_DOUBLE|GLUT_RGBA;
 
-	if (WithStencil) {
-		DisplayMode |= GLUT_STENCIL;
-	}
+    if (WithDepth) {
+        DisplayMode |= GLUT_DEPTH;
+    }
+
+    if (WithStencil) {
+        DisplayMode |= GLUT_STENCIL;
+    }
 
     glutInitDisplayMode(DisplayMode);
 

@@ -51,12 +51,23 @@ bool ReadFile(const char* pFileName, string& outFile)
     return ret;
 }
 
+void OgldevError(const char* pFileName, uint line, const char* pError)
+{
+#ifdef WIN32
+    char msg[1000];
+    _snprintf_s(msg, sizeof(msg), "%s:%d: %s, pFileName, line, pError);
+    MessageBoxA(NULL, msg, NULL, 0);
+#else
+    fprintf(stderr, "%s:%d: %s\n", pFileName, line, pError);
+#endif    
+}
+
 
 void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 {
 #ifdef WIN32
-	char msg[1000];
-	_snprintf_s(msg, sizeof(msg), "%s:%d: unable to open file `%s`", pFileName, line, pFileError);
+    char msg[1000];
+    _snprintf_s(msg, sizeof(msg), "%s:%d: unable to open file `%s`", pFileName, line, pFileError);
     MessageBoxA(NULL, msg, NULL, 0);
 #else
     fprintf(stderr, "%s:%d: unable to open file `%s`\n", pFileName, line, pFileError);
@@ -67,13 +78,13 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 long long GetCurrentTimeMillis()
 {
 #ifdef WIN32    
-	return GetTickCount();
+    return GetTickCount();
 #else
-	timeval t;
-	gettimeofday(&t, NULL);
+    timeval t;
+    gettimeofday(&t, NULL);
 
-	long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-	return ret;
+    long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
+    return ret;
 #endif    
 }
 

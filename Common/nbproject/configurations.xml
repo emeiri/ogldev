@@ -9,6 +9,7 @@
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>FreetypeGL/markup.h</itemPath>
       <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
+      <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
@@ -32,6 +33,7 @@
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>ogldev_glfw_backend.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
@@ -201,6 +203,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../Include/ogldev_glfw_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
@@ -246,6 +250,8 @@
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -281,6 +287,8 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="../Include/ogldev_glfw_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
@@ -326,6 +334,8 @@
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>

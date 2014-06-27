@@ -34,7 +34,7 @@
 #include "texture.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
-#include "ogldev_glut_backend.h"
+//#include "ogldev_glut_backend.h"
 #include "ogldev_glfw_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
@@ -54,11 +54,11 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-class Tutorial41 : public ICallbacks
+class Tutorial44 : public ICallbacks
 {
 public:
 
-    Tutorial41() 
+    Tutorial44() 
     {
         m_pGameCamera = NULL;
         m_pSkinningTech = NULL;
@@ -80,7 +80,7 @@ public:
         m_position = Vector3f(0.0f, 0.0f, 6.0f);      
     }
 
-    ~Tutorial41()
+    ~Tutorial44()
     {
         SAFE_DELETE(m_pSkinningTech);
         SAFE_DELETE(m_pMotionBlurTech);
@@ -230,7 +230,7 @@ public:
     {
         switch (Key) {
             case 'q':
-                glutLeaveMainLoop();
+             //   glutLeaveMainLoop();
                 break;
         }
     }
@@ -299,22 +299,20 @@ int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
 
-	if (!GLFWBackendInit(argc, argv, true, false)) {
-		return 1;
-	}
+    GLFWBackendInit(argc, argv, true, false);
 
     if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 44")) {
         return 1;
     }
-    
+
     SRANDOM;
     
-    Tutorial41* pApp = new Tutorial41();
+    Tutorial44* pApp = new Tutorial44();
 
     if (!pApp->Init()) {
         return 1;
     }
-    
+
     pApp->Run();
 
     delete pApp;
