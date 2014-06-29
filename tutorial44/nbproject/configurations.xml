@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>camera.h</itemPath>
-      <itemPath>../../../../../../tutorials/ogldev/tutorial41/engine_common.h</itemPath>
       <itemPath>intermediate_buffer.h</itemPath>
       <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
