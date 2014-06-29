@@ -55,7 +55,7 @@ void OgldevError(const char* pFileName, uint line, const char* pError)
 {
 #ifdef WIN32
     char msg[1000];
-    _snprintf_s(msg, sizeof(msg), "%s:%d: %s, pFileName, line, pError);
+    _snprintf_s(msg, sizeof(msg), "%s:%d: %s", pFileName, line, pError);
     MessageBoxA(NULL, msg, NULL, 0);
 #else
     fprintf(stderr, "%s:%d: %s\n", pFileName, line, pError);

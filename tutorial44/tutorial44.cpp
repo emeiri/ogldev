@@ -222,15 +222,17 @@ public:
 
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
+        
         m_pGameCamera->OnKeyboard(Key);
     }
 
 
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        switch (Key) {
-            case 'q':
-             //   glutLeaveMainLoop();
+        switch (OgldevKey) {
+            case OGLDEV_KEY_ESCAPE:
+            case OGLDEV_KEY_Q:
+                GLFWBackendSignalTerminate();
                 break;
         }
     }

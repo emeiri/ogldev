@@ -19,13 +19,13 @@
 #ifndef CALLBACKS_H
 #define	CALLBACKS_H
 
+#include "ogldev_keys.h"
+
 class ICallbacks
 {
 public:
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y) {};
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y) {};
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey) {};
 
     virtual void PassiveMouseCB(int x, int y) {};
 

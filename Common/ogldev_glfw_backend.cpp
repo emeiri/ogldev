@@ -27,6 +27,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_glfw_backend.h"
+#include "ogldev_keys.h"
 
 // Points to the object implementing the ICallbacks interface which was delivered to
 // GLUTBackendRun(). All events are forwarded to this object.
@@ -36,11 +37,79 @@ static bool sWithDepth = false;
 static bool sWithStencil = false;
 static GLFWwindow* s_pWindow = NULL;
 
-static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+
+static OGLDEV_KEY GLFWKeyToOGLDEVKey(uint Key)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GL_TRUE);
+    if (Key >= GLFW_KEY_SPACE && Key <= GLFW_KEY_RIGHT_BRACKET) {
+        return (OGLDEV_KEY)Key;
     }
+    
+    switch (Key) {
+        case GLFW_KEY_ESCAPE:            
+            return OGLDEV_KEY_ESCAPE;
+        case GLFW_KEY_ENTER:         
+            return OGLDEV_KEY_ENTER;
+        case GLFW_KEY_TAB:          
+            return OGLDEV_KEY_TAB;
+        case GLFW_KEY_BACKSPACE:  
+            return OGLDEV_KEY_BACKSPACE;
+        case GLFW_KEY_INSERT:         
+            return OGLDEV_KEY_INSERT;
+        case GLFW_KEY_DELETE:        
+            return OGLDEV_KEY_DELETE;
+        case GLFW_KEY_RIGHT:         
+            return OGLDEV_KEY_RIGHT;
+        case GLFW_KEY_LEFT:         
+            return OGLDEV_KEY_LEFT;
+        case GLFW_KEY_DOWN:        
+            return OGLDEV_KEY_DOWN;            
+        case GLFW_KEY_UP:         
+            return OGLDEV_KEY_UP;
+        case GLFW_KEY_PAGE_UP:   
+            return OGLDEV_KEY_PAGE_UP;
+        case GLFW_KEY_PAGE_DOWN:      
+            return OGLDEV_KEY_PAGE_DOWN;
+        case GLFW_KEY_HOME:    
+            return OGLDEV_KEY_HOME;
+        case GLFW_KEY_END:     
+            return OGLDEV_KEY_END;
+        case GLFW_KEY_F1:        
+            return OGLDEV_KEY_F1;
+        case GLFW_KEY_F2:        
+            return OGLDEV_KEY_F2;
+        case GLFW_KEY_F3:       
+            return OGLDEV_KEY_F3;
+        case GLFW_KEY_F4:   
+            return OGLDEV_KEY_F4;
+        case GLFW_KEY_F5:      
+            return OGLDEV_KEY_F5;
+        case GLFW_KEY_F6:     
+            return OGLDEV_KEY_F6;
+        case GLFW_KEY_F7:     
+            return OGLDEV_KEY_F7;
+        case GLFW_KEY_F8:     
+            return OGLDEV_KEY_F8;
+        case GLFW_KEY_F9:     
+            return OGLDEV_KEY_F9;
+        case GLFW_KEY_F10:    
+            return OGLDEV_KEY_F10;
+        case GLFW_KEY_F11:   
+            return OGLDEV_KEY_F11;
+        case GLFW_KEY_F12:    
+            return OGLDEV_KEY_F12;
+        default:
+            OGLDEV_ERROR("Unimplemented OGLDEV key");
+            exit(1);
+    }
+    
+    return OGLDEV_KEY_UNDEFINED;
+}
+
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{   
+    OGLDEV_KEY OgldevKey = GLFWKeyToOGLDEVKey(key);
+    
+    s_pCallbacks->KeyboardCB(OgldevKey);
 }
 
 
@@ -145,4 +214,10 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
         glfwSwapBuffers(s_pWindow);
         glfwPollEvents();
     }
+}
+
+
+void GLFWBackendSignalTerminate()
+{
+    glfwSetWindowShouldClose(s_pWindow, 1);
 }

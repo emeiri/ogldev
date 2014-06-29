@@ -32,4 +32,6 @@ bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
 
 void GLFWBackendRun(ICallbacks* pCallbacks);
 
+void GLFWBackendSignalTerminate();
+
 #endif
