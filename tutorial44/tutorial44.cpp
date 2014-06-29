@@ -15,15 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-<<<<<<< HEAD
     Tutorial 44 - GLFW
-=======
-<<<<<<< HEAD
-    Tutorial 44 - GLFW
-=======
-    Tutorial 41 - Motion Blur
->>>>>>> bff0ebcef6a0c37759b4e61572d9bafe055e7db3
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
 */
 
 #include <math.h>
@@ -42,10 +34,6 @@
 #include "texture.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
-<<<<<<< HEAD
-//#include "ogldev_glut_backend.h"
-=======
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
 #include "ogldev_glfw_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
@@ -65,19 +53,11 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-<<<<<<< HEAD
 class Tutorial44 : public ICallbacks
 {
 public:
 
     Tutorial44() 
-=======
-class Tutorial41 : public ICallbacks
-{
-public:
-
-    Tutorial41() 
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
     {
         m_pGameCamera = NULL;
         m_pSkinningTech = NULL;
@@ -99,11 +79,7 @@ public:
         m_position = Vector3f(0.0f, 0.0f, 6.0f);      
     }
 
-<<<<<<< HEAD
     ~Tutorial44()
-=======
-    ~Tutorial41()
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
     {
         SAFE_DELETE(m_pSkinningTech);
         SAFE_DELETE(m_pMotionBlurTech);
@@ -165,8 +141,7 @@ public:
             return false;
         }
 #endif        	
-        m_glutTime = glfwGetTime();
-        m_startTime = GetCurrentTimeMillis();
+        m_frameTime = m_startTime = GetCurrentTimeMillis();
        
         return true;
     }
@@ -180,11 +155,8 @@ public:
     virtual void RenderSceneCB()
     {   
         CalcFPS();
-<<<<<<< HEAD
-             
-=======
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
-        m_pGameCamera->OnRender();
+
+		m_pGameCamera->OnRender();
 
         RenderPass();
         
@@ -241,36 +213,16 @@ public:
         m_quad.Render();
     }
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
-
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-<<<<<<< HEAD
-        
-=======
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-<<<<<<< HEAD
-    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+    
+    void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
         switch (OgldevKey) {
             case OGLDEV_KEY_ESCAPE:
             case OGLDEV_KEY_Q:
                 GLFWBackendSignalTerminate();
-=======
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
                 break;
+			default:
+				m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
@@ -280,11 +232,6 @@ public:
         m_pGameCamera->OnMouse(x, y);
     }
     
-    
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
 
 private:
     
@@ -292,11 +239,10 @@ private:
     {
         m_frameCount++;
         
-        int time = glfwGetTime();
+        long long time = GetCurrentTimeMillis();
 
-        if (time - m_glutTime > 1) {
-            m_fps = (float)m_frameCount / (time - m_glutTime);
-            m_glutTime = time;
+        if (time - m_frameTime >= 1000) {
+            m_frameTime = time;
             m_frameCount = 0;
         }
     }
@@ -327,7 +273,7 @@ private:
 #ifndef WIN32
     FontRenderer m_fontRenderer;
 #endif
-    int m_glutTime;
+    long long m_frameTime;
     long long m_startTime;
     int m_frameCount;
     float m_fps;    
@@ -338,38 +284,21 @@ int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
 
-<<<<<<< HEAD
     GLFWBackendInit(argc, argv, true, false);
-=======
-	if (!GLFWBackendInit(argc, argv, true, false)) {
-		return 1;
-	}
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
 
     if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 44")) {
         return 1;
     }
-<<<<<<< HEAD
 
     SRANDOM;
     
     Tutorial44* pApp = new Tutorial44();
-=======
-    
-    SRANDOM;
-    
-    Tutorial41* pApp = new Tutorial41();
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
 
     if (!pApp->Init()) {
         return 1;
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> d9964e8da118d44df2e3d929f9a3456147ff2269
-    pApp->Run();
+	pApp->Run();
 
     delete pApp;
  

@@ -25,7 +25,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_glut_backend.h"
-#include "ogldev_keys.h"
+#include "ogldev_backend.h"
 
 // Points to the object implementing the ICallbacks interface which was delivered to
 // GLUTBackendRun(). All events are forwarded to this object.
@@ -90,6 +90,23 @@ static OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key)
 }
 
 
+static OGLDEV_MOUSE GLUTMouseToOGLDEVMouse(uint Button)
+{
+	switch (Button) {
+	case GLUT_LEFT_BUTTON:
+		return OGLDEV_MOUSE_BUTTON_LEFT;
+	case GLUT_RIGHT_BUTTON:
+		return OGLDEV_MOUSE_BUTTON_RIGHT;
+	case GLUT_MIDDLE_BUTTON:
+		return OGLDEV_MOUSE_BUTTON_MIDDLE;
+	default:
+		OGLDEV_ERROR("Unimplemented OGLDEV mouse button");
+	}
+
+	return OGLDEV_MOUSE_UNDEFINED;
+}
+
+
 static void SpecialKeyboardCB(int Key, int x, int y)
 {
     OGLDEV_KEY OgldevKey = GLUTKeyToOGLDEVKey(Key);
@@ -118,13 +135,16 @@ static void RenderSceneCB()
 
 static void IdleCB()
 {
-    s_pCallbacks->IdleCB();
+    s_pCallbacks->RenderSceneCB();
 }
 
 
 static void MouseCB(int Button, int State, int x, int y)
 {
-    s_pCallbacks->MouseCB(Button, State, x, y);
+	OGLDEV_MOUSE OgldevMouse = GLUTMouseToOGLDEVMouse(Button);
+	OGLDEV_KEY_STATE OgldevKeyState = (State == GLUT_DOWN) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
+
+    s_pCallbacks->MouseCB(OgldevMouse, OgldevKeyState, x, y);
 }
 
 
@@ -199,7 +219,7 @@ void GLUTBackendRun(ICallbacks* pCallbacks)
     glEnable(GL_CULL_FACE);
 
     if (sWithDepth) {
-            glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
     }
 
     s_pCallbacks = pCallbacks;

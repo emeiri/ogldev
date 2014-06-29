@@ -27,7 +27,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_glfw_backend.h"
-#include "ogldev_keys.h"
+#include "ogldev_backend.h"
 
 // Points to the object implementing the ICallbacks interface which was delivered to
 // GLUTBackendRun(). All events are forwarded to this object.
@@ -105,7 +105,23 @@ static OGLDEV_KEY GLFWKeyToOGLDEVKey(uint Key)
     return OGLDEV_KEY_UNDEFINED;
 }
 
-static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+static OGLDEV_MOUSE GLFWMouseToOGLDEVMouse(uint Button)
+{
+	switch (Button) {
+	case GLFW_MOUSE_BUTTON_LEFT:
+		return OGLDEV_MOUSE_BUTTON_LEFT;
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		return OGLDEV_MOUSE_BUTTON_RIGHT;
+	case GLFW_MOUSE_BUTTON_MIDDLE:
+		return OGLDEV_MOUSE_BUTTON_MIDDLE;
+	default:
+		OGLDEV_ERROR("Unimplemented OGLDEV mouse button");
+	}
+
+	return OGLDEV_MOUSE_UNDEFINED;
+}
+
+static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
 {   
     OGLDEV_KEY OgldevKey = GLFWKeyToOGLDEVKey(key);
     
@@ -113,14 +129,30 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 }
 
 
+static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)
+{
+	s_pCallbacks->PassiveMouseCB((int)x, (int)y);
+}
+
+
+static void MouseCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)
+{
+	OGLDEV_MOUSE OgldevMouse = GLFWMouseToOGLDEVMouse(Button);
+
+	OGLDEV_KEY_STATE State = (Action == GLFW_PRESS) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
+
+	double x, y;
+
+	glfwGetCursorPos(pWindow, &x, &y);
+
+	s_pCallbacks->MouseCB(OgldevMouse, State, (int)x, (int)y);
+}
+
 static void InitCallbacks()
 {
-    /*glutDisplayFunc(RenderSceneCB);
-    glutIdleFunc(IdleCB);
-    glutSpecialFunc(SpecialKeyboardCB);
-    glutPassiveMotionFunc(PassiveMouseCB);
-    glutMouseFunc(MouseCB);*/
     glfwSetKeyCallback(s_pWindow, KeyCallback);
+	glfwSetCursorPosCallback(s_pWindow, CursorPosCallback);
+	glfwSetMouseButtonCallback(s_pWindow, MouseCallback);
 }
 
 void GLFWErrorCallback(int error, const char* description)

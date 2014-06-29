@@ -131,11 +131,6 @@ public:
         glutSwapBuffers();
     }
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
-
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
         m_pGameCamera->OnKeyboard(Key);

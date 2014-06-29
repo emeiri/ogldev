@@ -19,6 +19,8 @@
     <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\ogldev_backend.h" />
+    <ClInclude Include="..\..\Include\ogldev_callbacks.h" />
     <ClInclude Include="..\..\Include\ogldev_cubemap_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_glfw_backend.h" />
     <ClInclude Include="..\..\Include\ogldev_glut_backend.h" />

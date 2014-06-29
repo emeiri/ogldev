@@ -162,10 +162,6 @@ public:
         glutSwapBuffers();
     }
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
 
     virtual void SpecialKeyboardCB(int Key, int x, int y)
     {
@@ -189,11 +185,6 @@ public:
     }
     
     
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
-
 private:
     
     void CalcFPS()
