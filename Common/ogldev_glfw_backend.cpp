@@ -131,28 +131,28 @@ static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, 
 
 static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)
 {
-	s_pCallbacks->PassiveMouseCB((int)x, (int)y);
+    s_pCallbacks->PassiveMouseCB((int)x, (int)y);
 }
 
 
 static void MouseCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)
 {
-	OGLDEV_MOUSE OgldevMouse = GLFWMouseToOGLDEVMouse(Button);
+    OGLDEV_MOUSE OgldevMouse = GLFWMouseToOGLDEVMouse(Button);
 
-	OGLDEV_KEY_STATE State = (Action == GLFW_PRESS) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
+    OGLDEV_KEY_STATE State = (Action == GLFW_PRESS) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
 
-	double x, y;
+    double x, y;
 
-	glfwGetCursorPos(pWindow, &x, &y);
+    glfwGetCursorPos(pWindow, &x, &y);
 
-	s_pCallbacks->MouseCB(OgldevMouse, State, (int)x, (int)y);
+    s_pCallbacks->MouseCB(OgldevMouse, State, (int)x, (int)y);
 }
 
 static void InitCallbacks()
 {
     glfwSetKeyCallback(s_pWindow, KeyCallback);
-	glfwSetCursorPosCallback(s_pWindow, CursorPosCallback);
-	glfwSetMouseButtonCallback(s_pWindow, MouseCallback);
+    glfwSetCursorPosCallback(s_pWindow, CursorPosCallback);
+    glfwSetMouseButtonCallback(s_pWindow, MouseCallback);
 }
 
 void GLFWErrorCallback(int error, const char* description)
@@ -249,7 +249,7 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 }
 
 
-void GLFWBackendSignalTerminate()
+void GLFWBackendLeaveMainLoop()
 {
     glfwSetWindowShouldClose(s_pWindow, 1);
 }

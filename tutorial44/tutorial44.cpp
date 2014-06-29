@@ -156,7 +156,7 @@ public:
     {   
         CalcFPS();
 
-		m_pGameCamera->OnRender();
+	m_pGameCamera->OnRender();
 
         RenderPass();
         
@@ -221,8 +221,8 @@ public:
             case OGLDEV_KEY_Q:
                 GLFWBackendSignalTerminate();
                 break;
-			default:
-				m_pGameCamera->OnKeyboard(OgldevKey);
+            default:
+                m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 

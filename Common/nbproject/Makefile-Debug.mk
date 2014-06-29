@@ -45,6 +45,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/FreetypeGL/vertex-buffer.o \
 	${OBJECTDIR}/cubemap_texture.o \
 	${OBJECTDIR}/glut_backend.o \
+	${OBJECTDIR}/ogldev_backend.o \
 	${OBJECTDIR}/ogldev_glfw_backend.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
@@ -126,6 +127,11 @@ ${OBJECTDIR}/glut_backend.o: glut_backend.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
+
+${OBJECTDIR}/ogldev_backend.o: ogldev_backend.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_backend.o ogldev_backend.cpp
 
 ${OBJECTDIR}/ogldev_glfw_backend.o: ogldev_glfw_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}

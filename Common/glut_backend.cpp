@@ -92,18 +92,18 @@ static OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key)
 
 static OGLDEV_MOUSE GLUTMouseToOGLDEVMouse(uint Button)
 {
-	switch (Button) {
-	case GLUT_LEFT_BUTTON:
-		return OGLDEV_MOUSE_BUTTON_LEFT;
-	case GLUT_RIGHT_BUTTON:
-		return OGLDEV_MOUSE_BUTTON_RIGHT;
-	case GLUT_MIDDLE_BUTTON:
-		return OGLDEV_MOUSE_BUTTON_MIDDLE;
-	default:
-		OGLDEV_ERROR("Unimplemented OGLDEV mouse button");
-	}
+    switch (Button) {
+    case GLUT_LEFT_BUTTON:
+            return OGLDEV_MOUSE_BUTTON_LEFT;
+    case GLUT_RIGHT_BUTTON:
+            return OGLDEV_MOUSE_BUTTON_RIGHT;
+    case GLUT_MIDDLE_BUTTON:
+            return OGLDEV_MOUSE_BUTTON_MIDDLE;
+    default:
+            OGLDEV_ERROR("Unimplemented OGLDEV mouse button");
+    }
 
-	return OGLDEV_MOUSE_UNDEFINED;
+    return OGLDEV_MOUSE_UNDEFINED;
 }
 
 
@@ -225,4 +225,9 @@ void GLUTBackendRun(ICallbacks* pCallbacks)
     s_pCallbacks = pCallbacks;
     InitCallbacks();
     glutMainLoop();
+}
+
+void GLUTBackendLeaveMainLoop()
+{
+    glutLeaveMainLoop();
 }

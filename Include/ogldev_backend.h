@@ -19,6 +19,8 @@
 #ifndef OGLDEV_KEYS_H
 #define OGLDEV_KEYS_H
 
+#include "ogldev_types.h"
+
 enum OGLDEV_KEY
 {
     OGLDEV_KEY_SPACE =             32,
@@ -108,6 +110,35 @@ enum OGLDEV_KEY_STATE {
 	OGLDEV_KEY_STATE_PRESS,
 	OGLDEV_KEY_STATE_RELEASE
 };
+
+enum OGLDEV_BACKEND_TYPE {
+    OGLDEV_BACKEND_TYPE_GLUT,
+    OGLDEV_BACKEND_TYPE_GLFW
+};
+
+class ICallbacks
+{
+public:
+
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey) {};
+
+    virtual void PassiveMouseCB(int x, int y) {};
+
+    virtual void RenderSceneCB() {};
+   
+    virtual void MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y) {};
+};
+
+
+void OgldevBackendInit(OGLDEV_BACKEND_TYPE BackendType, int argc, char** argv, bool WithDepth, bool WithStencil);
+
+void OgldevBackendTerminate();
+
+bool OgldevBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle);
+
+void OgldevBackendRun(ICallbacks* pCallbacks);
+
+void OgldevBackendLeaveMainLoop();
 
 
 #endif

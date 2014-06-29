@@ -8,6 +8,7 @@
       <itemPath>FreetypeGL/font_shader.h</itemPath>
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>FreetypeGL/markup.h</itemPath>
+      <itemPath>../Include/ogldev_backend.h</itemPath>
       <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
       <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
@@ -34,6 +35,7 @@
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>ogldev_backend.cpp</itemPath>
       <itemPath>ogldev_glfw_backend.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
@@ -199,6 +201,8 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_cubemap_texture.h"
             ex="false"
             tool="3"
@@ -253,6 +257,8 @@
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -285,6 +291,8 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_cubemap_texture.h"
             ex="false"
             tool="3"
@@ -339,6 +347,8 @@
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
