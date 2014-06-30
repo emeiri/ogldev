@@ -33,8 +33,7 @@
 #include "camera.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
-
-#include "ogldev_glfw_backend.h"
+#include "ogldev_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
 #ifndef WIN32
@@ -149,7 +148,7 @@ public:
 
     void Run()
     {
-        GLFWBackendRun(this);
+        OgldevBackendRun(this);
     }
     
 
@@ -220,7 +219,7 @@ public:
         switch (OgldevKey) {
             case OGLDEV_KEY_ESCAPE:
             case OGLDEV_KEY_Q:
-                GLFWBackendLeaveMainLoop();
+                OgldevBackendLeaveMainLoop();
                 break;
             default:
                 m_pGameCamera->OnKeyboard(OgldevKey);
@@ -285,9 +284,9 @@ int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
 
-    GLFWBackendInit(argc, argv, true, false);
+    OgldevBackendInit(OGLDEV_BACKEND_TYPE_GLFW, argc, argv, true, false);
 
-    if (!GLFWBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 44")) {
+    if (!OgldevBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 44")) {
         return 1;
     }
 

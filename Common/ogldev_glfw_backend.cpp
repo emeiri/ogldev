@@ -223,8 +223,8 @@ bool GLFWBackendCreateWindow(unsigned int Width, unsigned int Height, bool isFul
 void GLFWBackendRun(ICallbacks* pCallbacks)
 {
     if (!pCallbacks) {
-        fprintf(stderr, "%s : callbacks not specified!\n", __FUNCTION__);
-        return;
+        OGLDEV_ERROR("callbacks not specified");
+        exit(1);
     }
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

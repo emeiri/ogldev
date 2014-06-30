@@ -9,6 +9,7 @@
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>FreetypeGL/markup.h</itemPath>
       <itemPath>../Include/ogldev_backend.h</itemPath>
+      <itemPath>../Include/ogldev_callbacks.h</itemPath>
       <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
       <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
@@ -203,6 +204,8 @@
       </compileType>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_cubemap_texture.h"
             ex="false"
             tool="3"
@@ -292,6 +295,8 @@
         </archiverTool>
       </compileType>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_callbacks.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_cubemap_texture.h"
             ex="false"
