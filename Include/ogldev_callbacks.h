@@ -16,20 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_GLFW_BACKEND_H
-#define	OGLDEV_GLFW_BACKEND_H
 
-#include "ogldev_types.h"
-#include "ogldev_callbacks.h"
+#ifndef OGLDEV_CALLBACKS_H
+#define OGLDEV_CALLBACKS_H
 
-void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil);
+#include "ogldev_keys.h"
 
-void GLFWBackendTerminate();
 
-bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle);
+class ICallbacks
+{
+public:
 
-void GLFWBackendRun(ICallbacks* pCallbacks);
+	virtual void KeyboardCB(OGLDEV_KEY OgldevKey) {};
 
-void GLFWBackendLeaveMainLoop();
+	virtual void PassiveMouseCB(int x, int y) {};
+
+	virtual void RenderSceneCB() {};
+
+	virtual void MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y) {};
+};
+
 
 #endif

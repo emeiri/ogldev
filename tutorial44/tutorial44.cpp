@@ -31,15 +31,16 @@
 #include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
-#include "texture.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
+
 #include "ogldev_glfw_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
 #ifndef WIN32
 #include "freetypeGL.h"
 #endif
+
 
 using namespace std;
 
@@ -219,7 +220,7 @@ public:
         switch (OgldevKey) {
             case OGLDEV_KEY_ESCAPE:
             case OGLDEV_KEY_Q:
-                GLFWBackendSignalTerminate();
+                GLFWBackendLeaveMainLoop();
                 break;
             default:
                 m_pGameCamera->OnKeyboard(OgldevKey);

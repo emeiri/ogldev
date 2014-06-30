@@ -20,6 +20,7 @@
 #define	GLUT_BACKEND_H
 
 #include "ogldev_types.h"
+#include "ogldev_callbacks.h"
 
 void GLUTBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil);
 

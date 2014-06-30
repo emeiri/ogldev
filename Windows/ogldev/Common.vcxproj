@@ -24,6 +24,7 @@
     <ClInclude Include="..\..\Include\ogldev_cubemap_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_glfw_backend.h" />
     <ClInclude Include="..\..\Include\ogldev_glut_backend.h" />
+    <ClInclude Include="..\..\Include\ogldev_keys.h" />
     <ClInclude Include="..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />

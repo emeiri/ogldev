@@ -25,7 +25,6 @@
 
 #include "ogldev_util.h"
 #include "ogldev_glut_backend.h"
-#include "ogldev_backend.h"
 
 // Points to the object implementing the ICallbacks interface which was delivered to
 // GLUTBackendRun(). All events are forwarded to this object.

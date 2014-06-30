@@ -20,7 +20,7 @@
 #define	CAMERA_H
 
 #include "math_3d.h"
-#include "ogldev_backend.h"
+#include "ogldev_keys.h"
 
 class Camera
 {
