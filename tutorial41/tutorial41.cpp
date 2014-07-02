@@ -29,10 +29,11 @@
 #include <sys/types.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
+#include "ogldev_backend.h"
 #include "ogldev_util.h"
 #include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_camera.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
 #include "ogldev_glut_backend.h"
@@ -54,7 +55,7 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-class Tutorial41 : public ICallbacks
+class Tutorial41 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -141,10 +142,7 @@ public:
         if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
-#endif        	
-        m_glutTime = glutGet(GLUT_ELAPSED_TIME);
-        m_startTime = GetCurrentTimeMillis();
-       
+#endif        	      
         return true;
     }
 
@@ -218,54 +216,27 @@ public:
     }
 
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
+	void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			OgldevBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
-
-
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
     
     
 private:
-    
-    void CalcFPS()
-    {
-        m_frameCount++;
         
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_glutTime > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_glutTime);
-            m_glutTime = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-                
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }
-     
     SkinningTechnique* m_pSkinningTech;
     MotionBlurTechnique* m_pMotionBlurTech;
     Camera* m_pGameCamera;
@@ -278,10 +249,7 @@ private:
     IntermediateBuffer m_intermediateBuffer;
     Pipeline m_pipeline;
     vector<Matrix4f> m_prevTransforms;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-#endif
-    int m_glutTime;
+    long long m_frameTime;
     long long m_startTime;
     int m_frameCount;
     float m_fps;    

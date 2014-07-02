@@ -28,6 +28,8 @@
 #endif
 
 #include "engine_common.h"
+#include "ogldev_app.h"
+#include "ogldev_camera.h"
 #include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
@@ -53,7 +55,7 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-class Tutorial40 : public ICallbacks
+class Tutorial40 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -69,9 +71,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
         
         m_boxPos = Vector3f(0.0f, 2.0f, 0.0);
     }
@@ -120,10 +119,7 @@ public:
         if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
-#endif        	
-        m_glutTime = glutGet(GLUT_ELAPSED_TIME);
-        m_startTime = GetCurrentTimeMillis();
-               
+#endif        	              
         if (!m_quad.LoadMesh("../Content/quad.obj", false)) {
             return false;
         }
@@ -171,27 +167,23 @@ public:
     }
 
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
+	virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
-
-
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
-    
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
     
 private:
     
@@ -323,32 +315,7 @@ private:
         
         glDisable(GL_BLEND);
     }        
-
-    
-    void CalcFPS()
-    {
-        m_frameCount++;
-        
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_glutTime > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_glutTime);
-            m_glutTime = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }   
-    
-
+   
     ShadowVolumeTechnique m_ShadowVolTech;
     LightingTechnique m_LightingTech;
     NullTechnique m_nullTech;
@@ -360,13 +327,6 @@ private:
     Mesh m_quad;
     Texture* m_pGroundTex;
     PersProjInfo m_persProjInfo;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-#endif
-    int m_glutTime;
-    long long m_startTime;
-    int m_frameCount;
-    float m_fps;    
 };
 
 

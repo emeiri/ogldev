@@ -52,7 +52,7 @@ public:
 
     Tutorial34() 
 #ifndef WIN32
-           : m_fontRenderer2(sMarkup)
+           : m_fontRenderer(sMarkup)
 #endif
     {
         m_pGameCamera = NULL;
@@ -134,10 +134,6 @@ public:
 
 #ifndef WIN32
         if (!m_fontRenderer.InitFontRenderer()) {
-            return false;
-        }
-        
-        if (!m_fontRenderer2.InitFontRenderer()) {
             return false;
         }
 #endif
@@ -250,7 +246,6 @@ private:
     PersProjInfo m_persProjInfo;
 #ifndef WIN32
     FontRenderer m_fontRenderer;
-    FontRenderer m_fontRenderer2;
 #endif
     int m_time;
     int m_frameCount;

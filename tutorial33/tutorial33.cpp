@@ -233,12 +233,6 @@ private:
     DirectionalLight m_directionalLight;
     Mesh* m_pMesh;
     PersProjInfo m_persProjInfo;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-#endif
-    int m_time;
-    int m_frameCount;
-    float m_fps;    
     Vector3f m_positions[NUM_INSTANCES];            
     float m_velocity[NUM_INSTANCES];
 };

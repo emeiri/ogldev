@@ -15,6 +15,7 @@
     <ClCompile Include="..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\Common\glut_backend.cpp" />
     <ClCompile Include="..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_app.cpp" />
     <ClCompile Include="..\..\Common\ogldev_backend.cpp" />
     <ClCompile Include="..\..\Common\ogldev_glfw_backend.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
@@ -22,6 +23,7 @@
     <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\ogldev_app.h" />
     <ClInclude Include="..\..\Include\ogldev_backend.h" />
     <ClInclude Include="..\..\Include\ogldev_callbacks.h" />
     <ClInclude Include="..\..\Include\ogldev_camera.h" />

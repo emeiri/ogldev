@@ -28,6 +28,7 @@
 #include <sys/types.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "pipeline.h"
 #include "camera.h"
@@ -54,7 +55,7 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-class Tutorial44 : public ICallbacks
+class Tutorial44 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -73,9 +74,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
         
         m_position = Vector3f(0.0f, 0.0f, 6.0f);      
     }
@@ -141,9 +139,7 @@ public:
         if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
-#endif        	
-        m_frameTime = m_startTime = GetCurrentTimeMillis();
-       
+#endif        	      
         return true;
     }
 
@@ -176,7 +172,7 @@ public:
         
         vector<Matrix4f> Transforms;
                
-        float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)m_startTime) / 1000.0f;
+        float RunningTime = GetRunningTime();
 
         m_mesh.BoneTransform(RunningTime, Transforms);
         
@@ -215,11 +211,11 @@ public:
     }
 
     
-    void KeyboardCB(OGLDEV_KEY OgldevKey)
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
         switch (OgldevKey) {
             case OGLDEV_KEY_ESCAPE:
-            case OGLDEV_KEY_Q:
+            case OGLDEV_KEY_q:
                 OgldevBackendLeaveMainLoop();
                 break;
             default:
@@ -235,30 +231,7 @@ public:
     
 
 private:
-    
-    void CalcFPS()
-    {
-        m_frameCount++;
         
-        long long time = GetCurrentTimeMillis();
-
-        if (time - m_frameTime >= 1000) {
-            m_frameTime = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-                
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }
-     
     SkinningTechnique* m_pSkinningTech;
     MotionBlurTechnique* m_pMotionBlurTech;
     Camera* m_pGameCamera;
@@ -271,13 +244,6 @@ private:
     IntermediateBuffer m_intermediateBuffer;
     Pipeline m_pipeline;
     vector<Matrix4f> m_prevTransforms;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-#endif
-    long long m_frameTime;
-    long long m_startTime;
-    int m_frameCount;
-    float m_fps;    
 };
 
 

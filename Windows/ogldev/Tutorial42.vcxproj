@@ -11,11 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial42\camera.h" />
     <ClInclude Include="..\..\tutorial42\engine_common.h" />
-    <ClInclude Include="..\..\tutorial42\glut_backend.h" />
     <ClInclude Include="..\..\tutorial42\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial42\math_3d.h" />
     <ClInclude Include="..\..\tutorial42\mesh.h" />
     <ClInclude Include="..\..\tutorial42\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial42\pipeline.h" />
@@ -23,9 +20,7 @@
     <ClInclude Include="..\..\tutorial42\shadow_map_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial42\camera.cpp" />
     <ClCompile Include="..\..\tutorial42\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial42\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial42\mesh.cpp" />
     <ClCompile Include="..\..\tutorial42\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial42\shadow_map_fbo.cpp" />
@@ -93,7 +88,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ConfigurationName);$(SolutionDir)\..\..\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Common.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glew32.lib;assimp.lib;glfx_debug.lib;CORE_DB_Magick++_.lib</AdditionalDependencies>
+      <AdditionalDependencies>Common.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glew32.lib;assimp.lib;glfx_debug.lib;CORE_DB_Magick++_.lib;glfw3.lib;glfw3dll.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
