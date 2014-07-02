@@ -67,6 +67,8 @@ bool OgldevBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const
         default:
             assert(0);
     }
+
+	return false;
 }
 
 

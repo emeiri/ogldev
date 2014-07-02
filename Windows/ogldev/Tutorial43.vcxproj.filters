@@ -12,19 +12,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial43\camera.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial43\engine_common.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial43\glut_backend.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial43\lighting_technique.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial43\math_3d.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial43\mesh.h">
@@ -55,13 +46,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial43\camera.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial43\lighting_technique.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial43\math_3d.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial43\mesh.cpp">

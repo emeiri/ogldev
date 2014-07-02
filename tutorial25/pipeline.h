@@ -18,7 +18,7 @@
 #ifndef PIPELINE_H
 #define	PIPELINE_H
 
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 class Pipeline
 {

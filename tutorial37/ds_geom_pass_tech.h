@@ -19,7 +19,7 @@
 #define	DS_GEOM_PASS_TECH_H
 
 #include "technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 class DSGeomPassTech : public Technique {
 public:

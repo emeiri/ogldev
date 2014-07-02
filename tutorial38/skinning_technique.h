@@ -19,7 +19,7 @@
 #define	SKINNING_TECHNIQUE_H
 
 #include "technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 struct BaseLight
 {

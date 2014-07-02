@@ -36,52 +36,52 @@ static bool sWithStencil = false;
 static OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key)
 {
     switch (Key) {
-        case GLUT_KEY_INSERT:         
+		case GLUT_KEY_F1:        
+			return OGLDEV_KEY_F1;
+		case GLUT_KEY_F2:        
+			return OGLDEV_KEY_F2;
+		case GLUT_KEY_F3:       
+			return OGLDEV_KEY_F3;
+		case GLUT_KEY_F4:   
+			return OGLDEV_KEY_F4;
+		case GLUT_KEY_F5:      
+			return OGLDEV_KEY_F5;
+		case GLUT_KEY_F6:     
+			return OGLDEV_KEY_F6;
+		case GLUT_KEY_F7:     
+			return OGLDEV_KEY_F7;
+		case GLUT_KEY_F8:     
+			return OGLDEV_KEY_F8;
+		case GLUT_KEY_F9:     
+			return OGLDEV_KEY_F9;
+		case GLUT_KEY_F10:    
+			return OGLDEV_KEY_F10;
+		case GLUT_KEY_F11:   
+			return OGLDEV_KEY_F11;
+		case GLUT_KEY_F12:    
+			return OGLDEV_KEY_F12;
+		case GLUT_KEY_LEFT:         
+			return OGLDEV_KEY_LEFT;
+		case GLUT_KEY_UP:         
+			return OGLDEV_KEY_UP;
+		case GLUT_KEY_RIGHT:         
+			return OGLDEV_KEY_RIGHT;
+		case GLUT_KEY_DOWN:        
+			return OGLDEV_KEY_DOWN;            
+		case GLUT_KEY_PAGE_UP:   
+			return OGLDEV_KEY_PAGE_UP;
+		case GLUT_KEY_PAGE_DOWN:      
+			return OGLDEV_KEY_PAGE_DOWN;
+		case GLUT_KEY_HOME:    
+			return OGLDEV_KEY_HOME;
+		case GLUT_KEY_END:     
+			return OGLDEV_KEY_END;	
+		case GLUT_KEY_INSERT:         
             return OGLDEV_KEY_INSERT;
         case GLUT_KEY_DELETE:        
             return OGLDEV_KEY_DELETE;
-        case GLUT_KEY_RIGHT:         
-            return OGLDEV_KEY_RIGHT;
-        case GLUT_KEY_LEFT:         
-            return OGLDEV_KEY_LEFT;
-        case GLUT_KEY_DOWN:        
-            return OGLDEV_KEY_DOWN;            
-        case GLUT_KEY_UP:         
-            return OGLDEV_KEY_UP;
-        case GLUT_KEY_PAGE_UP:   
-            return OGLDEV_KEY_PAGE_UP;
-        case GLUT_KEY_PAGE_DOWN:      
-            return OGLDEV_KEY_PAGE_DOWN;
-        case GLUT_KEY_HOME:    
-            return OGLDEV_KEY_HOME;
-        case GLUT_KEY_END:     
-            return OGLDEV_KEY_END;
-        case GLUT_KEY_F1:        
-            return OGLDEV_KEY_F1;
-        case GLUT_KEY_F2:        
-            return OGLDEV_KEY_F2;
-        case GLUT_KEY_F3:       
-            return OGLDEV_KEY_F3;
-        case GLUT_KEY_F4:   
-            return OGLDEV_KEY_F4;
-        case GLUT_KEY_F5:      
-            return OGLDEV_KEY_F5;
-        case GLUT_KEY_F6:     
-            return OGLDEV_KEY_F6;
-        case GLUT_KEY_F7:     
-            return OGLDEV_KEY_F7;
-        case GLUT_KEY_F8:     
-            return OGLDEV_KEY_F8;
-        case GLUT_KEY_F9:     
-            return OGLDEV_KEY_F9;
-        case GLUT_KEY_F10:    
-            return OGLDEV_KEY_F10;
-        case GLUT_KEY_F11:   
-            return OGLDEV_KEY_F11;
-        case GLUT_KEY_F12:    
-            return OGLDEV_KEY_F12;
         default:
-            OGLDEV_ERROR("Unimplemented OGLDEV key");
+            OGLDEV_ERROR("Unimplemented GLUT key");
             exit(1);
     }
     
@@ -99,7 +99,7 @@ static OGLDEV_MOUSE GLUTMouseToOGLDEVMouse(uint Button)
     case GLUT_MIDDLE_BUTTON:
             return OGLDEV_MOUSE_BUTTON_MIDDLE;
     default:
-            OGLDEV_ERROR("Unimplemented OGLDEV mouse button");
+            OGLDEV_ERROR("Unimplemented GLUT mouse button");
     }
 
     return OGLDEV_MOUSE_UNDEFINED;
@@ -115,8 +115,18 @@ static void SpecialKeyboardCB(int Key, int x, int y)
 
 static void KeyboardCB(unsigned char Key, int x, int y)
 {
-    OGLDEV_KEY OgldevKey = (OGLDEV_KEY)Key;
-    s_pCallbacks->KeyboardCB(OgldevKey);
+	if (
+		((Key >= '0') && (Key <= '9')) ||
+		((Key >= 'A') && (Key <= 'Z')) ||
+		((Key >= 'a') && (Key <= 'z')) 
+		) {
+		OGLDEV_KEY OgldevKey = (OGLDEV_KEY)Key;
+		s_pCallbacks->KeyboardCB(OgldevKey);
+	}
+	else {
+		OGLDEV_ERROR("Unimplemented GLUT key");
+	}
+
 }
 
 

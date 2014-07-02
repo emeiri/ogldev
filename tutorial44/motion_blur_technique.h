@@ -20,7 +20,7 @@
 #define	MOTION_BLUR_TECHNIQUE_H
 
 #include "technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 class MotionBlurTechnique : public Technique {
 public:

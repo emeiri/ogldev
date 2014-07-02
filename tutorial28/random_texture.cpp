@@ -17,7 +17,7 @@
 */
 
 #include "random_texture.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 #include "ogldev_util.h"
 
 

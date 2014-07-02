@@ -19,7 +19,7 @@
 #define	SHADOW_MAP_TECHNIQUE_H
 
 #include "technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 class ShadowMapTechnique : public Technique {
 

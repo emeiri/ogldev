@@ -34,6 +34,7 @@
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
 #include "ogldev_backend.h"
+#include "ogldev_camera.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
 #ifndef WIN32

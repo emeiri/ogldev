@@ -19,7 +19,7 @@
 #include "engine_common.h"
 #include "ogldev_util.h"
 #include "particle_system.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 #define MAX_PARTICLES 1000
 #define PARTICLE_LIFETIME 10.0f

@@ -275,19 +275,15 @@ public:
     }
 
     
-    
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
+    void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
+        switch (OgldevKey) {
+            case OGLDEV_KEY_ESCAPE:
+            case OGLDEV_KEY_q:
                 glutLeaveMainLoop();
                 break;
+            default:
+                m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
