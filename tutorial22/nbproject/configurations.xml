@@ -4,11 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>callbacks.h</itemPath>
-      <itemPath>camera.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>pipeline.h</itemPath>
       <itemPath>texture.h</itemPath>
@@ -22,13 +18,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
-      <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
-      <itemPath>texture.cpp</itemPath>
       <itemPath>tutorial22.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -113,10 +105,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.vs" ex="false" tool="3" flavor2="0">
@@ -124,10 +112,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -160,10 +144,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.vs" ex="false" tool="3" flavor2="0">
@@ -171,10 +151,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

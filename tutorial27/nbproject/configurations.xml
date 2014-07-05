@@ -6,10 +6,8 @@
                    projectFiles="true">
       <itemPath>billboard_list.h</itemPath>
       <itemPath>billboard_technique.h</itemPath>
-      <itemPath>camera.h</itemPath>
       <itemPath>engine_common.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>pipeline.h</itemPath>
     </logicalFolder>
@@ -27,9 +25,7 @@
                    projectFiles="true">
       <itemPath>billboard_list.cpp</itemPath>
       <itemPath>billboard_technique.cpp</itemPath>
-      <itemPath>camera.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial27.cpp</itemPath>
@@ -119,10 +115,6 @@
       </item>
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
@@ -132,10 +124,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -182,10 +170,6 @@
       </item>
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
@@ -195,10 +179,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

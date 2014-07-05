@@ -35,13 +35,11 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/ds_dir_light_pass_tech.o \
 	${OBJECTDIR}/ds_geom_pass_tech.o \
 	${OBJECTDIR}/ds_light_pass_tech.o \
 	${OBJECTDIR}/ds_point_light_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
-	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/null_technique.o \
 	${OBJECTDIR}/pipeline.o \
@@ -74,11 +72,6 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial37: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial37 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`
 
-${OBJECTDIR}/camera.o: camera.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
 ${OBJECTDIR}/ds_dir_light_pass_tech.o: ds_dir_light_pass_tech.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -103,11 +96,6 @@ ${OBJECTDIR}/gbuffer.o: gbuffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/gbuffer.o gbuffer.cpp
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
 
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}

@@ -37,9 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/billboard_list.o \
 	${OBJECTDIR}/billboard_technique.o \
-	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/lighting_technique.o \
-	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial27.o
@@ -81,20 +79,10 @@ ${OBJECTDIR}/billboard_technique.o: billboard_technique.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/billboard_technique.o billboard_technique.cpp
 
-${OBJECTDIR}/camera.o: camera.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
 
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}

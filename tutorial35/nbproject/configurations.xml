@@ -80,10 +80,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="ds_geom_pass_tech.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ds_geom_pass_tech.h" ex="false" tool="3" flavor2="0">
@@ -91,10 +87,6 @@
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -152,10 +144,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="ds_geom_pass_tech.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ds_geom_pass_tech.h" ex="false" tool="3" flavor2="0">
@@ -163,10 +151,6 @@
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -4,12 +4,10 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>camera.h</itemPath>
+      <itemPath>../../../../../../tutorials/ogldev/tutorial41/engine_common.h</itemPath>
       <itemPath>intermediate_buffer.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>motion_blur_technique.h</itemPath>
-      <itemPath>ogldev_types.h</itemPath>
       <itemPath>pipeline.h</itemPath>
       <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
@@ -22,9 +20,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
       <itemPath>intermediate_buffer.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>motion_blur_technique.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
@@ -89,17 +85,9 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -108,8 +96,6 @@
       <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -178,17 +164,9 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -197,8 +175,6 @@
       <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>

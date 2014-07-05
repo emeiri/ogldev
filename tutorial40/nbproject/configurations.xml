@@ -4,13 +4,10 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>camera.h</itemPath>
       <itemPath>engine_common.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>null_technique.h</itemPath>
-      <itemPath>ogldev_types.h</itemPath>
       <itemPath>pipeline.h</itemPath>
       <itemPath>shadow_volume_technique.h</itemPath>
     </logicalFolder>
@@ -26,9 +23,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>null_technique.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
@@ -84,19 +79,11 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -105,8 +92,6 @@
       <item path="null_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="null_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -181,19 +166,11 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -202,8 +179,6 @@
       <item path="null_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="null_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
