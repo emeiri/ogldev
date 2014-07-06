@@ -150,7 +150,7 @@ public:
                 else {
                     glPolygonMode(GL_FRONT, GL_FILL);
                 }  
-
+				break;
 			default:
 				m_pGameCamera->OnKeyboard(OgldevKey);
         }
