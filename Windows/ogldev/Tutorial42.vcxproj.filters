@@ -24,9 +24,6 @@
     <ClInclude Include="..\..\tutorial42\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial42\ogldev_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial42\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>

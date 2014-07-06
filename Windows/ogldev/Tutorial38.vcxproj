@@ -11,16 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial38\camera.h" />
     <ClInclude Include="..\..\tutorial38\engine_common.h" />
-    <ClInclude Include="..\..\tutorial38\math_3d.h" />
     <ClInclude Include="..\..\tutorial38\mesh.h" />
     <ClInclude Include="..\..\tutorial38\pipeline.h" />
     <ClInclude Include="..\..\tutorial38\skinning_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial38\camera.cpp" />
-    <ClCompile Include="..\..\tutorial38\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial38\mesh.cpp" />
     <ClCompile Include="..\..\tutorial38\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial38\skinning_technique.cpp" />

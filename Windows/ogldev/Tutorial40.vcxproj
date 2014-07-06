@@ -15,7 +15,6 @@
     <ClInclude Include="..\..\tutorial40\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial40\mesh.h" />
     <ClInclude Include="..\..\tutorial40\null_technique.h" />
-    <ClInclude Include="..\..\tutorial40\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial40\pipeline.h" />
     <ClInclude Include="..\..\tutorial40\shadow_volume_technique.h" />
   </ItemGroup>

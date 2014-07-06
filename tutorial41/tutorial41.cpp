@@ -30,7 +30,6 @@
 
 #include "engine_common.h"
 #include "ogldev_app.h"
-#include "ogldev_backend.h"
 #include "ogldev_util.h"
 #include "pipeline.h"
 #include "ogldev_camera.h"
@@ -74,9 +73,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
         
         m_position = Vector3f(0.0f, 0.0f, 6.0f);      
     }
@@ -177,7 +173,7 @@ public:
         
         vector<Matrix4f> Transforms;
                
-        float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)m_startTime) / 1000.0f;
+        float RunningTime = GetRunningTime();
 
         m_mesh.BoneTransform(RunningTime, Transforms);
         
@@ -221,7 +217,7 @@ public:
 		switch (OgldevKey) {
 		case OGLDEV_KEY_ESCAPE:
 		case OGLDEV_KEY_q:
-			OgldevBackendLeaveMainLoop();
+			GLUTBackendLeaveMainLoop();
 			break;
 		default:
 			m_pGameCamera->OnKeyboard(OgldevKey);
@@ -240,7 +236,6 @@ private:
     SkinningTechnique* m_pSkinningTech;
     MotionBlurTechnique* m_pMotionBlurTech;
     Camera* m_pGameCamera;
-    float m_scale;
     DirectionalLight m_directionalLight;
     Mesh m_mesh;
     Mesh m_quad;
@@ -249,10 +244,6 @@ private:
     IntermediateBuffer m_intermediateBuffer;
     Pipeline m_pipeline;
     vector<Matrix4f> m_prevTransforms;
-    long long m_frameTime;
-    long long m_startTime;
-    int m_frameCount;
-    float m_fps;    
 };
 
 

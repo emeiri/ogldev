@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial36\camera.h" />
     <ClInclude Include="..\..\tutorial36\ds_dir_light_pass_tech.h" />
     <ClInclude Include="..\..\tutorial36\ds_geom_pass_tech.h" />
     <ClInclude Include="..\..\tutorial36\ds_light_pass_tech.h" />
@@ -19,18 +18,15 @@
     <ClInclude Include="..\..\tutorial36\engine_common.h" />
     <ClInclude Include="..\..\tutorial36\gbuffer.h" />
     <ClInclude Include="..\..\tutorial36\lights_common.h" />
-    <ClInclude Include="..\..\tutorial36\math_3d.h" />
     <ClInclude Include="..\..\tutorial36\mesh.h" />
     <ClInclude Include="..\..\tutorial36\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial36\camera.cpp" />
     <ClCompile Include="..\..\tutorial36\ds_dir_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial36\ds_geom_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial36\ds_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial36\ds_point_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial36\gbuffer.cpp" />
-    <ClCompile Include="..\..\tutorial36\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial36\mesh.cpp" />
     <ClCompile Include="..\..\tutorial36\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial36\tutorial36.cpp" />

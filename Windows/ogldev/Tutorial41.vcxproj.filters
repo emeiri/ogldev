@@ -27,9 +27,6 @@
     <ClInclude Include="..\..\tutorial41\motion_blur_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial41\ogldev_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial41\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>

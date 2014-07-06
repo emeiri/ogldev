@@ -14,7 +14,6 @@
     <ClInclude Include="..\..\tutorial42\engine_common.h" />
     <ClInclude Include="..\..\tutorial42\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial42\mesh.h" />
-    <ClInclude Include="..\..\tutorial42\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial42\pipeline.h" />
     <ClInclude Include="..\..\tutorial42\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial42\shadow_map_technique.h" />

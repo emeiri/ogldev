@@ -27,9 +27,6 @@
     <ClInclude Include="..\..\tutorial40\null_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial40\ogldev_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial40\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>

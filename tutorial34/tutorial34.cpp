@@ -24,9 +24,10 @@
 #include <string>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "pipeline.h"
-#include "camera.h"
+#include "ogldev_camera.h"
 #include "ogldev_texture.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
@@ -46,7 +47,7 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    0, {0,0,0,1}, 0, {0,0,0,1} };
 #endif
 
-class Tutorial34 : public ICallbacks
+class Tutorial34 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -68,9 +69,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
         
         m_positions[0] = Vector3f(-2.0f, 0.0f, 6.0f);
         m_positions[1] = Vector3f(0.0f, 0.0f, 6.0f);
@@ -138,8 +136,6 @@ public:
         }
 #endif
         
-        m_time = glutGet(GLUT_ELAPSED_TIME);
-        
         return true;
     }
 
@@ -188,53 +184,27 @@ public:
     }
 
 
-	virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
+	void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
-
-
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
     
     
 private:
     
-    void CalcFPS()
-    {
-        m_frameCount++;
-        
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_time > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_time);
-            m_time = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }       
-
     LightingTechnique* m_pEffect;
     Camera* m_pGameCamera;
     float m_scale;
@@ -247,9 +217,6 @@ private:
 #ifndef WIN32
     FontRenderer m_fontRenderer;
 #endif
-    int m_time;
-    int m_frameCount;
-    float m_fps;    
 };
 
 

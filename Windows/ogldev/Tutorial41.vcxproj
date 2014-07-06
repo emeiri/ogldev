@@ -15,7 +15,6 @@
     <ClInclude Include="..\..\tutorial41\intermediate_buffer.h" />
     <ClInclude Include="..\..\tutorial41\mesh.h" />
     <ClInclude Include="..\..\tutorial41\motion_blur_technique.h" />
-    <ClInclude Include="..\..\tutorial41\ogldev_types.h" />
     <ClInclude Include="..\..\tutorial41\pipeline.h" />
     <ClInclude Include="..\..\tutorial41\skinning_technique.h" />
   </ItemGroup>

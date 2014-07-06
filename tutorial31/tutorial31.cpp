@@ -23,10 +23,10 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_camera.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
@@ -34,7 +34,7 @@
 #define WINDOW_WIDTH  1680
 #define WINDOW_HEIGHT 1050
 
-class Tutorial31 : public ICallbacks
+class Tutorial31 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -122,19 +122,14 @@ public:
     }
 
        
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
 
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        switch (Key) {
-            case 27:
-            case 'q':
-                glutLeaveMainLoop();
-                break;
+        switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
 
             case '+':
                 m_tessellationLevel += 1.0f;
@@ -154,16 +149,19 @@ public:
                 }
                 else {
                     glPolygonMode(GL_FRONT, GL_FILL);
-                }                    
+                }  
+
+			default:
+				m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
-    
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
+
     
 private:
 
