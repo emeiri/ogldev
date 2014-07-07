@@ -13,9 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\tutorial27\billboard_list.cpp" />
     <ClCompile Include="..\..\tutorial27\billboard_technique.cpp" />
-    <ClCompile Include="..\..\tutorial27\camera.cpp" />
     <ClCompile Include="..\..\tutorial27\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial27\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial27\mesh.cpp" />
     <ClCompile Include="..\..\tutorial27\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial27\tutorial27.cpp" />
@@ -23,10 +21,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\tutorial27\billboard_list.h" />
     <ClInclude Include="..\..\tutorial27\billboard_technique.h" />
-    <ClInclude Include="..\..\tutorial27\camera.h" />
     <ClInclude Include="..\..\tutorial27\engine_common.h" />
     <ClInclude Include="..\..\tutorial27\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial27\math_3d.h" />
     <ClInclude Include="..\..\tutorial27\mesh.h" />
     <ClInclude Include="..\..\tutorial27\pipeline.h" />
   </ItemGroup>
