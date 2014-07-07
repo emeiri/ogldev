@@ -38,9 +38,6 @@
 #include "skinning_technique.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 
 using namespace std;
 

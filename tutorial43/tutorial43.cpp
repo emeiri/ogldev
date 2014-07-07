@@ -35,9 +35,7 @@
 #include "mesh.h"
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
+
 using namespace std;
 
 #define WINDOW_WIDTH  1000
@@ -302,10 +300,6 @@ private:
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-    FontRenderer m_fontRenderer;
-#endif
 };
 
 

@@ -38,9 +38,6 @@
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 #include "null_technique.h"
 
 using namespace std;

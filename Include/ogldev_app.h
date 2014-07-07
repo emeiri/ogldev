@@ -16,6 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef WIN32
+#include "freetypeGL.h"
+#endif
+
 
 class OgldevApp
 {
@@ -28,10 +32,11 @@ protected:
 
 	float GetRunningTime();
 
-private:
+protected:
 #ifndef WIN32
 	FontRenderer m_fontRenderer;
 #endif
+private:
 	long long m_frameTime;
 	long long m_startTime;
 	int m_frameCount;

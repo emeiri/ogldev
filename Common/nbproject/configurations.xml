@@ -8,8 +8,10 @@
       <itemPath>FreetypeGL/font_shader.h</itemPath>
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>FreetypeGL/markup.h</itemPath>
+      <itemPath>../Include/ogldev_app.h</itemPath>
       <itemPath>../Include/ogldev_backend.h</itemPath>
       <itemPath>../Include/ogldev_callbacks.h</itemPath>
+      <itemPath>../Include/ogldev_camera.h</itemPath>
       <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
       <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
@@ -31,11 +33,14 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>camera.cpp</itemPath>
       <itemPath>cubemap_texture.cpp</itemPath>
       <itemPath>FreetypeGL/font-manager.c</itemPath>
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>math_3d.cpp</itemPath>
+      <itemPath>ogldev_app.cpp</itemPath>
       <itemPath>ogldev_backend.cpp</itemPath>
       <itemPath>ogldev_glfw_backend.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
@@ -195,16 +200,21 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags ImageMagick++ freetype2`</commandLine>
+          <commandLine>`pkg-config --cflags ImageMagick++ freetype2 assimp`</commandLine>
           <warningLevel>2</warningLevel>
         </ccTool>
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_app.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_cubemap_texture.h"
             ex="false"
@@ -257,9 +267,15 @@
       </item>
       <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -294,9 +310,13 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev_app.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_callbacks.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_camera.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_cubemap_texture.h"
             ex="false"
@@ -349,9 +369,15 @@
       </item>
       <item path="FreetypeGL/vertex-buffer.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>

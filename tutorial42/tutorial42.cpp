@@ -35,9 +35,7 @@
 #include "mesh.h"
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
+
 using namespace std;
 
 #define WINDOW_WIDTH  1000

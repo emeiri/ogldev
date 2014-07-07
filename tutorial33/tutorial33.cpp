@@ -30,9 +30,6 @@
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024

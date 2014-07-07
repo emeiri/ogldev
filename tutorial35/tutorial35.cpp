@@ -31,9 +31,6 @@
 #include "ds_geom_pass_tech.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 #include "gbuffer.h"
 
 using namespace std;

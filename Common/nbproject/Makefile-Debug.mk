@@ -43,8 +43,11 @@ OBJECTFILES= \
 	${OBJECTDIR}/FreetypeGL/texture-glyph.o \
 	${OBJECTDIR}/FreetypeGL/vector.o \
 	${OBJECTDIR}/FreetypeGL/vertex-buffer.o \
+	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/cubemap_texture.o \
 	${OBJECTDIR}/glut_backend.o \
+	${OBJECTDIR}/math_3d.o \
+	${OBJECTDIR}/ogldev_app.o \
 	${OBJECTDIR}/ogldev_backend.o \
 	${OBJECTDIR}/ogldev_glfw_backend.o \
 	${OBJECTDIR}/ogldev_texture.o \
@@ -56,8 +59,8 @@ OBJECTFILES= \
 CFLAGS=`pkg-config --cflags freetype2` 
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags ImageMagick++ freetype2` 
-CXXFLAGS=`pkg-config --cflags ImageMagick++ freetype2` 
+CCFLAGS=`pkg-config --cflags ImageMagick++ freetype2 assimp` 
+CXXFLAGS=`pkg-config --cflags ImageMagick++ freetype2 assimp` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -86,12 +89,12 @@ ${OBJECTDIR}/FreetypeGL/font-manager.o: FreetypeGL/font-manager.c
 ${OBJECTDIR}/FreetypeGL/font_shader.o: FreetypeGL/font_shader.cpp 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/font_shader.o FreetypeGL/font_shader.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/font_shader.o FreetypeGL/font_shader.cpp
 
 ${OBJECTDIR}/FreetypeGL/freetypeGL.o: FreetypeGL/freetypeGL.cpp 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/freetypeGL.o FreetypeGL/freetypeGL.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/freetypeGL.o FreetypeGL/freetypeGL.cpp
 
 ${OBJECTDIR}/FreetypeGL/texture-atlas.o: FreetypeGL/texture-atlas.c 
 	${MKDIR} -p ${OBJECTDIR}/FreetypeGL
@@ -118,40 +121,55 @@ ${OBJECTDIR}/FreetypeGL/vertex-buffer.o: FreetypeGL/vertex-buffer.c
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FreetypeGL/vertex-buffer.o FreetypeGL/vertex-buffer.c
 
+${OBJECTDIR}/camera.o: camera.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
+
 ${OBJECTDIR}/cubemap_texture.o: cubemap_texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cubemap_texture.o cubemap_texture.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/cubemap_texture.o cubemap_texture.cpp
 
 ${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
+
+${OBJECTDIR}/math_3d.o: math_3d.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
+
+${OBJECTDIR}/ogldev_app.o: ogldev_app.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_app.o ogldev_app.cpp
 
 ${OBJECTDIR}/ogldev_backend.o: ogldev_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_backend.o ogldev_backend.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_backend.o ogldev_backend.cpp
 
 ${OBJECTDIR}/ogldev_glfw_backend.o: ogldev_glfw_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_glfw_backend.o ogldev_glfw_backend.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_glfw_backend.o ogldev_glfw_backend.cpp
 
 ${OBJECTDIR}/ogldev_texture.o: ogldev_texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_texture.o ogldev_texture.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_texture.o ogldev_texture.cpp
 
 ${OBJECTDIR}/ogldev_util.o: ogldev_util.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_util.o ogldev_util.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_util.o ogldev_util.cpp
 
 ${OBJECTDIR}/technique.o: technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/technique.o technique.cpp
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/technique.o technique.cpp
 
 # Subprojects
 .build-subprojects:

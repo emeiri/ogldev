@@ -38,9 +38,6 @@
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "intermediate_buffer.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 
 using namespace std;
 
