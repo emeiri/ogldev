@@ -45,13 +45,6 @@ using namespace std;
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
 
-#ifndef WIN32
-Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
-                   {.1,1.0,1.0,.5}, {1,1,1,0},
-                   0, {1,0,0,1}, 0, {1,0,0,1},
-                   0, {0,0,0,1}, 0, {0,0,0,1} };
-#endif
-
 class Tutorial44 : public ICallbacks, public OgldevApp
 {
 public:

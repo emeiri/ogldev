@@ -58,21 +58,12 @@ CameraDirection gCameraDirections[NUM_OF_LAYERS] =
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, -1.0f, 0.0f) }
 };
 
-#ifndef WIN32
-Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
-                   {.1,1.0,1.0,.5}, {1,1,1,0},
-                   0, {1,0,0,1}, 0, {1,0,0,1},
-                   0, {0,0,0,1}, 0, {0,0,0,1} };
-#endif
 
 class Tutorial43 : public ICallbacks, public OgldevApp
 {
 public:
 
     Tutorial43() 
-#ifndef WIN32
-           : m_fontRenderer(sMarkup)
-#endif
     {
         m_pGameCamera = NULL;
         m_scale = 0.0f;
