@@ -21,9 +21,6 @@
     <ClInclude Include="..\..\tutorial43\mesh.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial43\pipeline.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial43\shadow_map_fbo.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -50,9 +47,6 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial43\mesh.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial43\pipeline.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial43\shadow_map_fbo.cpp">

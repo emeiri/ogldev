@@ -27,7 +27,7 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768

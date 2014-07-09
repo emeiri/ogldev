@@ -17,7 +17,7 @@
 */
 
 #include "skybox.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 #include "ogldev_util.h"
 
 SkyBox::SkyBox(const Camera* pCamera,

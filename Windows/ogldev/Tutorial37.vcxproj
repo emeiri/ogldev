@@ -20,7 +20,6 @@
     <ClInclude Include="..\..\tutorial37\lights_common.h" />
     <ClInclude Include="..\..\tutorial37\mesh.h" />
     <ClInclude Include="..\..\tutorial37\null_technique.h" />
-    <ClInclude Include="..\..\tutorial37\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial37\ds_dir_light_pass_tech.cpp" />
@@ -30,7 +29,6 @@
     <ClCompile Include="..\..\tutorial37\gbuffer.cpp" />
     <ClCompile Include="..\..\tutorial37\mesh.cpp" />
     <ClCompile Include="..\..\tutorial37\null_technique.cpp" />
-    <ClCompile Include="..\..\tutorial37\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial37\tutorial37.cpp" />
   </ItemGroup>
   <ItemGroup>

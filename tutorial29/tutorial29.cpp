@@ -26,7 +26,7 @@
 #include "engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"

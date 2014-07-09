@@ -15,14 +15,12 @@
     <ClInclude Include="..\..\tutorial40\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial40\mesh.h" />
     <ClInclude Include="..\..\tutorial40\null_technique.h" />
-    <ClInclude Include="..\..\tutorial40\pipeline.h" />
     <ClInclude Include="..\..\tutorial40\shadow_volume_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial40\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial40\mesh.cpp" />
     <ClCompile Include="..\..\tutorial40\null_technique.cpp" />
-    <ClCompile Include="..\..\tutorial40\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial40\shadow_volume_technique.cpp" />
     <ClCompile Include="..\..\tutorial40\tutorial40.cpp" />
   </ItemGroup>

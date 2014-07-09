@@ -23,7 +23,7 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 #include "camera.h"
 #include "texture.h"
 #include "lighting_technique.h"

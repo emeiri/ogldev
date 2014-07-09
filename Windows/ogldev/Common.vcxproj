@@ -20,6 +20,7 @@
     <ClCompile Include="..\..\Common\ogldev_glfw_backend.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>

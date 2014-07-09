@@ -14,13 +14,11 @@
     <ClInclude Include="..\..\tutorial31\engine_common.h" />
     <ClInclude Include="..\..\tutorial31\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial31\mesh.h" />
-    <ClInclude Include="..\..\tutorial31\pipeline.h" />
     <ClInclude Include="..\..\tutorial31\render_callbacks.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial31\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial31\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial31\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial31\tutorial31.cpp" />
   </ItemGroup>
   <ItemGroup>

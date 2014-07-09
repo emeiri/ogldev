@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 
 
 const Matrix4f& Pipeline::GetWorldTrans()

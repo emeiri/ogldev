@@ -14,7 +14,6 @@
     <ClInclude Include="..\..\tutorial43\engine_common.h" />
     <ClInclude Include="..\..\tutorial43\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial43\mesh.h" />
-    <ClInclude Include="..\..\tutorial43\pipeline.h" />
     <ClInclude Include="..\..\tutorial43\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial43\shadow_map_technique.h" />
   </ItemGroup>
@@ -27,7 +26,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\tutorial43\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial43\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial43\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial43\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial43\shadow_map_technique.cpp" />
     <ClCompile Include="..\..\tutorial43\tutorial43.cpp" />

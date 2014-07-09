@@ -29,7 +29,7 @@
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 
 struct Vertex
 {

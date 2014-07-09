@@ -26,7 +26,7 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 #include "camera.h"
 #include "ogldev_texture.h"
 

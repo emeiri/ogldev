@@ -14,14 +14,12 @@
     <ClInclude Include="..\..\tutorial42\engine_common.h" />
     <ClInclude Include="..\..\tutorial42\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial42\mesh.h" />
-    <ClInclude Include="..\..\tutorial42\pipeline.h" />
     <ClInclude Include="..\..\tutorial42\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial42\shadow_map_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial42\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial42\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial42\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial42\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial42\shadow_map_technique.cpp" />
     <ClCompile Include="..\..\tutorial42\tutorial42.cpp" />

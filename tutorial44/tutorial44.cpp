@@ -30,7 +30,7 @@
 #include "engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 #include "camera.h"
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"

@@ -26,7 +26,7 @@
 #include "ogldev_app.h"
 #include "ogldev_camera.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 #include "ds_geom_pass_tech.h"
 #include "ds_point_light_pass_tech.h"
 #include "ds_dir_light_pass_tech.h"
