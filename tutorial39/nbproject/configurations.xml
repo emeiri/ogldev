@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>silhouette_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
@@ -21,7 +20,6 @@
                    projectFiles="true">
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>silhouette_technique.cpp</itemPath>
       <itemPath>tutorial39.cpp</itemPath>
     </logicalFolder>
@@ -98,10 +96,6 @@
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
@@ -166,10 +160,6 @@
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>

@@ -11,7 +11,6 @@
       <itemPath>gbuffer.h</itemPath>
       <itemPath>lights_common.h</itemPath>
       <itemPath>mesh.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/dir_light_pass.fs</itemPath>
@@ -29,7 +28,6 @@
       <itemPath>ds_point_light_pass_tech.cpp</itemPath>
       <itemPath>gbuffer.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial36.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -123,10 +121,6 @@
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/dir_light_pass.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/geometry_pass.fs" ex="false" tool="3" flavor2="0">
@@ -205,10 +199,6 @@
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/dir_light_pass.fs" ex="false" tool="3" flavor2="0">
       </item>

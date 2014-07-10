@@ -38,7 +38,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/null_technique.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/shadow_volume_technique.o \
 	${OBJECTDIR}/tutorial40.o
 
@@ -83,11 +82,6 @@ ${OBJECTDIR}/null_technique.o: null_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/null_technique.o null_technique.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/include/ImageMagick -I/usr/local/include/assimp -I/usr/include/freetype2 -IFreetypeGL -I/usr/local/include/glfx -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/shadow_volume_technique.o: shadow_volume_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

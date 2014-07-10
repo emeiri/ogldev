@@ -23,6 +23,7 @@ enum OGLDEV_KEY
 {
     OGLDEV_KEY_SPACE =             32,
     OGLDEV_KEY_APOSTROPHE =        39,
+    OGLDEV_KEY_PLUS =              43,
     OGLDEV_KEY_COMMA =             44,
     OGLDEV_KEY_MINUS =             45,
     OGLDEV_KEY_PERIOD =            46,

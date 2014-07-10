@@ -9,7 +9,6 @@
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>particle_system.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>ps_update_technique.h</itemPath>
       <itemPath>random_texture.h</itemPath>
     </logicalFolder>
@@ -31,7 +30,6 @@
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>particle_system.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>ps_update_technique.cpp</itemPath>
       <itemPath>random_texture.cpp</itemPath>
       <itemPath>tutorial28.cpp</itemPath>
@@ -104,8 +102,9 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp` -Wall</commandLine>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` -Wall</commandLine>
           <warningLevel>3</warningLevel>
         </ccTool>
         <linkerTool>
@@ -127,7 +126,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
       <item path="billboard.fs" ex="false" tool="3" flavor2="0">
@@ -157,10 +156,6 @@
       <item path="particle_system.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle_system.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ps_update.gs" ex="false" tool="3" flavor2="0">
       </item>
@@ -224,10 +219,6 @@
       <item path="particle_system.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle_system.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ps_update.gs" ex="false" tool="3" flavor2="0">
       </item>

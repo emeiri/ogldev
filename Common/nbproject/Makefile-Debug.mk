@@ -52,6 +52,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_glfw_backend.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
+	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/technique.o
 
 
@@ -165,6 +166,11 @@ ${OBJECTDIR}/ogldev_util.o: ogldev_util.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_util.o ogldev_util.cpp
+
+${OBJECTDIR}/pipeline.o: pipeline.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/technique.o: technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

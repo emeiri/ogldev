@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>mesh.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
@@ -16,7 +15,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>skinning_technique.cpp</itemPath>
       <itemPath>tutorial38.cpp</itemPath>
     </logicalFolder>
@@ -78,10 +76,6 @@
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/skinning.vs" ex="false" tool="3" flavor2="0">
@@ -140,10 +134,6 @@
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
       </item>

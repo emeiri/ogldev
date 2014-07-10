@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ds_point_light_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
 	${OBJECTDIR}/mesh.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial36.o
 
 
@@ -100,11 +99,6 @@ ${OBJECTDIR}/mesh.o: mesh.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/tutorial36.o: tutorial36.cpp 
 	${MKDIR} -p ${OBJECTDIR}

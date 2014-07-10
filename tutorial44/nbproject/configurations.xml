@@ -8,7 +8,6 @@
       <itemPath>intermediate_buffer.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>motion_blur_technique.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
@@ -23,7 +22,6 @@
       <itemPath>intermediate_buffer.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>motion_blur_technique.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>skinning_technique.cpp</itemPath>
       <itemPath>tutorial44.cpp</itemPath>
     </logicalFolder>
@@ -96,10 +94,6 @@
       <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/motion_blur.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -175,10 +169,6 @@
       <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/motion_blur.fs" ex="false" tool="3" flavor2="0">
       </item>

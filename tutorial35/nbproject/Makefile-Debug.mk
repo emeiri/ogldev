@@ -38,7 +38,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ds_geom_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
 	${OBJECTDIR}/mesh.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial35.o
 
 
@@ -82,11 +81,6 @@ ${OBJECTDIR}/mesh.o: mesh.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Common/FreetypeGL -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Common/FreetypeGL -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/tutorial35.o: tutorial35.cpp 
 	${MKDIR} -p ${OBJECTDIR}

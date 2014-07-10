@@ -42,7 +42,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/gbuffer.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/null_technique.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial37.o
 
 
@@ -106,11 +105,6 @@ ${OBJECTDIR}/null_technique.o: null_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/null_technique.o null_technique.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/tutorial37.o: tutorial37.cpp 
 	${MKDIR} -p ${OBJECTDIR}

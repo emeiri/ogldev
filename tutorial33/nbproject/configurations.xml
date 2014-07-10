@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Shader Files"
@@ -19,7 +18,6 @@
                    projectFiles="true">
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial33.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -99,10 +97,6 @@
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial33.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -154,10 +148,6 @@
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial33.cpp" ex="false" tool="1" flavor2="0">
       </item>

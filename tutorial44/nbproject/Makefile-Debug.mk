@@ -38,7 +38,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/intermediate_buffer.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/motion_blur_technique.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/skinning_technique.o \
 	${OBJECTDIR}/tutorial44.o
 
@@ -83,11 +82,6 @@ ${OBJECTDIR}/motion_blur_technique.o: motion_blur_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/motion_blur_technique.o motion_blur_technique.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/skinning_technique.o: skinning_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

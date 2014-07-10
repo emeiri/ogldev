@@ -7,7 +7,6 @@
       <itemPath>engine_common.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>shadow_map_fbo.h</itemPath>
       <itemPath>shadow_map_technique.h</itemPath>
     </logicalFolder>
@@ -22,7 +21,6 @@
                    projectFiles="true">
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>shadow_map_fbo.cpp</itemPath>
       <itemPath>shadow_map_technique.cpp</itemPath>
       <itemPath>tutorial42.cpp</itemPath>
@@ -77,7 +75,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
@@ -89,10 +87,6 @@
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -165,10 +159,6 @@
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>

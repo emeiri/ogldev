@@ -39,7 +39,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/particle_system.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/ps_update_technique.o \
 	${OBJECTDIR}/random_texture.o \
 	${OBJECTDIR}/tutorial28.o
@@ -49,8 +48,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags glew ImageMagick++ assimp` -Wall 
-CXXFLAGS=`pkg-config --cflags glew ImageMagick++ assimp` -Wall 
+CCFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` -Wall 
+CXXFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` -Wall 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -69,47 +68,42 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28: ../Common/dist/Debug/GNU-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++`
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ freetype2 fontconfig`
 
 ${OBJECTDIR}/billboard_technique.o: billboard_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/billboard_technique.o billboard_technique.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/billboard_technique.o billboard_technique.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/particle_system.o: particle_system.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/particle_system.o particle_system.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/particle_system.o particle_system.cpp
 
 ${OBJECTDIR}/ps_update_technique.o: ps_update_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ps_update_technique.o ps_update_technique.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ps_update_technique.o ps_update_technique.cpp
 
 ${OBJECTDIR}/random_texture.o: random_texture.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/random_texture.o random_texture.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/random_texture.o random_texture.cpp
 
 ${OBJECTDIR}/tutorial28.o: tutorial28.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial28.o tutorial28.cpp
+	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial28.o tutorial28.cpp
 
 # Subprojects
 .build-subprojects:

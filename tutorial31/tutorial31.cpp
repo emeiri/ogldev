@@ -131,17 +131,17 @@ public:
 			GLUTBackendLeaveMainLoop();
 			break;
 
-            case '+':
+            case OGLDEV_KEY_PLUS:
                 m_tessellationLevel += 1.0f;
                 break;
                 
-            case '-':
+            case OGLDEV_KEY_MINUS:
                 if (m_tessellationLevel >= 2.0f) {
                     m_tessellationLevel -= 1.0f;                    
                 }
                 break;
                 
-            case 'z':
+            case OGLDEV_KEY_z:
                 m_isWireframe = !m_isWireframe;
                 
                 if (m_isWireframe) {
