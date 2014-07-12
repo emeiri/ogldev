@@ -23,8 +23,9 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
+#include "ogldev_app.h"
 #include "ogldev_pipeline.h"
-#include "camera.h"
+#include "ogldev_camera.h"
 #include "ogldev_texture.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
@@ -65,6 +66,12 @@ public:
         m_directionalLight.AmbientIntensity = 0.0f;
         m_directionalLight.DiffuseIntensity = 0.01f;
         m_directionalLight.Direction = Vector3f(1.0f, -1.0, 0.0);
+
+        m_persProjInfo.FOV = 60.0f;
+        m_persProjInfo.Height = WINDOW_HEIGHT;
+        m_persProjInfo.Width = WINDOW_WIDTH;
+        m_persProjInfo.zNear = 1.0f;
+        m_persProjInfo.zFar = 50.0f;        
     }
 
     ~Tutorial21()
@@ -148,7 +155,7 @@ public:
         Pipeline p;
         p.WorldPos(0.0f, 0.0f, 1.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
+        p.SetPerspectiveProj(m_persProjInfo);
         m_pEffect->SetWVP(p.GetWVPTrans());
         const Matrix4f& WorldTransformation = p.GetWorldTrans();
         m_pEffect->SetWorldMatrix(WorldTransformation);
@@ -175,34 +182,28 @@ public:
     }
 
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
+
+    void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-
-            case 'a':
-                m_directionalLight.AmbientIntensity += 0.05f;
-                break;
-
-            case 's':
-                m_directionalLight.AmbientIntensity -= 0.05f;
-                break;
-
-            case 'z':
-                m_directionalLight.DiffuseIntensity += 0.05f;
-                break;
-
-            case 'x':
-                m_directionalLight.DiffuseIntensity -= 0.05f;
-                break;
+        switch (OgldevKey) {
+        case OGLDEV_KEY_ESCAPE:
+        case OGLDEV_KEY_q:
+            GLUTBackendLeaveMainLoop();
+            break;
+        case OGLDEV_KEY_a:
+            m_directionalLight.AmbientIntensity += 0.05f;
+            break;
+        case OGLDEV_KEY_s:
+            m_directionalLight.AmbientIntensity -= 0.05f;
+            break;
+        case OGLDEV_KEY_z:
+            m_directionalLight.DiffuseIntensity += 0.05f;
+            break;
+        case OGLDEV_KEY_x:
+            m_directionalLight.DiffuseIntensity -= 0.05f;
+            break;
+        default:
+            m_pGameCamera->OnKeyboard(OgldevKey);				
         }
     }
 
@@ -239,6 +240,7 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
+    PersProjInfo m_persProjInfo;	
 };
 
 

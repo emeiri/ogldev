@@ -4,8 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>math_3d.h</itemPath>
-      <itemPath>../Include/ogldev_types.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -16,7 +14,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../Common/ogldev_util.cpp</itemPath>
       <itemPath>tutorial04.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -65,8 +62,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
@@ -94,8 +89,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">

@@ -33,7 +33,7 @@
 #include "ogldev_camera.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
-#include "camera.h"
+#include "ogldev_camera.h"
 #include "texture.h"
 #include "skinning_technique.h"
 #include "ogldev_glut_backend.h"

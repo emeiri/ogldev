@@ -32,7 +32,7 @@
 #include "ogldev_camera.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
-#include "camera.h"
+#include "ogldev_camera.h"
 #include "texture.h"
 #include "shadow_volume_technique.h"
 #include "lighting_technique.h"

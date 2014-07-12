@@ -202,23 +202,23 @@ public:
     }
 
 
-	void KeyboardCB(OGLDEV_KEY OgldevKey)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			GLUTBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+    {
+        switch (OgldevKey) {
+        case OGLDEV_KEY_ESCAPE:
+        case OGLDEV_KEY_q:
+                GLUTBackendLeaveMainLoop();
+                break;
+        default:
+                m_pGameCamera->OnKeyboard(OgldevKey);
+        }
+    }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
+    virtual void PassiveMouseCB(int x, int y)
+    {
+        m_pGameCamera->OnMouse(x, y);
+    }
     
     
 private:

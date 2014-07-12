@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Shader Files"
@@ -17,7 +16,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial21.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -44,8 +42,9 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --cflags ImageMagick++ freetype2 fontconfig assimp`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -64,7 +63,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
@@ -74,10 +73,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial21.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -109,10 +104,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial21.cpp" ex="false" tool="1" flavor2="0">
       </item>

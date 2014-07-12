@@ -33,7 +33,7 @@ static ICallbacks* s_pCallbacks = NULL;
 static bool sWithDepth = false;
 static bool sWithStencil = false;
 
-static OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key)
+OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key)
 {
     switch (Key) {
 		case GLUT_KEY_F1:        

@@ -21,7 +21,7 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 #include "mesh.h"
-#include "camera.h"
+#include "ogldev_camera.h"
 
 #define NUM_OF_LAYERS 6
 

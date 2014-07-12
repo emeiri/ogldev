@@ -35,10 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/lighting_technique.o \
-	${OBJECTDIR}/math_3d.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial17.o
 
 
@@ -46,8 +43,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags glew ImageMagick++` 
-CXXFLAGS=`pkg-config --cflags glew ImageMagick++` 
+CCFLAGS=`pkg-config --cflags glew ImageMagick++ assimp gl freetype2 fontconfig` 
+CXXFLAGS=`pkg-config --cflags glew ImageMagick++ assimp gl freetype2 fontconfig` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -56,7 +53,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGL ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+LDLIBSOPTIONS=-lglut ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -66,32 +63,17 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial17: ../Common/dist/Debug/GNU-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial17: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial17 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++`
-
-${OBJECTDIR}/camera.o: camera.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial17 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ gl assimp freetype2 fontconfig`
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/tutorial17.o: tutorial17.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial17.o tutorial17.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial17.o tutorial17.cpp
 
 # Subprojects
 .build-subprojects:

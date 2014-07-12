@@ -27,7 +27,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
-#include "camera.h"
+#include "ogldev_camera.h"
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768

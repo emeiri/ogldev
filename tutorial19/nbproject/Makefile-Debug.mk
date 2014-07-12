@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/lighting_technique.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial19.o
 
 
@@ -44,8 +43,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags glew ImageMagick++` 
-CXXFLAGS=`pkg-config --cflags glew ImageMagick++` 
+CCFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` 
+CXXFLAGS=`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -64,22 +63,17 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial19: ../Common/dist/Debug/GNU-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial19: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial19 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++`
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial19 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/tutorial19.o: tutorial19.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial19.o tutorial19.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial19.o tutorial19.cpp
 
 # Subprojects
 .build-subprojects:

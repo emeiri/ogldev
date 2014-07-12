@@ -31,5 +31,7 @@ void GLUTBackendRun(ICallbacks* pCallbacks);
 
 void GLUTBackendLeaveMainLoop();
 
+OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key);
+
 #endif	/* GLUT_BACKEND_H */
 
