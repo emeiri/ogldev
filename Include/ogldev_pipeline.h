@@ -112,6 +112,7 @@ public:
         m_rotateInfo = o.m_rotation;
     }
 
+	const Matrix4f& GetWPTrans();
 	const Matrix4f& GetWVTrans();
     const Matrix4f& GetVPTrans();
     const Matrix4f& GetWVPTrans();
@@ -131,9 +132,10 @@ private:
     } m_camera;
 
     Matrix4f m_WVPtransformation;
-    Matrix4f m_VPTtransformation;
+    Matrix4f m_VPtransformation;
+	Matrix4f m_WPtransformation;
 	Matrix4f m_WVtransformation;
-    Matrix4f m_WorldTransformation;
+    Matrix4f m_Wtransformation;
 };
 
 

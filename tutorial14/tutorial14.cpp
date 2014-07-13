@@ -26,6 +26,7 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
+#include "ogldev_glut_backend.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
 
@@ -36,7 +37,8 @@ GLuint VBO;
 GLuint IBO;
 GLuint gWVPLocation;
 
-Camera GameCamera;
+Camera* pGameCamera = NULL;
+PersProjInfo gPersProjInfo;
 
 const char* pVSFileName = "shader.vs";
 const char* pFSFileName = "shader.fs";
@@ -52,10 +54,10 @@ static void RenderSceneCB()
     Pipeline p;
     p.Rotate(0.0f, Scale, 0.0f);
     p.WorldPos(0.0f, 0.0f, 3.0f);
-    p.SetCamera(GameCamera.GetPos(), GameCamera.GetTarget(), GameCamera.GetUp());
-    p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
+    p.SetCamera(*pGameCamera);
+    p.SetPerspectiveProj(gPersProjInfo);
 
-    glUniformMatrix4fv(gWVPLocation, 1, GL_TRUE, (const GLfloat*)p.GetTrans());
+    glUniformMatrix4fv(gWVPLocation, 1, GL_TRUE, (const GLfloat*)p.GetWVPTrans());
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -72,7 +74,8 @@ static void RenderSceneCB()
 
 static void SpecialKeyboardCB(int Key, int x, int y)
 {
-    GameCamera.OnKeyboard(Key);
+    OGLDEV_KEY OgldevKey = GLUTKeyToOGLDEVKey(Key);
+    pGameCamera->OnKeyboard(OgldevKey);
 }
 
 
@@ -192,6 +195,8 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
+    pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+
     // Must be done after glut is initialized!
     GLenum res = glewInit();
     if (res != GLEW_OK) {
@@ -199,8 +204,6 @@ int main(int argc, char** argv)
       return 1;
     }
     
-    printf("GL version: %s\n", glGetString(GL_VERSION));
-
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     CreateVertexBuffer();
@@ -208,6 +211,12 @@ int main(int argc, char** argv)
 
     CompileShaders();
 
+    gPersProjInfo.FOV = 60.0f;
+    gPersProjInfo.Height = WINDOW_HEIGHT;
+    gPersProjInfo.Width = WINDOW_WIDTH;
+    gPersProjInfo.zNear = 1.0f;
+    gPersProjInfo.zFar = 100.0f;
+	                
     glutMainLoop();
 
     return 0;

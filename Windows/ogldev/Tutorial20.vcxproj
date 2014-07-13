@@ -11,16 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial20\camera.h" />
     <ClInclude Include="..\..\tutorial20\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial20\math_3d.h" />
-    <ClInclude Include="..\..\tutorial20\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial20\camera.cpp" />
     <ClCompile Include="..\..\tutorial20\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial20\math_3d.cpp" />
-    <ClCompile Include="..\..\tutorial20\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial20\tutorial20.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -76,7 +70,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6;$(ProjectDir)\..\..\Include\assimp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

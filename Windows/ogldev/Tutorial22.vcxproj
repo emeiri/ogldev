@@ -15,14 +15,10 @@
     <ClInclude Include="..\..\tutorial22\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial22\math_3d.h" />
     <ClInclude Include="..\..\tutorial22\mesh.h" />
-    <ClInclude Include="..\..\tutorial22\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial22\camera.cpp" />
     <ClCompile Include="..\..\tutorial22\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial22\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial22\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial22\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial22\tutorial22.cpp" />
   </ItemGroup>
   <ItemGroup>

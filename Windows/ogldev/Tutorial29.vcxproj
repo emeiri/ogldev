@@ -16,7 +16,6 @@
     <ClInclude Include="..\..\tutorial29\mesh.h" />
     <ClInclude Include="..\..\tutorial29\picking_technique.h" />
     <ClInclude Include="..\..\tutorial29\picking_texture.h" />
-    <ClInclude Include="..\..\tutorial29\pipeline.h" />
     <ClInclude Include="..\..\tutorial29\render_callbacks.h" />
     <ClInclude Include="..\..\tutorial29\simple_color_technique.h" />
   </ItemGroup>
@@ -25,7 +24,6 @@
     <ClCompile Include="..\..\tutorial29\mesh.cpp" />
     <ClCompile Include="..\..\tutorial29\picking_technique.cpp" />
     <ClCompile Include="..\..\tutorial29\picking_texture.cpp" />
-    <ClCompile Include="..\..\tutorial29\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial29\simple_color_technique.cpp" />
     <ClCompile Include="..\..\tutorial29\tutorial29.cpp" />
   </ItemGroup>

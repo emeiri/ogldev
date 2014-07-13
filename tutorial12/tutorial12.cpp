@@ -35,6 +35,7 @@
 GLuint VBO;
 GLuint IBO;
 GLuint gWorldLocation;
+PersProjInfo gPersProjInfo;
 
 const char* pVSFileName = "shader.vs";
 const char* pFSFileName = "shader.fs";
@@ -51,9 +52,9 @@ static void RenderSceneCB()
     Pipeline p;
     p.Rotate(0.0f, Scale, 0.0f);
     p.WorldPos(0.0f, 0.0f, 5.0f);
-    p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
+    p.SetPerspectiveProj(gPersProjInfo);
 
-    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)p.GetTrans());
+    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)p.GetWPTrans());
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -190,8 +191,6 @@ int main(int argc, char** argv)
       return 1;
     }
     
-    printf("GL version: %s\n", glGetString(GL_VERSION));
-
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     CreateVertexBuffer();
@@ -199,6 +198,12 @@ int main(int argc, char** argv)
 
     CompileShaders();
 
+    gPersProjInfo.FOV = 30.0f;
+    gPersProjInfo.Height = WINDOW_HEIGHT;
+    gPersProjInfo.Width = WINDOW_WIDTH;
+    gPersProjInfo.zNear = 1.0f;
+    gPersProjInfo.zFar = 100.0f;
+	                
     glutMainLoop();
 
     return 0;

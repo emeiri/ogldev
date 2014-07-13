@@ -11,13 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial13\math_3d.cpp" />
-    <ClCompile Include="..\..\tutorial13\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial13\tutorial13.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\tutorial13\math_3d.h" />
-    <ClInclude Include="..\..\tutorial13\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\tutorial13\shader.fs" />
@@ -71,6 +65,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\assimp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

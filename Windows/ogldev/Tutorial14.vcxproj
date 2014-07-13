@@ -11,15 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial14\camera.cpp" />
-    <ClCompile Include="..\..\tutorial14\math_3d.cpp" />
-    <ClCompile Include="..\..\tutorial14\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial14\tutorial14.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\tutorial14\camera.h" />
-    <ClInclude Include="..\..\tutorial14\math_3d.h" />
-    <ClInclude Include="..\..\tutorial14\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\tutorial14\shader.fs" />
@@ -73,6 +65,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\assimp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

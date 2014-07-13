@@ -13,14 +13,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\tutorial24\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial24\mesh.h" />
-    <ClInclude Include="..\..\tutorial24\pipeline.h" />
     <ClInclude Include="..\..\tutorial24\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial24\shadow_map_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial24\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial24\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial24\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial24\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial24\shadow_map_technique.cpp" />
     <ClCompile Include="..\..\tutorial24\tutorial24.cpp" />

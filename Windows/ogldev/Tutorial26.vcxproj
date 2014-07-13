@@ -14,12 +14,10 @@
     <ClInclude Include="..\..\tutorial26\engine_common.h" />
     <ClInclude Include="..\..\tutorial26\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial26\mesh.h" />
-    <ClInclude Include="..\..\tutorial26\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial26\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial26\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial26\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial26\tutorial26.cpp" />
   </ItemGroup>
   <ItemGroup>

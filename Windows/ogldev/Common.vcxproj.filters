@@ -89,5 +89,8 @@
     <ClInclude Include="..\..\Include\ogldev_app.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Include\ogldev_pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
