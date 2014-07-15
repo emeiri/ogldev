@@ -36,12 +36,19 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>../Include</pElem>
+          </incDir>
+          <commandLine>`pkg-config --cflags ImageMagick++ gl assimp glew freetype2 fontconfig`</commandLine>
+        </ccTool>
         <linkerTool>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs ImageMagick++ gl assimp glew freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
       <item path="math_3d.h" ex="false" tool="3" flavor2="0">
