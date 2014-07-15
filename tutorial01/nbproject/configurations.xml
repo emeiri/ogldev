@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="88">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -30,7 +30,6 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>
@@ -39,8 +38,8 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibLibItem>GL</linkerLibLibItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs gl`</commandLine>
         </linkerTool>
       </compileType>
       <item path="tutorial01.cpp" ex="false" tool="1" flavor2="0">
@@ -48,7 +47,6 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
         <dependencyChecking>true</dependencyChecking>
         <rebuildPropChanged>false</rebuildPropChanged>

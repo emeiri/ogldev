@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lGL
+LDLIBSOPTIONS=-lglut
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -60,7 +60,7 @@ LDLIBSOPTIONS=-lglut -lGLEW -lGL
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial02: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial02 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs ImageMagick++ gl assimp glew freetype2 fontconfig`
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial02 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs gl glew`
 
 ${OBJECTDIR}/tutorial02.o: tutorial02.cpp 
 	${MKDIR} -p ${OBJECTDIR}

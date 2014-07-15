@@ -42,6 +42,7 @@
           <incDir>
             <pElem>../Include</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags assimp`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>

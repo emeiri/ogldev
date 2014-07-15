@@ -61,16 +61,15 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp`</commandLine>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
           <warningLevel>2</warningLevel>
         </ccTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial25</output>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibLibItem>assimp</linkerLibLibItem>
-            <linkerLibLibItem>GL</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../Common"
                             CT="3"
@@ -84,7 +83,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp gl freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">

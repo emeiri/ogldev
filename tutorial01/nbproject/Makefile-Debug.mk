@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGL
+LDLIBSOPTIONS=-lglut
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -60,7 +60,7 @@ LDLIBSOPTIONS=-lglut -lGL
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial01: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial01 ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial01 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs gl`
 
 ${OBJECTDIR}/tutorial01.o: tutorial01.cpp 
 	${MKDIR} -p ${OBJECTDIR}
