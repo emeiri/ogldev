@@ -36,12 +36,17 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <incDir>
+            <pElem>../Include</pElem>
+          </incDir>
+          <commandLine>`pkg-config --cflags assimp`</commandLine>
+        </ccTool>
         <linkerTool>
           <linkerLibItems>
-            <linkerLibLibItem>GLEW</linkerLibLibItem>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibLibItem>GL</linkerLibLibItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs gl glew`</commandLine>
         </linkerTool>
       </compileType>
       <item path="math_3d.h" ex="false" tool="3" flavor2="0">

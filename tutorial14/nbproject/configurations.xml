@@ -4,9 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>camera.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -17,9 +14,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial14.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -46,7 +40,9 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags ImageMagick++ gl assimp glew freetype2 fontconfig`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -66,20 +62,9 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs ImageMagick++ gl assimp glew freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
@@ -107,18 +92,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">

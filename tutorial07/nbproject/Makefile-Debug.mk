@@ -42,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=`pkg-config --cflags assimp` 
+CXXFLAGS=`pkg-config --cflags assimp` 
 
 # Fortran Compiler Flags
 FFLAGS=
