@@ -240,10 +240,15 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
     InitCallbacks();
 
     while (!glfwWindowShouldClose(s_pWindow)) {
-        s_pCallbacks->RenderSceneCB();
-        glfwSwapBuffers(s_pWindow);
+        s_pCallbacks->RenderSceneCB();        
         glfwPollEvents();
     }
+}
+
+
+void GLFWBackendSwapBuffers()
+{
+    glfwSwapBuffers(s_pWindow);
 }
 
 

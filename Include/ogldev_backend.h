@@ -38,5 +38,7 @@ void OgldevBackendRun(ICallbacks* pCallbacks);
 
 void OgldevBackendLeaveMainLoop();
 
+void OgldevBackendSwapBuffers();
+
 
 #endif

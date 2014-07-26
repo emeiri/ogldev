@@ -40,6 +40,5 @@ private:
 	long long m_frameTime;
 	long long m_startTime;
 	int m_frameCount;
-	float m_fps;    
-
+        int m_fps;
 };

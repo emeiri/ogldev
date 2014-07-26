@@ -29,6 +29,8 @@ bool GLUTBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
 
 void GLUTBackendRun(ICallbacks* pCallbacks);
 
+void GLUTBackendSwapBuffers();
+
 void GLUTBackendLeaveMainLoop();
 
 OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key);

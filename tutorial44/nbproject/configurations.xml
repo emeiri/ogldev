@@ -5,24 +5,18 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>../../../../../../tutorials/ogldev/tutorial41/engine_common.h</itemPath>
-      <itemPath>intermediate_buffer.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
-      <itemPath>motion_blur_technique.h</itemPath>
-      <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
-      <itemPath>shaders/motion_blur.fs</itemPath>
-      <itemPath>shaders/motion_blur.vs</itemPath>
-      <itemPath>shaders/skinning.fs</itemPath>
-      <itemPath>shaders/skinning.vs</itemPath>
+      <itemPath>shaders/lighting.fs</itemPath>
+      <itemPath>shaders/lighting.vs</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>intermediate_buffer.cpp</itemPath>
+      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>motion_blur_technique.cpp</itemPath>
-      <itemPath>skinning_technique.cpp</itemPath>
       <itemPath>tutorial44.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -83,29 +77,17 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
+      <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/motion_blur.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/motion_blur.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/skinning.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="skinning_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="skinning_technique.h" ex="false" tool="3" flavor2="0">
+      <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial44.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -158,29 +140,17 @@
             tool="3"
             flavor2="0">
       </item>
-      <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
+      <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/motion_blur.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/motion_blur.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/skinning.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="skinning_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="skinning_technique.h" ex="false" tool="3" flavor2="0">
+      <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial44.cpp" ex="false" tool="1" flavor2="0">
       </item>
