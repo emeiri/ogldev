@@ -12,16 +12,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial44\engine_common.h" />
-    <ClInclude Include="..\..\tutorial44\intermediate_buffer.h" />
+    <ClInclude Include="..\..\tutorial44\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial44\mesh.h" />
-    <ClInclude Include="..\..\tutorial44\motion_blur_technique.h" />
-    <ClInclude Include="..\..\tutorial44\skinning_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial44\intermediate_buffer.cpp" />
+    <ClCompile Include="..\..\tutorial44\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial44\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial44\motion_blur_technique.cpp" />
-    <ClCompile Include="..\..\tutorial44\skinning_technique.cpp" />
     <ClCompile Include="..\..\tutorial44\tutorial44.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -56,7 +56,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
+        m_persProjInfo.zFar = 1000.0f;  
         
         m_pipeline.SetPerspectiveProj(m_persProjInfo);           
         m_pipeline.WorldPos(Vector3f(0.0f, 0.0f, 0.0f));        
@@ -88,8 +88,7 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
 
-        if (!m_mesh.LoadMesh("../Content/sponza/sponza.obj")) {
-            printf("Mesh load failed\n");
+        if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
             return false;            
         }
                 
