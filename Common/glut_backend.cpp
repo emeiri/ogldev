@@ -236,6 +236,12 @@ void GLUTBackendRun(ICallbacks* pCallbacks)
     glutMainLoop();
 }
 
+
+void GLUTBackendSwapBuffers()
+{
+    glutSwapBuffers();
+}
+
 void GLUTBackendLeaveMainLoop()
 {
     glutLeaveMainLoop();

@@ -119,7 +119,7 @@ public:
         
         m_mesh.BoneTransform(0.0f, m_prevTransforms);
 
-        if (!m_quad.LoadMesh("../Content/quad.obj")) {
+        if (!m_quad.LoadMesh("../Content/quad_r.obj")) {
             printf("Quad mesh load failed\n");
             return false;            
         }

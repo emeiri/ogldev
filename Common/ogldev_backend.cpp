@@ -87,6 +87,21 @@ void OgldevBackendRun(ICallbacks* pCallbacks)
 }
 
 
+void OgldevBackendSwapBuffers()
+{
+    switch (sBackendType) {
+        case OGLDEV_BACKEND_TYPE_GLUT:
+            GLUTBackendSwapBuffers();
+            break;
+        case OGLDEV_BACKEND_TYPE_GLFW:
+            GLFWBackendSwapBuffers();
+            break;
+        default:
+            assert(0);
+    }    
+}
+
+
 void OgldevBackendLeaveMainLoop()
 {
     switch (sBackendType) {
