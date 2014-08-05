@@ -7,5 +7,5 @@ out vec3 FragColor;
 
 void main()                                                                         
 {                                                                                   
-    FragColor = uvec3(gObjectIndex, gDrawIndex,gl_PrimitiveID + 1);                 
+   FragColor = vec3(float(gObjectIndex), float(gDrawIndex),float(gl_PrimitiveID + 1));                 
 }

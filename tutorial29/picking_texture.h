@@ -34,9 +34,9 @@ public:
     void DisableWriting();
     
     struct PixelInfo {
-        unsigned int ObjectID;
-        unsigned int DrawID;
-        unsigned int PrimID;
+        float ObjectID;
+        float DrawID;
+        float PrimID;
         
         PixelInfo()
         {

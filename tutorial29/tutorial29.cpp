@@ -159,10 +159,10 @@ public:
             if (Pixel.PrimID != 0) {                
                 m_simpleColorEffect.Enable();
                 assert(Pixel.ObjectID < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
-                p.WorldPos(m_worldPos[Pixel.ObjectID]);
+                p.WorldPos(m_worldPos[(unsigned int)Pixel.ObjectID]);
                 m_simpleColorEffect.SetWVP(p.GetWVPTrans());
                 // Must compensate for the decrement in the FS!
-                m_pMesh->Render(Pixel.DrawID, Pixel.PrimID - 1); 
+                m_pMesh->Render((unsigned int)Pixel.DrawID, (unsigned int)Pixel.PrimID - 1); 
             }
         }
         
