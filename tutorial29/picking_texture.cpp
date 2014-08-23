@@ -106,17 +106,3 @@ PickingTexture::PixelInfo PickingTexture::ReadPixel(unsigned int x, unsigned int
 
     return Pixel;
 }
-
-struct foo
-{
-    uint a,b,c;
-};
-
-/*void PickingTexture::Dump()
-{
-    foo f[1680*1050];
-    
-    glBindTexture(GL_TEXTURE_2D, m_pickingTexture);
-    
-    glGetTexture(GL_TEXTURE_2D, 0, GL_RGB_INTEGER, GL_UNSIGNED_INT, &f);
-}*/

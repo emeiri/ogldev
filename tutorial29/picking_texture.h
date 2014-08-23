@@ -40,15 +40,13 @@ public:
         
         PixelInfo()
         {
-            ObjectID = 0;
-            DrawID = 0;
-            PrimID = 0;
+            ObjectID = 0.0f;
+            DrawID = 0.0f;
+            PrimID = 0.0f;
         }
     };
 
     PixelInfo ReadPixel(unsigned int x, unsigned int y);
-
-    //void Dump();
     
 private:
     GLuint m_fbo;
