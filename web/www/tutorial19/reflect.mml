@@ -1,0 +1,61 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <mi>R</mi>
+        <mo>=</mo>
+        <mi>I</mi>
+        <mo>+</mo>
+        <mi>V</mi>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi>V</mi>
+        <mo>=</mo>
+        <mn>2</mn>
+        <mo>&lowast;</mo>
+        <mi>N</mi>
+        <mo>&lowast;</mo>
+        <mo stretchy='false'>(</mo>
+        <mo>&minus;</mo>
+        <mi>N</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mi>I</mi>
+        <mo stretchy='false'>)</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mi>R</mi>
+        <mo>=</mo>
+        <mi>I</mi>
+        <mo>+</mo>
+        <mn>2</mn>
+        <mo>&lowast;</mo>
+        <mi>N</mi>
+        <mo>&lowast;</mo>
+        <mo stretchy='false'>(</mo>
+        <mo>&minus;</mo>
+        <mi>N</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mi>I</mi>
+        <mo stretchy='false'>)</mo>
+        <mo>=</mo>
+        <mi>I</mi>
+        <mo>&minus;</mo>
+        <mn>2</mn>
+        <mo>&lowast;</mo>
+        <mi>N</mi>
+        <mo>&lowast;</mo>
+        <mo stretchy='false'>(</mo>
+        <mi>N</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mi>I</mi>
+        <mo stretchy='false'>)</mo>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

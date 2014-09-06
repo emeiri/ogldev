@@ -1,0 +1,59 @@
+<math display = 'block'>
+  <mrow>
+    <mi>Q</mi>
+    <mo>=</mo>
+    <vector>
+      <csymbol>
+        <msub>
+          <mi>V</mi>
+          <mi>x</mi>
+        </msub>
+        <mo>&lowast;</mo>
+        <mi>sin</mi>
+        <mo stretchy='false'>(</mo>
+        <mfrac>
+          <mi>a</mi>
+          <mn>2</mn>
+        </mfrac>
+        <mo stretchy='false'>)</mo>
+      </csymbol>
+      <csymbol>
+        <msub>
+          <mi>V</mi>
+          <mi>y</mi>
+        </msub>
+        <mo>&lowast;</mo>
+        <mi>sin</mi>
+        <mo stretchy='false'>(</mo>
+        <mfrac>
+          <mi>a</mi>
+          <mn>2</mn>
+        </mfrac>
+        <mo stretchy='false'>)</mo>
+      </csymbol>
+      <csymbol>
+        <msub>
+          <mi>V</mi>
+          <mi>z</mi>
+        </msub>
+        <mo>&lowast;</mo>
+        <mi>sin</mi>
+        <mo stretchy='false'>(</mo>
+        <mfrac>
+          <mi>a</mi>
+          <mn>2</mn>
+        </mfrac>
+        <mo stretchy='false'>)</mo>
+      </csymbol>
+      <ci>
+        <mi>cos</mi>
+        <mo stretchy='false'>(</mo>
+        <mfrac>
+          <mi>a</mi>
+          <mn>2</mn>
+        </mfrac>
+        <mo stretchy='false'>)</mo>
+      </ci>
+    </vector>
+  </mrow>
+</math>

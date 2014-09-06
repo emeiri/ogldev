@@ -1,0 +1,450 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	
+<table width=100% >
+<tr>
+	<td width=34%><div align=left><a href="../tutorial42/tutorial42.html" rel="prev"><img src="../prev.jpg"></a></div></td>
+	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
+        <td width=33%><div align=right></a></div></td>
+</tr>
+</table>
+	
+<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+<title>Tutorial 43</title>
+</head>
+<body>
+<div class="content">
+<div class="lines">
+<h1>Tutorial 43 - Multipass Shadow Mapping With Point Lights</h1>
+<div style="text-align: center">
+<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
+</div>
+<h2>Background</h2>
+<p>
+    In <a href="../tutorial24/tutorial24.html">tutorial 24</a> we learned the basics of Shadow Mapping - first a rendering pass from the light
+    point of view using the light direction as the viewing vector and then a second pass from
+    the camera point of view using the data from the first pass for shadow calculation. At this
+    point most programmers will ask themselves: this is fine for directional/spot light but what 
+    if I want to generate shadows from a point light? There is no specific light direction in this 
+    case. Solving this problem is the topic of this tutorial.
+</p>
+<p>
+    The solution to this problem is to recognize that a point light basically casts its light in
+    all directions, so rather than place a rectangular shadow map texture somewhere that will only
+    receive a small portion of that light, we can place the light source in a middle of a texture
+    cube. We now have six rectangular shadow maps and the light has no where to escape. Every light
+    "beam" has to land on one of these six shadow maps and we can sample from it to do our standard
+    shadow calculations. We have already seen the cube map in action in the skybox tutorial so we
+    are already familiar with it.
+</p>
+<p>
+    In practice, in order to simulate the notion of spreading light all over we will do six shadow
+    map rendering passes from the location of the light source but each rendering pass will target
+    a different direction. We are going to make this very simple and target the following axis
+    aligned directions: positive/negative X, positive/negative Y and positive/negative Z. Eventually
+    the cubemap faces will contain the distance of all pixels in the scene that are closest to the
+    light source. By comparing this value to the distance of each pixel to the light during the
+    lighting pass we can tell whether that pixel is in light or shadow.
+</p>
+<p>
+    Take a look at the following picture:
+</p>
+<img src="cubemap2.jpg"</img>
+<p>
+    Our scene contains a blue sphere and a point light (the yellow light bulb) is stationed
+    nearby. In the first rendering pass we use a texture cube as the framebuffer. Remember that
+    at this stage we don't care about the original camera location or direction. We place the
+    camera at the position of the point light so it always looks like it is located at the middle
+    of the texture cube. In the example above we see that the current rendering direction is the
+    positive Z axis (into the yellow face). At this point we are back to the standard shadow
+    mapping process so using the depth values in the yellow face we can generate the proper
+    shadow for the blue sphere (these depth values are located in the black circle but the actual
+    shadow will be rendered in the second pass).
+</p>
+<p>
+    The following picture demonstrates the six camera directions that we will use in
+    the first rendering pass:
+</p>
+<img src='cubemap.jpg'</img>
+<p>
+    Since the same scene is rendered six times in the first rendering pass we call this
+    <i>Multipass Shadow Mapping.</i>
+</p>
+<h2>Code Walkthru</h2>
+<p>(shadow_map_fbo.h)</p>
+<code>
+    class ShadowMapFBO<br>
+{<br>
+public:<br>
+&nbsp; &nbsp;    ShadowMapFBO();<br>
+<br>
+&nbsp; &nbsp;    ~ShadowMapFBO();<br>
+<br>
+&nbsp; &nbsp;    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);<br>
+<br>
+&nbsp; &nbsp;    void BindForWriting(<b>GLenum CubeFace</b>);<br>
+<br>
+&nbsp; &nbsp;    void BindForReading(GLenum TextureUnit);<br>
+    <br>
+private:<br>
+&nbsp; &nbsp;    GLuint m_fbo;<br>
+&nbsp; &nbsp;    GLuint m_shadowMap;<br>
+&nbsp; &nbsp;  <b>  GLuint m_depth;</b><br>
+};<br>
+</code>
+<p>
+    Let's start the code walkthru by reviewing the changes in our shadow map FBO.
+    The FBO is mostly the same with two minor changes: the BindForWriting() method
+    now takes a cube face enumerator. Since we are doing a multi pass rendering
+    into the cubemap this is how we will tell the GL which cube face we are going
+    to render. The second change is the addition of a separate depth buffer. Previously
+    we used the m_shadowMap class member as the shadow map object (which is actually
+    a depth buffer). Now m_shadowMap is going to be used as a cube map and we
+    need a dedicated depth buffer. For each of the six passes into the cube map faces
+    we will use this depth buffer (and naturally we will clear it before each pass).
+</p>
+<p>(shadow_map_fbo.cpp:46)</p>
+<code>
+bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)<br>
+{<br>
+&nbsp; &nbsp;    // Create the FBO<br>
+&nbsp; &nbsp;    glGenFramebuffers(1, &m_fbo);<br>
+<br>
+&nbsp; &nbsp;    // Create the depth buffer<br>
+&nbsp; &nbsp;    glGenTextures(1, &m_depth);<br>
+&nbsp; &nbsp;    glBindTexture(GL_TEXTURE_2D, m_depth);<br>
+&nbsp; &nbsp;	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);<br>
+&nbsp; &nbsp;	glBindTexture(GL_TEXTURE_2D, 0);<br>
+<br>
+&nbsp; &nbsp;	// Create the cube map<br>
+&nbsp; &nbsp;<b>	glGenTextures(1, &m_shadowMap);<br>
+&nbsp; &nbsp;	glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);<br>
+&nbsp; &nbsp;	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);</b><br>
+<br>
+&nbsp; &nbsp;  for (uint i = 0 ; i < 6 ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_R32F, WindowWidth, WindowHeight, 0, GL_RED, GL_FLOAT, NULL);<br>
+&nbsp; &nbsp;    }<br>
+<br>
+&nbsp; &nbsp;    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);<br>
+&nbsp; &nbsp;    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);<br>
+<br>
+&nbsp; &nbsp;    // Disable writes to the color buffer<br>
+&nbsp; &nbsp;    glDrawBuffer(GL_NONE);<br>
+       <br>
+&nbsp; &nbsp;    // Disable reads from the color buffer<br>
+&nbsp; &nbsp;    glReadBuffer(GL_NONE);<br>
+    <br>
+&nbsp; &nbsp;    GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
+<br>
+&nbsp; &nbsp;    if (Status != GL_FRAMEBUFFER_COMPLETE) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;        printf("FB error, status: 0x%x\n", Status);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;        return false;<br>
+&nbsp; &nbsp;    }<br>
+    <br>
+&nbsp; &nbsp;    glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
+<br>
+&nbsp; &nbsp;    return GLCheckError();<br>
+}    
+</code>
+<p>
+    This is how we initialize the shadow map. First we create and setup the depth
+    buffer. Nothing new here. Next comes the cubemap texture. GL_TEXTURE_CUBE_MAP
+    is used as the target. The interesting part here is the way we initialize
+    the six cube faces. OpenGL provides a macro for each face: GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+    GL_TEXTURE_CUBE_MAP_NEGATIVE_X, etc.
+    They happen to be defines sequentially which makes the loop above possible (see glew.h
+    for the remaining macros; around line 1319 in the version I have). Each face
+    is initialized with a single 32 bit floating point value in each texel.
+</p>
+<p>(tutorial43.cpp:183)</p>
+<code>
+    virtual void RenderSceneCB()<br>
+{   <br>
+&nbsp;     CalcFPS();<br>
+<br>
+&nbsp;     m_scale += 0.05f;<br>
+<br>
+&nbsp;     m_pGameCamera->OnRender();<br>
+<br>
+&nbsp;     ShadowMapPass();<br>
+&nbsp;     RenderPass();<br>
+<br>
+&nbsp;     RenderFPS();<br>
+<br>
+&nbsp;     glutSwapBuffers();<br>
+}
+</code>
+<p>
+    This is the main render scene function and as you can see, there is no change
+    in comparison to previous shadow mapping tutorials. At the high level we have
+    the same two passes of shadow map generation and rendering.
+</p>
+<p>(tutorial43.cpp:200)</p>
+<code>
+void ShadowMapPass()<br>
+{<br>
+&nbsp; &nbsp;     glCullFace(GL_FRONT);<br>
+    <br>
+&nbsp; &nbsp;     m_shadowMapEffect.Enable();<br>
+    <br>
+&nbsp; &nbsp;     PersProjInfo ProjInfo;<br>
+&nbsp; &nbsp;  <b>   ProjInfo.FOV = 90.0f;</b><br>
+&nbsp; &nbsp;     ProjInfo.Height = WINDOW_HEIGHT;<br>
+&nbsp; &nbsp;     ProjInfo.Width = WINDOW_WIDTH;<br>
+&nbsp; &nbsp;     ProjInfo.zNear = 1.0f;<br>
+&nbsp; &nbsp;     ProjInfo.zFar = 100.0f;  <br>
+    <br>
+&nbsp; &nbsp;     Pipeline p;<br>
+&nbsp; &nbsp;     p.SetPerspectiveProj(m_persProjInfo);                           <br>
+    <br>
+&nbsp; &nbsp;    <b> glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);</b><br>
+    <br>
+&nbsp; &nbsp;     for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;<b> m_shadowMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);</b><br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);                       <br>
+                <br>
+&nbsp; &nbsp; &nbsp; &nbsp;     <b>    p.SetCamera(m_pointLight.Position, gCameraDirections[i].Target, gCameraDirections[i].Up);</b><br>
+        <br>
+&nbsp; &nbsp; &nbsp; &nbsp;         p.Orient(m_mesh1Orientation);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         m_shadowMapEffect.SetWorld(p.GetWorldTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         m_shadowMapEffect.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         m_mesh.Render();<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         p.Orient(m_mesh2Orientation);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         m_shadowMapEffect.SetWorld(p.GetWorldTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         m_shadowMapEffect.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         m_mesh.Render();<br>
+&nbsp; &nbsp;     }        <br>
+}    
+</code>
+<p>
+    This is the full shadow map pass. There are a few things we need to notice here
+    that are different from regular shadow mapping. First off is that the field of
+    view is set to 90 degrees. The reason is that we are going to render the entire
+    world into the cube map so to align the camera perfectly into each face we set
+    it to one quarter of a full circle (360 degrees).
+</p>
+<p>
+    Next is that the clear value of the cube map is set to the maximum value
+    of the floating point (FLT_MAX). Every texel which will actually be rendered
+    into will have a much smaller value. The "real" pixels will always have values
+    smaller than the un-rendered texels.
+</p>
+<p>
+    Finally, the loop over the cube map faces uses the gCameraDirections array (see below)
+    in order to set the proper face in the FBO and to orient the camera into that face.
+</p>
+<p>(tutorial43.cpp:45)</p>
+<code>
+    struct CameraDirection<br>
+{<br>
+&nbsp; &nbsp;     GLenum CubemapFace;<br>
+&nbsp; &nbsp;     Vector3f Target;<br>
+&nbsp; &nbsp;     Vector3f Up;<br>
+};<br>
+<br>
+CameraDirection gCameraDirections[NUM_OF_LAYERS] = <br>
+{<br>
+&nbsp; &nbsp;     { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, -1.0f, 0.0f) },<br>
+&nbsp; &nbsp;     { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, -1.0f, 0.0f) },<br>
+&nbsp; &nbsp;     { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },<br>
+&nbsp; &nbsp;     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },<br>
+&nbsp; &nbsp;     { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, -1.0f, 0.0f) },<br>
+&nbsp; &nbsp;     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f),  Vector3f(0.0f, -1.0f, 0.0f) }<br>
+};    
+</code>
+<p>
+This array combines the enums defined by GL to denote each cube face along with
+the two vectors used to orient the camera toward that face.
+</p>
+<p>(shadow_map_fbo.cpp:96)</p>
+<code>
+void ShadowMapFBO::BindForWriting(GLenum CubeFace)<br>
+{<br>
+&nbsp; &nbsp;     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);<br>
+&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);<br>
+&nbsp; &nbsp;     glDrawBuffer(GL_COLOR_ATTACHMENT0);<br>
+}    
+</code>
+<p>
+The function above is used by the shadow map pass to setup the face that will be rendered
+to. First we bind the FBO to make it current. After that we bind the face to the first
+color attachment and enable writing to it.
+</p>
+<p>(tutorial43.cpp:237)</p>
+<code>
+void RenderPass()<br>
+{<br>
+&nbsp; &nbsp;     glCullFace(GL_BACK);<br>
+<br>
+&nbsp; &nbsp;     glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
+&nbsp; &nbsp;     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);<br>
+&nbsp; &nbsp;     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;     m_lightingEffect.Enable();<br>
+&nbsp; &nbsp;     m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;     m_lightingEffect.SetEyeWorldPos(m_pGameCamera->GetPos());<br>
+<br>
+&nbsp; &nbsp;     Pipeline p;<br>
+&nbsp; &nbsp;     p.SetPerspectiveProj(m_persProjInfo);    <br>
+&nbsp; &nbsp;     p.SetCamera(*m_pGameCamera);<br>
+<br>
+&nbsp; &nbsp;     // Render the quads<br>
+&nbsp; &nbsp;     m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;     p.Orient(m_quad1Orientation);<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWVP(p.GetWVPTrans());        <br>
+&nbsp; &nbsp;     m_quad.Render();<br>
+<br>
+&nbsp; &nbsp;     p.Orient(m_quad2Orientation);<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWVP(p.GetWVPTrans());        <br>
+&nbsp; &nbsp;     m_quad.Render();        <br>
+<br>
+&nbsp; &nbsp;     // Render the meshes<br>
+&nbsp; &nbsp;     p.Orient(m_mesh1Orientation);<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWVP(p.GetWVPTrans());       <br>
+&nbsp; &nbsp;     m_mesh.Render();        <br>
+<br>
+&nbsp; &nbsp;     p.Orient(m_mesh2Orientation);<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp;     m_lightingEffect.SetWVP(p.GetWVPTrans());       <br>
+&nbsp; &nbsp;     m_mesh.Render();                <br>
+}    
+</code>
+<p>
+This is the full lighting pass. Everything is back to normal - we render
+into the default framebuffer, we bind the cubemap for reading and reset the
+camera based on the viewer position. This completes our C++ code review. Now
+let's take a look at the shaders.
+</p>
+<p>(shadow_map.vs)</p>
+<code>
+    #version 330<br>
+<br>
+layout (location = 0) in vec3 Position;<br>
+layout (location = 1) in vec2 TexCoord;<br>
+layout (location = 2) in vec3 Normal;<br>
+<br>
+uniform mat4 gWVP;<br>
+uniform mat4 gWorld;<br>
+<br>
+out vec3 WorldPos;<br>
+                  <br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;     vec4 Pos4 = vec4(Position, 1.0);<br>
+&nbsp; &nbsp;     gl_Position = gWVP * Pos4;<br>
+&nbsp; &nbsp;     WorldPos = (gWorld * Pos4).xyz;    <br>
+}    
+</code>
+<p>
+We are going to render from the position of the point light and the camera
+is currently aligned on one of the axis. The value that will be written into
+the cubemap is the distance from the object to the point light. So we need the object
+world position in the FS where this distance will be calculated.
+</p>
+<p>(shadow_map.fs)</p>
+<code>
+#version 330<br>
+<br>
+in vec3 WorldPos;<br>
+<br>
+uniform vec3 gLightWorldPos;<br>
+          <br>
+out float FragColor;<br>
+        <br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;     vec3 LightToVertex = WorldPos - gLightWorldPos;<br>
+<br>
+&nbsp; &nbsp;     float LightToPixelDistance = length(LightToVertex);<br>
+<br>
+&nbsp; &nbsp;     FragColor = LightToPixelDistance;<br>
+}   
+</code>
+<p>
+We now have the world space position of the pixel in the FS and the world space
+position of the point light is provided as a uniform. We calculate the vector 
+from the light to the pixel, take its length and write it out.
+</p>
+<p>(lighting.vs)</p>
+<code>
+#version 330<br>
+<br>
+layout (location = 0) in vec3 Position;<br>
+layout (location = 1) in vec2 TexCoord;<br>
+layout (location = 2) in vec3 Normal;<br>
+<br>
+out vec2 TexCoord0;<br>
+out vec3 Normal0;<br>
+out vec3 WorldPos0;<br>
+<br>
+uniform mat4 gWVP;<br>
+uniform mat4 gWorld;<br>
+<br>
+void main()<br>
+{                                                                                   <br>
+&nbsp; &nbsp; gl_Position = gWVP * vec4(Position, 1.0);                                        <br>
+&nbsp; &nbsp; TexCoord0   = TexCoord;                                                         <br>
+&nbsp; &nbsp; Normal0     = (gWorld * vec4(Normal, 0.0)).xyz;                                  <br>
+&nbsp; &nbsp; WorldPos0   = (gWorld * vec4(Position, 1.0)).xyz;                                <br>
+}    
+</code>
+<p>
+This is the updated lighting VS and what's interesting here is the missing piece -
+we no longer need to calculate the light space position of the vertex as we
+did in the original shadow mapping algorithm. This was required when we needed
+to place the shadow map along the light vector but now we only need the vector from
+the light to the pixel in world space in order to sample from the cubmap. Everything
+we need for this is here so we are good to go.
+</p>
+<p>(lighting.fs)</p>
+<code>
+    ...<br>
+    <br>
+uniform samplerCube gShadowMap;<br>
+<br>
+...<br>
+<br>
+float CalcShadowFactor(vec3 LightDirection)<br>
+{<br>
+&nbsp; &nbsp;     float SampledDistance = texture(gShadowMap, LightDirection).r;<br>
+<br>
+&nbsp; &nbsp;     float Distance = length(LightDirection);<br>
+<br>
+&nbsp; &nbsp;     if (Distance <= SampledDistance + EPSILON)<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         return 1.0; // Inside the light<br>
+&nbsp; &nbsp;     else<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         return 0.5; // Inside the shadow<br>
+}  <br>
+</code>
+<p>
+The code excerpt above contains the key changes in the lighting FS. The shadow
+map uniform that was previously sampler2D (in tutorial 24) or sampler2DShadow (in
+tutorial 42) is now a samplerCube. In order to sample from it we use the LightDirection
+vector which was calculated as the vector from the point light to the pixel. Note
+that all the three coordinates (X, Y and Z) of the light direction vector are used
+for sampling. Since the cube has three dimension we need a three dimension vector
+in order to select the proper face and the specific texel in that face. Comparison
+of the sampled value with the distance from the light to the pixel tells us whether
+we are in light or shadow.
+</p>
+<p>
+    In this tutorial example I've placed a couple of spheres facing a point
+    light such that the shadow will fall directly on the quad behind each sphere.
+    Here's the result:
+</p>
+<img src='../../tutorial43.jpg'</img>
+</body>
+</html>

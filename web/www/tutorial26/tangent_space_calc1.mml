@@ -1,0 +1,72 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <msub>
+          <mi>E</mi>
+          <mn>1</mn>
+        </msub>
+        <mo>=</mo>
+        <mo stretchy='false'>(</mo>
+        <msub>
+          <mi>U</mi>
+          <mn>1</mn>
+        </msub>
+        <mo>&minus;</mo>
+        <msub>
+          <mi>U</mi>
+          <mn>0</mn>
+        </msub>
+        <mo stretchy='false'>)</mo>
+        <mi>T</mi>
+        <mo>+</mo>
+        <mo stretchy='false'>(</mo>
+        <msub>
+          <mi>V</mi>
+          <mn>1</mn>
+        </msub>
+        <mo>&minus;</mo>
+        <msub>
+          <mi>V</mi>
+          <mn>0</mn>
+        </msub>
+        <mo stretchy='false'>)</mo>
+        <mi>B</mi>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <msub>
+          <mi>E</mi>
+          <mn>2</mn>
+        </msub>
+        <mo>=</mo>
+        <mo stretchy='false'>(</mo>
+        <msub>
+          <mi>U</mi>
+          <mn>2</mn>
+        </msub>
+        <mo>&minus;</mo>
+        <msub>
+          <mi>U</mi>
+          <mn>0</mn>
+        </msub>
+        <mo stretchy='false'>)</mo>
+        <mi>T</mi>
+        <mo>+</mo>
+        <mo stretchy='false'>(</mo>
+        <msub>
+          <mi>V</mi>
+          <mn>2</mn>
+        </msub>
+        <mo>&minus;</mo>
+        <msub>
+          <mi>V</mi>
+          <mn>0</mn>
+        </msub>
+        <mo stretchy='false'>)</mo>
+        <mi>B</mi>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

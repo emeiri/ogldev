@@ -1,0 +1,64 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <mfrac>
+          <msub>
+            <mi>x</mi>
+            <mi>ndc</mi>
+          </msub>
+          <mi>n</mi>
+        </mfrac>
+        <mo>=</mo>
+        <mfrac>
+          <msub>
+            <mi>v</mi>
+            <mi>x</mi>
+          </msub>
+          <msub>
+            <mi>v</mi>
+            <mi>z</mi>
+          </msub>
+        </mfrac>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <msub>
+          <mi>x</mi>
+          <mi>ndc</mi>
+        </msub>
+        <mo>=</mo>
+        <mi>n</mi>
+        <mfrac>
+          <msub>
+            <mi>v</mi>
+            <mi>x</mi>
+          </msub>
+          <msub>
+            <mi>v</mi>
+            <mi>z</mi>
+          </msub>
+        </mfrac>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mo lspace='0px' form='infix'>...</mo>
+        <msub>
+          <mi>y</mi>
+          <mi>ndc</mi>
+        </msub>
+        <mo>=</mo>
+        <mi>n</mi>
+        <mfrac>
+          <msub>
+            <mi>v</mi>
+            <mi>y</mi>
+          </msub>
+          <msub>
+            <mi>v</mi>
+            <mi>z</mi>
+          </msub>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

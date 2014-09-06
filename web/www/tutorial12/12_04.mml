@@ -1,0 +1,52 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <msub>
+          <mi>x</mi>
+          <mi>p</mi>
+        </msub>
+        <mo>=</mo>
+        <mfrac>
+          <mi>x</mi>
+          <mrow>
+            <mi>ar</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>z</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <tan/>
+            <mo stretchy='false'>(</mo>
+            <mfrac>
+              <mi>&alpha;</mi>
+              <mn>2</mn>
+            </mfrac>
+            <mo stretchy='false'>)</mo>
+          </mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <msub>
+          <mi>y</mi>
+          <mi>p</mi>
+        </msub>
+        <mo>=</mo>
+        <mfrac>
+          <mi>y</mi>
+          <mrow>
+            <mi>z</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <tan/>
+            <mo stretchy='false'>(</mo>
+            <mfrac>
+              <mi>&alpha;</mi>
+              <mn>2</mn>
+            </mfrac>
+            <mo stretchy='false'>)</mo>
+          </mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

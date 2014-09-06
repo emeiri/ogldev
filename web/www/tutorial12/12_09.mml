@@ -1,0 +1,224 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <mi>A</mi>
+        <mo fontfamily='Times New Roman'>&plus;</mo>
+        <mfrac>
+          <mi>B</mi>
+          <mi>NearZ</mi>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mn>1</mn>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mi>A</mi>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mn>1</mn>
+        <mo>&minus;</mo>
+        <mfrac>
+          <mi>B</mi>
+          <mi>NearZ</mi>
+        </mfrac>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi>A</mi>
+        <mo fontfamily='Times New Roman'>&plus;</mo>
+        <mfrac>
+          <mi>B</mi>
+          <mi>FarZ</mi>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mn>1</mn>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mfrac>
+          <mi>B</mi>
+          <mi>FarZ</mi>
+        </mfrac>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mn>1</mn>
+        <mo>&minus;</mo>
+        <mfrac>
+          <mi>B</mi>
+          <mi>NearZ</mi>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mn>1</mn>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mfrac>
+          <mrow>
+            <mi>B</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>NearZ</mi>
+            <mo>&minus;</mo>
+            <mi>B</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>FarZ</mi>
+          </mrow>
+          <mrow>
+            <mi>FarZ</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>NearZ</mi>
+          </mrow>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mn>2</mn>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mfrac>
+          <mrow>
+            <mi>B</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mo stretchy='false'>(</mo>
+            <mi>NearZ</mi>
+            <mo>&minus;</mo>
+            <mi>FarZ</mi>
+            <mo stretchy='false'>)</mo>
+          </mrow>
+          <mrow>
+            <mi>FarZ</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>NearZ</mi>
+          </mrow>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mn>2</mn>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mi>B</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mo stretchy='false'>(</mo>
+        <mi>NearZ</mi>
+        <mo>&minus;</mo>
+        <mi>FarZ</mi>
+        <mo stretchy='false'>)</mo>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mn>2</mn>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mi>FarZ</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mi>NearZ</mi>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi mathvariant='normal' fontfamily='Times New Roman'>B</mi>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mfrac>
+          <mrow>
+            <mn fontfamily='Times New Roman'>2</mn>
+            <mo fontfamily='Times New Roman' lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>FarZ</mi>
+            <mo fontfamily='Times New Roman' lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>NearZ</mi>
+          </mrow>
+          <mrow>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>NearZ</mi>
+            <mo fontfamily='Times New Roman'>&minus;</mo>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>FarZ</mi>
+          </mrow>
+        </mfrac>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi>A</mi>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mn>1</mn>
+        <mo>&minus;</mo>
+        <mfrac>
+          <mi>B</mi>
+          <mi>NearZ</mi>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mn>1</mn>
+        <mo>&minus;</mo>
+        <mfrac>
+          <mrow>
+            <mn>2</mn>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>FarZ</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>NearZ</mi>
+          </mrow>
+          <mrow>
+            <mi>NearZ</mi>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mo stretchy='false'>(</mo>
+            <mi>NearZ</mi>
+            <mo>&minus;</mo>
+            <mi>FarZ</mi>
+            <mo stretchy='false'>)</mo>
+          </mrow>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mn>1</mn>
+        <mtext fontfamily='Times New Roman'>−</mtext>
+        <mfrac>
+          <mrow>
+            <mn>2</mn>
+            <mo lspace='2px' rspace='2px'>&sdot;</mo>
+            <mi>FarZ</mi>
+          </mrow>
+          <mrow>
+            <mi>NearZ</mi>
+            <mo>&minus;</mo>
+            <mi>FarZ</mi>
+          </mrow>
+        </mfrac>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mfrac>
+          <mrow>
+            <mtext fontfamily='Times New Roman'>−</mtext>
+            <mi>NearZ</mi>
+            <mo fontfamily='Times New Roman'>+</mo>
+            <mi>FarZ</mi>
+            <mtext fontfamily='Times New Roman'>−</mtext>
+            <mrow>
+              <mn>2</mn>
+              <mo lspace='2px' rspace='2px'>&sdot;</mo>
+              <mi>FarZ</mi>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mi>NearZ</mi>
+            <mo>&minus;</mo>
+            <mi>FarZ</mi>
+          </mrow>
+        </mfrac>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi mathvariant='normal' fontfamily='Times New Roman'>A</mi>
+        <mo fontfamily='Times New Roman'>=</mo>
+        <mfrac>
+          <mrow>
+            <mo fontfamily='Times New Roman'>&minus;</mo>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>NearZ</mi>
+            <mo fontfamily='Times New Roman'>&minus;</mo>
+            <mrow>
+              <mi mathvariant='normal' fontfamily='Times New Roman'>FarZ</mi>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>NearZ</mi>
+            <mo fontfamily='Times New Roman'>&minus;</mo>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>FarZ</mi>
+          </mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

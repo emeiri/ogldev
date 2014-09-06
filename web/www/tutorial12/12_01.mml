@@ -1,0 +1,42 @@
+<math display = 'block'>
+  <mrow>
+    <tan/>
+    <mo stretchy='false'>(</mo>
+    <mfrac>
+      <mi>&alpha;</mi>
+      <mn>2</mn>
+    </mfrac>
+    <mo stretchy='false'>)</mo>
+    <mo>=</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mi>d</mi>
+    </mfrac>
+    <mo lspace='3px' rspace='3px'>&rArr;</mo>
+    <mi>d</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mtable columnalign='left' linebreak='true'>
+        <mtr>
+          <mtd>
+            <tan/>
+            <mo stretchy='false'>(</mo>
+            <mfrac>
+              <mi>&alpha;</mi>
+              <mn>2</mn>
+            </mfrac>
+            <mo stretchy='false'>)</mo>
+            <mo>:</mo>
+            <mi>bd</mi>
+          </mtd>
+        </mtr>
+        <mtr>
+          <mtd>
+            <mo>:</mo>
+          </mtd>
+        </mtr>
+      </mtable>
+    </mfrac>
+  </mrow>
+</math>

@@ -1,0 +1,126 @@
+<math display = 'block'>
+  <mrow>
+    <vector>
+      <csymbol>
+        <msub>
+          <mi>E</mi>
+          <msub>
+            <mn>1</mn>
+            <mi>x</mi>
+          </msub>
+        </msub>
+        <msub>
+          <mrow>
+            <mtext fontfamily='Times New Roman'>&nbsp;&nbsp;</mtext>
+            <mi>E</mi>
+          </mrow>
+          <msub>
+            <mn>1</mn>
+            <mi>y</mi>
+          </msub>
+        </msub>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msub>
+          <mi>E</mi>
+          <msub>
+            <mn>1</mn>
+            <mi>z</mi>
+          </msub>
+        </msub>
+      </csymbol>
+      <csymbol>
+        <msub>
+          <mi>E</mi>
+          <msub>
+            <mn>2</mn>
+            <mi>x</mi>
+          </msub>
+        </msub>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msub>
+          <mi>E</mi>
+          <msub>
+            <mn>2</mn>
+            <mi>y</mi>
+          </msub>
+        </msub>
+        <msub>
+          <mi>E</mi>
+          <msub>
+            <mn>2</mn>
+            <mi>z</mi>
+          </msub>
+        </msub>
+      </csymbol>
+    </vector>
+    <mo>=</mo>
+    <matrix>
+      <matrixrow>
+        <csymbol>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>&Delta;</mi>
+          <msub>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>U</mi>
+            <mn fontfamily='Times New Roman'>1</mn>
+          </msub>
+        </csymbol>
+        <csymbol>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>&Delta;</mi>
+          <msub>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>V</mi>
+            <mn fontfamily='Times New Roman'>1</mn>
+          </msub>
+        </csymbol>
+      </matrixrow>
+      <matrixrow>
+        <csymbol>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>&Delta;</mi>
+          <msub>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>U</mi>
+            <mn fontfamily='Times New Roman'>2</mn>
+          </msub>
+        </csymbol>
+        <csymbol>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>&Delta;</mi>
+          <msub>
+            <mi mathvariant='normal' fontfamily='Times New Roman'>V</mi>
+            <mn fontfamily='Times New Roman'>2</mn>
+          </msub>
+        </csymbol>
+      </matrixrow>
+    </matrix>
+    <vector>
+      <csymbol>
+        <msub>
+          <mi>T</mi>
+          <mi>x</mi>
+        </msub>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msub>
+          <mi>T</mi>
+          <mi>y</mi>
+        </msub>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msub>
+          <mi>T</mi>
+          <mi>z</mi>
+        </msub>
+      </csymbol>
+      <csymbol>
+        <msub>
+          <mi>B</mi>
+          <mi>x</mi>
+        </msub>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msub>
+          <mi>B</mi>
+          <mi>y</mi>
+        </msub>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msub>
+          <mi>B</mi>
+          <mi>z</mi>
+        </msub>
+      </csymbol>
+    </vector>
+  </mrow>
+</math>

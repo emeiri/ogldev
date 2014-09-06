@@ -1,0 +1,185 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <mn>0</mn>
+        <mo lspace='3px' rspace='3px'>&le;</mo>
+        <mi>Intensity</mi>
+        <mo lspace='3px' rspace='3px'>&le;</mo>
+        <mn>1</mn>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi>Light</mi>
+        <mo>=</mo>
+        <mi>R</mi>
+        <mo>,</mo>
+        <mi>G</mi>
+        <mo>,</mo>
+        <mi>B</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp; &nbsp; &nbsp;</mtext>
+        <mo stretchy='false'>(</mo>
+        <mn>0</mn>
+        <mo lspace='3px' rspace='3px'>&le;</mo>
+        <mi>R</mi>
+        <mo>,</mo>
+        <mi>G</mi>
+        <mo>,</mo>
+        <mi>B</mi>
+        <mo lspace='3px' rspace='3px'>&le;</mo>
+        <mn>1</mn>
+        <mo stretchy='false'>)</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi>C</mi>
+        <mo>=</mo>
+        <mi>max</mi>
+        <mo stretchy='false'>(</mo>
+        <mi>R</mi>
+        <mo>,</mo>
+        <mi>G</mi>
+        <mo>,</mo>
+        <mi>B</mi>
+        <mo stretchy='false'>)</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mrow></mrow>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mfrac>
+          <mrow>
+            <mi>C</mi>
+            <mo>&lowast;</mo>
+            <mi>Intensity</mi>
+          </mrow>
+          <mi>Attenuation</mi>
+        </mfrac>
+        <mo>=</mo>
+        <mfrac>
+          <mn>1</mn>
+          <mn>256</mn>
+        </mfrac>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mi>Attenuation</mi>
+        <mo>=</mo>
+        <mn>256</mn>
+        <mo>&lowast;</mo>
+        <mi>C</mi>
+        <mo>&lowast;</mo>
+        <mi>Intensity</mi>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mrow></mrow>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mi>Constant</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo>+</mo>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mi>Linear</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo>&lowast;</mo>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mi>Distance</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo>+</mo>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mi>Exp</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo>&lowast;</mo>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msup>
+          <mi>Distance</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>=</mo>
+        <mn>256</mn>
+        <mo>&lowast;</mo>
+        <mi>C</mi>
+        <mo>&lowast;</mo>
+        <mi>Intensity</mi>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mi>Exp</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo>&lowast;</mo>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <msup>
+          <mi>Distance</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>+</mo>
+        <mi>Linear</mi>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mo>&lowast;</mo>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mi>Distance</mi>
+        <mo>+</mo>
+        <mi>Constant</mi>
+        <mo>&minus;</mo>
+        <mn>256</mn>
+        <mo>&lowast;</mo>
+        <mi>C</mi>
+        <mo>&lowast;</mo>
+        <mi>Intensity</mi>
+        <mo>=</mo>
+        <mn>0</mn>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mo lspace='3px' rspace='3px'>&rArr;</mo>
+        <mi>Distance</mi>
+        <mo>=</mo>
+        <mfrac>
+          <mrow>
+            <mo>&minus;</mo>
+            <mi>Linear</mi>
+            <mo>+</mo>
+            <msqrt>
+              <mrow>
+                <msup>
+                  <mi>Linear</mi>
+                  <mn>2</mn>
+                </msup>
+                <mo>&minus;</mo>
+                <mn>4</mn>
+                <mo>&lowast;</mo>
+                <mi>Exp</mi>
+                <mo>&lowast;</mo>
+                <mo stretchy='false'>(</mo>
+                <mi>Constant</mi>
+                <mo>&minus;</mo>
+                <mn>256</mn>
+                <mo>&lowast;</mo>
+                <mi>C</mi>
+                <mo>&lowast;</mo>
+                <mi>Intensity</mi>
+                <mo stretchy='false'>)</mo>
+              </mrow>
+            </msqrt>
+          </mrow>
+          <mrow>
+            <mn>2</mn>
+            <mo>&lowast;</mo>
+            <mi>Exp</mi>
+          </mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

@@ -1,0 +1,63 @@
+<math display = 'block'>
+  <mrow>
+    <matrix>
+      <matrixrow>
+        <cn>1</cn>
+        <ci>a</ci>
+        <ci>b</ci>
+      </matrixrow>
+      <matrixrow>
+        <ci>c</ci>
+        <cn>1</cn>
+        <ci>d</ci>
+      </matrixrow>
+      <matrixrow>
+        <ci>e</ci>
+        <ci>f</ci>
+        <cn>1</cn>
+      </matrixrow>
+    </matrix>
+    <mtext>.</mtext>
+    <vector>
+      <ci>x</ci>
+      <ci>y</ci>
+      <ci>z</ci>
+    </vector>
+    <mo>=</mo>
+    <vector>
+      <csymbol>
+        <mtext>x</mtext>
+        <mo>+</mo>
+        <mtext>a</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>y</mtext>
+        <mo>+</mo>
+        <mtext>b</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>z</mtext>
+      </csymbol>
+      <csymbol>
+        <mtext>c</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>x</mtext>
+        <mo>+</mo>
+        <mtext>y</mtext>
+        <mo>+</mo>
+        <mtext>d</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>z</mtext>
+      </csymbol>
+      <csymbol>
+        <mtext>e</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>x</mtext>
+        <mo>+</mo>
+        <mtext>f</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>y</mtext>
+        <mo>+</mo>
+        <mtext>z</mtext>
+      </csymbol>
+    </vector>
+  </mrow>
+</math>

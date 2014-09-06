@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	
+<link rel="stylesheet" type="text/css" href="../balloontip.css" />
+<script type="text/javascript" src="../balloontip.js">
+/***********************************************
+* Rich HTML Balloon Tooltip- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+***********************************************/
+</script>
+<div id="prev" class="balloonstyle">
+<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Previous Tutorial
+</div>
+<div id="home" class="balloonstyle">
+<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Home
+</div>
+<div id="next" class="balloonstyle">
+<img src="shadetabs.gif" style="float: left; margin-left: 5px; border:1px solid black" />Next Tutorial
+</div>
+
+<table width=100% >
+<tr>
+	<td width=34%><div align=left"><a href="../tutorial13/tutorial13.html" rel="prev"><img src="../prev.jpg"></a></div></td>
+	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
+    <td width=33%><div align=right><a href="../tutorial15/tutorial15.html" rel="next"><img src="../next.jpg"></a></div></td>
+</tr>
+</table>
+	
+<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+<title>Tutorial 14</title>
+</head>
+<body>
+<h1>Tutorial 14 - Camera Control - Part 1</h1>
+<div style="text-align: center;"><span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> </div>
+<h2>Background</h2>
+<p>In the previous tutorial we learned how to position the camera anywhere in the 3D world. The next logical step is to allow the user to control it. 
+Movement will be unrestricted - the user will be able to move in all directions. Controlling the camera will be done using two input devices - the keyboard will
+control our position and the mouse will change our view target. This is very similar to what most first person shooters are doing. This tutorial will focus
+on the keyboard and the next one on the mouse.</p>
+<p>We are going to support the four directional keys in the conventional manner. Remember that our camera transformation is defined by position, target vector and up vector. 
+When we move using the keyboard we only change our position. We cannot tilt the camera or turn it so the target and up vectors are uneffected.</p>
+<p>To control the keyboard we will use another GLUT API: glutSpecialFunc(). This function registers a callback that is triggered when a "special" key is clicked.
+The group of special keys include the function, directional and PAGE-UP/PAGE-DOWN/HOME/END/INSERT keys. If you want to trap a regular key (characters and digits)
+use glutKeyboardFunc().</p>
+<h2>Code Walkthru</h2>
+<p>The camera functionality is encapsulated in the Camera class. This class stores the attributes of the camera and can change them based on movement events that
+it receives. The attributes are fetched by the pipeline class that generates the transformation matrix from them.</p>
+<p>(Camera.h)</p>
+<code>
+class Camera<br>
+{<br>
+public:<br>
+<br>
+ &nbsp;&nbsp;&nbsp;   Camera();<br>
+ &nbsp;&nbsp;&nbsp;   Camera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);<br>
+ &nbsp;&nbsp;&nbsp;   bool OnKeyboard(int Key);<br>
+ &nbsp;&nbsp;&nbsp;   const Vector3f& GetPos() const<br>
+ &nbsp;&nbsp;&nbsp;   const Vector3f& GetTarget() const<br>
+ &nbsp;&nbsp;&nbsp;   const Vector3f& GetUp() const<br>
+<br>
+private:<br>
+<br>
+ &nbsp;&nbsp;&nbsp;   Vector3f m_pos;<br>
+ &nbsp;&nbsp;&nbsp;   Vector3f m_target;<br>
+ &nbsp;&nbsp;&nbsp;   Vector3f m_up;<br>
+};<br>
+</code>
+
+<p>This is the declaration of the Camera class. It stores the three attributes that define the camera - position, target vector and up vector. Two constructors are available.
+The default one simply places the camera at the origin looking down the positive Z axe with an up vector that points to the "sky" (0,1,0). There is also an option to create a camera
+with specific attribute values. The OnKeyboard() function supplies keyboard events to the Camera class. It returns a boolean value which indicates whether the event was consumed by the
+class. If the key is relevant (one of the directional keys) the return value is true. If not - false. This way you can build a chain of clients that receive a keyboard event and stop
+after reaching the first client that actually does something with the specific event.</p>
+<p>(Camera.cpp:42)</p>
+<code>
+bool Camera::OnKeyboard(int Key)<br>
+{<br>
+  &nbsp;&nbsp;&nbsp;   bool Ret = false;<br>
+<br>
+  &nbsp;&nbsp;&nbsp;   switch (Key) {<br>
+<br>
+  &nbsp;&nbsp;&nbsp;   case GLUT_KEY_UP:<br>
+  &nbsp;&nbsp;&nbsp;       {<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           m_pos += (m_target * StepSize);<br>
+  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;          Ret = true;<br>
+  &nbsp;&nbsp;&nbsp;       }<br>
+  &nbsp;&nbsp;&nbsp;       break;<br>
+<br>
+  &nbsp;&nbsp;&nbsp;   case GLUT_KEY_DOWN:<br>
+  &nbsp;&nbsp;&nbsp;       {<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           m_pos -= (m_target * StepSize);<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Ret = true;<br>
+  &nbsp;&nbsp;&nbsp;       }<br>
+  &nbsp;&nbsp;&nbsp;       break;<br>
+<br>
+  &nbsp;&nbsp;&nbsp;   case GLUT_KEY_LEFT:<br>
+  &nbsp;&nbsp;&nbsp;       {<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Vector3f Left = m_target.Cross(m_up);<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Left.Normalize();<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Left *= StepSize;<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           m_pos += Left;<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Ret = true;<br>
+  &nbsp;&nbsp;&nbsp;       }<br>
+  &nbsp;&nbsp;&nbsp;       break;<br>
+<br>
+  &nbsp;&nbsp;&nbsp;   case GLUT_KEY_RIGHT:<br>
+  &nbsp;&nbsp;&nbsp;       {<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Vector3f Right = m_up.Cross(m_target);<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Right.Normalize();<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Right *= StepSize;<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           m_pos += Right;<br>
+  &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;           Ret = true;<br>
+  &nbsp;&nbsp;&nbsp;       }<br>
+  &nbsp;&nbsp;&nbsp;       break;<br>
+  &nbsp;&nbsp;&nbsp;   }<br>
+<br>
+  &nbsp;&nbsp;&nbsp;   return Ret;<br>
+}<br>
+</code>
+<p>This function move the camera according to keyboard events.
+GLUT defines macros that correspond to the directional keys and this is what the switch statement is based on. Unfortunately, the type of these macros is a simple 'int' rather than an enum.
+<p>Forward and backward movements are the simplest. Since movement is always along the target vector we only need to add or substract the target vector from the position. The
+target vector itself remains unchanged. Note that before adding or substracting the target vector we scale it by a constant value called 'StepSize'. We do it for all directional keys. StepSize
+provides a central point to change the speed (in the future we may change this into a class attribute). To make StepSize consistent we make sure that we always multiply it by unit length vectors
+(i.e. we must make sure the target and up vectors are unit length).</p>  
+<p>Sideways movement is a bit more complex. It is defined as a movement along a vector which is perpendicular to the plane created by the target and up vectors. This plane divides the three-dimensional
+space into two parts and there are two vectors that are perpendicular to it and are opposite to one another. We can call one of them "left" and the other "right". They are generated using a cross
+product of the target and up vectors in the two possible combinations: target cross up and up cross target (cross product is a non commutative operation - changing the order of parameters can generate
+different result). After getting the left/right vector we normalize it, scale it by the StepSize and add it to the position (which moves it in the left/right direction). 
+Again, the target and up vectors are uneffected.</p>
+<p>Note that the operations in this function make use of a few new operators such as '+=' and '-=' that have been added to the Vector3f class.</p>
+<p>(tutorial14.cpp:73)</p>
+<code>
+static void SpecialKeyboardCB(int Key, int x, int y)<br>
+{<br>
+   &nbsp;&nbsp;&nbsp;   GameCamera.OnKeyboard(Key);<br>
+}<br>
+<br>
+<br>
+static void InitializeGlutCallbacks()<br>
+{<br>
+  &nbsp;&nbsp;&nbsp;    glutDisplayFunc(RenderSceneCB);<br>
+  &nbsp;&nbsp;&nbsp;    glutIdleFunc(RenderSceneCB);<br>
+    &nbsp;&nbsp;&nbsp;  glutSpecialFunc(SpecialKeyboardCB);<br>
+}<br>
+</code>
+<p>Here we register a new callback to handle the special keyboard events. The callback receives the key and the location of the mouse at the time of the key press. We ignore the mouse position and pass 
+the event on to an instance of the camera class which was already allocated on the global section of the file.</p>
+<p>(tutorial14.cpp:55)</p>
+<code>p.SetCamera(GameCamera.GetPos(), GameCamera.GetTarget(), GameCamera.GetUp());</code>
+<p>Previously we initialized the camera parameters in the Pipeline class using a hard coded vectors. Now these vectors are dropped and the camera attributes are fetched directly from the Camera class.</p>
+</body>
+</html>
