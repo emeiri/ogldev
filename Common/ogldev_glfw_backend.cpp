@@ -162,7 +162,7 @@ void GLFWErrorCallback(int error, const char* description)
 #else
     fprintf(stderr, "GLFW error %d - %s", error, description);
 #endif    
-
+    exit(0);
 }
 
 void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
@@ -182,11 +182,7 @@ void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
     printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
     
     glfwSetErrorCallback(GLFWErrorCallback);
-    
-//    glfwWindowHint( GLFW_OPENGL_VERSION_MAJOR, 3 );
-  //  glfwOpenWindowHint( GLFW_OPENGL_VERSION_MINOR, 3 );
-  //  glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    }
+}
 
 
 void GLFWBackendTerminate()
@@ -241,6 +237,7 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 
     while (!glfwWindowShouldClose(s_pWindow)) {
         s_pCallbacks->RenderSceneCB();        
+        glfwSwapBuffers(s_pWindow);
         glfwPollEvents();
     }
 }
@@ -248,7 +245,7 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
 
 void GLFWBackendSwapBuffers()
 {
-    glfwSwapBuffers(s_pWindow);
+    // Nothing to do here
 }
 
 

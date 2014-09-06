@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include "mesh.h"
+#include "engine_common.h"
 
 using namespace std;
 
@@ -242,7 +243,7 @@ void Mesh::Render()
         assert(MaterialIndex < m_Textures.size());
         
         if (m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+            m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES, 
