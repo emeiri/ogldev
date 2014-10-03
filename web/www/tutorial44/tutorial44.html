@@ -191,8 +191,13 @@ void GLFWBackendTerminate()<br>
 {<br>
 &nbsp; &nbsp;     glfwDestroyWindow(s_pWindow);<br>
 &nbsp; &nbsp;     glfwTerminate();<br>
-}
-   
+} 
 </code>
+<p>
+This is how we shutdown the GLFW backend. First we destroy the window and after that
+we terminate the GLFW library and free all of its resources. 
+No call to GLFW can be done after that which is why this has to be the last thing we
+do in the main function (graphics-wise).
+</p>
 </body>
 </html>
