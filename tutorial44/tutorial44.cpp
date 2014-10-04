@@ -70,8 +70,8 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(0.0f, 0.0f, -5.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
+        Vector3f Pos(0.0f, 23.0f, -5.0f);
+        Vector3f Target(-1.0f, 0.0f, 0.1f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -93,9 +93,10 @@ public:
         }
                 
 #ifndef WIN32
-        if (!m_fontRenderer.InitFontRenderer()) {
-            return false;
-        }
+        // Disabled for now because it somehow clashes with the regular rendering...
+ //       if (!m_fontRenderer.InitFontRenderer()) {
+   //         return false;
+   //     }
 #endif        	      
         return true;
     }
@@ -121,7 +122,7 @@ public:
        
         m_mesh.Render();        
         	
-        RenderFPS();     
+    //    RenderFPS();     
         CalcFPS();
         
         OgldevBackendSwapBuffers();

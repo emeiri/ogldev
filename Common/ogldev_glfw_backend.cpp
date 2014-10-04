@@ -97,7 +97,6 @@ static OGLDEV_KEY GLFWKeyToOGLDEVKey(uint Key)
             return OGLDEV_KEY_F12;
         default:
             OGLDEV_ERROR("Unimplemented OGLDEV key");
-            exit(1);
     }
     
     return OGLDEV_KEY_UNDEFINED;
@@ -192,7 +191,7 @@ void GLFWBackendTerminate()
 }
 
 
-bool GLFWBackendCreateWindow(unsigned int Width, unsigned int Height, bool isFullScreen, const char* pTitle)
+bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle)
 {
     GLFWmonitor* pMonitor = isFullScreen ? glfwGetPrimaryMonitor() : NULL;
 

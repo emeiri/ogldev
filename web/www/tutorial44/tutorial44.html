@@ -25,7 +25,7 @@
     In the first tutorial we learned that OpenGL doesn't deal directly with windowing and
     that this responsibility is left to other APIs (GLX, WGL, etc). To make life simpler
     for ourselves we used GLUT to handle the windowing API. This makes our tutorials
-    portable between different OSs. We've been using GLUT exclusively. Until today.
+    portable between different OSs. We've been using GLUT exclusively, until today.
     We are now going to take a look at another popular library that handles the same stuff
     as GLUT. This library is called GLFW and is hosted at <a href=http://www.glfw.org>www.glfw.org</a>.
     One of the main differences between the two libraries is that GLFW is more modern and is
@@ -36,36 +36,44 @@
     Since there is no mathematical background for this tutorial we can go right ahead
     and review the code. What I've done here is to abstract the contents of glut_backend.h and
     glut_backend.cpp behind a general "backend" API that wraps the details of setting
-    up the window and handling the input from mouse and keyboard. You can easily switch between a GLUT
+    up the window and handling the input from the mouse and keyboard. You can easily switch between a GLUT
     backend and a GLFW backend and this gives a very nice flexibility for future tutorials.
 </p>
 <p>
-    In order to install GLFW on Fedora Core you simply run 'yum install glfw glfw-devel' as root
-    from the command line. TODO Ubuntu. If you're using Windows simply use the GLFW headers
-    and libraries that I provide as part of the source package. This tutorial should build out
-    of the box (please let me know if it doesn't...).
+    In order to install GLFW (run as root):
+</p>
+<ul>
+    <li>On Fedora Core: yum install glfw glfw-devel</li>
+    <li>On Ubuntu: apt-get install libglfw3 libglfw3-dev</li>
+    <li>Other Linux distributions also provide binary packages of GLFW. Alternatively, you
+        can grab the sources directly from GLFW website and build them.</li>        
+</ul>
+<p>
+    If you're using Windows simply use the GLFW headers
+    and libraries that I provide as part of the <a href="http://ogldev.atspace.co.uk/ogldev-source.zip">source package</a>. 
+    This tutorial should build out of the box (please let me know if it doesn't...).
 </p>
 <p>
     In order to build stuff aginst the GLFW library you must tell the compiler where the headers
-    and libraries are located. On Linux my recommendation is to use the pkg-config utility:<br>
-    pkg-config --cflags --libs glfw3<br>
+    and libraries are located. On Linux my recommendation is to use the pkg-config utility:<br><br>
+    pkg-config --cflags --libs glfw3<br><br>
     The '--cflags' flag tells pkg-config to output the flags GCC needs to compile a file that
     uses GLFW. The '--libs' flags outputs the flags required for linking. I'm using these
-    flags in the Netbeans project that I provide and you can use them in your own makefile
-    as well. If you're using one of the build systems such as autotools, cmake or scons you
+    flags in the Netbeans project that I provide for Linux and you can use them in your own makefile. 
+    If you're using one of the build systems such as autotools, cmake or scons you
     will need to check that system documentation for details.
 </p>
 <h2>Code Walkthru</h2>
-<p>(ogldev_glfw_backend.cpp:)</p>
+<p>(ogldev_glfw_backend.cpp:24)</p>
 <code>
-#define GLFW_DLL
+#define GLFW_DLL<br>
 #include <GLFW/glfw3.h>
 </code>
 <p>
-    This is how you include GLFW in your application. GLFW_DLL is required on Windows
-    for it to function is a DLL.
+    This is how you include GLFW in your application. The 'GLFW_DLL' macro is required on Windows
+    for using GLFW as a DLL.
 </p>
-<p>(ogldev_glfw_backend.cpp:)</p>
+<p>(ogldev_glfw_backend.cpp:168)</p>
 <code>
     void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)<br>
 {<br>
@@ -94,9 +102,9 @@
     a general error callback. If anything goes wrong we will print the error and
     exit.
 </p>
-<p>(ogldev_glfw_backend.cpp:)</p>
+<p>(ogldev_glfw_backend.cpp:195)</p>
 <code>
-    bool GLFWBackendCreateWindow(unsigned int Width, unsigned int Height, bool isFullScreen, const char* pTitle)<br>
+    bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle)<br>
 {<br>
 &nbsp; &nbsp;     GLFWmonitor* pMonitor = isFullScreen ? glfwGetPrimaryMonitor() : NULL;<br>
 <br>
@@ -126,8 +134,8 @@
     the monitor to use. 'GLFWmonitor' is an opaque GLFW object that represents the physical monitor.
     GLFW support multi-monitor setups and for such cases the function <a href="http://www.glfw.org/docs/latest/group__monitor.html#ga3fba51c8bd36491d4712aa5bd074a537">
         glfwGetMonitors</a> returns a list of all the available monitors. If we pass a NULL monitor pointer
-        we will get a regular window; if we pass a pointer to an actual monitors (which we easily get
-        using <a href="http://www.glfw.org/docs/latest/group__monitor.html#ga721867d84c6d18d6790d64d2847ca0b1">glfwGetPrimaryMonitor</a>)
+        we will get a regular window; if we pass a pointer to an actual monitor (we get the default using 
+        <a href="http://www.glfw.org/docs/latest/group__monitor.html#ga721867d84c6d18d6790d64d2847ca0b1">glfwGetPrimaryMonitor</a>)
         we get a full screen window. Very simple. The fifth and last parameter is used for context sharing which is
         out of scope for this tutorial.        
 </p>
@@ -136,7 +144,7 @@
     calling thread. We accomplish this using <a href="http://www.glfw.org/docs/latest/group__context.html#ga1c04dc242268f827290fe40aa1c91157">glfwMakeContextCurrent</a>.
     Finally, we initialize GLEW.
 </p>
-<p>(ogldev_glfw_backend.cpp:)</p>
+<p>(ogldev_glfw_backend.cpp:238)</p>
 <code>
     while (!glfwWindowShouldClose(s_pWindow)) { <br>
 &nbsp; &nbsp;         // OpenGL API calls go here...  <br>
@@ -146,13 +154,13 @@
 </code>
 <p>
     Unlike GLUT, GLFW doesn't provide its own main loop function. Therefore, we construct
-    it using the above code which is part of wrapper function called GLFWBackendRun.
-    s_pWindow is a pointer to a GLFW window previously created using glfwCreateWindow.
+    it using the above code which is part of wrapper function called GLFWBackendRun().
+    s_pWindow is a pointer to a GLFW window previously created using glfwCreateWindow().
     In order for the application to signal the end of this loop the function
     <a href="http://www.glfw.org/docs/latest/group__window.html#ga24e02fbfefbb81fc45320989f8140ab5">glfwSetWindowShouldClose</a>
     is available to the application via the wrapper function GLFWBackendLeaveMainLoop().
 </p>
-<p>(ogldev_glfw_backend.cpp:)</p>
+<p>(ogldev_glfw_backend.cpp:122)</p>
 <code>
 static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)<br>
 {   <br>
@@ -179,11 +187,11 @@ static void InitCallbacks()<br>
     What we see above is the initialization of our keyboard and mouse callbacks.
     If you are interested in using GLFW exclusively in your application simply
     review the documentation <a href="http://www.glfw.org/docs/latest/group__input.html">here<a/>
-    for information about the values of Button, Action, Mode, etc. In the case of OGLDEV
+    for information about the values of Button, Action, Mode, etc. For my tutorials
     I have created a set of enums to describe the various keyboard and mouse keys and
     translated GLFW to these enums. I have done the same for GLUT and this provides
     the commonality which lets the same application code quickly switch from one backend
-    to the other. 
+    to the other (see the implementation of the above functions in the code for further details).  
 </p>
 <p>(ogldev_glfw_backend.cpp:)</p>
 <code>
@@ -198,6 +206,32 @@ This is how we shutdown the GLFW backend. First we destroy the window and after 
 we terminate the GLFW library and free all of its resources. 
 No call to GLFW can be done after that which is why this has to be the last thing we
 do in the main function (graphics-wise).
+</p>
+<p>(ogldev_backend.h)</p>
+<code>
+enum OGLDEV_BACKEND_TYPE {<br>
+&nbsp; &nbsp;     OGLDEV_BACKEND_TYPE_GLUT,<br>
+&nbsp; &nbsp; OGLDEV_BACKEND_TYPE_GLFW<br>
+};<br>
+<br>
+void OgldevBackendInit(OGLDEV_BACKEND_TYPE BackendType, int argc, char** argv, bool WithDepth, bool WithStencil);<br>
+<br>
+void OgldevBackendTerminate();<br>
+<br>
+bool OgldevBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle);<br>
+<br>
+void OgldevBackendRun(ICallbacks* pCallbacks);<br>
+<br>
+void OgldevBackendLeaveMainLoop();<br>
+<br>
+void OgldevBackendSwapBuffers();
+</code>    
+<p>
+    I have created a new backend interface which we see in the above header file.
+    These functions replace the GLUT specific code which we have been using. They are
+    implemented in ogldev_backend.cpp in the Common project and are essentially redirections
+    into GLUT or GLFW. You select the backend using OgldevBackendInit() and after that
+    everything is transparent.
 </p>
 </body>
 </html>
