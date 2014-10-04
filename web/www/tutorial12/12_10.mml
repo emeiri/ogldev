@@ -1,0 +1,25 @@
+<math display = 'block'>
+  <mrow>
+    <mi>a</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>X</mi>
+    <mo>+</mo>
+    <mi>b</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>Y</mi>
+    <mo>+</mo>
+    <mi>c</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>Z</mi>
+    <mo>+</mo>
+    <mi>d</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>W</mi>
+    <mo>=</mo>
+    <mi>A</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>Z</mi>
+    <mo>+</mo>
+    <mi>B</mi>
+  </mrow>
+</math>

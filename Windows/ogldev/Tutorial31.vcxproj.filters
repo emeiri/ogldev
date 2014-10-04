@@ -15,28 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial31\callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial31\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial31\engine_common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial31\glut_backend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial31\lighting_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial31\math_3d.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial31\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial31\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial31\render_callbacks.h">
@@ -44,22 +29,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial31\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial31\glut_backend.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial31\lighting_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial31\math_3d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial31\mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial31\pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial31\tutorial31.cpp">

@@ -11,13 +11,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\camera.cpp" />
     <ClCompile Include="..\..\Common\cubemap_texture.cpp" />
+    <ClCompile Include="..\..\Common\glut_backend.cpp" />
+    <ClCompile Include="..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_app.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_backend.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_glfw_backend.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\ogldev_app.h" />
+    <ClInclude Include="..\..\Include\ogldev_backend.h" />
+    <ClInclude Include="..\..\Include\ogldev_callbacks.h" />
+    <ClInclude Include="..\..\Include\ogldev_camera.h" />
     <ClInclude Include="..\..\Include\ogldev_cubemap_texture.h" />
+    <ClInclude Include="..\..\Include\ogldev_glfw_backend.h" />
+    <ClInclude Include="..\..\Include\ogldev_glut_backend.h" />
+    <ClInclude Include="..\..\Include\ogldev_keys.h" />
+    <ClInclude Include="..\..\Include\ogldev_math_3d.h" />
+    <ClInclude Include="..\..\Include\ogldev_pipeline.h" />
     <ClInclude Include="..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />
@@ -59,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include;$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include;$(ProjectDir)\..\..\Include\assimp;$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

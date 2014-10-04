@@ -11,24 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial39\callbacks.h" />
-    <ClInclude Include="..\..\tutorial39\camera.h" />
     <ClInclude Include="..\..\tutorial39\engine_common.h" />
-    <ClInclude Include="..\..\tutorial39\glut_backend.h" />
     <ClInclude Include="..\..\tutorial39\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial39\math_3d.h" />
     <ClInclude Include="..\..\tutorial39\mesh.h" />
-    <ClInclude Include="..\..\tutorial39\ogldev_types.h" />
-    <ClInclude Include="..\..\tutorial39\pipeline.h" />
     <ClInclude Include="..\..\tutorial39\silhouette_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial39\camera.cpp" />
-    <ClCompile Include="..\..\tutorial39\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial39\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial39\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial39\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial39\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial39\silhouette_technique.cpp" />
     <ClCompile Include="..\..\tutorial39\tutorial39.cpp" />
   </ItemGroup>

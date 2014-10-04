@@ -1,0 +1,14 @@
+<math display = 'block'>
+  <mrow>
+    <mi>f</mi>
+    <mo stretchy='false'>(</mo>
+    <mi>z</mi>
+    <mo stretchy='false'>)</mo>
+    <mo>=</mo>
+    <mi>A</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>z</mi>
+    <mo>+</mo>
+    <mi>B</mi>
+  </mrow>
+</math>

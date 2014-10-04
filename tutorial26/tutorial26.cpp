@@ -23,19 +23,19 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
 
-class Tutorial26 : public ICallbacks
+class Tutorial26 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -165,36 +165,26 @@ public:
     }
 
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
-    
-
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-            
-            case 'b':
-                m_bumpMapEnabled = !m_bumpMapEnabled;
-                break;
-        }
-    }
+	void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
+		case OGLDEV_KEY_b:
+			m_bumpMapEnabled = !m_bumpMapEnabled;
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
 
  private:
 
@@ -214,9 +204,9 @@ public:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 26")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 26")) {
         return 1;
     }
 

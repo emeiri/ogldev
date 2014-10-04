@@ -18,7 +18,7 @@
 #ifndef LIGHTS_COMMON_H
 #define	LIGHTS_COMMON_H
 
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 struct BaseLight
 {

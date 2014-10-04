@@ -1,0 +1,20 @@
+<math display = 'block'>
+  <mrow>
+    <msup>
+      <mi>Q</mi>
+      <mrow>
+        <mo>&minus;</mo>
+        <mn>1</mn>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+    <mo>&minus;</mo>
+    <mi>xi</mi>
+    <mo>&minus;</mo>
+    <mi>yj</mi>
+    <mo>&minus;</mo>
+    <mi>zk</mi>
+    <mo>+</mo>
+    <mi>w</mi>
+  </mrow>
+</math>

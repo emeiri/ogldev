@@ -65,6 +65,9 @@ FontRenderer::FontRenderer()
     
 FontRenderer::FontRenderer(const Markup& markup)
 {
+    m_pManager = NULL;    
+    m_pFont = NULL;    
+    m_pTextBuffer = NULL;        
     m_markup = markup;
 }
 

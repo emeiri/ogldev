@@ -19,7 +19,7 @@
 #define	SILHOUETTE_TECHNIQUE_H
 
 #include "technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 class SilhouetteTechnique : public Technique {
 public:

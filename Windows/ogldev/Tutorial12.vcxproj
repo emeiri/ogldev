@@ -11,11 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial12\math_3d.h" />
-    <ClInclude Include="..\..\tutorial12\pipeline.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\tutorial12\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial12\tutorial12.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +65,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\assimp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

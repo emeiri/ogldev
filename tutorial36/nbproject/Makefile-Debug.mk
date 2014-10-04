@@ -35,16 +35,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/ds_dir_light_pass_tech.o \
 	${OBJECTDIR}/ds_geom_pass_tech.o \
 	${OBJECTDIR}/ds_light_pass_tech.o \
 	${OBJECTDIR}/ds_point_light_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
-	${OBJECTDIR}/glut_backend.o \
-	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/mesh.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial36.o
 
 
@@ -74,11 +70,6 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial36: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial36 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`
 
-${OBJECTDIR}/camera.o: camera.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
 ${OBJECTDIR}/ds_dir_light_pass_tech.o: ds_dir_light_pass_tech.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -104,25 +95,10 @@ ${OBJECTDIR}/gbuffer.o: gbuffer.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/gbuffer.o gbuffer.cpp
 
-${OBJECTDIR}/glut_backend.o: glut_backend.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
-
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/tutorial36.o: tutorial36.cpp 
 	${MKDIR} -p ${OBJECTDIR}

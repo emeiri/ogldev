@@ -11,23 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial23\callbacks.h" />
-    <ClInclude Include="..\..\tutorial23\camera.h" />
-    <ClInclude Include="..\..\tutorial23\glut_backend.h" />
     <ClInclude Include="..\..\tutorial23\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial23\math_3d.h" />
     <ClInclude Include="..\..\tutorial23\mesh.h" />
-    <ClInclude Include="..\..\tutorial23\pipeline.h" />
     <ClInclude Include="..\..\tutorial23\shadow_map_fbo.h" />
     <ClInclude Include="..\..\tutorial23\shadow_map_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial23\camera.cpp" />
-    <ClCompile Include="..\..\tutorial23\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial23\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial23\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial23\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial23\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial23\shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\tutorial23\shadow_map_technique.cpp" />
     <ClCompile Include="..\..\tutorial23\tutorial23.cpp" />

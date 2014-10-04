@@ -11,23 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial25\callbacks.h" />
-    <ClInclude Include="..\..\tutorial25\camera.h" />
-    <ClInclude Include="..\..\tutorial25\glut_backend.h" />
     <ClInclude Include="..\..\tutorial25\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial25\math_3d.h" />
     <ClInclude Include="..\..\tutorial25\mesh.h" />
-    <ClInclude Include="..\..\tutorial25\pipeline.h" />
     <ClInclude Include="..\..\tutorial25\skybox.h" />
     <ClInclude Include="..\..\tutorial25\skybox_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial25\camera.cpp" />
-    <ClCompile Include="..\..\tutorial25\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial25\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial25\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial25\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial25\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial25\skybox.cpp" />
     <ClCompile Include="..\..\tutorial25\skybox_technique.cpp" />
     <ClCompile Include="..\..\tutorial25\tutorial25.cpp" />

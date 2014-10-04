@@ -22,12 +22,13 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "ogldev_texture.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
@@ -47,7 +48,7 @@ struct Vertex
 };
 
 
-class Tutorial17 : public ICallbacks
+class Tutorial17 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -59,6 +60,12 @@ public:
         m_scale = 0.0f;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 0.5f;
+        
+        m_persProjInfo.FOV = 60.0f;
+        m_persProjInfo.Height = WINDOW_HEIGHT;
+        m_persProjInfo.Width = WINDOW_WIDTH;
+        m_persProjInfo.zNear = 1.0f;
+        m_persProjInfo.zFar = 100.0f;                
     }
 
     ~Tutorial17()
@@ -112,8 +119,8 @@ public:
         p.Rotate(0.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 100.0f);
-        m_pEffect->SetWVP(p.GetTrans());
+        p.SetPerspectiveProj(m_persProjInfo);
+        m_pEffect->SetWVP(p.GetWVPTrans());
         m_pEffect->SetDirectionalLight(m_directionalLight);
         
         glEnableVertexAttribArray(0);
@@ -131,29 +138,19 @@ public:
         glutSwapBuffers();
     }
 
-    virtual void IdleCB()
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        RenderSceneCB();
-    }
+        switch (OgldevKey) {
+            case OGLDEV_KEY_ESCAPE:
+            case OGLDEV_KEY_q:
+                    GLUTBackendLeaveMainLoop();
+                    break;
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-
-            case 'a':
+            case OGLDEV_KEY_a:
                 m_directionalLight.AmbientIntensity += 0.05f;
                 break;
 
-            case 's':
+            case OGLDEV_KEY_s:
                 m_directionalLight.AmbientIntensity -= 0.05f;
                 break;
         }
@@ -198,15 +195,16 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
+    PersProjInfo m_persProjInfo;    
 };
 
 
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, false, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 17")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 17")) {
         return 1;
     }
 

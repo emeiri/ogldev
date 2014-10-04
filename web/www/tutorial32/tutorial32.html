@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	
+<table width=100% >
+<tr>
+	<td width=34%><div align=left"><a href="../tutorial31/tutorial31.html" rel="prev"><img src="../prev.jpg"></a></div></td>
+	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
+    <td width=33%><div align=right><a href="../tutorial33/tutorial33.html" rel="home"><img src="../next.jpg"></a></div></td>
+</tr>
+</table>
+	
+<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+<title>Tutorial 32</title>
+</head>
+<body>
+<div class="content">
+<div class="lines">
+<h1>Tutorial 32 - Vertex Array Objects</h1>
+<div style="text-align: center">
+<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
+</div>
+<p>
+<h2>Background</h2>
+<p>
+The Vertex Array Object (a.k.a VAO) is a special type of object that encapsulates all
+the data that is associated with the vertex processor. Instead of containing the actual data,
+it holds references to the vertex buffers, the index buffer and the layout specification of the vertex itself.
+The advantage is that once you set up the VAO for a mesh you can bring in the entire mesh state
+by simply binding the VAO. After that you can render the mesh object and you don't need to worry about
+all of its state. The VAO remembers it for you. If your application needs to deal with meshes whose
+vertex layout slightly differs from one another the VAO takes care of it also. Just make sure to 
+set up the correct layout when you create the VAO and forget about it. From now on it "sticks" to
+the VAO and becomes active whenever that VAO is used.
+</p>
+<p>
+When used correctly, VAOs can also represent an optimization opportunity for the driver of the GPU. 
+If the VAO is set up once and used multiple times the driver can take advantage of knowing the mapping
+between the index buffer and the vertex buffers as well as the vertex layout in the buffers. Obviously,
+this depends on the specific driver that you are using and it is not guaranteed that all drivers will behave
+the same. At any rate, keep in mind that it is best to set up the VAO once and then reuse it over and over.
+</p>
+<p>
+In this tutorial we are going to update the Mesh class and base it on top of a VAO.
+In addition, we will organize the vertex data in the buffers in a method known as SOA (Structure Of Arrays).
+Up till now our vertex was represented as a structure of attributes (position, etc) and the vertex buffer
+contained structures of vertices lined up one after the other. This is called AOS (Array Of Structure). SOA
+is simply a transpose of this scheme. Instead of an array of attribute structures we have one structure that contains
+multiple arrays. Each array contains only one attribute. In order to setup the vertex the GPU uses the same index
+to read one attribute from each array. This method can sometimes be more approriate for some of the 3D file formats
+and it is interesting to see different ways of accomplishing the same thing.
+</p>
+<p>
+The following picture illustrates AOS and SOA:
+</p>
+<img src="aos_soa.jpg">
+<h2>Code Walkthru</h2>
+<p>(mesh.h:50)</p>
+<code>
+class Mesh<br>
+{<br>
+public:<br>
+&nbsp; &nbsp;    Mesh();<br>
+<br>
+ &nbsp; &nbsp;    ~Mesh();<br>
+<br>
+ &nbsp; &nbsp;    bool LoadMesh(const std::string& Filename);<br>
+<br>
+ &nbsp; &nbsp;    void Render();<br>
+<br>
+private:<br>
+ &nbsp; &nbsp;    bool InitFromScene(const aiScene* pScene, const std::string& Filename);<br>
+ &nbsp; &nbsp; <b>   void InitMesh(const aiMesh* paiMesh,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;    &nbsp; &nbsp; &nbsp; &nbsp;                 std::vector<Vector3f>& Positions,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;                   std::vector<Vector3f>& Normals,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;                  std::vector<Vector2f>& TexCoords,<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;                  std::vector<unsigned int>& Indices);</b><br>
+<br>
+ &nbsp; &nbsp;    bool InitMaterials(const aiScene* pScene, const std::string& Filename);<br>
+ &nbsp; &nbsp;    void Clear();<br>
+<br>
+#define INVALID_MATERIAL 0xFFFFFFFF<br>
+   <br>
+<b>#define INDEX_BUFFER 0    <br>
+#define POS_VB       1<br>
+#define NORMAL_VB    2<br>
+#define TEXCOORD_VB  3    <br>   
+<br>
+ &nbsp; &nbsp;    GLuint m_VAO;<br>
+ &nbsp; &nbsp;    GLuint m_Buffers[4];<br>
+<br>
+ &nbsp; &nbsp;    struct MeshEntry {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        MeshEntry()<br>
+ &nbsp; &nbsp;  &nbsp; &nbsp;       {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            NumIndices = 0;<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;              BaseVertex = 0;<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;              BaseIndex = 0;<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            MaterialIndex = INVALID_MATERIAL;<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        }<br>
+        <br>
+	 &nbsp; &nbsp; &nbsp; &nbsp; unsigned int BaseVertex;<br>
+  &nbsp; &nbsp; &nbsp; &nbsp;        unsigned int BaseIndex;<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        unsigned int NumIndices;<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        unsigned int MaterialIndex;<br>
+ &nbsp; &nbsp;    };<br>
+    <br></b>
+ &nbsp; &nbsp;    std::vector<MeshEntry> m_Entries;<br>
+ &nbsp; &nbsp;    std::vector<Texture*> m_Textures;<br>
+};
+</code>
+<p>
+All the changes in this tutorial are encapsulated in the mesh class whose declaration
+appears above with changes marked in bold face. We have switched from an array of VB/IB elements
+to four buffers - index buffer, position buffer, normal buffer and texture coordinates buffer.
+In addition, the Mesh class has a new member called m_VAO that stores the vertex array object. Since our
+model can be made of multiple subcomponents each with its own texture we have a vector called
+m_Entries that contains the material index as well as the location of the subcomponent. NumIndices
+is the number of indices in the subcomponent, BaseVertex is where the subcomponent starts in the vertex
+buffers and BaseIndex is where the subcomponent starts inside the index buffer (because all the subcomponents
+are stored one after the other inside the same buffers). Before rendering
+a subcomponent of the mesh we need to bind its texture and then submit a draw command for subcomponent
+vertices. We will later see how to do this.
+</p>
+<p>(mesh.cpp:56)</p>
+<code>
+bool Mesh::LoadMesh(const string& Filename)<br>
+{<br>
+&nbsp; &nbsp;    // Release the previously loaded mesh (if it exists)<br>
+ &nbsp; &nbsp;    Clear();<br>
+    <br>
+	&nbsp; &nbsp; <b>// Create the VAO<br>
+ &nbsp; &nbsp;   glGenVertexArrays(1, &m_VAO);   <br>
+ &nbsp; &nbsp;    glBindVertexArray(m_VAO);<br>
+    <br>
+&nbsp; &nbsp; // Create the buffers for the vertices atttributes<br>
+&nbsp; &nbsp;    glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);</b><br>
+<br>
+ &nbsp; &nbsp;    bool Ret = false;<br>
+ &nbsp; &nbsp;    Assimp::Importer Importer;<br>
+<br>
+ &nbsp; &nbsp;    const aiScene* pScene = Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate |<br>
+  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp; aiProcess_GenSmoothNormals | aiProcess_FlipUVs);<br>
+    <br>
+ &nbsp; &nbsp;    if (pScene) {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        Ret = InitFromScene(pScene, Filename);<br>
+ &nbsp; &nbsp;    }<br>
+ &nbsp; &nbsp;    else {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());<br>
+ &nbsp; &nbsp;    }<br>
+	<br>
+	&nbsp; &nbsp; // Make sure the VAO is not changed from outside code<br>
+ &nbsp; &nbsp; <b>   glBindVertexArray(0);</b>	<br>
+<br>
+ &nbsp; &nbsp;    return Ret;<br>
+}
+</code>
+<p>
+Not much has changed in the main function that loads the mesh. We generate the VAO using glGenVertexArrays() by providing the number 
+of elements in an array of GLuint and the address of the array itself (in our case we only need one
+GLuint). After that we bind the VAO using glBindVertexArray(). There can only be one VAO bound 
+at any time. From now on, any change to the state of the vertex processor will effect this
+VAO. The four buffers are generated using glGenBuffers() and the mesh is loaded using
+the Open Asset Import Library (see below). A very important function call is 
+glBindVertexArray(0) at the end of the function. By binding zero as the VAO we guarentee that no further
+changes to the vertex processor will effect our VAO (OpenGL will never generate a VAO with
+the value of zero so this is safe). 
+</p>
+<p>(mesh.cpp:86)</p>
+<code>
+bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)<br>
+{  <br>
+&nbsp; &nbsp;    m_Entries.resize(pScene->mNumMeshes);<br>
+ &nbsp; &nbsp;    m_Textures.resize(pScene->mNumMaterials);<br>
+<br>
+ &nbsp; &nbsp; // Prepare vectors for vertex attributes and indices<br>
+ &nbsp; &nbsp;    vector<Vector3f> Positions;<br>
+ &nbsp; &nbsp;    vector<Vector3f> Normals;<br>
+ &nbsp; &nbsp;    vector<Vector2f> TexCoords;<br>
+ &nbsp; &nbsp;    vector<unsigned int> Indices;<br>
+<br>
+ &nbsp; &nbsp;    unsigned int NumVertices = 0;<br>
+ &nbsp; &nbsp;    unsigned int NumIndices = 0;<br>
+    <br>
+ &nbsp; &nbsp;    // Count the number of vertices and indices<br>
+ &nbsp; &nbsp;    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;        <br>
+  &nbsp; &nbsp; &nbsp; &nbsp;         m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;<br>
+  &nbsp; &nbsp; &nbsp; &nbsp;         m_Entries[i].BaseVertex = NumVertices;<br>
+  &nbsp; &nbsp; &nbsp; &nbsp;         m_Entries[i].BaseIndex = NumIndices;<br>
+<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        NumVertices += pScene->mMeshes[i]->mNumVertices;<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        NumIndices  += m_Entries[i].BaseIndex;<br>
+ &nbsp; &nbsp;    }<br>
+    <br>
+ &nbsp; &nbsp;    // Reserve space in the vectors for the vertex attributes and indices<br>
+ &nbsp; &nbsp;    Positions.reserve(NumVertices);<br>
+ &nbsp; &nbsp;    Normals.reserve(NumVertices);<br>
+ &nbsp; &nbsp;    TexCoords.reserve(NumVertices);<br>
+ &nbsp; &nbsp;    Indices.reserve(NumIndices);<br>
+<br>
+ &nbsp; &nbsp;    // Initialize the meshes in the scene one by one<br>
+ &nbsp; &nbsp;    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        const aiMesh* paiMesh = pScene->mMeshes[i];<br>
+ &nbsp; &nbsp;  &nbsp; &nbsp;       InitMesh(paiMesh, Positions, Normals, TexCoords, Indices);<br>
+ &nbsp; &nbsp;    }<br>
+<br>
+ &nbsp; &nbsp;    if (!InitMaterials(pScene, Filename)) {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        return false;<br>
+ &nbsp; &nbsp;    }<br>
+<br>
+ &nbsp; &nbsp;    // Generate and populate the buffers with vertex attributes and the indices<br>
+ &nbsp; &nbsp;  	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);<br>
+	&nbsp; &nbsp; glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], <br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GL_STATIC_DRAW);<br>
+ &nbsp; &nbsp;    glEnableVertexAttribArray(0);<br>
+ &nbsp; &nbsp;    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);<br>
+<br>
+ &nbsp; &nbsp;    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);<br>
+	&nbsp; &nbsp; glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], <br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GL_STATIC_DRAW);<br>
+ &nbsp; &nbsp;    glEnableVertexAttribArray(1);<br>
+ &nbsp; &nbsp;    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);<br>
+<br>
+ &nbsp; &nbsp;   	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);<br>
+	&nbsp; &nbsp; glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], <br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GL_STATIC_DRAW);<br>
+ &nbsp; &nbsp;    glEnableVertexAttribArray(2);<br>
+ &nbsp; &nbsp;    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, 0);<br>
+<br>
+ &nbsp; &nbsp;    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);<br>
+	&nbsp; &nbsp; glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], <br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GL_STATIC_DRAW);<br>
+    <br>
+ &nbsp; &nbsp;    return true;<br>
+}
+</code>
+<p>
+This is the next level of details in terms of loading the mesh. The Open Asset Import Library (Assimp)
+has loaded the mesh data into an aiScene structure and we have a pointer to it.
+We now need to load it into GL buffers and attach them to the VAO. We do this by using STL vectors.
+We have a vector per GL buffer. We count the number of vertices and indices in the aiScene
+structure and for each aiMesh struct we store its material index, index count, base vertex and base index in the m_Entries
+array. We also reserve place in the vectors accordingly. We then go over each aiMesh structure inside
+the aiScene and initialize it. The vectors are passed by reference to InitMesh() which allows it
+to keep on populating them as we go. Materials are initialized same as before.
+</p>
+<p>
+The last part of the function is where things become interesting. The position, normal and texture
+coordinates buffers are bound one by one to the GL_ARRAY_BUFFER target. Any further operation on that
+target effect the currently bound buffer and such changes remain attached to that buffer when a new
+buffer is bound to the same target. For each of the three buffers we:
+<ol>
+	<li>Populate with data using glBufferData().</li>
+	<li>Enable the corresponding vertex attribute using glEnableVertexAttribArray().</li>
+ 	<li>Configure the vertex attribute (number of components, component type, etc) using glVertexAttribPointer().</li>
+</ol>
+</p>
+<p>
+The index buffer is initialized by binding it to the GL_ELEMENT_ARRAY_BUFFER target. We only need 
+to populate it with the indices and that's it. The buffers are now initialized and everything we did
+is encapsulated in the VAO.
+</p>
+<p>(mesh.cpp:148)</p>
+<code>
+void Mesh::InitMesh(const aiMesh* paiMesh,<br>
+  &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;                   vector<Vector3f>& Positions,<br>
+  &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;                   vector<Vector3f>& Normals,<br>
+  &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;                   vector<Vector2f>& TexCoords,<br>
+  &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;                   vector<unsigned int>& Indices)<br>
+{<br>
+ &nbsp; &nbsp;    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);<br>
+<br>
+ &nbsp; &nbsp;    // Populate the vertex attribute vectors<br>
+ &nbsp; &nbsp;    for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        const aiVector3D* pPos      = &(paiMesh->mVertices[i]);<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        const aiVector3D* pNormal   = &(paiMesh->mNormals[i]);<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ?<br>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &(paiMesh->mTextureCoords[0][i]) : &Zero3D;<br>
+<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        Positions.push_back(Vector3f(pPos->x, pPos->y, pPos->z));<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        Normals.push_back(Vector3f(pNormal->x, pNormal->y, pNormal->z));<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        TexCoords.push_back(Vector2f(pTexCoord->x, pTexCoord->y));<br>
+ &nbsp; &nbsp;    }<br>
+<br>
+ &nbsp; &nbsp;    // Populate the index buffer<br>
+ &nbsp; &nbsp;    for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        const aiFace& Face = paiMesh->mFaces[i];<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        assert(Face.mNumIndices == 3);<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        Indices.push_back(Face.mIndices[0]);<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        Indices.push_back(Face.mIndices[1]);<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        Indices.push_back(Face.mIndices[2]);<br>
+ &nbsp; &nbsp;    }<br>
+}
+</code>
+<p>
+This function is responsible for loading each aiMesh structure that is contained in the aiScene. Note how 
+the vectors are passed by reference and accessed using the push_back() function of the STL vector class.
+</p>
+<p>(mesh.cpp:225)</p>
+<code>
+void Mesh::Render()<br>
+{<br>
+  &nbsp; &nbsp;   glBindVertexArray(m_VAO);<br>
+    <br>
+  &nbsp; &nbsp;   for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {<br>
+  &nbsp; &nbsp;    &nbsp; &nbsp;      const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;<br>
+<br>
+  &nbsp; &nbsp;   &nbsp; &nbsp;       assert(MaterialIndex < m_Textures.size());<br>
+        <br>
+  &nbsp; &nbsp;      &nbsp; &nbsp;    if (m_Textures[MaterialIndex]) {<br>
+  &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;           m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);<br>
+  &nbsp; &nbsp;     &nbsp; &nbsp;     }<br>
+<br>
+	 &nbsp; &nbsp;	  &nbsp; &nbsp; glDrawElementsBaseVertex(GL_TRIANGLES, <br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   m_Entries[i].NumIndices, <br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;    &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; GL_UNSIGNED_INT, <br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;    &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex), <br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;     &nbsp; &nbsp;    &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;   m_Entries[i].BaseVertex);<br>
+  &nbsp; &nbsp;    }<br>
+<br>
+  &nbsp; &nbsp;   // Make sure the VAO is not changed from the outside    <br>
+  &nbsp; &nbsp;   glBindVertexArray(0);<br>
+}
+</code>
+<p>
+Finally, we've reached the render function. We start by binding our VAO and...this is all we need to do 
+in terms of setting up the state for the vertex processor! whatever state is already there has
+now been replaced by the state that we have set up when we initialized the VAO.
+Now we need to draw the subcomponents of the mesh and bind the proper texture before
+each one. For that we use the information in the m_Entries array and a new draw function called
+glDrawElementsBaseVertex(). This function takes the topology, the number of indices and their type. The fourth
+parameter tells it where to start in the index buffer. The problem is that the indices that Assimp supplied for
+each aiMesh structure starts at zero and we have accumulated them into the same buffer. So now we need to tell
+the draw function the offset in bytes in the buffer where the indices of the subcomponent start. We do this by multiplying the
+base index of the current entry by the size of an index. Since the vertex attributes have also been accumulated
+into their own buffers we do the same with the fifth parameter - the base vertex. Note that we are providing
+it as an index rather than as a byte offset because there can be multiple vertex buffers with different types
+of attributes (and therefore differen strides). OpenGL will need to multiply the base 
+vertex by the stride of each buffer in order to get the offset of that buffer. Nothing we need to worry
+about.
+</p>
+<p>
+Before leaving we reset the current VAO back to zero and the reason is the same as when 
+we initially created the VAO - we don't want outside code to bind a VB (for example) and
+change our VAO unintentinally. 
+</p>
+<p>(mesh.cpp:50)</p>
+<code>
+glDeleteVertexArrays(1, &m_VAO);
+</code>
+<p>
+The above function deletes the VAO. It does not delete the buffers that are bound to it (they may be bound to
+multiple VAOs at the same time).
+</p>
+</body>
+</html>

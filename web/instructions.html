@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="Content-Type">
+  <title>Instructions</title>
+</head>
+<body>
+<h1 style="text-align: center;">Instructions</h1>
+<div style="text-align: justify;"><big><big>The tutorials are written
+in C++. My assumption is that the reader is experienced in that
+language and in software development in general.<br>
+</div>
+The primary requirement for running the tutorials is a GPU 
+that supports version 3.3 of the OpenGL spec at least (though some of
+the tutorials, e.g. Tessellation, require 4.x support). The code provided by
+the tutorials was developed on Ubuntu Linux using <a href="https://netbeans.org/downloads/">NetBeans</a> as a primary
+development platform (the C/C++ version is enough to be able to build the tutorials). 
+You should be able to compile it without NetBeans
+by simply running 'make' from the command line. In order to install the
+required packages run the following commands:
+<br>
+<ol>
+  <li>On Ubuntu: apt-get install g++ freeglut3-dev glew1.5-dev libmagick++-dev libassimp-dev libglfw-dev</li>
+  <li>On Fedora: yum install gcc-c++ glew-devel freeglut-devel ImageMagick-c++-devel ImageMagick-c++ assimp-devel glfw-devel</li>
+</ol>
+<p>
+Note: since Nov-14, 2013, the source to all the tutorials is provided in a single zip
+package, instead of a package per tutorial. The package contains Netbeans projects
+for Linux and a Visual Studio solution for Windows (&lt;ROOT&gt;/Windows/ogldev/ogldev.sln).
+You can get the source package <a href="ogldev-source.zip">here</a>.
+</p>
+</body>
+</html>

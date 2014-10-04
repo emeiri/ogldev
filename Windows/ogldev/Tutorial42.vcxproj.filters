@@ -15,31 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial42\callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial42\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial42\engine_common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial42\glut_backend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial42\lighting_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial42\math_3d.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial42\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial42\ogldev_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial42\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial42\shadow_map_fbo.h">
@@ -50,22 +32,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial42\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial42\glut_backend.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial42\lighting_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial42\math_3d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial42\mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial42\pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial42\shadow_map_fbo.cpp">

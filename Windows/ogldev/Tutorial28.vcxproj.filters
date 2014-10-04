@@ -18,25 +18,13 @@
     <ClCompile Include="..\..\tutorial28\billboard_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial28\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial28\glut_backend.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial28\lighting_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial28\math_3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial28\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial28\particle_system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial28\pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial28\ps_update_technique.cpp">
@@ -53,31 +41,16 @@
     <ClInclude Include="..\..\tutorial28\billboard_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial28\callbacks.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial28\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial28\engine_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial28\glut_backend.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial28\lighting_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial28\math_3d.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial28\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial28\particle_system.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\tutorial28\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\tutorial28\ps_update_technique.h">

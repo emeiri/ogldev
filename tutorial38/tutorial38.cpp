@@ -29,30 +29,22 @@
 #include <sys/types.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
+#include "ogldev_camera.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "texture.h"
 #include "skinning_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 
 using namespace std;
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
 
-#ifndef WIN32
-Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
-                   {.1,1.0,1.0,.5}, {1,1,1,0},
-                   0, {1,0,0,1}, 0, {1,0,0,1},
-                   0, {0,0,0,1}, 0, {0,0,0,1} };
-#endif
-
-class Tutorial38 : public ICallbacks
+class Tutorial38 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -60,7 +52,6 @@ public:
     {
         m_pGameCamera = NULL;
         m_pEffect = NULL;
-        m_scale = 0.0f;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 0.55f;
         m_directionalLight.DiffuseIntensity = 0.9f;
@@ -71,9 +62,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
         
         m_position = Vector3f(0.0f, 0.0f, 6.0f);      
     }
@@ -116,9 +104,6 @@ public:
             return false;
         }
 #endif        	
-        m_glutTime = glutGet(GLUT_ELAPSED_TIME);
-        m_startTime = GetCurrentTimeMillis();
-        
         return true;
     }
 
@@ -132,8 +117,6 @@ public:
     {   
         CalcFPS();
         
-        m_scale += 0.005f;
-        
         m_pGameCamera->OnRender();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -142,7 +125,7 @@ public:
         
         vector<Matrix4f> Transforms;
                
-        float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)m_startTime) / 1000.0f;
+        float RunningTime = GetRunningTime();
 
         m_mesh.BoneTransform(RunningTime, Transforms);
         
@@ -170,87 +153,43 @@ public:
         glutSwapBuffers();
     }
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
+	virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
     
     
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
-
-private:
-    
-    void CalcFPS()
-    {
-        m_frameCount++;
-        
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_glutTime > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_glutTime);
-            m_glutTime = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }
-    
+private:      
  
     SkinningTechnique* m_pEffect;
     Camera* m_pGameCamera;
-    float m_scale;
     DirectionalLight m_directionalLight;
     Mesh m_mesh;
     Vector3f m_position;            
     PersProjInfo m_persProjInfo;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-#endif
-    int m_glutTime;
-    long long m_startTime;
-    int m_frameCount;
-    float m_fps;    
 };
 
 
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 38")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 38")) {
         return 1;
     }
     

@@ -1,0 +1,23 @@
+<math display = 'block'>
+  <mrow>
+    <msup>
+      <mi>i</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>=</mo>
+    <msup>
+      <mi>j</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>=</mo>
+    <msup>
+      <mi>k</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>=</mo>
+    <mi>ijk</mi>
+    <mo>=</mo>
+    <mo>&minus;</mo>
+    <mn>1</mn>
+  </mrow>
+</math>

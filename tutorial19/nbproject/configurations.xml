@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>callbacks.h</itemPath>
-      <itemPath>camera.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
-      <itemPath>texture.h</itemPath>
-      <itemPath>util.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Shader Files"
@@ -22,12 +15,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
-      <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
-      <itemPath>texture.cpp</itemPath>
       <itemPath>tutorial19.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -54,8 +42,9 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags glew ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -74,19 +63,9 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.vs" ex="false" tool="3" flavor2="0">
@@ -95,17 +74,7 @@
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial19.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="util.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -128,16 +97,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.vs" ex="false" tool="3" flavor2="0">
@@ -146,17 +105,7 @@
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial19.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="util.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

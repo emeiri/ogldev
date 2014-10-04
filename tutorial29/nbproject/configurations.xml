@@ -4,16 +4,11 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>callbacks.h</itemPath>
-      <itemPath>camera.h</itemPath>
       <itemPath>engine_common.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>picking_technique.h</itemPath>
       <itemPath>picking_texture.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>render_callbacks.h</itemPath>
       <itemPath>simple_color_technique.h</itemPath>
     </logicalFolder>
@@ -30,16 +25,23 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
-      <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>picking_technique.cpp</itemPath>
       <itemPath>picking_texture.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>simple_color_technique.cpp</itemPath>
       <itemPath>tutorial29.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -65,8 +67,9 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp` -Wall</commandLine>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` -Wall</commandLine>
           <warningLevel>3</warningLevel>
         </ccTool>
         <linkerTool>
@@ -87,20 +90,10 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++ assimp`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -109,10 +102,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -129,10 +118,6 @@
       <item path="picking_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="picking_texture.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="render_callbacks.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -167,17 +152,7 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -186,10 +161,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -206,10 +177,6 @@
       <item path="picking_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="picking_texture.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="render_callbacks.h" ex="false" tool="3" flavor2="0">
       </item>

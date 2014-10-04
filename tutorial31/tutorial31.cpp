@@ -23,18 +23,18 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 
 #define WINDOW_WIDTH  1680
 #define WINDOW_HEIGHT 1050
 
-class Tutorial31 : public ICallbacks
+class Tutorial31 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -122,36 +122,26 @@ public:
     }
 
        
-    virtual void IdleCB()
+
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        RenderSceneCB();
-    }
+        switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 27:
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-
-            case '+':
+            case OGLDEV_KEY_PLUS:
                 m_tessellationLevel += 1.0f;
                 break;
                 
-            case '-':
+            case OGLDEV_KEY_MINUS:
                 if (m_tessellationLevel >= 2.0f) {
                     m_tessellationLevel -= 1.0f;                    
                 }
                 break;
                 
-            case 'z':
+            case OGLDEV_KEY_z:
                 m_isWireframe = !m_isWireframe;
                 
                 if (m_isWireframe) {
@@ -159,21 +149,20 @@ public:
                 }
                 else {
                     glPolygonMode(GL_FRONT, GL_FILL);
-                }                    
+                }  
+				break;
+			default:
+				m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
-    
-    
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
 
+    
 private:
 
     LightingTechnique m_lightingEffect;
@@ -189,9 +178,9 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 31")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 31")) {
         return 1;
     }
 

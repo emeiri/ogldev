@@ -11,22 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial26\callbacks.h" />
-    <ClInclude Include="..\..\tutorial26\camera.h" />
     <ClInclude Include="..\..\tutorial26\engine_common.h" />
-    <ClInclude Include="..\..\tutorial26\glut_backend.h" />
     <ClInclude Include="..\..\tutorial26\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial26\math_3d.h" />
     <ClInclude Include="..\..\tutorial26\mesh.h" />
-    <ClInclude Include="..\..\tutorial26\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial26\camera.cpp" />
-    <ClCompile Include="..\..\tutorial26\glut_backend.cpp" />
     <ClCompile Include="..\..\tutorial26\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial26\math_3d.cpp" />
     <ClCompile Include="..\..\tutorial26\mesh.cpp" />
-    <ClCompile Include="..\..\tutorial26\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial26\tutorial26.cpp" />
   </ItemGroup>
   <ItemGroup>

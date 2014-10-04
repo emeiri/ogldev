@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>callbacks.h</itemPath>
-      <itemPath>camera.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
-      <itemPath>ogldev_types.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
@@ -20,11 +14,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
-      <itemPath>glut_backend.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>skinning_technique.cpp</itemPath>
       <itemPath>tutorial38.cpp</itemPath>
     </logicalFolder>
@@ -82,29 +72,9 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ogldev_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -161,29 +131,9 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ogldev_types.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
       </item>

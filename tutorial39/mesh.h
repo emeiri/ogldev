@@ -28,7 +28,7 @@
 #include <postprocess.h> // Post processing flags
 
 #include "ogldev_util.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
 
 using namespace std;

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	
+<link rel="stylesheet" type="text/css" href="../balloontip.css" />
+<script type="text/javascript" src="../balloontip.js">
+/***********************************************
+* Rich HTML Balloon Tooltip- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
+***********************************************/
+</script>
+<div id="prev" class="balloonstyle">
+<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Previous Tutorial
+</div>
+<div id="home" class="balloonstyle">
+<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Home
+</div>
+<div id="next" class="balloonstyle">
+<img src="shadetabs.gif" style="float: left; margin-left: 5px; border:1px solid black" />Next Tutorial
+</div>
+
+<table width=100% >
+<tr>
+	<td width=34%><div align=left"><a href="../tutorial06/tutorial06.html" rel="prev"><img src="../prev.jpg"></a></div></td>
+	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
+    <td width=33%><div align=right><a href="../tutorial08/tutorial08.html" rel="next"><img src="../next.jpg"></a></div></td>
+</tr>
+</table>
+	
+<link rel="stylesheet" type="text/css" href="../../tutorials.css"/>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Tutorial 07</title>
+</head>
+<body>
+<h1>Tutorial 7 - Rotation Transformation</h1>
+<div style="text-align: center;"><span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> </div>
+<h2>Background</h2>
+<p>Next on our transforation
+list is the rotation, that is, given an angle and a point we want to
+rotate the point around one of the axis. We will always change two out
+of the trio X, Y and Z and leave the third component unchanged. This
+means that the path will lie on one of the three major planes: XY (when
+turning around Z), YZ (when turning around X) and XZ (when turning
+around Y). There are more complex rotation transformations that allow
+you to rotate around an arbitrary vector but we don't need them at this
+stage.</p>
+<p>Let's define the problem in general terms. Consider the following diagram:</p>
+<img style="width: 816px; height: 650px;" alt="" src="rotation.png"><br>
+<p>We want to move along the circle from (x<sub>1,</sub>y<sub>1</sub>) to (x<sub>2,</sub>y<sub>2</sub>).
+In other words we want to rotate (x<sub>1,</sub>y<sub>1</sub>) by the
+angle <span style="font-family: Symbol;">a<sub>2</sub></span>.
+Let's assume that the radius of the circle is 1. This means the
+following:</p>
+x<sub>1</sub>=cos(<span style="font-family: Symbol;">a<sub>1</sub></span>)<span style="font-family: Symbol;"><sub></sub></span><br> 
+y<sub>1</sub>=sin(<span style="font-family: Symbol;">a<sub>1</sub></span>)<span style="font-family: Symbol;"></span><br>
+x<sub>2</sub>=cos(<span style="font-family: Symbol;">a<sub>1</sub></span><span style="font-family: Symbol;">+</span><span style="font-family: Symbol;"></span><span style="font-family: Symbol;">a<sub>2</sub></span>)<span style="font-family: Symbol;"></span><br>
+y<sub>2</sub>=sin(<span style="font-family: Symbol;">a<sub>1</sub></span><span style="font-family: Symbol;">+</span><span style="font-family: Symbol;">a<sub>2</sub></span>)<br>
+<p>We will use the following trigonometric identities to develop x<sub>2</sub> and y<sub>2</sub>:</p>
+cos(<span style="font-family: Symbol;">a+<span style="font-family: Symbol;">b) =<span style="font-family: Times New Roman,Times,serif;"></span></span></span> cos<span style="font-family: Symbol;">a</span>cos<span
+ style="font-family: Symbol;"><span style="font-family: Symbol;">b </span></span>- sin<span style="font-family: Symbol;">a</span>sin<span style="font-family: Symbol;"><span style="font-family: Symbol;">b</span></span><br>
+sin(<span style="font-family: Symbol;">a+<span style="font-family: Symbol;">b) =<span style="font-family: Times New Roman,Times,serif;"></span></span></span> sin<span style="font-family: Symbol;">a</span>cos<span
+ style="font-family: Symbol;"><span style="font-family: Symbol;">b</span></span>+cos<span style="font-family: Symbol;">a</span>sin<span style="font-family: Symbol;"><span style="font-family: Symbol;">b</span></span><br>
+<p>Using the above we can write:</p>
+x<sub>2</sub>=cos(<span style="font-family: Symbol;">a<sub>1</sub></span><span style="font-family: Symbol;">+</span><span style="font-family: Symbol;"></span><span style="font-family: Symbol;">a<sub>2</sub></span>)
+<span style="font-family: Symbol;">= </span>cos<span style="font-family: Symbol;">a<sub>1</sub></span><span style="font-family: Symbol;"></span>cos<span style="font-family: Symbol;">a<sub>2 </sub></span><span
+ style="font-family: Symbol;"><span style="font-family: Symbol;"></span></span>- sin<span style="font-family: Symbol;">a<sub>1</sub></span><span style="font-family: Symbol;"></span><span
+ style="font-family: Symbol;"></span>sin<span
+ style="font-family: Symbol;">a<sub>2</sub></span>
+<span style="font-family: Symbol;">= </span>x<sub>1</sub>cos<span
+ style="font-family: Symbol;">a<sub>2 </sub></span><span
+ style="font-family: Symbol;"><span style="font-family: Symbol;"></span></span>-
+y<sub>1</sub>sin<span
+ style="font-family: Symbol;">a<sub>2<br>
+</sub></span>y<sub>2</sub>=sin(<span
+ style="font-family: Symbol;">a<sub>1</sub></span><span
+ style="font-family: Symbol;">+</span><span
+ style="font-family: Symbol;">a<sub>2</sub></span>) = sin<span
+ style="font-family: Symbol;">a<sub>1</sub></span><span
+ style="font-family: Symbol;"></span>cos<span
+ style="font-family: Symbol;">a<sub>2 </sub></span><span
+ style="font-family: Symbol;">+</span> cos<span
+ style="font-family: Symbol;">a<sub>1</sub></span><span
+ style="font-family: Symbol;"></span><span
+ style="font-family: Symbol;"></span>sin<span
+ style="font-family: Symbol;">a<sub>2</sub></span>
+<span style="font-family: Symbol;">= </span>y<sub>1</sub>cos<span
+ style="font-family: Symbol;">a<sub>2 </sub></span><span
+ style="font-family: Symbol;"><span style="font-family: Symbol;"></span></span>+
+x<sub>1</sub>sin<span
+ style="font-family: Symbol;">a<sub>2</sub></span><br>
+<p>In the above diagram we are looking at the XY plane and Z is pointing
+into the page. If X&amp;Y are part of a 4-vector then the above
+equation can be written in matrix form (without effecting Z&amp;W):</p>
+<img style="width: 885px; height: 275px;" alt="" src="07_01.png">
+<p>If we want to create rotations for the Y and Z axis then the equations
+are basically the same but the matrix is arranged a bit differently.
+Here's the matrix for the rotation around the Y axis:</p>
+<img style="width: 885px; height: 275px;" alt="" src="07_02.png">
+<p>And the rotation matrix around the X axis:</p>
+<img style="width: 885px; height: 275px;" alt="" src="07_03.png">
+<h2>Code Walkthru</h2>
+<p>The code changes in this tutorial are very minor. We only change the contents of the single transformation matrix in the code.</p>
+<code>
+World.m[0][0]=cosf(Scale); World.m[0][1]=-sinf(Scale); World.m[0][2]=0.0f; World.m[0][3]=0.0f;<br>
+World.m[1][0]=sinf(Scale); World.m[1][1]=cosf(Scale);&nbsp;&nbsp;World.m[1][2]=0.0f; World.m[1][3]=0.0f;<br>
+World.m[2][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][2]=1.0f; World.m[2][3]=0.0f;<br>
+World.m[3][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][2]=0.0f; World.m[3][3]=1.0f;<br>
+</code>
+<p>As you can see we rotate around the Z axis. You can try the other
+rotations as well but I think that at this point without true
+projection from 3D to 2D the other rotations look a bit odd. We will
+complete them in a full transformation pipeline class in the coming
+tutorials.</p>
+</body>
+</html>

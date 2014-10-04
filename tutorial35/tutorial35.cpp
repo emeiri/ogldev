@@ -24,16 +24,13 @@
 #include <string>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "ds_geom_pass_tech.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
 #include "gbuffer.h"
 
 using namespace std;
@@ -41,7 +38,7 @@ using namespace std;
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
 
-class Tutorial35 : public ICallbacks
+class Tutorial35 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -55,11 +52,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
-        
-        m_time = glutGet(GLUT_ELAPSED_TIME);
     }
 
     ~Tutorial35()
@@ -162,73 +154,33 @@ public:
         glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, HalfWidth, 0, WINDOW_WIDTH, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);	
     }
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
 
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
+	void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
     
     
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
 private:
     
-    void CalcFPS()
-    {
-        m_frameCount++;
-        
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_time > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_time);
-            m_time = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }       
-
 	DSGeomPassTech m_DSGeomPassTech;
     Camera* m_pGameCamera;
     float m_scale;
     Mesh m_mesh;
     PersProjInfo m_persProjInfo;
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-#endif
-    int m_time;
-    int m_frameCount;
-    float m_fps;    
     GBuffer m_gbuffer;
 };
 
@@ -236,9 +188,9 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 35")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 35")) {
         return 1;
     }
     

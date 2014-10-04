@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>math_3d.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -16,7 +14,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial11.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -44,6 +41,7 @@
           <incDir>
             <pElem>../Include</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags assimp`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>
@@ -65,12 +63,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">
@@ -98,12 +90,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shader.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shader.vs" ex="false" tool="3" flavor2="0">

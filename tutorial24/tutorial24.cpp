@@ -23,12 +23,12 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_app.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "lighting_technique.h"
 #include "shadow_map_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "shadow_map_fbo.h"
 
@@ -36,7 +36,7 @@
 #define WINDOW_HEIGHT 1200
 
 
-class Tutorial24 : public ICallbacks
+class Tutorial24 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -57,6 +57,12 @@ public:
         m_spotLight.Position  = Vector3f(-20.0, 20.0, 1.0f);
         m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
         m_spotLight.Cutoff =  20.0f;
+
+        m_persProjInfo.FOV = 60.0f;
+        m_persProjInfo.Height = WINDOW_HEIGHT;
+        m_persProjInfo.Width = WINDOW_WIDTH;
+        m_persProjInfo.zNear = 1.0f;
+        m_persProjInfo.zFar = 50.0f;        
     }
     
 
@@ -151,7 +157,7 @@ public:
         p.Rotate(0.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);
+        p.SetPerspectiveProj(m_persProjInfo);
         m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
         m_pMesh->Render();
         
@@ -168,7 +174,7 @@ public:
         m_shadowMapFBO.BindForReading(GL_TEXTURE1);
 
         Pipeline p;
-        p.SetPerspectiveProj(60.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);
+        p.SetPerspectiveProj(m_persProjInfo);
         p.Scale(10.0f, 10.0f, 10.0f);
         p.WorldPos(0.0f, 0.0f, 1.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
@@ -195,32 +201,23 @@ public:
     }
 
 
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
-    
-
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
+	void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
 
  private:
 
@@ -233,15 +230,16 @@ public:
     Mesh* m_pQuad;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
+    PersProjInfo m_persProjInfo;	
 };
 
 
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 24")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 24")) {
         return 1;
     }
 

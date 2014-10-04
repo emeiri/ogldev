@@ -35,7 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial12.o
 
 
@@ -43,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=`pkg-config --cflags assimp` 
+CXXFLAGS=`pkg-config --cflags assimp` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -64,11 +63,6 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial12: ../Common/dist/Debug/GNU-
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial12: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial12 ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/tutorial12.o: tutorial12.cpp 
 	${MKDIR} -p ${OBJECTDIR}

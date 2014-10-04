@@ -1,0 +1,56 @@
+<math display = 'block'>
+  <mrow>
+    <mtext>...</mtext>
+    <mo>=</mo>
+    <vector>
+      <csymbol>
+        <mtext>x</mtext>
+        <mo>&plus;</mo>
+        <mtext>a</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>y</mtext>
+        <mo>&plus;</mo>
+        <mtext>b</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>z</mtext>
+        <mo>+</mo>
+        <msub>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>v</mi>
+          <mn fontfamily='Times New Roman'>1</mn>
+        </msub>
+      </csymbol>
+      <csymbol>
+        <mtext>c</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>x</mtext>
+        <mo>&plus;</mo>
+        <mtext>y</mtext>
+        <mo>&plus;</mo>
+        <mtext>d</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>z</mtext>
+        <mo>+</mo>
+        <msub>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>v</mi>
+          <mn fontfamily='Times New Roman'>2</mn>
+        </msub>
+      </csymbol>
+      <csymbol>
+        <mtext>e</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>x</mtext>
+        <mo>&plus;</mo>
+        <mtext>f</mtext>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mtext>y</mtext>
+        <mo>&plus;</mo>
+        <mtext>z</mtext>
+        <mo>+</mo>
+        <msub>
+          <mi mathvariant='normal' fontfamily='Times New Roman'>v</mi>
+          <mn fontfamily='Times New Roman'>3</mn>
+        </msub>
+      </csymbol>
+    </vector>
+  </mrow>
+</math>

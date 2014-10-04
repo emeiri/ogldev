@@ -19,7 +19,7 @@
 #ifndef SKYBOX_H
 #define	SKYBOX_H
 
-#include "camera.h"
+#include "ogldev_camera.h"
 #include "skybox_technique.h"
 #include "ogldev_cubemap_texture.h"
 #include "mesh.h"

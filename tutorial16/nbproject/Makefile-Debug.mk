@@ -35,9 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/camera.o \
-	${OBJECTDIR}/math_3d.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial16.o
 
 
@@ -45,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags ImageMagick++` 
-CXXFLAGS=`pkg-config --cflags ImageMagick++` 
+CCFLAGS=`pkg-config --cflags ImageMagick++ gl assimp freetype2 fontconfig` 
+CXXFLAGS=`pkg-config --cflags ImageMagick++ gl assimp freetype2 fontconfig` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -55,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lGL ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+LDLIBSOPTIONS=-lglut ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -65,27 +62,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial16: ../Common/dist/Debug/GNU-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial16: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial16 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs ImageMagick++`
-
-${OBJECTDIR}/camera.o: camera.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial16 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs ImageMagick++ gl assimp glew freetype2 fontconfig`
 
 ${OBJECTDIR}/tutorial16.o: tutorial16.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial16.o tutorial16.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial16.o tutorial16.cpp
 
 # Subprojects
 .build-subprojects:

@@ -35,8 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/math_3d.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial13.o
 
 
@@ -44,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=`pkg-config --cflags assimp` 
+CXXFLAGS=`pkg-config --cflags assimp` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -65,16 +63,6 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial13: ../Common/dist/Debug/GNU-
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial13: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial13 ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
 
 ${OBJECTDIR}/tutorial13.o: tutorial13.cpp 
 	${MKDIR} -p ${OBJECTDIR}

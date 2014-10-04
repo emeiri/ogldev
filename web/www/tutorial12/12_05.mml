@@ -1,0 +1,34 @@
+<math display = 'block'>
+  <mrow>
+    <mi>a</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mi>b</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>y</mi>
+    <mo>+</mo>
+    <mi>c</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>z</mi>
+    <mo>+</mo>
+    <mi>d</mi>
+    <mo lspace='2px' rspace='2px'>&sdot;</mo>
+    <mi>w</mi>
+    <mo>=</mo>
+    <mfrac>
+      <mi>x</mi>
+      <mrow>
+        <mi>z</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <tan/>
+        <mo stretchy='false'>(</mo>
+        <mfrac>
+          <mi>&alpha;</mi>
+          <mn>2</mn>
+        </mfrac>
+        <mo stretchy='false'>)</mo>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>

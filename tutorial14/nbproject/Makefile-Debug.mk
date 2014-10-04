@@ -35,9 +35,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/camera.o \
-	${OBJECTDIR}/math_3d.o \
-	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/tutorial14.o
 
 
@@ -45,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=`pkg-config --cflags ImageMagick++ gl assimp glew freetype2 fontconfig` 
+CXXFLAGS=`pkg-config --cflags ImageMagick++ gl assimp glew freetype2 fontconfig` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -65,27 +62,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial14: ../Common/dist/Debug/GNU-
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial14: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial14 ${OBJECTFILES} ${LDLIBSOPTIONS}
-
-${OBJECTDIR}/camera.o: camera.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/camera.o camera.cpp
-
-${OBJECTDIR}/math_3d.o: math_3d.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/math_3d.o math_3d.cpp
-
-${OBJECTDIR}/pipeline.o: pipeline.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial14 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs ImageMagick++ gl assimp glew freetype2 fontconfig`
 
 ${OBJECTDIR}/tutorial14.o: tutorial14.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial14.o tutorial14.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial14.o tutorial14.cpp
 
 # Subprojects
 .build-subprojects:

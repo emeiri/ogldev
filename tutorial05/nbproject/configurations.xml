@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="94">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -15,7 +15,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>../Common/ogldev_util.cpp</itemPath>
       <itemPath>tutorial05.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -43,6 +42,7 @@
           <incDir>
             <pElem>../Include</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags assimp`</commandLine>
         </ccTool>
         <linkerTool>
           <linkerLibItems>

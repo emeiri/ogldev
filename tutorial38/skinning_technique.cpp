@@ -167,13 +167,13 @@ bool SkinningTechnique::Init()
 
 void SkinningTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP);    
 }
 
 
-void SkinningTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
+void SkinningTechnique::SetWorldMatrix(const Matrix4f& World)
 {
-    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
+    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World);
 }
 
 
@@ -246,9 +246,10 @@ void SkinningTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
     }
 }
 
+
 void SkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
 {
     assert(Index < MAX_BONES);
     //Transform.Print();
-    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform.m);       
+    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);       
 }

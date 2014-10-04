@@ -122,7 +122,7 @@ bool Technique::Finalize()
     if (!Success) {
         glGetProgramInfoLog(m_shaderProg, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
-        return false;
+     //   return false;
     }
 
     // Delete the intermediate shader objects that have been added to the program

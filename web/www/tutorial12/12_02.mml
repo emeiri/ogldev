@@ -1,0 +1,45 @@
+<math display = 'block'>
+  <mrow>
+    <mfrac>
+      <msub>
+        <mi>y</mi>
+        <mi>p</mi>
+      </msub>
+      <mi>d</mi>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+      <mi>y</mi>
+      <mi>z</mi>
+    </mfrac>
+    <mo lspace='3px' rspace='3px'>&rArr;</mo>
+    <msub>
+      <mi>y</mi>
+      <mi>p</mi>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+      <mrow>
+        <mi>y</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <mi>d</mi>
+      </mrow>
+      <mi>z</mi>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+      <mi>y</mi>
+      <mrow>
+        <mi>z</mi>
+        <mo lspace='2px' rspace='2px'>&sdot;</mo>
+        <tan/>
+        <mo stretchy='false'>(</mo>
+        <mfrac>
+          <mi>&alpha;</mi>
+          <mn>2</mn>
+        </mfrac>
+        <mo stretchy='false'>)</mo>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>

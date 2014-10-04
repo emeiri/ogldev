@@ -26,17 +26,16 @@
 
 #include "engine_common.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
+#include "ogldev_app.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "texture.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
+
 using namespace std;
 
 #define WINDOW_WIDTH  1000
@@ -59,21 +58,12 @@ CameraDirection gCameraDirections[NUM_OF_LAYERS] =
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, -1.0f, 0.0f) }
 };
 
-#ifndef WIN32
-Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
-                   {.1,1.0,1.0,.5}, {1,1,1,0},
-                   0, {1,0,0,1}, 0, {1,0,0,1},
-                   0, {0,0,0,1}, 0, {0,0,0,1} };
-#endif
 
-class Tutorial43 : public ICallbacks
+class Tutorial43 : public ICallbacks, public OgldevApp
 {
 public:
 
     Tutorial43() 
-#ifndef WIN32
-           : m_fontRenderer2(sMarkup)
-#endif
     {
         m_pGameCamera = NULL;
         m_scale = 0.0f;
@@ -88,9 +78,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
     }
 
            
@@ -160,13 +147,7 @@ public:
         if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
-        
-        if (!m_fontRenderer2.InitFontRenderer()) {
-            return false;
-        }
-#endif
-        
-        m_time = glutGet(GLUT_ELAPSED_TIME);
+#endif       
         
         glEnable(GL_TEXTURE_CUBE_MAP);
         
@@ -275,24 +256,15 @@ public:
     }
 
     
-    virtual void IdleCB()
+    void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        RenderSceneCB();
-    }
-
-    
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
+        switch (OgldevKey) {
+            case OGLDEV_KEY_ESCAPE:
+            case OGLDEV_KEY_q:
                 glutLeaveMainLoop();
                 break;
+            default:
+                m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
@@ -303,36 +275,8 @@ public:
     }
     
     
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
-
 private:
     
-    void CalcFPS()
-    {
-        m_frameCount++;
-        
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_time > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_time);
-            m_time = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }       
-
     LightingTechnique m_lightingEffect;
     ShadowMapTechnique m_shadowMapEffect;
     Camera* m_pGameCamera;
@@ -347,22 +291,15 @@ private:
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
-    int m_time;
-    int m_frameCount;
-    float m_fps;        
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-    FontRenderer m_fontRenderer2;
-#endif
 };
 
 
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 43")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 43")) {
         return 1;
     }
 

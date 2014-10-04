@@ -5,15 +5,10 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>billboard_technique.h</itemPath>
-      <itemPath>callbacks.h</itemPath>
-      <itemPath>camera.h</itemPath>
       <itemPath>engine_common.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>particle_system.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
       <itemPath>ps_update_technique.h</itemPath>
       <itemPath>random_texture.h</itemPath>
     </logicalFolder>
@@ -32,16 +27,56 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>billboard_technique.cpp</itemPath>
-      <itemPath>camera.cpp</itemPath>
-      <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>particle_system.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>ps_update_technique.cpp</itemPath>
       <itemPath>random_texture.cpp</itemPath>
       <itemPath>tutorial28.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -67,8 +102,9 @@
         <ccTool>
           <incDir>
             <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp` -Wall</commandLine>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig` -Wall</commandLine>
           <warningLevel>3</warningLevel>
         </ccTool>
         <linkerTool>
@@ -90,7 +126,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
       <item path="billboard.fs" ex="false" tool="3" flavor2="0">
@@ -103,17 +139,7 @@
       </item>
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -123,10 +149,6 @@
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -134,10 +156,6 @@
       <item path="particle_system.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle_system.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ps_update.gs" ex="false" tool="3" flavor2="0">
       </item>
@@ -184,17 +202,7 @@
       </item>
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="callbacks.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="camera.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="camera.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
@@ -204,10 +212,6 @@
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="math_3d.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -215,10 +219,6 @@
       <item path="particle_system.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="particle_system.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ps_update.gs" ex="false" tool="3" flavor2="0">
       </item>

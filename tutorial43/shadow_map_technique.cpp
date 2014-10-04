@@ -17,7 +17,7 @@
 */
 
 #include "shadow_map_technique.h"
-#include "pipeline.h"
+#include "ogldev_pipeline.h"
 
 
 ShadowMapTechnique::ShadowMapTechnique()

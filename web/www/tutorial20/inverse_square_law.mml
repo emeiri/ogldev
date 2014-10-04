@@ -1,0 +1,38 @@
+<math display = 'block'>
+  <mrow>
+    <msub>
+      <mi>L</mi>
+      <mi>distance</mi>
+    </msub>
+    <mo>=</mo>
+    <mfrac>
+      <msub>
+        <mi>L</mi>
+        <mn>1</mn>
+      </msub>
+      <msup>
+        <mi>distance</mi>
+        <mn>2</mn>
+      </msup>
+    </mfrac>
+    <mtext fontfamily='Times New Roman'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</mtext>
+    <mo stretchy='false'>(</mo>
+    <msub>
+      <mi>L</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>&minus;</mo>
+    <mi>strength</mi>
+    <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+    <mi>of</mi>
+    <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+    <mi>light</mi>
+    <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+    <mi>at</mi>
+    <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+    <mi>distance</mi>
+    <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+    <mn>1</mn>
+    <mo stretchy='false'>)</mo>
+  </mrow>
+</math>

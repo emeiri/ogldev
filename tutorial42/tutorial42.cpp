@@ -24,39 +24,29 @@
 #include <string>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
+#include "ogldev_backend.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "texture.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
-#ifndef WIN32
-#include "freetypeGL.h"
-#endif
+
 using namespace std;
 
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
 
-#ifndef WIN32
-Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
-                   {.1,1.0,1.0,.5}, {1,1,1,0},
-                   0, {1,0,0,1}, 0, {1,0,0,1},
-                   0, {0,0,0,1}, 0, {0,0,0,1} };
-#endif
-
-class Tutorial42 : public ICallbacks
+class Tutorial42 : public ICallbacks, public OgldevApp
 {
 public:
 
     Tutorial42() 
-#ifndef WIN32
-           : m_fontRenderer2(sMarkup)
-#endif
     {
         m_pGameCamera = NULL;
         m_pLightingEffect = NULL;
@@ -75,9 +65,6 @@ public:
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 100.0f;  
-        
-        m_frameCount = 0;
-        m_fps = 0.0f;
     }
 
     ~Tutorial42()
@@ -138,13 +125,7 @@ public:
         if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
-        
-        if (!m_fontRenderer2.InitFontRenderer()) {
-            return false;
-        }
 #endif
-        
-        m_time = glutGet(GLUT_ELAPSED_TIME);
         
         return true;
     }
@@ -229,63 +210,29 @@ public:
 
         m_mesh.Render();        
     }
-    virtual void IdleCB()
-    {
-        RenderSceneCB();
-    }
-
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
 
 
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 'q':
-                glutLeaveMainLoop();
-                break;
-        }
-    }
+	void KeyboardCB(OGLDEV_KEY OgldevKey)
+	{
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			OgldevBackendLeaveMainLoop();
+			break;
+		default:
+			m_pGameCamera->OnKeyboard(OgldevKey);
+		}
+	}
 
 
-    virtual void PassiveMouseCB(int x, int y)
-    {
-        m_pGameCamera->OnMouse(x, y);
-    }
+	virtual void PassiveMouseCB(int x, int y)
+	{
+		m_pGameCamera->OnMouse(x, y);
+	}
+
     
-    
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
-
 private:
     
-    void CalcFPS()
-    {
-        m_frameCount++;
-        
-        int time = glutGet( GLUT_ELAPSED_TIME );
-
-        if (time - m_time > 1000) {
-            m_fps = (float)m_frameCount * 1000.0f / (time - m_time);
-            m_time = time;
-            m_frameCount = 0;
-        }
-    }
-        
-    void RenderFPS()
-    {
-        char text[32];
-        ZERO_MEM(text);        
-        SNPRINTF(text, sizeof(text), "FPS: %.2f", m_fps);
-#ifndef WIN32
-        m_fontRenderer.RenderText(10, 10, text);        
-#endif
-    }       
-
     LightingTechnique* m_pLightingEffect;
     ShadowMapTechnique* m_pShadowMapEffect;
     Camera* m_pGameCamera;
@@ -296,22 +243,15 @@ private:
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
-    int m_time;
-    int m_frameCount;
-    float m_fps;    
-#ifndef WIN32
-    FontRenderer m_fontRenderer;
-    FontRenderer m_fontRenderer2;
-#endif
 };
 
 
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 42")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 42")) {
         return 1;
     }
       

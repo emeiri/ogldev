@@ -19,7 +19,7 @@
 #define	PICKING_TECHNIQUE_H
 
 #include "technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 #include "render_callbacks.h"
 #include "ogldev_types.h"
 

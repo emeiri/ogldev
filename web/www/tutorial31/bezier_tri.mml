@@ -1,0 +1,353 @@
+<math display = 'block'>
+  <mtable columnalign='left' linebreak='true'>
+    <mtr>
+      <mtd>
+        <mi>b</mi>
+        <mo stretchy='false'>(</mo>
+        <mi>u</mi>
+        <mo>,</mo>
+        <mi>v</mi>
+        <mo>,</mo>
+        <mi>w</mi>
+        <mo stretchy='false'>)</mo>
+        <mo>=</mo>
+        <mrow>
+          <munder>
+            <mo>&sum;</mo>
+            <mrow>
+              <mi>i</mi>
+              <mo>&plus;</mo>
+              <mi>j</mi>
+              <mo>&plus;</mo>
+              <mi>k</mi>
+              <mo>=</mo>
+              <mn>3</mn>
+            </mrow>
+          </munder>
+          <mrow>
+            <msub>
+              <mi>B</mi>
+              <mi>ijk</mi>
+            </msub>
+            <mfrac>
+              <mrow>
+                <mn>3</mn>
+                <mo>!</mo>
+              </mrow>
+              <mrow>
+                <mi>i</mi>
+                <mo>!</mo>
+                <mi>j</mi>
+                <mo>!</mo>
+                <mi>k</mi>
+                <mo>!</mo>
+              </mrow>
+            </mfrac>
+          </mrow>
+        </mrow>
+        <msup>
+          <mi>u</mi>
+          <mi>i</mi>
+        </msup>
+        <msup>
+          <mi>v</mi>
+          <mi>j</mi>
+        </msup>
+        <msup>
+          <mi>w</mi>
+          <mi>k</mi>
+        </msup>
+        <mo>=</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>300</mn>
+        </msub>
+        <msup>
+          <mi>w</mi>
+          <mn>3</mn>
+        </msup>
+        <mo>&plus;</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>030</mn>
+        </msub>
+        <msup>
+          <mi>u</mi>
+          <mn>3</mn>
+        </msup>
+        <mo>&plus;</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>003</mn>
+        </msub>
+        <msup>
+          <mi>v</mi>
+          <mn>3</mn>
+        </msup>
+        <mo>&plus;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp; &nbsp; &nbsp;&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <msub>
+          <mi>B</mi>
+          <mn>210</mn>
+        </msub>
+        <mn>3</mn>
+        <msup>
+          <mi>w</mi>
+          <mn>2</mn>
+        </msup>
+        <mi>u</mi>
+        <mo>&plus;</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>120</mn>
+        </msub>
+        <mn>3</mn>
+        <msup>
+          <mi>wu</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>&plus;</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>201</mn>
+        </msub>
+        <mn>3</mn>
+        <msup>
+          <mi>w</mi>
+          <mn>2</mn>
+        </msup>
+        <mi>v</mi>
+        <mo>&plus;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp; &nbsp; &nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp; &nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <msub>
+          <mi>B</mi>
+          <mn>021</mn>
+        </msub>
+        <mn>3</mn>
+        <msup>
+          <mi>u</mi>
+          <mn>2</mn>
+        </msup>
+        <mi>v</mi>
+        <mo>&plus;</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>102</mn>
+        </msub>
+        <mn>3</mn>
+        <mi>w</mi>
+        <msup>
+          <mi>v</mi>
+          <mn>2</mn>
+        </msup>
+        <mi>u</mi>
+        <mo>&plus;</mo>
+        <msub>
+          <mi>B</mi>
+          <mn>012</mn>
+        </msub>
+        <mn>3</mn>
+        <msup>
+          <mi>uv</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>&plus;</mo>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp; &nbsp; &nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <mtext fontfamily='Times New Roman'>&nbsp;</mtext>
+        <mtext>&nbsp;</mtext>
+        <msub>
+          <mi>B</mi>
+          <mn>111</mn>
+        </msub>
+        <mn>6</mn>
+        <mi>wuv</mi>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>

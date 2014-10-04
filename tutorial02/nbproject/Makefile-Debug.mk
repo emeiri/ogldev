@@ -42,8 +42,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=`pkg-config --cflags ImageMagick++ gl assimp glew freetype2 fontconfig` 
+CXXFLAGS=`pkg-config --cflags ImageMagick++ gl assimp glew freetype2 fontconfig` 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lGL
+LDLIBSOPTIONS=-lglut
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -60,12 +60,12 @@ LDLIBSOPTIONS=-lglut -lGLEW -lGL
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial02: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial02 ${OBJECTFILES} ${LDLIBSOPTIONS}
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial02 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs gl glew`
 
 ${OBJECTDIR}/tutorial02.o: tutorial02.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial02.o tutorial02.cpp
+	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial02.o tutorial02.cpp
 
 # Subprojects
 .build-subprojects:

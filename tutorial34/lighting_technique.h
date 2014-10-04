@@ -19,7 +19,7 @@
 #define	LIGHTING_TECHNIQUE_H
 
 #include "glfx_technique.h"
-#include "math_3d.h"
+#include "ogldev_math_3d.h"
 
 struct BaseLight
 {

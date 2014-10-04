@@ -24,12 +24,12 @@
 #include <assert.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "picking_texture.h"
 #include "picking_technique.h"
@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH  1680
 #define WINDOW_HEIGHT 1050
 
-class Tutorial29 : public ICallbacks
+class Tutorial29 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -179,24 +179,13 @@ public:
     }
     
     
-    virtual void IdleCB()
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        RenderSceneCB();
-    }
-
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 27:
-            case 'q':
-                glutLeaveMainLoop();
-                break;
+        switch (OgldevKey) {
+			case OGLDEV_KEY_ESCAPE:
+			case OGLDEV_KEY_q:
+				GLUTBackendLeaveMainLoop();
+				break;
 
             case 'a':
                 m_directionalLight.AmbientIntensity += 0.05f;
@@ -213,6 +202,8 @@ public:
             case 'x':
                 m_directionalLight.DiffuseIntensity -= 0.05f;
                 break;
+			default:
+				m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
@@ -223,10 +214,10 @@ public:
     }
     
     
-    virtual void MouseCB(int Button, int State, int x, int y)
+    virtual void MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)
     {
-        if (Button == GLUT_LEFT_BUTTON) {
-            m_leftMouseButton.IsPressed = (State == GLUT_DOWN);
+        if (Button == OGLDEV_MOUSE_BUTTON_LEFT) {
+            m_leftMouseButton.IsPressed = (State == OGLDEV_KEY_STATE_PRESS);
             m_leftMouseButton.x = x;
             m_leftMouseButton.y = y;
         }
@@ -254,9 +245,9 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 29")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 29")) {
         return 1;
     }
 

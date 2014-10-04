@@ -1,0 +1,296 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	
+<table width=100% >
+<tr>
+	<td width=34%><div align=left><a href="../tutorial40/tutorial40.html" rel="prev"><img src="../prev.jpg"></a></div></td>
+	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
+	<td width=33%><div align=right><a href="../tutorial42/tutorial42.html" rel="next"><img src="../next.jpg"></a></div></td>
+</tr>
+</table>
+	
+<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+<title>Tutorial 41</title>
+</head>
+<body>
+<div class="content">
+<div class="lines">
+<h1>Tutorial 41 - Object Motion Blur</h1>
+<div style="text-align: center">
+<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
+</div>
+<h2>Background</h2>
+<p>
+  Motion Blur is a very popular technique in fast pace 3D games whose purpose is to add a blurring
+  effect to moving objects. This enhances the sense of realism experienced by the player. Motion
+  Blur can be accomplished in various ways. There is a camera based Motion Blur which focuses on
+  camera movement and there is an object based Motion Blur. In this tutorial we will study one of the
+  options to accomplish the later.
+</p>
+<p>
+  The principle behind Motion Blur is that we can calculate the vector of movement (a.k.a Motion Vector)
+  for each rendered pixel between two frames. By sampling along that vector from the current color buffer
+  and averaging the result we get pixels that represent the movement of the underlying objects. This is really
+  all there is to it. Let's take it to the next level of details. The following is a summary of the required
+  steps and after that we will review the actual code.
+</p>
+<p>
+  <ol>
+    <li>The technique is split into two passes - a render pass and then a motion blur pass.</li>
+    <li>In the render pass we render into two buffers - the regular color buffer and a motion vector
+      buffer. The color buffer contains the original image as if it was rendered without motion blur.
+      The motion vector blur contains a vector for each pixel which represents its movement along the screen
+      between the previous frame and the current.</li>
+    <li>The motion vector is calculated by supplying the WVP matrix of the previous frame to the VS. We transform the
+      local space position of each vertex using the current WVP and the previous one to clip space and pass both results
+      to the FS. We get the interpolated clip space positions in the FS and transform them to NDC by dividing them
+      by their respective W coordinate. This completes their projection to the screen so now we can substract
+      the previous position from the current and get a motion vector. The motion vector is written out to a texture.</li>
+    <li>The motion blur pass is implemented by rendering a full screen quad. We sample the motion vector for each
+      pixel in the FS and then we sample from the color buffer along that vector (starting from the current pixel).</li>
+    <li>We sum up the results of each sample operation while giving the highest weight to the current pixel
+      and the lowest weight to the one which is the most distant on the motion vector (this is what we do in this tutorial,
+      but there are many other options here).</li>
+    <li>This averaging of sample results along the motion vector creates the sense of bluriness. Obviously, pixels
+      that didn't move between two frames will look the same, which is fine.</li>
+  </ol>
+  </p>
+<p>This tutorial is based on the Skeletal Animation tutorial (#38). We will review here the changes that add
+the motion blur to that tutorial.</p>
+
+<h2>Code Walkthru</h2>
+<p>(tutorial41.cpp:157)</p>
+<code>
+    virtual void RenderSceneCB()<br>
+    {   <br>
+&nbsp; &nbsp;       CalcFPS();<br>
+              <br>
+&nbsp; &nbsp;        m_pGameCamera->OnRender();<br>
+<br>
+&nbsp; &nbsp; <b>       RenderPass();<br>
+        <br>
+&nbsp; &nbsp;        MotionBlurPass();</b><br>
+                             <br> 
+&nbsp; &nbsp;        RenderFPS();       <br>
+        <br>
+&nbsp; &nbsp;        glutSwapBuffers();<br>
+    }
+</code>    
+<p>This is the main render function and it is very simple. We have a render pass for all the
+objects in the scene and then a post processing pass for the motion blur.</p>
+<p>(tutorial41.cpp:172)</p>  
+<code>
+void RenderPass()<br>
+{<br>
+&nbsp; &nbsp;      <b>  m_intermediateBuffer.BindForWriting();</b><br>
+<br>
+&nbsp; &nbsp;        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;        m_pSkinningTech->Enable();<br>
+        <br>
+&nbsp; &nbsp;        vector<Matrix4f> Transforms;<br>
+               <br>
+&nbsp; &nbsp;        float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)m_startTime) / 1000.0f;<br>
+<br>
+&nbsp; &nbsp;        m_mesh.BoneTransform(RunningTime, Transforms);<br>
+        <br>
+&nbsp; &nbsp;        for (uint i = 0 ; i < Transforms.size() ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;            m_pSkinningTech->SetBoneTransform(i, Transforms[i]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;        <b>     m_pSkinningTech->SetPrevBoneTransform(i, m_prevTransforms[i]);</b><br>
+&nbsp; &nbsp;         }                <br>
+               <br>
+&nbsp; &nbsp;         m_pSkinningTech->SetEyeWorldPos(m_pGameCamera->GetPos());<br>
+        <br>
+&nbsp; &nbsp;         m_pipeline.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+&nbsp; &nbsp; m_pipeline.SetPerspectiveProj(m_persProjInfo);           <br>
+&nbsp; &nbsp;         m_pipeline.Scale(0.1f, 0.1f, 0.1f);                <br>
+             <br>
+&nbsp; &nbsp;         Vector3f Pos(m_position);<br>
+&nbsp; &nbsp;         m_pipeline.WorldPos(Pos);        <br>
+&nbsp; &nbsp;         m_pipeline.Rotate(270.0f, 180.0f, 0.0f);       <br>
+&nbsp; &nbsp;         m_pSkinningTech->SetWVP(m_pipeline.GetWVPTrans());<br>
+&nbsp; &nbsp;         m_pSkinningTech->SetWorldMatrix(m_pipeline.GetWorldTrans());            <br>
+       <br>
+&nbsp; &nbsp;         m_mesh.Render();        <br>
+        <br>
+&nbsp; &nbsp;    <b>     m_prevTransforms = Transforms;</b><br>
+}
+</code>    
+<p>This is our render pass. It is almost identical to the one from the Skeletal Animation tutorial
+with changes marked in bold face. The intermediate buffer is a simple class that combines the color, depth,
+and motion vector buffers under a single frame buffer object. We've seen this already when we studied deferred
+rendering (tutorials 35-37) so I'm not going to review it here. Check the attached sources. The basic idea
+is to render into a FBO and not directly to the screen. In the motion blur pass we will read from the intermediate
+buffer.</p>
+<p>
+  Other than that you can see that we've added a class member to the 'Tutorial41' class that keeps the vector of bone
+  transformations from the previous frame. We feed it into the skinning technique along with the current bone transformations.
+  We will see how this is used when we review the GLSL code of the technique. 
+</p>
+<p>(tutorial41.cpp:209)</p>    
+<code>
+void MotionBlurPass()<br>
+{<br>
+&nbsp; &nbsp;         m_intermediateBuffer.BindForReading();<br>
+<br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;         m_pMotionBlurTech->Enable();<br>
+<br>
+&nbsp; &nbsp;         m_quad.Render();<br>
+}
+</code>
+<p>In the motion blur pass we bind the intermediate buffer for reading (which means that the rendering
+  output goes to the screen) and render a full screen quad. Each screen pixel will be processed once
+  and the effect of motion blur will be calculated.
+</p>
+<p>(skinning.vs)</p>
+<code>
+#version 330                                                                        <br>
+                                                                                    <br>
+layout (location = 0) in vec3 Position;                                             <br>
+layout (location = 1) in vec2 TexCoord;                                             <br>
+layout (location = 2) in vec3 Normal;                                               <br>
+layout (location = 3) in ivec4 BoneIDs;<br>
+layout (location = 4) in vec4 Weights;<br>
+<br>
+out vec2 TexCoord0;<br>
+out vec3 Normal0;                                                                   <br>
+out vec3 WorldPos0;                                                                 <br>
+<b>out vec4 ClipSpacePos0;<br>
+    out vec4 PrevClipSpacePos0; </b>                                                               <br>
+<br>
+<br>
+const int MAX_BONES = 100;<br>
+<br>
+uniform mat4 gWVP;<br>
+uniform mat4 gWorld;<br>
+uniform mat4 gBones[MAX_BONES];<br>
+<b>uniform mat4 gPrevBones[MAX_BONES];</b><br>
+<br>
+void main()<br>
+{       <br>
+&nbsp; &nbsp;      mat4 BoneTransform = gBones[BoneIDs[0]] * Weights[0];<br>
+&nbsp; &nbsp;      BoneTransform     += gBones[BoneIDs[1]] * Weights[1];<br>
+&nbsp; &nbsp;      BoneTransform     += gBones[BoneIDs[2]] * Weights[2];<br>
+&nbsp; &nbsp;      BoneTransform     += gBones[BoneIDs[3]] * Weights[3];<br>
+<br>
+&nbsp; &nbsp;      vec4 PosL         = BoneTransform * vec4(Position, 1.0);<br>
+&nbsp; &nbsp;      vec4 ClipSpacePos = gWVP * PosL;<br>
+&nbsp; &nbsp;      gl_Position       = ClipSpacePos;<br>
+&nbsp; &nbsp;      TexCoord0         = TexCoord;<br>
+&nbsp; &nbsp;      vec4 NormalL      = BoneTransform * vec4(Normal, 0.0);<br>
+&nbsp; &nbsp;      Normal0           = (gWorld * NormalL).xyz;<br>
+&nbsp; &nbsp;      WorldPos0         = (gWorld * PosL).xyz;                                <br>
+<br>
+<b>&nbsp; &nbsp;      mat4 PrevBoneTransform = gPrevBones[BoneIDs[0]] * Weights[0];<br>
+&nbsp; &nbsp;      PrevBoneTransform += gPrevBones[BoneIDs[1]] * Weights[1];<br>
+&nbsp; &nbsp;  PrevBoneTransform += gPrevBones[BoneIDs[2]] * Weights[2];<br>
+&nbsp; &nbsp;      PrevBoneTransform += gPrevBones[BoneIDs[3]] * Weights[3];<br>
+<br>
+&nbsp; &nbsp;      ClipSpacePos0 = ClipSpacePos;<br>
+&nbsp; &nbsp;      vec4 PrevPosL = PrevBoneTransform * vec4(Position, 1.0);<br>
+&nbsp; &nbsp;      PrevClipSpacePos0 = gWVP * PrevPosL;                         </b> <br>
+}
+</code>
+<p>Above we see the changes to the VS of the skinning technique. We've added a uniform array
+which contains the bone transformations from the previous frame and we use it to calculate the
+clip space position of the current vertex in the previous frame. This position, along with the
+clip space position of the current vertex in the current frame are forwarded to the FS.</p>
+<p>(skinning.fs:123)</p>
+<code>
+    <b>layout (location = 0) out vec3 FragColor;<br>
+        layout (location = 1) out vec2 MotionVector;</b><br>
+            <br>
+    void main()<br>
+{                                    <br>
+&nbsp; &nbsp;     VSOutput In;<br>
+&nbsp; &nbsp;     In.TexCoord = TexCoord0;<br>
+&nbsp; &nbsp;     In.Normal   = normalize(Normal0);<br>
+&nbsp; &nbsp;     In.WorldPos = WorldPos0;<br>
+  <br>
+&nbsp; &nbsp;     vec4 TotalLight = CalcDirectionalLight(In);                                         <br>
+                                                                                            <br>
+&nbsp; &nbsp;     for (int i = 0 ; i < gNumPointLights ; i++) {                                           <br>
+&nbsp; &nbsp; &nbsp; &nbsp;         TotalLight += CalcPointLight(gPointLights[i], In);                              <br>
+&nbsp; &nbsp;     }                                                                                       <br>
+                                                                                            <br>
+&nbsp; &nbsp;     for (int i = 0 ; i < gNumSpotLights ; i++) {                                            <br>
+&nbsp; &nbsp; &nbsp; &nbsp;         TotalLight += CalcSpotLight(gSpotLights[i], In);                                <br>
+&nbsp; &nbsp;     }                                                                                       <br>
+                                                                                            <br>
+&nbsp; &nbsp; <b>    vec4 Color = texture(gColorMap, TexCoord0) * TotalLight;<br>
+&nbsp; &nbsp;     FragColor = Color.xyz;<br>
+&nbsp; &nbsp;     vec3 NDCPos = (ClipSpacePos0 / ClipSpacePos0.w).xyz;<br>
+&nbsp; &nbsp;     vec3 PrevNDCPos = (PrevClipSpacePos0 / PrevClipSpacePos0.w).xyz;<br>
+&nbsp; &nbsp;     MotionVector = (NDCPos - PrevNDCPos).xy;</b><br>
+}
+</code>  
+<p>The FS of the skinning technique has been updated to output two vectors into two separate buffers
+  (the color and the motion vector buffers). The color is calculated as usual. To calculate the motion vector
+  we project the clip space positions of the current and previous frame by doing perspective divide on both
+  and substract one from the other.</p>
+  <p>Note that the motion vector is just a 2D vector. This is because it "lives" only on the screen. The corresponding
+    motion buffer is created with the type GL_RG to match.</p>
+  <p>(motion_blur.vs)</p>
+  <code>
+      #version 330<br>
+<br>
+layout (location = 0) in vec3 Position;<br>
+layout (location = 1) in vec2 TexCoord;                                             <br>
+<br>
+out vec2 TexCoord0;<br>
+<br>
+void main()<br>
+{       <br>
+&nbsp; &nbsp;     gl_Position = vec4(Position, 1.0);<br>
+&nbsp; &nbsp;     TexCoord0   = TexCoord;<br>
+}
+</code>
+<p>This is the VS of the motion blur technique. We simply pass along the position and texture
+  coordinate of each vertex of the full screen quad.</p>
+<p>(motion_blur.fs)</p>
+<code>
+    #version 330<br>
+<br>
+in vec2 TexCoord0;<br>
+<br>
+uniform sampler2D gColorTexture;<br>
+uniform sampler2D gMotionTexture;<br>
+    <br>
+out vec4 FragColor;<br>
+                                                                                        <br>
+void main()<br>
+{                                    <br>
+&nbsp; &nbsp;     vec2 MotionVector = texture(gMotionTexture, TexCoord0).xy / 2.0;<br>
+<br>
+&nbsp; &nbsp; vec4 Color = vec4(0.0);<br>
+<br>
+&nbsp; &nbsp;     vec2 TexCoord = TexCoord0;<br>
+    <br>
+&nbsp; &nbsp;     Color += texture(gColorTexture, TexCoord) * 0.4;<br>
+&nbsp; &nbsp;     TexCoord -= MotionVector;<br>
+&nbsp; &nbsp;     Color += texture(gColorTexture, TexCoord) * 0.3;<br>
+&nbsp; &nbsp;     TexCoord -= MotionVector;<br>
+&nbsp; &nbsp;     Color += texture(gColorTexture, TexCoord) * 0.2;<br>
+&nbsp; &nbsp;     TexCoord -= MotionVector;<br>
+&nbsp; &nbsp;     Color += texture(gColorTexture, TexCoord) * 0.1;<br>
+<br>
+&nbsp; &nbsp;     FragColor = Color;<br>
+}
+</code>
+<p>This is where all the motion blur fun takes place. We sample the motion vector of the
+  current pixel and use it to sample four texels from the color buffer. The color of the current
+  pixel is sampled using the original texture coordinates and we give it the highest weight (0.4).
+  We then move the texture coordinate backward along the motion vector and sample three more color
+  texels. We combine them together while giving smaller and smaller weights as we move along. 
+</p>
+<p>
+  You can see that I divided the original motion vector by two. You will probably need some fine tuning
+  here as well as with the weights to get the best result for your scene. Have fun.
+</p>
+<p>Here's an example of a possible output:</p>
+<img src="../../tutorial41.jpg" width="50%" height="50%"</>
+</body>
+</html>

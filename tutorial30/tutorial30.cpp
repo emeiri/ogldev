@@ -23,18 +23,18 @@
 #include <GL/freeglut.h>
 
 #include "engine_common.h"
+#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "pipeline.h"
-#include "camera.h"
-#include "texture.h"
+#include "ogldev_pipeline.h"
+#include "ogldev_camera.h"
 #include "lighting_technique.h"
-#include "glut_backend.h"
+#include "ogldev_glut_backend.h"
 #include "mesh.h"
 
 #define WINDOW_WIDTH  1680
 #define WINDOW_HEIGHT 1050
 
-class Tutorial30 : public ICallbacks
+class Tutorial30 : public ICallbacks, public OgldevApp
 {
 public:
 
@@ -141,24 +141,13 @@ public:
     }
 
        
-    virtual void IdleCB()
+	virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
-        RenderSceneCB();
-    }
-
-    virtual void SpecialKeyboardCB(int Key, int x, int y)
-    {
-        m_pGameCamera->OnKeyboard(Key);
-    }
-
-
-    virtual void KeyboardCB(unsigned char Key, int x, int y)
-    {
-        switch (Key) {
-            case 27:
-            case 'q':
-                glutLeaveMainLoop();
-                break;
+		switch (OgldevKey) {
+		case OGLDEV_KEY_ESCAPE:
+		case OGLDEV_KEY_q:
+			GLUTBackendLeaveMainLoop();
+			break;
 
             case '+':
                 m_dispFactor += 0.01f;
@@ -178,8 +167,11 @@ public:
                 }
                 else {
                     glPolygonMode(GL_FRONT, GL_FILL);
-                }                    
-        }
+                }  
+				break;
+			default:
+				m_pGameCamera->OnKeyboard(OgldevKey);
+		}
     }
 
 
@@ -189,10 +181,6 @@ public:
     }
     
     
-    virtual void MouseCB(int Button, int State, int x, int y)
-    {
-    }
-
 private:
 
     LightingTechnique m_lightingEffect;
@@ -210,9 +198,9 @@ private:
 int main(int argc, char** argv)
 {
     Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv);
+    GLUTBackendInit(argc, argv, true, false);
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 32, false, "Tutorial 30")) {
+    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 30")) {
         return 1;
     }
 

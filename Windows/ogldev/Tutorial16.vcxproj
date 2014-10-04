@@ -11,15 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial16\camera.cpp" />
-    <ClCompile Include="..\..\tutorial16\math_3d.cpp" />
-    <ClCompile Include="..\..\tutorial16\pipeline.cpp" />
     <ClCompile Include="..\..\tutorial16\tutorial16.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\tutorial16\camera.h" />
-    <ClInclude Include="..\..\tutorial16\math_3d.h" />
-    <ClInclude Include="..\..\tutorial16\pipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\tutorial16\shader.fs" />
@@ -74,7 +66,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6;$(ProjectDir)\..\..\Include\assimp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
