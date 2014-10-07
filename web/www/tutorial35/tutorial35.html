@@ -232,7 +232,7 @@ void DSGeometryPass()<br>
 {<br>
 &nbsp; &nbsp; m_DSGeomPassTech.Enable();<br>
 <br>
-&nbsp; &nbsp; m_gbuffer.BindForGeometryPass();<br>
+&nbsp; &nbsp; m_gbuffer.BindForWriting();<br>
 <br>
 &nbsp; &nbsp; glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
 <br>
