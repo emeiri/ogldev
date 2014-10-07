@@ -42,7 +42,7 @@
 	<li>The rasterizer maps the X and Y of the position vector to the dimensions of the framebuffer (e.g. 800x600, 1024x768, etc). 
 		The results	are the screen space coordinates of the position vector.</li>
 	<li>The rasterizer takes the screen space coordinates of the three triangle vertices and interpolates them to create
-		the unique coordinates for each pixel that the triangle covers. The Z value (still in the [0,1] range) is also interpolated
+		the unique coordinates for each pixel that the triangle covers. The Z value (still in the [-1,1] range) is also interpolated
 		so every pixel has its own depth.
 	<li>Since we disabled color writes in the first pass the fragment shader is disabled. The depth test, however, still 
 		executes. To compare the Z value of the current pixel with the one in the buffer the screen space coordinates

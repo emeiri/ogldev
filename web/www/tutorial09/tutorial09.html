@@ -44,8 +44,8 @@ screen you need to designate one of the VS output variables as
 coordinates of the vertex. The XYZ components of that vector are
 divided by the W component (a process known as perspective divide and
 is dealt with in the tutorial dedicated to that subject) and any
-component which goes outside the normalized box ([-1,1] for XY; [0,1]
-for Z) gets clipped. The result is transformed to screen space
+component which goes outside the normalized box ([-1,1]) gets clipped. 
+The result is transformed to screen space
 coordinates and then the triangle (or any other supported primitive
 type) is rendered to screen by the rasterizer.</p>
 <p>The rasterizer performs
