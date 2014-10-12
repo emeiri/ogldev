@@ -158,11 +158,11 @@ bool Mesh::LoadMesh(const string& Filename)<br>
 Not much has changed in the main function that loads the mesh. We generate the VAO using glGenVertexArrays() by providing the number 
 of elements in an array of GLuint and the address of the array itself (in our case we only need one
 GLuint). After that we bind the VAO using glBindVertexArray(). There can only be one VAO bound 
-at any time. From now on, any change to the state of the vertex processor will effect this
+at any time. From now on, any change to the state of the vertex processor will affect this
 VAO. The four buffers are generated using glGenBuffers() and the mesh is loaded using
 the Open Asset Import Library (see below). A very important function call is 
 glBindVertexArray(0) at the end of the function. By binding zero as the VAO we guarentee that no further
-changes to the vertex processor will effect our VAO (OpenGL will never generate a VAO with
+changes to the vertex processor will affect our VAO (OpenGL will never generate a VAO with
 the value of zero so this is safe). 
 </p>
 <p>(mesh.cpp:86)</p>
@@ -247,7 +247,7 @@ to keep on populating them as we go. Materials are initialized same as before.
 <p>
 The last part of the function is where things become interesting. The position, normal and texture
 coordinates buffers are bound one by one to the GL_ARRAY_BUFFER target. Any further operation on that
-target effect the currently bound buffer and such changes remain attached to that buffer when a new
+target affects the currently bound buffer and such changes remain attached to that buffer when a new
 buffer is bound to the same target. For each of the three buffers we:
 <ol>
 	<li>Populate with data using glBufferData().</li>

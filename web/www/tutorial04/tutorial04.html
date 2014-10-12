@@ -231,7 +231,7 @@ perspective divide stage is something that we cannot disable. Whatever
 gl_Position value we output from the vertex shader will be divided by
 the HW using its W component. We need to remember that else we will not
 get the results we expect. In order to circumvent the effect of
-perspective divide we set W to 1.0. Division by 1.0 will not effect the
+perspective divide we set W to 1.0. Division by 1.0 will not affect the
 other components of the position vector which will stay inside our
 normalized box.</p>
 <p>If everything worked correctly, three vertices with the values (-0.5,
@@ -244,7 +244,7 @@ shader code is taken from the fragment shader.</p>
 <code>out vec4 FragColor;</code>
 <p>Usually the job of the fragment shader is to determine the color of the
 fragment (pixel). In addition, the fragment shader can discard the
-pixel altogether or change its Z value (which will effect the result of
+pixel altogether or change its Z value (which will affect the result of
 subsequent Z test). Outputing the color is done by declaring the above
 variable. The four components represent R, G, B and A (for alpha). The
 value that you set into this variable will be received by the

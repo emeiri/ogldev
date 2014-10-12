@@ -16,7 +16,7 @@ body {
   border-style:solid;
 	border-width:5px;
 	border-color: #383838;
-	width: 1100px;
+	max-width: 1100px;
 	padding:25px;
 	align: center;
 	margin: 0px auto;	
@@ -40,12 +40,14 @@ code {
 img {
     display: block;
     margin-left: auto;
-    margin-right: auto; }
-
+    margin-right: auto; 
+    max-width: 100%;
+    max-height: 100%;
+}
 
 
 div.content { 
-	width: 1100px;
+	max-width: 1100px;
 	margin: 0 auto; 
 }
 

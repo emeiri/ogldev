@@ -44,7 +44,7 @@ of triangles so the silhouette must be created by triangle edges. How do we deci
 an edge is part of the silhouette or not? The trick is based on the diffuse light model. According
 to that model the light strength is based on the dot product between the triangle normal and the
 light vector. If the triangle faces away from the light source the result of this dot product operation
-will be less than or equal to zero. In that case the light doesn't effect the triangle at all. In order
+will be less than or equal to zero. In that case the light doesn't affect the triangle at all. In order
  to decide whether a triangle edge is part of the silhouette or not we need to find the adjacent triangle
 that shares the same edge and calculate the dot product between the light direction and the normals of
 both the original triangle and its neighbor. An edge is considered a silhouette edge if one triangle faces

@@ -386,7 +386,7 @@ The ambient pass helps us avoid completely black pixels that were dropped by the
 stencil test. In real life we usually don't see such extreme shadows so we add
 a bit of ambient light to all pixels. This is done by simply doing another lighting
 pass outside the boundaries of the stencil test. Couple of things to note here: we
-zero out the diffuse intensity (because that one is effected by the shadow) and we
+zero out the diffuse intensity (because that one is affected by the shadow) and we
 enable blending (to merge the results of the previous pass with this one). Let's
 take a look at the shader now.
 </p>

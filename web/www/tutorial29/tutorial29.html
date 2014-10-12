@@ -147,8 +147,9 @@ bool PickingTexture::Init(unsigned int WindowWidth, unsigned int WindowHeight)<b
 &nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, <br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_depthTexture, 0);    <br>
 <br>
- &nbsp; &nbsp;    // Disable reading to avoid problems with older GPUs<br>
- &nbsp; &nbsp;    glReadBuffer(GL_NONE);<br><br>
+&nbsp; &nbsp;     // Disable reading to avoid problems with older GPUs<br>
+&nbsp; &nbsp;     glReadBuffer(GL_NONE);<br><br>
+&nbsp; &nbsp;     glDrawBuffer(GL_COLOR_ATTACHMENT0);<br><br>
 &nbsp; &nbsp;     // Verify that the FBO is correct<br>
 &nbsp; &nbsp;     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
 <br>
@@ -209,7 +210,7 @@ PickingTexture::PixelInfo PickingTexture::ReadPixel(unsigned int x, unsigned int
 &nbsp; &nbsp;     glReadBuffer(GL_COLOR_ATTACHMENT0);<br>
 <br>
 &nbsp; &nbsp;     PixelInfo Pixel;<br>
-&nbsp; &nbsp;     glReadPixels(x, y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &Pixel);<br>
+&nbsp; &nbsp;     glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &Pixel);<br>
   <br>
 &nbsp; &nbsp;     glReadBuffer(GL_NONE);<br>
 &nbsp; &nbsp;     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);<br>
@@ -219,7 +220,7 @@ PickingTexture::PixelInfo PickingTexture::ReadPixel(unsigned int x, unsigned int
 </code>
 <p>
 	This function takes a coordinate on the screen and returns the corresponding texel from the picking
-	texture. This texel is 3-vector of 32bit integers which is exactly what the structure PixelInfo contains.
+	texture. This texel is 3-vector of floats which is exactly what the structure PixelInfo contains.
 	To read from the FBO we must first bind it to the GL_READ_FRAMEBUFFER target. Then we need to specify 
 	which color buffer to read from using the function glReadBuffer(). The reason is that the FBO can contain
 	multiple color buffers (which the FS can render into simultaneously) but we can only read from one buffer
@@ -228,8 +229,8 @@ PickingTexture::PixelInfo PickingTexture::ReadPixel(unsigned int x, unsigned int
 	results into the address given by the last param. The rectangle in our case is one texel in size.
 	We also need to tell this function the format and data type because for some internal formats (such
 	as signed or unsigned normalized fixed point) the function is capable of converting the internal data
-	to a different type on the way out. In our case we want the raw data so we use GL_RGB_INTEGER as the format
-	and GL_UNSIGNED_INT as the type. After we finish we must reset the reading buffer and the framebuffer.
+	to a different type on the way out. In our case we want the raw data so we use GL_RGB as the format
+	and GL_FLOAT as the type. After we finish we must reset the reading buffer and the framebuffer.
 </p>
 <p>(picking.vs)</p>
 <code>
@@ -256,19 +257,18 @@ void main()<br>
 uniform uint gDrawIndex; <br>
 uniform uint gObjectIndex;   <br>
 <br>
-out uvec3 FragColor;<br>
+out vec3 FragColor;<br>
 <br>
 void main()<br>
 {<br>
-&nbsp; &nbsp;     FragColor = uvec3(gObjectIndex, gDrawIndex, gl_PrimitiveID + 1);<br>
+&nbsp; &nbsp;     FragColor = vec3(float(gObjectIndex), float(gDrawIndex),float(gl_PrimitiveID + 1));<br>
 }
 </code>
 <p>
 	The FS of PickingTechnique writes the pixel information into the picking texture. The object index and draw index
 	are the same for all pixels (in the same draw call) so they come from uniform variables. In order to get the primitive
 	index we use the built-in variable gl_PrimitiveID. This is a running index of the primitives which 
-	is automatically maintained by the system. Note that the extension GL_EXT_gpu_shader4 must be enabled
-	at the start of the shader in order to use it. gl_PrimitiveID can only be used in the GS and PS. If the
+	is automatically maintained by the system. gl_PrimitiveID can only be used in the GS and PS. If the
 	GS is enabled and the FS wants to use gl_PrimitiveID, the GS must write gl_PrimitiveID into one of its
 	output variables and the FS must declare a variable by the same name for input. In our case we have no 
 	GS so we can simply use gl_PrimitiveID.
@@ -412,10 +412,10 @@ void RenderPhase()<br>
 &nbsp; &nbsp; &nbsp; &nbsp; WINDOW_HEIGHT - m_leftMouseButton.y - 1);</b><br>
 &nbsp; &nbsp; &nbsp; &nbsp;         if (<b>Pixel.PrimID != 0</b>) {<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             m_simpleColorEffect.Enable();<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             p.WorldPos(m_worldPos[Pixel.ObjectID]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             p.WorldPos(m_worldPos[(uint)Pixel.ObjectID]);<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             m_simpleColorEffect.SetWVP(p.GetWVPTrans());<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             // Must compensate for the decrement in the FS!<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             m_pMesh->Render(Pixel.DrawID, <b>Pixel.PrimID - 1</b>);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             m_pMesh->Render((uint)Pixel.DrawID, <b>(uint)Pixel.PrimID - 1</b>);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
 &nbsp; &nbsp;     }<br>
     <br>

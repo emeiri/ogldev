@@ -73,7 +73,7 @@ must reflect the relative distance between (152.34,745.14) and each one of the t
 it gets. This looks much better than the original approach.</p>  
 <p>The method by which the final texel value is selected is known as 'filtering'. The simple approach of rounding the texture location is known as 'nearest filtering' and the more complex approach that we saw is called 'linear
 filtering'. Another name for nearest filtering you may come across is 'point filtering'. OpenGL supports several types of filters and you have the option to choose. Usually the filters that provide better results
-demand greater compute power from the GPU and may have an affect on the frame rate. Choosing the filter type is a matter of balancing between the desired result and the capability of the target platform.</p>
+demand greater compute power from the GPU and may have an effect on the frame rate. Choosing the filter type is a matter of balancing between the desired result and the capability of the target platform.</p>
 <p>Now that we understand the concept of texture coordinates it is time to take a look at the way texture mapping is done in OpenGL. Texturing in OpenGL means manipulating the intricate connections between four concepts:
 the texture object, the texture unit, the sampler object and the sampler uniform in the shader.</p>
 <p>The texture object contains the data of the texture image itself, i.e., the texels. The texture can be of different types (1D, 2D, etc) with different dimensions and the underlying data type can have multiple formats

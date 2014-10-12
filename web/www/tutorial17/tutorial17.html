@@ -39,11 +39,11 @@
 	adds a lot to the visual appeal of the rendered scene. The reason the word 'modeling' is used is 
 	because you cannot simulate exactly what nature does. The real light is made of huge amounts of 
 	particles called 'photons' and behaves as waves and particles simultaneously (the 'wave-particle 
-	duality' of light). If you try to calculate the affect of each photon in your program you'll run 
+	duality' of light). If you try to calculate the effect of each photon in your program you'll run 
 	out of compute power really quick.
 </p>
 <p>
-	Therefore, several light models have been developed over the years that capture the core affect 
+	Therefore, several light models have been developed over the years that capture the core effect 
 	that light has when it falls on objects and makes them visible. These light models have become more 
 	and more complex as the 3D graphics field advanced and more compute power became available. In the 
 	course of the next few tutorials we will go through the basic lighting models that are simpler to 
@@ -57,10 +57,10 @@
 	everything so objects that are not in the direct path of the sun are also lit. Even a light bulb in 
 	a room behaves like the sun in that sense and spreads ambient light because if the room is not too 
 	big everything is lit equally. The ambient light is modeled as light that has no origin, no direction 
-	and has an equal affect on all objects in the scene.
+	and has an equal effect on all objects in the scene.
 </p>
 <p>
-	Diffuse lighting emphasizes the fact that the angle by which the light hits the surface affects the
+	Diffuse lighting emphasizes the fact that the angle by which the light hits the surface effects the
 	brightness by which the object is lit. When light hits an object on one side that side is 
 	brighter than the other side (the side not directly infront of the light source). We just saw that 
 	the sun spreads ambient light which has no specific direction. However, the sun also has diffuse 
@@ -135,7 +135,7 @@
 	the final color. The following equation summarizes the calculation of ambient light:
 </p>
 <img style="width: 674px; height: 544px;" alt="" src="ambient_light.png">
-<p>In this tutorial code sample you will be able to play with the 'a' and 's' keys to increase or decrease the intensity of the ambient light and see the affect it has on the textured pyramid from the previous
+<p>In this tutorial code sample you will be able to play with the 'a' and 's' keys to increase or decrease the intensity of the ambient light and see the effect it has on the textured pyramid from the previous
 tutorial. This is only the ambient part of a directional light so the direction itself is not yet involved. This will change in the next tutorial when we study diffuse lighting. For now you will see that the pyramid
 is lit the same regardless of where you look at it.</p>
 <p>The ambient light is considered by many as something to be avoided as much as possible. This is because it looks somewhat artificial and the simplicity of implementation doesn't contribute much to the realism of the scene.

@@ -59,7 +59,7 @@ shader does not go through the steps above. If the fragment shader does
 not explicitly requests that variable (and you can mix and match
 multiple fragment shaders with the same vertex shader) then a common
 driver optimization will be to drop any instructions in the VS that
-only effect this variable (for that particular shader program that
+only affect this variable (for that particular shader program that
 combines this VS and FS pair). However, if the FS does use that
 variable the rasterizer interpolates it during rasterization and each
 FS invocation is provided a the interpolated value that matches that
