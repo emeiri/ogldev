@@ -18,7 +18,6 @@
 
 #include <limits.h>
 #include <string>
-#include <glfx.h>
 
 #include "lighting_technique.h"
 #include "ogldev_util.h"
