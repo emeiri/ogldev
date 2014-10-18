@@ -78,25 +78,29 @@
         </cTool>
         <ccTool>
           <incDir>
-            <pElem>/usr/include/ImageMagick</pElem>
-            <pElem>/usr/local/include/assimp</pElem>
-            <pElem>/usr/include/freetype2</pElem>
-            <pElem>FreetypeGL</pElem>
-            <pElem>/usr/local/include/glfx</pElem>
+            <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
           </incDir>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </ccTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial40</output>
           <linkerLibItems>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Common"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../Common"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibLibItem>GLEW</linkerLibLibItem>
-            <linkerLibLibItem>Magick++</linkerLibLibItem>
-            <linkerLibLibItem>assimp</linkerLibLibItem>
-            <linkerLibLibItem>freetype</linkerLibLibItem>
-            <linkerLibLibItem>fontconfig</linkerLibLibItem>
-            <linkerLibLibItem>GL</linkerLibLibItem>
-            <linkerLibFileItem>/usr/local/lib/libglfx.so</linkerLibFileItem>
           </linkerLibItems>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl`</commandLine>
         </linkerTool>
       </compileType>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">

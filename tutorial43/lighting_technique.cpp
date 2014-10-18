@@ -19,7 +19,6 @@
 #include <limits.h>
 #include "ogldev_math_3d.h"
 #include <string>
-#include <glfx.h>
 
 
 #include "lighting_technique.h"
