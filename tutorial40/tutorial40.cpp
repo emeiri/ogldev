@@ -220,7 +220,7 @@ private:
         glDepthMask(GL_FALSE);
         glEnable(GL_DEPTH_CLAMP);        
         glDisable(GL_CULL_FACE);
-        glDepthFunc(GL_LESS);
+     //   glDepthFunc(GL_LESS);
                     
 		// We need the stencil test to be enabled but we want it
 		// to succeed always. Only the depth test matters.
@@ -238,18 +238,12 @@ private:
         p.SetPerspectiveProj(m_persProjInfo);                       
         p.WorldPos(m_boxPos);        
         p.Rotate(0, m_scale, 0);
-        m_ShadowVolTech.SetWorldMatrix(p.GetWorldTrans());
-        Matrix4f Identity;
-        Identity.InitIdentity();
-        m_ShadowVolTech.SetWorldMatrix(Identity);
-        
-        m_ShadowVolTech.SetVP(p.GetWVPTrans());
-        
+        m_ShadowVolTech.SetWVP(p.GetWVPTrans());        
         m_box.Render();        
         
         glDisable(GL_DEPTH_CLAMP);
         glEnable(GL_CULL_FACE);                  
-        glDepthFunc(GL_LEQUAL);
+     //   glDepthFunc(GL_LEQUAL);
     }
         
     void RenderShadowedScene()

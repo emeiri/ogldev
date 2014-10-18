@@ -51,12 +51,10 @@ bool ShadowVolumeTechnique::Init()
         return false;
     }
     
-    m_VPLocation = GetUniformLocation("gVP");
-    m_WorldMatrixLocation = GetUniformLocation("gWorld");
+    m_WVPLocation = GetUniformLocation("gWVP");
     m_lightPosLocation = GetUniformLocation("gLightPos");
 
-    if (m_VPLocation == INVALID_UNIFORM_LOCATION ||
-        m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
+    if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
         m_lightPosLocation == INVALID_UNIFORM_LOCATION) {
         return false;
     }
@@ -65,15 +63,9 @@ bool ShadowVolumeTechnique::Init()
 }
 
 
-void ShadowVolumeTechnique::SetVP(const Matrix4f& VP)
+void ShadowVolumeTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_VPLocation, 1, GL_TRUE, (const GLfloat*)VP.m);    
-}
-
-
-void ShadowVolumeTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
-{
-    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
 }
 
 

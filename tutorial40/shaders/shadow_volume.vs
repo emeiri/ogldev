@@ -4,14 +4,9 @@ layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 TexCoord;                                             
 layout (location = 2) in vec3 Normal;                                               
 
-out vec3 WorldPos;                                                                 
-
-uniform mat4 gWVP;                                                  
-uniform mat4 gWorld;                                                
+out vec3 PosL;                                                                 
                                                                                     
 void main()                                                                         
 {                                                                                   
-    vec4 PosL   = vec4(Position, 1.0);
-  //  gl_Position = gWVP * PosL;
-    WorldPos    = (gWorld * PosL).xyz;                                
+    PosL = Position;
 }
