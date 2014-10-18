@@ -154,7 +154,7 @@ public:
         
         glDisable(GL_STENCIL_TEST);
         
-     //   RenderAmbientLight();
+        RenderAmbientLight();
         
    //     RenderFPS();
         
@@ -302,9 +302,7 @@ private:
         m_pointLight.DiffuseIntensity = 0.0f;
 
         m_LightingTech.SetPointLights(1, &m_pointLight);
-
-        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
-                              
+                             
         Pipeline p;
         p.SetPerspectiveProj(m_persProjInfo);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
@@ -320,7 +318,8 @@ private:
         p.Rotate(90.0f, 0.0f, 0.0f);
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
-        
+
+        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);        
         m_quad.Render();        
         
         glDisable(GL_BLEND);
