@@ -55,15 +55,17 @@ public:
         m_pGameCamera = NULL;
         m_scale = 0.0f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLight.Position = Vector3f(0.0f, 15.0f, 0.0f);
+        m_pointLight.Position = Vector3f(0.0f, 10.0f, 0.0f);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
+        m_persProjInfo.zFar = 1000.0f;  
         
         m_boxPos = Vector3f(0.0f, 2.0f, 0.0);
+        
+        m_isWireframe = false;
     }
 
     ~Tutorial40()
@@ -73,8 +75,8 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(0.0f, 2.0f, -7.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
+        Vector3f Pos(0.0f, 20.0f, -7.0f);
+        Vector3f Target(0.0f, -1.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -137,6 +139,8 @@ public:
         m_scale += 0.1f;
                
         m_pGameCamera->OnRender();
+        
+        glDepthMask(GL_TRUE);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
                
@@ -145,14 +149,14 @@ public:
         glEnable(GL_STENCIL_TEST);
                 
         RenderShadowVolIntoStencil();
-        
+                
         RenderShadowedScene();
         
         glDisable(GL_STENCIL_TEST);
         
-        RenderAmbientLight();
+     //   RenderAmbientLight();
         
-        RenderFPS();
+   //     RenderFPS();
         
         glutSwapBuffers();
     }
@@ -165,6 +169,15 @@ public:
 		case OGLDEV_KEY_q:
 			GLUTBackendLeaveMainLoop();
 			break;
+        case OGLDEV_KEY_w:
+            m_isWireframe = !m_isWireframe;
+            if (m_isWireframe) {                
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+            else {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            }                            
+            break;
 		default:
 			m_pGameCamera->OnKeyboard(OgldevKey);
 		}
@@ -181,7 +194,6 @@ private:
     void RenderSceneIntoDepth()
     {
         glDrawBuffer(GL_NONE);
-        glDepthMask(GL_TRUE);
               
         m_nullTech.Enable();
 
@@ -191,7 +203,7 @@ private:
         p.SetPerspectiveProj(m_persProjInfo);                       
                 
         p.WorldPos(m_boxPos);        
-        p.Rotate(0, m_scale, 0);
+        p.Rotate(0, m_scale, 0);        
         m_nullTech.SetWVP(p.GetWVPTrans());        
         m_box.Render();                
         
@@ -206,8 +218,9 @@ private:
     {
         glDrawBuffer(GL_NONE);
         glDepthMask(GL_FALSE);
-        
+        glEnable(GL_DEPTH_CLAMP);        
         glDisable(GL_CULL_FACE);
+        glDepthFunc(GL_LESS);
                     
 		// We need the stencil test to be enabled but we want it
 		// to succeed always. Only the depth test matters.
@@ -221,24 +234,30 @@ private:
         m_ShadowVolTech.SetLightPos(m_pointLight.Position);
                
         Pipeline p;
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());        
         p.SetPerspectiveProj(m_persProjInfo);                       
         p.WorldPos(m_boxPos);        
         p.Rotate(0, m_scale, 0);
         m_ShadowVolTech.SetWorldMatrix(p.GetWorldTrans());
-        m_ShadowVolTech.SetVP(p.GetVPTrans());
+        Matrix4f Identity;
+        Identity.InitIdentity();
+        m_ShadowVolTech.SetWorldMatrix(Identity);
+        
+        m_ShadowVolTech.SetVP(p.GetWVPTrans());
         
         m_box.Render();        
         
+        glDisable(GL_DEPTH_CLAMP);
         glEnable(GL_CULL_FACE);                  
+        glDepthFunc(GL_LEQUAL);
     }
         
     void RenderShadowedScene()
     {
         glDrawBuffer(GL_BACK);
-                                    
+                                          
         // prevent update to the stencil buffer
-        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
         glStencilFunc(GL_EQUAL, 0x0, 0xFF);
         
         m_LightingTech.Enable();
@@ -318,6 +337,7 @@ private:
     Mesh m_quad;
     Texture* m_pGroundTex;
     PersProjInfo m_persProjInfo;
+    bool m_isWireframe;
 };
 
 
@@ -333,7 +353,6 @@ int main(int argc, char** argv)
     SRANDOM;
 
 	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_DEPTH_CLAMP);
     
     Tutorial40* pApp = new Tutorial40();
 

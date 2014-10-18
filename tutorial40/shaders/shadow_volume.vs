@@ -12,6 +12,6 @@ uniform mat4 gWorld;
 void main()                                                                         
 {                                                                                   
     vec4 PosL   = vec4(Position, 1.0);
-    gl_Position = gWVP * PosL;
+  //  gl_Position = gWVP * PosL;
     WorldPos    = (gWorld * PosL).xyz;                                
 }
