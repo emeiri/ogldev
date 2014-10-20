@@ -40,11 +40,11 @@
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
 
-class Tutorial44 : public ICallbacks, public OgldevApp
+class Tutorial45 : public ICallbacks, public OgldevApp
 {
 public:
 
-    Tutorial44() 
+    Tutorial45() 
     {
         m_pGameCamera = NULL;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -63,7 +63,7 @@ public:
         m_pipeline.Scale(0.1f, 0.1f, 0.1f);                		
     }
 
-    ~Tutorial44()
+    ~Tutorial45()
     {
         SAFE_DELETE(m_pGameCamera);
     }    
