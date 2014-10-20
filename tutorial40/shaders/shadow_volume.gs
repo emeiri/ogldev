@@ -91,15 +91,15 @@ void main()
         EndPrimitive();
  
         // render the back cap
-        LightDir = (normalize(PosL[0] - gLightPos));
+        LightDir = PosL[0] - gLightPos;
         gl_Position = gWVP * vec4(LightDir, 0.0);
         EmitVertex();
 
-        LightDir = (normalize(PosL[4] - gLightPos));
+        LightDir = PosL[4] - gLightPos;
         gl_Position = gWVP * vec4(LightDir, 0.0);
         EmitVertex();
 
-        LightDir = (normalize(PosL[2] - gLightPos));
+        LightDir = PosL[2] - gLightPos;
         gl_Position = gWVP * vec4(LightDir, 0.0);
         EmitVertex();
 
