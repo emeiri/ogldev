@@ -63,7 +63,10 @@ public:
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 1000.0f;  
         
-        m_boxPos = Vector3f(0.0f, 2.0f, 0.0);
+        m_boxOrientation.m_pos = Vector3f(0.0f, 2.0f, 0.0);
+
+        m_quadOrientation.m_scale = Vector3f(10.0f, 10.0f, 10.0f);
+        m_quadOrientation.m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
         
         m_isWireframe = false;
     }
@@ -156,7 +159,7 @@ public:
         
         RenderAmbientLight();
         
-   //     RenderFPS();
+        RenderFPS();
         
         glutSwapBuffers();
     }
@@ -202,25 +205,21 @@ private:
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);                       
                 
-        p.WorldPos(m_boxPos);        
-        p.Rotate(0, m_scale, 0);        
+        m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);
+        p.Orient(m_boxOrientation);
         m_nullTech.SetWVP(p.GetWVPTrans());        
         m_box.Render();                
         
-        p.Scale(10.0f, 10.0f, 10.0f);
-        p.WorldPos(0.0f, 0.0f, 0.0f);
-        p.Rotate(90.0f, 0.0f, 0.0f);
+        p.Orient(m_quadOrientation);
         m_nullTech.SetWVP(p.GetWVPTrans());
         m_quad.Render();             
     }
 
     void RenderShadowVolIntoStencil()
     {
-        glDrawBuffer(GL_NONE);
         glDepthMask(GL_FALSE);
         glEnable(GL_DEPTH_CLAMP);        
         glDisable(GL_CULL_FACE);
-     //   glDepthFunc(GL_LESS);
                     
 		// We need the stencil test to be enabled but we want it
 		// to succeed always. Only the depth test matters.
@@ -232,28 +231,31 @@ private:
         m_ShadowVolTech.Enable();
 
         m_ShadowVolTech.SetLightPos(m_pointLight.Position);
-               
+             
+        // Render the occluder
         Pipeline p;
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());        
         p.SetPerspectiveProj(m_persProjInfo);                       
-        p.WorldPos(m_boxPos);        
-        p.Rotate(0, m_scale, 0);
+        m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);
+        p.Orient(m_boxOrientation);
         m_ShadowVolTech.SetWVP(p.GetWVPTrans());        
         m_box.Render();        
         
+        // Restore local stuff
         glDisable(GL_DEPTH_CLAMP);
         glEnable(GL_CULL_FACE);                  
-     //   glDepthFunc(GL_LEQUAL);
     }
         
     void RenderShadowedScene()
     {
         glDrawBuffer(GL_BACK);
                                           
-        // prevent update to the stencil buffer
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        // Draw only if the corresponding stencil value is zero
         glStencilFunc(GL_EQUAL, 0x0, 0xFF);
         
+        // prevent update to the stencil buffer
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+                
         m_LightingTech.Enable();
         
         m_pointLight.AmbientIntensity = 0.0f;
@@ -263,17 +265,15 @@ private:
                                      
         Pipeline p;
         p.SetPerspectiveProj(m_persProjInfo);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());        
         
-        p.WorldPos(m_boxPos);
-        p.Rotate(0, m_scale, 0);
+        m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);
+        p.Orient(m_boxOrientation);
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         m_box.Render();
-       
-        p.Scale(10.0f, 10.0f, 10.0f);
-        p.WorldPos(0.0f, 0.0f, 0.0f);
-        p.Rotate(90.0f, 0.0f, 0.0f);
+
+        p.Orient(m_quadOrientation);
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
@@ -282,10 +282,7 @@ private:
     
     
     void RenderAmbientLight()
-    {
-        glDrawBuffer(GL_BACK);
-        glDepthMask(GL_TRUE);
-        
+    {       
      	glEnable(GL_BLEND);
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_ONE, GL_ONE);
@@ -301,18 +298,15 @@ private:
         p.SetPerspectiveProj(m_persProjInfo);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         
-        p.WorldPos(m_boxPos);
-        p.Rotate(0, m_scale, 0);
+        m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);
+        p.Orient(m_boxOrientation);
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         m_box.Render();
        
-        p.Scale(10.0f, 10.0f, 10.0f);
-        p.WorldPos(0.0f, 0.0f, 0.0f);
-        p.Rotate(90.0f, 0.0f, 0.0f);
+        p.Orient(m_quadOrientation);
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
-
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);        
         m_quad.Render();        
         
@@ -325,9 +319,10 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     PointLight m_pointLight;
-    Vector3f m_boxPos;
     Mesh m_box;
+    Orientation m_boxOrientation;
     Mesh m_quad;
+    Orientation m_quadOrientation;
     Texture* m_pGroundTex;
     PersProjInfo m_persProjInfo;
     bool m_isWireframe;

@@ -24,7 +24,7 @@
 <p>
 In <a href="../tutorial23/tutorial23.html">tutorials 23 & 24</a> we studied the shadow map
 technique which is a relatively simple way to get shadows into your 3D world. Shadow
-maps have a disadvantage when trying to generate a shadow for a point light source. You need
+maps are in a disadvantage when trying to generate a shadow for a point light source. You need
 a direction vector in order to generate the shadow map and since a point light casts its light
 all over the place it is difficult to get such a vector. While there are methods to overcome this,
 they are a bit complex and make the shadow map technique more suitable for spot lights.
@@ -69,7 +69,8 @@ we are done we have the depth of the closest pixels available to us. Then we go 
 the objects in the scene one by one and create a shadow volume for each one. The example
 here shows only the shadow volume of the green box but in a complete application we
 would also create volumes for the round objects because they cast shadows of their own. The shadow volume is created by detecting
-its silhouette (see <a href=../tutorial39/tutorial39.html>tutorial 39</a>) and extending it
+its silhouette (make sure you fully understand <a href=../tutorial39/tutorial39.html>tutorial 39</a> before
+starting this one) and extending it
 into infinity. We render that volume into the stencil buffer using the following simple rules:
 <ul>
 <li>If the depth test fails when rendering the <b>back</b> facing polygons of the shadow volume we
@@ -168,16 +169,16 @@ view/projection matrix while adding a 'w' component with the value of zero to it
 extensively in the GS below.
 </p>
 <h2>Code Walkthru</h2>
-<p>(glut_backend.cpp:83)</p>
+<p>(glut_backend.cpp:171)</p>
 <code>
 glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH<b>|GLUT_STENCIL</b>);
 </code>
 <p>
-Before you start working on this tutorial make sure you add the code in bold face above.
+Before you start working on this tutorial make sure you initialize FreeGLUT per the code in bold face above.
 Without it the framebuffer will be created without a stencil buffer and nothing will work.
 I wasted some time before realizing this was missing so make sure you add this.
 </p>
-<p>(tutorial40.cpp:146)</p>
+<p>(tutorial40.cpp:139)</p>
 <code>
     virtual void RenderSceneCB()<br>
     {   <br>
@@ -186,6 +187,8 @@ I wasted some time before realizing this was missing so make sure you add this.
  &nbsp; &nbsp;        m_scale += 0.1f;<br>
                <br>
  &nbsp; &nbsp;        m_pGameCamera->OnRender();<br>
+<br>
+&nbsp; &nbsp;        glDepthMask(GL_TRUE);<br>
 <br>
  &nbsp; &nbsp;        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);<br>
                <br>
@@ -221,12 +224,15 @@ were using shadow map we had the opportunity to calculate ambient lighting on sh
 We don't have that opportunity here. Therefore, we add an ambient pass outside the stencil
 test.
 </p>
-<p>(tutorial40.cpp:207)</p>
+<p>
+Note that we enable writing to the depth buffer before the call to glClear. Without
+it the depth buffer will not be cleared (because we play with the mask later on).
+</p>
+<p>(tutorial40.cpp:198)</p>
 <code>
     void RenderSceneIntoDepth()<br>
     {<br>
   &nbsp; &nbsp;         glDrawBuffer(GL_NONE);<br>
-  &nbsp; &nbsp;         glDepthMask(GL_TRUE);<br>
               <br>
   &nbsp; &nbsp;         m_nullTech.Enable();<br>
 <br>
@@ -235,151 +241,149 @@ test.
   &nbsp; &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
   &nbsp; &nbsp;         p.SetPerspectiveProj(m_persProjInfo);                       <br>
                 <br>
-  &nbsp; &nbsp;         p.WorldPos(m_boxPos);        <br>
-  &nbsp; &nbsp;         p.Rotate(0, m_scale, 0);<br>
-  &nbsp; &nbsp;         m_nullTech.SetWVP(p.GetWVPTrans());                <br>
-  &nbsp; &nbsp;         m_box.Render();                <br>
+&nbsp; &nbsp;          m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);<br>
+&nbsp; &nbsp;          p.Orient(m_boxOrientation);<br>
+&nbsp; &nbsp;          m_nullTech.SetWVP(p.GetWVPTrans());        <br>
+&nbsp; &nbsp;          m_box.Render();                <br>
         <br>
-  &nbsp; &nbsp;         p.Scale(10.0f, 10.0f, 10.0f);<br>
-  &nbsp; &nbsp;         p.WorldPos(0.0f, 0.0f, 0.0f);<br>
-  &nbsp; &nbsp;         p.Rotate(90.0f, 0.0f, 0.0f);<br>
-  &nbsp; &nbsp;         m_nullTech.SetWVP(p.GetWVPTrans());<br>
-  &nbsp; &nbsp;         m_quad.Render();             <br>
+&nbsp; &nbsp;          p.Orient(m_quadOrientation);<br>
+&nbsp; &nbsp;          m_nullTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;          m_quad.Render();             <br>
     }<br>
 </code>
 <p>
 Here we render the entire scene into the depth buffer, while disabling writes to the
-color buffer. It's good to have this step because when you have multiple occluders
-in a scene you will have to render them one by one into the stencil buffer but
-you will only need to populate the depth buffer once because it is common for all occluders.
-Since we only care about the depth we use a null technique that has an empty FS.
+color buffer. We have to do this because in the next step we render the shadow volume
+and we need the depth fail algorithm to be performed correctly. If the depth buffer
+is only partially updated we will get incorrect results.
 </p>
-<p>(tutorial40.cpp:231)</p>
+<p>(tutorial40.cpp:219)</p>
 <code>
-   void RenderShadowVolIntoStencil()<br>
-    {<br>
- &nbsp; &nbsp;        glDrawBuffer(GL_NONE);<br>
+void RenderShadowVolIntoStencil()<br>
+{<br>
  &nbsp; &nbsp;        glDepthMask(GL_FALSE);<br>
-        <br>
+ &nbsp; &nbsp;        glEnable(GL_DEPTH_CLAMP);        <br>
  &nbsp; &nbsp;        glDisable(GL_CULL_FACE);<br>
-               <br>
-	&nbsp; &nbsp; 	// We need the stencil test to be enabled but we want it<br>
-	&nbsp; &nbsp; 	// to succeed always. Only the depth test matters.<br>
-	&nbsp; &nbsp; 	glStencilFunc(GL_ALWAYS, 0, 0xff);<br>
 <br>
- &nbsp; &nbsp;        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);<br>
- &nbsp; &nbsp;        glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);   <br>    
-		        <br>
- &nbsp; &nbsp;        m_ShadowVolTech.Enable();<br>
+&nbsp; &nbsp;         // We need the stencil test to be enabled but we want it<br>
+&nbsp; &nbsp;         // to succeed always. Only the depth test matters.<br>
+&nbsp; &nbsp;         glStencilFunc(GL_ALWAYS, 0, 0xff);<br>
 <br>
- &nbsp; &nbsp;        m_ShadowVolTech.SetLightPos(m_pointLight.Position);<br>
-               <br>
- &nbsp; &nbsp;        Pipeline p;<br>
- &nbsp; &nbsp;        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
- &nbsp; &nbsp;        p.SetPerspectiveProj(m_persProjInfo);                       <br>
- &nbsp; &nbsp;        p.WorldPos(m_boxPos);        <br>
- &nbsp; &nbsp;        m_ShadowVolTech.SetVP(p.GetVPTrans());<br>
- &nbsp; &nbsp;        m_ShadowVolTech.SetWorldMatrix(p.GetWorldTrans());            <br>
+&nbsp; &nbsp;         // Set the stencil test per the depth fail algorithm<br>
+&nbsp; &nbsp;         glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);<br>
+&nbsp; &nbsp;         glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);   <br>    
 <br>
- &nbsp; &nbsp;        m_box.Render();        <br>
-        <br>
- &nbsp; &nbsp;        glEnable(GL_CULL_FACE);                  <br>
-    }<br>
+&nbsp; &nbsp;         m_ShadowVolTech.Enable();<br>
+<br>
+&nbsp; &nbsp;         m_ShadowVolTech.SetLightPos(m_pointLight.Position);<br>
+<br>
+&nbsp; &nbsp;         // Render the occluder <br>
+&nbsp; &nbsp;         Pipeline p;<br>
+&nbsp; &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+&nbsp; &nbsp;         p.SetPerspectiveProj(m_persProjInfo);                       <br>
+&nbsp; &nbsp;         m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);<br>
+&nbsp; &nbsp;         p.Orient(m_boxOrientation);<br>
+&nbsp; &nbsp;         m_ShadowVolTech.SetVP(p.GetVPTrans());<br>
+&nbsp; &nbsp;         m_ShadowVolTech.SetWorldMatrix(p.GetWorldTrans());            <br>
+&nbsp; &nbsp;         m_box.Render();        <br>
+<br>
+&nbsp; &nbsp;         // Restore local stuff<br>
+&nbsp; &nbsp;         glDisable(GL_DEPTH_CLAMP);<br>
+&nbsp; &nbsp;         glEnable(GL_CULL_FACE);                  <br>
+}<br>
 </code>
 <p>
 This is where things become interesting. We use a special technique which is based on
 the silhouette technique from the previous tutorial. It generates the volume (and its caps)
-from the silhouette of the occluder. First we disable writes to the color and depth buffer.
-We are only going to update the stencil buffer. We disable back face culling because our
+from the silhouette of the occluder. First we disable writes to the depth buffer 
+(writes to the color are already disabled from the previous step).
+We are only going to update the stencil buffer. We enable depth clamp which will cause
+our projected-to-infinity-vertices (from the far cap) to be clamped to the maximum depth value.
+Otherwise, the far cap will simply be clipped away. We also disable back face culling because our
 algorithm depends on rendering all the triangles of the volume. Then we set the stencil
-test (which has been enabled from the caller) to always succeed and we set the stencil operations
-for the front and back faces according to the depth fail technique. After that we simply
+test (which has been enabled in the main render function) to always succeed and we set the stencil operations
+for the front and back faces according to the depth fail algorithm. After that we simply
 set everything the shader needs and render the occluder.
 </p>
-<p>(tutorial40.cpp:262)</p>
+<p>(tutorial40.cpp:250)</p>
 <code>
-    void RenderShadowedScene()<br>
-    {<br>
-  &nbsp; &nbsp;        glDrawBuffer(GL_BACK);<br>
-                                  <br>  
-   &nbsp; &nbsp;       // prevent update to the stencil buffer<br>
-  &nbsp; &nbsp;        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_KEEP);<br>
-  &nbsp; &nbsp;        glStencilFunc(GL_EQUAL, 0x0, 0xFF);<br>
-        <br>
-  &nbsp; &nbsp;        m_LightingTech.Enable();<br>
-        <br>
-  &nbsp; &nbsp;        m_pointLight.AmbientIntensity = 0.0f;<br>
-  &nbsp; &nbsp;        m_pointLight.DiffuseIntensity = 0.8f;<br>
+void RenderShadowedScene()<br>
+{<br>
+&nbsp; &nbsp;        glDrawBuffer(GL_BACK);<br>
+<br>  
+&nbsp; &nbsp;        // Draw only if the corresponding stencil value is zero<br>
+&nbsp; &nbsp;        glStencilFunc(GL_EQUAL, 0x0, 0xFF);<br>
 <br>
-  &nbsp; &nbsp;        m_LightingTech.SetPointLights(1, &m_pointLight);<br>
-        <br>
-  &nbsp; &nbsp;        m_pGroundTex->Bind(GL_TEXTURE0);<br>
-                              <br>
-  &nbsp; &nbsp;        Pipeline p;<br>
-  &nbsp; &nbsp;        p.SetPerspectiveProj(m_persProjInfo);<br>
-  &nbsp; &nbsp;        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
-        <br>
-  &nbsp; &nbsp;        p.WorldPos(m_boxPos);<br>
-  &nbsp; &nbsp;        p.Rotate(0, m_scale, 0);<br>
-  &nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
-  &nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
-  &nbsp; &nbsp;        m_box.Render();<br>
-       <br>
-  &nbsp; &nbsp;        p.Scale(10.0f, 10.0f, 10.0f);<br>
-  &nbsp; &nbsp;        p.WorldPos(0.0f, 0.0f, 0.0f);<br>
-  &nbsp; &nbsp;        p.Rotate(90.0f, 0.0f, 0.0f);<br>
-  &nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
-  &nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
-        <br>
-  &nbsp; &nbsp;        m_quad.Render();        <br>
-    }        
+&nbsp; &nbsp;        // prevent update to the stencil buffer<br>
+&nbsp; &nbsp;        glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_KEEP);<br>
+<br>
+&nbsp; &nbsp;        m_LightingTech.Enable();<br>
+<br>
+&nbsp; &nbsp;        m_pointLight.AmbientIntensity = 0.0f;<br>
+&nbsp; &nbsp;        m_pointLight.DiffuseIntensity = 0.8f;<br>
+<br>
+&nbsp; &nbsp;        m_LightingTech.SetPointLights(1, &m_pointLight);<br>
+<br>
+&nbsp; &nbsp;        Pipeline p;<br>
+&nbsp; &nbsp;        p.SetPerspectiveProj(m_persProjInfo);<br>
+&nbsp; &nbsp;        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+<br>
+&nbsp; &nbsp;        m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);<br>
+&nbsp; &nbsp;        p.Orient(m_boxOrientation);<br>
+&nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
+&nbsp; &nbsp;        m_box.Render();<br>
+<br>
+&nbsp; &nbsp;        p.Orient(m_quadOrientation);<br>
+&nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp;        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;        m_quad.Render();        <br>
+}        
 </code>
 <p>
 We can now put the updated stencil buffer into use. Based on our algorithm we
 set rendering to succeed only when the stencil value of the pixel is exactly zero.
+In addition, we also prevent updates to the stencil buffer by setting the stencil test
+action to GL_KEEP.
 And that's it! We can now use the standard lighting shader to render the scene. Just 
 remember to enable writing into the color buffer before you start...
 </p>
-<p>(tutorial40.cpp:297)</p>
+<p>(tutorial40.cpp:285)</p>
 <code>
-    void RenderAmbientLight()<br>
-    {<br>
-   &nbsp; &nbsp;        glDrawBuffer(GL_BACK);<br>
-   &nbsp; &nbsp;        glDepthMask(GL_TRUE);<br>
-        <br>
-   &nbsp; &nbsp;     	glEnable(GL_BLEND);<br>
-	  &nbsp; &nbsp; 	glBlendEquation(GL_FUNC_ADD);<br>
-	  &nbsp; &nbsp; 	glBlendFunc(GL_ONE, GL_ONE);<br>
-                                            <br>
-   &nbsp; &nbsp;        m_LightingTech.Enable();<br>
+void RenderAmbientLight()<br>
+{<br>
+&nbsp; &nbsp;        glEnable(GL_BLEND);<br>
+&nbsp; &nbsp;        glBlendEquation(GL_FUNC_ADD);<br>
+&nbsp; &nbsp; 	     glBlendFunc(GL_ONE, GL_ONE);<br>
 <br>
-   &nbsp; &nbsp;        m_pointLight.AmbientIntensity = 0.2f;<br>
-   &nbsp; &nbsp;        m_pointLight.DiffuseIntensity = 0.0f;<br>
+&nbsp; &nbsp;        m_LightingTech.Enable();<br>
 <br>
-   &nbsp; &nbsp;        m_LightingTech.SetPointLights(1, &m_pointLight);<br>
+&nbsp; &nbsp;        m_pointLight.AmbientIntensity = 0.2f;<br>
+&nbsp; &nbsp;        m_pointLight.DiffuseIntensity = 0.0f;<br>
 <br>
-   &nbsp; &nbsp;        m_pGroundTex->Bind(GL_TEXTURE0);<br>
-                              <br>
-   &nbsp; &nbsp;        Pipeline p;<br>
-   &nbsp; &nbsp;        p.SetPerspectiveProj(m_persProjInfo);<br>
-   &nbsp; &nbsp;        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
-        <br>
-   &nbsp; &nbsp;        p.WorldPos(m_boxPos);<br>
-   &nbsp; &nbsp;        p.Rotate(0, m_scale, 0);<br>
-   &nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
-   &nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
-   &nbsp; &nbsp;        m_box.Render();<br>
-       <br>
-   &nbsp; &nbsp;        p.Scale(10.0f, 10.0f, 10.0f);<br>
-   &nbsp; &nbsp;        p.WorldPos(0.0f, 0.0f, 0.0f);<br>
-   &nbsp; &nbsp;        p.Rotate(90.0f, 0.0f, 0.0f);<br>
-   &nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
-   &nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
-        <br>
-   &nbsp; &nbsp;        m_quad.Render();        <br>
-        <br>
-   &nbsp; &nbsp;        glDisable(GL_BLEND);<br>
-    }        
+&nbsp; &nbsp;        m_LightingTech.SetPointLights(1, &m_pointLight);<br>
+<br>
+&nbsp; &nbsp;        m_pGroundTex->Bind(GL_TEXTURE0);<br>
+<br>
+&nbsp; &nbsp;        Pipeline p;<br>
+&nbsp; &nbsp;        p.SetPerspectiveProj(m_persProjInfo);<br>
+&nbsp; &nbsp;        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+<br>
+&nbsp; &nbsp;        m_boxOrientation.m_rotation = Vector3f(0, m_scale, 0);<br>
+&nbsp; &nbsp;        p.Orient(m_boxOrientation);<br>
+&nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
+&nbsp; &nbsp;        m_box.Render();<br>
+<br>
+&nbsp; &nbsp;        p.Orient(m_quadOrientation);<br>
+&nbsp; &nbsp;        m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp;        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;        m_quad.Render();        <br>
+<br>
+&nbsp; &nbsp;        glDisable(GL_BLEND);<br>
+}        
 </code>
 <p>
 The ambient pass helps us avoid completely black pixels that were dropped by the 
@@ -387,8 +391,8 @@ stencil test. In real life we usually don't see such extreme shadows so we add
 a bit of ambient light to all pixels. This is done by simply doing another lighting
 pass outside the boundaries of the stencil test. Couple of things to note here: we
 zero out the diffuse intensity (because that one is affected by the shadow) and we
-enable blending (to merge the results of the previous pass with this one). Let's
-take a look at the shader now.
+enable blending (to merge the results of the previous pass with this one). Now let's
+take a look at the shaders of the shadow volume technique.
 </p>
 <p>(shadow_volume.vs)</p>
 <code>
@@ -398,52 +402,50 @@ layout (location = 0) in vec3 Position;                                         
 layout (location = 1) in vec2 TexCoord;                                             <br>
 layout (location = 2) in vec3 Normal;                                               <br>
 <br>
-out vec3 WorldPos;                                                                 <br>
+out vec3 PosL;<br>
 <br>
-uniform mat4 gWVP;                                                  <br>
-uniform mat4 gWorld;                                                <br>
-                                                                                    <br>
 void main()                                                                         <br>
 {                                                                                   <br>
-&nbsp; &nbsp;     vec4 PosL   = vec4(Position, 1.0);<br>
-&nbsp; &nbsp;     gl_Position = gWVP * PosL;<br>
-&nbsp; &nbsp;     WorldPos    = (gWorld * PosL).xyz;                                <br>
+&nbsp; &nbsp;     PosL = Position;<br>
 }
 </code>
 <p>
-Our VS is very simple - all we need to do is transform the vertex position
-into world space. Everything else is handled in the GS.
+In the VS we simply forward the position as-is (in local space).
+The entire algorithm is implemented in the GS.
 </p>
 <p>(shadow_volume.gs)</p>
 <code>
 #version 330<br>
 <br>
-layout (triangles_adjacency) in;<br>
+layout (triangles_adjacency) in;  // six vertices in<br>
 layout (triangle_strip, max_vertices = 18) out;<br>
 <br>
-in vec3 WorldPos[];<br>
+in vec3 PosL[]; // an array of 6 vertices (triangle with adjacency)<br>
 <br>
 uniform vec3 gLightPos;<br>
 uniform mat4 gVP;<br>
 <br>
-float EPSILON = 0.01;<br>
+float EPSILON = 0.0001;<br>
 <br>
-void EmitQuad(int StartIndex, vec3 StartVertex, int EndIndex, vec3 EndVertex)<br>
+// Emit a quad using a triangle strip<br>
+void EmitQuad(vec3 StartVertex, vec3 EndVertex)<br>
 {<br>
-&nbsp; &nbsp;     vec3 LightDir = normalize(StartVertex - gLightPos);<br>
-&nbsp; &nbsp;     vec3 l = LightDir * EPSILON;<br>
-&nbsp; &nbsp; gl_Position = gVP * vec4((StartVertex + l), 1.0);<br>
+&nbsp; &nbsp;     // Vertex #1: the starting vertex (just a tiny bit below the original edge)<br>
+&nbsp; &nbsp;     vec3 LightDir = normalize(StartVertex - gLightPos);   <br>
+&nbsp; &nbsp;     gl_Position = gWVP * vec4((StartVertex + LightDir * EPSILON), 1.0);<br>
+&nbsp; &nbsp;     EmitVertex();<br>
+ <br>
+&nbsp; &nbsp;     // Vertex #2: the starting vertex projected to infinity<br>
+&nbsp; &nbsp;     gl_Position = gWVP * vec4(LightDir, 0.0);<br>
 &nbsp; &nbsp;     EmitVertex();<br>
     <br>
-&nbsp; &nbsp;     gl_Position = gVP * vec4(LightDir, 0.0);<br>
-&nbsp; &nbsp;     EmitVertex();<br>
-<br>
+&nbsp; &nbsp;     // Vertex #3: the ending vertex (just a tiny bit below the original edge)<br>
 &nbsp; &nbsp;     LightDir = normalize(EndVertex - gLightPos);<br>
-&nbsp; &nbsp;     l = LightDir * EPSILON;<br>
-&nbsp; &nbsp;     gl_Position = gVP * vec4((EndVertex + l), 1.0);<br>
+&nbsp; &nbsp;     gl_Position = gWVP * vec4((EndVertex + LightDir * EPSILON), 1.0);<br>
 &nbsp; &nbsp;     EmitVertex();<br>
     <br>
-&nbsp; &nbsp;     gl_Position = gVP * vec4(LightDir, 0.0);<br>
+&nbsp; &nbsp;     // Vertex #4: the ending vertex projected to infinity<br>
+&nbsp; &nbsp;     gl_Position = gWVP * vec4(LightDir , 0.0);<br>
 &nbsp; &nbsp;     EmitVertex();<br>
 <br>
 &nbsp; &nbsp;     EndPrimitive();            <br>
@@ -462,14 +464,15 @@ void main()<br>
 &nbsp; &nbsp;     vec3 Normal = cross(e1,e2);<br>
 &nbsp; &nbsp;     vec3 LightDir = gLightPos - WorldPos[0];<br>
 <br>
-&nbsp; &nbsp;     if (dot(Normal, LightDir) > 0.000001) {<br>
+&nbsp; &nbsp;     // Handle only light facing triangles<br>
+&nbsp; &nbsp;     if (dot(Normal, LightDir) > 0) {<br>
 <br>
 &nbsp; &nbsp; &nbsp; &nbsp;         Normal = cross(e3,e1);<br>
 <br>
 &nbsp; &nbsp; &nbsp; &nbsp;         if (dot(Normal, LightDir) <= 0) {<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             vec3 StartVertex = WorldPos[0];<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             vec3 EndVertex = WorldPos[2];<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             EmitQuad(0, StartVertex, 2, EndVertex);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             EmitQuad(StartVertex, EndVertex);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
 <br>
 &nbsp; &nbsp; &nbsp; &nbsp;         Normal = cross(e4,e5);<br>
@@ -478,31 +481,46 @@ void main()<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         if (dot(Normal, LightDir) <= 0) {<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             vec3 StartVertex = WorldPos[2];<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             vec3 EndVertex = WorldPos[4];<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             EmitQuad(2, StartVertex, 4, EndVertex);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             EmitQuad(StartVertex, EndVertex);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
 <br>
 &nbsp; &nbsp; &nbsp; &nbsp;         Normal = cross(e2,e6);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         LightDir = gLightPos - WorldPos[4];<br>
 <br>
-&nbsp; &nbsp; &nbsp; &nbsp;         if (dot(Normal, LightDir) <= 0) {<br>
-&nbsp; &nbsp; &nbsp; &nbsp;             &nbsp; &nbsp; vec3 StartVertex = WorldPos[4];<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             vec3 EndVertex = WorldPos[0];<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             EmitQuad(4, StartVertex, 0, EndVertex);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; if (dot(Normal, LightDir) <= 0) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vec3 StartVertex = WorldPos[4];<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; vec3 EndVertex = WorldPos[0];<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; EmitQuad(StartVertex, EndVertex);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
 <br>
-&nbsp; &nbsp; &nbsp; &nbsp;         vec3 LightDir = (normalize(WorldPos[0] - gLightPos)) * EPSILON;<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gVP * vec4((WorldPos[0] + LightDir), 1.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         // render the front cap<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = (normalize(PosL[0] - gLightPos));<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4((PosL[0] + LightDir * EPSILON), 1.0);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
 <br>
-&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = (normalize(WorldPos[2] - gLightPos)) * EPSILON;<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gVP * vec4((WorldPos[2] + LightDir), 1.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = (normalize(PosL[2] - gLightPos));<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4((PosL[2] + LightDir * EPSILON), 1.0);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
 <br>
-&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = (normalize(WorldPos[4] - gLightPos)) * EPSILON;<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gVP * vec4((WorldPos[4] + LightDir), 1.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = (normalize(PosL[4] - gLightPos));<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4((PosL[4] + LightDir * EPSILON), 1.0);<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         EndPrimitive();<br>
-&nbsp; &nbsp;     }<br>
+ <br>
+&nbsp; &nbsp; &nbsp; &nbsp;         // render the back cap<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = PosL[0] - gLightPos;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4(LightDir, 0.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = PosL[4] - gLightPos;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4(LightDir, 0.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightDir = PosL[2] - gLightPos;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4(LightDir, 0.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
+&nbsp; &nbsp;     
+}<br>
 }</code>
 <p>
 The GS starts in pretty much the same way as the silhouette shader in the sense that we
@@ -530,20 +548,6 @@ It is critical that we set the maximum
 output vertices from the GS correctly (see 'max_vertices' above). We have 3 vertices for the front cap, 3 for the back cap and 4
 for each silhouette edge. When I was working on this tutorial I accidently set this value to 10 and
 got very strange corruptions. Make sure you don't make the same mistake...
-</p>
-<p>(glut_backend.cpp:111)</p>
-<code>
-void GLUTBackendRun(ICallbacks* pCallbacks)<br>
-{<br>
-   &nbsp; &nbsp; ...<br>
-    &nbsp; &nbsp;    glEnable(GL_DEPTH_CLAMP);<br>
-   &nbsp; &nbsp; ...<br>
-}
-</code>
-<p>
-Last but not least - we enable depth clamp. This means that when the far cap is extended to infinity
-the result is not clipped away but remains on the far clip plane. Without this call we would loose
-the far cap.
 </p>
 </body>
 </html>
