@@ -170,21 +170,23 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pLightingEffect->Enable();
+
+        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
        
         m_shadowMapFBO.BindForReading(GL_TEXTURE1);
 
         Pipeline p;
         p.SetPerspectiveProj(m_persProjInfo);
+
         p.Scale(10.0f, 10.0f, 10.0f);
         p.WorldPos(0.0f, 0.0f, 1.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
-        m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
+        m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());        
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
-        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
+
         m_pGroundTex->Bind(GL_TEXTURE0);
         m_pQuad->Render();
  
