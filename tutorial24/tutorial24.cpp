@@ -186,7 +186,6 @@ public:
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());        
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
-
         m_pGroundTex->Bind(GL_TEXTURE0);
         m_pQuad->Render();
  
@@ -198,7 +197,6 @@ public:
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
-
         m_pMesh->Render();        
     }
 
