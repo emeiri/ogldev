@@ -21,25 +21,25 @@
 
 #include "ogldev_math_3d.h"
 #include "ogldev_util.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 
 
-LightingTechnique::LightingTechnique()
+BasicLightingTechnique::BasicLightingTechnique()
 {   
 }
 
-bool LightingTechnique::Init()
+bool BasicLightingTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "shaders/lighting.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/basic_lighting.vs")) {
         return false;
     }
 
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/lighting.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/basic_lighting.fs")) {
         return false;
     }
 
@@ -156,25 +156,25 @@ bool LightingTechnique::Init()
     return true;
 }
 
-void LightingTechnique::SetWVP(const Matrix4f& WVP)
+void BasicLightingTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
 }
 
 
-void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
+void BasicLightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
 {
     glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
 }
 
 
-void LightingTechnique::SetColorTextureUnit(unsigned int TextureUnit)
+void BasicLightingTechnique::SetColorTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(m_colorTextureLocation, TextureUnit);
 }
 
 
-void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
+void BasicLightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
     glUniform3f(m_dirLightLocation.Color, Light.Color.x, Light.Color.y, Light.Color.z);
     glUniform1f(m_dirLightLocation.AmbientIntensity, Light.AmbientIntensity);
@@ -185,25 +185,25 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 }
 
 
-void LightingTechnique::SetEyeWorldPos(const Vector3f& EyeWorldPos)
+void BasicLightingTechnique::SetEyeWorldPos(const Vector3f& EyeWorldPos)
 {
     glUniform3f(m_eyeWorldPosLocation, EyeWorldPos.x, EyeWorldPos.y, EyeWorldPos.z);
 }
 
 
-void LightingTechnique::SetMatSpecularIntensity(float Intensity)
+void BasicLightingTechnique::SetMatSpecularIntensity(float Intensity)
 {
     glUniform1f(m_matSpecularIntensityLocation, Intensity);
 }
 
 
-void LightingTechnique::SetMatSpecularPower(float Power)
+void BasicLightingTechnique::SetMatSpecularPower(float Power)
 {
     glUniform1f(m_matSpecularPowerLocation, Power);
 }
 
 
-void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
+void BasicLightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
 {
     glUniform1i(m_numPointLightsLocation, NumLights);
     
@@ -218,7 +218,7 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
     }
 }
 
-void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* pLights)
+void BasicLightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* pLights)
 {
     glUniform1i(m_numSpotLightsLocation, NumLights);
 

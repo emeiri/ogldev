@@ -32,7 +32,7 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "mesh.h"
@@ -150,7 +150,7 @@ public:
 
 private:
         
-    LightingTechnique m_LightingTech;
+    BasicLightingTechnique m_LightingTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
     Mesh m_mesh;
