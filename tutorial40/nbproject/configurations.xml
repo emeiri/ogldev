@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>engine_common.h</itemPath>
-      <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>null_technique.h</itemPath>
       <itemPath>shadow_volume_technique.h</itemPath>
@@ -22,7 +21,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>null_technique.cpp</itemPath>
       <itemPath>shadow_volume_technique.cpp</itemPath>
@@ -105,10 +103,6 @@
       </compileType>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -187,10 +181,6 @@
         </linkerTool>
       </compileType>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
