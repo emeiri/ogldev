@@ -18,9 +18,6 @@
     <ClInclude Include="..\..\tutorial40\engine_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial40\lighting_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial40\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -32,9 +29,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial40\lighting_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial40\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,12 +43,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial40\shaders\lighting.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\tutorial40\shaders\lighting.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\..\tutorial40\shaders\null_technique.fs">
       <Filter>Shaders</Filter>
     </None>

@@ -35,7 +35,7 @@
 #include "ogldev_camera.h"
 #include "texture.h"
 #include "shadow_volume_technique.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "null_technique.h"
@@ -314,7 +314,7 @@ private:
     }        
    
     ShadowVolumeTechnique m_ShadowVolTech;
-    LightingTechnique m_LightingTech;
+    BasicLightingTechnique m_LightingTech;
     NullTechnique m_nullTech;
     Camera* m_pGameCamera;
     float m_scale;

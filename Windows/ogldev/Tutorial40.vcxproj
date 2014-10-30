@@ -12,21 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial40\engine_common.h" />
-    <ClInclude Include="..\..\tutorial40\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial40\mesh.h" />
     <ClInclude Include="..\..\tutorial40\null_technique.h" />
     <ClInclude Include="..\..\tutorial40\shadow_volume_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial40\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial40\mesh.cpp" />
     <ClCompile Include="..\..\tutorial40\null_technique.cpp" />
     <ClCompile Include="..\..\tutorial40\shadow_volume_technique.cpp" />
     <ClCompile Include="..\..\tutorial40\tutorial40.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial40\shaders\lighting.fs" />
-    <None Include="..\..\tutorial40\shaders\lighting.vs" />
     <None Include="..\..\tutorial40\shaders\null_technique.fs" />
     <None Include="..\..\tutorial40\shaders\null_technique.vs" />
     <None Include="..\..\tutorial40\shaders\shadow_volume.fs" />
