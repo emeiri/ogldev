@@ -25,6 +25,12 @@ required packages run the following commands:
   <li>On Fedora: yum install gcc-c++ glew-devel freeglut-devel ImageMagick-c++-devel ImageMagick-c++ assimp-devel glfw-devel</li>
 </ol>
 <p>
+Another thing that I did on Ubuntu to make my life easier is to run the following command
+as root: <br><br>ln /usr/lib/pkgconfig/libglfw.pc /usr/lib/pkgconfig/glfw3.pc<br><br>
+The reason is to use the same name for the package config file of GLFW in Ubuntu
+as in Fedora. This allows me to work with the same Netbeans project file for both distributions.
+</p>
+<p>
 Note: since Nov-14, 2013, the source to all the tutorials is provided in a single zip
 package, instead of a package per tutorial. The package contains Netbeans projects
 for Linux and a Visual Studio solution for Windows (&lt;ROOT&gt;/Windows/ogldev/ogldev.sln).
