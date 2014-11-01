@@ -33,9 +33,11 @@
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
 #include "lighting_technique.h"
+#include "geom_pass_tech.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "mesh.h"
+#include "gbuffer.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -59,8 +61,8 @@ public:
         m_persProjInfo.zFar = 1000.0f;  
         
         m_pipeline.SetPerspectiveProj(m_persProjInfo);           
-        m_pipeline.WorldPos(Vector3f(0.0f, 0.0f, 0.0f));        
-        m_pipeline.Scale(0.1f, 0.1f, 0.1f);                		
+        //m_pipeline.WorldPos(Vector3f(0.0f, 0.0f, 0.0f));        
+        //m_pipeline.Scale(0.1f, 0.1f, 0.1f);                		
     }
 
     ~Tutorial45()
@@ -70,8 +72,8 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(0.0f, 23.0f, -5.0f);
-        Vector3f Target(-1.0f, 0.0f, 0.1f);
+        Vector3f Pos(0.0f, 1.0f, -5.0f);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -88,10 +90,16 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
 
-        if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+        if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }
-                
+        
+        m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 5.0f);
+        
+        if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+            return false;
+        }
+                       
 #ifndef WIN32
         // Disabled for now because it somehow clashes with the regular rendering...
  //       if (!m_fontRenderer.InitFontRenderer()) {
@@ -111,23 +119,48 @@ public:
     {   
         m_pGameCamera->OnRender();      
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                    
-        m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());
-        
         m_pipeline.SetCamera(*m_pGameCamera);
-            
-        m_LightingTech.SetWVP(m_pipeline.GetWVPTrans());
-        m_LightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());            
-       
-        m_mesh.Render();        
-        	
+		
+        GeometryPass();
+        
+        RenderPass();
+		      	
     //    RenderFPS();     
         CalcFPS();
         
         OgldevBackendSwapBuffers();
     }
     
+    void GeometryPass()
+    {
+		m_geomPassTech.Enable();
+
+        m_gBuffer.BindForWriting();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        m_pipeline.Orient(m_mesh.GetOrientation());
+        m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());        
+		m_geomPassTech.SetWorldMatrix(m_pipeline.GetWorldTrans());
+        m_mesh.Render();       
+    }
+    
+    
+    void RenderPass()
+    {
+        m_LightingTech.Enable();
+        
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                           
+        m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());        
+        m_pipeline.Orient(m_mesh.GetOrientation());            
+        m_LightingTech.SetWVP(m_pipeline.GetWVPTrans());
+        m_LightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());                   
+        m_mesh.Render();                
+    }
+	
        
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
@@ -151,11 +184,13 @@ public:
 private:
         
     LightingTechnique m_LightingTech;
+    GeomPassTech m_geomPassTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
     Mesh m_mesh;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
+    GBuffer m_gBuffer;
 };
 
 

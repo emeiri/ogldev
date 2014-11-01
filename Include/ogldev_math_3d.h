@@ -77,6 +77,11 @@ struct Vector3f
         y = _y;
         z = _z;
     }
+    
+    Vector3f(float f)
+    {
+        x = y = z = f;
+    }
 
     Vector3f& operator+=(const Vector3f& r)
     {
