@@ -114,6 +114,12 @@
 </p>
 	<img style="width: 650px; height: 300px;" alt="" src="vertex_normals.png">
 <p>
+        You may find the pyramid model that we have been using in the last few tutorials a bit strange looking with
+        those vertex normals and decide to stick with the original normals. This is OK. However, as models become more
+        complex (and we will see that in the future) and their surfaces become smoother I think you will find the vertex
+        normals more appropriate.
+</p>
+<p>
 	The only thing left to worry about is the coordinate space in which diffuse lighting calculations are going to take
 	place. The vertices and their normals are specified in a local coordinate space and are transformed in the vertex 
 	shader all the way to clip space by the WVP matrix that we supply to the shader. However, specifying the direction 
