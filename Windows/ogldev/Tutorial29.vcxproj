@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial29\engine_common.h" />
-    <ClInclude Include="..\..\tutorial29\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial29\mesh.h" />
     <ClInclude Include="..\..\tutorial29\picking_technique.h" />
     <ClInclude Include="..\..\tutorial29\picking_texture.h" />
@@ -20,7 +19,6 @@
     <ClInclude Include="..\..\tutorial29\simple_color_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial29\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial29\mesh.cpp" />
     <ClCompile Include="..\..\tutorial29\picking_technique.cpp" />
     <ClCompile Include="..\..\tutorial29\picking_texture.cpp" />
@@ -28,8 +26,6 @@
     <ClCompile Include="..\..\tutorial29\tutorial29.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial29\lighting.fs" />
-    <None Include="..\..\tutorial29\lighting.vs" />
     <None Include="..\..\tutorial29\picking.fs" />
     <None Include="..\..\tutorial29\picking.vs" />
     <None Include="..\..\tutorial29\simple_color.fs" />

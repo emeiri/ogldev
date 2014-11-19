@@ -27,7 +27,7 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "billboard_list.h"
@@ -79,7 +79,7 @@ public:
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
      
-        m_pLightingTechnique = new LightingTechnique();
+        m_pLightingTechnique = new BasicLightingTechnique();
 
         if (!m_pLightingTechnique->Init()) {
             printf("Error initializing the lighting technique\n");
@@ -89,7 +89,7 @@ public:
         m_pLightingTechnique->Enable();
         m_pLightingTechnique->SetDirectionalLight(m_dirLight);
         m_pLightingTechnique->SetColorTextureUnit(0);
-        m_pLightingTechnique->SetNormalMapTextureUnit(2);
+     //   m_pLightingTechnique->SetNormalMapTextureUnit(2);
               
         m_pGround = new Mesh();
         
@@ -172,7 +172,7 @@ public:
 
  private:
 
-    LightingTechnique* m_pLightingTechnique;
+    BasicLightingTechnique* m_pLightingTechnique;
     Camera* m_pGameCamera;
     DirectionalLight m_dirLight;    
     Mesh* m_pGround;    

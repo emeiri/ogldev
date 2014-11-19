@@ -18,9 +18,6 @@
     <ClInclude Include="..\..\tutorial29\engine_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial29\lighting_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial29\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -38,9 +35,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial29\lighting_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial29\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,12 +52,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial29\lighting.fs">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="..\..\tutorial29\lighting.vs">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="..\..\tutorial29\picking.fs">
       <Filter>Shader Files</Filter>
     </None>
