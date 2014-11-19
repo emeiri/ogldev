@@ -11,11 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial44\engine_common.h" />
-    <ClInclude Include="..\..\tutorial44\mesh.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\tutorial44\mesh.cpp" />
     <ClCompile Include="..\..\tutorial44\tutorial44.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

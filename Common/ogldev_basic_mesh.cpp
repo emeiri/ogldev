@@ -18,7 +18,8 @@
 
 #include <assert.h>
 
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
+#include "ogldev_engine_common.h"
 
 using namespace std;
 
@@ -26,20 +27,20 @@ using namespace std;
 #define TEX_COORD_LOCATION 1
 #define NORMAL_LOCATION 2
 
-Mesh::Mesh()
+BasicMesh::BasicMesh()
 {
     m_VAO = 0;
     ZERO_MEM(m_Buffers);
 }
 
 
-Mesh::~Mesh()
+BasicMesh::~BasicMesh()
 {
     Clear();
 }
 
 
-void Mesh::Clear()
+void BasicMesh::Clear()
 {
     for (unsigned int i = 0 ; i < m_Textures.size() ; i++) {
         SAFE_DELETE(m_Textures[i]);
@@ -56,7 +57,7 @@ void Mesh::Clear()
 }
 
 
-bool Mesh::LoadMesh(const string& Filename)
+bool BasicMesh::LoadMesh(const string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -86,7 +87,7 @@ bool Mesh::LoadMesh(const string& Filename)
     return Ret;
 }
 
-bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)
+bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 {  
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
@@ -127,28 +128,28 @@ bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)
     }
 
     // Generate and populate the buffers with vertex attributes and the indices
-  	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POSITION_LOCATION);
     glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);    
 
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(TEX_COORD_LOCATION);
     glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-   	glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Normals[0]) * Normals.size(), &Normals[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(NORMAL_LOCATION);
     glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 
     return GLCheckError();
 }
 
-void Mesh::InitMesh(const aiMesh* paiMesh,
+void BasicMesh::InitMesh(const aiMesh* paiMesh,
                     vector<Vector3f>& Positions,
                     vector<Vector3f>& Normals,
                     vector<Vector2f>& TexCoords,
@@ -177,7 +178,7 @@ void Mesh::InitMesh(const aiMesh* paiMesh,
     }
 }
 
-bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
+bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 {
     // Extract the directory part from the file name
     string::size_type SlashIndex = Filename.find_last_of("/");
@@ -232,7 +233,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
-void Mesh::Render()
+void BasicMesh::Render()
 {
     glBindVertexArray(m_VAO);
     
@@ -242,21 +243,21 @@ void Mesh::Render()
         assert(MaterialIndex < m_Textures.size());
         
         if (m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+            m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
         }
 
-		glDrawElementsBaseVertex(GL_TRIANGLES, 
-                                 m_Entries[i].NumIndices, 
-                                 GL_UNSIGNED_INT, 
-                                 (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex), 
-                                 m_Entries[i].BaseVertex);
+        glDrawElementsBaseVertex(GL_TRIANGLES, 
+                         m_Entries[i].NumIndices, 
+                         GL_UNSIGNED_INT, 
+                         (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex), 
+                         m_Entries[i].BaseVertex);
     }
 
     // Make sure the VAO is not changed from the outside    
     glBindVertexArray(0);
 }
 
-void Mesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
+void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {        
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);

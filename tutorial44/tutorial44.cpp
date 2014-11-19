@@ -35,7 +35,7 @@
 #include "ogldev_basic_lighting.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -153,7 +153,7 @@ private:
     BasicLightingTechnique m_LightingTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
-    Mesh m_mesh;
+    BasicMesh m_mesh;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
 };

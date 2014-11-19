@@ -16,6 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef OGLDEV_APP_H
+#define OGLDEV_APP_H
+
 #ifndef WIN32
 #include "freetypeGL.h"
 #endif
@@ -42,3 +45,5 @@ private:
 	int m_frameCount;
         int m_fps;
 };
+
+#endif

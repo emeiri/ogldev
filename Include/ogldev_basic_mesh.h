@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MESH_H
-#define	MESH_H
+#ifndef OGLDEV_BASIC_MESH_H
+#define	OGLDEV_BASIC_MESH_H
 
 #include <map>
 #include <vector>
@@ -48,12 +48,12 @@ struct Vertex
 };
 
 
-class Mesh
+class BasicMesh
 {
 public:
-    Mesh();
+    BasicMesh();
 
-    ~Mesh();
+    ~BasicMesh();
 
     bool LoadMesh(const std::string& Filename);
 
@@ -86,8 +86,8 @@ private:
     GLuint m_VAO;
     GLuint m_Buffers[6];
 
-    struct MeshEntry {
-        MeshEntry()
+    struct BasicMeshEntry {
+        BasicMeshEntry()
         {
             NumIndices = 0;
             BaseVertex = 0;
@@ -101,11 +101,11 @@ private:
         unsigned int MaterialIndex;
     };
     
-    std::vector<MeshEntry> m_Entries;
+    std::vector<BasicMeshEntry> m_Entries;
     std::vector<Texture*> m_Textures;
     Orientation m_orientation;
 };
 
 
-#endif	/* MESH_H */
+#endif	/* OGLDEV_BASIC_MESH_H */
 
