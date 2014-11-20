@@ -49,10 +49,6 @@ public:
     Tutorial45() 
     {
         m_pGameCamera = NULL;
-        m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_directionalLight.AmbientIntensity = 0.66f;
-        m_directionalLight.DiffuseIntensity = 1.0f;
-        m_directionalLight.Direction = Vector3f(1.0f, 0.0, 0.0);
 
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -85,16 +81,18 @@ public:
 
         m_LightingTech.Enable();
 
-        m_LightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_LightingTech.SetDirectionalLight(m_directionalLight);
-        m_LightingTech.SetMatSpecularIntensity(0.0f);
-        m_LightingTech.SetMatSpecularPower(0);
+        m_LightingTech.SetPositionTextureUnit(GBUFFER_POSITION_TEXTURE_UNIT);
+        m_LightingTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
+        m_LightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
 
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
-        }
-        
+        }        
         m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 5.0f);
+        
+        if (!m_quad.LoadMesh("../Content/quad.obj")) {
+            return false;
+        }
         
         if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             return false;
@@ -150,15 +148,13 @@ public:
     {
         m_LightingTech.Enable();
         
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);        
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        m_gBuffer.BindForReading();
                            
-        m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());        
-        m_pipeline.Orient(m_mesh.GetOrientation());            
-        m_LightingTech.SetWVP(m_pipeline.GetWVPTrans());
-        m_LightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());                   
-        m_mesh.Render();                
+        m_quad.Render();                
     }
 	
        
@@ -186,8 +182,8 @@ private:
     LightingTechnique m_LightingTech;
     GeomPassTech m_geomPassTech;
     Camera* m_pGameCamera;
-    DirectionalLight m_directionalLight;
     Mesh m_mesh;
+    Mesh m_quad;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
     GBuffer m_gBuffer;

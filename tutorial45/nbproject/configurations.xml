@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>../../../../../../tutorials/ogldev/tutorial41/engine_common.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
       <itemPath>geom_pass_tech.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
@@ -78,11 +77,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="../../../../../../tutorials/ogldev/tutorial41/engine_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
@@ -153,11 +147,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="../../../../../../tutorials/ogldev/tutorial41/engine_common.h"
-            ex="false"
-            tool="3"
-            flavor2="0">
-      </item>
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">

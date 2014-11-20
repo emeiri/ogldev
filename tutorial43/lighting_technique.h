@@ -89,6 +89,7 @@ public:
     
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
+    void SetPositionTextureUnit(unsigned int TextureUnit);	
     void SetColorTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetPointLight(const PointLight& Light);
