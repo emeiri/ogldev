@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial41\engine_common.h" />
     <ClInclude Include="..\..\tutorial41\intermediate_buffer.h" />
     <ClInclude Include="..\..\tutorial41\mesh.h" />
     <ClInclude Include="..\..\tutorial41\motion_blur_technique.h" />

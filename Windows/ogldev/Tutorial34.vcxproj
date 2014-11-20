@@ -11,14 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial34\engine_common.h" />
     <ClInclude Include="..\..\tutorial34\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial34\mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial34\glfx_technique.cpp" />
     <ClCompile Include="..\..\tutorial34\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial34\mesh.cpp" />
     <ClCompile Include="..\..\tutorial34\tutorial34.cpp" />
   </ItemGroup>
   <ItemGroup>

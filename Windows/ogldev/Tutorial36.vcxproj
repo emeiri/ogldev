@@ -15,10 +15,8 @@
     <ClInclude Include="..\..\tutorial36\ds_geom_pass_tech.h" />
     <ClInclude Include="..\..\tutorial36\ds_light_pass_tech.h" />
     <ClInclude Include="..\..\tutorial36\ds_point_light_pass_tech.h" />
-    <ClInclude Include="..\..\tutorial36\engine_common.h" />
     <ClInclude Include="..\..\tutorial36\gbuffer.h" />
     <ClInclude Include="..\..\tutorial36\lights_common.h" />
-    <ClInclude Include="..\..\tutorial36\mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial36\ds_dir_light_pass_tech.cpp" />
@@ -26,7 +24,6 @@
     <ClCompile Include="..\..\tutorial36\ds_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial36\ds_point_light_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial36\gbuffer.cpp" />
-    <ClCompile Include="..\..\tutorial36\mesh.cpp" />
     <ClCompile Include="..\..\tutorial36\tutorial36.cpp" />
   </ItemGroup>
   <ItemGroup>

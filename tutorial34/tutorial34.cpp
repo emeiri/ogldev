@@ -23,7 +23,7 @@
 #include <GL/freeglut.h>
 #include <string>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
@@ -31,7 +31,7 @@
 #include "ogldev_texture.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 
 using namespace std;
 
@@ -197,7 +197,7 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
-    Mesh m_mesh[4];
+    BasicMesh m_mesh[4];
     Vector3f m_positions[4];            
     float m_velocity[4];    
     Vector4f m_colors[4];
