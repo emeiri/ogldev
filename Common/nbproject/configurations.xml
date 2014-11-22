@@ -8,9 +8,11 @@
       <itemPath>../Include/ogldev_app.h</itemPath>
       <itemPath>../Include/ogldev_backend.h</itemPath>
       <itemPath>../Include/ogldev_basic_lighting.h</itemPath>
+      <itemPath>../Include/ogldev_basic_mesh.h</itemPath>
       <itemPath>../Include/ogldev_callbacks.h</itemPath>
       <itemPath>../Include/ogldev_camera.h</itemPath>
       <itemPath>../Include/ogldev_cubemap_texture.h</itemPath>
+      <itemPath>../Include/ogldev_engine_common.h</itemPath>
       <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
       <itemPath>../Include/ogldev_keys.h</itemPath>
@@ -35,6 +37,7 @@
       <itemPath>ogldev_app.cpp</itemPath>
       <itemPath>ogldev_backend.cpp</itemPath>
       <itemPath>ogldev_basic_lighting.cpp</itemPath>
+      <itemPath>ogldev_basic_mesh.cpp</itemPath>
       <itemPath>ogldev_glfw_backend.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
@@ -82,6 +85,8 @@
       </item>
       <item path="../Include/ogldev_basic_lighting.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_basic_mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_callbacks.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_camera.h" ex="false" tool="3" flavor2="0">
@@ -90,6 +95,8 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="../Include/ogldev_engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_glfw_backend.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -140,6 +147,8 @@
       <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_basic_lighting.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_basic_mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -180,6 +189,8 @@
       </item>
       <item path="../Include/ogldev_basic_lighting.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_basic_mesh.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_callbacks.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_camera.h" ex="false" tool="3" flavor2="0">
@@ -188,6 +199,8 @@
             ex="false"
             tool="3"
             flavor2="0">
+      </item>
+      <item path="../Include/ogldev_engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_glfw_backend.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -238,6 +251,8 @@
       <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_basic_lighting.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_basic_mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>

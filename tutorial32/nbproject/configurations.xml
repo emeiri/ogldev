@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>mesh.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Shader Files"
@@ -15,7 +14,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>mesh.cpp</itemPath>
       <itemPath>tutorial32.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -82,10 +80,6 @@
       </item>
       <item path="lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial32.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -112,10 +106,6 @@
       <item path="lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial32.cpp" ex="false" tool="1" flavor2="0">
       </item>

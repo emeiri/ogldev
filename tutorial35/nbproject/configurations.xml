@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>ds_geom_pass_tech.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
-      <itemPath>mesh.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/geometry_pass.fs</itemPath>
@@ -17,7 +16,6 @@
                    projectFiles="true">
       <itemPath>ds_geom_pass_tech.cpp</itemPath>
       <itemPath>gbuffer.cpp</itemPath>
-      <itemPath>mesh.cpp</itemPath>
       <itemPath>tutorial35.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -82,10 +80,6 @@
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/geometry_pass.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/geometry_pass.vs" ex="false" tool="3" flavor2="0">
@@ -141,10 +135,6 @@
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/geometry_pass.fs" ex="false" tool="3" flavor2="0">
       </item>

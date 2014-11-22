@@ -37,7 +37,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/glfx_technique.o \
 	${OBJECTDIR}/lighting_technique.o \
-	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/tutorial34.o
 
 
@@ -78,11 +77,6 @@ ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
-
-${OBJECTDIR}/mesh.o: mesh.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/tutorial34.o: tutorial34.cpp 
 	${MKDIR} -p ${OBJECTDIR}

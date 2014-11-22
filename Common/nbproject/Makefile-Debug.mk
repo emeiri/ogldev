@@ -50,6 +50,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_app.o \
 	${OBJECTDIR}/ogldev_backend.o \
 	${OBJECTDIR}/ogldev_basic_lighting.o \
+	${OBJECTDIR}/ogldev_basic_mesh.o \
 	${OBJECTDIR}/ogldev_glfw_backend.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
@@ -157,6 +158,11 @@ ${OBJECTDIR}/ogldev_basic_lighting.o: ogldev_basic_lighting.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_basic_lighting.o ogldev_basic_lighting.cpp
+
+${OBJECTDIR}/ogldev_basic_mesh.o: ogldev_basic_mesh.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_basic_mesh.o ogldev_basic_mesh.cpp
 
 ${OBJECTDIR}/ogldev_glfw_backend.o: ogldev_glfw_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}
