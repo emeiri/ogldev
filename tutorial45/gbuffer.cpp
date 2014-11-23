@@ -17,6 +17,7 @@
 
 
 #include <stdio.h>
+#include <GL/glew.h>
 
 #include "ogldev_util.h"
 #include "gbuffer.h"
@@ -58,6 +59,12 @@ bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_textures) ; i++) {
     	glBindTexture(GL_TEXTURE_2D, m_textures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);
     }
 
@@ -86,19 +93,18 @@ bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 
 void GBuffer::BindForWriting()
 {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 
 
 void GBuffer::BindForReading()
 {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_TEXTURE_TYPE_POSITION]);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_textures[GBUFFER_TEXTURE_TYPE_NORMAL]);    
 }
 
 
-void GBuffer::SetReadBuffer(GBUFFER_TEXTURE_TYPE TextureType)
-{
-    glReadBuffer(GL_COLOR_ATTACHMENT0 + TextureType);
-}
 
 

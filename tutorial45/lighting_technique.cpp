@@ -61,20 +61,16 @@ bool LightingTechnique::Init()
 }
 
 
-
-
 void LightingTechnique::SetPositionTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(m_posTextureUnitLocation, TextureUnit);
 }
 
 
-
 void LightingTechnique::SetNormalTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(m_normalTextureUnitLocation, TextureUnit);
 }
-
 
 
 void LightingTechnique::SetScreenSize(unsigned int Width, unsigned int Height)

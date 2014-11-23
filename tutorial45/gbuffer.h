@@ -41,9 +41,7 @@ public:
 
     void BindForWriting();
    
-    void BindForReading();  
-    
-    void SetReadBuffer(GBUFFER_TEXTURE_TYPE TextureType);
+    void BindForReading();          
 
 private:
                      
