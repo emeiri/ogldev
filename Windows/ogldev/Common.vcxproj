@@ -20,6 +20,7 @@
     <ClCompile Include="..\..\Common\ogldev_basic_lighting.cpp" />
     <ClCompile Include="..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\Common\ogldev_glfw_backend.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_skinned_mesh.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\Common\pipeline.cpp" />
@@ -39,6 +40,7 @@
     <ClInclude Include="..\..\Include\ogldev_keys.h" />
     <ClInclude Include="..\..\Include\ogldev_math_3d.h" />
     <ClInclude Include="..\..\Include\ogldev_pipeline.h" />
+    <ClInclude Include="..\..\Include\ogldev_skinned_mesh.h" />
     <ClInclude Include="..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />

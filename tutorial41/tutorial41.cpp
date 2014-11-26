@@ -36,7 +36,7 @@
 #include "skinning_technique.h"
 #include "motion_blur_technique.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_skinned_mesh.h"
 #include "intermediate_buffer.h"
 
 using namespace std;
@@ -227,8 +227,8 @@ private:
     MotionBlurTechnique* m_pMotionBlurTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
-    Mesh m_mesh;
-    Mesh m_quad;
+    SkinnedMesh m_mesh;
+    SkinnedMesh m_quad;
     Vector3f m_position;            
     PersProjInfo m_persProjInfo;
     IntermediateBuffer m_intermediateBuffer;

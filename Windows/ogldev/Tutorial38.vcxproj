@@ -11,12 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial38\engine_common.h" />
-    <ClInclude Include="..\..\tutorial38\mesh.h" />
     <ClInclude Include="..\..\tutorial38\skinning_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial38\mesh.cpp" />
     <ClCompile Include="..\..\tutorial38\skinning_technique.cpp" />
     <ClCompile Include="..\..\tutorial38\tutorial38.cpp" />
   </ItemGroup>

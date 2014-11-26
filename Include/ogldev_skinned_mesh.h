@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MESH_H
-#define	MESH_H
+#ifndef OGLDEV_SKINNED_MESH_H
+#define	OGLDEV_SKINNED_MESH_H
 
 #include <map>
 #include <vector>
@@ -33,12 +33,12 @@
 
 using namespace std;
 
-class Mesh
+class SkinnedMesh
 {
 public:
-    Mesh();
+    SkinnedMesh();
 
-    ~Mesh();
+    ~SkinnedMesh();
 
     bool LoadMesh(const string& Filename);
 
@@ -147,5 +147,5 @@ enum VB_TYPES {
 };
 
 
-#endif	/* MESH_H */
+#endif	/* OGLDEV_SKINNED_MESH_H */
 

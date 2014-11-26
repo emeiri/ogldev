@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial30\engine_common.h" />
     <ClInclude Include="..\..\tutorial30\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial30\mesh.h" />
     <ClInclude Include="..\..\tutorial30\render_callbacks.h" />

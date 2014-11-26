@@ -21,7 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial28\billboard_technique.h" />
-    <ClInclude Include="..\..\tutorial28\engine_common.h" />
     <ClInclude Include="..\..\tutorial28\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial28\mesh.h" />
     <ClInclude Include="..\..\tutorial28\particle_system.h" />
