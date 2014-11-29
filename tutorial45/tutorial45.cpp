@@ -57,8 +57,6 @@ public:
         m_persProjInfo.zFar = 1000.0f;  
         
         m_pipeline.SetPerspectiveProj(m_persProjInfo);           
-        //m_pipeline.WorldPos(Vector3f(0.0f, 0.0f, 0.0f));        
-        //m_pipeline.Scale(0.1f, 0.1f, 0.1f);                		
     }
 
     ~Tutorial45()
@@ -73,7 +71,12 @@ public:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-              
+
+        if (!m_geomPassTech.Init()) {
+            OGLDEV_ERROR("Error initializing the lighting technique\n");
+            return false;
+        }
+
         if (!m_LightingTech.Init()) {
             OGLDEV_ERROR("Error initializing the lighting technique\n");
             return false;
@@ -89,6 +92,7 @@ public:
             return false;            
         }        
         m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 5.0f);
+        m_mesh.GetOrientation().m_scale = Vector3f(0.1f, 0.1f, 0.1f);
         
         if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;

@@ -51,7 +51,7 @@ bool GeomPassTech::Init()
 
 	if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
 		m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION) {
-		return false;
+	//	return false;
 	}
 
 	return true;
