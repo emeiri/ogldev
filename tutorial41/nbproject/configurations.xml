@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>intermediate_buffer.h</itemPath>
-      <itemPath>mesh.h</itemPath>
       <itemPath>motion_blur_technique.h</itemPath>
       <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
@@ -19,7 +18,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>intermediate_buffer.cpp</itemPath>
-      <itemPath>mesh.cpp</itemPath>
       <itemPath>motion_blur_technique.cpp</itemPath>
       <itemPath>skinning_technique.cpp</itemPath>
       <itemPath>tutorial41.cpp</itemPath>
@@ -92,10 +90,6 @@
       </item>
       <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="motion_blur_technique.h" ex="false" tool="3" flavor2="0">
@@ -161,10 +155,6 @@
       <item path="intermediate_buffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="intermediate_buffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="motion_blur_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

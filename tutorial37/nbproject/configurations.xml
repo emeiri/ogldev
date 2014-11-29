@@ -10,6 +10,7 @@
       <itemPath>ds_point_light_pass_tech.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
       <itemPath>lights_common.h</itemPath>
+      <itemPath>mesh.h</itemPath>
       <itemPath>null_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
@@ -30,7 +31,30 @@
       <itemPath>ds_point_light_pass_tech.cpp</itemPath>
       <itemPath>gbuffer.cpp</itemPath>
       <itemPath>null_technique.cpp</itemPath>
+      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial37.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"

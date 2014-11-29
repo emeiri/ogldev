@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>mesh.h</itemPath>
       <itemPath>skinning_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
@@ -14,7 +13,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>mesh.cpp</itemPath>
       <itemPath>skinning_technique.cpp</itemPath>
       <itemPath>tutorial38.cpp</itemPath>
     </logicalFolder>
@@ -72,10 +70,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/skinning.vs" ex="false" tool="3" flavor2="0">
@@ -131,10 +125,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/skinning.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/skinning.vs" ex="false" tool="3" flavor2="0">

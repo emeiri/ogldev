@@ -18,7 +18,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
       <itemPath>shadow_map_fbo.cpp</itemPath>
       <itemPath>shadow_map_technique.cpp</itemPath>
       <itemPath>tutorial42.cpp</itemPath>
