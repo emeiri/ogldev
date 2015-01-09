@@ -139,6 +139,9 @@ bool Camera::OnKeyboard(OGLDEV_KEY Key)
     case OGLDEV_KEY_PAGE_DOWN:
         m_pos.y -= STEP_SCALE;
         break;
+    
+    default:
+        break;            
     }
 
     return Ret;

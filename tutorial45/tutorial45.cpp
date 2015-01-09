@@ -66,8 +66,10 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(0.0f, 1.0f, -5.0f);
+       // Vector3f Pos(0.0f, 23.0f, -5.0f);
+        Vector3f Pos(0.0f, 2.0f, -10.0f);
         Vector3f Target(0.0f, 0.0f, 1.0f);
+        //Vector3f Target(-1.0f, 0.0f, 0.1f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -88,11 +90,14 @@ public:
         m_LightingTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
         m_LightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
 
+       // if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }        
-        m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 5.0f);
-        m_mesh.GetOrientation().m_scale = Vector3f(0.1f, 0.1f, 0.1f);
+     
+        m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 0.0f);
+        m_mesh.GetOrientation().m_rotation = Vector3f(0.0f, 180.0f, 0.0f);
+   //     m_mesh.GetOrientation().m_scale = Vector3f(0.1f, 0.1f, 0.1f);
         
         if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
@@ -135,15 +140,16 @@ public:
     
     void GeometryPass()
     {
-		m_geomPassTech.Enable();
+		m_geomPassTech.Enable();        
 
         m_gBuffer.BindForWriting();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        m_mesh.GetOrientation().m_rotation.y += 0.1;
         m_pipeline.Orient(m_mesh.GetOrientation());
         m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());        
-		m_geomPassTech.SetWorldMatrix(m_pipeline.GetWorldTrans());
+		m_geomPassTech.SetWVMatrix(m_pipeline.GetWVTrans());
         m_mesh.Render();       
     }
     

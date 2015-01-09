@@ -97,6 +97,8 @@
       </item>
       <item path="../Include/ogldev_pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_random_texture.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
@@ -142,6 +144,8 @@
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="random_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -191,6 +195,8 @@
       </item>
       <item path="../Include/ogldev_pipeline.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_random_texture.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
@@ -236,6 +242,8 @@
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="random_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -47,10 +47,10 @@ bool GeomPassTech::Init()
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
-    m_WorldMatrixLocation = GetUniformLocation("gWorld");
+    m_WVLocation = GetUniformLocation("gWV");
 
 	if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-		m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION) {
+		m_WVLocation == INVALID_UNIFORM_LOCATION) {
 		return false;
 	}
 
@@ -64,8 +64,8 @@ void GeomPassTech::SetWVP(const Matrix4f& WVP)
 }
 
 
-void GeomPassTech::SetWorldMatrix(const Matrix4f& WorldInverse)
+void GeomPassTech::SetWVMatrix(const Matrix4f& WV)
 {
-    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
+    glUniformMatrix4fv(m_WVLocation, 1, GL_TRUE, (const GLfloat*)WV.m);
 }
 
