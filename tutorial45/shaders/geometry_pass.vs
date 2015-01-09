@@ -7,12 +7,12 @@ layout (location = 2) in vec3 Normal;
 uniform mat4 gWVP;
 uniform mat4 gWV;
 
-out vec3 Pos0;                                        
-out vec3 Normal0;                                                                   
+out vec3 ViewPos;                                        
+out vec3 ViewNormal;                                                                   
 
 void main()
 {       
     gl_Position = gWVP * vec4(Position, 1.0);
-    Pos0        = (gWV * vec4(Position, 1.0)).xyz;
-    Normal0     = (gWV * vec4(Normal, 0.0)).xyz;    
+    ViewPos     = (gWV * vec4(Position, 1.0)).xyz;
+    ViewNormal  = (gWV * vec4(Normal, 0.0)).xyz;    
 }

@@ -29,10 +29,10 @@ void main()
 
     float AO = 0.0;
 
-    AO += CalcAmbientOcclusion(TexCoord + 0.1 * vec2(-1.0, -1.0) * WorldPos.z, WorldPos, Normal);
-    AO += CalcAmbientOcclusion(TexCoord + 0.2 * vec2(1.0, -1.0) * WorldPos.z, WorldPos, Normal);
-    AO += CalcAmbientOcclusion(TexCoord + 0.3 * vec2(-1.0, 1.0) * WorldPos.z, WorldPos, Normal);
-    AO += CalcAmbientOcclusion(TexCoord + 0.4 * vec2(1.0, 1.0) * WorldPos.z, WorldPos, Normal);
+    AO += CalcAmbientOcclusion(TexCoord + 0.1 * vec2(-1.0, -1.0) / WorldPos.z, WorldPos, Normal);
+    AO += CalcAmbientOcclusion(TexCoord + 0.2 * vec2(1.0, -1.0) / WorldPos.z, WorldPos, Normal);
+    AO += CalcAmbientOcclusion(TexCoord + 0.3 * vec2(-1.0, 1.0) / WorldPos.z, WorldPos, Normal);
+    AO += CalcAmbientOcclusion(TexCoord + 0.4 * vec2(1.0, 1.0) / WorldPos.z, WorldPos, Normal);
    // AO += CalcAmbientOcclusion(TexCoord + 0.5 * vec2(-0.707, -0.707) * WorldPos.z, WorldPos, Normal);
   //  AO += CalcAmbientOcclusion(TexCoord + 0.6 * vec2(0.707, -0.707) * WorldPos.z, WorldPos, Normal);
   //  AO += CalcAmbientOcclusion(TexCoord + 0.7 * vec2(-0.707, 0.707) * WorldPos.z, WorldPos, Normal);
