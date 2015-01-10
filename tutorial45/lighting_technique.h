@@ -32,12 +32,16 @@ public:
     void SetPositionTextureUnit(unsigned int TextureUnit);	
     void SetNormalTextureUnit(unsigned int TextureUnit);	
     void SetScreenSize(unsigned int Width, unsigned int Height);
+    void SetAmbientIntensity(float ai);    
+    void SetSampleRadius(float sr);    
     
 private:
 
     GLuint m_posTextureUnitLocation;
     GLuint m_normalTextureUnitLocation;
     GLuint m_screenSizeLocation;
+    GLuint m_AILocation;    
+    GLuint m_sampleRadLocation;    
 };
 
 

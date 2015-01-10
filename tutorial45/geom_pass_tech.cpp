@@ -49,6 +49,7 @@ bool GeomPassTech::Init()
     m_WVPLocation = GetUniformLocation("gWVP");
     m_WVLocation = GetUniformLocation("gWV");
 
+
 	if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
 		m_WVLocation == INVALID_UNIFORM_LOCATION) {
 		return false;
@@ -68,4 +69,5 @@ void GeomPassTech::SetWVMatrix(const Matrix4f& WV)
 {
     glUniformMatrix4fv(m_WVLocation, 1, GL_TRUE, (const GLfloat*)WV.m);
 }
+
 
