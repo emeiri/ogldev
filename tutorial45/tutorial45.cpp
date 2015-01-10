@@ -38,6 +38,7 @@
 #include "ogldev_camera.h"
 #include "mesh.h"
 #include "gbuffer.h"
+#include "ogldev_random_texture.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -88,6 +89,7 @@ public:
 
         m_LightingTech.SetPositionTextureUnit(GBUFFER_POSITION_TEXTURE_UNIT);
         m_LightingTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
+        m_LightingTech.SetRandomTextureUnit(2);
         m_LightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
         m_LightingTech.SetAmbientIntensity(2.0f);
         m_LightingTech.SetSampleRadius(0.005f);
@@ -108,6 +110,12 @@ public:
         if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             return false;
         }
+        
+        if (!m_randomTexture.Init(100)) {
+            return false;
+        }
+        
+        m_randomTexture.Bind(GL_TEXTURE2);
                        
 #ifndef WIN32
         // Disabled for now because it somehow clashes with the regular rendering...
@@ -199,6 +207,7 @@ private:
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
     GBuffer m_gBuffer;
+    RandomTexture m_randomTexture;
 };
 
 

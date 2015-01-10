@@ -50,35 +50,42 @@ bool LightingTechnique::Init()
 
 	m_posTextureUnitLocation = GetUniformLocation("gPositionMap");
 	m_normalTextureUnitLocation = GetUniformLocation("gNormalMap");
+    m_randomTextureUnitLocation = GetUniformLocation("gRandomMap");
     m_screenSizeLocation = GetUniformLocation("gScreenSize");	
     m_AILocation = GetUniformLocation("gIntensity");
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
 
     if (m_posTextureUnitLocation == INVALID_UNIFORM_LOCATION ||		
 		m_normalTextureUnitLocation == INVALID_UNIFORM_LOCATION ||		
+        m_randomTextureUnitLocation == INVALID_UNIFORM_LOCATION ||		
         m_screenSizeLocation == INVALID_UNIFORM_LOCATION ||
         m_AILocation == INVALID_UNIFORM_LOCATION ||
         m_sampleRadLocation == INVALID_UNIFORM_LOCATION) {
-        return false;
+      //  return false;
     }
 
     return true;
 }
 
 
-void LightingTechnique::SetPositionTextureUnit(unsigned int TextureUnit)
+void LightingTechnique::SetPositionTextureUnit(uint TextureUnit)
 {
     glUniform1i(m_posTextureUnitLocation, TextureUnit);
 }
 
 
-void LightingTechnique::SetNormalTextureUnit(unsigned int TextureUnit)
+void LightingTechnique::SetNormalTextureUnit(uint TextureUnit)
 {
     glUniform1i(m_normalTextureUnitLocation, TextureUnit);
 }
 
+void LightingTechnique::SetRandomTextureUnit(uint TextureUnit)
+{
+    glUniform1i(m_randomTextureUnitLocation, TextureUnit);
+}
 
-void LightingTechnique::SetScreenSize(unsigned int Width, unsigned int Height)
+
+void LightingTechnique::SetScreenSize(uint Width, uint Height)
 {
     glUniform2f(m_screenSizeLocation, (float)Width, (float)Height);
 }

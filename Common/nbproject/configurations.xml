@@ -15,6 +15,7 @@
       <itemPath>../Include/ogldev_keys.h</itemPath>
       <itemPath>../Include/ogldev_math_3d.h</itemPath>
       <itemPath>../Include/ogldev_pipeline.h</itemPath>
+      <itemPath>../Include/ogldev_random_texture.h</itemPath>
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
@@ -37,6 +38,7 @@
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
+      <itemPath>random_texture.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
       <itemPath>FreetypeGL/texture-atlas.c</itemPath>
       <itemPath>FreetypeGL/texture-font.c</itemPath>

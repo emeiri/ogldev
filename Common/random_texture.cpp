@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2014 Etay Meiri
+	Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,13 +34,27 @@ RandomTexture::~RandomTexture()
 }
 
 
-bool RandomTexture::Init()
+bool RandomTexture::Init(uint size)
 {
     glGenTextures(1, &m_texture);    
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.columns(), m_image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_blob.data());
+    
+    uint TextureSize = size * size * 3;
+    float* pRandom = new float[TextureSize];
+    for (uint i = 0 ; i < TextureSize ; i++) {
+        float r = 2.0f * (float)rand()/RAND_MAX - 1.0f;
+        pRandom[i] = r;
+    }
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, size, size, 0, GL_RGB, GL_FLOAT, pRandom);
+    
+    delete [] pRandom;
+    
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
+    
     glBindTexture(GL_TEXTURE_2D, 0);
     
     return GLCheckError();
@@ -48,5 +62,6 @@ bool RandomTexture::Init()
 
 void RandomTexture::Bind(GLenum TextureUnit)
 {
-        
+    glActiveTexture(TextureUnit);
+    glBindTexture(GL_TEXTURE_2D, m_texture);        
 }

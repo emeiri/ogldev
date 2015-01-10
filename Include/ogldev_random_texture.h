@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2014 Etay Meiri
+	Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class RandomTexture
 public:
     RandomTexture();
     
-    bool Init();
+    bool Init(uint size);
     
     ~RandomTexture();
     
