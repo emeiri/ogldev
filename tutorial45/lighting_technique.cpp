@@ -64,7 +64,33 @@ bool LightingTechnique::Init()
       //  return false;
     }
 
+    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation) ; i++ ) {
+        char Name[128] = { 0 };
+        SNPRINTF(Name, sizeof(Name), "gkernel[%d]", i);        
+        m_kernelLocation[i] = GetUniformLocation(Name);
+        
+        if (m_kernelLocation[i] == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
+    }
+    
+    GenKernel();
+    
     return true;
+}
+
+
+void LightingTechnique::GenKernel()
+{
+    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation) ; i++ ) {
+        float scale = (float)i / (float)(ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation));        
+        Vector3f v;
+        v.x = 2.0f * (float)rand()/RAND_MAX - 1.0f;
+        v.y = 2.0f * (float)rand()/RAND_MAX - 1.0f;
+        v.z = (float)rand()/RAND_MAX;
+        v *= (0.1f + 0.9f * scale * scale);
+        glUniform3f(m_kernelLocation[i], v.x, v.y, v.z);
+    }
 }
 
 

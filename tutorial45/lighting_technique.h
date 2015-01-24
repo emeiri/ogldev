@@ -37,6 +37,10 @@ public:
     void SetSampleRadius(float sr);    
     
 private:
+    
+    void GenKernel();
+    
+    const static uint KERNEL_SIZE = 128;
 
     GLuint m_posTextureUnitLocation;
     GLuint m_normalTextureUnitLocation;
@@ -44,6 +48,7 @@ private:
     GLuint m_screenSizeLocation;
     GLuint m_AILocation;    
     GLuint m_sampleRadLocation;    
+    GLuint m_kernelLocation[KERNEL_SIZE];
 };
 
 
