@@ -5,6 +5,7 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>engine_common.h</itemPath>
+      <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>picking_technique.h</itemPath>
       <itemPath>picking_texture.h</itemPath>
@@ -24,11 +25,34 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>picking_technique.cpp</itemPath>
       <itemPath>picking_texture.cpp</itemPath>
       <itemPath>simple_color_technique.cpp</itemPath>
       <itemPath>tutorial29.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
