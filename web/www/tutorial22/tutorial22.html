@@ -300,7 +300,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)<br>
 <p>(mesh.cpp:187)</p>
 <code>
 &nbsp; &nbsp;&nbsp; &nbsp;	        if (!m_Textures[i]) {<br>
-&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            m_Textures[i] = new Texture(GL_TEXTURE_2D, "./white.png");<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            m_Textures[i] = new Texture(GL_TEXTURE_2D, "../Content/white.png");<br>
 &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            Ret = m_Textures[i]->Load();<br>
 &nbsp; &nbsp;&nbsp; &nbsp;        }<br>
 &nbsp; &nbsp; }<br>
@@ -381,7 +381,7 @@ glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 	proporations as the screen so that each pixel in the color buffer has a corresponding slot in the depth buffer. 
 	That slot always stores the depth of the closest pixel and it is used in the depth test for the comparison.
 </p>
-<p>(tutorial22.cpp:95)</p>
+<p>(tutorial22.cpp:101)</p>
 <code>
 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 </code>

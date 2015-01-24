@@ -111,19 +111,15 @@ public:
         pl[1].Attenuation.Linear = 0.1f;
         m_pEffect->SetPointLights(2, pl);
 
-        SpotLight sl[2];
-        sl[0].DiffuseIntensity = 0.9f;
-        sl[0].Color = Vector3f(0.0f, 1.0f, 1.0f);
-        sl[0].Position = m_pGameCamera->GetPos();
-        sl[0].Direction = m_pGameCamera->GetTarget();
-        sl[0].Attenuation.Linear = 0.1f;
-        sl[0].Cutoff = 10.0f;
+        SpotLight sl;
+        sl.DiffuseIntensity = 0.9f;
+        sl.Color = Vector3f(0.0f, 1.0f, 1.0f);
+        sl.Position = m_pGameCamera->GetPos();
+        sl.Direction = m_pGameCamera->GetTarget();
+        sl.Attenuation.Linear = 0.1f;
+        sl.Cutoff = 10.0f;
 
-        sl[1].DiffuseIntensity = 0.75f;
-        sl[1].Color = Vector3f(0.0f, 0.5f, 1.0f);
-        sl[1].Position = Vector3f(7.0f, 1.0f, FieldDepth * (sinf(m_scale) + 1.0f) / 2.0f);
-        sl[1].Attenuation.Linear = 0.1f;
-        m_pEffect->SetSpotLights(1, sl);
+        m_pEffect->SetSpotLights(1, &sl);
 
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
