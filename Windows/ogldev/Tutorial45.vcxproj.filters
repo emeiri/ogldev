@@ -21,6 +21,9 @@
     <ClInclude Include="..\..\tutorial45\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\tutorial45\geom_pass_tech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial45\lighting_technique.cpp">
@@ -32,12 +35,24 @@
     <ClCompile Include="..\..\tutorial45\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tutorial45\gbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial45\geom_pass_tech.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\tutorial45\shaders\lighting.fs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\tutorial45\shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial45\shaders\geometry_pass.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial45\shaders\geometry_pass.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

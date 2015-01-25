@@ -12,15 +12,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tutorial45\engine_common.h" />
+    <ClInclude Include="..\..\tutorial45\geom_pass_tech.h" />
     <ClInclude Include="..\..\tutorial45\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial45\mesh.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\tutorial45\gbuffer.cpp" />
+    <ClCompile Include="..\..\tutorial45\geom_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial45\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial45\mesh.cpp" />
     <ClCompile Include="..\..\tutorial45\tutorial45.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\tutorial45\shaders\geometry_pass.fs" />
+    <None Include="..\..\tutorial45\shaders\geometry_pass.vs" />
     <None Include="..\..\tutorial45\shaders\lighting.fs" />
     <None Include="..\..\tutorial45\shaders\lighting.vs" />
   </ItemGroup>
