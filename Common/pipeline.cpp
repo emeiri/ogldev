@@ -82,6 +82,3 @@ const Matrix4f& Pipeline::GetWPTrans()
 	m_WPtransformation = PersProjTrans * m_Wtransformation;
 	return m_WPtransformation;
 }
-
-
-

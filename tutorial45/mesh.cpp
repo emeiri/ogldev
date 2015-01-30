@@ -76,6 +76,10 @@ bool Mesh::LoadMesh(const string& Filename)
     
     if (pScene) {
         Ret = InitFromScene(pScene, Filename);
+        
+        if (!Ret) {
+            OGLDEV_ERROR("Error initializing model");
+        }
     }
     else {
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());

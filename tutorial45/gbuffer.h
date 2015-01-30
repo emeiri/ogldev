@@ -22,6 +22,7 @@
 
 #define GBUFFER_POSITION_TEXTURE_UNIT 0
 #define GBUFFER_NORMAL_TEXTURE_UNIT   1
+#define GBUFFER_DEPTH_TEXTURE_UNIT    2
 
 class GBuffer
 {
@@ -30,6 +31,7 @@ public:
     enum GBUFFER_TEXTURE_TYPE {
         GBUFFER_TEXTURE_TYPE_POSITION,
         GBUFFER_TEXTURE_TYPE_NORMAL,
+        GBUFFER_TEXTURE_TYPE_DEPTH,
         GBUFFER_NUM_TEXTURES
     };
     
@@ -47,7 +49,6 @@ private:
                      
     GLuint m_fbo;
     GLuint m_textures[GBUFFER_NUM_TEXTURES];
-    GLuint m_depthTexture;
 };
 
 #endif	/* GBUFFER_H */

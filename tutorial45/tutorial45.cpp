@@ -89,13 +89,18 @@ public:
 
         m_LightingTech.SetPositionTextureUnit(GBUFFER_POSITION_TEXTURE_UNIT);
         m_LightingTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
-        m_LightingTech.SetRandomTextureUnit(2);
+        m_LightingTech.SetDepthTextureUnit(GBUFFER_DEPTH_TEXTURE_UNIT);
+        //m_LightingTech.SetRandomTextureUnit(3);
         m_LightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
         m_LightingTech.SetAmbientIntensity(2.0f);
         m_LightingTech.SetSampleRadius(0.005f);
+        
+         Matrix4f PersProjTrans;
+        PersProjTrans.InitPersProjTransform(m_persProjInfo);
+        m_LightingTech.SetProjMatrix(PersProjTrans);
 
        // if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-        if (!m_mesh.LoadMesh("../Content/buddha.obj")) {
+        if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }        
      

@@ -29,12 +29,14 @@ public:
 
     virtual bool Init();
 
-    void SetPositionTextureUnit(unsigned int TextureUnit);	
-    void SetNormalTextureUnit(unsigned int TextureUnit);	
-    void SetRandomTextureUnit(unsigned int TextureUnit);
-    void SetScreenSize(unsigned int Width, unsigned int Height);
+    void SetPositionTextureUnit(uint TextureUnit);	
+    void SetNormalTextureUnit(uint TextureUnit);	
+    void SetRandomTextureUnit(uint TextureUnit);
+    void SetDepthTextureUnit(uint TextureUnit);
+    void SetScreenSize(uint Width, uint Height);
     void SetAmbientIntensity(float ai);    
     void SetSampleRadius(float sr);    
+    void SetProjMatrix(const Matrix4f& m);
     
 private:
     
@@ -45,10 +47,12 @@ private:
     GLuint m_posTextureUnitLocation;
     GLuint m_normalTextureUnitLocation;
     GLuint m_randomTextureUnitLocation;
+    GLuint m_depthTextureUnitLocation;
     GLuint m_screenSizeLocation;
     GLuint m_AILocation;    
     GLuint m_sampleRadLocation;    
-    GLuint m_kernelLocation[KERNEL_SIZE];
+    GLuint m_kernelLocation;
+    GLuint m_projMatrixLocation;
 };
 
 

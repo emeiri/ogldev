@@ -49,48 +49,68 @@ bool LightingTechnique::Init()
     }
 
 	m_posTextureUnitLocation = GetUniformLocation("gPositionMap");
-	m_normalTextureUnitLocation = GetUniformLocation("gNormalMap");
+	//m_normalTextureUnitLocation = GetUniformLocation("gNormalMap");
     m_randomTextureUnitLocation = GetUniformLocation("gRandomMap");
+    m_depthTextureUnitLocation = GetUniformLocation("gDepthMap");
     m_screenSizeLocation = GetUniformLocation("gScreenSize");	
     m_AILocation = GetUniformLocation("gIntensity");
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
+    m_projMatrixLocation = GetUniformLocation("gProj");
+    m_kernelLocation = GetUniformLocation("gKernel");
 
-    if (m_posTextureUnitLocation == INVALID_UNIFORM_LOCATION ||		
-		m_normalTextureUnitLocation == INVALID_UNIFORM_LOCATION ||		
-        m_randomTextureUnitLocation == INVALID_UNIFORM_LOCATION ||		
-        m_screenSizeLocation == INVALID_UNIFORM_LOCATION ||
-        m_AILocation == INVALID_UNIFORM_LOCATION ||
-        m_sampleRadLocation == INVALID_UNIFORM_LOCATION) {
-      //  return false;
+    if (m_posTextureUnitLocation    == INVALID_UNIFORM_LOCATION ||
+		m_normalTextureUnitLocation == INVALID_UNIFORM_LOCATION ||
+        m_randomTextureUnitLocation == INVALID_UNIFORM_LOCATION ||
+        m_depthTextureUnitLocation  == INVALID_UNIFORM_LOCATION ||
+        m_screenSizeLocation        == INVALID_UNIFORM_LOCATION ||
+        m_AILocation                == INVALID_UNIFORM_LOCATION ||
+        m_sampleRadLocation         == INVALID_UNIFORM_LOCATION ||
+        m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||
+        m_kernelLocation            == INVALID_UNIFORM_LOCATION) {
+    //    return false;
     }
 
-    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation) ; i++ ) {
+ /*   for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation) ; i++ ) {
         char Name[128] = { 0 };
         SNPRINTF(Name, sizeof(Name), "gkernel[%d]", i);        
-        m_kernelLocation[i] = GetUniformLocation(Name);
+        m_kernelLocation[i] = GetUniformLocation("gKernel");
         
         if (m_kernelLocation[i] == INVALID_UNIFORM_LOCATION) {
             return false;
         }
-    }
+    }*/
+    
+    Enable();
+    
+    GLExitIfError;
     
     GenKernel();
     
-    return true;
+    GLExitIfError;
+    
+    return GLCheckError();
 }
 
 
 void LightingTechnique::GenKernel()
 {
-    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation) ; i++ ) {
-        float scale = (float)i / (float)(ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation));        
+    Vector3f kernel[KERNEL_SIZE];
+    
+    for (uint i = 0 ; i < KERNEL_SIZE ; i++ ) {
+        float scale = (float)i / (float)(KERNEL_SIZE);        
         Vector3f v;
         v.x = 2.0f * (float)rand()/RAND_MAX - 1.0f;
         v.y = 2.0f * (float)rand()/RAND_MAX - 1.0f;
         v.z = (float)rand()/RAND_MAX;
         v *= (0.1f + 0.9f * scale * scale);
-        glUniform3f(m_kernelLocation[i], v.x, v.y, v.z);
+        
+        v.Print();
+        printf("\n");
+        kernel[i] = v;
+        //glUniform3f(m_kernelLocation[i], v.x, v.y, v.z);
     }
+       
+    glUniform3fv(m_kernelLocation, KERNEL_SIZE, (const GLfloat*)&kernel[0]);    
 }
 
 
@@ -105,9 +125,16 @@ void LightingTechnique::SetNormalTextureUnit(uint TextureUnit)
     glUniform1i(m_normalTextureUnitLocation, TextureUnit);
 }
 
+
 void LightingTechnique::SetRandomTextureUnit(uint TextureUnit)
 {
     glUniform1i(m_randomTextureUnitLocation, TextureUnit);
+}
+
+
+void LightingTechnique::SetDepthTextureUnit(uint TextureUnit)
+{
+    glUniform1i(m_depthTextureUnitLocation, TextureUnit);
 }
 
 
@@ -126,4 +153,10 @@ void LightingTechnique::SetAmbientIntensity(float ai)
 void LightingTechnique::SetSampleRadius(float sr)
 {
     glUniform1f(m_sampleRadLocation, sr);
+}
+
+
+void LightingTechnique::SetProjMatrix(const Matrix4f& m)
+{
+    glUniformMatrix4fv(m_projMatrixLocation, 1, GL_TRUE, (const GLfloat*)m.m);    
 }

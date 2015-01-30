@@ -110,6 +110,11 @@ struct Vector3f
         return *this;
     }
 
+    operator const float*() const
+    {
+        return &(x);
+    }
+
     Vector3f Cross(const Vector3f& v) const;
 
     Vector3f& Normalize();
