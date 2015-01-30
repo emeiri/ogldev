@@ -10,6 +10,8 @@ uniform vec2 gScreenSize;
 uniform float gIntensity;
 uniform float gSampleRad;
 uniform mat4 gProj;
+uniform float gzNear;
+uniform float gzFar;
 
 const int MAX_KERNEL_SIZE = 128;
 uniform vec3 gKernel[MAX_KERNEL_SIZE];
@@ -22,12 +24,9 @@ vec2 CalcTexCoord()
 
 float linearizeDepth(float d)
 {
-    float zNear = 1.0;
-    float zFar = 1000.0;
     float z_n = 2.0 * d - 1.0;
-    float z_e = 2.0 * zNear * zFar / (zFar + zNear - z_n * (zFar - zNear));
+    float z_e = 2.0 * gzNear * gzFar / (gzFar + gzNear - z_n * (gzFar - gzNear));
     return z_e;
-    //return (gProj[3][2] / (d - gProj[2][2]));
 }
 
 

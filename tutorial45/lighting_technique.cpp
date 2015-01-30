@@ -55,7 +55,9 @@ bool LightingTechnique::Init()
     m_screenSizeLocation = GetUniformLocation("gScreenSize");	
     m_AILocation = GetUniformLocation("gIntensity");
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
-    m_projMatrixLocation = GetUniformLocation("gProj");
+    m_zNearLocation = GetUniformLocation("gzNear");
+    m_zFarLocation = GetUniformLocation("gzFar");
+    m_projMatrixLocation = GetUniformLocation("gProj");	
     m_kernelLocation = GetUniformLocation("gKernel");
 
     if (m_posTextureUnitLocation    == INVALID_UNIFORM_LOCATION ||
@@ -65,21 +67,13 @@ bool LightingTechnique::Init()
         m_screenSizeLocation        == INVALID_UNIFORM_LOCATION ||
         m_AILocation                == INVALID_UNIFORM_LOCATION ||
         m_sampleRadLocation         == INVALID_UNIFORM_LOCATION ||
-        m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||
+        m_zNearLocation             == INVALID_UNIFORM_LOCATION ||
+        m_zFarLocation              == INVALID_UNIFORM_LOCATION ||
+        m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||		
         m_kernelLocation            == INVALID_UNIFORM_LOCATION) {
     //    return false;
     }
-
- /*   for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_kernelLocation) ; i++ ) {
-        char Name[128] = { 0 };
-        SNPRINTF(Name, sizeof(Name), "gkernel[%d]", i);        
-        m_kernelLocation[i] = GetUniformLocation("gKernel");
-        
-        if (m_kernelLocation[i] == INVALID_UNIFORM_LOCATION) {
-            return false;
-        }
-    }*/
-    
+   
     Enable();
     
     GLExitIfError;
@@ -159,4 +153,11 @@ void LightingTechnique::SetSampleRadius(float sr)
 void LightingTechnique::SetProjMatrix(const Matrix4f& m)
 {
     glUniformMatrix4fv(m_projMatrixLocation, 1, GL_TRUE, (const GLfloat*)m.m);    
+}
+
+
+void LightingTechnique::SetZNearAndFar(float zNear, float zFar)
+{
+    glUniform1f(m_zNearLocation, zNear);
+    glUniform1f(m_zFarLocation, zFar);
 }

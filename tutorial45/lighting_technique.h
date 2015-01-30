@@ -37,6 +37,7 @@ public:
     void SetAmbientIntensity(float ai);    
     void SetSampleRadius(float sr);    
     void SetProjMatrix(const Matrix4f& m);
+    void SetZNearAndFar(float zNear, float zFar);
     
 private:
     
@@ -52,7 +53,9 @@ private:
     GLuint m_AILocation;    
     GLuint m_sampleRadLocation;    
     GLuint m_kernelLocation;
-    GLuint m_projMatrixLocation;
+    GLuint m_projMatrixLocation;	
+    GLuint m_zNearLocation;
+    GLuint m_zFarLocation;
 };
 
 

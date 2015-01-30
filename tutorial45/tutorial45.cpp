@@ -94,10 +94,10 @@ public:
         m_LightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
         m_LightingTech.SetAmbientIntensity(2.0f);
         m_LightingTech.SetSampleRadius(0.005f);
-        
-         Matrix4f PersProjTrans;
+        Matrix4f PersProjTrans;
         PersProjTrans.InitPersProjTransform(m_persProjInfo);
         m_LightingTech.SetProjMatrix(PersProjTrans);
+        m_LightingTech.SetZNearAndFar(m_persProjInfo.zNear, m_persProjInfo.zFar);
 
        // if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
