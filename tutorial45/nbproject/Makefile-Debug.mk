@@ -35,10 +35,12 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/aobuffer.o \
 	${OBJECTDIR}/gbuffer.o \
 	${OBJECTDIR}/geom_pass_tech.o \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
+	${OBJECTDIR}/ssao_technique.o \
 	${OBJECTDIR}/tutorial45.o
 
 
@@ -68,6 +70,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial45: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial45 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
 
+${OBJECTDIR}/aobuffer.o: aobuffer.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/aobuffer.o aobuffer.cpp
+
 ${OBJECTDIR}/gbuffer.o: gbuffer.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -87,6 +94,11 @@ ${OBJECTDIR}/mesh.o: mesh.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
+
+${OBJECTDIR}/ssao_technique.o: ssao_technique.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ssao_technique.o ssao_technique.cpp
 
 ${OBJECTDIR}/tutorial45.o: tutorial45.cpp 
 	${MKDIR} -p ${OBJECTDIR}

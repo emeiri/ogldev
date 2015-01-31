@@ -4,24 +4,30 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>aobuffer.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
       <itemPath>geom_pass_tech.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
+      <itemPath>ssao_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/geometry_pass.fs</itemPath>
       <itemPath>shaders/geometry_pass.vs</itemPath>
       <itemPath>shaders/lighting.fs</itemPath>
       <itemPath>shaders/lighting.vs</itemPath>
+      <itemPath>shaders/ssao.fs</itemPath>
+      <itemPath>shaders/ssao.vs</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>aobuffer.cpp</itemPath>
       <itemPath>gbuffer.cpp</itemPath>
       <itemPath>geom_pass_tech.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
+      <itemPath>ssao_technique.cpp</itemPath>
       <itemPath>tutorial45.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -77,6 +83,10 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
+      <item path="aobuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="aobuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
@@ -100,6 +110,14 @@
       <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/ssao.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/ssao.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ssao_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ssao_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial45.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -147,6 +165,10 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="aobuffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="aobuffer.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
@@ -170,6 +192,14 @@
       <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/ssao.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shaders/ssao.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ssao_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ssao_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial45.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2013 Etay Meiri
+	Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,12 +32,14 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ssao_technique.h"
 #include "geom_pass_tech.h"
+#include "lighting_technique.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "mesh.h"
 #include "gbuffer.h"
+#include "aobuffer.h"
 #include "ogldev_random_texture.h"
 
 #define WINDOW_WIDTH  1280  
@@ -58,6 +60,11 @@ public:
         m_persProjInfo.zFar = 1000.0f;  
         
         m_pipeline.SetPerspectiveProj(m_persProjInfo);           
+        
+        m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_directionalLight.AmbientIntensity = 0.66f;
+        m_directionalLight.DiffuseIntensity = 1.0f;
+        m_directionalLight.Direction = Vector3f(1.0f, 0.0, 0.0);        
     }
 
     ~Tutorial45()
@@ -76,29 +83,38 @@ public:
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
 
         if (!m_geomPassTech.Init()) {
-            OGLDEV_ERROR("Error initializing the lighting technique\n");
+            OGLDEV_ERROR("Error initializing the geometry pass technique\n");
             return false;
         }
 
-        if (!m_LightingTech.Init()) {
-            OGLDEV_ERROR("Error initializing the lighting technique\n");
+        if (!m_SSAOTech.Init()) {
+            OGLDEV_ERROR("Error initializing the SSAO technique\n");
             return false;
         }
 
-        m_LightingTech.Enable();
-
-        m_LightingTech.SetPositionTextureUnit(GBUFFER_POSITION_TEXTURE_UNIT);
-        m_LightingTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
-        m_LightingTech.SetDepthTextureUnit(GBUFFER_DEPTH_TEXTURE_UNIT);
+        m_SSAOTech.Enable();
+        m_SSAOTech.SetPositionTextureUnit(GBUFFER_POSITION_TEXTURE_UNIT);
+        m_SSAOTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
+        m_SSAOTech.SetDepthTextureUnit(GBUFFER_DEPTH_TEXTURE_UNIT);
         //m_LightingTech.SetRandomTextureUnit(3);
-        m_LightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
-        m_LightingTech.SetAmbientIntensity(2.0f);
-        m_LightingTech.SetSampleRadius(0.005f);
+        m_SSAOTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
+        m_SSAOTech.SetAmbientIntensity(2.0f);
+        m_SSAOTech.SetSampleRadius(0.005f);
         Matrix4f PersProjTrans;
         PersProjTrans.InitPersProjTransform(m_persProjInfo);
-        m_LightingTech.SetProjMatrix(PersProjTrans);
-        m_LightingTech.SetZNearAndFar(m_persProjInfo.zNear, m_persProjInfo.zFar);
+        m_SSAOTech.SetProjMatrix(PersProjTrans);
+        m_SSAOTech.SetZNearAndFar(m_persProjInfo.zNear, m_persProjInfo.zFar);
 
+        if (!m_lightingTech.Init()) {
+            OGLDEV_ERROR("Error initializing the SSAO technique\n");
+            return false;
+        }
+        
+        m_lightingTech.Enable();
+        m_lightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetDirectionalLight(m_directionalLight);
+        
        // if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
@@ -115,7 +131,11 @@ public:
         if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             return false;
         }
-        
+
+        if (!m_aoBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+            return false;
+        }
+
         if (!m_randomTexture.Init(100)) {
             return false;
         }
@@ -145,7 +165,9 @@ public:
 		
         GeometryPass();
         
-        RenderPass();
+        SSAOPass();
+        
+        LightingPass();
 		      	
     //    RenderFPS();     
         CalcFPS();
@@ -168,12 +190,12 @@ public:
         m_mesh.Render();       
     }
     
-    
-    void RenderPass()
+      
+    void SSAOPass()
     {
-        m_LightingTech.Enable();
+        m_SSAOTech.Enable();
         
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);        
+        m_aoBuffer.BindForWriting();
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
@@ -181,8 +203,25 @@ public:
                            
         m_quad.Render();                
     }
-	
-       
+    
+    
+    void LightingPass()
+    {
+        m_lightingTech.Enable();
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        m_aoBuffer.BindForReading();
+        
+        m_pipeline.Orient(m_mesh.GetOrientation());
+        m_lightingTech.SetWVP(m_pipeline.GetWVPTrans());        
+        m_lightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());        
+        m_mesh.Render();               
+    }
+    
+      
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
         switch (OgldevKey) {
@@ -204,15 +243,18 @@ public:
 
 private:
         
-    LightingTechnique m_LightingTech;
+    SSAOTechnique m_SSAOTech;
     GeomPassTech m_geomPassTech;
+    LightingTechnique m_lightingTech;
     Camera* m_pGameCamera;
     Mesh m_mesh;
     Mesh m_quad;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
     GBuffer m_gBuffer;
+    AOBuffer m_aoBuffer;
     RandomTexture m_randomTexture;
+    DirectionalLight m_directionalLight;
 };
 
 

@@ -1,5 +1,5 @@
 /*
-        Copyright 2011 Etay Meiri
+        Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,41 +21,127 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
+struct BaseLight
+{
+    Vector3f Color;
+    float AmbientIntensity;
+    float DiffuseIntensity;
+
+    BaseLight()
+    {
+        Color = Vector3f(0.0f, 0.0f, 0.0f);
+        AmbientIntensity = 0.0f;
+        DiffuseIntensity = 0.0f;
+    }
+};
+
+struct DirectionalLight : public BaseLight
+{        
+    Vector3f Direction;
+
+    DirectionalLight()
+    {
+        Direction = Vector3f(0.0f, 0.0f, 0.0f);
+    }
+};
+
+struct PointLight : public BaseLight
+{
+    Vector3f Position;
+
+    struct
+    {
+        float Constant;
+        float Linear;
+        float Exp;
+    } Attenuation;
+
+    PointLight()
+    {
+        Position = Vector3f(0.0f, 0.0f, 0.0f);
+        Attenuation.Constant = 1.0f;
+        Attenuation.Linear = 0.0f;
+        Attenuation.Exp = 0.0f;
+    }
+};
+
+struct SpotLight : public PointLight
+{
+    Vector3f Direction;
+    float Cutoff;
+
+    SpotLight()
+    {
+        Direction = Vector3f(0.0f, 0.0f, 0.0f);
+        Cutoff = 0.0f;
+    }
+};
 
 class LightingTechnique : public Technique {
 public:
+
+    static const uint MAX_POINT_LIGHTS = 2;
+    static const uint MAX_SPOT_LIGHTS = 2;
 
     LightingTechnique();
 
     virtual bool Init();
 
-    void SetPositionTextureUnit(uint TextureUnit);	
-    void SetNormalTextureUnit(uint TextureUnit);	
-    void SetRandomTextureUnit(uint TextureUnit);
-    void SetDepthTextureUnit(uint TextureUnit);
-    void SetScreenSize(uint Width, uint Height);
-    void SetAmbientIntensity(float ai);    
-    void SetSampleRadius(float sr);    
-    void SetProjMatrix(const Matrix4f& m);
-    void SetZNearAndFar(float zNear, float zFar);
-    
-private:
-    
-    void GenKernel();
-    
-    const static uint KERNEL_SIZE = 128;
+    void SetWVP(const Matrix4f& WVP);
+    void SetWorldMatrix(const Matrix4f& WVP);
+    void SetColorTextureUnit(uint TextureUnit);
+    void SetAOTextureUnit(uint TextureUnit);
+    void SetDirectionalLight(const DirectionalLight& Light);
+    void SetPointLights(uint NumLights, const PointLight* pLights);
+    void SetSpotLights(uint NumLights, const SpotLight* pLights);
+    void SetEyeWorldPos(const Vector3f& EyeWorldPos);
+    void SetMatSpecularIntensity(float Intensity);
+    void SetMatSpecularPower(float Power);
 
-    GLuint m_posTextureUnitLocation;
-    GLuint m_normalTextureUnitLocation;
-    GLuint m_randomTextureUnitLocation;
-    GLuint m_depthTextureUnitLocation;
-    GLuint m_screenSizeLocation;
-    GLuint m_AILocation;    
-    GLuint m_sampleRadLocation;    
-    GLuint m_kernelLocation;
-    GLuint m_projMatrixLocation;	
-    GLuint m_zNearLocation;
-    GLuint m_zFarLocation;
+private:
+
+    GLuint m_WVPLocation;
+    GLuint m_WorldMatrixLocation;
+    GLuint m_colorTextureLocation;
+    GLuint m_aoTextureLocation;
+    GLuint m_eyeWorldPosLocation;
+    GLuint m_matSpecularIntensityLocation;
+    GLuint m_matSpecularPowerLocation;
+    GLuint m_numPointLightsLocation;
+    GLuint m_numSpotLightsLocation;
+
+    struct {
+        GLuint Color;
+        GLuint AmbientIntensity;
+        GLuint DiffuseIntensity;
+        GLuint Direction;
+    } m_dirLightLocation;
+
+    struct {
+        GLuint Color;
+        GLuint AmbientIntensity;
+        GLuint DiffuseIntensity;
+        GLuint Position;
+        struct {
+            GLuint Constant;
+            GLuint Linear;
+            GLuint Exp;
+        } Atten;
+    } m_pointLightsLocation[MAX_POINT_LIGHTS];
+
+    struct {
+        GLuint Color;
+        GLuint AmbientIntensity;
+        GLuint DiffuseIntensity;
+        GLuint Position;
+        GLuint Direction;
+        GLuint Cutoff;
+        struct {
+            GLuint Constant;
+            GLuint Linear;
+            GLuint Exp;
+        } Atten;
+    } m_spotLightsLocation[MAX_SPOT_LIGHTS];
 };
 
 

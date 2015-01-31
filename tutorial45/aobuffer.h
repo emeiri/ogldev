@@ -1,5 +1,5 @@
 /*
-        Copyright 2011 Etay Meiri
+        Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,30 +15,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GBUFFER_H
-#define	GBUFFER_H
+#ifndef AOBUFFER_H
+#define	AOBUFFER_H
 
 #include <GL/glew.h>
 
-#define GBUFFER_POSITION_TEXTURE_UNIT 0
-#define GBUFFER_NORMAL_TEXTURE_UNIT   1
-#define GBUFFER_DEPTH_TEXTURE_UNIT    2
 
-class GBuffer
+class AOBuffer
 {
 public:
-
-    enum GBUFFER_TEXTURE_TYPE {
-        GBUFFER_TEXTURE_TYPE_POSITION,
-        GBUFFER_TEXTURE_TYPE_NORMAL,
-        GBUFFER_TEXTURE_TYPE_DEPTH,
-        
-        GBUFFER_NUM_TEXTURES
-    };
     
-    GBuffer();
+    AOBuffer();
 
-    ~GBuffer();
+    ~AOBuffer();
 
     bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
 
@@ -49,8 +38,8 @@ public:
 private:
                      
     GLuint m_fbo;
-    GLuint m_textures[GBUFFER_NUM_TEXTURES];
+    GLuint m_texture;
 };
 
-#endif	/* GBUFFER_H */
+#endif	/* AOBUFFER_H */
 
