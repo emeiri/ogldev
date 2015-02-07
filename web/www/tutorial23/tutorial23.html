@@ -331,7 +331,7 @@ void main()<br>
 <p>
 	Now let's see how to combine the pieces of code above and create the application.
 </p>
-<p>(tutorial23.cpp:109)</p>
+<p>(tutorial23.cpp:106)</p>
 <code>
 virtual void RenderSceneCB()<br>
 {<br>
@@ -350,7 +350,7 @@ virtual void RenderSceneCB()<br>
 	rotate the object. Then we call a function to render into the shadow map texture followed by a function to
 	display the results. Finally, glutSwapBuffer() is called to display it to the screen.
 </p>
-<p>(tutorial23.cpp:120)</p>
+<p>(tutorial23.cpp:117)</p>
 <code>
 virtual void ShadowMapPass()<br>
 {<br>
@@ -379,7 +379,7 @@ virtual void ShadowMapPass()<br>
 	here is that the camera is updated based on the position and direction of the spot light. We render the mesh
 	and then switch back to the default framebuffer by binding FBO zero.
 </p>
-<p>(tutorial23.cpp:138)</p>
+<p>(tutorial23.cpp:135)</p>
 <code>
 virtual void RenderPass()<br>
 {<br>
