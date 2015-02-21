@@ -47,6 +47,7 @@ bool LightingTechnique::Init()
         return false;
     }
 
+    m_shaderTypeLocation = GetUniformLocation("gShaderType");
     m_WVPLocation = GetUniformLocation("gWVP");
     m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_colorTextureLocation = GetUniformLocation("gColorMap");
@@ -60,8 +61,10 @@ bool LightingTechnique::Init()
     m_matSpecularPowerLocation = GetUniformLocation("gSpecularPower");
     m_numPointLightsLocation = GetUniformLocation("gNumPointLights");
     m_numSpotLightsLocation = GetUniformLocation("gNumSpotLights");
+    m_screenSizeLocation = GetUniformLocation("gScreenSize");		
 
-    if (m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
+    if (m_shaderTypeLocation == INVALID_UNIFORM_LOCATION ||
+        m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
         m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
         m_colorTextureLocation == INVALID_UNIFORM_LOCATION ||
@@ -73,8 +76,9 @@ bool LightingTechnique::Init()
         m_matSpecularIntensityLocation == INVALID_UNIFORM_LOCATION ||
         m_matSpecularPowerLocation == INVALID_UNIFORM_LOCATION ||
         m_numPointLightsLocation == INVALID_UNIFORM_LOCATION ||
+        m_screenSizeLocation        == INVALID_UNIFORM_LOCATION ||		
         m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
-        return false;
+   //     return false;
     }
 
     for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
@@ -157,6 +161,13 @@ bool LightingTechnique::Init()
 
     return true;
 }
+
+
+void LightingTechnique::SetShaderType(int ShaderType)
+{
+    glUniform1i(m_shaderTypeLocation, ShaderType);
+}
+
 
 void LightingTechnique::SetWVP(const Matrix4f& WVP)
 {
@@ -244,3 +255,9 @@ void LightingTechnique::SetSpotLights(uint NumLights, const SpotLight* pLights)
         glUniform1f(m_spotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
 }
+
+void LightingTechnique::SetScreenSize(uint Width, uint Height)
+{
+    glUniform2f(m_screenSizeLocation, (float)Width, (float)Height);
+}
+

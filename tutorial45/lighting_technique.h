@@ -87,6 +87,7 @@ public:
 
     virtual bool Init();
 
+    void SetShaderType(int ShaderType);    
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetColorTextureUnit(uint TextureUnit);
@@ -97,9 +98,11 @@ public:
     void SetEyeWorldPos(const Vector3f& EyeWorldPos);
     void SetMatSpecularIntensity(float Intensity);
     void SetMatSpecularPower(float Power);
+    void SetScreenSize(uint Width, uint Height);
 
 private:
 
+    GLuint m_shaderTypeLocation;
     GLuint m_WVPLocation;
     GLuint m_WorldMatrixLocation;
     GLuint m_colorTextureLocation;
@@ -109,6 +112,7 @@ private:
     GLuint m_matSpecularPowerLocation;
     GLuint m_numPointLightsLocation;
     GLuint m_numSpotLightsLocation;
+    GLuint m_screenSizeLocation;	
 
     struct {
         GLuint Color;

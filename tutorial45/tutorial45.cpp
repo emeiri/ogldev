@@ -62,7 +62,7 @@ public:
         m_pipeline.SetPerspectiveProj(m_persProjInfo);           
         
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_directionalLight.AmbientIntensity = 0.66f;
+        m_directionalLight.AmbientIntensity = 0.3f;
         m_directionalLight.DiffuseIntensity = 1.0f;
         m_directionalLight.Direction = Vector3f(1.0f, 0.0, 0.0);        
     }
@@ -74,10 +74,8 @@ public:
 
     bool Init()
     {
-       // Vector3f Pos(0.0f, 23.0f, -5.0f);
-        Vector3f Pos(0.0f, 2.0f, -10.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
-        //Vector3f Target(-1.0f, 0.0f, 0.1f);
+        Vector3f Pos(0.0f, 23.0f, -5.0f);
+        Vector3f Target(-1.0f, 0.0f, 0.1f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -114,15 +112,17 @@ public:
         m_lightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetDirectionalLight(m_directionalLight);
+        m_lightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_lightingTech.SetShaderType(2);
         
-       // if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-        if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
+        if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+       // if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
+   //     m_mesh.GetOrientation().m_scale = Vector3f(0.01f);
         m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 0.0f);
         m_mesh.GetOrientation().m_rotation = Vector3f(0.0f, 180.0f, 0.0f);
-   //     m_mesh.GetOrientation().m_scale = Vector3f(0.1f, 0.1f, 0.1f);
         
         if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
@@ -140,7 +140,7 @@ public:
             return false;
         }
         
-        m_randomTexture.Bind(GL_TEXTURE2);
+    //    m_randomTexture.Bind(GL_TEXTURE2);
                        
 #ifndef WIN32
         // Disabled for now because it somehow clashes with the regular rendering...
@@ -183,7 +183,7 @@ public:
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_mesh.GetOrientation().m_rotation.y += 0.1;
+    //    m_mesh.GetOrientation().m_rotation.y += 0.1;
         m_pipeline.Orient(m_mesh.GetOrientation());
         m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());        
 		m_geomPassTech.SetWVMatrix(m_pipeline.GetWVTrans());
@@ -197,7 +197,7 @@ public:
         
         m_aoBuffer.BindForWriting();
         
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
         
         m_gBuffer.BindForReading();
                            
@@ -228,6 +228,10 @@ public:
             case OGLDEV_KEY_ESCAPE:
             case OGLDEV_KEY_q:
                 OgldevBackendLeaveMainLoop();
+                break;
+            case OGLDEV_KEY_a:
+                printf("foo\n");
+                m_lightingTech.SetShaderType(2);
                 break;
             default:
                 m_pGameCamera->OnKeyboard(OgldevKey);

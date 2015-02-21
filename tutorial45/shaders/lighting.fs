@@ -1,7 +1,11 @@
 #version 330                                                                        
                                                                                     
 const int MAX_POINT_LIGHTS = 2;                                                     
-const int MAX_SPOT_LIGHTS = 2;                                                      
+const int MAX_SPOT_LIGHTS = 2;  
+
+#define SHADER_TYPE_SSAO    0
+#define SHADER_TYPE_NO_SSAO 1
+#define SHADER_TYPE_ONLY_AO 2
                                                                                     
 in vec2 TexCoord0;                                                                  
 in vec3 Normal0;                                                                    
@@ -42,7 +46,8 @@ struct SpotLight
     vec3 Direction;                                                                         
     float Cutoff;                                                                           
 };                                                                                          
-                                                                                            
+               
+uniform int gShaderType;                                                                             
 uniform int gNumPointLights;                                                                
 uniform int gNumSpotLights;                                                                 
 uniform DirectionalLight gDirectionalLight;                                                 
@@ -52,11 +57,24 @@ uniform sampler2D gColorMap;
 uniform sampler2D gAOMap;
 uniform vec3 gEyeWorldPos;
 uniform float gMatSpecularIntensity;                                                        
-uniform float gSpecularPower;                                                               
+uniform float gSpecularPower; 
+uniform vec2 gScreenSize;
+
+
+vec2 CalcScreenTexCoord()
+{
+    return gl_FragCoord.xy / gScreenSize;
+}
+                                                              
                                                                                             
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)                   
 {                                                                                           
-    vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity + texture(gAOMap, TexCoord0);                   
+    vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;
+
+    if (gShaderType == SHADER_TYPE_SSAO) {
+         AmbientColor *= texture(gAOMap, CalcScreenTexCoord()).r;
+    }
+
     float DiffuseFactor = dot(Normal, -LightDirection);                                     
                                                                                             
     vec4 DiffuseColor  = vec4(0, 0, 0, 0);                                                  
@@ -123,6 +141,11 @@ void main()
     for (int i = 0 ; i < gNumSpotLights ; i++) {                                            
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);                                
     }                                                                                       
-                                                                                            
-    FragColor = texture(gColorMap, TexCoord0.xy) * TotalLight + vec4(texture(gAOMap, TexCoord0).r * 199.0);
+           
+    if (gShaderType == SHADER_TYPE_ONLY_AO) {
+        FragColor = texture(gAOMap, CalcScreenTexCoord());        
+    }
+    else {
+        FragColor = texture(gColorMap, TexCoord0.xy) * TotalLight;
+    }
 }
