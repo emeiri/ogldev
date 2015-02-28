@@ -65,6 +65,8 @@ public:
         m_directionalLight.AmbientIntensity = 0.3f;
         m_directionalLight.DiffuseIntensity = 1.0f;
         m_directionalLight.Direction = Vector3f(1.0f, 0.0, 0.0);        
+        
+        m_shaderType = 0;
     }
 
     ~Tutorial45()
@@ -74,8 +76,11 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(0.0f, 23.0f, -5.0f);
+       Vector3f Pos(0.0f, 23.0f, -5.0f);
         Vector3f Target(-1.0f, 0.0f, 0.1f);
+     //   Vector3f Pos(0.0f, 0.0f, -5.0f);
+   //     Vector3f Target(0.0f, 0.0f, 1.0f);
+
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
@@ -114,13 +119,12 @@ public:
         m_lightingTech.SetDirectionalLight(m_directionalLight);
         m_lightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         m_lightingTech.SetShaderType(2);
-        
         if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
        // if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
-   //     m_mesh.GetOrientation().m_scale = Vector3f(0.01f);
+    //    m_mesh.GetOrientation().m_scale = Vector3f(0.01f);
         m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 0.0f);
         m_mesh.GetOrientation().m_rotation = Vector3f(0.0f, 180.0f, 0.0f);
         
@@ -200,14 +204,17 @@ public:
         glClear(GL_COLOR_BUFFER_BIT);
         
         m_gBuffer.BindForReading();
-                           
+                  
+        glDisable(GL_DEPTH_TEST);
         m_quad.Render();                
+        glEnable(GL_DEPTH_TEST);
     }
     
     
     void LightingPass()
     {
         m_lightingTech.Enable();
+        m_lightingTech.SetShaderType(m_shaderType);        
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
@@ -229,9 +236,9 @@ public:
             case OGLDEV_KEY_q:
                 OgldevBackendLeaveMainLoop();
                 break;
-            case OGLDEV_KEY_a:
-                printf("foo\n");
-                m_lightingTech.SetShaderType(2);
+            case OGLDEV_KEY_A:
+                m_shaderType++;
+                m_shaderType = m_shaderType % 3;
                 break;
             default:
                 m_pGameCamera->OnKeyboard(OgldevKey);
@@ -259,6 +266,7 @@ private:
     AOBuffer m_aoBuffer;
     RandomTexture m_randomTexture;
     DirectionalLight m_directionalLight;
+    int m_shaderType;
 };
 
 
