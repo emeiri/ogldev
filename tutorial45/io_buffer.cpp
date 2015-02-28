@@ -20,17 +20,17 @@
 #include <GL/glew.h>
 
 #include "ogldev_util.h"
-#include "aobuffer.h"
+#include "io_buffer.h"
 #include "ogldev_texture.h"
 #include "engine_common.h"
 
-AOBuffer::AOBuffer()
+IOBuffer::IOBuffer()
 {
     m_fbo = 0;
     m_texture = 0;
 }
 
-AOBuffer::~AOBuffer()
+IOBuffer::~IOBuffer()
 {
     if (m_fbo != 0) {
         glDeleteFramebuffers(1, &m_fbo);
@@ -42,7 +42,7 @@ AOBuffer::~AOBuffer()
 }
 
 
-bool AOBuffer::Init(uint WindowWidth, uint WindowHeight)
+bool IOBuffer::Init(uint WindowWidth, uint WindowHeight)
 {
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);    
@@ -77,15 +77,15 @@ bool AOBuffer::Init(uint WindowWidth, uint WindowHeight)
 }
 
 
-void AOBuffer::BindForWriting()
+void IOBuffer::BindForWriting()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 }
 
 
-void AOBuffer::BindForReading()
+void IOBuffer::BindForReading(GLenum TextureUnit)
 {
-    glActiveTexture(AO_TEXTURE_UNIT);
+    glActiveTexture(TextureUnit);
     glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 

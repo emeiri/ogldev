@@ -35,9 +35,10 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/aobuffer.o \
+	${OBJECTDIR}/blur_tech.o \
 	${OBJECTDIR}/gbuffer.o \
 	${OBJECTDIR}/geom_pass_tech.o \
+	${OBJECTDIR}/io_buffer.o \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/ssao_technique.o \
@@ -70,10 +71,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial45: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial45 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
 
-${OBJECTDIR}/aobuffer.o: aobuffer.cpp 
+${OBJECTDIR}/blur_tech.o: blur_tech.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/aobuffer.o aobuffer.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/blur_tech.o blur_tech.cpp
 
 ${OBJECTDIR}/gbuffer.o: gbuffer.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -84,6 +85,11 @@ ${OBJECTDIR}/geom_pass_tech.o: geom_pass_tech.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/geom_pass_tech.o geom_pass_tech.cpp
+
+${OBJECTDIR}/io_buffer.o: io_buffer.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/io_buffer.o io_buffer.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

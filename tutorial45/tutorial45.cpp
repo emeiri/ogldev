@@ -34,12 +34,13 @@
 #include "ogldev_camera.h"
 #include "ssao_technique.h"
 #include "geom_pass_tech.h"
+#include "blur_tech.h"
 #include "lighting_technique.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "mesh.h"
 #include "gbuffer.h"
-#include "aobuffer.h"
+#include "io_buffer.h"
 #include "ogldev_random_texture.h"
 
 #define WINDOW_WIDTH  1280  
@@ -109,7 +110,7 @@ public:
         m_SSAOTech.SetZNearAndFar(m_persProjInfo.zNear, m_persProjInfo.zFar);
 
         if (!m_lightingTech.Init()) {
-            OGLDEV_ERROR("Error initializing the SSAO technique\n");
+            OGLDEV_ERROR("Error initializing the lighting technique\n");
             return false;
         }
         
@@ -119,8 +120,16 @@ public:
         m_lightingTech.SetDirectionalLight(m_directionalLight);
         m_lightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         m_lightingTech.SetShaderType(2);
-        if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-       // if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
+        
+        if (!m_blurTech.Init()) {
+            OGLDEV_ERROR("Error initializing the blur technique\n");
+        }
+        
+        m_blurTech.Enable();
+        m_blurTech.SetColorTextureUnit(BLUR_TEXTURE_UNIT_INDEX);
+        
+        //if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+       if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
@@ -140,6 +149,10 @@ public:
             return false;
         }
 
+        if (!m_blurBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+            return false;
+        }
+        
         if (!m_randomTexture.Init(100)) {
             return false;
         }
@@ -172,6 +185,8 @@ public:
         SSAOPass();
         
         LightingPass();
+        
+        BlurPass();
 		      	
     //    RenderFPS();     
         CalcFPS();
@@ -216,16 +231,32 @@ public:
         m_lightingTech.Enable();
         m_lightingTech.SetShaderType(m_shaderType);        
         
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        m_blurBuffer.BindForWriting();
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        m_aoBuffer.BindForReading();
+        m_aoBuffer.BindForReading(AO_TEXTURE_UNIT);
         
         m_pipeline.Orient(m_mesh.GetOrientation());
         m_lightingTech.SetWVP(m_pipeline.GetWVPTrans());        
         m_lightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());        
         m_mesh.Render();               
+    }
+    
+    
+    void BlurPass()
+    {
+        m_blurTech.Enable();
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        m_blurBuffer.BindForReading(BLUR_TEXTURE_UNIT);
+                  
+        glDisable(GL_DEPTH_TEST);
+        m_quad.Render();                
+        glEnable(GL_DEPTH_TEST);        
     }
     
       
@@ -257,13 +288,15 @@ private:
     SSAOTechnique m_SSAOTech;
     GeomPassTech m_geomPassTech;
     LightingTechnique m_lightingTech;
+    BlurTech m_blurTech;
     Camera* m_pGameCamera;
     Mesh m_mesh;
     Mesh m_quad;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
     GBuffer m_gBuffer;
-    AOBuffer m_aoBuffer;
+    IOBuffer m_aoBuffer;
+    IOBuffer m_blurBuffer;
     RandomTexture m_randomTexture;
     DirectionalLight m_directionalLight;
     int m_shaderType;

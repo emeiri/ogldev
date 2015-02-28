@@ -15,31 +15,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef AOBUFFER_H
-#define	AOBUFFER_H
+#ifndef BLUR_TECH_H
+#define	BLUR_TECH_H
 
-#include <GL/glew.h>
+#include "technique.h"
+#include "ogldev_math_3d.h"
 
-
-class AOBuffer
-{
+class BlurTech : public Technique {
 public:
-    
-    AOBuffer();
 
-    ~AOBuffer();
+    BlurTech();
 
-    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
+    virtual bool Init();
 
-    void BindForWriting();
-   
-    void BindForReading();          
+    void SetColorTextureUnit(uint ColorTextureUnit);
 
 private:
-                     
-    GLuint m_fbo;
-    GLuint m_texture;
+
+    GLuint m_colorTextureUnitLocation;
 };
 
-#endif	/* AOBUFFER_H */
 
+#endif

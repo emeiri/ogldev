@@ -15,27 +15,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef GEOM_PASS_TECH_H
-#define	GEOM_PASS_TECH_H
+#ifndef IO_BUFFER_H
+#define	IO_BUFFER_H
 
-#include "technique.h"
-#include "ogldev_math_3d.h"
+#include <GL/glew.h>
 
-class GeomPassTech : public Technique {
+
+class IOBuffer
+{
 public:
+    
+    IOBuffer();
 
-    GeomPassTech();
+    ~IOBuffer();
 
-    virtual bool Init();
+    bool Init(uint WindowWidth, uint WindowHeight);
 
-    void SetWVP(const Matrix4f& WVP);
-    void SetWVMatrix(const Matrix4f& WV);
+    void BindForWriting();
+   
+    void BindForReading(GLenum TextureUnit);          
 
 private:
-
-    GLuint m_WVPLocation;
-    GLuint m_WVLocation;
+                     
+    GLuint m_fbo;
+    GLuint m_texture;
 };
 
+#endif	/* IO+BUFFER_H */
 
-#endif
