@@ -39,6 +39,7 @@ private:
                      
     GLuint m_fbo;
     GLuint m_texture;
+    GLuint m_depth;
 };
 
 #endif	/* IO+BUFFER_H */

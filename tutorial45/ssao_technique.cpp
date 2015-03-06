@@ -49,29 +49,17 @@ bool SSAOTechnique::Init()
     }
 
 	m_posTextureUnitLocation = GetUniformLocation("gPositionMap");
-	//m_normalTextureUnitLocation = GetUniformLocation("gNormalMap");
-    m_randomTextureUnitLocation = GetUniformLocation("gRandomMap");
-    m_depthTextureUnitLocation = GetUniformLocation("gDepthMap");
     m_screenSizeLocation = GetUniformLocation("gScreenSize");	
-    m_AILocation = GetUniformLocation("gIntensity");
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
-    m_zNearLocation = GetUniformLocation("gzNear");
-    m_zFarLocation = GetUniformLocation("gzFar");
     m_projMatrixLocation = GetUniformLocation("gProj");	
     m_kernelLocation = GetUniformLocation("gKernel");
 
     if (m_posTextureUnitLocation    == INVALID_UNIFORM_LOCATION ||
-		m_normalTextureUnitLocation == INVALID_UNIFORM_LOCATION ||
-        m_randomTextureUnitLocation == INVALID_UNIFORM_LOCATION ||
-        m_depthTextureUnitLocation  == INVALID_UNIFORM_LOCATION ||
         m_screenSizeLocation        == INVALID_UNIFORM_LOCATION ||
-        m_AILocation                == INVALID_UNIFORM_LOCATION ||
         m_sampleRadLocation         == INVALID_UNIFORM_LOCATION ||
-        m_zNearLocation             == INVALID_UNIFORM_LOCATION ||
-        m_zFarLocation              == INVALID_UNIFORM_LOCATION ||
         m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||		
         m_kernelLocation            == INVALID_UNIFORM_LOCATION) {
-    //    return false;
+        return false;
     }
    
     Enable();
@@ -114,33 +102,9 @@ void SSAOTechnique::SetPositionTextureUnit(uint TextureUnit)
 }
 
 
-void SSAOTechnique::SetNormalTextureUnit(uint TextureUnit)
-{
-    glUniform1i(m_normalTextureUnitLocation, TextureUnit);
-}
-
-
-void SSAOTechnique::SetRandomTextureUnit(uint TextureUnit)
-{
-    glUniform1i(m_randomTextureUnitLocation, TextureUnit);
-}
-
-
-void SSAOTechnique::SetDepthTextureUnit(uint TextureUnit)
-{
-    glUniform1i(m_depthTextureUnitLocation, TextureUnit);
-}
-
-
 void SSAOTechnique::SetScreenSize(uint Width, uint Height)
 {
     glUniform2f(m_screenSizeLocation, (float)Width, (float)Height);
-}
-
-
-void SSAOTechnique::SetAmbientIntensity(float ai)
-{
-    glUniform1f(m_AILocation, ai);
 }
 
 
@@ -153,11 +117,4 @@ void SSAOTechnique::SetSampleRadius(float sr)
 void SSAOTechnique::SetProjMatrix(const Matrix4f& m)
 {
     glUniformMatrix4fv(m_projMatrixLocation, 1, GL_TRUE, (const GLfloat*)m.m);    
-}
-
-
-void SSAOTechnique::SetZNearAndFar(float zNear, float zFar)
-{
-    glUniform1f(m_zNearLocation, zNear);
-    glUniform1f(m_zFarLocation, zFar);
 }

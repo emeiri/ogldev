@@ -39,9 +39,7 @@
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "mesh.h"
-#include "gbuffer.h"
 #include "io_buffer.h"
-#include "ogldev_random_texture.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -58,7 +56,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 1000.0f;  
+        m_persProjInfo.zFar = 5000.0f;  
         
         m_pipeline.SetPerspectiveProj(m_persProjInfo);           
         
@@ -97,17 +95,12 @@ public:
         }
 
         m_SSAOTech.Enable();
-        m_SSAOTech.SetPositionTextureUnit(GBUFFER_POSITION_TEXTURE_UNIT);
-        m_SSAOTech.SetNormalTextureUnit(GBUFFER_NORMAL_TEXTURE_UNIT);
-        m_SSAOTech.SetDepthTextureUnit(GBUFFER_DEPTH_TEXTURE_UNIT);
-        //m_LightingTech.SetRandomTextureUnit(3);
+        m_SSAOTech.SetPositionTextureUnit(POSITION_TEXTURE_UNIT_INDEX);
         m_SSAOTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
-        m_SSAOTech.SetAmbientIntensity(2.0f);
-        m_SSAOTech.SetSampleRadius(0.005f);
+        m_SSAOTech.SetSampleRadius(1.5f);
         Matrix4f PersProjTrans;
         PersProjTrans.InitPersProjTransform(m_persProjInfo);
         m_SSAOTech.SetProjMatrix(PersProjTrans);
-        m_SSAOTech.SetZNearAndFar(m_persProjInfo.zNear, m_persProjInfo.zFar);
 
         if (!m_lightingTech.Init()) {
             OGLDEV_ERROR("Error initializing the lighting technique\n");
@@ -116,24 +109,25 @@ public:
         
         m_lightingTech.Enable();
         m_lightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetAOTextureUnit(BLUR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetDirectionalLight(m_directionalLight);
         m_lightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-        m_lightingTech.SetShaderType(2);
+        m_lightingTech.SetShaderType(0);
         
         if (!m_blurTech.Init()) {
             OGLDEV_ERROR("Error initializing the blur technique\n");
+            return false;
         }
         
         m_blurTech.Enable();
-        m_blurTech.SetColorTextureUnit(BLUR_TEXTURE_UNIT_INDEX);
+        m_blurTech.SetColorTextureUnit(AO_TEXTURE_UNIT_INDEX);
         
-        //if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-       if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
+      //  if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+      if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
-    //    m_mesh.GetOrientation().m_scale = Vector3f(0.01f);
+        m_mesh.GetOrientation().m_scale = Vector3f(0.05f);
         m_mesh.GetOrientation().m_pos = Vector3f(0.0f, 0.0f, 0.0f);
         m_mesh.GetOrientation().m_rotation = Vector3f(0.0f, 180.0f, 0.0f);
         
@@ -153,12 +147,6 @@ public:
             return false;
         }
         
-        if (!m_randomTexture.Init(100)) {
-            return false;
-        }
-        
-    //    m_randomTexture.Bind(GL_TEXTURE2);
-                       
 #ifndef WIN32
         // Disabled for now because it somehow clashes with the regular rendering...
  //       if (!m_fontRenderer.InitFontRenderer()) {
@@ -184,9 +172,9 @@ public:
         
         SSAOPass();
         
-        LightingPass();
-        
         BlurPass();
+        
+        LightingPass();                
 		      	
     //    RenderFPS();     
         CalcFPS();
@@ -214,52 +202,49 @@ public:
     {
         m_SSAOTech.Enable();
         
+        m_gBuffer.BindForReading(POSITION_TEXTURE_UNIT);
         m_aoBuffer.BindForWriting();
         
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        m_gBuffer.BindForReading();
+        glClear(GL_COLOR_BUFFER_BIT);                
                   
         glDisable(GL_DEPTH_TEST);
         m_quad.Render();                
         glEnable(GL_DEPTH_TEST);
     }
+
     
+    void BlurPass()
+    {
+        m_blurTech.Enable();
+                
+        m_aoBuffer.BindForReading(AO_TEXTURE_UNIT);
+        m_blurBuffer.BindForWriting();
+        
+        glClear(GL_COLOR_BUFFER_BIT);                
+        
+        glDisable(GL_DEPTH_TEST);
+        m_quad.Render();                
+        glEnable(GL_DEPTH_TEST);        
+    }
+
     
     void LightingPass()
     {
         m_lightingTech.Enable();
         m_lightingTech.SetShaderType(m_shaderType);        
         
-        m_blurBuffer.BindForWriting();
+        m_blurBuffer.BindForReading(BLUR_TEXTURE_UNIT);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);        
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        m_aoBuffer.BindForReading(AO_TEXTURE_UNIT);
-        
+                        
         m_pipeline.Orient(m_mesh.GetOrientation());
         m_lightingTech.SetWVP(m_pipeline.GetWVPTrans());        
         m_lightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());        
         m_mesh.Render();               
     }
     
-    
-    void BlurPass()
-    {
-        m_blurTech.Enable();
-        
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        m_blurBuffer.BindForReading(BLUR_TEXTURE_UNIT);
-                  
-        glDisable(GL_DEPTH_TEST);
-        m_quad.Render();                
-        glEnable(GL_DEPTH_TEST);        
-    }
-    
-      
+             
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
         switch (OgldevKey) {
@@ -294,10 +279,9 @@ private:
     Mesh m_quad;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
-    GBuffer m_gBuffer;
+    IOBuffer m_gBuffer;
     IOBuffer m_aoBuffer;
     IOBuffer m_blurBuffer;
-    RandomTexture m_randomTexture;
     DirectionalLight m_directionalLight;
     int m_shaderType;
 };

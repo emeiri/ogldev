@@ -28,6 +28,7 @@ IOBuffer::IOBuffer()
 {
     m_fbo = 0;
     m_texture = 0;
+    m_depth = 0;
 }
 
 IOBuffer::~IOBuffer()
@@ -38,6 +39,10 @@ IOBuffer::~IOBuffer()
 
     if (m_texture != 0) {
         glDeleteTextures(1, &m_texture);
+    }
+
+    if (m_depth != 0) {
+        glDeleteTextures(1, &m_depth);
     }
 }
 
@@ -59,6 +64,18 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
 
+    // Create the textures
+    glGenTextures(1, &m_depth);
+
+	// depth
+	glBindTexture(GL_TEXTURE_2D, m_depth);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);
+    
 	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
 
     glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
