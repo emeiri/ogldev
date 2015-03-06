@@ -20,9 +20,9 @@
 #include <GL/glew.h>
 
 #include "ogldev_util.h"
-#include "io_buffer.h"
+#include "ogldev_io_buffer.h"
 #include "ogldev_texture.h"
-#include "engine_common.h"
+
 
 IOBuffer::IOBuffer()
 {
@@ -47,7 +47,7 @@ IOBuffer::~IOBuffer()
 }
 
 
-bool IOBuffer::Init(uint WindowWidth, uint WindowHeight)
+bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth)
 {
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);    
@@ -65,16 +65,19 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight)
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
 
     // Create the textures
-    glGenTextures(1, &m_depth);
+    if (WithDepth)
+    {
+        glGenTextures(1, &m_depth);
 
-	// depth
-	glBindTexture(GL_TEXTURE_2D, m_depth);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);
+        // depth
+        glBindTexture(GL_TEXTURE_2D, m_depth);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
+        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);        
+    }
     
 	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
 

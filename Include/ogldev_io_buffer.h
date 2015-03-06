@@ -29,7 +29,7 @@ public:
 
     ~IOBuffer();
 
-    bool Init(uint WindowWidth, uint WindowHeight);
+    bool Init(uint WindowWidth, uint WindowHeight, bool WidthDepth);
 
     void BindForWriting();
    

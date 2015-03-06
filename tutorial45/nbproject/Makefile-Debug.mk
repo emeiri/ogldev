@@ -36,9 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/blur_tech.o \
-	${OBJECTDIR}/gbuffer.o \
 	${OBJECTDIR}/geom_pass_tech.o \
-	${OBJECTDIR}/io_buffer.o \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/ssao_technique.o \
@@ -76,20 +74,10 @@ ${OBJECTDIR}/blur_tech.o: blur_tech.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/blur_tech.o blur_tech.cpp
 
-${OBJECTDIR}/gbuffer.o: gbuffer.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/gbuffer.o gbuffer.cpp
-
 ${OBJECTDIR}/geom_pass_tech.o: geom_pass_tech.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/geom_pass_tech.o geom_pass_tech.cpp
-
-${OBJECTDIR}/io_buffer.o: io_buffer.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/io_buffer.o io_buffer.cpp
 
 ${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

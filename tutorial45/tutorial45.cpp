@@ -39,7 +39,7 @@
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "mesh.h"
-#include "io_buffer.h"
+#include "ogldev_io_buffer.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -135,15 +135,15 @@ public:
             return false;
         }
         
-        if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+        if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, true)) {
             return false;
         }
 
-        if (!m_aoBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+        if (!m_aoBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, false)) {
             return false;
         }
 
-        if (!m_blurBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+        if (!m_blurBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, false)) {
             return false;
         }
         
@@ -207,9 +207,7 @@ public:
         
         glClear(GL_COLOR_BUFFER_BIT);                
                   
-        glDisable(GL_DEPTH_TEST);
         m_quad.Render();                
-        glEnable(GL_DEPTH_TEST);
     }
 
     
@@ -222,9 +220,7 @@ public:
         
         glClear(GL_COLOR_BUFFER_BIT);                
         
-        glDisable(GL_DEPTH_TEST);
         m_quad.Render();                
-        glEnable(GL_DEPTH_TEST);        
     }
 
     

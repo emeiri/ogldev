@@ -6,9 +6,7 @@
                    projectFiles="true">
       <itemPath>blur_tech.h</itemPath>
       <itemPath>engine_common.h</itemPath>
-      <itemPath>gbuffer.h</itemPath>
       <itemPath>geom_pass_tech.h</itemPath>
-      <itemPath>io_buffer.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>ssao_technique.h</itemPath>
@@ -27,9 +25,7 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>blur_tech.cpp</itemPath>
-      <itemPath>gbuffer.cpp</itemPath>
       <itemPath>geom_pass_tech.cpp</itemPath>
-      <itemPath>io_buffer.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>ssao_technique.cpp</itemPath>
@@ -94,17 +90,9 @@
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="geom_pass_tech.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="geom_pass_tech.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="io_buffer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="io_buffer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -186,17 +174,9 @@
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="geom_pass_tech.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="geom_pass_tech.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="io_buffer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="io_buffer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
