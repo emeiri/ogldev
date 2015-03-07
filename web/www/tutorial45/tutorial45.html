@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	
+<table width=100% >
+<tr>
+	<td width=34%><div align=left><a href="../tutorial44/tutorial44.html" rel="prev"><img src="../prev.jpg"></a></div></td>
+	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
+        <td width=33%><div align=right></a></div></td>
+</tr>
+</table>
+	
+<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
+<title>Tutorial 45</title>
+</head>
+<body>
+<div class="content">
+<div class="lines">
+<h1>Tutorial 45 - Screen Space Ambient Occlusion</h1>
+<div style="text-align: center">
+<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
+</div>
+<br>
+<img style="width: 602px; height: 500px;"  src="../../tutorial45.jpg">
+<h2>Background</h2>
+<p>
+    Do you remember our first lighting type? Back in <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
+    we took a first look at the lighting model, starting with the ambient lighting type. The ambient lighting
+    which is supposed to mimic the general feeling of "everything is bright" that you
+    get in a highly lit, mid-day environment, was implemented using a single floating point
+    value that was attached to each lighting source and we multiplied that value by
+    the color of the surface which we sampled from the texture bound to that surface.
+    So you could have a single light source in your scene called "sun" and you could 
+    play with the ambient light to control how well the scene was generally lit - closer
+    to zero values produced a darker scene while closer to 1 values produced a lighter
+    scene.
+</p>
+<p>
+    In the following tutorials we implemented diffuse and specular lighting which
+    contributed to the overall quality of the scene but the basic ambient light
+    remained the same. In the recent years we see a rise of what is known as 
+    <a href="http://en.wikipedia.org/wiki/Ambient_occlusion">Ambient Occlusion</a>
+    which basically means that instead of going with a fixed ambient light value
+    for each pixel we can calculate how much is the pixel exposed to the ambient
+    light source. A pixel on the floor in the middle of room is much more exposed
+    to the light than, say, a pixel in the corner. This means that the corner will
+    be a bit darker than the rest of the floor. This is the core of ambient occlusion.
+    So in order to implement it we need to find a way to differentiate between those
+    "tightly packed in corners pixels" vs. "out in the open pixels". The product of
+    this calculation is a ambient occlusion term which will in the final lighting
+    stage to control the ambient light. Here's a ambient map that visualizes this
+    ambient occlusion term:
+</p>
+<img src = "ao.jpg">
+<p>
+    There is a lot of research on the subject of ambient occlusion and many algorithms
+    have been developed to approximate it. We are going to study a branch of these algorithms
+    known as <i>Screen Space Ambient Occlusion</i> or SSAO, which was developed by 
+    <a href="http://en.wikipedia.org/wiki/Crytek">Crytek</a>
+    and became highly popular with their 2007 release of <a href = http://en.wikipedia.org/wiki/Crysis">Crysis</a>.
+    Many games have since implemented SSAO and a lot of variations were created 
+    on top of it. We are going to study a simplified version of the algorithm based
+    on a <a href="http://john-chapman-graphics.blogspot.co.il/2013/01/ssao-tutorial.html">SSAO tutorial by John Chapman</a>.
+</p>
+<p>
+    Ambient occlusion can be very compute intensive. Crytek came up with a good compromise
+    where the occlusion term is calculated once per pixel. Hence the prefix 'Screen Space'
+    to the algorithm name. The idea was to go over the window pixel by pixel and extract
+    the view space position in that location, sample a few random points very near that position
+    and check whether they fall inside or outside the real geometry in that region. If many
+    points fall inside the geometry it means the original pixel is cornered by many polygons
+    and receiving less light.
+    If many points are outside of any geometry it means the original pixel is "highly exposed"
+    and therefore receiving more light. For example, take a look at the following image:
+</p>
+<img src="algorithm.jpg">
+<p>
+    We have a surface with two points on it - P0 and P1. Assume that we are looking
+    at it from somewhere on the upper left corner of the image. We sample a few points
+    around each point and check whether they fall inside or outside the geometry. 
+    In the case of P0 there is a greater chance that random points around it will fall inside
+    the geometry. For P1 it is the opposite. Therefore we expect to get a greater ambient
+    occlusion term for P1 which means it will look lighter in the final frame.
+</p>
+<p>
+</p>
+
+<h2>Code Walkthru</h2>
+<p>(ogldev_glfw_backend.cpp:24)</p>
+<code>
+</code>
+<p>
+</p>
+<p>(ogldev_glfw_backend.cpp:168)</p>
+<code>
+</code>
+<p>
+</p>
+<p>(ogldev_glfw_backend.cpp:195)</p>
+<code>
+</code>
+<p>
+</p>
+<p>
+</p>
+<p>(ogldev_glfw_backend.cpp:238)</p>
+<code>
+</code>
+<p>
+</p>
+<p>(ogldev_glfw_backend.cpp:122)</p>
+<code>
+</code>
+<p>
+</p>
+<p>(ogldev_glfw_backend.cpp:)</p>
+<code>
+</code>
+<p>
+</p>
+<p>(ogldev_backend.h)</p>
+<code>
+</code>    
+<p>
+</p>
+<p>
+</p>
+</body>
+</html>
