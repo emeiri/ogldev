@@ -34,11 +34,14 @@ void main()
         float sampleDepth = texture(gPositionMap, offset.xy).b;
 
         if (abs(Pos.z - sampleDepth) < gSampleRad) {
-            if (sampleDepth <= samplePos.z) {
-               AO += 1.0/128.0;
-            }
+            AO += step(sampleDepth,samplePos.z);
+           // if (sampleDepth <= samplePos.z) {
+           //    AO += 1.0/128.0;
+          //  }
         }
     }
-    
+
+    AO = 1.0 - AO/128.0;
+ 
     FragColor = vec4(pow(AO, 2.0));
 }

@@ -83,7 +83,8 @@ void SSAOTechnique::GenKernel()
         Vector3f v;
         v.x = 2.0f * (float)rand()/RAND_MAX - 1.0f;
         v.y = 2.0f * (float)rand()/RAND_MAX - 1.0f;
-        v.z = (float)rand()/RAND_MAX;
+        v.z = 2.0f * (float)rand()/RAND_MAX - 1.0f;
+      //  v.z = (float)rand()/RAND_MAX;
         v *= (0.1f + 0.9f * scale * scale);
         
         v.Print();

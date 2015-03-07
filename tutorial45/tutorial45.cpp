@@ -122,8 +122,8 @@ public:
         m_blurTech.Enable();
         m_blurTech.SetColorTextureUnit(AO_TEXTURE_UNIT_INDEX);
         
-      //  if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-      if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
+        if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+     // if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
@@ -190,7 +190,6 @@ public:
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //    m_mesh.GetOrientation().m_rotation.y += 0.1;
         m_pipeline.Orient(m_mesh.GetOrientation());
         m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());        
 		m_geomPassTech.SetWVMatrix(m_pipeline.GetWVTrans());
