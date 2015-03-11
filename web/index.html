@@ -1,269 +1,452 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<link rel="stylesheet" type="text/css" href="tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-<title>OpenGL Step by Step - OpenGL Development on Linux</title>
-<META name="description" content="Modern OpenGL tutorials on Linux">
-<META name="keywords" content="tutorials, OpenGL, Linux">
-<style type="text/css">
-.lines {        	
-    border-left: 10px solid #383838;
-    padding-left:25px; 
-    height: auto;
-    border-right: 10px solid #383838;
-    padding-right:25px; 
-}    
-</style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+	<title> OpenGL Step by Step - OpenGL Development </title>
+	<meta name="description" content="Modern OpenGL tutorials">
 
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+	<link rel="stylesheet" href="www/style.css">
+	<link rel="stylesheet" href="www/print.css" media="print">
 </head>
 <body>
+	<header id="navigation">
+		<a id="logo" href="index.html" title="Homepage">
+			<img src="www/logo hdpi.png">
+		</a>
 
-<table align="center" width="100%">
-	<tr>
-		<td width="33%"><a href="http://www.opengl.org"><img src="ogl.jpg" align="left"></td>
-		<td width="33%"><img src="logo.jpg" style="width: 289px; height: 236px;"></td>
-		<td width="33%"><a href="http://www.opengl.org"><img src="ogl.jpg"></td>
-	</tr>
-</table>	
+		<div class="no-print">
+			<ul>
+				<li><a href="http://www.facebook.com/pages/Ogldev/188319114585587"> Facebook </a></li>
+				<li><a href="instructions.html"> Instructions </a></li>
+				<li><a href="faq.html"> FAQ </a></li>
+				<li><a href="news.html"> News </a></li>
+				<li><a href="contact.html"> Contact </a></li>
+				<li><a href="donate.html"> Donate </a></li>
+			</ul>
 
-<br>
-<div align="center"><FONT color="#ffffff" size="+1"><MARQUEE bgcolor="#400040" direction="right" loop="20" width="75%">
-	<STRONG>Tutorial 44 published!</STRONG></MARQUEE></FONT></DIV><br>
-	<div><div><br>
-<table align="center" width="100%">
-<tr>
-<font size=4>
-<td width="16%"><div align="center"><a href="http://www.facebook.com/pages/Ogldev/188319114585587">facebook page</a></div></td>
-<td width="16%"><div align="center"><a href="instructions.html">Instructions</a></div></td> 
-<td width="16%"><div align="center"><a href="faq.html">FAQ</a></div></td> 
-<td width="16%"><div align="center"><a href="news.html">News</a></div></td>
-<td width="16%"><div align="center"><a href="contact.html">Contact</a></div></td>
-<td width="16%"><div align="center"><a href="donate.html">Donate to OGLDEV</a></div></td>
-</tr>
-</table>
-<br>
-<font size=5>
-<div id="holder">
-<div id="pic1"><a href="http://dragonjoker.fr/tutos.php?tutos=1&prj=-1"><img src="french_flag.jpg" style="border: 0px solid ; width: 75px; height: 50px;"></a></div>
-<div id="pic2"><a href="http://ogltutor.netau.net/"><img src="russian_flag.jpg" style="border: 0px solid ; width: 75px; height: 50px;"></a></div>
-</div>
-<br><br>
-<div align="center"><a href="ogldev-source.zip"><img src="get_the_source.jpg"></a></div>
-</font>
-<br>
-<script src="http://connect.facebook.net/en_US/all.js"></script>
-<script>
-FB.init({
-status : true, // check login status
-cookie : true, // enable cookies to allow the server to access the session
-xfbml  : true  // parse XFBML
-});
-</script>
+			<ul>
+				<li><a href="ogldev-source.zip" class="highlight"> Get the source </a></li>
+				<li><a href="http://dragonjoker.fr/tutos.php?tutos=1&amp;prj=-1"> Français </a></li>
+				<li><a href="http://ogltutor.netau.net/"> Pусский </a></li>
+			</ul>
+		</div>
+	</header>
 
-<div class="fb-like" data-send="true" data-width="450" data-show-faces="true">
-<fb:like href="http://www.facebook.com/pages/Ogldev/188319114585587" layout="standard" show_faces="true" width="500" action="like" font="segoe ui" colorscheme="light" /> 
-</div>
+	<!--
+	<script src="http://connect.facebook.net/en_US/all.js"></script>
+	<script>
+	FB.init({
+	status : true, // check login status
+	cookie : true, // enable cookies to allow the server to access the session
+	xfbml  : true  // parse XFBML
+	});
+	</script>
 
-<div style="text-align: center;"></div>
-<font size=5>
-<b>
-<table width="100%" border="1" cellpadding="10" cellspacing="2">
-  <tbody>
-    <tr>
-      <td><a href="www/tutorial01/tutorial01.html"><img src="tutorial01.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 1 - Open a Window</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial02/tutorial02.html"><img src="tutorial02.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 2 - Hello dot!</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial03/tutorial03.html"><img src="tutorial03.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 3 - First triangle</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial04/tutorial04.html"><img src="tutorial04.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 4 - Shaders</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial05/tutorial05.html"><img src="tutorial05.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 5 - Uniform variables</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial06/tutorial06.html"><img src="tutorial06.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 6 - Translation transformation</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial07/tutorial07.html"><img src="tutorial07.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 7 - Rotation transformation</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial08/tutorial08.html"><img src="tutorial08.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 8 - Scaling transformation</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial09/tutorial09.html"><img src="tutorial09.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 9 - Interpolation</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial10/tutorial10.html"><img src="tutorial10.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 10 - Indexed draws</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial11/tutorial11.html"><img src="tutorial11.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 11 - Concatenating transformations</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial12/tutorial12.html"><img src="tutorial12.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 12 - Perspective Projection</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial13/tutorial13.html"><img src="tutorial13.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 13 - Camera Space</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial14/tutorial14.html"><img src="tutorial14.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 14 - Camera Control - Part 1</td>
-    </tr>
-    <tr>
-      <td><a href="www/tutorial15/tutorial15.html"><img src="tutorial15.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 15 - Camera Control - Part 2</td>
-    </tr>
-    <tr>
-			<td><a href="www/tutorial16/tutorial16.html"><img src="tutorial16.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 16 - Basic Texture Mapping</td>
-    </tr>
-    <tr>
-			<td><a href="www/tutorial17/tutorial17.html"><img src="tutorial17.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 17 - Ambient Lighting</td>
-    </tr>
-    <tr>
-			<td><a href="www/tutorial18/tutorial18.html"><img src="tutorial18.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 18 - Diffuse Lighting</td>
-    </tr>   
-    <tr>
-			<td><a href="www/tutorial19/tutorial19.html"><img src="tutorial19.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 19 - Specular Lighting</td>
-    </tr>   
-    <tr>
-			<td><a href="www/tutorial20/tutorial20.html"><img src="tutorial20.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 20 - Point Light</td>
-    </tr>     
-    <tr>
-			<td><a href="www/tutorial21/tutorial21.html"><img src="tutorial21.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 21 - Spot Light</td>
-    </tr>        
-    <tr>
-			<td><a href="www/tutorial22/tutorial22.html"><img src="tutorial22.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 22 - Loading models using the Open Asset Import Library</td>
-    </tr>        
-    <tr>
-			<td><a href="www/tutorial23/tutorial23.html"><img src="tutorial23.png" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 23 - Shadow Mapping - Part 1</td>
-    </tr>            
-    <tr>
-			<td><a href="www/tutorial24/tutorial24.html"><img src="tutorial24.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 24 - Shadow Mapping - Part 2</td>
-    </tr>               
-    <tr>
-			<td><a href="www/tutorial25/tutorial25.html"><img src="tutorial25.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 25 - Skybox</td>
-    </tr>                   
-    <tr>
-			<td><a href="www/tutorial26/tutorial26.html"><img src="tutorial26.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 26 - Normal Mapping</td>
-    </tr>                       
-    <tr>
-			<td><a href="www/tutorial27/tutorial27.html"><img src="tutorial27.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 27 - Billboarding and the Geometry Shader</td>
-    </tr>                          
-    <tr>
-			<td><a href="www/tutorial28/tutorial28.html"><img src="tutorial28.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 28 - Particle System Using Transform Feedback</td>
-    </tr>                              
-    <tr>
-			<td><a href="www/tutorial29/tutorial29.html"><img src="tutorial29.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 29 - 3D Picking</td>
-    </tr> 
-    <tr>
-			<td><a href="www/tutorial30/tutorial30.html"><img src="tutorial30.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 30 - Basic Tessellation</td>
-    </tr>                                                                       
-    <tr>
-			<td><a href="www/tutorial31/tutorial31.html"><img src="tutorial31.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 31 - PN Triangles Tessellation</td>
-    </tr>                                                                       
-	<tr>
-		<td><a href="www/tutorial32/tutorial32.html"><img src="tutorial32.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 32 - Vertex Array Objects</td>
-    </tr>                                                                       
-	<tr>
-		<td><a href="www/tutorial33/tutorial33.html"><img src="tutorial33.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 33 - Instanced Rendering</td>
-    </tr>                                                                       
-		<tr>
-		<td><a href="www/tutorial34/tutorial34.html"><img src="tutorial34.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 34 - GLFX - An OpenGL Effects Library</td>
-    </tr>                                                                       
-    </tr>                                                                       
-		<tr>
-		<td><a href="www/tutorial35/tutorial35.html"><img src="tutorial35.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 35 - Deferred Shading - Part 1</td>
-    </tr>                                                                       
-		<tr>
-	<td><a href="www/tutorial36/tutorial36.html"><img src="tutorial36.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 36 - Deferred Shading - Part 2</td>
-    </tr>                                                                       
-	<tr>
-	<td><a href="www/tutorial37/tutorial37.html"><img src="tutorial37.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 37 - Deferred Shading - Part 3</td>
-    </tr>
-	<tr>
-	<td><a href="www/tutorial38/tutorial38.html"><img src="tutorial38.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 38 - Skeletal Animation With Assimp</td>
-    </tr>
-	<tr>
-	<td><a href="www/tutorial39/tutorial39.html"><img src="tutorial39.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 39 - Silhouette Detection</td>
-    </tr>
-	<tr>
-	<td><a href="www/tutorial40/tutorial40.html"><img src="tutorial40.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 40 - Stencil Shadow Volume</td>
-    </tr>
-  <tr>
-  <td><a href="www/tutorial41/tutorial41.html"><img src="tutorial41.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 41 - Object Motion Blur</td>
-    </tr>    
-  <tr>
-  <td><a href="www/tutorial42/tutorial42.html"><img src="tutorial42.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 42 - The answer to the ultimate question of life, the universe and everything,<br><br>or...<br><br> Percentage Closer Filtering</td>
-    </tr>    
-  <tr>
-  <td><a href="www/tutorial43/tutorial43.html"><img src="tutorial43.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 43 - Multipass Shadow Mapping With Point Lights</td>
-    </tr>    
-  <tr>
-  <td><a href="www/tutorial44/tutorial44.html"><img src="tutorial44.jpg" style="border: 0px solid ; width: 250px; height: 195px;"></a></td>
-      <td>Tutorial 44 - GLFW</td>
-    </tr>    
-   </tbody>
-</table>
-<br>
-</div>
-</b>
-<script type="text/javascript">
+	<div class="fb-like" data-send="true" data-width="450" data-show-faces="true">
+	<fb:like href="http://www.facebook.com/pages/Ogldev/188319114585587" layout="standard" show_faces="true" width="500" action="like" font="segoe ui" colorscheme="light" /> 
+	</div>
+	-->
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-20180825-1']);
-  _gaq.push(['_trackPageview']);
+	<section id="homepage" class="breakpoint">
+		<article>
+			<a class="preview" href="www/tutorial01/tutorial01.html">
+				<img src="tutorial01.png">
+			</a>
+			<h3> Tutorial 1: </h3>
+			<h2> Open a window </h2>
+		</article>
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+		<article>
+			<a class="preview" href="www/tutorial02/tutorial02.html">
+				<img src="tutorial02.png">
+			</a>
+			<h3> Tutorial 2: </h3>
+			<h2> Hello dot! </h2>
+		</article>
 
-</script>
+		<article>
+			<a class="preview" href="www/tutorial03/tutorial03.html">
+				<img src="tutorial03.png">
+			</a>
+			<h3> Tutorial 3: </h3>
+			<h2> First triangle </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial04/tutorial04.html">
+				<img src="tutorial04.png">
+			</a>
+			<h3> Tutorial 4: </h3>
+			<h2> Shaders </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial05/tutorial05.html">
+				<img src="tutorial05.png">
+			</a>
+			<h3> Tutorial 5: </h3>
+			<h2> Uniform variables </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial06/tutorial06.html">
+				<img src="tutorial06.png">
+			</a>
+			<h3> Tutorial 6: </h3>
+			<h2> Translation transformation </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial07/tutorial07.html">
+				<img src="tutorial07.png">
+			</a>
+			<h3> Tutorial 7: </h3>
+			<h2> Rotation transformation </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial08/tutorial08.html">
+				<img src="tutorial08.png">
+			</a>
+			<h3> Tutorial 8: </h3>
+			<h2> Scaling transformation </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial09/tutorial09.html">
+				<img src="tutorial09.png">
+			</a>
+			<h3> Tutorial 9: </h3>
+			<h2> Interpolation </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial10/tutorial10.html">
+				<img src="tutorial10.png">
+			</a>
+			<h3> Tutorial 10: </h3>
+			<h2> Indexed draws </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial11/tutorial11.html">
+				<img src="tutorial11.png">
+			</a>
+			<h3> Tutorial 11: </h3>
+			<h2> Concatenating transformations </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial12/tutorial12.html">
+				<img src="tutorial12.png">
+			</a>
+			<h3> Tutorial 12: </h3>
+			<h2> Perspective Projection </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial13/tutorial13.html">
+				<img src="tutorial13.png">
+			</a>
+			<h3> Tutorial 13: </h3>
+			<h2> Camera Space </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial14/tutorial14.html">
+				<img src="tutorial14.png">
+			</a>
+			<h3> Tutorial 14: </h3>
+			<h2> Camera Control - Part 1 </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial15/tutorial15.html">
+				<img src="tutorial15.png">
+			</a>
+			<h3> Tutorial 15: </h3>
+			<h2> Camera Control - Part 2 </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial16/tutorial16.html">
+				<img src="tutorial16.png">
+			</a>
+			<h3> Tutorial 16: </h3>
+			<h2> Basic Texture Mapping </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial17/tutorial17.html">
+				<img src="tutorial17.png">
+			</a>
+			<h3> Tutorial 17: </h3>
+			<h2> Ambient Lighting </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial18/tutorial18.html">
+				<img src="tutorial18.png">
+			</a>
+			<h3> Tutorial 18: </h3>
+			<h2> Diffuse Lighting </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial19/tutorial19.html">
+				<img src="tutorial19.png">
+			</a>
+			<h3> Tutorial 19: </h3>
+			<h2> Specular Lighting </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial20/tutorial20.html">
+				<img src="tutorial20.png">
+			</a>
+			<h3> Tutorial 20: </h3>
+			<h2> Point Light </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial21/tutorial21.html">
+				<img src="tutorial21.png">
+			</a>
+			<h3> Tutorial 21: </h3>
+			<h2> Spot Light </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial22/tutorial22.html">
+				<img src="tutorial22.jpg">
+			</a>
+			<h3> Tutorial 22: </h3>
+			<h2> Loading models using the Open Asset Import Library </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial23/tutorial23.html">
+				<img src="tutorial23.png">
+			</a>
+			<h3> Tutorial 23: </h3>
+			<h2> Shadow Mapping - Part 1 </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial24/tutorial24.html">
+				<img src="tutorial24.jpg">
+			</a>
+			<h3> Tutorial 24: </h3>
+			<h2> Shadow Mapping - Part 2 </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial25/tutorial25.html">
+				<img src="tutorial25.jpg">
+			</a>
+			<h3> Tutorial 25: </h3>
+			<h2> Skybox </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial26/tutorial26.html">
+				<img src="tutorial26.jpg">
+			</a>
+			<h3> Tutorial 26: </h3>
+			<h2> Normal Mapping </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial27/tutorial27.html">
+				<img src="tutorial27.jpg">
+			</a>
+			<h3> Tutorial 27: </h3>
+			<h2> Billboarding and the Geometry Shader </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial28/tutorial28.html">
+				<img src="tutorial28.jpg">
+			</a>
+			<h3> Tutorial 28: </h3>
+			<h2> Particle System Using Transform Feedback </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial29/tutorial29.html">
+				<img src="tutorial29.jpg">
+			</a>
+			<h3> Tutorial 29: </h3>
+			<h2> 3D Picking </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial30/tutorial30.html">
+				<img src="tutorial30.jpg">
+			</a>
+			<h3> Tutorial 30: </h3>
+			<h2> Basic Tessellation </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial31/tutorial31.html">
+				<img src="tutorial31.jpg">
+			</a>
+			<h3> Tutorial 31: </h3>
+			<h2> PN Triangles Tessellation </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial32/tutorial32.html">
+				<img src="tutorial32.jpg">
+			</a>
+			<h3> Tutorial 32: </h3>
+			<h2> Vertex Array Objects </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial33/tutorial33.html">
+				<img src="tutorial33.jpg">
+			</a>
+			<h3> Tutorial 33: </h3>
+			<h2> Instanced Rendering </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial34/tutorial34.html">
+				<img src="tutorial34.jpg">
+			</a>
+			<h3> Tutorial 34: </h3>
+			<h2> GLFX - An OpenGL Effects Library </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial35/tutorial35.html">
+				<img src="tutorial35.jpg">
+			</a>
+			<h3> Tutorial 35: </h3>
+			<h2> Deferred Shading - Part 1 </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial36/tutorial36.html">
+				<img src="tutorial36.jpg">
+			</a>
+			<h3> Tutorial 36: </h3>
+			<h2> Deferred Shading - Part 2 </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial37/tutorial37.html">
+				<img src="tutorial37.jpg">
+			</a>
+			<h3> Tutorial 37: </h3>
+			<h2> Deferred Shading - Part 3 </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial38/tutorial38.html">
+				<img src="tutorial38.jpg">
+			</a>
+			<h3> Tutorial 38: </h3>
+			<h2> Skeletal Animation With Assimp </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial39/tutorial39.html">
+				<img src="tutorial39.jpg">
+			</a>
+			<h3> Tutorial 39: </h3>
+			<h2> Silhouette Detection </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial40/tutorial40.html">
+				<img src="tutorial40.jpg">
+			</a>
+			<h3> Tutorial 40: </h3>
+			<h2> Stencil Shadow Volume </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial41/tutorial41.html">
+				<img src="tutorial41.jpg">
+			</a>
+			<h3> Tutorial 41: </h3>
+			<h2> Object Motion Blur </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial42/tutorial42.html">
+				<img src="tutorial42.jpg">
+			</a>
+			<h3> Tutorial 42: </h3>
+			<h2> Percentage Closer Filtering </h2>
+		</article>
+
+		<div class="breakpoint"></div>
+
+		<article>
+			<a class="preview" href="www/tutorial43/tutorial43.html">
+				<img src="tutorial43.jpg">
+			</a>
+			<h3> Tutorial 43: </h3>
+			<h2> Multipass Shadow Mapping With Point Lights </h2>
+		</article>
+
+		<article>
+			<a class="preview" href="www/tutorial44/tutorial44.html">
+				<img src="tutorial44.jpg">
+			</a>
+			<h3> Tutorial 44: </h3>
+			<h2> GLFW </h2>
+		</article>
+	</section>
+
+        <footer id="footer">Theme by Wojciech Mleczek</footer>
+
+	<script src="www/html5shiv.min.js"></script>
+	<script src="www/html5shiv-printshiv.min.js"></script>
+	<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-20180825-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+	</script>
 </body>
 </html>
