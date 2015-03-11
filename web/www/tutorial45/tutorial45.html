@@ -83,8 +83,22 @@
     occlusion term for P1 which means it will look lighter in the final frame.
 </p>
 <p>
+    Let's take it to the next level of details. We are going to plug in an ambient occlusion
+    pass somewhere before our standard lighting pass (we will need the ambient term for the
+    lighting). This ambient occlusion pass will be a standard full screen quad pass where
+    the calculation is done once per pixel. For every pixel we will need its view space position
+    and we want to generate a few random points in close vicinity to that position. The easiest
+    way will be to have a texture ready at the point fully populated with the view space
+    positions of the entire scene geometry (obviously - only of the closest pixels). For
+    this we will need a geometry pass before the ambient pass where something very similar
+    to the gbuffer that we saw in the deferred rendering will be filled with view space
+    position information (and that's it - we don't need normals, color, etc). So now
+    getting the view space position for the current pixel in the ambient pass is just one
+    sample operation away. 
 </p>
-
+<p>
+    
+</p>
 <h2>Code Walkthru</h2>
 <p>(ogldev_glfw_backend.cpp:24)</p>
 <code>
