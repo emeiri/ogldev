@@ -1,189 +1,191 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-	<link rel="stylesheet" type="text/css" href="../balloontip.css" />
-<script type="text/javascript" src="../balloontip.js">
-/***********************************************
-* Rich HTML Balloon Tooltip- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
-* This notice MUST stay intact for legal use
-* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
-***********************************************/
-</script>
-<div id="prev" class="balloonstyle">
-<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Previous Tutorial
-</div>
-<div id="home" class="balloonstyle">
-<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Home
-</div>
-<div id="next" class="balloonstyle">
-<img src="shadetabs.gif" style="float: left; margin-left: 5px; border:1px solid black" />Next Tutorial
-</div>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-<table width=100% >
-<tr>
-	<td width=34%><div align=left"><a href="../tutorial05/tutorial05.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-    <td width=33%><div align=right><a href="../tutorial07/tutorial07.html" rel="next"><img src="../next.jpg"></a></div></td>
-</tr>
-</table>
+	<title> Tutorial 06 - Translation Transformation </title>
 
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/>
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-  <title>Tutorial 06</title>
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<h1>Tutorial 6 - Translation Transformation</h1>
-<div style="text-align: center;"><span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> </div>
-<h2>Background</h2>
-<p>In this tutorial we start looking at the various transformations that take an object in 3D and
-enable it to be displayed on screen while keeping the illusion of depth
-in the scene. The common way to do this is to represent each
-transformation using a matrix, multiply them one by one and then
-multiply the vertex position by the final product. Each tutorial will
-be dedicated to examining one transformation. </p>
-<p>Here we take a look at the translation transformation which
-is responsible to moving an object along a vector of any length and
-direction. Let's say you want to move the triangle in the left picture
-to the location on the right:</p>
-<img style="width: 816px; height: 384px;" alt="" src="translation.png">
-<p>One way to do it is to provide the offset vector (in this case - 1,1) as a uniform variable to
-the shader and simply add it to the position of each processed vertex.
-However, this breaks the method of multiplying a group of matrices into
-one to get a single comprehensive transformation. In addition, you will
-see later that translation is usually not the first one so you will to
-multiply the position by the matrix that represent the transformations
-before translation, then add the position and finally multiple by the
-matrix that represent the transformation that follow translation. This
-is too awkward. A better way will be to find a matrix that represents
-the translation and take part in the multiplication of all matrices.
-But can you find a matrix that when multiplied by the point (0,0), the
-bottom left vertex of the triangle on the left, gives the result (1,1)?
-The truth is that you can't do it using a 2D matrix (and you cannot do
-it with a 3D matrix for (0,0,0) ). In general we can say that what we
-need is a matrix M that given a point P(x,y,z) and a vector V(v1,v2,v3)
-provides M * P=P1(x + v1, y + v2, z + v3). In simple words this means
-that matrix M translates P to location P+V. In P1 we can see that each
-component is a sum of a component from P and the corresponding
-component of V. The left side of each sum equation is provided by the
-identity matrix:<br/>
-I * P = P(x,y,z). So it looks like we should start with the identity
-matrix and find out the changes that will complete the right hand side
-of the sum equation in each component (...+V1, ...+V2, ...+V3). Let's
-see how this improved identity matrix would look like:<p>
-<img style="width: 581px; height: 231px;" alt="" src="equation1.png">
-<p>From this calculation we can draw two conclusions:</p>
-<ol>
-  <li>a, b, c, d, e and f have to be zero else each two components will have an effect on the the third (so
-we are back to the identity matrix).</li>
-  <li>Since x, y and z have an effect on all three components of the result when they are all zeros the result will also be the zero
-vector (so we cannot translate the zero vector).</li>
-</ol>
-<p>We want to find the matrix that will provide the following right hand side of the calculation: </p>
-<img style="width: 471px; height: 244px;" alt="" src="equation2.png">
-<p>So we need to find the way to add v1-v3 as we see above and then a-f
-can be zero. The final result will be our translated vector. Seems like
-we want to add a fourth column to the matrix but then our calculation
-will be invalid. We cannot multiply a 3x4 matrix by a 3x1 vector. The
-rule says that you can only multiply matrices if they look like NxM and
-MxN. So we have to add a fourth component to our vector. A good fourth
-component will be 1 because then we can place v1-v3 on the fourth
-column of the matrix and they will be left unchanged in the result
-because they will get multiplied by 1. But our matrix is still invalid
-due to the rule above. Multiplying a 3x4 matrix by 4x1 vector is still
-invalid, by adding a fourth row to the matrix and making it 4x4 will
-make it valid. Finally, here is our translation matrix:</p>
-<img style="width: 519px; height: 289px;" alt="" src="equation3.png">
-<p>Now even if x,y and z are zero we can still translate them to any location.</p>
-<p>Representing a 3-vector using a 4-vector like that is called homogenous
-coordinates and is very popular and useful for 3D graphics. The fourth
-component is called 'w'. In fact, the internal shader symbol
-gl_Position that we have seen in the previous tutorial is a 4-vector
-and the w component has a very important role for making the projection
-from 3D to 2D. The common notation is to use w=1 for points and w=0 for
-vectors. The reason is that points can be translated but vectors
-cannot. You can change the length of a vector or its direction but all
-vectors with the same length/direction are considered equal, regardless
-their "starting position". So you can simply use the origin for all
-vectors. Setting w=0 and multiplying the translation matrix by the
-vector will result in the same vector.</p>
-<h2>Code Walkthru</h2>
-<code>struct Matrix4f {<br/>
-float m[4][4];<br/>
-};</code>
-<p>We added a 4x4 matrix definition to math_3d.h. This will be used for most of our transformation matrices from now on.</p>
-<code>GLuint gWorldLocation;</code>
-<p>We use this handle to access the world matrix uniform variable in the
-shader. We name it 'world' because what we are doing to the object is
-moving (translating) its location to where we want it in the coordinate
-system of our virtual "world".</p>
-<code>Matrix4f World;<br/>
-World.m[0][0] = 1.0f; World.m[0][1] = 0.0f; World.m[0][2] = 0.0f; World.m[0][3] = sinf(Scale);<br/>
-World.m[1][0] = 0.0f; World.m[1][1] = 1.0f; World.m[1][2] = 0.0f; World.m[1][3] = 0.0f;<br/>
-World.m[2][0] = 0.0f; World.m[2][1] = 0.0f; World.m[2][2] = 1.0f; World.m[2][3] = 0.0f;<br/>
-World.m[3][0] = 0.0f; World.m[3][1] = 0.0f; World.m[3][2] = 0.0f; World.m[3][3] = 1.0f;</code>
-<p>In the render function we prepare a 4x4 matrix and poplulate it
-according to the explanation above. We set v<sub>2</sub> and v<sub>3</sub>
-to zero so we expect no change in the Y and Z coordinate of the object
-and we set v<sub>1</sub> to the result of the sinus function. This will
-translate the X coordinate by a value that swings nicely between -1 and
-1. Now we need to load the matrix into the shader.</p>
-<code>glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &amp;World.m[0][0]);</code>
-<p>This is another example of a glUniform* function to load data into
-uniform shader variables. This specific function loads 4x4 matrices and
-there are also versions for 2x2, 3x3, 3x2, 2x4, 4x2, 3x4 and 4x3. The
-first parameter is the location of the uniform variable (retrieved
-after shader compilation using glGetUniformLocation()). The second
-parameter indicates the number of matrices we are updating. We use 1
-for one matrix but we can also use this function to update multiply
-matrices in one call. The third parameter often confuses newcomers. It
-indicates whether the matrix is supplied in row-major or column-major
-order. Row-major means the matrix is supplied row after row, starting
-from the top. Column-major is the same but in columns. The point is
-that C/C++ are row-major languages by default. This means that when you
-populate a two dimentional array with values they are laid out in
-memory row after row with the "top" row at the lower address. For
-example, see the following array:</p>
-<code>int a[2][3];<br>
-a[0][0] = 1;<br>
-a[0][1] = 2;<br>
-a[0][2] = 3;<br>
-a[1][0] = 4;<br>
-a[1][1] = 5;<br>
-a[1][2] = 6;</code>
-<p>Visually, the array looks like the following matrix:<br>
-<br>
-1 2 3<br>
-4 5 6<br>
-<br>
-And the memory layout is like that: 1 2 3 4 5 6 (with 1 at the lower address).</p>
-<p>So our third parameter to glUniformMatrix4fv() is GL_TRUE because we
-supply the matrix in row-major order. We can also make the third
-parameter GL_FALSE but then we will need to transpose the matrix values
-(the C/C++ memory layout will remain the same but OpenGL will "think"
-that the first 4 values we supply are actually a matrix column and so
-on and will behave accordingly). The fourth parameter is simply the
-starting address of the matrix in memory.</p>
-<p>The remaining source is shader code.</p>
-<code>uniform mat4 gWorld;</code>
-<p>This is a uniform variable of a 4x4 matrix. mat2 and mat3 are also available.</p>
-<code>gl_Position = gWorld * vec4(Position, 1.0);</code>
-<p>The position of the triangle vertices in the vertex buffer are vectors
-of 3 components, but we agreed that we need a fourth component with the
-value of 1. There are two options: place vertices with 4 components in
-the vertex buffer or add the fourth component in the vertex shader.
-There is no advantage to the first option. Each vertex position will
-consume an additional 4 bytes for a component which is known to be
-always 1. It is more efficient to stay with a 3 component vector and
-concatenate the w component in the shader. In GLSL this is done using
-'vec4(Position, 1.0)'. We multiply the matrix by that vector and the
-result goes into gl_Position. To summarize, in every frame we generate
-a translation matrix that translates the X coordinate by a value that
-goes back and fourth between -1 and 1. The shader multiplies the
-position of every vertex by that matrix which results in the combined
-object moving left and right. In most cases the one of the triangles
-sides will go out of the normalized box after the vertex shader and the
-clipper will clip out that side. We will only be able to see the region
-which is inside the normalized box.</p>
+	<header id="header">
+		<div>
+			<h2> Tutorial 6: </h2>
+			<h1> Translation Transformation </h1>
+		</div>
+
+		<a id="logo" class="small" href="../../index.html" title="Homepage">
+			<img src="..//logo ldpi.png">
+		</a>
+	</header>
+
+	<article id="content" class="breakpoint">
+		<section>
+			<h3> Background </h3>
+
+			<p>In this tutorial we start looking at the various transformations that take an object in 3D and
+			enable it to be displayed on screen while keeping the illusion of depth
+			in the scene. The common way to do this is to represent each
+			transformation using a matrix, multiply them one by one and then
+			multiply the vertex position by the final product. Each tutorial will
+			be dedicated to examining one transformation. </p>
+			<p>Here we take a look at the translation transformation which
+			is responsible to moving an object along a vector of any length and
+			direction. Let's say you want to move the triangle in the left picture
+			to the location on the right:</p>
+			<img class="center" src="translation.png">
+			<p>One way to do it is to provide the offset vector (in this case - 1,1) as a uniform variable to
+			the shader and simply add it to the position of each processed vertex.
+			However, this breaks the method of multiplying a group of matrices into
+			one to get a single comprehensive transformation. In addition, you will
+			see later that translation is usually not the first one so you will to
+			multiply the position by the matrix that represent the transformations
+			before translation, then add the position and finally multiple by the
+			matrix that represent the transformation that follow translation. This
+			is too awkward. A better way will be to find a matrix that represents
+			the translation and take part in the multiplication of all matrices.
+			But can you find a matrix that when multiplied by the point (0,0), the
+			bottom left vertex of the triangle on the left, gives the result (1,1)?
+			The truth is that you can't do it using a 2D matrix (and you cannot do
+			it with a 3D matrix for (0,0,0) ). In general we can say that what we
+			need is a matrix M that given a point P(x,y,z) and a vector V(v1,v2,v3)
+			provides M * P=P1(x + v1, y + v2, z + v3). In simple words this means
+			that matrix M translates P to location P+V. In P1 we can see that each
+			component is a sum of a component from P and the corresponding
+			component of V. The left side of each sum equation is provided by the
+			identity matrix:<br/>
+			I * P = P(x,y,z). So it looks like we should start with the identity
+			matrix and find out the changes that will complete the right hand side
+			of the sum equation in each component (...+V1, ...+V2, ...+V3). Let's
+			see how this improved identity matrix would look like:<p>
+			<img class="center" src="equation1.png">
+			<p>From this calculation we can draw two conclusions:</p>
+			<ol>
+			  <li>a, b, c, d, e and f have to be zero else each two components will have an effect on the the third (so
+			we are back to the identity matrix).</li>
+			  <li>Since x, y and z have an effect on all three components of the result when they are all zeros the result will also be the zero
+			vector (so we cannot translate the zero vector).</li>
+			</ol>
+			<p>We want to find the matrix that will provide the following right hand side of the calculation: </p>
+			<img class="center" src="equation2.png">
+			<p>So we need to find the way to add v1-v3 as we see above and then a-f
+			can be zero. The final result will be our translated vector. Seems like
+			we want to add a fourth column to the matrix but then our calculation
+			will be invalid. We cannot multiply a 3x4 matrix by a 3x1 vector. The
+			rule says that you can only multiply matrices if they look like NxM and
+			MxN. So we have to add a fourth component to our vector. A good fourth
+			component will be 1 because then we can place v1-v3 on the fourth
+			column of the matrix and they will be left unchanged in the result
+			because they will get multiplied by 1. But our matrix is still invalid
+			due to the rule above. Multiplying a 3x4 matrix by 4x1 vector is still
+			invalid, by adding a fourth row to the matrix and making it 4x4 will
+			make it valid. Finally, here is our translation matrix:</p>
+			<img class="center" src="equation3.png">
+			<p>Now even if x,y and z are zero we can still translate them to any location.</p>
+			<p>Representing a 3-vector using a 4-vector like that is called homogenous
+			coordinates and is very popular and useful for 3D graphics. The fourth
+			component is called 'w'. In fact, the internal shader symbol
+			gl_Position that we have seen in the previous tutorial is a 4-vector
+			and the w component has a very important role for making the projection
+			from 3D to 2D. The common notation is to use w=1 for points and w=0 for
+			vectors. The reason is that points can be translated but vectors
+			cannot. You can change the length of a vector or its direction but all
+			vectors with the same length/direction are considered equal, regardless
+			their "starting position". So you can simply use the origin for all
+			vectors. Setting w=0 and multiplying the translation matrix by the
+			vector will result in the same vector.</p>
+		</section>
+
+		<section>
+			<h3> Source walkthru </h3>
+
+			<code>struct Matrix4f {<br/>
+			&nbsp;&nbsp;&nbsp; float m[4][4];<br/>
+			};</code>
+			<p>We added a 4x4 matrix definition to math_3d.h. This will be used for most of our transformation matrices from now on.</p>
+			<code>GLuint gWorldLocation;</code>
+			<p>We use this handle to access the world matrix uniform variable in the
+			shader. We name it 'world' because what we are doing to the object is
+			moving (translating) its location to where we want it in the coordinate
+			system of our virtual "world".</p>
+			<code>Matrix4f World;<br/>
+			World.m[0][0] = 1.0f; World.m[0][1] = 0.0f; World.m[0][2] = 0.0f; World.m[0][3] = sinf(Scale);<br/>
+			World.m[1][0] = 0.0f; World.m[1][1] = 1.0f; World.m[1][2] = 0.0f; World.m[1][3] = 0.0f;<br/>
+			World.m[2][0] = 0.0f; World.m[2][1] = 0.0f; World.m[2][2] = 1.0f; World.m[2][3] = 0.0f;<br/>
+			World.m[3][0] = 0.0f; World.m[3][1] = 0.0f; World.m[3][2] = 0.0f; World.m[3][3] = 1.0f;</code>
+			<p>In the render function we prepare a 4x4 matrix and poplulate it
+			according to the explanation above. We set v<sub>2</sub> and v<sub>3</sub>
+			to zero so we expect no change in the Y and Z coordinate of the object
+			and we set v<sub>1</sub> to the result of the sinus function. This will
+			translate the X coordinate by a value that swings nicely between -1 and
+			1. Now we need to load the matrix into the shader.</p>
+			<code>glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &amp;World.m[0][0]);</code>
+			<p>This is another example of a glUniform* function to load data into
+			uniform shader variables. This specific function loads 4x4 matrices and
+			there are also versions for 2x2, 3x3, 3x2, 2x4, 4x2, 3x4 and 4x3. The
+			first parameter is the location of the uniform variable (retrieved
+			after shader compilation using glGetUniformLocation()). The second
+			parameter indicates the number of matrices we are updating. We use 1
+			for one matrix but we can also use this function to update multiply
+			matrices in one call. The third parameter often confuses newcomers. It
+			indicates whether the matrix is supplied in row-major or column-major
+			order. Row-major means the matrix is supplied row after row, starting
+			from the top. Column-major is the same but in columns. The point is
+			that C/C++ are row-major languages by default. This means that when you
+			populate a two dimentional array with values they are laid out in
+			memory row after row with the "top" row at the lower address. For
+			example, see the following array:</p>
+			<code>int a[2][3];<br>
+			a[0][0] = 1;<br>
+			a[0][1] = 2;<br>
+			a[0][2] = 3;<br>
+			a[1][0] = 4;<br>
+			a[1][1] = 5;<br>
+			a[1][2] = 6;</code>
+			<p>Visually, the array looks like the following matrix:<br>
+			<br>
+			1 2 3<br>
+			4 5 6<br>
+			<br>
+			And the memory layout is like that: 1 2 3 4 5 6 (with 1 at the lower address).</p>
+			<p>So our third parameter to glUniformMatrix4fv() is GL_TRUE because we
+			supply the matrix in row-major order. We can also make the third
+			parameter GL_FALSE but then we will need to transpose the matrix values
+			(the C/C++ memory layout will remain the same but OpenGL will "think"
+			that the first 4 values we supply are actually a matrix column and so
+			on and will behave accordingly). The fourth parameter is simply the
+			starting address of the matrix in memory.</p>
+			<p>The remaining source is shader code.</p>
+			<code>uniform mat4 gWorld;</code>
+			<p>This is a uniform variable of a 4x4 matrix. mat2 and mat3 are also available.</p>
+			<code>gl_Position = gWorld * vec4(Position, 1.0);</code>
+			<p>The position of the triangle vertices in the vertex buffer are vectors
+			of 3 components, but we agreed that we need a fourth component with the
+			value of 1. There are two options: place vertices with 4 components in
+			the vertex buffer or add the fourth component in the vertex shader.
+			There is no advantage to the first option. Each vertex position will
+			consume an additional 4 bytes for a component which is known to be
+			always 1. It is more efficient to stay with a 3 component vector and
+			concatenate the w component in the shader. In GLSL this is done using
+			'vec4(Position, 1.0)'. We multiply the matrix by that vector and the
+			result goes into gl_Position. To summarize, in every frame we generate
+			a translation matrix that translates the X coordinate by a value that
+			goes back and fourth between -1 and 1. The shader multiplies the
+			position of every vertex by that matrix which results in the combined
+			object moving left and right. In most cases the one of the triangles
+			sides will go out of the normalized box after the vertex shader and the
+			clipper will clip out that side. We will only be able to see the region
+			which is inside the normalized box.</p>
+		</section>
+
+		<a href="../tutorial07/tutorial07.html" class="next highlight"> Next tutorial </a>
+	</article>
+
+	<script src="../html5shiv.min.js"></script>
+	<script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>
