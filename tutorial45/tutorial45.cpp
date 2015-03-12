@@ -122,8 +122,8 @@ public:
         m_blurTech.Enable();
         m_blurTech.SetColorTextureUnit(AO_TEXTURE_UNIT_INDEX);
         
-        if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-     // if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
+      //  if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+      if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
@@ -148,10 +148,9 @@ public:
         }
         
 #ifndef WIN32
-        // Disabled for now because it somehow clashes with the regular rendering...
- //       if (!m_fontRenderer.InitFontRenderer()) {
-   //         return false;
-   //     }
+        if (!m_fontRenderer.InitFontRenderer()) {
+            return false;
+        }
 #endif        	      
         return true;
     }
@@ -176,7 +175,8 @@ public:
         
         LightingPass();                
 		      	
-    //    RenderFPS();     
+        RenderFPS();     
+        
         CalcFPS();
         
         OgldevBackendSwapBuffers();

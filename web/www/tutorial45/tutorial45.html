@@ -53,6 +53,10 @@
 </p>
 <img src = "ao.jpg">
 <p>
+    You can see how the edges are the brightest and the corners where we expect
+    to get the smaller amount of lighting are much darker.
+</p>
+<p>
     There is a lot of research on the subject of ambient occlusion and many algorithms
     have been developed to approximate it. We are going to study a branch of these algorithms
     known as <i>Screen Space Ambient Occlusion</i> or SSAO, which was developed by 
@@ -97,30 +101,172 @@
     sample operation away. 
 </p>
 <p>
-    
+    So now we are in a fragment shader holding the view space position for the current
+    pixel. Generating random points around it is very easy. We will pass into the shader
+    an array of random vectors (as uniform variables) and add them to the view space position.
+    For every generated point we want to check whether it lies inside or outside the geometry.
+    Remember that these points are virtual, so no match to the actual surface is expected. 
+    We are going to do something very similar to what we did in shadow mapping. Compare the Z
+    value of the random point to the Z value of the closest point in the actual geometry.
+    Naturally, that "geometry" point must lie on the ray that goes from the camera to the virtual
+    point. Take a look at the following diagram:
+</p>
+<img src="diagram1.jpg"</img>
+<p>
+    Point P lies on the red surface and the red and green points were generated randomly.
+    The green point lies outside the geometry and the red is inside (thus contributes to
+    the ambient occlusion). The circle represents the radius in which random points are
+    generated (they can't be too far off point P). R1 and R2 are the rays from the camera
+    to the red and green points. They intersect the geometry somewhere. In order 
+    to calculate the ambient occlusion we must compare the Z values of the red 
+    and green points vs the Z value of the corresponding geometry points that are formed
+    by the intersection of R1/R2 and the surface. We already have the Z value of the
+    red and green points (in view space; after all - this is how we created them). But
+    where's the Z value of the points formed by the above intersection?    
+</p>
+<p>
+    Well, there's more than one solution to that question but since we already have a texture
+    ready with the view space position of the entire scene the simplest way will be
+    to find it somehow in it. To do that we will need the two corresponding texture coordinates
+    that will sample the view space position for the R1 and R2 rays. Remember that the original
+    texture coordinates that were used to find the view space position of P are not
+    what we need. These coordinates were formed based on the interpolation of the 
+    full screen quad that we are scanning in that pass. But R1 and R2 don't intersect P.
+    They intersect the surface somewhere else.
+</p>
+<p>
+    Now we need to do a quick refresher on the way the texture with the view space positions
+    was originally created. After transforming the object space coordinates to view space
+    the resulting vectors were multiplied by the projection matrix (in fact - all these
+    transformation were performed by a single matrix). All this happened in the vertex
+    shader and on the way to the fragment shader the GPU automatically performed the
+    perspective divide to complete the projection. This projection placed the view space
+    position on the near clipping plane and the points inside the frustum have
+    a (-1,1) range for their XYZ components. As the view space position was written out to
+    the texture (the above calculation is performed only on gl_Position; the data
+    written to the texture is forwarded in a different variable) the XY were transformed
+    to the (0,1) range and the results are the texture coordinates where the view space
+    position is going to be written.
+</p>
+<p>
+    So can we use the same procedure in order to calculate the texture coordinates
+    for the red and green points? Well, why not? The math is the same. All we
+    need to do is provide the shader with the projection matrix and use
+    it to project the red and green points on the near clipping plane. We will need
+    to perform the perspective divide manually but that's a no-brainer. Next we will
+    need to transform the result to the (0,1) and here's our texture coordinate!
+    We are now just a sample away from getting the missing Z value and checking
+    whether the virtual point that we generated is located inside or outside the geometry.
+    Now let's see the code.
 </p>
 <h2>Code Walkthru</h2>
-<p>(ogldev_glfw_backend.cpp:24)</p>
+<p>(tutorial45.cpp:)</p>
 <code>
+    virtual void RenderSceneCB()<br>
+    {   <br>
+&nbsp; &nbsp;        m_pGameCamera->OnRender();      <br>
+<br>
+&nbsp; &nbsp;         m_pipeline.SetCamera(*m_pGameCamera);<br>
+		<br>
+&nbsp; &nbsp;         GeometryPass();<br>
+        <br>
+&nbsp; &nbsp;         SSAOPass();<br>
+        <br>
+&nbsp; &nbsp;         BlurPass();<br>
+        <br>
+&nbsp; &nbsp;         LightingPass();                <br>
+		      	<br>
+&nbsp; &nbsp;         RenderFPS();     <br>
+        <br>
+&nbsp; &nbsp;         CalcFPS();<br>
+        <br>
+&nbsp; &nbsp;         OgldevBackendSwapBuffers();<br>
+    }    
 </code>
 <p>
+    We will start from the top level and work our way down. This is the main
+    render loop and in addition to the three passes that we discussed in the
+    background section there's also a blur pass whose job is to apply a blur
+    kernel on the ambient occlusion map formed by the SSAO pass. This helps smooth
+    things up a bit and is not part of the core algorithm. It's up to you to decide
+    whether to include it or not in your engine.
 </p>
-<p>(ogldev_glfw_backend.cpp:168)</p>
+<p>(tutorial45.cpp:168)</p>
 <code>
+    void GeometryPass()<br>
+    {<br>
+&nbsp; &nbsp; 	m_geomPassTech.Enable();        <br>
+<br>
+&nbsp; &nbsp;         m_gBuffer.BindForWriting();<br>
+<br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;         m_pipeline.Orient(m_mesh.GetOrientation());<br>
+&nbsp; &nbsp;         m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());        <br>
+&nbsp; &nbsp; 	m_geomPassTech.SetWVMatrix(m_pipeline.GetWVTrans());<br>
+&nbsp; &nbsp;         m_mesh.Render();       <br>
+    }    
 </code>
 <p>
+    In the geometry pass we render the entire scene into a texture. In this
+    example there's only one mesh. In the real world there will probably
+    be many meshes.
 </p>
-<p>(ogldev_glfw_backend.cpp:195)</p>
+<p>(geometry_pass.vs / geometry_pass.fs)</p>
 <code>
+#version 330<br>
+<br>
+layout (location = 0) in vec3 Position;<br>
+<br>
+uniform mat4 gWVP;<br>
+uniform mat4 gWV;<br>
+<br>
+out vec3 ViewPos;<br>
+<br>
+void main()<br>
+{       <br>
+&nbsp; &nbsp;     gl_Position = gWVP * vec4(Position, 1.0);<br>
+&nbsp; &nbsp;     ViewPos     = (gWV * vec4(Position, 1.0)).xyz;<br>
+}    
+<br><br>
+#version 330<br>
+                                                                        <br>
+in vec3 ViewPos;<br>
+<br>
+layout (location = 0) out vec3 PosOut;   <br>
+<br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;     PosOut = ViewPos;<br>
+}
 </code>
 <p>
+These are the vertex and fragment shaders of the geometry pass. In the vertex shader
+we calculate the gl_position as usual and we pass to the fragment shader the view
+space position in a separate variable. Remember that there is no perspective
+divide for this variable but it is a subject to the regular interpolations performed
+during rasterization.
 </p>
 <p>
+    In the fragment shader we write the interpolated view space position to the 
+    texture. That's it.
 </p>
-<p>(ogldev_glfw_backend.cpp:238)</p>
+<p>(tutorial45.cpp:)</p>
 <code>
+    void SSAOPass()<br>
+    {<br>
+&nbsp; &nbsp;         m_SSAOTech.Enable();<br>
+        <br>
+&nbsp; &nbsp;         m_gBuffer.BindForReading(POSITION_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         m_aoBuffer.BindForWriting();<br>
+        <br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;         m_quad.Render();<br>
+    }   
 </code>
 <p>
+    
 </p>
 <p>(ogldev_glfw_backend.cpp:122)</p>
 <code>
