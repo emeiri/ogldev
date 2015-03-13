@@ -23,6 +23,9 @@
 #include "ogldev_util.h"
 #include "ssao_technique.h"
 
+#define POSITION_TEXTURE_UNIT           GL_TEXTURE1
+#define POSITION_TEXTURE_UNIT_INDEX     1
+
 
 SSAOTechnique::SSAOTechnique()
 {   
@@ -66,6 +69,8 @@ bool SSAOTechnique::Init()
     
     GenKernel();
     
+    glUniform1i(m_posTextureUnitLocation, POSITION_TEXTURE_UNIT_INDEX);
+    
     GLExitIfError;
     
     return GLCheckError();
@@ -93,9 +98,9 @@ void SSAOTechnique::GenKernel()
 }
 
 
-void SSAOTechnique::SetPositionTextureUnit(uint TextureUnit)
+void SSAOTechnique::BindPositionBuffer(IOBuffer& posBuf)
 {
-    glUniform1i(m_posTextureUnitLocation, TextureUnit);
+    posBuf.BindForReading(POSITION_TEXTURE_UNIT);
 }
 
 

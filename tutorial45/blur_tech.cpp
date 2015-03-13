@@ -22,6 +22,9 @@
 #include "blur_tech.h"
 #include "ogldev_util.h"
 
+#define INPUT_TEXTURE_UNIT                 GL_TEXTURE0
+#define INPUT_TEXTURE_UNIT_INDEX           0
+
 
 BlurTech::BlurTech()
 {   
@@ -46,18 +49,22 @@ bool BlurTech::Init()
         return false;
     }
 
-    m_colorTextureUnitLocation = GetUniformLocation("gColorMap");
+    m_inputTextureUnitLocation = GetUniformLocation("gColorMap");
 
-	if (m_colorTextureUnitLocation == INVALID_UNIFORM_LOCATION) {
+	if (m_inputTextureUnitLocation == INVALID_UNIFORM_LOCATION) {
 		return false;
 	}
+    
+    Enable();
+    
+    glUniform1i(m_inputTextureUnitLocation, INPUT_TEXTURE_UNIT_INDEX);
 
 	return true;
 }
 
 
-void BlurTech::SetColorTextureUnit(uint ColorTextureUnit)
+void BlurTech::BindInputBuffer(IOBuffer& inputBuf)
 {
-    glUniform1i(m_colorTextureUnitLocation, ColorTextureUnit);
+    inputBuf.BindForReading(INPUT_TEXTURE_UNIT);
 }
 

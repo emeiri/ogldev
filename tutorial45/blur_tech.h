@@ -20,6 +20,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "ogldev_io_buffer.h"
 
 class BlurTech : public Technique {
 public:
@@ -28,11 +29,11 @@ public:
 
     virtual bool Init();
 
-    void SetColorTextureUnit(uint ColorTextureUnit);
+    void BindInputBuffer(IOBuffer& inputBuf);
 
 private:
 
-    GLuint m_colorTextureUnitLocation;
+    GLuint m_inputTextureUnitLocation;
 };
 
 

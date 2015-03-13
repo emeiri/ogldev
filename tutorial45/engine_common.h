@@ -20,13 +20,6 @@
 
 #define COLOR_TEXTURE_UNIT              GL_TEXTURE0
 #define COLOR_TEXTURE_UNIT_INDEX        0
-#define POSITION_TEXTURE_UNIT           GL_TEXTURE1
-#define POSITION_TEXTURE_UNIT_INDEX     1
-#define AO_TEXTURE_UNIT                 GL_TEXTURE2
-#define AO_TEXTURE_UNIT_INDEX           2
-#define BLUR_TEXTURE_UNIT               GL_TEXTURE3
-#define BLUR_TEXTURE_UNIT_INDEX         3
-
 
 
 #endif	/* ENGINE_COMMON_H */

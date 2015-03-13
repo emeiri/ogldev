@@ -20,6 +20,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "ogldev_io_buffer.h"
 
 
 class SSAOTechnique : public Technique {
@@ -29,7 +30,7 @@ public:
 
     virtual bool Init();
 
-    void SetPositionTextureUnit(uint TextureUnit);	
+    void BindPositionBuffer(IOBuffer& posBuf);	
     void SetSampleRadius(float sr);    
     void SetProjMatrix(const Matrix4f& m);
     

@@ -27,7 +27,6 @@
 #endif
 #include <sys/types.h>
 
-#include "engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
@@ -95,7 +94,6 @@ public:
         }
 
         m_SSAOTech.Enable();
-        m_SSAOTech.SetPositionTextureUnit(POSITION_TEXTURE_UNIT_INDEX);
         m_SSAOTech.SetSampleRadius(1.5f);
         Matrix4f PersProjTrans;
         PersProjTrans.InitPersProjTransform(m_persProjInfo);
@@ -107,8 +105,6 @@ public:
         }
         
         m_lightingTech.Enable();
-        m_lightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingTech.SetAOTextureUnit(BLUR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetDirectionalLight(m_directionalLight);
         m_lightingTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         m_lightingTech.SetShaderType(0);
@@ -116,10 +112,7 @@ public:
         if (!m_blurTech.Init()) {
             OGLDEV_ERROR("Error initializing the blur technique\n");
             return false;
-        }
-        
-        m_blurTech.Enable();
-        m_blurTech.SetColorTextureUnit(AO_TEXTURE_UNIT_INDEX);
+        }                
         
       //  if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
       if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
@@ -198,9 +191,9 @@ public:
       
     void SSAOPass()
     {
-        m_SSAOTech.Enable();
+        m_SSAOTech.Enable();        
+        m_SSAOTech.BindPositionBuffer(m_gBuffer);        
         
-        m_gBuffer.BindForReading(POSITION_TEXTURE_UNIT);
         m_aoBuffer.BindForWriting();
         
         glClear(GL_COLOR_BUFFER_BIT);                
@@ -212,8 +205,9 @@ public:
     void BlurPass()
     {
         m_blurTech.Enable();
-                
-        m_aoBuffer.BindForReading(AO_TEXTURE_UNIT);
+        
+        m_blurTech.BindInputBuffer(m_aoBuffer);
+        
         m_blurBuffer.BindForWriting();
         
         glClear(GL_COLOR_BUFFER_BIT);                
@@ -225,9 +219,9 @@ public:
     void LightingPass()
     {
         m_lightingTech.Enable();
-        m_lightingTech.SetShaderType(m_shaderType);        
+        m_lightingTech.SetShaderType(m_shaderType);                
+        m_lightingTech.BindAOBuffer(m_blurBuffer);
         
-        m_blurBuffer.BindForReading(BLUR_TEXTURE_UNIT);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);        
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

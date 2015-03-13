@@ -19,10 +19,13 @@
 #include <limits.h>
 #include <string.h>
 
+#include "engine_common.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_util.h"
 #include "lighting_technique.h"
 
+#define AO_TEXTURE_UNIT               GL_TEXTURE3
+#define AO_TEXTURE_UNIT_INDEX         3
 
 LightingTechnique::LightingTechnique()
 {   
@@ -158,6 +161,11 @@ bool LightingTechnique::Init()
             return false;
         }
     }
+    
+    Enable();
+    
+    glUniform1i(m_aoTextureLocation, AO_TEXTURE_UNIT_INDEX);
+    glUniform1i(m_colorTextureLocation, COLOR_TEXTURE_UNIT_INDEX);
 
     return true;
 }
@@ -181,15 +189,9 @@ void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
 }
 
 
-void LightingTechnique::SetColorTextureUnit(uint TextureUnit)
+void LightingTechnique::BindAOBuffer(IOBuffer& aoBuffer)
 {
-    glUniform1i(m_colorTextureLocation, TextureUnit);
-}
-
-
-void LightingTechnique::SetAOTextureUnit(uint TextureUnit)
-{
-    glUniform1i(m_aoTextureLocation, TextureUnit);
+    aoBuffer.BindForReading(AO_TEXTURE_UNIT);    
 }
 
 

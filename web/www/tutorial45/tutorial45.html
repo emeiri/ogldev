@@ -259,7 +259,8 @@ during rasterization.
     {<br>
 &nbsp; &nbsp;         m_SSAOTech.Enable();<br>
         <br>
-&nbsp; &nbsp;         m_gBuffer.BindForReading(POSITION_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         m_SSAOTech.BindPositionBuffer(m_gBuffer);<br>
+<br>
 &nbsp; &nbsp;         m_aoBuffer.BindForWriting();<br>
         <br>
 &nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT);<br>
@@ -328,9 +329,6 @@ void main()<br>
 <br>
 &nbsp; &nbsp; &nbsp; &nbsp;         if (abs(Pos.z - sampleDepth) < gSampleRad) {<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             AO += step(sampleDepth,samplePos.z);<br>
-           // if (sampleDepth <= samplePos.z) {<br>
-           //    AO += 1.0/128.0;<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;           //  }<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
 &nbsp; &nbsp;     }<br>
 <br>
@@ -370,7 +368,8 @@ opinion. This is another artist variable you may want to play with in your engin
     {<br>
 &nbsp; &nbsp;         m_blurTech.Enable();<br>
                 <br>
-&nbsp; &nbsp;         m_aoBuffer.BindForReading(AO_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         m_blurTech.BindInputBuffer(m_aoBuffer);<br>
+<br>
 &nbsp; &nbsp;         m_blurBuffer.BindForWriting();<br>
         <br>
 &nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT);                <br>
@@ -438,8 +437,8 @@ void main()<br>
     {<br>
 &nbsp; &nbsp;         m_lightingTech.Enable();<br>
 &nbsp; &nbsp;         m_lightingTech.SetShaderType(m_shaderType);        <br>
-        <br>
-&nbsp; &nbsp;         m_blurBuffer.BindForReading(BLUR_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         m_lightingTech.BindAOBuffer(m_blurBuffer);<br>
+<br>
 &nbsp; &nbsp;         glBindFramebuffer(GL_FRAMEBUFFER, 0);        <br>
         <br>
 &nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>

@@ -20,6 +20,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "ogldev_io_buffer.h"
 
 struct BaseLight
 {
@@ -90,8 +91,7 @@ public:
     void SetShaderType(int ShaderType);    
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
-    void SetColorTextureUnit(uint TextureUnit);
-    void SetAOTextureUnit(uint TextureUnit);
+    void BindAOBuffer(IOBuffer& aoBuffer);
     void SetDirectionalLight(const DirectionalLight& Light);
     void SetPointLights(uint NumLights, const PointLight* pLights);
     void SetSpotLights(uint NumLights, const SpotLight* pLights);
