@@ -49,13 +49,11 @@ bool SSAOTechnique::Init()
     }
 
 	m_posTextureUnitLocation = GetUniformLocation("gPositionMap");
-    m_screenSizeLocation = GetUniformLocation("gScreenSize");	
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
     m_projMatrixLocation = GetUniformLocation("gProj");	
     m_kernelLocation = GetUniformLocation("gKernel");
 
     if (m_posTextureUnitLocation    == INVALID_UNIFORM_LOCATION ||
-        m_screenSizeLocation        == INVALID_UNIFORM_LOCATION ||
         m_sampleRadLocation         == INVALID_UNIFORM_LOCATION ||
         m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||		
         m_kernelLocation            == INVALID_UNIFORM_LOCATION) {
@@ -84,13 +82,11 @@ void SSAOTechnique::GenKernel()
         v.x = 2.0f * (float)rand()/RAND_MAX - 1.0f;
         v.y = 2.0f * (float)rand()/RAND_MAX - 1.0f;
         v.z = 2.0f * (float)rand()/RAND_MAX - 1.0f;
-      //  v.z = (float)rand()/RAND_MAX;
+        // Use an acceleration function so more points are
+        // located closer to the origin
         v *= (0.1f + 0.9f * scale * scale);
         
-        v.Print();
-        printf("\n");
         kernel[i] = v;
-        //glUniform3f(m_kernelLocation[i], v.x, v.y, v.z);
     }
        
     glUniform3fv(m_kernelLocation, KERNEL_SIZE, (const GLfloat*)&kernel[0]);    
@@ -100,12 +96,6 @@ void SSAOTechnique::GenKernel()
 void SSAOTechnique::SetPositionTextureUnit(uint TextureUnit)
 {
     glUniform1i(m_posTextureUnitLocation, TextureUnit);
-}
-
-
-void SSAOTechnique::SetScreenSize(uint Width, uint Height)
-{
-    glUniform2f(m_screenSizeLocation, (float)Width, (float)Height);
 }
 
 

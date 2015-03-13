@@ -1,25 +1,18 @@
 #version 330
 
+in vec2 TexCoord;
+
 out vec4 FragColor;
 
 uniform sampler2D gPositionMap;
-uniform vec2 gScreenSize;
-uniform float gIntensity;
 uniform float gSampleRad;
 uniform mat4 gProj;
 
 const int MAX_KERNEL_SIZE = 128;
 uniform vec3 gKernel[MAX_KERNEL_SIZE];
 
-vec2 CalcTexCoord()
-{
-    return gl_FragCoord.xy / gScreenSize;
-}
-
-
 void main()
 {
-    vec2 TexCoord = CalcTexCoord();
     vec3 Pos = texture(gPositionMap, TexCoord).xyz;
 
     float AO = 0.0;
@@ -29,7 +22,7 @@ void main()
         vec4 offset = vec4(samplePos, 1.0);
         offset = gProj * offset;
         offset.xy /= offset.w;
-        offset.xy = offset.xy * 0.5 + 0.5;
+        offset.xy = offset.xy * 0.5 + vec2(0.5);
             
         float sampleDepth = texture(gPositionMap, offset.xy).b;
 

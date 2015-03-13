@@ -96,7 +96,6 @@ public:
 
         m_SSAOTech.Enable();
         m_SSAOTech.SetPositionTextureUnit(POSITION_TEXTURE_UNIT_INDEX);
-        m_SSAOTech.SetScreenSize(WINDOW_WIDTH, WINDOW_HEIGHT);        
         m_SSAOTech.SetSampleRadius(1.5f);
         Matrix4f PersProjTrans;
         PersProjTrans.InitPersProjTransform(m_persProjInfo);

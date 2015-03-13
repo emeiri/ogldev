@@ -212,7 +212,7 @@
     example there's only one mesh. In the real world there will probably
     be many meshes.
 </p>
-<p>(geometry_pass.vs / geometry_pass.fs)</p>
+<p>(geometry_pass.vs)</p>
 <code>
 #version 330<br>
 <br>
@@ -228,7 +228,9 @@ void main()<br>
 &nbsp; &nbsp;     gl_Position = gWVP * vec4(Position, 1.0);<br>
 &nbsp; &nbsp;     ViewPos     = (gWV * vec4(Position, 1.0)).xyz;<br>
 }    
-<br><br>
+</code>
+<p>(geometry_pass.fs)</p>
+<code>
 #version 330<br>
                                                                         <br>
 in vec3 ViewPos;<br>
@@ -266,24 +268,217 @@ during rasterization.
     }   
 </code>
 <p>
-    
+This is the application code of the SSAO pass and it is very simple. On the
+input side we have the view space position from the previous pass and
+we write the output to an AO buffer. For the rendering we use a full screen quad.
+This will generate the AO term for every pixel. The real meat is in the shaders.
 </p>
-<p>(ogldev_glfw_backend.cpp:122)</p>
+<p>(ssao.vs)</p>
 <code>
+    #version 330<br>
+<br>
+layout (location = 0) in vec3 Position; <br>
+<br>
+out vec2 TexCoord;<br>
+<br>
+void main()<br>
+{          <br>
+&nbsp; &nbsp; gl_Position = vec4(Position, 1.0);<br>
+&nbsp; &nbsp; TexCoord = (Position.xy + vec2(1.0)) / 2.0;<br>
+}
 </code>
 <p>
+As in many screen space based techniques in the vertex shader we just need to
+pass-thru the position of the full screen quad. gl_Position will be consumed
+by the GPU for the purposes of rasterization but we use it's XY components for
+the texture coordinates. Remember that the full screen quad coordinates
+range from (-1,-1) to (1,1) so everything in the fragment shader will be interpolated 
+in that range. We want our texture coordinates to be in the (0,1) so we transform
+it here before sending it out to the fragment shader.
 </p>
-<p>(ogldev_glfw_backend.cpp:)</p>
+<p>(ssao.fs)</p>
 <code>
+#version 330<br>
+<br>
+in vec2 TexCoord;<br>
+<br>
+out vec4 FragColor;<br>
+<br>
+uniform sampler2D gPositionMap;<br>
+uniform float gSampleRad;<br>
+uniform mat4 gProj;<br>
+<br>
+const int MAX_KERNEL_SIZE = 128;<br>
+uniform vec3 gKernel[MAX_KERNEL_SIZE];<br>
+<br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;     vec3 Pos = texture(gPositionMap, TexCoord).xyz;<br>
+<br>
+&nbsp; &nbsp;     float AO = 0.0;<br>
+<br>
+&nbsp; &nbsp;     for (int i = 0 ; i < MAX_KERNEL_SIZE ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         vec3 samplePos = Pos + gKernel[i];<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         vec4 offset = vec4(samplePos, 1.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset = gProj * offset;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy /= offset.w;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy = offset.xy * 0.5 + vec2(0.5);<br>
+            <br>
+&nbsp; &nbsp; &nbsp; &nbsp;         float sampleDepth = texture(gPositionMap, offset.xy).b;<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         if (abs(Pos.z - sampleDepth) < gSampleRad) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             AO += step(sampleDepth,samplePos.z);<br>
+           // if (sampleDepth <= samplePos.z) {<br>
+           //    AO += 1.0/128.0;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;           //  }<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         }<br>
+&nbsp; &nbsp;     }<br>
+<br>
+&nbsp; &nbsp;     AO = 1.0 - AO/128.0;<br>
+ <br>
+&nbsp; &nbsp;     FragColor = vec4(pow(AO, 2.0));<br>
+}    
 </code>
 <p>
+Here's the core of the SSAO algorithm. We start by taking the texture coordinates
+we got from the vertex shader and transforming them to the normalized (0,1) range.
+We can now sample the position map and fetch our view space position. Next we
+enter a loop and start generating random points. This is done using an array of
+uniform vectors (gKernel). This array is populated by random vectors in the
+(-1,1) range in the ssao_technique.cpp file (which I haven't included here because it's pretty
+standard; check the code for more details). We now need to find the texture coordinates
+that will fetch the Z value for the geometry point that matches the current virtual point.
+We project the virtual point using the projection matrix, perform perspective divide on
+it and transform it to the (0,1) range. We can now use it to sample the view space position
+of the actual geometry and compare its Z value to the virtual point. But before we do
+that we make sure that the distance between the origin point and the one whose Z value
+we just fetched is not too far off. This helps us avoid all kinds of nasty artifacts.
+You can play with the gSampleRad variable for that. 
 </p>
-<p>(ogldev_backend.h)</p>
+<p>
+Next we compare the depth of the virtual point with the one from the actual
+geometry. The GLSL step(x,y) function returns 0 if y < x and 1 otherwise.
+This means that the local variable AO increases as more points end up behind the geometry.
+We plan to multiply the result by the color of the lighted pixel so we do a 'AO = 1.0 - AO/128.0'
+to kind-of reverse it. The result is written to the output buffer. Note that we take
+the AO to the power of 2 before writing it out. This simply makes it look a bit better in my
+opinion. This is another artist variable you may want to play with in your engine.
+</p>
+<p>(tutorial45.cpp)</p>
 <code>
+    void BlurPass()<br>
+    {<br>
+&nbsp; &nbsp;         m_blurTech.Enable();<br>
+                <br>
+&nbsp; &nbsp;         m_aoBuffer.BindForReading(AO_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         m_blurBuffer.BindForWriting();<br>
+        <br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT);                <br>
+        <br>
+&nbsp; &nbsp;         m_quad.Render();                <br>
+    }    
 </code>    
 <p>
+The application code of the blur pass is identical to the SSAO pass. Here the input
+is the ambient occlusionn term we just calculated and the output is a buffer
+containing the blurred results. 
 </p>
+<p>(blur.vs)</p>
+<code>
+    #version 330<br>
+<br>
+layout (location = 0) in vec3 Position; <br>
+<br>
+out vec2 TexCoord;<br>
+<br>
+void main()<br>
+{          <br>
+&nbsp; &nbsp;     gl_Position = vec4(Position, 1.0);<br>
+&nbsp; &nbsp;     TexCoord = (Position.xy + vec2(1.0)) / 2.0;<br>
+}
+</code>
+<p>(blur.fs)</p>
+<code>
+#version 330<br>
+<br>
+in vec2 TexCoord;<br>
+<br>
+out vec4 FragColor;<br>
+<br>
+uniform sampler2D gColorMap;<br>
+<br>
+float Offsets[4] = float[]( -1.5, -0.5, 0.5, 1.5 );<br>
+<br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;     vec3 Color = vec3(0.0, 0.0, 0.0);<br>
+<br>
+&nbsp; &nbsp;     for (int i = 0 ; i < 4 ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         for (int j = 0 ; j < 4 ; j++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             vec2 tc = TexCoord;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             tc.x = TexCoord.x + Offsets[j] / textureSize(gColorMap, 0).x;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             tc.y = TexCoord.y + Offsets[i] / textureSize(gColorMap, 0).y;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             Color += texture(gColorMap, tc).xyz;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         }<br>
+&nbsp; &nbsp; }<br>
+<br>
+&nbsp; &nbsp;     Color /= 16.0;<br>
+<br>
+&nbsp; &nbsp;     FragColor = vec4(Color, 1.0);<br>
+}
+</code>
 <p>
+    This is an example of a very simple blur technique. The VS is actually identical to the
+    one from the SSAO. In the fragment shader we sample 16 points around the origin and average
+    them out.
+</p>
+<p>(tutorial45.cpp)</p>
+<code>
+    void LightingPass()<br>
+    {<br>
+&nbsp; &nbsp;         m_lightingTech.Enable();<br>
+&nbsp; &nbsp;         m_lightingTech.SetShaderType(m_shaderType);        <br>
+        <br>
+&nbsp; &nbsp;         m_blurBuffer.BindForReading(BLUR_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         glBindFramebuffer(GL_FRAMEBUFFER, 0);        <br>
+        <br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+                        <br>
+&nbsp; &nbsp;         m_pipeline.Orient(m_mesh.GetOrientation());<br>
+&nbsp; &nbsp;         m_lightingTech.SetWVP(m_pipeline.GetWVPTrans());        <br>
+&nbsp; &nbsp;         m_lightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());        <br>
+&nbsp; &nbsp;         m_mesh.Render();               <br>
+    }    
+</code>
+<p>
+We have a pretty standard application code for the lighting pass. The only addition
+here is the blurred AO term buffer which is bound as input.
+</p>
+<p>(lighting.fs)</p>
+<code>
+    vec2 CalcScreenTexCoord()<br>
+{<br>
+&nbsp; &nbsp;     return gl_FragCoord.xy / gScreenSize;<br>
+}<br>
+<br>
+<br>
+vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)<br>
+{<br>
+&nbsp; &nbsp;     vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;<br>
+<br>
+&nbsp; &nbsp;     if (gShaderType == SHADER_TYPE_SSAO) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;          AmbientColor *= texture(gAOMap, CalcScreenTexCoord()).r;<br>
+&nbsp; &nbsp;     }<br>
+    <br>
+&nbsp; &nbsp;     ...<br>
+</code>
+<p>
+I haven't included the entire lighting shader since the change is very minor.
+The ambient color is modulated by the ambient occlusion term sampled from the AO map for
+the current pixel. Since we are rendering the actual geometry here and not a full screen quad
+we have to calculate the texture coordinates using the system maintained gl_FragCoord. gShaderType
+is a user controlled variable that helps us switch from SSAO to no-SSAO and only-ambient-occlusion-term
+display. Play with the 'a' key to see how it goes.
 </p>
 </body>
 </html>

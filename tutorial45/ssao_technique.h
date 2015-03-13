@@ -30,7 +30,6 @@ public:
     virtual bool Init();
 
     void SetPositionTextureUnit(uint TextureUnit);	
-    void SetScreenSize(uint Width, uint Height);
     void SetSampleRadius(float sr);    
     void SetProjMatrix(const Matrix4f& m);
     
@@ -41,7 +40,6 @@ private:
     const static uint KERNEL_SIZE = 128;
 
     GLuint m_posTextureUnitLocation;
-    GLuint m_screenSizeLocation;
     GLuint m_sampleRadLocation;    
     GLuint m_kernelLocation;
     GLuint m_projMatrixLocation;
