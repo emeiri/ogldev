@@ -143,7 +143,7 @@ void main()
     }                                                                                       
            
     if (gShaderType == SHADER_TYPE_ONLY_AO) {
-        FragColor = texture(gAOMap, CalcScreenTexCoord());        
+        FragColor = vec4(texture(gAOMap, CalcScreenTexCoord()).x);
     }
     else {
         FragColor = texture(gColorMap, TexCoord0.xy) * TotalLight;

@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>ds_geom_pass_tech.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
+      <itemPath>mesh.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/geometry_pass.fs</itemPath>
@@ -16,7 +17,19 @@
                    projectFiles="true">
       <itemPath>ds_geom_pass_tech.cpp</itemPath>
       <itemPath>gbuffer.cpp</itemPath>
+      <itemPath>mesh.cpp</itemPath>
       <itemPath>tutorial35.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"

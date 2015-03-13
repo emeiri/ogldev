@@ -47,8 +47,24 @@ IOBuffer::~IOBuffer()
 }
 
 
-bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth)
+bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum InternalType)
 {
+    GLenum Format, Type;
+    
+    switch (InternalType)
+    {
+        case GL_RGB32F:
+            Format = GL_RGB;
+            Type = GL_FLOAT;
+            break;
+        case GL_R32F:
+            Format = GL_RED;
+            Type = GL_FLOAT;
+            break;
+        default:
+            OGLDEV_ERROR("Invalid internal type");
+    }
+    
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);    
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
@@ -57,7 +73,7 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth)
     glGenTextures(1, &m_texture);
     
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, InternalType, WindowWidth, WindowHeight, 0, Format, Type, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

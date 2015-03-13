@@ -134,15 +134,15 @@ public:
             return false;
         }
         
-        if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, true)) {
+        if (!m_gBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, true, GL_RGB32F)) {
             return false;
         }
 
-        if (!m_aoBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, false)) {
+        if (!m_aoBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, false, GL_R32F)) {
             return false;
         }
 
-        if (!m_blurBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, false)) {
+        if (!m_blurBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, false, GL_R32F)) {
             return false;
         }
         
