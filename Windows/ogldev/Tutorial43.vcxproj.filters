@@ -18,9 +18,6 @@
     <ClInclude Include="..\..\tutorial43\lighting_technique.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial43\mesh.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\tutorial43\shadow_map_fbo.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -44,9 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial43\lighting_technique.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\tutorial43\mesh.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tutorial43\shadow_map_fbo.cpp">

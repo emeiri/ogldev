@@ -24,7 +24,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"

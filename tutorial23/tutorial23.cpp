@@ -26,7 +26,7 @@
 #include "ogldev_app.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "shadow_map_technique.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
@@ -41,7 +41,6 @@ public:
 
     Tutorial23()
     {
-        m_pEffect = NULL;
         m_pShadowMapTech = NULL;
         m_pGameCamera = NULL;
         m_pMesh = NULL;
@@ -65,7 +64,6 @@ public:
 
     ~Tutorial23()
     {
-        SAFE_DELETE(m_pEffect);
         SAFE_DELETE(m_pShadowMapTech);
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh);
@@ -79,13 +77,6 @@ public:
         }
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT/*, Pos, Target, Up*/);
-     
-        m_pEffect = new LightingTechnique();
-
-        if (!m_pEffect->Init()) {
-            printf("Error initializing the lighting technique\n");
-            return false;
-        }
      
         m_pShadowMapTech = new ShadowMapTechnique();
 
@@ -178,7 +169,6 @@ public:
 
  private:
 
-    LightingTechnique* m_pEffect;
     ShadowMapTechnique* m_pShadowMapTech;
     Camera* m_pGameCamera;
     float m_scale;

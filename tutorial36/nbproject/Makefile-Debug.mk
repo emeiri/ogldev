@@ -40,7 +40,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ds_light_pass_tech.o \
 	${OBJECTDIR}/ds_point_light_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
-	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/tutorial36.o
 
 
@@ -94,11 +93,6 @@ ${OBJECTDIR}/gbuffer.o: gbuffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/gbuffer.o gbuffer.cpp
-
-${OBJECTDIR}/mesh.o: mesh.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/tutorial36.o: tutorial36.cpp 
 	${MKDIR} -p ${OBJECTDIR}

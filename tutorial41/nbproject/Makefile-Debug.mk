@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/intermediate_buffer.o \
-	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/motion_blur_technique.o \
 	${OBJECTDIR}/skinning_technique.o \
 	${OBJECTDIR}/tutorial41.o
@@ -72,11 +71,6 @@ ${OBJECTDIR}/intermediate_buffer.o: intermediate_buffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/intermediate_buffer.o intermediate_buffer.cpp
-
-${OBJECTDIR}/mesh.o: mesh.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/motion_blur_technique.o: motion_blur_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

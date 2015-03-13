@@ -55,7 +55,7 @@ The following picture illustrates AOS and SOA:
 </p>
 <img src="aos_soa.jpg">
 <h2>Code Walkthru</h2>
-<p>(mesh.h:50)</p>
+<p>(ogldev_basic_mesh.h:50)</p>
 <code>
 class Mesh<br>
 {<br>
@@ -121,7 +121,7 @@ are stored one after the other inside the same buffers). Before rendering
 a subcomponent of the mesh we need to bind its texture and then submit a draw command for subcomponent
 vertices. We will later see how to do this.
 </p>
-<p>(mesh.cpp:56)</p>
+<p>(ogldev_basic_mesh.cpp:60)</p>
 <code>
 bool Mesh::LoadMesh(const string& Filename)<br>
 {<br>
@@ -165,7 +165,7 @@ glBindVertexArray(0) at the end of the function. By binding zero as the VAO we g
 changes to the vertex processor will affect our VAO (OpenGL will never generate a VAO with
 the value of zero so this is safe). 
 </p>
-<p>(mesh.cpp:86)</p>
+<p>(ogldev_basic_mesh.cpp:90)</p>
 <code>
 bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)<br>
 {  <br>
@@ -189,7 +189,7 @@ bool Mesh::InitFromScene(const aiScene* pScene, const string& Filename)<br>
   &nbsp; &nbsp; &nbsp; &nbsp;         m_Entries[i].BaseIndex = NumIndices;<br>
 <br>
  &nbsp; &nbsp; &nbsp; &nbsp;        NumVertices += pScene->mMeshes[i]->mNumVertices;<br>
- &nbsp; &nbsp; &nbsp; &nbsp;        NumIndices  += m_Entries[i].BaseIndex;<br>
+ &nbsp; &nbsp; &nbsp; &nbsp;        NumIndices  += m_Entries[i].NumIndices;<br>
  &nbsp; &nbsp;    }<br>
     <br>
  &nbsp; &nbsp;    // Reserve space in the vectors for the vertex attributes and indices<br>
@@ -260,7 +260,7 @@ The index buffer is initialized by binding it to the GL_ELEMENT_ARRAY_BUFFER tar
 to populate it with the indices and that's it. The buffers are now initialized and everything we did
 is encapsulated in the VAO.
 </p>
-<p>(mesh.cpp:148)</p>
+<p>(ogldev_basic_mesh.cpp:152)</p>
 <code>
 void Mesh::InitMesh(const aiMesh* paiMesh,<br>
   &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;                   vector<Vector3f>& Positions,<br>
@@ -296,7 +296,7 @@ void Mesh::InitMesh(const aiMesh* paiMesh,<br>
 This function is responsible for loading each aiMesh structure that is contained in the aiScene. Note how 
 the vectors are passed by reference and accessed using the push_back() function of the STL vector class.
 </p>
-<p>(mesh.cpp:225)</p>
+<p>(ogldev_basic_mesh.cpp:236)</p>
 <code>
 void Mesh::Render()<br>
 {<br>
@@ -344,7 +344,7 @@ Before leaving we reset the current VAO back to zero and the reason is the same 
 we initially created the VAO - we don't want outside code to bind a VB (for example) and
 change our VAO unintentinally. 
 </p>
-<p>(mesh.cpp:50)</p>
+<p>(ogldev_basic_mesh.cpp:50)</p>
 <code>
 glDeleteVertexArrays(1, &m_VAO);
 </code>

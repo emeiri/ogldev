@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #include "ogldev_util.h"
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "intermediate_buffer.h"
 
 IntermediateBuffer::IntermediateBuffer()

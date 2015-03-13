@@ -4,14 +4,8 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>callbacks.h</itemPath>
-      <itemPath>camera.h</itemPath>
       <itemPath>glfx_technique.h</itemPath>
-      <itemPath>glut_backend.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>math_3d.h</itemPath>
-      <itemPath>mesh.h</itemPath>
-      <itemPath>pipeline.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/lighting.glsl</itemPath>
@@ -19,13 +13,9 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>camera.cpp</itemPath>
       <itemPath>glfx_technique.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>math_3d.cpp</itemPath>
-      <itemPath>mesh.cpp</itemPath>
-      <itemPath>pipeline.cpp</itemPath>
       <itemPath>tutorial34.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -127,10 +117,6 @@
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial34.cpp" ex="false" tool="1" flavor2="0">
@@ -185,10 +171,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="mesh.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/lighting.glsl" ex="false" tool="3" flavor2="0">
       </item>

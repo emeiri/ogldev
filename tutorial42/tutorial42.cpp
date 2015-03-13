@@ -23,7 +23,7 @@
 #include <GL/freeglut.h>
 #include <string>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_backend.h"
 #include "ogldev_util.h"
@@ -32,7 +32,7 @@
 #include "texture.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
 
@@ -238,8 +238,8 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     SpotLight m_spotLight;
-    Mesh m_mesh;
-    Mesh m_quad;	
+    BasicMesh m_mesh;
+    BasicMesh m_quad;	
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;

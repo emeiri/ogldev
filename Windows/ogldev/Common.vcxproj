@@ -17,7 +17,10 @@
     <ClCompile Include="..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\Common\ogldev_app.cpp" />
     <ClCompile Include="..\..\Common\ogldev_backend.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_basic_lighting.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\Common\ogldev_glfw_backend.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_skinned_mesh.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\Common\pipeline.cpp" />
@@ -26,14 +29,18 @@
   <ItemGroup>
     <ClInclude Include="..\..\Include\ogldev_app.h" />
     <ClInclude Include="..\..\Include\ogldev_backend.h" />
+    <ClInclude Include="..\..\Include\ogldev_basic_lighting.h" />
+    <ClInclude Include="..\..\Include\ogldev_basic_mesh.h" />
     <ClInclude Include="..\..\Include\ogldev_callbacks.h" />
     <ClInclude Include="..\..\Include\ogldev_camera.h" />
     <ClInclude Include="..\..\Include\ogldev_cubemap_texture.h" />
+    <ClInclude Include="..\..\Include\ogldev_engine_common.h" />
     <ClInclude Include="..\..\Include\ogldev_glfw_backend.h" />
     <ClInclude Include="..\..\Include\ogldev_glut_backend.h" />
     <ClInclude Include="..\..\Include\ogldev_keys.h" />
     <ClInclude Include="..\..\Include\ogldev_math_3d.h" />
     <ClInclude Include="..\..\Include\ogldev_pipeline.h" />
+    <ClInclude Include="..\..\Include\ogldev_skinned_mesh.h" />
     <ClInclude Include="..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />

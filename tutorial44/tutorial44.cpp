@@ -27,15 +27,15 @@
 #endif
 #include <sys/types.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -150,10 +150,10 @@ public:
 
 private:
         
-    LightingTechnique m_LightingTech;
+    BasicLightingTechnique m_LightingTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
-    Mesh m_mesh;
+    BasicMesh m_mesh;
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
 };

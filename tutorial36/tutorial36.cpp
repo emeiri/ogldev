@@ -22,7 +22,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
@@ -31,7 +31,7 @@
 #include "ds_point_light_pass_tech.h"
 #include "ds_dir_light_pass_tech.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "gbuffer.h"
 #include "lights_common.h"
 
@@ -319,9 +319,9 @@ private:
     SpotLight m_spotLight;
 	DirectionalLight m_dirLight;
 	PointLight m_pointLight[3];
-    Mesh m_box;
-    Mesh m_bsphere;
-    Mesh m_quad;
+    BasicMesh m_box;
+    BasicMesh m_bsphere;
+    BasicMesh m_quad;
     PersProjInfo m_persProjInfo;
     GBuffer m_gbuffer;
     Vector3f m_boxPositions[5];

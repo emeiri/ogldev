@@ -345,27 +345,29 @@ virtual void ShadowMapPass()<br>
 	the ground cannot cast shadows. This is one of the optimizations that we can do when we know
 	something about the type of the object.
 </p>
-<p>(tutorial24.cpp:162)</p>
+<p>(tutorial24.cpp:168)</p>
 <code>
 virtual void RenderPass()<br>
 {<br>
 &nbsp; &nbsp 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
 <br>
 &nbsp; &nbsp 	    m_pLightingEffect->Enable();<br>
+<br>
+&nbsp; &nbsp        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
    <br>
 &nbsp; &nbsp 	    m_shadowMapFBO.BindForReading(GL_TEXTURE1);<br>
 <br>
 &nbsp; &nbsp 	    Pipeline p;<br>
 &nbsp; &nbsp 	    p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);<br>
+<br>
 &nbsp; &nbsp 	    p.Scale(10.0f, 10.0f, 10.0f);<br>
 &nbsp; &nbsp 	    p.WorldPos(0.0f, 0.0f, 1.0f);<br>
 &nbsp; &nbsp 	    p.Rotate(90.0f, 0.0f, 0.0f);<br>
-&nbsp; &nbsp 	<b>    p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());</b><br>
-&nbsp; &nbsp 	<b>    m_pLightingEffect->SetWVP(p.GetWVPTrans());</b><br>
+&nbsp; &nbsp 	<b> p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());</b><br>
+&nbsp; &nbsp 	<b> m_pLightingEffect->SetWVP(p.GetWVPTrans());</b><br>
 &nbsp; &nbsp 	    m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());<br>
-&nbsp; &nbsp 	<b>    p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
-&nbsp; &nbsp 	<b>    m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
-&nbsp; &nbsp 	    m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());<br>
+&nbsp; &nbsp 	<b> p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
+&nbsp; &nbsp 	<b> m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
 &nbsp; &nbsp 	    m_pGroundTex->Bind(GL_TEXTURE0);<br>
 &nbsp; &nbsp 	    m_pQuad->Render();<br>
 <br>
@@ -377,7 +379,6 @@ virtual void RenderPass()<br>
 &nbsp; &nbsp 	    m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());<br>
 &nbsp; &nbsp 	 <b>   p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
 &nbsp; &nbsp 	 <b>  m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
-<br>
 &nbsp; &nbsp 	    m_pMesh->Render();<br>
 }
 </code>

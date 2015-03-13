@@ -17,7 +17,7 @@
 */
 
 #include "ogldev_util.h"
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "billboard_list.h"
 
 #define NUM_ROWS 10

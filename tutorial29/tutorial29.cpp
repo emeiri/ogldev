@@ -23,12 +23,12 @@
 #include <GL/freeglut.h>
 #include <assert.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "picking_texture.h"
@@ -80,7 +80,7 @@ public:
         }
 
         m_lightingEffect.Enable();
-        m_lightingEffect.SetTextureUnit(0);
+        m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetDirectionalLight(m_directionalLight);
                
         if (!m_pickingTexture.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
@@ -225,7 +225,7 @@ public:
 
 private:
 
-    LightingTechnique m_lightingEffect;
+    BasicLightingTechnique m_lightingEffect;
     PickingTechnique m_pickingEffect;
     SimpleColorTechnique m_simpleColorEffect;
     Camera* m_pGameCamera;

@@ -1,0 +1,64 @@
+body {
+	background: white;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0 10px;
+}
+
+.no-print {
+	display: none !important;
+}
+
+#navigation {
+	width: 100%;
+}
+
+#navigation > a {
+	display: block;
+	text-align: center;
+}
+
+#header h1 {
+	padding-bottom: 20px;
+}
+
+#header h2 {
+	padding-top: 10px;
+}
+
+#homepage article {
+	width: 100%;
+	max-width: 300px;
+	margin: 15px auto;
+	float: none;
+}
+
+#homepage article + article {
+	margin: 30px auto 15px;
+}
+
+#homepage .breakpoint {
+	margin: 15px;
+}
+
+#homepage article .preview:before,
+#homepage article .preview:after {
+	display: none;
+}
+
+#content {
+	padding-top: 20px;
+}
+
+#content h3,
+#content code {
+	page-break-inside: avoid;
+}
+
+#content .next {
+	display: none;
+}
+
+#footer {
+	display: none;
+}

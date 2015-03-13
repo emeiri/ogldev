@@ -35,7 +35,7 @@
 #include "ogldev_camera.h"
 #include "texture.h"
 #include "silhouette_technique.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 
@@ -179,8 +179,7 @@ private:
         m_mesh.Render();        
     }        
     
-   
-    LightingTechnique m_LightingTech;
+    BasicLightingTechnique m_LightingTech;
     SilhouetteTechnique m_silhouetteTech;
     Camera* m_pGameCamera;
     float m_scale;

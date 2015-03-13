@@ -19,7 +19,7 @@
 #include <assert.h>
 
 #include "mesh.h"
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 
 Mesh::MeshEntry::MeshEntry()
 {

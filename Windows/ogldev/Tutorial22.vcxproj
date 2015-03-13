@@ -11,19 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial22\camera.h" />
-    <ClInclude Include="..\..\tutorial22\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial22\math_3d.h" />
     <ClInclude Include="..\..\tutorial22\mesh.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial22\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial22\mesh.cpp" />
     <ClCompile Include="..\..\tutorial22\tutorial22.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\tutorial22\lighting.fs" />
-    <None Include="..\..\tutorial22\lighting.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{88F0C4B4-98CA-4416-9485-B69D09629E5B}</ProjectGuid>

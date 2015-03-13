@@ -22,14 +22,14 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
@@ -76,7 +76,7 @@ public:
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
       
-        m_pEffect = new LightingTechnique();
+        m_pEffect = new BasicLightingTechnique();
 
         if (!m_pEffect->Init()) {
             printf("Error initializing the lighting technique\n");
@@ -90,19 +90,19 @@ public:
         m_pEffect->SetMatSpecularIntensity(0.0f);
         m_pEffect->SetMatSpecularPower(0);
 
-        m_pMesh1 = new Mesh();
+        m_pMesh1 = new BasicMesh();
 
         if (!m_pMesh1->LoadMesh("../Content/phoenix_ugv.md2")) {
             return false;            
         }
         
-        m_pMesh2 = new Mesh();
+        m_pMesh2 = new BasicMesh();
 
         if (!m_pMesh2->LoadMesh("../Content/jeep.obj")) {
             return false;            
         }
 
-        m_pMesh3 = new Mesh();
+        m_pMesh3 = new BasicMesh();
 
         if (!m_pMesh3->LoadMesh("../Content/hheli.obj")) {
             return false;            
@@ -173,13 +173,13 @@ public:
     
 private:
 
-    LightingTechnique* m_pEffect;
+    BasicLightingTechnique* m_pEffect;
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
-    Mesh* m_pMesh1;
-    Mesh* m_pMesh2;
-    Mesh* m_pMesh3;
+    BasicMesh* m_pMesh1;
+    BasicMesh* m_pMesh2;
+    BasicMesh* m_pMesh3;
     PersProjInfo m_persProjInfo;
 };
 

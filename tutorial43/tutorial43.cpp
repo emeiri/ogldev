@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <float.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_app.h"
 #include "ogldev_pipeline.h"
@@ -32,7 +32,7 @@
 #include "texture.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
 
@@ -282,8 +282,8 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     PointLight m_pointLight;
-    Mesh m_mesh;
-    Mesh m_quad;
+    BasicMesh m_mesh;
+    BasicMesh m_quad;
     Orientation m_quad1Orientation;
     Orientation m_quad2Orientation;
     Orientation m_mesh1Orientation;

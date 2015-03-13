@@ -11,20 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial44\engine_common.h" />
-    <ClInclude Include="..\..\tutorial44\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial44\mesh.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\tutorial44\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial44\mesh.cpp" />
     <ClCompile Include="..\..\tutorial44\tutorial44.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\tutorial44\shaders\motion_blur.fs" />
-    <None Include="..\..\tutorial44\shaders\motion_blur.vs" />
-    <None Include="..\..\tutorial44\shaders\skinning.fs" />
-    <None Include="..\..\tutorial44\shaders\skinning.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EE50856F-41EC-44B0-8298-095742D018BF}</ProjectGuid>

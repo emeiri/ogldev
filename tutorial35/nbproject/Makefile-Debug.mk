@@ -37,7 +37,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/ds_geom_pass_tech.o \
 	${OBJECTDIR}/gbuffer.o \
-	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/tutorial35.o
 
 
@@ -76,11 +75,6 @@ ${OBJECTDIR}/gbuffer.o: gbuffer.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Common/FreetypeGL -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/gbuffer.o gbuffer.cpp
-
-${OBJECTDIR}/mesh.o: mesh.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Common/FreetypeGL -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
 
 ${OBJECTDIR}/tutorial35.o: tutorial35.cpp 
 	${MKDIR} -p ${OBJECTDIR}

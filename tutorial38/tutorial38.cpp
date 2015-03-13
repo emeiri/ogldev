@@ -28,7 +28,7 @@
 #endif
 #include <sys/types.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_camera.h"
 #include "ogldev_util.h"
@@ -37,7 +37,7 @@
 #include "texture.h"
 #include "skinning_technique.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_skinned_mesh.h"
 
 using namespace std;
 
@@ -178,7 +178,7 @@ private:
     SkinningTechnique* m_pEffect;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
-    Mesh m_mesh;
+    SkinnedMesh m_mesh;
     Vector3f m_position;            
     PersProjInfo m_persProjInfo;
 };

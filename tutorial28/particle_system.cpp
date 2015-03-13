@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "particle_system.h"
 #include "ogldev_math_3d.h"

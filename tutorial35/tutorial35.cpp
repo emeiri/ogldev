@@ -23,14 +23,14 @@
 #include <GL/freeglut.h>
 #include <string>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
 #include "ds_geom_pass_tech.h"
 #include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "gbuffer.h"
 
 using namespace std;
@@ -179,7 +179,7 @@ private:
 	DSGeomPassTech m_DSGeomPassTech;
     Camera* m_pGameCamera;
     float m_scale;
-    Mesh m_mesh;
+    BasicMesh m_mesh;
     PersProjInfo m_persProjInfo;
     GBuffer m_gbuffer;
 };

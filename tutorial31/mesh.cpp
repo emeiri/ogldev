@@ -18,7 +18,7 @@
 
 #include <assert.h>
 
-#include "engine_common.h"
+#include "ogldev_engine_common.h"
 #include "mesh.h"
 
 

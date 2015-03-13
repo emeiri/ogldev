@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>silhouette_technique.h</itemPath>
     </logicalFolder>
@@ -18,7 +17,6 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>silhouette_technique.cpp</itemPath>
       <itemPath>tutorial39.cpp</itemPath>
@@ -88,10 +86,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -153,10 +147,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
