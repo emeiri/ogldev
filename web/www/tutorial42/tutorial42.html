@@ -1,196 +1,213 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-<table width=100% >
-<tr>
-	<td width=34%><div align=left><a href="../tutorial41/tutorial41.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-        <td width=33%><div align=right><a href="../tutorial43/tutorial43.html" rel="prev"><img src="../next.jpg"></a></div></td>
-</tr>
-</table>
-	
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-<title>Tutorial 42</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title> Tutorial 42 - Percentage Closer Filtering </title>
+
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<div class="content">
-<div class="lines">
-<h1>Tutorial 42 - Percentage Closer Filtering</h1>
-<div style="text-align: center">
-<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
-</div>
-<h2>Background</h2>
-<p>
-In <a href="../tutorial24/tutorial24.html">tutorial 24</a> we saw how to implement shadows
-using a technique called Shadow Mapping. The shadows that result from Shadow Mapping aren't that
-great and there is quite a lot of aliasing there, as you can see in the following picture:
-</p>
-<img src="no_pcf.png">
-<p>
-This tutorial describes a method (one of many) to reduce that problem. It is called <i>Percentage
-Closer Filtering</i>, or PCF. The idea is to sample from the shadow map around the current pixel
-and compare its depth to all the samples. By averaging out the results we get a smoother line
-between light and shadow. For example, take a look at the following shadow map:
-</p>
-<img src="shadow_map.png">
-<p>
-Each cell contains the depth value for each pixel (when viewed from the light source).
-To make life simple, let's say that the depth of all the pixels above is 0.5
-(when viewed from the camera point of view). According to the method from tutorial 24 
-all the pixels whose shadow map value is small than 0.5 will be in shadow while the ones whose
-shadow map value is greater than or equal to 0.5 will be in light. This will create a hard
-aliased line between light and shadow. 
-</p>
-<p>
-Now consider the following - the pixels that are nearest the border between light and shadow
-are surrounded by pixels who shadow map value is smaller than 0.5 as well as pixels whose shadow
-map value is greater than or equal to 0.5. If we sample these neighboring pixels and average out
-the results we will get a factor level that can help us smooth out the border between light and
-shadow. Ofcourse we don't know in advance what pixels are closest to that border so we simply do 
-this sampling work for each pixel. This is basically the entire system. In this tutorial we will sample
-9 pixels in a 3 by 3 kernel around each pixel and average out the result. This will be our shadow
-factor instead of the 0.5 or 1.0 which we have used as a factor in tutorial 24.
-</p>
-<p>
-Let us now review the source code that implements PCF. We will do this by going over the changes made
-to the implementation of tutorial 24. You may want to do a short refresh on that tutorial to make
-things clearer here.
-</p>
-<h2>Code Walkthru</h2>
-<p>(lighting.fs:64)</p>
-<code>
-uniform <b>sampler2DShadow</b> gShadowMap;<br>
-<br>
-#define EPSILON 0.00001<br>
-<br>
-float CalcShadowFactor(vec4 LightSpacePos)<br>
-{<br>
-&nbsp; &nbsp;   vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;<br>
- &nbsp; &nbsp;    vec2 UVCoords;<br>
- &nbsp; &nbsp;    UVCoords.x = 0.5 * ProjCoords.x + 0.5;<br>
- &nbsp; &nbsp;    UVCoords.y = 0.5 * ProjCoords.y + 0.5;<br>
- &nbsp; &nbsp;    float z = 0.5 * ProjCoords.z + 0.5;<br>
-  <br>
- &nbsp; &nbsp;  <b>  float xOffset = 1.0/gMapSize.x;<br>
- &nbsp; &nbsp;    float yOffset = 1.0/gMapSize.y;<br>
-<br>
- &nbsp; &nbsp;    float Factor = 0.0;<br>
-<br>
- &nbsp; &nbsp;    for (int y = -1 ; y <= 1 ; y++) {<br>
- &nbsp; &nbsp; &nbsp; &nbsp;        for (int x = -1 ; x <= 1 ; x++) {<br>
- &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            vec2 Offsets = vec2(x * xOffset, y * yOffset);<br>
- &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            vec3 UVC = vec3(UVCoords + Offsets, z + EPSILON);<br>
- &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            Factor += texture(gShadowMap, UVC);<br>
- &nbsp; &nbsp; &nbsp; &nbsp;        }<br>
- &nbsp; &nbsp;    }<br>
-    <br>
- &nbsp; &nbsp;    return (0.5 + (Factor / 18.0));</b><br>
-}
-</code>
-<p>
-This is the updated shadow factor calculation function. It starts out the same where we manually
-perform perspective divide on clip space coordinates from the light source point of view, followed
-by a transformation from the (-1,+1) range to (0,1). We now have coordinates that we can use to 
-sample from the shadow map and a Z value to compare against the sample result. From here on things
-are going to roll a bit differently. We are going to sample a 3 by 3 kernel so we need 9 texture coordinates
-altogether. The coordinates must result in sampling texels that are on one texel intervals on the X and/or Y
-axis. Since UV texture coordinates run from 0 to 1 and map into the texel ranges (0, Width-1) and (0, Height-1), 
-respectively, we divide 1 by the width and height of the texture. These values are stored in the gMapSize 
-uniform vector (see sources for more details). This gives us the offset in the texture coordinates space
-between two neighboring texels.
-</p>
-<p>
-Next we perform a nested for loop and calculate the offset vector for each of the 9 texels we are going
-to sample. The last couple of lines inside the loop may seem a bit odd. We sample from the shadow map
-using a vector with 3 components (UVC) instead of just 2. The last component contains the value which we used
-in tutorial 24 to manually compare against the value from the shadow map (the light source Z plus a small epsilon
-to avoid Z-fighting). The change here is that we are using a sampler2DShadow as the type of 'gShadowMap' instead of
-a sampler2D. When sampling from a shadow typed sampler (sampler1DShadow, sampler2DShadow, etc) the GPU
-performs a comparison between the texel value and a value that we supply as the last component of 
-the texture coordinate vector (the second component for 1D, the third component for 2D, etc). We get a zero
-result if the comparison fails and one if the comparison succeeds. The type of comparison is configured
-using a GL API and not through GLSL. We will see this change later on. For now, just assume that we
-get a zero result for shadow and one for light. We accumulate the 9 results and divide them by 18. Thus
-we get a value between 0 and 0.5. We add it to a base of 0.5 and this is our shadow factor.
-</p>
-<p>(shadow_map_fbo.cpp:39)</p>
-<code>
-bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)<br>
-{<br>
-&nbsp;  &nbsp;   // Create the FBO<br>
- &nbsp;  &nbsp;    glGenFramebuffers(1, &m_fbo);<br>
-<br>
- &nbsp;  &nbsp;    // Create the depth buffer<br>
- &nbsp;  &nbsp;    glGenTextures(1, &m_shadowMap);<br>
- &nbsp;  &nbsp;    glBindTexture(GL_TEXTURE_2D, m_shadowMap);<br>
- &nbsp;  &nbsp;    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);<br>
- &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br>
- &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br>
- &nbsp;  &nbsp;<b>    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);<br>
- &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);<br></b>
- &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);<br>
- &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);<br>
-<br>
- &nbsp;  &nbsp;    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);<br>
- &nbsp;  &nbsp;    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);<br>
-<br>
- &nbsp;  &nbsp;    // Disable writes to the color buffer<br>
- &nbsp;  &nbsp;    glDrawBuffer(GL_NONE);<br>
-       <br>
- &nbsp;  &nbsp;    // Disable reads from the color buffer<br>
- &nbsp;  &nbsp;    glReadBuffer(GL_NONE);<br>
-<br>
- &nbsp;  &nbsp;    GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
-<br>
- &nbsp;  &nbsp;    if (Status != GL_FRAMEBUFFER_COMPLETE) {<br>
- &nbsp;  &nbsp; &nbsp;  &nbsp;        printf("FB error, status: 0x%x\n", Status);<br>
- &nbsp;  &nbsp; &nbsp;  &nbsp;        return false;<br>
- &nbsp;  &nbsp;    }<br>
-<br>
- &nbsp;  &nbsp;    return true;<br>
-}
-</code>
-<p>
-This is how we configure our shadow map texture to work with the shadow sampler in the shader 
-instead of the regular sampler. There are two new lines here and they are marked in bold face.
-First we set the texture compare mode to 'compare ref to texture'. The only other possible value for
-the third parameter here is GL_NONE which is the default and makes the sampler behave in the regular, non-shadow, form.
-The second call to glTexParameteri sets the comparison function to 'less than or equal'. This means that the result
-of the sample operation will be 1.0 if the reference value is less than or equal to the value in the texture
-and zero otherwise. You can also use GL_GEQUAL, GL_LESS, GL_GREATER, GL_EQUAL, GL_NOTEQUAL for similar types of comparisons.
-You get the idea. There are also GL_ALWAYS which always return 1.0 and GL_NEVER which always return 0.0.
-</p>
-<p>(tutorial42.cpp:174)</p>
-<code>
-void ShadowMapPass()<br>
-{<br>
- &nbsp;  &nbsp; glCullFace(GL_FRONT);<br>
- &nbsp;  &nbsp; ...<br>
-}<br>
-<br><br>
-void RenderPass()<br>
-{<br>
- &nbsp;  &nbsp; glCullFace(GL_BACK);<br>
- &nbsp;  &nbsp; ...<br>
-}
-</code>
-<p>
-The last point that I want to discuss is a minor change intended to avoid self shadowing. Self shadowing
-is a big problem when dealing with almost any shadowing technique and the reason is that the precision
-of the depth buffer is quite limited (even at 32 bits). The problem is specific to the polygons that are facing
-the light and are not in shadow. In the shadow map pass we render their depth into the shadow map and in the
-render pass we compare their depth against the value stored in the shadow map. Due to the depth precision
-problem we often get Z fighting which leads to some pixels being in shadow while others are in light. To 
-reduce this problem we reverse culling so that we cull front facing polygons in the shadow map pass (and
-render only the back facing polygons into the shadow map). In the render pass we are back to the usual culling.
-Since real world occluders are generally closed volumes it is ok to use the back facing polygons for depth
-comparison and not the front facing ones. You should try to disable the code above and see the results for
-yourself.
-</p>
-<p>
-After applying all the changes that we discussed the shadow looks like this:
-</p>
-<img src="pcf.png">
+	<header id="header">
+		<div>
+			<h2> Tutorial 42: </h2>
+			<h1> Percentage Closer Filtering </h1>
+		</div>
+
+		<a id="logo" class="small" href="../../index.html" title="Homepage">
+			<img src="..//logo ldpi.png">
+		</a>
+	</header>
+
+	<article id="content" class="breakpoint">
+		<section>
+			<h3> Background </h3>
+
+			<p>
+			In <a href="../tutorial24/tutorial24.html">tutorial 24</a> we saw how to implement shadows
+			using a technique called Shadow Mapping. The shadows that result from Shadow Mapping aren't that
+			great and there is quite a lot of aliasing there, as you can see in the following picture:
+			</p>
+			<img class="center" src="no_pcf.png">
+			<p>
+			This tutorial describes a method (one of many) to reduce that problem. It is called <i>Percentage
+			Closer Filtering</i>, or PCF. The idea is to sample from the shadow map around the current pixel
+			and compare its depth to all the samples. By averaging out the results we get a smoother line
+			between light and shadow. For example, take a look at the following shadow map:
+			</p>
+			<img class="center" src="shadow_map.png">
+			<p>
+			Each cell contains the depth value for each pixel (when viewed from the light source).
+			To make life simple, let's say that the depth of all the pixels above is 0.5
+			(when viewed from the camera point of view). According to the method from tutorial 24 
+			all the pixels whose shadow map value is small than 0.5 will be in shadow while the ones whose
+			shadow map value is greater than or equal to 0.5 will be in light. This will create a hard
+			aliased line between light and shadow. 
+			</p>
+			<p>
+			Now consider the following - the pixels that are nearest the border between light and shadow
+			are surrounded by pixels who shadow map value is smaller than 0.5 as well as pixels whose shadow
+			map value is greater than or equal to 0.5. If we sample these neighboring pixels and average out
+			the results we will get a factor level that can help us smooth out the border between light and
+			shadow. Ofcourse we don't know in advance what pixels are closest to that border so we simply do 
+			this sampling work for each pixel. This is basically the entire system. In this tutorial we will sample
+			9 pixels in a 3 by 3 kernel around each pixel and average out the result. This will be our shadow
+			factor instead of the 0.5 or 1.0 which we have used as a factor in tutorial 24.
+			</p>
+			<p>
+			Let us now review the source code that implements PCF. We will do this by going over the changes made
+			to the implementation of tutorial 24. You may want to do a short refresh on that tutorial to make
+			things clearer here.
+			</p>
+		</section>
+
+		<section>
+			<h3> Source walkthru </h3>
+
+			<p>(lighting.fs:64)</p>
+			<code>
+			uniform <b>sampler2DShadow</b> gShadowMap;<br>
+			<br>
+			#define EPSILON 0.00001<br>
+			<br>
+			float CalcShadowFactor(vec4 LightSpacePos)<br>
+			{<br>
+			&nbsp; &nbsp;   vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;<br>
+			 &nbsp; &nbsp;    vec2 UVCoords;<br>
+			 &nbsp; &nbsp;    UVCoords.x = 0.5 * ProjCoords.x + 0.5;<br>
+			 &nbsp; &nbsp;    UVCoords.y = 0.5 * ProjCoords.y + 0.5;<br>
+			 &nbsp; &nbsp;    float z = 0.5 * ProjCoords.z + 0.5;<br>
+			  <br>
+			 &nbsp; &nbsp;  <b>  float xOffset = 1.0/gMapSize.x;<br>
+			 &nbsp; &nbsp;    float yOffset = 1.0/gMapSize.y;<br>
+			<br>
+			 &nbsp; &nbsp;    float Factor = 0.0;<br>
+			<br>
+			 &nbsp; &nbsp;    for (int y = -1 ; y &lt;= 1 ; y++) {<br>
+			 &nbsp; &nbsp; &nbsp; &nbsp;        for (int x = -1 ; x &lt;= 1 ; x++) {<br>
+			 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            vec2 Offsets = vec2(x * xOffset, y * yOffset);<br>
+			 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            vec3 UVC = vec3(UVCoords + Offsets, z + EPSILON);<br>
+			 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            Factor += texture(gShadowMap, UVC);<br>
+			 &nbsp; &nbsp; &nbsp; &nbsp;        }<br>
+			 &nbsp; &nbsp;    }<br>
+			    <br>
+			 &nbsp; &nbsp;    return (0.5 + (Factor / 18.0));</b><br>
+			}
+			</code>
+			<p>
+			This is the updated shadow factor calculation function. It starts out the same where we manually
+			perform perspective divide on clip space coordinates from the light source point of view, followed
+			by a transformation from the (-1,+1) range to (0,1). We now have coordinates that we can use to 
+			sample from the shadow map and a Z value to compare against the sample result. From here on things
+			are going to roll a bit differently. We are going to sample a 3 by 3 kernel so we need 9 texture coordinates
+			altogether. The coordinates must result in sampling texels that are on one texel intervals on the X and/or Y
+			axis. Since UV texture coordinates run from 0 to 1 and map into the texel ranges (0, Width-1) and (0, Height-1), 
+			respectively, we divide 1 by the width and height of the texture. These values are stored in the gMapSize 
+			uniform vector (see sources for more details). This gives us the offset in the texture coordinates space
+			between two neighboring texels.
+			</p>
+			<p>
+			Next we perform a nested for loop and calculate the offset vector for each of the 9 texels we are going
+			to sample. The last couple of lines inside the loop may seem a bit odd. We sample from the shadow map
+			using a vector with 3 components (UVC) instead of just 2. The last component contains the value which we used
+			in tutorial 24 to manually compare against the value from the shadow map (the light source Z plus a small epsilon
+			to avoid Z-fighting). The change here is that we are using a sampler2DShadow as the type of 'gShadowMap' instead of
+			a sampler2D. When sampling from a shadow typed sampler (sampler1DShadow, sampler2DShadow, etc) the GPU
+			performs a comparison between the texel value and a value that we supply as the last component of 
+			the texture coordinate vector (the second component for 1D, the third component for 2D, etc). We get a zero
+			result if the comparison fails and one if the comparison succeeds. The type of comparison is configured
+			using a GL API and not through GLSL. We will see this change later on. For now, just assume that we
+			get a zero result for shadow and one for light. We accumulate the 9 results and divide them by 18. Thus
+			we get a value between 0 and 0.5. We add it to a base of 0.5 and this is our shadow factor.
+			</p>
+			<p>(shadow_map_fbo.cpp:39)</p>
+			<code>
+			bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)<br>
+			{<br>
+			&nbsp;  &nbsp;   // Create the FBO<br>
+			 &nbsp;  &nbsp;    glGenFramebuffers(1, &amp;m_fbo);<br>
+			<br>
+			 &nbsp;  &nbsp;    // Create the depth buffer<br>
+			 &nbsp;  &nbsp;    glGenTextures(1, &amp;m_shadowMap);<br>
+			 &nbsp;  &nbsp;    glBindTexture(GL_TEXTURE_2D, m_shadowMap);<br>
+			 &nbsp;  &nbsp;    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);<br>
+			 &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br>
+			 &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br>
+			 &nbsp;  &nbsp;<b>    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);<br>
+			 &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);<br></b>
+			 &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);<br>
+			 &nbsp;  &nbsp;    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);<br>
+			<br>
+			 &nbsp;  &nbsp;    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);<br>
+			 &nbsp;  &nbsp;    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);<br>
+			<br>
+			 &nbsp;  &nbsp;    // Disable writes to the color buffer<br>
+			 &nbsp;  &nbsp;    glDrawBuffer(GL_NONE);<br>
+			       <br>
+			 &nbsp;  &nbsp;    // Disable reads from the color buffer<br>
+			 &nbsp;  &nbsp;    glReadBuffer(GL_NONE);<br>
+			<br>
+			 &nbsp;  &nbsp;    GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
+			<br>
+			 &nbsp;  &nbsp;    if (Status != GL_FRAMEBUFFER_COMPLETE) {<br>
+			 &nbsp;  &nbsp; &nbsp;  &nbsp;        printf("FB error, status: 0x%x\n", Status);<br>
+			 &nbsp;  &nbsp; &nbsp;  &nbsp;        return false;<br>
+			 &nbsp;  &nbsp;    }<br>
+			<br>
+			 &nbsp;  &nbsp;    return true;<br>
+			}
+			</code>
+			<p>
+			This is how we configure our shadow map texture to work with the shadow sampler in the shader 
+			instead of the regular sampler. There are two new lines here and they are marked in bold face.
+			First we set the texture compare mode to 'compare ref to texture'. The only other possible value for
+			the third parameter here is GL_NONE which is the default and makes the sampler behave in the regular, non-shadow, form.
+			The second call to glTexParameteri sets the comparison function to 'less than or equal'. This means that the result
+			of the sample operation will be 1.0 if the reference value is less than or equal to the value in the texture
+			and zero otherwise. You can also use GL_GEQUAL, GL_LESS, GL_GREATER, GL_EQUAL, GL_NOTEQUAL for similar types of comparisons.
+			You get the idea. There are also GL_ALWAYS which always return 1.0 and GL_NEVER which always return 0.0.
+			</p>
+			<p>(tutorial42.cpp:174)</p>
+			<code>
+			void ShadowMapPass()<br>
+			{<br>
+			 &nbsp;  &nbsp; glCullFace(GL_FRONT);<br>
+			 &nbsp;  &nbsp; ...<br>
+			}<br>
+			<br><br>
+			void RenderPass()<br>
+			{<br>
+			 &nbsp;  &nbsp; glCullFace(GL_BACK);<br>
+			 &nbsp;  &nbsp; ...<br>
+			}
+			</code>
+			<p>
+			The last point that I want to discuss is a minor change intended to avoid self shadowing. Self shadowing
+			is a big problem when dealing with almost any shadowing technique and the reason is that the precision
+			of the depth buffer is quite limited (even at 32 bits). The problem is specific to the polygons that are facing
+			the light and are not in shadow. In the shadow map pass we render their depth into the shadow map and in the
+			render pass we compare their depth against the value stored in the shadow map. Due to the depth precision
+			problem we often get Z fighting which leads to some pixels being in shadow while others are in light. To 
+			reduce this problem we reverse culling so that we cull front facing polygons in the shadow map pass (and
+			render only the back facing polygons into the shadow map). In the render pass we are back to the usual culling.
+			Since real world occluders are generally closed volumes it is ok to use the back facing polygons for depth
+			comparison and not the front facing ones. You should try to disable the code above and see the results for
+			yourself.
+			</p>
+			<p>
+			After applying all the changes that we discussed the shadow looks like this:
+			</p>
+			<img class="center" src="pcf.png">
+		</section>
+
+		<a href="../tutorial43/tutorial43.html" class="next highlight"> Next tutorial </a>
+	</article>
+
+	<script src="../html5shiv.min.js"></script>
+	<script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>
