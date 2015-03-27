@@ -38,7 +38,7 @@ private:
     
     void GenKernel();
     
-    const static uint KERNEL_SIZE = 128;
+    const static uint KERNEL_SIZE = 64;
 
     GLuint m_posTextureUnitLocation;
     GLuint m_sampleRadLocation;    

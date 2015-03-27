@@ -8,7 +8,7 @@ uniform sampler2D gPositionMap;
 uniform float gSampleRad;
 uniform mat4 gProj;
 
-const int MAX_KERNEL_SIZE = 128;
+const int MAX_KERNEL_SIZE = 64;
 uniform vec3 gKernel[MAX_KERNEL_SIZE];
 
 void main()
@@ -28,13 +28,10 @@ void main()
 
         if (abs(Pos.z - sampleDepth) < gSampleRad) {
             AO += step(sampleDepth,samplePos.z);
-           // if (sampleDepth <= samplePos.z) {
-           //    AO += 1.0/128.0;
-          //  }
         }
     }
 
-    AO = 1.0 - AO/128.0;
+    AO = 1.0 - AO/64.0;
  
     FragColor = vec4(pow(AO, 2.0));
 }

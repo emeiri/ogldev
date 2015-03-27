@@ -74,10 +74,10 @@ public:
 
     bool Init()
     {
-       Vector3f Pos(0.0f, 23.0f, -5.0f);
-        Vector3f Target(-1.0f, 0.0f, 0.1f);
-     //   Vector3f Pos(0.0f, 0.0f, -5.0f);
-   //     Vector3f Target(0.0f, 0.0f, 1.0f);
+   //    Vector3f Pos(0.0f, 23.0f, -5.0f);
+  //      Vector3f Target(-1.0f, 0.0f, 0.1f);
+        Vector3f Pos(0.0f, 24.0f, -38.0f);
+        Vector3f Target(0.0f, -0.5f, 1.0f);
 
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -114,8 +114,8 @@ public:
             return false;
         }                
         
-      //  if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
-      if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
+        //if (!m_mesh.LoadMesh("../Content/crytek_sponza/sponza.obj")) {
+        if (!m_mesh.LoadMesh("../Content/jeep.obj")) {
             return false;            
         }        
      
