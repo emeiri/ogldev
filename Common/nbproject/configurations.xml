@@ -15,11 +15,9 @@
       <itemPath>../Include/ogldev_engine_common.h</itemPath>
       <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
-      <itemPath>../Include/ogldev_io_buffer.h</itemPath>
       <itemPath>../Include/ogldev_keys.h</itemPath>
       <itemPath>../Include/ogldev_math_3d.h</itemPath>
       <itemPath>../Include/ogldev_pipeline.h</itemPath>
-      <itemPath>../Include/ogldev_random_texture.h</itemPath>
       <itemPath>../Include/ogldev_skinned_mesh.h</itemPath>
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
@@ -36,7 +34,6 @@
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
-      <itemPath>io_buffer.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>ogldev_app.cpp</itemPath>
       <itemPath>ogldev_backend.cpp</itemPath>
@@ -47,7 +44,6 @@
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
-      <itemPath>random_texture.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
       <itemPath>FreetypeGL/texture-atlas.c</itemPath>
       <itemPath>FreetypeGL/texture-font.c</itemPath>
@@ -108,15 +104,11 @@
       </item>
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="../Include/ogldev_io_buffer.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_random_texture.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_skinned_mesh.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -152,8 +144,6 @@
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="io_buffer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
@@ -173,8 +163,6 @@
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="random_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -224,15 +212,11 @@
       </item>
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="../Include/ogldev_io_buffer.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_pipeline.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_random_texture.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_skinned_mesh.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -268,8 +252,6 @@
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="io_buffer.cpp" ex="false" tool="1" flavor2="0">
-      </item>
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
@@ -289,8 +271,6 @@
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="random_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

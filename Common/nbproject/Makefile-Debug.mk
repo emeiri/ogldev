@@ -46,7 +46,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/camera.o \
 	${OBJECTDIR}/cubemap_texture.o \
 	${OBJECTDIR}/glut_backend.o \
-	${OBJECTDIR}/io_buffer.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/ogldev_app.o \
 	${OBJECTDIR}/ogldev_backend.o \
@@ -57,7 +56,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
 	${OBJECTDIR}/pipeline.o \
-	${OBJECTDIR}/random_texture.o \
 	${OBJECTDIR}/technique.o
 
 
@@ -142,11 +140,6 @@ ${OBJECTDIR}/glut_backend.o: glut_backend.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glut_backend.o glut_backend.cpp
 
-${OBJECTDIR}/io_buffer.o: io_buffer.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/io_buffer.o io_buffer.cpp
-
 ${OBJECTDIR}/math_3d.o: math_3d.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -196,11 +189,6 @@ ${OBJECTDIR}/pipeline.o: pipeline.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
-
-${OBJECTDIR}/random_texture.o: random_texture.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/random_texture.o random_texture.cpp
 
 ${OBJECTDIR}/technique.o: technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}
