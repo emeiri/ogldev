@@ -1,389 +1,406 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-<table width=100% >
-<tr>
-	<td width=34%><div align=left"><a href="../tutorial34/tutorial34.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-    <td width=33%><div align=right><a href="../tutorial36/tutorial36.html" rel="home"><img src="../next.jpg"></a></div></td>
-</tr>
-</table>
-	
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-<title>Tutorial 35</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 35 - Deferred Shading - Part 1 </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<div class="content">
-<div class="lines">
-<h1>Tutorial 35 - Deferred Shading - Part 1</h1>
-<div style="text-align: center">
-<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
-</div>
-<h2>Background</h2>
-<p>
-The way we've been doing lighting since <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
-is known as <i>Forward Rendering (or Shading)</i>. 
-This is a straightforward approach where we do a set of transformations on the vertices of every
-object in the VS (mostly translations of the normal and position to clip space) followed by a lighting
-calculation per pixel in the FS. Since each pixel of every object gets only a single FS invocation we have 
-to provide the FS with information on all light sources and take all of them into account when
-calculating the light effect per pixel. This is a simple approach but it has its downsides. 
-If the scene is highly complex (as is the case in most modern games) with many objects and a large depth
-complexity (same screen pixel covered by several objects) we get a lot of wasted GPU cycles. For example,
-if the depth complexity is 4 it means that the lighting calculations are executed on 3 pixels for nothing
-because only the topmost pixel counts. We can try to counter that by sorting the objects front to back
-but that doesn't always work well with complex objects.
-</p>
-<p>
-Another problem with forward rendering is when there are many light sources. In that case the light sources
-tend to be rather small with a limited area of effect (else it will overwhelm the scene). But our FS 
-calculates the effect of every light source, even if it is far away from the pixel.
-You can try to calculate the distance from the pixel to the light source
-but that just adds more overhead and branches into the FS. Forward rendering simply doesn't scale well with
-many light sources. Just image the amount of computation the FS needs to do when there are hundreds of light
-sources...
-</p>
-<p>
-Deferred shading is a popular technique in  
-<a href="http://en.wikipedia.org/wiki/Deferred_shading#Deferred_shading_in_commercial_games"> many games</a>
-which targets the specific problem above.
-The key point behind deferred shading is the decoupling of the geometry calculations (position and normal 
-transformations) and the lighting calculations. Instead of taking each
-object "all the way", from the vertex buffer into its final resting place in the framebuffer we seperate the
-processing into two major passes. In the first pass we run the usual VS but instead of sending the processed
-attributes into the FS for lighting calculations we forward them into what is known as the <i>G Buffer</i>. This
-is a logical grouping of several 2D textures and we have a texture per vertex attribute. We seperate the attributes
-and write them into the different textures all at once using a capability of OpenGL called <i>Multiple Render 
-Targets</i> (MRT). Since we are writing the attributes in the FS the values that end up in the G buffer are
- the result of the interpolation performed by the rasterizer on the vertex attributes. This stage is called the 
-<i>Geometry Pass</i>. Every object is processed in this pass. Because of the depth test, when the geometry 
-pass is complete the textures in the G buffer are populated by the interpolated attributes of the closest 
-pixels to the camera. This means that all the "irrelevant" pixels that have failed the depth test have been
-dropped and what is left in the G buffer are only the pixels for which lighting must be calculated. Here's a 
-typical example of a G buffer of a single frame:
-</p>
-<img src="gbuffer.jpg">
-<p>
-In the second pass (known as the <i>Lighting Pass</i>) we go over the G buffer pixel by pixel, sample all the pixel
-attributes from the different textures and do the lighting calculations in pretty much the same way that we are used
-to. Since all the pixels except the closest ones were already dropped when we created the G buffer we do the lighting
-calculations only once per pixel.
-</p>
-<p>
-How do we traverse the G buffer pixel by pixel? The simplest method is to render a screen space quad. But there is a 
-better way. We said earlier that since the light sources are weak with a limited area of influence we expect many
-pixels to be irrelevant to them. When the influence of a light source on a pixel is small enough it is better to
-simply ignore it for peformance reasons. In forward rendering there was no efficient way to do that but in deferred
-shading we can calculate the dimentions of a sphere around the light source (for points lights; for spot lights we
-use a cone). That sphere represents the area of influence of the light and outside of it we want to ignore this light source.
-We can use a very rough model of a sphere with a small number of polygons and simply render it with the light
-source at the center. The VS will do nothing except translate the position into clip space. The FS will be executed
-only on the relevant pixels and we will do our lighting calculations there. Some people go even further by calculating
-a minimal bounding quad that covers that sphere from the point of view of the light. Rendering this quad is even 
-lighter because there's only two triangles. These methods are useful to limit the number of pixels for which the 
-FS is executed to only the ones we are really interested in.
-</p>
-<p>
-<p>We will cover deferred shading in three steps (and three tutorials):
-<ol>
-<li>In this tutorial we will populate the G buffer using MRT. We will dump the contents of the G buffer to the screen
-to make sure we got it correctly.</li>
-<li>In the next tutorial we will add the light pass and get lighting working in true deferred shading fashion.</li>
-<li>Finally, we will learn how to use the stencil buffer to prevent small points lights from lighting objects that are further off (a problem which will become evident by the end of the second tutorial).</li>
-</ol>
-</p>
-<h2>Code Walkthru</h2>
-<p>(gbuffer.h:28)</p>
-<code>
-class GBuffer<br>
-{<br>
-public:<br>
-<br>
-&nbsp; &nbsp;   enum GBUFFER_TEXTURE_TYPE {<br>
- &nbsp; &nbsp; &nbsp; &nbsp;        GBUFFER_TEXTURE_TYPE_POSITION,<br>
- &nbsp; &nbsp;  &nbsp; &nbsp;       GBUFFER_TEXTURE_TYPE_DIFFUSE,<br>
- &nbsp; &nbsp; &nbsp; &nbsp;        GBUFFER_TEXTURE_TYPE_NORMAL,<br>
- &nbsp; &nbsp;  &nbsp; &nbsp;       GBUFFER_TEXTURE_TYPE_TEXCOORD,<br>
- &nbsp; &nbsp;   &nbsp; &nbsp;       GBUFFER_NUM_TEXTURES<br>
- &nbsp; &nbsp;    };<br>
-    <br>
- &nbsp; &nbsp;    GBuffer();<br>
-<br>
- &nbsp; &nbsp;    ~GBuffer();<br>
-<br>
- &nbsp; &nbsp;    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);<br>
-<br>
- &nbsp; &nbsp;    void BindForWriting();<br>
-<br>
- &nbsp; &nbsp;    void BindForReading();<br>
-<br>
-private:<br>
-<br>
- &nbsp; &nbsp;    GLuint m_fbo;<br>
- &nbsp; &nbsp;    GLuint m_textures[GBUFFER_NUM_TEXTURES];<br>
- &nbsp; &nbsp;    GLuint m_depthTexture;<br>
-};
-</code>
-<p>
-The GBuffer class contains all the textures that the G buffer in deferred shading needs.
-We have textures for the vertex attributes as well as a texture to serve as our depth buffer.
-We need this depth buffer because we are going to wrap all the textures in an FBO so the default
-depth buffer will not be available. FBOs have already been covered in 
-<a href="../tutorial23/tutorial23.html">tutorial 23</a> so we will skip that here.
-</p>
-<p>
-The GBuffer class also has two methods that will be repeatedly called at runtime - BindForWriting()
-binds the textures as a target during the geometry pass and BindForReading() binds the FBO as input
-so its contents can be dumped to the screen.
-</p>
-<p>(gbuffer.cpp:48)</p>
-<code>
-bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)<br>
-{<br>
-&nbsp; &nbsp;   // Create the FBO<br>
-&nbsp; &nbsp;   glGenFramebuffers(1, &m_fbo);    <br>
-&nbsp; &nbsp; glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);<br>
-<br>
-&nbsp; &nbsp;   // Create the gbuffer textures<br>
-&nbsp; &nbsp;   glGenTextures(ARRAY_SIZE_IN_ELEMENTS(m_textures), m_textures);<br>
-&nbsp; &nbsp; glGenTextures(1, &m_depthTexture);<br>
-    <br>
-&nbsp; &nbsp;   for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_textures) ; i++) {<br>
-&nbsp; &nbsp;&nbsp; &nbsp;   	glBindTexture(GL_TEXTURE_2D, m_textures[i]);<br>
-&nbsp; &nbsp;&nbsp; &nbsp;       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);<br>
-&nbsp; &nbsp;&nbsp; &nbsp;       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);<br>
-&nbsp; &nbsp;   }<br>
-<br>
-&nbsp; &nbsp; // depth<br>
-&nbsp; &nbsp; glBindTexture(GL_TEXTURE_2D, m_depthTexture);<br>
-&nbsp; &nbsp; glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT,<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; NULL);<br>
-&nbsp; &nbsp; glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);<br>
-<br>
-&nbsp; &nbsp; GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-<br>
- &nbsp; &nbsp; glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);<br>
-<br>
- &nbsp; &nbsp; GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
-<br>
- &nbsp; &nbsp; if (Status != GL_FRAMEBUFFER_COMPLETE) {<br>
- &nbsp; &nbsp; &nbsp; &nbsp;      printf("FB error, status: 0x%x\n", Status);<br>
- &nbsp; &nbsp; &nbsp; &nbsp;     return false;<br>
- &nbsp; &nbsp; }<br>
-<br>
-&nbsp; &nbsp; // restore default FBO<br>
-&nbsp; &nbsp; glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);<br>
-<br>
-&nbsp; &nbsp;   return true;<br>
-}
-</code>
-<p>
-This is how we initialize the G buffer. We start by creating the FBO and textures for the
-vertex attributes and the depth buffer. The vertex attributes textures are then initialized
-in a loop that does the following:
-<ul>
-<li>Creates the storage area of the texture (without initializing it).</li>
-<li>Attaches the texture to the FBO as a target.</li>
-</ul>
-<p>
-Initialization of the depth texture is done explicitly because it requires a different format 
-and is attached to the FBO at a different spot.
-</p>
-<p>
-In order to do MRT we need to enable writing to all four textures. We do that by supplying an array
-of attachment locations to the glDrawBuffers() function. This array allows for some level of flexibility
-because if we put GL_COLOR_ATTACHMENT6 as its first index then when the FS writes to the first output variable
-it will go into the texture that is attached to GL_COLOR_ATTACHMENT6. We are not interested in this 
-complexity in this tutorial so we simply line the attachments one after the other.
-</p>
-<p>
-Finally, we check the FBO status to make sure everything was done correctly and restore the
-default FBO (so that further changes will not affect our G buffer). The G buffer is ready for use.
-</p>
-<p>(tutorial35.cpp:105)</p>
-<code>
-virtual void RenderSceneCB()<br>
-{   <br>
-&nbsp; &nbsp; CalcFPS();<br>
-        <br>
-&nbsp; &nbsp; m_scale += 0.05f;<br>
-<br>
-&nbsp; &nbsp; m_pGameCamera->OnRender();<br>
-<br>
-&nbsp; &nbsp; DSGeometryPass();<br>
-&nbsp; &nbsp; DSLightPass();<br>
-                  <br>          
-&nbsp; &nbsp; RenderFPS();<br>
-        <br>
-&nbsp; &nbsp; glutSwapBuffers();<br>
-}
-</code>
-<p>
-Let's now review the implementation top down. The function above is the main render function
-and it doesn't have a lot to do. It handles a few "global" stuff such as frame rate calculation
-and display, camera update, etc. Its main job is to execute the geometry pass followed by the light pass.
-As I mentioned earlier, in this tutorial we are just generating the G buffer so our "light pass" doesn't
-really do deferred shading. It just dumps the G buffer to the screen.
-</p>
-<p>(tutorial35.cpp:122)</p>
-<code>
-void DSGeometryPass()<br>
-{<br>
-&nbsp; &nbsp; m_DSGeomPassTech.Enable();<br>
-<br>
-&nbsp; &nbsp; m_gbuffer.BindForWriting();<br>
-<br>
-&nbsp; &nbsp; glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
-<br>
-&nbsp; &nbsp; Pipeline p;<br>
-&nbsp; &nbsp; p.Scale(0.1f, 0.1f, 0.1f);<br>
-&nbsp; &nbsp; p.Rotate(0.0f, m_scale, 0.0f);<br>
-&nbsp; &nbsp; p.WorldPos(-0.8f, -1.0f, 12.0f);<br>
-&nbsp; &nbsp; p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
-&nbsp; &nbsp; p.SetPerspectiveProj(m_persProjInfo);<br>
-&nbsp; &nbsp; m_DSGeomPassTech.SetWVP(p.GetWVPTrans());        <br>
-&nbsp; &nbsp; m_DSGeomPassTech.SetWorldMatrix(p.GetWorldTrans());<br>
-&nbsp; &nbsp; m_mesh.Render();<br>
-        <br>
-}
-</code>
-<p>
-We start the geometry pass by enabling the proper technique and setting the GBuffer object for writing. After
-that we clear the G buffer (glClear() works on the current FBO which is our G buffer).
-Now that everything is ready we setup the transformations and render the mesh. In a real game we
-would probably render many meshes here one after the other. When we are done the G buffer will contain
-the attributes of the closest pixels which will enable us to do the light pass.
-</p>
-<p>(tutorial35.cpp:141)</p>
-<code>
-void DSLightPass()<br>
-{<br>
-&nbsp; &nbsp; glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
-<br>
-&nbsp; &nbsp; glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
-<br>
-&nbsp; &nbsp; m_gbuffer.BindForReading();<br>
-<br>
-&nbsp; &nbsp; GLsizei HalfWidth = (GLsizei)(WINDOW_WIDTH / 2.0f);<br>
-&nbsp; &nbsp; GLsizei HalfHeight = (GLsizei)(WINDOW_HEIGHT / 2.0f);<br>
-<br>
-&nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_POSITION);<br>
-&nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0, 0, HalfWidth, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);<br>
-<br>
-&nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_DIFFUSE);<br>
-&nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, <br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0, HalfHeight, HalfWidth, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);<br>
-<br>
-&nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);<br>
-&nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, <br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HalfWidth, HalfHeight, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);<br>
-<br>
-&nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_TEXCOORD);<br>
-&nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, <br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HalfWidth, 0, WINDOW_WIDTH, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);	<br>
-}
-</code>
-<p>
-The light pass starts by restoring the default FBO (the screen) and clearing it. Next we
-bind the FBO of the G buffer for reading. We now want to copy from the G buffer textures
-into the screen. One way to do that is to write a simple program where the FS samples from a
-texture and outputs the result. If we draw a full screen quad with texture coordinates that
-go from [0,0] to [1,1] we would get the result that we want. But there is a better way. OpenGL
-provides means to copy from one FBO to another using a single call and without all the setup overhead
-than the other method incurs. The function glBlitFramebuffer() takes the source coordinates, destination
-coordinates and a couple of other variables and performs the copy operation. It requires the source FBO
-to be bound to the GL_READ_FRAMEBUFFER and the destination FBO to the GL_DRAW_FRAMEBUFFER (which we did at
-the start of the function). Since the FBO can have several textures attached to its various attachment locations 
-we must also bind the specific texture to the GL_READ_BUFFER target (because we can only copy from a single
-texture at a time). This is hidden inside GBuffer::SetReadBuffer()
-which we will review in a bit. The first four parameters to glBlitframebuffer() defines the source rectangle - 
-bottom X, bottom Y, top X, top Y. The next four parameters define the destination rectangle in the same way. 
-</p>
-<p>
-The ninth parameter says whether we want to read from the color, depth or stencil buffer and can take the
-values GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, or GL_STENCIL_BUFFER_BIT. The last parameter determines the
-way in which OpenGL will handle possible scaling (when the source and destination parameters are not of the
-same dimensions) and can be GL_NEAREST or GL_LINEAR (looks better than GL_NEAREST but requires more compute 
-resources). GL_LINEAR is the only valid option in the case of GL_COLOR_BUFFER_BIT. In the example above we
-see how to scale down each source texture into one of the screen quadrants.
-</p>
-<p>(geometry_pass.vs)</p>
-<code>
-#version 330                                                                        <br>
-                                                                                    <br>
-layout (location = 0) in vec3 Position;                                             <br>
-layout (location = 1) in vec2 TexCoord;                                             <br>
-layout (location = 2) in vec3 Normal;                                               <br>
-<br>
-uniform mat4 gWVP;<br>
-uniform mat4 gWorld;<br>
-                        <br>                
-out vec2 TexCoord0;         <br>                                                        
-out vec3 Normal0;               <br>                                                    
-out vec3 WorldPos0;                 <br>                                                
-<br>
-void main()<br>
-{       <br>
-  &nbsp; &nbsp;     gl_Position    = gWVP * vec4(Position, 1.0);<br>
-  &nbsp; &nbsp;     TexCoord0      = TexCoord;                  <br>
-  &nbsp; &nbsp;     Normal0        = (gWorld * vec4(Normal, 0.0)).xyz;   <br>
-  &nbsp; &nbsp;     WorldPos0      = (gWorld * vec4(Position, 1.0)).xyz;<br>
-}<br>
-</code>
-<p>This is the entire VS of the geometry pass. There is nothing new here. We simple perform the
-usual transformations and pass the results to the FS.
-</p>
-<p>(geometry_pass.fs)</p>
-<code>
-#version 330<br>
-                <br>                                                        
-in vec2 TexCoord0;  <br>                                                                
-in vec3 Normal0;        <br>                                                            
-in vec3 WorldPos0;          <br>                                                        
-<br>
-layout (location = 0) out vec3 WorldPosOut;   <br>
-layout (location = 1) out vec3 DiffuseOut;     <br>
-layout (location = 2) out vec3 NormalOut;     <br>
-layout (location = 3) out vec3 TexCoordOut;    <br>
-							<br>			
-uniform sampler2D gColorMap;                <br>
-						<br>					
-void main()						<br>			
-{								<br>			
-	  &nbsp; &nbsp; WorldPosOut     = WorldPos0;					<br>
-	  &nbsp; &nbsp; DiffuseOut      = texture(gColorMap, TexCoord0).xyz;	<br>
-	  &nbsp; &nbsp; NormalOut       = normalize(Normal0);				<br>	
-	  &nbsp; &nbsp; TexCoordOut     = vec3(TexCoord0, 0.0);				<br>
-}
-</code>
-<p>
-The FS is responsible for doing MRT. Instead
-of outputting a single vector it outputs multiple vectors. Each of these vectors goes to a corresponding
-index in the array that was previously set by glDrawBuffers(). So in each FS invocation we are writing into 
-the four textures of the G buffer.
-</p>
-<p>(gbuffer.cpp:90)</p>
-<code>
-void GBuffer::BindForWriting()<br>
-{<br>
-&nbsp; &nbsp;     glBindFramebuffer(<b>GL_DRAW_FRAMEBUFFER</b>, m_fbo);<br>
-}<br>
-<br>
-void GBuffer::BindForReading()<br>
-{<br>
-&nbsp; &nbsp;     glBindFramebuffer(<b>GL_READ_FRAMEBUFFER</b>, m_fbo);<br>
-}<br>
-<br>
-void GBuffer::SetReadBuffer(GBUFFER_TEXTURE_TYPE TextureType)<br>
-{<br>
-&nbsp; &nbsp;     glReadBuffer(GL_COLOR_ATTACHMENT0 + TextureType);<br>
-}
-</code>
-<p>
-The above three functions are used to change the state of the G buffer to fit the current pass by the 
-main application code.
-</p>
+    <header id="header">
+        <div>
+            <h2> Tutorial 35: </h2>
+            <h1> Deferred Shading - Part 1 </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+    <article id="content" class="breakpoint">
+        <section>
+            <h3> Background </h3>
+
+            <p>
+            The way we've been doing lighting since <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
+            is known as <i>Forward Rendering (or Shading)</i>. 
+            This is a straightforward approach where we do a set of transformations on the vertices of every
+            object in the VS (mostly translations of the normal and position to clip space) followed by a lighting
+            calculation per pixel in the FS. Since each pixel of every object gets only a single FS invocation we have 
+            to provide the FS with information on all light sources and take all of them into account when
+            calculating the light effect per pixel. This is a simple approach but it has its downsides. 
+            If the scene is highly complex (as is the case in most modern games) with many objects and a large depth
+            complexity (same screen pixel covered by several objects) we get a lot of wasted GPU cycles. For example,
+            if the depth complexity is 4 it means that the lighting calculations are executed on 3 pixels for nothing
+            because only the topmost pixel counts. We can try to counter that by sorting the objects front to back
+            but that doesn't always work well with complex objects.
+            </p>
+            <p>
+            Another problem with forward rendering is when there are many light sources. In that case the light sources
+            tend to be rather small with a limited area of effect (else it will overwhelm the scene). But our FS 
+            calculates the effect of every light source, even if it is far away from the pixel.
+            You can try to calculate the distance from the pixel to the light source
+            but that just adds more overhead and branches into the FS. Forward rendering simply doesn't scale well with
+            many light sources. Just image the amount of computation the FS needs to do when there are hundreds of light
+            sources...
+            </p>
+            <p>
+            Deferred shading is a popular technique in  
+            <a href="http://en.wikipedia.org/wiki/Deferred_shading#Deferred_shading_in_commercial_games"> many games</a>
+            which targets the specific problem above.
+            The key point behind deferred shading is the decoupling of the geometry calculations (position and normal 
+            transformations) and the lighting calculations. Instead of taking each
+            object "all the way", from the vertex buffer into its final resting place in the framebuffer we seperate the
+            processing into two major passes. In the first pass we run the usual VS but instead of sending the processed
+            attributes into the FS for lighting calculations we forward them into what is known as the <i>G Buffer</i>. This
+            is a logical grouping of several 2D textures and we have a texture per vertex attribute. We seperate the attributes
+            and write them into the different textures all at once using a capability of OpenGL called <i>Multiple Render 
+            Targets</i> (MRT). Since we are writing the attributes in the FS the values that end up in the G buffer are
+             the result of the interpolation performed by the rasterizer on the vertex attributes. This stage is called the 
+            <i>Geometry Pass</i>. Every object is processed in this pass. Because of the depth test, when the geometry 
+            pass is complete the textures in the G buffer are populated by the interpolated attributes of the closest 
+            pixels to the camera. This means that all the "irrelevant" pixels that have failed the depth test have been
+            dropped and what is left in the G buffer are only the pixels for which lighting must be calculated. Here's a 
+            typical example of a G buffer of a single frame:
+            </p>
+            <img class="center" src="gbuffer.jpg">
+            <p>
+            In the second pass (known as the <i>Lighting Pass</i>) we go over the G buffer pixel by pixel, sample all the pixel
+            attributes from the different textures and do the lighting calculations in pretty much the same way that we are used
+            to. Since all the pixels except the closest ones were already dropped when we created the G buffer we do the lighting
+            calculations only once per pixel.
+            </p>
+            <p>
+            How do we traverse the G buffer pixel by pixel? The simplest method is to render a screen space quad. But there is a 
+            better way. We said earlier that since the light sources are weak with a limited area of influence we expect many
+            pixels to be irrelevant to them. When the influence of a light source on a pixel is small enough it is better to
+            simply ignore it for peformance reasons. In forward rendering there was no efficient way to do that but in deferred
+            shading we can calculate the dimentions of a sphere around the light source (for points lights; for spot lights we
+            use a cone). That sphere represents the area of influence of the light and outside of it we want to ignore this light source.
+            We can use a very rough model of a sphere with a small number of polygons and simply render it with the light
+            source at the center. The VS will do nothing except translate the position into clip space. The FS will be executed
+            only on the relevant pixels and we will do our lighting calculations there. Some people go even further by calculating
+            a minimal bounding quad that covers that sphere from the point of view of the light. Rendering this quad is even 
+            lighter because there's only two triangles. These methods are useful to limit the number of pixels for which the 
+            FS is executed to only the ones we are really interested in.
+            </p>
+            <p>
+            <p>We will cover deferred shading in three steps (and three tutorials):
+            <ol>
+            <li>In this tutorial we will populate the G buffer using MRT. We will dump the contents of the G buffer to the screen
+            to make sure we got it correctly.</li>
+            <li>In the next tutorial we will add the light pass and get lighting working in true deferred shading fashion.</li>
+            <li>Finally, we will learn how to use the stencil buffer to prevent small points lights from lighting objects that are further off (a problem which will become evident by the end of the second tutorial).</li>
+            </ol>
+            </p>
+        </section>
+
+        <section>
+            <h3> Source walkthru </h3>
+
+            <p>(gbuffer.h:28)</p>
+            <code>
+            class GBuffer<br>
+            {<br>
+            public:<br>
+            <br>
+            &nbsp; &nbsp;   enum GBUFFER_TEXTURE_TYPE {<br>
+             &nbsp; &nbsp; &nbsp; &nbsp;        GBUFFER_TEXTURE_TYPE_POSITION,<br>
+             &nbsp; &nbsp;  &nbsp; &nbsp;       GBUFFER_TEXTURE_TYPE_DIFFUSE,<br>
+             &nbsp; &nbsp; &nbsp; &nbsp;        GBUFFER_TEXTURE_TYPE_NORMAL,<br>
+             &nbsp; &nbsp;  &nbsp; &nbsp;       GBUFFER_TEXTURE_TYPE_TEXCOORD,<br>
+             &nbsp; &nbsp;   &nbsp; &nbsp;       GBUFFER_NUM_TEXTURES<br>
+             &nbsp; &nbsp;    };<br>
+                <br>
+             &nbsp; &nbsp;    GBuffer();<br>
+            <br>
+             &nbsp; &nbsp;    ~GBuffer();<br>
+            <br>
+             &nbsp; &nbsp;    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);<br>
+            <br>
+             &nbsp; &nbsp;    void BindForWriting();<br>
+            <br>
+             &nbsp; &nbsp;    void BindForReading();<br>
+            <br>
+            private:<br>
+            <br>
+             &nbsp; &nbsp;    GLuint m_fbo;<br>
+             &nbsp; &nbsp;    GLuint m_textures[GBUFFER_NUM_TEXTURES];<br>
+             &nbsp; &nbsp;    GLuint m_depthTexture;<br>
+            };
+            </code>
+            <p>
+            The GBuffer class contains all the textures that the G buffer in deferred shading needs.
+            We have textures for the vertex attributes as well as a texture to serve as our depth buffer.
+            We need this depth buffer because we are going to wrap all the textures in an FBO so the default
+            depth buffer will not be available. FBOs have already been covered in 
+            <a href="../tutorial23/tutorial23.html">tutorial 23</a> so we will skip that here.
+            </p>
+            <p>
+            The GBuffer class also has two methods that will be repeatedly called at runtime - BindForWriting()
+            binds the textures as a target during the geometry pass and BindForReading() binds the FBO as input
+            so its contents can be dumped to the screen.
+            </p>
+            <p>(gbuffer.cpp:48)</p>
+            <code>
+            bool GBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)<br>
+            {<br>
+            &nbsp; &nbsp;   // Create the FBO<br>
+            &nbsp; &nbsp;   glGenFramebuffers(1, &amp;m_fbo);    <br>
+            &nbsp; &nbsp; glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);<br>
+            <br>
+            &nbsp; &nbsp;   // Create the gbuffer textures<br>
+            &nbsp; &nbsp;   glGenTextures(ARRAY_SIZE_IN_ELEMENTS(m_textures), m_textures);<br>
+            &nbsp; &nbsp; glGenTextures(1, &amp;m_depthTexture);<br>
+                <br>
+            &nbsp; &nbsp;   for (unsigned int i = 0 ; i &lt; ARRAY_SIZE_IN_ELEMENTS(m_textures) ; i++) {<br>
+            &nbsp; &nbsp;&nbsp; &nbsp;      glBindTexture(GL_TEXTURE_2D, m_textures[i]);<br>
+            &nbsp; &nbsp;&nbsp; &nbsp;       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);<br>
+            &nbsp; &nbsp;&nbsp; &nbsp;       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);<br>
+            &nbsp; &nbsp;   }<br>
+            <br>
+            &nbsp; &nbsp; // depth<br>
+            &nbsp; &nbsp; glBindTexture(GL_TEXTURE_2D, m_depthTexture);<br>
+            &nbsp; &nbsp; glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT,<br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; NULL);<br>
+            &nbsp; &nbsp; glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);<br>
+            <br>
+            &nbsp; &nbsp; GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+            <br>
+             &nbsp; &nbsp; glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);<br>
+            <br>
+             &nbsp; &nbsp; GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
+            <br>
+             &nbsp; &nbsp; if (Status != GL_FRAMEBUFFER_COMPLETE) {<br>
+             &nbsp; &nbsp; &nbsp; &nbsp;      printf("FB error, status: 0x%x\n", Status);<br>
+             &nbsp; &nbsp; &nbsp; &nbsp;     return false;<br>
+             &nbsp; &nbsp; }<br>
+            <br>
+            &nbsp; &nbsp; // restore default FBO<br>
+            &nbsp; &nbsp; glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);<br>
+            <br>
+            &nbsp; &nbsp;   return true;<br>
+            }
+            </code>
+            <p>
+            This is how we initialize the G buffer. We start by creating the FBO and textures for the
+            vertex attributes and the depth buffer. The vertex attributes textures are then initialized
+            in a loop that does the following:
+            <ul>
+            <li>Creates the storage area of the texture (without initializing it).</li>
+            <li>Attaches the texture to the FBO as a target.</li>
+            </ul>
+            <p>
+            Initialization of the depth texture is done explicitly because it requires a different format 
+            and is attached to the FBO at a different spot.
+            </p>
+            <p>
+            In order to do MRT we need to enable writing to all four textures. We do that by supplying an array
+            of attachment locations to the glDrawBuffers() function. This array allows for some level of flexibility
+            because if we put GL_COLOR_ATTACHMENT6 as its first index then when the FS writes to the first output variable
+            it will go into the texture that is attached to GL_COLOR_ATTACHMENT6. We are not interested in this 
+            complexity in this tutorial so we simply line the attachments one after the other.
+            </p>
+            <p>
+            Finally, we check the FBO status to make sure everything was done correctly and restore the
+            default FBO (so that further changes will not affect our G buffer). The G buffer is ready for use.
+            </p>
+            <p>(tutorial35.cpp:105)</p>
+            <code>
+            virtual void RenderSceneCB()<br>
+            {   <br>
+            &nbsp; &nbsp; CalcFPS();<br>
+                    <br>
+            &nbsp; &nbsp; m_scale += 0.05f;<br>
+            <br>
+            &nbsp; &nbsp; m_pGameCamera->OnRender();<br>
+            <br>
+            &nbsp; &nbsp; DSGeometryPass();<br>
+            &nbsp; &nbsp; DSLightPass();<br>
+                              <br>          
+            &nbsp; &nbsp; RenderFPS();<br>
+                    <br>
+            &nbsp; &nbsp; glutSwapBuffers();<br>
+            }
+            </code>
+            <p>
+            Let's now review the implementation top down. The function above is the main render function
+            and it doesn't have a lot to do. It handles a few "global" stuff such as frame rate calculation
+            and display, camera update, etc. Its main job is to execute the geometry pass followed by the light pass.
+            As I mentioned earlier, in this tutorial we are just generating the G buffer so our "light pass" doesn't
+            really do deferred shading. It just dumps the G buffer to the screen.
+            </p>
+            <p>(tutorial35.cpp:122)</p>
+            <code>
+            void DSGeometryPass()<br>
+            {<br>
+            &nbsp; &nbsp; m_DSGeomPassTech.Enable();<br>
+            <br>
+            &nbsp; &nbsp; m_gbuffer.BindForWriting();<br>
+            <br>
+            &nbsp; &nbsp; glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+            <br>
+            &nbsp; &nbsp; Pipeline p;<br>
+            &nbsp; &nbsp; p.Scale(0.1f, 0.1f, 0.1f);<br>
+            &nbsp; &nbsp; p.Rotate(0.0f, m_scale, 0.0f);<br>
+            &nbsp; &nbsp; p.WorldPos(-0.8f, -1.0f, 12.0f);<br>
+            &nbsp; &nbsp; p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+            &nbsp; &nbsp; p.SetPerspectiveProj(m_persProjInfo);<br>
+            &nbsp; &nbsp; m_DSGeomPassTech.SetWVP(p.GetWVPTrans());        <br>
+            &nbsp; &nbsp; m_DSGeomPassTech.SetWorldMatrix(p.GetWorldTrans());<br>
+            &nbsp; &nbsp; m_mesh.Render();<br>
+                    <br>
+            }
+            </code>
+            <p>
+            We start the geometry pass by enabling the proper technique and setting the GBuffer object for writing. After
+            that we clear the G buffer (glClear() works on the current FBO which is our G buffer).
+            Now that everything is ready we setup the transformations and render the mesh. In a real game we
+            would probably render many meshes here one after the other. When we are done the G buffer will contain
+            the attributes of the closest pixels which will enable us to do the light pass.
+            </p>
+            <p>(tutorial35.cpp:141)</p>
+            <code>
+            void DSLightPass()<br>
+            {<br>
+            &nbsp; &nbsp; glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
+            <br>
+            &nbsp; &nbsp; glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+            <br>
+            &nbsp; &nbsp; m_gbuffer.BindForReading();<br>
+            <br>
+            &nbsp; &nbsp; GLsizei HalfWidth = (GLsizei)(WINDOW_WIDTH / 2.0f);<br>
+            &nbsp; &nbsp; GLsizei HalfHeight = (GLsizei)(WINDOW_HEIGHT / 2.0f);<br>
+            <br>
+            &nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_POSITION);<br>
+            &nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT,<br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0, 0, HalfWidth, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);<br>
+            <br>
+            &nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_DIFFUSE);<br>
+            &nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, <br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 0, HalfHeight, HalfWidth, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);<br>
+            <br>
+            &nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);<br>
+            &nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, <br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HalfWidth, HalfHeight, WINDOW_WIDTH, WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);<br>
+            <br>
+            &nbsp; &nbsp; m_gbuffer.SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_TEXCOORD);<br>
+            &nbsp; &nbsp; glBlitFramebuffer(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, <br>
+            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; HalfWidth, 0, WINDOW_WIDTH, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);  <br>
+            }
+            </code>
+            <p>
+            The light pass starts by restoring the default FBO (the screen) and clearing it. Next we
+            bind the FBO of the G buffer for reading. We now want to copy from the G buffer textures
+            into the screen. One way to do that is to write a simple program where the FS samples from a
+            texture and outputs the result. If we draw a full screen quad with texture coordinates that
+            go from [0,0] to [1,1] we would get the result that we want. But there is a better way. OpenGL
+            provides means to copy from one FBO to another using a single call and without all the setup overhead
+            than the other method incurs. The function glBlitFramebuffer() takes the source coordinates, destination
+            coordinates and a couple of other variables and performs the copy operation. It requires the source FBO
+            to be bound to the GL_READ_FRAMEBUFFER and the destination FBO to the GL_DRAW_FRAMEBUFFER (which we did at
+            the start of the function). Since the FBO can have several textures attached to its various attachment locations 
+            we must also bind the specific texture to the GL_READ_BUFFER target (because we can only copy from a single
+            texture at a time). This is hidden inside GBuffer::SetReadBuffer()
+            which we will review in a bit. The first four parameters to glBlitframebuffer() defines the source rectangle - 
+            bottom X, bottom Y, top X, top Y. The next four parameters define the destination rectangle in the same way. 
+            </p>
+            <p>
+            The ninth parameter says whether we want to read from the color, depth or stencil buffer and can take the
+            values GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, or GL_STENCIL_BUFFER_BIT. The last parameter determines the
+            way in which OpenGL will handle possible scaling (when the source and destination parameters are not of the
+            same dimensions) and can be GL_NEAREST or GL_LINEAR (looks better than GL_NEAREST but requires more compute 
+            resources). GL_LINEAR is the only valid option in the case of GL_COLOR_BUFFER_BIT. In the example above we
+            see how to scale down each source texture into one of the screen quadrants.
+            </p>
+            <p>(geometry_pass.vs)</p>
+            <code>
+            #version 330                                                                        <br>
+                                                                                                <br>
+            layout (location = 0) in vec3 Position;                                             <br>
+            layout (location = 1) in vec2 TexCoord;                                             <br>
+            layout (location = 2) in vec3 Normal;                                               <br>
+            <br>
+            uniform mat4 gWVP;<br>
+            uniform mat4 gWorld;<br>
+                                    <br>                
+            out vec2 TexCoord0;         <br>                                                        
+            out vec3 Normal0;               <br>                                                    
+            out vec3 WorldPos0;                 <br>                                                
+            <br>
+            void main()<br>
+            {       <br>
+              &nbsp; &nbsp;     gl_Position    = gWVP * vec4(Position, 1.0);<br>
+              &nbsp; &nbsp;     TexCoord0      = TexCoord;                  <br>
+              &nbsp; &nbsp;     Normal0        = (gWorld * vec4(Normal, 0.0)).xyz;   <br>
+              &nbsp; &nbsp;     WorldPos0      = (gWorld * vec4(Position, 1.0)).xyz;<br>
+            }<br>
+            </code>
+            <p>This is the entire VS of the geometry pass. There is nothing new here. We simple perform the
+            usual transformations and pass the results to the FS.
+            </p>
+            <p>(geometry_pass.fs)</p>
+            <code>
+            #version 330<br>
+                            <br>                                                        
+            in vec2 TexCoord0;  <br>                                                                
+            in vec3 Normal0;        <br>                                                            
+            in vec3 WorldPos0;          <br>                                                        
+            <br>
+            layout (location = 0) out vec3 WorldPosOut;   <br>
+            layout (location = 1) out vec3 DiffuseOut;     <br>
+            layout (location = 2) out vec3 NormalOut;     <br>
+            layout (location = 3) out vec3 TexCoordOut;    <br>
+                                        <br>            
+            uniform sampler2D gColorMap;                <br>
+                                    <br>                    
+            void main()                     <br>            
+            {                               <br>            
+                  &nbsp; &nbsp; WorldPosOut     = WorldPos0;                    <br>
+                  &nbsp; &nbsp; DiffuseOut      = texture(gColorMap, TexCoord0).xyz;    <br>
+                  &nbsp; &nbsp; NormalOut       = normalize(Normal0);               <br>    
+                  &nbsp; &nbsp; TexCoordOut     = vec3(TexCoord0, 0.0);             <br>
+            }
+            </code>
+            <p>
+            The FS is responsible for doing MRT. Instead
+            of outputting a single vector it outputs multiple vectors. Each of these vectors goes to a corresponding
+            index in the array that was previously set by glDrawBuffers(). So in each FS invocation we are writing into 
+            the four textures of the G buffer.
+            </p>
+            <p>(gbuffer.cpp:90)</p>
+            <code>
+            void GBuffer::BindForWriting()<br>
+            {<br>
+            &nbsp; &nbsp;     glBindFramebuffer(<b>GL_DRAW_FRAMEBUFFER</b>, m_fbo);<br>
+            }<br>
+            <br>
+            void GBuffer::BindForReading()<br>
+            {<br>
+            &nbsp; &nbsp;     glBindFramebuffer(<b>GL_READ_FRAMEBUFFER</b>, m_fbo);<br>
+            }<br>
+            <br>
+            void GBuffer::SetReadBuffer(GBUFFER_TEXTURE_TYPE TextureType)<br>
+            {<br>
+            &nbsp; &nbsp;     glReadBuffer(GL_COLOR_ATTACHMENT0 + TextureType);<br>
+            }
+            </code>
+            <p>
+            The above three functions are used to change the state of the G buffer to fit the current pass by the 
+            main application code.
+            </p>
+        </section>
+
+        <a href="../tutorial36/tutorial36.html" class="next highlight"> Next tutorial </a>
+    </article>
+
+    <script src="../html5shiv.min.js"></script>
+    <script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>

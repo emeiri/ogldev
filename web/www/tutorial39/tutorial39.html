@@ -1,327 +1,343 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-<table width=100% >
-<tr>
-	<td width=33%><div align=left"><a href="../tutorial38/tutorial38.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-	<td width=33%><div align=next"><a href="../tutorial40/tutorial40.html" rel="next"><img src="../next.jpg"></a></div></td>
-</tr>
-</table>
-	
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-<title>Tutorial 39</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title> Tutorial 39 - __ </title>
+
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<div class="content">
-<div class="lines">
-<h1>Tutorial 39 - Silhouette Detection</h1>
-<div style="text-align: center">
-<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
-</div>
-<h2>Background</h2>
-<p>
-Today we are going to discuss one way in which the silhouette of an object can be detected.
-To make things clearer, I'm referring to the silhouette of a 3D object which is created when
-light falls upon it from an arbitrary direction. Moving the light source will likely change
-the silhouette accordingly. This is entirely different from silhouette detection in 
-image space that deals with finding the boundaries of an object in a 2D picture (which is usually
-not dependant on the location of the light source). While the subject of silhouette detection
-may be interesting by itself, for me its main goal is as a first
-step in the implementation of a <i>Stencil Shadow Volume</i>. This is a technique for rendering
-shadows which is particularly useful when dealing with point lights. We will study this technique
-in the next tutorial (so you may refer to this tutorial as "Stencil Shadow Volume - Part 1"...).
-<p>The following image demonstrates the silhouette that we want to detect:
-</p>
-<img src="silhouette1.jpg">
-<p>
-In the image above the silhouette is the ellipsis which is touched by the light rays.
-</p>
-<p>
-Let us now move to a more traditional 3D language. A model is basically composed
-of triangles so the silhouette must be created by triangle edges. How do we decide whether
-an edge is part of the silhouette or not? The trick is based on the diffuse light model. According
-to that model the light strength is based on the dot product between the triangle normal and the
-light vector. If the triangle faces away from the light source the result of this dot product operation
-will be less than or equal to zero. In that case the light doesn't affect the triangle at all. In order
- to decide whether a triangle edge is part of the silhouette or not we need to find the adjacent triangle
-that shares the same edge and calculate the dot product between the light direction and the normals of
-both the original triangle and its neighbor. An edge is considered a silhouette edge if one triangle faces
-the light but its neighbor does not. 
-</p>
-<p>
-The following picture shows a 2D object for simplicity:
-</p>
-<img src="silhouette2.jpg">
-<p> The red arrow represents the light ray that hits the
-three edges (in 3D these would be triangles) whose normals are 1, 2 and 3 (dot product between these normals and 
-the reverse of the light vector is obviously greater than zero). The edges whose normals are 4, 5 and 6 are facing away from the light 
-(here the same dot product would be less than or equal to zero). The two blue circles mark the
-silhouette of the object and the reason is that edge 1 is facing the light but its neighbor edge 6 does not.
-The point between them is therefore a silhoette. Same goes for the other silhouette point. Edges (or points
-in this example) that face the light as well as their neighbors are not silhoette (between 1 and 2 and between
-2 and 3).
-</p>
-<p>
-As you can see, the algorithm for finding the silhouette is very simple. However, it does require us
-to have knowledge of the three neighbors of each triangle. This is known as the <i>Adjacencies</i> of
-the triangles. Unfortunately, Assimp does not support automatic adjacencies calculation for us so
-we need to implement such an algorithm ourselves. In the coding section we will review a simple algorithm that
-will satisfy our needs. 
-</p>
-<p>
-What is the best place in the pipeline for the silhouette algorithm itself? remember that we
-need to do a dot product between the light vector and the triangle normal as well as the normals
-of the three adjacent triangles. This requires us to have access to the entire primitive information.
-Therefore, the VS is not enough. Looks like the GS is more appropriate since it allows access to
-all the vertices of a primitive. But what about the adjacencies? luckily for us, the designers
-of OpenGL have already given it much thought and created a topology type known as 'triangle with adjacencies'.
-If you provide a vertex buffer with adjacency information it will correctly load it and provide
-the GS with six vertices per triangle instead of three. The additional three vertices belong
-to the adjacent triangles and are not shared with the current triangle. The following image should
-make this much clearer:
-</p>
-<img src="adjacencies.jpg">
-<p>
-The red vertices in the above picture belong to the original triangle and the blue ones are
-the adjacent vertices (ignore the edges e1-e6 for now - they are referenced later in the code section).
-When we supply a vertex buffer in the above format the VS is executed for every vertex (adjacent
-and non adjacent) and the GS (if it exists) is executed on a group of six vertices that include
-the triangle and its adjacent vertices. When the GS is present it is up to the developer to
-supply an output topology but if there is no GS the rasterizer knows how to deal with such a scheme
-and it rasterizes only the actual triangles (ignoring the adjacent triangles).
-</p>
-<p>
-Note that the adjacent vertices in the vertex buffer have the same format and attributes as regular
-vertices. What makes them adjacent is simply their relative location within each group of six vertices.
-In the case of a model whose triangles are continuous the same vertices will sometimes be regular
-and sometimes adjacent, depending on the current triangle. This makes indexed draws even more attractive
-due to the saving of space in the vertex buffer.
-</p>
-<h2>Code Walkthru</h2>
-<p>(mesh.cpp:204)</p>
-<code>
-void Mesh::FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices)<br>
-{       <br>
- &nbsp;  &nbsp;     for (uint i = 0 ; i < paiMesh->mNumFaces ; i++) {<br>
-  &nbsp;  &nbsp;  &nbsp;  &nbsp;          const aiFace& face = paiMesh->mFaces[i];<br>
-<br>
-   &nbsp;  &nbsp;  &nbsp;  &nbsp; Face Unique;<br>
-        <br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;        // If a position vector is duplicated in the VB we fetch the <br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;        // index of the first occurrence.<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;        for (uint j = 0 ; j < 3 ; j++) {            <br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           uint Index = face.mIndices[j];<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           aiVector3D& v = paiMesh->mVertices[Index];<br>
-            <br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           if (m_posMap.find(v) == m_posMap.end()) {<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp;                m_posMap[v] = Index;<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           }<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           else {<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; &nbsp;  &nbsp;               Index = m_posMap[v];<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           }           <br>
-            <br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           Unique.Indices[j] = Index;<br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;        }<br>
-        <br>
- &nbsp;  &nbsp;  &nbsp;  &nbsp;        m_uniqueFaces.push_back(Unique);<br>
-<br>
-  &nbsp;  &nbsp;  &nbsp;  &nbsp;          Edge e1(Unique.Indices[0], Unique.Indices[1]);<br>
-  &nbsp;  &nbsp;  &nbsp;  &nbsp;          Edge e2(Unique.Indices[1], Unique.Indices[2]);<br>
-  &nbsp;  &nbsp;  &nbsp;  &nbsp;          Edge e3(Unique.Indices[2], Unique.Indices[0]);<br>
-        <br>
-  &nbsp;  &nbsp; &nbsp;  &nbsp;           m_indexMap[e1].AddNeigbor(i);<br>
-  &nbsp;  &nbsp;  &nbsp;  &nbsp;          m_indexMap[e2].AddNeigbor(i);<br>
-  &nbsp;  &nbsp;  &nbsp;  &nbsp;          m_indexMap[e3].AddNeigbor(i);<br>
- &nbsp;  &nbsp;     }   
+  <header id="header">
+    <div>
+      <h2> Tutorial 39: </h2>
+      <h1> Silhouette Detection </h1>
+    </div>
 
-</code>
-<p>
-Most of the adjacency logic is contained in the above function and a few helper structures.
-The algorithm is composed of two stages. In the first stage we create a map between each edge and the two triangles that
-share it. This happens in the above for loop. In the first half of this loop we generate a map between each vertex position
-and the first index that refers to it. The reason why different indices may point to vertices that share the same position
-is that sometimes other attributes force Assimp to split the same vertex into two vertices. e.g. the same vertex may have
-different texture attributes for two neighboring triangles that share it. This creates a problem for our adjacency algorithm
-and we prefer to have each vertex appear only once. Therefore, we create this mapping between a position and first index and use
-only this index from now on. 
-</p>
-<p>(mesh.cpp:240)</p>
-<code>
- &nbsp;  &nbsp;     for (uint i = 0 ; i < paiMesh->mNumFaces ; i++) {        <br>
-   &nbsp;  &nbsp;   &nbsp;  &nbsp;         const Face& face = m_uniqueFaces[i];<br>
-        <br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;       for (uint j = 0 ; j < 3 ; j++) {            <br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Edge e(face.Indices[j], face.Indices[(j + 1) % 3]);<br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             assert(m_indexMap.find(e) != m_indexMap.end());<br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Neighbors n = m_indexMap[e];<br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             uint OtherTri = n.GetOther(i);<br>
-            <br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             assert(OtherTri != -1)<br>
-            <br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             const Face& OtherFace = m_uniqueFaces[OtherTri];<br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             uint OppositeIndex = OtherFace.GetOppositeIndex(e);<br>
-         <br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(face.Indices[j]);<br>
-   &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(OppositeIndex);       <br>     
-   &nbsp;  &nbsp;      &nbsp;  &nbsp;        }<br>
-   &nbsp;  &nbsp;     }    <br>
-}
-</code>
-<p>
-In the second stage we populate the index vector with sets of six vertices each that match the topology
-of the triangle list with adjacency that we saw earlier. The map that we created in the first stage 
-helps us here because for each edge in the triangle it is very easy to find the neighboring triangle 
-that shares it and then the vertex in that triangle which is opposite to this edge. The last two lines
-in the loop alternate the content of the index buffer between vertices from the current triangle
-and vertices from the adjacent triangles that are opposite to edges of the current triangle.
-</p>
-<p>
-There are a few additional minor changes to the Mesh class. I suggest you compare it to the
-version from the previous tutorial to make sure you capture all differences. One of the notable
-changes is that we use GL_TRIANGLES_ADJACENCY instead of GL_TRIANGLES as the topology when calling 
-glDrawElementsBaseVertex(). If you forget that the GL will feed incorrectly sized primitives into the GS.
-</p>
-<p>(silhouette.vs)</p>
-<code>
-    #version 330<br>
-<br>
-layout (location = 0) in vec3 Position;                                             <br>
-layout (location = 1) in vec2 TexCoord;                                             <br>
-layout (location = 2) in vec3 Normal;                                               <br>
-<br>
-out vec3 WorldPos0;                                                                 <br>
-<br>
-uniform mat4 gWVP;                                                  <br>
-uniform mat4 gWorld;                                                <br>
-                                                                                    <br>
-void main()                                                                         <br>
-{                                                                                   <br>
-&nbsp;  &nbsp;      vec4 PosL   = vec4(Position, 1.0);<br>
-&nbsp;  &nbsp;      gl_Position = gWVP * PosL;<br>
-&nbsp;  &nbsp;      WorldPos0   = (gWorld * PosL).xyz;                                <br>
-}
-</code>
-<p>
-In today's demo we are going to detect the silhouette of an object and mark it by a thick red line.
-The object itself will be drawn using our standard forward rendering lighting shader and the silhouette
-will be drawn using a dedicated shader. The code above belongs to the VS of that shader. There is nothing special
-about it. We just need to transform the position into clip space using the WVP matrix and provide the GS with
-the vertices in world space (since the silhouette algorithm takes place in world space).
-</p>
-<p>(silhouette.gs)</p>
-<code>
-    #version 330<br>
-<br>
-layout (triangles_adjacency) in;<br>
-layout (line_strip, max_vertices = 6) out;<br>
-<br>
-in vec3 WorldPos0[];<br>
-<br>
-void EmitLine(int StartIndex, int EndIndex)<br>
-{<br>
-&nbsp;  &nbsp;      gl_Position = gl_in[StartIndex].gl_Position;<br>
-&nbsp;  &nbsp;      EmitVertex();<br>
-<br>
-&nbsp;  &nbsp;      gl_Position = gl_in[EndIndex].gl_Position;<br>
-&nbsp;  &nbsp;      EmitVertex();<br>
-<br>
-&nbsp;  &nbsp;      EndPrimitive();<br>
-}<br>
-<br>
-uniform vec3 gLightPos;<br>
-<br>
-void main()<br>
-{<br>
-&nbsp;  &nbsp;      vec3 e1 = WorldPos0[2] - WorldPos0[0];<br>
-    &nbsp;  &nbsp;  vec3 e2 = WorldPos0[4] - WorldPos0[0];<br>
-&nbsp;  &nbsp;      vec3 e3 = WorldPos0[1] - WorldPos0[0];<br>
-&nbsp;  &nbsp;      vec3 e4 = WorldPos0[3] - WorldPos0[2];<br>
-&nbsp;  &nbsp;      vec3 e5 = WorldPos0[4] - WorldPos0[2];<br>
-&nbsp;  &nbsp;      vec3 e6 = WorldPos0[5] - WorldPos0[0];<br>
-<br>
-&nbsp;  &nbsp;      vec3 Normal = cross(e1,e2);<br>
-&nbsp;  &nbsp;      vec3 LightDir = gLightPos - WorldPos0[0];<br>
-<br>
-&nbsp;  &nbsp;      if (dot(Normal, LightDir) > 0.00001) {<br>
-<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          Normal = cross(e3,e1);<br>
-<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          if (dot(Normal, LightDir) <= 0) {<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;              EmitLine(0, 2);<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          }<br>
-<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          Normal = cross(e4,e5);<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          LightDir = gLightPos - WorldPos0[2];<br>
-<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          if (dot(Normal, LightDir) <=0) {<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;              EmitLine(2, 4);<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          }<br>
-<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          Normal = cross(e2,e6);<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          LightDir = gLightPos - WorldPos0[4];<br>
-<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          if (dot(Normal, LightDir) <= 0) {<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;              EmitLine(4, 0);<br>
-&nbsp;  &nbsp;  &nbsp;  &nbsp;          }<br>
-    &nbsp;  &nbsp;  }<br>
-}
-</code>
-<p>
-All the silhouette logic is contained within the GS. When using the triangle list with adjacencies 
-topology the GS receives an array of six vertices. We start by calculating a few selected edges
-that will help us calculate the normal of the current triangle as well as the three adjacent triangles.
-Use the picture above to understand how to map e1-e6 to actual edges. Then we check whether
-the triangle faces the light by calculating a dot product between its normal and the light direction
-(with the light vector going towards the light). If the result of the dot product is positive 
-the answer is yes (we use a small epsilon due to floating point inaccuracies). If the triangle
-does not face the light then this is the end of the way for it, but if it is light facing, we do the same
-dot product operation between the light vector and every one of the three adjacent triangles. 
-If we hit an adjacent triangle that doesn't face the light we call the EmitLine() function which
-(unsurprisingly) emits the shared edge between the triangle (which faces the light) and its
-neighbor (which does not). The FS simply draws that edge in red.
-</p>
-<p>(tutorial39.cpp:183)</p>
-<code>
-    void RenderScene()<br>
-    {<br>
- &nbsp;  &nbsp;         // Render the object as-is<br>
- &nbsp;  &nbsp;         m_LightingTech.Enable();<br>
-                                    <br> 
- &nbsp;  &nbsp;         Pipeline p;<br>
- &nbsp;  &nbsp;         p.SetPerspectiveProj(m_persProjInfo);<br>
- &nbsp;  &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());        <br>
- &nbsp;  &nbsp;         p.WorldPos(m_boxPos);<br>
- &nbsp;  &nbsp;         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
- &nbsp;  &nbsp;         m_LightingTech.SetWVP(p.GetWVPTrans());        <br>
- &nbsp;  &nbsp;        <b> m_mesh.Render();</b><br>
-        <br>
- &nbsp;  &nbsp;         // Render the object's silhouette<br>
- &nbsp;  &nbsp;         m_silhouetteTech.Enable();<br>
-        <br>
- &nbsp;  &nbsp;         m_silhouetteTech.SetWorldMatrix(p.GetWorldTrans());        <br>
- &nbsp;  &nbsp;         m_silhouetteTech.SetWVP(p.GetWVPTrans());        <br>
- &nbsp;  &nbsp;         m_silhouetteTech.SetLightPos(Vector3f(0.0f, 10.0f, 0.0f));<br>
-        <br>
- &nbsp;  &nbsp;         glLineWidth(5.0f);<br>
-        <br>
- &nbsp;  &nbsp;      <b>   m_mesh.Render();   </b>     <br>
-    }        
-</code>
-<p>
-This is how we use the silhouette technique. The same object is rendered twice. First with the
-standard lighting shader. Then with the silhouette shader. Note how the function glLightWidth()
-is used to make the silhouette thicker and thus more noticeable. 
-</p>
-<p>
-If you use the code above as-is to create the demo, you might notice a minor corruption around
-the silhouette lines. The reason is that the second render generates a line with roughly the
-same depth as the original mesh edge. This causes a phenomenon known as <i>Z fighting</i> as pixels
-from the silhouette and the original mesh cover each other in an inconsistent way (again, due to
-floating point accuracies). To fix this we call glDepthFunc(GL_LEQUAL) which relaxes the depth
-test a bit. It means that if a second pixel is rendered on top of a previous pixel with the same depth
-the last pixel always take precedence.
-</p>
+    <a id="logo" class="small" href="../../index.html" title="Homepage">
+      <img src="..//logo ldpi.png">
+    </a>
+  </header>
+  <article id="content" class="breakpoint">
+    <section>
+      <h3> Background </h3>
+
+      <p>
+      Today we are going to discuss one way in which the silhouette of an object can be detected.
+      To make things clearer, I'm referring to the silhouette of a 3D object which is created when
+      light falls upon it from an arbitrary direction. Moving the light source will likely change
+      the silhouette accordingly. This is entirely different from silhouette detection in 
+      image space that deals with finding the boundaries of an object in a 2D picture (which is usually
+      not dependant on the location of the light source). While the subject of silhouette detection
+      may be interesting by itself, for me its main goal is as a first
+      step in the implementation of a <i>Stencil Shadow Volume</i>. This is a technique for rendering
+      shadows which is particularly useful when dealing with point lights. We will study this technique
+      in the next tutorial (so you may refer to this tutorial as "Stencil Shadow Volume - Part 1"...).
+      <p>The following image demonstrates the silhouette that we want to detect:
+      </p>
+      <img class="center" src="silhouette1.jpg">
+      <p>
+      In the image above the silhouette is the ellipsis which is touched by the light rays.
+      </p>
+      <p>
+      Let us now move to a more traditional 3D language. A model is basically composed
+      of triangles so the silhouette must be created by triangle edges. How do we decide whether
+      an edge is part of the silhouette or not? The trick is based on the diffuse light model. According
+      to that model the light strength is based on the dot product between the triangle normal and the
+      light vector. If the triangle faces away from the light source the result of this dot product operation
+      will be less than or equal to zero. In that case the light doesn't affect the triangle at all. In order
+       to decide whether a triangle edge is part of the silhouette or not we need to find the adjacent triangle
+      that shares the same edge and calculate the dot product between the light direction and the normals of
+      both the original triangle and its neighbor. An edge is considered a silhouette edge if one triangle faces
+      the light but its neighbor does not. 
+      </p>
+      <p>
+      The following picture shows a 2D object for simplicity:
+      </p>
+      <img class="center" src="silhouette2.jpg">
+      <p> The red arrow represents the light ray that hits the
+      three edges (in 3D these would be triangles) whose normals are 1, 2 and 3 (dot product between these normals and 
+      the reverse of the light vector is obviously greater than zero). The edges whose normals are 4, 5 and 6 are facing away from the light 
+      (here the same dot product would be less than or equal to zero). The two blue circles mark the
+      silhouette of the object and the reason is that edge 1 is facing the light but its neighbor edge 6 does not.
+      The point between them is therefore a silhoette. Same goes for the other silhouette point. Edges (or points
+      in this example) that face the light as well as their neighbors are not silhoette (between 1 and 2 and between
+      2 and 3).
+      </p>
+      <p>
+      As you can see, the algorithm for finding the silhouette is very simple. However, it does require us
+      to have knowledge of the three neighbors of each triangle. This is known as the <i>Adjacencies</i> of
+      the triangles. Unfortunately, Assimp does not support automatic adjacencies calculation for us so
+      we need to implement such an algorithm ourselves. In the coding section we will review a simple algorithm that
+      will satisfy our needs. 
+      </p>
+      <p>
+      What is the best place in the pipeline for the silhouette algorithm itself? remember that we
+      need to do a dot product between the light vector and the triangle normal as well as the normals
+      of the three adjacent triangles. This requires us to have access to the entire primitive information.
+      Therefore, the VS is not enough. Looks like the GS is more appropriate since it allows access to
+      all the vertices of a primitive. But what about the adjacencies? luckily for us, the designers
+      of OpenGL have already given it much thought and created a topology type known as 'triangle with adjacencies'.
+      If you provide a vertex buffer with adjacency information it will correctly load it and provide
+      the GS with six vertices per triangle instead of three. The additional three vertices belong
+      to the adjacent triangles and are not shared with the current triangle. The following image should
+      make this much clearer:
+      </p>
+      <img class="center" src="adjacencies.jpg">
+      <p>
+      The red vertices in the above picture belong to the original triangle and the blue ones are
+      the adjacent vertices (ignore the edges e1-e6 for now - they are referenced later in the code section).
+      When we supply a vertex buffer in the above format the VS is executed for every vertex (adjacent
+      and non adjacent) and the GS (if it exists) is executed on a group of six vertices that include
+      the triangle and its adjacent vertices. When the GS is present it is up to the developer to
+      supply an output topology but if there is no GS the rasterizer knows how to deal with such a scheme
+      and it rasterizes only the actual triangles (ignoring the adjacent triangles).
+      </p>
+      <p>
+      Note that the adjacent vertices in the vertex buffer have the same format and attributes as regular
+      vertices. What makes them adjacent is simply their relative location within each group of six vertices.
+      In the case of a model whose triangles are continuous the same vertices will sometimes be regular
+      and sometimes adjacent, depending on the current triangle. This makes indexed draws even more attractive
+      due to the saving of space in the vertex buffer.
+      </p>
+    </section>
+
+    <section>
+      <h3> Source walkthru </h3>
+
+      <p>(mesh.cpp:204)</p>
+      <code>
+      void Mesh::FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>&amp; Indices)<br>
+      {       <br>
+       &nbsp;  &nbsp;     for (uint i = 0 ; i &lt; paiMesh->mNumFaces ; i++) {<br>
+        &nbsp;  &nbsp;  &nbsp;  &nbsp;          const aiFace&amp; face = paiMesh->mFaces[i];<br>
+      <br>
+         &nbsp;  &nbsp;  &nbsp;  &nbsp; Face Unique;<br>
+              <br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;        // If a position vector is duplicated in the VB we fetch the <br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;        // index of the first occurrence.<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;        for (uint j = 0 ; j &lt; 3 ; j++) {            <br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           uint Index = face.mIndices[j];<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           aiVector3D&amp; v = paiMesh->mVertices[Index];<br>
+                  <br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           if (m_posMap.find(v) == m_posMap.end()) {<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp;                m_posMap[v] = Index;<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           }<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           else {<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; &nbsp;  &nbsp;               Index = m_posMap[v];<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           }           <br>
+                  <br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;           Unique.Indices[j] = Index;<br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;        }<br>
+              <br>
+       &nbsp;  &nbsp;  &nbsp;  &nbsp;        m_uniqueFaces.push_back(Unique);<br>
+      <br>
+        &nbsp;  &nbsp;  &nbsp;  &nbsp;          Edge e1(Unique.Indices[0], Unique.Indices[1]);<br>
+        &nbsp;  &nbsp;  &nbsp;  &nbsp;          Edge e2(Unique.Indices[1], Unique.Indices[2]);<br>
+        &nbsp;  &nbsp;  &nbsp;  &nbsp;          Edge e3(Unique.Indices[2], Unique.Indices[0]);<br>
+              <br>
+        &nbsp;  &nbsp; &nbsp;  &nbsp;           m_indexMap[e1].AddNeigbor(i);<br>
+        &nbsp;  &nbsp;  &nbsp;  &nbsp;          m_indexMap[e2].AddNeigbor(i);<br>
+        &nbsp;  &nbsp;  &nbsp;  &nbsp;          m_indexMap[e3].AddNeigbor(i);<br>
+       &nbsp;  &nbsp;     }   
+
+      </code>
+      <p>
+      Most of the adjacency logic is contained in the above function and a few helper structures.
+      The algorithm is composed of two stages. In the first stage we create a map between each edge and the two triangles that
+      share it. This happens in the above for loop. In the first half of this loop we generate a map between each vertex position
+      and the first index that refers to it. The reason why different indices may point to vertices that share the same position
+      is that sometimes other attributes force Assimp to split the same vertex into two vertices. e.g. the same vertex may have
+      different texture attributes for two neighboring triangles that share it. This creates a problem for our adjacency algorithm
+      and we prefer to have each vertex appear only once. Therefore, we create this mapping between a position and first index and use
+      only this index from now on. 
+      </p>
+      <p>(mesh.cpp:240)</p>
+      <code>
+       &nbsp;  &nbsp;     for (uint i = 0 ; i &lt; paiMesh->mNumFaces ; i++) {        <br>
+         &nbsp;  &nbsp;   &nbsp;  &nbsp;         const Face&amp; face = m_uniqueFaces[i];<br>
+              <br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;       for (uint j = 0 ; j &lt; 3 ; j++) {            <br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Edge e(face.Indices[j], face.Indices[(j + 1) % 3]);<br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             assert(m_indexMap.find(e) != m_indexMap.end());<br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Neighbors n = m_indexMap[e];<br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             uint OtherTri = n.GetOther(i);<br>
+                  <br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             assert(OtherTri != -1)<br>
+                  <br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             const Face&amp; OtherFace = m_uniqueFaces[OtherTri];<br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             uint OppositeIndex = OtherFace.GetOppositeIndex(e);<br>
+               <br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(face.Indices[j]);<br>
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(OppositeIndex);       <br>     
+         &nbsp;  &nbsp;      &nbsp;  &nbsp;        }<br>
+         &nbsp;  &nbsp;     }    <br>
+      }
+      </code>
+      <p>
+      In the second stage we populate the index vector with sets of six vertices each that match the topology
+      of the triangle list with adjacency that we saw earlier. The map that we created in the first stage 
+      helps us here because for each edge in the triangle it is very easy to find the neighboring triangle 
+      that shares it and then the vertex in that triangle which is opposite to this edge. The last two lines
+      in the loop alternate the content of the index buffer between vertices from the current triangle
+      and vertices from the adjacent triangles that are opposite to edges of the current triangle.
+      </p>
+      <p>
+      There are a few additional minor changes to the Mesh class. I suggest you compare it to the
+      version from the previous tutorial to make sure you capture all differences. One of the notable
+      changes is that we use GL_TRIANGLES_ADJACENCY instead of GL_TRIANGLES as the topology when calling 
+      glDrawElementsBaseVertex(). If you forget that the GL will feed incorrectly sized primitives into the GS.
+      </p>
+      <p>(silhouette.vs)</p>
+      <code>
+          #version 330<br>
+      <br>
+      layout (location = 0) in vec3 Position;                                             <br>
+      layout (location = 1) in vec2 TexCoord;                                             <br>
+      layout (location = 2) in vec3 Normal;                                               <br>
+      <br>
+      out vec3 WorldPos0;                                                                 <br>
+      <br>
+      uniform mat4 gWVP;                                                  <br>
+      uniform mat4 gWorld;                                                <br>
+                                                                                          <br>
+      void main()                                                                         <br>
+      {                                                                                   <br>
+      &nbsp;  &nbsp;      vec4 PosL   = vec4(Position, 1.0);<br>
+      &nbsp;  &nbsp;      gl_Position = gWVP * PosL;<br>
+      &nbsp;  &nbsp;      WorldPos0   = (gWorld * PosL).xyz;                                <br>
+      }
+      </code>
+      <p>
+      In today's demo we are going to detect the silhouette of an object and mark it by a thick red line.
+      The object itself will be drawn using our standard forward rendering lighting shader and the silhouette
+      will be drawn using a dedicated shader. The code above belongs to the VS of that shader. There is nothing special
+      about it. We just need to transform the position into clip space using the WVP matrix and provide the GS with
+      the vertices in world space (since the silhouette algorithm takes place in world space).
+      </p>
+      <p>(silhouette.gs)</p>
+      <code>
+          #version 330<br>
+      <br>
+      layout (triangles_adjacency) in;<br>
+      layout (line_strip, max_vertices = 6) out;<br>
+      <br>
+      in vec3 WorldPos0[];<br>
+      <br>
+      void EmitLine(int StartIndex, int EndIndex)<br>
+      {<br>
+      &nbsp;  &nbsp;      gl_Position = gl_in[StartIndex].gl_Position;<br>
+      &nbsp;  &nbsp;      EmitVertex();<br>
+      <br>
+      &nbsp;  &nbsp;      gl_Position = gl_in[EndIndex].gl_Position;<br>
+      &nbsp;  &nbsp;      EmitVertex();<br>
+      <br>
+      &nbsp;  &nbsp;      EndPrimitive();<br>
+      }<br>
+      <br>
+      uniform vec3 gLightPos;<br>
+      <br>
+      void main()<br>
+      {<br>
+      &nbsp;  &nbsp;      vec3 e1 = WorldPos0[2] - WorldPos0[0];<br>
+          &nbsp;  &nbsp;  vec3 e2 = WorldPos0[4] - WorldPos0[0];<br>
+      &nbsp;  &nbsp;      vec3 e3 = WorldPos0[1] - WorldPos0[0];<br>
+      &nbsp;  &nbsp;      vec3 e4 = WorldPos0[3] - WorldPos0[2];<br>
+      &nbsp;  &nbsp;      vec3 e5 = WorldPos0[4] - WorldPos0[2];<br>
+      &nbsp;  &nbsp;      vec3 e6 = WorldPos0[5] - WorldPos0[0];<br>
+      <br>
+      &nbsp;  &nbsp;      vec3 Normal = cross(e1,e2);<br>
+      &nbsp;  &nbsp;      vec3 LightDir = gLightPos - WorldPos0[0];<br>
+      <br>
+      &nbsp;  &nbsp;      if (dot(Normal, LightDir) > 0.00001) {<br>
+      <br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          Normal = cross(e3,e1);<br>
+      <br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          if (dot(Normal, LightDir) &lt;= 0) {<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;              EmitLine(0, 2);<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          }<br>
+      <br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          Normal = cross(e4,e5);<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          LightDir = gLightPos - WorldPos0[2];<br>
+      <br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          if (dot(Normal, LightDir) &lt;=0) {<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;              EmitLine(2, 4);<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          }<br>
+      <br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          Normal = cross(e2,e6);<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          LightDir = gLightPos - WorldPos0[4];<br>
+      <br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          if (dot(Normal, LightDir) &lt;= 0) {<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;              EmitLine(4, 0);<br>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;          }<br>
+          &nbsp;  &nbsp;  }<br>
+      }
+      </code>
+      <p>
+      All the silhouette logic is contained within the GS. When using the triangle list with adjacencies 
+      topology the GS receives an array of six vertices. We start by calculating a few selected edges
+      that will help us calculate the normal of the current triangle as well as the three adjacent triangles.
+      Use the picture above to understand how to map e1-e6 to actual edges. Then we check whether
+      the triangle faces the light by calculating a dot product between its normal and the light direction
+      (with the light vector going towards the light). If the result of the dot product is positive 
+      the answer is yes (we use a small epsilon due to floating point inaccuracies). If the triangle
+      does not face the light then this is the end of the way for it, but if it is light facing, we do the same
+      dot product operation between the light vector and every one of the three adjacent triangles. 
+      If we hit an adjacent triangle that doesn't face the light we call the EmitLine() function which
+      (unsurprisingly) emits the shared edge between the triangle (which faces the light) and its
+      neighbor (which does not). The FS simply draws that edge in red.
+      </p>
+      <p>(tutorial39.cpp:183)</p>
+      <code>
+          void RenderScene()<br>
+          {<br>
+       &nbsp;  &nbsp;         // Render the object as-is<br>
+       &nbsp;  &nbsp;         m_LightingTech.Enable();<br>
+                                          <br> 
+       &nbsp;  &nbsp;         Pipeline p;<br>
+       &nbsp;  &nbsp;         p.SetPerspectiveProj(m_persProjInfo);<br>
+       &nbsp;  &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());        <br>
+       &nbsp;  &nbsp;         p.WorldPos(m_boxPos);<br>
+       &nbsp;  &nbsp;         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
+       &nbsp;  &nbsp;         m_LightingTech.SetWVP(p.GetWVPTrans());        <br>
+       &nbsp;  &nbsp;        <b> m_mesh.Render();</b><br>
+              <br>
+       &nbsp;  &nbsp;         // Render the object's silhouette<br>
+       &nbsp;  &nbsp;         m_silhouetteTech.Enable();<br>
+              <br>
+       &nbsp;  &nbsp;         m_silhouetteTech.SetWorldMatrix(p.GetWorldTrans());        <br>
+       &nbsp;  &nbsp;         m_silhouetteTech.SetWVP(p.GetWVPTrans());        <br>
+       &nbsp;  &nbsp;         m_silhouetteTech.SetLightPos(Vector3f(0.0f, 10.0f, 0.0f));<br>
+              <br>
+       &nbsp;  &nbsp;         glLineWidth(5.0f);<br>
+              <br>
+       &nbsp;  &nbsp;      <b>   m_mesh.Render();   </b>     <br>
+          }        
+      </code>
+      <p>
+      This is how we use the silhouette technique. The same object is rendered twice. First with the
+      standard lighting shader. Then with the silhouette shader. Note how the function glLightWidth()
+      is used to make the silhouette thicker and thus more noticeable. 
+      </p>
+      <p>
+      If you use the code above as-is to create the demo, you might notice a minor corruption around
+      the silhouette lines. The reason is that the second render generates a line with roughly the
+      same depth as the original mesh edge. This causes a phenomenon known as <i>Z fighting</i> as pixels
+      from the silhouette and the original mesh cover each other in an inconsistent way (again, due to
+      floating point accuracies). To fix this we call glDepthFunc(GL_LEQUAL) which relaxes the depth
+      test a bit. It means that if a second pixel is rendered on top of a previous pixel with the same depth
+      the last pixel always take precedence.
+      </p>
+    </section>
+
+    <a href="../tutorial40/tutorial40.html" class="next highlight"> Next tutorial </a>
+  </article>
+
+  <script src="../html5shiv.min.js"></script>
+  <script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>

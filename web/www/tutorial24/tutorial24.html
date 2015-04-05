@@ -1,398 +1,412 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-<table width=100% >
-<tr>
-	<td width=34%><div align=left"><a href="../tutorial23/tutorial23.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-    <td width=33%><div align=right><a href="../tutorial25/tutorial25.html" rel="next"><img src="../next.jpg"></a></div></td>
-</tr>
-</table>
-	
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-<title>Tutorial 24</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<title> Tutorial 24 - Shadow Mapping - Part 2 </title>
+
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+	<link rel="stylesheet" href="../style.css">
+	<link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<div class="content">
-<div class="lines">
-<h1>Tutorial 24 - Shadow Mapping - Part 2</h1>
-<div style="text-align: center">
-<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
-</div>
-<h2>Background</h2>
-<p>
-	In the previous tutorial we learned the basic principle behind the shadow mapping technique and saw
-	how to render the depth into a texture and later display it on the screen by sampling from the depth
-	buffer. In this tutorial we will see how to use this capability and display the shadow itself.
-</p>
-<p>
-	We know that shadow mapping is a two-pass technique and that in the first pass the scene is rendered
-	from the point of view of the light. Let's review what happens to the Z component of the position vector
-	during that first pass:
-	<ol>
-	<li>The position of the vertices that are fed into the vertex shader are generally specified in local
-	space.</li>
-	<li>The vertex shader transforms the position from local space to clip space and forwards it down the pipeline
-	(see tutorial 12 if you need a refresher about clip space).</li>
-	<li>The rasterizer performs perspective divide (a division of the position vector by its W component). This
-		takes the position vector from clip space to NDC space. In NDC space everything which ends up on the screen
-	has a X, Y and Z components in the range [-1,1]. Things outside these ranges
-	are clipped away.</li>
-	<li>The rasterizer maps the X and Y of the position vector to the dimensions of the framebuffer (e.g. 800x600, 1024x768, etc). 
-		The results	are the screen space coordinates of the position vector.</li>
-	<li>The rasterizer takes the screen space coordinates of the three triangle vertices and interpolates them to create
-		the unique coordinates for each pixel that the triangle covers. The Z value (still in the [-1,1] range) is also interpolated
-		so every pixel has its own depth.
-	<li>Since we disabled color writes in the first pass the fragment shader is disabled. The depth test, however, still 
-		executes. To compare the Z value of the current pixel with the one in the buffer the screen space coordinates
-		of the pixel are used to fetch the depth from the buffer. If the depth of the new pixel is smaller than the stored
-	one the buffer is updated (and if color writes were enabled the color buffer would have also been updated).</li>
-	</ol>
-<p>
-	In the process above we saw how the depth value from the light point of view is calculated and stored. In the second
-	pass we render from the camera point of view so naturally we get a different depth. But we need both depth values - 
-	one to get the triangles ordered correctly on the screen and the other to check what is inside the shadow and what is
-	not. The trick in shadow mapping is to maintain two position vectors and two WVP matrices while traveling through
-	the 3D pipeline. One WVP matrix is calculated
-	from the light point of view and the other from the camera point of view. The vertex shader gets one position vector
-	in local space as usual, but it outputs two vectors:
-</p>
-	<ol>
-	 <li>The builtin gl_Position which is the result of transforming the position by the camera WVP matrix.</li>
-	 <li>A "plain" vector which is the result of transforming the position by the light WVP matrix.</li>
-	</ol>
-<p>
-	The first vector will go through above process (--> NDC space...etc) and these will be used for the regular
-	rasterization. The second vector will simply be interpolated by the rasterizer 
-	across the triangle face and each fragment shader invocation will be provided with its own value. 
-	So now for each physical pixel we also have a clip space coordinate of the same point in the original triangle
-	when looking at it from the light point of view. It is very likely that the physical pixels from the two point
-	of views are different but the general location in the triangle is the same. All that remains is to somehow 
-	use that clip space coordinate in order to fetch the depth value from the shadow map. After that we can compare the depth
-	to the one in the clip space coordinate and if the stored depth is smaller then it means the pixel is in shadow (because
-	another pixel had the same clip space coordinate but with a smaller depth).
-</p>
-<p>
-	So how can we fetch the depth in the fragment shader using the clip space coordinate that was 
-	calculated by trasforming the position by the light WVP matrix? When we start out we are basically in step 2 above.
-	<ol>
-		<li>Since the fragment shader receives the clip space coordinate as a standard vertex attribute the rasterizer
-			does not perform perspective divide on it (only what goes through gl_Position). But this is something that
-			is very easy to do manually in the shader. We divide the coordinate by its W component and get a coordinate in 
-			NDC space.</li>
-		<li>We know that in NDC the X and Y range from -1 to 1. In step 4 above the rasterizer maps the NDC coordinates
-			to screen space and uses them to store the depth. We are going to sample the depth and for that we need a texture
-			coordinate in the range [0,1]. If we linearly map the range [-1,1] to [0,1] we will get a texture coordinate
-			that will map to the same location in the shadow map. Example: the X in NDC is zero and the width of the texture
-			is 800. Zero in NDC needs to be mapped to 0.5 in the texture coordinate space (because it is half way between
-			-1 and 1). The texture coordinate 0.5 is mapped to 400 in the texture which is the same location that is calculated
-		by the rasterizer when it performs screen space transform.</li>
-		<li>Transforming X and Y from NDC space to texture space is done as follows: </li>
-		<ul>
-			<li>u = 0.5 * X + 0.5</li>
-			<li>v = 0.5 * Y + 0.5</li>
-		</ul>
-	</ol>
-</p>
-<h2>Code Walkthru</h2>
-<p>(lighting_technique.h:80)</p>
-<code>
-class LightingTechnique : public Technique {<br>
-&nbsp; &nbsp public:<br>
-&nbsp; &nbsp ...	<br>
-&nbsp; &nbsp &nbsp; &nbsp void SetLightWVP(const Matrix4f& LightWVP);<br>
-&nbsp; &nbsp &nbsp; &nbsp void SetShadowMapTextureUnit(unsigned int TextureUnit);<br>
-&nbsp; &nbsp ...<br>
-&nbsp; &nbsp private:<br>
-&nbsp; &nbsp &nbsp; &nbsp GLuint m_LightWVPLocation;<br>
-&nbsp; &nbsp &nbsp; &nbsp GLuint m_shadowMapLocation;<br>
-		...<br>
-</code>
-<p>
-	The lighting technique needs a couple of new attributes. A WVP matrix that is calculated from the 
-	light point of view and a texture unit for the shadow map. We will continue using texture unit 0 
-	for the regular texture that is mapped on the object and will dedicate texture unit 1 for the shadow map.
-</p>
-<p>(lighting.vs)</p>
-<code>
-#version 330<br>
-<br>
-layout (location = 0) in vec3 Position;<br>
-layout (location = 1) in vec2 TexCoord;<br>
-layout (location = 2) in vec3 Normal;<br>
-<br>
-uniform mat4 gWVP;<br>
-<b>uniform mat4 gLightWVP;</b><br>
-uniform mat4 gWorld;<br>
-<br>
-<b>out vec4 LightSpacePos;</b><br>
-out vec2 TexCoord0;<br>
-out vec3 Normal0;<br>
-out vec3 WorldPos0;<br>
-<br>
-void main()<br>
-{<br>
-&nbsp; &nbsp     gl_Position      = gWVP * vec4(Position, 1.0);<br>
-&nbsp; &nbsp  <b>   LightSpacePos    = gLightWVP * vec4(Position, 1.0);</b><br>
-&nbsp; &nbsp     TexCoord0        = TexCoord;<br>
-&nbsp; &nbsp     Normal0          = (gWorld * vec4(Normal, 0.0)).xyz;<br>
-&nbsp; &nbsp     WorldPos0        = (gWorld * vec4(Position, 1.0)).xyz;<br>
-}
-</code>
-<p>
-	This is the updated vertex shader of the LightingTechnique class with the additions marked in bold text. 
-	We have an additional WVP matrix uniform variable and a 4-vector as output which contains the clip space coordinates calculated
-	by transforming the position by the light WVP matrix. As you can see, in the vertex shader of the first
-	pass the variable gWVP contained the same matrix as gLightWVP here and gl_Position
-	there got the same value as LightSpacePos here. But since LightSpacePos is just a standard vector it does
-	not get an automatic perspective division as gl_Position. We will do this manually in the fragment shader below.
-</p>
-<p>(lighting.fs:58)</p>
-<code>
-float CalcShadowFactor(vec4 LightSpacePos)<br>
-{<br>
-&nbsp; &nbsp     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;<br>
-&nbsp; &nbsp     vec2 UVCoords;<br>
-&nbsp; &nbsp     UVCoords.x = 0.5 * ProjCoords.x + 0.5;<br>
-&nbsp; &nbsp     UVCoords.y = 0.5 * ProjCoords.y + 0.5;<br>
-&nbsp; &nbsp     float z    = 0.5 * ProjCoords.z + 0.5;<br>
-&nbsp; &nbsp     float Depth = texture(gShadowMap, UVCoords).x;<br>
-&nbsp; &nbsp     if (Depth < (z + 0.00001))<br>
-&nbsp; &nbsp &nbsp; &nbsp         return 0.5;<br>
-&nbsp; &nbsp     else<br>
-&nbsp; &nbsp &nbsp; &nbsp         return 1.0;<br>
-}
-</code>
-<p>
-	This function is used in the fragment shader to calculate the shadow factor of a pixel.
-	The shadow factor is a new factor in the light equation. We simply multiply the result of
-	our current light equation by that factor and this causes some attenuation of the light
-	in pixels that are determined to be shadowed. The function takes the interpolated LightSpacePos
-	vector that was passed from the vertex shader. The first step is to perform perspective
-	division - we divide the XYZ components by the W component. This transfers the vector to NDC space.	
-	Next we prepare a 2D coordinate vector to be used as the texture coordinate and initialize it by 
-	transforming the LightSpacePos vector from NDC to texture space according to the equation in the
-	background section. The texture coordinates are used to fetch the depth from the shadow map.
-	This is the depth of the closest location from all the points in the scene that are projected 
-	to this pixel. We compare that depth to the depth of the current pixel and if it is
-	smaller return a shadow factor of 0.5, else the shadow factor is 1.0 (no shadow). The Z from the NDC
-        space also goes through transformation from the (-1,1) range to (0,1) range because we have
-to be in the same space when we compare. Notice that we
-	add a small epsilon value to the current pixel's depth. This is to avoid precision errors that
-	are inherent when dealing with floating point values.
-</p>
-<p>(lighting.fs:72)</p>
-<code>
-vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal<b>, float ShadowFactor</b>)<br>
-{<br>
-&nbsp; &nbsp 		...<br>
-&nbsp; &nbsp     return (AmbientColor + <b>ShadowFactor * </b>(DiffuseColor + SpecularColor));<br>
-}	
-</code>
-<p>
-	The changes to the core function that does the lighting calculations are minimal. The caller must pass
-	the shadow factor and the diffuse and specular colors are modulated by that factor. Ambient light
-	is not affected by the shadow because by definition, it is everywhere.
-</p>
-<p>(lighting.fs:97)</p>
-<code>
-vec4 CalcDirectionalLight(vec3 Normal)<br>
-{<br>
-&nbsp; &nbsp     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal<b>, 1.0</b>);<br>
-}
-</code>
-<p>
-	Our shadow mapping implementation is currently limited to spot lights. In order to calculate the WVP matrix of 
-	the light it needs both a position and a direction which point light and directional light lack. We will add
-	the missing features in the future but for now we simply use a shadow factor of 1 for the directional light.
-</p>
-<p>(lighting.fs:102)</p>
-<code>
-vec4 CalcPointLight(struct PointLight l, vec3 Normal<b>, vec4 LightSpacePos</b>)<br>
-{<br>
-&nbsp; &nbsp      vec3 LightDirection = WorldPos0 - l.Position;<br>
-&nbsp; &nbsp      float Distance = length(LightDirection);<br>
-&nbsp; &nbsp      LightDirection = normalize(LightDirection);<br>
-&nbsp; &nbsp   <b>float ShadowFactor = CalcShadowFactor(LightSpacePos);</b><br>
-<br>
-&nbsp; &nbsp      vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal<b>, ShadowFactor</b>);<br>
-&nbsp; &nbsp      float Attenuation =  l.Atten.Constant +<br>
-&nbsp; &nbsp  &nbsp; &nbsp  l.Atten.Linear * Distance +<br>
-&nbsp; &nbsp  &nbsp; &nbsp  l.Atten.Exp * Distance * Distance;<br>
-<br>
-&nbsp; &nbsp      return Color / Attenuation;<br>
-}
-</code>
-<p>
-	Since the spot light is actually calculated using a point light this function now takes the extra
-	parameter of the light space position and calculates the shadow factor. It passes it on to CalcLightInternal()
-	which uses it as described above.
-</p>
-<p>(lighting.fs:117)</p>
-<code>
-vec4 CalcSpotLight(struct SpotLight l, vec3 Normal<b>, vec4 LightSpacePos</b>)<br>
-{<br>
-&nbsp; &nbsp     vec3 LightToPixel = normalize(WorldPos0 - l.Base.Position);<br>
-&nbsp; &nbsp     float SpotFactor = dot(LightToPixel, l.Direction);<br>
-<br>
-&nbsp; &nbsp     if (SpotFactor > l.Cutoff) {<br>
-&nbsp; &nbsp &nbsp; &nbsp         vec4 Color = CalcPointLight(l.Base, Normal<b>, LightSpacePos</b>);<br>
-&nbsp; &nbsp &nbsp; &nbsp         return Color * (1.0 - (1.0 - SpotFactor) * 1.0/(1.0 - l.Cutoff));<br>
-&nbsp; &nbsp     }<br>
-&nbsp; &nbsp     else {<br>
-&nbsp; &nbsp &nbsp; &nbsp         return vec4(0,0,0,0);<br>
-&nbsp; &nbsp     }<br>
-}
-</code>
-<p>
-	The spot light function simply passes through the light space position to the point light
-	function.
-</p>
-<p>(lighting.fs:131)</p>
-<code>
-void main()<br>
-{<br>
-&nbsp; &nbsp       vec3 Normal = normalize(Normal0);<br>
-&nbsp; &nbsp       vec4 TotalLight = CalcDirectionalLight(Normal);<br>
-<br>
-&nbsp; &nbsp       for (int i = 0 ; i < gNumPointLights ; i++) {<br>
-&nbsp &nbsp &nbsp &nbsp             TotalLight += CalcPointLight(gPointLights[i], Normal<b>, LightSpacePos</b>);<br>
-&nbsp; &nbsp       }<br>
-<br>
-&nbsp &nbsp       for (int i = 0 ; i < gNumSpotLights ; i++) {<br>
-&nbsp; &nbsp &nbsp &nbsp           TotalLight += CalcSpotLight(gSpotLights[i], Normal<b>, LightSpacePos</b>);<br>
-&nbsp; &nbsp       }<br>
-<br>
-&nbsp; &nbsp       vec4 SampledColor = texture2D(gSampler, TexCoord0.xy);<br>
-&nbsp; &nbsp       FragColor = SampledColor * TotalLight;<br>
-}
-</code>
-<p>
-	Finally, the main function of the fragment shader. We are using the same light space position
-	vector for both spot and point lights even though only spot lights are supported. This limitation
-	will be fixed in the future. We have finished reviewing the changes in the lighting technique and
-	will now take a look at the application code.
-</p>
-<p>(tutorial24.cpp:86)</p>
-<code>
-m_pLightingEffect = new LightingTechnique();<br>
-<br>
-if (!m_pLightingEffect->Init()) {<br>
-&nbsp; &nbsp    printf("Error initializing the lighting technique\n");<br>
-&nbsp; &nbsp    return false;<br>
-}<br>
-<br>
-m_pLightingEffect->Enable();<br>
-m_pLightingEffect->SetSpotLights(1, &m_spotLight);<br>
-m_pLightingEffect->SetTextureUnit(0);<br>
-m_pLightingEffect->SetShadowMapTextureUnit(1);
-</code>
-<p>
-	This code which sets up the LightingTechnique is part of the Init() function so it is executed only once
-	during startup. Here we set the uniform values that will not change from frame to frame. Our standard
-	texture unit for the texture which belongs to the mesh is 0 and we dedicate texture unit 1 for the
-	shadow map. Remember that the shader program must be enabled before its uniform variables are set up and
-	they remain persistent as long as the program is not relinked. This is convenient because it allows you
-	to switch between shader programs and only worry about the uniform variables that are dynamic. Uniform
-	variables that never change can be set once during startup.
-</p>
-<p>(tutorial24.cpp:129)</p>
-<code>	
-virtual void RenderSceneCB()<br>
-{<br>
-&nbsp; &nbsp 		m_pGameCamera->OnRender();<br>
-&nbsp; &nbsp 		m_scale += 0.05f;<br>
-		<br>
-&nbsp; &nbsp 		ShadowMapPass();<br>
-&nbsp; &nbsp 		RenderPass();<br>
-		<br>
-&nbsp; &nbsp 		glutSwapBuffers();<br>
-}
-</code>
-<p>
-	Nothing has changed in the main render function - first we take care of the global stuff such as the camera
-	and the scale factor which is used for rotating the mesh. Then we do the shadow pass followed by the render
-	pass.
-</p>
-<p>(tutorial24.cpp:141)</p>
-<code>
-virtual void ShadowMapPass()<br>
-{<br>
-&nbsp; &nbsp 	    m_shadowMapFBO.BindForWriting();<br>
-<br>
-&nbsp; &nbsp 	    glClear(GL_DEPTH_BUFFER_BIT);<br>
-<br>
-&nbsp; &nbsp 	<b>    m_pShadowMapEffect->Enable();</b><br>
-<br>
-&nbsp; &nbsp 	    Pipeline p;<br>
-&nbsp; &nbsp 	    p.Scale(0.1f, 0.1f, 0.1f);<br>
-&nbsp; &nbsp 	    p.Rotate(0.0f, m_scale, 0.0f);<br>
-&nbsp; &nbsp 	    p.WorldPos(0.0f, 0.0f, 3.0f);<br>
-&nbsp; &nbsp 	    p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
-&nbsp; &nbsp 	    p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);<br>
-&nbsp; &nbsp 	    m_pShadowMapEffect->SetWVP(p.GetWVPTrans());<br>
-&nbsp; &nbsp 	    m_pMesh->Render();<br>
-    <br>
-&nbsp; &nbsp 	    glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
-}
-</code>
-<p>
-	This is basically the same shadow pass from the previous tutorial. The only change is that
-	we enable the shadow map technique each time because we toggle between this technique
-	and the lighting technique. Note that even though our scene contains both a mesh and a quad that
-	serves as the ground, only the mesh is rendered into the shadow map. The reason is that
-	the ground cannot cast shadows. This is one of the optimizations that we can do when we know
-	something about the type of the object.
-</p>
-<p>(tutorial24.cpp:168)</p>
-<code>
-virtual void RenderPass()<br>
-{<br>
-&nbsp; &nbsp 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
-<br>
-&nbsp; &nbsp 	    m_pLightingEffect->Enable();<br>
-<br>
-&nbsp; &nbsp        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
-   <br>
-&nbsp; &nbsp 	    m_shadowMapFBO.BindForReading(GL_TEXTURE1);<br>
-<br>
-&nbsp; &nbsp 	    Pipeline p;<br>
-&nbsp; &nbsp 	    p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);<br>
-<br>
-&nbsp; &nbsp 	    p.Scale(10.0f, 10.0f, 10.0f);<br>
-&nbsp; &nbsp 	    p.WorldPos(0.0f, 0.0f, 1.0f);<br>
-&nbsp; &nbsp 	    p.Rotate(90.0f, 0.0f, 0.0f);<br>
-&nbsp; &nbsp 	<b> p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());</b><br>
-&nbsp; &nbsp 	<b> m_pLightingEffect->SetWVP(p.GetWVPTrans());</b><br>
-&nbsp; &nbsp 	    m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());<br>
-&nbsp; &nbsp 	<b> p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
-&nbsp; &nbsp 	<b> m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
-&nbsp; &nbsp 	    m_pGroundTex->Bind(GL_TEXTURE0);<br>
-&nbsp; &nbsp 	    m_pQuad->Render();<br>
-<br>
-&nbsp; &nbsp 	    p.Scale(0.1f, 0.1f, 0.1f);<br>
-&nbsp; &nbsp 	    p.Rotate(0.0f, m_scale, 0.0f);<br>
-&nbsp; &nbsp 	    p.WorldPos(0.0f, 0.0f, 3.0f);<br>
-&nbsp; &nbsp 	 <b>   p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());</b><br>
-&nbsp; &nbsp 	 <b>   m_pLightingEffect->SetWVP(p.GetWVPTrans());</b><br>
-&nbsp; &nbsp 	    m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());<br>
-&nbsp; &nbsp 	 <b>   p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
-&nbsp; &nbsp 	 <b>  m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
-&nbsp; &nbsp 	    m_pMesh->Render();<br>
-}
-</code>
-<p>
-	The render pass starts the same way as in the previous tutorial - we clear both the depth and color buffers, replace
-	the shadow map technique with the lighting technique and bind the shadow map frame buffer object for reading
-	on texture unit 1. Next we render the quad so that it will serve as the ground on which the shadow will appear.
-	It is scaled up a bit, rotated 90 degrees around the X axis (because originally it is facing the camera) and positioned.
-	Note how the WVP is updated based on the location of the camera but for the light WVP we move the camera
-	to the light position. Since the quad model comes without its own texture we manually bind a texture here. The mesh
-	is rendered in the same way.
-</p>
-</table>
-</div>
-</div>
+	<header id="header">
+		<div>
+			<h2> Tutorial 24: </h2>
+			<h1> Shadow Mapping - Part 2 </h1>
+		</div>
+
+		<a id="logo" class="small" href="../../index.html" title="Homepage">
+			<img src="..//logo ldpi.png">
+		</a>
+	</header>
+
+	<article id="content" class="breakpoint">
+		<section>
+			<h3> Background </h3>
+
+			<p>
+				In the previous tutorial we learned the basic principle behind the shadow mapping technique and saw
+				how to render the depth into a texture and later display it on the screen by sampling from the depth
+				buffer. In this tutorial we will see how to use this capability and display the shadow itself.
+			</p>
+			<p>
+				We know that shadow mapping is a two-pass technique and that in the first pass the scene is rendered
+				from the point of view of the light. Let's review what happens to the Z component of the position vector
+				during that first pass:
+				<ol>
+				<li>The position of the vertices that are fed into the vertex shader are generally specified in local
+				space.</li>
+				<li>The vertex shader transforms the position from local space to clip space and forwards it down the pipeline
+				(see tutorial 12 if you need a refresher about clip space).</li>
+				<li>The rasterizer performs perspective divide (a division of the position vector by its W component). This
+					takes the position vector from clip space to NDC space. In NDC space everything which ends up on the screen
+				has a X, Y and Z components in the range [-1,1]. Things outside these ranges
+				are clipped away.</li>
+				<li>The rasterizer maps the X and Y of the position vector to the dimensions of the framebuffer (e.g. 800x600, 1024x768, etc). 
+					The results	are the screen space coordinates of the position vector.</li>
+				<li>The rasterizer takes the screen space coordinates of the three triangle vertices and interpolates them to create
+					the unique coordinates for each pixel that the triangle covers. The Z value (still in the [-1,1] range) is also interpolated
+					so every pixel has its own depth.
+				<li>Since we disabled color writes in the first pass the fragment shader is disabled. The depth test, however, still 
+					executes. To compare the Z value of the current pixel with the one in the buffer the screen space coordinates
+					of the pixel are used to fetch the depth from the buffer. If the depth of the new pixel is smaller than the stored
+				one the buffer is updated (and if color writes were enabled the color buffer would have also been updated).</li>
+				</ol>
+			<p>
+				In the process above we saw how the depth value from the light point of view is calculated and stored. In the second
+				pass we render from the camera point of view so naturally we get a different depth. But we need both depth values - 
+				one to get the triangles ordered correctly on the screen and the other to check what is inside the shadow and what is
+				not. The trick in shadow mapping is to maintain two position vectors and two WVP matrices while traveling through
+				the 3D pipeline. One WVP matrix is calculated
+				from the light point of view and the other from the camera point of view. The vertex shader gets one position vector
+				in local space as usual, but it outputs two vectors:
+			</p>
+				<ol>
+				 <li>The builtin gl_Position which is the result of transforming the position by the camera WVP matrix.</li>
+				 <li>A "plain" vector which is the result of transforming the position by the light WVP matrix.</li>
+				</ol>
+			<p>
+				The first vector will go through above process (--> NDC space...etc) and these will be used for the regular
+				rasterization. The second vector will simply be interpolated by the rasterizer 
+				across the triangle face and each fragment shader invocation will be provided with its own value. 
+				So now for each physical pixel we also have a clip space coordinate of the same point in the original triangle
+				when looking at it from the light point of view. It is very likely that the physical pixels from the two point
+				of views are different but the general location in the triangle is the same. All that remains is to somehow 
+				use that clip space coordinate in order to fetch the depth value from the shadow map. After that we can compare the depth
+				to the one in the clip space coordinate and if the stored depth is smaller then it means the pixel is in shadow (because
+				another pixel had the same clip space coordinate but with a smaller depth).
+			</p>
+			<p>
+				So how can we fetch the depth in the fragment shader using the clip space coordinate that was 
+				calculated by trasforming the position by the light WVP matrix? When we start out we are basically in step 2 above.
+				<ol>
+					<li>Since the fragment shader receives the clip space coordinate as a standard vertex attribute the rasterizer
+						does not perform perspective divide on it (only what goes through gl_Position). But this is something that
+						is very easy to do manually in the shader. We divide the coordinate by its W component and get a coordinate in 
+						NDC space.</li>
+					<li>We know that in NDC the X and Y range from -1 to 1. In step 4 above the rasterizer maps the NDC coordinates
+						to screen space and uses them to store the depth. We are going to sample the depth and for that we need a texture
+						coordinate in the range [0,1]. If we linearly map the range [-1,1] to [0,1] we will get a texture coordinate
+						that will map to the same location in the shadow map. Example: the X in NDC is zero and the width of the texture
+						is 800. Zero in NDC needs to be mapped to 0.5 in the texture coordinate space (because it is half way between
+						-1 and 1). The texture coordinate 0.5 is mapped to 400 in the texture which is the same location that is calculated
+					by the rasterizer when it performs screen space transform.</li>
+					<li>Transforming X and Y from NDC space to texture space is done as follows: </li>
+					<ul>
+						<li>u = 0.5 * X + 0.5</li>
+						<li>v = 0.5 * Y + 0.5</li>
+					</ul>
+				</ol>
+			</p>
+		</section>
+
+		<section>
+			<h3> Source walkthru </h3>
+
+			<p>(lighting_technique.h:80)</p>
+			<code>
+			class LightingTechnique : public Technique {<br>
+			&nbsp; &nbsp; public:<br>
+			&nbsp; &nbsp; ...	<br>
+			&nbsp; &nbsp; &nbsp; &nbsp; void SetLightWVP(const Matrix4f&amp; LightWVP);<br>
+			&nbsp; &nbsp; &nbsp; &nbsp; void SetShadowMapTextureUnit(unsigned int TextureUnit);<br>
+			&nbsp; &nbsp; ...<br>
+			&nbsp; &nbsp; private:<br>
+			&nbsp; &nbsp; &nbsp; &nbsp; GLuint m_LightWVPLocation;<br>
+			&nbsp; &nbsp; &nbsp; &nbsp GLuint m_shadowMapLocation;<br>
+					...<br>
+			</code>
+			<p>
+				The lighting technique needs a couple of new attributes. A WVP matrix that is calculated from the 
+				light point of view and a texture unit for the shadow map. We will continue using texture unit 0 
+				for the regular texture that is mapped on the object and will dedicate texture unit 1 for the shadow map.
+			</p>
+			<p>(lighting.vs)</p>
+			<code>
+			#version 330<br>
+			<br>
+			layout (location = 0) in vec3 Position;<br>
+			layout (location = 1) in vec2 TexCoord;<br>
+			layout (location = 2) in vec3 Normal;<br>
+			<br>
+			uniform mat4 gWVP;<br>
+			<b>uniform mat4 gLightWVP;</b><br>
+			uniform mat4 gWorld;<br>
+			<br>
+			<b>out vec4 LightSpacePos;</b><br>
+			out vec2 TexCoord0;<br>
+			out vec3 Normal0;<br>
+			out vec3 WorldPos0;<br>
+			<br>
+			void main()<br>
+			{<br>
+			&nbsp; &nbsp;     gl_Position      = gWVP * vec4(Position, 1.0);<br>
+			&nbsp; &nbsp;  <b>   LightSpacePos    = gLightWVP * vec4(Position, 1.0);</b><br>
+			&nbsp; &nbsp;     TexCoord0        = TexCoord;<br>
+			&nbsp; &nbsp;     Normal0          = (gWorld * vec4(Normal, 0.0)).xyz;<br>
+			&nbsp; &nbsp;     WorldPos0        = (gWorld * vec4(Position, 1.0)).xyz;<br>
+			}
+			</code>
+			<p>
+				This is the updated vertex shader of the LightingTechnique class with the additions marked in bold text. 
+				We have an additional WVP matrix uniform variable and a 4-vector as output which contains the clip space coordinates calculated
+				by transforming the position by the light WVP matrix. As you can see, in the vertex shader of the first
+				pass the variable gWVP contained the same matrix as gLightWVP here and gl_Position
+				there got the same value as LightSpacePos here. But since LightSpacePos is just a standard vector it does
+				not get an automatic perspective division as gl_Position. We will do this manually in the fragment shader below.
+			</p>
+			<p>(lighting.fs:58)</p>
+			<code>
+			float CalcShadowFactor(vec4 LightSpacePos)<br>
+			{<br>
+			&nbsp; &nbsp;     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;<br>
+			&nbsp; &nbsp;     vec2 UVCoords;<br>
+			&nbsp; &nbsp;     UVCoords.x = 0.5 * ProjCoords.x + 0.5;<br>
+			&nbsp; &nbsp;     UVCoords.y = 0.5 * ProjCoords.y + 0.5;<br>
+			&nbsp; &nbsp;     float z    = 0.5 * ProjCoords.z + 0.5;<br>
+			&nbsp; &nbsp;     float Depth = texture(gShadowMap, UVCoords).x;<br>
+			&nbsp; &nbsp;     if (Depth &lt; (z + 0.00001))<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;         return 0.5;<br>
+			&nbsp; &nbsp;     else<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;         return 1.0;<br>
+			}
+			</code>
+			<p>
+				This function is used in the fragment shader to calculate the shadow factor of a pixel.
+				The shadow factor is a new factor in the light equation. We simply multiply the result of
+				our current light equation by that factor and this causes some attenuation of the light
+				in pixels that are determined to be shadowed. The function takes the interpolated LightSpacePos
+				vector that was passed from the vertex shader. The first step is to perform perspective
+				division - we divide the XYZ components by the W component. This transfers the vector to NDC space.	
+				Next we prepare a 2D coordinate vector to be used as the texture coordinate and initialize it by 
+				transforming the LightSpacePos vector from NDC to texture space according to the equation in the
+				background section. The texture coordinates are used to fetch the depth from the shadow map.
+				This is the depth of the closest location from all the points in the scene that are projected 
+				to this pixel. We compare that depth to the depth of the current pixel and if it is
+				smaller return a shadow factor of 0.5, else the shadow factor is 1.0 (no shadow). The Z from the NDC
+			        space also goes through transformation from the (-1,1) range to (0,1) range because we have
+			to be in the same space when we compare. Notice that we
+				add a small epsilon value to the current pixel's depth. This is to avoid precision errors that
+				are inherent when dealing with floating point values.
+			</p>
+			<p>(lighting.fs:72)</p>
+			<code>
+			vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal<b>, float ShadowFactor</b>)<br>
+			{<br>
+			&nbsp; &nbsp; 		...<br>
+			&nbsp; &nbsp;     return (AmbientColor + <b>ShadowFactor * </b>(DiffuseColor + SpecularColor));<br>
+			}	
+			</code>
+			<p>
+				The changes to the core function that does the lighting calculations are minimal. The caller must pass
+				the shadow factor and the diffuse and specular colors are modulated by that factor. Ambient light
+				is not affected by the shadow because by definition, it is everywhere.
+			</p>
+			<p>(lighting.fs:97)</p>
+			<code>
+			vec4 CalcDirectionalLight(vec3 Normal)<br>
+			{<br>
+			&nbsp; &nbsp;     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal<b>, 1.0</b>);<br>
+			}
+			</code>
+			<p>
+				Our shadow mapping implementation is currently limited to spot lights. In order to calculate the WVP matrix of 
+				the light it needs both a position and a direction which point light and directional light lack. We will add
+				the missing features in the future but for now we simply use a shadow factor of 1 for the directional light.
+			</p>
+			<p>(lighting.fs:102)</p>
+			<code>
+			vec4 CalcPointLight(struct PointLight l, vec3 Normal<b>, vec4 LightSpacePos</b>)<br>
+			{<br>
+			&nbsp; &nbsp;      vec3 LightDirection = WorldPos0 - l.Position;<br>
+			&nbsp; &nbsp;      float Distance = length(LightDirection);<br>
+			&nbsp; &nbsp;      LightDirection = normalize(LightDirection);<br>
+			&nbsp; &nbsp;   <b>float ShadowFactor = CalcShadowFactor(LightSpacePos);</b><br>
+			<br>
+			&nbsp; &nbsp;      vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal<b>, ShadowFactor</b>);<br>
+			&nbsp; &nbsp;      float Attenuation =  l.Atten.Constant +<br>
+			&nbsp; &nbsp;  &nbsp; &nbsp;  l.Atten.Linear * Distance +<br>
+			&nbsp; &nbsp;  &nbsp; &nbsp;  l.Atten.Exp * Distance * Distance;<br>
+			<br>
+			&nbsp; &nbsp;      return Color / Attenuation;<br>
+			}
+			</code>
+			<p>
+				Since the spot light is actually calculated using a point light this function now takes the extra
+				parameter of the light space position and calculates the shadow factor. It passes it on to CalcLightInternal()
+				which uses it as described above.
+			</p>
+			<p>(lighting.fs:117)</p>
+			<code>
+			vec4 CalcSpotLight(struct SpotLight l, vec3 Normal<b>, vec4 LightSpacePos</b>)<br>
+			{<br>
+			&nbsp; &nbsp;     vec3 LightToPixel = normalize(WorldPos0 - l.Base.Position);<br>
+			&nbsp; &nbsp;     float SpotFactor = dot(LightToPixel, l.Direction);<br>
+			<br>
+			&nbsp; &nbsp;     if (SpotFactor > l.Cutoff) {<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;         vec4 Color = CalcPointLight(l.Base, Normal<b>, LightSpacePos</b>);<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;         return Color * (1.0 - (1.0 - SpotFactor) * 1.0/(1.0 - l.Cutoff));<br>
+			&nbsp; &nbsp;     }<br>
+			&nbsp; &nbsp;     else {<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;         return vec4(0,0,0,0);<br>
+			&nbsp; &nbsp;     }<br>
+			}
+			</code>
+			<p>
+				The spot light function simply passes through the light space position to the point light
+				function.
+			</p>
+			<p>(lighting.fs:131)</p>
+			<code>
+			void main()<br>
+			{<br>
+			&nbsp; &nbsp;       vec3 Normal = normalize(Normal0);<br>
+			&nbsp; &nbsp;       vec4 TotalLight = CalcDirectionalLight(Normal);<br>
+			<br>
+			&nbsp; &nbsp;       for (int i = 0 ; i &lt; gNumPointLights ; i++) {<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;             TotalLight += CalcPointLight(gPointLights[i], Normal<b>, LightSpacePos</b>);<br>
+			&nbsp; &nbsp;       }<br>
+			<br>
+			&nbsp; &nbsp;       for (int i = 0 ; i &lt; gNumSpotLights ; i++) {<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;           TotalLight += CalcSpotLight(gSpotLights[i], Normal<b>, LightSpacePos</b>);<br>
+			&nbsp; &nbsp;       }<br>
+			<br>
+			&nbsp; &nbsp;       vec4 SampledColor = texture2D(gSampler, TexCoord0.xy);<br>
+			&nbsp; &nbsp;       FragColor = SampledColor * TotalLight;<br>
+			}
+			</code>
+			<p>
+				Finally, the main function of the fragment shader. We are using the same light space position
+				vector for both spot and point lights even though only spot lights are supported. This limitation
+				will be fixed in the future. We have finished reviewing the changes in the lighting technique and
+				will now take a look at the application code.
+			</p>
+			<p>(tutorial24.cpp:86)</p>
+			<code>
+			m_pLightingEffect = new LightingTechnique();<br>
+			<br>
+			if (!m_pLightingEffect->Init()) {<br>
+			&nbsp; &nbsp;    printf("Error initializing the lighting technique\n");<br>
+			&nbsp; &nbsp;    return false;<br>
+			}<br>
+			<br>
+			m_pLightingEffect->Enable();<br>
+			m_pLightingEffect->SetSpotLights(1, &amp;m_spotLight);<br>
+			m_pLightingEffect->SetTextureUnit(0);<br>
+			m_pLightingEffect->SetShadowMapTextureUnit(1);
+			</code>
+			<p>
+				This code which sets up the LightingTechnique is part of the Init() function so it is executed only once
+				during startup. Here we set the uniform values that will not change from frame to frame. Our standard
+				texture unit for the texture which belongs to the mesh is 0 and we dedicate texture unit 1 for the
+				shadow map. Remember that the shader program must be enabled before its uniform variables are set up and
+				they remain persistent as long as the program is not relinked. This is convenient because it allows you
+				to switch between shader programs and only worry about the uniform variables that are dynamic. Uniform
+				variables that never change can be set once during startup.
+			</p>
+			<p>(tutorial24.cpp:129)</p>
+			<code>	
+			virtual void RenderSceneCB()<br>
+			{<br>
+			&nbsp; &nbsp; 		m_pGameCamera->OnRender();<br>
+			&nbsp; &nbsp; 		m_scale += 0.05f;<br>
+					<br>
+			&nbsp; &nbsp; 		ShadowMapPass();<br>
+			&nbsp; &nbsp; 		RenderPass();<br>
+					<br>
+			&nbsp; &nbsp; 		glutSwapBuffers();<br>
+			}
+			</code>
+			<p>
+				Nothing has changed in the main render function - first we take care of the global stuff such as the camera
+				and the scale factor which is used for rotating the mesh. Then we do the shadow pass followed by the render
+				pass.
+			</p>
+			<p>(tutorial24.cpp:141)</p>
+			<code>
+			virtual void ShadowMapPass()<br>
+			{<br>
+			&nbsp; &nbsp; 	    m_shadowMapFBO.BindForWriting();<br>
+			<br>
+			&nbsp; &nbsp; 	    glClear(GL_DEPTH_BUFFER_BIT);<br>
+			<br>
+			&nbsp; &nbsp; 	<b>    m_pShadowMapEffect->Enable();</b><br>
+			<br>
+			&nbsp; &nbsp; 	    Pipeline p;<br>
+			&nbsp; &nbsp; 	    p.Scale(0.1f, 0.1f, 0.1f);<br>
+			&nbsp; &nbsp; 	    p.Rotate(0.0f, m_scale, 0.0f);<br>
+			&nbsp; &nbsp; 	    p.WorldPos(0.0f, 0.0f, 3.0f);<br>
+			&nbsp; &nbsp; 	    p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
+			&nbsp; &nbsp; 	    p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);<br>
+			&nbsp; &nbsp; 	    m_pShadowMapEffect->SetWVP(p.GetWVPTrans());<br>
+			&nbsp; &nbsp; 	    m_pMesh->Render();<br>
+			    <br>
+			&nbsp; &nbsp; 	    glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
+			}
+			</code>
+			<p>
+				This is basically the same shadow pass from the previous tutorial. The only change is that
+				we enable the shadow map technique each time because we toggle between this technique
+				and the lighting technique. Note that even though our scene contains both a mesh and a quad that
+				serves as the ground, only the mesh is rendered into the shadow map. The reason is that
+				the ground cannot cast shadows. This is one of the optimizations that we can do when we know
+				something about the type of the object.
+			</p>
+			<p>(tutorial24.cpp:168)</p>
+			<code>
+			virtual void RenderPass()<br>
+			{<br>
+			&nbsp; &nbsp; 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+			<br>
+			&nbsp; &nbsp; 	    m_pLightingEffect->Enable();<br>
+			<br>
+			&nbsp; &nbsp;        m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
+			   <br>
+			&nbsp; &nbsp; 	    m_shadowMapFBO.BindForReading(GL_TEXTURE1);<br>
+			<br>
+			&nbsp; &nbsp; 	    Pipeline p;<br>
+			&nbsp; &nbsp; 	    p.SetPerspectiveProj(30.0f, WINDOW_WIDTH, WINDOW_HEIGHT, 1.0f, 50.0f);<br>
+			<br>
+			&nbsp; &nbsp; 	    p.Scale(10.0f, 10.0f, 10.0f);<br>
+			&nbsp; &nbsp; 	    p.WorldPos(0.0f, 0.0f, 1.0f);<br>
+			&nbsp; &nbsp; 	    p.Rotate(90.0f, 0.0f, 0.0f);<br>
+			&nbsp; &nbsp; 	<b> p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());</b><br>
+			&nbsp; &nbsp; 	<b> m_pLightingEffect->SetWVP(p.GetWVPTrans());</b><br>
+			&nbsp; &nbsp; 	    m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());<br>
+			&nbsp; &nbsp; 	<b> p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
+			&nbsp; &nbsp; 	<b> m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
+			&nbsp; &nbsp; 	    m_pGroundTex->Bind(GL_TEXTURE0);<br>
+			&nbsp; &nbsp; 	    m_pQuad->Render();<br>
+			<br>
+			&nbsp; &nbsp; 	    p.Scale(0.1f, 0.1f, 0.1f);<br>
+			&nbsp; &nbsp; 	    p.Rotate(0.0f, m_scale, 0.0f);<br>
+			&nbsp; &nbsp; 	    p.WorldPos(0.0f, 0.0f, 3.0f);<br>
+			&nbsp; &nbsp; 	 <b>   p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());</b><br>
+			&nbsp; &nbsp; 	 <b>   m_pLightingEffect->SetWVP(p.GetWVPTrans());</b><br>
+			&nbsp; &nbsp; 	    m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());<br>
+			&nbsp; &nbsp; 	 <b>   p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));</b><br>
+			&nbsp; &nbsp; 	 <b>  m_pLightingEffect->SetLightWVP(p.GetWVPTrans());</b><br>
+			&nbsp; &nbsp; 	    m_pMesh->Render();<br>
+			}
+			</code>
+			<p>
+				The render pass starts the same way as in the previous tutorial - we clear both the depth and color buffers, replace
+				the shadow map technique with the lighting technique and bind the shadow map frame buffer object for reading
+				on texture unit 1. Next we render the quad so that it will serve as the ground on which the shadow will appear.
+				It is scaled up a bit, rotated 90 degrees around the X axis (because originally it is facing the camera) and positioned.
+				Note how the WVP is updated based on the location of the camera but for the light WVP we move the camera
+				to the light position. Since the quad model comes without its own texture we manually bind a texture here. The mesh
+				is rendered in the same way.
+			</p>
+		</section>
+
+		<a href="../tutorial25/tutorial25.html" class="next highlight"> Next tutorial </a>
+	</article>
+
+	<script src="../html5shiv.min.js"></script>
+	<script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>

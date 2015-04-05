@@ -1,313 +1,316 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-<link rel="stylesheet" type="text/css" href="../balloontip.css" />
-<script type="text/javascript" src="../balloontip.js">
-/***********************************************
-* Rich HTML Balloon Tooltip- © Dynamic Drive DHTML code library (www.dynamicdrive.com)
-* This notice MUST stay intact for legal use
-* Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
-***********************************************/
-</script>
-<div id="prev" class="balloonstyle">
-<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Previous Tutorial
-</div>
-<div id="home" class="balloonstyle">
-<img src="shadetabs.gif" style="float: right; margin-left: 5px; border:1px solid black" />Home
-</div>
-<div id="next" class="balloonstyle">
-<img src="shadetabs.gif" style="float: left; margin-left: 5px; border:1px solid black" />Next Tutorial
-</div>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-<table width=100% >
-<tr>
-	<td width=34%><div align=left"><a href="../tutorial14/tutorial14.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-    <td width=33%><div align=right><a href="../tutorial16/tutorial16.html" rel="next"><img src="../next.jpg"></a></div></td>
-</tr>
-</table>
-	
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-<title>Tutorial 15</title>
+  <title> Tutorial 15 - Camera Control - Part 2 </title>
+
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<h1>Tutorial 15 - Camera Control - Part 2</h1>
-<div style="text-align: center;"><span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> </div>
-<h2>Background</h2>
-<p>In this tutorial we complete the implementation of the camera by enabling direction control using the mouse. There are various levels of freedom which are associated with the design of the camera.
-We are going to enable the level of control you come to expect in a first person game (shooter or otherwise). This means we will be able to turn the camera 360 degrees (around the positive Y axis), which corresponds
-to turning your head left or right and completing a full circle with your body. In addition, we will be able to tilt the camera up and down to get a better view above or below. We won't be able to turn the camera
-up until we complete a full circle or tilt it in a way a plane fuselage tilts during a turn. These levels of freedom are in the domain of flight simulators which is out of scope for this tutorial. At any rate, we
-will have a camera that will allow us to conveniently explore the 3D world will are going to develop in the coming tutorials.</p>
-<p>The following world war 2 anti aircraft gun demonstrates the kind of camera we are going to build:</p>
-<img style="width: 312px; height: 254px;" alt="" src="aa_gun.jpg">
-<p>The gun has two control axis:<p>
-<ol>
-<li>It can turn 360 degrees around the vector (0,1,0). This angle is called the 'horizontal angle' and the vector is the 'vertical axis'.</li>
-<li>It can tilt up and down around a vector which is parallel to the ground. This movement is somewhat limited and the gun cannot complete a full circle. This angle is called the 'vertical angle' and the vector
-is the 'horizontal axis'. Note that while the vertical axis is constant (0,1,0) the horizontal axis turns around with the gun and is always perpendicular to the target of the gun. This is a key point to understand
-in order to get the math correctly.</li>
-</ol>
-<p>The plan is to follow the movement of the mouse and change the horizontal angle when the mouse moves left and right and the vertical angle when the mouse moves up and down. Given these two angles we want to 
-calculate the target and up vectors.</p>
-<p>Turning the target vector by the horizontal angle is pretty straightforward. Using basic trigonometry we can see that the Z component of the target vector is the sine of the horizontal vector and the X component is the 
-cosine of the horizontal angle (at this stage the camera looks straight ahead so the Y is zero). Revisit tutorial 7 to see a diagram of that.</p>
-<p>Turning the target vector by the vertical angle is more complex since the horizontal axis turns along with the camera. The horizontal axis can be calculated using a cross product between the vertical axis and the 
-target vector after is was turned by the horizontal angle, but turning around an arbitrary vector (lifting the gun up and down) can be tricky.</p> 
-<p>Luckily, we have an extremely useful mathematical tool for that problem - the quaternion. Quaternions were discovered in 1843 by Sir Willilam Rowan Hamilton, an irish mathematician, and are based on the complex
-number system. The quaternion 'Q' is defined as:</p>
-<img style="width: 282px; height: 89px;" alt="" src="quaternion.png">
-<p>Where i, j and k are complex numbers and the following equation holds true:</p>
-<img style="width: 323px; height: 92px;" alt="" src="quaternion1.png">
-<p>In practice, we specify a quaternion as the 4-vector (x, y, z, w). The conjugate of quaternion 'Q' is defined as:</p>
-<img style="width: 334px; height: 93px;" alt="" src="conjugate.png">
-<p>Normalizing a quaternion is the same as normalizing a vector. I'm going to describe the steps required to rotate a vector around an arbitrary vector using a quaternion. More details about the mathematical
-proof behind the steps can be found on the web.</p>
-<p>The general function to calculate a quaternion 'W' that represents the rotated vector 'V' by the angle 'a' is:</p> 
-<img style="width: 203px; height: 93px;" alt="" src="rotation.png">
-<p>Where Q is the rotation quaternion which is defined as:</p>
-<img style="width: 285px; height: 343px;" alt="" src="rotationq.png">
-<p>After calculating 'W' the rotated vector is simply (W.x,W.y,W.z). An important point to note in the calculation of 'W' is that first we need to multiple 'Q' by 'V' which is a quaternion-by-vector multiplication that results
-in a quaternion, and then we need to do a quaternion-by-quaternion multiplication (the result of Q*V multiplied by the conjugate of 'Q'). The two types of multiplications are not the same. The file math_3d.cpp includes
-the implementations of these multiplication types.</p>
-<p>We will need to keep the horizontal and vertical angles updated all the time as the user moves the mouse around the screen and we need to decide how to initialize them. The logical choice is to initialize them
-according to the target vector that is supplied to the constructor of the camera. Let's start with the horizontal angle. Take a look at the following diagram which looks down the XZ plane from above:</p>
-<img style="width: 750px; height: 660px;" alt="" src="h_angle.png">
-<p>The target vector is (x,z) and we want to find the horizontal angle which is represented by the letter alpha (the Y component is relevant only for the vertical angle). Since the length of the radius of the circle is 1 it
-is very easy to see that the sine function of alpha is exactly z. Therefore, calculating the asine of z will provide alpha. Are we done? - not yet. Since z can be in the range [-1,1], the result of asine is 
--90 degrees to +90 degrees. But the range of the horizontal angle is 360 degrees. In addition, our quaternion does rotation clockwise. This means that when we rotate 90 degrees with the quaternion 
-we end up with -1 on the Z axis which is opposite to the actual sine of 90 degrees (which is 1). IMHO, the easiest way to get this right is to always calculate the asine function using the positive value of Z 
-and combine the result with the specific quarter of the circle where the vector is located. For example, when our target vector is (0,1) we calculate the asine of 1 which is 90 and substract it from 360.
-The result is 270. The asine range of 0 to 1 is 0 to 90 degrees. Combine that with the specific quarter of the circle and you get the final horizontal angle.</p>
-<p>Calculating the vertical angle is a bit simpler. We are going to limit the range of movement to -90 degrees (equal to 270 degrees - looking straight up) to +90 degrees (looking straight down). This means we only
-need the negative value of the asine function of the Y component in the target vector. When Y equals 1 (looking straight up) the asine is 90 so we just need to reverse the sign. When Y equals -1 (looking
-straight down) the asine is -90 and reversing the sign gets us to 90. If you are confused check the diagram again and simply replace Z with Y and X with Z.</p>
-<h2>Code Walkthru</h2>
-<p>(camera.cpp:38)</p>
-<code>
-Camera::Camera(int WindowWidth, int WindowHeight, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)<br>
-{<br>
-&nbsp &nbsp   m_windowWidth  = WindowWidth;<br>
- &nbsp &nbsp   m_windowHeight = WindowHeight;<br>
- &nbsp &nbsp   m_pos = Pos;<br>
-<br>
- &nbsp &nbsp   m_target = Target;<br>
- &nbsp &nbsp   m_target.Normalize();<br>
-<br>
- &nbsp &nbsp   m_up = Up;<br>
- &nbsp &nbsp   m_up.Normalize();<br>
-<br>
- &nbsp &nbsp   Init();<br>
-}<br>
-</code>
-<p>The constructor of the camera now gets the dimensions of the window. We need it in order to move the mouse to the center of the screen. In addition, note the call to Init() which sets up the internal camera attributes.</p>
-<p>(camera.cpp:54)</p>
-<code>
-void Camera::Init()<br>
-{<br>
-  &nbsp &nbsp   Vector3f HTarget(m_target.x, 0.0, m_target.z);<br>
-  &nbsp &nbsp   HTarget.Normalize();<br>
-    <br>
-  &nbsp &nbsp   if (HTarget.z >= 0.0f)<br>
-  &nbsp &nbsp   {<br>
-  &nbsp &nbsp  &nbsp &nbsp      if (HTarget.x >= 0.0f)<br>
-  &nbsp &nbsp  &nbsp &nbsp      {<br>
-  &nbsp &nbsp   &nbsp &nbsp  &nbsp &nbsp        m_AngleH = 360.0f - ToDegree(asin(HTarget.z));<br>
-  &nbsp &nbsp   &nbsp &nbsp     }<br>
-  &nbsp &nbsp     &nbsp &nbsp   else<br>
-  &nbsp &nbsp   &nbsp &nbsp     {<br>
-  &nbsp &nbsp   &nbsp &nbsp  &nbsp &nbsp        m_AngleH = 180.0f + ToDegree(asin(HTarget.z));<br>
-  &nbsp &nbsp   &nbsp &nbsp     }<br>
-  &nbsp &nbsp  }<br>
-  &nbsp &nbsp  else<br>
-  &nbsp &nbsp   {<br>
-  &nbsp &nbsp   &nbsp &nbsp     if (HTarget.x >= 0.0f)<br>
-  &nbsp &nbsp   &nbsp &nbsp     {<br>
-  &nbsp &nbsp   &nbsp &nbsp  &nbsp &nbsp        m_AngleH = ToDegree(asin(-HTarget.z));<br>
-  &nbsp &nbsp  &nbsp &nbsp      }<br>
-  &nbsp &nbsp   &nbsp &nbsp   else<br>
-  &nbsp &nbsp   &nbsp &nbsp     {<br>
-  &nbsp &nbsp    &nbsp &nbsp   &nbsp &nbsp      m_AngleH = 90.0f + ToDegree(asin(-HTarget.z));<br>
-  &nbsp &nbsp  &nbsp &nbsp      }<br>
-  &nbsp &nbsp   }<br>
-    <br>
-  &nbsp &nbsp   m_AngleV = -ToDegree(asin(m_target.y));<br>
-<br>
-  &nbsp &nbsp   m_OnUpperEdge = false;<br>
-  &nbsp &nbsp   m_OnLowerEdge = false;<br>
-  &nbsp &nbsp   m_OnLeftEdge  = false;<br>
-  &nbsp &nbsp   m_OnRightEdge = false;<br>
-  &nbsp &nbsp   m_mousePos.x  = m_windowWidth / 2;<br>
-  &nbsp &nbsp   m_mousePos.y  = m_windowHeight / 2;<br>
-<br>
-  &nbsp &nbsp   glutWarpPointer(m_mousePos.x, m_mousePos.y);<br>
-}
-</code>
-<p>In the Init() function we start by calculating the horizontal angle. We create a new target vector called HTarget (horizontal target) which is a projection of the original target vector on the XZ plane. Next we normalize
-it (since the math that was described earlier assumes a unit vector on the XZ plane). Then we check which quarter the target vector belongs to and calculate the final angle based on the positive value of the Z component.
-Next we calculate the vertical angle which is much simpler. 
-<p>The camera has 4 new flags to indicate whether the mouse is positioned on one of the edges of the screen. We are going to implement an automatic turn in the
-corresponding direction when that happens. This will allow us to turn 360 degrees. We initialize the flags to FALSE since the mouse starts at the center of the screen. The next two lines of code calculate where the center
-of the screen is (based on the window dimension) and the new function glutWarpPointer actually moves the mouse. Starting with the mouse at the center of the screen makes life much simpler.</p>
-<p>(camera.cpp:140)</p>
-<code>
-void Camera::OnMouse(int x, int y)<br>
-{<br>
-   &nbsp &nbsp   const int DeltaX = x - m_mousePos.x;<br>
-   &nbsp &nbsp   const int DeltaY = y - m_mousePos.y;<br>
-<br>
-   &nbsp &nbsp   m_mousePos.x = x;<br>
-   &nbsp &nbsp   m_mousePos.y = y;<br>
-<br>
-   &nbsp &nbsp   m_AngleH += (float)DeltaX / 20.0f;<br>
-   &nbsp &nbsp   m_AngleV += (float)DeltaY / 20.0f;<br>
-<br>
-   &nbsp &nbsp   if (DeltaX == 0) {<br>
-   &nbsp &nbsp  &nbsp &nbsp       if (x <= MARGIN) {<br>
-   &nbsp &nbsp  &nbsp &nbsp  &nbsp &nbsp           m_OnLeftEdge = true;<br>
-   &nbsp &nbsp  &nbsp &nbsp       }<br>
-   &nbsp &nbsp  &nbsp &nbsp      else if (x >= (m_windowWidth - MARGIN)) {<br>
-   &nbsp &nbsp  &nbsp &nbsp  &nbsp &nbsp           m_OnRightEdge = true;<br>
-   &nbsp &nbsp  &nbsp &nbsp       }<br>
-   &nbsp &nbsp   }<br>
-   &nbsp &nbsp   else {<br>
-   &nbsp &nbsp  &nbsp &nbsp       m_OnLeftEdge = false;<br>
-   &nbsp &nbsp  &nbsp &nbsp       m_OnRightEdge = false;<br>
-   &nbsp &nbsp   }<br>
-<br>
-   &nbsp &nbsp   if (DeltaY == 0) {<br>
-   &nbsp &nbsp  &nbsp &nbsp       if (y <= MARGIN) {<br>
-   &nbsp &nbsp  &nbsp &nbsp  &nbsp &nbsp           m_OnUpperEdge = true;<br>
-   &nbsp &nbsp  &nbsp &nbsp       }<br>
-   &nbsp &nbsp  &nbsp &nbsp       else if (y >= (m_windowHeight - MARGIN)) {<br>
-   &nbsp &nbsp  &nbsp &nbsp  &nbsp &nbsp           m_OnLowerEdge = true;<br>
-   &nbsp &nbsp  &nbsp &nbsp       }<br>
-   &nbsp &nbsp   }<br>
-   &nbsp &nbsp   else {<br>
-   &nbsp &nbsp  &nbsp &nbsp       m_OnUpperEdge = false;<br>
-   &nbsp &nbsp  &nbsp &nbsp       m_OnLowerEdge = false;<br>
-   &nbsp &nbsp   }<br>
-<br>
-   &nbsp &nbsp   Update();<br>
-}
-</code>
-<p>This function is used to notify the camera that the mouse moved. The parameters are the new screen position of the mouse. We start by calculating the delta from the previous location on both the X and Y axis.
-Next we store the new values for the next call to the function. We update the current horizontal and vertical angles by scaling down the deltas. I'm using a scaling value which works fine for me but on different
-computers you may want different scaling values. We are going to improve this in a future tutorial when we add the frame rate of the application as a factor.<p>
-<p>The next set of tests update the 'm_On*Edge' flags according to the location of the mouse. There is a margin which is by default 10 pixels that triggers the "edge" behavior when the mouse gets close to one of the edges
-of the screen. Finally, we call Update() to recalculate the target and up vectors based on the new horizontal and vertical angles.</p>
-<p>(camera.cpp:183)</p>
-<code>
-void Camera::OnRender()<br>
-{<br>
- &nbsp &nbsp    bool ShouldUpdate = false;<br>
-<br>
- &nbsp &nbsp    if (m_OnLeftEdge) {<br>
- &nbsp &nbsp &nbsp &nbsp        m_AngleH -= 0.1f;<br>
- &nbsp &nbsp &nbsp &nbsp        ShouldUpdate = true;<br>
- &nbsp &nbsp    }<br>
- &nbsp &nbsp    else if (m_OnRightEdge) {<br>
- &nbsp &nbsp &nbsp &nbsp        m_AngleH += 0.1f;<br>
- &nbsp &nbsp &nbsp &nbsp        ShouldUpdate = true;<br>
- &nbsp &nbsp    }<br>
-<br>
- &nbsp &nbsp    if (m_OnUpperEdge) {<br>
- &nbsp &nbsp &nbsp &nbsp        if (m_AngleV > -90.0f) {<br>
- &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp            m_AngleV -= 0.1f;<br>
- &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp            ShouldUpdate = true;<br>
- &nbsp &nbsp &nbsp &nbsp        }<br>
- &nbsp &nbsp    }<br>
- &nbsp &nbsp    else if (m_OnLowerEdge) {<br>
- &nbsp &nbsp  &nbsp &nbsp       if (m_AngleV < 90.0f) {<br>
- &nbsp &nbsp &nbsp &nbsp  &nbsp &nbsp          m_AngleV += 0.1f;<br>
- &nbsp &nbsp &nbsp &nbsp   &nbsp &nbsp         ShouldUpdate = true;<br>
- &nbsp &nbsp   &nbsp &nbsp      }<br>
- &nbsp &nbsp    }<br>
-<br>
- &nbsp &nbsp    if (ShouldUpdate) {<br>
- &nbsp &nbsp &nbsp &nbsp        Update();<br>
- &nbsp &nbsp    }<br>
-}
-</code>
-<p>This function is called from the main render loop. We need it for cases where the mouse is located on one of the edges of the screen and is not moving. In this case there are no mouse events but we still
-want the camera to continuously move (until the mouse moves away from the edge). We check if one of the flags is set and update the corresponding angle accordingly. If there was a change in one of the angles
-we call Update() to update the target and up vectors. When the mouse moves aways from the screen we detect it in the mouse event handler and clear the flag. Note the way the vertical angle is limited between the ranges
--90 degrees and +90 degrees. This is to prevent a full circle when looking up or down.</p>
-<p>(camera.cpp:214)</p>
-<code>
-void Camera::Update()<br>
-{<br>
- &nbsp &nbsp    const Vector3f Vaxis(0.0f, 1.0f, 0.0f);<br>
-<br>
- &nbsp &nbsp    // Rotate the view vector by the horizontal angle around the vertical axis<br>
- &nbsp &nbsp    Vector3f View(1.0f, 0.0f, 0.0f);<br>
- &nbsp &nbsp    View.Rotate(m_AngleH, Vaxis);<br>
- &nbsp &nbsp    View.Normalize();<br>
-<br>
- &nbsp &nbsp    // Rotate the view vector by the vertical angle around the horizontal axis<br>
- &nbsp &nbsp    Vector3f Haxis = Vaxis.Cross(View);<br>
- &nbsp &nbsp    Haxis.Normalize();<br>
- &nbsp &nbsp    View.Rotate(m_AngleV, Haxis);<br>
- &nbsp &nbsp    View.Normalize();<br>
-       <br>
- &nbsp &nbsp    m_target = View;<br>
- &nbsp &nbsp    m_target.Normalize();<br>
-<br>
- &nbsp &nbsp    m_up = m_target.Cross(Haxis);<br>
- &nbsp &nbsp    m_up.Normalize();<br>
-}
-</code>
-<p>This function updates the target and up vector according to the horizontal and vertical angles. We start with the view vector in a "reset" state. This means it is parallel to the gound (vertical angle is zero) and 
-looking directly to the right (horizontal angle is zero - see the diagram above). We set the vertical axis to point straight up and then rotate the view vector around it by the horizontal angle. The result
-is a vector which points in the general direction of the intended target but not necessarily in the correct height (i.e. it is on the XZ plane). By doing a cross product of this vector with the vertical axis we
-get another vector on the XZ plane which is perpendicular to the plane created by the view vector and the vertical axis. This is our new horizontal axis and now it is time to rotate the vector up or down around it
-according to the vertical angle. The result is the final target vector and we set it into the corresponding member attribute. Now we must fix the up vector. For example, if the camera is looking up, the up vector
-must tilt back to compensate (it must be 90 degrees in respect to the target vector). This is similar to the way the back of your head tilts back when you look up to the sky. The new up vector is calculated by 
-simply doing another cross product between the final target vector and the horizontal axis. If the vertical angle is still zero then the target vector remains on the XZ plane and the up vector remains (0,1,0).
-If the target vector is tilted up or down the up vector will tilt backward or forward, respectively.</p>
-<p>(tutorial15.cpp:209)</p>
-<code>
-glutGameModeString("1920x1200@32");<br>
-glutEnterGameMode();<br>
-</code>
-<p>These glut functions enable our application to run full screen in the so called high performance 'game mode'. It makes turning the camera 360 degrees simpler because all you need to do is pull the mouse towards one
-of the edges of the screen. Note the resolution and the bits per pixel that are configured via the game mode string. 32 bits per pixel provides the maximum number of colors for rendering.</p>
-</code>
-<p>(tutorial15.cpp:214)</p>
-<code>
-pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);<br>
-</code>
-<p>The camera is now allocated dynamically at this location because it performs a glut call (glutWarpPointer). This call will fail if glut has not yet been initialized.</p>
-<p>(tutorial15.cpp:99)</p>
-<code>
-glutPassiveMotionFunc(PassiveMouseCB);<br>
-glutKeyboardFunc(KeyboardCB);<br>
-</code>
-<p>We register two new glut callback functions here. One is for the mouse and the other for regular keyboard clicks (the special keyboard callback traps directional and function keys). Passive motion means
-that the mouse moves without any of its buttons pressed.</p>
-<p>(tutorial15.cpp:81)</p>
-<code>
-static void KeyboardCB(unsigned char Key, int x, int y)<br>
-{<br>
-  &nbsp &nbsp    switch (Key) {<br>
-  &nbsp &nbsp  &nbsp &nbsp        case 'q':<br>
-  &nbsp &nbsp  &nbsp &nbsp  &nbsp &nbsp            exit(0);<br>
-  &nbsp &nbsp    }<br>
-}<br>
-<br>
-static void PassiveMouseCB(int x, int y)<br>
-{<br>
-  &nbsp &nbsp    pGameCamera->OnMouse(x, y);<br>
-}<br>
-</code>
-<p>Now that we are using a full screen mode it is more difficult to exit the application. The keyboard callback traps the 'q' key and exits. The mouse callback simply transfers the location of the mouse to the camera.</p>
-<p>(tutorial15.cpp:44)</p>
-<code>
-static void RenderSceneCB()<br>
-{<br>
- &nbsp &nbsp pGameCamera->OnRender();<br>
-</code>
-<p>Whenever we are in the main render loop we must notify the camera. This gives the camera a chance to turn when the mouse is not moving and is on one of the screen edges.</p>
+  <header id="header">
+    <div>
+      <h2> Tutorial 15: </h2>
+      <h1> Camera Control - Part 2 </h1>
+    </div>
+
+    <a id="logo" class="small" href="../../index.html" title="Homepage">
+      <img src="..//logo ldpi.png">
+    </a>
+  </header>
+
+  <article id="content" class="breakpoint">
+    <section>
+      <h3> Background </h3>
+
+      <p>In this tutorial we complete the implementation of the camera by enabling direction control using the mouse. There are various levels of freedom which are associated with the design of the camera.
+      We are going to enable the level of control you come to expect in a first person game (shooter or otherwise). This means we will be able to turn the camera 360 degrees (around the positive Y axis), which corresponds
+      to turning your head left or right and completing a full circle with your body. In addition, we will be able to tilt the camera up and down to get a better view above or below. We won't be able to turn the camera
+      up until we complete a full circle or tilt it in a way a plane fuselage tilts during a turn. These levels of freedom are in the domain of flight simulators which is out of scope for this tutorial. At any rate, we
+      will have a camera that will allow us to conveniently explore the 3D world will are going to develop in the coming tutorials.</p>
+      <p>The following world war 2 anti aircraft gun demonstrates the kind of camera we are going to build:</p>
+      <img class="center" src="aa_gun.jpg">
+      <p>The gun has two control axis:<p>
+      <ol>
+      <li>It can turn 360 degrees around the vector (0,1,0). This angle is called the 'horizontal angle' and the vector is the 'vertical axis'.</li>
+      <li>It can tilt up and down around a vector which is parallel to the ground. This movement is somewhat limited and the gun cannot complete a full circle. This angle is called the 'vertical angle' and the vector
+      is the 'horizontal axis'. Note that while the vertical axis is constant (0,1,0) the horizontal axis turns around with the gun and is always perpendicular to the target of the gun. This is a key point to understand
+      in order to get the math correctly.</li>
+      </ol>
+      <p>The plan is to follow the movement of the mouse and change the horizontal angle when the mouse moves left and right and the vertical angle when the mouse moves up and down. Given these two angles we want to 
+      calculate the target and up vectors.</p>
+      <p>Turning the target vector by the horizontal angle is pretty straightforward. Using basic trigonometry we can see that the Z component of the target vector is the sine of the horizontal vector and the X component is the 
+      cosine of the horizontal angle (at this stage the camera looks straight ahead so the Y is zero). Revisit tutorial 7 to see a diagram of that.</p>
+      <p>Turning the target vector by the vertical angle is more complex since the horizontal axis turns along with the camera. The horizontal axis can be calculated using a cross product between the vertical axis and the 
+      target vector after is was turned by the horizontal angle, but turning around an arbitrary vector (lifting the gun up and down) can be tricky.</p> 
+      <p>Luckily, we have an extremely useful mathematical tool for that problem - the quaternion. Quaternions were discovered in 1843 by Sir Willilam Rowan Hamilton, an irish mathematician, and are based on the complex
+      number system. The quaternion 'Q' is defined as:</p>
+      <img class="center" src="quaternion.png">
+      <p>Where i, j and k are complex numbers and the following equation holds true:</p>
+      <img class="center" src="quaternion1.png">
+      <p>In practice, we specify a quaternion as the 4-vector (x, y, z, w). The conjugate of quaternion 'Q' is defined as:</p>
+      <img class="center" src="conjugate.png">
+      <p>Normalizing a quaternion is the same as normalizing a vector. I'm going to describe the steps required to rotate a vector around an arbitrary vector using a quaternion. More details about the mathematical
+      proof behind the steps can be found on the web.</p>
+      <p>The general function to calculate a quaternion 'W' that represents the rotated vector 'V' by the angle 'a' is:</p> 
+      <img class="center" src="rotation.png">
+      <p>Where Q is the rotation quaternion which is defined as:</p>
+      <img class="center" src="rotationq.png">
+      <p>After calculating 'W' the rotated vector is simply (W.x,W.y,W.z). An important point to note in the calculation of 'W' is that first we need to multiple 'Q' by 'V' which is a quaternion-by-vector multiplication that results
+      in a quaternion, and then we need to do a quaternion-by-quaternion multiplication (the result of Q*V multiplied by the conjugate of 'Q'). The two types of multiplications are not the same. The file math_3d.cpp includes
+      the implementations of these multiplication types.</p>
+      <p>We will need to keep the horizontal and vertical angles updated all the time as the user moves the mouse around the screen and we need to decide how to initialize them. The logical choice is to initialize them
+      according to the target vector that is supplied to the constructor of the camera. Let's start with the horizontal angle. Take a look at the following diagram which looks down the XZ plane from above:</p>
+      <img class="center" src="h_angle.png">
+      <p>The target vector is (x,z) and we want to find the horizontal angle which is represented by the letter alpha (the Y component is relevant only for the vertical angle). Since the length of the radius of the circle is 1 it
+      is very easy to see that the sine function of alpha is exactly z. Therefore, calculating the asine of z will provide alpha. Are we done? - not yet. Since z can be in the range [-1,1], the result of asine is 
+      -90 degrees to +90 degrees. But the range of the horizontal angle is 360 degrees. In addition, our quaternion does rotation clockwise. This means that when we rotate 90 degrees with the quaternion 
+      we end up with -1 on the Z axis which is opposite to the actual sine of 90 degrees (which is 1). IMHO, the easiest way to get this right is to always calculate the asine function using the positive value of Z 
+      and combine the result with the specific quarter of the circle where the vector is located. For example, when our target vector is (0,1) we calculate the asine of 1 which is 90 and substract it from 360.
+      The result is 270. The asine range of 0 to 1 is 0 to 90 degrees. Combine that with the specific quarter of the circle and you get the final horizontal angle.</p>
+      <p>Calculating the vertical angle is a bit simpler. We are going to limit the range of movement to -90 degrees (equal to 270 degrees - looking straight up) to +90 degrees (looking straight down). This means we only
+      need the negative value of the asine function of the Y component in the target vector. When Y equals 1 (looking straight up) the asine is 90 so we just need to reverse the sign. When Y equals -1 (looking
+      straight down) the asine is -90 and reversing the sign gets us to 90. If you are confused check the diagram again and simply replace Z with Y and X with Z.</p>
+    </section>
+
+    <section>
+      <h3> Source walkthru </h3>
+
+      <p>(camera.cpp:38)</p>
+      <code>
+      Camera::Camera(int WindowWidth, int WindowHeight, const Vector3f&amp; Pos, const Vector3f&amp; Target, const Vector3f&amp; Up)<br>
+      {<br>
+      &nbsp; &nbsp;   m_windowWidth  = WindowWidth;<br>
+       &nbsp; &nbsp;   m_windowHeight = WindowHeight;<br>
+       &nbsp; &nbsp;   m_pos = Pos;<br>
+      <br>
+       &nbsp; &nbsp;   m_target = Target;<br>
+       &nbsp; &nbsp;   m_target.Normalize();<br>
+      <br>
+       &nbsp; &nbsp;   m_up = Up;<br>
+       &nbsp; &nbsp;   m_up.Normalize();<br>
+      <br>
+       &nbsp; &nbsp;   Init();<br>
+      }<br>
+      </code>
+      <p>The constructor of the camera now gets the dimensions of the window. We need it in order to move the mouse to the center of the screen. In addition, note the call to Init() which sets up the internal camera attributes.</p>
+      <p>(camera.cpp:54)</p>
+      <code>
+      void Camera::Init()<br>
+      {<br>
+        &nbsp; &nbsp;   Vector3f HTarget(m_target.x, 0.0, m_target.z);<br>
+        &nbsp; &nbsp;   HTarget.Normalize();<br>
+          <br>
+        &nbsp; &nbsp;   if (HTarget.z >= 0.0f)<br>
+        &nbsp; &nbsp;   {<br>
+        &nbsp; &nbsp;  &nbsp; &nbsp;      if (HTarget.x >= 0.0f)<br>
+        &nbsp; &nbsp;  &nbsp; &nbsp;      {<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;  &nbsp; &nbsp;        m_AngleH = 360.0f - ToDegree(asin(HTarget.z));<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;     }<br>
+        &nbsp; &nbsp;     &nbsp; &nbsp;   else<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;     {<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;  &nbsp; &nbsp;        m_AngleH = 180.0f + ToDegree(asin(HTarget.z));<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;     }<br>
+        &nbsp; &nbsp;  }<br>
+        &nbsp; &nbsp;  else<br>
+        &nbsp; &nbsp;   {<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;     if (HTarget.x >= 0.0f)<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;     {<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;  &nbsp; &nbsp;        m_AngleH = ToDegree(asin(-HTarget.z));<br>
+        &nbsp; &nbsp;  &nbsp; &nbsp;      }<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;   else<br>
+        &nbsp; &nbsp;   &nbsp; &nbsp;     {<br>
+        &nbsp; &nbsp;    &nbsp; &nbsp;   &nbsp; &nbsp;      m_AngleH = 90.0f + ToDegree(asin(-HTarget.z));<br>
+        &nbsp; &nbsp;  &nbsp; &nbsp;      }<br>
+        &nbsp; &nbsp;   }<br>
+          <br>
+        &nbsp; &nbsp;   m_AngleV = -ToDegree(asin(m_target.y));<br>
+      <br>
+        &nbsp; &nbsp;   m_OnUpperEdge = false;<br>
+        &nbsp; &nbsp;   m_OnLowerEdge = false;<br>
+        &nbsp; &nbsp;   m_OnLeftEdge  = false;<br>
+        &nbsp; &nbsp;   m_OnRightEdge = false;<br>
+        &nbsp; &nbsp;   m_mousePos.x  = m_windowWidth / 2;<br>
+        &nbsp; &nbsp;   m_mousePos.y  = m_windowHeight / 2;<br>
+      <br>
+        &nbsp; &nbsp;   glutWarpPointer(m_mousePos.x, m_mousePos.y);<br>
+      }
+      </code>
+      <p>In the Init() function we start by calculating the horizontal angle. We create a new target vector called HTarget (horizontal target) which is a projection of the original target vector on the XZ plane. Next we normalize
+      it (since the math that was described earlier assumes a unit vector on the XZ plane). Then we check which quarter the target vector belongs to and calculate the final angle based on the positive value of the Z component.
+      Next we calculate the vertical angle which is much simpler. 
+      <p>The camera has 4 new flags to indicate whether the mouse is positioned on one of the edges of the screen. We are going to implement an automatic turn in the
+      corresponding direction when that happens. This will allow us to turn 360 degrees. We initialize the flags to FALSE since the mouse starts at the center of the screen. The next two lines of code calculate where the center
+      of the screen is (based on the window dimension) and the new function glutWarpPointer actually moves the mouse. Starting with the mouse at the center of the screen makes life much simpler.</p>
+      <p>(camera.cpp:140)</p>
+      <code>
+      void Camera::OnMouse(int x, int y)<br>
+      {<br>
+         &nbsp; &nbsp;   const int DeltaX = x - m_mousePos.x;<br>
+         &nbsp; &nbsp;   const int DeltaY = y - m_mousePos.y;<br>
+      <br>
+         &nbsp; &nbsp;   m_mousePos.x = x;<br>
+         &nbsp; &nbsp;   m_mousePos.y = y;<br>
+      <br>
+         &nbsp; &nbsp;   m_AngleH += (float)DeltaX / 20.0f;<br>
+         &nbsp; &nbsp;   m_AngleV += (float)DeltaY / 20.0f;<br>
+      <br>
+         &nbsp; &nbsp;   if (DeltaX == 0) {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       if (x &lt;= MARGIN) {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;           m_OnLeftEdge = true;<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       }<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;      else if (x >= (m_windowWidth - MARGIN)) {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;           m_OnRightEdge = true;<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       }<br>
+         &nbsp; &nbsp;   }<br>
+         &nbsp; &nbsp;   else {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       m_OnLeftEdge = false;<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       m_OnRightEdge = false;<br>
+         &nbsp; &nbsp;   }<br>
+      <br>
+         &nbsp; &nbsp;   if (DeltaY == 0) {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       if (y &lt;= MARGIN) {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;           m_OnUpperEdge = true;<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       }<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       else if (y >= (m_windowHeight - MARGIN)) {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;           m_OnLowerEdge = true;<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       }<br>
+         &nbsp; &nbsp;   }<br>
+         &nbsp; &nbsp;   else {<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       m_OnUpperEdge = false;<br>
+         &nbsp; &nbsp;  &nbsp; &nbsp;       m_OnLowerEdge = false;<br>
+         &nbsp; &nbsp;   }<br>
+      <br>
+         &nbsp; &nbsp;   Update();<br>
+      }
+      </code>
+      <p>This function is used to notify the camera that the mouse moved. The parameters are the new screen position of the mouse. We start by calculating the delta from the previous location on both the X and Y axis.
+      Next we store the new values for the next call to the function. We update the current horizontal and vertical angles by scaling down the deltas. I'm using a scaling value which works fine for me but on different
+      computers you may want different scaling values. We are going to improve this in a future tutorial when we add the frame rate of the application as a factor.<p>
+      <p>The next set of tests update the 'm_On*Edge' flags according to the location of the mouse. There is a margin which is by default 10 pixels that triggers the "edge" behavior when the mouse gets close to one of the edges
+      of the screen. Finally, we call Update() to recalculate the target and up vectors based on the new horizontal and vertical angles.</p>
+      <p>(camera.cpp:183)</p>
+      <code>
+      void Camera::OnRender()<br>
+      {<br>
+       &nbsp; &nbsp;    bool ShouldUpdate = false;<br>
+      <br>
+       &nbsp; &nbsp;    if (m_OnLeftEdge) {<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        m_AngleH -= 0.1f;<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        ShouldUpdate = true;<br>
+       &nbsp; &nbsp;    }<br>
+       &nbsp; &nbsp;    else if (m_OnRightEdge) {<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        m_AngleH += 0.1f;<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        ShouldUpdate = true;<br>
+       &nbsp; &nbsp;    }<br>
+      <br>
+       &nbsp; &nbsp;    if (m_OnUpperEdge) {<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        if (m_AngleV > -90.0f) {<br>
+       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            m_AngleV -= 0.1f;<br>
+       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;            ShouldUpdate = true;<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        }<br>
+       &nbsp; &nbsp;    }<br>
+       &nbsp; &nbsp;    else if (m_OnLowerEdge) {<br>
+       &nbsp; &nbsp;  &nbsp; &nbsp;       if (m_AngleV &lt; 90.0f) {<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp;          m_AngleV += 0.1f;<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp;         ShouldUpdate = true;<br>
+       &nbsp; &nbsp;   &nbsp; &nbsp;      }<br>
+       &nbsp; &nbsp;    }<br>
+      <br>
+       &nbsp; &nbsp;    if (ShouldUpdate) {<br>
+       &nbsp; &nbsp; &nbsp; &nbsp;        Update();<br>
+       &nbsp; &nbsp;    }<br>
+      }
+      </code>
+      <p>This function is called from the main render loop. We need it for cases where the mouse is located on one of the edges of the screen and is not moving. In this case there are no mouse events but we still
+      want the camera to continuously move (until the mouse moves away from the edge). We check if one of the flags is set and update the corresponding angle accordingly. If there was a change in one of the angles
+      we call Update() to update the target and up vectors. When the mouse moves aways from the screen we detect it in the mouse event handler and clear the flag. Note the way the vertical angle is limited between the ranges
+      -90 degrees and +90 degrees. This is to prevent a full circle when looking up or down.</p>
+      <p>(camera.cpp:214)</p>
+      <code>
+      void Camera::Update()<br>
+      {<br>
+       &nbsp; &nbsp;    const Vector3f Vaxis(0.0f, 1.0f, 0.0f);<br>
+      <br>
+       &nbsp; &nbsp;    // Rotate the view vector by the horizontal angle around the vertical axis<br>
+       &nbsp; &nbsp;    Vector3f View(1.0f, 0.0f, 0.0f);<br>
+       &nbsp; &nbsp;    View.Rotate(m_AngleH, Vaxis);<br>
+       &nbsp; &nbsp;    View.Normalize();<br>
+      <br>
+       &nbsp; &nbsp;    // Rotate the view vector by the vertical angle around the horizontal axis<br>
+       &nbsp; &nbsp;    Vector3f Haxis = Vaxis.Cross(View);<br>
+       &nbsp; &nbsp;    Haxis.Normalize();<br>
+       &nbsp; &nbsp;    View.Rotate(m_AngleV, Haxis);<br>
+       &nbsp; &nbsp;    View.Normalize();<br>
+             <br>
+       &nbsp; &nbsp;    m_target = View;<br>
+       &nbsp; &nbsp;    m_target.Normalize();<br>
+      <br>
+       &nbsp; &nbsp;    m_up = m_target.Cross(Haxis);<br>
+       &nbsp; &nbsp;    m_up.Normalize();<br>
+      }
+      </code>
+      <p>This function updates the target and up vector according to the horizontal and vertical angles. We start with the view vector in a "reset" state. This means it is parallel to the gound (vertical angle is zero) and 
+      looking directly to the right (horizontal angle is zero - see the diagram above). We set the vertical axis to point straight up and then rotate the view vector around it by the horizontal angle. The result
+      is a vector which points in the general direction of the intended target but not necessarily in the correct height (i.e. it is on the XZ plane). By doing a cross product of this vector with the vertical axis we
+      get another vector on the XZ plane which is perpendicular to the plane created by the view vector and the vertical axis. This is our new horizontal axis and now it is time to rotate the vector up or down around it
+      according to the vertical angle. The result is the final target vector and we set it into the corresponding member attribute. Now we must fix the up vector. For example, if the camera is looking up, the up vector
+      must tilt back to compensate (it must be 90 degrees in respect to the target vector). This is similar to the way the back of your head tilts back when you look up to the sky. The new up vector is calculated by 
+      simply doing another cross product between the final target vector and the horizontal axis. If the vertical angle is still zero then the target vector remains on the XZ plane and the up vector remains (0,1,0).
+      If the target vector is tilted up or down the up vector will tilt backward or forward, respectively.</p>
+      <p>(tutorial15.cpp:209)</p>
+      <code>
+      glutGameModeString("1920x1200@32");<br>
+      glutEnterGameMode();<br>
+      </code>
+      <p>These glut functions enable our application to run full screen in the so called high performance 'game mode'. It makes turning the camera 360 degrees simpler because all you need to do is pull the mouse towards one
+      of the edges of the screen. Note the resolution and the bits per pixel that are configured via the game mode string. 32 bits per pixel provides the maximum number of colors for rendering.</p>
+      </code>
+      <p>(tutorial15.cpp:214)</p>
+      <code>
+      pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT);<br>
+      </code>
+      <p>The camera is now allocated dynamically at this location because it performs a glut call (glutWarpPointer). This call will fail if glut has not yet been initialized.</p>
+      <p>(tutorial15.cpp:99)</p>
+      <code>
+      glutPassiveMotionFunc(PassiveMouseCB);<br>
+      glutKeyboardFunc(KeyboardCB);<br>
+      </code>
+      <p>We register two new glut callback functions here. One is for the mouse and the other for regular keyboard clicks (the special keyboard callback traps directional and function keys). Passive motion means
+      that the mouse moves without any of its buttons pressed.</p>
+      <p>(tutorial15.cpp:81)</p>
+      <code>
+      static void KeyboardCB(unsigned char Key, int x, int y)<br>
+      {<br>
+        &nbsp; &nbsp;    switch (Key) {<br>
+        &nbsp; &nbsp;  &nbsp; &nbsp;        case 'q':<br>
+        &nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;            exit(0);<br>
+        &nbsp; &nbsp;    }<br>
+      }<br>
+      <br>
+      static void PassiveMouseCB(int x, int y)<br>
+      {<br>
+        &nbsp; &nbsp;    pGameCamera->OnMouse(x, y);<br>
+      }<br>
+      </code>
+      <p>Now that we are using a full screen mode it is more difficult to exit the application. The keyboard callback traps the 'q' key and exits. The mouse callback simply transfers the location of the mouse to the camera.</p>
+      <p>(tutorial15.cpp:44)</p>
+      <code>
+      static void RenderSceneCB()<br>
+      {<br>
+       &nbsp; &nbsp; pGameCamera->OnRender();<br>
+      </code>
+      <p>Whenever we are in the main render loop we must notify the camera. This gives the camera a chance to turn when the mouse is not moving and is on one of the screen edges.</p>
+    </section>
+
+    <a href="../tutorial16/tutorial16.html" class="next highlight"> Next tutorial </a>
+  </article>
+
+  <script src="../html5shiv.min.js"></script>
+  <script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>
