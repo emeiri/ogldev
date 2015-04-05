@@ -1,38 +1,42 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transsitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-	
-<table width=100% >
-<tr>
-	<td width=34%><div align=left><a href="../tutorial44/tutorial44.html" rel="prev"><img src="../prev.jpg"></a></div></td>
-	<td width=34%><div align=center><a href="../../index.html" rel="home"><img src="../home.jpg"></a></div></td>
-        <td width=33%><div align=right></a></div></td>
-</tr>
-</table>
-	
-<link rel="stylesheet" type="text/css" href="../../tutorials.css"/> <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"> 
-<title>Tutorial 45</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 45 - Screen Space Ambient Occlusion </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-<div class="content">
-<div class="lines">
-<h1>Tutorial 45 - Screen Space Ambient Occlusion</h1>
-<div style="text-align: center">
-<span style="font-weight: bold;"><a href="../../ogldev-source.zip">Get the source!</a></span><br> 
-</div>
-<br>
-<img style="width: 602px; height: 500px;"  src="../../tutorial45.jpg">
-<h2>Background</h2>
+    <header id="header">
+        <div>
+            <h2> Tutorial 45: </h2>
+            <h1> Screen Space Ambient Occlusion </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+    <article id="content" class="breakpoint">
+        <section>
+            <h4> Credits: <a href="http://john-chapman-graphics.blogspot.co.il/2013/01/ssao-tutorial.html">SSAO tutorial by John Chapman</a> </h4><br>
+            <h3> Background </h3>
 <p>
-    Do you remember our first lighting type? Back in <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
+    Do you remember how our lighting model began evolving? Back in <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
     we took a first look at the lighting model, starting with the ambient lighting type. The ambient lighting
     which is supposed to mimic the general feeling of "everything is bright" that you
     get in a highly lit, mid-day environment, was implemented using a single floating point
     value that was attached to each lighting source and we multiplied that value by
     the color of the surface which we sampled from the texture bound to that surface.
     So you could have a single light source in your scene called "sun" and you could 
-    play with the ambient light to control how well the scene was generally lit - closer
-    to zero values produced a darker scene while closer to 1 values produced a lighter
+    play with the ambient light to control how well the scene was generally lit - values closer
+    to zero produced a darker scene while values closer to 1 produced a lighter
     scene.
 </p>
 <p>
@@ -41,15 +45,14 @@
     remained the same. In the recent years we see a rise of what is known as 
     <a href="http://en.wikipedia.org/wiki/Ambient_occlusion">Ambient Occlusion</a>
     which basically means that instead of going with a fixed ambient light value
-    for each pixel we can calculate how much is the pixel exposed to the ambient
+    for each pixel we can calculate how much the pixel is exposed to the ambient
     light source. A pixel on the floor in the middle of room is much more exposed
     to the light than, say, a pixel in the corner. This means that the corner will
     be a bit darker than the rest of the floor. This is the core of ambient occlusion.
     So in order to implement it we need to find a way to differentiate between those
     "tightly packed in corners pixels" vs. "out in the open pixels". The product of
-    this calculation is a ambient occlusion term which will in the final lighting
-    stage to control the ambient light. Here's a ambient map that visualizes this
-    ambient occlusion term:
+    this calculation is an ambient occlusion term which will control the ambient light
+    in the final lighting stage. Here's a visualization of this ambient occlusion term:
 </p>
 <img src = "ao.jpg">
 <p>
@@ -69,13 +72,13 @@
 <p>
     Ambient occlusion can be very compute intensive. Crytek came up with a good compromise
     where the occlusion term is calculated once per pixel. Hence the prefix 'Screen Space'
-    to the algorithm name. The idea was to go over the window pixel by pixel and extract
+    to the algorithm name. The idea was to go over the window pixel by pixel, extract
     the view space position in that location, sample a few random points very near that position
-    and check whether they fall inside or outside the real geometry in that region. If many
+    and check whether they fall inside or outside the real geometry in that area. If many
     points fall inside the geometry it means the original pixel is cornered by many polygons
-    and receiving less light.
+    and receives less light.
     If many points are outside of any geometry it means the original pixel is "highly exposed"
-    and therefore receiving more light. For example, take a look at the following image:
+    and therefore receives more light. For example, take a look at the following image:
 </p>
 <img src="algorithm.jpg">
 <p>
@@ -95,7 +98,7 @@
     way will be to have a texture ready at the point fully populated with the view space
     positions of the entire scene geometry (obviously - only of the closest pixels). For
     this we will need a geometry pass before the ambient pass where something very similar
-    to the gbuffer that we saw in the deferred rendering will be filled with view space
+    to the gbuffer that we saw in deferred rendering will be filled with view space
     position information (and that's it - we don't need normals, color, etc). So now
     getting the view space position for the current pixel in the ambient pass is just one
     sample operation away. 
@@ -103,21 +106,21 @@
 <p>
     So now we are in a fragment shader holding the view space position for the current
     pixel. Generating random points around it is very easy. We will pass into the shader
-    an array of random vectors (as uniform variables) and add them to the view space position.
+    an array of random vectors (as uniform variables) and add each one to the view space position.
     For every generated point we want to check whether it lies inside or outside the geometry.
     Remember that these points are virtual, so no match to the actual surface is expected. 
     We are going to do something very similar to what we did in shadow mapping. Compare the Z
     value of the random point to the Z value of the closest point in the actual geometry.
-    Naturally, that "geometry" point must lie on the ray that goes from the camera to the virtual
+    Naturally, that actual geometry point must lie on the ray that goes from the camera to the virtual
     point. Take a look at the following diagram:
 </p>
 <img src="diagram1.jpg"</img>
 <p>
-    Point P lies on the red surface and the red and green points were generated randomly.
-    The green point lies outside the geometry and the red is inside (thus contributes to
+    Point P lies on the red surface and the red and green points were generated randomly around it.
+    The green point lies outside (before) the geometry and the red is inside (thus contributes to
     the ambient occlusion). The circle represents the radius in which random points are
-    generated (they can't be too far off point P). R1 and R2 are the rays from the camera
-    to the red and green points. They intersect the geometry somewhere. In order 
+    generated (we don't want them to be too far off point P). R1 and R2 are the rays from the camera
+    (at 0,0,0) to the red and green points. They intersect the geometry somewhere. In order 
     to calculate the ambient occlusion we must compare the Z values of the red 
     and green points vs the Z value of the corresponding geometry points that are formed
     by the intersection of R1/R2 and the surface. We already have the Z value of the
@@ -127,7 +130,7 @@
 <p>
     Well, there's more than one solution to that question but since we already have a texture
     ready with the view space position of the entire scene the simplest way will be
-    to find it somehow in it. To do that we will need the two corresponding texture coordinates
+    to find it somehow in it. To do that we will need the two texture coordinates
     that will sample the view space position for the R1 and R2 rays. Remember that the original
     texture coordinates that were used to find the view space position of P are not
     what we need. These coordinates were formed based on the interpolation of the 
@@ -139,11 +142,11 @@
     was originally created. After transforming the object space coordinates to view space
     the resulting vectors were multiplied by the projection matrix (in fact - all these
     transformation were performed by a single matrix). All this happened in the vertex
-    shader and on the way to the fragment shader the GPU automatically performed the
+    shader and on the way to the fragment shader the GPU automatically performed
     perspective divide to complete the projection. This projection placed the view space
     position on the near clipping plane and the points inside the frustum have
     a (-1,1) range for their XYZ components. As the view space position was written out to
-    the texture (the above calculation is performed only on gl_Position; the data
+    the texture in the fragment shader (the above calculation is performed only on gl_Position; the data
     written to the texture is forwarded in a different variable) the XY were transformed
     to the (0,1) range and the results are the texture coordinates where the view space
     position is going to be written.
@@ -159,8 +162,12 @@
     whether the virtual point that we generated is located inside or outside the geometry.
     Now let's see the code.
 </p>
-<h2>Code Walkthru</h2>
-<p>(tutorial45.cpp:)</p>
+        </section>
+
+        <section>
+            <h3> Source walkthru </h3>
+
+<p>(tutorial45.cpp:156)</p>
 <code>
     virtual void RenderSceneCB()<br>
     {   <br>
@@ -184,14 +191,14 @@
     }    
 </code>
 <p>
-    We will start from the top level and work our way down. This is the main
+    We will start the source walkthru from the top level and work our way down. This is the main
     render loop and in addition to the three passes that we discussed in the
     background section there's also a blur pass whose job is to apply a blur
     kernel on the ambient occlusion map formed by the SSAO pass. This helps smooth
     things up a bit and is not part of the core algorithm. It's up to you to decide
     whether to include it or not in your engine.
 </p>
-<p>(tutorial45.cpp:168)</p>
+<p>(tutorial45.cpp:177)</p>
 <code>
     void GeometryPass()<br>
     {<br>
@@ -244,8 +251,8 @@ void main()<br>
 </code>
 <p>
 These are the vertex and fragment shaders of the geometry pass. In the vertex shader
-we calculate the gl_position as usual and we pass to the fragment shader the view
-space position in a separate variable. Remember that there is no perspective
+we calculate the gl_position as usual and we pass the view
+space position to the fragment shader in a separate variable. Remember that there is no perspective
 divide for this variable but it is a subject to the regular interpolations performed
 during rasterization.
 </p>
@@ -253,7 +260,7 @@ during rasterization.
     In the fragment shader we write the interpolated view space position to the 
     texture. That's it.
 </p>
-<p>(tutorial45.cpp:)</p>
+<p>(tutorial45.cpp:192)</p>
 <code>
     void SSAOPass()<br>
     {<br>
@@ -319,11 +326,11 @@ void main()<br>
 &nbsp; &nbsp;     float AO = 0.0;<br>
 <br>
 &nbsp; &nbsp;     for (int i = 0 ; i < MAX_KERNEL_SIZE ; i++) {<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         vec3 samplePos = Pos + gKernel[i];<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         vec4 offset = vec4(samplePos, 1.0);<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         offset = gProj * offset;<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy /= offset.w;<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy = offset.xy * 0.5 + vec2(0.5);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         vec3 samplePos = Pos + gKernel[i];   // generate a random point<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         vec4 offset = vec4(samplePos, 1.0);  // make it a 4-vector<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset = gProj * offset;        // project on the near clipping plane<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy /= offset.w;      // perform perspective divide<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy = offset.xy * 0.5 + vec2(0.5);    // transform to (0,1) range<br>
             <br>
 &nbsp; &nbsp; &nbsp; &nbsp;         float sampleDepth = texture(gPositionMap, offset.xy).b;<br>
 <br>
@@ -338,17 +345,16 @@ void main()<br>
 }    
 </code>
 <p>
-Here's the core of the SSAO algorithm. We start by taking the texture coordinates
-we got from the vertex shader and transforming them to the normalized (0,1) range.
-We can now sample the position map and fetch our view space position. Next we
+Here's the core of the SSAO algorithm. We take the texture coordinates
+we got from the vertex shader and sample the position map to fetch our view space position. Next we
 enter a loop and start generating random points. This is done using an array of
 uniform vectors (gKernel). This array is populated by random vectors in the
 (-1,1) range in the ssao_technique.cpp file (which I haven't included here because it's pretty
 standard; check the code for more details). We now need to find the texture coordinates
-that will fetch the Z value for the geometry point that matches the current virtual point.
-We project the virtual point using the projection matrix, perform perspective divide on
+that will fetch the Z value for the geometry point that matches the current random point.
+We project the random point from view space on the near clipping plane using the projection matrix, perform perspective divide on
 it and transform it to the (0,1) range. We can now use it to sample the view space position
-of the actual geometry and compare its Z value to the virtual point. But before we do
+of the actual geometry and compare its Z value to the random point. But before we do
 that we make sure that the distance between the origin point and the one whose Z value
 we just fetched is not too far off. This helps us avoid all kinds of nasty artifacts.
 You can play with the gSampleRad variable for that. 
@@ -362,7 +368,7 @@ to kind-of reverse it. The result is written to the output buffer. Note that we 
 the AO to the power of 2 before writing it out. This simply makes it look a bit better in my
 opinion. This is another artist variable you may want to play with in your engine.
 </p>
-<p>(tutorial45.cpp)</p>
+<p>(tutorial45.cpp:205)</p>
 <code>
     void BlurPass()<br>
     {<br>
@@ -431,7 +437,7 @@ void main()<br>
     one from the SSAO. In the fragment shader we sample 16 points around the origin and average
     them out.
 </p>
-<p>(tutorial45.cpp)</p>
+<p>(tutorial45.cpp:219)</p>
 <code>
     void LightingPass()<br>
     {<br>
@@ -479,5 +485,10 @@ we have to calculate the texture coordinates using the system maintained gl_Frag
 is a user controlled variable that helps us switch from SSAO to no-SSAO and only-ambient-occlusion-term
 display. Play with the 'a' key to see how it goes.
 </p>
+        </section>
+    </article>
+
+    <script src="../html5shiv.min.js"></script>
+    <script src="../html5shiv-printshiv.min.js"></script>
 </body>
 </html>
