@@ -14,6 +14,7 @@
     <ClCompile Include="..\..\Common\camera.cpp" />
     <ClCompile Include="..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\Common\glut_backend.cpp" />
+    <ClCompile Include="..\..\Common\io_buffer.cpp" />
     <ClCompile Include="..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\Common\ogldev_app.cpp" />
     <ClCompile Include="..\..\Common\ogldev_backend.cpp" />
@@ -24,6 +25,7 @@
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\Common\pipeline.cpp" />
+    <ClCompile Include="..\..\Common\random_texture.cpp" />
     <ClCompile Include="..\..\Common\technique.cpp" />
   </ItemGroup>
   <ItemGroup>
