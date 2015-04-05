@@ -11,16 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\tutorial45\blur_tech.h" />
     <ClInclude Include="..\..\tutorial45\engine_common.h" />
     <ClInclude Include="..\..\tutorial45\geom_pass_tech.h" />
     <ClInclude Include="..\..\tutorial45\lighting_technique.h" />
     <ClInclude Include="..\..\tutorial45\mesh.h" />
+    <ClInclude Include="..\..\tutorial45\ssao_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial45\gbuffer.cpp" />
+    <ClCompile Include="..\..\tutorial45\blur_tech.cpp" />
     <ClCompile Include="..\..\tutorial45\geom_pass_tech.cpp" />
     <ClCompile Include="..\..\tutorial45\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial45\mesh.cpp" />
+    <ClCompile Include="..\..\tutorial45\ssao_technique.cpp" />
     <ClCompile Include="..\..\tutorial45\tutorial45.cpp" />
   </ItemGroup>
   <ItemGroup>
