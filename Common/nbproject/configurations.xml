@@ -34,6 +34,7 @@
       <itemPath>FreetypeGL/font_shader.cpp</itemPath>
       <itemPath>FreetypeGL/freetypeGL.cpp</itemPath>
       <itemPath>glut_backend.cpp</itemPath>
+      <itemPath>io_buffer.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>ogldev_app.cpp</itemPath>
       <itemPath>ogldev_backend.cpp</itemPath>
@@ -144,6 +145,8 @@
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="io_buffer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
@@ -251,6 +254,8 @@
       <item path="cubemap_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="glut_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="io_buffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
