@@ -15,8 +15,9 @@ void main()
 {
     float Depth = texture(gDepthMap, TexCoord).x;
 
-if (Depth == 1.0) Depth = 0.0;
-FragColor = vec4(Depth);
+    float ViewDepth = gProj[3][2] / (2 * Depth -1 - gProj[2][2]);
+
+    FragColor = vec4(ViewDepth);
  //   float AO = 0.0;
 
  //   for (int i = 0 ; i < MAX_KERNEL_SIZE ; i++) {
