@@ -65,6 +65,6 @@ bool BlurTech::Init()
 
 void BlurTech::BindInputBuffer(IOBuffer& inputBuf)
 {
-    inputBuf.BindForReading(INPUT_TEXTURE_UNIT);
+    inputBuf.BindForReading(false, INPUT_TEXTURE_UNIT);
 }
 

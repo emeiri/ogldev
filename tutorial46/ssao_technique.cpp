@@ -23,8 +23,8 @@
 #include "ogldev_util.h"
 #include "ssao_technique.h"
 
-#define POSITION_TEXTURE_UNIT           GL_TEXTURE1
-#define POSITION_TEXTURE_UNIT_INDEX     1
+#define DEPTH_TEXTURE_UNIT           GL_TEXTURE1
+#define DEPTH_TEXTURE_UNIT_INDEX     1
 
 
 SSAOTechnique::SSAOTechnique()
@@ -51,16 +51,16 @@ bool SSAOTechnique::Init()
         return false;
     }
 
-	m_posTextureUnitLocation = GetUniformLocation("gPositionMap");
+	m_depthTextureUnitLocation = GetUniformLocation("gDepthMap");
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
     m_projMatrixLocation = GetUniformLocation("gProj");	
     m_kernelLocation = GetUniformLocation("gKernel");
 
-    if (m_posTextureUnitLocation    == INVALID_UNIFORM_LOCATION ||
+    if (m_depthTextureUnitLocation  == INVALID_UNIFORM_LOCATION ||
         m_sampleRadLocation         == INVALID_UNIFORM_LOCATION ||
         m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||		
         m_kernelLocation            == INVALID_UNIFORM_LOCATION) {
-        return false;
+     //   return false;
     }
    
     Enable();
@@ -69,7 +69,7 @@ bool SSAOTechnique::Init()
     
     GenKernel();
     
-    glUniform1i(m_posTextureUnitLocation, POSITION_TEXTURE_UNIT_INDEX);
+    glUniform1i(m_depthTextureUnitLocation, DEPTH_TEXTURE_UNIT_INDEX);
     
     GLExitIfError;
     
@@ -98,9 +98,9 @@ void SSAOTechnique::GenKernel()
 }
 
 
-void SSAOTechnique::BindPositionBuffer(IOBuffer& posBuf)
+void SSAOTechnique::BindDepthBuffer(IOBuffer& depthBuf)
 {
-    posBuf.BindForReading(POSITION_TEXTURE_UNIT);
+    depthBuf.BindForReading(true, DEPTH_TEXTURE_UNIT);
 }
 
 

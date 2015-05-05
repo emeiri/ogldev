@@ -33,7 +33,7 @@ public:
 
     void BindForWriting();
    
-    void BindForReading(GLenum TextureUnit);          
+    void BindForReading(bool depth, GLenum TextureUnit);          
 
 private:
                      

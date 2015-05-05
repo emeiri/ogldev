@@ -26,9 +26,9 @@
 
 IOBuffer::IOBuffer()
 {
-    m_fbo = 0;
+    m_fbo     = 0;
     m_texture = 0;
-    m_depth = 0;
+    m_depth   = 0;
 }
 
 IOBuffer::~IOBuffer()
@@ -51,8 +51,7 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum 
 {
     GLenum Format, Type;
     
-    switch (InternalType)
-    {
+    switch (InternalType) {
         case GL_RGB32F:
             Format = GL_RGB;
             Type = GL_FLOAT;
@@ -60,6 +59,8 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum 
         case GL_R32F:
             Format = GL_RED;
             Type = GL_FLOAT;
+            break;
+        case GL_NONE:
             break;
         default:
             OGLDEV_ERROR("Invalid internal type");
@@ -70,19 +71,24 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     // Create the textures
-    glGenTextures(1, &m_texture);
-    
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, InternalType, WindowWidth, WindowHeight, 0, Format, Type, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
+    if (InternalType != GL_NONE) {
+        glGenTextures(1, &m_texture);
 
-    // Create the textures
-    if (WithDepth)
-    {
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, InternalType, WindowWidth, WindowHeight, 0, Format, Type, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);        
+        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
+
+    	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+
+        glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
+    }
+        
+    // Create the depth buffer 
+    if (WithDepth) {
         glGenTextures(1, &m_depth);
 
         // depth
@@ -95,10 +101,6 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum 
         glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth, 0);        
     }
     
-	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
-
-    glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
-
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
     if (Status != GL_FRAMEBUFFER_COMPLETE) {
@@ -119,10 +121,16 @@ void IOBuffer::BindForWriting()
 }
 
 
-void IOBuffer::BindForReading(GLenum TextureUnit)
+void IOBuffer::BindForReading(bool depth, GLenum TextureUnit)
 {
     glActiveTexture(TextureUnit);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+    
+    if (depth) {
+        glBindTexture(GL_TEXTURE_2D, m_depth);
+    }
+    else {
+        glBindTexture(GL_TEXTURE_2D, m_texture);
+    }
 }
 
 
