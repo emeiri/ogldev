@@ -33,6 +33,8 @@ public:
     void BindDepthBuffer(IOBuffer& depthBuf);	
     void SetSampleRadius(float sr);    
     void SetProjMatrix(const Matrix4f& m);
+    void SetAspectRatio(float aspectRatio);
+    void SetTanHalfFOV(float tanHalfFOV);
     
 private:
     
@@ -44,6 +46,8 @@ private:
     GLuint m_sampleRadLocation;    
     GLuint m_kernelLocation;
     GLuint m_projMatrixLocation;
+    GLuint m_aspectRatioLocation;
+    GLuint m_tanHalfFOVLocation;
 };
 
 

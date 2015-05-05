@@ -55,11 +55,15 @@ bool SSAOTechnique::Init()
     m_sampleRadLocation = GetUniformLocation("gSampleRad");
     m_projMatrixLocation = GetUniformLocation("gProj");	
     m_kernelLocation = GetUniformLocation("gKernel");
-
+    m_aspectRatioLocation = GetUniformLocation("gAspectRatio");
+    m_tanHalfFOVLocation = GetUniformLocation("gTanHalfFOV");
+            
     if (m_depthTextureUnitLocation  == INVALID_UNIFORM_LOCATION ||
         m_sampleRadLocation         == INVALID_UNIFORM_LOCATION ||
         m_projMatrixLocation        == INVALID_UNIFORM_LOCATION ||		
-        m_kernelLocation            == INVALID_UNIFORM_LOCATION) {
+        m_kernelLocation            == INVALID_UNIFORM_LOCATION ||
+        m_aspectRatioLocation       == INVALID_UNIFORM_LOCATION ||
+        m_tanHalfFOVLocation        == INVALID_UNIFORM_LOCATION) {
      //   return false;
     }
    
@@ -113,4 +117,16 @@ void SSAOTechnique::SetSampleRadius(float sr)
 void SSAOTechnique::SetProjMatrix(const Matrix4f& m)
 {
     glUniformMatrix4fv(m_projMatrixLocation, 1, GL_TRUE, (const GLfloat*)m.m);    
+}
+
+
+void SSAOTechnique::SetAspectRatio(float aspectRatio)
+{
+    glUniform1f(m_aspectRatioLocation, aspectRatio);
+}
+
+
+void SSAOTechnique::SetTanHalfFOV(float tanHalfFOV)
+{
+    glUniform1f(m_tanHalfFOVLocation, tanHalfFOV);
 }
