@@ -64,5 +64,17 @@
     <None Include="..\..\tutorial45\shaders\geometry_pass.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\tutorial45\shaders\blur.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial45\shaders\blur.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial45\shaders\ssao.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial45\shaders\ssao.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
