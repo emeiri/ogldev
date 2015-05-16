@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 46 - SSAO With Depth Reconstruction </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 46: </h2>
+            <h1> SSAO With Depth Reconstruction </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+    <article id="content" class="breakpoint">
+        <section>
+            <h3> Background </h3>
+<p>
+    In the <a href="../tutorial45/tutorial45.html">previous tutorial</a> we studied the
+    Screen Space Ambient Occlusion algorithm. We used a geometry buffer which contained 
+    the view space position of all the pixels as a first step in our calculations. 
+    In this tutorial we are going to challenge ourselves by calculating the view space
+    position directly from the depth buffer. The advantage of this approach is that
+    much less memory is required because we will only need one floating point value
+    per pixel instead of three. This tutorial relies heavily on the previous tutorial
+    so make sure you fully understand it before starting this one. The code here will 
+    be presented only as required changes over the original algorithm.
+</p>
+<p>
+    In the SSAO algorithm we scan the entire window pixel by pixel, generate random
+    points around each pixel in view space, project them on the near clipping plane
+    and compare their Z value with the actual pixel at that location. The view space
+    position is generated in a geometry pass at the start of the render loop. In
+    order to populate correctly the geometry buffer with the view space position 
+    we also need a depth buffer (else pixels will be updated based on draw order rather
+    than depth). We can use that depth buffer alone to reconstruct the entire view space
+    position vector, thus giving up on the space required for it (while replacing it
+    with some more per-pixel math).
+</p>
+<p>
+    Let's do a short recap on the stages required to populate the depth buffer (if you need a 
+    more in-depth review please see <a href="../tutorial12/tutorial12.html">tutorial 12</a>. We begin
+    with the object space position of a vertex and multiply it with the WVP matrix which
+    is a combined transformations of local-to-world, world-to->view and projection from
+    view on the near clipping plane. The result is a 4D vector with the view space Z value
+    in the fourth component. We say that this vector is in clip space at this point. The clip
+    space vector goes into the gl_Position output vector from the vertex shader and
+    the GPU clips its first three components between -W and W (W is the fourth component with
+    the view space Z value). Next the GPU performs perspective divide which means that
+    the vector is divided by W. This means that now the first three components are between
+    -1 and 1 the last component is simply 1. We say that at this point the vector is in NDC
+    space (Normalized Device Coordinates). 
+</p>
+<p>
+    Usually the vertex is just one out of three vertices comprising a triangle so the GPU
+    interpolates the NDC vector across the triangle face and executes the fragment shader
+    on each pixel. On the way out of the fragment shader the GPU updates the depth buffer
+    with the Z component of the NDC vector (based on several state nobs that must be 
+    configured correctly such as depth testing, depth write, etc). An important point
+    to remember is that before writing the Z value to the depth buffer the GPU transforms
+    it from (-1,1) to (0,1). We must handle this correctly or else we will get visual
+    anomalies.
+</p>
+<p>
+    So this is basically all the math relevant to the Z buffer handling. Now let's say
+    that we have a Z value that we sampled for the pixel and we want to reconstruct 
+    the entire view space vector. Everything we need in order to retrace our steps is
+    in the above description but before we dive any further let's see that math
+    again only this time with numbers and matrices rather than words. Since we are only
+    interested in the view space position we can look at the projection matrix rather
+    than the combined WVP:
+</p>
+<img src="diagram1.jpg">
+<p>
+    What we see above is the projection of the view space vector to clip space (the result on
+    the right). Few notations:
+<ul>
+    <li>ar = Aspect Ratio</li>
+    <li>FOV = Field of View</li>
+    <li>n = near clipping plane</li>
+    <li>f = far clipping plane</li>
+</ul>
+</p>
+<p>
+    In order to simplify the next steps let's call the value in location (3,3) of the
+    projection matrix 'S' and the value in location (3,4) 'T'. This means that the value
+    of the Z in NDC is:
+</p>
+<img src="diagram2.jpg">
+<p>
+    And since we need to transform the NDC value from (-1,1) to (0,1) the actual
+    value written to the depth buffer is:
+</p>
+<p>
+    <img src="diagram3.jpg">
+</p>
+<p>
+    It is now easy to see that we can extract the view space Z from the above 
+    formula. I haven't specified all the intermediate steps because you
+    should be able to do them yourself. The final result is:
+</p>
+<p>
+    <img src="diagram4.jpg">
+</p>
+<p>
+    So we have the view space Z. Let's see how we can recover X and Y. Remember
+    that after transforming X and Y to clip space we perform clipping to (-W,W)
+    and divide by W (which is actual Z in view space). X and Y are now in the (-1,1)
+    range and so are all the X and Y values of the to-be-interpolated pixels
+    of the triangle. Actually, -1 and 1 mapped to the left, right, top and bottom
+    of the screen. This means that for every pixel on the screen the following equation
+    applies (showing for X only; same applies to Y just without 'ar'):
+</p>
+<p>
+    <img src="diagram5.jpg">
+</p>
+<p>
+    We can write the same as:
+</p>
+    <img src="diagram6.jpg">
+<p>
+    Note that the left and right hand side of the inequality are basically constants
+    and can be calculated by the application before the draw call. This means that
+    we can draw a full screen quad and prepare a 2D vector with those values for
+    X and Y and have the GPU interpolate them all over the screen. When we get to
+    the pixel we just need to multiply the vector by the view space Z to get X and 
+    Y also in view space.
+</p>
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+<p>(tutorial46.cpp:101)</p>
+<code>
+    float AspectRatio = m_persProjInfo.Width / m_persProjInfo.Height;<br>
+m_SSAOTech.SetAspectRatio(AspectRatio);<br>
+float TanHalfFOV = tanf(ToRadian(m_persProjInfo.FOV / 2.0f));<br>
+m_SSAOTech.SetTanHalfFOV(TanHalfFOV);  <br>
+</code>
+<p>
+    As I said earlier, we are only going to review the specific code changes
+    required on the previous tutorial in order to implement depth reconstruction.
+    The first change that we need to make is to provide the aspect ratio and the
+    tangent of half the field of view angle to the SSAO technique. We can see
+    above how to calculate them.
+</p>
+<p>(tutorial46.cpp:134)</p>
+<code>
+    if (!m_depthBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, true, <b>GL_NONE</b>)) {<br>
+&nbsp; &nbsp;   return false;<br>
+}    
+</code>
+<p>
+    Next we need to initialize the geometry buffer (whose class attribute was renamed
+    from m_gBuffer to m_depthBuffer) with GL_NONE as the internal format type. This
+    will cause only the depth buffer to be created. Review io_buffer.cpp in the Common
+    project for further details on the internal workings of the IOBuffer class.
+</p>
+<p>(tutorial46.cpp:181)</p>
+<code>
+    void GeometryPass()<br>
+{<br>
+&nbsp; &nbsp;      m_geomPassTech.Enable();        <br>
+<br>
+&nbsp; &nbsp;     <b> m_depthBuffer</b>.BindForWriting();<br>
+<br>
+&nbsp; &nbsp;   <b>   glClear(GL_DEPTH_BUFFER_BIT);</b><br>
+<br>
+&nbsp; &nbsp;      m_pipeline.Orient(m_mesh.GetOrientation());<br>
+&nbsp; &nbsp;      m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());<br>
+&nbsp; &nbsp;      m_mesh.Render();       <br>
+ }<br>
+<br>
+<br>
+ void SSAOPass()<br>
+ {<br>
+&nbsp; &nbsp;      m_SSAOTech.Enable();        <br>
+&nbsp; &nbsp;  <b>    m_SSAOTech.BindDepthBuffer(m_depthBuffer);  </b>      <br>
+<br>
+&nbsp; &nbsp;      m_aoBuffer.BindForWriting();<br>
+<br>
+&nbsp; &nbsp;      glClear(GL_COLOR_BUFFER_BIT);                <br>
+<br>
+&nbsp; &nbsp;      m_quad.Render();                <br>
+ }    
+</code>
+<p>
+    We can see the change from m_gBuffer to m_depthBuffer in the geometry and SSAO
+    passses. Also, we no longer need to call glClear with the color buffer bit
+    because m_depthBuffer does not contain a color buffer. This completes the changes
+    in the main application code and you can see that they are fairly minimal. Most of
+    the juice is in the shader. Let's review them.
+</p>
+<p>(geometry_pass.vs/fs)</p>
+<code>
+    #version 330<br>
+                <br>
+layout (location = 0) in vec3 Position;                                             <br>
+<br>
+uniform mat4 gWVP;<br>
+<b>// uniform mat4 gWV;</b><br>
+<br>
+<b>// out vec3 ViewPos; </b>                                       <br>
+<br>
+void main()<br>
+{       <br>
+&nbsp; &nbsp;     gl_Position = gWVP * vec4(Position, 1.0);<br>
+&nbsp; &nbsp; <b>  //  ViewPos     = (gWV * vec4(Position, 1.0)).xyz;</b><br>
+}<br>
+<br>
+<br>
+#version 330<br>
+<br>
+<b>// in vec3 ViewPos;</b><br>
+<br>
+<b>// layout (location = 0) out vec3 PosOut;</b>   <br>
+<br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;  <b> //  PosOut = ViewPos;</b><br>
+}<br>
+</code>
+<p>
+    Above we see the revised geometry pass vertex and fragment shaders with
+    the stuff that we no longer need commented out. Since we are only writing
+    out the depth everything related to view space position was thrown out.
+    In fact, the fragment shader is now empty.    
+</p>
+<p>(ssao.vs)</p>
+<code>
+#version 330<br>
+<br>
+layout (location = 0) in vec3 Position; <br>
+<br>
+<b>uniform float gAspectRatio;<br>
+    uniform float gTanHalfFOV;</b><br>
+<br>
+out vec2 TexCoord;<br>
+<b>out vec2 ViewRay;</b><br>
+<br>
+void main()<br>
+{          <br>
+&nbsp; &nbsp;     gl_Position = vec4(Position, 1.0);<br>
+&nbsp; &nbsp;     TexCoord = (Position.xy + vec2(1.0)) / 2.0;<br>
+&nbsp; &nbsp; <b>    ViewRay.x = Position.x * gAspectRatio * gTanHalfFOV;<br>
+    &nbsp; &nbsp;     ViewRay.y = Position.y * gTanHalfFOV;</b><br>
+}<br>    
+</code>
+<p>
+Based on the math reviewed above (see the very end of the background section)
+we need to generate something that we call a
+view ray in the vertex shader of the SSAO technique. Combined with the view space
+Z calculated in the fragment shader it will help us extract the view space X and Y.
+Note how we use the fact that the incoming geometry is a full screen quad that goes
+from -1 to 1 on the X and Y axis in order to generate the end points of '-1 * ar * tan(FOV/2)'
+and 'ar * tan(FOV/2)' for X and '-1 * tan(FOV/2)' and 'tan(FOV/2)' for Y.
+</p>
+<p>(ssao.fs)</p>
+<code>
+#version 330<br>
+<br>
+in vec2 TexCoord;<br>
+<b>in vec2 ViewRay;</b><br>
+<br>
+out vec4 FragColor;<br>
+<br>
+<b>uniform sampler2D gDepthMap;</b><br>
+uniform float gSampleRad;<br>
+uniform mat4 gProj;<br>
+<br>
+const int MAX_KERNEL_SIZE = 64;<br>
+uniform vec3 gKernel[MAX_KERNEL_SIZE];<br>
+<br>
+<br>
+<b>float CalcViewZ(vec2 Coords)<br>
+{<br>
+&nbsp; &nbsp;     float Depth = texture(gDepthMap, Coords).x;<br>
+&nbsp; &nbsp;     float ViewZ = gProj[3][2] / (2 * Depth -1 - gProj[2][2]);<br>
+&nbsp; &nbsp;     return ViewZ;<br>
+}</b><br>
+<br>
+<br>
+void main()<br>
+{<br>
+&nbsp; &nbsp; <b>    float ViewZ = CalcViewZ(TexCoord);<br>
+<br>
+&nbsp; &nbsp;     float ViewX = ViewRay.x * ViewZ;<br>
+&nbsp; &nbsp;     float ViewY = ViewRay.y * ViewZ;<br>
+<br>
+&nbsp; &nbsp;     vec3 Pos = vec3(ViewX, ViewY, ViewZ);</b><br>
+<br>
+&nbsp; &nbsp;     float AO = 0.0;<br>
+<br>
+&nbsp; &nbsp;     for (int i = 0 ; i < MAX_KERNEL_SIZE ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         vec3 samplePos = Pos + gKernel[i];<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         vec4 offset = vec4(samplePos, 1.0);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset = gProj * offset;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy /= offset.w;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         offset.xy = offset.xy * 0.5 + vec2(0.5);<br>
+            <br>
+&nbsp; &nbsp; &nbsp; &nbsp;   <b>      float sampleDepth = CalcViewZ(offset.xy);</b><br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         if (abs(Pos.z - sampleDepth) < gSampleRad) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             AO += step(sampleDepth,samplePos.z);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         }<br>
+&nbsp; &nbsp;     }<br>
+<br>
+&nbsp; &nbsp; AO = 1.0 - AO/64.0;<br>
+ <br>
+&nbsp; &nbsp;     FragColor = vec4(pow(AO, 2.0));<br>
+}    
+</code>
+<p>
+The first thing we do in the fragment shader is to calculate the view space Z. We do
+this with the exact same formula we saw in the background section. The projection matrix
+was already here in the previous tutorial and we just need to be careful when accessing
+the 'S' and 'T' items in the (3,3) and (3,4) locations. Remember that the index goes from
+0 to 3 (vs. 1 to 4 in standard matrix semantics) and that the matrix is transposed so
+we we need to reverse the column/row for the 'T'.   
+</p>
+<p>
+    Once the Z is ready we multiply it by the view ray in order to retrieve the X and Y.
+    We continue as usual by generating the random points and projecting them on the
+    screen. We use the same trick to calculate the depth of the projected point.
+</p>
+<p>
+  If you have done everything correctly you should end up with pretty much the same
+  results as in the previous tutorial... ;-)
+</p>
+</section>
+</article>
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+</body>
+</html>
