@@ -42,7 +42,6 @@ bool SSAOTechnique::Init()
         return false;
     }
 
-
     if (!AddShader(GL_FRAGMENT_SHADER, "shaders/ssao.fs")) {
         return false;
     }

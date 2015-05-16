@@ -103,8 +103,6 @@ public:
         float TanHalfFOV = tanf(ToRadian(m_persProjInfo.FOV / 2.0f));
         m_SSAOTech.SetTanHalfFOV(TanHalfFOV);
         
-        printf("%f\n", AspectRatio * TanHalfFOV);
-
         if (!m_lightingTech.Init()) {
             OGLDEV_ERROR("Error initializing the lighting technique\n");
             return false;

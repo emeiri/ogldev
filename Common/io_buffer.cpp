@@ -26,9 +26,10 @@
 
 IOBuffer::IOBuffer()
 {
-    m_fbo     = 0;
-    m_texture = 0;
-    m_depth   = 0;
+    m_fbo          = 0;
+    m_texture      = 0;
+    m_depth        = 0;
+    m_internalType = GL_NONE;
 }
 
 IOBuffer::~IOBuffer()
@@ -49,6 +50,8 @@ IOBuffer::~IOBuffer()
 
 bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum InternalType)
 {
+    m_internalType = InternalType;
+    
     GLenum Format, Type;
     
     switch (InternalType) {
@@ -121,11 +124,11 @@ void IOBuffer::BindForWriting()
 }
 
 
-void IOBuffer::BindForReading(bool depth, GLenum TextureUnit)
+void IOBuffer::BindForReading(GLenum TextureUnit)
 {
     glActiveTexture(TextureUnit);
     
-    if (depth) {
+    if (m_internalType == GL_NONE) {
         glBindTexture(GL_TEXTURE_2D, m_depth);
     }
     else {

@@ -33,13 +33,14 @@ public:
 
     void BindForWriting();
    
-    void BindForReading(bool depth, GLenum TextureUnit);          
+    void BindForReading(GLenum TextureUnit);          
 
 private:
                      
     GLuint m_fbo;
     GLuint m_texture;
     GLuint m_depth;
+    GLenum m_internalType;
 };
 
 #endif	/* IO+BUFFER_H */

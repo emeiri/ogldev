@@ -191,7 +191,7 @@ void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
 
 void LightingTechnique::BindAOBuffer(IOBuffer& aoBuffer)
 {
-    aoBuffer.BindForReading(false, AO_TEXTURE_UNIT);    
+    aoBuffer.BindForReading(AO_TEXTURE_UNIT);    
 }
 
 

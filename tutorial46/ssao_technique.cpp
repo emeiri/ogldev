@@ -42,7 +42,6 @@ bool SSAOTechnique::Init()
         return false;
     }
 
-
     if (!AddShader(GL_FRAGMENT_SHADER, "shaders/ssao.fs")) {
         return false;
     }
@@ -64,7 +63,7 @@ bool SSAOTechnique::Init()
         m_kernelLocation            == INVALID_UNIFORM_LOCATION ||
         m_aspectRatioLocation       == INVALID_UNIFORM_LOCATION ||
         m_tanHalfFOVLocation        == INVALID_UNIFORM_LOCATION) {
-     //   return false;
+        return false;
     }
    
     Enable();
@@ -104,7 +103,7 @@ void SSAOTechnique::GenKernel()
 
 void SSAOTechnique::BindDepthBuffer(IOBuffer& depthBuf)
 {
-    depthBuf.BindForReading(true, DEPTH_TEXTURE_UNIT);
+    depthBuf.BindForReading(DEPTH_TEXTURE_UNIT);
 }
 
 
