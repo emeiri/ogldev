@@ -34,7 +34,7 @@
     position directly from the depth buffer. The advantage of this approach is that
     much less memory is required because we will only need one floating point value
     per pixel instead of three. This tutorial relies heavily on the previous tutorial
-    so make sure you fully understand it before starting this one. The code here will 
+    so make sure you fully understand it before going on. The code here will 
     be presented only as required changes over the original algorithm.
 </p>
 <p>
@@ -45,26 +45,26 @@
     order to populate correctly the geometry buffer with the view space position 
     we also need a depth buffer (else pixels will be updated based on draw order rather
     than depth). We can use that depth buffer alone to reconstruct the entire view space
-    position vector, thus giving up on the space required for it (while replacing it
-    with some more per-pixel math).
+    position vector, thus reducing the space required for it (though some more 
+    per-pixel math will be required).
 </p>
 <p>
     Let's do a short recap on the stages required to populate the depth buffer (if you need a 
-    more in-depth review please see <a href="../tutorial12/tutorial12.html">tutorial 12</a>. We begin
+    more in-depth review please see <a href="../tutorial12/tutorial12.html">tutorial 12</a>). We begin
     with the object space position of a vertex and multiply it with the WVP matrix which
-    is a combined transformations of local-to-world, world-to->view and projection from
+    is a combined transformations of local-to-world, world-to-view and projection from
     view on the near clipping plane. The result is a 4D vector with the view space Z value
     in the fourth component. We say that this vector is in clip space at this point. The clip
     space vector goes into the gl_Position output vector from the vertex shader and
     the GPU clips its first three components between -W and W (W is the fourth component with
     the view space Z value). Next the GPU performs perspective divide which means that
-    the vector is divided by W. This means that now the first three components are between
-    -1 and 1 the last component is simply 1. We say that at this point the vector is in NDC
+    the vector is divided by W. Now the first three components are between
+    -1 and 1 and the last component is simply 1. We say that at this point the vector is in NDC
     space (Normalized Device Coordinates). 
 </p>
 <p>
     Usually the vertex is just one out of three vertices comprising a triangle so the GPU
-    interpolates the NDC vector across the triangle face and executes the fragment shader
+    interpolates between the three NDC vectors across the triangle face and executes the fragment shader
     on each pixel. On the way out of the fragment shader the GPU updates the depth buffer
     with the Z component of the NDC vector (based on several state nobs that must be 
     configured correctly such as depth testing, depth write, etc). An important point
@@ -75,18 +75,18 @@
 <p>
     So this is basically all the math relevant to the Z buffer handling. Now let's say
     that we have a Z value that we sampled for the pixel and we want to reconstruct 
-    the entire view space vector. Everything we need in order to retrace our steps is
+    the entire view space vector from it. Everything we need in order to retrace our steps is
     in the above description but before we dive any further let's see that math
     again only this time with numbers and matrices rather than words. Since we are only
     interested in the view space position we can look at the projection matrix rather
-    than the combined WVP:
+    than the combined WVP (because projection works on the view space position):
 </p>
 <img src="diagram1.jpg">
 <p>
     What we see above is the projection of the view space vector to clip space (the result on
     the right). Few notations:
 <ul>
-    <li>ar = Aspect Ratio</li>
+    <li>ar = Aspect Ratio (width/height)</li>
     <li>FOV = Field of View</li>
     <li>n = near clipping plane</li>
     <li>f = far clipping plane</li>
@@ -95,7 +95,7 @@
 <p>
     In order to simplify the next steps let's call the value in location (3,3) of the
     projection matrix 'S' and the value in location (3,4) 'T'. This means that the value
-    of the Z in NDC is:
+    of the Z in NDC is (remember perspective divide):
 </p>
 <img src="diagram2.jpg">
 <p>
@@ -116,9 +116,9 @@
 <p>
     So we have the view space Z. Let's see how we can recover X and Y. Remember
     that after transforming X and Y to clip space we perform clipping to (-W,W)
-    and divide by W (which is actual Z in view space). X and Y are now in the (-1,1)
+    and divide by W (which is actually Z in view space). X and Y are now in the (-1,1)
     range and so are all the X and Y values of the to-be-interpolated pixels
-    of the triangle. Actually, -1 and 1 mapped to the left, right, top and bottom
+    of the triangle. In fact, -1 and 1 mapped to the left, right, top and bottom
     of the screen. This means that for every pixel on the screen the following equation
     applies (showing for X only; same applies to Y just without 'ar'):
 </p>
@@ -134,8 +134,8 @@
     and can be calculated by the application before the draw call. This means that
     we can draw a full screen quad and prepare a 2D vector with those values for
     X and Y and have the GPU interpolate them all over the screen. When we get to
-    the pixel we just need to multiply the vector by the view space Z to get X and 
-    Y also in view space.
+    the pixel we can use the interpolated value along with Z in order to calculate
+    both X and Y.
 </p>
 </section>
 
@@ -150,9 +150,9 @@ m_SSAOTech.SetTanHalfFOV(TanHalfFOV);  <br>
 </code>
 <p>
     As I said earlier, we are only going to review the specific code changes
-    required on the previous tutorial in order to implement depth reconstruction.
+    to the previous tutorial in order to implement depth reconstruction.
     The first change that we need to make is to provide the aspect ratio and the
-    tangent of half the field of view angle to the SSAO technique. We can see
+    tangent of half the field of view angle to the SSAO technique. We see
     above how to calculate them.
 </p>
 <p>(tutorial46.cpp:134)</p>
@@ -200,7 +200,7 @@ m_SSAOTech.SetTanHalfFOV(TanHalfFOV);  <br>
     passses. Also, we no longer need to call glClear with the color buffer bit
     because m_depthBuffer does not contain a color buffer. This completes the changes
     in the main application code and you can see that they are fairly minimal. Most of
-    the juice is in the shader. Let's review them.
+    the juice is in the shaders. Let's review them.
 </p>
 <p>(geometry_pass.vs/fs)</p>
 <code>
@@ -263,8 +263,8 @@ we need to generate something that we call a
 view ray in the vertex shader of the SSAO technique. Combined with the view space
 Z calculated in the fragment shader it will help us extract the view space X and Y.
 Note how we use the fact that the incoming geometry is a full screen quad that goes
-from -1 to 1 on the X and Y axis in order to generate the end points of '-1 * ar * tan(FOV/2)'
-and 'ar * tan(FOV/2)' for X and '-1 * tan(FOV/2)' and 'tan(FOV/2)' for Y.
+from -1 to 1 on the X and Y axis in order to generate the end points of '-1/+1 * ar * tan(FOV/2)'
+for X and '-1/+1 * tan(FOV/2)' and 'tan(FOV/2)' for Y.
 </p>
 <p>(ssao.fs)</p>
 <code>
