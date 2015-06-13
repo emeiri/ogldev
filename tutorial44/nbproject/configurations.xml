@@ -5,10 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
     </logicalFolder>
-    <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
-      <itemPath>shaders/lighting.fs</itemPath>
-      <itemPath>shaders/lighting.vs</itemPath>
-    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
@@ -67,10 +63,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial44.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -117,10 +109,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="shaders/lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shaders/lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial44.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>

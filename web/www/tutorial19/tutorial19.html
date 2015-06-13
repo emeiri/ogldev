@@ -186,7 +186,7 @@
 			<br>
 			void main()<br>
 			{<br>
-			&nbsp; &nbsp;      vec4 AmbientColor = vec4(gDirectionalLight.Color, 1.0f) * gDirectionalLight.AmbientIntensity;<br>
+			&nbsp; &nbsp;      vec4 AmbientColor = vec4(gDirectionalLight.Color * gDirectionalLight.AmbientIntensity, 1.0f);<br>
 			&nbsp; &nbsp;      vec3 LightDirection = -gDirectionalLight.Direction;<br>
 			&nbsp; &nbsp;      vec3 Normal = normalize(Normal0);<br>
 			<br>
@@ -205,7 +205,7 @@
 			&nbsp; &nbsp;  &nbsp; &nbsp;      float SpecularFactor = dot(VertexToEye, LightReflect);<br>
 			&nbsp; &nbsp;  &nbsp; &nbsp;      SpecularFactor = pow(SpecularFactor, gSpecularPower);<br>
 			&nbsp; &nbsp;  &nbsp; &nbsp;      if (SpecularFactor > 0) {<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              SpecularColor = vec4(gDirectionalLight.Color, 1.0f) * gMatSpecularIntensity * SpecularFactor;<br>
+			&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              SpecularColor = vec4(gDirectionalLight.Color * gMatSpecularIntensity * SpecularFactor, 1.0f);<br>
 			&nbsp; &nbsp;  &nbsp; &nbsp;          }<br>
 			&nbsp; &nbsp;      }<br>
 			<br>

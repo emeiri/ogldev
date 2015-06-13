@@ -6,7 +6,6 @@
                    projectFiles="true">
       <itemPath>billboard_technique.h</itemPath>
       <itemPath>engine_common.h</itemPath>
-      <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>particle_system.h</itemPath>
       <itemPath>ps_update_technique.h</itemPath>
@@ -18,8 +17,6 @@
       <itemPath>billboard.fs</itemPath>
       <itemPath>billboard.gs</itemPath>
       <itemPath>billboard.vs</itemPath>
-      <itemPath>lighting.fs</itemPath>
-      <itemPath>lighting.vs</itemPath>
       <itemPath>ps_update.gs</itemPath>
       <itemPath>ps_update.vs</itemPath>
     </logicalFolder>
@@ -27,7 +24,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>billboard_technique.cpp</itemPath>
-      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>particle_system.cpp</itemPath>
       <itemPath>ps_update_technique.cpp</itemPath>
@@ -141,14 +137,6 @@
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -203,14 +191,6 @@
       <item path="billboard_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="engine_common.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

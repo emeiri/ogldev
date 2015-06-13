@@ -200,8 +200,7 @@
 			<code>
 			void main()<br>
 			{<br>
-			&nbsp; &nbsp;  vec4 AmbientColor = vec4(gDirectionalLight.Color, 1.0f) *<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;  gDirectionalLight.AmbientIntensity;<br>
+			&nbsp; &nbsp;  vec4 AmbientColor = vec4(gDirectionalLight.Color * gDirectionalLight.AmbientIntensity, 1.0f);<br>
 			</code>
 			<p>
 				There is no change in the calculation of the ambient color factor. We calculate and store it here and use it in the
@@ -235,8 +234,7 @@
 			&nbsp; &nbsp;     vec4 DiffuseColor;<br>
 			<br>
 			&nbsp; &nbsp;     if (DiffuseFactor > 0) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; DiffuseColor = vec4(gDirectionalLight.Color, 1.0f) * gDirectionalLight.DiffuseIntensity *
-			DiffuseFactor;<br>
+			&nbsp; &nbsp; &nbsp; &nbsp; DiffuseColor = vec4(gDirectionalLight.Color * gDirectionalLight.DiffuseIntensity * DiffuseFactor, 1.0f);<br>
 			&nbsp; &nbsp;     }<br>
 			&nbsp; &nbsp;     else {<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;  DiffuseColor = vec4(0, 0, 0, 0);<br>

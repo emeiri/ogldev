@@ -29,7 +29,7 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "lighting_technique.h"
+#include "ogldev_basic_lighting.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 #include "particle_system.h"
@@ -83,7 +83,7 @@ public:
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
      
-        m_pLightingTechnique = new LightingTechnique();
+        m_pLightingTechnique = new BasicLightingTechnique();
 
         if (!m_pLightingTechnique->Init()) {
             printf("Error initializing the lighting technique\n");
@@ -93,7 +93,6 @@ public:
         m_pLightingTechnique->Enable();
         m_pLightingTechnique->SetDirectionalLight(m_dirLight);
         m_pLightingTechnique->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_pLightingTechnique->SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
               
         m_pGround = new Mesh();
         
@@ -180,7 +179,7 @@ public:
  private:
 
     long long m_currentTimeMillis;
-    LightingTechnique* m_pLightingTechnique;
+    BasicLightingTechnique* m_pLightingTechnique;
     Camera* m_pGameCamera;
     DirectionalLight m_dirLight;    
     Mesh* m_pGround;    
@@ -192,9 +191,7 @@ public:
 
 
 int main(int argc, char** argv)
-{
-    Magick::InitializeMagick(*argv);
-    
+{   
     SRANDOM;
        
     GLUTBackendInit(argc, argv, true, false);

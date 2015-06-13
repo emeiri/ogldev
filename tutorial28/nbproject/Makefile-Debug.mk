@@ -36,7 +36,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/billboard_technique.o \
-	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
 	${OBJECTDIR}/particle_system.o \
 	${OBJECTDIR}/ps_update_technique.o \
@@ -74,11 +73,6 @@ ${OBJECTDIR}/billboard_technique.o: billboard_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/billboard_technique.o billboard_technique.cpp
-
-${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
 ${OBJECTDIR}/mesh.o: mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}

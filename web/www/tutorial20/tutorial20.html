@@ -180,14 +180,13 @@
 			&nbsp; &nbsp;     vec4 SpecularColor = vec4(0, 0, 0, 0);<br>
 			<br>
 			&nbsp; &nbsp;     if (DiffuseFactor > 0) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         DiffuseColor = vec4(Light.Color, 1.0f) * Light.DiffuseIntensity * DiffuseFactor;<br>
+			&nbsp; &nbsp; &nbsp; &nbsp;         DiffuseColor = vec4(Light.Color * Light.DiffuseIntensity * DiffuseFactor, 1.0f);<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos0);<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;         vec3 LightReflect = normalize(reflect(LightDirection, Normal));<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;         float SpecularFactor = dot(VertexToEye, LightReflect);<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;         SpecularFactor = pow(SpecularFactor, gSpecularPower);<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;         if (SpecularFactor > 0) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             SpecularColor = vec4(Light.Color, 1.0f) *<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                             gMatSpecularIntensity * SpecularFactor;<br>
+			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0f);<br>
 			&nbsp; &nbsp; &nbsp; &nbsp;         }<br>
 			&nbsp; &nbsp;     }<br>
 			<br>

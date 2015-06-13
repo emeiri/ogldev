@@ -74,22 +74,21 @@ uniform vec4 gColor;
                                                                                             
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput1 In)            
 {                                                                                           
-    vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;                   
+    vec4 AmbientColor = vec4(Light.Color * Light.AmbientIntensity, 1.0f);
     float DiffuseFactor = dot(In.Normal, -LightDirection);                                     
                                                                                             
     vec4 DiffuseColor  = vec4(0, 0, 0, 0);                                                  
     vec4 SpecularColor = vec4(0, 0, 0, 0);                                                  
                                                                                             
     if (DiffuseFactor > 0) {                                                                
-        DiffuseColor = vec4(Light.Color, 1.0f) * Light.DiffuseIntensity * DiffuseFactor;    
+        DiffuseColor = vec4(Light.Color * Light.DiffuseIntensity * DiffuseFactor, 1.0f);
                                                                                             
         vec3 VertexToEye = normalize(gEyeWorldPos - In.WorldPos);                             
         vec3 LightReflect = normalize(reflect(LightDirection, In.Normal));                     
         float SpecularFactor = dot(VertexToEye, LightReflect);                              
         SpecularFactor = pow(SpecularFactor, gSpecularPower);                               
         if (SpecularFactor > 0) {                                                           
-            SpecularColor = vec4(Light.Color, 1.0f) *                                       
-                            gMatSpecularIntensity * SpecularFactor;                         
+            SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0f);
         }                                                                                   
     }                                                                                       
                                                                                             

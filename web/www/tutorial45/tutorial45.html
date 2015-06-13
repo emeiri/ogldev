@@ -469,7 +469,7 @@ here is the blurred AO term buffer which is bound as input.
 <br>
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)<br>
 {<br>
-&nbsp; &nbsp;     vec4 AmbientColor = vec4(Light.Color, 1.0f) * Light.AmbientIntensity;<br>
+&nbsp; &nbsp;     vec4 AmbientColor = vec4(Light.Color * Light.AmbientIntensity, 1.0f);<br>
 <br>
 &nbsp; &nbsp;     if (gShaderType == SHADER_TYPE_SSAO) {<br>
 &nbsp; &nbsp; &nbsp; &nbsp;          AmbientColor *= texture(gAOMap, CalcScreenTexCoord()).r;<br>

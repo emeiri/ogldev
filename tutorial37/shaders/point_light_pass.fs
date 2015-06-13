@@ -47,25 +47,25 @@ uniform int gLightType;
 uniform vec2 gScreenSize;
 
 vec4 CalcLightInternal(BaseLight Light,
-					   vec3 LightDirection,
-					   vec3 WorldPos,
-					   vec3 Normal)
+                       vec3 LightDirection,
+                       vec3 WorldPos,
+                       vec3 Normal)
 {
-    vec4 AmbientColor = vec4(Light.Color, 1.0) * Light.AmbientIntensity;
+    vec4 AmbientColor = vec4(Light.Color * Light.AmbientIntensity, 1.0);
     float DiffuseFactor = dot(Normal, -LightDirection);
 
     vec4 DiffuseColor  = vec4(0, 0, 0, 0);
     vec4 SpecularColor = vec4(0, 0, 0, 0);
 
     if (DiffuseFactor > 0.0) {
-        DiffuseColor = vec4(Light.Color, 1.0) * Light.DiffuseIntensity * DiffuseFactor;
+        DiffuseColor = vec4(Light.Color * Light.DiffuseIntensity * DiffuseFactor, 1.0);
 
         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos);
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(VertexToEye, LightReflect);
         SpecularFactor = pow(SpecularFactor, gSpecularPower);
         if (SpecularFactor > 0.0) {
-            SpecularColor = vec4(Light.Color, 1.0) * gMatSpecularIntensity * SpecularFactor;
+            SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0);
         }
     }
 
@@ -75,9 +75,9 @@ vec4 CalcLightInternal(BaseLight Light,
 vec4 CalcDirectionalLight(vec3 WorldPos, vec3 Normal)
 {
     return CalcLightInternal(gDirectionalLight.Base,
-							 gDirectionalLight.Direction,
-							 WorldPos,
-							 Normal);
+                             gDirectionalLight.Direction,
+                             WorldPos,
+                             Normal);
 }
 
 vec4 CalcPointLight(vec3 WorldPos, vec3 Normal)
