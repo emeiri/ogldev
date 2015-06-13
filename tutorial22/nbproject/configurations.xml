@@ -7,12 +7,6 @@
       <itemPath>mesh.h</itemPath>
       <itemPath>texture.h</itemPath>
     </logicalFolder>
-    <logicalFolder name="ResourceFiles"
-                   displayName="Shader Files"
-                   projectFiles="true">
-      <itemPath>lighting.fs</itemPath>
-      <itemPath>lighting.vs</itemPath>
-    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
@@ -100,10 +94,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ freetype2 fontconfig gl assimp`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -131,10 +121,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">

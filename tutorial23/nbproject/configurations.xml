@@ -4,7 +4,6 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>lighting_technique.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>shadow_map_fbo.h</itemPath>
       <itemPath>shadow_map_technique.h</itemPath>
@@ -12,15 +11,12 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Shader Files"
                    projectFiles="true">
-      <itemPath>lighting.fs</itemPath>
-      <itemPath>lighting.vs</itemPath>
       <itemPath>shadow_map.fs</itemPath>
       <itemPath>shadow_map.vs</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>lighting_technique.cpp</itemPath>
       <itemPath>mesh.cpp</itemPath>
       <itemPath>shadow_map_fbo.cpp</itemPath>
       <itemPath>shadow_map_technique.cpp</itemPath>
@@ -307,10 +303,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ freetype2 fontconfig`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">
@@ -350,10 +342,6 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lighting.vs" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="mesh.h" ex="false" tool="3" flavor2="0">

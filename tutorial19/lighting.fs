@@ -22,8 +22,7 @@ uniform float gSpecularPower;
                                                                                     
 void main()                                                                         
 {                                                                                   
-    vec4 AmbientColor = vec4(gDirectionalLight.Color, 1.0f) *                       
-                        gDirectionalLight.AmbientIntensity;                         
+    vec4 AmbientColor = vec4(gDirectionalLight.Color * gDirectionalLight.AmbientIntensity, 1.0f);
     vec3 LightDirection = -gDirectionalLight.Direction;                             
     vec3 Normal = normalize(Normal0);                                               
                                                                                     
@@ -33,17 +32,14 @@ void main()
     vec4 SpecularColor = vec4(0, 0, 0, 0);                                          
                                                                                     
     if (DiffuseFactor > 0) {                                                        
-        DiffuseColor = vec4(gDirectionalLight.Color, 1.0f) *                        
-                       gDirectionalLight.DiffuseIntensity *                         
-                       DiffuseFactor;                                               
+        DiffuseColor = vec4(gDirectionalLight.Color * gDirectionalLight.DiffuseIntensity * DiffuseFactor, 1.0f);
                                                                                     
         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos0);                     
         vec3 LightReflect = normalize(reflect(gDirectionalLight.Direction, Normal));
         float SpecularFactor = dot(VertexToEye, LightReflect);                      
-        SpecularFactor = pow(SpecularFactor, gSpecularPower);                       
         if (SpecularFactor > 0) {                                                   
-            SpecularColor = vec4(gDirectionalLight.Color, 1.0f) *                   
-                            gMatSpecularIntensity * SpecularFactor;                 
+            SpecularFactor = pow(SpecularFactor, gSpecularPower);
+            SpecularColor = vec4(gDirectionalLight.Color * gMatSpecularIntensity * SpecularFactor, 1.0f);
         }                                                                           
     }                                                                               
                                                                                     

@@ -83,9 +83,9 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
                                                                                             
         vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos0);                             
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));                     
-        float SpecularFactor = dot(VertexToEye, LightReflect);                              
-        SpecularFactor = pow(SpecularFactor, gSpecularPower);                               
+        float SpecularFactor = dot(VertexToEye, LightReflect);                                      
         if (SpecularFactor > 0) {                                                           
+            SpecularFactor = pow(SpecularFactor, gSpecularPower);                               
             SpecularColor = vec4(Light.Color, 1.0f) * gMatSpecularIntensity * SpecularFactor;                         
         }                                                                                   
     }                                                                                       

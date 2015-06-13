@@ -61,31 +61,13 @@
 			I * P = P(x,y,z). So it looks like we should start with the identity
 			matrix and find out the changes that will complete the right hand side
 			of the sum equation in each component (...+V1, ...+V2, ...+V3). Let's
-			see how this improved identity matrix would look like:<p>
-			<img class="center" src="equation1.png">
-			<p>From this calculation we can draw two conclusions:</p>
-			<ol>
-			  <li>a, b, c, d, e and f have to be zero else each two components will have an effect on the the third (so
-			we are back to the identity matrix).</li>
-			  <li>Since x, y and z have an effect on all three components of the result when they are all zeros the result will also be the zero
-			vector (so we cannot translate the zero vector).</li>
-			</ol>
-			<p>We want to find the matrix that will provide the following right hand side of the calculation: </p>
-			<img class="center" src="equation2.png">
-			<p>So we need to find the way to add v1-v3 as we see above and then a-f
-			can be zero. The final result will be our translated vector. Seems like
-			we want to add a fourth column to the matrix but then our calculation
-			will be invalid. We cannot multiply a 3x4 matrix by a 3x1 vector. The
-			rule says that you can only multiply matrices if they look like NxM and
-			MxN. So we have to add a fourth component to our vector. A good fourth
-			component will be 1 because then we can place v1-v3 on the fourth
-			column of the matrix and they will be left unchanged in the result
-			because they will get multiplied by 1. But our matrix is still invalid
-			due to the rule above. Multiplying a 3x4 matrix by 4x1 vector is still
-			invalid, by adding a fourth row to the matrix and making it 4x4 will
-			make it valid. Finally, here is our translation matrix:</p>
-			<img class="center" src="equation3.png">
-			<p>Now even if x,y and z are zero we can still translate them to any location.</p>
+			see how the identity matrix looks like:<p>
+			<img class="center" src="equation1.jpg">
+			<p>We want to modify the identity matrix such that the result will be:</p>
+                        <img class="center" src="equation2.jpg">
+                        <p>There really isn't an easy way to do this if we stick to 3x3 matrix, but
+                            if we change to a 4x4 matrix we can do the following:</p>
+			<img class="center" src="equation3.jpg">
 			<p>Representing a 3-vector using a 4-vector like that is called homogenous
 			coordinates and is very popular and useful for 3D graphics. The fourth
 			component is called 'w'. In fact, the internal shader symbol
