@@ -198,7 +198,7 @@ bool GLUTBackendCreateWindow(unsigned int Width, unsigned int Height, bool isFul
     if (isFullScreen) {
         char ModeString[64] = { 0 };
         int bpp = 32;
-        SNPRINTF(ModeString, sizeof(ModeString), "%dx%d@%d", Width, Height, bpp);
+        SNPRINTF(ModeString, sizeof(ModeString), "%dx%d:%d@60", Width, Height, bpp);
         glutGameModeString(ModeString);
         glutEnterGameMode();
     }
