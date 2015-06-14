@@ -232,7 +232,7 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
 }
 
 
-void Mesh::Render(unsigned int DrawIndex, unsigned int PrimID)
+/*void Mesh::Render(unsigned int DrawIndex, unsigned int PrimID)
 {
     assert(DrawIndex < m_Entries.size());
     
@@ -253,4 +253,4 @@ void Mesh::Render(unsigned int DrawIndex, unsigned int PrimID)
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);    
-}
+}*/

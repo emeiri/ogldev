@@ -115,15 +115,17 @@ static void SpecialKeyboardCB(int Key, int x, int y)
 
 static void KeyboardCB(unsigned char Key, int x, int y)
 {
+    
 	if (
-		((Key >= '0') && (Key <= '9')) ||
+		((Key >= '+') && (Key <= '9')) ||
 		((Key >= 'A') && (Key <= 'Z')) ||
-		((Key >= 'a') && (Key <= 'z')) 
-		) {
+		((Key >= 'a') && (Key <= 'z'))
+        ) {
 		OGLDEV_KEY OgldevKey = (OGLDEV_KEY)Key;
 		s_pCallbacks->KeyboardCB(OgldevKey);
 	}
 	else {
+        printf("%d\n", Key);        
 		OGLDEV_ERROR("Unimplemented GLUT key");
 	}
 

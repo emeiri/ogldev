@@ -59,8 +59,6 @@ public:
 
     void Render(IRenderCallbacks* pRenderCallbacks);
     
-    void Render(unsigned int DrawIndex, unsigned int PrimID);
-
 private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
     void InitMesh(unsigned int Index, const aiMesh* paiMesh);

@@ -149,11 +149,11 @@ public:
 			GLUTBackendLeaveMainLoop();
 			break;
 
-            case '+':
+            case OGLDEV_KEY_PLUS:
                 m_dispFactor += 0.01f;
                 break;
                 
-            case '-':
+            case OGLDEV_KEY_MINUS:
                 if (m_dispFactor >= 0.01f) {
                     m_dispFactor -= 0.01f;                    
                 }

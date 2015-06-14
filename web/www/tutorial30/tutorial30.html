@@ -448,8 +448,16 @@
 			    &nbsp; &nbsp; ...<br>
 			</code>
 			<p>
-				Finally, don't forget to compile the two new shader stages!
+				We have two new shader stage so we must compile them.
 			</p>
+                        <p>(mesh.cpp:226)</p>
+                        <code>
+                            glDrawElements(<b>GL_PATCHES</b>, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);
+                        </code>
+                        <p>
+                            Finally, we have to use GL_PATCHES as the primitive type instead of GL_TRIANGLES.
+                        </p>
+                       
 			<p><b>The Demo</b></p>
 			<p>
 				The demo in this tutorial shows how to tessellate a quad terrain and displace vertices along the rocks
