@@ -76,13 +76,13 @@
 			source code itself or by loading it from an external text file (again
 			into an array of characters). Then you compile the shaders one by one
 			into shader objects. After that you link the shaders into a single
-			program and load it into the GPU. Linking the shaders give the driver
+			program and load it into the GPU. Linking the shaders gives the driver
 			the opportunity to trim down the shaders and optimize them according to
 			their relationships. For example, you may pair a vertex shader that
 			emits a normal with a fragment shader that ignores it. In that case the
 			GLSL compiler in the driver can remove the normal related functionality
 			of the shader and enable faster execution of the vertex shader. If that
-			shader is later paired with a fragment shader that use the normal then
+			shader is later paired with a fragment shader that uses the normal then
 			linking the other program will generate a different vertex shader. </p>
 		</section>
 
@@ -212,10 +212,10 @@
 			the position in screen space (following a few more transformations).
 			Cutting the X and Y values by half means that we will see a triangle
 			which is one quarter the size of the triangle in the previous tutorial.
-			Note that we are setting W to 1.0. This is extremely important to get
+			Note that we are setting W to 1.0. This is extremely important to getting
 			the triangle displayed correctly. Getting the projection from 3D to 2D
 			is actually accomplished in two seperate stages. First you need to
-			multiple all your vertices by the projection matrix (which we will
+			multiply all your vertices by the projection matrix (which we will
 			develop in a few tutorials) and then the GPU automatically performs
 			what is known as "perspective divide" to the position attribute before
 			it reaches the rasterizer. This means that it divides all the
