@@ -57,6 +57,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
 	${OBJECTDIR}/pipeline.o \
+	${OBJECTDIR}/random_texture.o \
 	${OBJECTDIR}/technique.o
 
 
@@ -195,6 +196,11 @@ ${OBJECTDIR}/pipeline.o: pipeline.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/pipeline.o pipeline.cpp
+
+${OBJECTDIR}/random_texture.o: random_texture.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/random_texture.o random_texture.cpp
 
 ${OBJECTDIR}/technique.o: technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

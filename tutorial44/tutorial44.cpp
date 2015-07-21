@@ -161,7 +161,7 @@ private:
 
 int main(int argc, char** argv)
 {
-    Magick::InitializeMagick(*argv);
+//    Magick::InitializeMagick(*argv);
 
     OgldevBackendInit(OGLDEV_BACKEND_TYPE_GLFW, argc, argv, true, false);
 
