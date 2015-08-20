@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\tutorial28\billboard_technique.cpp" />
-    <ClCompile Include="..\..\tutorial28\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial28\mesh.cpp" />
     <ClCompile Include="..\..\tutorial28\particle_system.cpp" />
     <ClCompile Include="..\..\tutorial28\ps_update_technique.cpp" />

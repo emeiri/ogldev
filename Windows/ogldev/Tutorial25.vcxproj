@@ -17,7 +17,6 @@
     <ClInclude Include="..\..\tutorial25\skybox_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial25\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial25\mesh.cpp" />
     <ClCompile Include="..\..\tutorial25\skybox.cpp" />
     <ClCompile Include="..\..\tutorial25\skybox_technique.cpp" />

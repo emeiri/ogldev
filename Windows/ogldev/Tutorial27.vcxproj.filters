@@ -21,9 +21,6 @@
     <ClCompile Include="..\..\tutorial27\billboard_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial27\lighting_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\tutorial27\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

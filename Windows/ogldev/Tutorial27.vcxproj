@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\tutorial27\billboard_list.cpp" />
     <ClCompile Include="..\..\tutorial27\billboard_technique.cpp" />
-    <ClCompile Include="..\..\tutorial27\lighting_technique.cpp" />
     <ClCompile Include="..\..\tutorial27\mesh.cpp" />
     <ClCompile Include="..\..\tutorial27\tutorial27.cpp" />
   </ItemGroup>
