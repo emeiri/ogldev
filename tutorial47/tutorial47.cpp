@@ -40,7 +40,7 @@
 #include "shadow_map_technique.h"
 #include "shadow_map_fbo.h"
 
-#define WINDOW_WIDTH  1280  
+#define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
 
 class Tutorial47 : public ICallbacks, public OgldevApp
@@ -64,15 +64,17 @@ public:
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
 
-        m_persProjInfo.FOV    = 60.0f;
+        m_persProjInfo.FOV    = 45.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width  = WINDOW_WIDTH;
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 100.0f;  
-        
-        m_pipeline.SetPerspectiveProj(m_persProjInfo);           
-        m_pipeline.WorldPos(Vector3f(0.0f, 0.0f, 0.0f));        
-        m_pipeline.Scale(0.1f, 0.1f, 0.1f);                		
+
+        m_shadowPersProjInfo.FOV    = 45.0f;
+        m_shadowPersProjInfo.Height = 1024;
+        m_shadowPersProjInfo.Width  = 1024;
+        m_shadowPersProjInfo.zNear  = 1.0f;
+        m_shadowPersProjInfo.zFar   = 100.0f;  
     }
 
     ~Tutorial47()
@@ -83,16 +85,16 @@ public:
 
     bool Init()
     {
-        Vector3f Pos(3.0f, 8.0f, -10.0f);
-        Vector3f Target(0.0f, -0.2f, 1.0f);
-        Vector3f Up(0.0, 1.0f, 0.0f);
-
-        if (!m_shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+        if (!m_shadowMapFBO.Init(1024, 1024)) {
             return false;
         }
 
+        Vector3f Pos(3.0f, 8.0f, -10.0f);
+        Vector3f Target(0.0f, -0.2f, 1.0f);
+        Vector3f Up(0.0, 1.0f, 0.0f);
+        
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-              
+        
         if (!m_LightingTech.Init()) {
             OGLDEV_ERROR("Error initializing the lighting technique\n");
             return false;
@@ -162,7 +164,7 @@ public:
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_persProjInfo);
+        p.SetPerspectiveProj(m_shadowPersProjInfo);
         
         for (int i = 0; i < 3 ; i++) {
             p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
@@ -300,7 +302,7 @@ private:
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
-    Pipeline m_pipeline;
+    PersProjInfo m_shadowPersProjInfo;
 };
 
 
