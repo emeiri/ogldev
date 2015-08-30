@@ -114,7 +114,8 @@ struct Vector3f
     {
         return &(x);
     }
-
+    
+   
     Vector3f Cross(const Vector3f& v) const;
 
     Vector3f& Normalize();
@@ -151,7 +152,15 @@ struct Vector4f
     {
         printf("(%.02f, %.02f, %.02f, %.02f)", x, y, z, w);
     }       
+    
+    Vector3f to3f() const
+    {
+        Vector3f v(x, y, z);
+        return v;
+    }
 };
+
+
 
 inline Vector3f operator+(const Vector3f& l, const Vector3f& r)
 {
@@ -179,6 +188,18 @@ inline Vector3f operator*(const Vector3f& l, float f)
 
     return Ret;
 }
+
+
+inline Vector4f operator/(const Vector4f& l, float f)
+{
+    Vector4f Ret(l.x / f,
+                 l.y / f,
+                 l.z / f,
+                 l.w / f);
+    
+    return Ret;
+}
+
 
 struct PersProjInfo
 {

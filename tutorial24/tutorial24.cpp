@@ -144,7 +144,7 @@ public:
     }
 
     
-    virtual void ShadowMapPass()
+    void ShadowMapPass()
     {
         m_shadowMapFBO.BindForWriting();
 
@@ -165,7 +165,7 @@ public:
     }
 
         
-    virtual void RenderPass()
+    void RenderPass()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
