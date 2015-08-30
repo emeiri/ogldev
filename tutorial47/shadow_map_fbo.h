@@ -20,16 +20,18 @@
 
 #include <GL/glew.h>
 
-class ShadowMapFBO
+#define NUM_SHADOW_CASCADES 4
+
+class CascadedShadowMapFBO
 {
 public:
-    ShadowMapFBO();
+    CascadedShadowMapFBO();
 
-    ~ShadowMapFBO();
+    ~CascadedShadowMapFBO();
 
     bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
 
-    void BindForWriting();
+    void BindForWriting(uint Layer);
 
     void BindForReading(GLenum TextureUnit);
 

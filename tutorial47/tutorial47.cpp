@@ -155,9 +155,6 @@ public:
 	
     void ShadowMapPass()
     {
-        m_shadowMapFBO.BindForWriting();
-
-        glClear(GL_DEPTH_BUFFER_BIT);
 
         m_ShadowMapEffect.Enable();
 
@@ -166,10 +163,15 @@ public:
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         p.SetPerspectiveProj(m_shadowPersProjInfo);
         
-        for (int i = 0; i < 3 ; i++) {
-            p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
-            m_ShadowMapEffect.SetWVP(p.GetWVPTrans());
-            m_mesh.Render();        
+        for (int j = 0 ; j < NUM_SHADOW_CASCADES ; j++) {
+            m_shadowMapFBO.BindForWriting(j);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            
+            for (int i = 0; i < 3 ; i++) {
+                p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
+                m_ShadowMapEffect.SetWVP(p.GetWVPTrans());
+                m_mesh.Render();        
+            }
         }
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -300,7 +302,7 @@ private:
     BasicMesh m_mesh;
 	BasicMesh m_quad;
     Texture* m_pGroundTex;
-    ShadowMapFBO m_shadowMapFBO;
+    CascadedShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
     PersProjInfo m_shadowPersProjInfo;
 };
