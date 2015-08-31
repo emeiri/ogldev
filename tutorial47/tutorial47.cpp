@@ -70,11 +70,17 @@ public:
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 100.0f;  
 
-        m_shadowPersProjInfo.FOV    = 45.0f;
-        m_shadowPersProjInfo.Height = 1024;
-        m_shadowPersProjInfo.Width  = 1024;
-        m_shadowPersProjInfo.zNear  = 1.0f;
-        m_shadowPersProjInfo.zFar   = 100.0f;  
+        for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
+            m_shadowPersProjInfo[i].FOV    = 45.0f;
+            m_shadowPersProjInfo[i].Height = 1024;
+            m_shadowPersProjInfo[i].Width  = 1024;            
+            m_shadowPersProjInfo[i].zNear  = 1.0f;            
+        }
+        
+        m_shadowPersProjInfo[0].zFar = 100.0f;  
+        m_shadowPersProjInfo[1].zFar = 20.0f;  
+        m_shadowPersProjInfo[2].zFar = 50.0f;  
+        m_shadowPersProjInfo[3].zFar = 100.0f;  
     }
 
     ~Tutorial47()
@@ -155,17 +161,17 @@ public:
 	
     void ShadowMapPass()
     {
-
         m_ShadowMapEffect.Enable();
 
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_shadowPersProjInfo);
         
         for (int j = 0 ; j < NUM_SHADOW_CASCADES ; j++) {
             m_shadowMapFBO.BindForWriting(j);
             glClear(GL_DEPTH_BUFFER_BIT);
+
+            p.SetPerspectiveProj(m_shadowPersProjInfo[j]);
             
             for (int i = 0; i < 3 ; i++) {
                 p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
@@ -189,8 +195,8 @@ public:
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         Pipeline p;
+        
         p.SetPerspectiveProj(m_persProjInfo);
-
         p.Scale(50.0f, 50.0f, 50.0f);
         p.WorldPos(0.0f, 0.0f, 10.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
@@ -198,18 +204,22 @@ public:
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetWVPTrans());
+        p.SetPerspectiveProj(m_shadowPersProjInfo[0]);
+        m_LightingTech.SetLightWV(p.GetWVTrans());
+        m_LightingTech.SetLightProj(p.GetProjTrans());
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
  
         p.Scale(0.1f, 0.1f, 0.1f);
 		p.Rotate(0.0f, 0.0f, 0.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetWVPTrans());
+        m_LightingTech.SetLightWV(p.GetWVTrans());
+        m_LightingTech.SetLightProj(p.GetProjTrans());
        
         for (int i = 0; i < 3 ; i++) {
             p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
             p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+            p.SetPerspectiveProj(m_persProjInfo);
             m_LightingTech.SetWVP(p.GetWVPTrans());
             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
             m_mesh.Render();
@@ -304,7 +314,7 @@ private:
     Texture* m_pGroundTex;
     CascadedShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
-    PersProjInfo m_shadowPersProjInfo;
+    PersProjInfo m_shadowPersProjInfo[NUM_SHADOW_CASCADES];
 };
 
 

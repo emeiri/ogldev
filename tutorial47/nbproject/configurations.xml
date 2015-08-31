@@ -56,7 +56,7 @@
           <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig glfw3`</commandLine>
         </ccTool>
         <linkerTool>
-          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial44</output>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial47</output>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibProjectItem>

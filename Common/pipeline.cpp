@@ -18,14 +18,19 @@
 
 #include "ogldev_pipeline.h"
 
+const Matrix4f& Pipeline::GetProjTrans() 
+{
+    m_ProjTransformation.InitPersProjTransform(m_persProjInfo);
+    return m_ProjTransformation;
+}
+
+
 const Matrix4f& Pipeline::GetVPTrans()
 {
     GetViewTrans();
-    
-    Matrix4f PersProjTrans;
-    PersProjTrans.InitPersProjTransform(m_persProjInfo);
-    
-    m_VPtransformation = PersProjTrans * m_Vtransformation;
+    GetProjTrans();
+       
+    m_VPtransformation = m_ProjTransformation * m_Vtransformation;
     return m_VPtransformation;
 }
 

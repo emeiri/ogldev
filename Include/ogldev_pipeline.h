@@ -118,6 +118,7 @@ public:
     const Matrix4f& GetWVPTrans();
     const Matrix4f& GetWorldTrans();
     const Matrix4f& GetViewTrans();
+    const Matrix4f& GetProjTrans();
 
 private:
     Vector3f m_scale;
@@ -138,6 +139,7 @@ private:
     Matrix4f m_WVtransformation;
     Matrix4f m_Wtransformation;
     Matrix4f m_Vtransformation;
+    Matrix4f m_ProjTransformation;
 };
 
 

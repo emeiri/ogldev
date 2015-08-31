@@ -48,7 +48,8 @@ bool LightingTechnique::Init()
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
-    m_LightWVPLocation = GetUniformLocation("gLightWVP");
+    m_LightWVLocation = GetUniformLocation("gLightWV");
+    m_LightProjLocation = GetUniformLocation("gLightProj");
     m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_samplerLocation = GetUniformLocation("gSampler");
     m_shadowMapLocation = GetUniformLocation("gShadowMap");
@@ -64,7 +65,8 @@ bool LightingTechnique::Init()
 
     if (m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-        m_LightWVPLocation == INVALID_UNIFORM_LOCATION ||
+        m_LightWVLocation == INVALID_UNIFORM_LOCATION ||
+        m_LightProjLocation == INVALID_UNIFORM_LOCATION ||
         m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
         m_samplerLocation == INVALID_UNIFORM_LOCATION ||
         m_shadowMapLocation == INVALID_UNIFORM_LOCATION ||
@@ -167,9 +169,14 @@ void LightingTechnique::SetWVP(const Matrix4f& WVP)
 }
 
 
-void LightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
+void LightingTechnique::SetLightWV(const Matrix4f& LightWVP)
 {
-    glUniformMatrix4fv(m_LightWVPLocation, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
+    glUniformMatrix4fv(m_LightWVLocation, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
+}
+
+void LightingTechnique::SetLightProj(const Matrix4f& LightProj)
+{
+    glUniformMatrix4fv(m_LightProjLocation, 1, GL_TRUE, (const GLfloat*)LightProj.m);
 }
 
 
