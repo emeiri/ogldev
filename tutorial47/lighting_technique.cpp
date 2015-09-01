@@ -49,7 +49,6 @@ bool LightingTechnique::Init()
 
     m_WVPLocation = GetUniformLocation("gWVP");
     m_LightWVLocation = GetUniformLocation("gLightWV");
-    m_LightProjLocation = GetUniformLocation("gLightProj");
     m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_samplerLocation = GetUniformLocation("gSampler");
     m_shadowMapLocation = GetUniformLocation("gShadowMap");
@@ -66,7 +65,6 @@ bool LightingTechnique::Init()
     if (m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
         m_LightWVLocation == INVALID_UNIFORM_LOCATION ||
-        m_LightProjLocation == INVALID_UNIFORM_LOCATION ||
         m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
         m_samplerLocation == INVALID_UNIFORM_LOCATION ||
         m_shadowMapLocation == INVALID_UNIFORM_LOCATION ||
@@ -80,8 +78,24 @@ bool LightingTechnique::Init()
         m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
         return false;
     }
+    
+    for (uint i  = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
+        char Name[128];
+        memset(Name, 0, sizeof(Name));
+        SNPRINTF(Name, sizeof(Name), "gLightProj[%d]", i);        
+        m_LightProjLocation[i] = GetUniformLocation(Name);
 
-    for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
+        memset(Name, 0, sizeof(Name));
+        SNPRINTF(Name, sizeof(Name), "gZfar[%d]", i);        
+        m_ZfarLocation[i] = GetUniformLocation(Name);
+        
+        if (m_LightProjLocation[i] == INVALID_UNIFORM_LOCATION ||
+            m_ZfarLocation[i] == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
+    }
+            
+    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
         char Name[128];
         memset(Name, 0, sizeof(Name));
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.Color", i);
@@ -116,7 +130,7 @@ bool LightingTechnique::Init()
         }
     }
 
-    for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_spotLightsLocation) ; i++) {
+    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_spotLightsLocation) ; i++) {
         char Name[128];
         memset(Name, 0, sizeof(Name));
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.Color", i);
@@ -174,9 +188,11 @@ void LightingTechnique::SetLightWV(const Matrix4f& LightWVP)
     glUniformMatrix4fv(m_LightWVLocation, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
 }
 
-void LightingTechnique::SetLightProj(const Matrix4f& LightProj)
+void LightingTechnique::SetLightProj(uint Index, const Matrix4f& LightProj, float Zfar)
 {
-    glUniformMatrix4fv(m_LightProjLocation, 1, GL_TRUE, (const GLfloat*)LightProj.m);
+    assert(Index < NUM_SHADOW_CASCADES);
+    glUniformMatrix4fv(m_LightProjLocation[Index], 1, GL_TRUE, (const GLfloat*)LightProj.m);
+    glUniform1f(m_ZfarLocation[Index], Zfar);
 }
 
 
@@ -186,13 +202,13 @@ void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
 }
 
 
-void LightingTechnique::SetColorTextureUnit(unsigned int TextureUnit)
+void LightingTechnique::SetColorTextureUnit(uint TextureUnit)
 {
     glUniform1i(m_samplerLocation, TextureUnit);
 }
 
 
-void LightingTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
+void LightingTechnique::SetShadowMapTextureUnit(uint TextureUnit)
 {
     glUniform1i(m_shadowMapLocation, TextureUnit);
 }
@@ -227,11 +243,11 @@ void LightingTechnique::SetMatSpecularPower(float Power)
 }
 
 
-void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
+void LightingTechnique::SetPointLights(uint NumLights, const PointLight* pLights)
 {
     glUniform1i(m_numPointLightsLocation, NumLights);
     
-    for (unsigned int i = 0 ; i < NumLights ; i++) {
+    for (uint i = 0 ; i < NumLights ; i++) {
         glUniform3f(m_pointLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(m_pointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(m_pointLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
@@ -243,11 +259,11 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
 }
 
 
-void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* pLights)
+void LightingTechnique::SetSpotLights(uint NumLights, const SpotLight* pLights)
 {
     glUniform1i(m_numSpotLightsLocation, NumLights);
 
-    for (unsigned int i = 0 ; i < NumLights ; i++) {
+    for (uint i = 0 ; i < NumLights ; i++) {
         glUniform3f(m_spotLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(m_spotLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(m_spotLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);

@@ -20,6 +20,8 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "shadow_map_technique.h"
+#include "shadow_map_fbo.h"
 
 struct BaseLight
 {
@@ -89,7 +91,7 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
     void SetLightWV(const Matrix4f& LightWV);
-    void SetLightProj(const Matrix4f& LightProj);
+    void SetLightProj(uint Index, const Matrix4f& LightProj, float Zfar);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetColorTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -104,7 +106,8 @@ private:
 
     GLuint m_WVPLocation;
     GLuint m_LightWVLocation;
-    GLuint m_LightProjLocation;
+    GLuint m_LightProjLocation[NUM_SHADOW_CASCADES];
+    GLuint m_ZfarLocation[NUM_SHADOW_CASCADES];
     GLuint m_WorldMatrixLocation;
     GLuint m_samplerLocation;
     GLuint m_shadowMapLocation;

@@ -74,13 +74,16 @@ public:
             m_shadowPersProjInfo[i].FOV    = 45.0f;
             m_shadowPersProjInfo[i].Height = 1024;
             m_shadowPersProjInfo[i].Width  = 1024;            
-            m_shadowPersProjInfo[i].zNear  = 1.0f;            
         }
-        
-        m_shadowPersProjInfo[0].zFar = 100.0f;  
-        m_shadowPersProjInfo[1].zFar = 20.0f;  
-        m_shadowPersProjInfo[2].zFar = 50.0f;  
-        m_shadowPersProjInfo[3].zFar = 100.0f;  
+
+        m_shadowPersProjInfo[0].zNear = 1.0f;                    
+        m_shadowPersProjInfo[0].zFar  = 10.0f;  
+        m_shadowPersProjInfo[1].zNear = 1.0f;
+        m_shadowPersProjInfo[1].zFar  = 20.0f; 
+        m_shadowPersProjInfo[2].zNear = 1.0f;
+        m_shadowPersProjInfo[2].zFar  = 50.0f; 
+        m_shadowPersProjInfo[3].zNear = 1.0f;
+        m_shadowPersProjInfo[3].zFar  = 100.0f;
     }
 
     ~Tutorial47()
@@ -114,6 +117,12 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
         m_LightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
+        
+        for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
+            Matrix4f LightProj;
+            LightProj.InitPersProjTransform(m_shadowPersProjInfo[i]);
+            m_LightingTech.SetLightProj(i, LightProj, m_shadowPersProjInfo[i].zFar);
+        }        
 
         if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
             return false;            
@@ -204,9 +213,7 @@ public:
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_shadowPersProjInfo[0]);
         m_LightingTech.SetLightWV(p.GetWVTrans());
-        m_LightingTech.SetLightProj(p.GetProjTrans());
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
  
@@ -214,12 +221,12 @@ public:
 		p.Rotate(0.0f, 0.0f, 0.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWV(p.GetWVTrans());
-        m_LightingTech.SetLightProj(p.GetProjTrans());
-       
+
+        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        p.SetPerspectiveProj(m_persProjInfo);
+        
         for (int i = 0; i < 3 ; i++) {
             p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
-            p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-            p.SetPerspectiveProj(m_persProjInfo);
             m_LightingTech.SetWVP(p.GetWVPTrans());
             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
             m_mesh.Render();

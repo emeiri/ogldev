@@ -1,7 +1,9 @@
 #version 330                                                                        
                                                                                     
-const int MAX_POINT_LIGHTS = 2;                                                     
-const int MAX_SPOT_LIGHTS = 2;                                                      
+const int MAX_POINT_LIGHTS = 2;
+const int MAX_SPOT_LIGHTS = 2;
+const int NUM_SHADOW_CASCADES = 4;
+
                                                                                     
 in vec4 LightViewPos;                                                              
 in vec2 TexCoord0;                                                                  
@@ -54,17 +56,27 @@ uniform sampler2DArray gShadowMap;
 uniform vec3 gEyeWorldPos;                                                                  
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
-uniform mat4 gLightProj;
+uniform mat4 gLightProj[NUM_SHADOW_CASCADES];
+uniform float gZfar[NUM_SHADOW_CASCADES];
 
                                                                                             
 float CalcShadowFactor(vec4 LightViewPos)                                                  
-{                      
-    vec4 LightSpacePos = gLightProj * LightViewPos;
+{                 
+    int Index = NUM_SHADOW_CASCADES - 1;
+
+    for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
+        if (LightViewPos.z < gZfar[i]) {
+            Index = i;
+            break;
+        }
+    }
+        
+    vec4 LightSpacePos = gLightProj[Index] * LightViewPos;
     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;                                  
     vec3 UVCoords;
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;
-    UVCoords.z = 0.0;
+    UVCoords.z = Index;
     float z = 0.5 * ProjCoords.z + 0.5;                                                     
     float Depth = texture(gShadowMap, UVCoords).x;                                          
     if (Depth < z + 0.00001)                                                                 
