@@ -17,7 +17,7 @@
 */
 
 
-#include <assert.h>
+#include "ogldev_util.h"
 #include "ogldev_backend.h"
 #include "ogldev_glut_backend.h"
 #include "ogldev_glfw_backend.h"

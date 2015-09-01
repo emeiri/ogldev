@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string>
 #include <string.h>
+#include <assert.h>
 #include "ogldev_types.h"
 
 using namespace std;

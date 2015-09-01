@@ -18,7 +18,7 @@
 
 #include <limits.h>
 #include <string>
-#include <assert.h>
+
 
 #include "shadow_volume_technique.h"
 

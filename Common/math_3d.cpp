@@ -17,7 +17,7 @@
 */
 
 #include <stdlib.h>
-#include <assert.h>
+
 
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"

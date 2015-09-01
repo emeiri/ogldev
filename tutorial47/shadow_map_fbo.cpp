@@ -16,7 +16,7 @@
 */
 
 #include <stdio.h>
-#include <assert.h>
+
 
 #include "ogldev_util.h"
 #include "shadow_map_fbo.h"

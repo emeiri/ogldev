@@ -21,7 +21,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <string>
-#include <assert.h>
+
 #include <float.h>
 
 #include "ogldev_engine_common.h"
