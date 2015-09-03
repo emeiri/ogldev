@@ -15,28 +15,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SHADOWMAPFBO_H
-#define	SHADOWMAPFBO_H
+#ifndef SHADOW_CUBE_MAP_FBO_H
+#define	SHADOW_CUBE_MAP_FBO_H
 
 #include <GL/glew.h>
 
-class ShadowMapFBO
+class ShadowCubeMapFBO
 {
 public:
-    ShadowMapFBO();
+    ShadowCubeMapFBO();
 
-    ~ShadowMapFBO();
+    ~ShadowCubeMapFBO();
 
     bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
 
-    void BindForWriting();
+    void BindForWriting(GLenum CubeFace);
 
     void BindForReading(GLenum TextureUnit);
-
+    
 private:
     GLuint m_fbo;
     GLuint m_shadowMap;
+    GLuint m_depth;
 };
 
-#endif	/* SHADOWMAPFBO_H */
+#endif	/* SHADOW_CUBE_MAP_FBO_H */
 

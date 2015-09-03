@@ -34,7 +34,7 @@
 #include "ogldev_glut_backend.h"
 #include "ogldev_basic_mesh.h"
 #include "shadow_map_technique.h"
-#include "shadow_map_fbo.h"
+#include "shadow_cube_map_fbo.h"
 
 using namespace std;
 
@@ -290,7 +290,7 @@ private:
     Orientation m_mesh2Orientation;
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
-    ShadowMapFBO m_shadowMapFBO;
+    ShadowCubeMapFBO m_shadowMapFBO;
 };
 
 

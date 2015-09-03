@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2013 Etay Meiri
+	Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 47 - Cascaded Shadow Maps
+    Tutorial 47 - Shadow Mapping With Directional Lights
 */
 
 #include <math.h>
@@ -36,9 +36,10 @@
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "ogldev_basic_mesh.h"
+#include "ogldev_shadow_map_fbo.h"
 #include "lighting_technique.h"
 #include "shadow_map_technique.h"
-#include "shadow_map_fbo.h"
+
 
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
@@ -52,15 +53,15 @@ public:
         m_pGameCamera = NULL;
         m_pGroundTex  = NULL;
         
-        m_spotLight.AmbientIntensity = 0.1f;
+        m_spotLight.AmbientIntensity = 0.0f;
         m_spotLight.DiffuseIntensity = 0.9f;
         m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_spotLight.Attenuation.Linear = 0.01f;
-        m_spotLight.Position  = Vector3f(-35.0, 35.0, 25.0f);
+        m_spotLight.Attenuation.Linear = 0.0f;
+        m_spotLight.Position  = Vector3f(-500.0, 500.0, 25.0f);
         m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
         m_spotLight.Cutoff =  30.0f;
         
-        m_dirLight.AmbientIntensity = 0.2f;
+        m_dirLight.AmbientIntensity = 0.0f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
 
@@ -68,7 +69,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width  = WINDOW_WIDTH;
         m_persProjInfo.zNear  = 1.0f;
-        m_persProjInfo.zFar   = 100.0f;  
+        m_persProjInfo.zFar   = 1000.0f;  
 
         for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
             m_shadowPersProjInfo[i].FOV    = 45.0f;
@@ -77,13 +78,13 @@ public:
         }
 
         m_shadowPersProjInfo[0].zNear = 1.0f;                    
-        m_shadowPersProjInfo[0].zFar  = 10.0f;  
+        m_shadowPersProjInfo[0].zFar  = 500.0f;  
         m_shadowPersProjInfo[1].zNear = 1.0f;
-        m_shadowPersProjInfo[1].zFar  = 20.0f; 
+        m_shadowPersProjInfo[1].zFar  = 1000.0f; 
         m_shadowPersProjInfo[2].zNear = 1.0f;
-        m_shadowPersProjInfo[2].zFar  = 50.0f; 
+        m_shadowPersProjInfo[2].zFar  = 100.0f; 
         m_shadowPersProjInfo[3].zNear = 1.0f;
-        m_shadowPersProjInfo[3].zFar  = 100.0f;
+        m_shadowPersProjInfo[3].zFar  = 1000.0f;
     }
 
     ~Tutorial47()
@@ -124,7 +125,7 @@ public:
             m_LightingTech.SetLightProj(i, LightProj, m_shadowPersProjInfo[i].zFar);
         }        
 
-        if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
+        if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }                
        
@@ -143,7 +144,7 @@ public:
             return false;
         }
 
-		m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
+		m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/wal67ar_small.jpg");
 
         if (!m_pGroundTex->Load()) {
             return false;
@@ -171,23 +172,17 @@ public:
     void ShadowMapPass()
     {
         m_ShadowMapEffect.Enable();
+       
+        m_shadowMapFBO.BindForWriting();
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         Pipeline p;
-        p.Scale(0.1f, 0.1f, 0.1f);
+      //  p.Scale(0.1f, 0.1f, 0.1f);
+        p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        
-        for (int j = 0 ; j < NUM_SHADOW_CASCADES ; j++) {
-            m_shadowMapFBO.BindForWriting(j);
-            glClear(GL_DEPTH_BUFFER_BIT);
-
-            p.SetPerspectiveProj(m_shadowPersProjInfo[j]);
-            
-            for (int i = 0; i < 3 ; i++) {
-                p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
-                m_ShadowMapEffect.SetWVP(p.GetWVPTrans());
-                m_mesh.Render();        
-            }
-        }
+        p.SetPerspectiveProj(m_shadowPersProjInfo[0]);                    
+        m_ShadowMapEffect.SetWVP(p.GetWVPTrans());
+        m_mesh.Render();        
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -206,7 +201,7 @@ public:
         Pipeline p;
         
         p.SetPerspectiveProj(m_persProjInfo);
-        p.Scale(50.0f, 50.0f, 50.0f);
+        p.Scale(500.0f, 500.0f, 500.0f);
         p.WorldPos(0.0f, 0.0f, 10.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
@@ -217,7 +212,7 @@ public:
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
  
-        p.Scale(0.1f, 0.1f, 0.1f);
+        p.Scale(1.0f, 1.0f, 1.0f);
 		p.Rotate(0.0f, 0.0f, 0.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWV(p.GetWVTrans());
@@ -225,8 +220,8 @@ public:
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
         
-        for (int i = 0; i < 3 ; i++) {
-            p.WorldPos(0.0f, 0.0f, 3.0f + i * 20.0f);
+        for (int i = 0; i < 4 ; i++) {
+            p.WorldPos(0.0f, 0.0f, 3.0f + i * 30.0f);
             m_LightingTech.SetWVP(p.GetWVPTrans());
             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
             m_mesh.Render();
@@ -319,7 +314,7 @@ private:
     BasicMesh m_mesh;
 	BasicMesh m_quad;
     Texture* m_pGroundTex;
-    CascadedShadowMapFBO m_shadowMapFBO;
+    ShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
     PersProjInfo m_shadowPersProjInfo[NUM_SHADOW_CASCADES];
 };

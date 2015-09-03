@@ -5,10 +5,9 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>shadow_map_fbo.h</itemPath>
       <itemPath>shadow_map_technique.h</itemPath>
     </logicalFolder>
-    <logicalFolder name="f1" displayName="Shaders" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="Shaders" projectFiles="true">
       <itemPath>Shaders/lighting.fs</itemPath>
       <itemPath>Shaders/lighting.vs</itemPath>
       <itemPath>Shaders/shadow_map.fs</itemPath>
@@ -18,7 +17,6 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>shadow_map_fbo.cpp</itemPath>
       <itemPath>shadow_map_technique.cpp</itemPath>
       <itemPath>tutorial47.cpp</itemPath>
     </logicalFolder>
@@ -87,10 +85,6 @@
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="shadow_map_fbo.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
@@ -152,10 +146,6 @@
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="shadow_map_fbo.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

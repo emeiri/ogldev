@@ -17,18 +17,18 @@
 
 #include <stdio.h>
 
-#include "shadow_map_fbo.h"
+#include "shadow_cube_map_fbo.h"
 #include "ogldev_util.h"
 #include "shadow_map_technique.h"
 
-ShadowMapFBO::ShadowMapFBO()
+ShadowCubeMapFBO::ShadowCubeMapFBO()
 {
     m_fbo = 0;
     m_shadowMap = 0;	
     m_depth = 0;
 }
 
-ShadowMapFBO::~ShadowMapFBO()
+ShadowCubeMapFBO::~ShadowCubeMapFBO()
 {
     if (m_fbo != 0) {
         glDeleteFramebuffers(1, &m_fbo);
@@ -43,7 +43,7 @@ ShadowMapFBO::~ShadowMapFBO()
     }	
 }
 
-bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
+bool ShadowCubeMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 {
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);
@@ -93,7 +93,7 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 }
 
 
-void ShadowMapFBO::BindForWriting(GLenum CubeFace)
+void ShadowCubeMapFBO::BindForWriting(GLenum CubeFace)
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);
@@ -101,7 +101,7 @@ void ShadowMapFBO::BindForWriting(GLenum CubeFace)
 }
 
 
-void ShadowMapFBO::BindForReading(GLenum TextureUnit)
+void ShadowCubeMapFBO::BindForReading(GLenum TextureUnit)
 {
     glActiveTexture(TextureUnit);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_shadowMap);
