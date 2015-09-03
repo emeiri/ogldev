@@ -9,7 +9,6 @@
       <itemPath>ds_light_pass_tech.h</itemPath>
       <itemPath>ds_point_light_pass_tech.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
-      <itemPath>lights_common.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles" displayName="Shaders" projectFiles="true">
       <itemPath>shaders/dir_light_pass.fs</itemPath>
@@ -113,8 +112,6 @@
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="lights_common.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="shaders/dir_light_pass.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/geometry_pass.fs" ex="false" tool="3" flavor2="0">
@@ -187,8 +184,6 @@
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lights_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="shaders/dir_light_pass.fs" ex="false" tool="3" flavor2="0">
       </item>

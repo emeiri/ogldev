@@ -9,7 +9,6 @@
       <itemPath>ds_light_pass_tech.h</itemPath>
       <itemPath>ds_point_light_pass_tech.h</itemPath>
       <itemPath>gbuffer.h</itemPath>
-      <itemPath>lights_common.h</itemPath>
       <itemPath>mesh.h</itemPath>
       <itemPath>null_technique.h</itemPath>
     </logicalFolder>
@@ -141,8 +140,6 @@
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="lights_common.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="null_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="null_technique.h" ex="false" tool="3" flavor2="0">
@@ -223,8 +220,6 @@
       <item path="gbuffer.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="gbuffer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="lights_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="null_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>

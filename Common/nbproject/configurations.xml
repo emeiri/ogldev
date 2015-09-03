@@ -16,6 +16,7 @@
       <itemPath>../Include/ogldev_glfw_backend.h</itemPath>
       <itemPath>../Include/ogldev_glut_backend.h</itemPath>
       <itemPath>../Include/ogldev_keys.h</itemPath>
+      <itemPath>../Include/ogldev_lights_common.h</itemPath>
       <itemPath>../Include/ogldev_math_3d.h</itemPath>
       <itemPath>../Include/ogldev_pipeline.h</itemPath>
       <itemPath>../Include/ogldev_random_texture.h</itemPath>
@@ -110,6 +111,8 @@
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_lights_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -228,6 +231,8 @@
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_lights_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
