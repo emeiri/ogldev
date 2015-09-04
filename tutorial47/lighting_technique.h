@@ -36,8 +36,7 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetLightWV(const Matrix4f& LightWV);
-    void SetLightProj(uint Index, const Matrix4f& LightProj, float Zfar);
+    void SetLightWVP(const Matrix4f& LightWVP);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetColorTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -51,9 +50,7 @@ public:
 private:
 
     GLuint m_WVPLocation;
-    GLuint m_LightWVLocation;
-    GLuint m_LightProjLocation[NUM_SHADOW_CASCADES];
-    GLuint m_ZfarLocation[NUM_SHADOW_CASCADES];
+    GLuint m_LightWVPLocation;
     GLuint m_WorldMatrixLocation;
     GLuint m_samplerLocation;
     GLuint m_shadowMapLocation;

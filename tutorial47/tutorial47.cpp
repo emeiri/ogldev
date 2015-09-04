@@ -53,15 +53,15 @@ public:
         m_pGameCamera = NULL;
         m_pGroundTex  = NULL;
         
-        m_spotLight.AmbientIntensity = 0.0f;
+        m_spotLight.AmbientIntensity = 0.1f;
         m_spotLight.DiffuseIntensity = 0.9f;
         m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_spotLight.Attenuation.Linear = 0.0f;
-        m_spotLight.Position  = Vector3f(-500.0, 500.0, 25.0f);
+        m_spotLight.Attenuation.Linear = 0.01f;
+        m_spotLight.Position  = Vector3f(-20.0, 20.0, 1.0f);
         m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
-        m_spotLight.Cutoff =  30.0f;
-        
-        m_dirLight.AmbientIntensity = 0.0f;
+        m_spotLight.Cutoff =  20.0f;
+		
+        m_dirLight.AmbientIntensity = 1.0f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
 
@@ -71,20 +71,11 @@ public:
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 1000.0f;  
 
-        for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
-            m_shadowPersProjInfo[i].FOV    = 45.0f;
-            m_shadowPersProjInfo[i].Height = 1024;
-            m_shadowPersProjInfo[i].Width  = 1024;            
-        }
-
-        m_shadowPersProjInfo[0].zNear = 1.0f;                    
-        m_shadowPersProjInfo[0].zFar  = 500.0f;  
-        m_shadowPersProjInfo[1].zNear = 1.0f;
-        m_shadowPersProjInfo[1].zFar  = 1000.0f; 
-        m_shadowPersProjInfo[2].zNear = 1.0f;
-        m_shadowPersProjInfo[2].zFar  = 100.0f; 
-        m_shadowPersProjInfo[3].zNear = 1.0f;
-        m_shadowPersProjInfo[3].zFar  = 1000.0f;
+        m_shadowPersProjInfo.FOV    = 45.0f;
+        m_shadowPersProjInfo.Height = 1024;
+        m_shadowPersProjInfo.Width  = 1024;            
+        m_shadowPersProjInfo.zNear = 1.0f;                    
+        m_shadowPersProjInfo.zFar  = 1000.0f;  
     }
 
     ~Tutorial47()
@@ -119,12 +110,6 @@ public:
         m_LightingTech.SetMatSpecularPower(0);
         m_LightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
         
-        for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
-            Matrix4f LightProj;
-            LightProj.InitPersProjTransform(m_shadowPersProjInfo[i]);
-            m_LightingTech.SetLightProj(i, LightProj, m_shadowPersProjInfo[i].zFar);
-        }        
-
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }                
@@ -170,19 +155,25 @@ public:
 	
 	
     void ShadowMapPass()
-    {
-        m_ShadowMapEffect.Enable();
-       
+    {      
         m_shadowMapFBO.BindForWriting();
         glClear(GL_DEPTH_BUFFER_BIT);
+
+        m_ShadowMapEffect.Enable();
 
         Pipeline p;
       //  p.Scale(0.1f, 0.1f, 0.1f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_shadowPersProjInfo[0]);                    
+        p.SetPerspectiveProj(m_shadowPersProjInfo);                    
         m_ShadowMapEffect.SetWVP(p.GetWVPTrans());
-        m_mesh.Render();        
+        
+        for (int i = 0; i < 4 ; i++) {
+            p.WorldPos(0.0f, 0.0f, 3.0f + i * 30.0f);
+            m_LightingTech.SetWVP(p.GetWVPTrans());
+            m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
+            m_mesh.Render();
+        }
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
@@ -201,21 +192,21 @@ public:
         Pipeline p;
         
         p.SetPerspectiveProj(m_persProjInfo);
-        p.Scale(500.0f, 500.0f, 500.0f);
+        p.Scale(50.0f, 50.0f, 50.0f);
         p.WorldPos(0.0f, 0.0f, 10.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWV(p.GetWVTrans());
+        m_LightingTech.SetLightWVP(p.GetWVPTrans());
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
- 
+    
         p.Scale(1.0f, 1.0f, 1.0f);
 		p.Rotate(0.0f, 0.0f, 0.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWV(p.GetWVTrans());
+        m_LightingTech.SetLightWVP(p.GetWVPTrans());
 
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
@@ -229,60 +220,6 @@ public:
     }
 	
 	
-
-    /*void RenderPass()
-    {   
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                    
-        m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());
-        
-        m_pipeline.SetCamera(*m_pGameCamera);
-        
-        float ViewSpaceDepth[] = { 5.0f, 50.0f };
-        
-        float ClipSpaceDepth[2];
-        Matrix4f PersProjTrans;
-        PersProjTrans.InitPersProjTransform(m_persProjInfo);
-
-        for (int i = 0 ; i < 2 ; i++) {
-            printf("\n\n%i\n", i);
-            Vector4f v = PersProjTrans * Vector4f(0.0f, 0.0f, ViewSpaceDepth[i], 1.0f);
-            v.Print();
-            printf("\n");
-            ClipSpaceDepth[i] = v.z / v.w;
-            printf("clip space depth %f\n", ClipSpaceDepth[i]);
-        }
-        
-        Matrix4f ViewProjInverse = m_pipeline.GetVPTrans();
-        ViewProjInverse.Inverse();
-        
-        Vector4f Corners[] = {  Vector4f(-1.0f, -1.0f, ClipSpaceDepth[0], 1.0f),
-                                Vector4f(1.0f, -1.0f,  ClipSpaceDepth[0], 1.0f),
-                                Vector4f(-1.0f, 1.0f,  ClipSpaceDepth[0], 1.0f),
-                                Vector4f(1.0f, 1.0f,   ClipSpaceDepth[0], 1.0f),
-                                Vector4f(-1.0f, -1.0f, ClipSpaceDepth[1], 1.0f),
-                                Vector4f(1.0f, -1.0f,  ClipSpaceDepth[1], 1.0f),
-                                Vector4f(-1.0f, 1.0f,  ClipSpaceDepth[1], 1.0f),
-                                Vector4f(1.0f, 1.0f,   ClipSpaceDepth[1], 1.0f) };
-        
-        Vector3f ClipCorners[8];
-        
-        for (int i = 0 ; i < 8 ; i++) {
-            Vector4f v = ViewProjInverse * Corners[i];                    
-            ClipCorners[i] = (v / v.w).to3f();
-            ClipCorners[i].Print(); printf("\n");
-        }
-        
-        exit(0);
-            
-        m_LightingTech.SetWVP(m_pipeline.GetWVPTrans());
-        m_LightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());            
-       
-        m_mesh.Render();        
-        	
-    //    RenderFPS();     
-        CalcFPS();        
-    }*/
     
        
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
@@ -316,7 +253,7 @@ private:
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
-    PersProjInfo m_shadowPersProjInfo[NUM_SHADOW_CASCADES];
+    PersProjInfo m_shadowPersProjInfo;
 };
 
 

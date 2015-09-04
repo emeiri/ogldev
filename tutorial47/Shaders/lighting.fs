@@ -1,11 +1,9 @@
 #version 330                                                                        
                                                                                     
 const int MAX_POINT_LIGHTS = 2;
-const int MAX_SPOT_LIGHTS = 2;
-const int NUM_SHADOW_CASCADES = 4;
-
+const int MAX_SPOT_LIGHTS = 2;                                                      
                                                                                     
-in vec4 LightViewPos;                                                              
+in vec4 LightSpacePos;                                                              
 in vec2 TexCoord0;                                                                  
 in vec3 Normal0;                                                                    
 in vec3 WorldPos0;                                                                  
@@ -52,31 +50,17 @@ uniform DirectionalLight gDirectionalLight;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];                                          
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             
 uniform sampler2D gSampler;                                                                 
-uniform sampler2DArray gShadowMap;                                                               
+uniform sampler2D gShadowMap;                                                               
 uniform vec3 gEyeWorldPos;                                                                  
-uniform float gMatSpecularIntensity;
-uniform float gSpecularPower;
-uniform mat4 gLightProj[NUM_SHADOW_CASCADES];
-uniform float gZfar[NUM_SHADOW_CASCADES];
-
+uniform float gMatSpecularIntensity;                                                        
+uniform float gSpecularPower;                                                               
                                                                                             
-float CalcShadowFactor(vec4 LightViewPos)                                                  
-{                 
-    int Index = NUM_SHADOW_CASCADES - 1;
-
-    for (int i = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
-        if (LightViewPos.z < gZfar[i]) {
-            Index = i;
-            break;
-        }
-    }
-        
-    vec4 LightSpacePos = gLightProj[Index] * LightViewPos;
+float CalcShadowFactor(vec4 LightSpacePos)                                                  
+{                                                                                           
     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;                                  
-    vec3 UVCoords;
-    UVCoords.x = 0.5 * ProjCoords.x + 0.5;
-    UVCoords.y = 0.5 * ProjCoords.y + 0.5;
-    UVCoords.z = Index;
+    vec2 UVCoords;                                                                          
+    UVCoords.x = 0.5 * ProjCoords.x + 0.5;                                                  
+    UVCoords.y = 0.5 * ProjCoords.y + 0.5;                                                  
     float z = 0.5 * ProjCoords.z + 0.5;                                                     
     float Depth = texture(gShadowMap, UVCoords).x;                                          
     if (Depth < z + 0.00001)                                                                 
@@ -149,11 +133,11 @@ void main()
     vec4 TotalLight = CalcDirectionalLight(Normal);                                         
                                                                                             
     for (int i = 0 ; i < gNumPointLights ; i++) {                                           
-        TotalLight += CalcPointLight(gPointLights[i], Normal, LightViewPos);               
+        TotalLight += CalcPointLight(gPointLights[i], Normal, LightSpacePos);               
     }                                                                                       
                                                                                             
     for (int i = 0 ; i < gNumSpotLights ; i++) {                                            
-        TotalLight += CalcSpotLight(gSpotLights[i], Normal, LightViewPos);                 
+        TotalLight += CalcSpotLight(gSpotLights[i], Normal, LightSpacePos);                 
     }                                                                                       
                                                                                             
     vec4 SampledColor = texture2D(gSampler, TexCoord0.xy);                                  

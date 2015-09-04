@@ -48,7 +48,7 @@ bool LightingTechnique::Init()
     }
 
     m_WVPLocation = GetUniformLocation("gWVP");
-    m_LightWVLocation = GetUniformLocation("gLightWV");
+    m_LightWVPLocation = GetUniformLocation("gLightWVP");
     m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_samplerLocation = GetUniformLocation("gSampler");
     m_shadowMapLocation = GetUniformLocation("gShadowMap");
@@ -64,7 +64,7 @@ bool LightingTechnique::Init()
 
     if (m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-        m_LightWVLocation == INVALID_UNIFORM_LOCATION ||
+        m_LightWVPLocation == INVALID_UNIFORM_LOCATION ||
         m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
         m_samplerLocation == INVALID_UNIFORM_LOCATION ||
         m_shadowMapLocation == INVALID_UNIFORM_LOCATION ||
@@ -78,22 +78,7 @@ bool LightingTechnique::Init()
         m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
         return false;
     }
-    
-    for (uint i  = 0 ; i < NUM_SHADOW_CASCADES ; i++) {
-        char Name[128];
-        memset(Name, 0, sizeof(Name));
-        SNPRINTF(Name, sizeof(Name), "gLightProj[%d]", i);        
-        m_LightProjLocation[i] = GetUniformLocation(Name);
 
-        memset(Name, 0, sizeof(Name));
-        SNPRINTF(Name, sizeof(Name), "gZfar[%d]", i);        
-        m_ZfarLocation[i] = GetUniformLocation(Name);
-        
-        if (m_LightProjLocation[i] == INVALID_UNIFORM_LOCATION ||
-            m_ZfarLocation[i] == INVALID_UNIFORM_LOCATION) {
-            return false;
-        }
-    }
             
     for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
         char Name[128];
@@ -183,16 +168,9 @@ void LightingTechnique::SetWVP(const Matrix4f& WVP)
 }
 
 
-void LightingTechnique::SetLightWV(const Matrix4f& LightWVP)
+void LightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
 {
-    glUniformMatrix4fv(m_LightWVLocation, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
-}
-
-void LightingTechnique::SetLightProj(uint Index, const Matrix4f& LightProj, float Zfar)
-{
-    assert(Index < NUM_SHADOW_CASCADES);
-    glUniformMatrix4fv(m_LightProjLocation[Index], 1, GL_TRUE, (const GLfloat*)LightProj.m);
-    glUniform1f(m_ZfarLocation[Index], Zfar);
+    glUniformMatrix4fv(m_LightWVPLocation, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
 }
 
 
