@@ -116,6 +116,7 @@ public:
     const Matrix4f& GetWVTrans();
     const Matrix4f& GetVPTrans();
     const Matrix4f& GetWVPTrans();
+    const Matrix4f& GetWVOrthoPTrans();
     const Matrix4f& GetWorldTrans();
     const Matrix4f& GetViewTrans();
     const Matrix4f& GetProjTrans();

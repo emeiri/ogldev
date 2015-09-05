@@ -65,7 +65,7 @@ public:
         m_dirLight.AmbientIntensity = 1.0f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
 
         m_persProjInfo.FOV    = 45.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -74,10 +74,10 @@ public:
         m_persProjInfo.zFar   = 1000.0f;  
 
         m_shadowPersProjInfo.FOV    = 45.0f;
-        m_shadowPersProjInfo.Height = 1024;
-        m_shadowPersProjInfo.Width  = 1024;            
+        m_shadowPersProjInfo.Height = 100;
+        m_shadowPersProjInfo.Width  = 100;            
         m_shadowPersProjInfo.zNear = 1.0f;                    
-        m_shadowPersProjInfo.zFar  = 1000.0f;  
+        m_shadowPersProjInfo.zFar  = 100.0f;  
     }
 
     ~Tutorial47()
@@ -172,13 +172,13 @@ public:
         m_ShadowMapEffect.Enable();
 
         Pipeline p;
-        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
+        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(1.0f, 0.0f, 0.0f));
+        //p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f), Vector3f(0.0f, 1.0f, 0.0f));
         p.SetPerspectiveProj(m_shadowPersProjInfo);                    
         
         for (int i = 0; i < NUM_MESHES ; i++) {
             p.Orient(m_meshOrientation[i]);
-            m_LightingTech.SetWVP(p.GetWVPTrans());
-            m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
+            m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());
             m_mesh.Render();
         }
         
