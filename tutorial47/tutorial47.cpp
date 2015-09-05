@@ -40,9 +40,10 @@
 #include "lighting_technique.h"
 #include "shadow_map_technique.h"
 
-
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
+
+#define NUM_MESHES 10
 
 class Tutorial47 : public ICallbacks, public OgldevApp
 {
@@ -62,8 +63,9 @@ public:
         m_spotLight.Cutoff =  20.0f;
 		
         m_dirLight.AmbientIntensity = 1.0f;
+        m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
+        m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
 
         m_persProjInfo.FOV    = 45.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -104,12 +106,12 @@ public:
         m_LightingTech.Enable();
 
         m_LightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_LightingTech.SetSpotLights(1, &m_spotLight);
+        m_LightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
+       // m_LightingTech.SetSpotLights(1, &m_spotLight);
         m_LightingTech.SetDirectionalLight(m_dirLight);
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
-        m_LightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
-        
+                
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }                
@@ -134,6 +136,14 @@ public:
         if (!m_pGroundTex->Load()) {
             return false;
         }
+        
+        m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 150.0f, 150.0f);
+        m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 150.0f);
+        m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
+
+        for (int i = 0; i < NUM_MESHES ; i++) {
+            m_meshOrientation[i].m_pos      = Vector3f(0.0f, 0.0f, 3.0f + i * 30.0f);
+        }            
 
         return true;
     }
@@ -162,14 +172,11 @@ public:
         m_ShadowMapEffect.Enable();
 
         Pipeline p;
-      //  p.Scale(0.1f, 0.1f, 0.1f);
-        p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         p.SetPerspectiveProj(m_shadowPersProjInfo);                    
-        m_ShadowMapEffect.SetWVP(p.GetWVPTrans());
         
-        for (int i = 0; i < 4 ; i++) {
-            p.WorldPos(0.0f, 0.0f, 3.0f + i * 30.0f);
+        for (int i = 0; i < NUM_MESHES ; i++) {
+            p.Orient(m_meshOrientation[i]);
             m_LightingTech.SetWVP(p.GetWVPTrans());
             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
             m_mesh.Render();
@@ -189,38 +196,25 @@ public:
        
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
-        Pipeline p;
-        
-        p.SetPerspectiveProj(m_persProjInfo);
-        p.Scale(50.0f, 50.0f, 50.0f);
-        p.WorldPos(0.0f, 0.0f, 10.0f);
-        p.Rotate(90.0f, 0.0f, 0.0f);
+        Pipeline p;        
+        p.SetPerspectiveProj(m_persProjInfo);        
+        p.Orient(m_quad.GetOrientation());
+        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
+        m_LightingTech.SetLightWVP(p.GetWVPTrans());        
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
-        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetWVPTrans());
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
         m_quad.Render();
-    
-        p.Scale(1.0f, 1.0f, 1.0f);
-		p.Rotate(0.0f, 0.0f, 0.0f);
-        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetWVPTrans());
-
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(m_persProjInfo);
-        
-        for (int i = 0; i < 4 ; i++) {
-            p.WorldPos(0.0f, 0.0f, 3.0f + i * 30.0f);
+           
+        for (int i = 0; i < NUM_MESHES ; i++) {
+            p.Orient(m_meshOrientation[i]);
             m_LightingTech.SetWVP(p.GetWVPTrans());
             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
             m_mesh.Render();
         }
     }
 	
-	
-    
        
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
@@ -249,6 +243,7 @@ private:
     SpotLight m_spotLight;
     DirectionalLight m_dirLight;
     BasicMesh m_mesh;
+    Orientation m_meshOrientation[NUM_MESHES];
 	BasicMesh m_quad;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
