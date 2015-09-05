@@ -93,17 +93,18 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor));                  
 }                                                                                           
                                                                                             
-vec4 CalcDirectionalLight(vec3 Normal)                                                      
+vec4 CalcDirectionalLight(vec3 Normal, vec4 LightSpacePos)
 {                                                                                                
-    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, 1.0);  
+    float ShadowFactor = CalcShadowFactor(LightSpacePos);
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);  
 }                                                                                                
                                                                                             
-vec4 CalcPointLight(PointLight l, vec3 Normal, vec4 LightSpacePos)                   
+vec4 CalcPointLight(PointLight l, vec3 Normal, vec4 LightSpacePos)
 {                                                                                           
     vec3 LightDirection = WorldPos0 - l.Position;                                           
     float Distance = length(LightDirection);                                                
     LightDirection = normalize(LightDirection);                                             
-    float ShadowFactor = CalcShadowFactor(LightSpacePos);                                   
+    float ShadowFactor = CalcShadowFactor(LightSpacePos);
                                                                                             
     vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);           
     float Attenuation =  l.Atten.Constant +                                                 
@@ -130,7 +131,7 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal, vec4 LightSpacePos)
 void main()                                                                                 
 {                                                                                           
     vec3 Normal = normalize(Normal0);                                                       
-    vec4 TotalLight = CalcDirectionalLight(Normal);                                         
+    vec4 TotalLight = CalcDirectionalLight(Normal, LightSpacePos);                                         
                                                                                             
     for (int i = 0 ; i < gNumPointLights ; i++) {                                           
         TotalLight += CalcPointLight(gPointLights[i], Normal, LightSpacePos);               

@@ -62,10 +62,10 @@ public:
         m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
         m_spotLight.Cutoff =  20.0f;
 		
-        m_dirLight.AmbientIntensity = 1.0f;
+        m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.Direction = Vector3f(0.0f, -1.0f, 0.0f);
+        m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
 
         m_persProjInfo.FOV    = 45.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -74,8 +74,8 @@ public:
         m_persProjInfo.zFar   = 1000.0f;  
 
         m_shadowPersProjInfo.FOV    = 45.0f;
-        m_shadowPersProjInfo.Height = 100;
-        m_shadowPersProjInfo.Width  = 100;            
+        m_shadowPersProjInfo.Height = 500;
+        m_shadowPersProjInfo.Width  = 500;            
         m_shadowPersProjInfo.zNear = 1.0f;                    
         m_shadowPersProjInfo.zFar  = 100.0f;  
     }
@@ -142,6 +142,7 @@ public:
         m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
 
         for (int i = 0; i < NUM_MESHES ; i++) {
+            m_meshOrientation[i].m_scale    = Vector3f(2.0f, 2.0f, 2.0f);
             m_meshOrientation[i].m_pos      = Vector3f(0.0f, 0.0f, 3.0f + i * 30.0f);
         }            
 
@@ -173,7 +174,6 @@ public:
 
         Pipeline p;
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(1.0f, 0.0f, 0.0f));
-        //p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f), Vector3f(0.0f, 1.0f, 0.0f));
         p.SetPerspectiveProj(m_shadowPersProjInfo);                    
         
         for (int i = 0; i < NUM_MESHES ; i++) {
@@ -197,10 +197,11 @@ public:
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         Pipeline p;        
-        p.SetPerspectiveProj(m_persProjInfo);        
+        p.SetPerspectiveProj(m_shadowPersProjInfo);        
         p.Orient(m_quad.GetOrientation());
-        p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetWVPTrans());        
+        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(1.0f, 0.0f, 0.0f));
+        m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
+        p.SetPerspectiveProj(m_persProjInfo);        
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
