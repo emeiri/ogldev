@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{a96525e2-2be2-405f-a52d-b11ce74ec286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{4ad362b8-97bb-4a44-bf9b-6ac80dcd5a61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{a04420ca-5c10-4a03-acb3-a711ef1b30a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\tutorial46\blur_tech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\engine_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\geom_pass_tech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\lighting_technique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\ssao_technique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\tutorial46\shaders\blur.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\blur.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\geometry_pass.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\geometry_pass.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\ssao.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\ssao.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\tutorial46\blur_tech.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\geom_pass_tech.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\lighting_technique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\ssao_technique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\tutorial46.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
