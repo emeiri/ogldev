@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <AntTweakBar.h>
 
 #include "ogldev_util.h"
 #include "ogldev_backend.h"
@@ -39,6 +40,8 @@ void OgldevBackendInit(OGLDEV_BACKEND_TYPE BackendType, int argc, char** argv, b
         default:
             assert(0);
     }
+    
+    TwInit(TW_OPENGL, NULL);
 }
 
 
@@ -59,6 +62,8 @@ void OgldevBackendTerminate()
 
 bool OgldevBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle)
 {
+    TwWindowSize(Width, Height);
+    
     switch (sBackendType) {
         case OGLDEV_BACKEND_TYPE_GLUT:
             return GLUTBackendCreateWindow(Width, Height, isFullScreen, pTitle);
@@ -67,13 +72,15 @@ bool OgldevBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const
         default:
             assert(0);
     }
+    
+    
 
 	return false;
 }
 
 
 void OgldevBackendRun(ICallbacks* pCallbacks)
-{
+{  
     switch (sBackendType) {
         case OGLDEV_BACKEND_TYPE_GLUT:
             GLUTBackendRun(pCallbacks);
@@ -83,12 +90,14 @@ void OgldevBackendRun(ICallbacks* pCallbacks)
             break;
         default:
             assert(0);
-    }
+    }    
 }
 
 
 void OgldevBackendSwapBuffers()
 {
+    TwDraw();
+    
     switch (sBackendType) {
         case OGLDEV_BACKEND_TYPE_GLUT:
             GLUTBackendSwapBuffers();

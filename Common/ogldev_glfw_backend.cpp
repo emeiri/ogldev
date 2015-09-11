@@ -134,6 +134,7 @@ static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)
 
 static void MouseCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)
 {
+    //TwEventMouseButtonGLFW()
     OGLDEV_MOUSE OgldevMouse = GLFWMouseToOGLDEVMouse(Button);
 
     OGLDEV_KEY_STATE State = (Action == GLFW_PRESS) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
@@ -150,6 +151,7 @@ static void InitCallbacks()
     glfwSetKeyCallback(s_pWindow, KeyCallback);
     glfwSetCursorPosCallback(s_pWindow, CursorPosCallback);
     glfwSetMouseButtonCallback(s_pWindow, MouseCallback);
+    glfwSetMousePosCallback((GLFWmouseposfun)TwEventMousePosGLFW);
 }
 
 void GLFWErrorCallback(int error, const char* description)
