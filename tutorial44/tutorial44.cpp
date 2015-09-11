@@ -26,6 +26,7 @@
 #include <unistd.h>
 #endif
 #include <sys/types.h>
+#include <AntTweakBar.h>
 
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"
@@ -97,7 +98,23 @@ public:
  //       if (!m_fontRenderer.InitFontRenderer()) {
    //         return false;
    //     }
-#endif        	      
+#endif        	    
+        
+        TwBar *bar;
+        bar = TwNewBar("NameOfMyTweakBar");
+            
+        TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLFW and OpenGL.' "); // Message added to the help bar.
+
+        double speed = 0.3; // Model rotation speed
+        // Add 'speed' to 'bar': it is a modifable (RW) variable of type TW_TYPE_DOUBLE. Its key shortcuts are [s] and [S].
+        TwAddVarRW(bar, "speed", TW_TYPE_DOUBLE, &speed, 
+               " label='Rot speed' min=0 max=2 step=0.01 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
+
+        float g_Rotation[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        // Add 'g_Rotation' to 'bar': this is a variable of type TW_TYPE_QUAT4F which defines the object's orientation
+        TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, 
+                  " label='Object rotation' opened=true help='Change the object orientation.' ");
+
         return true;
     }
 
@@ -123,7 +140,7 @@ public:
         m_mesh.Render();        
         	
     //    RenderFPS();     
-        CalcFPS();
+        CalcFPS();                
         
         OgldevBackendSwapBuffers();
     }
