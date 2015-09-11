@@ -43,7 +43,7 @@
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
 
-#define NUM_MESHES 10
+#define NUM_MESHES 5
 
 class Tutorial47 : public ICallbacks, public OgldevApp
 {
@@ -74,10 +74,10 @@ public:
         m_persProjInfo.zFar   = 1000.0f;  
 
         m_shadowPersProjInfo.FOV    = 45.0f;
-        m_shadowPersProjInfo.Height = 500;
-        m_shadowPersProjInfo.Width  = 500;            
+        m_shadowPersProjInfo.Height = 100;
+        m_shadowPersProjInfo.Width  = 100;            
         m_shadowPersProjInfo.zNear = 1.0f;                    
-        m_shadowPersProjInfo.zFar  = 100.0f;  
+        m_shadowPersProjInfo.zFar  = 100.0f;          
     }
 
     ~Tutorial47()
@@ -137,12 +137,12 @@ public:
             return false;
         }
         
-        m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 150.0f, 150.0f);
-        m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 150.0f);
+        m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
+        m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
         m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
 
         for (int i = 0; i < NUM_MESHES ; i++) {
-            m_meshOrientation[i].m_scale    = Vector3f(2.0f, 2.0f, 2.0f);
+            m_meshOrientation[i].m_scale    = Vector3f(1.0f, 1.0f, 1.0f);
             m_meshOrientation[i].m_pos      = Vector3f(0.0f, 0.0f, 3.0f + i * 30.0f);
         }            
 
@@ -156,6 +156,10 @@ public:
     
     virtual void RenderSceneCB()
     {
+        for (int i = 0; i < NUM_MESHES ; i++) {
+            m_meshOrientation[i].m_rotation.y += 0.5f;
+        }
+        
         m_pGameCamera->OnRender();
         
         ShadowMapPass();
