@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 47 - Shadow Mapping with Directional Lights </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 47: </h2>
+            <h1> Shadow Mapping with Directional Lights </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+<article id="content" class="breakpoint">
+<section>
+            <h3> Background </h3>
+<p>
+    The Shadow Mapping algorithm that we explored in <a href="../tutorial23/tutorial23.html">tutorial 23</a> and
+<a href="../tutorial24/tutorial24.html">tutorial 24</a> used a spot light as the light source. The algorithm itself
+is based on the idea of rendering into a shadow map from the light point of view. This is simpler with spot lights
+because they behave the same as the regular camera of the viewer. The spot light has a location and a direction vector
+and the area covered by the light grows as we move further away from the light:    
+</p>
+<img src="spotlight.jpg">
+<p>
+The fact that the spotlight behaves like a frustum makes it easier to implement shadow mapping because we
+can use the same perspective projection matrix as the camera in order to render into the shadow map. Implementing
+<a href="../tutorial43/tutorial43.html" > Shadow Mapping with Point Lights </a> was a bit of a challenge but we were
+able to overcome it by rendering into a cubemap. Projection, though, was once again perspective.
+</p>
+<p>
+Now let's think about directional lights. A directional light has a direction but not a position. It
+is usually used to mimic the behavior of the sun which due to its size and distance seems to cast 
+lights rays which are parallel:
+</p>
+<img src="dirlight.jpg">
+<p>
+In this case, we can no longer use the Perspective Projection. Enter Orthographic Projection. The idea
+here is that instead of projecting something on a projection plane using a single point (the camera),
+the projection keeps 
+</p>
+<p>
+In the following image we see the same box using perspective projection on the left hand side and 
+orthographic projection on the right hand side:
+</p>
+<img src="boxes.jpg">
+<p>
+The left box looks real, just as you would expect it to be and delivers the correct sense of depth.
+The right one doesn't look real since the front and back rectangles are exactly the same. We know that
+they are the same in the real world but in a picture we expect the front one to look larger.
+</p>
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+<p>(tutorial46.cpp:101)</p>
+<code>
+</code>
+</section>
+</article>
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+</body>
+</html>
