@@ -72,11 +72,11 @@ public:
         m_persProjInfo.Width  = WINDOW_WIDTH;
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 1000.0f;  
-
+ 
         m_shadowPersProjInfo.FOV    = 45.0f;
-        m_shadowPersProjInfo.Height = 100;
-        m_shadowPersProjInfo.Width  = 100;            
-        m_shadowPersProjInfo.zNear = 1.0f;                    
+        m_shadowPersProjInfo.Height = 10;
+        m_shadowPersProjInfo.Width  = 10;            
+        m_shadowPersProjInfo.zNear = -10.0f;                    
         m_shadowPersProjInfo.zFar  = 100.0f;          
         
         m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
@@ -177,7 +177,7 @@ public:
         m_ShadowMapEffect.Enable();
 
         Pipeline p;
-        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(1.0f, 0.0f, 0.0f));
+        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         p.SetPerspectiveProj(m_shadowPersProjInfo);                    
         
         for (int i = 0; i < NUM_MESHES ; i++) {
@@ -203,7 +203,7 @@ public:
         Pipeline p;        
         p.SetPerspectiveProj(m_shadowPersProjInfo);        
         p.Orient(m_quad.GetOrientation());
-        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(1.0f, 0.0f, 0.0f));
+        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
         p.SetPerspectiveProj(m_persProjInfo);        
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());

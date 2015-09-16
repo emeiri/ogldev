@@ -11,26 +11,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial47\lighting_technique.h" />
-    <ClInclude Include="..\..\tutorial47\shadow_map_fbo.h" />
-    <ClInclude Include="..\..\tutorial47\shadow_map_technique.h" />
+    <ClInclude Include="..\..\tutorial46\blur_tech.h" />
+    <ClInclude Include="..\..\tutorial46\engine_common.h" />
+    <ClInclude Include="..\..\tutorial46\geom_pass_tech.h" />
+    <ClInclude Include="..\..\tutorial46\lighting_technique.h" />
+    <ClInclude Include="..\..\tutorial46\mesh.h" />
+    <ClInclude Include="..\..\tutorial46\ssao_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial47\Shaders\lighting.fs" />
-    <None Include="..\..\tutorial47\Shaders\lighting.vs" />
-    <None Include="..\..\tutorial47\Shaders\shadow_map.fs" />
-    <None Include="..\..\tutorial47\Shaders\shadow_map.vs" />
+    <None Include="..\..\tutorial46\shaders\blur.fs" />
+    <None Include="..\..\tutorial46\shaders\blur.vs" />
+    <None Include="..\..\tutorial46\shaders\geometry_pass.fs" />
+    <None Include="..\..\tutorial46\shaders\geometry_pass.vs" />
+    <None Include="..\..\tutorial46\shaders\lighting.fs" />
+    <None Include="..\..\tutorial46\shaders\lighting.vs" />
+    <None Include="..\..\tutorial46\shaders\ssao.fs" />
+    <None Include="..\..\tutorial46\shaders\ssao.vs" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial47\lighting_technique.cpp" />
-    <ClCompile Include="..\..\tutorial47\shadow_map_technique.cpp" />
-    <ClCompile Include="..\..\tutorial47\tutorial47.cpp" />
+    <ClCompile Include="..\..\tutorial46\blur_tech.cpp" />
+    <ClCompile Include="..\..\tutorial46\geom_pass_tech.cpp" />
+    <ClCompile Include="..\..\tutorial46\lighting_technique.cpp" />
+    <ClCompile Include="..\..\tutorial46\mesh.cpp" />
+    <ClCompile Include="..\..\tutorial46\ssao_technique.cpp" />
+    <ClCompile Include="..\..\tutorial46\tutorial46.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1DDD16C0-FB2E-4676-93DB-956CE839A8EE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ogldev</RootNamespace>
-    <ProjectName>Tutorial47</ProjectName>
+    <ProjectName>Tutorial46</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
