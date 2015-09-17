@@ -12,38 +12,68 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\tutorial47\lighting_technique.h">
+    <ClInclude Include="..\..\tutorial46\blur_tech.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial47\shadow_map_fbo.h">
+    <ClInclude Include="..\..\tutorial46\engine_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\tutorial47\shadow_map_technique.h">
+    <ClInclude Include="..\..\tutorial46\geom_pass_tech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\lighting_technique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tutorial46\ssao_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\tutorial47\Shaders\lighting.fs">
+    <None Include="..\..\tutorial46\shaders\blur.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\tutorial47\Shaders\lighting.vs">
+    <None Include="..\..\tutorial46\shaders\blur.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\tutorial47\Shaders\shadow_map.fs">
+    <None Include="..\..\tutorial46\shaders\geometry_pass.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\tutorial47\Shaders\shadow_map.vs">
+    <None Include="..\..\tutorial46\shaders\geometry_pass.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\ssao.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\tutorial46\shaders\ssao.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\tutorial47\lighting_technique.cpp">
+    <ClCompile Include="..\..\tutorial46\blur_tech.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial47\shadow_map_technique.cpp">
+    <ClCompile Include="..\..\tutorial46\geom_pass_tech.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\tutorial47\tutorial47.cpp">
+    <ClCompile Include="..\..\tutorial46\lighting_technique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\ssao_technique.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tutorial46\tutorial46.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
