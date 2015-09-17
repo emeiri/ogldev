@@ -59,7 +59,18 @@ orthographic projection on the right hand side:
 <p>
 The left box looks real, just as you would expect it to be and delivers the correct sense of depth.
 The right one doesn't look real since the front and back rectangles are exactly the same. We know that
-they are the same in the real world but in a picture we expect the front one to look larger.
+they are the same in the real world but in a picture we expect the front one to look larger. So how does
+Orthographic Projection helps us with directional lights? Well, remember that Perspective Projection takes
+something that looks like a frustum and maps it to a normalized cube (a cube that goes from [-1,-1,-1] to
+[1,1,1]). After mapping, the XY coordinates are used to find the location in the texture (in our case the shadow map)
+and the Z is the value which is written there. An Orthographic projection takes a general box and maps it to the normalized
+cube:
+</p>
+<img src="ortho.jpg">
+<p>
+Now think about the rays of the directional light as if they are originating from the front face of the box
+and going parallel to each other until they hit the back face. If we do the mapping properly the rest of the generation
+of the shadow map remains the same.
 </p>
 </section>
 
