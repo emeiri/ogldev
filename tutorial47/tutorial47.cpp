@@ -54,14 +54,6 @@ public:
         m_pGameCamera = NULL;
         m_pGroundTex  = NULL;
         
-        m_spotLight.AmbientIntensity = 0.1f;
-        m_spotLight.DiffuseIntensity = 0.9f;
-        m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_spotLight.Attenuation.Linear = 0.01f;
-        m_spotLight.Position  = Vector3f(-20.0, 20.0, 1.0f);
-        m_spotLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
-        m_spotLight.Cutoff =  20.0f;
-		
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -73,11 +65,10 @@ public:
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 1000.0f;  
  
-        m_shadowPersProjInfo.FOV    = 45.0f;
-        m_shadowPersProjInfo.Height = 10;
-        m_shadowPersProjInfo.Width  = 10;            
-        m_shadowPersProjInfo.zNear = -10.0f;                    
-        m_shadowPersProjInfo.zFar  = 100.0f;          
+        m_shadowOrthoProjInfo.Height = 20;
+        m_shadowOrthoProjInfo.Width  = 20;            
+        m_shadowOrthoProjInfo.zNear = -10.0f;                    
+        m_shadowOrthoProjInfo.zFar  = 100.0f;          
         
         m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
         m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
@@ -116,7 +107,6 @@ public:
 
         m_LightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_LightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
-       // m_LightingTech.SetSpotLights(1, &m_spotLight);
         m_LightingTech.SetDirectionalLight(m_dirLight);
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
@@ -149,10 +139,12 @@ public:
         return true;
     }
 
+    
     void Run()
     {
         OgldevBackendRun(this);
     }
+
     
     virtual void RenderSceneCB()
     {
@@ -168,7 +160,7 @@ public:
         OgldevBackendSwapBuffers();
     }
 	
-	
+
     void ShadowMapPass()
     {      
         m_shadowMapFBO.BindForWriting();
@@ -178,7 +170,7 @@ public:
 
         Pipeline p;
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_shadowPersProjInfo);                    
+        p.SetPerspectiveProj(m_shadowOrthoProjInfo);                    
         
         for (int i = 0; i < NUM_MESHES ; i++) {
             p.Orient(m_meshOrientation[i]);
@@ -201,7 +193,7 @@ public:
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         Pipeline p;        
-        p.SetPerspectiveProj(m_shadowPersProjInfo);        
+        p.SetPerspectiveProj(m_shadowOrthoProjInfo);        
         p.Orient(m_quad.GetOrientation());
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
@@ -219,8 +211,8 @@ public:
             m_mesh.Render();
         }
     }
-	
-       
+    
+	       
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
     {
         switch (OgldevKey) {
@@ -240,12 +232,11 @@ public:
     }
     
 
-private:
+private:        
         
     LightingTechnique m_LightingTech;
     ShadowMapTechnique m_ShadowMapEffect;
     Camera* m_pGameCamera;
-    SpotLight m_spotLight;
     DirectionalLight m_dirLight;
     BasicMesh m_mesh;
     Orientation m_meshOrientation[NUM_MESHES];
@@ -253,7 +244,7 @@ private:
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
-    PersProjInfo m_shadowPersProjInfo;
+    PersProjInfo m_shadowOrthoProjInfo;
 };
 
 
