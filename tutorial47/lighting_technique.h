@@ -22,7 +22,6 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_lights_common.h"
 #include "shadow_map_technique.h"
-#include "shadow_map_fbo.h"
 
 
 class LightingTechnique : public Technique {

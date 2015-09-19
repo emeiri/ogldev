@@ -32,7 +32,6 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-//#include "ogldev_basic_lighting.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "ogldev_basic_mesh.h"
@@ -65,10 +64,10 @@ public:
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 1000.0f;  
  
-        m_shadowOrthoProjInfo.Height = 20;
-        m_shadowOrthoProjInfo.Width  = 20;            
-        m_shadowOrthoProjInfo.zNear = -10.0f;                    
-        m_shadowOrthoProjInfo.zFar  = 100.0f;          
+        m_shadowOrthoProjInfo.Height = 200;
+        m_shadowOrthoProjInfo.Width  = 200;            
+        m_shadowOrthoProjInfo.zNear  = -10.0f;                    
+        m_shadowOrthoProjInfo.zFar   = 100.0f;          
         
         m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
         m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
@@ -92,8 +91,8 @@ public:
             return false;
         }
 
-        Vector3f Pos(3.0f, 8.0f, -10.0f);
-        Vector3f Target(0.0f, -0.2f, 1.0f);
+        Vector3f Pos(8.0, 21.0, -23.0);
+        Vector3f Target(-0.07f, -0.44f, 0.9f);
         Vector3f Up(0.0, 1.0f, 0.0f);
         
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
