@@ -24,32 +24,35 @@
     </header>
 
 <article id="content" class="breakpoint">
+        <p>Credits: some of the images were take from <a href="http://www.clipartpanda.com">Clipart Panda</a>
+            and <a href="http://www.cliparthut.com">ClipArtHut</a>
+        </p>
 <section>
             <h3> Background </h3>
 <p>
     The Shadow Mapping algorithm that we explored in <a href="../tutorial23/tutorial23.html">tutorial 23</a> and
 <a href="../tutorial24/tutorial24.html">tutorial 24</a> used a spot light as the light source. The algorithm itself
-is based on the idea of rendering into a shadow map from the light point of view. This is simpler with spot lights
-because they behave the same as the regular camera of the viewer. The spot light has a location and a direction vector
-and the area covered by the light grows as we move further away from the light:    
+is based on the idea of rendering into a shadow map from the light point of view. This is simple with spot lights
+because they behave in the same way as our standard camera. The spot light has a location and a direction vector
+and the area covered by the light grows as we move further away from its source:    
 </p>
 <img src="spotlight.jpg">
 <p>
 The fact that the spotlight behaves like a frustum makes it easier to implement shadow mapping because we
 can use the same perspective projection matrix as the camera in order to render into the shadow map. Implementing
 <a href="../tutorial43/tutorial43.html" > Shadow Mapping with Point Lights </a> was a bit of a challenge but we were
-able to overcome it by rendering into a cubemap. Projection, though, was once again perspective.
+able to overcome it by rendering into a cubemap. Projection, though, was still perspective.
 </p>
 <p>
 Now let's think about directional lights. A directional light has a direction but not a position. It
 is usually used to mimic the behavior of the sun which due to its size and distance seems to cast 
-lights rays which are parallel:
+parallel lights rays:
 </p>
 <img src="dirlight.jpg">
 <p>
-In this case, we can no longer use the Perspective Projection. Enter Orthographic Projection. The idea
-here is that instead of projecting something on a projection plane using a single point (the camera),
-the projection keeps 
+In this case, we can no longer use Perspective Projection. Enter Orthographic Projection. The idea
+here is that of converging all light rays in one spot (the camera), the light rays remain parallel so
+no 3D effect is created.
 </p>
 <p>
 In the following image we see the same box using perspective projection on the left hand side and 
@@ -59,7 +62,7 @@ orthographic projection on the right hand side:
 <p>
 The left box looks real, just as you would expect it to be and delivers the correct sense of depth.
 The right one doesn't look real since the front and back rectangles are exactly the same. We know that
-they are the same in the real world but in a picture we expect the front one to look larger. So how does
+their dimensions are the same but when looking at a picture we expect the front one to look larger. So how does
 Orthographic Projection helps us with directional lights? Well, remember that Perspective Projection takes
 something that looks like a frustum and maps it to a normalized cube (a cube that goes from [-1,-1,-1] to
 [1,1,1]). After mapping, the XY coordinates are used to find the location in the texture (in our case the shadow map)
@@ -74,14 +77,14 @@ and the normalized box (remember - we call this NDC space) properly the rest of 
 of the shadow map remains the same.
 </p>
 <p>
-    So now let's see how the mapping is done. We have three ranges that we need to map to (-1,1). To make life 
-    simpler, we will place the general box symmetrically around the axis. This makes sense because the projection
+    So now let's see how this mapping is done. We have three ranges along the XYZ axes that we need to map to (-1,1). To make life 
+    simpler, we will place the general box symmetrically around the axes. This makes sense because the projection
     comes after view space transform where we rotate and translate the world so that the light is placed at the origin
     and it goes along the positive Z axis. The general form of an equation that maps range (a,b) to (c,d) is:
 </p>
 <img src="calc1.jpg">
 <p>
-    Where X is between 'a' and 'b'. Let's do the mapping on the X-axis. Plug the ranges (-r,r) to (-1,1) in the
+    Where a<=X<=b. Let's do the mapping on the X-axis. Plug the ranges (-r,r) to (-1,1) in the
     above equation and we get ('r' means "right" on the X-axis):
 </p>
 <img src="calc2.jpg">
@@ -98,18 +101,18 @@ of the shadow map remains the same.
 </p>
 <img src="calc5.jpg">
 <p>
-    Compare this matrix with one we created for perpective projection in <a href='../tutorial12/tutorial12.html'>tutorial 12</a>.
+    Compare this matrix with the one we created for perpective projection in <a href='../tutorial12/tutorial12.html'>tutorial 12</a>.
     An important difference is that in location [3,2] (count starts at zero) we have 0 instead of 1. For perspective
     projection the 1 was required in order to copy the Z into the W location of the result. This allows the GPU
-    to perform perspective divide when everything is divided automatically (and you cannot disable this) by W. In the case
+    to perform perspective divide when everything is divided automatically by W (and you cannot disable this). In the case
     of orthographic projection the W will remain as 1, effectively disabling this operation.
 </p>
 <p>
-    When working on shadow mapping with directional lights you need to be careful on how you define the dimensions 
-    of orthographic projection. With perspective projection life is a bit simpler. The field of view defines how
+    When working on shadow mapping with directional lights you need to be careful about how you define the dimensions 
+    of orthographic projection. With perspective projection life is a bit simpler. The field-of-view defines how
     wide the camera is and due to the nature of the frustum we capture more and more as we move further away from the 
-    viewer. We also need to define a near and far plane depending on the way the scene is structured. In many cases
-    the same values of field of view, near and far plane will work just fine. But in the case of orthographic 
+    viewer (same as how our eye functions). We also need to define a near and far plane to control clipping based on distance. In many cases
+    the same values of field-of-view, near and far plane will work just fine. But in the case of orthographic 
     projection we have a box rather than a frustum and if we are not careful we may "miss" the objects and not render
     anything. Let's see an example. In the scene below I've defined the width and height to be 20, the near plane as -10
     and the far plane as 100:
@@ -117,7 +120,8 @@ of the shadow map remains the same.
 <img src='high_res.jpg'>
 <p>
     The problem is that the objects are placed at distance of 30 from each other so the projection was not wide enough in order
-    to capture everything. Now let's increase the width/height to 200 (near/far planes unchanged):
+    to capture everything (remember that the light direction is orthogonal to the viewer so the objects are scattered on a wide
+    field relative to the light). Now let's increase the width/height to 200 (near/far planes unchanged):
 </p>
 <img src='low_res.jpg'>
 <p>
@@ -146,19 +150,19 @@ void Matrix4f::InitOrthoProjTransform(const PersProjInfo& p)<br>
 {<br>
 &nbsp; &nbsp;   const float zRange = p.zFar - p.zNear;<br>
 <br>
-&nbsp; &nbsp;     m[0][0] = 2.0f/p.Width; m[0][1] = 0.0f;          m[0][2] = 0.0f;        m[0][3] = 0.0;<br>
-&nbsp; &nbsp; m[1][0] = 0.0f;         m[1][1] = 2.0f/p.Height; m[1][2] = 0.0f;        m[1][3] = 0.0;<br>
-&nbsp; &nbsp;     m[2][0] = 0.0f;         m[2][1] = 0.0f;          m[2][2] = 2.0f/zRange; m[2][3] = (-p.zFar - p.zNear)/zRange;<br>
-&nbsp; &nbsp;     m[3][0] = 0.0f;         m[3][1] = 0.0f;          m[3][2] = 0.0f;        m[3][3] = 1.0;    <br>
+&nbsp; &nbsp; m[0][0] = 2.0f/p.Width; m[0][1] = 0.0f;     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;m[0][2] = 0.0f;&nbsp; &nbsp; &nbsp; &nbsp;      m[0][3] = 0.0;<br>
+&nbsp; &nbsp; m[1][0] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;        m[1][1] = 2.0f/p.Height; m[1][2] = 0.0f;&nbsp; &nbsp; &nbsp; &nbsp;  m[1][3] = 0.0;<br>
+&nbsp; &nbsp; m[2][0] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;        m[2][1] = 0.0f; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;m[2][2] = 2.0f/zRange; m[2][3] = (-p.zFar - p.zNear)/zRange;<br>
+&nbsp; &nbsp; m[3][0] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;        m[3][1] = 0.0f; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;m[3][2] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;m[3][3] = 1.0;    <br>
 }    
 </code>
 <p>
     I've added the above function to the Matrix4f class in order to initialize the orthographic projection
-    matrix. Notice that we are dividing 2 rather then 1 in locations (0,0) and (1,1). The reason is that
+    matrix. Notice that we are dividing 2 rather than 1 in locations (0,0) and (1,1). The reason is that
     in the development of the matrix in the background section we mapped the ranges (-l,l) and (-t,t), but
     in the code itself we have a width and a height so we have to divide it by 2 to match.
 </p>
-<p>(tutorial47.cpp:164)</p>
+<p>(tutorial47.cpp:163)</p>
 <code>
     void ShadowMapPass()<br>
     {      <br>
@@ -245,7 +249,7 @@ void main()                                                                     
     for the directional light as well. 
 </p>
 </section>
-</article>
+</article>    
 
 <script src="../html5shiv.min.js"></script>
 <script src="../html5shiv-printshiv.min.js"></script>
