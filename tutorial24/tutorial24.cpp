@@ -30,7 +30,7 @@
 #include "shadow_map_technique.h"
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
-#include "shadow_map_fbo.h"
+#include "ogldev_shadow_map_fbo.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
@@ -144,7 +144,7 @@ public:
     }
 
     
-    virtual void ShadowMapPass()
+    void ShadowMapPass()
     {
         m_shadowMapFBO.BindForWriting();
 
@@ -165,7 +165,7 @@ public:
     }
 
         
-    virtual void RenderPass()
+    void RenderPass()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

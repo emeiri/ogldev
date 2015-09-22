@@ -18,7 +18,7 @@
 
 #include <limits.h>
 #include <string>
-#include <assert.h>
+
 
 #include "skinning_technique.h"
 #include "ogldev_util.h"

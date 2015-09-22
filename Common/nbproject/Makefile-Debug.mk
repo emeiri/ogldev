@@ -53,6 +53,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_basic_lighting.o \
 	${OBJECTDIR}/ogldev_basic_mesh.o \
 	${OBJECTDIR}/ogldev_glfw_backend.o \
+	${OBJECTDIR}/ogldev_shadow_map_fbo.o \
 	${OBJECTDIR}/ogldev_skinned_mesh.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
@@ -176,6 +177,11 @@ ${OBJECTDIR}/ogldev_glfw_backend.o: ogldev_glfw_backend.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_glfw_backend.o ogldev_glfw_backend.cpp
+
+${OBJECTDIR}/ogldev_shadow_map_fbo.o: ogldev_shadow_map_fbo.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_shadow_map_fbo.o ogldev_shadow_map_fbo.cpp
 
 ${OBJECTDIR}/ogldev_skinned_mesh.o: ogldev_skinned_mesh.cpp 
 	${MKDIR} -p ${OBJECTDIR}

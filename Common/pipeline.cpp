@@ -18,14 +18,19 @@
 
 #include "ogldev_pipeline.h"
 
+const Matrix4f& Pipeline::GetProjTrans() 
+{
+    m_ProjTransformation.InitPersProjTransform(m_persProjInfo);
+    return m_ProjTransformation;
+}
+
+
 const Matrix4f& Pipeline::GetVPTrans()
 {
     GetViewTrans();
-    
-    Matrix4f PersProjTrans;
-    PersProjTrans.InitPersProjTransform(m_persProjInfo);
-    
-    m_VPtransformation = PersProjTrans * m_Vtransformation;
+    GetProjTrans();
+       
+    m_VPtransformation = m_ProjTransformation * m_Vtransformation;
     return m_VPtransformation;
 }
 
@@ -61,6 +66,19 @@ const Matrix4f& Pipeline::GetWVPTrans()
     m_WVPtransformation = m_VPtransformation * m_Wtransformation;
     return m_WVPtransformation;
 }
+
+const Matrix4f& Pipeline::GetWVOrthoPTrans()
+{
+    GetWorldTrans();
+    GetViewTrans();
+
+    Matrix4f P;
+    P.InitOrthoProjTransform(m_persProjInfo);
+    
+    m_WVPtransformation = P * m_Vtransformation * m_Wtransformation;
+    return m_WVPtransformation;
+}
+
 
 const Matrix4f& Pipeline::GetWVTrans()
 {

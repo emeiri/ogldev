@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <assert.h>
+
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 

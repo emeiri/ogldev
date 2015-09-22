@@ -37,7 +37,6 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/lighting_technique.o \
 	${OBJECTDIR}/mesh.o \
-	${OBJECTDIR}/shadow_map_fbo.o \
 	${OBJECTDIR}/shadow_map_technique.o \
 	${OBJECTDIR}/tutorial24.o
 
@@ -77,11 +76,6 @@ ${OBJECTDIR}/mesh.o: mesh.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
-
-${OBJECTDIR}/shadow_map_fbo.o: shadow_map_fbo.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/shadow_map_fbo.o shadow_map_fbo.cpp
 
 ${OBJECTDIR}/shadow_map_technique.o: shadow_map_technique.cpp 
 	${MKDIR} -p ${OBJECTDIR}

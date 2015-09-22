@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <string>
-#include <assert.h>
+
 #include <glfx.h>
 
 #include "glfx_technique.h"

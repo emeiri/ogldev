@@ -27,14 +27,15 @@
 #include "ogldev_camera.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_basic_mesh.h"
+#include "ogldev_lights_common.h"
+#include "gbuffer.h"
+#include "null_technique.h"
 #include "ds_geom_pass_tech.h"
 #include "ds_point_light_pass_tech.h"
 #include "ds_dir_light_pass_tech.h"
-#include "null_technique.h"
-#include "ogldev_glut_backend.h"
-#include "ogldev_basic_mesh.h"
-#include "gbuffer.h"
-#include "lights_common.h"
+
 
 #define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024

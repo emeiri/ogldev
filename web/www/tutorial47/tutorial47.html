@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 47 - Shadow Mapping with Directional Lights </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 47: </h2>
+            <h1> Shadow Mapping with Directional Lights </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+<article id="content" class="breakpoint">
+        <p>Credits: some of the images were take from <a href="http://www.clipartpanda.com">Clipart Panda</a>
+            and <a href="http://www.cliparthut.com">ClipArtHut</a>
+        </p>
+<section>
+            <h3> Background </h3>
+<p>
+    The Shadow Mapping algorithm that we explored in <a href="../tutorial23/tutorial23.html">tutorial 23</a> and
+<a href="../tutorial24/tutorial24.html">tutorial 24</a> used a spot light as the light source. The algorithm itself
+is based on the idea of rendering into a shadow map from the light point of view. This is simple with spot lights
+because they behave in the same way as our standard camera. The spot light has a location and a direction vector
+and the area covered by the light grows as we move further away from its source:    
+</p>
+<img src="spotlight.jpg">
+<p>
+The fact that the spotlight behaves like a frustum makes it easier to implement shadow mapping because we
+can use the same perspective projection matrix as the camera in order to render into the shadow map. Implementing
+<a href="../tutorial43/tutorial43.html" > Shadow Mapping with Point Lights </a> was a bit of a challenge but we were
+able to overcome it by rendering into a cubemap. Projection, though, was still perspective.
+</p>
+<p>
+Now let's think about directional lights. A directional light has a direction but not a position. It
+is usually used to mimic the behavior of the sun which due to its size and distance seems to cast 
+parallel lights rays:
+</p>
+<img src="dirlight.jpg">
+<p>
+In this case, we can no longer use Perspective Projection. Enter Orthographic Projection. The idea
+here is that of converging all light rays in one spot (the camera), the light rays remain parallel so
+no 3D effect is created.
+</p>
+<p>
+In the following image we see the same box using perspective projection on the left hand side and 
+orthographic projection on the right hand side:
+</p>
+<img src="boxes.jpg">
+<p>
+The left box looks real, just as you would expect it to be and delivers the correct sense of depth.
+The right one doesn't look real since the front and back rectangles are exactly the same. We know that
+their dimensions are the same but when looking at a picture we expect the front one to look larger. So how does
+Orthographic Projection helps us with directional lights? Well, remember that Perspective Projection takes
+something that looks like a frustum and maps it to a normalized cube (a cube that goes from [-1,-1,-1] to
+[1,1,1]). After mapping, the XY coordinates are used to find the location in the texture (in our case the shadow map)
+and the Z is the value which is written there. An Orthographic projection takes a general box and maps it to the normalized
+cube:
+</p>
+<img src="ortho.jpg">
+<p>
+Now think about the rays of the directional light as if they are originating from the front face of the box
+and going parallel to each other until they hit the back face. If we do the mapping between the general box
+and the normalized box (remember - we call this NDC space) properly the rest of the generation
+of the shadow map remains the same.
+</p>
+<p>
+    So now let's see how this mapping is done. We have three ranges along the XYZ axes that we need to map to (-1,1). To make life 
+    simpler, we will place the general box symmetrically around the axes. This makes sense because the projection
+    comes after view space transform where we rotate and translate the world so that the light is placed at the origin
+    and it goes along the positive Z axis. The general form of an equation that maps range (a,b) to (c,d) is:
+</p>
+<img src="calc1.jpg">
+<p>
+    Where a<=X<=b. Let's do the mapping on the X-axis. Plug the ranges (-r,r) to (-1,1) in the
+    above equation and we get ('r' means "right" on the X-axis):
+</p>
+<img src="calc2.jpg">
+<p>
+    Following the same logic we do the mapping on the Y-axis from (-t,t) to (-1,1):    
+</p>
+<img src="calc3.jpg">
+<p>
+    In the case of the Z-axis we need to map (n,f) (where n is the near plane and f is the far plane) to (-1,1):
+</p>
+<img src="calc4.jpg">
+<p>
+    Now that we have the three mapping equations let's create a matrix to wrap them together nicely:
+</p>
+<img src="calc5.jpg">
+<p>
+    Compare this matrix with the one we created for perpective projection in <a href='../tutorial12/tutorial12.html'>tutorial 12</a>.
+    An important difference is that in location [3,2] (count starts at zero) we have 0 instead of 1. For perspective
+    projection the 1 was required in order to copy the Z into the W location of the result. This allows the GPU
+    to perform perspective divide when everything is divided automatically by W (and you cannot disable this). In the case
+    of orthographic projection the W will remain as 1, effectively disabling this operation.
+</p>
+<p>
+    When working on shadow mapping with directional lights you need to be careful about how you define the dimensions 
+    of orthographic projection. With perspective projection life is a bit simpler. The field-of-view defines how
+    wide the camera is and due to the nature of the frustum we capture more and more as we move further away from the 
+    viewer (same as how our eye functions). We also need to define a near and far plane to control clipping based on distance. In many cases
+    the same values of field-of-view, near and far plane will work just fine. But in the case of orthographic 
+    projection we have a box rather than a frustum and if we are not careful we may "miss" the objects and not render
+    anything. Let's see an example. In the scene below I've defined the width and height to be 20, the near plane as -10
+    and the far plane as 100:
+</p>
+<img src='high_res.jpg'>
+<p>
+    The problem is that the objects are placed at distance of 30 from each other so the projection was not wide enough in order
+    to capture everything (remember that the light direction is orthogonal to the viewer so the objects are scattered on a wide
+    field relative to the light). Now let's increase the width/height to 200 (near/far planes unchanged):
+</p>
+<img src='low_res.jpg'>
+<p>
+    Now all the objects have a shadow. However, we have a new problem. The shadows don't look as good as when only one object
+    had a shadow. This problem is called <i>Perspective Aliasing</i> and the reason is that many pixels in view space (when
+    rendering from the camera point of view) are mapped to the same pixel in the shadow map. This makes the shadows look kind of 
+    blocky. When we increased the dimensions of the orthographic box we increased that ratio because the shadow map remains
+    the same but a larger part of the world is now rendered to it. Perspective Aliasing can be mitigated somewhat by
+    increasing the size of the shadow map but you cannot go too far with that as there is a negative impact on memory footprint.
+    In future tutorials we will explore advanced techniques to handle this problem.
+</p>
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+<p>
+    The main difference between shadow mapping with directional and spot lights is the orthographic vs. perspective projection.
+    This is why I'm only going to review the changes required for shadows with directional light. Make sure you are highly familiar
+    with <a href="../tutorial23/tutorial23.html">tutorial 23</a> and <a href="../tutorial24/tutorial24.html">tutorial 24</a> before
+    proceeding because most of the code is the same. If you have a working version of shadows with spot lights you will only
+    need to make a few minor changes to get directional lights shadows working.
+</p>
+<p>(matrix_3d.cpp:137)</p>
+<code>
+void Matrix4f::InitOrthoProjTransform(const PersProjInfo& p)<br>
+{<br>
+&nbsp; &nbsp;   const float zRange = p.zFar - p.zNear;<br>
+<br>
+&nbsp; &nbsp; m[0][0] = 2.0f/p.Width; m[0][1] = 0.0f;     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;m[0][2] = 0.0f;&nbsp; &nbsp; &nbsp; &nbsp;      m[0][3] = 0.0;<br>
+&nbsp; &nbsp; m[1][0] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;        m[1][1] = 2.0f/p.Height; m[1][2] = 0.0f;&nbsp; &nbsp; &nbsp; &nbsp;  m[1][3] = 0.0;<br>
+&nbsp; &nbsp; m[2][0] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;        m[2][1] = 0.0f; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;m[2][2] = 2.0f/zRange; m[2][3] = (-p.zFar - p.zNear)/zRange;<br>
+&nbsp; &nbsp; m[3][0] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;        m[3][1] = 0.0f; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;m[3][2] = 0.0f;  &nbsp; &nbsp; &nbsp; &nbsp;m[3][3] = 1.0;    <br>
+}    
+</code>
+<p>
+    I've added the above function to the Matrix4f class in order to initialize the orthographic projection
+    matrix. Notice that we are dividing 2 rather than 1 in locations (0,0) and (1,1). The reason is that
+    in the development of the matrix in the background section we mapped the ranges (-l,l) and (-t,t), but
+    in the code itself we have a width and a height so we have to divide it by 2 to match.
+</p>
+<p>(tutorial47.cpp:163)</p>
+<code>
+    void ShadowMapPass()<br>
+    {      <br>
+&nbsp; &nbsp;         m_shadowMapFBO.BindForWriting();<br>
+&nbsp; &nbsp;         glClear(GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;         m_ShadowMapEffect.Enable();<br>
+<br>
+&nbsp; &nbsp;         Pipeline p;<br>
+&nbsp; &nbsp;   <b>      p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
+    &nbsp; &nbsp;         p.SetPerspectiveProj(m_shadowOrthoProjInfo);            </b>        <br>
+        <br>
+&nbsp; &nbsp;         for (int i = 0; i < NUM_MESHES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             p.Orient(m_meshOrientation[i]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_mesh.Render();<br>
+&nbsp; &nbsp;         }<br>
+        <br>
+&nbsp; &nbsp;         glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
+    }<br>
+<br>
+        <br>
+    void RenderPass()<br>
+    {<br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;         m_LightingTech.Enable();<br>
+<br>
+&nbsp; &nbsp;         m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());<br>
+       <br>
+&nbsp; &nbsp;         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);<br>
+<br>
+&nbsp; &nbsp;         Pipeline p;        <br>
+&nbsp; &nbsp;      <b>   p.SetPerspectiveProj(m_shadowOrthoProjInfo);        <br>
+&nbsp; &nbsp;         p.Orient(m_quad.GetOrientation());<br>
+&nbsp; &nbsp;         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
+&nbsp; &nbsp;         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        <br>
+&nbsp; &nbsp;         p.SetPerspectiveProj(m_persProjInfo);  </b>      <br>
+&nbsp; &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+&nbsp; &nbsp;         m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        <br>
+&nbsp; &nbsp;         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);<br>
+&nbsp; &nbsp;         m_quad.Render();<br>
+           <br>
+&nbsp; &nbsp;         for (int i = 0; i < NUM_MESHES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             p.Orient(m_meshOrientation[i]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_mesh.Render();<br>
+&nbsp; &nbsp;         }<br>
+    }<br>    
+</code>
+<p>
+    These are the complete shadow and render passes and they are practically the same
+    as for spot lights so we don't have to review them fully. Just a couple of differences
+    that must be noted here. First is that I've added a member called m_shadowOrthoProjInfo
+    in order to keep the orthographic projection variables separate from the existing perspective
+    projection variables that are used for rendering. m_shadowOrthoProjInfo is used to
+    configure the WVP for the light point of view.
+</p>
+<p>
+    The second change is that when we configure the camera for that light WVP matrix
+    we use the origin as the location of the light. Since a directional light only
+    has a direction and no position we don't care about that variable in the view matrix.
+    We just need to rotate the world so that the light points toward the positive Z-axis.
+</p>
+<p>(lighting.fs:96)</p>
+<code>
+    vec4 CalcDirectionalLight(vec3 Normal, <b>vec4 LightSpacePos</b>)<br>
+{                                                             <br>                                   
+&nbsp; &nbsp;    float ShadowFactor = CalcShadowFactor(LightSpacePos);<br>
+&nbsp; &nbsp;     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, <b>ShadowFactor</b>);  <br>
+}                                                                                                <br>
+<br>
+void main()                                                                                 <br>
+{                                                                                           <br>
+...<br>
+&nbsp;     vec4 TotalLight = CalcDirectionalLight(Normal, <b>LightSpacePos</b>);  <br>
+...<br>    
+}    
+</code>
+<p>
+    The shaders are almost exactly the same - we just need to calculate a shadow factor
+    for the directional light as well. 
+</p>
+</section>
+</article>    
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_identifier = 'tutorial47'
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</body>
+</html>

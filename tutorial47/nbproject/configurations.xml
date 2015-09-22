@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>lighting_technique.h</itemPath>
+      <itemPath>shadow_map_technique.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f1" displayName="Shaders" projectFiles="true">
+      <itemPath>Shaders/lighting.fs</itemPath>
+      <itemPath>Shaders/lighting.vs</itemPath>
+      <itemPath>Shaders/shadow_map.fs</itemPath>
+      <itemPath>Shaders/shadow_map.vs</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>lighting_technique.cpp</itemPath>
+      <itemPath>shadow_map_technique.cpp</itemPath>
+      <itemPath>tutorial47.cpp</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <incDir>
+            <pElem>/usr/include/freetype2</pElem>
+          </incDir>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>../Include</pElem>
+            <pElem>../Common/FreetypeGL</pElem>
+          </incDir>
+          <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig glfw3`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial47</output>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../Common"
+                            CT="3"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../Common"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
+              </makeArtifact>
+            </linkerLibProjectItem>
+          </linkerLibItems>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="Shaders/lighting.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/lighting.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/shadow_map.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/shadow_map.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial47.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/include/freetype2</pElem>
+          </incDir>
+          <warningLevel>3</warningLevel>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>/usr/include/ImageMagick</pElem>
+            <pElem>/usr/local/include/assimp</pElem>
+            <pElem>/usr/include/freetype2</pElem>
+            <pElem>FreetypeGL</pElem>
+          </incDir>
+          <warningLevel>3</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerLibItems>
+            <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>GLEW</linkerLibLibItem>
+            <linkerLibLibItem>Magick++</linkerLibLibItem>
+            <linkerLibLibItem>assimp</linkerLibLibItem>
+            <linkerLibFileItem>/usr/lib/libglfx.so</linkerLibFileItem>
+            <linkerLibLibItem>fontconfig</linkerLibLibItem>
+            <linkerLibLibItem>freetype</linkerLibLibItem>
+            <linkerLibLibItem>GL</linkerLibLibItem>
+          </linkerLibItems>
+        </linkerTool>
+      </compileType>
+      <item path="Shaders/lighting.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/lighting.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/shadow_map.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/shadow_map.vs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial47.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

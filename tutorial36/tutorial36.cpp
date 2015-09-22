@@ -33,7 +33,7 @@
 #include "ogldev_glut_backend.h"
 #include "ogldev_basic_mesh.h"
 #include "gbuffer.h"
-#include "lights_common.h"
+#include "ogldev_lights_common.h"
 
 #define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024

@@ -17,7 +17,7 @@
 */
 
 #include <stdlib.h>
-#include <assert.h>
+
 
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
@@ -131,6 +131,17 @@ void Matrix4f::InitPersProjTransform(const PersProjInfo& p)
     m[1][0] = 0.0f;                   m[1][1] = 1.0f/tanHalfFOV; m[1][2] = 0.0f;            m[1][3] = 0.0;
     m[2][0] = 0.0f;                   m[2][1] = 0.0f;            m[2][2] = (-p.zNear - p.zFar)/zRange ; m[2][3] = 2.0f*p.zFar*p.zNear/zRange;
     m[3][0] = 0.0f;                   m[3][1] = 0.0f;            m[3][2] = 1.0f;            m[3][3] = 0.0;    
+}
+
+
+void Matrix4f::InitOrthoProjTransform(const PersProjInfo& p)
+{
+    const float zRange = p.zFar - p.zNear;
+
+    m[0][0] = 2.0f/p.Width; m[0][1] = 0.0f;          m[0][2] = 0.0f;        m[0][3] = 0.0;
+    m[1][0] = 0.0f;         m[1][1] = 2.0f/p.Height; m[1][2] = 0.0f;        m[1][3] = 0.0;
+    m[2][0] = 0.0f;         m[2][1] = 0.0f;          m[2][2] = 2.0f/zRange; m[2][3] = (-p.zFar - p.zNear)/zRange;
+    m[3][0] = 0.0f;         m[3][1] = 0.0f;          m[3][2] = 0.0f;        m[3][3] = 1.0;    
 }
 
 

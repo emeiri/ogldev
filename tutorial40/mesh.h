@@ -21,7 +21,7 @@
 
 #include <map>
 #include <vector>
-#include <assert.h>
+
 #include <GL/glew.h>
 #include <Importer.hpp>      // C++ importer interface
 #include <scene.h>       // Output data structure
