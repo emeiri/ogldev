@@ -78,6 +78,13 @@ struct Vector3f
         z = _z;
     }
     
+    Vector3f(const float* pFloat)
+    {
+        x = pFloat[0];
+        y = pFloat[0];
+        z = pFloat[0];
+    }
+    
     Vector3f(float f)
     {
         x = y = z = f;

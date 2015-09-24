@@ -39,9 +39,7 @@ void OgldevBackendInit(OGLDEV_BACKEND_TYPE BackendType, int argc, char** argv, b
             break;
         default:
             assert(0);
-    }
-    
-    TwInit(TW_OPENGL, NULL);
+    }   
 }
 
 
