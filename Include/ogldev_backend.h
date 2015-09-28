@@ -40,5 +40,7 @@ void OgldevBackendLeaveMainLoop();
 
 void OgldevBackendSwapBuffers();
 
+void OgldevBackendSetMousePos(uint x, uint y);
+
 
 #endif

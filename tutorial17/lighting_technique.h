@@ -21,6 +21,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "ogldev_lights_common.h"
 
 struct DirectionalLight
 {

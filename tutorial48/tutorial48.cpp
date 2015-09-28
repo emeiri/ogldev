@@ -26,7 +26,7 @@
 #include <unistd.h>
 #endif
 #include <sys/types.h>
-#include <AntTweakBar.h>
+
 
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"
@@ -37,6 +37,7 @@
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "ogldev_basic_mesh.h"
+#include "ogldev_atb.h"
 
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
@@ -45,58 +46,12 @@ float g_Rotation[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 typedef enum { BUDDHA, BUNNY, DRAGON } MESH_TYPE;
 
-void TW_CALL RunCB(void *p /*clientData*/)
+bool gAutoRotate = false;
+int gGLMajorVersion = 0;
+
+void TW_CALL AutoRotateCB(void *p)
 { 
-}
-
-
-class ATB
-{
-public:
-    ATB();
-    
-    bool Init();
-    
-    bool KeyboardCB(OGLDEV_KEY OgldevKey);
-
-    bool PassiveMouseCB(int x, int y);
-
-    void RenderSceneCB();
-
-    bool MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y);
-    
-};
-
-
-ATB::ATB()
-{
-    
-}
-
-
-bool ATB::Init()
-{
-    return (TwInit(TW_OPENGL, NULL) == 1);
-}
-
-bool ATB::KeyboardCB(OGLDEV_KEY OgldevKey)
-{
-    return (TwKeyPressed(OgldevKey, TW_KMOD_NONE) == 1);
-}
-
-
-bool ATB::PassiveMouseCB(int x, int y)
-{
-    return (TwMouseMotion(x, y) == 1);
-}
-
-
-bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)
-{    
-    TwMouseButtonID btn = (Button == OGLDEV_MOUSE_BUTTON_LEFT) ? TW_MOUSE_LEFT : TW_MOUSE_RIGHT;
-    TwMouseAction ma = (State == OGLDEV_KEY_STATE_PRESS) ? TW_MOUSE_PRESSED : TW_MOUSE_RELEASED;
-    
-    return (TwMouseButton(ma, btn) == 1);
+    gAutoRotate = !gAutoRotate;
 }
 
 
@@ -107,6 +62,8 @@ public:
     Tutorial48() 
     {
         m_pGameCamera = NULL;
+        
+        m_directionalLight.Name = "DirLight1";
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 0.66f;
         m_directionalLight.DiffuseIntensity = 1.0f;
@@ -118,10 +75,12 @@ public:
         m_persProjInfo.zNear = 1.0f;
         m_persProjInfo.zFar = 1000.0f;  
         
-        m_pipeline.SetPerspectiveProj(m_persProjInfo);           
-        m_pipeline.WorldPos(Vector3f(0.0f, -8.0f, 14.0f));        
+        m_pipeline.SetPerspectiveProj(m_persProjInfo);                   
         
         m_currentMesh = BUDDHA;
+        m_rotationSpeed = 0.2f;
+        
+        glGetIntegerv(GL_MAJOR_VERSION, &gGLMajorVersion);
     }
 
     ~Tutorial48()
@@ -155,7 +114,8 @@ public:
 
         if (!m_mesh[BUDDHA].LoadMesh("../Content/buddha.obj")) {
             return false;            
-        }
+        }        
+        m_mesh[BUDDHA].GetOrientation().m_rotation.y = 180.0f;
         
         if (!m_mesh[BUNNY].LoadMesh("../Content/bunny.obj")) {
             return false;            
@@ -164,36 +124,37 @@ public:
         if (!m_mesh[DRAGON].LoadMesh("../Content/dragon.obj")) {
             return false;            
         }
-                
+         
+        for (int i = 0 ; i < 3 ; i++) {
+            m_mesh[i].GetOrientation().m_pos = Vector3f(0.0f, -8.0f, 34.0f);
+        }
 #ifndef WIN32
         // Disabled for now because it somehow clashes with the regular rendering...
  //       if (!m_fontRenderer.InitFontRenderer()) {
    //         return false;
    //     }
 #endif        	    
+        bar = TwNewBar("OGLDEV");
         
-        TwBar *bar;
-        bar = TwNewBar("NameOfMyTweakBar");
+        float refresh = 0.1f;
+        TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);                
             
         TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLFW and OpenGL.' "); // Message added to the help bar.
-
-        double speed = 0.3; // Model rotation speed
-
-        TwAddVarRW(bar, "speed", TW_TYPE_DOUBLE, &speed, 
-               " label='Rot speed' min=0 max=2 step=0.01 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
-
-        TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, 
-                  " label='Object rotation' opened=true help='Change the object orientation.' ");
+        // TODO: TwDefine more params
+        
         TwAddSeparator(bar, "", NULL);
-        TwAddButton(bar, "Camera", NULL, NULL, "");
-        TwAddVarRO(bar, "Position", TW_TYPE_DIR3F, m_pGameCamera->GetPos(), " label='Position' ");
-        TwAddVarRO(bar, "Direction", TW_TYPE_DIR3F, m_pGameCamera->GetTarget(), " label='Target' ");
+        m_pGameCamera->AddToATB(bar);
         TwAddSeparator(bar, "", NULL);
         TwEnumVal Meshes[] = { {BUDDHA, "Buddha"}, {BUNNY, "Bunny"}, {DRAGON, "Dragon"}};
         TwType MeshTwType = TwDefineEnum("MeshType", Meshes, 3);
         TwAddVarRW(bar, "Mesh", MeshTwType, &m_currentMesh, NULL);
-
-        TwAddButton(bar, "Run", RunCB, NULL, " label='Run Forest' ");
+        TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, " axisz=-z ");
+        TwAddButton(bar, "AutoRotate", AutoRotateCB, this, " label='Auto rotate' ");
+        TwAddVarRW(bar, "Speed", TW_TYPE_FLOAT, &m_rotationSpeed, 
+                   " label='Rot speed' min=0 max=3 step=0.1 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
+        TwAddVarRO(bar, "GL Major Version", TW_TYPE_INT32, &gGLMajorVersion, " label='Major version of GL' ");
+        TwAddSeparator(bar, "", NULL);
+        m_directionalLight.AddToATB(bar);
         return true;
     }
 
@@ -205,17 +166,41 @@ public:
 
     virtual void RenderSceneCB()
     {   
+        printf("%d\n", m_currentMesh);
         m_pGameCamera->OnRender();      
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                     
         m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());
+        m_LightingTech.SetDirectionalLight(m_directionalLight);
         
         m_pipeline.SetCamera(*m_pGameCamera);
-        float r[] = { ToDegree(g_Rotation[0]), 
+     /*   float r[] = { ToDegree(g_Rotation[0]), 
                       ToDegree(g_Rotation[1]), 
                       ToDegree(g_Rotation[2]) };
-        m_mesh[m_currentMesh].GetOrientation().m_rotation = Vector3f(r);
+        
+        if (gAutoRotate) {
+            m_mesh[m_currentMesh].GetOrientation().m_rotation.y += m_rotationSpeed;
+        }
+        else {
+            float f[3];
+            f[0] = atan2(
+                    2.0f * (g_Rotation[0]*g_Rotation[1] + g_Rotation[2]*g_Rotation[3]),
+                    1.0f - 2*(g_Rotation[1]*g_Rotation[1] + g_Rotation[2]*g_Rotation[2])
+                    );
+            f[1] = asin(
+                    2.0f * (g_Rotation[0]*g_Rotation[2] - g_Rotation[3]*g_Rotation[1])
+                    );
+            f[2] = atan2(
+                    2.0f * (g_Rotation[0]*g_Rotation[3] + g_Rotation[1]*g_Rotation[2]),
+                    1.0f - 2*(g_Rotation[2]*g_Rotation[2] + g_Rotation[3]*g_Rotation[3])
+                    );
+            //f[1] = asin()
+            f[0] = ToDegree(f[0]);
+            f[1] = ToDegree(f[1]);
+            f[2] = ToDegree(f[2]);
+            m_mesh[m_currentMesh].GetOrientation().m_rotation = Vector3f(f);
+        }*/
         m_pipeline.Orient(m_mesh[m_currentMesh].GetOrientation());
         m_LightingTech.SetWVP(m_pipeline.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());            
@@ -233,6 +218,24 @@ public:
     {
         if (!m_atb.KeyboardCB(OgldevKey)) {
             switch (OgldevKey) {
+                case OGLDEV_KEY_A:
+                {
+                    int Pos[2], Size[2];
+                    TwGetParam(bar, NULL, "position", TW_PARAM_INT32, 2, Pos);
+                    TwGetParam(bar, NULL, "size", TW_PARAM_INT32, 2, Size);
+                    OgldevBackendSetMousePos(Pos[0] + Size[0]/2, 
+                                             Pos[1] + Size[1]/2);
+                    int i;
+//                    TwGetParam(bar, NULL, "axisz", TW_PARAM_INT32, 1, &i);
+                    printf("%d\n", i);
+                    break;
+                }
+                case OGLDEV_KEY_B:
+                    m_currentMesh = DRAGON;
+                    break;
+                case OGLDEV_KEY_C:
+                    m_currentMesh = BUDDHA;
+                    break;                    
                 case OGLDEV_KEY_ESCAPE:
                 case OGLDEV_KEY_q:
                     OgldevBackendLeaveMainLoop();
@@ -267,6 +270,8 @@ private:
     Pipeline m_pipeline;
     ATB m_atb;
     MESH_TYPE m_currentMesh;
+    float m_rotationSpeed;
+    TwBar *bar;
 };
 
 

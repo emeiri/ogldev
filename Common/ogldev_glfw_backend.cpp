@@ -252,3 +252,9 @@ void GLFWBackendLeaveMainLoop()
 {
     glfwSetWindowShouldClose(s_pWindow, 1);
 }
+
+
+void GLFWBackendSetMousePos(uint x, uint y)
+{
+    glfwSetCursorPos(s_pWindow, (double)x, (double)y);
+}
