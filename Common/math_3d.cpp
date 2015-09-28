@@ -97,6 +97,34 @@ void Matrix4f::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
     *this = rz * ry * rx;
 }
 
+
+void Matrix4f::InitRotateTransform(const Quaternion& quat)
+{
+    float yy2 = 2.0f * quat.y * quat.y;
+    float xy2 = 2.0f * quat.x * quat.y;
+    float xz2 = 2.0f * quat.x * quat.z;
+    float yz2 = 2.0f * quat.y * quat.z;
+    float zz2 = 2.0f * quat.z * quat.z;
+    float wz2 = 2.0f * quat.w * quat.z;
+    float wy2 = 2.0f * quat.w * quat.y;
+    float wx2 = 2.0f * quat.w * quat.x;
+    float xx2 = 2.0f * quat.x * quat.x;
+    m[0][0] = - yy2 - zz2 + 1.0f;
+    m[0][1] = xy2 + wz2;
+    m[0][2] = xz2 - wy2;
+    m[0][3] = 0;
+    m[1][0] = xy2 - wz2;
+    m[1][1] = - xx2 - zz2 + 1.0f;
+    m[1][2] = yz2 + wx2;
+    m[1][3] = 0;
+    m[2][0] = xz2 + wy2;
+    m[2][1] = yz2 - wx2;
+    m[2][2] = - xx2 - yy2 + 1.0f;
+    m[2][3] = 0.0f;
+    m[3][0] = m[3][1] = m[3][2] = 0;
+    m[3][3] = 1.0f;
+}
+
 void Matrix4f::InitTranslationTransform(float x, float y, float z)
 {
     m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = x;

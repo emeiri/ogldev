@@ -124,3 +124,16 @@ void OgldevBackendLeaveMainLoop()
 }
 
 
+void OgldevBackendSetMousePos(uint x, uint y)
+{
+    switch (sBackendType) {
+        case OGLDEV_BACKEND_TYPE_GLUT:
+           //GLUTBackendLeaveMainLoop();
+            break;
+        case OGLDEV_BACKEND_TYPE_GLFW:
+            GLFWBackendSetMousePos(x, y);
+            break;
+        default:
+            assert(0);
+    }    
+}

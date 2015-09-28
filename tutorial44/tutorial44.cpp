@@ -26,7 +26,6 @@
 #include <unistd.h>
 #endif
 #include <sys/types.h>
-#include <AntTweakBar.h>
 
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"

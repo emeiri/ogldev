@@ -5,7 +5,9 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
+      <itemPath>../Include/ogldev.h</itemPath>
       <itemPath>../Include/ogldev_app.h</itemPath>
+      <itemPath>../Include/ogldev_atb.h</itemPath>
       <itemPath>../Include/ogldev_backend.h</itemPath>
       <itemPath>../Include/ogldev_basic_lighting.h</itemPath>
       <itemPath>../Include/ogldev_basic_mesh.h</itemPath>
@@ -38,6 +40,7 @@
       <itemPath>io_buffer.cpp</itemPath>
       <itemPath>math_3d.cpp</itemPath>
       <itemPath>ogldev_app.cpp</itemPath>
+      <itemPath>ogldev_atb.cpp</itemPath>
       <itemPath>ogldev_backend.cpp</itemPath>
       <itemPath>ogldev_basic_lighting.cpp</itemPath>
       <itemPath>ogldev_basic_mesh.cpp</itemPath>
@@ -84,7 +87,11 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_app.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_atb.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -154,6 +161,8 @@
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_atb.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -198,7 +207,11 @@
         <archiverTool>
         </archiverTool>
       </compileType>
+      <item path="../Include/ogldev.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_app.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_atb.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -268,6 +281,8 @@
       <item path="math_3d.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_app.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_atb.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -49,6 +49,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/io_buffer.o \
 	${OBJECTDIR}/math_3d.o \
 	${OBJECTDIR}/ogldev_app.o \
+	${OBJECTDIR}/ogldev_atb.o \
 	${OBJECTDIR}/ogldev_backend.o \
 	${OBJECTDIR}/ogldev_basic_lighting.o \
 	${OBJECTDIR}/ogldev_basic_mesh.o \
@@ -156,6 +157,11 @@ ${OBJECTDIR}/ogldev_app.o: ogldev_app.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_app.o ogldev_app.cpp
+
+${OBJECTDIR}/ogldev_atb.o: ogldev_atb.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_atb.o ogldev_atb.cpp
 
 ${OBJECTDIR}/ogldev_backend.o: ogldev_backend.cpp 
 	${MKDIR} -p ${OBJECTDIR}

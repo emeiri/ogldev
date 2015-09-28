@@ -22,6 +22,46 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_lighting.h"
+#include "ogldev_atb.h"
+
+
+void BaseLight::AddToATB(TwBar *bar)
+{
+    std::string s = Name + ".Color";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_COLOR3F, &Color, NULL);
+    s = Name + ".Ambient Intensity";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &AmbientIntensity, "min=0.0 max=1.0 step=0.005");
+    s = Name + ".Diffuse Intensity";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &DiffuseIntensity, "min=0.0 max=1.0 step=0.005");
+}
+
+
+void DirectionalLight::AddToATB(TwBar *bar)
+{
+    BaseLight::AddToATB(bar);
+    std::string s = Name + ".Direction";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_DIR3F, &Direction, "axisz=-z");
+}
+
+
+void PointLight::AddToATB(TwBar *bar)
+{
+    BaseLight::AddToATB(bar);
+    std::string s = Name + ".Position";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_OGLDEV_VECTOR3F, &Position, "axisz=-z");
+    s = Name + ".Attenuation";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_OGLDEV_ATTENUATION, &Attenuation, "");
+}
+
+
+void SpotLight::AddToATB(TwBar *bar)
+{
+    PointLight::AddToATB(bar);
+    std::string s = Name + ".Direction";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_DIR3F, &Direction, "axisz=-z");
+    s = Name + ".Cutoff";
+    TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &Cutoff, "");
+}
 
 
 BasicLightingTechnique::BasicLightingTechnique()

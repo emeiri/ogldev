@@ -1,15 +1,14 @@
 # 3ds Max Wavefront OBJ Exporter v0.94b - (c)2007 guruware
-# File Created: 04.07.2010 10:28:13
+# File Created: 04.07.2010 10:41:39
 
-newmtl wire_134110008
+newmtl wire_087224198
 	Ns 32
 	d 1
 	Tr 1
 	Tf 1 1 1
 	illum 2
 	Ka 0.0000 0.0000 0.0000
-	Kd 0.5255 0.4314 0.0314
+	Kd 0.3412 0.8784 0.7765
 	Ks 0.3500 0.3500 0.3500
-
 
 map_Kd .\wal67ar_small.jpg
