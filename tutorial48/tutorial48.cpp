@@ -42,7 +42,7 @@
 #define WINDOW_WIDTH  1280  
 #define WINDOW_HEIGHT 1024
 
-float g_Rotation[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+Quaternion g_Rotation = Quaternion(0.707f, 0.0f, 0.0f, 0.707f);
 
 typedef enum { BUDDHA, BUNNY, DRAGON } MESH_TYPE;
 
@@ -69,11 +69,11 @@ public:
         m_directionalLight.DiffuseIntensity = 1.0f;
         m_directionalLight.Direction = Vector3f(1.0f, 0.0, 0.0);
 
-        m_persProjInfo.FOV = 60.0f;
+        m_persProjInfo.FOV    = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
-        m_persProjInfo.Width = WINDOW_WIDTH;
-        m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 1000.0f;  
+        m_persProjInfo.Width  = WINDOW_WIDTH;
+        m_persProjInfo.zNear  = 1.0f;
+        m_persProjInfo.zFar   = 1000.0f;  
         
         m_pipeline.SetPerspectiveProj(m_persProjInfo);                   
         
@@ -112,7 +112,7 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
 
-        if (!m_mesh[BUDDHA].LoadMesh("../Content/buddha.obj")) {
+        if (!m_mesh[BUDDHA].LoadMesh("../Content/box.obj")) {
             return false;            
         }        
         m_mesh[BUDDHA].GetOrientation().m_rotation.y = 180.0f;
@@ -139,22 +139,32 @@ public:
         float refresh = 0.1f;
         TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);                
             
-        TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with GLFW and OpenGL.' "); // Message added to the help bar.
+        TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with OGLDEV.' "); // Message added to the help bar.
         // TODO: TwDefine more params
         
         TwAddSeparator(bar, "", NULL);
+        
         m_pGameCamera->AddToATB(bar);
+        
         TwAddSeparator(bar, "", NULL);
+        
         TwEnumVal Meshes[] = { {BUDDHA, "Buddha"}, {BUNNY, "Bunny"}, {DRAGON, "Dragon"}};
         TwType MeshTwType = TwDefineEnum("MeshType", Meshes, 3);
         TwAddVarRW(bar, "Mesh", MeshTwType, &m_currentMesh, NULL);
+        
         TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, " axisz=-z ");
+        
         TwAddButton(bar, "AutoRotate", AutoRotateCB, this, " label='Auto rotate' ");
+        
         TwAddVarRW(bar, "Speed", TW_TYPE_FLOAT, &m_rotationSpeed, 
                    " label='Rot speed' min=0 max=3 step=0.1 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
+        
         TwAddVarRO(bar, "GL Major Version", TW_TYPE_INT32, &gGLMajorVersion, " label='Major version of GL' ");
+        
         TwAddSeparator(bar, "", NULL);
+        
         m_directionalLight.AddToATB(bar);
+        
         return true;
     }
 
@@ -166,7 +176,6 @@ public:
 
     virtual void RenderSceneCB()
     {   
-        printf("%d\n", m_currentMesh);
         m_pGameCamera->OnRender();      
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -175,39 +184,36 @@ public:
         m_LightingTech.SetDirectionalLight(m_directionalLight);
         
         m_pipeline.SetCamera(*m_pGameCamera);
-     /*   float r[] = { ToDegree(g_Rotation[0]), 
-                      ToDegree(g_Rotation[1]), 
-                      ToDegree(g_Rotation[2]) };
+        
+        float q0 = g_Rotation.x;
+        float q1 = g_Rotation.y;
+        float q2 = g_Rotation.z;
+        float q3 = g_Rotation.w;
+        
+        float x = atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
+        float y = asin(2 * (q0 * q2 - q3 * q1));
+        float z = atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
+        
+        printf("%f %f %f\n", x, y, z);
+        
+        m_mesh[m_currentMesh].GetOrientation().m_rotation.x = ToDegree(x);
+        m_mesh[m_currentMesh].GetOrientation().m_rotation.y = ToDegree(y);
+        m_mesh[m_currentMesh].GetOrientation().m_rotation.z = ToDegree(z);
         
         if (gAutoRotate) {
             m_mesh[m_currentMesh].GetOrientation().m_rotation.y += m_rotationSpeed;
         }
         else {
-            float f[3];
-            f[0] = atan2(
-                    2.0f * (g_Rotation[0]*g_Rotation[1] + g_Rotation[2]*g_Rotation[3]),
-                    1.0f - 2*(g_Rotation[1]*g_Rotation[1] + g_Rotation[2]*g_Rotation[2])
-                    );
-            f[1] = asin(
-                    2.0f * (g_Rotation[0]*g_Rotation[2] - g_Rotation[3]*g_Rotation[1])
-                    );
-            f[2] = atan2(
-                    2.0f * (g_Rotation[0]*g_Rotation[3] + g_Rotation[1]*g_Rotation[2]),
-                    1.0f - 2*(g_Rotation[2]*g_Rotation[2] + g_Rotation[3]*g_Rotation[3])
-                    );
-            //f[1] = asin()
-            f[0] = ToDegree(f[0]);
-            f[1] = ToDegree(f[1]);
-            f[2] = ToDegree(f[2]);
-            m_mesh[m_currentMesh].GetOrientation().m_rotation = Vector3f(f);
-        }*/
+            m_mesh[m_currentMesh].GetOrientation().m_rotation = g_Rotation.ToDegrees();
+        }
+        
         m_pipeline.Orient(m_mesh[m_currentMesh].GetOrientation());
         m_LightingTech.SetWVP(m_pipeline.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());            
        
         m_mesh[m_currentMesh].Render();        
         	
-    //    RenderFPS();     
+      //  RenderFPS();     
         CalcFPS();                
         
         OgldevBackendSwapBuffers();

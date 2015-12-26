@@ -67,9 +67,7 @@ struct Vector3f
     float y;
     float z;
 
-    Vector3f()
-    {
-    }
+    Vector3f() {}
 
     Vector3f(float _x, float _y, float _z)
     {
@@ -226,6 +224,8 @@ struct Quaternion
     void Normalize();
 
     Quaternion Conjugate();  
+    
+    Vector3f ToDegrees();
  };
 
 
@@ -345,8 +345,6 @@ public:
     void InitPersProjTransform(const PersProjInfo& p);
     void InitOrthoProjTransform(const PersProjInfo& p);
 };
-
-
 
 Quaternion operator*(const Quaternion& l, const Quaternion& r);
 
