@@ -59,7 +59,7 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
               </makeArtifact>
             </linkerLibProjectItem>
-            <linkerLibLibItem>AntTweakBar</linkerLibLibItem>
+            <linkerLibFileItem>../Lib/libAntTweakBar.so</linkerLibFileItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>

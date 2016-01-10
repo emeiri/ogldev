@@ -276,29 +276,22 @@ Quaternion operator*(const Quaternion& q, const Vector3f& v)
     return ret;
 }
 
+
 Vector3f Quaternion::ToDegrees()
 {
     float f[3];
     
-   /* f[0] = atan2(2.0f * (x * y + z * w),
-                 1.0f - 2*(y * y + z * z));
-    
-    f[1] = asin(2.0f * (x * z - w * y));
-    
-    f[2] = atan2(2.0f * (x * w + y * z),
-                 1.0f - 2*(z * z + w * w));
-*/
     f[0] = atan2(x * z + y * w, x * w - y * z);
     f[1] = acos(-x * x - y * y - z * z - w * w);
     f[2] = atan2(x * z - y * w, x * w + y * z);
-    
-    
+       
     f[0] = ToDegree(f[0]);
     f[1] = ToDegree(f[1]);
     f[2] = ToDegree(f[2]);
 
     return Vector3f(f);
 }
+
 
 float RandomFloat()
 {

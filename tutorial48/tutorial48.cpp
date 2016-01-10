@@ -135,12 +135,10 @@ public:
    //     }
 #endif        	    
         bar = TwNewBar("OGLDEV");
-        
-        float refresh = 0.1f;
-        TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);                
-            
-        TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with OGLDEV.' "); // Message added to the help bar.
-        // TODO: TwDefine more params
+
+        TwEnumVal Meshes[] = { {BUDDHA, "Buddha"}, {BUNNY, "Bunny"}, {DRAGON, "Dragon"}};
+        TwType MeshTwType = TwDefineEnum("MeshType", Meshes, 3);
+        TwAddVarRW(bar, "Mesh", MeshTwType, &m_currentMesh, NULL);
         
         TwAddSeparator(bar, "", NULL);
         
@@ -148,14 +146,14 @@ public:
         
         TwAddSeparator(bar, "", NULL);
         
-        TwEnumVal Meshes[] = { {BUDDHA, "Buddha"}, {BUNNY, "Bunny"}, {DRAGON, "Dragon"}};
-        TwType MeshTwType = TwDefineEnum("MeshType", Meshes, 3);
-        TwAddVarRW(bar, "Mesh", MeshTwType, &m_currentMesh, NULL);
-        
         TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, " axisz=-z ");
         
-        TwAddButton(bar, "AutoRotate", AutoRotateCB, this, " label='Auto rotate' ");
-        
+        TwAddButton(bar, "AutoRotate", AutoRotateCB, NULL, " label='Auto rotate' ");
+      /*  float refresh = 0.1f;
+        TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);                
+            
+        TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with OGLDEV.' "); // Message added to the help bar.
+                                                
         TwAddVarRW(bar, "Speed", TW_TYPE_FLOAT, &m_rotationSpeed, 
                    " label='Rot speed' min=0 max=3 step=0.1 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
         
@@ -163,7 +161,7 @@ public:
         
         TwAddSeparator(bar, "", NULL);
         
-        m_directionalLight.AddToATB(bar);
+        m_directionalLight.AddToATB(bar);*/
         
         return true;
     }
@@ -185,7 +183,7 @@ public:
         
         m_pipeline.SetCamera(*m_pGameCamera);
         
-        float q0 = g_Rotation.x;
+    /*    float q0 = g_Rotation.x;
         float q1 = g_Rotation.y;
         float q2 = g_Rotation.z;
         float q3 = g_Rotation.w;
@@ -198,7 +196,7 @@ public:
         
         m_mesh[m_currentMesh].GetOrientation().m_rotation.x = ToDegree(x);
         m_mesh[m_currentMesh].GetOrientation().m_rotation.y = ToDegree(y);
-        m_mesh[m_currentMesh].GetOrientation().m_rotation.z = ToDegree(z);
+        m_mesh[m_currentMesh].GetOrientation().m_rotation.z = ToDegree(z);*/
         
         if (gAutoRotate) {
             m_mesh[m_currentMesh].GetOrientation().m_rotation.y += m_rotationSpeed;
