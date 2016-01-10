@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 48 - User Interface with Ant Tweak Bar </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 48: </h2>
+            <h1> Tutorial 48 - User Interface with Ant Tweak Bar </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+<article id="content" class="breakpoint">
+<section>
+            <h3> Background </h3>
+<p>
+    In this tutorial we are going to leave 3D for a while and focus on adding some
+    practical value to our programs. We will learn how to integrate a user interface
+    library into our code which will help in configuring the various values that
+    interest us in the tutorials. The library that we will use is called <i>Ant Tweak Bar</i> (a.k.a ATB)
+    which is hosted at <a href="http://anttweakbar.sourceforge.net/">anttweakbar.sourceforge.net</a>.
+    There are many options available and if you do some research on the subject you will find
+    a lot of discussions and opinions on the matter. In addition to OpenGL ATB also 
+    supports DirectX 9/10/11 so if you want your UI to be
+    portable this is a good advantage. I found it to be very useful and easy to
+    learn. I hope you will too. So let's jump right in.
+</p>
+<h4><u>Installation</u></h4>
+<br>
+<p>
+    The first thing we need to do is to install ATB. You can grab the zip file which contains
+    almost everything you need or use a copy of the files that I provide along with the
+    tutorials source package. If you decide to go with the official package simply grab it
+    from <a href http://sourceforge.net/projects/anttweakbar/files/latest/download?source=dlp>here</a>,
+    unzip it somewhere and grab AntTweakBar.h from the include directory and copy it
+    where your project sees it. On Linux I recommend putting it in /usr/local/include. In the
+    tutorials source package this file is available under Include/ATB. 
+</p>
+<p>
+    Now for the libraries.
+    If you are using Windows this is very easy. The official zip file contains a lib directory
+    with AntTweakBar.dll and AntTweakBar.lib (there is also a matching couple for 64 bits). You
+    will need to link your project to the lib file and when you run the executable have the dll
+    in the local directory or in Windows\System32. On Linux you will need to go into the src directory
+    and type make to build the libraries. The result will be libAntTweakBar.a, libAntTweakBar.so and
+    libAntTweakBar.so.1. I recommend you copy these into /usr/local/lib to make them available from everywhere.
+    The tutorials source packages contains the Windows libraries in Windows/ogldev/Debug and the Linux binaries
+    in Lib (so you don't need to build them).
+</p>
+<h4><u>Integration</u></h4>
+<br>
+<p>
+    In order to use ATB you will need to include the AntTweakBar.h in your source code:
+    <code>
+        <br>#include &lt;AntTweakBar.h&gt;
+    </code>
+    If you are using the Netbeans project that I provide then the Include/ATB directory which
+    contains this header is already in the include path. If not then make sure your build system
+    sees it.
+</p>
+<p>
+    To link against the libraries:
+    <ul>
+        <li>Windows: add the AntTweakBar.lib to your Visual Studio project</li>
+        <li>Linux: add '-lAntTweakBar' to the build command and make sure the Linux
+            binaries are in /usr/local/lib</li>
+    </ul>
+    Again, if you are using my Visual Studio or Netbeans projects then all of this
+    is already set up for you so you don't need to worry about anything.    
+</p>
+<h4><u>Initialization</u></h4>
+<br>
+<p>
+    In order to initialize ATB you need to call:
+<code>
+    TwInit(TW_OPENGL, NULL);
+</code>
+    or in case you want to initialize the GL context for core profile:
+    <code>
+    TwInit(TW_OPENGL_CORE, NULL);
+    </code>
+    For the tutorials series I created a class called ATB which encapsulates some 
+    of the functionality of the library and added some stuff to make it easier for integration.
+    You can initialize ATB via that class using a code similar to this:
+    <code>
+        <br>
+        ATB atb;<br>
+        <br>
+        if (!m_atb.Init()) {<br>
+        &nbsp; &nbsp; // error<br>
+        &nbsp; &nbsp; return false;<br>
+        }<br>
+    </code>
+</p>
+<h4><u>Create a tweak bar</u></h4>
+<br>
+<p>
+    You need to create at least one tweak bar which is basically a window with widgets
+    that ATB provides to tweak your application:
+    <code>
+        <br>
+    TwBar *bar = TwNewBar("OGLDEV");    
+    </code>
+    The string in the parenthesis is just a way to name the tweak bar.
+</p>
+<h4><u>Draw the tweak bar</u></h4>
+<br>
+<p>
+    In order for the tweak bar to appear in your OpenGL window there must be a call present
+    to the TwDraw() function in the render look. The ATB website provides the following
+    generic render loop as an example:
+    <code>
+        <br>
+    // main loop<br>
+    while( ... )<br>
+    {<br>
+&nbsp; &nbsp;         // clear the frame buffer<br>
+&nbsp; &nbsp;         // update view and camera<br>
+&nbsp; &nbsp;         // update your scene<br>
+&nbsp; &nbsp;         // draw your scene<br>
+<br>
+&nbsp; &nbsp;         TwDraw();  // draw the tweak bar(s)<br>
+<br>
+&nbsp; &nbsp;         // present/swap the frame buffer <br>
+    } // end of main loop<br>
+    </code>
+    I placed a call to TwDraw() in the beginning of OgldevBackendSwapBuffers() (ogldev_backend.cpp:97).
+    This function is called at the end of every main render function and is a good place
+    to integrate TwDraw() into the framework.
+</p>
+<h4><u>Adding widgets</u></h4>
+<br>
+<p>
+    The above is everything you need to basically have ATB up and running in your application.
+    Your ATB bar should now look like this:
+    <br><br>
+    <img src="atb1.jpg">
+    <br>
+    From now on what we need to do is to add widgets and link them to our application
+    so that they can be used to tweak parameters of our code.
+
+    Let's add a drop down box. In this tutorial I will use it to select the mesh to
+    be displayed. We need to use the TwEnumVal structure provided by ATB in order to create
+    a list of available items in the drop down box. That structure is made of pairs of integer
+    and a char array. The integer will be used as an identifier for the drop down item and the
+    char array is the name to be displayed. Once the item list is created as an array of TwEnumVal
+    structs we create a TwType object using the TwDefineEnum function. TwType is an enum of a few
+    parameter types that ATB understands (color, vectors, etc) but we can add user defined types 
+    to support our specific needs. Once our TwType is ready we can use TwAddVarRW to link it
+    to the tweak bar. TwAddVarRW() also takes an address of an integer where ATB will place 
+    the current selection in the drop down box. We can then use that integer to change stuff
+    in our application (the mesh to be displayed in our case).
+    
+    <code>
+        <br>
+        // Create an internal enum to name the meshes<br>
+        typedef enum { BUDDHA, BUNNY, DRAGON } MESH_TYPE;    <br><br>
+    // A variable for the current selection - will be updated by ATB<br>
+    MESH_TYPE m_currentMesh = BUDDHA;<br><br>
+    // Array of drop down items<br>
+    TwEnumVal Meshes[] = { {BUDDHA, "Buddha"}, {BUNNY, "Bunny"}, {DRAGON, "Dragon"}};<br><br>
+    // ATB identifier for the array<br>
+    TwType MeshTwType = TwDefineEnum("MeshType", Meshes, 3);<br><br>
+    // Link it to the tweak bar<br>
+    TwAddVarRW(bar, "Mesh", MeshTwType, &m_currentMesh, NULL);<br><br>
+    </code>
+    The result should look like this:
+    <br><br>
+    <img src="atb2.jpg">
+    <br>
+    We can add a seperator using the following line:
+    <code>
+        <br>
+        // The second parameter is an optional name<br>
+    TwAddSeparator(bar, "", NULL);
+    </code>
+    Now we have:
+    <br><br>
+    <img src="atb3.jpg">
+    <br>
+    Let's see how we can link our camera so that its position and direction will always 
+    be displayed. Until now you are probably already used to printing the current
+    camera parameters so that they can be reused later but displaying them in the UI
+    is much nicer. To make the code reusable I've added the function AddToATB() to the camera
+    class. It contains three calls to ATB functions. The first call just uses TwAddButton()
+    in order to add a string to the tweak bar. TwAddButton() can do much more and we will see
+    an example later on. Then we have TwAddVarRW() that adds a read/write variable and
+    TwAddVarRO() that adds a read-only variable. The read/write variable we use here
+    is simply the position of the camera and the UI can be used to modify this so and
+    have it reflected in the actual application. Surprisingly, ATB does no provide an
+    a internal TwType for an array of three floats so I created one to be used by 
+    the framework:
+    <br>
+    (ogldev_atb.cpp:38)
+    <code>
+        <br>    
+        TwStructMember Vector3fMembers[] = {<br>
+&nbsp; &nbsp;             { "x", TW_TYPE_FLOAT, offsetof(Vector3f, x), "" },<br>
+&nbsp; &nbsp;             { "y", TW_TYPE_FLOAT, offsetof(Vector3f, y), "" },<br>
+&nbsp; &nbsp;             { "z", TW_TYPE_FLOAT, offsetof(Vector3f, z), "" }<br>
+        };<br>
+        <br>
+        TW_TYPE_OGLDEV_VECTOR3F = TwDefineStruct("Vector3f", Vector3fMembers, 3, sizeof(Vector3f), NULL, NULL);
+    </code>
+    We can now use TW_TYPE_OGLDEV_VECTOR3F whenever we want to add a widget to tweak a
+    vector of 3 floats. Here's the complete AddToATB() function:
+    <code>
+        <br>
+        void Camera::AddToATB(TwBar* bar)<br>
+{<br>
+&nbsp; &nbsp;     TwAddButton(bar, "Camera", NULL, NULL, "");                <br>
+&nbsp; &nbsp;     TwAddVarRW(bar, "Position", TW_TYPE_OGLDEV_VECTOR3F, (void*)&m_pos, NULL);<br>
+&nbsp; &nbsp;     TwAddVarRO(bar, "Direction", TW_TYPE_DIR3F, &m_target, " axisz=-z ");<br>
+}   
+    </code>
+    We have use the provided TW_TYPE_DIR3F as the parameter type that displays an array
+    of 3 floats using an arrow. Note the addition of 'axisz=-z' as the last parameter
+    of TwAddVarRO(). Many ATB functions take a string of options in the last parameter. This allows
+    modifying the internal behavior of the function. axisz is used to change from right handed system (ATB default)
+    to left handed system (OGLDEV default). There's a lot of additional options available that
+    I simply cannot cover. You can find them <a href="http://anttweakbar.sourceforge.net/doc/tools:anttweakbar:varparamsyntax">here</a>.
+    <br><br>
+    Here's how the tweak bar looks with the camera added:
+    <br><br>    
+    <img src="atb4.jpg">
+    <br>
+
+    You are probably spending a lot of time playing with the orientation of your meshes. Let's add
+    something to the tweak bar to simplify that. The solution is a visual quaternion that
+    can be used to set the rotation of a mesh. We start by adding a local Quaternion variable (see ogldev_math_3d.h for
+    the definition of that struct):
+    <code>
+        <br>
+    Quaternion g_Rotation = Quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+    </code>
+    We then link the quaternion variable to the tweak bar using the parameter type TW_TYPE_QUAT4F:
+    <code>
+        <br>
+    TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, " axisz=-z ");        
+    </code>
+    Again, we need to change from right handed to left handed system. Finally the quaternion
+    is converted to degrees:
+    <code>
+        <br>
+    m_mesh[m_currentMesh].GetOrientation().m_rotation = g_Rotation.ToDegrees();
+    </code>
+    The rotation vector can now be used to orient the mesh and generate the WVP matrix for it:
+    <code>
+        <br>
+    m_pipeline.Orient(m_mesh[m_currentMesh].GetOrientation());
+    </code>
+    Our tweak bar now looks like this:
+    <br><br>    
+    <img src="atb5.jpg">
+    <br>
+    Now let's add a check box. We will use the check box to toggle between automatic
+    rotation of the mesh around the Y-axis and manual rotation (using the quaternion we
+    saw earlier). First we make an ATB call to add a button:
+    
+    <code>
+        <br>
+    TwAddButton(bar, "AutoRotate", AutoRotateCB, NULL, " label='Auto rotate' ");
+    </code>
+    The third parameter is a callback function which is triggered when the check box
+    is clicked and the fourth parameter is a value to be transfered as a parameter to
+    the callback. I don't need it here so I've used NULL.
+    <code>
+    <br>
+    bool gAutoRotate = false;<br>
+    <br>
+    void TW_CALL AutoRotateCB(void *p)<br>
+    { <br>
+&nbsp; &nbsp;     gAutoRotate = !gAutoRotate;<br>
+    }
+    </code>
+        
+    You can now use gAutoRotate to toggle between automatic and manual rotations.
+    <br>
+    Here's how the tweak bar now looks:
+    
+    
+
+</p>
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+</section>
+</article>    
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_url = 'http://www.ogldev.org/www/tutorial48/tutorial48.html'
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</body>
+</html>

@@ -4,7 +4,7 @@
 #include "ogldev_keys.h"
 #include "ogldev_math_3d.h"
 
-#include <AntTweakBar.h>
+#include "ATB/AntTweakBar.h"
 
 class ATB
 {
