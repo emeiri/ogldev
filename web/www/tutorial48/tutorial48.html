@@ -38,8 +38,7 @@
     portable this is a good advantage. I found it to be very useful and easy to
     learn. I hope you will too. So let's jump right in.
 </p>
-<h4><u>Installation</u></h4>
-<br>
+<h3>Installation</h3>
 <p>
     The first thing we need to do is to install ATB. You can grab the zip file which contains
     almost everything you need or use a copy of the files that I provide along with the
@@ -60,8 +59,7 @@
     The tutorials source packages contains the Windows libraries in Windows/ogldev/Debug and the Linux binaries
     in Lib (so you don't need to build them).
 </p>
-<h4><u>Integration</u></h4>
-<br>
+<h3>Integration</h3>
 <p>
     In order to use ATB you will need to include the AntTweakBar.h in your source code:
     <code>
@@ -81,8 +79,7 @@
     Again, if you are using my Visual Studio or Netbeans projects then all of this
     is already set up for you so you don't need to worry about anything.    
 </p>
-<h4><u>Initialization</u></h4>
-<br>
+<h3>Initialization</h3>
 <p>
     In order to initialize ATB you need to call:
 <code>
@@ -105,8 +102,82 @@
         }<br>
     </code>
 </p>
-<h4><u>Create a tweak bar</u></h4>
+<h3>Processing Events</h3>
+<p>
+    ATB provides widgets that allow you to modify their values in different ways. In some widgets you
+    can simply type in a new value. Others are more graphical in nature and allows the use of the
+    mouse in order to modify the value. This means that ATB must be notified on mouse and keyboard events
+    in the system. This is done using a set of callback functions that ATB provides for each of the underlying
+    windowing libraries it supports (glut, glfw, SDL, etc). If your framework is based on just one of these
+    libraries you can simply hook ATB's callbacks inside your callbacks. See ATB website for an example. Since OGLDEV supports both glut
+    and glfw I'm going to show you how I integrated the callbacks into my framework so that these two libraries
+    are supported in a unified manner. Take a look at the following three functions from the ATB class:    
+</p>
+<code>
+bool ATB::KeyboardCB(OGLDEV_KEY OgldevKey)<br>
+{<br>
+&nbsp; &nbsp;     return (TwKeyPressed(OgldevKey, TW_KMOD_NONE) == 1);<br>
+}<br>
 <br>
+<br>
+bool ATB::PassiveMouseCB(int x, int y)<br>
+{<br>
+&nbsp; &nbsp;     return (TwMouseMotion(x, y) == 1);<br>
+}<br>
+<br>
+<br>
+bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
+{    <br>
+&nbsp; &nbsp;     TwMouseButtonID btn = (Button == OGLDEV_MOUSE_BUTTON_LEFT) ? TW_MOUSE_LEFT : TW_MOUSE_RIGHT;<br>
+&nbsp; &nbsp;     TwMouseAction ma = (State == OGLDEV_KEY_STATE_PRESS) ? TW_MOUSE_PRESSED : TW_MOUSE_RELEASED;<br>
+    <br>
+&nbsp; &nbsp;     return (TwMouseButton(ma, btn) == 1);<br>
+}
+</code>
+<p>
+    These functions are basically wrappers around the native ATB callback functions. They translate
+    OGLDEV types to ATB types and then pass the call down to ATB. They return true if ATB processed the
+    event (in which case you can simply discard it) and false if not (so you should take a look at
+    the event and see if it interests you). Here's how I hooked the functions into the callbacks of
+    the tutorial:     
+</p>
+<code>
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)<br>
+    {<br>
+&nbsp; &nbsp;          if (!m_atb.KeyboardCB(OgldevKey)) {<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;              switch (OgldevKey) {<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;                  default:<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;                      m_pGameCamera->OnKeyboard(OgldevKey);<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;              }<br>
+&nbsp; &nbsp;          }<br>
+    }<br>
+<br>
+<br>
+    virtual void PassiveMouseCB(int x, int y)<br>
+    {<br>
+&nbsp; &nbsp;          if (!m_atb.PassiveMouseCB(x, y)) {<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;              m_pGameCamera->OnMouse(x, y);<br>
+&nbsp; &nbsp;          }        <br>
+    }<br>
+    <br>
+    <br>
+    virtual void MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
+    {<br>
+&nbsp; &nbsp;          m_atb.MouseCB(Button, State, x, y);<br>
+    }    
+</code>
+<p>
+   If you are not familiar with OGLDEV framework then the above may not make much sense to you so
+   make sure you spend some time with the tutorials first and get to know how things are done. Every
+   tutorial is just a class that inherits from ICallbacks and OgldevApp. ICallbacks provides the (not surprisingly)
+   callback functions that are called from the backend (by glut or glfw). We first let ATB know about the events
+   and if it didn't process them we let the app handle them (e.g passing them on to the camera object).
+ </p> 
+
+<h3>Create a tweak bar</h3>
 <p>
     You need to create at least one tweak bar which is basically a window with widgets
     that ATB provides to tweak your application:
@@ -116,8 +187,7 @@
     </code>
     The string in the parenthesis is just a way to name the tweak bar.
 </p>
-<h4><u>Draw the tweak bar</u></h4>
-<br>
+<h3>Draw the tweak bar</h3>
 <p>
     In order for the tweak bar to appear in your OpenGL window there must be a call present
     to the TwDraw() function in the render look. The ATB website provides the following
@@ -141,8 +211,7 @@
     This function is called at the end of every main render function and is a good place
     to integrate TwDraw() into the framework.
 </p>
-<h4><u>Adding widgets</u></h4>
-<br>
+<h3>Adding widgets</h3>
 <p>
     The above is everything you need to basically have ATB up and running in your application.
     Your ATB bar should now look like this:
@@ -283,7 +352,7 @@
     <br>
     void TW_CALL AutoRotateCB(void *p)<br>
     { <br>
-&nbsp; &nbsp;     gAutoRotate = !gAutoRotate;<br>
+        &nbsp; &nbsp;     gAutoRotate = !gAutoRotate;<br>
     }
     </code>
         
@@ -293,14 +362,27 @@
     <br><br>    
     <img src="atb6.jpg">
     <br>    
-    
+    Another useful widget that we can add is a read/write widget for controlling the speed
+    of rotation (when auto rotation is enabled). This widget provides multiple ways to control
+    its value:
+<code>
+    <br>    
+    TwAddVarRW(bar, "Rot Speed", TW_TYPE_FLOAT, &m_rotationSpeed,<br> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                    " min=0 max=5 step=0.1 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
+</code>
+     The first four parameters are obvious. We have the pointer to the tweak bar, the string to display, the type of the parameter and the
+     address where ATB will place the updated value. The interesting stuff comes in the option string at the end. First we
+     limit the value to be between 0 and 5 and we set the increment/decrement step to 0.1. We set the keys 's' and 'd' to be shortcuts
+     to increment or decrement the value, respectively. When you hover over the widget you can see the shortcuts in the bottom of the tweak
+     bar. You can either type in the value directly, use the shortcut keys, click on the '+' or '-' icons on the right or use the lever to
+     modify the value (click on the circle to bring up the rotation lever). Here's the bar with this widget: 
+    <br><br>    
+    <img src="atb7.jpg">
+    <br>    
 
-</p>
+ </p>
 </section>
 
-<section>
-<h3> Source walkthru </h3>
-</section>
 </article>    
 
 <script src="../html5shiv.min.js"></script>
