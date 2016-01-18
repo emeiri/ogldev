@@ -149,19 +149,22 @@ public:
         TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation, " axisz=-z ");
         
         TwAddButton(bar, "AutoRotate", AutoRotateCB, NULL, " label='Auto rotate' ");
+        
+        TwAddVarRW(bar, "Rot Speed", TW_TYPE_FLOAT, &m_rotationSpeed, 
+                   " min=0 max=5 step=0.1 keyIncr=s keyDecr=d help='Rotation speed (turns/second)' ");
+
+        TwAddSeparator(bar, "", NULL);
+        
+        m_directionalLight.AddToATB(bar);
+        
       /*  float refresh = 0.1f;
         TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);                
             
         TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with OGLDEV.' "); // Message added to the help bar.
-                                                
-        TwAddVarRW(bar, "Speed", TW_TYPE_FLOAT, &m_rotationSpeed, 
-                   " label='Rot speed' min=0 max=3 step=0.1 keyIncr=s keyDecr=S help='Rotation speed (turns/second)' ");
-        
+                                                        
         TwAddVarRO(bar, "GL Major Version", TW_TYPE_INT32, &gGLMajorVersion, " label='Major version of GL' ");
         
-        TwAddSeparator(bar, "", NULL);
-        
-        m_directionalLight.AddToATB(bar);*/
+*/
         
         return true;
     }
