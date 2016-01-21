@@ -164,11 +164,14 @@ void GLFWErrorCallback(int error, const char* description)
     exit(0);
 }
 
+
 void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
     sWithDepth = WithDepth;
     sWithStencil = WithStencil;
 
+    glfwSetErrorCallback(GLFWErrorCallback);    
+    
     if (glfwInit() != 1) {
         OGLDEV_ERROR("Error initializing GLFW");
         exit(1);
@@ -178,9 +181,7 @@ void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
     
     glfwGetVersion(&Major, &Minor, &Rev);
     
-    printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
-    
-    glfwSetErrorCallback(GLFWErrorCallback);
+    printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);       
 }
 
 
