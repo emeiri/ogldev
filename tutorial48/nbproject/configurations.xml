@@ -46,7 +46,6 @@
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial48</output>
           <linkerLibItems>
-            <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../Common"
                             CT="3"
@@ -59,6 +58,7 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
               </makeArtifact>
             </linkerLibProjectItem>
+            <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibFileItem>../Lib/libAntTweakBar.so</linkerLibFileItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
