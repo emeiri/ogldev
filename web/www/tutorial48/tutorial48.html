@@ -379,7 +379,82 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     <br><br>    
     <img src="atb7.jpg">
     <br>    
-
+    In all of the tutorials there is usually at least one light source so it makes sense to add some code that will allow us to
+    easily hook it up to the tweak bar so we can play with it parameters. So I went ahead and added the following methods to the
+    various light source classes:
+    <code>
+        <br>
+void BaseLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     std::string s = Name + ".Color";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_COLOR3F, &Color, NULL);<br>
+&nbsp; &nbsp;     s = Name + ".Ambient Intensity";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &AmbientIntensity, "min=0.0 max=1.0 step=0.005");<br>
+&nbsp; &nbsp;     s = Name + ".Diffuse Intensity";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &DiffuseIntensity, "min=0.0 max=1.0 step=0.005");<br>
+}<br>
+<br>
+<br>
+void DirectionalLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     BaseLight::AddToATB(bar);<br>
+&nbsp; &nbsp;     std::string s = Name + ".Direction";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_DIR3F, &Direction, "axisz=-z");<br>
+}<br>
+<br>
+<br>
+void PointLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     BaseLight::AddToATB(bar);<br>
+&nbsp; &nbsp;     std::string s = Name + ".Position";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_OGLDEV_VECTOR3F, &Position, "axisz=-z");<br>
+&nbsp; &nbsp;     s = Name + ".Attenuation";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_OGLDEV_ATTENUATION, &Attenuation, "");<br>
+}<br>
+<br>
+<br>
+void SpotLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     PointLight::AddToATB(bar);<br>
+&nbsp; &nbsp;     std::string s = Name + ".Direction";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_DIR3F, &Direction, "axisz=-z");<br>
+&nbsp; &nbsp;     s = Name + ".Cutoff";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &Cutoff, "");<br>
+}<br>
+</code>         
+    Note that 'Name' is a new string memeber of the BaseLight class that must be set before AddToATB() function
+    is called on the light object. It represents the string that will be displayed in the tweak bar for that light.
+    If you plan on adding multiple lights you must make sure to pick up unique names for them. Here's the bar
+    with a directional light source:
+    <br><br>    
+    <img src="atb8.jpg">
+    <br>  
+    The last thing that I want to demonstrate is the ability to get and set various parameters that control the behaviour 
+    of the tweak bar. Here's an example of setting the refresh rate of the bar to one tenth of a second:
+    <code>
+        <br>
+        float refresh = 0.1f;<br>
+        <b>TwSetParam</b>(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);<br>
+        </code>
+    Since moving the mouse to the tweak bar means that the camera also moves I made the key 'a' automatically move the
+    mouse to the center of the tweak bar without touching the camera. I had to read the location and size of the tweak bar
+    in order to accomplish that so I used TwGetParam() in order to do that:
+    <code>
+        <br>
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)<br>
+    {<br>
+&nbsp; &nbsp;         if (!m_atb.KeyboardCB(OgldevKey)) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             switch (OgldevKey) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 case OGLDEV_KEY_A:<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     int Pos[2], Size[2];<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     <b>TwGetParam</b>(bar, NULL, "position", TW_PARAM_INT32, 2, Pos);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     <b>TwGetParam</b>(bar, NULL, "size", TW_PARAM_INT32, 2, Size);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     OgldevBackendSetMousePos(Pos[0] + Size[0]/2, Pos[1] + Size[1]/2);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     break;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 }
+</code>                        
+        
  </p>
 </section>
 

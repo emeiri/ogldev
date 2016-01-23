@@ -112,7 +112,7 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
 
-        if (!m_mesh[BUDDHA].LoadMesh("../Content/box.obj")) {
+        if (!m_mesh[BUDDHA].LoadMesh("../Content/buddha.obj")) {
             return false;            
         }        
         m_mesh[BUDDHA].GetOrientation().m_rotation.y = 180.0f;
@@ -157,15 +157,13 @@ public:
         
         m_directionalLight.AddToATB(bar);
         
-      /*  float refresh = 0.1f;
+        float refresh = 0.1f;
         TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);                
             
         TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with OGLDEV.' "); // Message added to the help bar.
                                                         
         TwAddVarRO(bar, "GL Major Version", TW_TYPE_INT32, &gGLMajorVersion, " label='Major version of GL' ");
-        
-*/
-        
+                
         return true;
     }
 
@@ -185,22 +183,7 @@ public:
         m_LightingTech.SetDirectionalLight(m_directionalLight);
         
         m_pipeline.SetCamera(*m_pGameCamera);
-        
-    /*    float q0 = g_Rotation.x;
-        float q1 = g_Rotation.y;
-        float q2 = g_Rotation.z;
-        float q3 = g_Rotation.w;
-        
-        float x = atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2));
-        float y = asin(2 * (q0 * q2 - q3 * q1));
-        float z = atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
-        
-        printf("%f %f %f\n", x, y, z);
-        
-        m_mesh[m_currentMesh].GetOrientation().m_rotation.x = ToDegree(x);
-        m_mesh[m_currentMesh].GetOrientation().m_rotation.y = ToDegree(y);
-        m_mesh[m_currentMesh].GetOrientation().m_rotation.z = ToDegree(z);*/
-        
+               
         if (gAutoRotate) {
             m_mesh[m_currentMesh].GetOrientation().m_rotation.y += m_rotationSpeed;
         }
@@ -221,35 +204,36 @@ public:
     }
     
        
-    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE OgldevKeyState)
     {
-        if (!m_atb.KeyboardCB(OgldevKey)) {
-            switch (OgldevKey) {
-                case OGLDEV_KEY_A:
-                {
-                    int Pos[2], Size[2];
-                    TwGetParam(bar, NULL, "position", TW_PARAM_INT32, 2, Pos);
-                    TwGetParam(bar, NULL, "size", TW_PARAM_INT32, 2, Size);
-                    OgldevBackendSetMousePos(Pos[0] + Size[0]/2, 
-                                             Pos[1] + Size[1]/2);
-                    int i;
-//                    TwGetParam(bar, NULL, "axisz", TW_PARAM_INT32, 1, &i);
-                    printf("%d\n", i);
-                    break;
-                }
-                case OGLDEV_KEY_B:
-                    m_currentMesh = DRAGON;
-                    break;
-                case OGLDEV_KEY_C:
-                    m_currentMesh = BUDDHA;
-                    break;                    
-                case OGLDEV_KEY_ESCAPE:
-                case OGLDEV_KEY_q:
-                    OgldevBackendLeaveMainLoop();
-                    break;
-                default:
-                    m_pGameCamera->OnKeyboard(OgldevKey);
+        if (OgldevKeyState == OGLDEV_KEY_STATE_PRESS) {
+            if (m_atb.KeyboardCB(OgldevKey)) {
+                return;
             }
+        }
+        
+        switch (OgldevKey) {
+            case OGLDEV_KEY_A:
+            {
+                int Pos[2], Size[2];
+                TwGetParam(bar, NULL, "position", TW_PARAM_INT32, 2, Pos);
+                TwGetParam(bar, NULL, "size", TW_PARAM_INT32, 2, Size);
+                OgldevBackendSetMousePos(Pos[0] + Size[0]/2, 
+                                         Pos[1] + Size[1]/2);
+                break;
+            }
+            case OGLDEV_KEY_B:
+                m_currentMesh = DRAGON;
+                break;
+            case OGLDEV_KEY_C:
+                m_currentMesh = BUDDHA;
+                break;                    
+            case OGLDEV_KEY_ESCAPE:
+            case OGLDEV_KEY_q:
+                OgldevBackendLeaveMainLoop();
+                break;
+            default:
+                m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
