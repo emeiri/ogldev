@@ -239,7 +239,7 @@
 			 &nbsp; &nbsp;	       float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear -<br> 
 			 &nbsp; &nbsp; &nbsp; &nbsp;		4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel * Light.DiffuseIntensity))) <br>
 			  &nbsp; &nbsp;	 &nbsp; &nbsp;	 &nbsp; &nbsp;	                   /<br>
-			  &nbsp; &nbsp;	 &nbsp; &nbsp;	                   2 * Light.Attenuation.Exp;<br>
+			  &nbsp; &nbsp;	 &nbsp; &nbsp;	                   (2 * Light.Attenuation.Exp);<br>
 			 &nbsp; &nbsp;	       return ret;<br>
 			}    
 			</code>
