@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 48 - Ant Tweak Bar
+    Tutorial 48 - User Interface with Ant Tweak Bar
 */
 
 #include <math.h>
