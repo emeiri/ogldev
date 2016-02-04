@@ -120,9 +120,9 @@ static OGLDEV_MOUSE GLFWMouseToOGLDEVMouse(uint Button)
 
 static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
 {   
-    OGLDEV_KEY OgldevKey = GLFWKeyToOGLDEVKey(key);
-   
-    s_pCallbacks->KeyboardCB(OgldevKey);
+    OGLDEV_KEY OgldevKey = GLFWKeyToOGLDEVKey(key);   
+    OGLDEV_KEY_STATE OgldevKeyState = (action == GLFW_PRESS) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
+    s_pCallbacks->KeyboardCB(OgldevKey, OgldevKeyState);
 }
 
 

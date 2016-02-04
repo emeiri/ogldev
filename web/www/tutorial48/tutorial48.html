@@ -27,8 +27,8 @@
 <section>
             <h3> Background </h3>
 <p>
-    In this tutorial we are going to leave 3D for a while and focus on adding some
-    practical value to our programs. We will learn how to integrate a user interface
+    In this tutorial we are going to leave 3D for a while and focus on adding something
+    practical and useful to our programs. We will learn how to integrate a user interface
     library into our code which will help in configuring the various values that
     interest us in the tutorials. The library that we will use is called <i>Ant Tweak Bar</i> (a.k.a ATB)
     which is hosted at <a href="http://anttweakbar.sourceforge.net/">anttweakbar.sourceforge.net</a>.
@@ -40,12 +40,12 @@
 </p>
 <h3>Installation</h3>
 <p>
-    The first thing we need to do is to install ATB. You can grab the zip file which contains
+    The first thing we need to do is to install ATB. You can grab the <a href=https://sourceforge.net/projects/anttweakbar/files/latest/download?source=dlp>zip file</a>
+    from the ATB website (version 1.16 when this tutorial was published) which contains
     almost everything you need or use a copy of the files that I provide along with the
     tutorials source package. If you decide to go with the official package simply grab it
-    from <a href http://sourceforge.net/projects/anttweakbar/files/latest/download?source=dlp>here</a>,
-    unzip it somewhere and grab AntTweakBar.h from the include directory and copy it
-    where your project sees it. On Linux I recommend putting it in /usr/local/include. In the
+    from the link above, unzip it somewhere and grab AntTweakBar.h from the include directory and copy it
+    where your project sees it. On Linux I recommend putting it in /usr/local/include (requires root access). In the
     tutorials source package this file is available under Include/ATB. 
 </p>
 <p>
@@ -54,14 +54,14 @@
     with AntTweakBar.dll and AntTweakBar.lib (there is also a matching couple for 64 bits). You
     will need to link your project to the lib file and when you run the executable have the dll
     in the local directory or in Windows\System32. On Linux you will need to go into the src directory
-    and type make to build the libraries. The result will be libAntTweakBar.a, libAntTweakBar.so and
+    and type 'make' to build the libraries. The result will be libAntTweakBar.a, libAntTweakBar.so and
     libAntTweakBar.so.1. I recommend you copy these into /usr/local/lib to make them available from everywhere.
-    The tutorials source packages contains the Windows libraries in Windows/ogldev/Debug and the Linux binaries
+    The tutorials source package contains the Windows libraries in Windows/ogldev/Debug and the Linux binaries
     in Lib (so you don't need to build them).
 </p>
 <h3>Integration</h3>
 <p>
-    In order to use ATB you will need to include the AntTweakBar.h in your source code:
+    In order to use ATB you will need to include the header AntTweakBar.h in your source code:
     <code>
         <br>#include &lt;AntTweakBar.h&gt;
     </code>
@@ -90,11 +90,11 @@
     TwInit(TW_OPENGL_CORE, NULL);
     </code>
     For the tutorials series I created a class called ATB which encapsulates some 
-    of the functionality of the library and added some stuff to make it easier for integration.
+    of the functionality of the library and adds some stuff to make it easier for integration.
     You can initialize ATB via that class using a code similar to this:
     <code>
         <br>
-        ATB atb;<br>
+        ATB m_atb;<br>
         <br>
         if (!m_atb.Init()) {<br>
         &nbsp; &nbsp; // error<br>
@@ -116,7 +116,13 @@
 <code>
 bool ATB::KeyboardCB(OGLDEV_KEY OgldevKey)<br>
 {<br>
-&nbsp; &nbsp;     return (TwKeyPressed(OgldevKey, TW_KMOD_NONE) == 1);<br>
+&nbsp; &nbsp;     int ATBKey = OgldevKeyToATBKey(OgldevKey);<br>
+    <br>
+&nbsp; &nbsp;     if (ATBKey == TW_KEY_LAST) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         return false;<br>
+&nbsp; &nbsp;     }<br>
+    <br>
+&nbsp; &nbsp;     return (TwKeyPressed(ATBKey, TW_KMOD_NONE) == 1);<br>
 }<br>
 <br>
 <br>
@@ -142,17 +148,21 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     the tutorial:     
 </p>
 <code>
-    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)<br>
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE OgldevKeyState)<br>
     {<br>
-&nbsp; &nbsp;          if (!m_atb.KeyboardCB(OgldevKey)) {<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;              switch (OgldevKey) {<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;                  default:<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;  &nbsp; &nbsp;                      m_pGameCamera->OnKeyboard(OgldevKey);<br>
-&nbsp; &nbsp;  &nbsp; &nbsp;              }<br>
-&nbsp; &nbsp;          }<br>
+&nbsp; &nbsp;         if (OgldevKeyState == OGLDEV_KEY_STATE_PRESS) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             if (m_atb.KeyboardCB(OgldevKey)) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 return;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             }<br>
+&nbsp; &nbsp;         }<br>
+    <br>
+&nbsp; &nbsp;              switch (OgldevKey) {<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;              .<br>
+&nbsp; &nbsp;                  default:<br>
+&nbsp; &nbsp;  &nbsp; &nbsp;                      m_pGameCamera->OnKeyboard(OgldevKey);<br>
+&nbsp; &nbsp;              }<br>
     }<br>
 <br>
 <br>
@@ -185,7 +195,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
         <br>
     TwBar *bar = TwNewBar("OGLDEV");    
     </code>
-    The string in the parenthesis is just a way to name the tweak bar.
+    The string in the parenthesis is just a way to name the tweak bar. 
 </p>
 <h3>Draw the tweak bar</h3>
 <p>
@@ -379,7 +389,82 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     <br><br>    
     <img src="atb7.jpg">
     <br>    
-
+    In all of the tutorials there is usually at least one light source so it makes sense to add some code that will allow us to
+    easily hook it up to the tweak bar so we can play with it parameters. So I went ahead and added the following methods to the
+    various light source classes:
+    <code>
+        <br>
+void BaseLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     std::string s = Name + ".Color";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_COLOR3F, &Color, NULL);<br>
+&nbsp; &nbsp;     s = Name + ".Ambient Intensity";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &AmbientIntensity, "min=0.0 max=1.0 step=0.005");<br>
+&nbsp; &nbsp;     s = Name + ".Diffuse Intensity";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &DiffuseIntensity, "min=0.0 max=1.0 step=0.005");<br>
+}<br>
+<br>
+<br>
+void DirectionalLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     BaseLight::AddToATB(bar);<br>
+&nbsp; &nbsp;     std::string s = Name + ".Direction";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_DIR3F, &Direction, "axisz=-z");<br>
+}<br>
+<br>
+<br>
+void PointLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     BaseLight::AddToATB(bar);<br>
+&nbsp; &nbsp;     std::string s = Name + ".Position";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_OGLDEV_VECTOR3F, &Position, "axisz=-z");<br>
+&nbsp; &nbsp;     s = Name + ".Attenuation";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_OGLDEV_ATTENUATION, &Attenuation, "");<br>
+}<br>
+<br>
+<br>
+void SpotLight::AddToATB(TwBar *bar)<br>
+{<br>
+&nbsp; &nbsp;     PointLight::AddToATB(bar);<br>
+&nbsp; &nbsp;     std::string s = Name + ".Direction";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_DIR3F, &Direction, "axisz=-z");<br>
+&nbsp; &nbsp;     s = Name + ".Cutoff";<br>
+&nbsp; &nbsp;     TwAddVarRW(bar, s.c_str(), TW_TYPE_FLOAT, &Cutoff, "");<br>
+}<br>
+</code>         
+    Note that 'Name' is a new string memeber of the BaseLight class that must be set before AddToATB() function
+    is called on the light object. It represents the string that will be displayed in the tweak bar for that light.
+    If you plan on adding multiple lights you must make sure to pick up unique names for them. Here's the bar
+    with a directional light source:
+    <br><br>    
+    <img src="atb8.jpg">
+    <br>  
+    The last thing that I want to demonstrate is the ability to get and set various parameters that control the behaviour 
+    of the tweak bar. Here's an example of setting the refresh rate of the bar to one tenth of a second:
+    <code>
+        <br>
+        float refresh = 0.1f;<br>
+        <b>TwSetParam</b>(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);<br>
+        </code>
+    Since moving the mouse to the tweak bar means that the camera also moves I made the key 'a' automatically move the
+    mouse to the center of the tweak bar without touching the camera. I had to read the location and size of the tweak bar
+    in order to accomplish that so I used TwGetParam() in order to do that:
+    <code>
+        <br>
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)<br>
+    {<br>
+&nbsp; &nbsp;         if (!m_atb.KeyboardCB(OgldevKey)) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             switch (OgldevKey) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 case OGLDEV_KEY_A:<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     int Pos[2], Size[2];<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     <b>TwGetParam</b>(bar, NULL, "position", TW_PARAM_INT32, 2, Pos);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     <b>TwGetParam</b>(bar, NULL, "size", TW_PARAM_INT32, 2, Size);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     OgldevBackendSetMousePos(Pos[0] + Size[0]/2, Pos[1] + Size[1]/2);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                     break;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 }
+</code>                        
+        
  </p>
 </section>
 
@@ -391,7 +476,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
 <div id="disqus_thread"></div>
 <script type="text/javascript">
 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_shortname = 'tutorial48'; // required: replace example with your forum shortname
 var disqus_url = 'http://www.ogldev.org/www/tutorial48/tutorial48.html'
 
 /* * * DON'T EDIT BELOW THIS LINE * * */

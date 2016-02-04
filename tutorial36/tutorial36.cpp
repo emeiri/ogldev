@@ -258,7 +258,7 @@ private:
         
         float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear - 4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel * Light.DiffuseIntensity))) 
                     /
-                    2 * Light.Attenuation.Exp;
+                    (2 * Light.Attenuation.Exp);
         
         return ret;
     }    

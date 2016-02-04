@@ -17,6 +17,7 @@
     <ClCompile Include="..\..\Common\io_buffer.cpp" />
     <ClCompile Include="..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\Common\ogldev_app.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_atb.cpp" />
     <ClCompile Include="..\..\Common\ogldev_backend.cpp" />
     <ClCompile Include="..\..\Common\ogldev_basic_lighting.cpp" />
     <ClCompile Include="..\..\Common\ogldev_basic_mesh.cpp" />
@@ -89,7 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include;$(ProjectDir)\..\..\Include\assimp;$(ProjectDir)\..\..\Include\ImageMagick-6</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include;$(ProjectDir)\..\..\Include\assimp;$(ProjectDir)\..\..\Include\ImageMagick-6;$(ProjectDir)\..\..\Include\ATB</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
