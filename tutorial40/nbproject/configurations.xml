@@ -96,6 +96,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibLibItem>glut</linkerLibLibItem>
+            <linkerLibLibItem>AntTweakBar</linkerLibLibItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl`</commandLine>
         </linkerTool>

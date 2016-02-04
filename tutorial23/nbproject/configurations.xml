@@ -299,6 +299,7 @@
                             OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libcommon.a">
               </makeArtifact>
             </linkerLibProjectItem>
+            <linkerLibLibItem>AntTweakBar</linkerLibLibItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ freetype2 fontconfig`</commandLine>
         </linkerTool>

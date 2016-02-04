@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut ../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lAntTweakBar
+LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lAntTweakBar -lglut
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

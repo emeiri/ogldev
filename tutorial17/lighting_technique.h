@@ -23,11 +23,6 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_lights_common.h"
 
-struct DirectionalLight
-{
-    Vector3f Color;
-    float AmbientIntensity;
-};
 
 class LightingTechnique : public Technique
 {

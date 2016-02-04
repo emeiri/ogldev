@@ -45,6 +45,7 @@
       <itemPath>ogldev_basic_lighting.cpp</itemPath>
       <itemPath>ogldev_basic_mesh.cpp</itemPath>
       <itemPath>ogldev_glfw_backend.cpp</itemPath>
+      <itemPath>ogldev_shadow_map_fbo.cpp</itemPath>
       <itemPath>ogldev_skinned_mesh.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
@@ -172,6 +173,8 @@
       </item>
       <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="ogldev_shadow_map_fbo.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="ogldev_skinned_mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
@@ -291,6 +294,8 @@
       <item path="ogldev_basic_mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_glfw_backend.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_shadow_map_fbo.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_skinned_mesh.cpp" ex="false" tool="1" flavor2="0">
       </item>

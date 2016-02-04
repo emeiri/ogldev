@@ -46,7 +46,6 @@
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial44</output>
           <linkerLibItems>
-            <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../Common"
                             CT="3"
@@ -60,6 +59,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibLibItem>AntTweakBar</linkerLibLibItem>
+            <linkerLibLibItem>glut</linkerLibLibItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
