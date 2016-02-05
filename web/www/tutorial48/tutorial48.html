@@ -29,15 +29,24 @@
 <p>
     In this tutorial we are going to leave 3D for a while and focus on adding something
     practical and useful to our programs. We will learn how to integrate a user interface
-    library into our code which will help in configuring the various values that
+    library which will help in configuring the various values that
     interest us in the tutorials. The library that we will use is called <i>Ant Tweak Bar</i> (a.k.a ATB)
     which is hosted at <a href="http://anttweakbar.sourceforge.net/">anttweakbar.sourceforge.net</a>.
     There are many options available and if you do some research on the subject you will find
-    a lot of discussions and opinions on the matter. In addition to OpenGL ATB also 
+    a lot of discussions and opinions on the matter. In addition to OpenGL, ATB also 
     supports DirectX 9/10/11 so if you want your UI to be
     portable this is a good advantage. I found it to be very useful and easy to
     learn. I hope you will too. So let's jump right in.
 </p>
+<p>
+    <b><font color='red'>
+    Disclaimer: as I was putting the finishing touches on this tutorial I noticed that ATB is no longer supported. The official website
+    is alive but the author states that he is no longer actively maintaining it. After some thought I decided to publish this tutorial 
+    regardless. The library has proved to be very useful to me and I plan to keep using it. If you are looking for something like that
+    and having the library being actively maintained is a requirement for you then you may need to find an alternative but I think
+    many people can use it as it is. Since this is open source there is always a chance someone will pick up maintenance.
+    </b></font>
+ </p>
 <h3>Installation</h3>
 <p>
     The first thing we need to do is to install ATB. You can grab the <a href=https://sourceforge.net/projects/anttweakbar/files/latest/download?source=dlp>zip file</a>
@@ -76,6 +85,7 @@
         <li>Linux: add '-lAntTweakBar' to the build command and make sure the Linux
             binaries are in /usr/local/lib</li>
     </ul>
+    <br>
     Again, if you are using my Visual Studio or Netbeans projects then all of this
     is already set up for you so you don't need to worry about anything.    
 </p>
@@ -83,14 +93,17 @@
 <p>
     In order to initialize ATB you need to call:
 <code>
+    <br>
     TwInit(TW_OPENGL, NULL);
 </code>
-    or in case you want to initialize the GL context for core profile:
+    or in case you want to initialize the GL context for core profile:    
     <code>
+        <br>
     TwInit(TW_OPENGL_CORE, NULL);
     </code>
     For the tutorials series I created a class called ATB which encapsulates some 
-    of the functionality of the library and adds some stuff to make it easier for integration.
+    of the functionality of the library and adds some stuff to make it easier for integration (that 
+    class is part of the Common project).
     You can initialize ATB via that class using a code similar to this:
     <code>
         <br>
@@ -144,7 +157,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     These functions are basically wrappers around the native ATB callback functions. They translate
     OGLDEV types to ATB types and then pass the call down to ATB. They return true if ATB processed the
     event (in which case you can simply discard it) and false if not (so you should take a look at
-    the event and see if it interests you). Here's how I hooked the functions into the callbacks of
+    the event and see if it interests you). Here's how I hooked these functions into the callbacks of
     the tutorial:     
 </p>
 <code>
@@ -200,7 +213,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
 <h3>Draw the tweak bar</h3>
 <p>
     In order for the tweak bar to appear in your OpenGL window there must be a call present
-    to the TwDraw() function in the render look. The ATB website provides the following
+    to the TwDraw() function in the render loop. The ATB website provides the following
     generic render loop as an example:
     <code>
         <br>
@@ -234,7 +247,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     Let's add a drop down box. In this tutorial I will use it to select the mesh to
     be displayed. We need to use the TwEnumVal structure provided by ATB in order to create
     a list of available items in the drop down box. That structure is made of pairs of integer
-    and a char array. The integer will be used as an identifier for the drop down item and the
+    and a char array. The integer is an identifier for the drop down item and the
     char array is the name to be displayed. Once the item list is created as an array of TwEnumVal
     structs we create a TwType object using the TwDefineEnum function. TwType is an enum of a few
     parameter types that ATB understands (color, vectors, etc) but we can add user defined types 
@@ -278,11 +291,11 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
     in order to add a string to the tweak bar. TwAddButton() can do much more and we will see
     an example later on. Then we have TwAddVarRW() that adds a read/write variable and
     TwAddVarRO() that adds a read-only variable. The read/write variable we use here
-    is simply the position of the camera and the UI can be used to modify this so and
+    is simply the position of the camera and the UI can be used to modify this and
     have it reflected in the actual application. Surprisingly, ATB does no provide an
-    a internal TwType for an array of three floats so I created one to be used by 
+    internal TwType for an array of three floats so I created one to be used by 
     the framework:
-    <br>
+    <br><br>
     (ogldev_atb.cpp:38)
     <code>
         <br>    
@@ -305,7 +318,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
 &nbsp; &nbsp;     TwAddVarRO(bar, "Direction", TW_TYPE_DIR3F, &m_target, " axisz=-z ");<br>
 }   
     </code>
-    We have use the provided TW_TYPE_DIR3F as the parameter type that displays an array
+    We have used the provided TW_TYPE_DIR3F as the parameter type that displays an array
     of 3 floats using an arrow. Note the addition of 'axisz=-z' as the last parameter
     of TwAddVarRO(). Many ATB functions take a string of options in the last parameter. This allows
     modifying the internal behavior of the function. axisz is used to change from right handed system (ATB default)
@@ -368,7 +381,7 @@ bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)<br>
         
     You can now use gAutoRotate to toggle between automatic and manual rotations.
     <br>
-    Here's how the tweak bar now looks:
+    Here's how the tweak bar looks like:
     <br><br>    
     <img src="atb6.jpg">
     <br>    
@@ -434,7 +447,8 @@ void SpotLight::AddToATB(TwBar *bar)<br>
 </code>         
     Note that 'Name' is a new string memeber of the BaseLight class that must be set before AddToATB() function
     is called on the light object. It represents the string that will be displayed in the tweak bar for that light.
-    If you plan on adding multiple lights you must make sure to pick up unique names for them. Here's the bar
+    If you plan on adding multiple lights you must make sure to pick up unique names for them. AddToATB() is a virtual
+    function so the correct instance according to the concrete class is always called. Here's the bar
     with a directional light source:
     <br><br>    
     <img src="atb8.jpg">
