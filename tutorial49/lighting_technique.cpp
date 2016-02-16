@@ -21,7 +21,9 @@
 
 #include "ogldev_math_3d.h"
 #include "ogldev_util.h"
+#include "ogldev_engine_common.h"
 #include "lighting_technique.h"
+
 
 
 LightingTechnique::LightingTechnique()
@@ -49,8 +51,7 @@ bool LightingTechnique::Init()
     m_WVPLocation = GetUniformLocation("gWVP");
     m_LightWVPLocation = GetUniformLocation("gLightWVP");
     m_WorldMatrixLocation = GetUniformLocation("gWorld");
-    m_samplerLocation = GetUniformLocation("gSampler");
-    m_shadowMapLocation = GetUniformLocation("gShadowMap");
+    m_samplerLocation = GetUniformLocation("gSampler");    
     m_eyeWorldPosLocation = GetUniformLocation("gEyeWorldPos");
     m_dirLightLocation.Color = GetUniformLocation("gDirectionalLight.Base.Color");
     m_dirLightLocation.AmbientIntensity = GetUniformLocation("gDirectionalLight.Base.AmbientIntensity");
@@ -65,8 +66,7 @@ bool LightingTechnique::Init()
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
         m_LightWVPLocation == INVALID_UNIFORM_LOCATION ||
         m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
-        m_samplerLocation == INVALID_UNIFORM_LOCATION ||
-        m_shadowMapLocation == INVALID_UNIFORM_LOCATION ||
+        m_samplerLocation == INVALID_UNIFORM_LOCATION ||        
         m_eyeWorldPosLocation == INVALID_UNIFORM_LOCATION ||
         m_dirLightLocation.Color == INVALID_UNIFORM_LOCATION ||
         m_dirLightLocation.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
@@ -76,6 +76,17 @@ bool LightingTechnique::Init()
         m_numPointLightsLocation == INVALID_UNIFORM_LOCATION ||
         m_numSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
         return false;
+    }
+    
+    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_shadowMapLocation) ; i++) {
+        char Name[128];
+        memset(Name, 0, sizeof(Name));
+        SNPRINTF(Name, sizeof(Name), "gShadowMap[%d]", i);
+        m_shadowMapLocation[i] = GetUniformLocation(Name);
+        
+        if (m_shadowMapLocation[i] == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
     }
 
             
@@ -156,7 +167,11 @@ bool LightingTechnique::Init()
             return false;
         }
     }
-
+    
+    glUniform1i(m_shadowMapLocation[0], CASCACDE_SHADOW_TEXTURE_UNIT0_INDEX);
+    glUniform1i(m_shadowMapLocation[1], CASCACDE_SHADOW_TEXTURE_UNIT1_INDEX);
+    glUniform1i(m_shadowMapLocation[2], CASCACDE_SHADOW_TEXTURE_UNIT2_INDEX);
+    
     return true;
 }
 
@@ -186,8 +201,7 @@ void LightingTechnique::SetColorTextureUnit(uint TextureUnit)
 
 
 void LightingTechnique::SetShadowMapTextureUnit(uint TextureUnit)
-{
-    glUniform1i(m_shadowMapLocation, TextureUnit);
+{   
 }
 
 

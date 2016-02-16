@@ -52,7 +52,7 @@ private:
     GLuint m_LightWVPLocation;
     GLuint m_WorldMatrixLocation;
     GLuint m_samplerLocation;
-    GLuint m_shadowMapLocation;
+    GLuint m_shadowMapLocation[3];
     GLuint m_eyeWorldPosLocation;
     GLuint m_matSpecularIntensityLocation;
     GLuint m_matSpecularPowerLocation;
