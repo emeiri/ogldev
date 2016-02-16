@@ -17,25 +17,25 @@
 */
 
 #include "ogldev_util.h"
-#include "shadow_map_technique.h"
+#include "csm_technique.h"
 
 
 
-ShadowMapTechnique::ShadowMapTechnique()
+CSMTechnique::CSMTechnique()
 {
 }
 
-bool ShadowMapTechnique::Init()
+bool CSMTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "Shaders/shadow_map.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "Shaders/csm.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "Shaders/shadow_map.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "Shaders/csm.fs")) {
         return false;
     }
 
@@ -52,7 +52,7 @@ bool ShadowMapTechnique::Init()
     return true;
 }
 
-void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
+void CSMTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }

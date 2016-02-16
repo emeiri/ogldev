@@ -21,11 +21,11 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
-class ShadowMapTechnique : public Technique {
+class CSMTechnique : public Technique {
 
 public:
 
-    ShadowMapTechnique();
+    CSMTechnique();
 
     virtual bool Init();
 

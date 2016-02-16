@@ -39,7 +39,7 @@
 #include "ogldev_lights_common.h"
 #include "ogldev_shadow_map_fbo.h"
 #include "lighting_technique.h"
-#include "shadow_map_technique.h"
+#include "csm_technique.h"
 #include "ogldev_atb.h"
 
 #define WINDOW_WIDTH  1024  
@@ -60,6 +60,7 @@ public:
     Tutorial49() 
     {
         m_pGameCamera = NULL;
+        m_pGroundTex = NULL;
         
         m_dirLight.Name = "DirLight1";
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -103,7 +104,7 @@ public:
             return false;
         }
         
-        if (!m_shadowMapFBO.Init(1024, 1024)) {
+        if (!m_csmFBO.Init(1024, 1024)) {
             return false;
         }
 		
@@ -196,7 +197,7 @@ public:
 	
     void ShadowMapPass()
     {      
-        m_shadowMapFBO.BindForWriting();
+        m_csmFBO.BindForWriting(0);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         m_ShadowMapEffect.Enable();
@@ -223,7 +224,7 @@ public:
 
         m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());
        
-        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_csmFBO.BindForReading();
 
         Pipeline p;        
         p.SetPerspectiveProj(m_shadowOrthoProjInfo);        
@@ -290,14 +291,14 @@ public:
 private:
         
     LightingTechnique m_LightingTech;
-    ShadowMapTechnique m_ShadowMapEffect;
+    CSMTechnique m_ShadowMapEffect;
     Camera* m_pGameCamera;
     DirectionalLight m_dirLight;
     BasicMesh m_mesh;
     Orientation m_meshOrientation[NUM_MESHES];
 	BasicMesh m_quad;
     Texture* m_pGroundTex;
-    ShadowMapFBO m_shadowMapFBO;
+    CascadedShadowMapFBO m_csmFBO;
     PersProjInfo m_persProjInfo;
     PersProjInfo m_shadowOrthoProjInfo;
     ATB m_atb;

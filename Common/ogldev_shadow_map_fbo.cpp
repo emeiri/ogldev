@@ -17,8 +17,10 @@
 
 #include <stdio.h>
 
+#include "ogldev_types.h"
 #include "ogldev_shadow_map_fbo.h"
 #include "ogldev_util.h"
+#include "ogldev_engine_common.h"
 
 ShadowMapFBO::ShadowMapFBO()
 {
@@ -144,6 +146,13 @@ void CascadedShadowMapFBO::BindForWriting(uint CascadeIndex)
 
 void CascadedShadowMapFBO::BindForReading()
 {
-    glActiveTexture(TextureUnit);
-    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
+    glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT0);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMap[0]);
+
+    glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT1);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMap[1]);
+
+    glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT2);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMap[2]);
+
 }

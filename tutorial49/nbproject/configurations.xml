@@ -4,20 +4,20 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>csm_technique.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
-      <itemPath>shadow_map_technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f1" displayName="Shaders" projectFiles="true" kind="ROOT">
+      <itemPath>Shaders/csm.fs</itemPath>
+      <itemPath>Shaders/csm.vs</itemPath>
       <itemPath>Shaders/lighting.fs</itemPath>
       <itemPath>Shaders/lighting.vs</itemPath>
-      <itemPath>Shaders/shadow_map.fs</itemPath>
-      <itemPath>Shaders/shadow_map.vs</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>csm_technique.cpp</itemPath>
       <itemPath>lighting_technique.cpp</itemPath>
-      <itemPath>shadow_map_technique.cpp</itemPath>
       <itemPath>tutorial49.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -74,21 +74,21 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
+      <item path="Shaders/csm.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/csm.vs" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Shaders/lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="Shaders/shadow_map.fs" ex="false" tool="3" flavor2="0">
+      <item path="csm_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="Shaders/shadow_map.vs" ex="false" tool="3" flavor2="0">
+      <item path="csm_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial49.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -136,21 +136,21 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
+      <item path="Shaders/csm.fs" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/csm.vs" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="Shaders/lighting.fs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="Shaders/lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="Shaders/shadow_map.fs" ex="false" tool="3" flavor2="0">
+      <item path="csm_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="Shaders/shadow_map.vs" ex="false" tool="3" flavor2="0">
+      <item path="csm_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="lighting_technique.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="lighting_technique.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="shadow_map_technique.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="shadow_map_technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="tutorial49.cpp" ex="false" tool="1" flavor2="0">
       </item>
