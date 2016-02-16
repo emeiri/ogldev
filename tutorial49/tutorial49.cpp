@@ -197,19 +197,21 @@ public:
 	
     void ShadowMapPass()
     {      
-        m_csmFBO.BindForWriting(0);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        for (uint i = 0 ; i < 3 ; i++) {
+            m_csmFBO.BindForWriting(i);
+            glClear(GL_DEPTH_BUFFER_BIT);
 
-        m_ShadowMapEffect.Enable();
+            m_ShadowMapEffect.Enable();
 
-        Pipeline p;
-        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_shadowOrthoProjInfo);                    
-        
-        for (int i = 0; i < NUM_MESHES ; i++) {
-            p.Orient(m_meshOrientation[i]);
-            m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());
-            m_mesh.Render();
+            Pipeline p;
+            p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
+            p.SetPerspectiveProj(m_shadowOrthoProjInfo);                    
+
+            for (int i = 0; i < NUM_MESHES ; i++) {
+                p.Orient(m_meshOrientation[i]);
+                m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());
+                m_mesh.Render();
+            }
         }
         
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
