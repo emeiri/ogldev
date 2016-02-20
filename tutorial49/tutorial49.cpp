@@ -238,6 +238,13 @@ public:
         
         Vector4f frustumCornersL[8];
         
+        float minX = std::numeric_limits<float>::max();
+        float maxX = std::numeric_limits<float>::min();
+        float minY = std::numeric_limits<float>::max();
+        float maxY = std::numeric_limits<float>::min();
+        float minZ = std::numeric_limits<float>::max();
+        float maxZ = std::numeric_limits<float>::min();
+        
         for (uint i = 0 ; i < 8 ; i++) {
             printf("Frustum: ");
             Vector4f vW = CamInv * frustumCorners[i];
@@ -246,7 +253,16 @@ public:
             frustumCornersL[i] = LightM * vW;
             frustumCornersL[i].Print();
             printf("\n");
+            
+            minX = min(minX, frustumCornersL[i].x);
+            maxX = max(maxX, frustumCornersL[i].x);
+            minY = min(minY, frustumCornersL[i].y);
+            maxY = max(maxY, frustumCornersL[i].y);
+            minZ = min(minZ, frustumCornersL[i].z);
+            maxZ = max(maxZ, frustumCornersL[i].z);
         }
+        
+        printf("BB: %f %f %f %f %f %f\n", minX, maxX, minY, maxY, minZ, maxZ);
         
         exit(1);        
         
