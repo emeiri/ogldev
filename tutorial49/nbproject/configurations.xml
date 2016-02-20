@@ -7,7 +7,7 @@
       <itemPath>csm_technique.h</itemPath>
       <itemPath>lighting_technique.h</itemPath>
     </logicalFolder>
-    <logicalFolder name="f1" displayName="Shaders" projectFiles="true" kind="ROOT">
+    <logicalFolder name="f1" displayName="Shaders" projectFiles="true">
       <itemPath>Shaders/csm.fs</itemPath>
       <itemPath>Shaders/csm.vs</itemPath>
       <itemPath>Shaders/lighting.fs</itemPath>

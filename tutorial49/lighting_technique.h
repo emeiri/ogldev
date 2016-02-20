@@ -27,8 +27,8 @@
 class LightingTechnique : public Technique {
 public:
 
-    static const unsigned int MAX_POINT_LIGHTS = 2;
-    static const unsigned int MAX_SPOT_LIGHTS = 2;
+    static const uint MAX_POINT_LIGHTS = 2;
+    static const uint MAX_SPOT_LIGHTS = 2;
 
     LightingTechnique();
 
@@ -37,11 +37,11 @@ public:
     void SetWVP(const Matrix4f& WVP);
     void SetLightWVP(const Matrix4f& LightWVP);
     void SetWorldMatrix(const Matrix4f& WVP);
-    void SetColorTextureUnit(unsigned int TextureUnit);
-    void SetShadowMapTextureUnit(unsigned int TextureUnit);
+    void SetColorTextureUnit(uint TextureUnit);    
+    void SetShadowMapTextureUnit();
     void SetDirectionalLight(const DirectionalLight& Light);
-    void SetPointLights(unsigned int NumLights, const PointLight* pLights);
-    void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
+    void SetPointLights(uint NumLights, const PointLight* pLights);
+    void SetSpotLights(uint NumLights, const SpotLight* pLights);
     void SetEyeWorldPos(const Vector3f& EyeWorldPos);
     void SetMatSpecularIntensity(float Intensity);
     void SetMatSpecularPower(float Power);
@@ -52,7 +52,7 @@ private:
     GLuint m_LightWVPLocation;
     GLuint m_WorldMatrixLocation;
     GLuint m_samplerLocation;
-    GLuint m_shadowMapLocation[3];
+    GLuint m_shadowMapLocation[1];
     GLuint m_eyeWorldPosLocation;
     GLuint m_matSpecularIntensityLocation;
     GLuint m_matSpecularPowerLocation;

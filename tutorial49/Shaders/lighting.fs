@@ -50,7 +50,7 @@ uniform DirectionalLight gDirectionalLight;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];                                          
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             
 uniform sampler2D gSampler;                                                                 
-uniform sampler2D gShadowMap;                                                               
+uniform sampler2D gShadowMap[1];                                                               
 uniform vec3 gEyeWorldPos;                                                                  
 uniform float gMatSpecularIntensity;                                                        
 uniform float gSpecularPower;                                                               
@@ -62,7 +62,7 @@ float CalcShadowFactor(vec4 LightSpacePos)
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;                                                  
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;                                                  
     float z = 0.5 * ProjCoords.z + 0.5;                                                     
-    float Depth = texture(gShadowMap, UVCoords).x;                                          
+    float Depth = texture(gShadowMap[0], UVCoords).x;                                          
     if (Depth < z + 0.00001)                                                                 
         return 0.5;                                                                         
     else                                                                                    

@@ -88,7 +88,6 @@ bool LightingTechnique::Init()
             return false;
         }
     }
-
             
     for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pointLightsLocation) ; i++) {
         char Name[128];
@@ -167,11 +166,7 @@ bool LightingTechnique::Init()
             return false;
         }
     }
-    
-    glUniform1i(m_shadowMapLocation[0], CASCACDE_SHADOW_TEXTURE_UNIT0_INDEX);
-    glUniform1i(m_shadowMapLocation[1], CASCACDE_SHADOW_TEXTURE_UNIT1_INDEX);
-    glUniform1i(m_shadowMapLocation[2], CASCACDE_SHADOW_TEXTURE_UNIT2_INDEX);
-    
+
     return true;
 }
 
@@ -199,9 +194,14 @@ void LightingTechnique::SetColorTextureUnit(uint TextureUnit)
     glUniform1i(m_samplerLocation, TextureUnit);
 }
 
-
-void LightingTechnique::SetShadowMapTextureUnit(uint TextureUnit)
+void LightingTechnique::SetShadowMapTextureUnit()
 {   
+    glUniform1i(m_shadowMapLocation[0], CASCACDE_SHADOW_TEXTURE_UNIT0_INDEX);
+    GLExitIfError
+  /*  glUniform1i(m_shadowMapLocation[1], CASCACDE_SHADOW_TEXTURE_UNIT1_INDEX);
+    GLExitIfError
+    glUniform1i(m_shadowMapLocation[2], CASCACDE_SHADOW_TEXTURE_UNIT2_INDEX);*/
+    GLExitIfError
 }
 
 
