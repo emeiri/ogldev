@@ -70,17 +70,12 @@ public:
         m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
       //  m_dirLight.Direction = Vector3f(0.0f, 0.0f, 1.0f);
 
-        m_persProjInfo.FOV    = 45.0f;
+        m_persProjInfo.FOV    = 90.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width  = WINDOW_WIDTH;
         m_persProjInfo.zNear  = 1.0f;
-        m_persProjInfo.zFar   = 1000.0f;  
-        
-        m_shadowOrthoProjInfo.Height = 200;
-        m_shadowOrthoProjInfo.Width  = 200;            
-        m_shadowOrthoProjInfo.zNear  = -10.0f;                    
-        m_shadowOrthoProjInfo.zFar   = 100.0f;          
-        
+        m_persProjInfo.zFar   = 200.0f;  
+              
         m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
         m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
         m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
@@ -123,10 +118,7 @@ public:
         }
 
         GLExitIfError
-        m_LightingTech.Enable();
-        
-        
-
+        m_LightingTech.Enable();               
         m_LightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_LightingTech.SetShadowMapTextureUnit();		
         m_LightingTech.SetDirectionalLight(m_dirLight);
@@ -277,13 +269,7 @@ public:
                 m_shadowOrthoProjInfo.Height,
                 m_shadowOrthoProjInfo.zNear,
                 m_shadowOrthoProjInfo.zFar);
-        
-     //   exit(0);
-        m_shadowOrthoProjInfo.Height = 200;
-        m_shadowOrthoProjInfo.Width  = 200;               
-        m_shadowOrthoProjInfo.zNear  = -10.0f;                    
-        m_shadowOrthoProjInfo.zFar   = 100.0f;         
-        
+               
         for (uint i = 0 ; i < 3 ; i++) {
             m_csmFBO.BindForWriting(i);
             glClear(GL_DEPTH_BUFFER_BIT);            
