@@ -42,8 +42,8 @@
 #include "csm_technique.h"
 #include "ogldev_atb.h"
 
-#define WINDOW_WIDTH  1024  
-#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH  200  
+#define WINDOW_HEIGHT 100
 
 #define NUM_MESHES 5
 
@@ -67,9 +67,10 @@ public:
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
+        //m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight.Direction = Vector3f(0.0f, 0.0f, 1.0f);
 
-        m_persProjInfo.FOV    = 45.0f;
+        m_persProjInfo.FOV    = 90.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width  = WINDOW_WIDTH;
         m_persProjInfo.zNear  = 1.0f;
@@ -108,15 +109,17 @@ public:
             return false;
         }
 		
-        Vector3f Pos(8.0, 21.0, -23.0);
-        Vector3f Target(-0.07f, -0.44f, 0.9f);
+        //Vector3f Pos(8.0, 21.0, -23.0);
+        Vector3f Pos(0.0, 0.0, 0.0);
+        //Vector3f Target(-0.07f, -0.44f, 0.9f);
+        Vector3f Target(0.0f, 0.0f, 0.1f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
               
         if (!m_LightingTech.Init()) {
             OGLDEV_ERROR("Error initializing the lighting technique\n");
-            return false;
+        //    return false;
         }
 
         m_LightingTech.Enable();
@@ -197,14 +200,63 @@ public:
 	
     void ShadowMapPass()
     {      
+        Pipeline p;
+        
+        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        Matrix4f Cam = p.GetViewTrans();
+        Matrix4f CamInv = Cam.Inverse();
+        
+        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
+        Matrix4f LightM = p.GetViewTrans();
+        
+        float ar = m_persProjInfo.Height / m_persProjInfo.Width;
+        float tanHalfHFOV = tanf(ToRadian(m_persProjInfo.FOV / 2.0f));
+        float tanHalfVFOV = tanf(ToRadian((m_persProjInfo.FOV * ar) / 2.0f));
+                        
+        printf("ar %f tanHalfHFOV %f tanHalfVFOV %f\n", ar, tanHalfHFOV, tanHalfVFOV);
+
+        float xn = m_persProjInfo.zNear * tanHalfHFOV;
+        float xf = m_persProjInfo.zFar * tanHalfHFOV;
+        float yn = m_persProjInfo.zNear * tanHalfVFOV;
+        float yf = m_persProjInfo.zFar * tanHalfVFOV;
+        
+        printf("xn %f xf %f\n", xn, xf);
+        printf("yn %f yf %f\n", yn, yf);
+
+        Vector4f frustumCorners[8] = { 
+            // near face
+            Vector4f(xn,   yn, m_persProjInfo.zNear, 1.0),
+            Vector4f(-xn,  yn, m_persProjInfo.zNear, 1.0),
+            Vector4f(xn,  -yn, m_persProjInfo.zNear, 1.0),
+            Vector4f(-xn, -yn, m_persProjInfo.zNear, 1.0),
+            // far face
+            Vector4f(xn,   yn, m_persProjInfo.zFar, 1.0),
+            Vector4f(-xn,  yn, m_persProjInfo.zFar, 1.0),
+            Vector4f(xn,  -yn, m_persProjInfo.zFar, 1.0),
+            Vector4f(-xn, -yn, m_persProjInfo.zFar, 1.0)            
+        };
+        
+        Vector4f frustumCornersL[8];
+        
+        for (uint i = 0 ; i < 8 ; i++) {
+            printf("Frustum: ");
+            Vector4f vW = CamInv * frustumCorners[i];
+            vW.Print();
+            printf("Light space: ");
+            frustumCornersL[i] = LightM * vW;
+            frustumCornersL[i].Print();
+            printf("\n");
+        }
+        
+        exit(1);        
+        
         for (uint i = 0 ; i < 3 ; i++) {
             m_csmFBO.BindForWriting(i);
-            glClear(GL_DEPTH_BUFFER_BIT);
-
+            glClear(GL_DEPTH_BUFFER_BIT);            
+            
+            
             m_ShadowMapEffect.Enable();
 
-            Pipeline p;
-            p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
             p.SetPerspectiveProj(m_shadowOrthoProjInfo);                    
 
             for (int i = 0; i < NUM_MESHES ; i++) {

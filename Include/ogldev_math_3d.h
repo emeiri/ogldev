@@ -153,9 +153,13 @@ struct Vector4f
         w = _w;
     }
     
-    void Print() const
+    void Print(bool endl = true) const
     {
         printf("(%.02f, %.02f, %.02f, %.02f)", x, y, z, w);
+        
+        if (endl) {
+            printf("\n");
+        }
     }       
     
     Vector3f to3f() const
