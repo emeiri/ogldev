@@ -23,6 +23,7 @@
 #include "ogldev_lights_common.h"
 #include "csm_technique.h"
 
+#define NUM_CASCADES 3
 
 class LightingTechnique : public Technique {
 public:
@@ -35,7 +36,8 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetLightWVP(const Matrix4f& LightWVP);
+    void SetLightWVP(uint CascadeIndex, const Matrix4f& LightWVP);
+    void SetCascadeEndClipSpace(uint CascadeIndex, float End);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetColorTextureUnit(uint TextureUnit);    
     void SetShadowMapTextureUnit();
@@ -49,10 +51,11 @@ public:
 private:
 
     GLuint m_WVPLocation;
-    GLuint m_LightWVPLocation;
-    GLuint m_WorldMatrixLocation;
+    GLuint m_lightWVPLocation[NUM_CASCADES];
+    GLuint m_cascadeEndClipSpace[NUM_CASCADES];
+    GLuint m_worldMatrixLocation;
     GLuint m_samplerLocation;
-    GLuint m_shadowMapLocation[1];
+    GLuint m_shadowMapLocation[NUM_CASCADES];
     GLuint m_eyeWorldPosLocation;
     GLuint m_matSpecularIntensityLocation;
     GLuint m_matSpecularPowerLocation;

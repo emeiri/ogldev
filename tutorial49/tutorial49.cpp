@@ -47,7 +47,6 @@
 #define WINDOW_HEIGHT 1024
 
 #define NUM_MESHES 5
-#define NUM_CASCADES 3
 #define NUM_FRUSTUM_CORNERS 8
 
 Quaternion g_Rotation = Quaternion(0.707f, 0.0f, 0.0f, 0.707f);
@@ -78,7 +77,12 @@ public:
         m_persProjInfo.Width  = WINDOW_WIDTH;
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 200.0f;  
-              
+        
+        m_cascadeEnd[0] = m_persProjInfo.zNear;
+        m_cascadeEnd[1] = 25.0f,
+        m_cascadeEnd[2] = 90.0f,
+        m_cascadeEnd[3] = m_persProjInfo.zFar;
+                                     
         m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
         m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
         m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
@@ -128,6 +132,18 @@ public:
         m_LightingTech.SetMatSpecularIntensity(0.0f);
         m_LightingTech.SetMatSpecularPower(0);
 
+        for (uint i = 0 ; i < NUM_CASCADES ; i++) {
+            Matrix4f Proj;
+            Proj.InitPersProjTransform(m_persProjInfo);
+            Vector4f vView(0.0f, 0.0f, m_cascadeEnd[i + 1], 1.0f);
+            Vector4f vClip = Proj * vView;
+            vClip.Print();
+            m_LightingTech.SetCascadeEndClipSpace(i, vClip.z);
+        }
+        
+        
+     //   exit(0);
+        
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }                
@@ -204,13 +220,13 @@ public:
                 
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
                
-        for (uint i = 0 ; i < 3 ; i++) {
+        for (uint i = 0 ; i < NUM_CASCADES ; i++) {
             m_csmFBO.BindForWriting(i);
             glClear(GL_DEPTH_BUFFER_BIT);            
                         
             m_ShadowMapEffect.Enable();
 
-            p.SetOrthographicProj(m_shadowOrthoProjInfo[2]);                    
+            p.SetOrthographicProj(m_shadowOrthoProjInfo[i]);                    
 
             for (int i = 0; i < NUM_MESHES ; i++) {
                 p.Orient(m_meshOrientation[i]);
@@ -234,19 +250,24 @@ public:
         m_csmFBO.BindForReading();
 
         Pipeline p;        
-        p.SetOrthographicProj(m_shadowOrthoProjInfo[2]);        
-        p.Orient(m_quad.GetOrientation());
+        p.Orient(m_quad.GetOrientation());        
+        
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetGenWVOrthoPTrans());        
-        p.SetPerspectiveProj(m_persProjInfo);        
+        for (uint i = 0 ; i < NUM_CASCADES ; i++) {
+            p.SetOrthographicProj(m_shadowOrthoProjInfo[i]);        
+            m_LightingTech.SetLightWVP(i, p.GetGenWVOrthoPTrans());
+        }
+                
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        p.SetPerspectiveProj(m_persProjInfo);                
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);
+
         m_quad.Render();
            
         for (int i = 0; i < NUM_MESHES ; i++) {
-            p.Orient(m_meshOrientation[i]);
+            p.Orient(m_meshOrientation[i]);                     
             m_LightingTech.SetWVP(p.GetWVPTrans());
             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());
             m_mesh.Render();
@@ -298,11 +319,7 @@ public:
 private:
     
     void CalcOrthoProjs()
-    {
-        float zCascades[] = { m_persProjInfo.zNear,
-                              10.0f,
-                              50.0f,
-                              m_persProjInfo.zFar };
+    {                                   
         Pipeline p;
         
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
@@ -319,30 +336,26 @@ private:
         printf("ar %f tanHalfHFOV %f tanHalfVFOV %f\n", ar, tanHalfHFOV, tanHalfVFOV);
         
         for (uint i = 0 ; i < NUM_CASCADES ; i++) {
-            float xn = zCascades[i]     * tanHalfHFOV;
-            float xf = zCascades[i + 1] * tanHalfHFOV;
-            float yn = zCascades[i] * tanHalfVFOV;
-            float yf = zCascades[i + 1] * tanHalfVFOV;
+            float xn = m_cascadeEnd[i]     * tanHalfHFOV;
+            float xf = m_cascadeEnd[i + 1] * tanHalfHFOV;
+            float yn = m_cascadeEnd[i]     * tanHalfVFOV;
+            float yf = m_cascadeEnd[i + 1] * tanHalfVFOV;
 
             printf("xn %f xf %f\n", xn, xf);
             printf("yn %f yf %f\n", yn, yf);
 
             Vector4f frustumCorners[NUM_FRUSTUM_CORNERS] = { 
                 // near face
-            /*    Vector4f(xn,   yn, zCascades[i], 1.0),
-                Vector4f(-xn,  yn, zCascades[i], 1.0),
-                Vector4f(xn,  -yn, zCascades[i], 1.0),
-                Vector4f(-xn, -yn, zCascades[i], 1.0),*/
-                Vector4f(xn,   yn, zCascades[0], 1.0),
-                Vector4f(-xn,  yn, zCascades[0], 1.0),
-                Vector4f(xn,  -yn, zCascades[0], 1.0),
-                Vector4f(-xn, -yn, zCascades[0], 1.0),
+                Vector4f(xn,   yn, m_cascadeEnd[i], 1.0),
+                Vector4f(-xn,  yn, m_cascadeEnd[i], 1.0),
+                Vector4f(xn,  -yn, m_cascadeEnd[i], 1.0),
+                Vector4f(-xn, -yn, m_cascadeEnd[i], 1.0),
                 
                 // far face
-                Vector4f(xf,   yf, zCascades[i + 1], 1.0),
-                Vector4f(-xf,  yf, zCascades[i + 1], 1.0),
-                Vector4f(xf,  -yf, zCascades[i + 1], 1.0),
-                Vector4f(-xf, -yf, zCascades[i + 1], 1.0)            
+                Vector4f(xf,   yf, m_cascadeEnd[i + 1], 1.0),
+                Vector4f(-xf,  yf, m_cascadeEnd[i + 1], 1.0),
+                Vector4f(xf,  -yf, m_cascadeEnd[i + 1], 1.0),
+                Vector4f(-xf, -yf, m_cascadeEnd[i + 1], 1.0)            
             };
 
             Vector4f frustumCornersL[NUM_FRUSTUM_CORNERS];
@@ -393,6 +406,7 @@ private:
     CascadedShadowMapFBO m_csmFBO;
     PersProjInfo m_persProjInfo;
     OrthoProjInfo m_shadowOrthoProjInfo[NUM_CASCADES];
+    float m_cascadeEnd[NUM_CASCADES + 1];
     ATB m_atb;
     TwBar *bar;
 };
