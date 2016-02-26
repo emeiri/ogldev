@@ -219,6 +219,17 @@ struct PersProjInfo
     float zFar;
 };
 
+
+struct OrthoProjInfo
+{
+    float r;        // right
+    float l;        // left
+    float b;        // bottom
+    float t;        // top
+    float n;        // z near
+    float f;        // z far
+};
+
 struct Quaternion
 {
     float x, y, z, w;
@@ -348,6 +359,7 @@ public:
     void InitCameraTransform(const Vector3f& Target, const Vector3f& Up);
     void InitPersProjTransform(const PersProjInfo& p);
     void InitOrthoProjTransform(const PersProjInfo& p);
+    void InitOrthoProjTransform(const OrthoProjInfo& p);
 };
 
 Quaternion operator*(const Quaternion& l, const Quaternion& r);

@@ -92,6 +92,11 @@ public:
     {
         m_persProjInfo = p;
     }
+    
+    void SetOrthographicProj(const OrthoProjInfo& p)
+    {
+        m_orthoProjInfo = p;
+    }    
 
     void SetCamera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
     {
@@ -117,6 +122,7 @@ public:
     const Matrix4f& GetVPTrans();
     const Matrix4f& GetWVPTrans();
     const Matrix4f& GetWVOrthoPTrans();
+    const Matrix4f& GetGenWVOrthoPTrans();
     const Matrix4f& GetWorldTrans();
     const Matrix4f& GetViewTrans();
     const Matrix4f& GetProjTrans();
@@ -127,6 +133,7 @@ private:
     Vector3f m_rotateInfo;
 
     PersProjInfo m_persProjInfo;
+    OrthoProjInfo m_orthoProjInfo;
 
     struct {
         Vector3f Pos;

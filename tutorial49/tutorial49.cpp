@@ -210,11 +210,11 @@ public:
                         
             m_ShadowMapEffect.Enable();
 
-            p.SetPerspectiveProj(m_shadowOrthoProjInfo[2]);                    
+            p.SetOrthographicProj(m_shadowOrthoProjInfo[2]);                    
 
             for (int i = 0; i < NUM_MESHES ; i++) {
                 p.Orient(m_meshOrientation[i]);
-                m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());
+                m_ShadowMapEffect.SetWVP(p.GetGenWVOrthoPTrans());
                 m_mesh.Render();
             }
         }
@@ -234,10 +234,10 @@ public:
         m_csmFBO.BindForReading();
 
         Pipeline p;        
-        p.SetPerspectiveProj(m_shadowOrthoProjInfo[2]);        
+        p.SetOrthographicProj(m_shadowOrthoProjInfo[2]);        
         p.Orient(m_quad.GetOrientation());
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
+        m_LightingTech.SetLightWVP(p.GetGenWVOrthoPTrans());        
         p.SetPerspectiveProj(m_persProjInfo);        
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         m_LightingTech.SetWVP(p.GetWVPTrans());
@@ -373,19 +373,12 @@ private:
 
             printf("BB: %f %f %f %f %f %f\n", minX, maxX, minY, maxY, minZ, maxZ);
             
-            float Width = maxX - minX;
-            float Height = maxY - minY;
-
-            m_shadowOrthoProjInfo[i].Width = Width / 2.0;
-            m_shadowOrthoProjInfo[i].Height = Height / 2.0;        
-            m_shadowOrthoProjInfo[i].zNear = minZ;
-            m_shadowOrthoProjInfo[i].zFar = maxZ;
-
-            printf("Ortho proj: width %f height %f zNear %f zFar %f\n", 
-                    m_shadowOrthoProjInfo[i].Width,
-                    m_shadowOrthoProjInfo[i].Height,
-                    m_shadowOrthoProjInfo[i].zNear,
-                    m_shadowOrthoProjInfo[i].zFar);
+            m_shadowOrthoProjInfo[i].r = maxX;
+            m_shadowOrthoProjInfo[i].l = minX;
+            m_shadowOrthoProjInfo[i].b = minY;
+            m_shadowOrthoProjInfo[i].t = maxY;
+            m_shadowOrthoProjInfo[i].f = maxZ;
+            m_shadowOrthoProjInfo[i].n = minZ;
 		}
 	}
         
@@ -399,7 +392,7 @@ private:
     Texture* m_pGroundTex;
     CascadedShadowMapFBO m_csmFBO;
     PersProjInfo m_persProjInfo;
-    PersProjInfo m_shadowOrthoProjInfo[NUM_CASCADES];
+    OrthoProjInfo m_shadowOrthoProjInfo[NUM_CASCADES];
     ATB m_atb;
     TwBar *bar;
 };
