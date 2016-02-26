@@ -18,6 +18,7 @@
     Tutorial 49 - Cascaded Shadow Maps
 */
 
+#include <cfloat>
 #include <math.h>
 #include <GL/glew.h>
 #include <string>
@@ -46,6 +47,8 @@
 #define WINDOW_HEIGHT 1024
 
 #define NUM_MESHES 5
+#define NUM_CASCADES 3
+#define NUM_FRUSTUM_CORNERS 8
 
 Quaternion g_Rotation = Quaternion(0.707f, 0.0f, 0.0f, 0.707f);
 
@@ -195,80 +198,11 @@ public:
 	
     void ShadowMapPass()
     {      
+        CalcOrthoProjs();
+        
         Pipeline p;
-        
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        Matrix4f Cam = p.GetViewTrans();
-        Matrix4f CamInv = Cam.Inverse();
-        
+                
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        Matrix4f LightM = p.GetViewTrans();
-        
-        float ar = m_persProjInfo.Height / m_persProjInfo.Width;
-        float tanHalfHFOV = tanf(ToRadian(m_persProjInfo.FOV / 2.0f));
-        float tanHalfVFOV = tanf(ToRadian((m_persProjInfo.FOV * ar) / 2.0f));
-                        
-        printf("ar %f tanHalfHFOV %f tanHalfVFOV %f\n", ar, tanHalfHFOV, tanHalfVFOV);
-
-        float xn = m_persProjInfo.zNear * tanHalfHFOV;
-        float xf = m_persProjInfo.zFar * tanHalfHFOV;
-        float yn = m_persProjInfo.zNear * tanHalfVFOV;
-        float yf = m_persProjInfo.zFar * tanHalfVFOV;
-        
-        printf("xn %f xf %f\n", xn, xf);
-        printf("yn %f yf %f\n", yn, yf);
-
-        Vector4f frustumCorners[8] = { 
-            // near face
-            Vector4f(xn,   yn, m_persProjInfo.zNear, 1.0),
-            Vector4f(-xn,  yn, m_persProjInfo.zNear, 1.0),
-            Vector4f(xn,  -yn, m_persProjInfo.zNear, 1.0),
-            Vector4f(-xn, -yn, m_persProjInfo.zNear, 1.0),
-            // far face
-            Vector4f(xf,   yf, m_persProjInfo.zFar, 1.0),
-            Vector4f(-xf,  yf, m_persProjInfo.zFar, 1.0),
-            Vector4f(xf,  -yf, m_persProjInfo.zFar, 1.0),
-            Vector4f(-xf, -yf, m_persProjInfo.zFar, 1.0)            
-        };
-        
-        Vector4f frustumCornersL[8];
-         
-        float minX = std::numeric_limits<float>::max();
-        float maxX = std::numeric_limits<float>::min();
-        float minY = std::numeric_limits<float>::max();
-        float maxY = std::numeric_limits<float>::min();
-        float minZ = std::numeric_limits<float>::max();
-        float maxZ = std::numeric_limits<float>::min();
-        
-        for (uint i = 0 ; i < 8 ; i++) {
-            printf("Frustum: ");
-            Vector4f vW = CamInv * frustumCorners[i];
-            vW.Print();
-            printf("Light space: ");
-            frustumCornersL[i] = LightM * vW;
-            frustumCornersL[i].Print();
-            printf("\n");
-            
-            minX = min(minX, frustumCornersL[i].x);
-            maxX = max(maxX, frustumCornersL[i].x);
-            minY = min(minY, frustumCornersL[i].y);
-            maxY = max(maxY, frustumCornersL[i].y);
-            minZ = min(minZ, frustumCornersL[i].z);
-            maxZ = max(maxZ, frustumCornersL[i].z);
-        }
-        
-        printf("BB: %f %f %f %f %f %f\n", minX, maxX, minY, maxY, minZ, maxZ);
-        
-        m_shadowOrthoProjInfo.Width = maxX - minX;
-        m_shadowOrthoProjInfo.Height = maxY - minY;        
-        m_shadowOrthoProjInfo.zNear = minZ;
-        m_shadowOrthoProjInfo.zFar = maxZ;
-        
-        printf("Ortho proj: width %f height %f zNear %f zFar %f\n", 
-                m_shadowOrthoProjInfo.Width,
-                m_shadowOrthoProjInfo.Height,
-                m_shadowOrthoProjInfo.zNear,
-                m_shadowOrthoProjInfo.zFar);
                
         for (uint i = 0 ; i < 3 ; i++) {
             m_csmFBO.BindForWriting(i);
@@ -276,7 +210,7 @@ public:
                         
             m_ShadowMapEffect.Enable();
 
-            p.SetPerspectiveProj(m_shadowOrthoProjInfo);                    
+            p.SetPerspectiveProj(m_shadowOrthoProjInfo[2]);                    
 
             for (int i = 0; i < NUM_MESHES ; i++) {
                 p.Orient(m_meshOrientation[i]);
@@ -300,7 +234,7 @@ public:
         m_csmFBO.BindForReading();
 
         Pipeline p;        
-        p.SetPerspectiveProj(m_shadowOrthoProjInfo);        
+        p.SetPerspectiveProj(m_shadowOrthoProjInfo[2]);        
         p.Orient(m_quad.GetOrientation());
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
@@ -362,6 +296,98 @@ public:
     }
 
 private:
+    
+    void CalcOrthoProjs()
+    {
+        float zCascades[] = { m_persProjInfo.zNear,
+                              10.0f,
+                              50.0f,
+                              m_persProjInfo.zFar };
+        Pipeline p;
+        
+        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        Matrix4f Cam = p.GetViewTrans();
+        Matrix4f CamInv = Cam.Inverse();
+        
+        p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
+        Matrix4f LightM = p.GetViewTrans();
+        
+        float ar = m_persProjInfo.Height / m_persProjInfo.Width;
+        float tanHalfHFOV = tanf(ToRadian(m_persProjInfo.FOV / 2.0f));
+        float tanHalfVFOV = tanf(ToRadian((m_persProjInfo.FOV * ar) / 2.0f));
+                        
+        printf("ar %f tanHalfHFOV %f tanHalfVFOV %f\n", ar, tanHalfHFOV, tanHalfVFOV);
+        
+        for (uint i = 0 ; i < NUM_CASCADES ; i++) {
+            float xn = zCascades[i]     * tanHalfHFOV;
+            float xf = zCascades[i + 1] * tanHalfHFOV;
+            float yn = zCascades[i] * tanHalfVFOV;
+            float yf = zCascades[i + 1] * tanHalfVFOV;
+
+            printf("xn %f xf %f\n", xn, xf);
+            printf("yn %f yf %f\n", yn, yf);
+
+            Vector4f frustumCorners[NUM_FRUSTUM_CORNERS] = { 
+                // near face
+            /*    Vector4f(xn,   yn, zCascades[i], 1.0),
+                Vector4f(-xn,  yn, zCascades[i], 1.0),
+                Vector4f(xn,  -yn, zCascades[i], 1.0),
+                Vector4f(-xn, -yn, zCascades[i], 1.0),*/
+                Vector4f(xn,   yn, zCascades[0], 1.0),
+                Vector4f(-xn,  yn, zCascades[0], 1.0),
+                Vector4f(xn,  -yn, zCascades[0], 1.0),
+                Vector4f(-xn, -yn, zCascades[0], 1.0),
+                
+                // far face
+                Vector4f(xf,   yf, zCascades[i + 1], 1.0),
+                Vector4f(-xf,  yf, zCascades[i + 1], 1.0),
+                Vector4f(xf,  -yf, zCascades[i + 1], 1.0),
+                Vector4f(-xf, -yf, zCascades[i + 1], 1.0)            
+            };
+
+            Vector4f frustumCornersL[NUM_FRUSTUM_CORNERS];
+
+            float minX = std::numeric_limits<float>::max();
+            float maxX = std::numeric_limits<float>::min();
+            float minY = std::numeric_limits<float>::max();
+            float maxY = std::numeric_limits<float>::min();
+            float minZ = std::numeric_limits<float>::max();
+            float maxZ = std::numeric_limits<float>::min();
+
+            for (uint j = 0 ; j < NUM_FRUSTUM_CORNERS ; j++) {
+                printf("Frustum: ");
+                Vector4f vW = CamInv * frustumCorners[j];
+                vW.Print();
+                printf("Light space: ");
+                frustumCornersL[j] = LightM * vW;
+                frustumCornersL[j].Print();
+                printf("\n");
+
+                minX = min(minX, frustumCornersL[j].x);
+                maxX = max(maxX, frustumCornersL[j].x);
+                minY = min(minY, frustumCornersL[j].y);
+                maxY = max(maxY, frustumCornersL[j].y);
+                minZ = min(minZ, frustumCornersL[j].z);
+                maxZ = max(maxZ, frustumCornersL[j].z);
+            }
+
+            printf("BB: %f %f %f %f %f %f\n", minX, maxX, minY, maxY, minZ, maxZ);
+            
+            float Width = maxX - minX;
+            float Height = maxY - minY;
+
+            m_shadowOrthoProjInfo[i].Width = Width / 2.0;
+            m_shadowOrthoProjInfo[i].Height = Height / 2.0;        
+            m_shadowOrthoProjInfo[i].zNear = minZ;
+            m_shadowOrthoProjInfo[i].zFar = maxZ;
+
+            printf("Ortho proj: width %f height %f zNear %f zFar %f\n", 
+                    m_shadowOrthoProjInfo[i].Width,
+                    m_shadowOrthoProjInfo[i].Height,
+                    m_shadowOrthoProjInfo[i].zNear,
+                    m_shadowOrthoProjInfo[i].zFar);
+		}
+	}
         
     LightingTechnique m_LightingTech;
     CSMTechnique m_ShadowMapEffect;
@@ -373,7 +399,7 @@ private:
     Texture* m_pGroundTex;
     CascadedShadowMapFBO m_csmFBO;
     PersProjInfo m_persProjInfo;
-    PersProjInfo m_shadowOrthoProjInfo;
+    PersProjInfo m_shadowOrthoProjInfo[NUM_CASCADES];
     ATB m_atb;
     TwBar *bar;
 };
