@@ -87,19 +87,19 @@ of the shadow map remains the same.
     Where a<=X<=b. Let's do the mapping on the X-axis. Plug the ranges (-r,r) to (-1,1) in the
     above equation and we get ('r' means "right" on the X-axis):
 </p>
-<img src="calc2.jpg">
+<img src="calc2.png">
 <p>
     Following the same logic we do the mapping on the Y-axis from (-t,t) to (-1,1):    
 </p>
-<img src="calc3.jpg">
+<img src="calc3.png">
 <p>
     In the case of the Z-axis we need to map (n,f) (where n is the near plane and f is the far plane) to (-1,1):
 </p>
-<img src="calc4.jpg">
+<img src="calc4.png">
 <p>
     Now that we have the three mapping equations let's create a matrix to wrap them together nicely:
 </p>
-<img src="calc5.jpg">
+<img src="calc5.png">
 <p>
     Compare this matrix with the one we created for perpective projection in <a href='../tutorial12/tutorial12.html'>tutorial 12</a>.
     An important difference is that in location [3,2] (count starts at zero) we have 0 instead of 1. For perspective
