@@ -64,10 +64,12 @@ public:
         m_persProjInfo.zNear  = 1.0f;
         m_persProjInfo.zFar   = 1000.0f;  
  
-        m_shadowOrthoProjInfo.Height = 200;
-        m_shadowOrthoProjInfo.Width  = 200;            
-        m_shadowOrthoProjInfo.zNear  = -10.0f;                    
-        m_shadowOrthoProjInfo.zFar   = 100.0f;          
+        m_shadowOrthoProjInfo.l = -100.0f;
+        m_shadowOrthoProjInfo.r = 100.0f;
+        m_shadowOrthoProjInfo.t = 100.0f;
+        m_shadowOrthoProjInfo.b = -100.0f;
+        m_shadowOrthoProjInfo.n = -10.0f;                    
+        m_shadowOrthoProjInfo.f = 100.0f;          
         
         m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
         m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
@@ -169,7 +171,7 @@ public:
 
         Pipeline p;
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
-        p.SetPerspectiveProj(m_shadowOrthoProjInfo);                    
+        p.SetOrthographicProj(m_shadowOrthoProjInfo);                    
         
         for (int i = 0; i < NUM_MESHES ; i++) {
             p.Orient(m_meshOrientation[i]);
@@ -192,7 +194,7 @@ public:
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         Pipeline p;        
-        p.SetPerspectiveProj(m_shadowOrthoProjInfo);        
+        p.SetOrthographicProj(m_shadowOrthoProjInfo);        
         p.Orient(m_quad.GetOrientation());
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
@@ -212,7 +214,7 @@ public:
     }
     
 	       
-    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE OgldevKeyState = OGLDEV_KEY_STATE_PRESS)
     {
         switch (OgldevKey) {
             case OGLDEV_KEY_ESCAPE:
@@ -243,7 +245,7 @@ private:
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;
-    PersProjInfo m_shadowOrthoProjInfo;
+    OrthoProjInfo m_shadowOrthoProjInfo;
 };
 
 

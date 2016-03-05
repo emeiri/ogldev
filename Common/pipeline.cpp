@@ -67,19 +67,8 @@ const Matrix4f& Pipeline::GetWVPTrans()
     return m_WVPtransformation;
 }
 
+
 const Matrix4f& Pipeline::GetWVOrthoPTrans()
-{
-    GetWorldTrans();
-    GetViewTrans();
-
-    Matrix4f P;
-    P.InitOrthoProjTransform(m_persProjInfo);
-    
-    m_WVPtransformation = P * m_Vtransformation * m_Wtransformation;
-    return m_WVPtransformation;
-}
-
-const Matrix4f& Pipeline::GetGenWVOrthoPTrans()
 {
     GetWorldTrans();
     GetViewTrans();

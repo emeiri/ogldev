@@ -55,7 +55,7 @@ uniform sampler2D gSampler;
 uniform sampler2D gShadowMap[NUM_CASCADES];                                                               
 uniform vec3 gEyeWorldPos;                                                                  
 uniform float gMatSpecularIntensity;                                                        
-uniform float gSpecularPower;      
+uniform float gSpecularPower;
 uniform float gCascadeEndClipSpace[NUM_CASCADES];
                                                                                             
 float CalcShadowFactor(int CascadeIndex, vec4 LightSpacePos)                                                  

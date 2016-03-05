@@ -230,7 +230,7 @@ public:
 
             for (int i = 0; i < NUM_MESHES ; i++) {
                 p.Orient(m_meshOrientation[i]);
-                m_ShadowMapEffect.SetWVP(p.GetGenWVOrthoPTrans());
+                m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());
                 m_mesh.Render();
             }
         }
@@ -255,7 +255,7 @@ public:
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         for (uint i = 0 ; i < NUM_CASCADES ; i++) {
             p.SetOrthographicProj(m_shadowOrthoProjInfo[i]);        
-            m_LightingTech.SetLightWVP(i, p.GetGenWVOrthoPTrans());
+            m_LightingTech.SetLightWVP(i, p.GetWVOrthoPTrans());
         }
                 
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
