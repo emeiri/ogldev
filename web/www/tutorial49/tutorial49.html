@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 49 - Cascaded Shadow Mapping </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 49: </h2>
+            <h1> Cascaded Shadow Mapping </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+<article id="content" class="breakpoint">
+<section>
+            <h3> Background </h3>
+<p>
+    Let's take a close up look of the shadow from <a href="../tutorial47/tutorial47.html">tutorial 47</a>:
+</p>
+<img src="img1.jpg">
+<p>
+    As you can see, the shadow is not a very good one. It's too blocky. We've touched on the reason for that
+    blockiness at the end of tutorial 47 and referred to it as <i>Perspective Aliasing</i> which
+    means a large number of pixels in view space being mapped to the same pixel in the shadow map. This means
+    that all these pixels will either be in shadow or in light, contributing to the sense of blockiness. 
+    In other words, since the resolution of the shadow map is not high enough it cannot cover the view space
+    adequately. So one obvious way to deal with this is to increase the resolution of the shadow map but
+    that will increase the memory footprint of our app so it may not be the best course of action.      
+</p>
+<p>
+    Another way to deal with this problem is to notice that shadows closer to the camera a far more important
+    in terms of quality than shadow of objects that are far away. Distant objects are smaller anyway and
+    usually the eye focuses on what happens close by, leaving the rest as a "background". If we can find a way
+    to use a dedicated shadow map for closer objects and a different shadow map for distant objects then the
+    first shadow map will only need to cover the closer objects, thus decreasing the ratio that we discusses above.
+    This, in a nutshell, is what Cascaded Shadow Mapping (a.k.a CSM) is all about. At the time of writing this tutorial
+    CSM is considered one of the best ways to deal with Perpective Aliasing. Let's see how we can implement it.      
+</p>
+<p>
+    From a high level view we are going to split the view frustum into several cascades (since it doesn't need
+    to be just two as in the previous example). For the purpose of this tutorial we will use three cascades: near, middle and
+    far. The algorithm itself is pretty generic so you can use more cascades if you feel like it. Every cascade will
+    be rendered into its own private shadow map. The shadow algorithm itself will remain the same but when sampling
+    the depth from the shadow map we will need to select the appropriate map based on the distance from the viewer.
+    Let's take a look at a generic view frustum:
+</p>
+<img src="img2.png">
+<p>
+    As usual, we have a small near plane and a larger far plane. Now let's take a look at this fustum from above:
+</p>
+<img src="img3.png">
+<p>
+    The next step is to split the range from the near plane to the far plane into three. We will call this near, middle and far.
+    In addition, let's add the light direction:
+</p>
+<img src="img4.png">
+<p>
+    So how are we going to render each cascade into its own private shadow map? Let's think about the shadow
+    phase in the shadow mapping algorithm. We set up things to render the scene from the light point of view. This
+    means creating a WVP matrix with the world transform of the object, the view transform based on the light and
+    a projection matrix. Since this tutorial is based on tutorial 47 which dealt with shadows of directional lights
+    the projection matrix will be orthographic. In general CSMs make more sense in outdoor scenes where the
+    main light source is usually the sun so using a directional light here is natural. If you look at the desription
+    of the WVP matrix above you will notice that the first two parts (world and view) are the same for all cascades.
+    After all, the position of the object in the world and the orientation of the camera based on the light source
+    are not related to the splitting of the frustum into cascades. What matters here is only the projection matrix
+    because it defines the extent of the region which will eventually be rendered. And since orthographic
+    projections are defined using a box we need to define three different boxes which will be translated into 
+    three different orthographic projection matrices. These projection matrices will be used to create the three
+    WVP matrices to render each cascade into its own shadow map.   
+</p>
+<p>
+    The most logical thing to do will be to make these boxes as small as posible in order to keep the ratio
+    of view pixels to shadow map pixels as low as possible. This means creating a bounding box for each cascade
+    which is oriented along the light direction vector. Let's create such a bounding box for the first cascade:
+</p>
+<img src="img5.png">
+<p>
+    Now let's create a bounding box for the second cascade:
+    </p>
+<img src="img6.png">    
+<p>
+    And finally a bouding box for the last cascade:
+    </p>
+<img src="img7.png">    
+<p>
+    As you can see, there is some overlap of the bounding boxes due to the orientationn of the light which 
+    means some pixels will be rendered into more than one shadow map. There is no problem with that
+    as long as all the pixels of a single cascade are entirely inside a single shadow map. The selection of 
+    the shadow map to use in the shader for shadow calculations will be based on the distance of the pixel from 
+    the actual viewer. 
+</p>
+<p>
+    Calculations of the bounding boxes that serve as the basis for the orthographic projection in the
+    shadow phase is the most complicated part of the algorithm. These boxes must be described in light space
+    because the projections come after world and view transforms (at which point the light "originates" from
+    the origin and points along the positive Z axis). Since the boxes will be calculated as min/max values 
+    on all three axis they will be aligned on the light direction, which is what we need for projection. To calculate
+    the bounding box we need to know how each cascade looks like in light space. To do that we need to follow these
+    steps:
+    <ol>
+        <li>Calculate the eight corners of each cascade in view space. This is easy and requires simple trigonometry.</li>
+        <li>Transform the cascade corners 
+        </ol>    
+</p>
+
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+</section>
+</article>    
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_url = 'http://www.ogldev.org/www/tutorial47/tutorial47.html'
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</body>
+</html>
