@@ -111,8 +111,51 @@
     the bounding box we need to know how each cascade looks like in light space. To do that we need to follow these
     steps:
     <ol>
-        <li>Calculate the eight corners of each cascade in view space. This is easy and requires simple trigonometry.</li>
-        <li>Transform the cascade corners 
+        <li>Calculate the eight corners of each cascade in view space. This is easy and requires simple trigonometry:</li>
+        <br>
+          <img src="frustum1.png">
+        </li> 
+        <p>
+            The above represents an arbitrary cascade (since each cascade on its own is basically a frustum and
+            shares the same field-of-view angle with the other cascades). We need to calculate X<sub>1</sub> and
+            X<sub>2</sub>:             
+            </p>
+            <img src="calc1.png">
+            <img src="calc2.png">
+            <p>
+                This gives us the X and Z components of the eight coordinates of the cascade in view space. Using
+                similar math with the vertical field-of-view we can get the Y component and finalize the coordinates.
+        <li>Now we need to transform the cascade coordinates from view space back to world space. Let's say that the
+            viewer is oriented such that in world space the frustum looks like that (the red arrow is the light direction
+            but ignore it for now):</li>
+            <br>
+        </li>
+        <img src="frustum2.png">
+        <p>
+            In order to transform from world space to view space we multiply the world position vector by
+            the view matrix (which is based on the camera location and rotation). This means that if we already
+            have the coordinates of the cascade in view space we must multiply them by the inverse of the view matrix
+            in order to transform them to world space:
+            </p>        
+    <img src="calc3.png">         
+    <li>
+        With the frustum coordinates in world space we can now transform them to light space as any other object.
+        Remember that the light space is exactly like view space but instead of the camera we use the light source. 
+        Since we are dealing with a directional light that has no origin we just need to rotate the world so that
+        the light direction becomes aligned with the positive Z axis. The origin of light can simply be the origin
+        of the light space coordinate system (which means we don't need any translation). If we do that using the previous
+        diagram (with the red arrow being the light direction) the cascade frustum in light space should look like: 
+        </li>   
+        <br>
+        <img src="frustum3.png">
+        <li>
+            With the cascade coordinates finally in light space we just need to generate a bounding box for it
+            by taking the min/max values of the X/Y/Z components of the eight coordinates. This bounding box 
+            provides the values for the orthographic projection for rendering this cascade into its shadow map.
+            By generating an orthographic projection for each cascade separately we can now render each cascade
+            into different shadow map. During the light phase we will calculate the shadow factor by selecting
+            a shadow map based on the distance from the viewer. 
+            </li>
         </ol>    
 </p>
 
