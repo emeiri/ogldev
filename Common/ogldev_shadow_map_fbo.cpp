@@ -155,5 +155,4 @@ void CascadedShadowMapFBO::BindForReading()
 
     glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT2);
     glBindTexture(GL_TEXTURE_2D, m_shadowMap[2]);
-
 }

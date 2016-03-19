@@ -70,7 +70,6 @@ public:
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.Direction = Vector3f(1.0f, -1.0f, 0.0f);
-      //  m_dirLight.Direction = Vector3f(0.0f, 0.0f, 1.0f);
 
         m_persProjInfo.FOV    = 90.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
@@ -107,7 +106,7 @@ public:
             return false;
         }
         
-        if (!m_csmFBO.Init(1024, 1024)) {
+        if (!m_csmFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             return false;
         }
 		
@@ -124,8 +123,8 @@ public:
             return false;
         }
 
-        GLExitIfError
         m_LightingTech.Enable();               
+
         m_LightingTech.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_LightingTech.SetShadowMapTextureUnit();		
         m_LightingTech.SetDirectionalLight(m_dirLight);
@@ -140,10 +139,7 @@ public:
             vClip.Print();
             m_LightingTech.SetCascadeEndClipSpace(i, vClip.z);
         }
-        
-        
-     //   exit(0);
-        
+              
         if (!m_mesh.LoadMesh("../Content/dragon.obj")) {
             return false;            
         }                
@@ -215,6 +211,8 @@ public:
     void ShadowMapPass()
     {      
         CalcOrthoProjs();
+
+        m_ShadowMapEffect.Enable();        
         
         Pipeline p;
                 
@@ -224,8 +222,6 @@ public:
             m_csmFBO.BindForWriting(i);
             glClear(GL_DEPTH_BUFFER_BIT);            
                         
-            m_ShadowMapEffect.Enable();
-
             p.SetOrthographicProj(m_shadowOrthoProjInfo[i]);                    
 
             for (int i = 0; i < NUM_MESHES ; i++) {

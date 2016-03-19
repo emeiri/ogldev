@@ -89,7 +89,7 @@ public:
 
     bool Init()
     {
-        if (!m_shadowMapFBO.Init(1024, 1024)) {
+        if (!m_shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             return false;
         }
 
@@ -198,8 +198,8 @@ public:
         p.Orient(m_quad.GetOrientation());
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());        
-        p.SetPerspectiveProj(m_persProjInfo);        
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
+        p.SetPerspectiveProj(m_persProjInfo);        
         m_LightingTech.SetWVP(p.GetWVPTrans());
         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());        
         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);

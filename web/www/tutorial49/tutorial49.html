@@ -158,11 +158,431 @@
             </li>
         </ol>    
 </p>
-
 </section>
 
 <section>
 <h3> Source walkthru </h3>
+<p>(ogldev_shadow_map_fbo.cpp:104)</p>
+
+<code>
+bool CascadedShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)<br>
+{<br>
+&nbsp; &nbsp;     // Create the FBO<br>
+&nbsp; &nbsp;     glGenFramebuffers(1, &m_fbo);<br>
+<br>
+&nbsp; &nbsp;     // Create the depth buffer    <br>
+&nbsp; &nbsp;     glGenTextures(ARRAY_SIZE_IN_ELEMENTS(m_shadowMap), m_shadowMap);<br>
+    <br>
+&nbsp; &nbsp;     for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_shadowMap) ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glBindTexture(GL_TEXTURE_2D, m_shadowMap[i]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);<br>
+&nbsp; &nbsp;     }<br>
+<br>
+&nbsp; &nbsp;     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);<br>
+&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[0], 0);<br>
+<br>
+&nbsp; &nbsp;     // Disable writes to the color buffer<br>
+&nbsp; &nbsp;     glDrawBuffer(GL_NONE);<br>
+&nbsp; &nbsp;     glReadBuffer(GL_NONE);<br>
+<br>
+&nbsp; &nbsp;     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);<br>
+<br>
+&nbsp; &nbsp;     if (Status != GL_FRAMEBUFFER_COMPLETE) {<br>
+&nbsp; &nbsp;         printf("FB error, status: 0x%x\n", Status);<br>
+&nbsp; &nbsp;         return false;<br>
+&nbsp; &nbsp;     }<br>
+<br>
+&nbsp; &nbsp;     return true;<br>
+}<br>
+<br>
+<br>
+void CascadedShadowMapFBO::BindForWriting(uint CascadeIndex)<br>
+{<br>
+&nbsp; &nbsp;     assert(CascadeIndex < ARRAY_SIZE_IN_ELEMENTS(m_shadowMap));<br>
+&nbsp; &nbsp;     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);<br>
+&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[CascadeIndex], 0);<br>    
+}<br>
+<br>
+<br>
+void CascadedShadowMapFBO::BindForReading()<br>
+{<br>
+&nbsp; &nbsp;     glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT0);<br>
+&nbsp; &nbsp;     glBindTexture(GL_TEXTURE_2D, m_shadowMap[0]);<br>
+<br>
+&nbsp; &nbsp;     glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT1);<br>
+&nbsp; &nbsp;     glBindTexture(GL_TEXTURE_2D, m_shadowMap[1]);<br>
+<br>
+&nbsp; &nbsp;     glActiveTexture(CASCACDE_SHADOW_TEXTURE_UNIT2);<br>
+&nbsp; &nbsp;     glBindTexture(GL_TEXTURE_2D, m_shadowMap[2]);<br>
+}<br>
+</code>
+<p>
+    The CascadedShadowMapFBO class we see above is a modification of the ShadowMapFBO class
+    that we have previously used for shadow mapping. The main change is that the m_shadowMap
+    array has space for three shadow map objects which is the number of cascades we are going
+    to use for this example. Here we have the three main functions of the class used to
+    initialize it, bind it for writing in the shadow map phase and for reading in the lighting phase.
+    </p>
+
+<p>(tutorial49.cpp:201)</p>
+<code>    
+    virtual void RenderSceneCB()<br>
+    {   <br>
+&nbsp; &nbsp;        for (int i = 0; i < NUM_MESHES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_meshOrientation[i].m_rotation.y += 0.5f;<br>
+&nbsp; &nbsp;         }<br>
+        <br>
+&nbsp; &nbsp;         m_pGameCamera->OnRender();<br>
+        <br>
+&nbsp; &nbsp;         ShadowMapPass();<br>
+&nbsp; &nbsp;         RenderPass();<br>
+&nbsp; &nbsp;         OgldevBackendSwapBuffers();<br>
+    }
+</code>    
+<p>
+    The main render function in the CCM algorithm is the same as in the standard shadow mapping algorithm.
+    </p>
+<p>(tutorial49.cpp:215)</p>    
+<code>   
+    void ShadowMapPass()<br>
+    {      <br>
+&nbsp; &nbsp;         <b>CalcOrthoProjs();</b><br>
+<br>
+&nbsp; &nbsp;         m_ShadowMapEffect.Enable();<br>               
+&nbsp; &nbsp;         Pipeline p;<br>
+                <br>
+&nbsp; &nbsp;                 // The camera is set as the light source - doesn't change in this phase<br>
+&nbsp; &nbsp;         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
+               <br>
+&nbsp; &nbsp;         for (uint i = 0 ; i < NUM_CASCADES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             // Bind and clear the current cascade<br>
+&nbsp; &nbsp; &nbsp; &nbsp;            <b> m_csmFBO.BindForWriting(i);</b><br>
+&nbsp; &nbsp; &nbsp; &nbsp;             glClear(GL_DEPTH_BUFFER_BIT);  <br>          
+                        <br>
+&nbsp; &nbsp; &nbsp; &nbsp;           <b>  p.SetOrthographicProj(m_shadowOrthoProjInfo[i]);</b><br>                    
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             for (int i = 0; i < NUM_MESHES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 p.Orient(m_meshOrientation[i]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 m_ShadowMapEffect.SetWVP(p.GetWVOrthoPTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 m_mesh.Render();<br>
+&nbsp; &nbsp;             &nbsp; &nbsp; }<br>
+&nbsp; &nbsp;         }<br>
+        <br>
+&nbsp; &nbsp;         glBindFramebuffer(GL_FRAMEBUFFER, 0);<br>
+    }
+</code> 
+<p>
+    There are a few changes in the shadow mapping phase worth noting. The first is the call to CalOrthoProjs()
+    at the start of the phase. This function is responsible for calculating the bounding boxes used for
+    orthographic projections. The next change is the loop over the cascades. Each cascade must be bound for writing 
+    and cleared separately. Each cascade has its own projection set up in the m_shadowOrthoProjInfo array (done by
+    CalcOrthoProjs). Since we don't know which mesh goes to which cascade (and it can be more than one) we have
+    to render the entire scene into all the cascades.
+</p>   
+<p>(tutorial49.cpp:241)</p>
+<code>
+    void RenderPass()<br>
+    {<br>
+&nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);<br>
+<br>
+&nbsp; &nbsp;         m_LightingTech.Enable();<br>
+<br>
+&nbsp; &nbsp;         m_LightingTech.SetEyeWorldPos(m_pGameCamera->GetPos());<br>
+       <br>
+&nbsp; &nbsp;         m_csmFBO.BindForReading();<br>
+<br>
+&nbsp; &nbsp;         Pipeline p;<br>        
+&nbsp; &nbsp;         p.Orient(m_quad.GetOrientation());<br>                
+&nbsp; &nbsp;         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
+<br>
+&nbsp; &nbsp;   <b>      for (uint i = 0 ; i < NUM_CASCADES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             p.SetOrthographicProj(m_shadowOrthoProjInfo[i]);<br>        
+&nbsp; &nbsp; &nbsp; &nbsp;             m_LightingTech.SetLightWVP(i, p.GetWVOrthoPTrans());<br>
+&nbsp; &nbsp;         }</b><br>
+                <br>
+&nbsp; &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+&nbsp; &nbsp;         p.SetPerspectiveProj(m_persProjInfo);                <br>
+&nbsp; &nbsp;         m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp;         m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>        
+&nbsp; &nbsp;         m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);<br>
+<br>
+&nbsp; &nbsp;         m_quad.Render();<br>
+           <br>
+&nbsp; &nbsp;         for (int i = 0; i < NUM_MESHES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             p.Orient(m_meshOrientation[i]);        <br>             
+&nbsp; &nbsp; &nbsp; &nbsp;             m_LightingTech.SetWVP(p.GetWVPTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_mesh.Render();<br>
+&nbsp; &nbsp;         }<br>
+    }    
+    </code>
+ <p>
+     The only change in the lighting phase is that instead of a single light WVP matrix we have three.
+     They are identical expect for the projection part. We set them up accordingly in the loop at the middle
+     of the phase.
+     </p> 
+<p>(tutorial49.cpp:80)</p>     
+<code>
+&nbsp; &nbsp;         m_cascadeEnd[0] = m_persProjInfo.zNear;<br>
+&nbsp; &nbsp;         m_cascadeEnd[1] = 25.0f,<br>
+&nbsp; &nbsp;         m_cascadeEnd[2] = 90.0f,<br>
+&nbsp; &nbsp;         m_cascadeEnd[3] = m_persProjInfo.zFar;<br>    
+    </code>     
+    <p>
+Before we study how to calculate the orthographic projections we need to take a look
+at the m_cascadeEnd array (which is set up as part of the constructor). This array defines the 
+cascades by placing the near Z and far Z in the first and last slots, respectively, and ends of
+the cascades in between. So the first cascade ends in the value of slot one, the second in slot two
+and the last cascade ends with the far Z in the last slot. We need the near Z in the first slot to simplify
+the calculations later.
+</p>
+<p>(tutorial49.cpp:320)</p>
+<code>
+    void CalcOrthoProjs()<br>
+    {                        <br>           
+&nbsp; &nbsp;         Pipeline p;<br>
+        <br>
+&nbsp; &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
+&nbsp; &nbsp;         Matrix4f Cam = p.GetViewTrans();<br>
+&nbsp; &nbsp;         Matrix4f CamInv = Cam.Inverse();<br>
+        <br>
+&nbsp; &nbsp;         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
+&nbsp; &nbsp;         Matrix4f LightM = p.GetViewTrans();<br>
+        <br>
+&nbsp; &nbsp;         float ar = m_persProjInfo.Height / m_persProjInfo.Width;<br>
+&nbsp; &nbsp;         float tanHalfHFOV = tanf(ToRadian(m_persProjInfo.FOV / 2.0f));<br>
+&nbsp; &nbsp;         float tanHalfVFOV = tanf(ToRadian((m_persProjInfo.FOV * ar) / 2.0f));<br>
+                        <br>
+&nbsp; &nbsp;         for (uint i = 0 ; i < NUM_CASCADES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float xn = m_cascadeEnd[i]     * tanHalfHFOV;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float xf = m_cascadeEnd[i + 1] * tanHalfHFOV;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float yn = m_cascadeEnd[i]     * tanHalfVFOV;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float yf = m_cascadeEnd[i + 1] * tanHalfVFOV;<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             Vector4f frustumCorners[NUM_FRUSTUM_CORNERS] = {<br> 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 // near face<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(xn,   yn, m_cascadeEnd[i], 1.0),<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(-xn,  yn, m_cascadeEnd[i], 1.0),<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(xn,  -yn, m_cascadeEnd[i], 1.0),<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(-xn, -yn, m_cascadeEnd[i], 1.0),<br>
+                <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 // far face<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(xf,   yf, m_cascadeEnd[i + 1], 1.0),<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(-xf,  yf, m_cascadeEnd[i + 1], 1.0),<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(xf,  -yf, m_cascadeEnd[i + 1], 1.0),<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f(-xf, -yf, m_cascadeEnd[i + 1], 1.0)     <br>       
+&nbsp; &nbsp; &nbsp; &nbsp;             };<br>
+</code>
+<p>
+    What we see above matches step #1 of the description in the background section on how we 
+    calculate the orthographic projections for the cascades. The frustumCorners array is populated with
+    the eight corners of each cascade in view space. Note that since the field of view is provided only
+    for the horizontal axis we have to extrapolate it for the vertical axis (e.g, if the horizontal field of
+    view is 90 degrees and the window has a width of 1000 and a height of 500 the vertical field of view
+    will be only 45 degrees). 
+    </p>
+<code>    
+&nbsp; &nbsp; &nbsp; &nbsp;             Vector4f frustumCornersL[NUM_FRUSTUM_CORNERS];<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float minX = std::numeric_limits<float>::max();<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float maxX = std::numeric_limits<float>::min();<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float minY = std::numeric_limits<float>::max();<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float maxY = std::numeric_limits<float>::min();<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float minZ = std::numeric_limits<float>::max();<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             float maxZ = std::numeric_limits<float>::min();<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             for (uint j = 0 ; j < NUM_FRUSTUM_CORNERS ; j++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f vW = CamInv * frustumCorners[j];<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 frustumCornersL[j] = LightM * vW;<br>
+<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                  minX = min(minX, frustumCornersL[j].x);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 maxX = max(maxX, frustumCornersL[j].x);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 minY = min(minY, frustumCornersL[j].y);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 maxY = max(maxY, frustumCornersL[j].y);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 minZ = min(minZ, frustumCornersL[j].z);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 maxZ = max(maxZ, frustumCornersL[j].z);<br>
+&nbsp; &nbsp; &nbsp; &nbsp;            }<br>           
+</code>          
+<p>
+    The above code contains step #2 until #4. Each frustum corner coordinate is multiplied
+    by the inverse view transform in order to bring it into world  space. It is then
+    multiplied by the light transform in order to move it into light space. We then use
+    a series of min/max functions in order to find the size of the bounding box of the cascade in 
+    light space.
+    </p>  
+    <code>           
+&nbsp; &nbsp; &nbsp; &nbsp;             m_shadowOrthoProjInfo[i].r = maxX;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_shadowOrthoProjInfo[i].l = minX;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_shadowOrthoProjInfo[i].b = minY;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_shadowOrthoProjInfo[i].t = maxY;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_shadowOrthoProjInfo[i].f = maxZ;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             m_shadowOrthoProjInfo[i].n = minZ;<br>
+&nbsp; &nbsp; 		}<br>
+	}
+</code>    
+<p>
+    The current entry in the m_shadowOrthoProjInfo array is populated using the values 
+    of the bounding box.
+    </p>
+    <p>(csm.vs)</p>
+<code>
+#version 330   <br>                                                                     
+                   <br>                                                                 
+layout (location = 0) in vec3 Position;                                             <br>
+layout (location = 1) in vec2 TexCoord;<br>                                             
+layout (location = 2) in vec3 Normal;      <br>                                         
+                                               <br>                                     
+uniform mat4 gWVP;                                 <br>                                 
+                                                       <br>                                                                                                                
+void main()                                                <br>                         
+{                                                              <br>                     
+&nbsp; &nbsp;     gl_Position = gWVP * vec4(Position, 1.0);<br>
+}
+</code>
+<p>(csm.fs)</p>
+<code>
+#version 330<br>                                                                                                                                                                                                                                          
+                <br>                                                                    
+void main()         <br>                                                                
+{                       <br>                                                            
+}
+ </code>
+ <p>
+     There is nothing new in the vertex and fragment shaders of the shadow map phase. We render just the depth
+     as usual and all the changes happen in the application code.
+     </p>
+<p>(lighting.vs)</p>      
+<code>
+#version 330<br>
+<br>
+layout (location = 0) in vec3 Position;<br>
+layout (location = 1) in vec2 TexCoord;<br>
+layout (location = 2) in vec3 Normal;<br>
+<br>
+<b>const int NUM_CASCADES = 3;</b><br>
+<br>
+uniform mat4 gWVP;<br>
+uniform mat4 gLightWVP<b>[NUM_CASCADES];</b><br>
+uniform mat4 gWorld;<br>
+<br>
+out vec4 LightSpacePos<b>[NUM_CASCADES];</b><br>
+<b>out float ClipSpacePosZ;</b><br>
+out vec2 TexCoord0;<br>
+out vec3 Normal0;<br>
+out vec3 WorldPos0;<br>
+<br>
+void main()<br>
+{<br>
+&nbsp; &nbsp;     vec4 Pos = vec4(Position, 1.0);<br>
+<br>
+&nbsp; &nbsp;     gl_Position = gWVP * Pos;<br>
+    <br>
+&nbsp; &nbsp;    <b> for (int i = 0 ; i < NUM_CASCADES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         LightSpacePos[i] = gLightWVP[i] * Pos;<br>
+&nbsp; &nbsp;     }<br>
+<br>
+&nbsp; &nbsp;     ClipSpacePosZ = gl_Position.z;</b><br>
+&nbsp; &nbsp;     TexCoord0     = TexCoord;<br>
+&nbsp; &nbsp;     Normal0       = (gWorld * vec4(Normal, 0.0)).xyz;<br>
+&nbsp; &nbsp;     WorldPos0     = (gWorld * vec4(Position, 1.0)).xyz;<br>
+}
+</code>    
+<p>
+    Let's review the changes in the vertex shader of the lighting phase. Instead
+    of a single position in light space we are going to output one for each cascade
+    and select the proper one for each pixel in the fragment shader. You can optimize this 
+    later but for educational purposes I found this to be the simplest way to go. Remember
+    that you cannot select the cascade in the vertex shader anyway because a triangle 
+    can be cross cascade. So we have three light space WVP matrices and we output
+    three light space positions. In addition, we also output the Z component of
+    the clip space coordinate. We will use this in the fragment shader to select 
+    the cascade. Note that this is calculated in view space and not light space.   
+    </p>
+<p>(lighting.fs)</p>         
+<code>
+const int NUM_CASCADES = 3;<br>
+<br>
+in vec4 LightSpacePos[NUM_CASCADES];<br>
+in float ClipSpacePosZ;<br>
+<br>
+uniform sampler2D gShadowMap[NUM_CASCADES];<br>
+uniform float gCascadeEndClipSpace[NUM_CASCADES];<br>    
+</code>
+<p>
+    The fragment shader of the lighting phase requires some changes/additions in
+    the general section. We get the three light space positions calculated by
+    the vertex shader as input as well as the Z component of the clip space coordinate.
+    Instead of a single shadow map we now have three. In addition, the application must supply
+    the end of each cascade in clip space. We will see later how to calculate this. For now
+    just assume that it is available.
+</p>
+<code>
+float CalcShadowFactor(<b>int CascadeIndex,</b> vec4 LightSpacePos)<br>                                                  
+{                                                               <br>                            
+&nbsp; &nbsp;     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;          <br>
+<br>                        
+&nbsp; &nbsp;     vec2 UVCoords;                                                      <br>                    
+&nbsp; &nbsp;     UVCoords.x = 0.5 * ProjCoords.x + 0.5;                                  <br>                
+&nbsp; &nbsp;     UVCoords.y = 0.5 * ProjCoords.y + 0.5;                                      <br>
+<br>            
+&nbsp; &nbsp;     float z = 0.5 * ProjCoords.z + 0.5;                                             <br>        
+&nbsp; &nbsp;     float Depth = texture(gShadowMap<b>[CascadeIndex]</b>, UVCoords).x;                        <br>
+<br>                  
+&nbsp; &nbsp;     if (Depth < z + 0.00001)                                                                <br> 
+&nbsp; &nbsp; &nbsp; &nbsp;         return 0.5;<br>                                                                         
+&nbsp; &nbsp;     else               <br>                                                                     
+&nbsp; &nbsp; &nbsp; &nbsp;         return 1.0;        <br>                                                                 
+}                              <br>                                                             
+    <br>
+void main()<br>                                                                        
+{              <br>                                                                                 
+&nbsp; &nbsp;     float ShadowFactor = 0.0;<br>
+<br>
+&nbsp; &nbsp;     for (int i = 0 ; i < NUM_CASCADES ; i++) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         if (ClipSpacePosZ < gCascadeEndClipSpace[i]) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             ShadowFactor = CalcShadowFactor(i, LightSpacePos[i]);<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             break;<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         }<br>
+&nbsp; &nbsp;    }<br>
+&nbsp; &nbsp;    ...    
+</code>    
+<p>
+    In order to find out the proper cascade for the current pixel
+    we traverse the uniform gCascadeEndClipSpace array and compare the Z component of the
+    clip space coordinate to each entry. The array is sorted from the closest cascade to
+    the furthest. We stop as soon as we find an entry whose value is greater than or equal 
+    to that Z component. We then call the CalcShadowFactor() function and pass in the index of the
+    cascade we found. The only change to CalcShadowFactor() is that it samples the depth from the
+    shadow map which matches that index. Everything else is the same.
+    </p>
+<p>(tutorial49.cpp:134)</p>    
+<code>
+        for (uint i = 0 ; i < NUM_CASCADES ; i++) {<br>
+&nbsp; &nbsp;             Matrix4f Proj;<br>
+&nbsp; &nbsp;             Proj.InitPersProjTransform(m_persProjInfo);<br>
+&nbsp; &nbsp;             Vector4f vView(0.0f, 0.0f, m_cascadeEnd[i + 1], 1.0f);<br>
+&nbsp; &nbsp;             Vector4f vClip = Proj * vView;<br>
+&nbsp; &nbsp;             m_LightingTech.SetCascadeEndClipSpace(i, vClip.z);<br>
+        }    
+</code>       
+<p>
+    The last piece of the puzzle is to prepare the values for the gCascadeEndClipSpace array. 
+    For this we simply take the (0, 0, Z) coordinate where Z is the end of the cascade in view space.
+    We project it using our standard perspective projection transform to move it into clip space. 
+    We do this for each cascade in order to calculate the end of every cascade in clip space. 
+    </p>
+<p>
+    If you study the tutorial sample code you will see that I've added a cascade indicator
+    by adding a red, green or blue color to each cascade to make them stand out. This is
+    very useful for debugging because you can actually see the extent of each cascade. 
+    With the CSM algorithm (and the cascade indicator) the scene should now look like this:
+    </p>    
+<img src="final.jpg">
 </section>
 </article>    
 

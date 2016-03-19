@@ -5,7 +5,7 @@ const int MAX_SPOT_LIGHTS = 2;
 const int NUM_CASCADES = 3;
 
 in vec4 LightSpacePos[NUM_CASCADES];
-in vec4 ClipSpacePos;
+in float ClipSpacePosZ;
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 WorldPos0;
@@ -52,7 +52,7 @@ uniform DirectionalLight gDirectionalLight;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];                                          
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];                                             
 uniform sampler2D gSampler;                                                                 
-uniform sampler2D gShadowMap[NUM_CASCADES];                                                               
+uniform sampler2D gShadowMap[NUM_CASCADES];
 uniform vec3 gEyeWorldPos;                                                                  
 uniform float gMatSpecularIntensity;                                                        
 uniform float gSpecularPower;
@@ -137,7 +137,7 @@ void main()
     vec4 CascadeIndicator = vec4(0.0, 0.0, 0.0, 0.0);
 
     for (int i = 0 ; i < NUM_CASCADES ; i++) {
-        if (ClipSpacePos.z < gCascadeEndClipSpace[i]) {
+        if (ClipSpacePosZ <= gCascadeEndClipSpace[i]) {
             ShadowFactor = CalcShadowFactor(i, LightSpacePos[i]);
 
             if (i == 0) 
