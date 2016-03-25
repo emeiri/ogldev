@@ -31,12 +31,12 @@
 </p>
 <img src="img1.jpg">
 <p>
-    As you can see, the shadow is not a very good one. It's too blocky. We've touched on the reason for that
+    As you can see, the qaulity of the shadow is not high. It's too blocky. We've touched on the reason for that
     blockiness at the end of tutorial 47 and referred to it as <i>Perspective Aliasing</i> which
     means a large number of pixels in view space being mapped to the same pixel in the shadow map. This means
     that all these pixels will either be in shadow or in light, contributing to the sense of blockiness. 
     In other words, since the resolution of the shadow map is not high enough it cannot cover the view space
-    adequately. So one obvious way to deal with this is to increase the resolution of the shadow map but
+    adequately. One obvious way to deal with this is to increase the resolution of the shadow map but
     that will increase the memory footprint of our app so it may not be the best course of action.      
 </p>
 <p>
@@ -44,9 +44,9 @@
     in terms of quality than shadow of objects that are far away. Distant objects are smaller anyway and
     usually the eye focuses on what happens close by, leaving the rest as a "background". If we can find a way
     to use a dedicated shadow map for closer objects and a different shadow map for distant objects then the
-    first shadow map will only need to cover the closer objects, thus decreasing the ratio that we discusses above.
+    first shadow map will only need to cover the a smaller region, thus decreasing the ratio that we discusses above.
     This, in a nutshell, is what Cascaded Shadow Mapping (a.k.a CSM) is all about. At the time of writing this tutorial
-    CSM is considered one of the best ways to deal with Perpective Aliasing. Let's see how we can implement it.      
+    CSM is considered one of the best ways to deal with Perspective Aliasing. Let's see how we can implement it.      
 </p>
 <p>
     From a high level view we are going to split the view frustum into several cascades (since it doesn't need
@@ -58,12 +58,12 @@
 </p>
 <img src="img2.png">
 <p>
-    As usual, we have a small near plane and a larger far plane. Now let's take a look at this fustum from above:
+    As usual, we have a small near plane and a larger far plane. Now let's take a look at the same fustum from above:
 </p>
 <img src="img3.png">
 <p>
-    The next step is to split the range from the near plane to the far plane into three. We will call this near, middle and far.
-    In addition, let's add the light direction:
+    The next step is to split the range from the near plane to the far plane into three parts. We will call this near, middle and far.
+    In addition, let's add the light direction (the arrow on the right hand side):
 </p>
 <img src="img4.png">
 <p>
@@ -72,8 +72,8 @@
     means creating a WVP matrix with the world transform of the object, the view transform based on the light and
     a projection matrix. Since this tutorial is based on tutorial 47 which dealt with shadows of directional lights
     the projection matrix will be orthographic. In general CSMs make more sense in outdoor scenes where the
-    main light source is usually the sun so using a directional light here is natural. If you look at the desription
-    of the WVP matrix above you will notice that the first two parts (world and view) are the same for all cascades.
+    main light source is usually the sun so using a directional light here is natural. If you look at the 
+    WVP matrix above you will notice that the first two parts (world and view) are the same for all cascades.
     After all, the position of the object in the world and the orientation of the camera based on the light source
     are not related to the splitting of the frustum into cascades. What matters here is only the projection matrix
     because it defines the extent of the region which will eventually be rendered. And since orthographic
@@ -116,15 +116,16 @@
           <img src="frustum1.png">
         </li> 
         <p>
-            The above represents an arbitrary cascade (since each cascade on its own is basically a frustum and
-            shares the same field-of-view angle with the other cascades). We need to calculate X<sub>1</sub> and
+            The above image represents an arbitrary cascade (since each cascade on its own is basically a frustum and
+            shares the same field-of-view angle with the other cascades). Note that we are looking from the top 
+            down to the XZ plane. We need to calculate X<sub>1</sub> and
             X<sub>2</sub>:             
             </p>
             <img src="calc1.png">
             <img src="calc2.png">
             <p>
                 This gives us the X and Z components of the eight coordinates of the cascade in view space. Using
-                similar math with the vertical field-of-view we can get the Y component and finalize the coordinates.
+                similar math with the vertical field-of-view angle we can get the Y component and finalize the coordinates.
         <li>Now we need to transform the cascade coordinates from view space back to world space. Let's say that the
             viewer is oriented such that in world space the frustum looks like that (the red arrow is the light direction
             but ignore it for now):</li>
@@ -229,7 +230,7 @@ void CascadedShadowMapFBO::BindForReading()<br>
     initialize it, bind it for writing in the shadow map phase and for reading in the lighting phase.
     </p>
 
-<p>(tutorial49.cpp:201)</p>
+<p>(tutorial49.cpp:197)</p>
 <code>    
     virtual void RenderSceneCB()<br>
     {   <br>
@@ -245,15 +246,17 @@ void CascadedShadowMapFBO::BindForReading()<br>
     }
 </code>    
 <p>
-    The main render function in the CCM algorithm is the same as in the standard shadow mapping algorithm.
+    The main render function in the CCM algorithm is the same as in the standard shadow mapping algorithm - first
+    render into the shadow maps and then use them for the actual lighting.
     </p>
-<p>(tutorial49.cpp:215)</p>    
+<p>(tutorial49.cpp:211)</p>    
 <code>   
     void ShadowMapPass()<br>
     {      <br>
 &nbsp; &nbsp;         <b>CalcOrthoProjs();</b><br>
 <br>
-&nbsp; &nbsp;         m_ShadowMapEffect.Enable();<br>               
+&nbsp; &nbsp;         m_ShadowMapEffect.Enable();<br>
+<br>               
 &nbsp; &nbsp;         Pipeline p;<br>
                 <br>
 &nbsp; &nbsp;                 // The camera is set as the light source - doesn't change in this phase<br>
@@ -279,12 +282,12 @@ void CascadedShadowMapFBO::BindForReading()<br>
 <p>
     There are a few changes in the shadow mapping phase worth noting. The first is the call to CalOrthoProjs()
     at the start of the phase. This function is responsible for calculating the bounding boxes used for
-    orthographic projections. The next change is the loop over the cascades. Each cascade must be bound for writing 
-    and cleared separately. Each cascade has its own projection set up in the m_shadowOrthoProjInfo array (done by
+    orthographic projections. The next change is the loop over the cascades. Each cascade must be bound for writing, 
+    cleared and rendered to separately. Each cascade has its own projection set up in the m_shadowOrthoProjInfo array (done by
     CalcOrthoProjs). Since we don't know which mesh goes to which cascade (and it can be more than one) we have
     to render the entire scene into all the cascades.
 </p>   
-<p>(tutorial49.cpp:241)</p>
+<p>(tutorial49.cpp:238)</p>
 <code>
     void RenderPass()<br>
     {<br>
@@ -323,7 +326,7 @@ void CascadedShadowMapFBO::BindForReading()<br>
     </code>
  <p>
      The only change in the lighting phase is that instead of a single light WVP matrix we have three.
-     They are identical expect for the projection part. We set them up accordingly in the loop at the middle
+     They are identical except for the projection part. We set them up accordingly in the loop at the middle
      of the phase.
      </p> 
 <p>(tutorial49.cpp:80)</p>     
@@ -336,21 +339,23 @@ void CascadedShadowMapFBO::BindForReading()<br>
     <p>
 Before we study how to calculate the orthographic projections we need to take a look
 at the m_cascadeEnd array (which is set up as part of the constructor). This array defines the 
-cascades by placing the near Z and far Z in the first and last slots, respectively, and ends of
+cascades by placing the near Z and far Z in the first and last slots, respectively, and the ends of
 the cascades in between. So the first cascade ends in the value of slot one, the second in slot two
 and the last cascade ends with the far Z in the last slot. We need the near Z in the first slot to simplify
 the calculations later.
 </p>
-<p>(tutorial49.cpp:320)</p>
+<p>(tutorial49.cpp:317)</p>
 <code>
     void CalcOrthoProjs()<br>
     {                        <br>           
 &nbsp; &nbsp;         Pipeline p;<br>
         <br>
+&nbsp; &nbsp;         // Get the inverse of the view transform<br>        
 &nbsp; &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());<br>
 &nbsp; &nbsp;         Matrix4f Cam = p.GetViewTrans();<br>
 &nbsp; &nbsp;         Matrix4f CamInv = Cam.Inverse();<br>
         <br>
+&nbsp; &nbsp;         // Get the light space tranform<br> 
 &nbsp; &nbsp;         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));<br>
 &nbsp; &nbsp;         Matrix4f LightM = p.GetViewTrans();<br>
         <br>
@@ -379,7 +384,7 @@ the calculations later.
 &nbsp; &nbsp; &nbsp; &nbsp;             };<br>
 </code>
 <p>
-    What we see above matches step #1 of the description in the background section on how we 
+    What we see above matches step #1 of the description in the background section on how to 
     calculate the orthographic projections for the cascades. The frustumCorners array is populated with
     the eight corners of each cascade in view space. Note that since the field of view is provided only
     for the horizontal axis we have to extrapolate it for the vertical axis (e.g, if the horizontal field of
@@ -396,8 +401,10 @@ the calculations later.
 &nbsp; &nbsp; &nbsp; &nbsp;             float minZ = std::numeric_limits<float>::max();<br>
 &nbsp; &nbsp; &nbsp; &nbsp;             float maxZ = std::numeric_limits<float>::min();<br>
 <br>
-&nbsp; &nbsp; &nbsp; &nbsp;             for (uint j = 0 ; j < NUM_FRUSTUM_CORNERS ; j++) {<br>
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f vW = CamInv * frustumCorners[j];<br>
+&nbsp; &nbsp; &nbsp; &nbsp;             for (uint j = 0 ; j < NUM_FRUSTUM_CORNERS ; j++) {<br><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 // Transform the frustum coordinate from view to world space<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 Vector4f vW = CamInv * frustumCorners[j];<br><br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 // Transform the frustum coordinate from world to light space<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                 frustumCornersL[j] = LightM * vW;<br>
 <br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;                  minX = min(minX, frustumCornersL[j].x);<br>
@@ -453,8 +460,8 @@ void main()         <br>
 }
  </code>
  <p>
-     There is nothing new in the vertex and fragment shaders of the shadow map phase. We render just the depth
-     as usual and all the changes happen in the application code.
+     There is nothing new in the vertex and fragment shaders of the shadow map phase. We just need to
+     render the depth.
      </p>
 <p>(lighting.vs)</p>      
 <code>
@@ -544,7 +551,7 @@ void main()<br>
 &nbsp; &nbsp;     float ShadowFactor = 0.0;<br>
 <br>
 &nbsp; &nbsp;     for (int i = 0 ; i < NUM_CASCADES ; i++) {<br>
-&nbsp; &nbsp; &nbsp; &nbsp;         if (ClipSpacePosZ < gCascadeEndClipSpace[i]) {<br>
+&nbsp; &nbsp; &nbsp; &nbsp;         if (ClipSpacePosZ <= gCascadeEndClipSpace[i]) {<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             ShadowFactor = CalcShadowFactor(i, LightSpacePos[i]);<br>
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             break;<br>
 &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
