@@ -95,7 +95,9 @@
       and non adjacent) and the GS (if it exists) is executed on a group of six vertices that include
       the triangle and its adjacent vertices. When the GS is present it is up to the developer to
       supply an output topology but if there is no GS the rasterizer knows how to deal with such a scheme
-      and it rasterizes only the actual triangles (ignoring the adjacent triangles).
+      and it rasterizes only the actual triangles (ignoring the adjacent triangles). One of the readers
+      informed me that such a setup has produced an error on his Macbook with Intel HD 3000 so if
+      you run into a similar problem simply use a pass thru GS, or change the topology type.  
       </p>
       <p>
       Note that the adjacent vertices in the vertex buffer have the same format and attributes as regular
