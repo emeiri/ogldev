@@ -281,7 +281,7 @@
             void ShadowMapFBO::BindForWriting(GLenum CubeFace)<br>
             {<br>
             &nbsp; &nbsp;     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);<br>
-            &nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);<br>
+            &nbsp; &nbsp;     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);<br>
             &nbsp; &nbsp;     glDrawBuffer(GL_COLOR_ATTACHMENT0);<br>
             }    
             </code>

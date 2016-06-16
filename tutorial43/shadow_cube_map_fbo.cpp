@@ -96,7 +96,7 @@ bool ShadowCubeMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 void ShadowCubeMapFBO::BindForWriting(GLenum CubeFace)
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowMap, 0);
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 }
 
