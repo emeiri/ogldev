@@ -41,6 +41,11 @@
 #include "ogldev_shadow_map_fbo.h"
 #include "ogldev_atb.h"
 
+#ifdef _WIN32
+#define VK_USE_PLATFORM_WIN32_KHR
+#else
+#define VK_USE_PLATFORM_XCB_KHR
+#endif
 
 #include <vulkan/vulkan.h>
 
@@ -441,31 +446,70 @@ private:
 }*/
 #endif
 
+
+
 class OgldevVulkanApp
 {
 public:
-    OgldevVulkanApp();
+    OgldevVulkanApp(const char* pAppName);
     
     ~OgldevVulkanApp();
     
-    bool Init(const char* pAppName);
-    
-    void EnumDevices();
+    bool Init();       
     
 private:
+    void EnumExt();
+    void EnumDevices();
+    void CreateInstance();
+    void CreateDevice();
+    
     VkInstance m_inst;
+    std::string m_appName;
+    std::vector<VkPhysicalDevice> m_physDevices;
+    int m_gfxDeviceIndex;
+    VkDevice m_device;
+    std::vector<std::string> m_instExt;
+    std::vector<std::string> m_devExt;
 };
 
 
-OgldevVulkanApp::OgldevVulkanApp()
+OgldevVulkanApp::OgldevVulkanApp(const char* pAppName)
 {
-    
+    m_appName = std::string(pAppName);
+    m_gfxDeviceIndex = -1;
 }
 
 
 OgldevVulkanApp::~OgldevVulkanApp()
 {
     
+}
+
+void OgldevVulkanApp::EnumExt()
+{
+    uint NumExt = 0;
+    VkResult res = vkEnumerateInstanceExtensionProperties(NULL, &NumExt, NULL);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error enumerating extensions");
+        assert(0);
+    }
+    
+    printf("Found %d extensions\n", NumExt);
+    
+    std::vector<VkExtensionProperties> ExtProps(NumExt);
+
+    res = vkEnumerateInstanceExtensionProperties(NULL, &NumExt, &ExtProps[0]);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error enumerating extensions");
+        assert(0);
+    }
+        
+    for (uint i = 0 ; i < NumExt ; i++) {
+        printf("Instance extension %d - %s\n", i, ExtProps[i].extensionName);
+        m_instExt.push_back(std::string(ExtProps[i].extensionName));
+    }
 }
 
 void OgldevVulkanApp::EnumDevices()
@@ -480,9 +524,9 @@ void OgldevVulkanApp::EnumDevices()
     
     printf("Num physical devices %d\n", NumDevices);
     
-    std::vector<VkPhysicalDevice> Devices(NumDevices);
+    m_physDevices.reserve(NumDevices);
     
-    res = vkEnumeratePhysicalDevices(m_inst, &NumDevices, &Devices[0]);
+    res = vkEnumeratePhysicalDevices(m_inst, &NumDevices, &m_physDevices[0]);
     
     if (res != VK_SUCCESS) {
         OGLDEV_ERROR("vkEnumeratePhysicalDevices");
@@ -492,7 +536,7 @@ void OgldevVulkanApp::EnumDevices()
     
     for (uint i = 0 ; i < NumDevices ; i++) {
         memset(&DeviceProperties, 0, sizeof(DeviceProperties));
-        vkGetPhysicalDeviceProperties(Devices[i], &DeviceProperties);
+        vkGetPhysicalDeviceProperties(m_physDevices[i], &DeviceProperties);
         
         printf("Device name: %s\n", DeviceProperties.deviceName);
         uint32_t apiVer = DeviceProperties.apiVersion;
@@ -500,25 +544,59 @@ void OgldevVulkanApp::EnumDevices()
                                           VK_VERSION_MINOR(apiVer),
                                           VK_VERSION_PATCH(apiVer));
         uint NumQFamily = 0;         
-        vkGetPhysicalDeviceQueueFamilyProperties(Devices[i], &NumQFamily, NULL);
+        vkGetPhysicalDeviceQueueFamilyProperties(m_physDevices[i], &NumQFamily, NULL);
         printf("Num of family queues: %d\n", NumQFamily);
         
         std::vector<VkQueueFamilyProperties> QFamilyProp(NumQFamily);
-        vkGetPhysicalDeviceQueueFamilyProperties(Devices[i], &NumQFamily, &QFamilyProp[0]);
+        vkGetPhysicalDeviceQueueFamilyProperties(m_physDevices[i], &NumQFamily, &QFamilyProp[0]);
         
         for (uint j = 0 ; j < NumQFamily ; j++) {
             printf("Family %d Num queues: %d\n", j, QFamilyProp[j].queueCount);
-            VkQueueFlagBits flags = QFamilyProp[j].
-            printf("    GFX %d, Compute %d, Transfer %d, Sparse binding %d\n",
-                    QFamilyProp[]
+            VkQueueFlags flags = QFamilyProp[j].queueFlags;
+            printf("    GFX %s, Compute %s, Transfer %s, Sparse binding %s\n",
+                    (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
+            
+            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDeviceIndex == -1)) {
+                m_gfxDeviceIndex = i;
+                printf("Using GFX device %d\n", m_gfxDeviceIndex);
+            }
         }
     }
     
+    if (m_gfxDeviceIndex == -1) {
+        printf("No GFX device found!\n");
+        assert(0);
+    }    
     
+    uint NumExt = 0;
+    
+    res = vkEnumerateDeviceExtensionProperties(m_physDevices[m_gfxDeviceIndex], NULL, &NumExt, NULL);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error enumerating device extensions %x\n", res);
+        assert(0);
+    }
+    
+    std::vector<VkExtensionProperties> ExtProps(NumExt);
+
+    res = vkEnumerateDeviceExtensionProperties(m_physDevices[m_gfxDeviceIndex], NULL, &NumExt, &ExtProps[0]);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error enumerating extensions");
+        assert(0);
+    }
+        
+    for (uint i = 0 ; i < NumExt ; i++) {
+        printf("Device extension %d - %s\n", i, ExtProps[i].extensionName);
+        m_devExt.push_back(std::string(ExtProps[i].extensionName));
+    }    
 }
 
 
-bool OgldevVulkanApp::Init(const char* pAppName)
+void OgldevVulkanApp::CreateInstance()
 {
     VkApplicationInfo appInfo;
     VkInstanceCreateInfo instCreateInfo;
@@ -527,19 +605,74 @@ bool OgldevVulkanApp::Init(const char* pAppName)
     ZERO_MEM_VAR(instCreateInfo);
     
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = pAppName;
+    appInfo.pApplicationName = m_appName.c_str();
     appInfo.engineVersion = 1;
     appInfo.apiVersion = VK_API_VERSION_1_0;
+
+    const char* pInstExt[] = {
+        VK_KHR_SURFACE_EXTENSION_NAME,
+    #ifdef _WIN32    
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+    #else    
+        VK_KHR_XCB_SURFACE_EXTENSION_NAME
+    #endif            
+    };
     
     instCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instCreateInfo.pApplicationInfo = &appInfo;
+    instCreateInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
+    instCreateInfo.ppEnabledExtensionNames = pInstExt;         
 
     VkResult res = vkCreateInstance(&instCreateInfo, NULL, &m_inst);
     
     if (res != VK_SUCCESS) {
         OGLDEV_ERROR("Failed to create instance");
-        return false;
-    }        
+        assert(0);
+    }    
+}
+
+
+void OgldevVulkanApp::CreateDevice()
+{
+    VkDeviceQueueCreateInfo qInfo;
+    ZERO_MEM_VAR(qInfo);
+    qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    
+    float qPriorities = 1.0f;
+    qInfo.queueCount = 1;
+    qInfo.pQueuePriorities = &qPriorities;
+
+    const char* pDevExt[] = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+    
+    VkDeviceCreateInfo devInfo;
+    ZERO_MEM_VAR(devInfo);
+    devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    devInfo.enabledExtensionCount = 1;
+    devInfo.ppEnabledExtensionNames = pDevExt;
+    devInfo.queueCreateInfoCount = 1;
+    devInfo.pQueueCreateInfos = &qInfo;
+    
+    printf("%d\n",devInfo.enabledExtensionCount );
+    
+    VkResult res = vkCreateDevice(m_physDevices[m_gfxDeviceIndex], &devInfo, NULL, &m_device);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating device\n");
+        assert(0);
+    }
+   
+    printf("Device created\n");
+}
+
+
+bool OgldevVulkanApp::Init()
+{
+    EnumExt();
+    CreateInstance();
+    EnumDevices();
+    CreateDevice();
     
     return true;
 }
@@ -548,13 +681,13 @@ bool OgldevVulkanApp::Init(const char* pAppName)
 class Tutorial50 : public OgldevVulkanApp
 {
 public:
-    Tutorial50();
+    Tutorial50(const char* pAppName);
     
     ~Tutorial50();
 };
 
 
-Tutorial50::Tutorial50()
+Tutorial50::Tutorial50(const char* pAppName) : OgldevVulkanApp(pAppName)
 {
     
 }
@@ -566,13 +699,11 @@ Tutorial50::~Tutorial50()
 
 int main(int argc, char** argv)
 {
-    Tutorial50 app;
+    Tutorial50 app("Tutorial 50");
     
-    if (!app.Init("Tutorial 50")) {
+    if (!app.Init()) {
         return 1;
-    }
-    
-    app.EnumDevices();
+    }        
     
     return 0;
 }
