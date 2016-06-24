@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut ../Lib/libAntTweakBar.so -lvulkan
+LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut ../Lib/libAntTweakBar.so -lvulkan -lxcb
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

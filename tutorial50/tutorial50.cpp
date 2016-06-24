@@ -25,9 +25,9 @@
 #ifndef WIN32
 #include <sys/time.h>
 #include <unistd.h>
+//#include <xcb/xcb.h>
 #endif
 #include <sys/types.h>
-
 
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"
@@ -51,9 +51,10 @@
 
 #include <vulkan/vk_sdk_platform.h>
 
-#if 0
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
+
+#if 0
 
 #define NUM_MESHES 5
 #define NUM_FRUSTUM_CORNERS 8
@@ -458,25 +459,39 @@ public:
     bool Init();       
     
 private:
+#ifndef WIN32    
+    void CreateWindow();
+#endif    
     void EnumExt();
     void EnumDevices();
     void CreateInstance();
     void CreateDevice();
+    void CreateSurface();
     
     VkInstance m_inst;
     std::string m_appName;
     std::vector<VkPhysicalDevice> m_physDevices;
-    int m_gfxDeviceIndex;
+    int m_gfxDevIndex;
     VkDevice m_device;
     std::vector<std::string> m_instExt;
     std::vector<std::string> m_devExt;
+    VkSurfaceKHR m_surface;
+    VkFormat m_colorFormat;
+#ifdef WIN32
+    fsdfs
+#else
+    xcb_connection_t* m_pXCBConn;
+    xcb_screen_t* m_pXCBScreen;
+    xcb_window_t m_xcbWindow;           
+    xcb_intern_atom_reply_t* m_pXCBDelWin;
+#endif    
 };
 
 
 OgldevVulkanApp::OgldevVulkanApp(const char* pAppName)
 {
     m_appName = std::string(pAppName);
-    m_gfxDeviceIndex = -1;
+    m_gfxDevIndex = -1;
 }
 
 
@@ -484,6 +499,76 @@ OgldevVulkanApp::~OgldevVulkanApp()
 {
     
 }
+
+#ifndef WIN32
+void OgldevVulkanApp::CreateWindow()
+{
+    const xcb_setup_t *setup;
+    xcb_screen_iterator_t iter;
+    int scr;
+
+    m_pXCBConn = xcb_connect(NULL, &scr);
+    
+    if (m_pXCBConn == NULL) {
+        printf("Error opening xcb connection\n");
+        assert(0);
+    }
+    
+    printf("XCB connection opened\n");
+
+    setup = xcb_get_setup(m_pXCBConn);
+    iter = xcb_setup_roots_iterator(setup);
+    while (scr-- > 0)
+        xcb_screen_next(&iter);
+
+    m_pXCBScreen = iter.data;    
+    
+    printf("XCB screen %p\n", m_pXCBScreen);
+    
+    uint32_t value_mask, value_list[32];
+
+    m_xcbWindow = xcb_generate_id(m_pXCBConn);
+
+    value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    value_list[0] = m_pXCBScreen->black_pixel;
+    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_EXPOSURE |
+                    XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+
+    xcb_create_window(m_pXCBConn, 
+                      XCB_COPY_FROM_PARENT, 
+                      m_xcbWindow,
+                      m_pXCBScreen->root, 
+                      0, 
+                      0, 
+                      WINDOW_WIDTH, 
+                      WINDOW_HEIGHT, 
+                      0,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, 
+                      m_pXCBScreen->root_visual,
+                      value_mask, 
+                      value_list);
+
+    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, 12, "WM_PROTOCOLS");
+    xcb_intern_atom_reply_t* reply =  xcb_intern_atom_reply(m_pXCBConn, cookie, 0);
+
+    xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(m_pXCBConn, 0, 16, "WM_DELETE_WINDOW");
+    m_pXCBDelWin = xcb_intern_atom_reply(m_pXCBConn, cookie2, 0);
+
+    xcb_change_property(m_pXCBConn, 
+                        XCB_PROP_MODE_REPLACE, 
+                        m_xcbWindow,
+                        (*reply).atom, 
+                        4, 
+                        32, 
+                        1,
+                        &(m_pXCBDelWin->atom));
+    free(reply);
+
+    xcb_map_window(m_pXCBConn, m_xcbWindow);    
+    
+    printf("Window %x created\n", m_xcbWindow);
+}
+#endif
 
 void OgldevVulkanApp::EnumExt()
 {
@@ -559,21 +644,23 @@ void OgldevVulkanApp::EnumDevices()
                     (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
                     (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
             
-            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDeviceIndex == -1)) {
-                m_gfxDeviceIndex = i;
-                printf("Using GFX device %d\n", m_gfxDeviceIndex);
+            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
+                m_gfxDevIndex = i;
+                printf("Using GFX device %d\n", m_gfxDevIndex);
             }
         }
     }
     
-    if (m_gfxDeviceIndex == -1) {
+    if (m_gfxDevIndex == -1) {
         printf("No GFX device found!\n");
         assert(0);
     }    
     
     uint NumExt = 0;
     
-    res = vkEnumerateDeviceExtensionProperties(m_physDevices[m_gfxDeviceIndex], NULL, &NumExt, NULL);
+    VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
+    
+    res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, NULL);
     
     if (res != VK_SUCCESS) {
         printf("Error enumerating device extensions %x\n", res);
@@ -582,7 +669,7 @@ void OgldevVulkanApp::EnumDevices()
     
     std::vector<VkExtensionProperties> ExtProps(NumExt);
 
-    res = vkEnumerateDeviceExtensionProperties(m_physDevices[m_gfxDeviceIndex], NULL, &NumExt, &ExtProps[0]);
+    res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, &ExtProps[0]);
     
     if (res != VK_SUCCESS) {
         printf("Error enumerating extensions");
@@ -592,7 +679,7 @@ void OgldevVulkanApp::EnumDevices()
     for (uint i = 0 ; i < NumExt ; i++) {
         printf("Device extension %d - %s\n", i, ExtProps[i].extensionName);
         m_devExt.push_back(std::string(ExtProps[i].extensionName));
-    }    
+    }            
 }
 
 
@@ -656,7 +743,7 @@ void OgldevVulkanApp::CreateDevice()
     
     printf("%d\n",devInfo.enabledExtensionCount );
     
-    VkResult res = vkCreateDevice(m_physDevices[m_gfxDeviceIndex], &devInfo, NULL, &m_device);
+    VkResult res = vkCreateDevice(m_physDevices[m_gfxDevIndex], &devInfo, NULL, &m_device);
     
     if (res != VK_SUCCESS) {
         printf("Error creating device\n");
@@ -667,12 +754,39 @@ void OgldevVulkanApp::CreateDevice()
 }
 
 
+void OgldevVulkanApp::CreateSurface()
+{
+#ifdef WIN32
+    sfsdfsdfsd
+#else
+    VkXcbSurfaceCreateInfoKHR surfaceCreateInfo;
+    ZERO_MEM_VAR(surfaceCreateInfo);
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.connection = m_pXCBConn;
+    surfaceCreateInfo.window = m_xcbWindow;
+    
+    VkResult res = vkCreateXcbSurfaceKHR(m_inst, &surfaceCreateInfo, NULL, &m_surface);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating surface\n");
+        assert(0);
+    }
+    
+    printf("Surface created\n");
+#endif
+}
+
+
 bool OgldevVulkanApp::Init()
 {
+#ifndef WIN32
+    CreateWindow();
+#endif    
     EnumExt();
     CreateInstance();
     EnumDevices();
     CreateDevice();
+    CreateSurface();
     
     return true;
 }
