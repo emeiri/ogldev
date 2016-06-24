@@ -452,6 +452,7 @@ PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR;
 class OgldevVulkanApp
 {
 public:
+
     OgldevVulkanApp(const char* pAppName);
     
     ~OgldevVulkanApp();
@@ -459,6 +460,7 @@ public:
     bool Init();       
     
 private:
+
 #ifndef WIN32    
     void CreateWindow();
 #endif    
@@ -471,7 +473,8 @@ private:
     VkInstance m_inst;
     std::string m_appName;
     std::vector<VkPhysicalDevice> m_physDevices;
-    int m_gfxDevIndex;
+    uint m_gfxDevIndex;
+    uint m_gfxQueueFamily;
     VkDevice m_device;
     std::vector<std::string> m_instExt;
     std::vector<std::string> m_devExt;
@@ -485,6 +488,9 @@ private:
     xcb_window_t m_xcbWindow;           
     xcb_intern_atom_reply_t* m_pXCBDelWin;
 #endif    
+    std::vector<VkImage> m_images;
+    std::vector<VkImageView> m_views;
+    VkSwapchainKHR m_swapChainKHR;
 };
 
 
@@ -646,6 +652,7 @@ void OgldevVulkanApp::EnumDevices()
             
             if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
                 m_gfxDevIndex = i;
+                m_gfxQueueFamily = j;
                 printf("Using GFX device %d\n", m_gfxDevIndex);
             }
         }
@@ -775,10 +782,12 @@ void OgldevVulkanApp::CreateSurface()
     printf("Surface created\n");
 #endif
     
+    VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
+    
     uint NumFormats = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physDevices[m_gfxDevIndex], m_surface, &NumFormats, NULL);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(gfxPhysDev, m_surface, &NumFormats, NULL);
     std::vector<VkSurfaceFormatKHR> SurfaceFormats(NumFormats);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physDevices[m_gfxDevIndex], m_surface, &NumFormats, &(SurfaceFormats[0]));
+    vkGetPhysicalDeviceSurfaceFormatsKHR(gfxPhysDev, m_surface, &NumFormats, &(SurfaceFormats[0]));
     
     for (uint i = 0 ; i < NumFormats ; i++) {
         printf("Format %d color space %d\n", SurfaceFormats[i].format, SurfaceFormats[i].colorSpace);
@@ -787,6 +796,93 @@ void OgldevVulkanApp::CreateSurface()
     assert(NumFormats > 0);
     
     m_surfaceFormat = SurfaceFormats[0].format;
+    
+    VkBool32 SupportsPresent = false;
+    vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_gfxQueueFamily, m_surface, &SupportsPresent);
+    
+    if (!SupportsPresent) {
+        printf("Present is not supported\n");
+        exit(0);
+    }
+    
+    VkSurfaceCapabilitiesKHR SurfaceCaps;
+    
+    res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gfxPhysDev, m_surface, &SurfaceCaps);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error getting surface caps\n");
+        assert(0);
+    }
+
+    uint NumPresentModes = 0;
+    
+    res = vkGetPhysicalDeviceSurfacePresentModesKHR(gfxPhysDev, m_surface, &NumPresentModes, NULL);
+    
+    assert(NumPresentModes != 0);
+            
+    printf("Number of presentation modes %d\n", NumPresentModes);
+    
+    VkExtent2D SwapChainExtent = SurfaceCaps.currentExtent;
+    
+    if (SurfaceCaps.currentExtent.width == -1) {
+        SwapChainExtent.width = WINDOW_WIDTH;
+        SwapChainExtent.height = WINDOW_HEIGHT;
+    }
+    
+    uint NumImages = SurfaceCaps.minImageCount + 1;
+    
+    if ((SurfaceCaps.maxImageCount > 0) &&
+        (NumImages > SurfaceCaps.maxImageCount)) {
+        NumImages =  SurfaceCaps.maxImageCount;
+    }
+    
+    printf("Num images: %d\n", NumImages);
+    
+    VkSurfaceTransformFlagBitsKHR preTransform;
+    
+    if (SurfaceCaps.currentTransform & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
+        preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    }
+    else {
+        preTransform = SurfaceCaps.currentTransform;
+    }
+    
+    VkSwapchainCreateInfoKHR SwapChainCreateInfo;
+    ZERO_MEM_VAR(SwapChainCreateInfo);
+    
+    SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    SwapChainCreateInfo.surface          = m_surface;
+    SwapChainCreateInfo.minImageCount    = NumImages;
+    SwapChainCreateInfo.imageFormat      = m_surfaceFormat;
+    SwapChainCreateInfo.imageColorSpace  = SurfaceFormats[0].colorSpace;
+    SwapChainCreateInfo.imageExtent      = SwapChainExtent;
+    SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    SwapChainCreateInfo.preTransform     = preTransform;
+    SwapChainCreateInfo.imageArrayLayers = 1;
+    SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    SwapChainCreateInfo.presentMode      = VK_PRESENT_MODE_FIFO_KHR;
+    SwapChainCreateInfo.clipped          = true;
+    SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    
+    res = vkCreateSwapchainKHR(m_device, &SwapChainCreateInfo, NULL, &m_swapChainKHR);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating swap chain\n");
+        assert(0);
+    }
+    
+    printf("Swap chain created\n");
+    
+    uint NumSwapChainImages = 0;
+    res = vkGetSwapchainImagesKHR(m_device, m_swapChainKHR, &NumSwapChainImages, NULL);
+
+    if (res != VK_SUCCESS) {
+        printf("Error getting number of images\n");
+        assert(0);
+    }
+    
+    printf("Number of images %d\n", NumSwapChainImages);
+
 }
 
 
