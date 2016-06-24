@@ -447,7 +447,7 @@ private:
 }*/
 #endif
 
-
+PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR;
 
 class OgldevVulkanApp
 {
@@ -476,7 +476,7 @@ private:
     std::vector<std::string> m_instExt;
     std::vector<std::string> m_devExt;
     VkSurfaceKHR m_surface;
-    VkFormat m_colorFormat;
+    VkFormat m_surfaceFormat;
 #ifdef WIN32
     fsdfs
 #else
@@ -774,6 +774,19 @@ void OgldevVulkanApp::CreateSurface()
     
     printf("Surface created\n");
 #endif
+    
+    uint NumFormats = 0;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physDevices[m_gfxDevIndex], m_surface, &NumFormats, NULL);
+    std::vector<VkSurfaceFormatKHR> SurfaceFormats(NumFormats);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_physDevices[m_gfxDevIndex], m_surface, &NumFormats, &(SurfaceFormats[0]));
+    
+    for (uint i = 0 ; i < NumFormats ; i++) {
+        printf("Format %d color space %d\n", SurfaceFormats[i].format, SurfaceFormats[i].colorSpace);
+    }
+    
+    assert(NumFormats > 0);
+    
+    m_surfaceFormat = SurfaceFormats[0].format;
 }
 
 
