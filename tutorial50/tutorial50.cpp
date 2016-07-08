@@ -449,6 +449,37 @@ private:
 
 PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR;
 
+void PrintImageUsageFlags(const VkImageUsageFlags& flags)
+{
+    if (flags & VK_IMAGE_USAGE_TRANSFER_SRC_BIT) {
+        printf("Image usage transfer src is supported\n");
+    }
+
+    if (flags & VK_IMAGE_USAGE_TRANSFER_DST_BIT) {
+        printf("Image usage transfer dest is supported\n");
+    }
+
+    if (flags & VK_IMAGE_USAGE_SAMPLED_BIT) {
+        printf("Image usage sampled is supported\n");
+    }
+
+    if (flags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
+        printf("Image usage color attachment is supported\n");
+    }
+
+    if (flags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+        printf("Image usage depth stencil attachment is supported\n");
+    }
+
+    if (flags & VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT) {
+        printf("Image usage transient attachment is supported\n");
+    }
+
+    if (flags & VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT) {
+        printf("Image usage input attachment is supported\n");
+    }    
+}
+
 class OgldevVulkanApp
 {
 public:
@@ -469,6 +500,8 @@ private:
     void CreateInstance();
     void CreateDevice();
     void CreateSurface();
+    void CreateCommandBuffer();
+    void CreateSemaphore();
     
     VkInstance m_inst;
     std::string m_appName;
@@ -491,6 +524,8 @@ private:
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
+    VkQueue m_queue;
+    VkSemaphore m_sem;
 };
 
 
@@ -653,7 +688,7 @@ void OgldevVulkanApp::EnumDevices()
             if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
                 m_gfxDevIndex = i;
                 m_gfxQueueFamily = j;
-                printf("Using GFX device %d\n", m_gfxDevIndex);
+                printf("Using GFX device %d and queue family %d\n", m_gfxDevIndex, m_gfxQueueFamily);
             }
         }
     }
@@ -735,6 +770,7 @@ void OgldevVulkanApp::CreateDevice()
     float qPriorities = 1.0f;
     qInfo.queueCount = 1;
     qInfo.pQueuePriorities = &qPriorities;
+    qInfo.queueFamilyIndex = m_gfxQueueFamily;
 
     const char* pDevExt[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -758,6 +794,8 @@ void OgldevVulkanApp::CreateDevice()
     }
    
     printf("Device created\n");
+    
+    vkGetDeviceQueue(m_device, m_gfxQueueFamily, 0, &m_queue);
 }
 
 
@@ -796,6 +834,7 @@ void OgldevVulkanApp::CreateSurface()
     assert(NumFormats > 0);
     
     m_surfaceFormat = SurfaceFormats[0].format;
+    assert(m_surfaceFormat != VK_FORMAT_UNDEFINED);
     
     VkBool32 SupportsPresent = false;
     vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_gfxQueueFamily, m_surface, &SupportsPresent);
@@ -813,6 +852,8 @@ void OgldevVulkanApp::CreateSurface()
         printf("Error getting surface caps\n");
         assert(0);
     }
+    
+    PrintImageUsageFlags(SurfaceCaps.supportedUsageFlags);
 
     uint NumPresentModes = 0;
     
@@ -828,6 +869,11 @@ void OgldevVulkanApp::CreateSurface()
         SwapChainExtent.width = WINDOW_WIDTH;
         SwapChainExtent.height = WINDOW_HEIGHT;
     }
+    else {
+        SwapChainExtent = SurfaceCaps.currentExtent;
+    }
+    
+    printf("Swap chain extent: width %d height %d\n", SwapChainExtent.width, SwapChainExtent.height);
     
     uint NumImages = SurfaceCaps.minImageCount + 1;
     
@@ -883,8 +929,50 @@ void OgldevVulkanApp::CreateSurface()
     
     printf("Number of images %d\n", NumSwapChainImages);
 
+    m_images.resize(NumSwapChainImages);
+    m_views.resize(NumSwapChainImages);
+    
+    res = vkGetSwapchainImagesKHR(m_device, m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
+
+    if (res != VK_SUCCESS) {
+        printf("Error getting images\n");
+        assert(0);
+    }
+    
+    for (uint i = 0 ; i < NumSwapChainImages ; i++) {
+        VkImageViewCreateInfo ViewCreateInfo = {};
+        ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        //ViewCreateInfo.image = 
+        ViewCreateInfo.format = m_surfaceFormat;
+        ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        ViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
+        ViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
+        ViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
+        ViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+        ViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ViewCreateInfo.subresourceRange.levelCount = 1;
+        ViewCreateInfo.subresourceRange.layerCount = 1;        
+    }
+    
 }
 
+
+void OgldevVulkanApp::CreateSemaphore()
+{
+    VkSemaphoreCreateInfo semCreateInfo;
+    ZERO_MEM_VAR(semCreateInfo);
+    semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    
+    VkResult res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_sem);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating semaphore\n");
+        assert(0);
+    }
+    
+    printf("Semaphore created\n");
+    
+}
 
 bool OgldevVulkanApp::Init()
 {
@@ -896,6 +984,7 @@ bool OgldevVulkanApp::Init()
     EnumDevices();
     CreateDevice();
     CreateSurface();
+    CreateSemaphore();
     
     return true;
 }
