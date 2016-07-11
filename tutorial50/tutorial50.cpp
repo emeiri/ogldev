@@ -502,6 +502,7 @@ private:
     void CreateSurface();
     void CreateCommandBuffer();
     void CreateSemaphore();
+    void Draw();
     
     VkInstance m_inst;
     std::string m_appName;
@@ -954,6 +955,24 @@ void OgldevVulkanApp::CreateSurface()
         ViewCreateInfo.subresourceRange.layerCount = 1;        
     }
     
+}
+
+
+void OgldevVulkanApp::Draw()
+{
+    uint ImageIndex = 0;
+    
+    VkResult res = vkAcquireNextImageKHR(m_device, m_swapChainKHR, UINT64_MAX, m_sem, NULL, &ImageIndex);
+    
+    switch (res) {
+        case VK_SUCCESS:
+        case VK_SUBOPTIMAL_KHR:
+            break;
+        case VK_ERROR_OUT_OF_DATE_KHR:
+            assert(0);
+        default:
+            assert(0);
+    }
 }
 
 
