@@ -88,13 +88,13 @@ vec4 CalcPointLight(vec3 WorldPos, vec3 Normal)
 
     vec4 Color = CalcLightInternal(gPointLight.Base, LightDirection, WorldPos, Normal);
 
-    float Attenuation =  gPointLight.Atten.Constant +
+    float AttenuationFactor =  gPointLight.Atten.Constant +
                          gPointLight.Atten.Linear * Distance +
                          gPointLight.Atten.Exp * Distance * Distance;
 
-    Attenuation = max(1.0, Attenuation);
+    AttenuationFactor = max(1.0, AttenuationFactor);
 
-    return Color / Attenuation;
+    return Color / AttenuationFactor;
 }
 
 
