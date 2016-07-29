@@ -447,6 +447,14 @@ private:
 }*/
 #endif
 
+
+#define CheckVulkanError(msg)           \
+    if (res != VK_SUCCESS) {            \
+        printf(msg);                    \
+        printf(", result: %x\n", res);  \
+        abort();                        \
+    }
+
 PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR;
 
 void PrintImageUsageFlags(const VkImageUsageFlags& flags)
@@ -526,7 +534,10 @@ private:
     std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
-    VkSemaphore m_sem;
+    VkSemaphore m_imageAvailSem;
+    VkSemaphore m_rendCompSem;
+    std::vector<VkCommandBuffer> m_presentQCmdBuffs;
+    VkCommandPool m_presentQCmdPool;
 };
 
 
@@ -932,6 +943,7 @@ void OgldevVulkanApp::CreateSurface()
 
     m_images.resize(NumSwapChainImages);
     m_views.resize(NumSwapChainImages);
+    m_presentQCmdBuffs.resize(NumSwapChainImages);
     
     res = vkGetSwapchainImagesKHR(m_device, m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
 
@@ -958,11 +970,110 @@ void OgldevVulkanApp::CreateSurface()
 }
 
 
+void OgldevVulkanApp::CreateCommandBuffer()
+{
+    VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
+    cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    cmdPoolCreateInfo.queueFamilyIndex = m_gfxQueueFamily;
+    
+    VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
+    
+    CheckVulkanError("vkCreateCommandPool");
+    
+    printf("Command buffer pool created\n");
+    
+    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+    cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    cmdBufAllocInfo.commandPool = m_presentQCmdPool;
+    cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    cmdBufAllocInfo.commandBufferCount = m_images.size();
+    
+    res = vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
+            
+    CheckVulkanError("vkAllocateCommandBuffers failed");
+    
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    
+    VkClearColorValue clearColor = { 1.0f, 0.0f, 0.0f, 0.0f };
+    
+    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;
+    
+    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {
+        VkImageMemoryBarrier memBarrier_PresentToClear = {};
+        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.image = m_images[i];
+        memBarrier_PresentToClear.subresourceRange = imageRange;        
+        
+        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
+        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
+        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
+        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.image = m_images[i];
+        memBarrier_PresentToClear.subresourceRange = imageRange;        
+        
+        res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
+        CheckVulkanError("vkBeginCommandBuffer failed\n");
+        
+        vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                             0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);
+        
+        vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
+                             1, &imageRange);
+        
+        vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                             0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
+
+        res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
+        CheckVulkanError("vkEndCommandBuffer failed\n");        
+    }
+    
+    printf("Command buffers recorded\n");
+}
+
+void OgldevVulkanApp::CreateSemaphore()
+{
+    VkSemaphoreCreateInfo semCreateInfo;
+    ZERO_MEM_VAR(semCreateInfo);
+    semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    
+    VkResult res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_imageAvailSem);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating semaphore\n");
+        assert(0);
+    }
+
+    res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_rendCompSem);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating semaphore\n");
+        assert(0);
+    }
+    
+    printf("Semaphores created\n");    
+}
+
+
 void OgldevVulkanApp::Draw()
 {
     uint ImageIndex = 0;
     
-    VkResult res = vkAcquireNextImageKHR(m_device, m_swapChainKHR, UINT64_MAX, m_sem, NULL, &ImageIndex);
+    VkResult res = vkAcquireNextImageKHR(m_device, m_swapChainKHR, UINT64_MAX, m_imageAvailSem, NULL, &ImageIndex);
     
     switch (res) {
         case VK_SUCCESS:
@@ -973,25 +1084,37 @@ void OgldevVulkanApp::Draw()
         default:
             assert(0);
     }
+    
+    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount   = 1;
+    submitInfo.pWaitSemaphores      = &m_imageAvailSem;
+    submitInfo.pWaitDstStageMask    = &stageFlags;
+    submitInfo.commandBufferCount   = 1;
+    submitInfo.pCommandBuffers      = &m_presentQCmdBuffs[ImageIndex];
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores    = &m_rendCompSem;
+    
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
+    
+    CheckVulkanError("vkQueueSubmit failed");
+    
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores    = &m_rendCompSem;
+    presentInfo.swapchainCount     = 1;
+    presentInfo.pSwapchains        = &m_swapChainKHR;
+    presentInfo.pImageIndices      = &ImageIndex;
+    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);
+    
+    CheckVulkanError("vkQueuePresentKHR failed");
 }
 
 
-void OgldevVulkanApp::CreateSemaphore()
-{
-    VkSemaphoreCreateInfo semCreateInfo;
-    ZERO_MEM_VAR(semCreateInfo);
-    semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    
-    VkResult res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_sem);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating semaphore\n");
-        assert(0);
-    }
-    
-    printf("Semaphore created\n");
-    
-}
 
 bool OgldevVulkanApp::Init()
 {
@@ -1004,6 +1127,7 @@ bool OgldevVulkanApp::Init()
     CreateDevice();
     CreateSurface();
     CreateSemaphore();
+    CreateCommandBuffer();
     
     return true;
 }
