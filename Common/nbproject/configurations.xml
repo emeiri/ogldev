@@ -23,6 +23,7 @@
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
+      <itemPath>../Include/ogldev_vulkan.h</itemPath>
       <itemPath>../Include/technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
@@ -47,6 +48,7 @@
       <itemPath>ogldev_skinned_mesh.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
+      <itemPath>ogldev_vulkan.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
       <itemPath>random_texture.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
@@ -129,6 +131,8 @@
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
@@ -180,6 +184,8 @@
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -247,6 +253,8 @@
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
@@ -298,6 +306,8 @@
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>

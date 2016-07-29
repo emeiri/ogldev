@@ -58,6 +58,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_skinned_mesh.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
+	${OBJECTDIR}/ogldev_vulkan.o \
 	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/random_texture.o \
 	${OBJECTDIR}/technique.o
@@ -203,6 +204,11 @@ ${OBJECTDIR}/ogldev_util.o: ogldev_util.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_util.o ogldev_util.cpp
+
+${OBJECTDIR}/ogldev_vulkan.o: ogldev_vulkan.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_vulkan.o ogldev_vulkan.cpp
 
 ${OBJECTDIR}/pipeline.o: pipeline.cpp 
 	${MKDIR} -p ${OBJECTDIR}
