@@ -16,30 +16,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_VULKAN_H
-#define OGLDEV_VULKAN_H
+#ifndef VULKAN_XCB_CONTROL_H
+#define VULKAN_XCB_CONTROL_H
 
-#include <vector>
+#include <xcb/xcb.h>
 
-#ifdef _WIN32
-#define VK_USE_PLATFORM_WIN32_KHR
-#else
-#define VK_USE_PLATFORM_XCB_KHR
-#endif
-#include <vulkan/vulkan.h>
-#include <vulkan/vk_sdk_platform.h>
+class XCBControl
+{
+public:
+    XCBControl();
+    
+    ~XCBControl();
+    
+    bool Init(uint Width, uint Height);
+    
+    VkSurfaceKHR CreateSurface();
 
-
-
-#define CheckVulkanError(msg)           \
-    if (res != VK_SUCCESS) {            \
-        printf(msg);                    \
-        printf(", result: %x\n", res);  \
-        abort();                        \
-    }
-
-bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);
-void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags);
+    xcb_connection_t* m_pXCBConn;
+    xcb_screen_t* m_pXCBScreen;
+    xcb_window_t m_xcbWindow;           
+    xcb_intern_atom_reply_t* m_pXCBDelWin;    
+};
 
 
 #endif
