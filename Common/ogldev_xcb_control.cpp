@@ -125,3 +125,15 @@ VkSurfaceKHR XCBControl::CreateSurface()
         return NULL
     }
 }
+
+
+void XCBControl::PreRun()
+{
+    xcb_flush(m_pXCBConn);
+}
+
+
+bool XCBControl::PollEvent()
+{
+    xcb_generic_event_t* pEvent = xcb_poll_for_event(m_pXCBConn);
+}

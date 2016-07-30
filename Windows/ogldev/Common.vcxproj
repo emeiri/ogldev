@@ -26,6 +26,8 @@
     <ClCompile Include="..\..\Common\ogldev_skinned_mesh.cpp" />
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_vulkan.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_xcb_control.cpp" />
     <ClCompile Include="..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\Common\random_texture.cpp" />
     <ClCompile Include="..\..\Common\technique.cpp" />
@@ -52,6 +54,8 @@
     <ClInclude Include="..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />
+    <ClInclude Include="..\..\Include\ogldev_vulkan.h" />
+    <ClInclude Include="..\..\Include\ogldev_xcb_control.h" />
     <ClInclude Include="..\..\Include\technique.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

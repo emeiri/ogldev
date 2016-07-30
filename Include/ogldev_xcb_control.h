@@ -19,18 +19,24 @@
 #ifndef VULKAN_XCB_CONTROL_H
 #define VULKAN_XCB_CONTROL_H
 
+#ifndef WIN32
+
 #include <xcb/xcb.h>
 
-class XCBControl
+class XCBControl : public VulkanWindowControl
 {
 public:
     XCBControl();
     
     ~XCBControl();
     
-    bool Init(uint Width, uint Height);
+    virtual bool Init(uint Width, uint Height);
     
-    VkSurfaceKHR CreateSurface();
+    virtual kSurfaceKHR CreateSurface();
+
+    virtual void PreRun();
+
+    virtual bool PollEvent() = 0;
 
     xcb_connection_t* m_pXCBConn;
     xcb_screen_t* m_pXCBScreen;
@@ -38,5 +44,6 @@ public:
     xcb_intern_atom_reply_t* m_pXCBDelWin;    
 };
 
+#endif
 
 #endif

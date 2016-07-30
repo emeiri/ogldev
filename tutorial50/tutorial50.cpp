@@ -28,6 +28,7 @@
 //#include <xcb/xcb.h>
 #endif
 #include <sys/types.h>
+#include <vector>
 
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"
@@ -83,11 +84,7 @@ private:
     std::vector<std::string> m_devExt;
     VkSurfaceKHR m_surface;
     VkFormat m_surfaceFormat;
-#ifdef WIN32
-    fsdfs
-#else
-    XCBControl m_xcbControl;
-#endif    
+    VulkanWindowControl* m_pWindowControl;
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
@@ -275,7 +272,7 @@ void OgldevVulkanApp::CreateDevice()
 void OgldevVulkanApp::CreateSurface()
 {
 #ifdef WIN32
-    sfsdfsdfsd
+
 #else
     m_surface = m_xcbControl.CreateSurface();
     assert(m_surface);
@@ -310,7 +307,7 @@ void OgldevVulkanApp::CreateSurface()
     
     VkSurfaceCapabilitiesKHR SurfaceCaps;
     
-    res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gfxPhysDev, m_surface, &SurfaceCaps);
+    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gfxPhysDev, m_surface, &SurfaceCaps);
     
     if (res != VK_SUCCESS) {
         printf("Error getting surface caps\n");
@@ -573,8 +570,9 @@ bool OgldevVulkanApp::Init()
     std::vector<VkExtensionProperties> ExtProps;
     VulkanEnumExtProps(ExtProps);
 #ifdef WIN32
-    sdfsdf
+    
 #else            
+    m_pWindowControl = new XCBControl;
     bool ret = m_xcbControl.Init(WINDOW_WIDTH, WINDOW_HEIGHT);
     assert(ret);
 #endif    
@@ -591,12 +589,10 @@ bool OgldevVulkanApp::Init()
 
 void OgldevVulkanApp::Run()
 {
-    xcb_flush(m_pXCBConn);
+    m_pWindowControl->PreRun();
 
     while (true) {
-        xcb_generic_event_t *event;
-
-        event = xcb_poll_for_event(m_pXCBConn);
+        m_pWindowControl->PollEvent();
       //  if (event) {
        //     demo_handle_event(demo, event);
       //      free(event);
