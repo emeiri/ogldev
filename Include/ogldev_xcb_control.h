@@ -23,6 +23,8 @@
 
 #include <xcb/xcb.h>
 
+#include "ogldev_vulkan.h"
+
 class XCBControl : public VulkanWindowControl
 {
 public:
@@ -32,11 +34,11 @@ public:
     
     virtual bool Init(uint Width, uint Height);
     
-    virtual kSurfaceKHR CreateSurface();
+    virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
 
     virtual void PreRun();
 
-    virtual bool PollEvent() = 0;
+    virtual bool PollEvent();
 
     xcb_connection_t* m_pXCBConn;
     xcb_screen_t* m_pXCBScreen;

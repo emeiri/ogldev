@@ -18,9 +18,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <vulkan/vulkan.h>
 
-#include "ogldev_vulkan.h"
+//#include "ogldev_vulkan.h"
 #include "ogldev_xcb_control.h"
 
 XCBControl::XCBControl() 
@@ -109,7 +108,7 @@ bool XCBControl::Init(uint Width, uint Height)
 }
 
 
-VkSurfaceKHR XCBControl::CreateSurface()
+VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
 {
     VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
     surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
@@ -118,12 +117,14 @@ VkSurfaceKHR XCBControl::CreateSurface()
     
     VkSurfaceKHR surface;
     
-    VkResult res = vkCreateXcbSurfaceKHR(m_inst, &surfaceCreateInfo, NULL, &surface);
+    VkResult res = vkCreateXcbSurfaceKHR(inst, &surfaceCreateInfo, NULL, &surface);
     
     if (res != VK_SUCCESS) {
         printf("Error creating surface\n");
-        return NULL
+        return NULL;
     }
+    
+    return surface;
 }
 
 
@@ -135,5 +136,6 @@ void XCBControl::PreRun()
 
 bool XCBControl::PollEvent()
 {
-    xcb_generic_event_t* pEvent = xcb_poll_for_event(m_pXCBConn);
+//    xcb_generic_event_t* pEvent = xcb_poll_for_event(m_pXCBConn);
+    return true;
 }

@@ -274,10 +274,9 @@ void OgldevVulkanApp::CreateSurface()
 #ifdef WIN32
 
 #else
-    m_surface = m_xcbControl.CreateSurface();
+    m_surface = m_pWindowControl->CreateSurface(m_inst);
     assert(m_surface);
-       
-    
+          
     printf("Surface created\n");
 #endif
     
@@ -572,10 +571,10 @@ bool OgldevVulkanApp::Init()
 #ifdef WIN32
     
 #else            
-    m_pWindowControl = new XCBControl;
-    bool ret = m_xcbControl.Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-    assert(ret);
+    m_pWindowControl = new XCBControl();
 #endif    
+    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+    assert(ret);
     CreateInstance();
     EnumDevices();
     CreateDevice();

@@ -22,11 +22,6 @@
 #include <vector>
 
 #ifdef _WIN32
-#define VK_USE_PLATFORM_WIN32_KHR
-
-#define VULKAN_ROOT c:\\VulkanSDK\\1.0.21.1\\
-
-
 #else
 #define VK_USE_PLATFORM_XCB_KHR
 #endif
@@ -48,15 +43,15 @@ void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags);
 class VulkanWindowControl
 {
 protected:
-    VulkanWindowControl();
+    VulkanWindowControl() {};
 
-    ~VulkanWindowControl();
+    ~VulkanWindowControl() {};
 
 public:
 
     virtual bool Init(uint Width, uint Height) = 0;
     
-    virtual VkSurfaceKHR CreateSurface() = 0;
+    virtual VkSurfaceKHR CreateSurface(VkInstance& inst) = 0;
 
     virtual void PreRun() = 0;
 
