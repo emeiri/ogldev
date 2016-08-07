@@ -18,7 +18,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <vulkan/vulkan.h>
+
+#ifndef WIN32
 
 #include "ogldev_vulkan.h"
 #include "ogldev_xcb_control.h"
@@ -137,3 +138,5 @@ bool XCBControl::PollEvent()
 {
     xcb_generic_event_t* pEvent = xcb_poll_for_event(m_pXCBConn);
 }
+
+#endif
