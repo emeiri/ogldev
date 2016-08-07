@@ -25,7 +25,6 @@
 #ifndef WIN32
 #include <sys/time.h>
 #include <unistd.h>
-//#include <xcb/xcb.h>
 #endif
 #include <sys/types.h>
 #include <vector>
@@ -33,14 +32,6 @@
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
-#include "ogldev_backend.h"
-#include "ogldev_camera.h"
-#include "ogldev_basic_mesh.h"
-#include "ogldev_lights_common.h"
-#include "ogldev_shadow_map_fbo.h"
-#include "ogldev_atb.h"
 #include "ogldev_vulkan.h"
 
 #include "ogldev_xcb_control.h"
