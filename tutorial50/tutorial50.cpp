@@ -66,8 +66,9 @@ public:
     
 private:
 
-    void EnumExt();
     void EnumDevices();
+    void EnumPhysDeviceProps();
+    void EnumPhysDeviceExtProps();
     void CreateInstance();
     void CreateDevice();
     void CreateSurface();
@@ -123,17 +124,21 @@ void OgldevVulkanApp::EnumDevices()
     
     printf("Num physical devices %d\n", NumDevices);
     
-    m_physDevices.reserve(NumDevices);
+    m_physDevices.resize(NumDevices);
     
     res = vkEnumeratePhysicalDevices(m_inst, &NumDevices, &m_physDevices[0]);
     
     if (res != VK_SUCCESS) {
         OGLDEV_ERROR("vkEnumeratePhysicalDevices");
     }
-    
+}
+
+void OgldevVulkanApp::EnumPhysDeviceProps()
+{
     VkPhysicalDeviceProperties DeviceProperties;
     
-    for (uint i = 0 ; i < NumDevices ; i++) {
+    printf("%d\n", m_physDevices.size());
+    for (uint i = 0 ; i < m_physDevices.size() ; i++) {
         memset(&DeviceProperties, 0, sizeof(DeviceProperties));
         vkGetPhysicalDeviceProperties(m_physDevices[i], &DeviceProperties);
         
@@ -170,12 +175,15 @@ void OgldevVulkanApp::EnumDevices()
         printf("No GFX device found!\n");
         assert(0);
     }    
+}
     
+void OgldevVulkanApp::EnumPhysDeviceExtProps()
+{
     uint NumExt = 0;
     
     VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
     
-    res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, NULL);
+    VkResult res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, NULL);
     
     if (res != VK_SUCCESS) {
         printf("Error enumerating device extensions %x\n", res);
@@ -200,12 +208,7 @@ void OgldevVulkanApp::EnumDevices()
 
 void OgldevVulkanApp::CreateInstance()
 {
-    VkApplicationInfo appInfo;
-    VkInstanceCreateInfo instCreateInfo;
-        
-    ZERO_MEM_VAR(appInfo);
-    ZERO_MEM_VAR(instCreateInfo);
-    
+    VkApplicationInfo appInfo = {};       
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = m_appName.c_str();
     appInfo.engineVersion = 1;
@@ -220,6 +223,7 @@ void OgldevVulkanApp::CreateInstance()
     #endif            
     };
     
+    VkInstanceCreateInfo instCreateInfo = {};
     instCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instCreateInfo.pApplicationInfo = &appInfo;
     instCreateInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
@@ -236,8 +240,7 @@ void OgldevVulkanApp::CreateInstance()
 
 void OgldevVulkanApp::CreateDevice()
 {
-    VkDeviceQueueCreateInfo qInfo;
-    ZERO_MEM_VAR(qInfo);
+    VkDeviceQueueCreateInfo qInfo = {};
     qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     
     float qPriorities = 1.0f;
@@ -249,8 +252,7 @@ void OgldevVulkanApp::CreateDevice()
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
     
-    VkDeviceCreateInfo devInfo;
-    ZERO_MEM_VAR(devInfo);
+    VkDeviceCreateInfo devInfo = {};
     devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     devInfo.enabledExtensionCount = 1;
     devInfo.ppEnabledExtensionNames = pDevExt;
@@ -275,14 +277,12 @@ void OgldevVulkanApp::CreateDevice()
 void OgldevVulkanApp::CreateSurface()
 {
 #ifdef WIN32
-
+    assert(0);
 #else
-    m_surface = m_xcbControl.CreateSurface();
-    assert(m_surface);
-       
-    
-    printf("Surface created\n");
+    m_surface = m_pWindowControl->CreateSurface(m_inst);
+    assert(m_surface);          
 #endif
+    printf("Surface created\n");
     
     VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
     
@@ -357,8 +357,7 @@ void OgldevVulkanApp::CreateSurface()
         preTransform = SurfaceCaps.currentTransform;
     }
     
-    VkSwapchainCreateInfoKHR SwapChainCreateInfo;
-    ZERO_MEM_VAR(SwapChainCreateInfo);
+    VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
     
     SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     SwapChainCreateInfo.surface          = m_surface;
@@ -483,8 +482,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
 
 void OgldevVulkanApp::CreateSemaphore()
 {
-    VkSemaphoreCreateInfo semCreateInfo;
-    ZERO_MEM_VAR(semCreateInfo);
+    VkSemaphoreCreateInfo semCreateInfo = {};
     semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     
     VkResult res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_imageAvailSem);
@@ -624,12 +622,14 @@ bool OgldevVulkanApp::Init()
 #ifdef WIN32
     
 #else            
-    m_pWindowControl = new XCBControl;
-    bool ret = m_xcbControl.Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-    assert(ret);
+    m_pWindowControl = new XCBControl();
 #endif    
+    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+    assert(ret);
     CreateInstance();
     EnumDevices();
+    EnumPhysDeviceProps();
+    EnumPhysDeviceExtProps();
     CreateDevice();
     CreateSurface();
     CreateSemaphore();
