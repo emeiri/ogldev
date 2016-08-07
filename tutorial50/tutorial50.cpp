@@ -65,6 +65,8 @@ private:
     void CreateSurface();
     void CreateCommandBuffer();
     void CreateSemaphore();
+    void CreateRenderPass();
+    void CreateFramebuffer();
     void Draw();
     
     VkInstance m_inst;
@@ -85,6 +87,7 @@ private:
     VkSemaphore m_rendCompSem;
     std::vector<VkCommandBuffer> m_presentQCmdBuffs;
     VkCommandPool m_presentQCmdPool;
+    VkRenderPass m_renderPass;
 };
 
 
@@ -389,20 +392,6 @@ void OgldevVulkanApp::CreateSurface()
     if (res != VK_SUCCESS) {
         printf("Error getting images\n");
         assert(0);
-    }
-    
-    for (uint i = 0 ; i < NumSwapChainImages ; i++) {
-        VkImageViewCreateInfo ViewCreateInfo = {};
-        ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        ViewCreateInfo.format = m_surfaceFormat;
-        ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        ViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-        ViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-        ViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-        ViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-        ViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        ViewCreateInfo.subresourceRange.levelCount = 1;
-        ViewCreateInfo.subresourceRange.layerCount = 1;        
     }    
 }
 
@@ -505,6 +494,71 @@ void OgldevVulkanApp::CreateSemaphore()
 }
 
 
+void OgldevVulkanApp::CreateRenderPass()
+{
+    VkAttachmentDescription attachDesc = {};
+    attachDesc.format = m_surfaceFormat;
+    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+    attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference attachRef = {};
+    attachRef.attachment = 0;
+    attachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpassDesc = {};
+    subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpassDesc.colorAttachmentCount = 1;
+    subpassDesc.pColorAttachments = &attachDesc;
+
+    VkRenderPassCreateInfo renderPassCreateInfo = {};
+    renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassCreateInfo.attachmentCount = 1;
+    renderPassCreateInfo.pAttachments = &attachDesc;
+    renderPassCreateInfo.subpassCount = 1;
+    renderPassCreateInfo.pSubpasses = &subpassDesc;
+
+    VkResult res = vkCreateRenderPass(m_device, &renderPassCreateInfo, NULL, &m_renderPass);
+    CheckVulkanError("vkCreateRenderPass failed");
+
+    printf("Created a render pass\n");
+}
+
+
+void OgldevVulkanApp::CreateFramebuffer()
+{
+    for (uint i = 0 ; i < m_images.size() ; i++) {
+        VkImageViewCreateInfo ViewCreateInfo = {};
+        ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        ViewCreateInfo.image = m_images[i];
+        ViewCreateInfo.format = m_surfaceFormat;
+        ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        ViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        ViewCreateInfo.subresourceRange.levelCount = 1;
+        ViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        ViewCreateInfo.subresourceRange.layerCount = 1;    
+
+        VkResult res = vkCreateImageView(m_device, &ViewCreateInfo, NULL, &m_views[i]);
+        CheckVulkanError("vkCreateImageView failed\n");
+    }
+
+    VkFramebufferCreateInfo fbCreateInfo = {};
+    fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    fbCreateInfo.renderPass m_renderPass;
+    fbCreateInfo.attachmentCount = 1;
+    fbCreateInfo.pAttachments = &m_views[i];
+    fbCreateInfo
+}
+
 void OgldevVulkanApp::Draw()
 {
     uint ImageIndex = 0;
@@ -571,7 +625,9 @@ bool OgldevVulkanApp::Init()
     CreateSurface();
     CreateSemaphore();
     CreateCommandBuffer();
-    
+    CreateRenderPass();
+    CreateFramebuffer();
+
     return true;
 }
 
