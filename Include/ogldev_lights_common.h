@@ -60,6 +60,13 @@ struct LightAttenuation
     float Constant;
     float Linear;
     float Exp;
+    
+    LightAttenuation()
+    {
+        Constant = 1.0f;
+        Linear = 0.0f;
+        Exp = 0.0f;
+    }
 };
 
 
@@ -72,9 +79,6 @@ public:
     PointLight()
     {
         Position = Vector3f(0.0f, 0.0f, 0.0f);
-        Attenuation.Constant = 0.0f;
-        Attenuation.Linear = 0.0f;
-        Attenuation.Exp = 0.0f;
     }
     
     virtual void AddToATB(TwBar *bar);
