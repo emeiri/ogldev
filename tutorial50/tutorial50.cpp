@@ -513,7 +513,7 @@ void OgldevVulkanApp::CreateRenderPass()
     VkSubpassDescription subpassDesc = {};
     subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDesc.colorAttachmentCount = 1;
-    subpassDesc.pColorAttachments = &attachDesc;
+    subpassDesc.pColorAttachments = &attachRef;
 
     VkRenderPassCreateInfo renderPassCreateInfo = {};
     renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -553,7 +553,7 @@ void OgldevVulkanApp::CreateFramebuffer()
 
     VkFramebufferCreateInfo fbCreateInfo = {};
     fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    fbCreateInfo.renderPass m_renderPass;
+    fbCreateInfo.renderPass = m_renderPass;
     fbCreateInfo.attachmentCount = 1;
     fbCreateInfo.pAttachments = &m_views[i];
     fbCreateInfo

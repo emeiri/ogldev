@@ -22,11 +22,13 @@
 #include <vector>
 
 #ifdef _WIN32
-#else
-#define VK_USE_PLATFORM_XCB_KHR
-#endif
 #include "c:\\VulkanSDK\\1.0.21.1\\Include\\vulkan\\vulkan.h"
 #include "c:\\VulkanSDK\\1.0.21.1\\Include\\vulkan\\vk_sdk_platform.h"
+#else
+#define VK_USE_PLATFORM_XCB_KHR
+#include <vulkan/vulkan.h>
+#include <vulkan/vk_sdk_platform.h>
+#endif
 
 
 
