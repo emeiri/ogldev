@@ -25,6 +25,12 @@
 #include <sys/time.h>
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+
+
 #include "ogldev_util.h"
 
 bool ReadFile(const char* pFileName, string& outFile)
@@ -50,6 +56,43 @@ bool ReadFile(const char* pFileName, string& outFile)
     
     return ret;
 }
+
+
+bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
+{
+    int f = open(pFileName, O_RDONLY);
+    
+    if (f == -1) {
+        printf("Error opening '%s': %s\n", pFileName, strerror(errno));
+        return false;        
+    }
+    
+    v.clear();
+    
+    int len = 0;
+    int index = 0;
+    
+    do {
+        int syms[64];
+        
+        len = read(f, syms, sizeof(syms));
+        assert((len % 4) == 0);
+        
+        if (len > 0) {
+            v.resize(v.size() + len / 4);
+            for (int i = 0 ; i < len / 4 ; i++) {
+                v[index] = syms[i];
+                index++;
+            }
+        }
+    }
+    while (len > 0);
+    
+    close(f);
+    
+    return true;
+}
+
 
 void OgldevError(const char* pFileName, uint line, const char* pError)
 {

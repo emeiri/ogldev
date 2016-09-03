@@ -41,6 +41,7 @@
 
 bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);
 void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags);
+VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName);
 
 class VulkanWindowControl
 {

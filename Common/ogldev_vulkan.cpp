@@ -16,10 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+#include <string>
 #include <stdio.h>
-#include <vector>
 
 #include "ogldev_vulkan.h"
+#include "ogldev_util.h"
 
 
 void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags)
@@ -80,4 +82,31 @@ bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
     }
     
     return true;
+}
+
+
+VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
+{
+   /* std::vector<int> s;
+    
+    if (!ReadBinaryFile(pFileName, s)) {
+        return NULL;
+    }*/
+    
+    std::string s;
+    
+    if (!ReadFile(pFileName, s)) {
+        return NULL;
+    }
+  
+    VkShaderModuleCreateInfo shaderCreateInfo = {};
+    shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderCreateInfo.codeSize = s.size();
+    shaderCreateInfo.pCode = (const uint32_t*)s.c_str();
+    
+    VkShaderModule shaderModule;
+    VkResult res = vkCreateShaderModule(device, &shaderCreateInfo, NULL, &shaderModule);
+    CheckVulkanError("vkCreateShaderModule failed");
+    printf("Created shader %s\n", pFileName);
+    return shaderModule;    
 }

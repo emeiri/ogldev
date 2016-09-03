@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
 #include <string.h>
 #include <assert.h>
 #include "ogldev_types.h"
@@ -32,6 +33,7 @@
 using namespace std;
 
 bool ReadFile(const char* fileName, string& outFile);
+bool ReadBinaryFile(const char* pFileName, std::vector<int>& v);
 
 void OgldevError(const char* pFileName, uint line, const char* pError);
 void OgldevFileError(const char* pFileName, uint line, const char* pFileError);

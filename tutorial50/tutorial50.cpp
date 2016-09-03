@@ -40,8 +40,25 @@
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
 
-PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR;
+PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR = NULL;
+PFN_vkCreateDebugReportCallbackEXT my_vkCreateDebugReportCallbackEXT = NULL; 
+//PFN_vkDebugReportMessageEXT vkDebugReportMessageEXT = NULL;
+//PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = NULL;
 
+       
+VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
+    VkDebugReportFlagsEXT       flags,
+    VkDebugReportObjectTypeEXT  objectType,
+    uint64_t                    object,
+    size_t                      location,
+    int32_t                     messageCode,
+    const char*                 pLayerPrefix,
+    const char*                 pMessage,
+    void*                       pUserData)
+{
+    printf("%s\n", pMessage);
+    return VK_FALSE;
+}
 
 class OgldevVulkanApp
 {
@@ -67,6 +84,8 @@ private:
     void CreateSemaphore();
     void CreateRenderPass();
     void CreateFramebuffer();
+    void CreateShaders();
+    void CreatePipeline();
     void Draw();
     
     VkInstance m_inst;
@@ -88,6 +107,10 @@ private:
     std::vector<VkCommandBuffer> m_presentQCmdBuffs;
     VkCommandPool m_presentQCmdPool;
     VkRenderPass m_renderPass;
+    VkFramebuffer m_fb;
+    VkShaderModule m_vsModule;
+    VkShaderModule m_fsModule;
+    VkPipeline m_pipeline;
 };
 
 
@@ -206,6 +229,7 @@ void OgldevVulkanApp::CreateInstance()
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
     const char* pInstExt[] = {
+        "VK_EXT_debug_report",
         VK_KHR_SURFACE_EXTENSION_NAME,
     #ifdef _WIN32    
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
@@ -214,18 +238,44 @@ void OgldevVulkanApp::CreateInstance()
     #endif            
     };
     
-    VkInstanceCreateInfo instCreateInfo = {};
-    instCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instCreateInfo.pApplicationInfo = &appInfo;
-    instCreateInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
-    instCreateInfo.ppEnabledExtensionNames = pInstExt;         
+    const char* pInstLayers[] = {
+        "VK_LAYER_LUNARG_standard_validation"
+    };
+    //std::vector enabledInstanceExtensions;
+    
+    VkInstanceCreateInfo instInfo = {};
+    instInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    instInfo.pApplicationInfo = &appInfo;
+    instInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pInstLayers);
+    instInfo.ppEnabledLayerNames = pInstLayers;
+    instInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
+    instInfo.ppEnabledExtensionNames = pInstExt;         
 
-    VkResult res = vkCreateInstance(&instCreateInfo, NULL, &m_inst);
+    VkResult res = vkCreateInstance(&instInfo, NULL, &m_inst);
     
     if (res != VK_SUCCESS) {
         OGLDEV_ERROR("Failed to create instance");
         assert(0);
     }    
+    
+    my_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkCreateDebugReportCallbackEXT"));
+    
+    /* Setup callback creation information */
+    VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
+    callbackCreateInfo.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+    callbackCreateInfo.pNext       = NULL;
+    callbackCreateInfo.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                                     VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+    callbackCreateInfo.pfnCallback = &MyDebugReportCallback;
+    callbackCreateInfo.pUserData   = NULL;
+
+    /* Register the callback */
+    VkDebugReportCallbackEXT callback;
+    res = my_vkCreateDebugReportCallbackEXT(m_inst, &callbackCreateInfo, NULL, &callback);
+    CheckVulkanError("my_vkCreateDebugReportCallbackEXT failed");
+  //  vkDebugReportMessageEXT = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(m_inst, "vkDebugReportMessageEXT"));
+   // vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkDestroyDebugReportCallbackEXT"));
 }
 
 
@@ -243,9 +293,15 @@ void OgldevVulkanApp::CreateDevice()
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
     
+    const char* pDevLayers[] = {
+        "VK_LAYER_LUNARG_standard_validation"
+    };
+    
     VkDeviceCreateInfo devInfo = {};
     devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    devInfo.enabledExtensionCount = 1;
+    devInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pDevLayers);
+    devInfo.ppEnabledLayerNames = pDevLayers;
+    devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
     devInfo.ppEnabledExtensionNames = pDevExt;
     devInfo.queueCreateInfoCount = 1;
     devInfo.pQueueCreateInfos = &qInfo;
@@ -531,9 +587,11 @@ void OgldevVulkanApp::CreateRenderPass()
 
 void OgldevVulkanApp::CreateFramebuffer()
 {
+    VkResult res;
+            
     for (uint i = 0 ; i < m_images.size() ; i++) {
         VkImageViewCreateInfo ViewCreateInfo = {};
-        ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         ViewCreateInfo.image = m_images[i];
         ViewCreateInfo.format = m_surfaceFormat;
         ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -547,16 +605,23 @@ void OgldevVulkanApp::CreateFramebuffer()
         ViewCreateInfo.subresourceRange.baseArrayLayer = 0;
         ViewCreateInfo.subresourceRange.layerCount = 1;    
 
-        VkResult res = vkCreateImageView(m_device, &ViewCreateInfo, NULL, &m_views[i]);
+        res = vkCreateImageView(m_device, &ViewCreateInfo, NULL, &m_views[i]);
         CheckVulkanError("vkCreateImageView failed\n");
     }
 
     VkFramebufferCreateInfo fbCreateInfo = {};
     fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     fbCreateInfo.renderPass = m_renderPass;
-    fbCreateInfo.attachmentCount = 1;
-    fbCreateInfo.pAttachments = &m_views[i];
-    fbCreateInfo
+    fbCreateInfo.attachmentCount = m_views.size();
+    fbCreateInfo.pAttachments = &m_views[0];
+    fbCreateInfo.width = WINDOW_WIDTH;
+    fbCreateInfo.height = WINDOW_HEIGHT;
+    fbCreateInfo.layers = 1;
+    
+    res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fb);
+    CheckVulkanError("vkCreateFramebuffer failed\n");
+    
+    printf("Framebuffer created\n");
 }
 
 void OgldevVulkanApp::Draw()
@@ -606,6 +671,135 @@ void OgldevVulkanApp::Draw()
 
 
 
+void OgldevVulkanApp::CreateShaders()
+{
+    m_vsModule = VulkanCreateShaderModule(m_device, "Shaders/vs.spv");
+    assert(m_vsModule);
+
+    m_fsModule = VulkanCreateShaderModule(m_device, "Shaders/fs.spv");
+    assert(m_fsModule);
+    }
+
+
+void OgldevVulkanApp::CreatePipeline()
+{
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfo[2] = {};
+    
+    shaderStageCreateInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStageCreateInfo[0].module = m_vsModule;
+    shaderStageCreateInfo[0].pName = "main";
+    shaderStageCreateInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shaderStageCreateInfo[1].module = m_fsModule;
+    shaderStageCreateInfo[1].pName = "main";       
+
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    
+    VkPipelineInputAssemblyStateCreateInfo pipelineIACreateInfo = {};
+    pipelineIACreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    pipelineIACreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    
+    VkViewport vp = {};
+    vp.x = 0.0f;
+    vp.y = 0.0f;
+    vp.width  = (float)WINDOW_WIDTH;
+    vp.height = (float)WINDOW_HEIGHT;
+    vp.minDepth = 0.0f;
+    vp.maxDepth = 1.0f;
+    
+    VkRect2D scissor = {};
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+    scissor.extent.width  = WINDOW_WIDTH;
+    scissor.extent.height = WINDOW_HEIGHT;
+    
+    VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE] = {};
+    VkPipelineDynamicStateCreateInfo dynamicState = {};
+    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dynamicState.pDynamicStates = dynamicStateEnables;
+
+    VkPipelineViewportStateCreateInfo vpCreateInfo = {};
+    vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    vpCreateInfo.viewportCount = 1;
+    vpCreateInfo.pViewports = &vp;
+    vpCreateInfo.scissorCount = 1;
+    vpCreateInfo.pScissors = &scissor;
+    dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_VIEWPORT;
+    dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_SCISSOR;
+    
+    VkPipelineDepthStencilStateCreateInfo dsInfo = {};
+    dsInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    dsInfo.depthTestEnable = VK_TRUE;
+    dsInfo.depthWriteEnable = VK_TRUE;
+    dsInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+    dsInfo.back.failOp = VK_STENCIL_OP_KEEP;
+    dsInfo.back.passOp = VK_STENCIL_OP_KEEP;
+    dsInfo.back.compareOp = VK_COMPARE_OP_ALWAYS;
+    dsInfo.front = dsInfo.back;
+    
+    VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
+    rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+    rastCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+    rastCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rastCreateInfo.lineWidth = 1.0f;
+    
+    VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
+    pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    //pipelineMSCreateInfo.minSampleShading = 1.0f;
+    
+    VkPipelineColorBlendAttachmentState blendAttachState = {};
+    /*blendAttachState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+    blendAttachState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+    blendAttachState.colorBlendOp = VK_BLEND_OP_ADD;
+    blendAttachState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    blendAttachState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    blendAttachState.alphaBlendOp = VK_BLEND_OP_ADD;
+    blendAttachState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | 
+                                      VK_COLOR_COMPONENT_G_BIT | 
+                                      VK_COLOR_COMPONENT_B_BIT | 
+                                      VK_COLOR_COMPONENT_A_BIT;*/
+    blendAttachState.colorWriteMask = 0xf;
+    
+    VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
+    blendCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
+    blendCreateInfo.attachmentCount = 1;
+    blendCreateInfo.pAttachments = &blendAttachState;
+    
+    VkPipelineLayoutCreateInfo layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    
+    VkPipelineLayout pipelineLayout;
+    VkResult res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &pipelineLayout);
+    CheckVulkanError("vkCreatePipelineLayout failed");
+        
+    VkGraphicsPipelineCreateInfo pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = ARRAY_SIZE_IN_ELEMENTS(shaderStageCreateInfo);
+    pipelineInfo.pStages = &shaderStageCreateInfo[0];
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &pipelineIACreateInfo;
+    pipelineInfo.pViewportState = &vpCreateInfo;
+    pipelineInfo.pDepthStencilState = &dsInfo;
+    pipelineInfo.pRasterizationState = &rastCreateInfo;
+    pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
+    pipelineInfo.pColorBlendState = &blendCreateInfo;
+    pipelineInfo.layout = pipelineLayout;
+    pipelineInfo.renderPass = m_renderPass;
+    pipelineInfo.pDynamicState = &dynamicState;
+    pipelineInfo.basePipelineIndex = -1;
+    
+    res = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    CheckVulkanError("vkCreateGraphicsPipelines failed");
+    
+    printf("Graphics pipeline created\n");
+}
+
+
 bool OgldevVulkanApp::Init()
 {
     std::vector<VkExtensionProperties> ExtProps;
@@ -627,6 +821,8 @@ bool OgldevVulkanApp::Init()
     CreateCommandBuffer();
     CreateRenderPass();
     CreateFramebuffer();
+    CreateShaders();
+    CreatePipeline();
 
     return true;
 }
