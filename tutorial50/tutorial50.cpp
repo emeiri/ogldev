@@ -87,6 +87,7 @@ private:
     void CreateFramebuffer();
     void CreateShaders();
     void CreatePipeline();
+    void RecordCommandBuffers();
     void Draw();
     
     VkInstance m_inst;
@@ -108,7 +109,7 @@ private:
     std::vector<VkCommandBuffer> m_presentQCmdBuffs;
     VkCommandPool m_presentQCmdPool;
     VkRenderPass m_renderPass;
-    VkFramebuffer m_fb;
+    std::vector<VkFramebuffer> m_fbs;
     VkShaderModule m_vsModule;
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
@@ -487,59 +488,9 @@ void OgldevVulkanApp::CreateCommandBuffer()
     
     res = vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
             
-    CheckVulkanError("vkAllocateCommandBuffers failed");
+    CheckVulkanError("vkAllocateCommandBuffers failed");    
     
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-    
-    VkClearColorValue clearColor = { 1.0f, 0.0f, 0.0f, 0.0f };
-    
-    VkImageSubresourceRange imageRange = {};
-    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    imageRange.levelCount = 1;
-    imageRange.layerCount = 1;
-    
-    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {
-        VkImageMemoryBarrier memBarrier_PresentToClear = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;        
-        
-        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;        
-        
-        res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
-        CheckVulkanError("vkBeginCommandBuffer failed\n");
-        
-        vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                             0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);
-        
-        vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
-                             1, &imageRange);
-        
-        vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-                             0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
-
-        res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
-        CheckVulkanError("vkEndCommandBuffer failed\n");        
-    }
-    
-    printf("Command buffers recorded\n");
+    printf("Created command buffers\n");
 }
 
 void OgldevVulkanApp::CreateSemaphore()
@@ -602,6 +553,8 @@ void OgldevVulkanApp::CreateRenderPass()
 
 void OgldevVulkanApp::CreateFramebuffer()
 {
+    m_fbs.resize(m_images.size());
+    
     VkResult res;
             
     for (uint i = 0 ; i < m_images.size() ; i++) {
@@ -622,21 +575,21 @@ void OgldevVulkanApp::CreateFramebuffer()
 
         res = vkCreateImageView(m_device, &ViewCreateInfo, NULL, &m_views[i]);
         CheckVulkanError("vkCreateImageView failed\n");
-    }
+        
+        VkFramebufferCreateInfo fbCreateInfo = {};
+        fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        fbCreateInfo.renderPass = m_renderPass;
+        fbCreateInfo.attachmentCount = 1;
+        fbCreateInfo.pAttachments = &m_views[i];
+        fbCreateInfo.width = WINDOW_WIDTH;
+        fbCreateInfo.height = WINDOW_HEIGHT;
+        fbCreateInfo.layers = 1;
 
-    VkFramebufferCreateInfo fbCreateInfo = {};
-    fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    fbCreateInfo.renderPass = m_renderPass;
-    fbCreateInfo.attachmentCount = m_views.size();
-    fbCreateInfo.pAttachments = &m_views[0];
-    fbCreateInfo.width = WINDOW_WIDTH;
-    fbCreateInfo.height = WINDOW_HEIGHT;
-    fbCreateInfo.layers = 1;
-    
-    res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fb);
-    CheckVulkanError("vkCreateFramebuffer failed\n");
-    
-    printf("Framebuffer created\n");
+        res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fbs[i]);
+        CheckVulkanError("vkCreateFramebuffer failed\n");        
+    }
+   
+    printf("Frame buffers created\n");
 }
 
 void OgldevVulkanApp::Draw()
@@ -856,6 +809,85 @@ void OgldevVulkanApp::CreatePipeline()
 }
 
 
+void OgldevVulkanApp::RecordCommandBuffers() 
+{
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    
+    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
+    VkClearValue clearValue = {};
+    clearValue.color = clearColor;
+    
+    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;
+    
+    VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = m_renderPass;
+    renderPassInfo.renderArea.offset.x = 0;
+    renderPassInfo.renderArea.offset.y = 0;
+    renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
+    renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearValue;
+    
+    VkResult res;
+    
+    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {
+     /*   VkImageMemoryBarrier memBarrier_PresentToClear = {};
+        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.image = m_images[i];
+        memBarrier_PresentToClear.subresourceRange = imageRange;        
+        
+        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
+        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
+        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
+        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.image = m_images[i];
+        memBarrier_PresentToClear.subresourceRange = imageRange;  */      
+              
+        res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
+        CheckVulkanError("vkBeginCommandBuffer failed\n");
+                
+      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+      //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
+        renderPassInfo.framebuffer = m_fbs[i];
+        vkCmdBeginRenderPass(m_presentQCmdBuffs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBindPipeline(m_presentQCmdBuffs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+        
+        vkCmdDraw(m_presentQCmdBuffs[i], 3, 1, 0, 0);
+        
+        vkCmdEndRenderPass(m_presentQCmdBuffs[i]);
+        
+      //  vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
+           //                  1, &imageRange);                
+        
+      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
+
+        res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
+        CheckVulkanError("vkEndCommandBuffer failed\n");        
+    }
+    
+    printf("Command buffers recorded\n");    
+}
+
+
+
+
 bool OgldevVulkanApp::Init()
 {
     std::vector<VkExtensionProperties> ExtProps;
@@ -873,12 +905,13 @@ bool OgldevVulkanApp::Init()
     EnumPhysDeviceExtProps();
     CreateDevice();      
     CreateSurface();
-    CreateSemaphore();
-    CreateCommandBuffer();
+    CreateSemaphore();    
     CreateRenderPass();
     CreateFramebuffer();
+    CreateCommandBuffer();
     CreateShaders();
     CreatePipeline();
+    RecordCommandBuffers();
 
     return true;
 }
