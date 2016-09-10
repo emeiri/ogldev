@@ -36,6 +36,7 @@
 
 #include "ogldev_xcb_control.h"
 
+//#define ENABLE_DEBUG_LAYERS
 
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
@@ -111,6 +112,7 @@ private:
     VkShaderModule m_vsModule;
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
+    VkPhysicalDeviceMemoryProperties m_memProps;
 };
 
 
@@ -217,6 +219,8 @@ void OgldevVulkanApp::EnumPhysDeviceExtProps()
         printf("Device extension %d - %s\n", i, ExtProps[i].extensionName);
         m_devExt.push_back(std::string(ExtProps[i].extensionName));
     }            
+    
+    vkGetPhysicalDeviceMemoryProperties(m_physDevices[m_gfxDevIndex], &m_memProps);
 }
 
 
@@ -229,7 +233,9 @@ void OgldevVulkanApp::CreateInstance()
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
     const char* pInstExt[] = {
+#ifdef ENABLE_DEBUG_LAYERS
         "VK_EXT_debug_report",
+#endif        
         VK_KHR_SURFACE_EXTENSION_NAME,
     #ifdef _WIN32    
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
@@ -238,16 +244,19 @@ void OgldevVulkanApp::CreateInstance()
     #endif            
     };
     
+#ifdef ENABLE_DEBUG_LAYERS    
     const char* pInstLayers[] = {
         "VK_LAYER_LUNARG_standard_validation"
     };
-    //std::vector enabledInstanceExtensions;
+#endif    
     
     VkInstanceCreateInfo instInfo = {};
     instInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instInfo.pApplicationInfo = &appInfo;
+#ifdef ENABLE_DEBUG_LAYERS    
     instInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pInstLayers);
     instInfo.ppEnabledLayerNames = pInstLayers;
+#endif    
     instInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
     instInfo.ppEnabledExtensionNames = pInstExt;         
 
@@ -258,6 +267,7 @@ void OgldevVulkanApp::CreateInstance()
         assert(0);
     }    
     
+#ifdef ENABLE_DEBUG_LAYERS
     my_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkCreateDebugReportCallbackEXT"));
     
     /* Setup callback creation information */
@@ -276,6 +286,7 @@ void OgldevVulkanApp::CreateInstance()
     CheckVulkanError("my_vkCreateDebugReportCallbackEXT failed");
   //  vkDebugReportMessageEXT = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(m_inst, "vkDebugReportMessageEXT"));
    // vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkDestroyDebugReportCallbackEXT"));
+#endif    
 }
 
 
@@ -293,14 +304,18 @@ void OgldevVulkanApp::CreateDevice()
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
     
+#ifdef ENABLE_DEBUG_LAYERS        
     const char* pDevLayers[] = {
         "VK_LAYER_LUNARG_standard_validation"
     };
+#endif    
     
     VkDeviceCreateInfo devInfo = {};
     devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+#ifdef ENABLE_DEBUG_LAYERS        
     devInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pDevLayers);
     devInfo.ppEnabledLayerNames = pDevLayers;
+#endif    
     devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
     devInfo.ppEnabledExtensionNames = pDevExt;
     devInfo.queueCreateInfoCount = 1;
@@ -426,7 +441,7 @@ void OgldevVulkanApp::CreateSurface()
         printf("Error creating swap chain\n");
         assert(0);
     }
-    
+
     printf("Swap chain created\n");
     
     uint NumSwapChainImages = 0;
@@ -678,8 +693,31 @@ void OgldevVulkanApp::CreateShaders()
 
     m_fsModule = VulkanCreateShaderModule(m_device, "Shaders/fs.spv");
     assert(m_fsModule);
-    }
+}
 
+
+static bool memory_type_from_properties(VkPhysicalDeviceMemoryProperties& memProps, 
+                                        uint32_t typeBits,
+                                        VkFlags requirements_mask,
+                                        uint32_t *typeIndex) 
+{
+    // Search memtypes to find first index with those properties
+    for (uint32_t i = 0; i < 32; i++) {
+        if ((typeBits & 1) == 1) {
+            // Type is available, does it match user properties?
+            if ((memProps.memoryTypes[i].propertyFlags &
+                 requirements_mask) == requirements_mask) {
+                *typeIndex = i;
+                return true;
+            }
+        }
+        typeBits >>= 1;
+    }
+    // No memory types matched, return failure
+    return false;
+}
+
+#define VERTEX_BUFFER_BIND_ID 0
 
 void OgldevVulkanApp::CreatePipeline()
 {
@@ -692,8 +730,8 @@ void OgldevVulkanApp::CreatePipeline()
     shaderStageCreateInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStageCreateInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     shaderStageCreateInfo[1].module = m_fsModule;
-    shaderStageCreateInfo[1].pName = "main";       
-
+    shaderStageCreateInfo[1].pName = "main";   
+	    
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     
@@ -769,14 +807,32 @@ void OgldevVulkanApp::CreatePipeline()
     blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
     blendCreateInfo.attachmentCount = 1;
     blendCreateInfo.pAttachments = &blendAttachState;
-    
+
+    VkDescriptorSetLayoutBinding layoutBinding = {};
+    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    layoutBinding.descriptorCount = 1;
+    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    layoutBinding.pImmutableSamplers = NULL;
+
+    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
+    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorLayout.pNext = NULL;
+    descriptorLayout.bindingCount = 1;
+    descriptorLayout.pBindings = &layoutBinding;
+
+    VkDescriptorSetLayout descriptorSetLayout;
+    VkResult res = vkCreateDescriptorSetLayout(m_device, &descriptorLayout, NULL, &descriptorSetLayout);    
+    CheckVulkanError("vkCreateDescriptorSetLayout failed");
+     
     VkPipelineLayoutCreateInfo layoutInfo = {};
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layoutInfo.setLayoutCount = 1;
+    layoutInfo.pSetLayouts = &descriptorSetLayout;
     
     VkPipelineLayout pipelineLayout;
-    VkResult res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &pipelineLayout);
+    res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &pipelineLayout);
     CheckVulkanError("vkCreatePipelineLayout failed");
-        
+   
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = ARRAY_SIZE_IN_ELEMENTS(shaderStageCreateInfo);
@@ -815,7 +871,7 @@ bool OgldevVulkanApp::Init()
     EnumDevices();
     EnumPhysDeviceProps();
     EnumPhysDeviceExtProps();
-    CreateDevice();
+    CreateDevice();      
     CreateSurface();
     CreateSemaphore();
     CreateCommandBuffer();
