@@ -114,6 +114,7 @@ private:
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
     VkPhysicalDeviceMemoryProperties m_memProps;
+    VkPipelineLayout m_pipelineLayout;
 };
 
 
@@ -781,9 +782,8 @@ void OgldevVulkanApp::CreatePipeline()
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.setLayoutCount = 1;
     layoutInfo.pSetLayouts = &descriptorSetLayout;
-    
-    VkPipelineLayout pipelineLayout;
-    res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &pipelineLayout);
+        
+    res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &m_pipelineLayout);
     CheckVulkanError("vkCreatePipelineLayout failed");
    
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
@@ -797,7 +797,7 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
-    pipelineInfo.layout = pipelineLayout;
+    pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.basePipelineIndex = -1;
@@ -826,7 +826,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
     
     VkRenderPassBeginInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_renderPass;
+    renderPassInfo.renderPass = m_renderPass;   
     renderPassInfo.renderArea.offset.x = 0;
     renderPassInfo.renderArea.offset.y = 0;
     renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
@@ -865,9 +865,25 @@ void OgldevVulkanApp::RecordCommandBuffers()
       //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
       //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
         renderPassInfo.framebuffer = m_fbs[i];
+
         vkCmdBeginRenderPass(m_presentQCmdBuffs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
         vkCmdBindPipeline(m_presentQCmdBuffs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
         
+        VkViewport viewport = { 0 };
+        viewport.height = (float)WINDOW_HEIGHT;
+        viewport.width = (float)WINDOW_WIDTH;
+        viewport.minDepth = (float)0.0f;
+        viewport.maxDepth = (float)1.0f;
+        vkCmdSetViewport(m_presentQCmdBuffs[i], 0, 1, &viewport);
+
+        VkRect2D scissor = { 0 };
+        scissor.extent.width = WINDOW_WIDTH;
+        scissor.extent.height = WINDOW_HEIGHT;
+        scissor.offset.x = 0;
+        scissor.offset.y = 0;
+        vkCmdSetScissor(m_presentQCmdBuffs[i], 0, 1, &scissor);
+
         vkCmdDraw(m_presentQCmdBuffs[i], 3, 1, 0, 0);
         
         vkCmdEndRenderPass(m_presentQCmdBuffs[i]);
