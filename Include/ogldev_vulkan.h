@@ -31,7 +31,6 @@
 #endif
 
 
-
 #define CheckVulkanError(msg)           \
     if (res != VK_SUCCESS) {            \
         printf(msg);                    \
@@ -39,9 +38,16 @@
         abort();                        \
     }
 
+struct VulkanPhysicalDevices {
+    std::vector<VkPhysicalDevice> m_devices;
+    std::vector<VkPhysicalDeviceProperties> m_devProps;
+    std::vector<std::vector<VkQueueFamilyProperties> > m_qFamilyProps;
+};
+
 bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);
 void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags);
 VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName);
+bool VulkanGetPhysicalDevices(const VkInstance& inst, VulkanPhysicalDevices& PhysDevices);
 
 class VulkanWindowControl
 {

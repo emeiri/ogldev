@@ -61,120 +61,73 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
     return VK_FALSE;
 }
 
-class OgldevVulkanApp
+
+class OgldevVulkanCore
 {
 public:
-
-    OgldevVulkanApp(const char* pAppName);
+    OgldevVulkanCore(const char* pAppName);
+    ~OgldevVulkanCore();
     
-    ~OgldevVulkanApp();
+    bool Init();
     
-    bool Init();    
+    const VkPhysicalDevice& GetPhysDevice() const;
     
-    void Run();
+    int GetQueueFamily() const { return m_gfxQueueFamily; }
+    
+    VkInstance& GetInstance() { return m_inst; }
     
 private:
-
-    void EnumDevices();
-    void EnumPhysDeviceProps();
-    void EnumPhysDeviceExtProps();
     void CreateInstance();
-    void CreateDevice();
-    void CreateSurface();
-    void CreateCommandBuffer();
-    void CreateSemaphore();
-    void CreateRenderPass();
-    void CreateFramebuffer();
-    void CreateShaders();
-    void CreatePipeline();
-    void RecordCommandBuffers();
-    void Draw();
+    void SelectPhysicalDevice();
     
-    VkInstance m_inst;
     std::string m_appName;
-    std::vector<VkPhysicalDevice> m_physDevices;
-    uint m_gfxDevIndex;
-    uint m_gfxQueueFamily;
-    VkDevice m_device;
-    std::vector<std::string> m_devExt;
-    VkSurfaceKHR m_surface;
-    VkFormat m_surfaceFormat;
-    VulkanWindowControl* m_pWindowControl;
-    std::vector<VkImage> m_images;
-    std::vector<VkImageView> m_views;
-    VkSwapchainKHR m_swapChainKHR;
-    VkQueue m_queue;
-    VkSemaphore m_imageAvailSem;
-    VkSemaphore m_rendCompSem;
-    std::vector<VkCommandBuffer> m_presentQCmdBuffs;
-    VkCommandPool m_presentQCmdPool;
-    VkRenderPass m_renderPass;
-    std::vector<VkFramebuffer> m_fbs;
-    VkShaderModule m_vsModule;
-    VkShaderModule m_fsModule;
-    VkPipeline m_pipeline;
-    VkPhysicalDeviceMemoryProperties m_memProps;
-    VkPipelineLayout m_pipelineLayout;
+    VkInstance m_inst;
+    VulkanPhysicalDevices m_physDevices;
+    int m_gfxDevIndex;
+    int m_gfxQueueFamily;
 };
 
 
-OgldevVulkanApp::OgldevVulkanApp(const char* pAppName)
+OgldevVulkanCore::OgldevVulkanCore(const char* pAppName) 
 {
     m_appName = std::string(pAppName);
     m_gfxDevIndex = -1;
+    m_gfxQueueFamily = -1;
 }
 
 
-OgldevVulkanApp::~OgldevVulkanApp()
+OgldevVulkanCore::~OgldevVulkanCore()
 {
     
 }
 
-void OgldevVulkanApp::EnumDevices()
+
+bool OgldevVulkanCore::Init()
 {
-    uint NumDevices = 0;
+    std::vector<VkExtensionProperties> ExtProps;
+    VulkanEnumExtProps(ExtProps);
     
-    VkResult res = vkEnumeratePhysicalDevices(m_inst, &NumDevices, NULL);
-    
-    if (res != VK_SUCCESS) {
-        OGLDEV_ERROR("vkEnumeratePhysicalDevices error");
-    }
-    
-    printf("Num physical devices %d\n", NumDevices);
-    
-    m_physDevices.resize(NumDevices);
-    
-    res = vkEnumeratePhysicalDevices(m_inst, &NumDevices, &m_physDevices[0]);
-    
-    if (res != VK_SUCCESS) {
-        OGLDEV_ERROR("vkEnumeratePhysicalDevices");
-    }
+    CreateInstance();
+    VulkanGetPhysicalDevices(m_inst, m_physDevices);
+    SelectPhysicalDevice();
 }
 
-void OgldevVulkanApp::EnumPhysDeviceProps()
+const VkPhysicalDevice& OgldevVulkanCore::GetPhysDevice() const
 {
-    VkPhysicalDeviceProperties DeviceProperties;
-    
-    printf("%d\n", m_physDevices.size());
-    for (uint i = 0 ; i < m_physDevices.size() ; i++) {
-        memset(&DeviceProperties, 0, sizeof(DeviceProperties));
-        vkGetPhysicalDeviceProperties(m_physDevices[i], &DeviceProperties);
-        
-        printf("Device name: %s\n", DeviceProperties.deviceName);
-        uint32_t apiVer = DeviceProperties.apiVersion;
-        printf("API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer),
-                                          VK_VERSION_MINOR(apiVer),
-                                          VK_VERSION_PATCH(apiVer));
-        uint NumQFamily = 0;         
-        vkGetPhysicalDeviceQueueFamilyProperties(m_physDevices[i], &NumQFamily, NULL);
-        printf("Num of family queues: %d\n", NumQFamily);
-        
-        std::vector<VkQueueFamilyProperties> QFamilyProp(NumQFamily);
-        vkGetPhysicalDeviceQueueFamilyProperties(m_physDevices[i], &NumQFamily, &QFamilyProp[0]);
-        
-        for (uint j = 0 ; j < NumQFamily ; j++) {
-            printf("Family %d Num queues: %d\n", j, QFamilyProp[j].queueCount);
-            VkQueueFlags flags = QFamilyProp[j].queueFlags;
+    assert(m_gfxDevIndex >= 0);
+    return m_physDevices.m_devices[m_gfxDevIndex];
+}
+
+
+void OgldevVulkanCore::SelectPhysicalDevice()
+{
+    for (uint i = 0 ; i < m_physDevices.m_devices.size() ; i++) {
+                
+        for (uint j = 0 ; j < m_physDevices.m_qFamilyProps[i].size() ; j++) {
+            VkQueueFamilyProperties& QFamilyProp = m_physDevices.m_qFamilyProps[i][j];
+            
+            printf("Family %d Num queues: %d\n", j, QFamilyProp.queueCount);
+            VkQueueFlags flags = QFamilyProp.queueFlags;
             printf("    GFX %s, Compute %s, Transfer %s, Sparse binding %s\n",
                     (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No",
                     (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No",
@@ -194,10 +147,73 @@ void OgldevVulkanApp::EnumPhysDeviceProps()
         assert(0);
     }    
 }
+
+class OgldevVulkanApp
+{
+public:
+
+    OgldevVulkanApp(const char* pAppName);
+    
+    ~OgldevVulkanApp();
+    
+    bool Init();    
+    
+    void Run();
+    
+private:
+
+   // void EnumPhysDeviceProps();
+    void EnumPhysDeviceExtProps();
+    void CreateInstance();
+    void CreateDevice();
+    void CreateSurface();
+    void CreateCommandBuffer();
+    void CreateSemaphore();
+    void CreateRenderPass();
+    void CreateFramebuffer();
+    void CreateShaders();
+    void CreatePipeline();
+    void RecordCommandBuffers();
+    void Draw();
+
+    OgldevVulkanCore m_core;    
+    VkDevice m_device;
+ //   std::vector<std::string> m_devExt;
+    VkSurfaceKHR m_surface;
+    VkFormat m_surfaceFormat;
+    VulkanWindowControl* m_pWindowControl;
+    std::vector<VkImage> m_images;
+    std::vector<VkImageView> m_views;
+    VkSwapchainKHR m_swapChainKHR;
+    VkQueue m_queue;
+    VkSemaphore m_imageAvailSem;
+    VkSemaphore m_rendCompSem;
+    std::vector<VkCommandBuffer> m_presentQCmdBuffs;
+    VkCommandPool m_presentQCmdPool;
+    VkRenderPass m_renderPass;
+    std::vector<VkFramebuffer> m_fbs;
+    VkShaderModule m_vsModule;
+    VkShaderModule m_fsModule;
+    VkPipeline m_pipeline;
+ //   VkPhysicalDeviceMemoryProperties m_memProps;
+    VkPipelineLayout m_pipelineLayout;
+};
+
+
+OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
+{
+}
+
+
+OgldevVulkanApp::~OgldevVulkanApp()
+{
+    
+}
+
     
 void OgldevVulkanApp::EnumPhysDeviceExtProps()
 {
-    uint NumExt = 0;
+   /* uint NumExt = 0;
     
     VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
     
@@ -220,13 +236,13 @@ void OgldevVulkanApp::EnumPhysDeviceExtProps()
     for (uint i = 0 ; i < NumExt ; i++) {
         printf("Device extension %d - %s\n", i, ExtProps[i].extensionName);
         m_devExt.push_back(std::string(ExtProps[i].extensionName));
-    }            
+    }     */       
     
-    vkGetPhysicalDeviceMemoryProperties(m_physDevices[m_gfxDevIndex], &m_memProps);
+    //vkGetPhysicalDeviceMemoryProperties(m_physDevices[m_gfxDevIndex], &m_memProps);
 }
 
 
-void OgldevVulkanApp::CreateInstance()
+void OgldevVulkanCore::CreateInstance()
 {
     VkApplicationInfo appInfo = {};       
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -300,7 +316,7 @@ void OgldevVulkanApp::CreateDevice()
     float qPriorities = 1.0f;
     qInfo.queueCount = 1;
     qInfo.pQueuePriorities = &qPriorities;
-    qInfo.queueFamilyIndex = m_gfxQueueFamily;
+    qInfo.queueFamilyIndex = m_core.GetQueueFamily();
 
     const char* pDevExt[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -325,7 +341,7 @@ void OgldevVulkanApp::CreateDevice()
     
     printf("%d\n",devInfo.enabledExtensionCount );
     
-    VkResult res = vkCreateDevice(m_physDevices[m_gfxDevIndex], &devInfo, NULL, &m_device);
+    VkResult res = vkCreateDevice(m_core.GetPhysDevice(), &devInfo, NULL, &m_device);
     
     if (res != VK_SUCCESS) {
         printf("Error creating device\n");
@@ -334,7 +350,7 @@ void OgldevVulkanApp::CreateDevice()
    
     printf("Device created\n");
     
-    vkGetDeviceQueue(m_device, m_gfxQueueFamily, 0, &m_queue);
+    vkGetDeviceQueue(m_device, m_core.GetQueueFamily(), 0, &m_queue);
 }
 
 
@@ -343,12 +359,12 @@ void OgldevVulkanApp::CreateSurface()
 #ifdef WIN32
     assert(0);
 #else
-    m_surface = m_pWindowControl->CreateSurface(m_inst);
+    m_surface = m_pWindowControl->CreateSurface(m_core.GetInstance());
     assert(m_surface);          
 #endif
     printf("Surface created\n");
     
-    VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
+    const VkPhysicalDevice& gfxPhysDev = m_core.GetPhysDevice();
     
     uint NumFormats = 0;
     vkGetPhysicalDeviceSurfaceFormatsKHR(gfxPhysDev, m_surface, &NumFormats, NULL);
@@ -365,7 +381,7 @@ void OgldevVulkanApp::CreateSurface()
     assert(m_surfaceFormat != VK_FORMAT_UNDEFINED);
     
     VkBool32 SupportsPresent = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_gfxQueueFamily, m_surface, &SupportsPresent);
+    vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_core.GetQueueFamily(), m_surface, &SupportsPresent);
     
     if (!SupportsPresent) {
         printf("Present is not supported\n");
@@ -473,7 +489,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
 {
     VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    cmdPoolCreateInfo.queueFamilyIndex = m_gfxQueueFamily;
+    cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
     
     VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
     
@@ -797,7 +813,7 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
-    pipelineInfo.layout = m_pipelineLayout;
+ //  pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.basePipelineIndex = -1;
@@ -906,8 +922,6 @@ void OgldevVulkanApp::RecordCommandBuffers()
 
 bool OgldevVulkanApp::Init()
 {
-    std::vector<VkExtensionProperties> ExtProps;
-    VulkanEnumExtProps(ExtProps);
 #ifdef WIN32
     
 #else            
@@ -915,9 +929,9 @@ bool OgldevVulkanApp::Init()
 #endif    
     bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
     assert(ret);
-    CreateInstance();
-    EnumDevices();
-    EnumPhysDeviceProps();
+
+    m_core.Init();
+    //EnumPhysDeviceProps();
     EnumPhysDeviceExtProps();
     CreateDevice();      
     CreateSurface();

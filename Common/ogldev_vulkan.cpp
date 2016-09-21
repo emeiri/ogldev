@@ -110,3 +110,73 @@ VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
     printf("Created shader %s\n", pFileName);
     return shaderModule;    
 }
+
+
+
+
+bool VulkanGetPhysicalDevices(const VkInstance& inst, VulkanPhysicalDevices& PhysDevices)
+{
+    uint NumDevices = 0;
+    
+    VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, NULL);
+    
+    if (res != VK_SUCCESS) {
+        OGLDEV_ERROR("vkEnumeratePhysicalDevices error");
+    }
+    
+    printf("Num physical devices %d\n", NumDevices);
+    
+    PhysDevices.m_devices.resize(NumDevices);
+    PhysDevices.m_devProps.resize(NumDevices);
+    PhysDevices.m_qFamilyProps.resize(NumDevices);
+    
+    res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
+    
+    if (res != VK_SUCCESS) {
+        OGLDEV_ERROR("vkEnumeratePhysicalDevices");
+    }
+  
+    for (uint i = 0 ; i < NumDevices ; i++) {
+        vkGetPhysicalDeviceProperties(PhysDevices.m_devices[i], &PhysDevices.m_devProps[i]);
+        
+        printf("Device name: %s\n", PhysDevices.m_devProps[i].deviceName);
+        uint32_t apiVer = PhysDevices.m_devProps[i].apiVersion;
+        printf("API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer),
+                                          VK_VERSION_MINOR(apiVer),
+                                          VK_VERSION_PATCH(apiVer));
+        uint NumQFamily = 0;         
+        
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDevices.m_devices[i], &NumQFamily, NULL);
+    
+        printf("Num of family queues: %d\n", NumQFamily);
+
+        PhysDevices.m_qFamilyProps[i].resize(NumQFamily);
+
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDevices.m_devices[i], &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));
+                
+      /*  for (uint j = 0 ; j < NumQFamily ; j++) {
+            VkQueueFamilyProperties& QFamilyProp = PhysDevices.m_qFamilyProps[i][j];
+            
+            printf("Family %d Num queues: %d\n", j, QFamilyProp.queueCount);
+            VkQueueFlags flags = QFamilyProp.queueFlags;
+            printf("    GFX %s, Compute %s, Transfer %s, Sparse binding %s\n",
+                    (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
+            
+            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
+                m_gfxDevIndex = i;
+                m_gfxQueueFamily = j;
+                printf("Using GFX device %d and queue family %d\n", m_gfxDevIndex, m_gfxQueueFamily);
+            }
+        }*/
+    }
+    
+    /*if (m_gfxDevIndex == -1) {
+        printf("No GFX device found!\n");
+        assert(0);
+    }    
+        */
+    return true;
+}
