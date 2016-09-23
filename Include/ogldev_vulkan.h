@@ -41,13 +41,14 @@
 struct VulkanPhysicalDevices {
     std::vector<VkPhysicalDevice> m_devices;
     std::vector<VkPhysicalDeviceProperties> m_devProps;
-    std::vector<std::vector<VkQueueFamilyProperties> > m_qFamilyProps;
+    std::vector< std::vector<VkQueueFamilyProperties> > m_qFamilyProps;
+    std::vector< std::vector<VkSurfaceFormatKHR> > m_surfaceFormats;
 };
 
 bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);
 void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags);
 VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName);
-bool VulkanGetPhysicalDevices(const VkInstance& inst, VulkanPhysicalDevices& PhysDevices);
+bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices);
 
 class VulkanWindowControl
 {

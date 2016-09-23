@@ -72,16 +72,21 @@ public:
     
     const VkPhysicalDevice& GetPhysDevice() const;
     
+    const VkSurfaceFormatKHR& GetSurfaceFormat() const;
+    
     int GetQueueFamily() const { return m_gfxQueueFamily; }
     
     VkInstance& GetInstance() { return m_inst; }
     
 private:
     void CreateInstance();
+    void CreateSurface();
     void SelectPhysicalDevice();
     
     std::string m_appName;
+    VulkanWindowControl* m_pWindowControl;
     VkInstance m_inst;
+    VkSurfaceKHR m_surface;
     VulkanPhysicalDevices m_physDevices;
     int m_gfxDevIndex;
     int m_gfxQueueFamily;
@@ -104,11 +109,28 @@ OgldevVulkanCore::~OgldevVulkanCore()
 
 bool OgldevVulkanCore::Init()
 {
+#ifdef WIN32
+    
+#else            
+    m_pWindowControl = new XCBControl();
+#endif    
+    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+    assert(ret);
+  
     std::vector<VkExtensionProperties> ExtProps;
     VulkanEnumExtProps(ExtProps);
     
     CreateInstance();
-    VulkanGetPhysicalDevices(m_inst, m_physDevices);
+    
+#ifdef WIN32
+    assert(0);
+#else
+    m_surface = m_pWindowControl->CreateSurface(m_inst);
+    assert(m_surface);          
+#endif
+    printf("Surface created\n");
+
+    VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
     SelectPhysicalDevice();
 }
 
@@ -117,6 +139,13 @@ const VkPhysicalDevice& OgldevVulkanCore::GetPhysDevice() const
     assert(m_gfxDevIndex >= 0);
     return m_physDevices.m_devices[m_gfxDevIndex];
 }
+
+const VkSurfaceFormatKHR& OgldevVulkanCore::GetSurfaceFormat() const
+{
+    assert(m_gfxDevIndex >= 0);
+    return m_physDevices.m_surfaceFormats[m_gfxDevIndex][0];
+}
+
 
 
 void OgldevVulkanCore::SelectPhysicalDevice()
@@ -166,7 +195,6 @@ private:
     void EnumPhysDeviceExtProps();
     void CreateInstance();
     void CreateDevice();
-    void CreateSurface();
     void CreateCommandBuffer();
     void CreateSemaphore();
     void CreateRenderPass();
@@ -178,10 +206,7 @@ private:
 
     OgldevVulkanCore m_core;    
     VkDevice m_device;
- //   std::vector<std::string> m_devExt;
-    VkSurfaceKHR m_surface;
-    VkFormat m_surfaceFormat;
-    VulkanWindowControl* m_pWindowControl;
+ //   std::vector<std::string> m_devExt;    
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
@@ -308,80 +333,14 @@ void OgldevVulkanCore::CreateInstance()
 }
 
 
-void OgldevVulkanApp::CreateDevice()
-{
-    VkDeviceQueueCreateInfo qInfo = {};
-    qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    
-    float qPriorities = 1.0f;
-    qInfo.queueCount = 1;
-    qInfo.pQueuePriorities = &qPriorities;
-    qInfo.queueFamilyIndex = m_core.GetQueueFamily();
-
-    const char* pDevExt[] = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
-    };
-    
-#ifdef ENABLE_DEBUG_LAYERS        
-    const char* pDevLayers[] = {
-        "VK_LAYER_LUNARG_standard_validation"
-    };
-#endif    
-    
-    VkDeviceCreateInfo devInfo = {};
-    devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-#ifdef ENABLE_DEBUG_LAYERS        
-    devInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pDevLayers);
-    devInfo.ppEnabledLayerNames = pDevLayers;
-#endif    
-    devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
-    devInfo.ppEnabledExtensionNames = pDevExt;
-    devInfo.queueCreateInfoCount = 1;
-    devInfo.pQueueCreateInfos = &qInfo;
-    
-    printf("%d\n",devInfo.enabledExtensionCount );
-    
-    VkResult res = vkCreateDevice(m_core.GetPhysDevice(), &devInfo, NULL, &m_device);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating device\n");
-        assert(0);
-    }
-   
-    printf("Device created\n");
-    
-    vkGetDeviceQueue(m_device, m_core.GetQueueFamily(), 0, &m_queue);
-}
-
-
-void OgldevVulkanApp::CreateSurface()
-{
-#ifdef WIN32
-    assert(0);
-#else
-    m_surface = m_pWindowControl->CreateSurface(m_core.GetInstance());
-    assert(m_surface);          
-#endif
-    printf("Surface created\n");
-    
-    const VkPhysicalDevice& gfxPhysDev = m_core.GetPhysDevice();
-    
-    uint NumFormats = 0;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(gfxPhysDev, m_surface, &NumFormats, NULL);
-    std::vector<VkSurfaceFormatKHR> SurfaceFormats(NumFormats);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(gfxPhysDev, m_surface, &NumFormats, &(SurfaceFormats[0]));
-    
-    for (uint i = 0 ; i < NumFormats ; i++) {
-        printf("Format %d color space %d\n", SurfaceFormats[i].format, SurfaceFormats[i].colorSpace);
-    }
-    
-    assert(NumFormats > 0);
-    
-    m_surfaceFormat = SurfaceFormats[0].format;
-    assert(m_surfaceFormat != VK_FORMAT_UNDEFINED);
+void OgldevVulkanCore::CreateSurface()
+{    
+    const VkPhysicalDevice& gfxPhysDev = GetPhysDevice();
+        
+    assert(GetSurfaceFormat().format != VK_FORMAT_UNDEFINED);
     
     VkBool32 SupportsPresent = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_core.GetQueueFamily(), m_surface, &SupportsPresent);
+    vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_gfxQueueFamily, m_surface, &SupportsPresent);
     
     if (!SupportsPresent) {
         printf("Present is not supported\n");
@@ -442,8 +401,8 @@ void OgldevVulkanApp::CreateSurface()
     SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     SwapChainCreateInfo.surface          = m_surface;
     SwapChainCreateInfo.minImageCount    = NumImages;
-    SwapChainCreateInfo.imageFormat      = m_surfaceFormat;
-    SwapChainCreateInfo.imageColorSpace  = SurfaceFormats[0].colorSpace;
+    SwapChainCreateInfo.imageFormat      = GetSurfaceFormat().format;
+    SwapChainCreateInfo.imageColorSpace  = GetSurfaceFormat().colorSpace;
     SwapChainCreateInfo.imageExtent      = SwapChainExtent;
     SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     SwapChainCreateInfo.preTransform     = preTransform;
@@ -482,6 +441,52 @@ void OgldevVulkanApp::CreateSurface()
         printf("Error getting images\n");
         assert(0);
     }    
+}
+
+
+void OgldevVulkanApp::CreateDevice()
+{
+    VkDeviceQueueCreateInfo qInfo = {};
+    qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    
+    float qPriorities = 1.0f;
+    qInfo.queueCount = 1;
+    qInfo.pQueuePriorities = &qPriorities;
+    qInfo.queueFamilyIndex = m_core.GetQueueFamily();
+
+    const char* pDevExt[] = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+    
+#ifdef ENABLE_DEBUG_LAYERS        
+    const char* pDevLayers[] = {
+        "VK_LAYER_LUNARG_standard_validation"
+    };
+#endif    
+    
+    VkDeviceCreateInfo devInfo = {};
+    devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+#ifdef ENABLE_DEBUG_LAYERS        
+    devInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pDevLayers);
+    devInfo.ppEnabledLayerNames = pDevLayers;
+#endif    
+    devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
+    devInfo.ppEnabledExtensionNames = pDevExt;
+    devInfo.queueCreateInfoCount = 1;
+    devInfo.pQueueCreateInfos = &qInfo;
+    
+    printf("%d\n",devInfo.enabledExtensionCount );
+    
+    VkResult res = vkCreateDevice(m_core.GetPhysDevice(), &devInfo, NULL, &m_device);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error creating device\n");
+        assert(0);
+    }
+   
+    printf("Device created\n");
+    
+    vkGetDeviceQueue(m_device, m_core.GetQueueFamily(), 0, &m_queue);
 }
 
 
@@ -536,7 +541,7 @@ void OgldevVulkanApp::CreateSemaphore()
 void OgldevVulkanApp::CreateRenderPass()
 {
     VkAttachmentDescription attachDesc = {};
-    attachDesc.format = m_surfaceFormat;
+    attachDesc.format = m_core.GetSurfaceFormat().format;
     attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
     attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -578,7 +583,7 @@ void OgldevVulkanApp::CreateFramebuffer()
         VkImageViewCreateInfo ViewCreateInfo = {};
         ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         ViewCreateInfo.image = m_images[i];
-        ViewCreateInfo.format = m_surfaceFormat;
+        ViewCreateInfo.format = m_core.GetSurfaceFormat().format;
         ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
         ViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         ViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -922,19 +927,10 @@ void OgldevVulkanApp::RecordCommandBuffers()
 
 bool OgldevVulkanApp::Init()
 {
-#ifdef WIN32
-    
-#else            
-    m_pWindowControl = new XCBControl();
-#endif    
-    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-    assert(ret);
-
     m_core.Init();
     //EnumPhysDeviceProps();
     EnumPhysDeviceExtProps();
     CreateDevice();      
-    CreateSurface();
     CreateSemaphore();    
     CreateRenderPass();
     CreateFramebuffer();

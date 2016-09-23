@@ -114,7 +114,7 @@ VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
 
 
 
-bool VulkanGetPhysicalDevices(const VkInstance& inst, VulkanPhysicalDevices& PhysDevices)
+bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices)
 {
     uint NumDevices = 0;
     
@@ -129,6 +129,7 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, VulkanPhysicalDevices& Phy
     PhysDevices.m_devices.resize(NumDevices);
     PhysDevices.m_devProps.resize(NumDevices);
     PhysDevices.m_qFamilyProps.resize(NumDevices);
+    PhysDevices.m_surfaceFormats.resize(NumDevices);
     
     res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
     
@@ -141,42 +142,33 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, VulkanPhysicalDevices& Phy
         
         printf("Device name: %s\n", PhysDevices.m_devProps[i].deviceName);
         uint32_t apiVer = PhysDevices.m_devProps[i].apiVersion;
-        printf("API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer),
+        printf("    API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer),
                                           VK_VERSION_MINOR(apiVer),
                                           VK_VERSION_PATCH(apiVer));
         uint NumQFamily = 0;         
         
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDevices.m_devices[i], &NumQFamily, NULL);
     
-        printf("Num of family queues: %d\n", NumQFamily);
+        printf("    Num of family queues: %d\n", NumQFamily);
 
         PhysDevices.m_qFamilyProps[i].resize(NumQFamily);
 
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDevices.m_devices[i], &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));
-                
-      /*  for (uint j = 0 ; j < NumQFamily ; j++) {
-            VkQueueFamilyProperties& QFamilyProp = PhysDevices.m_qFamilyProps[i][j];
-            
-            printf("Family %d Num queues: %d\n", j, QFamilyProp.queueCount);
-            VkQueueFlags flags = QFamilyProp.queueFlags;
-            printf("    GFX %s, Compute %s, Transfer %s, Sparse binding %s\n",
-                    (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No",
-                    (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No",
-                    (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
-                    (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
-            
-            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
-                m_gfxDevIndex = i;
-                m_gfxQueueFamily = j;
-                printf("Using GFX device %d and queue family %d\n", m_gfxDevIndex, m_gfxQueueFamily);
-            }
-        }*/
+              
+        uint NumFormats = 0;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDevices.m_devices[i], Surface, &NumFormats, NULL);
+        
+        PhysDevices.m_surfaceFormats[i].resize(NumFormats);
+        
+        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDevices.m_devices[i], Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+    
+        for (uint j = 0 ; j < NumFormats ; j++) {
+            const VkSurfaceFormatKHR SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
+            printf("    Format %d color space %d\n", SurfaceFormat.format , SurfaceFormat.colorSpace);
+        }
+    
+        assert(NumFormats > 0);
     }
     
-    /*if (m_gfxDevIndex == -1) {
-        printf("No GFX device found!\n");
-        assert(0);
-    }    
-        */
     return true;
 }
