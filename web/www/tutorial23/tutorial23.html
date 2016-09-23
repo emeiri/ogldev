@@ -208,7 +208,7 @@
 			</p>
 			<p>(shadow_map_fbo.cpp:55)</p>
 			<code>
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);
 			</code>
 			<p>
 				Here we attach the shadow map texture to the depth attachment point of the FBO. The last parameter

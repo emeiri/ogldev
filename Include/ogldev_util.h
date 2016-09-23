@@ -49,7 +49,11 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define SNPRINTF _snprintf_s
 #define RANDOM rand
 #define SRANDOM srand((unsigned)time(NULL))
+#if (_MSC_VER == 1900)
+#elif (_MSC_VER == 1800)
+#else
 float fmax(float a, float b);
+#endif
 #else
 #define SNPRINTF snprintf
 #define RANDOM random
@@ -74,6 +78,9 @@ float fmax(float a, float b);
 #define GLCheckError() (glGetError() == GL_NO_ERROR)
 
 long long GetCurrentTimeMillis();
+
+
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices)
 
 #endif	/* OGLDEV_UTIL_H */
 

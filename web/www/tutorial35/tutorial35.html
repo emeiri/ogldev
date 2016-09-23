@@ -162,14 +162,14 @@
             &nbsp; &nbsp;   for (unsigned int i = 0 ; i &lt; ARRAY_SIZE_IN_ELEMENTS(m_textures) ; i++) {<br>
             &nbsp; &nbsp;&nbsp; &nbsp;      glBindTexture(GL_TEXTURE_2D, m_textures[i]);<br>
             &nbsp; &nbsp;&nbsp; &nbsp;       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);<br>
-            &nbsp; &nbsp;&nbsp; &nbsp;       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);<br>
+            &nbsp; &nbsp;&nbsp; &nbsp;       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, m_textures[i], 0);<br>
             &nbsp; &nbsp;   }<br>
             <br>
             &nbsp; &nbsp; // depth<br>
             &nbsp; &nbsp; glBindTexture(GL_TEXTURE_2D, m_depthTexture);<br>
             &nbsp; &nbsp; glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT,<br>
             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; NULL);<br>
-            &nbsp; &nbsp; glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);<br>
+            &nbsp; &nbsp; glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);<br>
             <br>
             &nbsp; &nbsp; GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
             <br>

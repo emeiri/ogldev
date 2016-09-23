@@ -146,7 +146,7 @@
 			&nbsp; &nbsp;     glBindTexture(GL_TEXTURE_2D, m_pickingTexture);<br>
 			&nbsp; &nbsp;     glTexImage2D(GL_TEXTURE_2D, 0, <b>GL_RGB32F</b>, WindowWidth, WindowHeight,<br> 
 			&nbsp; &nbsp; &nbsp; &nbsp;  &nbsp;  &nbsp;  &nbsp; &nbsp; 								0, <b>GL_RGB, GL_FLOAT</b>, NULL);<br>
-			&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, <br>
+			&nbsp; &nbsp;     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, <br>
 			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_pickingTexture, 0);    <br>
 			<br>
 			&nbsp; &nbsp;     // Create the texture object for the depth buffer<br>
@@ -154,7 +154,7 @@
 			&nbsp; &nbsp;     glBindTexture(GL_TEXTURE_2D, m_depthTexture);<br>
 			&nbsp; &nbsp;     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, <br>
 			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;     0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);<br>
-			&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, <br>
+			&nbsp; &nbsp;     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, <br>
 			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_depthTexture, 0);    <br>
 			<br>
 			&nbsp; &nbsp;     // Disable reading to avoid problems with older GPUs<br>

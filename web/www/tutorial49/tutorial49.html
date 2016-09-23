@@ -185,7 +185,7 @@ bool CascadedShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHei
 &nbsp; &nbsp;     }<br>
 <br>
 &nbsp; &nbsp;     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);<br>
-&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[0], 0);<br>
+&nbsp; &nbsp;     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[0], 0);<br>
 <br>
 &nbsp; &nbsp;     // Disable writes to the color buffer<br>
 &nbsp; &nbsp;     glDrawBuffer(GL_NONE);<br>
@@ -206,7 +206,7 @@ void CascadedShadowMapFBO::BindForWriting(uint CascadeIndex)<br>
 {<br>
 &nbsp; &nbsp;     assert(CascadeIndex < ARRAY_SIZE_IN_ELEMENTS(m_shadowMap));<br>
 &nbsp; &nbsp;     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);<br>
-&nbsp; &nbsp;     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[CascadeIndex], 0);<br>    
+&nbsp; &nbsp;     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[CascadeIndex], 0);<br>    
 }<br>
 <br>
 <br>
