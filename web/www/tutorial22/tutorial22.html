@@ -123,7 +123,8 @@
 			&nbsp; &nbsp;      bool Ret = false;<br>
 			&nbsp; &nbsp;      Assimp::Importer Importer;<br>
 			<br>
-			&nbsp; &nbsp;      const aiScene* pScene = Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);<br>
+			&nbsp; &nbsp;      const aiScene* pScene = Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs |
+                        aiProcess_JoinIdenticalVertices);<br>
 			<br>    
 			&nbsp; &nbsp;      if (pScene) {<br>
 			&nbsp; &nbsp;  &nbsp; &nbsp;          Ret = InitFromScene(pScene, Filename);<br>
@@ -141,12 +142,19 @@
 				post processing options. Assimp is capable of performing many useful processing actions on the loaded models. For example,
 				it can generate normals for models that lack them, optimize the structure of the model to improve performance, etc. The full
 				list of options is availabe <a href="http://assimp.sourceforge.net/lib_html/ai_post_process_8h.html">here</a>. In this tutorial we
-				use three options, aiProcess_Triangulate, which translate models that are made from non triangle polygons into triangle based
-				meshes. For example, a quad mesh can be translated into a triangle mesh by creating two triangles out of each quad. The second
-				option, aiProcess_GenSmoothNormals, generates vertex normals in the case that the original model does not already contain them.
-				Note that the post processing options are basically non overlapping bitmasks so you can combine multiple options by simply ORing their
-				values. The final option, aiProcess_FlipUVsv, flips the texture coordinates along the Y axis. This was required in order to render
-				the Quake model that was used for the demo correctly. You will need to tailor the options that you use according to the input data.
+				use the following options:
+                        <ul>
+                            <li>aiProcess_Triangulate - translate models that are made from non triangle polygons into triangle based
+				meshes. For example, a quad mesh can be translated into a triangle mesh by creating two triangles out of each quad. </li>
+                            <li>aiProcess_GenSmoothNormals - generates vertex normals in the case that the original model does not already contain them.</li>
+                            <li>aiProcess_FlipUVsv - flip the texture coordinates along the Y axis. This was required in order to render
+                                the Quake model that was used for the demo correctly. </li>
+                            <li>aiProcess_JoinIdenticalVertices - use a single copy for each vertex and reference it from multiple indices, if required. Helps
+                                save up memory.</li>
+                        </ul>
+                        <br>
+                        Note that the post processing options are basically non overlapping bitmasks so you can combine multiple options by simply ORing their
+				values. You will need to tailor the options that you use according to the input data.
 				If the mesh was loaded successfully, we get a pointer to an <a href="http://assimp.sourceforge.net/lib_html/structai_scene.html">
 				aiScene</a> object. This object contains the entire model contents,	divided into <a href="http://assimp.sourceforge.net/lib_html/structai_mesh.html">
 				aiMesh</a> structures. Next we call the InitFromScene() function to initialize the Mesh object.

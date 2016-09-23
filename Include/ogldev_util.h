@@ -76,5 +76,8 @@ float fmax(float a, float b);
 
 long long GetCurrentTimeMillis();
 
+
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices)
+
 #endif	/* OGLDEV_UTIL_H */
 

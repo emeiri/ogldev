@@ -86,7 +86,7 @@ bool SkinnedMesh::LoadMesh(const string& Filename)
 
     bool Ret = false;    
   
-    m_pScene = m_Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+    m_pScene = m_Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
     
     if (m_pScene) {  
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
