@@ -130,6 +130,7 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
     PhysDevices.m_devProps.resize(NumDevices);
     PhysDevices.m_qFamilyProps.resize(NumDevices);
     PhysDevices.m_surfaceFormats.resize(NumDevices);
+    PhysDevices.m_surfaceCaps.resize(NumDevices);
     
     res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
     
@@ -138,7 +139,8 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
     }
   
     for (uint i = 0 ; i < NumDevices ; i++) {
-        vkGetPhysicalDeviceProperties(PhysDevices.m_devices[i], &PhysDevices.m_devProps[i]);
+        const VkPhysicalDevice& PhysDev = PhysDevices.m_devices[i];
+        vkGetPhysicalDeviceProperties(PhysDev, &PhysDevices.m_devProps[i]);
         
         printf("Device name: %s\n", PhysDevices.m_devProps[i].deviceName);
         uint32_t apiVer = PhysDevices.m_devProps[i].apiVersion;
@@ -147,27 +149,43 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
                                           VK_VERSION_PATCH(apiVer));
         uint NumQFamily = 0;         
         
-        vkGetPhysicalDeviceQueueFamilyProperties(PhysDevices.m_devices[i], &NumQFamily, NULL);
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, NULL);
     
         printf("    Num of family queues: %d\n", NumQFamily);
 
         PhysDevices.m_qFamilyProps[i].resize(NumQFamily);
 
-        vkGetPhysicalDeviceQueueFamilyProperties(PhysDevices.m_devices[i], &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));
               
         uint NumFormats = 0;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDevices.m_devices[i], Surface, &NumFormats, NULL);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, NULL);
+        assert(NumFormats > 0);
         
         PhysDevices.m_surfaceFormats[i].resize(NumFormats);
         
-        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDevices.m_devices[i], Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
     
         for (uint j = 0 ; j < NumFormats ; j++) {
             const VkSurfaceFormatKHR SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
             printf("    Format %d color space %d\n", SurfaceFormat.format , SurfaceFormat.colorSpace);
         }
+        
+        res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
     
-        assert(NumFormats > 0);
+        if (res != VK_SUCCESS) {
+            printf("Error getting surface caps\n");
+            assert(0);
+        }
+    
+        VulkanPrintImageUsageFlags(PhysDevices.m_surfaceCaps[i].supportedUsageFlags);
+  
+        uint NumPresentModes = 0;
+    
+        res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, NULL);
+
+        assert(NumPresentModes != 0);
+
+        printf("Number of presentation modes %d\n", NumPresentModes);
     }
     
     return true;

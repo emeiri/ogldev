@@ -43,6 +43,7 @@ struct VulkanPhysicalDevices {
     std::vector<VkPhysicalDeviceProperties> m_devProps;
     std::vector< std::vector<VkQueueFamilyProperties> > m_qFamilyProps;
     std::vector< std::vector<VkSurfaceFormatKHR> > m_surfaceFormats;
+    std::vector<VkSurfaceCapabilitiesKHR> m_surfaceCaps;
 };
 
 bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);

@@ -69,19 +69,30 @@ public:
     ~OgldevVulkanCore();
     
     bool Init();
+           
+    void PreRenderLoop();
+    
+    void PollEvent();
     
     const VkPhysicalDevice& GetPhysDevice() const;
     
     const VkSurfaceFormatKHR& GetSurfaceFormat() const;
     
+    const VkSurfaceCapabilitiesKHR GetSurfaceCaps() const;
+    
+    const VkSurfaceKHR& GetSurface() const { return m_surface; }
+    
     int GetQueueFamily() const { return m_gfxQueueFamily; }
     
     VkInstance& GetInstance() { return m_inst; }
+    
+    VkDevice& GetDevice() { return m_device; }
     
 private:
     void CreateInstance();
     void CreateSurface();
     void SelectPhysicalDevice();
+    void CreateDevice();
     
     std::string m_appName;
     VulkanWindowControl* m_pWindowControl;
@@ -90,6 +101,7 @@ private:
     VulkanPhysicalDevices m_physDevices;
     int m_gfxDevIndex;
     int m_gfxQueueFamily;
+    VkDevice m_device;
 };
 
 
@@ -132,6 +144,7 @@ bool OgldevVulkanCore::Init()
 
     VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
     SelectPhysicalDevice();
+    CreateDevice();
 }
 
 const VkPhysicalDevice& OgldevVulkanCore::GetPhysDevice() const
@@ -146,6 +159,13 @@ const VkSurfaceFormatKHR& OgldevVulkanCore::GetSurfaceFormat() const
     return m_physDevices.m_surfaceFormats[m_gfxDevIndex][0];
 }
 
+
+const VkSurfaceCapabilitiesKHR OgldevVulkanCore::GetSurfaceCaps() const
+{
+    assert(m_gfxDevIndex >= 0);
+    return m_physDevices.m_surfaceCaps[m_gfxDevIndex];
+    
+}
 
 
 void OgldevVulkanCore::SelectPhysicalDevice()
@@ -164,6 +184,14 @@ void OgldevVulkanCore::SelectPhysicalDevice()
                     (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
             
             if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
+                VkBool32 SupportsPresent = false;
+                vkGetPhysicalDeviceSurfaceSupportKHR(m_physDevices.m_devices[i], j, m_surface, &SupportsPresent);
+    
+                if (!SupportsPresent) {
+                    printf("Present is not supported\n");
+                    continue;
+                }
+
                 m_gfxDevIndex = i;
                 m_gfxQueueFamily = j;
                 printf("Using GFX device %d and queue family %d\n", m_gfxDevIndex, m_gfxQueueFamily);
@@ -175,6 +203,18 @@ void OgldevVulkanCore::SelectPhysicalDevice()
         printf("No GFX device found!\n");
         assert(0);
     }    
+}
+
+
+void OgldevVulkanCore::PreRenderLoop()
+{
+    m_pWindowControl->PreRun();    
+}
+
+
+void OgldevVulkanCore::PollEvent()
+{
+    m_pWindowControl->PollEvent();
 }
 
 class OgldevVulkanApp
@@ -193,8 +233,7 @@ private:
 
    // void EnumPhysDeviceProps();
     void EnumPhysDeviceExtProps();
-    void CreateInstance();
-    void CreateDevice();
+    void CreateSwapChain();
     void CreateCommandBuffer();
     void CreateSemaphore();
     void CreateRenderPass();
@@ -205,7 +244,6 @@ private:
     void Draw();
 
     OgldevVulkanCore m_core;    
-    VkDevice m_device;
  //   std::vector<std::string> m_devExt;    
     std::vector<VkImage> m_images;
     std::vector<VkImageView> m_views;
@@ -333,39 +371,12 @@ void OgldevVulkanCore::CreateInstance()
 }
 
 
-void OgldevVulkanCore::CreateSurface()
-{    
-    const VkPhysicalDevice& gfxPhysDev = GetPhysDevice();
-        
-    assert(GetSurfaceFormat().format != VK_FORMAT_UNDEFINED);
+void OgldevVulkanApp::CreateSwapChain()
+{          
+    assert(m_core.GetSurfaceFormat().format != VK_FORMAT_UNDEFINED);
     
-    VkBool32 SupportsPresent = false;
-    vkGetPhysicalDeviceSurfaceSupportKHR(gfxPhysDev, m_gfxQueueFamily, m_surface, &SupportsPresent);
-    
-    if (!SupportsPresent) {
-        printf("Present is not supported\n");
-        exit(0);
-    }
-    
-    VkSurfaceCapabilitiesKHR SurfaceCaps;
-    
-    VkResult res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gfxPhysDev, m_surface, &SurfaceCaps);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error getting surface caps\n");
-        assert(0);
-    }
-    
-    VulkanPrintImageUsageFlags(SurfaceCaps.supportedUsageFlags);
-
-    uint NumPresentModes = 0;
-    
-    res = vkGetPhysicalDeviceSurfacePresentModesKHR(gfxPhysDev, m_surface, &NumPresentModes, NULL);
-    
-    assert(NumPresentModes != 0);
-            
-    printf("Number of presentation modes %d\n", NumPresentModes);
-    
+    const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_core.GetSurfaceCaps();
+         
     VkExtent2D SwapChainExtent = SurfaceCaps.currentExtent;
     
     if (SurfaceCaps.currentExtent.width == -1) {
@@ -399,10 +410,10 @@ void OgldevVulkanCore::CreateSurface()
     VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
     
     SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    SwapChainCreateInfo.surface          = m_surface;
+    SwapChainCreateInfo.surface          = m_core.GetSurface();
     SwapChainCreateInfo.minImageCount    = NumImages;
-    SwapChainCreateInfo.imageFormat      = GetSurfaceFormat().format;
-    SwapChainCreateInfo.imageColorSpace  = GetSurfaceFormat().colorSpace;
+    SwapChainCreateInfo.imageFormat      = m_core.GetSurfaceFormat().format;
+    SwapChainCreateInfo.imageColorSpace  = m_core.GetSurfaceFormat().colorSpace;
     SwapChainCreateInfo.imageExtent      = SwapChainExtent;
     SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     SwapChainCreateInfo.preTransform     = preTransform;
@@ -412,7 +423,7 @@ void OgldevVulkanCore::CreateSurface()
     SwapChainCreateInfo.clipped          = true;
     SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     
-    res = vkCreateSwapchainKHR(m_device, &SwapChainCreateInfo, NULL, &m_swapChainKHR);
+    VkResult res = vkCreateSwapchainKHR(m_core.GetDevice(), &SwapChainCreateInfo, NULL, &m_swapChainKHR);
     
     if (res != VK_SUCCESS) {
         printf("Error creating swap chain\n");
@@ -422,7 +433,7 @@ void OgldevVulkanCore::CreateSurface()
     printf("Swap chain created\n");
     
     uint NumSwapChainImages = 0;
-    res = vkGetSwapchainImagesKHR(m_device, m_swapChainKHR, &NumSwapChainImages, NULL);
+    res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
 
     if (res != VK_SUCCESS) {
         printf("Error getting number of images\n");
@@ -435,7 +446,7 @@ void OgldevVulkanCore::CreateSurface()
     m_views.resize(NumSwapChainImages);
     m_presentQCmdBuffs.resize(NumSwapChainImages);
     
-    res = vkGetSwapchainImagesKHR(m_device, m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
+    res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
 
     if (res != VK_SUCCESS) {
         printf("Error getting images\n");
@@ -444,7 +455,7 @@ void OgldevVulkanCore::CreateSurface()
 }
 
 
-void OgldevVulkanApp::CreateDevice()
+void OgldevVulkanCore::CreateDevice()
 {
     VkDeviceQueueCreateInfo qInfo = {};
     qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -452,7 +463,7 @@ void OgldevVulkanApp::CreateDevice()
     float qPriorities = 1.0f;
     qInfo.queueCount = 1;
     qInfo.pQueuePriorities = &qPriorities;
-    qInfo.queueFamilyIndex = m_core.GetQueueFamily();
+    qInfo.queueFamilyIndex = m_gfxQueueFamily;
 
     const char* pDevExt[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
@@ -477,7 +488,7 @@ void OgldevVulkanApp::CreateDevice()
     
     printf("%d\n",devInfo.enabledExtensionCount );
     
-    VkResult res = vkCreateDevice(m_core.GetPhysDevice(), &devInfo, NULL, &m_device);
+    VkResult res = vkCreateDevice(GetPhysDevice(), &devInfo, NULL, &m_device);
     
     if (res != VK_SUCCESS) {
         printf("Error creating device\n");
@@ -485,8 +496,6 @@ void OgldevVulkanApp::CreateDevice()
     }
    
     printf("Device created\n");
-    
-    vkGetDeviceQueue(m_device, m_core.GetQueueFamily(), 0, &m_queue);
 }
 
 
@@ -496,7 +505,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
     
-    VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
+    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
     
     CheckVulkanError("vkCreateCommandPool");
     
@@ -508,7 +517,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufAllocInfo.commandBufferCount = m_images.size();
     
-    res = vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
             
     CheckVulkanError("vkAllocateCommandBuffers failed");    
     
@@ -520,14 +529,14 @@ void OgldevVulkanApp::CreateSemaphore()
     VkSemaphoreCreateInfo semCreateInfo = {};
     semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     
-    VkResult res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_imageAvailSem);
+    VkResult res = vkCreateSemaphore(m_core.GetDevice(), &semCreateInfo, NULL, &m_imageAvailSem);
     
     if (res != VK_SUCCESS) {
         printf("Error creating semaphore\n");
         assert(0);
     }
 
-    res = vkCreateSemaphore(m_device, &semCreateInfo, NULL, &m_rendCompSem);
+    res = vkCreateSemaphore(m_core.GetDevice(), &semCreateInfo, NULL, &m_rendCompSem);
     
     if (res != VK_SUCCESS) {
         printf("Error creating semaphore\n");
@@ -566,7 +575,7 @@ void OgldevVulkanApp::CreateRenderPass()
     renderPassCreateInfo.subpassCount = 1;
     renderPassCreateInfo.pSubpasses = &subpassDesc;
 
-    VkResult res = vkCreateRenderPass(m_device, &renderPassCreateInfo, NULL, &m_renderPass);
+    VkResult res = vkCreateRenderPass(m_core.GetDevice(), &renderPassCreateInfo, NULL, &m_renderPass);
     CheckVulkanError("vkCreateRenderPass failed");
 
     printf("Created a render pass\n");
@@ -595,7 +604,7 @@ void OgldevVulkanApp::CreateFramebuffer()
         ViewCreateInfo.subresourceRange.baseArrayLayer = 0;
         ViewCreateInfo.subresourceRange.layerCount = 1;    
 
-        res = vkCreateImageView(m_device, &ViewCreateInfo, NULL, &m_views[i]);
+        res = vkCreateImageView(m_core.GetDevice(), &ViewCreateInfo, NULL, &m_views[i]);
         CheckVulkanError("vkCreateImageView failed\n");
         
         VkFramebufferCreateInfo fbCreateInfo = {};
@@ -607,7 +616,7 @@ void OgldevVulkanApp::CreateFramebuffer()
         fbCreateInfo.height = WINDOW_HEIGHT;
         fbCreateInfo.layers = 1;
 
-        res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fbs[i]);
+        res = vkCreateFramebuffer(m_core.GetDevice(), &fbCreateInfo, NULL, &m_fbs[i]);
         CheckVulkanError("vkCreateFramebuffer failed\n");        
     }
    
@@ -618,7 +627,7 @@ void OgldevVulkanApp::Draw()
 {
     uint ImageIndex = 0;
     
-    VkResult res = vkAcquireNextImageKHR(m_device, m_swapChainKHR, UINT64_MAX, m_imageAvailSem, NULL, &ImageIndex);
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, m_imageAvailSem, NULL, &ImageIndex);
     
     switch (res) {
         case VK_SUCCESS:
@@ -663,10 +672,10 @@ void OgldevVulkanApp::Draw()
 
 void OgldevVulkanApp::CreateShaders()
 {
-    m_vsModule = VulkanCreateShaderModule(m_device, "Shaders/vs.spv");
+    m_vsModule = VulkanCreateShaderModule(m_core.GetDevice(), "Shaders/vs.spv");
     assert(m_vsModule);
 
-    m_fsModule = VulkanCreateShaderModule(m_device, "Shaders/fs.spv");
+    m_fsModule = VulkanCreateShaderModule(m_core.GetDevice(), "Shaders/fs.spv");
     assert(m_fsModule);
 }
 
@@ -796,7 +805,7 @@ void OgldevVulkanApp::CreatePipeline()
     descriptorLayout.pBindings = &layoutBinding;
 
     VkDescriptorSetLayout descriptorSetLayout;
-    VkResult res = vkCreateDescriptorSetLayout(m_device, &descriptorLayout, NULL, &descriptorSetLayout);    
+    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);    
     CheckVulkanError("vkCreateDescriptorSetLayout failed");
      
     VkPipelineLayoutCreateInfo layoutInfo = {};
@@ -804,7 +813,7 @@ void OgldevVulkanApp::CreatePipeline()
     layoutInfo.setLayoutCount = 1;
     layoutInfo.pSetLayouts = &descriptorSetLayout;
         
-    res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &m_pipelineLayout);
+    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
     CheckVulkanError("vkCreatePipelineLayout failed");
    
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
@@ -823,7 +832,7 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.basePipelineIndex = -1;
     
-    res = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
     CheckVulkanError("vkCreateGraphicsPipelines failed");
     
     printf("Graphics pipeline created\n");
@@ -928,9 +937,12 @@ void OgldevVulkanApp::RecordCommandBuffers()
 bool OgldevVulkanApp::Init()
 {
     m_core.Init();
+        
+    vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
+
     //EnumPhysDeviceProps();
     EnumPhysDeviceExtProps();
-    CreateDevice();      
+    CreateSwapChain();
     CreateSemaphore();    
     CreateRenderPass();
     CreateFramebuffer();
@@ -944,11 +956,12 @@ bool OgldevVulkanApp::Init()
 
 
 void OgldevVulkanApp::Run()
-{
-    m_pWindowControl->PreRun();
+{    
+    m_core.PreRenderLoop();
 
     while (true) {
-        m_pWindowControl->PollEvent();
+        m_core.PollEvent();
+        
       //  if (event) {
        //     demo_handle_event(demo, event);
       //      free(event);
@@ -957,12 +970,13 @@ void OgldevVulkanApp::Run()
         Draw();
 
         // Wait for work to finish before updating MVP.
-        vkDeviceWaitIdle(m_device);
+        vkDeviceWaitIdle(m_core.GetDevice());
        // demo->curFrame++;
         //if (demo->frameCount != INT32_MAX && demo->curFrame == demo->frameCount)
         //    demo->quit = true;
     }
 }
+
 
 class Tutorial50 : public OgldevVulkanApp
 {
