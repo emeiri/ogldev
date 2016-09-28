@@ -68,12 +68,8 @@ public:
     OgldevVulkanCore(const char* pAppName);
     ~OgldevVulkanCore();
     
-    bool Init();
-           
-    void PreRenderLoop();
-    
-    void PollEvent();
-    
+    bool Init(VulkanWindowControl* pWindowControl);
+              
     const VkPhysicalDevice& GetPhysDevice() const;
     
     const VkSurfaceFormatKHR& GetSurfaceFormat() const;
@@ -95,7 +91,6 @@ private:
     void CreateDevice();
     
     std::string m_appName;
-    VulkanWindowControl* m_pWindowControl;
     VkInstance m_inst;
     VkSurfaceKHR m_surface;
     VulkanPhysicalDevices m_physDevices;
@@ -119,16 +114,8 @@ OgldevVulkanCore::~OgldevVulkanCore()
 }
 
 
-bool OgldevVulkanCore::Init()
-{
-#ifdef WIN32
-    
-#else            
-    m_pWindowControl = new XCBControl();
-#endif    
-    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-    assert(ret);
-  
+bool OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
+{ 
     std::vector<VkExtensionProperties> ExtProps;
     VulkanEnumExtProps(ExtProps);
     
@@ -137,7 +124,7 @@ bool OgldevVulkanCore::Init()
 #ifdef WIN32
     assert(0);
 #else
-    m_surface = m_pWindowControl->CreateSurface(m_inst);
+    m_surface = pWindowControl->CreateSurface(m_inst);
     assert(m_surface);          
 #endif
     printf("Surface created\n");
@@ -206,17 +193,6 @@ void OgldevVulkanCore::SelectPhysicalDevice()
 }
 
 
-void OgldevVulkanCore::PreRenderLoop()
-{
-    m_pWindowControl->PreRun();    
-}
-
-
-void OgldevVulkanCore::PollEvent()
-{
-    m_pWindowControl->PollEvent();
-}
-
 class OgldevVulkanApp
 {
 public:
@@ -243,6 +219,7 @@ private:
     void RecordCommandBuffers();
     void Draw();
 
+    VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
  //   std::vector<std::string> m_devExt;    
     std::vector<VkImage> m_images;
@@ -936,7 +913,15 @@ void OgldevVulkanApp::RecordCommandBuffers()
 
 bool OgldevVulkanApp::Init()
 {
-    m_core.Init();
+    #ifdef WIN32
+    
+#else            
+    m_pWindowControl = new XCBControl();
+#endif    
+    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+    assert(ret);
+
+    m_core.Init(m_pWindowControl);
         
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
@@ -957,10 +942,10 @@ bool OgldevVulkanApp::Init()
 
 void OgldevVulkanApp::Run()
 {    
-    m_core.PreRenderLoop();
+    m_pWindowControl->PreRun();
 
     while (true) {
-        m_core.PollEvent();
+        m_pWindowControl->PollEvent();
         
       //  if (event) {
        //     demo_handle_event(demo, event);
