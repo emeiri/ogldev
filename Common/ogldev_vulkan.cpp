@@ -56,14 +56,13 @@ void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags)
 }
 
 
-bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
+void VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
 {
     uint NumExt = 0;
     VkResult res = vkEnumerateInstanceExtensionProperties(NULL, &NumExt, NULL);
     
     if (res != VK_SUCCESS) {
         printf("Error enumerating extensions: %x\n", res);
-        return false;
     }
     
     printf("Found %d extensions\n", NumExt);
@@ -74,14 +73,11 @@ bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
     
     if (res != VK_SUCCESS) {
         printf("Error enumerating extensions: %x\n", res);
-        return false;
     }
         
     for (uint i = 0 ; i < NumExt ; i++) {
         printf("Instance extension %d - %s\n", i, ExtProps[i].extensionName);
     }
-    
-    return true;
 }
 
 
@@ -106,23 +102,18 @@ VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
     
     VkShaderModule shaderModule;
     VkResult res = vkCreateShaderModule(device, &shaderCreateInfo, NULL, &shaderModule);
-    CheckVulkanError("vkCreateShaderModule failed");
+    CHECK_VULKAN_ERROR("vkCreateShaderModule error %d\n", res);
     printf("Created shader %s\n", pFileName);
     return shaderModule;    
 }
 
 
-
-
-bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices)
+void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices)
 {
     uint NumDevices = 0;
     
     VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, NULL);
-    
-    if (res != VK_SUCCESS) {
-        OGLDEV_ERROR("vkEnumeratePhysicalDevices error");
-    }
+    CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
     
     printf("Num physical devices %d\n", NumDevices);
     
@@ -133,11 +124,8 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
     PhysDevices.m_surfaceCaps.resize(NumDevices);
     
     res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
+    CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
     
-    if (res != VK_SUCCESS) {
-        OGLDEV_ERROR("vkEnumeratePhysicalDevices");
-    }
-  
     for (uint i = 0 ; i < NumDevices ; i++) {
         const VkPhysicalDevice& PhysDev = PhysDevices.m_devices[i];
         vkGetPhysicalDeviceProperties(PhysDev, &PhysDevices.m_devProps[i]);
@@ -173,7 +161,7 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
     
         if (res != VK_SUCCESS) {
-            printf("Error getting surface caps\n");
+            CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceCapabilitiesKHR %d\n", res);
             assert(0);
         }
     
@@ -187,6 +175,4 @@ bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
 
         printf("Number of presentation modes %d\n", NumPresentModes);
     }
-    
-    return true;
 }

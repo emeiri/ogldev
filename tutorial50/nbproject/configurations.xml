@@ -63,9 +63,8 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibFileItem>../Lib/libAntTweakBar.so</linkerLibFileItem>
-            <linkerLibLibItem>vulkan</linkerLibLibItem>
             <linkerLibLibItem>xcb</linkerLibLibItem>
+            <linkerLibLibItem>vulkan</linkerLibLibItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>

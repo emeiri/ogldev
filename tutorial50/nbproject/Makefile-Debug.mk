@@ -52,15 +52,13 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut ../Lib/libAntTweakBar.so -lvulkan -lxcb
+LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut -lxcb -lvulkan
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
-
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50: ../Lib/libAntTweakBar.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}

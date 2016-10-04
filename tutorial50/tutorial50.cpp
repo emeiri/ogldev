@@ -32,165 +32,13 @@
 #include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "ogldev_vulkan.h"
+#include "ogldev_vulkan_core.h"
 
 #include "ogldev_xcb_control.h"
-
-//#define ENABLE_DEBUG_LAYERS
 
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
 
-PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR = NULL;
-PFN_vkCreateDebugReportCallbackEXT my_vkCreateDebugReportCallbackEXT = NULL; 
-//PFN_vkDebugReportMessageEXT vkDebugReportMessageEXT = NULL;
-//PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = NULL;
-
-       
-VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
-    VkDebugReportFlagsEXT       flags,
-    VkDebugReportObjectTypeEXT  objectType,
-    uint64_t                    object,
-    size_t                      location,
-    int32_t                     messageCode,
-    const char*                 pLayerPrefix,
-    const char*                 pMessage,
-    void*                       pUserData)
-{
-    printf("%s\n", pMessage);
-    return VK_FALSE;
-}
-
-
-class OgldevVulkanCore
-{
-public:
-    OgldevVulkanCore(const char* pAppName);
-    ~OgldevVulkanCore();
-    
-    bool Init(VulkanWindowControl* pWindowControl);
-              
-    const VkPhysicalDevice& GetPhysDevice() const;
-    
-    const VkSurfaceFormatKHR& GetSurfaceFormat() const;
-    
-    const VkSurfaceCapabilitiesKHR GetSurfaceCaps() const;
-    
-    const VkSurfaceKHR& GetSurface() const { return m_surface; }
-    
-    int GetQueueFamily() const { return m_gfxQueueFamily; }
-    
-    VkInstance& GetInstance() { return m_inst; }
-    
-    VkDevice& GetDevice() { return m_device; }
-    
-private:
-    void CreateInstance();
-    void CreateSurface();
-    void SelectPhysicalDevice();
-    void CreateDevice();
-    
-    std::string m_appName;
-    VkInstance m_inst;
-    VkSurfaceKHR m_surface;
-    VulkanPhysicalDevices m_physDevices;
-    int m_gfxDevIndex;
-    int m_gfxQueueFamily;
-    VkDevice m_device;
-};
-
-
-OgldevVulkanCore::OgldevVulkanCore(const char* pAppName) 
-{
-    m_appName = std::string(pAppName);
-    m_gfxDevIndex = -1;
-    m_gfxQueueFamily = -1;
-}
-
-
-OgldevVulkanCore::~OgldevVulkanCore()
-{
-    
-}
-
-
-bool OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
-{ 
-    std::vector<VkExtensionProperties> ExtProps;
-    VulkanEnumExtProps(ExtProps);
-    
-    CreateInstance();
-    
-#ifdef WIN32
-    assert(0);
-#else
-    m_surface = pWindowControl->CreateSurface(m_inst);
-    assert(m_surface);          
-#endif
-    printf("Surface created\n");
-
-    VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
-    SelectPhysicalDevice();
-    CreateDevice();
-}
-
-const VkPhysicalDevice& OgldevVulkanCore::GetPhysDevice() const
-{
-    assert(m_gfxDevIndex >= 0);
-    return m_physDevices.m_devices[m_gfxDevIndex];
-}
-
-const VkSurfaceFormatKHR& OgldevVulkanCore::GetSurfaceFormat() const
-{
-    assert(m_gfxDevIndex >= 0);
-    return m_physDevices.m_surfaceFormats[m_gfxDevIndex][0];
-}
-
-
-const VkSurfaceCapabilitiesKHR OgldevVulkanCore::GetSurfaceCaps() const
-{
-    assert(m_gfxDevIndex >= 0);
-    return m_physDevices.m_surfaceCaps[m_gfxDevIndex];
-    
-}
-
-
-void OgldevVulkanCore::SelectPhysicalDevice()
-{
-    for (uint i = 0 ; i < m_physDevices.m_devices.size() ; i++) {
-                
-        for (uint j = 0 ; j < m_physDevices.m_qFamilyProps[i].size() ; j++) {
-            VkQueueFamilyProperties& QFamilyProp = m_physDevices.m_qFamilyProps[i][j];
-            
-            printf("Family %d Num queues: %d\n", j, QFamilyProp.queueCount);
-            VkQueueFlags flags = QFamilyProp.queueFlags;
-            printf("    GFX %s, Compute %s, Transfer %s, Sparse binding %s\n",
-                    (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No",
-                    (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No",
-                    (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
-                    (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
-            
-            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
-                VkBool32 SupportsPresent = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(m_physDevices.m_devices[i], j, m_surface, &SupportsPresent);
-    
-                if (!SupportsPresent) {
-                    printf("Present is not supported\n");
-                    continue;
-                }
-
-                m_gfxDevIndex = i;
-                m_gfxQueueFamily = j;
-                printf("Using GFX device %d and queue family %d\n", m_gfxDevIndex, m_gfxQueueFamily);
-            }
-        }
-    }
-    
-    if (m_gfxDevIndex == -1) {
-        printf("No GFX device found!\n");
-        assert(0);
-    }    
-}
 
 
 class OgldevVulkanApp
@@ -282,72 +130,6 @@ void OgldevVulkanApp::EnumPhysDeviceExtProps()
 }
 
 
-void OgldevVulkanCore::CreateInstance()
-{
-    VkApplicationInfo appInfo = {};       
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = m_appName.c_str();
-    appInfo.engineVersion = 1;
-    appInfo.apiVersion = VK_API_VERSION_1_0;
-
-    const char* pInstExt[] = {
-#ifdef ENABLE_DEBUG_LAYERS
-        "VK_EXT_debug_report",
-#endif        
-        VK_KHR_SURFACE_EXTENSION_NAME,
-    #ifdef _WIN32    
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-    #else    
-        VK_KHR_XCB_SURFACE_EXTENSION_NAME
-    #endif            
-    };
-    
-#ifdef ENABLE_DEBUG_LAYERS    
-    const char* pInstLayers[] = {
-        "VK_LAYER_LUNARG_standard_validation"
-    };
-#endif    
-    
-    VkInstanceCreateInfo instInfo = {};
-    instInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instInfo.pApplicationInfo = &appInfo;
-#ifdef ENABLE_DEBUG_LAYERS    
-    instInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pInstLayers);
-    instInfo.ppEnabledLayerNames = pInstLayers;
-#endif    
-    instInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
-    instInfo.ppEnabledExtensionNames = pInstExt;         
-
-    VkResult res = vkCreateInstance(&instInfo, NULL, &m_inst);
-    
-    if (res != VK_SUCCESS) {
-        OGLDEV_ERROR("Failed to create instance");
-        assert(0);
-    }    
-    
-#ifdef ENABLE_DEBUG_LAYERS
-    my_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkCreateDebugReportCallbackEXT"));
-    
-    /* Setup callback creation information */
-    VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
-    callbackCreateInfo.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
-    callbackCreateInfo.pNext       = NULL;
-    callbackCreateInfo.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT |
-                                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
-                                     VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-    callbackCreateInfo.pfnCallback = &MyDebugReportCallback;
-    callbackCreateInfo.pUserData   = NULL;
-
-    /* Register the callback */
-    VkDebugReportCallbackEXT callback;
-    res = my_vkCreateDebugReportCallbackEXT(m_inst, &callbackCreateInfo, NULL, &callback);
-    CheckVulkanError("my_vkCreateDebugReportCallbackEXT failed");
-  //  vkDebugReportMessageEXT = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(m_inst, "vkDebugReportMessageEXT"));
-   // vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkDestroyDebugReportCallbackEXT"));
-#endif    
-}
-
-
 void OgldevVulkanApp::CreateSwapChain()
 {          
     assert(m_core.GetSurfaceFormat().format != VK_FORMAT_UNDEFINED);
@@ -432,50 +214,6 @@ void OgldevVulkanApp::CreateSwapChain()
 }
 
 
-void OgldevVulkanCore::CreateDevice()
-{
-    VkDeviceQueueCreateInfo qInfo = {};
-    qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    
-    float qPriorities = 1.0f;
-    qInfo.queueCount = 1;
-    qInfo.pQueuePriorities = &qPriorities;
-    qInfo.queueFamilyIndex = m_gfxQueueFamily;
-
-    const char* pDevExt[] = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
-    };
-    
-#ifdef ENABLE_DEBUG_LAYERS        
-    const char* pDevLayers[] = {
-        "VK_LAYER_LUNARG_standard_validation"
-    };
-#endif    
-    
-    VkDeviceCreateInfo devInfo = {};
-    devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-#ifdef ENABLE_DEBUG_LAYERS        
-    devInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pDevLayers);
-    devInfo.ppEnabledLayerNames = pDevLayers;
-#endif    
-    devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
-    devInfo.ppEnabledExtensionNames = pDevExt;
-    devInfo.queueCreateInfoCount = 1;
-    devInfo.pQueueCreateInfos = &qInfo;
-    
-    printf("%d\n",devInfo.enabledExtensionCount );
-    
-    VkResult res = vkCreateDevice(GetPhysDevice(), &devInfo, NULL, &m_device);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating device\n");
-        assert(0);
-    }
-   
-    printf("Device created\n");
-}
-
-
 void OgldevVulkanApp::CreateCommandBuffer()
 {
     VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
@@ -484,7 +222,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     
     VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
     
-    CheckVulkanError("vkCreateCommandPool");
+    CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);
     
     printf("Command buffer pool created\n");
     
@@ -496,7 +234,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     
     res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
             
-    CheckVulkanError("vkAllocateCommandBuffers failed");    
+    CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
     
     printf("Created command buffers\n");
 }
@@ -553,7 +291,7 @@ void OgldevVulkanApp::CreateRenderPass()
     renderPassCreateInfo.pSubpasses = &subpassDesc;
 
     VkResult res = vkCreateRenderPass(m_core.GetDevice(), &renderPassCreateInfo, NULL, &m_renderPass);
-    CheckVulkanError("vkCreateRenderPass failed");
+    CHECK_VULKAN_ERROR("vkCreateRenderPass error %d\n", res);
 
     printf("Created a render pass\n");
 }
@@ -582,7 +320,7 @@ void OgldevVulkanApp::CreateFramebuffer()
         ViewCreateInfo.subresourceRange.layerCount = 1;    
 
         res = vkCreateImageView(m_core.GetDevice(), &ViewCreateInfo, NULL, &m_views[i]);
-        CheckVulkanError("vkCreateImageView failed\n");
+        CHECK_VULKAN_ERROR("vkCreateImageView error %d\n", res);
         
         VkFramebufferCreateInfo fbCreateInfo = {};
         fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -594,7 +332,7 @@ void OgldevVulkanApp::CreateFramebuffer()
         fbCreateInfo.layers = 1;
 
         res = vkCreateFramebuffer(m_core.GetDevice(), &fbCreateInfo, NULL, &m_fbs[i]);
-        CheckVulkanError("vkCreateFramebuffer failed\n");        
+        CHECK_VULKAN_ERROR("vkCreateFramebuffer error %d\n", res);
     }
    
     printf("Frame buffers created\n");
@@ -630,7 +368,7 @@ void OgldevVulkanApp::Draw()
     
     res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
     
-    CheckVulkanError("vkQueueSubmit failed");
+    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
     
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -642,7 +380,7 @@ void OgldevVulkanApp::Draw()
     
     res = vkQueuePresentKHR(m_queue, &presentInfo);
     
-    CheckVulkanError("vkQueuePresentKHR failed");
+    CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
 }
 
 
@@ -783,7 +521,7 @@ void OgldevVulkanApp::CreatePipeline()
 
     VkDescriptorSetLayout descriptorSetLayout;
     VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);    
-    CheckVulkanError("vkCreateDescriptorSetLayout failed");
+    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);
      
     VkPipelineLayoutCreateInfo layoutInfo = {};
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -791,7 +529,7 @@ void OgldevVulkanApp::CreatePipeline()
     layoutInfo.pSetLayouts = &descriptorSetLayout;
         
     res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
-    CheckVulkanError("vkCreatePipelineLayout failed");
+    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);
    
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -810,7 +548,7 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.basePipelineIndex = -1;
     
     res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
-    CheckVulkanError("vkCreateGraphicsPipelines failed");
+    CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
     
     printf("Graphics pipeline created\n");
 }
@@ -867,7 +605,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
         memBarrier_PresentToClear.subresourceRange = imageRange;  */      
               
         res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
-        CheckVulkanError("vkBeginCommandBuffer failed\n");
+        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
                 
       //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
       //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
@@ -902,7 +640,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
       //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
 
         res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
-        CheckVulkanError("vkEndCommandBuffer failed\n");        
+        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
     }
     
     printf("Command buffers recorded\n");    
@@ -913,7 +651,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
 
 bool OgldevVulkanApp::Init()
 {
-    #ifdef WIN32
+#ifdef WIN32
     
 #else            
     m_pWindowControl = new XCBControl();

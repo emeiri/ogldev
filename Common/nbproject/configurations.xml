@@ -24,6 +24,7 @@
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
       <itemPath>../Include/ogldev_vulkan.h</itemPath>
+      <itemPath>../Include/ogldev_vulkan_core.h</itemPath>
       <itemPath>../Include/ogldev_xcb_control.h</itemPath>
       <itemPath>../Include/technique.h</itemPath>
     </logicalFolder>
@@ -50,6 +51,7 @@
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>ogldev_vulkan.cpp</itemPath>
+      <itemPath>ogldev_vulkan_core.cpp</itemPath>
       <itemPath>ogldev_xcb_control.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
       <itemPath>random_texture.cpp</itemPath>
@@ -121,8 +123,6 @@
       </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="../Include/ogldev_lights_common.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_pipeline.h" ex="false" tool="3" flavor2="0">
@@ -136,6 +136,8 @@
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_vulkan_core.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_xcb_control.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -160,10 +162,6 @@
       <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="Makefile" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -196,6 +194,8 @@
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_vulkan_core.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_xcb_control.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -253,8 +253,6 @@
       </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="../Include/ogldev_lights_common.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_pipeline.h" ex="false" tool="3" flavor2="0">
@@ -268,6 +266,8 @@
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_vulkan.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../Include/ogldev_vulkan_core.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_xcb_control.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -292,10 +292,6 @@
       <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="Makefile" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -328,6 +324,8 @@
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_vulkan_core.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_xcb_control.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -21,6 +21,8 @@
 
 #include <vector>
 
+//#define ENABLE_DEBUG_LAYERS
+
 #ifdef _WIN32
 #include "c:\\VulkanSDK\\1.0.21.1\\Include\\vulkan\\vulkan.h"
 #include "c:\\VulkanSDK\\1.0.21.1\\Include\\vulkan\\vk_sdk_platform.h"
@@ -31,10 +33,9 @@
 #endif
 
 
-#define CheckVulkanError(msg)           \
+#define CHECK_VULKAN_ERROR(msg, res)    \
     if (res != VK_SUCCESS) {            \
-        printf(msg);                    \
-        printf(", result: %x\n", res);  \
+        OGLDEV_ERROR(msg, res);         \
         abort();                        \
     }
 
@@ -46,10 +47,10 @@ struct VulkanPhysicalDevices {
     std::vector<VkSurfaceCapabilitiesKHR> m_surfaceCaps;
 };
 
-bool VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);
+void VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps);
 void VulkanPrintImageUsageFlags(const VkImageUsageFlags& flags);
 VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName);
-bool VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices);
+void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices);
 
 class VulkanWindowControl
 {

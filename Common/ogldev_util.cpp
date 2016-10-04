@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-
+#include <stdarg.h>
 
 #include "ogldev_util.h"
 
@@ -94,14 +94,19 @@ bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
 }
 
 
-void OgldevError(const char* pFileName, uint line, const char* pError)
+void OgldevError(const char* pFileName, uint line, const char* format, ...)
 {
+    char msg[1000];    
+    va_list args;
+    va_start(args, format);
+    vsnprintf(msg, sizeof(msg), format, args);
+    va_end(args);
 #ifdef WIN32
-    char msg[1000];
-    _snprintf_s(msg, sizeof(msg), "%s:%d: %s", pFileName, line, pError);
+    
+    _snprintf_s(msg, sizeof(msg), "%s:%d: %s", pFileName, line, format);
     MessageBoxA(NULL, msg, NULL, 0);
 #else
-    fprintf(stderr, "%s:%d: %s\n", pFileName, line, pError);
+    fprintf(stderr, "%s:%d - %s", pFileName, line, msg);
 #endif    
 }
 

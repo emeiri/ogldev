@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 50 - Introduction To Vulkan </title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 50: </h2>
+            <h1> Introduction To Vulkan  </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+<article id="content" class="breakpoint">
+<section>
+            <h3> Background </h3>
+<p>
+   You've probably heard by not quite a bit about <a href="https://www.khronos.org/vulkan/">Vulkan</a>,
+    the new Graphics API from Khronos (the same organization responsible for the development of OpenGL).
+    Vulkan was announced in Feb-2016 and after 24 years with OpenGL it's actually a completely new
+    standard and a departure from the current model. I won't go into many details about the various
+    features of Vulkan only to say that in comparison to OpenGL it is much more low
+    level and provides a lot of power and performance to the developer. But with great power comes
+    great responsibility. The developer has to take charge of various aspects such as command buffer,
+    synchronization and memory management that were previously the sole responsibility of the driver.
+    Through the unique knowledge that the developer has about the way the application is structured,
+    the Vulkan API can be executed in a way to increase the overall performance of the system.
+</p>
+<p>
+    The thing that surprises people the most, IMHO, about Vulkan is the amount of code that must be
+    written only to get the first triangle on the screen. Comparing this to the few lines we had to
+    write in OpenGL in the first few tutorials this is a major change and becomes a challenge when 
+    one tries to write a tutorial about it. Therefore, as always with OGLDEV, I'll try to present
+    the material step by step. We will develop our first OGLDEV triangle demo in a few tutorials, 
+    making additional progress in each one. In addition, instead of laying out the dozens of APIs 
+    in one long list I'll present a simple software design that I hope will make it simpler for you
+    to understand without imposing too much restriction on your future apps. Consider this an educational
+    design which you are free to throw away later. 
+</p>
+<p>
+    Let's take a look at a diagram of the main objects of Vulkan:
+    </p>    
+    <img="Vulkan.jpg"</img>
+<p>
+    This diagram is by all means not a complete representation. It includes only the major components 
+    that will probably be present in most applications. The connectors between the objects represents 
+    the dependencies between them at creation or enumeration time. For example, in order to create a surface
+    you need an instance object and when you enumerate the physical devices on your system you also
+    need an instance. The two colors the I've used roughly describe the software design that we will
+    use. The dark red objects will go into something I call the "core" and the light green objects will
+    go into the "app". We will later see why this makes sense. The application code that you will write
+    will actually inherit from "app" and all of its member will be available for you for further use.
+    I hope this design will provide a solid base to develop future Vulkan tutorials. 
+    </p>
+</section>
+
+<section>
+<h3> System Setup </h3>
+    <p>
+        The first thing we need to do is to make sure your system supports Vulkan and get
+        everything ready for development. You need to verify that your graphics card supports Vulkan
+        and install the latest drivers for it. Since Vulkan is still new it's best to check for 
+        drivers updates often because hardware vendors will probably fix a lot of bugs before everything
+        stabilizes. Since there are many GPUs available I can't provide much help here. My main development
+        system is Linux Fedora and I have a GT710 card by NVIDIA. At the time of writing this the 367.44
+        is their latest driver. On Linux you can use the 'lspci' to scan your system for devices
+        and see what GPU you have. You can use the '-v', '-vv' and '-vvv' options to get increasingly
+        more info on your devices. 
+    </p>
+    <p>
+        The second thing we need is the Vulkan SDK by Khronos, available <a href="https://vulkan.lunarg.com/">here</a>.
+        The SDK includes the headers and libraries we need as well as many samples that you can use
+        to get more info beyond what this tutorial provides. At the time of writing this the latest version is 1.0.26
+        and I urge you to update often because the SDK is in active development. 
+    </p>
+    
+    <h4> Linux </h4><br>
+    
+    <p>
+        Khronos provides a package only for Ubuntu in the form of an executable run file. Executing this
+        file should install everything for you but on Fedora I encoutered some difficulties so I used the
+        following procedure (which is also forward looking in terms of writing the code later):
+        <ul>
+            <li>bash$ chmod +x vulkansdk-linux-x86_64-1.0.26.0.run </li><br>
+            <li>base$ ./vulkansdk-linux-x86_64-1.0.26.0.run --target VulkanSDK-1.0.26 --noexec</li><br>
+            <li>base$ ln -s ~/VulkanSDK-1.0.26/1.0.26.0/x86_64 ~/VulkanSDK</li>
+    </ul>
+    </p>
+    <p>
+        The above extracts the contents of the package without running its internal scripts. Let's assume
+        I'm running this in my home directory (/home/emeiri/) so we should end up with a /home/emeiri/VulkanSDK
+        directory that contains a 1.0.26.0 dir. The symbolic link that we created in the last step
+        is to make it easier to switch your development environment to newer versions of the SDK.
+        It points to the location of the headers and libraries that we need. We will see later how to connect
+        them to the rest of the system. Now do the following:
+        <ul>
+            <li>bash$ cd VulkanSDK/1.0.26.0</li><br>
+            <li>bash$ ./build_examples.sh</li><br>
+    </ul>
+        If everything went well the examples were built into examples/build. To run the examples you must first 
+        cd into that directory. You can now run './tri', './cube' and './vulkaninfo' to make sure Vulkan runs
+        on your system and get some useful information in the driver.
+    </p>
+    <p>        
+        Hopefully everything went ok so we want to create some symbolic links that will make the files
+        we need for development easily accessible from our working environment. Change to the root user
+        and execute the following:
+    </p>
+    <p>
+        <ul>
+            <li>bash# ln -s /home/&lt;your username&gt;/VulkanSDK/include/vulkan /usr/include/vulkan</li><br>
+            <li>base# ln -s /home/&lt;your username&gt;/VulkanSDK/lib/libvulkan.so.1 /usr/lib64</li><br>
+            <li>base# ln -s /usr/lib64/libvulkan.so.1 /usr/lib64/libvulkan.so</li><br>
+    </ul>
+    </p>
+    <p>
+        What we did in the above three commands is to create a symbolic link from /usr/include to the
+        vulkan header directory and as well as a couple of symbolic links to the shared object files
+        against which we are going to link our executables. Since we used the previously created ~/VulkanSDK
+        symbolic link it is enough to change that link whenever we download a new version of the SDK
+        in order to keep the entire system up to date.
+    </p>
+    
+    <h4> Windows </h4>
+    
+    <p>
+        TODO
+    </p>
+</section>    
+
+<section>
+<h3> Building and Running </h3>
+    
+    <h4> Linux </h4><br>
+    
+    <p>
+        My main development environment on Linux is <a href="http://www.netbeans.org">Netbeans</a>. The source
+        code that accompanies all my tutorials contains project files which can be used with the
+        C/C++ Netbeans download bundle. If you followed the above system setup procedure then these projects 
+        should work out of the box for you (and please let me know if there are any problems). If you are using
+        a different build system you need to make sure to add:
+    </p>
+    <ul>
+        <li>To the compile command: '-I&lt;path to VulkanSDK/1.0.26.0/x86_64/include&gt;</li>
+        <li>To the link command: '-L&lt;path to VulkanSDK/1.0.26.0/x86_64/lib&gt; -lxcb -lvulkan'</li><br>
+    </ul>        
+    <p>
+        Even if you don't use Netbeans I suggest you go into 'ogldev/tutorial50' after you unzip the
+        <a href="http://ogldev.org/ogldev-source.zip">tutorial source package</a> and run 'make'. I provide
+        the makefiles that Netbeans generates so you can check whether your system is able to build them
+        or something is missing. If everything was ok you can now run 'dist/Debug/GNU-Linux-x86/tutorial50'
+        from 'ogldev/tutorial50'. It is important to execute the tutorial from that directory because the
+        shader files are accessed using a relative directory path.
+    </p>
+
+    <h4> Windows </h4>
+    
+    <p>
+        TODO
+    </p>        
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+    
+    <p>
+        I hope that you successfully completed the above procedures and you are now ready to dive into
+        the internals of Vulkan itself. As I said, we are going to develop our first demo in several 
+        steps. The first step will be to setup four important Vulkan objects: the instance, surface,
+        physical device and logical device. I'm going to describe this by walking through my software
+        design but you are welcomed to throw this away and just follow the Vulkan calls.
+        
+        TODO: Add note on error handling
+        
+        TODO: recommend how to read the tutorial.
+        
+        TODO: describe only what we need.
+    </p>
+    <p>
+        Let's start by reviewing the class OgldevVulkanCore whose job is to create and maintain
+        the core four objects mentioned above (note that I'm using red in order to mark all
+        Vulkan structs, enums, functions, etc):
+    </p>
+    <pre>
+    <code>
+struct VulkanPhysicalDevices {
+    std::vector&lt;<font color="red">VkPhysicalDevice</font> &gt; m_devices;
+    std::vector&lt;<font color="red">VkPhysicalDeviceProperties</font>&gt; m_devProps;
+    std::vector&lt; std::vector&lt;<font color="red">VkQueueFamilyProperties</font>&gt; &gt; m_qFamilyProps;
+    std::vector&lt; std::vector&lt;<font color="red">VkSurfaceFormatKHR</font>&gt; &gt; m_surfaceFormats;
+    std::vector&lt;<font color="red">VkSurfaceCapabilitiesKHR</font>&gt; m_surfaceCaps;
+};
+    
+class OgldevVulkanCore
+{
+public:
+    OgldevVulkanCore(const char* pAppName);
+    ~OgldevVulkanCore();
+    
+    bool Init(VulkanWindowControl* pWindowControl);
+              
+    const <font color="red">VkPhysicalDevice</font>& GetPhysDevice() const;
+    
+    const <font color="red">VkSurfaceFormatKHR</font>& GetSurfaceFormat() const;
+    
+    const <font color="red">VkSurfaceCapabilitiesKHR</font> GetSurfaceCaps() const;
+    
+    const <font color="red">VkSurfaceKHR</font>& GetSurface() const { return m_surface; }
+    
+    int GetQueueFamily() const { return m_gfxQueueFamily; }
+    
+    <font color="red">VkInstance</font>& GetInstance() { return m_inst; }
+    
+    <font color="red">VkDevice</font>& GetDevice() { return m_device; }
+    
+private:
+    void CreateInstance();
+    void CreateSurface();
+    void SelectPhysicalDevice();
+    void CreateDevice();
+
+    // Vulkan objects
+    <font color="red">VkInstance m_inst;
+    VkDevice m_device;
+    VkSurfaceKHR m_surface;</font>
+    VulkanPhysicalDevices m_physDevices;
+        
+    // Internal stuff
+    std::string m_appName;
+    int m_gfxDevIndex;
+    int m_gfxQueueFamily;
+};
+</code>
+    </pre>
+    <p>
+        This class has three pure Vulkan members (m_inst, surface and m_device) as well
+        as a vector of Vulkan objects called m_physDevices. In addition, we have other
+        members to keep the application name and an index to the physical device we will
+        be using and an index to the queue family. The class also contains a few getter functions
+        and an Init() function that set's everything up. Let's see what it does.
+    </p>
+    <pre>
+    <code>
+bool OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
+{ 
+    std::vector<VkExtensionProperties> ExtProps;
+    VulkanEnumExtProps(ExtProps);
+    
+    CreateInstance();
+    
+#ifdef WIN32
+    assert(0);
+#else
+    m_surface = pWindowControl->CreateSurface(m_inst);
+    assert(m_surface);          
+#endif
+    printf("Surface created\n");
+
+    VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
+    SelectPhysicalDevice();
+    CreateDevice();
+    
+    return true;
+}
+    
+    </code>
+    </pre>
+    <p>
+    This function takes a pointer to a VulkanWindowControl object. We will review this object
+    later. For now it suffices to say that this is an OS specific class whose job is to create
+    a window surface where rendering will take place. As in OpenGL, the Vulkan core spec does
+    not include windowing. This task is left to extensions and we have windowing extensions for all
+    major operating systems. An extension is simply an addition to Vulkan which is not part of the core
+    spec. Members of Khronos can publish their extensions and add them to the 
+    <a href="https://www.khronos.org/registry/vulkan/">registry</a>. Driver vendors can decide 
+    which extension they want to implement. The developer can then query for the list of available extensions
+    during runtime and proceed accordingly.
+    </p>
+    <p>
+    We start by enumerating all these extensions. This is done in the following wrapper function:
+    </p>
+    <pre>
+    <code>
+bool VulkanEnumExtProps(std::vector&lt;<font color="red">VkExtensionProperties</font>&gt;& ExtProps)
+{
+    uint NumExt = 0;
+    VkResult res = <font color="red">vkEnumerateInstanceExtensionProperties</font>(NULL, &NumExt, NULL);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error enumerating extensions: %x\n", res);
+        return false;
+    }
+    
+    printf("Found %d extensions\n", NumExt);
+    
+    ExtProps.resize(NumExt);
+
+    res = <font color="red">vkEnumerateInstanceExtensionProperties</font>(NULL, &NumExt, &ExtProps[0]);
+    
+    if (res != VK_SUCCESS) {
+        printf("Error enumerating extensions: %x\n", res);
+        return false;
+    }
+        
+    for (uint i = 0 ; i < NumExt ; i++) {
+        printf("Instance extension %d - %s\n", i, ExtProps[i].extensionName);
+    }
+    
+    return true;
+}    
+    </code>
+    </pre>
+    <p>
+    The above function is a wrapper to the Vulkan API vkEnumerateInstanceExtensionProperties which 
+    returns the extensions available on the system. The way we use this function is very common in Vulkan.
+    The first call returns the number of extensions which we use to resize the extension vector. The second
+    call retrieves the extensions themselves. The first parameter can be used to select a specific layer. 
+    Vulkan is structured in a way that allows vendors to add logic layers that do stuff like validation, extra
+    logging, etc. You can decide at runtime which layer you want to enable. For example, while developing your application
+    you can enable the validation layer and when distributing it to your users - disable it. Since we are
+    interested in all the extensions we use NULL as the layer.
+    </p>
+    <p>
+    Once we get the extension list we just print it. If you want to do some additional logic you can do it here.
+    </p>
+</section>
+    
+</article>    
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial50/tutorial50.html';
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</body>
+</html>
