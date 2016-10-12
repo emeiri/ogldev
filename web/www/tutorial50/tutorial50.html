@@ -187,23 +187,19 @@
         TODO: recommend how to read the tutorial.
         
         TODO: describe only what we need.
+        
+        TODO: note about allocators.
+        
+        TODO: note on sType.
+        
+        TODO: note about function pointers
     </p>
     <p>
         Let's start by reviewing the class OgldevVulkanCore whose job is to create and maintain
         the core four objects mentioned above (note that I'm using red in order to mark all
         Vulkan structs, enums, functions, etc):
     </p>
-    <pre>
-    <code>
-struct VulkanPhysicalDevices {
-    std::vector&lt;<font color="red">VkPhysicalDevice</font> &gt; m_devices;
-    std::vector&lt;<font color="red">VkPhysicalDeviceProperties</font>&gt; m_devProps;
-    std::vector&lt; std::vector&lt;<font color="red">VkQueueFamilyProperties</font>&gt; &gt; m_qFamilyProps;
-    std::vector&lt; std::vector&lt;<font color="red">VkSurfaceFormatKHR</font>&gt; &gt; m_surfaceFormats;
-    std::vector&lt;<font color="red">VkSurfaceCapabilitiesKHR</font>&gt; m_surfaceCaps;
-};
-    
-class OgldevVulkanCore
+<pre><code>class OgldevVulkanCore
 {
 public:
     OgldevVulkanCore(const char* pAppName);
@@ -229,7 +225,7 @@ private:
     void CreateInstance();
     void CreateSurface();
     void SelectPhysicalDevice();
-    void CreateDevice();
+    void CreateLogicalDevice();
 
     // Vulkan objects
     <font color="red">VkInstance m_inst;
@@ -241,19 +237,15 @@ private:
     std::string m_appName;
     int m_gfxDevIndex;
     int m_gfxQueueFamily;
-};
-</code>
-    </pre>
+};</code></pre>
     <p>
         This class has three pure Vulkan members (m_inst, surface and m_device) as well
-        as a vector of Vulkan objects called m_physDevices. In addition, we have other
+        as a vector of Vulkan objects called m_physDevices (see the definition below). In addition, we have other
         members to keep the application name and an index to the physical device we will
         be using and an index to the queue family. The class also contains a few getter functions
         and an Init() function that set's everything up. Let's see what it does.
     </p>
-    <pre>
-    <code>
-bool OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
+<pre><code>void OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
 { 
     std::vector<VkExtensionProperties> ExtProps;
     VulkanEnumExtProps(ExtProps);
@@ -270,13 +262,8 @@ bool OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
 
     VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
     SelectPhysicalDevice();
-    CreateDevice();
-    
-    return true;
-}
-    
-    </code>
-    </pre>
+    CreateLogicalDevice();
+}</code></pre>
     <p>
     This function takes a pointer to a VulkanWindowControl object. We will review this object
     later. For now it suffices to say that this is an OS specific class whose job is to create
@@ -291,37 +278,23 @@ bool OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
     <p>
     We start by enumerating all these extensions. This is done in the following wrapper function:
     </p>
-    <pre>
-    <code>
-bool VulkanEnumExtProps(std::vector&lt;<font color="red">VkExtensionProperties</font>&gt;& ExtProps)
+<pre><code>void VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
 {
     uint NumExt = 0;
     VkResult res = <font color="red">vkEnumerateInstanceExtensionProperties</font>(NULL, &NumExt, NULL);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating extensions: %x\n", res);
-        return false;
-    }
+    CHECK_VULKAN_ERROR("vkEnumerateInstanceExtensionProperties error %d\n", res);
     
     printf("Found %d extensions\n", NumExt);
     
     ExtProps.resize(NumExt);
 
     res = <font color="red">vkEnumerateInstanceExtensionProperties</font>(NULL, &NumExt, &ExtProps[0]);
+    CHECK_VULKAN_ERROR("vkEnumerateInstanceExtensionProperties error %d\n", res);        
     
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating extensions: %x\n", res);
-        return false;
-    }
-        
     for (uint i = 0 ; i < NumExt ; i++) {
         printf("Instance extension %d - %s\n", i, ExtProps[i].extensionName);
     }
-    
-    return true;
-}    
-    </code>
-    </pre>
+}</code></pre>
     <p>
     The above function is a wrapper to the Vulkan API vkEnumerateInstanceExtensionProperties which 
     returns the extensions available on the system. The way we use this function is very common in Vulkan.
@@ -333,7 +306,356 @@ bool VulkanEnumExtProps(std::vector&lt;<font color="red">VkExtensionProperties</
     interested in all the extensions we use NULL as the layer.
     </p>
     <p>
-    Once we get the extension list we just print it. If you want to do some additional logic you can do it here.
+    Once we get the extension list we just print it. If you want to do some additional logic you can do it here. Next in
+    the initialization process is the creation of the Vulkan instance:
+    </p>
+<pre><code>void OgldevVulkanCore::CreateInstance()
+{
+    <font color="red">VkApplicationInfo</font> appInfo = {};       
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = m_appName.c_str();
+    appInfo.engineVersion = 1;
+    appInfo.apiVersion = VK_API_VERSION_1_0;
+
+    const char* pInstExt[] = {
+#ifdef ENABLE_DEBUG_LAYERS
+        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+#endif        
+        VK_KHR_SURFACE_EXTENSION_NAME,
+#ifdef _WIN32    
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#else    
+        VK_KHR_XCB_SURFACE_EXTENSION_NAME
+#endif            
+    };
+    
+#ifdef ENABLE_DEBUG_LAYERS    
+    const char* pInstLayers[] = {
+        "VK_LAYER_LUNARG_standard_validation"
+    };
+#endif    
+    
+    <font color="red">VkInstanceCreateInfo</font> instInfo = {};
+    instInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    instInfo.pApplicationInfo = &appInfo;
+#ifdef ENABLE_DEBUG_LAYERS    
+    instInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pInstLayers);
+    instInfo.ppEnabledLayerNames = pInstLayers;
+#endif    
+    instInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pInstExt);
+    instInfo.ppEnabledExtensionNames = pInstExt;         
+
+    VkResult res = <font color="red">vkCreateInstance</font>(&instInfo, NULL, &m_inst);
+    CHECK_VULKAN_ERROR("vkCreateInstance %d\n", res);
+        
+#ifdef ENABLE_DEBUG_LAYERS
+    // Get the address to the vkCreateDebugReportCallbackEXT function
+    my_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(<font color="red">vkGetInstanceProcAddr</font>(m_inst, "vkCreateDebugReportCallbackEXT"));
+    
+    // Register the debug callback
+    <font color="red">VkDebugReportCallbackCreateInfoEXT</font> callbackCreateInfo;
+    callbackCreateInfo.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
+    callbackCreateInfo.pNext       = NULL;
+    callbackCreateInfo.flags       = VK_DEBUG_REPORT_ERROR_BIT_EXT |
+                                     VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                                     VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+    callbackCreateInfo.pfnCallback = &MyDebugReportCallback;
+    callbackCreateInfo.pUserData   = NULL;
+
+    VkDebugReportCallbackEXT callback;
+    res = my_vkCreateDebugReportCallbackEXT(m_inst, &callbackCreateInfo, NULL, &callback);
+    CheckVulkanError("my_vkCreateDebugReportCallbackEXT error %d\n", res);
+#endif    
+}</code></pre>
+    
+    <p>
+    In order to initialize the Vulkan library we must create an <i>VkInstance object</i>. This object carries all the state of the
+    application. The function that creates it is called vkCreateInstance() and it takes most of its parameters in 
+    a VkInstanceCreateInfo structure. The parameters that we are interested in are the extensions and (optionally) the
+    layers we want to enable. The extensions are the generic surface extension and the OS specific surface extension. The
+    extensions and layers are identified by their name strings and for some of them the Khronos SDK provides a macro.
+    VkInstanceCreateInfo also takes a pointer to a VkApplicationInfo structure. This structure describes the application
+    and allows the developer to put in the application name and some internal engine version. An important field of
+    VkApplicationnInfo is apiVersion. This is the Vulkan version that the application is requesting and if the driver
+    doesn't support it the call will fail. We are requesting version 1.0 so it should be ok.
+    </p>
+    <p>
+    Once we get the handle of the instance object we can register a function in the validation layer
+    that will print warning and error messages. We must first get a pointer to a function called vkCreateDebugReportCallbackEXT,
+    then we populate a VkDebugReportCallbackCreateInfoEXT structure with flags for the stuff we want the driver to
+    notify us about and a pointer to our debug function. The actual registration is done by calling the function whose pointer
+    we previously acquired. We define the pointer to vkCreateDebugReportCallbackEXT and our debug callback as follows:    
+    </p>
+<pre><code>PFN_vkCreateDebugReportCallbackEXT my_vkCreateDebugReportCallbackEXT = NULL; 
+
+VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
+    VkDebugReportFlagsEXT       flags,
+    VkDebugReportObjectTypeEXT  objectType,
+    uint64_t                    object,
+    size_t                      location,
+    int32_t                     messageCode,
+    const char*                 pLayerPrefix,
+    const char*                 pMessage,
+    void*                       pUserData)
+{
+    printf("%s\n", pMessage);
+    return VK_FALSE;    // Since we don't want to fail the original call
+}</code></pre>
+    <p>
+    The next step is to create a window surface and for that we use the VulkanWindowControl object that the Init() function
+    got as a pointer parameter. We will review this class later so let's skip it for now (note that we need an instance
+    in order to create a surface so this is why we do stuff in this order). Once we have an instance and a surface we are ready
+    to get all the information we need on the physical devices on your system. A physical device is either a discrete
+    or an integrated graphics card on the platform. For example, your system may have a couple of NVIDIA cards in a SLI
+    formation and a Intel HD graphics GPU integrated into the CPU. In this case you have three physical devices. The function
+    below retrieves all the physical devices and some of their characteristics and populates the VulkanPhysicalDevices
+    structure. This structure is essentially a database of physical devices and their properties. It is made up of
+    several vectors (sometimes vectors of vectors) of various Vulkan objects. In order to access a specific device
+    you simply go to one of the members and index into that vector using the physical device index. So to get
+    all the information on physical device 2 access m_device[2], m_devProps[2], etc. The reason I structured it
+    like that (and not a structure per device with all the info inside it) is because it matches the way the Vulkan
+    APIs work. You provide an array of XYZ and get all the XYZ objects for all physical devices. Here's the definition
+    of that database structure:
+    </p>
+<pre><code>struct VulkanPhysicalDevices {
+    std::vector&lt;<font color="red">VkPhysicalDevice</font> &gt; m_devices;
+    std::vector&lt;<font color="red">VkPhysicalDeviceProperties</font>&gt; m_devProps;
+    std::vector&lt; std::vector&lt;<font color="red">VkQueueFamilyProperties</font>&gt; &gt; m_qFamilyProps;
+    std::vector&lt; std::vector&lt;<font color="red">VkBool32</font>&gt; &gt; m_qSupportsPresent;
+    std::vector&lt; std::vector&lt;<font color="red">VkSurfaceFormatKHR</font>&gt; &gt; m_surfaceFormats;
+    std::vector&lt;<font color="red">VkSurfaceCapabilitiesKHR</font>&gt; m_surfaceCaps;
+};</code></pre>
+    <p>
+    Now let's take a look at the function that populates the database. The first two parameters are the instance and surface.  
+    The third parameter is where the result will go to. We will review this function step by step.
+    </p>
+<pre><code>void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices)
+{
+    uint NumDevices = 0;
+    
+    VkResult res = <font color="red">vkEnumeratePhysicalDevices</font>(inst, &NumDevices, NULL);
+    CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
+    printf("Num physical devices %d\n", NumDevices);</pre></code>
+    <p>
+    The first thing we do is get the number of physical devices. Again we see the usage of dual 
+    call - first to get the number of items and then to get the items themselves.
+    </p>
+<pre><code>    PhysDevices.m_devices.resize(NumDevices);
+    PhysDevices.m_devProps.resize(NumDevices);
+    PhysDevices.m_qFamilyProps.resize(NumDevices);
+    PhysDevices.m_qSupportsPresent.resize(NumDevices);
+    PhysDevices.m_surfaceFormats.resize(NumDevices);
+    PhysDevices.m_surfaceCaps.resize(NumDevices);</pre></code>
+    <p>
+    We can now resize our database so that we will have enough space to retrieve the info on all
+    devices. 
+    </p>
+<pre><code>    res = <font color="red">vkEnumeratePhysicalDevices</font>(inst, &NumDevices, &PhysDevices.m_devices[0]);
+    CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);</pre></code>
+    <p>
+    We do the same call again, this time providing the address of a vector of VkPhysicalDevice as the result. 
+    Using STL vectors is handly because they function the same way as standard arrays, so the address of the first element is the
+    address of the address of the array. From our point of view VkPhysicalDevice is just a handle that represents
+    the identity of the physical device. Now we begin a loop over the number of physical devices where
+    we will extract more info for one device at a time.
+    </p>
+    <pre><code>for (uint i = 0 ; i < NumDevices ; i++) {
+        const VkPhysicalDevice& PhysDev = PhysDevices.m_devices[i];
+        vkGetPhysicalDeviceProperties(PhysDev, &PhysDevices.m_devProps[i]);</pre></code>
+    <p>
+        We start by getting the properties of the current device. m_devProps is a vector of VkPhysicalDeviceProperties.
+        This structure contains information about the device such as a name, versions, IDs, etc. We print some of these
+        properties in the next couple of printf statements:
+    </p>                
+    <pre><code>        printf("Device name: %s\n", PhysDevices.m_devProps[i].deviceName);
+        uint32_t apiVer = PhysDevices.m_devProps[i].apiVersion;
+        printf("    API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer),
+                                          VK_VERSION_MINOR(apiVer),
+                                          VK_VERSION_PATCH(apiVer));
+        uint NumQFamily = 0;         
+        
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, NULL);
+    
+        printf("    Num of family queues: %d\n", NumQFamily);
+
+        PhysDevices.m_qFamilyProps[i].resize(NumQFamily);
+        PhysDevices.m_qSupportsPresent[i].resize(NumQFamily);
+
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));</code></pre>
+        <p>
+        Next we get the properties of all the queue families that the physical device supports. There are four categories
+        that a GPU can support:
+        <ol>
+        <li>Graphics - 2D/3D rendering (same as OpenGL).</li>
+        <li>Compute - general processing work which is not rendering in nature. This can be scientific calculations
+        that need the parallel power of the GPU but not the 3D pipeline.</li>
+        <li>Transfer - copying of buffers and images.</li>
+        <li>Sparse Memory Management - TODO</li>
+        </ol>
+        </p>
+        <p>
+        The work that we send to the device is executed in a queue. A device exposes one or more queue families and
+        each family contains one or more queues. Each family is characterized by some combination of the four functionality
+        categories above. The queues in each family all support the family functionality. For example, my GPU has two families.
+        The first one contains 16 queues that support all the four categories and the other has just one queue that only supports
+        transfer. You can take advantage of the specific architecture of the device at runtime in order to tailor the behavior
+        of your app in order to increase performance.        
+        </p>
+        <p>
+        In the code above we first get the number of family properties for the current device, resize m_qFamilyProps and
+        m_qSupportsPresent (note that both are vectors of vectors so we must first index into the current device) and after 
+        that we get a vector of properties and store it in the database.
+        </p>
+        <pre><code>        for (uint q = 0 ; q < NumQFamily ; q++) {
+            res = vkGetPhysicalDeviceSurfaceSupportKHR(PhysDev, q, Surface, &(PhysDevices.m_qSupportsPresent[i][q]));
+            CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR error %d\n", res);
+        }</code></pre>
+        <p>
+        While we are still on the queue family subject let's query each family and check whether it supports presentation.
+        vkGetPhysicalDeviceSurfaceSupportKHR takes a physical device, a surface and a queue family index and returns
+        a boolean value which indicates whether this combination of device and family and present on the specified surface.
+        </p>
+        <pre><code>        uint NumFormats = 0;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, NULL);
+        assert(NumFormats > 0);
+        
+        PhysDevices.m_surfaceFormats[i].resize(NumFormats);
+        
+        res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR error %d\n", res);
+    
+        for (uint j = 0 ; j < NumFormats ; j++) {
+            const VkSurfaceFormatKHR SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
+            printf("    Format %d color space %d\n", SurfaceFormat.format , SurfaceFormat.colorSpace);
+        }</code></pre>
+        <p>
+        Next up is the surface format. Each surface can support one or more formats. A format is simply the way data
+        is arranged on the surface. For example, RGB and RGBA are surface formats. The format of the surface is critical because
+        it determines the way data on the surface is converted or interpreted before various operations (e.g. displaying
+        it to the screen). To query the surface we need both the physical device and the surface itself because the devices
+        may not be compatible in terms of the surface formats that they can work with. 
+        There can be multiple surface formats available which is why again we have a vector of vectors here.
+        The surface format will be required later for creating the swap chain and the render pass which is why it is part of the
+        database. Now we query the surface capabilities:
+        </p>
+        <pre><code>        res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
+        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceCapabilitiesKHR error %d\n", res);
+       
+        VulkanPrintImageUsageFlags(PhysDevices.m_surfaceCaps[i].supportedUsageFlags);</code></pre>
+        <p>
+        The VkSurfaceCapabilitiesKHR structure describes the capabilities of the physical device when working with a specific
+        surface. This includes the minimum and maximum images that can be created on the swap chain, the minimum and maximum
+        extents (size of the area that can be rendered), supported rotation, etc. There is one such structure for each combination
+        of a physical device and surface and we store it in the m_surfaceCaps member. 
+        </p>
+        <pre><code>        uint NumPresentModes = 0;
+    
+        res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, NULL);
+        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfacePresentModesKHR error %d\n", res);
+
+        assert(NumPresentModes != 0);
+
+        printf("Number of presentation modes %d\n", NumPresentModes);
+    }
+}</code></pre>
+    <p>
+        The last thing we do here is to query the number of present modes for the combination of physical device and surface.
+        TODO: decide if we need this.
+    </p>
+    <p>
+        We completed getting all the information on the physical devices! (note that some of it is specific to the combination
+        of a device and surface). The next step in the Init() function is to select one of the physical devices and 
+        one of the queues to do the processing. The following function does exactly that:
+    </p>
+    <pre><code>void OgldevVulkanCore::SelectPhysicalDevice()
+{
+    for (uint i = 0 ; i < m_physDevices.m_devices.size() ; i++) {
+                
+        for (uint j = 0 ; j < m_physDevices.m_qFamilyProps[i].size() ; j++) {
+            VkQueueFamilyProperties& QFamilyProp = m_physDevices.m_qFamilyProps[i][j];
+            
+            printf("Family %d Num queues: %d\n", j, QFamilyProp.queueCount);
+            VkQueueFlags flags = QFamilyProp.queueFlags;
+            printf("    GFX %s, Compute %s, Transfer %s, Sparse binding %s\n",
+                    (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
+                    (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
+            
+            if (flags & VK_QUEUE_GRAPHICS_BIT) {
+                if (!m_physDevices.m_qSupportsPresent[i][j]) {
+                    printf("Present is not supported\n");
+                    continue;
+                }
+
+                m_gfxDevIndex = i;
+                m_gfxQueueFamily = j;
+                printf("Using GFX device %d and queue family %d\n", m_gfxDevIndex, m_gfxQueueFamily);
+                break;
+            }
+        }
+    }
+    
+    if (m_gfxDevIndex == -1) {
+        printf("No GFX device found!\n");
+        assert(0);
+    }    
+}</code></pre>
+    <p>
+    The nested loop in this function traverses the list of devices and the list of queue families for each device. 
+    We are searching for a physical device with a queue family that support graphics functionality as well as being
+    able to present on the surface for which the database was initialized. When we find such device and family we
+    store their corresponding indices and quit the loop. This device and family pair is going to serve us through
+    this tutorial. If no such pair is found the application aborts. It means the system doesn't meet the minimum requirements
+    to run the code.
+    </p>
+    <p>
+    The last thing we need to do to initialiaze our core object is to create a logical device:
+    </p>
+    <pre><code>void OgldevVulkanCore::CreateLogicalDevice()
+{
+    float qPriorities = 1.0f;
+    VkDeviceQueueCreateInfo qInfo = {};
+    qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    qInfo.queueFamilyIndex = m_gfxQueueFamily;
+    qInfo.queueCount = 1;
+    qInfo.pQueuePriorities = &qPriorities;
+    
+    const char* pDevExt[] = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+    
+    VkDeviceCreateInfo devInfo = {};
+    devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
+    devInfo.ppEnabledExtensionNames = pDevExt;
+    devInfo.queueCreateInfoCount = 1;
+    devInfo.pQueueCreateInfos = &qInfo;
+       
+    VkResult res = vkCreateDevice(GetPhysDevice(), &devInfo, NULL, &m_device);
+
+    CHECK_VULKAN_ERROR("vkCreateDevice error %d\n", res);
+   
+    printf("Device created\n");
+}</code></pre>
+    <p>
+    The Vulkan architecture separates the concept of a physical device which is attached to the system
+    and the logical device which is what we use in the application to create most of the objects that
+    are below the device level (queues, swap chains, etc). This design choice enables flexibility in
+    the management of device resource as well as configuration of device behavior to fit our needs. 
+    The logical device allows us to expose only parts of the physical device. For example, if the physical
+    device supports both graphics and compute we can expose only graphics via the logical device.    
+    </p>
+    <p>
+    In order to create the device we need one VkDeviceCreateInfo structure and one or more VkDeviceQueueCreateInfo
+    structures. VkDeviceCreateInfo is the main point of device definition. In that struct we set a pointer
+    to an array of extensions we want to enable. We need to enable the swap chain which is defined as part
+    of an extension and not part of the core spec. A swap chain is an array of surfaceimages that can be presented. 
+    We also need the size of the extension array. The second thing we need is a pointer to an array of VkDeviceQueueCreateInfo
+    structs (and the size of that array). For each queue family we want to enable we must have one VkDeviceQueueCreateInfo
+    struct which describes it. This struct specifies the index of the queue family (which we got earlier in SelectPhysicalDevice()),
+    the number of queues we want to create from that family and for each queue we can specify a different priority.
+    In this tutorial we keep things simple so we won't use priorities. We have just one queue and we set the priority to 1.0.
     </p>
 </section>
     

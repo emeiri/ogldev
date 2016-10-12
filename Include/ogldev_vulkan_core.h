@@ -51,7 +51,7 @@ private:
     void CreateInstance();
     void CreateSurface();
     void SelectPhysicalDevice();
-    void CreateDevice();
+    void CreateLogicalDevice();
 
     // Vulkan objects
     VkInstance m_inst;

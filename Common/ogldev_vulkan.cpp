@@ -60,21 +60,15 @@ void VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
 {
     uint NumExt = 0;
     VkResult res = vkEnumerateInstanceExtensionProperties(NULL, &NumExt, NULL);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating extensions: %x\n", res);
-    }
+    CHECK_VULKAN_ERROR("vkEnumerateInstanceExtensionProperties error %d\n", res);
     
     printf("Found %d extensions\n", NumExt);
     
     ExtProps.resize(NumExt);
 
     res = vkEnumerateInstanceExtensionProperties(NULL, &NumExt, &ExtProps[0]);
+    CHECK_VULKAN_ERROR("vkEnumerateInstanceExtensionProperties error %d\n", res);        
     
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating extensions: %x\n", res);
-    }
-        
     for (uint i = 0 ; i < NumExt ; i++) {
         printf("Instance extension %d - %s\n", i, ExtProps[i].extensionName);
     }
@@ -120,9 +114,10 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
     PhysDevices.m_devices.resize(NumDevices);
     PhysDevices.m_devProps.resize(NumDevices);
     PhysDevices.m_qFamilyProps.resize(NumDevices);
+    PhysDevices.m_qSupportsPresent.resize(NumDevices);
     PhysDevices.m_surfaceFormats.resize(NumDevices);
     PhysDevices.m_surfaceCaps.resize(NumDevices);
-    
+        
     res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
     CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
     
@@ -142,8 +137,14 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         printf("    Num of family queues: %d\n", NumQFamily);
 
         PhysDevices.m_qFamilyProps[i].resize(NumQFamily);
+        PhysDevices.m_qSupportsPresent[i].resize(NumQFamily);
 
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));
+        
+        for (uint q = 0 ; q < NumQFamily ; q++) {
+            res = vkGetPhysicalDeviceSurfaceSupportKHR(PhysDev, q, Surface, &(PhysDevices.m_qSupportsPresent[i][q]));
+            CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR error %d\n", res);
+        }
               
         uint NumFormats = 0;
         vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, NULL);
@@ -151,7 +152,8 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         
         PhysDevices.m_surfaceFormats[i].resize(NumFormats);
         
-        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+        res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR error %d\n", res);
     
         for (uint j = 0 ; j < NumFormats ; j++) {
             const VkSurfaceFormatKHR SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
@@ -159,17 +161,14 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         }
         
         res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
-    
-        if (res != VK_SUCCESS) {
-            CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceCapabilitiesKHR %d\n", res);
-            assert(0);
-        }
-    
+        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceCapabilitiesKHR error %d\n", res);
+       
         VulkanPrintImageUsageFlags(PhysDevices.m_surfaceCaps[i].supportedUsageFlags);
   
         uint NumPresentModes = 0;
     
         res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, NULL);
+        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfacePresentModesKHR error %d\n", res);
 
         assert(NumPresentModes != 0);
 

@@ -19,10 +19,7 @@
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
 
-PFN_vkGetPhysicalDeviceSurfaceFormatsKHR pfnGetPhysicalDeviceSurfaceFormatsKHR = NULL;
 PFN_vkCreateDebugReportCallbackEXT my_vkCreateDebugReportCallbackEXT = NULL; 
-//PFN_vkDebugReportMessageEXT vkDebugReportMessageEXT = NULL;
-//PFN_vkDestroyDebugReportCallbackEXT vkDestroyDebugReportCallbackEXT = NULL;
 
        
 VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
@@ -73,7 +70,7 @@ void OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
 
     VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
     SelectPhysicalDevice();
-    CreateDevice();
+    CreateLogicalDevice();
 }
 
 const VkPhysicalDevice& OgldevVulkanCore::GetPhysDevice() const
@@ -112,11 +109,8 @@ void OgldevVulkanCore::SelectPhysicalDevice()
                     (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
                     (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
             
-            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {
-                VkBool32 SupportsPresent = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(m_physDevices.m_devices[i], j, m_surface, &SupportsPresent);
-    
-                if (!SupportsPresent) {
+            if ((flags & VK_QUEUE_GRAPHICS_BIT) && (m_gfxDevIndex == -1)) {    
+                if (!m_physDevices.m_qSupportsPresent[i][j]) {
                     printf("Present is not supported\n");
                     continue;
                 }
@@ -145,14 +139,14 @@ void OgldevVulkanCore::CreateInstance()
 
     const char* pInstExt[] = {
 #ifdef ENABLE_DEBUG_LAYERS
-        "VK_EXT_debug_report",
+        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 #endif        
         VK_KHR_SURFACE_EXTENSION_NAME,
-    #ifdef _WIN32    
+#ifdef _WIN32    
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-    #else    
+#else    
         VK_KHR_XCB_SURFACE_EXTENSION_NAME
-    #endif            
+#endif            
     };
     
 #ifdef ENABLE_DEBUG_LAYERS    
@@ -172,16 +166,13 @@ void OgldevVulkanCore::CreateInstance()
     instInfo.ppEnabledExtensionNames = pInstExt;         
 
     VkResult res = vkCreateInstance(&instInfo, NULL, &m_inst);
-    
-    if (res != VK_SUCCESS) {
-      //  OGLDEV_ERROR("Failed to create instance");
-        assert(0);
-    }    
-    
+    CHECK_VULKAN_ERROR("vkCreateInstance %d\n", res);
+        
 #ifdef ENABLE_DEBUG_LAYERS
+    // Get the address to the vkCreateDebugReportCallbackEXT function
     my_vkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkCreateDebugReportCallbackEXT"));
     
-    /* Setup callback creation information */
+    // Register the debug callback
     VkDebugReportCallbackCreateInfoEXT callbackCreateInfo;
     callbackCreateInfo.sType       = VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
     callbackCreateInfo.pNext       = NULL;
@@ -191,17 +182,14 @@ void OgldevVulkanCore::CreateInstance()
     callbackCreateInfo.pfnCallback = &MyDebugReportCallback;
     callbackCreateInfo.pUserData   = NULL;
 
-    /* Register the callback */
     VkDebugReportCallbackEXT callback;
     res = my_vkCreateDebugReportCallbackEXT(m_inst, &callbackCreateInfo, NULL, &callback);
-    CheckVulkanError("my_vkCreateDebugReportCallbackEXT failed");
-  //  vkDebugReportMessageEXT = reinterpret_cast<PFN_vkDebugReportMessageEXT>(vkGetInstanceProcAddr(m_inst, "vkDebugReportMessageEXT"));
-   // vkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>(vkGetInstanceProcAddr(m_inst, "vkDestroyDebugReportCallbackEXT"));
+    CHECK_VULKAN_ERROR("my_vkCreateDebugReportCallbackEXT error %d\n", res);
 #endif    
 }
 
 
-void OgldevVulkanCore::CreateDevice()
+void OgldevVulkanCore::CreateLogicalDevice()
 {
     VkDeviceQueueCreateInfo qInfo = {};
     qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -214,32 +202,17 @@ void OgldevVulkanCore::CreateDevice()
     const char* pDevExt[] = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
-    
-#ifdef ENABLE_DEBUG_LAYERS        
-    const char* pDevLayers[] = {
-        "VK_LAYER_LUNARG_standard_validation"
-    };
-#endif    
-    
+       
     VkDeviceCreateInfo devInfo = {};
     devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-#ifdef ENABLE_DEBUG_LAYERS        
-    devInfo.enabledLayerCount = ARRAY_SIZE_IN_ELEMENTS(pDevLayers);
-    devInfo.ppEnabledLayerNames = pDevLayers;
-#endif    
     devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
     devInfo.ppEnabledExtensionNames = pDevExt;
     devInfo.queueCreateInfoCount = 1;
     devInfo.pQueueCreateInfos = &qInfo;
-    
-    printf("%d\n",devInfo.enabledExtensionCount );
-    
+       
     VkResult res = vkCreateDevice(GetPhysDevice(), &devInfo, NULL, &m_device);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating device\n");
-        assert(0);
-    }
+
+    CHECK_VULKAN_ERROR("vkCreateDevice error %d\n", res);
    
     printf("Device created\n");
 }
