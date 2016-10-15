@@ -12,7 +12,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>tutorial50.cpp</itemPath>
+      <itemPath>tutorial51.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -73,7 +73,7 @@
       </item>
       <item path="Shaders/vulkan.vert" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="tutorial50.cpp" ex="false" tool="1" flavor2="0">
+      <item path="tutorial51.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -123,7 +123,7 @@
       </item>
       <item path="Shaders/vulkan.vert" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="tutorial50.cpp" ex="false" tool="1" flavor2="0">
+      <item path="tutorial51.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

@@ -35,6 +35,10 @@ public:
     virtual void Init(uint Width, uint Height);
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
+    
+    virtual void PollEvent();
+    
+    virtual void PreRun();
 
  private:    
     xcb_connection_t* m_pXCBConn;

@@ -21,7 +21,7 @@
 
 #include <vector>
 
-#define ENABLE_DEBUG_LAYERS
+//#define ENABLE_DEBUG_LAYERS
 
 #ifdef _WIN32
 #define  VK_USE_PLATFORM_WIN32_KHR
@@ -68,6 +68,10 @@ public:
     virtual void Init(uint Width, uint Height) = 0;
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst) = 0;
+    
+    virtual void PollEvent() = 0;
+    
+    virtual void PreRun() = 0;
 };
 
 #endif

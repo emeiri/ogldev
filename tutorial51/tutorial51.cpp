@@ -542,7 +542,7 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
- //  pipelineInfo.layout = m_pipelineLayout;
+   pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.basePipelineIndex = -1;
@@ -656,8 +656,7 @@ bool OgldevVulkanApp::Init()
 #else            
     m_pWindowControl = new XCBControl();
 #endif    
-    bool ret = m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-    assert(ret);
+    m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     m_core.Init(m_pWindowControl);
         
@@ -701,28 +700,28 @@ void OgldevVulkanApp::Run()
 }
 
 
-class Tutorial50 : public OgldevVulkanApp
+class Tutorial51 : public OgldevVulkanApp
 {
 public:
-    Tutorial50(const char* pAppName);
+    Tutorial51(const char* pAppName);
     
-    ~Tutorial50();
+    ~Tutorial51();
 };
 
 
-Tutorial50::Tutorial50(const char* pAppName) : OgldevVulkanApp(pAppName)
+Tutorial51::Tutorial51(const char* pAppName) : OgldevVulkanApp(pAppName)
 {
     
 }
 
-Tutorial50::~Tutorial50()
+Tutorial51::~Tutorial51()
 {
     
 }
 
 int main(int argc, char** argv)
 {
-    Tutorial50 app("Tutorial 50");
+    Tutorial51 app("Tutorial 51");
     
     if (!app.Init()) {
         return 1;

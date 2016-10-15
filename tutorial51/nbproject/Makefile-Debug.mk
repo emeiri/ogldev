@@ -35,7 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/tutorial50.o
+	${OBJECTDIR}/tutorial51.o
 
 
 # C Compiler Flags
@@ -64,10 +64,10 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial51: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial51 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
 
-${OBJECTDIR}/tutorial50.o: tutorial50.cpp 
+${OBJECTDIR}/tutorial51.o: tutorial51.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial50.o tutorial50.cpp
+	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial51.o tutorial51.cpp
 
 # Subprojects
 .build-subprojects:
