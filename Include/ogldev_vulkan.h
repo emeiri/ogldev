@@ -62,13 +62,9 @@ protected:
 
 public:
 
-    virtual bool Init(uint Width, uint Height) = 0;
+    virtual void Init(uint Width, uint Height) = 0;
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst) = 0;
-
-    virtual void PreRun() = 0;
-
-    virtual bool PollEvent() = 0;
 };
 
 #endif

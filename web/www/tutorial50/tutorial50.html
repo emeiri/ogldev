@@ -657,6 +657,159 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
     the number of queues we want to create from that family and for each queue we can specify a different priority.
     In this tutorial we keep things simple so we won't use priorities. We have just one queue and we set the priority to 1.0.
     </p>
+    <p>
+    So this completes the initialization process of our OgldevVulkanCore process, but to actually call the Init() function
+    we need a VulkanWindowControl which is a class I created to wrap the management of the window surface. Remember that this
+    job is not part of the core Vulkan spec and since every operating system needs entirely different code here I found that it
+    makes sense to separate all window management to a different class and implement OS specific versions by this class derivatives.
+    This class is actually an interface and it is defined as follows:    
+    </p>
+<pre><code>class VulkanWindowControl
+{
+protected:
+    VulkanWindowControl() {};
+
+    ~VulkanWindowControl() {};
+
+public:
+
+    virtual bool Init(uint Width, uint Height) = 0;
+    
+    virtual VkSurfaceKHR CreateSurface(VkInstance& inst) = 0;
+};</code></pre>    
+    <p>
+    As you can see, this class is very simple. It doesn't have any members. It's constructor and destructor are protected
+    so you can't create an instance of this class directly. You have only create an instance of a derived class. There are
+    two public methods. One to initialize the object and one to create a Vulkan surface. So for every OS we are free to
+    do OS specific stuff but we have to return a VkSurfaceKHR which is a handle to the window surface. Note that CreateSurface()
+    takes an instance reference as a parameter which means we can init this class before we create our VulkanCoreObject but
+    we have to initialize the VulkanCoreObject before we call CreateSurface(). We will review this again when we get to the main() function
+    so don't worry about it.
+    </p>
+    <p>
+    The concrete class which implements VulkanWindowControl on Linux is called XCBControl and it is defined as follows:
+    </p>
+    <pre><code>class XCBControl : public VulkanWindowControl
+{
+public:
+    XCBControl();
+    
+    ~XCBControl();
+    
+    virtual bool Init(uint Width, uint Height);
+    
+    virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
+
+ private:    
+    xcb_connection_t* m_pXCBConn;
+    xcb_screen_t* m_pXCBScreen;
+    xcb_window_t m_xcbWindow;           
+    xcb_intern_atom_reply_t* m_pXCBDelWin;    
+};</code></pre>
+    <p>
+    XWindow is the most common windowing system
+    on Unix and Linux. It works in a client/server model. The server manages the screen, keyboard and mouse. The client is an application
+    that wants to display something on the server. It connects to the server via the X11 protocol and sends it requests
+    to create a window, control the mouse/keyboard, etc. The two most common implementations of the X11 protocol is
+    Xlib and XCB and Vulkan provides extensions to use both.
+    <a href="https://en.wikipedia.org/wiki/XCB">XCB</a> is more modern so this is what we will use on Linux. XCBControl
+    implements the VulkanWindowControl class using XCB calls.
+    Remember that the target of this object is to create
+    an OS specific window and connect it to a Vulkan surface so that Vulkan will be able to render to it. Let's start
+    by creating the window.
+    </p>
+    <pre><code>void XCBControl::Init(uint Width, uint Height)
+{
+    m_pXCBConn = xcb_connect(NULL, NULL);
+    
+    int error = xcb_connection_has_error(m_pXCBConn);
+    
+    if  (error) {
+        printf("Error opening xcb connection error %d\n", error);
+        assert(0);
+    }
+    
+    printf("XCB connection opened\n");</code></pre>
+    <p>
+    The first thing we need to do is to connect to the XWindow server. You are probably running on a GUI environment
+    so that server is already running in the background. xcb_connect() opens a connection to that server. It takes
+    two parameters - the name of the server and a pointer to a preferred screen number. XWindow is very flexible. For example,
+    it allows you to run the server on one machine and the client on another. You can also run multiple instances of the
+    same server on the same machine. To connect remotely you need to specify the name or IP as well as a display number in
+    some specific string format and provide it in the first parameter. We want to keep the tutorial as simple as possible so
+    we use NULL for both parameters. This will be enough to run your application locally. 
+    </p>
+    <p>
+    xcb_connect() returns a connection pointer which we store in the class. It always returns something so we have to 
+    check for errors using xcb_connectionn_has_error() in the manner that we see above.
+    </p><pre><code>    const xcb_setup_t *pSetup = xcb_get_setup(m_pXCBConn);
+    
+    xcb_screen_iterator_t iter = xcb_setup_roots_iterator(setup);
+    
+    m_pXCBScreen = iter.data;    
+    
+    printf("XCB screen %p\n", m_pXCBScreen);        </code></pre>
+    <p>
+    A XWindow server can control multiple monitors and potentially run multiple screens on each monitor. A screen is where
+    applications are eventually executed. It is defined by a width and height, a color depth, etc. We want to get a handle to
+    the current screen and there are two steps that we need to do. The first one is to use the xcb_get_setup() function to
+    get access to the xcb_setup_t structure of the connection. This struct contains a lot of info about the server. One
+    of the things it includes is a list of screens. To access this list we setup an iterator using the xcb_setup_roots_iterator()
+    function. On a more robust piece of code what you will now see is a loop that traverses the list of screens, searching
+    for the one the applications wants. In our case it is enough to extract the first screen. The screen can be retrieved from
+    the 'data' member of the iterator.
+    </p><pre><code>     m_xcbWindow = xcb_generate_id(m_pXCBConn);</code></pre>
+    <p>
+    We are now ready to create the actual window. The first step to do that is to generate a <i>XID</i> for it. The XID is an unsigned
+    integer identifier to many XWindow resources. When the client connects to a server it allocates a range of XIDs for it from a global
+    range in the server. When the client wants to create some resource on the server it starts by locally allocating an XID from the
+    range it was given. The following function calls can use that XID to identify the resource to be created. This is somewhat unique
+    in the approach where the server doesn't say "here's your new resource and its identifer is XYZ". Instead, the client says "hey server -
+    I want to create a resource and here's the identifier for it. xcb_generate_id() generates the XID for the window and we store it in
+    the member variable m_xcbWindow.
+    </p><pre><code>     uint value_list[32];
+     value_list[0] = m_pXCBScreen->black_pixel;
+     value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | 
+                     XCB_EVENT_MASK_EXPOSURE |
+                     XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+
+     xcb_create_window(m_pXCBConn,                               // the connection to the XWindow server
+                       XCB_COPY_FROM_PARENT,                     // color depth - copy from parent window
+                       m_xcbWindow,                              // XID of the new window
+                       m_pXCBScreen->root,                       // parent window of the new window
+                       0,                                        // X coordinate
+                       0,                                        // Y coordinate
+                       Width,                                    // window width
+                       Height,                                   // window height
+                       0,                                        // border width
+                       XCB_WINDOW_CLASS_INPUT_OUTPUT,            // window class - couldn't find any documentation on it
+                       m_pXCBScreen->root_visual,                // the visual describes the color mapping
+                       XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK, 
+                       value_list);</code></pre>
+    <p>
+    xcb_create_window() does the window creation and takes no less than 13 parameters.
+    </p>
+    <pre><code>     xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, 12, "WM_PROTOCOLS");
+    xcb_intern_atom_reply_t* reply =  xcb_intern_atom_reply(m_pXCBConn, cookie, 0);
+
+    xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(m_pXCBConn, 0, 16, "WM_DELETE_WINDOW");
+    m_pXCBDelWin = xcb_intern_atom_reply(m_pXCBConn, cookie2, 0);
+
+    xcb_change_property(m_pXCBConn, 
+                        XCB_PROP_MODE_REPLACE, 
+                        m_xcbWindow,
+                        (*reply).atom, 
+                        4, 
+                        32, 
+                        1,
+                        &(m_pXCBDelWin->atom));
+    free(reply);
+
+    xcb_map_window(m_pXCBConn, m_xcbWindow);    
+    
+    printf("Window %x created\n", m_xcbWindow);
+}</code></pre>
+
 </section>
     
 </article>    

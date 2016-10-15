@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #ifndef WIN32
 
@@ -39,37 +40,32 @@ XCBControl::~XCBControl()
 }
 
 
-bool XCBControl::Init(uint Width, uint Height)
+void XCBControl::Init(uint Width, uint Height)
 {
-    const xcb_setup_t *setup;
-    xcb_screen_iterator_t iter;
-    int scr;
+    m_pXCBConn = xcb_connect(NULL, NULL);
 
-    m_pXCBConn = xcb_connect(NULL, &scr);
+    int error = xcb_connection_has_error(m_pXCBConn);
     
-    if (m_pXCBConn == NULL) {
-        printf("Error opening xcb connection\n");
-        return false;
+    if  (error) {
+        printf("Error opening xcb connection error %d\n", error);
+        assert(0);
     }
     
     printf("XCB connection opened\n");
 
-    setup = xcb_get_setup(m_pXCBConn);
-    iter = xcb_setup_roots_iterator(setup);
-    while (scr-- > 0)
-        xcb_screen_next(&iter);
-
+    const xcb_setup_t* pSetup = xcb_get_setup(m_pXCBConn);
+    xcb_screen_iterator_t iter = xcb_setup_roots_iterator(pSetup);
+    
     m_pXCBScreen = iter.data;    
     
-    printf("XCB screen %p\n", m_pXCBScreen);
-    
-    uint32_t value_mask, value_list[32];
+    printf("XCB screen %p\n", m_pXCBScreen);        
 
     m_xcbWindow = xcb_generate_id(m_pXCBConn);
-
-    value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+  
+    uint value_list[32];
     value_list[0] = m_pXCBScreen->black_pixel;
-    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_EXPOSURE |
+    value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | 
+                    XCB_EVENT_MASK_EXPOSURE |
                     XCB_EVENT_MASK_STRUCTURE_NOTIFY;
 
     xcb_create_window(m_pXCBConn, 
@@ -83,7 +79,7 @@ bool XCBControl::Init(uint Width, uint Height)
                       0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, 
                       m_pXCBScreen->root_visual,
-                      value_mask, 
+                      XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK, 
                       value_list);
 
     xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, 12, "WM_PROTOCOLS");
@@ -105,8 +101,6 @@ bool XCBControl::Init(uint Width, uint Height)
     xcb_map_window(m_pXCBConn, m_xcbWindow);    
     
     printf("Window %x created\n", m_xcbWindow);
-
-    return true;
 }
 
 
@@ -127,19 +121,6 @@ VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
     }
     
     return surface;
-}
-
-
-void XCBControl::PreRun()
-{
-    xcb_flush(m_pXCBConn);
-}
-
-
-bool XCBControl::PollEvent()
-{
-//    xcb_generic_event_t* pEvent = xcb_poll_for_event(m_pXCBConn);
-    return true;
 }
 
 #endif

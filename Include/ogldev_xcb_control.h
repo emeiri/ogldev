@@ -32,14 +32,11 @@ public:
     
     ~XCBControl();
     
-    virtual bool Init(uint Width, uint Height);
+    virtual void Init(uint Width, uint Height);
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
 
-    virtual void PreRun();
-
-    virtual bool PollEvent();
-
+ private:    
     xcb_connection_t* m_pXCBConn;
     xcb_screen_t* m_pXCBScreen;
     xcb_window_t m_xcbWindow;           

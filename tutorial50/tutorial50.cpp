@@ -49,8 +49,7 @@ int main(int argc, char** argv)
 #else            
     pWindowControl = new XCBControl();
 #endif    
-    bool ret = pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-    assert(ret);
+    pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     OgldevVulkanCore core("tutorial 50");
     core.Init(pWindowControl);
