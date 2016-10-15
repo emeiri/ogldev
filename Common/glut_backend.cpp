@@ -81,7 +81,7 @@ OGLDEV_KEY GLUTKeyToOGLDEVKey(uint Key)
         case GLUT_KEY_DELETE:        
             return OGLDEV_KEY_DELETE;
         default:
-            OGLDEV_ERROR("Unimplemented GLUT key");
+            OGLDEV_ERROR0("Unimplemented GLUT key");
             exit(1);
     }
     
@@ -99,7 +99,7 @@ static OGLDEV_MOUSE GLUTMouseToOGLDEVMouse(uint Button)
     case GLUT_MIDDLE_BUTTON:
             return OGLDEV_MOUSE_BUTTON_MIDDLE;
     default:
-            OGLDEV_ERROR("Unimplemented GLUT mouse button");
+            OGLDEV_ERROR0("Unimplemented GLUT mouse button");
     }
 
     return OGLDEV_MOUSE_UNDEFINED;
@@ -126,7 +126,7 @@ static void KeyboardCB(unsigned char Key, int x, int y)
 	}
 	else {
         printf("%d\n", Key);        
-		OGLDEV_ERROR("Unimplemented GLUT key");
+		OGLDEV_ERROR0("Unimplemented GLUT key");
 	}
 
 }

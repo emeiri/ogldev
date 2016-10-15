@@ -96,7 +96,7 @@ static OGLDEV_KEY GLFWKeyToOGLDEVKey(uint Key)
         case GLFW_KEY_F12:    
             return OGLDEV_KEY_F12;
         default:
-            OGLDEV_ERROR("Unimplemented OGLDEV key");
+            OGLDEV_ERROR("Unimplemented OGLDEV key %d\n", Key);
     }
     
     return OGLDEV_KEY_UNDEFINED;
@@ -112,7 +112,7 @@ static OGLDEV_MOUSE GLFWMouseToOGLDEVMouse(uint Button)
 	case GLFW_MOUSE_BUTTON_MIDDLE:
 		return OGLDEV_MOUSE_BUTTON_MIDDLE;
 	default:
-		OGLDEV_ERROR("Unimplemented OGLDEV mouse button");
+		OGLDEV_ERROR("Unimplemented OGLDEV mouse button %d\n", Button);
 	}
 
 	return OGLDEV_MOUSE_UNDEFINED;
@@ -173,7 +173,7 @@ void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
     glfwSetErrorCallback(GLFWErrorCallback);    
     
     if (glfwInit() != 1) {
-        OGLDEV_ERROR("Error initializing GLFW");
+        OGLDEV_ERROR0("Error initializing GLFW");
         exit(1);
     }
     
@@ -199,7 +199,7 @@ bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
     s_pWindow = glfwCreateWindow(Width, Height, pTitle, pMonitor, NULL);
 
     if (!s_pWindow) {
-        OGLDEV_ERROR("error creating window");
+        OGLDEV_ERROR0("error creating window");
         exit(1);
     }
     
@@ -209,7 +209,7 @@ bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
     glewExperimental = GL_TRUE;
     GLenum res = glewInit();
     if (res != GLEW_OK) {
-        OGLDEV_ERROR((const char*)glewGetErrorString(res));
+        OGLDEV_ERROR0((const char*)glewGetErrorString(res));
         exit(1);
     }    
     
@@ -219,7 +219,7 @@ bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
 void GLFWBackendRun(ICallbacks* pCallbacks)
 {
     if (!pCallbacks) {
-        OGLDEV_ERROR("callbacks not specified");
+        OGLDEV_ERROR0("callbacks not specified");
         exit(1);
     }
 

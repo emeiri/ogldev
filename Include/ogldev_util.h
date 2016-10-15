@@ -38,6 +38,7 @@ bool ReadBinaryFile(const char* pFileName, std::vector<int>& v);
 void OgldevError(const char* pFileName, uint line, const char* msg, ... );
 void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 
+#define OGLDEV_ERROR0(msg) OgldevError(__FILE__, __LINE__, msg)
 #define OGLDEV_ERROR(msg, ...) OgldevError(__FILE__, __LINE__, msg, __VA_ARGS__)
 #define OGLDEV_FILE_ERROR(FileError) OgldevFileError(__FILE__, __LINE__, FileError);
 

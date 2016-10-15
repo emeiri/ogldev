@@ -66,7 +66,7 @@ bool IOBuffer::Init(uint WindowWidth, uint WindowHeight, bool WithDepth, GLenum 
         case GL_NONE:
             break;
         default:
-            OGLDEV_ERROR("Invalid internal type");
+            OGLDEV_ERROR0("Invalid internal type");
     }
     
     // Create the FBO

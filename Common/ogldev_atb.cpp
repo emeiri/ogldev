@@ -122,7 +122,7 @@ static int OgldevKeyToATBKey(OGLDEV_KEY OgldevKey)
         case OGLDEV_KEY_F12:
             return TW_KEY_F12;
         default:
-            OGLDEV_ERROR("Unimplemented OGLDEV to ATB key");
+            OGLDEV_ERROR0("Unimplemented OGLDEV to ATB key");
     }
     
     return TW_KEY_LAST;
