@@ -6,6 +6,7 @@
                    projectFiles="true">
       <itemPath>FreetypeGL/freetypeGL.h</itemPath>
       <itemPath>../Include/ogldev_app.h</itemPath>
+      <itemPath>../Include/ogldev_atb.h</itemPath>
       <itemPath>../Include/ogldev_backend.h</itemPath>
       <itemPath>../Include/ogldev_basic_lighting.h</itemPath>
       <itemPath>../Include/ogldev_basic_mesh.h</itemPath>
@@ -94,6 +95,8 @@
       </compileType>
       <item path="../Include/ogldev_app.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_atb.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_basic_lighting.h" ex="false" tool="3" flavor2="0">
@@ -116,8 +119,6 @@
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_lights_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -152,10 +153,6 @@
       <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="Makefile" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -218,6 +215,8 @@
       </compileType>
       <item path="../Include/ogldev_app.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_atb.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_basic_lighting.h" ex="false" tool="3" flavor2="0">
@@ -240,8 +239,6 @@
       <item path="../Include/ogldev_glut_backend.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_keys.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_lights_common.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_math_3d.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -276,10 +273,6 @@
       <item path="FreetypeGL/vertex-buffer.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="Makefile" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.fs" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/basic_lighting.vs" ex="false" tool="3" flavor2="0">
       </item>
       <item path="camera.cpp" ex="false" tool="1" flavor2="0">
       </item>
