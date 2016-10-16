@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <unistd.h>
+#include <string.h>
 
 #ifndef WIN32
 
@@ -78,14 +80,16 @@ void XCBControl::Init(uint Width, uint Height)
                       Height, 
                       0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, 
-                      m_pXCBScreen->root_visual,
-                      XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK, 
-                      value_list);
+                      m_pXCBScreen->root_visual, 0, 0);
+                    //  XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK, 
+                     // value_list);
 
-    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, 12, "WM_PROTOCOLS");
+    /*const char* pAtom1 = "WM_PROTOCOLS";
+    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, strlen(pAtom1), pAtom1);
     xcb_intern_atom_reply_t* reply =  xcb_intern_atom_reply(m_pXCBConn, cookie, 0);
 
-    xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(m_pXCBConn, 0, 16, "WM_DELETE_WINDOW");
+    const char* pAtom2 = "WM_DELETE_WINDOW";
+    xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(m_pXCBConn, 0, strlen(pAtom2), pAtom2);
     m_pXCBDelWin = xcb_intern_atom_reply(m_pXCBConn, cookie2, 0);
 
     xcb_change_property(m_pXCBConn, 
@@ -96,10 +100,12 @@ void XCBControl::Init(uint Width, uint Height)
                         32, 
                         1,
                         &(m_pXCBDelWin->atom));
-    free(reply);
+    free(reply);*/
 
     xcb_map_window(m_pXCBConn, m_xcbWindow);    
     
+    xcb_flush (m_pXCBConn);
+     
     printf("Window %x created\n", m_xcbWindow);
 }
 
@@ -114,11 +120,7 @@ VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
     VkSurfaceKHR surface;
     
     VkResult res = vkCreateXcbSurfaceKHR(inst, &surfaceCreateInfo, NULL, &surface);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating surface\n");
-        return NULL;
-    }
+    CHECK_VULKAN_ERROR("vkCreateXcbSurfaceKHR error %d\n", res);
     
     return surface;
 }

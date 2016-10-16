@@ -32,6 +32,8 @@
 #include <vulkan/vk_sdk_platform.h>
 #endif
 
+#include "ogldev_util.h"
+
 
 #define CHECK_VULKAN_ERROR(msg, res)    \
     if (res != VK_SUCCESS) {            \

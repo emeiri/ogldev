@@ -788,8 +788,9 @@ public:
                        value_list);</code></pre>
     <p>
     xcb_create_window() does the window creation and takes no less than 13 parameters.
+    TODO value_list
     </p>
-    <pre><code>     xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, 12, "WM_PROTOCOLS");
+    <pre><code>    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(m_pXCBConn, 1, 12, "WM_PROTOCOLS");
     xcb_intern_atom_reply_t* reply =  xcb_intern_atom_reply(m_pXCBConn, cookie, 0);
 
     xcb_intern_atom_cookie_t cookie2 = xcb_intern_atom(m_pXCBConn, 0, 16, "WM_DELETE_WINDOW");
@@ -803,13 +804,57 @@ public:
                         32, 
                         1,
                         &(m_pXCBDelWin->atom));
-    free(reply);
-
-    xcb_map_window(m_pXCBConn, m_xcbWindow);    
+    free(reply);</code></pre>
+    <p>
+    </p>
+    <pre><code>    xcb_map_window(m_pXCBConn, m_xcbWindow);</code></pre>
+    <p>
+    In order to make the window visible we have to map it which is exactly what the above call does.
+    </p>        
+    <pre>   <code>VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
+{
+    VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.connection = m_pXCBConn;
+    surfaceCreateInfo.window = m_xcbWindow;
     
-    printf("Window %x created\n", m_xcbWindow);
+    VkSurfaceKHR surface;
+    
+    VkResult res = vkCreateXcbSurfaceKHR(inst, &surfaceCreateInfo, NULL, &surface);
+    CHECK_VULKAN_ERROR("vkCreateXcbSurfaceKHR error %d\n", res);
+    
+    return surface;
 }</code></pre>
+    <p>
+    The last function from the XCBControl class which we want to review is CreateSurface(). This is basically
+    a wrapper around the Vulkan function from the XCB extension vkCreateXcbSurfaceKHR(). We populate the 
+    VkXcbSurfaceCreateInfoKHR struct with the XWindow server connection pointer and the window which we created earlier.
+    In return we get a generic handle to a Vulkan surface which we return back to the caller.
+    </p>
+    <pre><code>    int main(int argc, char** argv)
+{
+    VulkanWindowControl* pWindowControl = NULL;
+#ifdef WIN32
+    
+#else            
+    pWindowControl = new XCBControl();
+#endif    
+    pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    OgldevVulkanCore core("tutorial 50");
+    core.Init(pWindowControl);
+    
+    return 0;
+}
+</code></pre>
+    <p>
+    At last, we have reached the glue code in the form of the main function. If you are interested, you may start
+    here and start creating the building blocks step by step so that you can check the return values of each Vulkan
+    function call one at a time. What happens in this functionn has already been generally discussed. We start
+    with the concrete VulkanWindowControl object (be it Linux or Windows). We initialize it (thus creating the OS 
+    specific window) and then create and init the OgldevVulkanCore object. We now has a Vulkan surface connected
+    to an OS window, a Vulkan instance and device and a database with all the physical devices in the system.
+    </p>
 </section>
     
 </article>    
