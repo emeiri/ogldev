@@ -179,7 +179,7 @@ public:
     }
     
     
-    virtual void KeyboardCB(OGLDEV_KEY OgldevKey)
+    virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
     {
         switch (OgldevKey) {
 			case OGLDEV_KEY_ESCAPE:
