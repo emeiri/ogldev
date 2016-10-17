@@ -33,7 +33,6 @@
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
-
 #include "ogldev_xcb_control.h"
 
 #define WINDOW_WIDTH  1024  

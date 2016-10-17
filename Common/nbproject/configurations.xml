@@ -142,6 +142,8 @@
       </item>
       <item path="../Include/ogldev_vulkan_core.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_win32_control.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_xcb_control.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
@@ -199,6 +201,8 @@
       <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_vulkan_core.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_win32_control.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_xcb_control.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -274,6 +278,8 @@
       </item>
       <item path="../Include/ogldev_vulkan_core.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="../Include/ogldev_win32_control.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="../Include/ogldev_xcb_control.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
@@ -331,6 +337,8 @@
       <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_vulkan_core.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ogldev_win32_control.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_xcb_control.cpp" ex="false" tool="1" flavor2="0">
       </item>

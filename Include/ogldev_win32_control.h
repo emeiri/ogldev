@@ -16,30 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VULKAN_XCB_CONTROL_H
-#define VULKAN_XCB_CONTROL_H
+#ifndef VULKAN_WIN32_CONTROL_H
+#define VULKAN_WIN32_CONTROL_H
 
-#ifndef WIN32
-
-#include <xcb/xcb.h>
+#ifdef WIN32
 
 #include "ogldev_vulkan.h"
 
-class XCBControl : public VulkanWindowControl
+class Win32Control : public VulkanWindowControl
 {
 public:
-    XCBControl();
+    Win32Control();
     
-    ~XCBControl();
+    ~Win32Control();
     
     virtual void Init(uint Width, uint Height);
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
 
  private:    
-    xcb_connection_t* m_pXCBConn;
-    xcb_screen_t* m_pXCBScreen;
-    xcb_window_t m_xcbWindow;           
 };
 
 #endif
