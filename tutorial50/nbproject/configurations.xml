@@ -5,10 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
     </logicalFolder>
-    <logicalFolder name="f1" displayName="Shaders" projectFiles="true">
-      <itemPath>Shaders/vulkan.frag</itemPath>
-      <itemPath>Shaders/vulkan.vert</itemPath>
-    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
@@ -69,10 +65,6 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="Shaders/vulkan.frag" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/vulkan.vert" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial50.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -119,10 +111,6 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="Shaders/vulkan.frag" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="Shaders/vulkan.vert" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="tutorial50.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
