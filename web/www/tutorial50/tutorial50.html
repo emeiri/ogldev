@@ -27,16 +27,16 @@
 <section>
             <h3> Background </h3>
 <p>
-   You've probably heard by not quite a bit about <a href="https://www.khronos.org/vulkan/">Vulkan</a>,
+    You've probably heard by now quite a bit about <a href="https://www.khronos.org/vulkan/">Vulkan</a>,
     the new Graphics API from Khronos (the same organization responsible for the development of OpenGL).
     Vulkan was announced in Feb-2016 and after 24 years with OpenGL it's actually a completely new
     standard and a departure from the current model. I won't go into many details about the various
     features of Vulkan only to say that in comparison to OpenGL it is much more low
-    level and provides a lot of power and performance to the developer. But with great power comes
+    level and provides a lot of power and performance opportunities to the developer. But with great power comes
     great responsibility. The developer has to take charge of various aspects such as command buffer,
     synchronization and memory management that were previously the sole responsibility of the driver.
     Through the unique knowledge that the developer has about the way the application is structured,
-    the Vulkan API can be executed in a way to increase the overall performance of the system.
+    the usage of the Vulkan API can be tailored in a way to increase the overall performance of the system.
 </p>
 <p>
     The thing that surprises people the most, IMHO, about Vulkan is the amount of code that must be
@@ -46,7 +46,7 @@
     the material step by step. We will develop our first OGLDEV triangle demo in a few tutorials, 
     making additional progress in each one. In addition, instead of laying out the dozens of APIs 
     in one long list I'll present a simple software design that I hope will make it simpler for you
-    to understand without imposing too much restriction on your future apps. Consider this an educational
+    to understand without imposing too much restrictions on your future apps. Consider this an educational
     design which you are free to throw away later. 
 </p>
 <p>
@@ -73,17 +73,20 @@
         everything ready for development. You need to verify that your graphics card supports Vulkan
         and install the latest drivers for it. Since Vulkan is still new it's best to check for 
         drivers updates often because hardware vendors will probably fix a lot of bugs before everything
-        stabilizes. Since there are many GPUs available I can't provide much help here. My main development
-        system is Linux Fedora and I have a GT710 card by NVIDIA. At the time of writing this the 367.44
-        is their latest driver. On Linux you can use the 'lspci' to scan your system for devices
+        stabilizes. Since there are many GPUs available I can't provide much help here. Updating/installing
+        the driver on Windows should be fairly simple. On Linux the process may be a bit more involved.My main development
+        system is Linux Fedora and I have a GT710 card by NVIDIA. NVIDIA provide a binary run file which can
+        only be installed from the command line. Other vendors have their own processes.
+        On Linux you can use the 'lspci' to scan your system for devices
         and see what GPU you have. You can use the '-v', '-vv' and '-vvv' options to get increasingly
         more info on your devices. 
     </p>
     <p>
         The second thing we need is the Vulkan SDK by Khronos, available <a href="https://vulkan.lunarg.com/">here</a>.
         The SDK includes the headers and libraries we need as well as many samples that you can use
-        to get more info beyond what this tutorial provides. At the time of writing this the latest version is 1.0.26
-        and I urge you to update often because the SDK is in active development. 
+        to get more info beyond what this tutorial provides. At the time of writing this the latest version is 1.0.30.0
+        and I urge you to update often because the SDK is in active development. That version number will be used throughout
+        the next few sections so make sure you fix it according to the version you have.
     </p>
     
     <h4> Linux </h4><br>
@@ -93,35 +96,36 @@
         file should install everything for you but on Fedora I encoutered some difficulties so I used the
         following procedure (which is also forward looking in terms of writing the code later):
         <ul>
-            <li>bash$ chmod +x vulkansdk-linux-x86_64-1.0.26.0.run </li><br>
-            <li>base$ ./vulkansdk-linux-x86_64-1.0.26.0.run --target VulkanSDK-1.0.26 --noexec</li><br>
-            <li>base$ ln -s ~/VulkanSDK-1.0.26/1.0.26.0/x86_64 ~/VulkanSDK</li>
+            <li>bash$ chmod +x vulkansdk-linux-x86_64-1.0.30.0.run </li><br>
+            <li>base$ ./vulkansdk-linux-x86_64-1.0.30.0.run <b>--target</b> VulkanSDK-1.0.30.0 <b>--noexec</b></li><br>
+            <li>base$ ln -s ~/VulkanSDK-1.0.30/1.0.30.0 ~/VulkanSDK</li>
     </ul>
     </p>
     <p>
-        The above extracts the contents of the package without running its internal scripts. Let's assume
-        I'm running this in my home directory (/home/emeiri/) so we should end up with a /home/emeiri/VulkanSDK
-        directory that contains a 1.0.26.0 dir. The symbolic link that we created in the last step
-        is to make it easier to switch your development environment to newer versions of the SDK.
+        The above commands extract the contents of the package without running its internal scripts. After
+        extraction the directory VulkanSDK-1.0.30.0 will contain a directory called 1.0.30.0 where the actual
+        content of the package will be located. Let's assume
+        I ran the above commands in my home directory (a.k.a in bash as '~') so we should end up with a '~/VulkanSDK' symbolic
+        link to the directory with the actual content. This link makes it easier to switch your development environment to newer versions of the SDK.
         It points to the location of the headers and libraries that we need. We will see later how to connect
         them to the rest of the system. Now do the following:
         <ul>
-            <li>bash$ cd VulkanSDK/1.0.26.0</li><br>
+            <li>bash$ cd VulkanSDK/1.0.30.0</li><br>
             <li>bash$ ./build_examples.sh</li><br>
     </ul>
-        If everything went well the examples were built into examples/build. To run the examples you must first 
-        cd into that directory. You can now run './tri', './cube' and './vulkaninfo' to make sure Vulkan runs
-        on your system and get some useful information in the driver.
+        If everything went well the examples were built into <b>examples/build</b>. To run the examples you must first 
+        cd into that directory. You can now run './cube' and './vulkaninfo' to make sure Vulkan runs
+        on your system and get some useful information on the driver.
     </p>
     <p>        
-        Hopefully everything went ok so we want to create some symbolic links that will make the files
+        Hopefully everything is OK so far so we want to create some symbolic links that will make the files
         we need for development easily accessible from our working environment. Change to the root user
-        and execute the following:
+        (by executing 'su' and entering the root password) and execute the following:
     </p>
     <p>
         <ul>
-            <li>bash# ln -s /home/&lt;your username&gt;/VulkanSDK/include/vulkan /usr/include/vulkan</li><br>
-            <li>base# ln -s /home/&lt;your username&gt;/VulkanSDK/lib/libvulkan.so.1 /usr/lib64</li><br>
+            <li>bash# ln -s /home/&lt;your username&gt;/VulkanSDK/x86_x64/include/vulkan /usr/include</li><br>
+            <li>base# ln -s /home/&lt;your username&gt;/VulkanSDK/x86_x64/lib/libvulkan.so.1 /usr/lib64</li><br>
             <li>base# ln -s /usr/lib64/libvulkan.so.1 /usr/lib64/libvulkan.so</li><br>
     </ul>
     </p>
@@ -130,7 +134,10 @@
         vulkan header directory and as well as a couple of symbolic links to the shared object files
         against which we are going to link our executables. Since we used the previously created ~/VulkanSDK
         symbolic link it is enough to change that link whenever we download a new version of the SDK
-        in order to keep the entire system up to date.
+        in order to keep the entire system up to date. To emphasis: the procedure as the root user must
+        only be executed once. Once you get a newer version of the SDK you will only need extract it and
+        update the symbolic link from your home directory. You are free to place that link anywhere you want
+        but the code I provide will assume it is in the home directory so you will need to fix that.
     </p>
     
     <h4> Windows </h4>
@@ -150,18 +157,18 @@
         code that accompanies all my tutorials contains project files which can be used with the
         C/C++ Netbeans download bundle. If you followed the above system setup procedure then these projects 
         should work out of the box for you (and please let me know if there are any problems). If you are using
-        a different build system you need to make sure to add:
+        a different build system you need to make sure to add the following:
     </p>
     <ul>
-        <li>To the compile command: '-I&lt;path to VulkanSDK/1.0.26.0/x86_64/include&gt;</li>
-        <li>To the link command: '-L&lt;path to VulkanSDK/1.0.26.0/x86_64/lib&gt; -lxcb -lvulkan'</li><br>
+        <li>To the compile command: <b>-I&lt;path to VulkanSDK/1.0.30.0/x86_64/include&gt;</b></li>
+        <li>To the link command: <b>-L&lt;path to VulkanSDK/1.0.30.0/x86_64/lib&gt; -lxcb -lvulkan'</b></li><br>
     </ul>        
     <p>
         Even if you don't use Netbeans I suggest you go into 'ogldev/tutorial50' after you unzip the
         <a href="http://ogldev.org/ogldev-source.zip">tutorial source package</a> and run 'make'. I provide
         the makefiles that Netbeans generates so you can check whether your system is able to build them
-        or something is missing. If everything was ok you can now run 'dist/Debug/GNU-Linux-x86/tutorial50'
-        from 'ogldev/tutorial50'. It is important to execute the tutorial from that directory because the
+        or something is missing. If everything was ok you can now run '<b>dist/Debug/GNU-Linux-x86/tutorial50</b>'
+        from '<b>ogldev/tutorial50</b>'. It is important to execute the tutorial from that directory because the
         shader files are accessed using a relative directory path.
     </p>
 
@@ -170,6 +177,55 @@
     <p>
         TODO
     </p>        
+</section>
+
+<section>
+    <h3>General Comments</h3>
+    <p>
+        Before we get going I have a few comments about some of my design choices with regard to Vulkan:
+    </p>
+    <ol>
+        <li><p>
+            Many Vulkan functions (particularly the ones used to create objects) take a structure as
+        one of the parameters. This structure usually serve as a wrapper for most of the parameters
+        the function needs and it helps in keeping the number of parameters to the function low. The Vulkan
+        architects decided to place a member called 'sType' as the first member in all these structures. 
+        This member is of an enum type and every structure has its own code. This allows the driver to identify
+        the type of the structure using only its address. All of these enum code have a 'VK_STRUCTURE_TYPE_' prefix.
+        For example, the code for the structure used in the creation of the instance is called
+        VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO.</p>
+        <p>
+        Whenever I declare a variable of one of these structure types the first member I update will by sType.
+        To save time I won't comment about it later in the source walkthrough. 
+        </p></li>
+        <li>
+        <p>
+            Another comment on these Vulkan structures - they contain quite a lot of stuff which we don't need
+            in our first few steps. To keep the code as short as possible (as well as the text here...) I always
+            initialize the memory of all structures to zero (using 'struct = {};') and I will only set and describe
+            the structure members that cannot be zero. I will discuss the stuff that I skipped in future tutorials
+            as they become relevant.
+        </p></li>
+        <li><p>
+            Vulkan functions are either void or they return VkResult which is the error code. The error code
+            is an enum where VK_SUCCESS is zero and everything else is greater than zero. When it is possible
+            I check the return value for errors. If an error occured I print a message to the console (on Windows
+            there should be a message box) and exit. Error handling in real world applications tend to make the
+            code more complex and I want to keep it as simple as possible.
+        </p></li>
+        <li><p>
+            Many Vulkan functions (particularly of creation type) can take a pointer to an allocator function.
+            These allocators allow you to control the process of allocating memory that the Vulkan functions need.
+            I consider this as an advanced topic and will not discuss it. We will pass NULL as the allocators
+            to the driver will use its default.
+        </p></li>
+
+        <li><p>
+        TODO: note about function pointers                
+        </p></li>        
+
+    </ol>
+
 </section>
 
 <section>
@@ -182,17 +238,6 @@
         physical device and logical device. I'm going to describe this by walking through my software
         design but you are welcomed to throw this away and just follow the Vulkan calls.
         
-        TODO: Add note on error handling
-        
-        TODO: recommend how to read the tutorial.
-        
-        TODO: describe only what we need.
-        
-        TODO: note about allocators.
-        
-        TODO: note on sType.
-        
-        TODO: note about function pointers
     </p>
     <p>
         Let's start by reviewing the class OgldevVulkanCore whose job is to create and maintain
@@ -247,7 +292,7 @@ private:
     </p>
 <pre><code>void OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
 { 
-    std::vector<VkExtensionProperties> ExtProps;
+    std::vector<<font color="red">VkExtensionProperties</font>> ExtProps;
     VulkanEnumExtProps(ExtProps);
     
     CreateInstance();
@@ -319,13 +364,13 @@ private:
 
     const char* pInstExt[] = {
 #ifdef ENABLE_DEBUG_LAYERS
-        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+        <font color="red">VK_EXT_DEBUG_REPORT_EXTENSION_NAME</font>,
 #endif        
-        VK_KHR_SURFACE_EXTENSION_NAME,
+        <font color="red">VK_KHR_SURFACE_EXTENSION_NAME</font>,
 #ifdef _WIN32    
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+        <font color="red">VK_KHR_WIN32_SURFACE_EXTENSION_NAME</font>,
 #else    
-        VK_KHR_XCB_SURFACE_EXTENSION_NAME
+        <font color="red">VK_KHR_XCB_SURFACE_EXTENSION_NAME</font>
 #endif            
     };
     
@@ -461,7 +506,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
     </p>
     <pre><code>for (uint i = 0 ; i < NumDevices ; i++) {
         const VkPhysicalDevice& PhysDev = PhysDevices.m_devices[i];
-        vkGetPhysicalDeviceProperties(PhysDev, &PhysDevices.m_devProps[i]);</pre></code>
+        <font color="red">vkGetPhysicalDeviceProperties</font>(PhysDev, &PhysDevices.m_devProps[i]);</pre></code>
     <p>
         We start by getting the properties of the current device. m_devProps is a vector of VkPhysicalDeviceProperties.
         This structure contains information about the device such as a name, versions, IDs, etc. We print some of these
@@ -474,14 +519,14 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
                                           VK_VERSION_PATCH(apiVer));
         uint NumQFamily = 0;         
         
-        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, NULL);
+        <font color="red">vkGetPhysicalDeviceQueueFamilyProperties</font>(PhysDev, &NumQFamily, NULL);
     
         printf("    Num of family queues: %d\n", NumQFamily);
 
         PhysDevices.m_qFamilyProps[i].resize(NumQFamily);
         PhysDevices.m_qSupportsPresent[i].resize(NumQFamily);
 
-        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));</code></pre>
+        <font color="red">vkGetPhysicalDeviceQueueFamilyProperties</font>(PhysDev, &NumQFamily, &(PhysDevices.m_qFamilyProps[i][0]));</code></pre>
         <p>
         Next we get the properties of all the queue families that the physical device supports. There are four categories
         that a GPU can support:
@@ -507,7 +552,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
         that we get a vector of properties and store it in the database.
         </p>
         <pre><code>        for (uint q = 0 ; q < NumQFamily ; q++) {
-            res = vkGetPhysicalDeviceSurfaceSupportKHR(PhysDev, q, Surface, &(PhysDevices.m_qSupportsPresent[i][q]));
+            res = <font color="red">vkGetPhysicalDeviceSurfaceSupportKHR</font>(PhysDev, q, Surface, &(PhysDevices.m_qSupportsPresent[i][q]));
             CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceSupportKHR error %d\n", res);
         }</code></pre>
         <p>
@@ -516,12 +561,12 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
         a boolean value which indicates whether this combination of device and family and present on the specified surface.
         </p>
         <pre><code>        uint NumFormats = 0;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, NULL);
+        <font color="red">vkGetPhysicalDeviceSurfaceFormatsKHR</font>(PhysDev, Surface, &NumFormats, NULL);
         assert(NumFormats > 0);
         
         PhysDevices.m_surfaceFormats[i].resize(NumFormats);
         
-        res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+        res = <font color="red">vkGetPhysicalDeviceSurfaceFormatsKHR</font>(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
         CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR error %d\n", res);
     
         for (uint j = 0 ; j < NumFormats ; j++) {
@@ -538,7 +583,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
         The surface format will be required later for creating the swap chain and the render pass which is why it is part of the
         database. Now we query the surface capabilities:
         </p>
-        <pre><code>        res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
+        <pre><code>        res = <font color="red">vkGetPhysicalDeviceSurfaceCapabilitiesKHR</font>(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
         CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceCapabilitiesKHR error %d\n", res);
        
         VulkanPrintImageUsageFlags(PhysDevices.m_surfaceCaps[i].supportedUsageFlags);</code></pre>
@@ -550,7 +595,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
         </p>
         <pre><code>        uint NumPresentModes = 0;
     
-        res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, NULL);
+        res = <font color="red">vkGetPhysicalDeviceSurfacePresentModesKHR</font>(PhysDev, Surface, &NumPresentModes, NULL);
         CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfacePresentModesKHR error %d\n", res);
 
         assert(NumPresentModes != 0);
@@ -615,7 +660,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
     <pre><code>void OgldevVulkanCore::CreateLogicalDevice()
 {
     float qPriorities = 1.0f;
-    VkDeviceQueueCreateInfo qInfo = {};
+    <font color="red">VkDeviceQueueCreateInfo</font> qInfo = {};
     qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     qInfo.queueFamilyIndex = m_gfxQueueFamily;
     qInfo.queueCount = 1;
@@ -625,14 +670,14 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
     
-    VkDeviceCreateInfo devInfo = {};
+    <font color="red">VkDeviceCreateInfo</font> devInfo = {};
     devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     devInfo.enabledExtensionCount = ARRAY_SIZE_IN_ELEMENTS(pDevExt);
     devInfo.ppEnabledExtensionNames = pDevExt;
     devInfo.queueCreateInfoCount = 1;
     devInfo.pQueueCreateInfos = &qInfo;
        
-    VkResult res = vkCreateDevice(GetPhysDevice(), &devInfo, NULL, &m_device);
+    VkResult res = <font color="red">vkCreateDevice</font>(GetPhysDevice(), &devInfo, NULL, &m_device);
 
     CHECK_VULKAN_ERROR("vkCreateDevice error %d\n", res);
    
@@ -807,20 +852,21 @@ public:
     free(reply);</code></pre>
     <p>
     </p>
-    <pre><code>    xcb_map_window(m_pXCBConn, m_xcbWindow);</code></pre>
+    <pre><code>    xcb_map_window(m_pXCBConn, m_xcbWindow);
+}</code></pre>
     <p>
     In order to make the window visible we have to map it which is exactly what the above call does.
     </p>        
     <pre>   <code>VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
 {
-    VkXcbSurfaceCreateInfoKHR surfaceCreateInfo = {};
+    <font color="red">VkXcbSurfaceCreateInfoKHR</font> surfaceCreateInfo = {};
     surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
     surfaceCreateInfo.connection = m_pXCBConn;
     surfaceCreateInfo.window = m_xcbWindow;
     
     VkSurfaceKHR surface;
     
-    VkResult res = vkCreateXcbSurfaceKHR(inst, &surfaceCreateInfo, NULL, &surface);
+    VkResult res = <font color="red">vkCreateXcbSurfaceKHR</font>(inst, &surfaceCreateInfo, NULL, &surface);
     CHECK_VULKAN_ERROR("vkCreateXcbSurfaceKHR error %d\n", res);
     
     return surface;
@@ -831,7 +877,7 @@ public:
     VkXcbSurfaceCreateInfoKHR struct with the XWindow server connection pointer and the window which we created earlier.
     In return we get a generic handle to a Vulkan surface which we return back to the caller.
     </p>
-    <pre><code>    int main(int argc, char** argv)
+    <pre><code>int main(int argc, char** argv)
 {
     VulkanWindowControl* pWindowControl = NULL;
 #ifdef WIN32
