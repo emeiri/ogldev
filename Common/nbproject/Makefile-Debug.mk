@@ -60,7 +60,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_util.o \
 	${OBJECTDIR}/ogldev_vulkan.o \
 	${OBJECTDIR}/ogldev_vulkan_core.o \
-	${OBJECTDIR}/ogldev_win32_control.o \
 	${OBJECTDIR}/ogldev_xcb_control.o \
 	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/random_texture.o \
@@ -217,11 +216,6 @@ ${OBJECTDIR}/ogldev_vulkan_core.o: ogldev_vulkan_core.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_vulkan_core.o ogldev_vulkan_core.cpp
-
-${OBJECTDIR}/ogldev_win32_control.o: ogldev_win32_control.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_win32_control.o ogldev_win32_control.cpp
 
 ${OBJECTDIR}/ogldev_xcb_control.o: ogldev_xcb_control.cpp 
 	${MKDIR} -p ${OBJECTDIR}
