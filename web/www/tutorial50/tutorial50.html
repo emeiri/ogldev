@@ -507,7 +507,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
     of that database structure:
     </p>
 <pre><code>struct VulkanPhysicalDevices {
-    std::vector&lt;<font color="red">VkPhysicalDevice</font> &gt; m_devices;
+    std::vector&lt;<font color="red">VkPhysicalDevice</font>&gt; m_devices;
     std::vector&lt;<font color="red">VkPhysicalDeviceProperties</font>&gt; m_devProps;
     std::vector&lt; std::vector&lt;<font color="red">VkQueueFamilyProperties</font>&gt; &gt; m_qFamilyProps;
     std::vector&lt; std::vector&lt;<font color="red">VkBool32</font>&gt; &gt; m_qSupportsPresent;
@@ -747,7 +747,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MyDebugReportCallback(
     In this tutorial we keep things simple so we won't use priorities. We have just one queue and we set the priority to 1.0.
     </p>
     <p>
-    So this completes the initialization process of our OgldevVulkanCore process, but to actually call the Init() function
+    This completes the initialization process of our OgldevVulkanCore process, but to actually call the Init() function
     we need a VulkanWindowControl which is a class I created to wrap the management of the window surface. Remember that this
     job is not part of the core Vulkan spec and since every operating system needs entirely different code here I found that it
     makes sense to separate all window management to a different class and implement OS specific versions by this class derivatives.
@@ -776,7 +776,8 @@ public:
     so don't worry about it.
     </p>
     <p>
-    The concrete class which implements VulkanWindowControl on Linux is called XCBControl and it is defined as follows:
+    The concrete classes which implements VulkanWindowControl are <b>XCBControl</b> on Linux and <b>Win32Control</b> on Windows. We will review Linux first
+	and then Windows:
     </p>
     <pre><code>class XCBControl : public VulkanWindowControl
 {
@@ -895,6 +896,7 @@ public:
                         &(m_pXCBDelWin->atom));
     free(reply);</code></pre>
     <p>
+	TODO
     </p>
     <pre><code>    xcb_map_window(m_pXCBConn, m_xcbWindow);
 }</code></pre>
@@ -908,7 +910,7 @@ public:
     surfaceCreateInfo.connection = m_pXCBConn;
     surfaceCreateInfo.window = m_xcbWindow;
     
-    VkSurfaceKHR surface;
+    <font color="red">VkSurfaceKHR</font> surface;
     
     VkResult res = <font color="red">vkCreateXcbSurfaceKHR</font>(inst, &surfaceCreateInfo, NULL, &surface);
     CHECK_VULKAN_ERROR("vkCreateXcbSurfaceKHR error %d\n", res);
@@ -921,11 +923,115 @@ public:
     VkXcbSurfaceCreateInfoKHR struct with the XWindow server connection pointer and the window which we created earlier.
     In return we get a generic handle to a Vulkan surface which we return back to the caller.
     </p>
-    <pre><code>int main(int argc, char** argv)
+	<p>
+	Now let's review the corresponding class for Windows:
+	<pre><code>class Win32Control : public VulkanWindowControl
+{
+public:
+    Win32Control(HINSTANCE hInstance, const char* pAppName);
+    
+    ~Win32Control();
+    
+    virtual void Init(uint Width, uint Height);
+    
+    virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
+
+ private:    
+
+    HINSTANCE   m_hinstance;
+    HWND        m_hwnd;
+    std::wstring m_appName;
+};</code></pre>
+	<p>
+	As you can see, the interface is very similar for both operating systems. In fact, Init() and CreateSurface() are identical because they
+	are virtual classes. Note that the contstructor takes a HINSTANCE parameter which we get from WinMain below. We have a private member to store
+	it and a handle for the window which we will create. 
+	<p>
+	<pre><code>Win32Control::Win32Control(HINSTANCE hInstance, const char* pAppName) 
+{
+    m_hinstance = hInstance;
+    m_hwnd = 0;
+    <b>std::string s(pAppName)</b>;
+    m_appName = <b>std::wstring(s.begin(), s.end())</b>;
+}</code></pre>
+	<p>
+	Above you can see the constructor for the Win32Control class and I'm only showing it here so that you can see the way 
+	that the app name which is provided as an array of char is transformed into a std::wstring. We do this for the CreateWindowEx function
+	below that needs a window name parameter with the LPCTSTR type. The standard wstring class helps us with that.
+	</p>
+	<pre><code>LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+void Win32Control::Init(uint Width, uint Height)
+{
+    WNDCLASSEX wndcls = {};
+
+    wndcls.cbSize = sizeof(wndcls);
+    wndcls.lpfnWndProc = WindowProc;
+    wndcls.hInstance = m_hinstance; 
+    wndcls.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wndcls.lpszClassName = L"ogldev";
+
+    if (!RegisterClassEx(&wndcls)) {
+        DWORD error = GetLastError();
+        OGLDEV_ERROR("RegisterClassEx error %d", error);
+    }
+
+    m_hwnd = CreateWindowEx(0,
+                            L"ogldev",                        // class name
+                            m_appName.c_str(),        
+                            WS_OVERLAPPEDWINDOW | WS_VISIBLE, // window style
+                            100, 100,                         // window start
+                            Width, 
+                            Height, 
+                            NULL,          
+                            NULL,          
+                            m_hinstance,   
+                            NULL);  
+
+    if (m_hwnd == 0) {
+        DWORD error = GetLastError();
+        OGLDEV_ERROR("CreateWindowEx error %d", error);
+    }
+
+    ShowWindow(m_hwnd, SW_SHOW);
+}</code></pre>
+	<p>
+	The code above is straightforward window creation stuff which I got from MSDN so I won't go too deeply into
+	it. We have to register the window class using RegisterClassEx. This class will be associated with the WindowProc()
+	function that serve as the event handler for our window. Right now we are just calling the default handler of the system
+	but on the next tutorial we will add more details to it. The window is then created using CreateWindowEx() and finally displayed using
+	ShowWindow().
+	</p>
+	<pre><code>VkSurfaceKHR Win32Control::CreateSurface(VkInstance& inst)
+{
+    <font color="red">VkWin32SurfaceCreateInfoKHR</font> surfaceCreateInfo = {};
+    surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.hinstance = m_hinstance;
+    surfaceCreateInfo.hwnd = m_hwnd;
+    
+    <font color="red">VkSurfaceKHR</font> surface;
+    
+    VkResult res = <font color="red">vkCreateWin32SurfaceKHR</font>(inst, &surfaceCreateInfo, NULL, &surface);
+    CHECK_VULKAN_ERROR("vkCreateXcbSurfaceKHR error %d\n", res);
+    
+    return surface;
+}</code></pre>
+	<p>
+	CreateSurface() is also very similar to its Linux counterpart. The CreateInfo param just takes the instance instead of the XCB connection (and ofcourse - 
+	the window handles are of different types).
+	</p>
+    <pre><code>#ifdef WIN32
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
+#else
+int main(int argc, char** argv)
+#endif
 {
     VulkanWindowControl* pWindowControl = NULL;
 #ifdef WIN32
-    
+    pWindowControl = new Win32Control(hInstance, pAppName);
 #else            
     pWindowControl = new XCBControl();
 #endif    
@@ -939,12 +1045,21 @@ public:
 </code></pre>
     <p>
     At last, we have reached the glue code in the form of the main function. If you are interested, you may start
-    here and start creating the building blocks step by step so that you can check the return values of each Vulkan
+    here and create the building blocks step by step so that you can check the return values of each Vulkan
     function call one at a time. What happens in this functionn has already been generally discussed. We start
     with the concrete VulkanWindowControl object (be it Linux or Windows). We initialize it (thus creating the OS 
     specific window) and then create and init the OgldevVulkanCore object. We now has a Vulkan surface connected
     to an OS window, a Vulkan instance and device and a database with all the physical devices in the system.
+	Also note the different function signatures for Linux and Windows. On Linux we use the standard main() while
+	on Windows we use the Win32 specific version of WinMain. WinMain provides us the HINSTANCE parameter which we 
+	need to call the constructor of the Win32Control class.
     </p>
+	<p>
+	I hope you will find this tutorial useful. The T-shirt that should go along with it is "I've written tons of Vulkan code
+	and all I got was this lousy window". Indeed, we have accomplished a lot but we didn't get any rendering in return. But don't
+	despair. You now have a basic structure with a few of the core Vulkan objects. On the next tutorials we will build on this further
+	so stay tuned.
+	</p>
 </section>
     
 </article>    
