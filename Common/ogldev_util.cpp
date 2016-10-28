@@ -58,6 +58,31 @@ bool ReadFile(const char* pFileName, string& outFile)
 }
 
 
+#ifdef WIN32
+
+bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
+{
+    HANDLE f = CreateFileA(pFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (f == INVALID_HANDLE_VALUE) {
+        OGLDEV_FILE_ERROR(pFileName);
+        return false;
+    }
+
+    int len = GetFileSize(f, NULL);
+
+    if (len == INVALID_FILE_SIZE) {
+        OGLDEV_ERROR("Invalid file size %s\n", pFileName);
+        return false;
+    }
+
+    // wip for tutorial51
+    assert(0);
+
+    return true;
+}
+
+#else
 bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
 {
     int f = open(pFileName, O_RDONLY);
@@ -92,19 +117,20 @@ bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
     
     return true;
 }
-
+#endif
 
 void OgldevError(const char* pFileName, uint line, const char* format, ...)
 {
     char msg[1000];    
     va_list args;
     va_start(args, format);
-    vsnprintf(msg, sizeof(msg), format, args);
+    VSNPRINTF(msg, sizeof(msg), format, args);
     va_end(args);
-#ifdef WIN32
-    
-    _snprintf_s(msg, sizeof(msg), "%s:%d: %s", pFileName, line, format);
-    MessageBoxA(NULL, msg, NULL, 0);
+
+#ifdef WIN32 
+    char msg2[1000];
+    _snprintf_s(msg2, sizeof(msg2), "%s:%d: %s", pFileName, line, msg);
+    MessageBoxA(NULL, msg2, NULL, 0);
 #else
     fprintf(stderr, "%s:%d - %s", pFileName, line, msg);
 #endif    

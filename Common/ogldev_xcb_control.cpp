@@ -16,13 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+#ifndef WIN32
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <unistd.h>
 #include <string.h>
-
-#ifndef WIN32
+#include <unistd.h>
 
 #include "ogldev_vulkan.h"
 #include "ogldev_xcb_control.h"

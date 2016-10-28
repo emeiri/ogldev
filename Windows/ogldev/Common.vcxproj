@@ -27,6 +27,8 @@
     <ClCompile Include="..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\Common\ogldev_vulkan.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_vulkan_core.cpp" />
+    <ClCompile Include="..\..\Common\ogldev_win32_control.cpp" />
     <ClCompile Include="..\..\Common\ogldev_xcb_control.cpp" />
     <ClCompile Include="..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\Common\random_texture.cpp" />
@@ -55,6 +57,8 @@
     <ClInclude Include="..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\Include\ogldev_util.h" />
     <ClInclude Include="..\..\Include\ogldev_vulkan.h" />
+    <ClInclude Include="..\..\Include\ogldev_vulkan_core.h" />
+    <ClInclude Include="..\..\Include\ogldev_win32_control.h" />
     <ClInclude Include="..\..\Include\ogldev_xcb_control.h" />
     <ClInclude Include="..\..\Include\technique.h" />
   </ItemGroup>
@@ -94,7 +98,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include;$(ProjectDir)\..\..\Include\assimp;$(ProjectDir)\..\..\Include\ImageMagick-6;$(ProjectDir)\..\..\Include\ATB</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include;$(ProjectDir)\..\..\Include\assimp;$(ProjectDir)\..\..\Include\ImageMagick-6;$(ProjectDir)\..\..\Include\ATB;C:\VulkanSDK\1.0.30.0\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

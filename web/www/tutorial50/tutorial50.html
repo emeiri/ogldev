@@ -140,10 +140,15 @@
         but the code I provide will assume it is in the home directory so you will need to fix that.
     </p>
     
-    <h4> Windows </h4>
+    <h4> Windows </h4><br>
     
     <p>
-        TODO
+        Installation on Windows is simpler than on Linux. You just need to get the latest version from
+		<a href="https://vulkan.lunarg.com/sdk/home#windows">here</a>, double click the executable installer
+		and after agreeing to the license agreement and selecting the target directory you are done. 
+		I suggest you install the SDK under c:\VulkanSDK to make it compatible
+		with the Visual Studio solution that I provide, but it is not a must. If you install it somewhere else
+		make sure you update the include and link directories in the project files. See details in the next section.
     </p>
 </section>    
 
@@ -172,11 +177,30 @@
         shader files are accessed using a relative directory path.
     </p>
 
-    <h4> Windows </h4>
+    <h4> Windows </h4><br>
     
-    <p>
-        TODO
-    </p>        
+	<p>
+		If you installed the SDK under c:\VulkanSDK then the Visual Studio project files I supply
+		should work out of the box. If you haven't or you want to setup a Visual Studio project from scratch then
+		follow the steps below.
+	</p>
+	<p>
+		To update the include directory right click on the project in the solution explorer, go to 'properties'
+		and then to 'Configuration Properties -&gt; C/C++ -&gt; General'. Now you must add c:\VulkanSDK\&lt;version&gth;\Include
+		to 'Additional Include Directories'. See example below:
+	</p><br>
+	<img src="include.jpg"><br>
+	<p>
+		To update the link directory right click on the project in the solution explorer, go to 'properties'
+		and then to 'Configuration Properties -&gt; Link -&gt; General'. Now you must add c:\VulkanSDK\&lt;version&gth;\Bin32
+		to 'Additional Library Directories'. See example below:
+	</p><br>
+	<img src="link.jpg"><br>
+	<p>
+		While you are still in the linker settings go to 'Input' (just one below 'General') and add vulkan-1.lib to 
+		'Additional Dependencies". 
+	</p>
+
 </section>
 
 <section>
@@ -236,9 +260,29 @@
         the internals of Vulkan itself. As I said, we are going to develop our first demo in several 
         steps. The first step will be to setup four important Vulkan objects: the instance, surface,
         physical device and logical device. I'm going to describe this by walking through my software
-        design but you are welcomed to throw this away and just follow the Vulkan calls.
-        
+        design but you are welcomed to throw this away and just follow the Vulkan calls.        
     </p>
+	<p>
+		The first thing we need to do is to include the Vulkan headers. I've added ogldev_vulkan.h as
+		the primary Vulkan include file in my projects. This will be the only place where I will include
+		the Vulkan header files and everything else will just include this file. Here's the relevant
+		piece of code:
+	</p>
+	<pre><code>#ifdef _WIN32
+#define VK_USE_PLATFORM_WIN32_KHR
+#include "vulkan/vulkan.h"
+#include "vulkan/vk_sdk_platform.h"
+#else
+#define VK_USE_PLATFORM_XCB_KHR
+#include &lt;vulkan/vulkan.h&gt;
+#include &lt;vulkan/vk_sdk_platform.h&gt;
+#endif</code></pre>
+	<p>
+	Note that we define different _PLATFORM_ macros for Windows and Linux. These macros enable
+	the extensions that support the windowing systems in each OS. The reason that we include the headers
+	like that is that on Linux they are installed in a system directory ( /usr/include/vulkan ) while
+	on Windows they are installed in a standard directory.
+	</p>
     <p>
         Let's start by reviewing the class OgldevVulkanCore whose job is to create and maintain
         the core four objects mentioned above (note that I'm using red in order to mark all

@@ -48,6 +48,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 
 #ifdef WIN32
 #define SNPRINTF _snprintf_s
+#define VSNPRINTF vsnprintf_s
 #define RANDOM rand
 #define SRANDOM srand((unsigned)time(NULL))
 #if (_MSC_VER == 1900)
@@ -57,6 +58,7 @@ float fmax(float a, float b);
 #endif
 #else
 #define SNPRINTF snprintf
+#define VSNPRINTF vsnprintf
 #define RANDOM random
 #define SRANDOM srandom(getpid())
 #endif

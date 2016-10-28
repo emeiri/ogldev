@@ -26,7 +26,7 @@
 class Win32Control : public VulkanWindowControl
 {
 public:
-    Win32Control();
+    Win32Control(HINSTANCE hInstance, const char* pAppName);
     
     ~Win32Control();
     
@@ -35,6 +35,10 @@ public:
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
 
  private:    
+
+    HINSTANCE   m_hinstance;
+    HWND        m_hwnd;
+    std::wstring m_appName;
 };
 
 #endif
