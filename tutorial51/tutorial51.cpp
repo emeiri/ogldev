@@ -65,15 +65,15 @@ private:
     std::vector<VkImage> m_images;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
-    VkSemaphore m_imageAvailSem;
-    VkSemaphore m_rendCompSem;
     std::vector<VkCommandBuffer> m_presentQCmdBuffs;
     VkCommandPool m_presentQCmdPool;
+    uint m_frameCount;
 };
 
 
 OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
 {
+    m_frameCount = 0;
 }
 
 
@@ -208,34 +208,12 @@ void OgldevVulkanApp::CreateCommandBuffer()
     printf("Created command buffers\n");
 }
 
-void OgldevVulkanApp::CreateSemaphore()
-{
-    VkSemaphoreCreateInfo semCreateInfo = {};
-    semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    
-    VkResult res = vkCreateSemaphore(m_core.GetDevice(), &semCreateInfo, NULL, &m_imageAvailSem);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating semaphore\n");
-        assert(0);
-    }
-
-    res = vkCreateSemaphore(m_core.GetDevice(), &semCreateInfo, NULL, &m_rendCompSem);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating semaphore\n");
-        assert(0);
-    }
-    
-    printf("Semaphores created\n");    
-}
-
 
 void OgldevVulkanApp::Draw()
 {
     uint ImageIndex = 0;
     
-    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL/*m_imageAvailSem*/, NULL, &ImageIndex);
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
     
     switch (res) {
         case VK_SUCCESS:
@@ -251,13 +229,9 @@ void OgldevVulkanApp::Draw()
     
     VkSubmitInfo submitInfo = {};
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.waitSemaphoreCount   = 0;
-    submitInfo.pWaitSemaphores      = &m_imageAvailSem;
     submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
     submitInfo.pCommandBuffers      = &m_presentQCmdBuffs[ImageIndex];
-    submitInfo.signalSemaphoreCount = 0;
-    submitInfo.pSignalSemaphores    = &m_rendCompSem;
     
     res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
     
@@ -265,8 +239,6 @@ void OgldevVulkanApp::Draw()
     
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = 0;
-    presentInfo.pWaitSemaphores    = &m_rendCompSem;
     presentInfo.swapchainCount     = 1;
     presentInfo.pSwapchains        = &m_swapChainKHR;
     presentInfo.pImageIndices      = &ImageIndex;
@@ -331,7 +303,6 @@ void OgldevVulkanApp::Init()
 
     EnumPhysDeviceExtProps();
     CreateSwapChain();
-    CreateSemaphore();    
     CreateCommandBuffer();
     RecordCommandBuffers();
 }
