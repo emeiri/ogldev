@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 50 - Vulkan
+    Tutorial 51 - Vulkan Clear Window
 */
 
 #include <cfloat>
@@ -39,8 +39,6 @@
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
 
-
-
 class OgldevVulkanApp
 {
 public:
@@ -49,13 +47,12 @@ public:
     
     ~OgldevVulkanApp();
     
-    bool Init();    
+    void Init();    
     
     void Run();
     
 private:
 
-   // void EnumPhysDeviceProps();
     void EnumPhysDeviceExtProps();
     void CreateSwapChain();
     void CreateCommandBuffer();
@@ -66,7 +63,6 @@ private:
     VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
     std::vector<VkImage> m_images;
-    std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
     VkSemaphore m_imageAvailSem;
@@ -171,34 +167,21 @@ void OgldevVulkanApp::CreateSwapChain()
     SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     
     VkResult res = vkCreateSwapchainKHR(m_core.GetDevice(), &SwapChainCreateInfo, NULL, &m_swapChainKHR);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating swap chain\n");
-        assert(0);
-    }
+    CHECK_VULKAN_ERROR("vkCreateSwapchainKHR error %d\n", res);    
 
     printf("Swap chain created\n");
     
     uint NumSwapChainImages = 0;
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
-
-    if (res != VK_SUCCESS) {
-        printf("Error getting number of images\n");
-        assert(0);
-    }
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
     
     printf("Number of images %d\n", NumSwapChainImages);
 
     m_images.resize(NumSwapChainImages);
-    m_views.resize(NumSwapChainImages);
     m_presentQCmdBuffs.resize(NumSwapChainImages);
     
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
-
-    if (res != VK_SUCCESS) {
-        printf("Error getting images\n");
-        assert(0);
-    }    
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
 }
 
 
@@ -208,8 +191,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
     
-    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
-    
+    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);    
     CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);
     
     printf("Command buffer pool created\n");
@@ -220,8 +202,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufAllocInfo.commandBufferCount = m_images.size();
     
-    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
-            
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);            
     CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
     
     printf("Created command buffers\n");
@@ -254,7 +235,7 @@ void OgldevVulkanApp::Draw()
 {
     uint ImageIndex = 0;
     
-    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, m_imageAvailSem, NULL, &ImageIndex);
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL/*m_imageAvailSem*/, NULL, &ImageIndex);
     
     switch (res) {
         case VK_SUCCESS:
@@ -270,12 +251,12 @@ void OgldevVulkanApp::Draw()
     
     VkSubmitInfo submitInfo = {};
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.waitSemaphoreCount   = 1;
+    submitInfo.waitSemaphoreCount   = 0;
     submitInfo.pWaitSemaphores      = &m_imageAvailSem;
     submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
     submitInfo.pCommandBuffers      = &m_presentQCmdBuffs[ImageIndex];
-    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.signalSemaphoreCount = 0;
     submitInfo.pSignalSemaphores    = &m_rendCompSem;
     
     res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
@@ -284,7 +265,7 @@ void OgldevVulkanApp::Draw()
     
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.waitSemaphoreCount = 0;
     presentInfo.pWaitSemaphores    = &m_rendCompSem;
     presentInfo.swapchainCount     = 1;
     presentInfo.pSwapchains        = &m_swapChainKHR;
@@ -313,41 +294,19 @@ void OgldevVulkanApp::RecordCommandBuffers()
        
     VkResult res;
     
-    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {
-        VkImageMemoryBarrier memBarrier_PresentToClear = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_core.GetQueueFamily();
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_core.GetQueueFamily();
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;        
-        
-        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_core.GetQueueFamily();
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_core.GetQueueFamily();
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;    
-              
+    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {             
         res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
                 
-        vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                             0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);
+      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);
 
                      
         vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor, 1, &imageRange);                
         
         
-        vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-                             0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
+      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
 
         res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
         CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
@@ -357,7 +316,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
 }
 
 
-bool OgldevVulkanApp::Init()
+void OgldevVulkanApp::Init()
 {
 #ifdef WIN32
     
@@ -370,18 +329,11 @@ bool OgldevVulkanApp::Init()
         
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
-    //EnumPhysDeviceProps();
     EnumPhysDeviceExtProps();
     CreateSwapChain();
     CreateSemaphore();    
- //  CreateRenderPass();
-  //  CreateFramebuffer();
     CreateCommandBuffer();
-   // CreateShaders();
-    //CreatePipeline();
     RecordCommandBuffers();
-
-    return true;
 }
 
 
@@ -392,18 +344,10 @@ void OgldevVulkanApp::Run()
     while (true) {
         m_pWindowControl->PollEvent();
         
-      //  if (event) {
-       //     demo_handle_event(demo, event);
-      //      free(event);
-      //  }
-
         Draw();
 
         // Wait for work to finish before updating MVP.
         vkDeviceWaitIdle(m_core.GetDevice());
-       // demo->curFrame++;
-        //if (demo->frameCount != INT32_MAX && demo->curFrame == demo->frameCount)
-        //    demo->quit = true;
     }
 }
 
@@ -431,9 +375,7 @@ int main(int argc, char** argv)
 {
     Tutorial51 app("Tutorial 51");
     
-    if (!app.Init()) {
-        return 1;
-    }      
+    app.Init();
     
     app.Run();
     
