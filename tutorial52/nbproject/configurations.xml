@@ -5,10 +5,14 @@
                    displayName="Header Files"
                    projectFiles="true">
     </logicalFolder>
+    <logicalFolder name="f1" displayName="Shaders" projectFiles="true">
+      <itemPath>Shaders/vulkan.frag</itemPath>
+      <itemPath>Shaders/vulkan.vert</itemPath>
+    </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>tutorial51.cpp</itemPath>
+      <itemPath>tutorial52.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -44,7 +48,7 @@
           <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig glfw3`</commandLine>
         </ccTool>
         <linkerTool>
-          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial51</output>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52</output>
           <linkerLibItems>
             <linkerLibProjectItem>
               <makeArtifact PL="../Common"
@@ -65,7 +69,11 @@
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
       </compileType>
-      <item path="tutorial51.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Shaders/vulkan.frag" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/vulkan.vert" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial52.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -111,7 +119,11 @@
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="tutorial51.cpp" ex="false" tool="1" flavor2="0">
+      <item path="Shaders/vulkan.frag" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Shaders/vulkan.vert" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tutorial52.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>
