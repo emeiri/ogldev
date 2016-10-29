@@ -245,11 +245,55 @@
         </p></li>
 
         <li><p>
-        TODO: note about function pointers                
+        Vulkan does not guarantee that its functions will be automatically exposed by the implementing library.
+        This means that on some platforms you might get a segmentation fault when you call a Vulkan function because
+        it turns out to be a NULL. In these cases you have to use vkGetInstanceProcAddr() to get the function address
+        before it is used (remember that with OpenGL we had GLEW to save us from all this hassle). 
+        My personal experience with my driver was that only vkCreateDebugReportCallbackEXT() was not available. This function
+        is only required for the optional validation layer. Therefore, I decided to take a risk and release the
+        tutorial without fetching the addresses for all the functions that I used. If readers will report problems
+            on their platforms I will update the code.
+        </p></li>        
+
+        <li><p>
+        Every serious software has to deal with object deallocation or it will eventually run out of memory.
+        In this tutorial I'm keeping things simple and not destroying any of the objects that I allocate.
+        They are destroyed anyway when the program shuts down. I will probably revisit this topic in the future 
+            but for now just remember that almost every vkCreate*() function has a corresponding vkDestroy*() 
+            and you need to be careful if you are destroying stuff while the program is running. You can
+            find more information about it <a href="https://www.khronos.org/registry/vulkan/specs/1.0-wsi_extensions/xhtml/vkspec.html#fundamentals-objectmodel-overview">here</a>.
         </p></li>        
 
     </ol>
 
+</section>
+
+<section>
+    <h3> Code Structure </h3>
+    <p>
+        Here's a short summary of the files that contain the code that we are going to review. The path relates to the
+        root of the ogldev software package:
+    </p>
+    <ol>
+        <li>'tutorial50/tutorial50.cpp' - location of the main/WinMain function.</li>
+        <li>'include/ogldev_vulkan.h' - primary header for all of our Vulkan code. This is the only place where
+        the Vulkan headers by Khronos are included. You can enable the validation layer here by uncommenting
+        ENABLE_DEBUG_LAYERS. This file contains a few Vulkan helper functions and macros as well
+        as the definition of the VulkanWindowControl class.</li>
+    <li>'Common/ogldev_vulkan.cpp' - implementation of the functions defined in ogldev_vulkan.h</li>
+    <li>'include/ogldev_vulkan_core.h' - declaration of the OgldevVulkanCore which is the primary class
+        that we will develop.</li>
+    <li>'Common/ogldev_vulkan_core.cpp' - implementation of the OgldevVulkanCore class.</li>
+    <li>'include/ogldev_xcb_control.h' - declaration of the XCBControl class that creates a window
+        surface on Linux.</li>
+    <li>'Common/ogldev_xcb_control.cpp' - implementation of XCBControl.</li>
+    <li>'include/ogldev_win32_control.h' - declaration of the Win32Control class that creates a window
+        surface on Windows.</li></li>
+    <li>'Common/ogldev_win32_control.cpp' - implementation of Win32Control.</li>
+    </ol><br>
+    <p>
+        Note that on both Netbeans and Visual Studio the files are divided between the 'tutorial50' and 'Common' projects.
+    </p>
 </section>
 
 <section>
