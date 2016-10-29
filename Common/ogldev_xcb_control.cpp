@@ -107,15 +107,4 @@ VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
 }
 
 
-void XCBControl::PreRun()
-{
-    xcb_flush(m_pXCBConn);
-}
-
-
-void XCBControl::PollEvent()
-{
-    xcb_generic_event_t* pEvent = xcb_poll_for_event(m_pXCBConn);
-}
-
 #endif

@@ -68,10 +68,6 @@ public:
     virtual void Init(uint Width, uint Height) = 0;
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst) = 0;
-    
-    virtual void PollEvent() = 0;
-    
-    virtual void PreRun() = 0;
 };
 
 #endif

@@ -53,10 +53,8 @@ public:
     
 private:
 
-    void EnumPhysDeviceExtProps();
     void CreateSwapChain();
     void CreateCommandBuffer();
-    void CreateSemaphore();
     void RecordCommandBuffers();
     void Draw();
 
@@ -65,54 +63,20 @@ private:
     std::vector<VkImage> m_images;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
-    std::vector<VkCommandBuffer> m_presentQCmdBuffs;
-    VkCommandPool m_presentQCmdPool;
-    uint m_frameCount;
+    std::vector<VkCommandBuffer> m_cmdBufs;
+    VkCommandPool m_cmdBufPool;
 };
 
 
 OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
 {
-    m_frameCount = 0;
 }
 
 
 OgldevVulkanApp::~OgldevVulkanApp()
-{
-    
+{    
 }
-
-    
-void OgldevVulkanApp::EnumPhysDeviceExtProps()
-{
-   /* uint NumExt = 0;
-    
-    VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
-    
-    VkResult res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, NULL);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating device extensions %x\n", res);
-        assert(0);
-    }
-    
-    std::vector<VkExtensionProperties> ExtProps(NumExt);
-
-    res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, &ExtProps[0]);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating extensions");
-        assert(0);
-    }
-        
-    for (uint i = 0 ; i < NumExt ; i++) {
-        printf("Device extension %d - %s\n", i, ExtProps[i].extensionName);
-        m_devExt.push_back(std::string(ExtProps[i].extensionName));
-    }     */       
-    
-    //vkGetPhysicalDeviceMemoryProperties(m_physDevices[m_gfxDevIndex], &m_memProps);
-}
-
+   
 
 void OgldevVulkanApp::CreateSwapChain()
 {          
@@ -178,7 +142,7 @@ void OgldevVulkanApp::CreateSwapChain()
     printf("Number of images %d\n", NumSwapChainImages);
 
     m_images.resize(NumSwapChainImages);
-    m_presentQCmdBuffs.resize(NumSwapChainImages);
+    m_cmdBufs.resize(NumSwapChainImages);
     
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
     CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
@@ -191,21 +155,52 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
     
-    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);    
+    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);    
     CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);
     
     printf("Command buffer pool created\n");
     
     VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
     cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cmdBufAllocInfo.commandPool = m_presentQCmdPool;
+    cmdBufAllocInfo.commandPool = m_cmdBufPool;
     cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufAllocInfo.commandBufferCount = m_images.size();
     
-    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);            
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);            
     CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
     
     printf("Created command buffers\n");
+}
+
+
+void OgldevVulkanApp::RecordCommandBuffers() 
+{
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    
+    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
+    VkClearValue clearValue = {};
+    clearValue.color = clearColor;
+    
+    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;
+       
+    VkResult res;
+    
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {             
+        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
+
+        vkCmdClearColorImage(m_cmdBufs[i], m_images[i], VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);                
+
+        res = vkEndCommandBuffer(m_cmdBufs[i]);
+        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
+    }
+    
+    printf("Command buffers recorded\n");    
 }
 
 
@@ -231,7 +226,7 @@ void OgldevVulkanApp::Draw()
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
-    submitInfo.pCommandBuffers      = &m_presentQCmdBuffs[ImageIndex];
+    submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
     
     res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
     
@@ -249,44 +244,6 @@ void OgldevVulkanApp::Draw()
 }
 
 
-void OgldevVulkanApp::RecordCommandBuffers() 
-{
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-    
-    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
-    VkClearValue clearValue = {};
-    clearValue.color = clearColor;
-    
-    VkImageSubresourceRange imageRange = {};
-    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    imageRange.levelCount = 1;
-    imageRange.layerCount = 1;
-       
-    VkResult res;
-    
-    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {             
-        res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
-        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
-                
-      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);
-
-                     
-        vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor, 1, &imageRange);                
-        
-        
-      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
-
-        res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
-        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
-    }
-    
-    printf("Command buffers recorded\n");    
-}
-
 
 void OgldevVulkanApp::Init()
 {
@@ -301,7 +258,6 @@ void OgldevVulkanApp::Init()
         
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
-    EnumPhysDeviceExtProps();
     CreateSwapChain();
     CreateCommandBuffer();
     RecordCommandBuffers();
@@ -310,11 +266,7 @@ void OgldevVulkanApp::Init()
 
 void OgldevVulkanApp::Run()
 {    
-    m_pWindowControl->PreRun();
-
-    while (true) {
-        m_pWindowControl->PollEvent();
-        
+    while (true) {        
         Draw();
 
         // Wait for work to finish before updating MVP.
@@ -323,28 +275,9 @@ void OgldevVulkanApp::Run()
 }
 
 
-class Tutorial51 : public OgldevVulkanApp
-{
-public:
-    Tutorial51(const char* pAppName);
-    
-    ~Tutorial51();
-};
-
-
-Tutorial51::Tutorial51(const char* pAppName) : OgldevVulkanApp(pAppName)
-{
-    
-}
-
-Tutorial51::~Tutorial51()
-{
-    
-}
-
 int main(int argc, char** argv)
 {
-    Tutorial51 app("Tutorial 51");
+    OgldevVulkanApp app("Tutorial 51");
     
     app.Init();
     
