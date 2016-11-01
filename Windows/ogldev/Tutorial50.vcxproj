@@ -70,7 +70,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\Include\ImageMagick-6;$(ProjectDir)\..\..\Include\ATB;C:\VulkanSDK\1.0.30.0\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ConfigurationName);$(SolutionDir)\..\..\Lib;c:\VulkanSDK\1.0.30.0\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Common.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glew32.lib;assimp.lib;glfx_debug.lib;CORE_DB_Magick++_.lib;glfw3.lib;glfw3dll.lib;opengl32.lib;vulkan-1.lib</AdditionalDependencies>

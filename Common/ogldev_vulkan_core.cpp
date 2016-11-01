@@ -57,15 +57,12 @@ void OgldevVulkanCore::Init(VulkanWindowControl* pWindowControl)
 { 
     std::vector<VkExtensionProperties> ExtProps;
     VulkanEnumExtProps(ExtProps);
-    
+
     CreateInstance();
     
-#ifdef WIN32
-    assert(0);
-#else
     m_surface = pWindowControl->CreateSurface(m_inst);
     assert(m_surface);          
-#endif
+
     printf("Surface created\n");
 
     VulkanGetPhysicalDevices(m_inst, m_surface, m_physDevices);
