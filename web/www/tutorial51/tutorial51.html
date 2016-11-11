@@ -34,14 +34,243 @@
     to three new and improtant Vulkan entities - swap chain, images and the command buffers.
     </p>    
 <p>
-    Let's look at a very simple OpenGL render loop which just clears the screen. A trivial example will be:
+    Let's look at a very simple OpenGL render loop which just clears the screen:
     </p>
-    <pre><code>void
-    </code></pre>
+    <pre><code>void RenderLoop()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glutSwapBuffers();   // Or in GLFW: glfwSwapBuffers(pWindow);
+}</code></pre>
+    <p>
+        What we have here is a GL command to clear the color buffer followed by a GLUT or GLFW call that
+        swaps the front buffer which is currently being displayed with the back buffer (which is really the
+        buffer that glClear targeted). These two seemingly innocent functions hide a ton of back stage activity
+        by the OpenGL driver. What Vulkan does is to provide us with a standard interface to the low level
+        operations that used to be the sole domain of the OpenGL driver. Now we have to take control and manage
+        the back stage of the driver ourselves.
+    </p>
+    <p>
+        So now let's think what really happens in the driver when it executes that render loop. In most graphics drivers
+        there is a concept of a command buffer. The command buffer is a memory buffer that the driver fills with
+        GPU instructions. The driver submits the command buffer to the GPU and is usually some form of a queue of
+        all the command buffers that are currently in flight. The GPU picks up the command buffers one by one and
+        executes their contents. The command buffers contain instructions, pointers to resources and everything
+        the GPU needs in order to execute the the OpenGL commands correctly and each command buffer
+        can potentially contain multiple OpenGL commands. It is up to the driver to decide how many OpenGL commands
+        go into each command buffer. The GPU informs the driver whenever
+        a command buffer is completed and the driver can stall the application to prevent it from getting too much 
+        ahead of the GPU (e.g. the GPU renders frame N while the application is already at frame N+10).
+    </p>
+    <p>
+        This model works pretty well. Why do we need to change it? Well, making the driver in charge of command
+        buffer management prevents us from some important potential performance optimizations that only we can
+        make. For example, consider
+        the Mesh class that we developed in previous tutorials when we studied the Assimp library. Rendering a mesh
+        meant that in each frame we had to submit the same group of draw commands when the only real change was a few
+        matrices that controlled the transformation. For each draw command the driver had to do considerable amount of work 
+        which is a waste of time in each frame? What if we could create a command buffer for this mesh class ahead of 
+        time and just submit it in each frame? That's the whole idea behind Vulkan. For the OpenGL driver the frame
+        is just a series of draw commands (and other stuff of course) that the drive cannot grasp what they represent.
+        It doesn't even know that they will be repeated in the next frame. Only the app designer understands what's going
+        on and can create command buffers in the most efficient way.
+    </p>
+    <p>
+        Another area where OpenGL never excelled in is multi threading. Submitting draw commands in different
+        threads is possible but complex. The problem is that OpenGL was not designed with multi threading in mind. Therefore,
+        in most cases a graphics app has one rendering thread and uses multi-threading for the rest of the logic. Vulkan
+        addresses multi threading by allowing you to build command buffers concurrently and introduces the concept of
+        queues and semaphores to handle concurrency at the GPU level.
+    </p>
+    <p>
+        Let's get back to that render loop. By now you can imagine that what we are going to do is create a command buffer
+        and add the clear instruction to it. What about swap buffers? We have been using GLUT/GLFW so we never gave much thought
+        about it. GLUT/GLFW are not part of OpenGL. They are libraries built on top of windowing APIs such as GLX (Linux), WGL (Windows),
+        EGL (Android) and CGL (Mac). They make it easy to build OS independent OpenGL programs. If you use the underlying APIs directly
+        you will have to create an OpenGL context and window surface which are in general corresponding to the instance and surface
+        we created in the previous tutorial. The underlying APIs provide functions such as glXSwapBuffers() and eglSwapBuffers() in
+        order to swap the front and back buffers that are hidden under the cover of the surface. They don't provide you much control
+        beyond that.
+    </p>
+    <p>
+        Vulkan goes a step further by introducing the concepts of swap chain, images and presentation engine. The Vulkan spec
+        describes the swap chain as an abstraction of an array of presentable images that are associated with the surface. The images
+        are what is actually being displayed on the screen and only one can be displayed at a time. When an image is displayed the
+        application is free to prepare the remaining images and queue them for presentation. The total number of images
+        can also be controlled by the application.
+    </p>
+    <p>
+        The presentation engine represents the display on the platform. It is responsible for picking up images from the queue,
+        presenting them on the screen and notifying the application when an image can be reused.
+    </p>
+    <p>
+        Now that we understand these concepts let's review what we need add to the previous tutorial in order to make
+        it clear the screen. Here's the one time initialization steps:
+    </p>
+        <p><ol>
+            <li>
+                Get the command buffer queue from the logical device. Remember that the device create info included
+            an array of VkDeviceQueueCreateInfo structures with the number of queues from each family to create.
+            For simplicity we are using just one queue from graphics family. So this queue was already created in
+            the previous tutorial. We just need to get its address.
+            </li>
+            <li>
+                Create the swap chain and get the handles to its images.
+            </li>
+            <li>
+                Create a command buffer and add the clear instruction to it.
+    </li></p>
+    </ol>
+    <p>And here's what we need to do in the render loop:</p>
+    <p><ol>
+        <li>Acquire the next image from the swap chain.</li>
+        <li>Submit the command buffer.</li>
+    <li>Submit a request to present the image.</li>
+    </ol>
+    </p>
+    <p>
+        Now let's review the code to accomplish this.
+    </p>
 </section>
 
 <section>
 <h3> Source walkthru </h3>
+    <p>
+        All the logic that needs to be developed for this tutorial will go into the following class:
+    </p>
+    <pre><code>class OgldevVulkanApp
+{
+public:
+
+    OgldevVulkanApp(const char* pAppName);
+    
+    ~OgldevVulkanApp();
+    
+    void Init();    
+    
+    void Run();
+    
+private:
+
+    void CreateSwapChain();
+    void CreateCommandBuffer();
+    void RecordCommandBuffers();
+    void RenderScene();
+
+    std::string m_appName;
+    VulkanWindowControl* m_pWindowControl;
+    OgldevVulkanCore m_core;    
+    std::vector<VkImage> m_images;
+    VkSwapchainKHR m_swapChainKHR;
+    VkQueue m_queue;
+    std::vector<VkCommandBuffer> m_cmdBufs;
+    VkCommandPool m_cmdBufPool;
+};</code></pre>
+<p>
+    What we have here are a couple of public functions that will be called from main() later on (Init() Run()) and 
+    several private member functions that are based on the step that were described in the previous section. In addition,
+    there are a few private member variables. The VulkanWindowControl and OgldevVulkanCore which were part of the main()
+    function in the previous tutorial have moved here. We also have a vector of images, swap chain object, command queue,
+    vector of command buffers and a command buffer pool. Now let's look at the Init() function:
+</p>
+<pre><code>void OgldevVulkanApp::Init()
+{
+#ifdef WIN32
+    m_pWindowControl = new Win32Control(m_appName.c_str());
+#else            
+    m_pWindowControl = new XCBControl();
+#endif    
+    m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    m_core.Init(m_pWindowControl);
+        
+    <b>vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
+
+    CreateSwapChain();
+    CreateCommandBuffer();
+    RecordCommandBuffers();</b>
+}</code></pre>
+<p>
+    This function starts in a similar fashion to the previous tutorial by creating and initializing the window control
+    and Vulkan core objects. After that we call the private members to create the swap chain and command buffer and
+    to record the clear instruction into the command buffer. Note the call to vkGetDeviceQueue(). This Vulkan function
+    fetches the handle of a VkQueue object from the device. The first three parameters are the device, the index of the
+    queue family and the index of the queue in that queue family (zero in our case because there is only one queue).
+    The driver returns the result in the last parameter. The two getter functions here were added in this tutorial to the
+    Vulkan core object.
+</p>
+<p>
+Let's review the creation of the swap chain step by step:
+</p>
+<pre><code>void OgldevVulkanApp::CreateSwapChain()
+{          
+    const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_core.GetSurfaceCaps();
+         
+    assert(SurfaceCaps.currentExtent.width != -1);</code></pre>
+<p>
+    The first thing we need to do is to fetch the surface capabilities from the Vulkan core object. Remember that in the previous
+    tutorial we populated a physical device database in the Vulkan core object with info about all the physical
+    devices in the system. Some of that info was not generic but specific to the combination of the physical
+    device and the surface that was created earlier. An example is the VkSurfaceCapabilitiesKHR vector which contains a 
+    VkSurfaceCapabilitiesKHR structure for each physical device. The function GetSurfaceCaps() indexes into that vector 
+    using the physical device index (which was selected in the previous tutorial). The VkSurfaceCapabilitiesKHR structure
+    contains a lot of info on the surface. One of its members called currentExtent describes the current size of the
+    surface. Its type is a VkExtent2D which contains a width and height. Theoretically, the current extent should contain
+    the dimensions that we have set when creating the surface and I have found that to be true on both Linux and Windows.
+    In several examples (including the one in the Khronos SDK) I saw some logic which checks whether the width of the
+    current extent is -1 and if so overwrites that with desired dimensions. I found that logic to be redundant so I just
+    placed the assert you see above. 
+</p>
+    
+<pre><code>    uint NumImages = 2;
+
+    assert(NumImages >= SurfaceCaps.minImageCount);
+    assert(NumImages <= SurfaceCaps.maxImageCount);</code></pre>
+<p>
+    Next we set the number of images that we will create in the swap chain to 2. This should be mimic the behavior
+    of double buffering in OpenGL. I added assertions to make sure that this number is within the valid range
+    of the platform. I assume that you won't hit these assertions but if you do you can try with one image only.
+</p>        
+<pre><code>    VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
+    
+    SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    SwapChainCreateInfo.surface          = m_core.GetSurface();
+    SwapChainCreateInfo.minImageCount    = NumImages;</code></pre>
+<p>
+    The function that creates the swap chain takes most of its parameters from the VkSwapchainCreateInfoKHR structure.
+    The first three parameters are obvious - the structure type, the surface handle and the number of images.
+</p>    
+<pre><code>    SwapChainCreateInfo.imageFormat      = m_core.GetSurfaceFormat().format;
+    SwapChainCreateInfo.imageColorSpace  = m_core.GetSurfaceFormat().colorSpace;</code></pre>
+    <p>
+    </p>
+    SwapChainCreateInfo.imageExtent      = SwapChainExtent;
+    SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    SwapChainCreateInfo.preTransform     = preTransform;
+    SwapChainCreateInfo.imageArrayLayers = 1;
+    SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    SwapChainCreateInfo.presentMode      = VK_PRESENT_MODE_FIFO_KHR;
+    SwapChainCreateInfo.clipped          = true;
+    SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    
+    VkResult res = vkCreateSwapchainKHR(m_core.GetDevice(), &SwapChainCreateInfo, NULL, &m_swapChainKHR);
+    CHECK_VULKAN_ERROR("vkCreateSwapchainKHR error %d\n", res);    
+
+    printf("Swap chain created\n");
+    
+    uint NumSwapChainImages = 0;
+    res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
+    
+    printf("Number of images %d\n", NumSwapChainImages);
+
+    m_images.resize(NumSwapChainImages);
+    m_cmdBufs.resize(NumSwapChainImages);
+    
+    res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
+}
+
+</code></pre>
 </section>
     
 </article>    

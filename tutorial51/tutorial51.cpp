@@ -56,8 +56,9 @@ private:
     void CreateSwapChain();
     void CreateCommandBuffer();
     void RecordCommandBuffers();
-    void Draw();
+    void RenderScene();
 
+    std::string m_appName;
     VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
     std::vector<VkImage> m_images;
@@ -70,6 +71,7 @@ private:
 
 OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
 {
+    m_appName = std::string(pAppName);
 }
 
 
@@ -80,38 +82,22 @@ OgldevVulkanApp::~OgldevVulkanApp()
 
 void OgldevVulkanApp::CreateSwapChain()
 {          
-    assert(m_core.GetSurfaceFormat().format != VK_FORMAT_UNDEFINED);
-    
     const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_core.GetSurfaceCaps();
          
-    VkExtent2D SwapChainExtent = SurfaceCaps.currentExtent;
-    
-    if (SurfaceCaps.currentExtent.width == -1) {
-        SwapChainExtent.width = WINDOW_WIDTH;
-        SwapChainExtent.height = WINDOW_HEIGHT;
-    }
-    else {
-        SwapChainExtent = SurfaceCaps.currentExtent;
-    }
-    
-    printf("Swap chain extent: width %d height %d\n", SwapChainExtent.width, SwapChainExtent.height);
-    
-    uint NumImages = SurfaceCaps.minImageCount + 1;
-    
-    if ((SurfaceCaps.maxImageCount > 0) &&
-        (NumImages > SurfaceCaps.maxImageCount)) {
-        NumImages =  SurfaceCaps.maxImageCount;
-    }
-    
-    printf("Num images: %d\n", NumImages);
-    
-    VkSurfaceTransformFlagBitsKHR preTransform;
+    assert(SurfaceCaps.currentExtent.width != -1);
+                   
+    uint NumImages = 2;
+
+    assert(NumImages >= SurfaceCaps.minImageCount);
+    assert(NumImages <= SurfaceCaps.maxImageCount);
+   
+    VkSurfaceTransformFlagBitsKHR preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     
     if (SurfaceCaps.currentTransform & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
-        preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    //    preTransform = 
     }
     else {
-        preTransform = SurfaceCaps.currentTransform;
+      //  preTransform = SurfaceCaps.currentTransform;
     }
     
     VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
@@ -121,7 +107,7 @@ void OgldevVulkanApp::CreateSwapChain()
     SwapChainCreateInfo.minImageCount    = NumImages;
     SwapChainCreateInfo.imageFormat      = m_core.GetSurfaceFormat().format;
     SwapChainCreateInfo.imageColorSpace  = m_core.GetSurfaceFormat().colorSpace;
-    SwapChainCreateInfo.imageExtent      = SwapChainExtent;
+    SwapChainCreateInfo.imageExtent      = SurfaceCaps.currentExtent;
     SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     SwapChainCreateInfo.preTransform     = preTransform;
     SwapChainCreateInfo.imageArrayLayers = 1;
@@ -204,7 +190,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
 }
 
 
-void OgldevVulkanApp::Draw()
+void OgldevVulkanApp::RenderScene()
 {
     uint ImageIndex = 0;
     
@@ -248,7 +234,7 @@ void OgldevVulkanApp::Draw()
 void OgldevVulkanApp::Init()
 {
 #ifdef WIN32
-    
+    m_pWindowControl = new Win32Control(m_appName.c_str());
 #else            
     m_pWindowControl = new XCBControl();
 #endif    
@@ -267,7 +253,7 @@ void OgldevVulkanApp::Init()
 void OgldevVulkanApp::Run()
 {    
     while (true) {        
-        Draw();
+        RenderScene();
 
         // Wait for work to finish before updating MVP.
         vkDeviceWaitIdle(m_core.GetDevice());

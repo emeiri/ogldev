@@ -346,3 +346,9 @@ img {
 	color: #b3b3b3;
 	padding: 10px 0 20px;
 }
+
+ol {
+    //background: gray;
+    //padding: 20px;
+    line-height: 200%;
+}
