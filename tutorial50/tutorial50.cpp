@@ -45,15 +45,11 @@
 const char* pAppName = "tutorial50";
 
 
-#ifdef WIN32
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)
-#else
 int main(int argc, char** argv)
-#endif
-{
+{    
     VulkanWindowControl* pWindowControl = NULL;
 #ifdef WIN32
-    pWindowControl = new Win32Control(hInstance, pAppName);
+    pWindowControl = new Win32Control(pAppName);
 #else            
     pWindowControl = new XCBControl();
 #endif    

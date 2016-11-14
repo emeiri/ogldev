@@ -26,7 +26,7 @@
 class Win32Control : public VulkanWindowControl
 {
 public:
-    Win32Control(HINSTANCE hInstance, const char* pAppName);
+    Win32Control(const char* pAppName);
     
     ~Win32Control();
     

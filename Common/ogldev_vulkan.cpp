@@ -148,7 +148,7 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR error %d\n", res);
     
         for (uint j = 0 ; j < NumFormats ; j++) {
-            const VkSurfaceFormatKHR SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
+            const VkSurfaceFormatKHR& SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
             printf("    Format %d color space %d\n", SurfaceFormat.format , SurfaceFormat.colorSpace);
         }
         

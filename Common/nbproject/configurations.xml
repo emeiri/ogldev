@@ -26,6 +26,7 @@
       <itemPath>../Include/ogldev_util.h</itemPath>
       <itemPath>../Include/ogldev_vulkan.h</itemPath>
       <itemPath>../Include/ogldev_vulkan_core.h</itemPath>
+      <itemPath>../Include/ogldev_win32_control.h</itemPath>
       <itemPath>../Include/ogldev_xcb_control.h</itemPath>
       <itemPath>../Include/technique.h</itemPath>
     </logicalFolder>
@@ -53,6 +54,7 @@
       <itemPath>ogldev_util.cpp</itemPath>
       <itemPath>ogldev_vulkan.cpp</itemPath>
       <itemPath>ogldev_vulkan_core.cpp</itemPath>
+      <itemPath>ogldev_win32_control.cpp</itemPath>
       <itemPath>ogldev_xcb_control.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
       <itemPath>random_texture.cpp</itemPath>

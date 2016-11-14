@@ -27,9 +27,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-Win32Control::Win32Control(HINSTANCE hInstance, const char* pAppName) 
+Win32Control::Win32Control(const char* pAppName) 
 {
-    m_hinstance = hInstance;
+    m_hinstance = GetModuleHandle(NULL);;
+    assert(m_hinstance);
     m_hwnd = 0;
     std::string s(pAppName);
     m_appName = std::wstring(s.begin(), s.end());
