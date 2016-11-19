@@ -237,40 +237,237 @@ Let's review the creation of the swap chain step by step:
     SwapChainCreateInfo.minImageCount    = NumImages;</code></pre>
 <p>
     The function that creates the swap chain takes most of its parameters from the VkSwapchainCreateInfoKHR structure.
-    The first three parameters are obvious - the structure type, the surface handle and the number of images.
+    The first three parameters are obvious - the structure type, the surface handle and the number of images. Once created
+    the swap chain is permanently attached to the same surface.
 </p>    
 <pre><code>    SwapChainCreateInfo.imageFormat      = m_core.GetSurfaceFormat().format;
     SwapChainCreateInfo.imageColorSpace  = m_core.GetSurfaceFormat().colorSpace;</code></pre>
     <p>
+    Next comes the image format and color space. The image format was discussed in the previous tutorial. It describes
+    the layout of data in image memory. It contains stuff such as channels (red, green and/or blue) and format (float,
+    normalized int, etc). The color space describes the way the values are matched to colors. For example, this
+    can be linear or sRGB. We will take both from the physical device database.
     </p>
-    SwapChainCreateInfo.imageExtent      = SwapChainExtent;
-    SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    SwapChainCreateInfo.preTransform     = preTransform;
-    SwapChainCreateInfo.imageArrayLayers = 1;
-    SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    SwapChainCreateInfo.presentMode      = VK_PRESENT_MODE_FIFO_KHR;
-    SwapChainCreateInfo.clipped          = true;
-    SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    
-    VkResult res = vkCreateSwapchainKHR(m_core.GetDevice(), &SwapChainCreateInfo, NULL, &m_swapChainKHR);
-    CHECK_VULKAN_ERROR("vkCreateSwapchainKHR error %d\n", res);    
-
-    printf("Swap chain created\n");
-    
-    uint NumSwapChainImages = 0;
+<pre><code>    SwapChainCreateInfo.imageExtent      = SurfaceCaps.currentExtent;</code></pre>
+    <p>
+    We can create the swap chain with a different size than the surface. For now, just grab the current extent from the surface
+    capabilities structure.
+    </p>
+<pre><code>    SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;</code></pre>
+    <p>
+    We need to tell the driver how we are going to use this swap chain. We do that by specifying a combination
+    of bit masks and there are 8 usage bits in total. For example, the swap chain can be used as a source
+    or destination of a transfer (buffer copy) operation, as a depth stencil attachment, etc. We just want a standard
+    color buffer so we use the bit above. 
+    </p>
+<pre><code>    SwapChainCreateInfo.preTransform     = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;</code></pre>
+    <p>
+    The pre transform field was designed for hand held devices that can change their orientation (cellular phones
+    and tablets). It specifies how the orientation must be changed before presentation (90 degrees, 180 degrees, etc). 
+    It is more relevant to Android so we just tell the driver not to do any orientation change.
+    </p>
+<pre><code>    SwapChainCreateInfo.imageArrayLayers = 1;</code></pre>
+    <p>
+    imageArrayLayers is intended for stereoscopic applications where rendering takes place from more than
+    one location and then combined before presentations. An example is VR where you want to render the scene from each
+    eye separately. We are not going to do that today so just specify 1.
+    </p>
+<pre><code>    SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;</code></pre>
+    <p>
+    Swap chain images can be shared by queues of different families. We will use exclusive access by
+    the queue family we have selected previously.
+    </p>
+<pre><code>    SwapChainCreateInfo.presentMode      = VK_PRESENT_MODE_FIFO_KHR;</code></pre>
+    <p>
+    In the previous tutorial we briefly touched on the presentation engine which is the part of the platform
+    involved in actually taking the swap chain image and putting it on the screen. This engine also exists
+    in OpenGL where it is quite limited in comparison to Vulkan. In OpenGL you can select between single and double buffering.
+    Double buffering avoids tearing by switching the buffers only on VSync and you have some control on the number
+    of VSync in a second. That's it. Vulkan, however, provides you no less than four different modes of operation
+    that allow a higher level of flexibility and performance. We will be conservative here and use the FIFO mode which
+    is the most similar to OpenGL double buffering.
+    </p>
+<pre><code>    SwapChainCreateInfo.clipped          = true;</code></pre>
+    <p>
+    The clipped field indicates whether the driver can discard parts of the image that are outside of the visible
+    surface. There are some obscure cases where this is interesting but not in our case.
+    </p>
+<pre><code>    SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;</code></pre>
+    <p>
+    compositeAlpha controls the manner in which the image is combined with other surfaces. This is only relevant on
+    some of the operating systems so we don't use it.
+    </p>    
+<pre><code>    VkResult res = vkCreateSwapchainKHR(m_core.GetDevice(), &SwapChainCreateInfo, NULL, &m_swapChainKHR);
+    CHECK_VULKAN_ERROR("vkCreateSwapchainKHR error %d\n", res);    </code></pre>
+    <p>
+    Finally, we can create the swap chain and get its handle.
+    </p>
+<pre><code>    uint NumSwapChainImages = 0;
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
-    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
-    
-    printf("Number of images %d\n", NumSwapChainImages);
-
-    m_images.resize(NumSwapChainImages);
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);</code></pre>
+    <p>
+    When we created the swap chain we specified the minimum number of images it should contain. In the above
+    call we fetch the actual number of images that were created.
+    </p>
+<pre><code>    m_images.resize(NumSwapChainImages);
     m_cmdBufs.resize(NumSwapChainImages);
     
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
     CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
-}
+}</code></pre>
+    <p>
+    We have to get the handles of all the swap chain images so we resize the image handle vector accordingly. 
+    We also resize the command buffer vector because we are going to clear the window so we have to record a dedicated
+    command buffer for each image in the swap chain.
+    </p>
+<p>
+    The following function creates the command buffers:
+</p>
+<pre><code>void OgldevVulkanApp::CreateCommandBuffer()
+{
+    VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
+    cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
+    
+    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);    
+    CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);</code></pre>
+    <p>
+    Command buffer are not created directly. Instead, they must be allocated from pools. As expected, the motivation is
+    performance. By making command buffers part of a pool better memory management and reuse can be implemented.
+    It is imported to note that the pools are not thread safe. This means that any action on the pool or its command
+    buffers must be explicitly synchronized by the application. So if you want multiple threads to create command
+    buffers in parallel you can either do this synchronization or simply create a different pool for each thread.
+    </p>
+    <p>
+    The function vkCreateCommandPool() creates the pool. It takes a VkCommandPoolCreateInfo structure parameter
+    whose most important member is the queue family index. All commands allocated from this pool must be submitted
+    to queues from this queue family.
+    </p>
+<pre><code>    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+    cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    cmdBufAllocInfo.commandPool = m_cmdBufPool;
+    cmdBufAllocInfo.commandBufferCount = m_images.size();
+    cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);            
+    CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
+}</code></pre>
+<p>
+    We are now ready to allocate the command buffers. In the VkCommandBufferAllocateInfo structure we specify the pool
+    we have just created and the number of command buffers (we need a dedicated command buffer per swap chain image)
+    We also specify whether this is a primary or secondary command buffer. Primary command buffers are the common
+    vehicle for submitting commands to the GPU but they cannot reference each other. This means that you can
+    have two very similar command buffers but you still need to record everything into each one. You cannot share
+    the common stuff between them. This is where secondary command buffers come in. They cannot be directly submitted
+    to the queues but they can be referenced by primary command buffers which solves the problem of sharing. At this
+    point we only need primary command buffers.
+</p>
+<p>
+    Now let's record the clear instruction into our new command buffers.
+</p>
 
+<pre><code>void OgldevVulkanApp::RecordCommandBuffers() 
+{
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;</code></pre>
+<p>
+    Recording of command buffers takes place inside a region explictly defined by a vkBeginCommandBuffer() and
+    vkEndCommandBuffer(). In the VkCommandBufferBeginInfo structure we have a flags member where we tell the driver
+    that the command buffers will be resubmitted to the queue over and over again. There are other usage models
+    but for now we don't need them.
+</p>    
+    
+<pre><code>    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
+    VkClearValue clearValue = {};
+    clearValue.color = clearColor;</code></pre>
+    <p>
+    We have to specify our clear color using the two structures above. The first one is a union of four float/int/uint
+    which allows different ways to do that. The second structure is a union of a VkClearColorValue structure and a
+    VkClearDepthStencilValue structure. This scheme is used in parts of the API that can take either of the two structures.
+    We go with the color case.
+    </p>
+<pre><code>    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;</code></pre>
+    
+<pre><code>    VkResult res;
+    
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {             
+        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
+
+        vkCmdClearColorImage(m_cmdBufs[i], m_images[i], VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);                
+
+        res = vkEndCommandBuffer(m_cmdBufs[i]);
+        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
+    }
+}</code></pre>
+
+
+<pre><code>     void OgldevVulkanApp::RenderScene()
+{
+    uint ImageIndex = 0;
+    
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
+    
+    switch (res) {
+        case VK_SUCCESS:
+        case VK_SUBOPTIMAL_KHR:
+            break;
+        case VK_ERROR_OUT_OF_DATE_KHR:
+            assert(0);
+        default:
+            assert(0);
+    }
+    
+    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask    = &stageFlags;
+    submitInfo.commandBufferCount   = 1;
+    submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
+    
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
+    
+    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
+    
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.swapchainCount     = 1;
+    presentInfo.pSwapchains        = &m_swapChainKHR;
+    presentInfo.pImageIndices      = &ImageIndex;
+    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);
+    
+    CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
+}</code></pre>
+
+<pre><code> void OgldevVulkanApp::Run()
+{    
+    while (true) {        
+        RenderScene();
+
+        // Wait for work to finish before updating MVP.
+        vkDeviceWaitIdle(m_core.GetDevice());
+    }
+}</code></pre>
+
+<pre><code> int main(int argc, char** argv)
+{
+    OgldevVulkanApp app("Tutorial 51");
+    
+    app.Init();
+    
+    app.Run();
+    
+    return 0;
+}
 </code></pre>
+
+
 </section>
     
 </article>    

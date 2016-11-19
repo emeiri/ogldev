@@ -90,16 +90,7 @@ void OgldevVulkanApp::CreateSwapChain()
 
     assert(NumImages >= SurfaceCaps.minImageCount);
     assert(NumImages <= SurfaceCaps.maxImageCount);
-   
-    VkSurfaceTransformFlagBitsKHR preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    
-    if (SurfaceCaps.currentTransform & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
-    //    preTransform = 
-    }
-    else {
-      //  preTransform = SurfaceCaps.currentTransform;
-    }
-    
+      
     VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
     
     SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -109,7 +100,7 @@ void OgldevVulkanApp::CreateSwapChain()
     SwapChainCreateInfo.imageColorSpace  = m_core.GetSurfaceFormat().colorSpace;
     SwapChainCreateInfo.imageExtent      = SurfaceCaps.currentExtent;
     SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    SwapChainCreateInfo.preTransform     = preTransform;
+    SwapChainCreateInfo.preTransform     = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     SwapChainCreateInfo.imageArrayLayers = 1;
     SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     SwapChainCreateInfo.presentMode      = VK_PRESENT_MODE_FIFO_KHR;
@@ -124,6 +115,7 @@ void OgldevVulkanApp::CreateSwapChain()
     uint NumSwapChainImages = 0;
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
     CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
+    assert(NumImages == NumSwapChainImages);
     
     printf("Number of images %d\n", NumSwapChainImages);
 
