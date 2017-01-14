@@ -84,12 +84,12 @@ public:
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
 
         if (!m_geomPassTech.Init()) {
-            OGLDEV_ERROR("Error initializing the geometry pass technique\n");
+            OGLDEV_ERROR0("Error initializing the geometry pass technique\n");
             return false;
         }
 
         if (!m_SSAOTech.Init()) {
-            OGLDEV_ERROR("Error initializing the SSAO technique\n");
+            OGLDEV_ERROR0("Error initializing the SSAO technique\n");
             return false;
         }
 
@@ -104,7 +104,7 @@ public:
         m_SSAOTech.SetTanHalfFOV(TanHalfFOV);
         
         if (!m_lightingTech.Init()) {
-            OGLDEV_ERROR("Error initializing the lighting technique\n");
+            OGLDEV_ERROR0("Error initializing the lighting technique\n");
             return false;
         }
         
@@ -114,7 +114,7 @@ public:
         m_lightingTech.SetShaderType(0);
         
         if (!m_blurTech.Init()) {
-            OGLDEV_ERROR("Error initializing the blur technique\n");
+            OGLDEV_ERROR0("Error initializing the blur technique\n");
             return false;
         }                
         

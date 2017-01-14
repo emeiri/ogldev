@@ -78,7 +78,7 @@ bool Mesh::LoadMesh(const string& Filename)
         Ret = InitFromScene(pScene, Filename);
         
         if (!Ret) {
-            OGLDEV_ERROR("Error initializing model");
+            OGLDEV_ERROR0("Error initializing model");
         }
     }
     else {

@@ -77,7 +77,7 @@ public:
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
               
         if (!m_LightingTech.Init()) {
-            OGLDEV_ERROR("Error initializing the lighting technique\n");
+            OGLDEV_ERROR0("Error initializing the lighting technique\n");
             return false;
         }
 
