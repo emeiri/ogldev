@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef VULKAN
+
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
 
@@ -214,3 +216,4 @@ void OgldevVulkanCore::CreateLogicalDevice()
     printf("Device created\n");
 }
 
+#endif

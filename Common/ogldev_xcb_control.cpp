@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef VULKAN
 
 #ifndef WIN32
 
@@ -105,5 +106,7 @@ VkSurfaceKHR XCBControl::CreateSurface(VkInstance& inst)
     
     return surface;
 }
+
+#endif
 
 #endif

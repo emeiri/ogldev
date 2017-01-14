@@ -58,10 +58,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/ogldev_skinned_mesh.o \
 	${OBJECTDIR}/ogldev_texture.o \
 	${OBJECTDIR}/ogldev_util.o \
-	${OBJECTDIR}/ogldev_vulkan.o \
-	${OBJECTDIR}/ogldev_vulkan_core.o \
-	${OBJECTDIR}/ogldev_win32_control.o \
-	${OBJECTDIR}/ogldev_xcb_control.o \
 	${OBJECTDIR}/pipeline.o \
 	${OBJECTDIR}/random_texture.o \
 	${OBJECTDIR}/technique.o
@@ -71,8 +67,8 @@ OBJECTFILES= \
 CFLAGS=`pkg-config --cflags freetype2` 
 
 # CC Compiler Flags
-CCFLAGS=`pkg-config --cflags ImageMagick++ freetype2 assimp` 
-CXXFLAGS=`pkg-config --cflags ImageMagick++ freetype2 assimp` 
+CCFLAGS=`pkg-config --cflags ImageMagick++ freetype2 assimp` -fPIC 
+CXXFLAGS=`pkg-config --cflags ImageMagick++ freetype2 assimp` -fPIC 
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -207,26 +203,6 @@ ${OBJECTDIR}/ogldev_util.o: ogldev_util.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_util.o ogldev_util.cpp
-
-${OBJECTDIR}/ogldev_vulkan.o: ogldev_vulkan.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_vulkan.o ogldev_vulkan.cpp
-
-${OBJECTDIR}/ogldev_vulkan_core.o: ogldev_vulkan_core.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_vulkan_core.o ogldev_vulkan_core.cpp
-
-${OBJECTDIR}/ogldev_win32_control.o: ogldev_win32_control.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_win32_control.o ogldev_win32_control.cpp
-
-${OBJECTDIR}/ogldev_xcb_control.o: ogldev_xcb_control.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -g -Wall -I../Include -IFreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ogldev_xcb_control.o ogldev_xcb_control.cpp
 
 ${OBJECTDIR}/pipeline.o: pipeline.cpp 
 	${MKDIR} -p ${OBJECTDIR}

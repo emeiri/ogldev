@@ -24,10 +24,6 @@
       <itemPath>../Include/ogldev_texture.h</itemPath>
       <itemPath>../Include/ogldev_types.h</itemPath>
       <itemPath>../Include/ogldev_util.h</itemPath>
-      <itemPath>../Include/ogldev_vulkan.h</itemPath>
-      <itemPath>../Include/ogldev_vulkan_core.h</itemPath>
-      <itemPath>../Include/ogldev_win32_control.h</itemPath>
-      <itemPath>../Include/ogldev_xcb_control.h</itemPath>
       <itemPath>../Include/technique.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
@@ -52,10 +48,6 @@
       <itemPath>ogldev_skinned_mesh.cpp</itemPath>
       <itemPath>ogldev_texture.cpp</itemPath>
       <itemPath>ogldev_util.cpp</itemPath>
-      <itemPath>ogldev_vulkan.cpp</itemPath>
-      <itemPath>ogldev_vulkan_core.cpp</itemPath>
-      <itemPath>ogldev_win32_control.cpp</itemPath>
-      <itemPath>ogldev_xcb_control.cpp</itemPath>
       <itemPath>pipeline.cpp</itemPath>
       <itemPath>random_texture.cpp</itemPath>
       <itemPath>technique.cpp</itemPath>
@@ -95,7 +87,7 @@
             <pElem>../Include</pElem>
             <pElem>FreetypeGL</pElem>
           </incDir>
-          <commandLine>`pkg-config --cflags ImageMagick++ freetype2 assimp`</commandLine>
+          <commandLine>`pkg-config --cflags ImageMagick++ freetype2 assimp` -fPIC</commandLine>
           <warningLevel>2</warningLevel>
         </ccTool>
         <archiverTool>
@@ -139,14 +131,6 @@
       <item path="../Include/ogldev_types.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_vulkan.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_vulkan_core.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_win32_control.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_xcb_control.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -199,14 +183,6 @@
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_vulkan_core.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_win32_control.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_xcb_control.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -276,14 +252,6 @@
       </item>
       <item path="../Include/ogldev_util.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="../Include/ogldev_vulkan.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_vulkan_core.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_win32_control.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="../Include/ogldev_xcb_control.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="../Include/technique.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="FreetypeGL/font-manager.c" ex="false" tool="0" flavor2="0">
@@ -335,14 +303,6 @@
       <item path="ogldev_texture.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ogldev_util.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_vulkan.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_vulkan_core.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_win32_control.cpp" ex="false" tool="1" flavor2="0">
-      </item>
-      <item path="ogldev_xcb_control.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="pipeline.cpp" ex="false" tool="1" flavor2="0">
       </item>

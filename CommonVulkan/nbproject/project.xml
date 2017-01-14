@@ -3,25 +3,23 @@
     <type>org.netbeans.modules.cnd.makeproject</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/make-project/1">
-            <name>Tutorial50</name>
-            <make-project-type>0</make-project-type>
+            <name>CommonVulkan</name>
             <c-extensions/>
             <cpp-extensions>cpp</cpp-extensions>
-            <header-extensions/>
+            <header-extensions>h</header-extensions>
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects>
                 <make-dep-project>../Common</make-dep-project>
-                <make-dep-project>../CommonVulkan</make-dep-project>
             </make-dep-projects>
             <sourceRootList/>
             <confList>
                 <confElem>
                     <name>Debug</name>
-                    <type>1</type>
+                    <type>2</type>
                 </confElem>
                 <confElem>
                     <name>Release</name>
-                    <type>1</type>
+                    <type>2</type>
                 </confElem>
             </confList>
             <formatting>

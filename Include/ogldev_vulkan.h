@@ -19,6 +19,8 @@
 #ifndef OGLDEV_VULKAN_H
 #define OGLDEV_VULKAN_H
 
+#ifdef VULKAN
+
 #include <vector>
 
 //#define ENABLE_DEBUG_LAYERS
@@ -69,5 +71,7 @@ public:
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst) = 0;
 };
+
+#endif // VULKAN
 
 #endif

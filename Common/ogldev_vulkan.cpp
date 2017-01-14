@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifdef VULKAN
 
 #include <string>
 #include <stdio.h>
@@ -175,3 +176,5 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         printf("Number of presentation modes %d\n", NumPresentModes);
     }
 }
+
+#endif
