@@ -150,8 +150,8 @@
 			 &nbsp;&nbsp;&nbsp;     Vector3f N = Target;<br>
 			 &nbsp;&nbsp;&nbsp;     N.Normalize();<br>
 			 &nbsp;&nbsp;&nbsp;     Vector3f U = Up;<br>
-			 &nbsp;&nbsp;&nbsp;     U.Normalize();<br>
 			 &nbsp;&nbsp;&nbsp;     U = U.Cross(Target);<br>
+             &nbsp;&nbsp;&nbsp;     U.Normalize();<br>
 			 &nbsp;&nbsp;&nbsp;     Vector3f V = N.Cross(U);<br>
 			<br>
 			 &nbsp;&nbsp;&nbsp;    m[0][0] = U.x;   m[0][1] = U.y;   m[0][2] = U.z;   m[0][3] = 0.0f;<br>
