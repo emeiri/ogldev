@@ -157,7 +157,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
     
-    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
+    VkClearColorValue clearColor = { 164.0f/256.0f, 30.0f/256.0f, 34.0f/256.0f, 0.0f };
     VkClearValue clearValue = {};
     clearValue.color = clearColor;
     
@@ -165,11 +165,9 @@ void OgldevVulkanApp::RecordCommandBuffers()
     imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageRange.levelCount = 1;
     imageRange.layerCount = 1;
-       
-    VkResult res;
-    
+          
     for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {             
-        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+        VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
 
         vkCmdClearColorImage(m_cmdBufs[i], m_images[i], VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);                
@@ -187,27 +185,14 @@ void OgldevVulkanApp::RenderScene()
     uint ImageIndex = 0;
     
     VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
-    
-    switch (res) {
-        case VK_SUCCESS:
-        case VK_SUBOPTIMAL_KHR:
-            break;
-        case VK_ERROR_OUT_OF_DATE_KHR:
-            assert(0);
-        default:
-            assert(0);
-    }
-    
-    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    
+    CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n" , res);
+   
     VkSubmitInfo submitInfo = {};
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
     submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
     
-    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
-    
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
     CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
     
     VkPresentInfoKHR presentInfo = {};
@@ -216,8 +201,7 @@ void OgldevVulkanApp::RenderScene()
     presentInfo.pSwapchains        = &m_swapChainKHR;
     presentInfo.pImageIndices      = &ImageIndex;
     
-    res = vkQueuePresentKHR(m_queue, &presentInfo);
-    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);    
     CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
 }
 
@@ -246,9 +230,6 @@ void OgldevVulkanApp::Run()
 {    
     while (true) {        
         RenderScene();
-
-        // Wait for work to finish before updating MVP.
-        vkDeviceWaitIdle(m_core.GetDevice());
     }
 }
 

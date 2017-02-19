@@ -27,8 +27,8 @@
 <section>
             <h3> Background </h3>
 <p>
-    Welcome back. I hope that you've been able to complete the <a href="../tutorial50/tutorial50.html">previous tutorial </a>successfully and
-    ready to continue. In this tutorial we will do a very basic operation that usually starts
+    Welcome back. I hope that you've been able to complete the <a href="../tutorial50/tutorial50.html">previous tutorial</a> successfully and
+    you are now ready to continue. In this tutorial we will do a very basic operation that usually starts
     each new frame - clear the screen. In OpenGL this can be done very easily with just the glClear()
     command but as you can already assume - it's a totally different ball game with Vulkan. This tutorial will introduce us
     to three new and improtant Vulkan entities - swap chain, images and the command buffers.
@@ -47,16 +47,16 @@
         buffer that glClear targeted). These two seemingly innocent functions hide a ton of back stage activity
         by the OpenGL driver. What Vulkan does is to provide us with a standard interface to the low level
         operations that used to be the sole domain of the OpenGL driver. Now we have to take control and manage
-        the back stage of the driver ourselves.
+        these back stage activities ourselves.
     </p>
     <p>
         So now let's think what really happens in the driver when it executes that render loop. In most graphics drivers
         there is a concept of a command buffer. The command buffer is a memory buffer that the driver fills with
-        GPU instructions. The driver submits the command buffer to the GPU and is usually some form of a queue of
+        GPU instructions. The driver submits the command buffer to the GPU and there is usually some form of a queue of
         all the command buffers that are currently in flight. The GPU picks up the command buffers one by one and
         executes their contents. The command buffers contain instructions, pointers to resources and everything
-        the GPU needs in order to execute the the OpenGL commands correctly and each command buffer
-        can potentially contain multiple OpenGL commands. It is up to the driver to decide how many OpenGL commands
+        that the GPU needs in order to execute the the OpenGL commands correctly. Each command buffer
+        can potentially contain multiple OpenGL commands (and it usually does). It is up to the driver to decide how many OpenGL commands
         go into each command buffer. The GPU informs the driver whenever
         a command buffer is completed and the driver can stall the application to prevent it from getting too much 
         ahead of the GPU (e.g. the GPU renders frame N while the application is already at frame N+10).
@@ -354,7 +354,7 @@ Let's review the creation of the swap chain step by step:
 }</code></pre>
 <p>
     We are now ready to allocate the command buffers. In the VkCommandBufferAllocateInfo structure we specify the pool
-    we have just created and the number of command buffers (we need a dedicated command buffer per swap chain image)
+    we have just created and the number of command buffers (we need a dedicated command buffer per swap chain image).
     We also specify whether this is a primary or secondary command buffer. Primary command buffers are the common
     vehicle for submitting commands to the GPU but they cannot reference each other. This means that you can
     have two very similar command buffers but you still need to record everything into each one. You cannot share
@@ -372,30 +372,34 @@ Let's review the creation of the swap chain step by step:
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;</code></pre>
 <p>
-    Recording of command buffers takes place inside a region explictly defined by a vkBeginCommandBuffer() and
-    vkEndCommandBuffer(). In the VkCommandBufferBeginInfo structure we have a flags member where we tell the driver
+    Recording of command buffers must be done inside a region of the code explictly marked by a vkBeginCommandBuffer() and
+    vkEndCommandBuffer(). In the VkCommandBufferBeginInfo structure we have a field named 'flags' where we tell the driver
     that the command buffers will be resubmitted to the queue over and over again. There are other usage models
     but for now we don't need them.
 </p>    
     
-<pre><code>    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
+<pre><code>    VkClearColorValue clearColor = { 164.0f/256.0f, 30.0f/256.0f, 34.0f/256.0f, 0.0f };
     VkClearValue clearValue = {};
     clearValue.color = clearColor;</code></pre>
     <p>
     We have to specify our clear color using the two structures above. The first one is a union of four float/int/uint
     which allows different ways to do that. The second structure is a union of a VkClearColorValue structure and a
     VkClearDepthStencilValue structure. This scheme is used in parts of the API that can take either of the two structures.
-    We go with the color case.
+    We go with the color case. Since I'm very creative today I used the RGB values from the color of the Vulkan logo ;-)
     </p>
 <pre><code>    VkImageSubresourceRange imageRange = {};
     imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageRange.levelCount = 1;
     imageRange.layerCount = 1;</code></pre>
+<p>
+    We need to specify the range of images that we want to clear. In future tutorials we will study more complex schemes where
+    there will be multiple mipmap levels, layers, etc. For now we just want the basics so we specify one mip map level and one layer.
+    The aspectMask field tells the driver whether to clear the color, depth or stenctil (or a combination of them). We are only interested
+    in the color aspect of the images.
+</p>    
     
-<pre><code>    VkResult res;
-    
-    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {             
-        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+<pre><code>    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {             
+        VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
 
         vkCmdClearColorImage(m_cmdBufs[i], m_images[i], VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);                
@@ -404,58 +408,99 @@ Let's review the creation of the swap chain step by step:
         CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
     }
 }</code></pre>
-
-
-<pre><code>     void OgldevVulkanApp::RenderScene()
+<p>
+We are now ready to record the command buffers. As mentioned earlier, the commands that do the actual recording
+must be inside a block marked by calls that begin and end a command buffer. For that we specify the command buffer
+to record to and the beginInfo structure which we already prepared. Since we have an array of command buffers (one buffer
+per swap chain image) the entire thing is enclosed inside a for loop. vkCmdClearColorImage() records the clear instruction
+into the command buffer. As parameters it takes the command buffer to record, the target image, the layout of the image in memory,
+the clear color, the number of VkImageSubresourceRange structures to use and a pointer to an array of these structures (only one 
+in our case).
+</p>
+<p>
+We prepared everything we need and we can now code our main render function. In standard OpenGL this usually means specifying a
+list of GL commands to draw stuff followed by a swap buffers call (be it GLUT, GLFW or any other windowing API). For the driver
+it means a tedious repetition of command buffer recording and submission where changes from one frame to the next are relatively small
+(changes in shader matrices, etc). But in Vulkan all our command buffers are already recorded! We just need to queue them to the GPU. Since
+we have to be more verbose in Vulkan we also need to manage how we acquire and image for rendering and how to tell the presentation
+image to display it.
+</p>
+<pre><code>void OgldevVulkanApp::RenderScene()
 {
     uint ImageIndex = 0;
     
     VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
-    
-    switch (res) {
-        case VK_SUCCESS:
-        case VK_SUBOPTIMAL_KHR:
-            break;
-        case VK_ERROR_OUT_OF_DATE_KHR:
-            assert(0);
-        default:
-            assert(0);
-    }
-    
-    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    
-    VkSubmitInfo submitInfo = {};
+    CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n", res);</pre></code>
+<p>
+    The first thing we need to do is to acquire an image from the presentation engine which is available for rendering. 
+    We can acquire more than one image (e.g. if we plan to render two or more frames ahead) in an advanced scenario but
+    for now one image will be enough. The API call above takes the device and swap chain as the first two parameters, respectively.
+    The third parameter is the amount of time we're prepared to wait until that function returns. Often, the presentation engine
+    cannot provide an image immediately because it needs to wait for an image to be released or some internal OS or GPU event (e.g. the
+    VSync signal of the display). If we specify zero we make this a non blocking call which means that if an image is available we
+    get it immediately and if not the function returns with an error. Any value above zero and below the maximum value of an unsigned 64bit
+    integer will cause a timeout of that number of nanoseconds. The value of UINT64_MAX will cause the function to return only when an image
+    becomes available (or some internal error occured). This seems like the safest course of action for us here. The next two parameters
+    are pointers to a semaphore and a fence, respectively. Vulkan was designed with a lot of asynchronous operation in mind. This means
+    that you can define inter-dependencies between queues on the GPU, between the CPU and GPU, etc. This allows you to submit 
+    work to the image even if it is not really ready to be rendered to (which is a bit counter intuitive to what vkAcquireNextImageKHR is
+    supposed to do but can still happen). These semaphore and fence are synchornization primitives that must be waited upon before
+    the actual rendering to the image can begin. A semaphore syncs between stuff on the GPU and the fence between the host CPU
+    and the GPU. As you can see, I've specified NULL in both cases which might be unsafe and theoretically is not supposed
+    to work yet it does. This may be because of the simplicity of our application. It allowed me to postpone all the synchronization 
+    business to a later date. Please let me know if you encounter problems because of this. The last parameter to the function is the index
+    of the image that became available.
+</p>            
+<pre><code>    VkSubmitInfo submitInfo = {};
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
     submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
     
-    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
+    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);</pre></code>
+<p>
+Now that we have an image, let's submit the work to the queue. The vkQueueSubmit() function takes the handle of a queue, the number
+of VkSubmitInfo structures and a pointer to the corresponding array. The last parameter is a fence which we will conviniently ignore for now.
+The VkSubmitInfo actually contains 8 members in addition to the standard sType, but we are going to use only 2 (so just imagine how
+much complexity is still down there). We specify that we have one command
+buffer and we specify its address (the one that corresponds to the acquired image). The Vulkan spec notes that submission of work can have a high overhead and encourages us to pack as many command
+buffers as we possibly can into that API to minimize that overhead. In this simple example we don't have an opportunity to do that but
+we should keep that in mind as our application becomes more complex in the future.
+</p>    
     
-    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
-    
-    VkPresentInfoKHR presentInfo = {};
+<pre><code>    VkPresentInfoKHR presentInfo = {};
     presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.swapchainCount     = 1;
     presentInfo.pSwapchains        = &m_swapChainKHR;
     presentInfo.pImageIndices      = &ImageIndex;
     
-    res = vkQueuePresentKHR(m_queue, &presentInfo);
-    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);    
     CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
 }</code></pre>
-
-<pre><code> void OgldevVulkanApp::Run()
+<p>
+Once the previous API call has returned we know that the command buffer is on its way to the GPU queue but we have no idea
+when exactly it is going to be executed, and frankly, we don't really care. Command buffers in a queue are guaranteed to be
+processed in the order of submission and since we submit a present command after the clear command into the same queue we
+know that the image will be cleared before it is presented. So the vkQueuePresent() call is basically a marker that ends
+the frame and tells the presentation engine to display it. This function takes two parameters - a queue which has presentation
+capabilities (we took care of that when initializing the device and queue) and a pointer to a VkPresentInfoKHR structure. 
+This structure contains, among other stuff, two arrays of equal sizes. A swap chain array and an image index array. This means that
+you can queue a present command to multiple swap chains where each swap chain is connected to a different window. Every swap chain
+in the array has a corresponding image index which specifies which image will be presented. The swapchainCount member says how many
+swap chains and images we are going present.
+</p>
+<pre><code>void OgldevVulkanApp::Run()
 {    
     while (true) {        
         RenderScene();
-
-        // Wait for work to finish before updating MVP.
-        vkDeviceWaitIdle(m_core.GetDevice());
     }
 }</code></pre>
 
-<pre><code> int main(int argc, char** argv)
+<p>
+Our main render function is very simple. We loop endlessly and call the function that we have just reviewed.
+</p>
+
+<pre><code>int main(int argc, char** argv)
 {
     OgldevVulkanApp app("Tutorial 51");
     
@@ -466,7 +511,12 @@ Let's review the creation of the swap chain step by step:
     return 0;
 }
 </code></pre>
-
+<p>
+The main function is also very simple. We declare an OgldevVulkanApp object, initialize and run it.
+</p>
+<p>
+That's it for today. I hope that your window is clear. Next time we will draw a triangle.
+</p>
 
 </section>
     
