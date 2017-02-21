@@ -29,7 +29,7 @@
 <p>
     Welcome back. I hope that you've been able to complete the <a href="../tutorial50/tutorial50.html">previous tutorial</a> successfully and
     you are now ready to continue. In this tutorial we will do a very basic operation that usually starts
-    each new frame - clear the screen. In OpenGL this can be done very easily with just the glClear()
+    a new frame - clear the screen. In OpenGL this can be done very easily with just the glClear()
     command but as you can already assume - it's a totally different ball game with Vulkan. This tutorial will introduce us
     to three new and improtant Vulkan entities - swap chain, images and the command buffers.
     </p>    
@@ -52,12 +52,12 @@
     <p>
         So now let's think what really happens in the driver when it executes that render loop. In most graphics drivers
         there is a concept of a command buffer. The command buffer is a memory buffer that the driver fills with
-        GPU instructions. The driver submits the command buffer to the GPU and there is usually some form of a queue of
+        GPU instructions. The driver translates the GL commands into GPU instructions. It submits the command buffer to the GPU and there is usually some form of a queue of
         all the command buffers that are currently in flight. The GPU picks up the command buffers one by one and
-        executes their contents. The command buffers contain instructions, pointers to resources and everything
+        executes their contents. The command buffers contain instructions, pointers to resources, state changes and everything else
         that the GPU needs in order to execute the the OpenGL commands correctly. Each command buffer
-        can potentially contain multiple OpenGL commands (and it usually does). It is up to the driver to decide how many OpenGL commands
-        go into each command buffer. The GPU informs the driver whenever
+        can potentially contain multiple OpenGL commands (and it usually does because it is more efficient). It is up to the driver to decide how to batch the OpenGL commands
+        into the command buffers. The GPU informs the driver whenever
         a command buffer is completed and the driver can stall the application to prevent it from getting too much 
         ahead of the GPU (e.g. the GPU renders frame N while the application is already at frame N+10).
     </p>
@@ -68,11 +68,11 @@
         the Mesh class that we developed in previous tutorials when we studied the Assimp library. Rendering a mesh
         meant that in each frame we had to submit the same group of draw commands when the only real change was a few
         matrices that controlled the transformation. For each draw command the driver had to do considerable amount of work 
-        which is a waste of time in each frame? What if we could create a command buffer for this mesh class ahead of 
-        time and just submit it in each frame? That's the whole idea behind Vulkan. For the OpenGL driver the frame
-        is just a series of draw commands (and other stuff of course) that the drive cannot grasp what they represent.
-        It doesn't even know that they will be repeated in the next frame. Only the app designer understands what's going
-        on and can create command buffers in the most efficient way.
+        which is a waste of time in each frame. What if we could create a command buffer for this mesh class ahead of 
+        time and just submit it in each frame (while changing the matrices somehow)? That's the whole idea behind Vulkan. For the OpenGL driver the frame
+        is just a series of GL commands and the driver doesn't understand what exactly the application is doing.
+        It doesn't even know that these commands will be repeated in the next frame. Only the app designer understands what's going
+        on and can create command buffers in a way that will match the structure of the application.
     </p>
     <p>
         Another area where OpenGL never excelled in is multi threading. Submitting draw commands in different
@@ -159,17 +159,17 @@ private:
     std::string m_appName;
     VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
-    std::vector<VkImage> m_images;
+    std::vector&lt;VkImage> m_images;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
-    std::vector<VkCommandBuffer> m_cmdBufs;
+    std::vector&lt;VkCommandBuffer> m_cmdBufs;
     VkCommandPool m_cmdBufPool;
 };</code></pre>
 <p>
-    What we have here are a couple of public functions that will be called from main() later on (Init() Run()) and 
-    several private member functions that are based on the step that were described in the previous section. In addition,
+    What we have here are a couple of public functions (Init() and Run()) that will be called from main() later on and 
+    several private member functions that are based on the steps that were described in the previous section. In addition,
     there are a few private member variables. The VulkanWindowControl and OgldevVulkanCore which were part of the main()
-    function in the previous tutorial have moved here. We also have a vector of images, swap chain object, command queue,
+    function in the previous tutorial were moved here. We also have a vector of images, swap chain object, command queue,
     vector of command buffers and a command buffer pool. Now let's look at the Init() function:
 </p>
 <pre><code>void OgldevVulkanApp::Init()
@@ -213,7 +213,7 @@ Let's review the creation of the swap chain step by step:
     device and the surface that was created earlier. An example is the VkSurfaceCapabilitiesKHR vector which contains a 
     VkSurfaceCapabilitiesKHR structure for each physical device. The function GetSurfaceCaps() indexes into that vector 
     using the physical device index (which was selected in the previous tutorial). The VkSurfaceCapabilitiesKHR structure
-    contains a lot of info on the surface. One of its members called currentExtent describes the current size of the
+    contains a lot of info on the surface. The currentExtent member describes the current size of the
     surface. Its type is a VkExtent2D which contains a width and height. Theoretically, the current extent should contain
     the dimensions that we have set when creating the surface and I have found that to be true on both Linux and Windows.
     In several examples (including the one in the Khronos SDK) I saw some logic which checks whether the width of the
@@ -226,7 +226,7 @@ Let's review the creation of the swap chain step by step:
     assert(NumImages >= SurfaceCaps.minImageCount);
     assert(NumImages <= SurfaceCaps.maxImageCount);</code></pre>
 <p>
-    Next we set the number of images that we will create in the swap chain to 2. This should be mimic the behavior
+    Next we set the number of images that we will create in the swap chain to 2. This mimics the behavior
     of double buffering in OpenGL. I added assertions to make sure that this number is within the valid range
     of the platform. I assume that you won't hit these assertions but if you do you can try with one image only.
 </p>        
@@ -283,7 +283,7 @@ Let's review the creation of the swap chain step by step:
     involved in actually taking the swap chain image and putting it on the screen. This engine also exists
     in OpenGL where it is quite limited in comparison to Vulkan. In OpenGL you can select between single and double buffering.
     Double buffering avoids tearing by switching the buffers only on VSync and you have some control on the number
-    of VSync in a second. That's it. Vulkan, however, provides you no less than four different modes of operation
+    of VSync in a second. That's it. Vulkan, however, provides you with no less than four different modes of operation
     that allow a higher level of flexibility and performance. We will be conservative here and use the FIFO mode which
     is the most similar to OpenGL double buffering.
     </p>
@@ -317,8 +317,7 @@ Let's review the creation of the swap chain step by step:
 }</code></pre>
     <p>
     We have to get the handles of all the swap chain images so we resize the image handle vector accordingly. 
-    We also resize the command buffer vector because we are going to clear the window so we have to record a dedicated
-    command buffer for each image in the swap chain.
+    We also resize the command buffer vector because we will record a dedicated command buffer for each image in the swap chain.
     </p>
 <p>
     The following function creates the command buffers:
@@ -333,7 +332,7 @@ Let's review the creation of the swap chain step by step:
     CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);</code></pre>
     <p>
     Command buffer are not created directly. Instead, they must be allocated from pools. As expected, the motivation is
-    performance. By making command buffers part of a pool better memory management and reuse can be implemented.
+    performance. By making command buffers part of a pool, better memory management and reuse can be implemented.
     It is imported to note that the pools are not thread safe. This means that any action on the pool or its command
     buffers must be explicitly synchronized by the application. So if you want multiple threads to create command
     buffers in parallel you can either do this synchronization or simply create a different pool for each thread.
@@ -353,8 +352,8 @@ Let's review the creation of the swap chain step by step:
     CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
 }</code></pre>
 <p>
-    We are now ready to allocate the command buffers. In the VkCommandBufferAllocateInfo structure we specify the pool
-    we have just created and the number of command buffers (we need a dedicated command buffer per swap chain image).
+    We are now ready to create the command buffers. In the VkCommandBufferAllocateInfo structure we specify the pool
+    we have just created and the number of command buffers (we need a dedicated command buffer per image in the swap chain).
     We also specify whether this is a primary or secondary command buffer. Primary command buffers are the common
     vehicle for submitting commands to the GPU but they cannot reference each other. This means that you can
     have two very similar command buffers but you still need to record everything into each one. You cannot share
@@ -385,7 +384,9 @@ Let's review the creation of the swap chain step by step:
     We have to specify our clear color using the two structures above. The first one is a union of four float/int/uint
     which allows different ways to do that. The second structure is a union of a VkClearColorValue structure and a
     VkClearDepthStencilValue structure. This scheme is used in parts of the API that can take either of the two structures.
-    We go with the color case. Since I'm very creative today I used the RGB values from the color of the Vulkan logo ;-)
+    We go with the color case. Since I'm very creative today I used the RGB values from the color of the Vulkan logo ;-) <br> Note
+    that each color channel goes from 0 (darkest) to 1 (brightest) and that this endless spectrum of real numbers is divided to 256 
+    discrete segments which is why I divide by 256.
     </p>
 <pre><code>    VkImageSubresourceRange imageRange = {};
     imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -463,7 +464,7 @@ Now that we have an image, let's submit the work to the queue. The vkQueueSubmit
 of VkSubmitInfo structures and a pointer to the corresponding array. The last parameter is a fence which we will conviniently ignore for now.
 The VkSubmitInfo actually contains 8 members in addition to the standard sType, but we are going to use only 2 (so just imagine how
 much complexity is still down there). We specify that we have one command
-buffer and we specify its address (the one that corresponds to the acquired image). The Vulkan spec notes that submission of work can have a high overhead and encourages us to pack as many command
+buffer and we provide its address (the one that corresponds to the acquired image). The Vulkan spec notes that submission of work can have a high overhead and encourages us to pack as many command
 buffers as we possibly can into that API to minimize that overhead. In this simple example we don't have an opportunity to do that but
 we should keep that in mind as our application becomes more complex in the future.
 </p>    
