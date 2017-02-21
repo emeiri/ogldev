@@ -78,22 +78,14 @@ void VulkanEnumExtProps(std::vector<VkExtensionProperties>& ExtProps)
 
 VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
 {
-   /* std::vector<int> s;
-    
-    if (!ReadBinaryFile(pFileName, s)) {
-        return NULL;
-    }*/
-    
-    std::string s;
-    
-    if (!ReadFile(pFileName, s)) {
-        return NULL;
-    }
+    int codeSize = 0;
+    char* pShaderCode = ReadBinaryFile(pFileName, codeSize);
+    assert(pShaderCode);
   
     VkShaderModuleCreateInfo shaderCreateInfo = {};
     shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shaderCreateInfo.codeSize = s.size();
-    shaderCreateInfo.pCode = (const uint32_t*)s.c_str();
+    shaderCreateInfo.codeSize = codeSize;
+    shaderCreateInfo.pCode = (const uint32_t*)pShaderCode;
     
     VkShaderModule shaderModule;
     VkResult res = vkCreateShaderModule(device, &shaderCreateInfo, NULL, &shaderModule);

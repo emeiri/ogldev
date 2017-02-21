@@ -33,7 +33,7 @@
 using namespace std;
 
 bool ReadFile(const char* fileName, string& outFile);
-bool ReadBinaryFile(const char* pFileName, std::vector<int>& v);
+char* ReadBinaryFile(const char* pFileName, int& size);
 
 void OgldevError(const char* pFileName, uint line, const char* msg, ... );
 void OgldevFileError(const char* pFileName, uint line, const char* pFileError);

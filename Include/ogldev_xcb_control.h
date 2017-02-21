@@ -35,7 +35,7 @@ public:
     virtual void Init(uint Width, uint Height);
     
     virtual VkSurfaceKHR CreateSurface(VkInstance& inst);
-
+    
  private:    
     xcb_connection_t* m_pXCBConn;
     xcb_screen_t* m_pXCBScreen;

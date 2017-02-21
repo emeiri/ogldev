@@ -60,7 +60,7 @@ bool ReadFile(const char* pFileName, string& outFile)
 
 #ifdef WIN32
 
-bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
+char* ReadBinaryFile(const char* pFileName, int& size)
 {
     HANDLE f = CreateFileA(pFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -69,9 +69,9 @@ bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
         return false;
     }
 
-    int len = GetFileSize(f, NULL);
+    size = GetFileSize(f, NULL);
 
-    if (len == INVALID_FILE_SIZE) {
+    if (size == INVALID_FILE_SIZE) {
         OGLDEV_ERROR("Invalid file size %s\n", pFileName);
         return false;
     }
@@ -83,39 +83,38 @@ bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
 }
 
 #else
-bool ReadBinaryFile(const char* pFileName, std::vector<int>& v)
+char* ReadBinaryFile(const char* pFileName, int& size)
 {
     int f = open(pFileName, O_RDONLY);
     
     if (f == -1) {
-        printf("Error opening '%s': %s\n", pFileName, strerror(errno));
-        return false;        
+        OGLDEV_ERROR("Error opening '%s': %s\n", pFileName, strerror(errno));
+        return NULL;        
     }
     
-    v.clear();
+    struct stat stat_buf;
+    int error = stat(pFileName, &stat_buf);
     
-    int len = 0;
-    int index = 0;
-    
-    do {
-        int syms[64];
-        
-        len = read(f, syms, sizeof(syms));
-        assert((len % 4) == 0);
-        
-        if (len > 0) {
-            v.resize(v.size() + len / 4);
-            for (int i = 0 ; i < len / 4 ; i++) {
-                v[index] = syms[i];
-                index++;
-            }
-        }
+    if (error) {
+        OGLDEV_ERROR("Error getting file stats: %s\n", strerror(errno));
+        return NULL;
     }
-    while (len > 0);
+    
+    size = stat_buf.st_size;
+       
+    char* p = (char*)malloc(size);
+    assert(p);
+    
+    int read_len = read(f, p, size);
+    
+    if (read_len != size) {
+        OGLDEV_ERROR("Error reading file: %s\n", strerror(errno));
+        return NULL;        
+    }
     
     close(f);
     
-    return true;
+    return p;
 }
 #endif
 
