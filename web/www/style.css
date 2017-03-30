@@ -303,7 +303,7 @@ img {
 
 #content code {
 	display: block;
-	font-family: monospace, Webdings, Courier;
+	font-family: monospace, Courier, Webdings;
 	padding-bottom: 12px;
 	line-height: 140%;
 	color: #004876;
