@@ -49,13 +49,12 @@ public:
     
     ~OgldevVulkanApp();
     
-    bool Init();    
+    void Init();    
     
     void Run();
     
 private:
 
-   // void EnumPhysDeviceProps();
     void EnumPhysDeviceExtProps();
     void CreateSwapChain();
     void CreateCommandBuffer();
@@ -69,19 +68,17 @@ private:
     std::string m_appName;
     VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
- //   std::vector<std::string> m_devExt;    
     std::vector<VkImage> m_images;
-    std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
     std::vector<VkCommandBuffer> m_cmdBufs;
     VkCommandPool m_cmdBufPool;
+    std::vector<VkImageView> m_views;	
     VkRenderPass m_renderPass;
     std::vector<VkFramebuffer> m_fbs;
     VkShaderModule m_vsModule;
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
- //   VkPhysicalDeviceMemoryProperties m_memProps;
     VkPipelineLayout m_pipelineLayout;
 };
 
@@ -93,41 +90,9 @@ OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
 
 
 OgldevVulkanApp::~OgldevVulkanApp()
-{
-    
+{   
 }
-
     
-void OgldevVulkanApp::EnumPhysDeviceExtProps()
-{
-   /* uint NumExt = 0;
-    
-    VkPhysicalDevice& gfxPhysDev = m_physDevices[m_gfxDevIndex];
-    
-    VkResult res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, NULL);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating device extensions %x\n", res);
-        assert(0);
-    }
-    
-    std::vector<VkExtensionProperties> ExtProps(NumExt);
-
-    res = vkEnumerateDeviceExtensionProperties(gfxPhysDev, NULL, &NumExt, &ExtProps[0]);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error enumerating extensions");
-        assert(0);
-    }
-        
-    for (uint i = 0 ; i < NumExt ; i++) {
-        printf("Device extension %d - %s\n", i, ExtProps[i].extensionName);
-        m_devExt.push_back(std::string(ExtProps[i].extensionName));
-    }     */       
-    
-    //vkGetPhysicalDeviceMemoryProperties(m_physDevices[m_gfxDevIndex], &m_memProps);
-}
-
 
 void OgldevVulkanApp::CreateSwapChain()
 {          
@@ -225,73 +190,69 @@ void OgldevVulkanApp::RecordCommandBuffers()
     renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearValue;
-    
-    VkResult res;
-    
-    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {
-     /*   VkImageMemoryBarrier memBarrier_PresentToClear = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;        
+
+    VkViewport viewport = { 0 };
+    viewport.height = (float)WINDOW_HEIGHT;
+    viewport.width = (float)WINDOW_WIDTH;
+    viewport.minDepth = (float)0.0f;
+    viewport.maxDepth = (float)1.0f;
         
-        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;  */      
-              
-        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+    VkRect2D scissor = { 0 };
+    scissor.extent.width = WINDOW_WIDTH;
+    scissor.extent.height = WINDOW_HEIGHT;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {            
+        VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
-                
-      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-      //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
         renderPassInfo.framebuffer = m_fbs[i];
 
         vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
         vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
         
-        VkViewport viewport = { 0 };
-        viewport.height = (float)WINDOW_HEIGHT;
-        viewport.width = (float)WINDOW_WIDTH;
-        viewport.minDepth = (float)0.0f;
-        viewport.maxDepth = (float)1.0f;
         vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
 
-        VkRect2D scissor = { 0 };
-        scissor.extent.width = WINDOW_WIDTH;
-        scissor.extent.height = WINDOW_HEIGHT;
-        scissor.offset.x = 0;
-        scissor.offset.y = 0;
         vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
 
         vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
         
         vkCmdEndRenderPass(m_cmdBufs[i]);
-        
-      //  vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
-           //                  1, &imageRange);                
-        
-      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
-
+               
         res = vkEndCommandBuffer(m_cmdBufs[i]);
         CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
     }
     
     printf("Command buffers recorded\n");    
 }
+
+
+void OgldevVulkanApp::RenderScene()
+{
+    uint ImageIndex = 0;
+    
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
+    CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n" , res);
+   
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount   = 1;
+    submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
+    
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
+    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
+    
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.swapchainCount     = 1;
+    presentInfo.pSwapchains        = &m_swapChainKHR;
+    presentInfo.pImageIndices      = &ImageIndex;
+    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);    
+    CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
+}
+
 
 
 void OgldevVulkanApp::CreateRenderPass()
@@ -370,32 +331,6 @@ void OgldevVulkanApp::CreateFramebuffer()
     printf("Frame buffers created\n");
 }
 
-void OgldevVulkanApp::RenderScene()
-{
-    uint ImageIndex = 0;
-    
-    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
-    CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n" , res);
-   
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount   = 1;
-    submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
-    
-    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
-    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
-    
-    VkPresentInfoKHR presentInfo = {};
-    presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.swapchainCount     = 1;
-    presentInfo.pSwapchains        = &m_swapChainKHR;
-    presentInfo.pImageIndices      = &ImageIndex;
-    
-    res = vkQueuePresentKHR(m_queue, &presentInfo);    
-    CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
-}
-
-
 
 void OgldevVulkanApp::CreateShaders()
 {
@@ -406,27 +341,6 @@ void OgldevVulkanApp::CreateShaders()
     assert(m_fsModule);
 }
 
-
-static bool memory_type_from_properties(VkPhysicalDeviceMemoryProperties& memProps, 
-                                        uint32_t typeBits,
-                                        VkFlags requirements_mask,
-                                        uint32_t *typeIndex) 
-{
-    // Search memtypes to find first index with those properties
-    for (uint32_t i = 0; i < 32; i++) {
-        if ((typeBits & 1) == 1) {
-            // Type is available, does it match user properties?
-            if ((memProps.memoryTypes[i].propertyFlags &
-                 requirements_mask) == requirements_mask) {
-                *typeIndex = i;
-                return true;
-            }
-        }
-        typeBits >>= 1;
-    }
-    // No memory types matched, return failure
-    return false;
-}
 
 #define VERTEX_BUFFER_BIND_ID 0
 
@@ -554,7 +468,7 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
-   pipelineInfo.layout = m_pipelineLayout;
+    pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.basePipelineIndex = -1;
@@ -566,14 +480,10 @@ void OgldevVulkanApp::CreatePipeline()
 }
 
 
-
-
-
-
-bool OgldevVulkanApp::Init()
+void OgldevVulkanApp::Init()
 {
 #ifdef WIN32
-    
+    m_pWindowControl = new Win32Control(m_appName.c_str());
 #else            
     m_pWindowControl = new XCBControl();
 #endif    
@@ -583,8 +493,6 @@ bool OgldevVulkanApp::Init()
         
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
-    //EnumPhysDeviceProps();
-    EnumPhysDeviceExtProps();
     CreateSwapChain();
     CreateRenderPass();
     CreateFramebuffer();
@@ -592,28 +500,13 @@ bool OgldevVulkanApp::Init()
     CreateShaders();
     CreatePipeline();
     RecordCommandBuffers();
-
-    return true;
 }
 
 
 void OgldevVulkanApp::Run()
 {    
-    while (true) {
-//        m_pWindowControl->PollEvent();
-        
-      //  if (event) {
-       //     demo_handle_event(demo, event);
-      //      free(event);
-      //  }
-
+    while (true) {        
         RenderScene();
-
-        // Wait for work to finish before updating MVP.
-        vkDeviceWaitIdle(m_core.GetDevice());
-       // demo->curFrame++;
-        //if (demo->frameCount != INT32_MAX && demo->curFrame == demo->frameCount)
-        //    demo->quit = true;
     }
 }
 
@@ -641,9 +534,7 @@ int main(int argc, char** argv)
 {
     Tutorial51 app("Tutorial 51");
     
-    if (!app.Init()) {
-        return 1;
-    }      
+    app.Init();
     
     app.Run();
     
