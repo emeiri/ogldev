@@ -59,7 +59,6 @@ private:
     void EnumPhysDeviceExtProps();
     void CreateSwapChain();
     void CreateCommandBuffer();
-    void CreateSemaphore();
     void CreateRenderPass();
     void CreateFramebuffer();
     void CreateShaders();
@@ -75,8 +74,6 @@ private:
     std::vector<VkImageView> m_views;
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
-    VkSemaphore m_imageAvailSem;
-    VkSemaphore m_rendCompSem;
     std::vector<VkCommandBuffer> m_cmdBufs;
     VkCommandPool m_cmdBufPool;
     VkRenderPass m_renderPass;
@@ -186,8 +183,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
     
-    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
-    
+    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);    
     CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);
     
     printf("Command buffer pool created\n");
@@ -198,33 +194,103 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufAllocInfo.commandBufferCount = m_images.size();
     
-    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);
-            
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);            
     CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
     
     printf("Created command buffers\n");
 }
 
-void OgldevVulkanApp::CreateSemaphore()
-{
-    VkSemaphoreCreateInfo semCreateInfo = {};
-    semCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    
-    VkResult res = vkCreateSemaphore(m_core.GetDevice(), &semCreateInfo, NULL, &m_imageAvailSem);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating semaphore\n");
-        assert(0);
-    }
 
-    res = vkCreateSemaphore(m_core.GetDevice(), &semCreateInfo, NULL, &m_rendCompSem);
+void OgldevVulkanApp::RecordCommandBuffers() 
+{
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
     
-    if (res != VK_SUCCESS) {
-        printf("Error creating semaphore\n");
-        assert(0);
+    VkClearColorValue clearColor = { 164.0f/256.0f, 30.0f/256.0f, 34.0f/256.0f, 0.0f };
+    VkClearValue clearValue = {};
+    clearValue.color = clearColor;
+    
+    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;
+    
+    VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = m_renderPass;   
+    renderPassInfo.renderArea.offset.x = 0;
+    renderPassInfo.renderArea.offset.y = 0;
+    renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
+    renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearValue;
+    
+    VkResult res;
+    
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {
+     /*   VkImageMemoryBarrier memBarrier_PresentToClear = {};
+        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.image = m_images[i];
+        memBarrier_PresentToClear.subresourceRange = imageRange;        
+        
+        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
+        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
+        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
+        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
+        memBarrier_PresentToClear.image = m_images[i];
+        memBarrier_PresentToClear.subresourceRange = imageRange;  */      
+              
+        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
+                
+      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+      //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
+        renderPassInfo.framebuffer = m_fbs[i];
+
+        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+        
+        VkViewport viewport = { 0 };
+        viewport.height = (float)WINDOW_HEIGHT;
+        viewport.width = (float)WINDOW_WIDTH;
+        viewport.minDepth = (float)0.0f;
+        viewport.maxDepth = (float)1.0f;
+        vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
+
+        VkRect2D scissor = { 0 };
+        scissor.extent.width = WINDOW_WIDTH;
+        scissor.extent.height = WINDOW_HEIGHT;
+        scissor.offset.x = 0;
+        scissor.offset.y = 0;
+        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
+
+        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
+        
+        vkCmdEndRenderPass(m_cmdBufs[i]);
+        
+      //  vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
+           //                  1, &imageRange);                
+        
+      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
+
+        res = vkEndCommandBuffer(m_cmdBufs[i]);
+        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
     }
     
-    printf("Semaphores created\n");    
+    printf("Command buffers recorded\n");    
 }
 
 
@@ -308,44 +374,24 @@ void OgldevVulkanApp::RenderScene()
 {
     uint ImageIndex = 0;
     
-    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, m_imageAvailSem, NULL, &ImageIndex);
-    
-    switch (res) {
-        case VK_SUCCESS:
-        case VK_SUBOPTIMAL_KHR:
-            break;
-        case VK_ERROR_OUT_OF_DATE_KHR:
-            assert(0);
-        default:
-            assert(0);
-    }
-    
-    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
+    CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n" , res);
+   
     VkSubmitInfo submitInfo = {};
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.waitSemaphoreCount   = 1;
-    submitInfo.pWaitSemaphores      = &m_imageAvailSem;
-    submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
     submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
-    submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores    = &m_rendCompSem;
     
-    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
-    
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
     CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
     
     VkPresentInfoKHR presentInfo = {};
     presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores    = &m_rendCompSem;
     presentInfo.swapchainCount     = 1;
     presentInfo.pSwapchains        = &m_swapChainKHR;
     presentInfo.pImageIndices      = &ImageIndex;
     
-    res = vkQueuePresentKHR(m_queue, &presentInfo);
-    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);    
     CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
 }
 
@@ -520,97 +566,6 @@ void OgldevVulkanApp::CreatePipeline()
 }
 
 
-void OgldevVulkanApp::RecordCommandBuffers() 
-{
-    VkCommandBufferBeginInfo beginInfo = {};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-    
-    VkClearColorValue clearColor = { 1.0f, 1.0f, 0.0f, 0.0f };
-    VkClearValue clearValue = {};
-    clearValue.color = clearColor;
-    
-    VkImageSubresourceRange imageRange = {};
-    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    imageRange.levelCount = 1;
-    imageRange.layerCount = 1;
-    
-    VkRenderPassBeginInfo renderPassInfo = {};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = m_renderPass;   
-    renderPassInfo.renderArea.offset.x = 0;
-    renderPassInfo.renderArea.offset.y = 0;
-    renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
-    renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
-    renderPassInfo.clearValueCount = 1;
-    renderPassInfo.pClearValues = &clearValue;
-    
-    VkResult res;
-    
-    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {
-     /*   VkImageMemoryBarrier memBarrier_PresentToClear = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;        
-        
-        VkImageMemoryBarrier memBarrier_ClearToPresent = {};
-        memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        memBarrier_PresentToClear.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;               
-        memBarrier_PresentToClear.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        memBarrier_PresentToClear.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;                
-        memBarrier_PresentToClear.srcQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.dstQueueFamilyIndex = m_gfxQueueFamily;
-        memBarrier_PresentToClear.image = m_images[i];
-        memBarrier_PresentToClear.subresourceRange = imageRange;  */      
-              
-        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
-        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
-                
-      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-      //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
-        renderPassInfo.framebuffer = m_fbs[i];
-
-        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-        
-        VkViewport viewport = { 0 };
-        viewport.height = (float)WINDOW_HEIGHT;
-        viewport.width = (float)WINDOW_WIDTH;
-        viewport.minDepth = (float)0.0f;
-        viewport.maxDepth = (float)1.0f;
-        vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
-
-        VkRect2D scissor = { 0 };
-        scissor.extent.width = WINDOW_WIDTH;
-        scissor.extent.height = WINDOW_HEIGHT;
-        scissor.offset.x = 0;
-        scissor.offset.y = 0;
-        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
-
-        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
-        
-        vkCmdEndRenderPass(m_cmdBufs[i]);
-        
-      //  vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
-           //                  1, &imageRange);                
-        
-      //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-      //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
-
-        res = vkEndCommandBuffer(m_cmdBufs[i]);
-        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
-    }
-    
-    printf("Command buffers recorded\n");    
-}
 
 
 
@@ -631,7 +586,6 @@ bool OgldevVulkanApp::Init()
     //EnumPhysDeviceProps();
     EnumPhysDeviceExtProps();
     CreateSwapChain();
-    CreateSemaphore();    
     CreateRenderPass();
     CreateFramebuffer();
     CreateCommandBuffer();
