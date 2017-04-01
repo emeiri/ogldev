@@ -494,12 +494,12 @@ void OgldevVulkanApp::Init()
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
     CreateSwapChain();
+    CreateCommandBuffer();
     CreateRenderPass();
     CreateFramebuffer();
-    CreateCommandBuffer();
     CreateShaders();
     CreatePipeline();
-    RecordCommandBuffers();
+    RecordCommandBuffers();    
 }
 
 
@@ -532,7 +532,7 @@ Tutorial51::~Tutorial51()
 
 int main(int argc, char** argv)
 {
-    Tutorial51 app("Tutorial 51");
+    OgldevVulkanApp app("Tutorial 51");
     
     app.Init();
     
