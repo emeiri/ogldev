@@ -67,6 +67,7 @@ private:
     void RecordCommandBuffers();
     void RenderScene();
 
+    std::string m_appName;
     VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
  //   std::vector<std::string> m_devExt;    
@@ -76,8 +77,8 @@ private:
     VkQueue m_queue;
     VkSemaphore m_imageAvailSem;
     VkSemaphore m_rendCompSem;
-    std::vector<VkCommandBuffer> m_presentQCmdBuffs;
-    VkCommandPool m_presentQCmdPool;
+    std::vector<VkCommandBuffer> m_cmdBufs;
+    VkCommandPool m_cmdBufPool;
     VkRenderPass m_renderPass;
     std::vector<VkFramebuffer> m_fbs;
     VkShaderModule m_vsModule;
@@ -90,6 +91,7 @@ private:
 
 OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
 {
+    m_appName = std::string(pAppName);
 }
 
 
@@ -132,40 +134,15 @@ void OgldevVulkanApp::EnumPhysDeviceExtProps()
 
 void OgldevVulkanApp::CreateSwapChain()
 {          
-    assert(m_core.GetSurfaceFormat().format != VK_FORMAT_UNDEFINED);
-    
     const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_core.GetSurfaceCaps();
          
-    VkExtent2D SwapChainExtent = SurfaceCaps.currentExtent;
-    
-    if (SurfaceCaps.currentExtent.width == -1) {
-        SwapChainExtent.width = WINDOW_WIDTH;
-        SwapChainExtent.height = WINDOW_HEIGHT;
-    }
-    else {
-        SwapChainExtent = SurfaceCaps.currentExtent;
-    }
-    
-    printf("Swap chain extent: width %d height %d\n", SwapChainExtent.width, SwapChainExtent.height);
-    
-    uint NumImages = SurfaceCaps.minImageCount + 1;
-    
-    if ((SurfaceCaps.maxImageCount > 0) &&
-        (NumImages > SurfaceCaps.maxImageCount)) {
-        NumImages =  SurfaceCaps.maxImageCount;
-    }
-    
-    printf("Num images: %d\n", NumImages);
-    
-    VkSurfaceTransformFlagBitsKHR preTransform;
-    
-    if (SurfaceCaps.currentTransform & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
-        preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    }
-    else {
-        preTransform = SurfaceCaps.currentTransform;
-    }
-    
+    assert(SurfaceCaps.currentExtent.width != -1);
+                   
+    uint NumImages = 2;
+
+    assert(NumImages >= SurfaceCaps.minImageCount);
+    assert(NumImages <= SurfaceCaps.maxImageCount);
+      
     VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
     
     SwapChainCreateInfo.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -173,9 +150,9 @@ void OgldevVulkanApp::CreateSwapChain()
     SwapChainCreateInfo.minImageCount    = NumImages;
     SwapChainCreateInfo.imageFormat      = m_core.GetSurfaceFormat().format;
     SwapChainCreateInfo.imageColorSpace  = m_core.GetSurfaceFormat().colorSpace;
-    SwapChainCreateInfo.imageExtent      = SwapChainExtent;
+    SwapChainCreateInfo.imageExtent      = SurfaceCaps.currentExtent;
     SwapChainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    SwapChainCreateInfo.preTransform     = preTransform;
+    SwapChainCreateInfo.preTransform     = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     SwapChainCreateInfo.imageArrayLayers = 1;
     SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     SwapChainCreateInfo.presentMode      = VK_PRESENT_MODE_FIFO_KHR;
@@ -183,34 +160,23 @@ void OgldevVulkanApp::CreateSwapChain()
     SwapChainCreateInfo.compositeAlpha   = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     
     VkResult res = vkCreateSwapchainKHR(m_core.GetDevice(), &SwapChainCreateInfo, NULL, &m_swapChainKHR);
-    
-    if (res != VK_SUCCESS) {
-        printf("Error creating swap chain\n");
-        assert(0);
-    }
+    CHECK_VULKAN_ERROR("vkCreateSwapchainKHR error %d\n", res);    
 
     printf("Swap chain created\n");
     
     uint NumSwapChainImages = 0;
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
-
-    if (res != VK_SUCCESS) {
-        printf("Error getting number of images\n");
-        assert(0);
-    }
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
+    assert(NumImages == NumSwapChainImages);
     
     printf("Number of images %d\n", NumSwapChainImages);
 
     m_images.resize(NumSwapChainImages);
     m_views.resize(NumSwapChainImages);
-    m_presentQCmdBuffs.resize(NumSwapChainImages);
+    m_cmdBufs.resize(NumSwapChainImages);
     
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, &(m_images[0]));
-
-    if (res != VK_SUCCESS) {
-        printf("Error getting images\n");
-        assert(0);
-    }    
+    CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
 }
 
 
@@ -220,7 +186,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
     
-    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_presentQCmdPool);
+    VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
     
     CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);
     
@@ -228,11 +194,11 @@ void OgldevVulkanApp::CreateCommandBuffer()
     
     VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
     cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cmdBufAllocInfo.commandPool = m_presentQCmdPool;
+    cmdBufAllocInfo.commandPool = m_cmdBufPool;
     cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufAllocInfo.commandBufferCount = m_images.size();
     
-    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_presentQCmdBuffs[0]);
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);
             
     CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
     
@@ -362,7 +328,7 @@ void OgldevVulkanApp::RenderScene()
     submitInfo.pWaitSemaphores      = &m_imageAvailSem;
     submitInfo.pWaitDstStageMask    = &stageFlags;
     submitInfo.commandBufferCount   = 1;
-    submitInfo.pCommandBuffers      = &m_presentQCmdBuffs[ImageIndex];
+    submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores    = &m_rendCompSem;
     
@@ -581,7 +547,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
     
     VkResult res;
     
-    for (uint i = 0 ; i < m_presentQCmdBuffs.size() ; i++) {
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {
      /*   VkImageMemoryBarrier memBarrier_PresentToClear = {};
         memBarrier_PresentToClear.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         memBarrier_PresentToClear.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
@@ -604,34 +570,34 @@ void OgldevVulkanApp::RecordCommandBuffers()
         memBarrier_PresentToClear.image = m_images[i];
         memBarrier_PresentToClear.subresourceRange = imageRange;  */      
               
-        res = vkBeginCommandBuffer(m_presentQCmdBuffs[i], &beginInfo);
+        res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
                 
       //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
       //                      0, 0, NULL, 0, NULL, 1, &memBarrier_PresentToClear);                
         renderPassInfo.framebuffer = m_fbs[i];
 
-        vkCmdBeginRenderPass(m_presentQCmdBuffs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        vkCmdBindPipeline(m_presentQCmdBuffs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
         
         VkViewport viewport = { 0 };
         viewport.height = (float)WINDOW_HEIGHT;
         viewport.width = (float)WINDOW_WIDTH;
         viewport.minDepth = (float)0.0f;
         viewport.maxDepth = (float)1.0f;
-        vkCmdSetViewport(m_presentQCmdBuffs[i], 0, 1, &viewport);
+        vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
 
         VkRect2D scissor = { 0 };
         scissor.extent.width = WINDOW_WIDTH;
         scissor.extent.height = WINDOW_HEIGHT;
         scissor.offset.x = 0;
         scissor.offset.y = 0;
-        vkCmdSetScissor(m_presentQCmdBuffs[i], 0, 1, &scissor);
+        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
 
-        vkCmdDraw(m_presentQCmdBuffs[i], 3, 1, 0, 0);
+        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
         
-        vkCmdEndRenderPass(m_presentQCmdBuffs[i]);
+        vkCmdEndRenderPass(m_cmdBufs[i]);
         
       //  vkCmdClearColorImage(m_presentQCmdBuffs[i], m_images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColor,
            //                  1, &imageRange);                
@@ -639,7 +605,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
       //  vkCmdPipelineBarrier(m_presentQCmdBuffs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
       //                       0, 0, NULL, 0, NULL, 1, &memBarrier_ClearToPresent);
 
-        res = vkEndCommandBuffer(m_presentQCmdBuffs[i]);
+        res = vkEndCommandBuffer(m_cmdBufs[i]);
         CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
     }
     
