@@ -65,7 +65,7 @@ private:
     void CreateShaders();
     void CreatePipeline();
     void RecordCommandBuffers();
-    void Draw();
+    void RenderScene();
 
     VulkanWindowControl* m_pWindowControl;
     OgldevVulkanCore m_core;    
@@ -338,7 +338,7 @@ void OgldevVulkanApp::CreateFramebuffer()
     printf("Frame buffers created\n");
 }
 
-void OgldevVulkanApp::Draw()
+void OgldevVulkanApp::RenderScene()
 {
     uint ImageIndex = 0;
     
@@ -679,17 +679,15 @@ bool OgldevVulkanApp::Init()
 
 void OgldevVulkanApp::Run()
 {    
-    m_pWindowControl->PreRun();
-
     while (true) {
-        m_pWindowControl->PollEvent();
+//        m_pWindowControl->PollEvent();
         
       //  if (event) {
        //     demo_handle_event(demo, event);
       //      free(event);
       //  }
 
-        Draw();
+        RenderScene();
 
         // Wait for work to finish before updating MVP.
         vkDeviceWaitIdle(m_core.GetDevice());

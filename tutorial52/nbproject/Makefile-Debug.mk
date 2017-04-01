@@ -52,13 +52,15 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut -lxcb -lvulkan
+LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut -lxcb -lvulkan -Wl,-rpath,../CommonVulkan/dist/Debug/GNU-Linux-x86 -L../CommonVulkan/dist/Debug/GNU-Linux-x86 -lCommonVulkan
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../CommonVulkan/dist/Debug/GNU-Linux-x86/libCommonVulkan.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
@@ -67,11 +69,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ${OBJECTFILES}
 ${OBJECTDIR}/tutorial52.o: tutorial52.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial52.o tutorial52.cpp
+	$(COMPILE.cc) -g -DVULKAN -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial52.o tutorial52.cpp
 
 # Subprojects
 .build-subprojects:
 	cd ../Common && ${MAKE}  -f Makefile CONF=Debug
+	cd ../CommonVulkan && ${MAKE}  -f Makefile CONF=Debug
 
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
@@ -81,6 +84,7 @@ ${OBJECTDIR}/tutorial52.o: tutorial52.cpp
 # Subprojects
 .clean-subprojects:
 	cd ../Common && ${MAKE}  -f Makefile CONF=Debug clean
+	cd ../CommonVulkan && ${MAKE}  -f Makefile CONF=Debug clean
 
 # Enable dependency checking
 .dep.inc: .depcheck-impl

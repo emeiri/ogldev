@@ -11,6 +11,7 @@
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects>
                 <make-dep-project>../Common</make-dep-project>
+                <make-dep-project>../CommonVulkan</make-dep-project>
             </make-dep-projects>
             <sourceRootList/>
             <confList>

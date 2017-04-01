@@ -46,6 +46,9 @@
             <pElem>../Common/FreetypeGL</pElem>
           </incDir>
           <commandLine>`pkg-config --cflags glew ImageMagick++ assimp freetype2 fontconfig glfw3`</commandLine>
+          <preprocessorList>
+            <Elem>VULKAN</Elem>
+          </preprocessorList>
         </ccTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52</output>
@@ -65,6 +68,18 @@
             <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibLibItem>xcb</linkerLibLibItem>
             <linkerLibLibItem>vulkan</linkerLibLibItem>
+            <linkerLibProjectItem>
+              <makeArtifact PL="../CommonVulkan"
+                            CT="2"
+                            CN="Debug"
+                            AC="true"
+                            BL="true"
+                            WD="../CommonVulkan"
+                            BC="${MAKE}  -f Makefile CONF=Debug"
+                            CC="${MAKE}  -f Makefile CONF=Debug clean"
+                            OP="${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT}">
+              </makeArtifact>
+            </linkerLibProjectItem>
           </linkerLibItems>
           <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
         </linkerTool>
