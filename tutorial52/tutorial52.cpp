@@ -55,7 +55,6 @@ public:
     
 private:
 
-    void EnumPhysDeviceExtProps();
     void CreateSwapChain();
     void CreateCommandBuffer();
     void CreateRenderPass();
@@ -510,25 +509,6 @@ void OgldevVulkanApp::Run()
     }
 }
 
-
-class Tutorial51 : public OgldevVulkanApp
-{
-public:
-    Tutorial51(const char* pAppName);
-    
-    ~Tutorial51();
-};
-
-
-Tutorial51::Tutorial51(const char* pAppName) : OgldevVulkanApp(pAppName)
-{
-    
-}
-
-Tutorial51::~Tutorial51()
-{
-    
-}
 
 int main(int argc, char** argv)
 {
