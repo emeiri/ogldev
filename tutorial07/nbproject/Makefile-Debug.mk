@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -52,21 +52,21 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lGLEW -lGL ../Common/dist/Debug/GNU-Linux-x86/libcommon.a ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+LDLIBSOPTIONS=-lglut -lGLEW -lGL ../Common/dist/Debug/GNU-Linux/libcommon.a ../Common/dist/Debug/GNU-Linux/libcommon.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07: ../Common/dist/Debug/GNU-Linux/libcommon.a
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07: ../Common/dist/Debug/GNU-Linux/libcommon.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07 ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/tutorial07.o: tutorial07.cpp 
+${OBJECTDIR}/tutorial07.o: tutorial07.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I../Include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial07.o tutorial07.cpp
@@ -79,7 +79,6 @@ ${OBJECTDIR}/tutorial07.o: tutorial07.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial07
 
 # Subprojects
 .clean-subprojects:

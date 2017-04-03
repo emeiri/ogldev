@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="100">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -105,6 +105,9 @@
         </ccTool>
         <linkerTool>
           <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial32</output>
+          <linkerAddLib>
+            <pElem>../Lib</pElem>
+          </linkerAddLib>
           <linkerLibItems>
             <linkerLibLibItem>glut</linkerLibLibItem>
             <linkerLibLibItem>GL</linkerLibLibItem>

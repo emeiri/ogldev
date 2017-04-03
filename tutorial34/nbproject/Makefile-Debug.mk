@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -54,7 +54,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lfontconfig -lGL /usr/local/lib/libglfx.so ../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lAntTweakBar
+LDLIBSOPTIONS=-L../Lib -lglut -lfontconfig -lGL /usr/local/lib/libglfx.so ../Common/dist/Debug/GNU-Linux/libcommon.a -lAntTweakBar
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -62,23 +62,23 @@ LDLIBSOPTIONS=-lglut -lfontconfig -lGL /usr/local/lib/libglfx.so ../Common/dist/
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: /usr/local/lib/libglfx.so
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: ../Common/dist/Debug/GNU-Linux/libcommon.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig`
 
-${OBJECTDIR}/glfx_technique.o: glfx_technique.cpp 
+${OBJECTDIR}/glfx_technique.o: glfx_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/glfx_technique.o glfx_technique.cpp
 
-${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp 
+${OBJECTDIR}/lighting_technique.o: lighting_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/lighting_technique.o lighting_technique.cpp
 
-${OBJECTDIR}/tutorial34.o: tutorial34.cpp 
+${OBJECTDIR}/tutorial34.o: tutorial34.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -I/usr/local/include/glfx -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial34.o tutorial34.cpp
@@ -90,6 +90,7 @@ ${OBJECTDIR}/tutorial34.o: tutorial34.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libglfx.so
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial34
 
 # Subprojects

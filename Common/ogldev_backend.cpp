@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <AntTweakBar.h>
+#include "ATB/AntTweakBar.h"
 
 #include "ogldev_util.h"
 #include "ogldev_backend.h"

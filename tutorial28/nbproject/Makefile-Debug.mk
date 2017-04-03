@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -57,44 +57,44 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-lglut -lassimp -lGL ../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lAntTweakBar
+LDLIBSOPTIONS=-L../Lib -lglut -lassimp -lGL ../Common/dist/Debug/GNU-Linux/libcommon.a -lAntTweakBar
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28: ../Common/dist/Debug/GNU-Linux/libcommon.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ freetype2 fontconfig`
 
-${OBJECTDIR}/billboard_technique.o: billboard_technique.cpp 
+${OBJECTDIR}/billboard_technique.o: billboard_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/billboard_technique.o billboard_technique.cpp
 
-${OBJECTDIR}/mesh.o: mesh.cpp 
+${OBJECTDIR}/mesh.o: mesh.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mesh.o mesh.cpp
 
-${OBJECTDIR}/particle_system.o: particle_system.cpp 
+${OBJECTDIR}/particle_system.o: particle_system.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/particle_system.o particle_system.cpp
 
-${OBJECTDIR}/ps_update_technique.o: ps_update_technique.cpp 
+${OBJECTDIR}/ps_update_technique.o: ps_update_technique.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ps_update_technique.o ps_update_technique.cpp
 
-${OBJECTDIR}/random_texture.o: random_texture.cpp 
+${OBJECTDIR}/random_texture.o: random_texture.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/random_texture.o random_texture.cpp
 
-${OBJECTDIR}/tutorial28.o: tutorial28.cpp 
+${OBJECTDIR}/tutorial28.o: tutorial28.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Werror -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial28.o tutorial28.cpp
@@ -106,7 +106,6 @@ ${OBJECTDIR}/tutorial28.o: tutorial28.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial28
 
 # Subprojects
 .clean-subprojects:

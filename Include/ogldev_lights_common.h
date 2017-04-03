@@ -18,7 +18,7 @@
 #ifndef LIGHTS_COMMON_H
 #define	LIGHTS_COMMON_H
 
-#include <AntTweakBar.h>
+#include "ATB/AntTweakBar.h"
 
 #include "ogldev_math_3d.h"
 
