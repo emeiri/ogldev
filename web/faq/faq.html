@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
+	<script src="js/modernizr.js"></script> <!-- Modernizr -->
+	<title>FAQ Template | CodyHouse</title>
+</head>
+<body>
+<header>
+	<h1>OGLDEV Frequently Asked Questions</h1>
+</header>
+<section class="cd-faq">
+	<ul class="cd-faq-categories">
+		<li><a class="selected" href="#general">General</a></li>
+		<li><a href="#technical">Technical</a></li>
+	</ul> <!-- cd-faq-categories -->
+
+	<div class="cd-faq-items">
+		<ul id="general" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>General</h2></li>
+			<li>
+				<a class="cd-faq-trigger" href="#0">Can I translate your tutorials to my native language? </a>
+				<div class="cd-faq-content">
+					<p>Please do. I will add a link to the translation to the website.</p>
+				</div> <!-- cd-faq-content -->
+			</li>
+
+			<li>
+				<a class="cd-faq-trigger" href="#1">Is there a translation to Russian? </a>
+				<div class="cd-faq-content">
+					<p>Yes: <a href="http://ogltutor.netau.net/">http://ogltutor.netau.net/</a></a></p>
+				</div> <!-- cd-faq-content -->
+			</li>
+
+			<li>
+				<a class="cd-faq-trigger" href="#2">Is there a translation to French?</a>
+				<div class="cd-faq-content">
+					<p>Yes: <a href="http://dragonjoker.fr/tutos.php?tutos=1&prj=-1">http://dragonjoker.fr/tutos.php?tutos=1&prj=-1</a></a></p>
+				</div> <!-- cd-faq-content -->
+			</li>
+
+			<li>
+				<a class="cd-faq-trigger" href="#3">Is there a port to Java?</a>
+				<div class="cd-faq-content">
+					<p>Yes: <a href="https://github.com/elect86/oglDevTutorials">https://github.com/elect86/oglDevTutorials</a></a></p>
+				</div> <!-- cd-faq-content -->
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="technical" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>Technical</h2></li>
+			<li>
+				<a class="cd-faq-trigger" href="#4">Why doesn't tutorials 2 and 3 work?</a>
+				<div class="cd-faq-content">
+					<p>Tutorials 2 and 3 are somewhat unsafe since they don't use shaders for rendering. 
+This is because I take a step by step approach and only introduce shaders in tutorial 4 but I still
+wanted to demonstrate how to render a dot and a triangle before that. Not having a shader program active
+is undefined behavior in the programmable pipeline but it still works on my NVIDIA card. I guess there is
+a fallback in the driver that makes it work. Some people told me that it only worked for them after updating
+their drivers and for some it didn't work at all. Anyway, if you cannot get it to work don't worry. Simply
+study the theory and continue to tutorial 4. From there on it is all shaders.</p>
+				</div> <!-- cd-faq-content -->
+			</li>
+
+			<li>
+				<a class="cd-faq-trigger" href="#5">I'm unable to load my model file</a>
+				<div class="cd-faq-content">
+					<p>We use Assimp to load models (see tutorial 22). If you are unable to load your model
+    try to load it with the <a href="http://assimp.sourceforge.net/main_viewer.html"</a>Assimp Viewer</a>.
+This will tell you whether the problem is with the file or with my code (and let me know...).</p>
+				</div> <!-- cd-faq-content -->
+			</li>
+
+			<li>
+				<a class="cd-faq-trigger" href="#6">Why am I getting compilation errors on the shaders?</a>
+				<div class="cd-faq-content">
+					<p>Intel GPUs on Linux are using the Mesa driver and I have not been able to compile the shaders there. I use NVIDIA on my development platform and I know people have been able
+                    to compile the shaders on AMD as well. If you are able to compile them on Intel it will be great if you could send the required modifications.</p>
+				</div> <!-- cd-faq-content -->
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+	</div> <!-- cd-faq-items -->
+	<a href="#0" class="cd-close-panel">Close</a>
+</section> <!-- cd-faq -->
+<script src="js/jquery-2.1.1.js"></script>
+<script src="js/jquery.mobile.custom.min.js"></script>
+<script src="js/main.js"></script> <!-- Resource jQuery -->
+</body>
+</html>
