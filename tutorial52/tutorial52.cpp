@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 50 - Vulkan
+    Tutorial 52 - Vulkan
 */
 
 #include <cfloat>
@@ -256,16 +256,6 @@ void OgldevVulkanApp::RenderScene()
 
 void OgldevVulkanApp::CreateRenderPass()
 {
-    VkAttachmentDescription attachDesc = {};
-    attachDesc.format = m_core.GetSurfaceFormat().format;
-    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
-    attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
     VkAttachmentReference attachRef = {};
     attachRef.attachment = 0;
     attachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -275,13 +265,23 @@ void OgldevVulkanApp::CreateRenderPass()
     subpassDesc.colorAttachmentCount = 1;
     subpassDesc.pColorAttachments = &attachRef;
 
+    VkAttachmentDescription attachDesc = {};    
+    attachDesc.format = m_core.GetSurfaceFormat().format;
+    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+    attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
     VkRenderPassCreateInfo renderPassCreateInfo = {};
     renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassCreateInfo.attachmentCount = 1;
     renderPassCreateInfo.pAttachments = &attachDesc;
     renderPassCreateInfo.subpassCount = 1;
     renderPassCreateInfo.pSubpasses = &subpassDesc;
-
+        
     VkResult res = vkCreateRenderPass(m_core.GetDevice(), &renderPassCreateInfo, NULL, &m_renderPass);
     CHECK_VULKAN_ERROR("vkCreateRenderPass error %d\n", res);
 
@@ -512,7 +512,7 @@ void OgldevVulkanApp::Run()
 
 int main(int argc, char** argv)
 {
-    OgldevVulkanApp app("Tutorial 51");
+    OgldevVulkanApp app("Tutorial 52");
     
     app.Init();
     

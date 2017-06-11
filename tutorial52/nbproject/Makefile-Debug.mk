@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -52,21 +52,21 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a -lglut -lxcb -lvulkan -Wl,-rpath,../CommonVulkan/dist/Debug/GNU-Linux-x86 -L../CommonVulkan/dist/Debug/GNU-Linux-x86 -lCommonVulkan
+LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux/libcommon.a -lglut -lxcb -lvulkan -Wl,-rpath,'../CommonVulkan/dist/Debug/GNU-Linux' -L../CommonVulkan/dist/Debug/GNU-Linux -lCommonVulkan
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../Common/dist/Debug/GNU-Linux/libcommon.a
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../CommonVulkan/dist/Debug/GNU-Linux-x86/libCommonVulkan.so
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../CommonVulkan/dist/Debug/GNU-Linux/libCommonVulkan.so
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
 
-${OBJECTDIR}/tutorial52.o: tutorial52.cpp 
+${OBJECTDIR}/tutorial52.o: tutorial52.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -DVULKAN -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial52.o tutorial52.cpp
@@ -79,6 +79,7 @@ ${OBJECTDIR}/tutorial52.o: tutorial52.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
+	${RM} -r ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.so
 	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52
 
 # Subprojects

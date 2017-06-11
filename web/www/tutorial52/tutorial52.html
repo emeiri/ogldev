@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title> Tutorial 52 - Vulkan First Triangle</title>
+
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+</head>
+<body>
+    <header id="header">
+        <div>
+            <h2> Tutorial 52: </h2>
+            <h1> Vulkan First Triangle  </h1>
+        </div>
+
+        <a id="logo" class="small" href="../../index.html" title="Homepage">
+            <img src="..//logo ldpi.png">
+        </a>
+    </header>
+
+<article id="content" class="breakpoint">
+<section>
+            <h3> Background </h3>
+<p>
+In the previous tutorial we learned how to clear the window and were introduced to a couple of Vulkan
+    entities, the swap chain the the command buffer, that are key parts of that operation. Today we are going
+    to render our first triangle. This will require the introduction of four new Vulkan entities - the image view,
+    render pass, framebuffer and pipeline. Shaders are also required but since they play the same role as
+    in OpenGL programmable pipeline, I don't consider them a new entity. If you are not familiar with shaders
+    make sure you study tutorial 4 before continuing. 
+</p>
+<p>
+    Let's start with the largest new object introduced by this tutorial - the <i>pipeline</i>. Actually, the full name is
+    the <i>graphics pipeline</i> because in addition to graphics Vulkan takes the compute field very seriously. In general, the compute
+    field comprises of many algorithms that are not 3D in nature (they are not based on the way GPUs process triangles) but they
+    can be accelerated by the distributive power of the GPUs. This is why the Vulkan spec specifies both a graphics pipeline and
+    a compute pipeline. In this tutorial we are going to use only the graphics pipeline. The graphics pipeline object holds
+    most of the state that is already familiar to us from standard OpenGL. 
+</p>
+</section>
+
+<section>
+<h3> Source walkthru </h3>
+    
+    <pre><code>
+void OgldevVulkanApp::Init()
+{
+#ifdef WIN32
+    m_pWindowControl = new Win32Control(m_appName.c_str());
+#else            
+    m_pWindowControl = new XCBControl();
+#endif    
+    m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    m_core.Init(m_pWindowControl);
+        
+    vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
+
+    CreateSwapChain();
+    CreateCommandBuffer();
+<b>    CreateRenderPass();
+    CreateFramebuffer();
+    CreateShaders();
+    CreatePipeline();</b>
+    RecordCommandBuffers();    
+}
+    
+</code></pre>
+<p>
+Let's review the changes top to bottom. The first thing we need to do is add functions to create the four new types of objects. The new functions that were added on top
+    of the material of the previous tutorial are marked in bold face above.
+</p>
+<pre><code>
+void OgldevVulkanApp::CreateRenderPass()
+{
+    VkAttachmentReference attachRef = {};
+    attachRef.attachment = 0;
+    attachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+</code></pre>
+<pre><code>
+    VkSubpassDescription subpassDesc = {};
+    subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpassDesc.colorAttachmentCount = 1;
+    subpassDesc.pColorAttachments = &attachRef;
+</code></pre>
+<p>
+    The subpass description struct describes the subset of attachments that take part in the subpass. This means that any attachment that the subpass reads from or writes
+    to must be specified. This also includes depth/stencil and multisample attachments. In our single subpass description struct we first specify that we are binding this subpass to the graphics pipeline (rather than the compute).
+    Then we specify that we have just one color attachment that we are going to render to and we set the pColorAttachments to point to the descriptor
+    of that attachments (in the case of multiple color attachments this would have been a descriptor array). We don't have any other type of attachment here (input, depth, etc) so all 
+    the other attachment count members remain zero. 
+</p>
+<p>
+    All the attachments that the subpass descriptor can point to have the VkAttachmentReference struct type. This struct has just two members. The first member, titled 'attachments', is an index into the
+    renderPassCreateInfo.pAttachments below. Basically the render pass create info struct points to an array of attachements and all the attachments specified in the subpasses are
+    just indices into that array. We have just one attachment here so the index in our case is zero. 
+</p>
+<pre><code>
+    VkAttachmentDescription attachDesc = {};
+    attachDesc.format = m_core.GetSurfaceFormat().format;
+    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+    attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkRenderPassCreateInfo renderPassCreateInfo = {};
+    renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassCreateInfo.attachmentCount = 1;
+    renderPassCreateInfo.pAttachments = &attachDesc;
+    renderPassCreateInfo.subpassCount = 1;
+    renderPassCreateInfo.pSubpasses = &subpassDesc;
+</code></pre>
+<p>
+In the render pass create info struct we specify that we have one attachment and one subpass. We also specify the
+    addresses of the corresponding structures that describe the attachment and subpass (if we had more than one these would
+    have been struct arrays). Note that by clearing the create info struct upfront we implicitly set the depedency count
+    to zero. Dependencies are used when there are multiple subpasses with interdependencies.
+</p>
+<pre><code>
+    VkResult res = vkCreateRenderPass(m_core.GetDevice(), &renderPassCreateInfo, NULL, &m_renderPass);
+    CHECK_VULKAN_ERROR("vkCreateRenderPass error %d\n", res);
+
+    printf("Created a render pass\n");
+}    
+</code></pre>
+<p>
+    Finally, the call to create the render pass is very simple - it takes the device, the address of the create info struct, an allocator (NULL in our case)
+    and returns the handle to the render pass object in the last parameter.
+    </p>
+
+
+
+</section>
+    
+</article>    
+
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial52/tutorial52.html';
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</body>
+</html>
