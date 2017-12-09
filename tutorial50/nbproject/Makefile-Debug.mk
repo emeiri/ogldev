@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-L../Lib ../Common/dist/Debug/GNU-Linux/libcommon.a -lglut -lxcb -lvulkan -Wl,-rpath,'../CommonVulkan/dist/Debug/GNU-Linux' -L../CommonVulkan/dist/Debug/GNU-Linux -lCommonVulkan
+LDLIBSOPTIONS=-L../Lib ../Common/dist/Debug/GNU-Linux/libcommon.a -lglut -Wl,-rpath,'../CommonVulkan/dist/Debug/GNU-Linux' -L../CommonVulkan/dist/Debug/GNU-Linux -lCommonVulkan
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -64,7 +64,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50: ../CommonVulkan/dist/Debu
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial50 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3 x11-xcb vulkan`
 
 ${OBJECTDIR}/tutorial50.o: tutorial50.cpp
 	${MKDIR} -p ${OBJECTDIR}
