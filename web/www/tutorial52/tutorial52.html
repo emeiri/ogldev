@@ -73,7 +73,7 @@ void OgldevVulkanApp::Init()
 </code></pre>
 <p>
 Let's review the changes top to bottom. The first thing we need to do is add functions to create the four new types of objects. The new functions that were added on top
-    of the material of the previous tutorial are marked in bold face above.
+    of the material of the previous tutorial are marked in bold face above. We will start with the creation of the render pass.
 </p>
 <pre><code>
 void OgldevVulkanApp::CreateRenderPass()
@@ -81,8 +81,7 @@ void OgldevVulkanApp::CreateRenderPass()
     VkAttachmentReference attachRef = {};
     attachRef.attachment = 0;
     attachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-</code></pre>
-<pre><code>
+<br>
     VkSubpassDescription subpassDesc = {};
     subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDesc.colorAttachmentCount = 1;
@@ -120,15 +119,38 @@ void OgldevVulkanApp::CreateRenderPass()
 </code></pre>
 <p>
 In the render pass create info struct we specify that we have one attachment and one subpass. We also specify the
-    addresses of the corresponding structures that describe the attachment and subpass (if we had more than one these would
-    have been struct arrays). Note that by clearing the create info struct upfront we implicitly set the depedency count
-    to zero. Dependencies are used when there are multiple subpasses with interdependencies.
+    addresses of the corresponding structures that describe the attachment and subpass (if we had more than one then 'attachDesc'
+    and 'subpassDesc' would have been arrays of structs). 
+</p>
+<p>
+    Let's review the members in the VkAttachmentDescription structure. 
+    <ul>
+        <li>
+            <b>'format'</b> is simply the format of the image used for the 
+            attachment. We grab it from the surface we created as part of the core (see <a href="../tutorial50/tutorial50.html">tutorial 50</a>). </li>
+        <li>
+            <b>'samples'</b> is only relevant for texture sampling which we are not going to do here so we set it to 
+        <li>
+            <b>'loadOp'</b> specifies whether we preserve or clear the previous contents in the color and depth buffers (we don't need it so we will clear the contents).
+        </li>            
+        <li>
+            <b>'storeOp'</b> specifies whether the content we will generate in the render pass will be stored to the color and depth buffers or be discarded (store in our case).
+        </li>            
+        <li>
+            <b>'stencilLoadOp'/'stencilStoreOp'</b> is the same as the above two but for the stencil buffer. We are not using stencil here so we set it to 'don't care'.
+        </li>            
+        <li>
+            <b>'initialLayout'/'finalLayout'</b> images in Vulkan are stored in an implementationn defined layout which is opaque to us. This means that we don't know how the images
+            pixels are structured in the physical memory that contains them. What Vulkan does is to provide a few image usage types (a.k.a <i>layouts</i>) that allows the
+            programmer to specify how the image will be used. Each GPU vender can then map this to the most optimal method of storing the image in memory. We can often transition
+            an image from one layout to another. The attributes 'initialLayout'/'finalLayout' specify in what layout the image will be at the start of the render pass and the 
+            layout they will transition to when the render pass ends. In our case we start and end with the "presentable" layout.
+        </li>            
+    </ul>
 </p>
 <pre><code>
     VkResult res = vkCreateRenderPass(m_core.GetDevice(), &renderPassCreateInfo, NULL, &m_renderPass);
-    CHECK_VULKAN_ERROR("vkCreateRenderPass error %d\n", res);
-
-    printf("Created a render pass\n");
+    CHECK_VULKAN_ERROR("vkCreateRenderPass error %d\n", res);    
 }    
 </code></pre>
 <p>
@@ -136,7 +158,48 @@ In the render pass create info struct we specify that we have one attachment and
     and returns the handle to the render pass object in the last parameter.
     </p>
 
+<pre><code>
+void OgldevVulkanApp::CreateFramebuffer()
+{
+    m_fbs.resize(m_images.size());
+    
+    VkResult res;
+            
+    for (uint i = 0 ; i < m_images.size() ; i++) {
+        VkImageViewCreateInfo ViewCreateInfo = {};
+        ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        ViewCreateInfo.image = m_images[i];
+        ViewCreateInfo.format = m_core.GetSurfaceFormat().format;
+        ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        ViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        ViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        ViewCreateInfo.subresourceRange.levelCount = 1;
+        ViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        ViewCreateInfo.subresourceRange.layerCount = 1;    
 
+        res = vkCreateImageView(m_core.GetDevice(), &ViewCreateInfo, NULL, &m_views[i]);
+        CHECK_VULKAN_ERROR("vkCreateImageView error %d\n", res);
+        
+        VkFramebufferCreateInfo fbCreateInfo = {};
+        fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        fbCreateInfo.renderPass = m_renderPass;
+        fbCreateInfo.attachmentCount = 1;
+        fbCreateInfo.pAttachments = &m_views[i];
+        fbCreateInfo.width = WINDOW_WIDTH;
+        fbCreateInfo.height = WINDOW_HEIGHT;
+        fbCreateInfo.layers = 1;
+
+        res = vkCreateFramebuffer(m_core.GetDevice(), &fbCreateInfo, NULL, &m_fbs[i]);
+        CHECK_VULKAN_ERROR("vkCreateFramebuffer error %d\n", res);
+    }
+   
+    printf("Frame buffers created\n");
+}
+</code></pre>
 
 </section>
     

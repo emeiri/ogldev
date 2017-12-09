@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2016 Etay Meiri
+	Copyright 2017 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
