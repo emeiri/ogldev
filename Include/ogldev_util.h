@@ -46,16 +46,15 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define ZERO_MEM_VAR(var) memset(&var, 0, sizeof(var))
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
 #ifdef WIN32
 #define SNPRINTF _snprintf_s
 #define VSNPRINTF vsnprintf_s
 #define RANDOM rand
 #define SRANDOM srand((unsigned)time(NULL))
-#if (_MSC_VER == 1900)
-#elif (_MSC_VER == 1800)
-#else
-float fmax(float a, float b);
-#endif
 #else
 #define SNPRINTF snprintf
 #define VSNPRINTF vsnprintf

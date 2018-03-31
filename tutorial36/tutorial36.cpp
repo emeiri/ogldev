@@ -254,7 +254,7 @@ private:
     // The calculation solves a quadratic equation (see http://en.wikipedia.org/wiki/Quadratic_equation)
     float CalcPointLightBSphere(const PointLight& Light)
     {
-        float MaxChannel = fmax(fmax(Light.Color.x, Light.Color.y), Light.Color.z);
+        float MaxChannel = MAX(MAX(Light.Color.x, Light.Color.y), Light.Color.z);
         
         float ret = (-Light.Attenuation.Linear + sqrtf(Light.Attenuation.Linear * Light.Attenuation.Linear - 4 * Light.Attenuation.Exp * (Light.Attenuation.Exp - 256 * MaxChannel * Light.DiffuseIntensity))) 
                     /
