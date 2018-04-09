@@ -65,7 +65,6 @@
               </makeArtifact>
             </linkerLibProjectItem>
             <linkerLibLibItem>glut</linkerLibLibItem>
-            <linkerLibLibItem>xcb</linkerLibLibItem>
             <linkerLibLibItem>vulkan</linkerLibLibItem>
             <linkerLibProjectItem>
               <makeArtifact PL="../CommonVulkan"
@@ -80,7 +79,7 @@
               </makeArtifact>
             </linkerLibProjectItem>
           </linkerLibItems>
-          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`</commandLine>
+          <commandLine>`pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3 x11-xcb vulkan`</commandLine>
         </linkerTool>
       </compileType>
       <item path="tutorial51.cpp" ex="false" tool="1" flavor2="0">

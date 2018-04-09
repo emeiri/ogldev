@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -35,10 +35,10 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/2108356922/ogldev_vulkan.o \
-	${OBJECTDIR}/_ext/2108356922/ogldev_vulkan_core.o \
-	${OBJECTDIR}/_ext/2108356922/ogldev_win32_control.o \
-	${OBJECTDIR}/_ext/2108356922/ogldev_xcb_control.o
+	${OBJECTDIR}/_ext/7daaf93a/ogldev_vulkan.o \
+	${OBJECTDIR}/_ext/7daaf93a/ogldev_vulkan_core.o \
+	${OBJECTDIR}/_ext/7daaf93a/ogldev_win32_control.o \
+	${OBJECTDIR}/_ext/7daaf93a/ogldev_xcb_control.o
 
 
 # C Compiler Flags
@@ -55,37 +55,37 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+LDLIBSOPTIONS=../Common/dist/Debug/GNU-Linux/libcommon.a
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
 	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT}
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT}: ../Common/dist/Debug/GNU-Linux-x86/libcommon.a
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT}: ../Common/dist/Debug/GNU-Linux/libcommon.a
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT}: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -shared -fPIC
 
-${OBJECTDIR}/_ext/2108356922/ogldev_vulkan.o: ../Common/ogldev_vulkan.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/2108356922
+${OBJECTDIR}/_ext/7daaf93a/ogldev_vulkan.o: ../Common/ogldev_vulkan.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2108356922/ogldev_vulkan.o ../Common/ogldev_vulkan.cpp
+	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/ogldev_vulkan.o ../Common/ogldev_vulkan.cpp
 
-${OBJECTDIR}/_ext/2108356922/ogldev_vulkan_core.o: ../Common/ogldev_vulkan_core.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/2108356922
+${OBJECTDIR}/_ext/7daaf93a/ogldev_vulkan_core.o: ../Common/ogldev_vulkan_core.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2108356922/ogldev_vulkan_core.o ../Common/ogldev_vulkan_core.cpp
+	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/ogldev_vulkan_core.o ../Common/ogldev_vulkan_core.cpp
 
-${OBJECTDIR}/_ext/2108356922/ogldev_win32_control.o: ../Common/ogldev_win32_control.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/2108356922
+${OBJECTDIR}/_ext/7daaf93a/ogldev_win32_control.o: ../Common/ogldev_win32_control.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2108356922/ogldev_win32_control.o ../Common/ogldev_win32_control.cpp
+	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/ogldev_win32_control.o ../Common/ogldev_win32_control.cpp
 
-${OBJECTDIR}/_ext/2108356922/ogldev_xcb_control.o: ../Common/ogldev_xcb_control.cpp 
-	${MKDIR} -p ${OBJECTDIR}/_ext/2108356922
+${OBJECTDIR}/_ext/7daaf93a/ogldev_xcb_control.o: ../Common/ogldev_xcb_control.cpp
+	${MKDIR} -p ${OBJECTDIR}/_ext/7daaf93a
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/2108356922/ogldev_xcb_control.o ../Common/ogldev_xcb_control.cpp
+	$(COMPILE.cc) -g -DVULKAN -I../Include -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/7daaf93a/ogldev_xcb_control.o ../Common/ogldev_xcb_control.cpp
 
 # Subprojects
 .build-subprojects:
@@ -94,7 +94,6 @@ ${OBJECTDIR}/_ext/2108356922/ogldev_xcb_control.o: ../Common/ogldev_xcb_control.
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libCommonVulkan.${CND_DLIB_EXT}
 
 # Subprojects
 .clean-subprojects:
