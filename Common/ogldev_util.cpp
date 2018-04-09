@@ -76,10 +76,12 @@ char* ReadBinaryFile(const char* pFileName, int& size)
         return false;
     }
 
-    // wip for tutorial51
-    assert(0);
+	char* p = (char*)malloc(size);
 
-    return true;
+	DWORD bytes_read = 0;
+	bool b = ReadFile(f, p, size, &bytes_read, NULL);
+
+    return p;
 }
 
 #else
