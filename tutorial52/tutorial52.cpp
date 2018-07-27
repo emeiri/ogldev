@@ -369,36 +369,17 @@ void OgldevVulkanApp::CreatePipeline()
     vp.height = (float)WINDOW_HEIGHT;
     vp.minDepth = 0.0f;
     vp.maxDepth = 1.0f;
-    
-    VkRect2D scissor = {};
-    scissor.offset.x = 0;
-    scissor.offset.y = 0;
-    scissor.extent.width  = WINDOW_WIDTH;
-    scissor.extent.height = WINDOW_HEIGHT;
-    
-    VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE] = {};
-    VkPipelineDynamicStateCreateInfo dynamicState = {};
-    dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-    dynamicState.pDynamicStates = dynamicStateEnables;
-
+        
     VkPipelineViewportStateCreateInfo vpCreateInfo = {};
     vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     vpCreateInfo.viewportCount = 1;
     vpCreateInfo.pViewports = &vp;
-    vpCreateInfo.scissorCount = 1;
-    vpCreateInfo.pScissors = &scissor;
-    dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_VIEWPORT;
-    dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_SCISSOR;
     
     VkPipelineDepthStencilStateCreateInfo dsInfo = {};
     dsInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     dsInfo.depthTestEnable = VK_TRUE;
     dsInfo.depthWriteEnable = VK_TRUE;
     dsInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-    dsInfo.back.failOp = VK_STENCIL_OP_KEEP;
-    dsInfo.back.passOp = VK_STENCIL_OP_KEEP;
-    dsInfo.back.compareOp = VK_COMPARE_OP_ALWAYS;
-    dsInfo.front = dsInfo.back;
     
     VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
     rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -409,20 +390,8 @@ void OgldevVulkanApp::CreatePipeline()
     
     VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
     pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-    //pipelineMSCreateInfo.minSampleShading = 1.0f;
     
     VkPipelineColorBlendAttachmentState blendAttachState = {};
-    /*blendAttachState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-    blendAttachState.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-    blendAttachState.colorBlendOp = VK_BLEND_OP_ADD;
-    blendAttachState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    blendAttachState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    blendAttachState.alphaBlendOp = VK_BLEND_OP_ADD;
-    blendAttachState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | 
-                                      VK_COLOR_COMPONENT_G_BIT | 
-                                      VK_COLOR_COMPONENT_B_BIT | 
-                                      VK_COLOR_COMPONENT_A_BIT;*/
     blendAttachState.colorWriteMask = 0xf;
     
     VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
@@ -468,7 +437,6 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pColorBlendState = &blendCreateInfo;
     pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
-    pipelineInfo.pDynamicState = &dynamicState;
     pipelineInfo.basePipelineIndex = -1;
     
     res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);

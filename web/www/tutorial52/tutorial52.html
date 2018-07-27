@@ -243,48 +243,491 @@ void OgldevVulkanApp::CreateFramebuffer()
         VkImageViewCreateInfo ViewCreateInfo = {};
         ViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         ViewCreateInfo.image = m_images[i];
+</code></pre>
+<p>We prepare a VkImageViewCreateInfo structure. The 'image' member must point to the corresponding surface image.
+</p>
+<pre><code>
         ViewCreateInfo.format = m_core.GetSurfaceFormat().format;
+</code></pre>
+<p>
+Image views enable us to access the image using a format which is different than the native image format. For example,
+if the underlying format is 16 bit we can access it as a single 16 bit channel or two 8 bits channel. The restrictions are specified
+<a href="https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#features-formats-compatibility-classes">here</a>.
+<pre><code>
         ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+</code></pre>
+      <p>
+You can use the view type in order to change the way the system looks at the image. In our case we stay with the original 2D.
+</p>
+<pre><code>
         ViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
         ViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
         ViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
         ViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+</code></pre>
+          <p>
+The components member is of the VkComponentMapping type. This structure allows you to map each component of a pixel to a different
+component. For example, you can broadcast one component across multiple components or change RGBA to GBAR (if it is useful...).
+The VK_COMPONENT_SWIZZLE_IDENTITY macro simply means each component is mapped to itself.
+</p>
+<p>
+  An image can be complex, containing multiple mip levels (that allow various levels of resolution of the same basic picture) as well
+  as multiple array slices (that allow placing several different textures into the same image). We can use the subresourceRange member
+  in order to specify the part of the image we wish to target. This structure contains five fields:
+</p>
+<pre><code>
         ViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+</code></pre>
+<p>
+  The aspectMask member specifies the parts of the image (color, depth or stencil) that are part of the view
+</p>
+<pre><code>
         ViewCreateInfo.subresourceRange.baseMipLevel = 0;
         ViewCreateInfo.subresourceRange.levelCount = 1;
+      </code></pre>
+      <p>
+baseMipLevel and levelCount specify a subrange of the mip levels in the image. You must be careful not to overflow the actual number
+of mip levels. Since the minimum is one mip level what we do above is safe.
+      </p>
+      </code></pre>
+      <pre><code>
         ViewCreateInfo.subresourceRange.baseArrayLayer = 0;
         ViewCreateInfo.subresourceRange.layerCount = 1;
-
-        VkResult res = vkCreateImageView(m_core.GetDevice(), &ViewCreateInfo, NULL, &m_views[i]);
-	CHECK_VULKAN_ERROR("vkCreateImageView error %d\n", res);
-			  </code></pre>
-<p>
-  We populate the VkImageViewCreateInfo struct with several fields: the handle to the image view, format (which we take from our core objects)
-  and view type which says how we look at the image (for example, we can create an image of the cube type and access only one face as a 2D image).
-  There is also a components member that allows remapping of the RGBA channels (which we are not interested in so we set to the default). Finally,
-  we have a subresourceRange struct that defines the range of subresources that can be accessed. We will revisit this in the future so for now we keep
-  it as simple as possible (no mip-mapping, no arrays, etc). 
-  </p>
-  <pre><code>
+      </code></pre>
+      <p>
+We do the same thing with the array part of the image.
+      </p>
+      <pre><code>
+        res = vkCreateImageView(m_core.GetDevice(), &ViewCreateInfo, NULL, &m_views[i]);
+        CHECK_VULKAN_ERROR("vkCreateImageView error %d\n", res);
+      </code></pre>
+      <p>
+We can now create the image view and switch to creating the framebuffer.
+      </p>
+      <pre><code>
         VkFramebufferCreateInfo fbCreateInfo = {};
         fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         fbCreateInfo.renderPass = m_renderPass;
+      </code></pre>
+      <p>
+From section 7.2 of the spec: "Framebuffers and graphics pipelines are created based on a specific render pass object.
+They must only be used with that render pass object, or one compatible with it". We are not going to go into the issue of render pass compatibility
+since it is only relevant when you have more than one render pass. For now our framebuffer simply points to the render pass we created earlier.
+      </p>
+      <pre><code>
         fbCreateInfo.attachmentCount = 1;
         fbCreateInfo.pAttachments = &m_views[i];
+      </code></pre>
+      <p>
+The framebuffer can point to multiple attachments. The attachmentCount and pAttachments members specify an array of image views and
+its size. We have a single attachment.
+      </p>
+      <pre><code>
         fbCreateInfo.width = WINDOW_WIDTH;
         fbCreateInfo.height = WINDOW_HEIGHT;
+      </code></pre>
+      <p>
+Not sure exactly why we need to re-specify the width and height and why they are not fetched from the image.
+I played with the values here and there was no change in the result. Need to investigate this further.
+      </p>
+      <pre><code>
         fbCreateInfo.layers = 1;
-
+      </code></pre>
+      <p>
+When a geometry shader is preset we can render into a multi layer framebuffer. For now, we have a single layer.
+      </p>
+      <pre><code>
         res = vkCreateFramebuffer(m_core.GetDevice(), &fbCreateInfo, NULL, &m_fbs[i]);
-        CHECK_VULKAN_ERROR("vkCreateFramebuffer error %d\n", res);	
+        CHECK_VULKAN_ERROR("vkCreateFramebuffer error %d\n", res);
     }
 }
 </code></pre>
 <p>
   Once the image view has been created we can create a framebuffer object that points to it. Notice that both the render pass
   and the framebuffer has a notion of an attachment. But where the framebuffer contains references to the actual resource (via image view),
-  the render pass only contains indices into the framebuffer which is currently active. We will see later how the framebuffer is used.
+  the render pass only contains indices into the framebuffer which is currently active. We will see later how the framebuffer is used. 
+        Our framebuffer object is now ready. The next thing we need to create are the shaders. Now I'm not going to go too deeply into the
+        background about shaders because we covered that in tutorial #4 and the principle idea hasn't changed. Just read that tutorial again
+        if you need more details. What we need in order to render a triangle are a couple of shaders - a vertex shader and a fragment shader.
+        Usually you will also use a vertex buffer in order to feed vertices into the vertex shader. You cannot go far without it because
+        this is how you will feed models stored on disk into the graphics pipeline. But at this stage where we just want one triangle on the screen
+        and we want to keep things as simple as possible we can actually use the vertex shader in order to generate three vertices and send them one
+        by one all the way through the pipeline until the rasterizer interpolates them and executes the fragment shader on each interpolated fragment.
+      </p>
+      <p>
+        So now fire up your favourite editor and type in the text of the vertex shader:
+      </p>
+</p>
+<pre><code>
+#version 400
+ 
+void main()
+{
+    vec2 pos[3] = vec2[3]( vec2(-0.7, 0.7),
+                           vec2(0.7, 0.7),
+                           vec2(0.0, -0.7) );
+    gl_Position = vec4( pos[gl_VertexIndex], 0.0, 1.0 );
+}
+</code></pre>
+<p>
+  The vertex shader starts by a pragma that sets the version. The shader code itself is contained in a single function. Same as in GLSL
+  the entry point function to each shader stage must be called 'main' and it must take no parameters and return void. The shader creates
+  an array of 3 two dimensional vectors and populates them with the coordinates of the triangle. We start at the bottom left and go
+  in a counter clockwise direction until we reach the top. We are not going into the coordinate system at this time but you can play with
+  the values and see for yourself.
+</p>
+<p>
+  Even though we are not going to attach a vertex buffer, since the draw command will be executed with a vertex count of 3 the vertex shader will
+  also execute 3 times. We are not accesing vertices from vertex buffers so I guess this is ok. We now need to send the vertices one by one for each
+  execution of the vertex shader. We do this using the builtin variable gl_VertexIndex. As you may have guessed, this variable is a counter which is
+  initialized to zero and automatically incremented by one for each execution of the vertex shader. We use it in order to index into the pos array and grab
+  the next vertex to send. We set the Z coordinate to zero and the homogenous coordinate W to 1.0. The result is set into another buildin variable - gl_Position.
+  gl_Position is the output from the vertex shader. It is sent down to the rasterizer which accumulates all three vertices and interpolates the fragments between
+  them.
+</p>
+<p>
+  In order to connect the shader to the graphics pipeline we must compile the shader text into binary form. The shader languange in Vulkan is called SPIR-V and
+  it also provides a common intermediate form that is similar to assembly language. This intermediate form will be fed into the driver of your the GPU which will
+  translate it into its own instruction set. The compiler is located in the Vulkan SDK in <b>&lt;Vulkan root&gt;/glslang/build/install/bin/glslangValidator</b>.
+</p>
+<p>
+  The vertex shader is compiled as follows:
+</p>
+<p>
+  <b>glslangValidator -V simple.vert -o simple_vs.spv</b>
+</p>
+<p>
+  simple.vert contains the shader text and the '-o' option specifies the name of the binary file. Note that the compiler decifers the type of the shader stage
+  from the extension of the shader text file so we must use 'vert' for vertex shaders and 'frag' for fragment shaders.
+</p>
+<p>
+  Now for the fragment shader:
+</p>
+<pre><code>
+#version 400
+
+layout(location = 0) out vec4 out_Color;
+
+void main()
+{
+  out_Color = vec4( 0.0, 0.4, 1.0, 1.0 );
+}
+</code></pre>
+<p>
+  The version and entry point are the same idea as the vertex shader, but the fragment shader is focused on the output color of the pixel rather
+  than the location of the vertex. We define the output from the shader as a 4 dimensional color vector and set it to some constant color. That's it. The fragment
+  shader is compiled using:
+</p>
+<p>
+  <b>glslangValidator -V simple.vert -o simple_vs.spv</b>
+</p>
+<p>
+  Now that both shaders are compiled we need to create a couple of shader handles that will later be attached to the pipeline object. The following function takes
+  care of that:
+</p>
+<pre><code>
+void OgldevVulkanApp::CreateShaders()
+{
+    m_vsModule = VulkanCreateShaderModule(m_core.GetDevice(), "Shaders/vs.spv");
+    assert(m_vsModule);
+
+    m_fsModule = VulkanCreateShaderModule(m_core.GetDevice(), "Shaders/fs.spv");
+    assert(m_fsModule);
+}
+</code></pre>
+<p>
+  VulkanCreateShaderModule() is a wrapper that is defined in the commonVulkan library (which is part of OGLDEV sources) as:
+</p>
+<pre><code>
+VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
+{
+    int codeSize = 0;
+    char* pShaderCode = ReadBinaryFile(pFileName, codeSize);
+    assert(pShaderCode);
+
+    VkShaderModuleCreateInfo shaderCreateInfo = {};
+    shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderCreateInfo.codeSize = codeSize;
+    shaderCreateInfo.pCode = (const uint32_t*)pShaderCode;
+
+    VkShaderModule shaderModule;
+    VkResult res = vkCreateShaderModule(device, &shaderCreateInfo, NULL, &shaderModule);
+    CHECK_VULKAN_ERROR("vkCreateShaderModule error %d\n", res);
+    printf("Created shader %s\n", pFileName);
+    return shaderModule;
+}
+</code></pre>
+<p>
+This function starts by reading the shader binary file. ReadBinaryFile() is a utility function that returns a pointer
+to a char buffer with the file content as well as its size. The pointer and size are set into a VkShaderModuleCreateInfo structure
+and the Vulkan function vkCreateShaderModule takes this structure and returns a shader handle.
+</p>
+<p>
+  The final object we need to create is a graphics pipeline object. This is going to be one big object so hang on...
+</p>
+<pre><code>
+void OgldevVulkanApp::CreatePipeline()
+{
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfo[2] = {};
+    
+    shaderStageCreateInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStageCreateInfo[0].module = m_vsModule;
+    shaderStageCreateInfo[0].pName = "main";
+    shaderStageCreateInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shaderStageCreateInfo[1].module = m_fsModule;
+    shaderStageCreateInfo[1].pName = "main";
+  </code></pre>
+  <p>
+    The pipeline object creation function takes several structures as input parameters. We will review them one by one.
+    The first structure, VkPipelineShaderStageCreateInfo, specifies the shader stages that are enabled. In this tutorial we only
+    have the vertex and the fragment shader so we need an array with two instances. For each shader stage we set the shader stage bit,
+    the handle that we created using vkCreateShaderModule() and the name of the entry point.
   </p>
+  <pre><code>
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+  </code></pre>
+  <p>
+    VkPipelineVertexInputStateCreateInfo defines the vertex buffers that feed the pipeline. Since we don't have any we just
+    set the type of the struct and that's it.
+  </p>
+  <pre><code>
+    VkPipelineInputAssemblyStateCreateInfo pipelineIACreateInfo = {};
+    pipelineIACreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    pipelineIACreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+  </code></pre>
+  <p>
+    VkPipelineInputAssemblyStateCreateInfo specifies the topology that the pipeline will process. This is a very small struct and
+    we only skip one member which is relevant for indexed draws only.
+  </p>
+  <p>
+    We are now going to set the viewport state of the pipeline. This a complex structure which points to two sub structures so let's review
+    them first.
+  </p>
+  <pre><code>
+    VkViewport vp = {};
+    vp.x = 0.0f;
+    vp.y = 0.0f;
+    vp.width  = (float)WINDOW_WIDTH;
+    vp.height = (float)WINDOW_HEIGHT;
+    vp.minDepth = 0.0f;
+    vp.maxDepth = 1.0f;
+  </code></pre>
+  <p>
+    The viewport structure defines the viewport transformation, that is, the way the normalized coordinates (-1 to 1 on all axis) will be
+    translated to screen space (as well as the depth range that will be written to the depth buffer). We set the X/Y values according to the size
+    of the window and we set the Z to go from zero to one.
+  </p>
+  <p>
+  The second structure that the viewport state points to is the scissor rectangle. The scissor test determines whether a fragment will be drawn or not
+  based (according to its location relative to the scissor rectangle). Since we are not using the scissor test I'll skip it.
+  </p>
+  <pre><code>
+    VkPipelineViewportStateCreateInfo vpCreateInfo = {};
+    vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    vpCreateInfo.viewportCount = 1;
+    vpCreateInfo.pViewports = &vp;
+  </code></pre>
+  <p>
+  We can now initialize the viewport state struct with our single viewport.
+  </p>
+  <pre><code>
+    VkPipelineDepthStencilStateCreateInfo dsInfo = {};
+    dsInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    dsInfo.depthTestEnable = VK_TRUE;
+    dsInfo.depthWriteEnable = VK_TRUE;
+    dsInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+  </code></pre>
+  <p>
+    The VkPipelineDepthStencilStateCreateInfo set the depth/stencil state. The stencil test here is implicitly disabled (since we initialized the struct to
+    zero the stencilTestEnable is false). We set the depth state to a very standard state where the depth test is enabled, the depth buffer is written to when
+    the depth is succesful and the compare function means that in order to pass the test the fragment must have a lower value of Z.
+  </p>
+  <pre><code>
+    VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
+    rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+    rastCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+    rastCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rastCreateInfo.lineWidth = 1.0f;
+  </code></pre>
+  <p>
+    The VkPipelineRasterizationStateCreateInfo controlls various interesting aspects of rasterization. The polygonMode toggles between wireframe and
+    full mode (try changing it to VK_POLYGON_MODE_LINE). <b>cullMode</b> determines whether we cull back or front facing triangles. <b>frontFace</b> tells
+    the pipeline how to read the order of our vertices (whether they are spilled out in clockwise or counter clockwise mode).
+  </p>
+  <pre><code>
+    VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
+    pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+  </code></pre>
+  <p>
+    Multi
+  </p>
+  <pre><code>
+    VkPipelineColorBlendAttachmentState blendAttachState = {};
+    blendAttachState.colorWriteMask = 0xf;
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
+    blendCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
+    blendCreateInfo.attachmentCount = 1;
+    blendCreateInfo.pAttachments = &blendAttachState;
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    VkDescriptorSetLayoutBinding layoutBinding = {};
+    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    layoutBinding.descriptorCount = 1;
+    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    layoutBinding.pImmutableSamplers = NULL;
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
+    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorLayout.pNext = NULL;
+    descriptorLayout.bindingCount = 1;
+    descriptorLayout.pBindings = &layoutBinding;
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    VkDescriptorSetLayout descriptorSetLayout;
+    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);
+    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    VkPipelineLayoutCreateInfo layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layoutInfo.setLayoutCount = 1;
+    layoutInfo.pSetLayouts = &descriptorSetLayout;
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
+    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    VkGraphicsPipelineCreateInfo pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = ARRAY_SIZE_IN_ELEMENTS(shaderStageCreateInfo);
+    pipelineInfo.pStages = &shaderStageCreateInfo[0];
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &pipelineIACreateInfo;
+    pipelineInfo.pViewportState = &vpCreateInfo;
+    pipelineInfo.pDepthStencilState = &dsInfo;
+    pipelineInfo.pRasterizationState = &rastCreateInfo;
+    pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
+    pipelineInfo.pColorBlendState = &blendCreateInfo;
+    pipelineInfo.layout = m_pipelineLayout;
+    pipelineInfo.renderPass = m_renderPass;
+    pipelineInfo.basePipelineIndex = -1;
+  </code></pre>
+  <p>
+  </p>
+  <pre><code>
+    res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
+    
+}
+  </code></pre>
+  <pre><code>
+void OgldevVulkanApp::RecordCommandBuffers() 
+{
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    
+    VkClearColorValue clearColor = { 164.0f/256.0f, 30.0f/256.0f, 34.0f/256.0f, 0.0f };
+    VkClearValue clearValue = {};
+    clearValue.color = clearColor;
+    
+    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;
+    
+ <b>   VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = m_renderPass;   
+    renderPassInfo.renderArea.offset.x = 0;
+    renderPassInfo.renderArea.offset.y = 0;
+    renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
+    renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearValue;
+
+    VkViewport viewport = { 0 };
+    viewport.height = (float)WINDOW_HEIGHT;
+    viewport.width = (float)WINDOW_WIDTH;
+    viewport.minDepth = (float)0.0f;
+    viewport.maxDepth = (float)1.0f;
+        
+    VkRect2D scissor = { 0 };
+    scissor.extent.width = WINDOW_WIDTH;
+    scissor.extent.height = WINDOW_HEIGHT;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;</b>
+
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {            
+        VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
+<b>        renderPassInfo.framebuffer = m_fbs[i];
+
+        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+        
+        vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
+
+        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
+
+        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
+        
+        vkCmdEndRenderPass(m_cmdBufs[i]);</b>
+               
+        res = vkEndCommandBuffer(m_cmdBufs[i]);
+        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
+    }
+ }
+  </code></pre>
+
+  <pre><code>
+void OgldevVulkanApp::Init()
+{
+#ifdef WIN32
+    m_pWindowControl = new Win32Control(m_appName.c_str());
+#else            
+    m_pWindowControl = new XCBControl();
+#endif    
+    m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    m_core.Init(m_pWindowControl);
+        
+    vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
+
+    CreateSwapChain();
+    CreateCommandBuffer();
+<b>    CreateRenderPass();
+    CreateFramebuffer();
+    CreateShaders();
+    CreatePipeline();</b>
+    RecordCommandBuffers();    
+}
+      
+</code></pre>
 </section>
 
 </article>
