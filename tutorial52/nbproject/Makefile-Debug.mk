@@ -64,12 +64,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ../CommonVulkan/dist/Debu
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3`
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/tutorial52 ${OBJECTFILES} ${LDLIBSOPTIONS} `pkg-config --libs glew ImageMagick++ assimp freetype2 fontconfig gl glfw3 xcb`
 
 ${OBJECTDIR}/tutorial52.o: tutorial52.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -DVULKAN -I../Include -I../Common/FreetypeGL -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial52.o tutorial52.cpp
+	$(COMPILE.cc) -g -DVULKAN -I../Include -I../Common/FreetypeGL -I../Include/assimp -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tutorial52.o tutorial52.cpp
 
 # Subprojects
 .build-subprojects:

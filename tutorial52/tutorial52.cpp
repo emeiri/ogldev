@@ -267,7 +267,6 @@ void OgldevVulkanApp::CreateRenderPass()
 
     VkAttachmentDescription attachDesc = {};    
     attachDesc.format = m_core.GetSurfaceFormat().format;
-    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
     attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
