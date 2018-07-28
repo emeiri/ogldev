@@ -463,7 +463,9 @@ to a char buffer with the file content as well as its size. The pointer and size
 and the Vulkan function vkCreateShaderModule takes this structure and returns a shader handle.
 </p>
 <p>
-  The final object we need to create is a graphics pipeline object. This is going to be one big object so hang on...
+  The final object we need to create is a graphics pipeline object. This is going to be one complex object so hang on...
+  I tried to remove as much as I could from the initialization of this object. It works for me. Hopefully I didn't leave out
+  something which will prevent it from running on your system.
 </p>
 <pre><code>
 void OgldevVulkanApp::CreatePipeline()
@@ -500,11 +502,8 @@ void OgldevVulkanApp::CreatePipeline()
   </code></pre>
   <p>
     VkPipelineInputAssemblyStateCreateInfo specifies the topology that the pipeline will process. This is a very small struct and
-    we only skip one member which is relevant for indexed draws only.
-  </p>
-  <p>
-    We are now going to set the viewport state of the pipeline. This a complex structure which points to two sub structures so let's review
-    them first.
+    we only need to set the topology for the draw call. Vulkan supports ten types of topologies such as point/line/triangle lists,
+    topologies with and without adjacencies, etc. See more in <a href="https://www.khronos.org/registry/vulkan/specs/1.1/html/vkspec.html#VkPrimitiveTopology">this link</a>.
   </p>
   <pre><code>
     VkViewport vp = {};
@@ -517,12 +516,8 @@ void OgldevVulkanApp::CreatePipeline()
   </code></pre>
   <p>
     The viewport structure defines the viewport transformation, that is, the way the normalized coordinates (-1 to 1 on all axis) will be
-    translated to screen space (as well as the depth range that will be written to the depth buffer). We set the X/Y values according to the size
-    of the window and we set the Z to go from zero to one.
-  </p>
-  <p>
-  The second structure that the viewport state points to is the scissor rectangle. The scissor test determines whether a fragment will be drawn or not
-  based (according to its location relative to the scissor rectangle). Since we are not using the scissor test I'll skip it.
+    translated to screen space. We set the X/Y values according to the size
+    of the window. The depth range represents the min/max values that will be written to the depth buffer. We set it to go from zero to one.
   </p>
   <pre><code>
     VkPipelineViewportStateCreateInfo vpCreateInfo = {};
@@ -534,18 +529,6 @@ void OgldevVulkanApp::CreatePipeline()
   We can now initialize the viewport state struct with our single viewport.
   </p>
   <pre><code>
-    VkPipelineDepthStencilStateCreateInfo dsInfo = {};
-    dsInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    dsInfo.depthTestEnable = VK_TRUE;
-    dsInfo.depthWriteEnable = VK_TRUE;
-    dsInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-  </code></pre>
-  <p>
-    The VkPipelineDepthStencilStateCreateInfo set the depth/stencil state. The stencil test here is implicitly disabled (since we initialized the struct to
-    zero the stencilTestEnable is false). We set the depth state to a very standard state where the depth test is enabled, the depth buffer is written to when
-    the depth is succesful and the compare function means that in order to pass the test the fragment must have a lower value of Z.
-  </p>
-  <pre><code>
     VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
     rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
@@ -554,8 +537,9 @@ void OgldevVulkanApp::CreatePipeline()
     rastCreateInfo.lineWidth = 1.0f;
   </code></pre>
   <p>
-    The VkPipelineRasterizationStateCreateInfo controlls various interesting aspects of rasterization. The polygonMode toggles between wireframe and
-    full mode (try changing it to VK_POLYGON_MODE_LINE). <b>cullMode</b> determines whether we cull back or front facing triangles. <b>frontFace</b> tells
+    The VkPipelineRasterizationStateCreateInfo controlls various aspects of rasterization. The polygonMode toggles between wireframe and
+    full mode (try changing it to VK_POLYGON_MODE_LINE). <b>cullMode</b> determines whether we cull back or front facing triangles (see what happens
+    when you change it from VK_POLYGON_FRONT_BIT). <b>frontFace</b> tells
     the pipeline how to read the order of our vertices (whether they are spilled out in clockwise or counter clockwise mode).
   </p>
   <pre><code>
@@ -563,13 +547,17 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   </code></pre>
   <p>
-    Multi
+    Multi-Sampling is a mechanism that improves the appearance of lines and the edges of polygons (but also points). This is also known as Anti-Aliasing.
+    While we are not using it we must set the corresponding state in the pipeline so above we prepare a minimal structure for it.
   </p>
   <pre><code>
     VkPipelineColorBlendAttachmentState blendAttachState = {};
     blendAttachState.colorWriteMask = 0xf;
   </code></pre>
-  <p>
+<p>
+  Even though we are not using any blending here we must set the color write mask in the blend state structure to enabling writing
+  on all four channels (try playing with various combinations of the bottom 4 bits). Actually, this struct does not stand on its own and must
+  be pointed to by the color blend state create info struct, which we will create next.
   </p>
   <pre><code>
     VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
@@ -578,46 +566,9 @@ void OgldevVulkanApp::CreatePipeline()
     blendCreateInfo.attachmentCount = 1;
     blendCreateInfo.pAttachments = &blendAttachState;
   </code></pre>
-  <p>
-  </p>
-  <pre><code>
-    VkDescriptorSetLayoutBinding layoutBinding = {};
-    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    layoutBinding.descriptorCount = 1;
-    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    layoutBinding.pImmutableSamplers = NULL;
-  </code></pre>
-  <p>
-  </p>
-  <pre><code>
-    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
-    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorLayout.pNext = NULL;
-    descriptorLayout.bindingCount = 1;
-    descriptorLayout.pBindings = &layoutBinding;
-  </code></pre>
-  <p>
-  </p>
-  <pre><code>
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);
-    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);
-  </code></pre>
-  <p>
-  </p>
-  <pre><code>
-    VkPipelineLayoutCreateInfo layoutInfo = {};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.setLayoutCount = 1;
-    layoutInfo.pSetLayouts = &descriptorSetLayout;
-  </code></pre>
-  <p>
-  </p>
-  <pre><code>
-    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
-    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);
-  </code></pre>
-  <p>
+<p>
+  The logic op determines whether we will AND/OR/XOR/etc the old and new contents of the framebuffer. Since we want the new contents to override the old
+  we set it to copy.
   </p>
   <pre><code>
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
@@ -631,18 +582,19 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
-    pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.basePipelineIndex = -1;
-  </code></pre>
-  <p>
-  </p>
-  <pre><code>
-    res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
-    CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
-    
+    VkResult res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);    
 }
   </code></pre>
+<p>
+  We now have everything we need to create the pipeline object. We update the graphic pipeline create info struct with points to all the intermediate
+  structures that we've just created. We also set the render pass handle and disable pipeline derivatives (an advanced topic) by setting basePipelineIndex to -1.
+</p>
+<p>
+  Now with the four new objects finally created we take a look at the final major change in this tutorial - recording the command buffers.
+  </p>
   <pre><code>
 void OgldevVulkanApp::RecordCommandBuffers() 
 {
@@ -658,7 +610,11 @@ void OgldevVulkanApp::RecordCommandBuffers()
     imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     imageRange.levelCount = 1;
     imageRange.layerCount = 1;
-    
+   </code></pre>
+<p>
+  There is no change in the first three structures of this function.
+  </p>
+     <pre><code>    
  <b>   VkRenderPassBeginInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = m_renderPass;   
@@ -668,8 +624,19 @@ void OgldevVulkanApp::RecordCommandBuffers()
     renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearValue;
-
-    VkViewport viewport = { 0 };
+ </b>
+   </code></pre>
+<p>
+  The way that a render pass is used while recording a command buffer is by telling the driver where the
+  render pass begins and where it ends. Beginning a render pass requires the above structure which contains
+  the render pass handle and a render area which defines the region where the render pass has an affect. We simply
+  set it to the entire size of the window (not exactly sure why we need both viewport and render area). In the previous
+  tutorial we began the command buffer, recorded a clear command into it and ended the command buffer. We can still do that
+  but there is a simpler way. The render pass begin info contains an array of clear values structures. If that area is
+  set it is the same as an explicit clear command.
+  </p>
+     <pre><code>
+<b>    VkViewport viewport = { 0 };
     viewport.height = (float)WINDOW_HEIGHT;
     viewport.width = (float)WINDOW_WIDTH;
     viewport.minDepth = (float)0.0f;
@@ -680,24 +647,47 @@ void OgldevVulkanApp::RecordCommandBuffers()
     scissor.extent.height = WINDOW_HEIGHT;
     scissor.offset.x = 0;
     scissor.offset.y = 0;</b>
-
+   </code></pre>
+<p>
+  We prepare an viewport and scissor that cover the entire extent of the window.
+</p>
+     <pre><code>
     for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {            
         VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
-<b>        renderPassInfo.framebuffer = m_fbs[i];
+<b>        renderPassInfo.framebuffer = m_fbs[i];</b>
+   </code></pre>
+<p>
+  We reuse the render pass begin info by setting just the handle to the correct framebuffer on each iteration.
+</p>
+     <pre><code>
+<b>        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);</b>
+   </code></pre>
+<p>
+  We begin the command buffer and specify VK_SUBPASS_CONTENTS_INLINE so that everything is recorded in the primary
+  command buffer (avoiding the use of secondary command buffers at this time).
+</p>
+	<pre><code>
+<b>        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-        
         vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
 
-        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
-
-        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
+        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);</b>
+	</code></pre>
+<p>
+  We bind the graphics pipeline and set the viewports and scissor structures.
+  </p>
+     <pre><code>     
+<b>        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
         
         vkCmdEndRenderPass(m_cmdBufs[i]);</b>
-               
+	</code></pre>
+<p>
+  Finally, we record a command to draw. The arguments are the command buffer to record to, number of vertices,
+  number of instances (for re-running the same drawing ops on different shader parameters), index of the first vertex to
+  draw and index of the first instance to draw. We can now end the command buffer.
+</p>
+     <pre><code>     
         res = vkEndCommandBuffer(m_cmdBufs[i]);
         CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
     }
@@ -725,9 +715,11 @@ void OgldevVulkanApp::Init()
     CreateShaders();
     CreatePipeline();</b>
     RecordCommandBuffers();    
-}
-      
-</code></pre>
+}      
+     </code></pre>
+<p>
+  The last thing we need to do is to call the functions to create the four new objects.
+  </p>
 </section>
 
 </article>

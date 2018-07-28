@@ -374,13 +374,7 @@ void OgldevVulkanApp::CreatePipeline()
     vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     vpCreateInfo.viewportCount = 1;
     vpCreateInfo.pViewports = &vp;
-    
-    VkPipelineDepthStencilStateCreateInfo dsInfo = {};
-    dsInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    dsInfo.depthTestEnable = VK_TRUE;
-    dsInfo.depthWriteEnable = VK_TRUE;
-    dsInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
-    
+       
     VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
     rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
@@ -399,31 +393,7 @@ void OgldevVulkanApp::CreatePipeline()
     blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
     blendCreateInfo.attachmentCount = 1;
     blendCreateInfo.pAttachments = &blendAttachState;
-
-    VkDescriptorSetLayoutBinding layoutBinding = {};
-    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    layoutBinding.descriptorCount = 1;
-    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    layoutBinding.pImmutableSamplers = NULL;
-
-    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
-    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorLayout.pNext = NULL;
-    descriptorLayout.bindingCount = 1;
-    descriptorLayout.pBindings = &layoutBinding;
-
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);    
-    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);
-     
-    VkPipelineLayoutCreateInfo layoutInfo = {};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.setLayoutCount = 1;
-    layoutInfo.pSetLayouts = &descriptorSetLayout;
-        
-    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
-    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);
-   
+ 
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = ARRAY_SIZE_IN_ELEMENTS(shaderStageCreateInfo);
@@ -431,15 +401,13 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &pipelineIACreateInfo;
     pipelineInfo.pViewportState = &vpCreateInfo;
-    pipelineInfo.pDepthStencilState = &dsInfo;
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
-    pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.basePipelineIndex = -1;
     
-    res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    VkResult res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
     CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
     
     printf("Graphics pipeline created\n");
