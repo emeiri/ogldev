@@ -28,7 +28,7 @@
             <h3> Background </h3>
 <p>
 In the previous tutorial we learned how to clear the window and were introduced to a couple of Vulkan
-    entities, the swap chain the the command buffer, that are key parts of that operation. Today we are going
+    entities that are key parts of that operation - the swap chain the the command buffe. Today we are going
     to render our first triangle. This will require the introduction of four new Vulkan entities - the image view,
     render pass, framebuffer and pipeline. Shaders are also required but since they play the same role as
     in OpenGL programmable pipeline, I don't consider them a new entity. If you are not familiar with shaders
@@ -40,8 +40,25 @@ In the previous tutorial we learned how to clear the window and were introduced 
     field comprises of many algorithms that are not 3D in nature (they are not based on the way GPUs process triangles) but they
     can be accelerated by the distributive power of the GPUs. This is why the Vulkan spec specifies both a graphics pipeline and
     a compute pipeline. In this tutorial we are going to use only the graphics pipeline. The graphics pipeline object holds
-    most of the state that is already familiar to us from standard OpenGL.
+    most of the state that is already familiar to us from standard OpenGL. Stuff such as details about various stages in the pipeline (
+    vertex, geometry, tesselation, etc) that execute shaders; state of the input assembly which creates lines and triangles from buffers; viewport
+    and rasterization state; depth stencil state and much more. We didn't create a graphics pipeline in the previous couple of tutorials
+    because we didn't use the draw command. Now - we have to.
 </p>
+	    <p>
+	      Image views are meta data objects that stand between the shaders and the actual resource that is being read from or written to.
+    	      The allow us to limit the access to the resource (for example we can create and image view that represents a single image inside
+	      an array) and some control on the apearance of the resource in terms of format. 
+	    </p>
+	    <p>
+	      A render pass maintains a list of all resources that will be used and their dependencies (for example when a resource is changed
+	      from an output to input during shadow mapping). The framebuffer works hand in hand with the render pass by creating a two step connection
+	      from the pipeline to the resource. The render pass is bound to the command buffer and contains indices into the framebuffer. The framebuffer
+	      maps these indices to image views (that in turn reference a real resource).
+	    </p>
+	    <p>
+	      This in a nutshell is an overview of the new objects. Now let's see how to create them and put them to good use.
+	      </p>
 </section>
 
 <section>
@@ -83,38 +100,13 @@ private:
     std::vector<VkFramebuffer> m_fbs;
     VkShaderModule m_vsModule;
     VkShaderModule m_fsModule;
-    VkPipeline m_pipeline;
-    VkPipelineLayout m_pipelineLayout;</b>
+    VkPipeline m_pipeline;</b>
 };
 </code></pre>
   <p>
     This is the updated main class of the tutorial. Highlighted we can see the four new private methods that were added in order to create the new objects
     and their respective members to hold the relevant handles.
     </p>
-    <pre><code>
-void OgldevVulkanApp::Init()
-{
-#ifdef WIN32
-    m_pWindowControl = new Win32Control(m_appName.c_str());
-#else
-    m_pWindowControl = new XCBControl();
-#endif
-    m_pWindowControl->Init(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-    m_core.Init(m_pWindowControl);
-
-    vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
-
-    CreateSwapChain();
-    CreateCommandBuffer();
-<b>    CreateRenderPass();
-    CreateFramebuffer();
-    CreateShaders();
-    CreatePipeline();</b>
-    RecordCommandBuffers();
-}
-
-</code></pre>
 <p>
 Let's review the changes top to bottom. The first thing we need to do is add functions to create the four new types of objects. The new functions that were added on top
     of the material of the previous tutorial are marked in bold face above. We will start with the creation of the render pass.

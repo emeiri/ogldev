@@ -78,7 +78,6 @@ private:
     VkShaderModule m_vsModule;
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
-    VkPipelineLayout m_pipelineLayout;
 };
 
 
