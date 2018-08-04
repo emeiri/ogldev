@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 52 - Vulkan
+    Tutorial 52 - Vulkan First Triangle
 */
 
 #include <cfloat>
