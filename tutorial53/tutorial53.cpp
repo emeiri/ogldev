@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 52 - Vulkan Vertex Buffers
+    Tutorial 53 - Vulkan Vertex Buffers
 */
 
 #include <cfloat>
@@ -33,7 +33,7 @@
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
-
+#include "ogldev_math_3d.h"
 #include "ogldev_xcb_control.h"
 
 #define WINDOW_WIDTH  1024  
@@ -59,6 +59,7 @@ private:
     void CreateCommandBuffer();
     void CreateRenderPass();
     void CreateFramebuffer();
+    void CreateVertexBuffer();
     void CreateShaders();
     void CreatePipeline();
     void RecordCommandBuffers();
@@ -329,6 +330,31 @@ void OgldevVulkanApp::CreateFramebuffer()
 }
 
 
+void OgldevVulkanApp::CreateVertexBuffer() 
+{
+    Vector3f Vertices[3] = { (-1.0f, -1.0f, 0.0f),
+                             ( 1.0f, -1.0f, 0.0f),
+                             ( 0.0f,  1.0f, 0.0f), };
+    
+    VkBufferCreateInfo vbCreateInfo = {};
+    vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    vbCreateInfo.size = sizeof(Vertices);
+    vbCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    VkBuffer vb;
+    VkResult res = vkCreateBuffer(m_core.GetDevice(), &vbCreateInfo, NULL, &vb);
+    CHECK_VULKAN_ERROR("vkCreateBuffer error %d\n", res);
+    printf("Create vertex buffer\n");
+    
+    VkMemoryRequirements memReqs = {};
+    vkGetBufferMemoryRequirements(m_core.GetDevice(), vb, &memReqs);
+    printf("Vertex buffer requires %lud bytes\n", memReqs.size);
+    VkMemoryAllocateInfo memAllocInfo = {};
+    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memAllocInfo.allocationSize = memReqs.size;
+    
+}
+
+
 void OgldevVulkanApp::CreateShaders()
 {
     m_vsModule = VulkanCreateShaderModule(m_core.GetDevice(), "Shaders/vs.spv");
@@ -430,6 +456,7 @@ void OgldevVulkanApp::Init()
     CreateCommandBuffer();
     CreateRenderPass();
     CreateFramebuffer();
+    CreateVertexBuffer();
     CreateShaders();
     CreatePipeline();
     RecordCommandBuffers();    
@@ -446,7 +473,7 @@ void OgldevVulkanApp::Run()
 
 int main(int argc, char** argv)
 {
-    OgldevVulkanApp app("Tutorial 52");
+    OgldevVulkanApp app("Tutorial 53");
     
     app.Init();
     
