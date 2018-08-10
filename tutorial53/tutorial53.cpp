@@ -64,6 +64,7 @@ private:
     void CreateShaders();
     void CreatePipeline();
     void RecordCommandBuffers();
+    void CreateSemaphores();
     void RenderScene();
 
     std::string m_appName;
@@ -82,6 +83,8 @@ private:
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
     VkPipelineLayout m_pipelineLayout;
+    VkSemaphore m_presentCompleteSem;
+    VkSemaphore m_renderCompleteSem;
 };
 
 
@@ -200,18 +203,6 @@ void OgldevVulkanApp::RecordCommandBuffers()
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearValue;
 
-    VkViewport viewport = { 0 };
-    viewport.height = (float)WINDOW_HEIGHT;
-    viewport.width = (float)WINDOW_WIDTH;
-    viewport.minDepth = (float)0.0f;
-    viewport.maxDepth = (float)1.0f;
-        
-    VkRect2D scissor = { 0 };
-    scissor.extent.width = WINDOW_WIDTH;
-    scissor.extent.height = WINDOW_HEIGHT;
-    scissor.offset.x = 0;
-    scissor.offset.y = 0;
-
     for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {            
         VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
         CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
@@ -221,10 +212,6 @@ void OgldevVulkanApp::RecordCommandBuffers()
 
         vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
         
-        vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
-
-        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);
-
         vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
         
         vkCmdEndRenderPass(m_cmdBufs[i]);
@@ -420,6 +407,13 @@ void OgldevVulkanApp::CreateShaders()
 }
 
 
+void OgldevVulkanApp::CreateSemaphores() 
+{
+    m_presentCompleteSem = m_core.CreateSemaphore();
+    m_renderCompleteSem = m_core.CreateSemaphore();
+}
+
+
 #define VERTEX_BUFFER_BIND_ID 0
 
 void OgldevVulkanApp::CreatePipeline()
@@ -449,11 +443,19 @@ void OgldevVulkanApp::CreatePipeline()
     vp.height = (float)WINDOW_HEIGHT;
     vp.minDepth = 0.0f;
     vp.maxDepth = 1.0f;
+    
+    VkRect2D scissor;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+    scissor.extent.width = WINDOW_WIDTH;
+    scissor.extent.height = WINDOW_HEIGHT;
         
     VkPipelineViewportStateCreateInfo vpCreateInfo = {};
     vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     vpCreateInfo.viewportCount = 1;
     vpCreateInfo.pViewports = &vp;
+    vpCreateInfo.scissorCount = 1;
+    vpCreateInfo.pScissors = &scissor;
        
     VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
     rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -464,6 +466,7 @@ void OgldevVulkanApp::CreatePipeline()
     
     VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
     pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     
     VkPipelineColorBlendAttachmentState blendAttachState = {};
     blendAttachState.colorWriteMask = 0xf;
@@ -532,13 +535,14 @@ void OgldevVulkanApp::Init()
         
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
-    CreateSwapChain();
+    CreateSwapChain();    
     CreateCommandBuffers();
     CreateRenderPass();
     CreateFramebuffer();
     CreateVertexBuffer();
     CreateShaders();
     CreatePipeline();
+    CreateSemaphores();
     RecordCommandBuffers();    
 }
 

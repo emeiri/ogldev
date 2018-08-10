@@ -230,4 +230,17 @@ u32 OgldevVulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags 
     OGLDEV_ERROR("Cannot find memory type for type %x requested mem props %x\n", memTypeBits, reqMemPropFlags);
 }
 
+
+VkSemaphore OgldevVulkanCore::CreateSemaphore()
+{
+    VkSemaphoreCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    
+    VkSemaphore semaphore;
+    VkResult res = vkCreateSemaphore(m_device, &createInfo, NULL, &semaphore);    
+    CHECK_VULKAN_ERROR("vkCreateSemaphore error %d\n", res);
+    return semaphore;
+}
+
+
 #endif

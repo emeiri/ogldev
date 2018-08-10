@@ -49,6 +49,8 @@ public:
     
     u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
     
+    VkSemaphore CreateSemaphore();
+    
 private:
     void CreateInstance();
     void CreateSurface();
