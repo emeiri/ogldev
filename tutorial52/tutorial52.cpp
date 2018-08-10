@@ -272,6 +272,7 @@ void OgldevVulkanApp::CreateRenderPass()
     attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 
     VkRenderPassCreateInfo renderPassCreateInfo = {};
     renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
