@@ -81,6 +81,7 @@ private:
     VkShaderModule m_vsModule;
     VkShaderModule m_fsModule;
     VkPipeline m_pipeline;
+    VkPipelineLayout m_pipelineLayout;
 };
 
 
@@ -170,16 +171,7 @@ void OgldevVulkanApp::CreateCommandBuffers()
     printf("Command buffer pool created\n");
     
     CreateCommandBufferInternal(m_images.size(), &m_cmdBufs[0]);
-   /* VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
-    cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cmdBufAllocInfo.commandPool = m_cmdBufPool;
-    cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    cmdBufAllocInfo.commandBufferCount = m_images.size();
-    
-    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);            
-    CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
-    
-    printf("Created command buffers\n");*/
+    CreateCommandBufferInternal(1, &m_copyCmdBuf);
 }
 
 
@@ -291,6 +283,7 @@ void OgldevVulkanApp::CreateRenderPass()
     attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 
     VkRenderPassCreateInfo renderPassCreateInfo = {};
     renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -354,9 +347,11 @@ void OgldevVulkanApp::CreateVertexBuffer()
                              ( 1.0f, -1.0f, 0.0f),
                              ( 0.0f,  1.0f, 0.0f), };
     
+    size_t verticesSize = sizeof(Vertices);
+    
     VkBufferCreateInfo vbCreateInfo = {};
     vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    vbCreateInfo.size = sizeof(Vertices);
+    vbCreateInfo.size = verticesSize;
     vbCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     VkBuffer stagingVB;
     VkResult res = vkCreateBuffer(m_core.GetDevice(), &vbCreateInfo, NULL, &stagingVB);
@@ -365,21 +360,23 @@ void OgldevVulkanApp::CreateVertexBuffer()
     
     VkMemoryRequirements memReqs = {};
     vkGetBufferMemoryRequirements(m_core.GetDevice(), stagingVB, &memReqs);
-    printf("Vertex buffer requires %lud bytes\n", memReqs.size);
+    printf("Vertex buffer requires %lu bytes\n", memReqs.size);
     
     VkMemoryAllocateInfo memAllocInfo = {};
     memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memAllocInfo.allocationSize = memReqs.size;
     memAllocInfo.memoryTypeIndex = m_core.GetMemoryTypeIndex(memReqs.memoryTypeBits,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    printf("index %d\n",memAllocInfo.memoryTypeIndex);
+    printf("Memory type index %d\n",memAllocInfo.memoryTypeIndex);
     
     VkDeviceMemory stagingDevMem;
     res = vkAllocateMemory(m_core.GetDevice(), &memAllocInfo, NULL, &stagingDevMem);
     CHECK_VULKAN_ERROR("vkAllocateMemory error %d\n", res);
-    void* mappedMemAddr = NULL;
-    
+    res = vkBindBufferMemory(m_core.GetDevice(), stagingVB, stagingDevMem, 0);
+    CHECK_VULKAN_ERROR("vkBindBufferMemory error %d\n", res);    
+
+    void* mappedMemAddr = NULL;  
     res = vkMapMemory(m_core.GetDevice(), stagingDevMem, 0, memAllocInfo.allocationSize, 0, &mappedMemAddr);
-    memcpy(mappedMemAddr, &Vertices[0], sizeof(Vertices));
+    memcpy(mappedMemAddr, &Vertices[0], verticesSize);
     vkUnmapMemory(m_core.GetDevice(), stagingDevMem);
 
     VkBuffer vb;        
@@ -388,19 +385,28 @@ void OgldevVulkanApp::CreateVertexBuffer()
     CHECK_VULKAN_ERROR("vkCreateBuffer error %d\n", res);
 
     vkGetBufferMemoryRequirements(m_core.GetDevice(), vb, &memReqs);
-    printf("Vertex buffer requires %lud bytes\n", memReqs.size);
+    printf("Vertex buffer requires %lu bytes\n", memReqs.size);
     memAllocInfo.allocationSize = memReqs.size;
     memAllocInfo.memoryTypeIndex = m_core.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    printf("index %d\n",memAllocInfo.memoryTypeIndex);
+    printf("Memory type index %d\n",memAllocInfo.memoryTypeIndex);
     
     VkDeviceMemory devMem;
     res = vkAllocateMemory(m_core.GetDevice(), &memAllocInfo, NULL, &devMem);
     CHECK_VULKAN_ERROR("vkAllocateMemory error %d\n", res);    
     res = vkBindBufferMemory(m_core.GetDevice(), vb, devMem, 0);
+    CHECK_VULKAN_ERROR("vkBindBufferMemory error %d\n", res);    
     
     VkCommandBufferBeginInfo cmdBufBeginInfo = {};
     cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     
+    res = vkBeginCommandBuffer(m_copyCmdBuf, &cmdBufBeginInfo);
+    CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);    
+    
+    VkBufferCopy bufferCopy = {};
+    bufferCopy.size = verticesSize;
+    vkCmdCopyBuffer(m_copyCmdBuf, stagingVB, vb, 1, &bufferCopy);
+    
+    vkEndCommandBuffer(m_copyCmdBuf);
 }
 
 
@@ -467,6 +473,30 @@ void OgldevVulkanApp::CreatePipeline()
     blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
     blendCreateInfo.attachmentCount = 1;
     blendCreateInfo.pAttachments = &blendAttachState;
+    
+    VkDescriptorSetLayoutBinding layoutBinding = {};
+    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    layoutBinding.descriptorCount = 1;
+    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    layoutBinding.pImmutableSamplers = NULL;
+
+    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
+    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorLayout.pNext = NULL;
+    descriptorLayout.bindingCount = 1;
+    descriptorLayout.pBindings = &layoutBinding;
+
+    VkDescriptorSetLayout descriptorSetLayout;
+    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);    
+    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);    
+    
+    VkPipelineLayoutCreateInfo layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layoutInfo.setLayoutCount = 1;
+    layoutInfo.pSetLayouts = &descriptorSetLayout;
+        
+    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
+    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);    
  
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -478,10 +508,11 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
+    pipelineInfo.layout = m_pipelineLayout;
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.basePipelineIndex = -1;
     
-    VkResult res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
     CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
     
     printf("Graphics pipeline created\n");
