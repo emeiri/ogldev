@@ -56,7 +56,8 @@ public:
 private:
 
     void CreateSwapChain();
-    void CreateCommandBuffer();
+    void CreateCommandBuffers();
+    void CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs);
     void CreateRenderPass();
     void CreateFramebuffer();
     void CreateVertexBuffer();
@@ -72,6 +73,7 @@ private:
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
     std::vector<VkCommandBuffer> m_cmdBufs;
+    VkCommandBuffer m_copyCmdBuf;
     VkCommandPool m_cmdBufPool;
     std::vector<VkImageView> m_views;	
     VkRenderPass m_renderPass;
@@ -140,8 +142,23 @@ void OgldevVulkanApp::CreateSwapChain()
     CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
 }
 
+void OgldevVulkanApp::CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs)
+{
+    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+    cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    cmdBufAllocInfo.commandPool = m_cmdBufPool;
+    cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    cmdBufAllocInfo.commandBufferCount = count;
+    
+    VkResult res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, cmdBufs);            
+    CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
+    
+    printf("Created %d command buffers\n", count);
+}
 
-void OgldevVulkanApp::CreateCommandBuffer()
+
+
+void OgldevVulkanApp::CreateCommandBuffers()
 {
     VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -152,7 +169,8 @@ void OgldevVulkanApp::CreateCommandBuffer()
     
     printf("Command buffer pool created\n");
     
-    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+    CreateCommandBufferInternal(m_images.size(), &m_cmdBufs[0]);
+   /* VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
     cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     cmdBufAllocInfo.commandPool = m_cmdBufPool;
     cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -161,7 +179,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);            
     CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
     
-    printf("Created command buffers\n");
+    printf("Created command buffers\n");*/
 }
 
 
@@ -379,6 +397,10 @@ void OgldevVulkanApp::CreateVertexBuffer()
     res = vkAllocateMemory(m_core.GetDevice(), &memAllocInfo, NULL, &devMem);
     CHECK_VULKAN_ERROR("vkAllocateMemory error %d\n", res);    
     res = vkBindBufferMemory(m_core.GetDevice(), vb, devMem, 0);
+    
+    VkCommandBufferBeginInfo cmdBufBeginInfo = {};
+    cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    
 }
 
 
@@ -480,7 +502,7 @@ void OgldevVulkanApp::Init()
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
     CreateSwapChain();
-    CreateCommandBuffer();
+    CreateCommandBuffers();
     CreateRenderPass();
     CreateFramebuffer();
     CreateVertexBuffer();
