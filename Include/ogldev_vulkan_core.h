@@ -47,6 +47,8 @@ public:
     
     VkDevice& GetDevice() { return m_device; }
     
+    u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
+    
 private:
     void CreateInstance();
     void CreateSurface();

@@ -216,4 +216,18 @@ void OgldevVulkanCore::CreateLogicalDevice()
     printf("Device created\n");
 }
 
+
+u32 OgldevVulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
+{
+    const VkPhysicalDeviceMemoryProperties& physDeviceMemProps = m_physDevices.m_memProps[m_gfxDevIndex];
+    for (int i = 0 ; i < physDeviceMemProps.memoryTypeCount ; i++) {        
+        if ((memTypeBits & (1 << i)) && 
+            ((physDeviceMemProps.memoryTypes[i].propertyFlags & reqMemPropFlags) == reqMemPropFlags)) {
+            return i;
+        }
+    }
+    
+    OGLDEV_ERROR("Cannot find memory type for type %x requested mem props %x\n", memTypeBits, reqMemPropFlags);
+}
+
 #endif
