@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 53 - Vulkan Vertex Buffers
+    Tutorial 53 - Semaphores and other fixes
 */
 
 #include <cfloat>
@@ -60,7 +60,6 @@ private:
     void CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs);
     void CreateRenderPass();
     void CreateFramebuffer();
-    void CreateVertexBuffer();
     void CreateShaders();
     void CreatePipeline();
     void RecordCommandBuffers();
@@ -336,75 +335,6 @@ void OgldevVulkanApp::CreateFramebuffer()
 }
 
 
-void OgldevVulkanApp::CreateVertexBuffer() 
-{
-    Vector3f Vertices[3] = { (-1.0f, -1.0f, 0.0f),
-                             ( 1.0f, -1.0f, 0.0f),
-                             ( 0.0f,  1.0f, 0.0f), };
-    
-    size_t verticesSize = sizeof(Vertices);
-    
-    VkBufferCreateInfo vbCreateInfo = {};
-    vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    vbCreateInfo.size = verticesSize;
-    vbCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    VkBuffer stagingVB;
-    VkResult res = vkCreateBuffer(m_core.GetDevice(), &vbCreateInfo, NULL, &stagingVB);
-    CHECK_VULKAN_ERROR("vkCreateBuffer error %d\n", res);
-    printf("Create vertex buffer\n");
-    
-    VkMemoryRequirements memReqs = {};
-    vkGetBufferMemoryRequirements(m_core.GetDevice(), stagingVB, &memReqs);
-    printf("Vertex buffer requires %lu bytes\n", memReqs.size);
-    
-    VkMemoryAllocateInfo memAllocInfo = {};
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memAllocInfo.allocationSize = memReqs.size;
-    memAllocInfo.memoryTypeIndex = m_core.GetMemoryTypeIndex(memReqs.memoryTypeBits,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    printf("Memory type index %d\n",memAllocInfo.memoryTypeIndex);
-    
-    VkDeviceMemory stagingDevMem;
-    res = vkAllocateMemory(m_core.GetDevice(), &memAllocInfo, NULL, &stagingDevMem);
-    CHECK_VULKAN_ERROR("vkAllocateMemory error %d\n", res);
-    res = vkBindBufferMemory(m_core.GetDevice(), stagingVB, stagingDevMem, 0);
-    CHECK_VULKAN_ERROR("vkBindBufferMemory error %d\n", res);    
-
-    void* mappedMemAddr = NULL;  
-    res = vkMapMemory(m_core.GetDevice(), stagingDevMem, 0, memAllocInfo.allocationSize, 0, &mappedMemAddr);
-    memcpy(mappedMemAddr, &Vertices[0], verticesSize);
-    vkUnmapMemory(m_core.GetDevice(), stagingDevMem);
-
-    VkBuffer vb;        
-    vbCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-    res = vkCreateBuffer(m_core.GetDevice(), &vbCreateInfo, NULL, &vb);
-    CHECK_VULKAN_ERROR("vkCreateBuffer error %d\n", res);
-
-    vkGetBufferMemoryRequirements(m_core.GetDevice(), vb, &memReqs);
-    printf("Vertex buffer requires %lu bytes\n", memReqs.size);
-    memAllocInfo.allocationSize = memReqs.size;
-    memAllocInfo.memoryTypeIndex = m_core.GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    printf("Memory type index %d\n",memAllocInfo.memoryTypeIndex);
-    
-    VkDeviceMemory devMem;
-    res = vkAllocateMemory(m_core.GetDevice(), &memAllocInfo, NULL, &devMem);
-    CHECK_VULKAN_ERROR("vkAllocateMemory error %d\n", res);    
-    res = vkBindBufferMemory(m_core.GetDevice(), vb, devMem, 0);
-    CHECK_VULKAN_ERROR("vkBindBufferMemory error %d\n", res);    
-    
-    VkCommandBufferBeginInfo cmdBufBeginInfo = {};
-    cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    
-    res = vkBeginCommandBuffer(m_copyCmdBuf, &cmdBufBeginInfo);
-    CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);    
-    
-    VkBufferCopy bufferCopy = {};
-    bufferCopy.size = verticesSize;
-    vkCmdCopyBuffer(m_copyCmdBuf, stagingVB, vb, 1, &bufferCopy);
-    
-    vkEndCommandBuffer(m_copyCmdBuf);
-}
-
-
 void OgldevVulkanApp::CreateShaders()
 {
     m_vsModule = VulkanCreateShaderModule(m_core.GetDevice(), "Shaders/vs.spv");
@@ -547,7 +477,6 @@ void OgldevVulkanApp::Init()
     CreateCommandBuffers();
     CreateRenderPass();
     CreateFramebuffer();
-    CreateVertexBuffer();
     CreateShaders();
     CreatePipeline();
     CreateSemaphores();

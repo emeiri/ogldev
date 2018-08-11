@@ -46,9 +46,7 @@ public:
     VkInstance& GetInstance() { return m_inst; }
     
     VkDevice& GetDevice() { return m_device; }
-    
-    u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
-    
+       
     VkSemaphore CreateSemaphore();
     
 private:
