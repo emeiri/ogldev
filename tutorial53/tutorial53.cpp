@@ -228,13 +228,19 @@ void OgldevVulkanApp::RenderScene()
 {
     uint ImageIndex = 0;
     
-    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, NULL, NULL, &ImageIndex);
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, m_presentCompleteSem, NULL, &ImageIndex);
     CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n" , res);
    
+    VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     VkSubmitInfo submitInfo = {};
     submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount   = 1;
     submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
+    submitInfo.pWaitSemaphores      = &m_presentCompleteSem;  
+    submitInfo.waitSemaphoreCount   = 1;
+    submitInfo.pWaitDstStageMask    = &waitFlags;
+    submitInfo.pSignalSemaphores    = &m_renderCompleteSem;
+    submitInfo.signalSemaphoreCount = 1;
     
     res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
     CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
@@ -244,6 +250,8 @@ void OgldevVulkanApp::RenderScene()
     presentInfo.swapchainCount     = 1;
     presentInfo.pSwapchains        = &m_swapChainKHR;
     presentInfo.pImageIndices      = &ImageIndex;
+    presentInfo.pWaitSemaphores    = &m_renderCompleteSem;
+    presentInfo.waitSemaphoreCount = 1;
     
     res = vkQueuePresentKHR(m_queue, &presentInfo);    
     CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
@@ -268,7 +276,7 @@ void OgldevVulkanApp::CreateRenderPass()
     attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachDesc.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 
