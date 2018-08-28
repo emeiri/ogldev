@@ -56,8 +56,7 @@ public:
 private:
 
     void CreateSwapChain();
-    void CreateCommandBuffers();
-    void CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs);
+    void CreateCommandBuffer();
     void CreateRenderPass();
     void CreateFramebuffer();
     void CreateShaders();
@@ -73,7 +72,6 @@ private:
     VkSwapchainKHR m_swapChainKHR;
     VkQueue m_queue;
     std::vector<VkCommandBuffer> m_cmdBufs;
-    VkCommandBuffer m_copyCmdBuf;
     VkCommandPool m_cmdBufPool;
     std::vector<VkImageView> m_views;	
     VkRenderPass m_renderPass;
@@ -145,23 +143,8 @@ void OgldevVulkanApp::CreateSwapChain()
     CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
 }
 
-void OgldevVulkanApp::CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs)
-{
-    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
-    cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    cmdBufAllocInfo.commandPool = m_cmdBufPool;
-    cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    cmdBufAllocInfo.commandBufferCount = count;
-    
-    VkResult res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, cmdBufs);            
-    CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
-    
-    printf("Created %d command buffers\n", count);
-}
 
-
-
-void OgldevVulkanApp::CreateCommandBuffers()
+void OgldevVulkanApp::CreateCommandBuffer()
 {
     VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -172,8 +155,16 @@ void OgldevVulkanApp::CreateCommandBuffers()
     
     printf("Command buffer pool created\n");
     
-    CreateCommandBufferInternal(m_images.size(), &m_cmdBufs[0]);
-    CreateCommandBufferInternal(1, &m_copyCmdBuf);
+    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+    cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    cmdBufAllocInfo.commandPool = m_cmdBufPool;
+    cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    cmdBufAllocInfo.commandBufferCount = m_images.size();
+    
+    res = vkAllocateCommandBuffers(m_core.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);            
+    CHECK_VULKAN_ERROR("vkAllocateCommandBuffers error %d\n", res);
+    
+    printf("Created command buffers\n");
 }
 
 
@@ -404,7 +395,7 @@ void OgldevVulkanApp::CreatePipeline()
     
     VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
     pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+  //  pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     
     VkPipelineColorBlendAttachmentState blendAttachState = {};
     blendAttachState.colorWriteMask = 0xf;
@@ -474,7 +465,7 @@ void OgldevVulkanApp::Init()
     vkGetDeviceQueue(m_core.GetDevice(), m_core.GetQueueFamily(), 0, &m_queue);
 
     CreateSwapChain();    
-    CreateCommandBuffers();
+    CreateCommandBuffer();
     CreateRenderPass();
     CreateFramebuffer();
     CreateShaders();
