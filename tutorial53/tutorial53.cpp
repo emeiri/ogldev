@@ -395,7 +395,7 @@ void OgldevVulkanApp::CreatePipeline()
     
     VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
     pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-  //  pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     
     VkPipelineColorBlendAttachmentState blendAttachState = {};
     blendAttachState.colorWriteMask = 0xf;
@@ -405,29 +405,11 @@ void OgldevVulkanApp::CreatePipeline()
     blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
     blendCreateInfo.attachmentCount = 1;
     blendCreateInfo.pAttachments = &blendAttachState;
-    
-    VkDescriptorSetLayoutBinding layoutBinding = {};
-    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    layoutBinding.descriptorCount = 1;
-    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    layoutBinding.pImmutableSamplers = NULL;
-
-    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
-    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorLayout.pNext = NULL;
-    descriptorLayout.bindingCount = 1;
-    descriptorLayout.pBindings = &layoutBinding;
-
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);    
-    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);    
-    
+      
     VkPipelineLayoutCreateInfo layoutInfo = {};
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.setLayoutCount = 1;
-    layoutInfo.pSetLayouts = &descriptorSetLayout;
         
-    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
+    VkResult res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
     CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);    
  
     VkGraphicsPipelineCreateInfo pipelineInfo = {};

@@ -223,8 +223,14 @@ void OgldevVulkanApp::CreatePipeline()
     
     VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
     pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-<b>    pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;</b>
-    
+    <b>pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;</b>
+  </code></pre>
+  <p>
+    I've added the rasterizationSamples here because the spec (section 24) says that we have to put a valid value.
+    This value is the number of samples per pixel during rasterization and is not too important
+    at this point so I just use the minimal value.
+  </p>
+    <pre><code>    
     VkPipelineColorBlendAttachmentState blendAttachState = {};
     blendAttachState.colorWriteMask = 0xf;
     
@@ -234,29 +240,27 @@ void OgldevVulkanApp::CreatePipeline()
     blendCreateInfo.attachmentCount = 1;
     blendCreateInfo.pAttachments = &blendAttachState;
     
-    VkDescriptorSetLayoutBinding layoutBinding = {};
-    layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    layoutBinding.descriptorCount = 1;
-    layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    layoutBinding.pImmutableSamplers = NULL;
-
-    VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
-    descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorLayout.pNext = NULL;
-    descriptorLayout.bindingCount = 1;
-    descriptorLayout.pBindings = &layoutBinding;
-
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkResult res = vkCreateDescriptorSetLayout(m_core.GetDevice(), &descriptorLayout, NULL, &descriptorSetLayout);    
-    CHECK_VULKAN_ERROR("vkCreateDescriptorSetLayout error %d\n", res);    
-    
-    VkPipelineLayoutCreateInfo layoutInfo = {};
+<b>    VkPipelineLayoutCreateInfo layoutInfo = {};
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    layoutInfo.setLayoutCount = 1;
-    layoutInfo.pSetLayouts = &descriptorSetLayout;
         
-    res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
-    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);    
+    VkResult res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
+    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);    </b>
+    </code></pre>
+  <p>
+    Various resources such as buffers, image views and samplers can be accessed in a shader stage. A descriptor is a data structure
+    which describes these resources and connects them to the pipeline object. Right now our shader is very simple and doesn't need
+    any outside data (e.g. transformation matrices) but we are still required to provide some minimal descriptor meta data. In the above
+    highlighted block of code we create that.
+  </p>
+  <p>
+    The object that was missing in the previous tutorial and caused some validation warnings is called <i>Pipeline Layout</i>.
+    This object points to the descriptor sets and the descriptor sets are groups of descriptors. Since we are not going to reference
+    any real resources in this tutorial the only thing that we need to create is a pipeline layout object. This object is mandatory for
+    the creation of the pipeline. The pipeline layout usually points to descriptor set layout but here it is enough
+    to create an empty VkPipelineLayoutCreateInfo struct and only set its type. Next we call vkCreatePipelineLayout() in order
+    to create the pipeline layout.
+  </p>
+    <pre><code>
  
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -268,19 +272,22 @@ void OgldevVulkanApp::CreatePipeline()
     pipelineInfo.pRasterizationState = &rastCreateInfo;
     pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
     pipelineInfo.pColorBlendState = &blendCreateInfo;
-    pipelineInfo.layout = m_pipelineLayout;
+<b>    pipelineInfo.layout = m_pipelineLayout;</b>
     pipelineInfo.renderPass = m_renderPass;
     pipelineInfo.basePipelineIndex = -1;
     
     res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
     CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
-}
-
-  </code></pre>
+} </code></pre>
+  <p>
+    The only thing that remains in order to complete a valid creation of the graphics pipeline is to set the layout
+    member in the pipeline create info struct to point to the pipeline layout that we just created.
+    </p>
 </section>
 
 </article>
 
+    </code></pre>
     <pre><code>
     </code></pre>
 <script src="../html5shiv.min.js"></script>
