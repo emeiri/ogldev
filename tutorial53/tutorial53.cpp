@@ -94,14 +94,14 @@ OgldevVulkanApp::OgldevVulkanApp(const char* pAppName) : m_core(pAppName)
 OgldevVulkanApp::~OgldevVulkanApp()
 {   
 }
-    
+
 
 void OgldevVulkanApp::CreateSwapChain()
 {          
     const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_core.GetSurfaceCaps();
          
     assert(SurfaceCaps.currentExtent.width != -1);
-                   
+
     uint NumImages = 2;
 
     assert(NumImages >= SurfaceCaps.minImageCount);
@@ -132,7 +132,6 @@ void OgldevVulkanApp::CreateSwapChain()
     res = vkGetSwapchainImagesKHR(m_core.GetDevice(), m_swapChainKHR, &NumSwapChainImages, NULL);
     CHECK_VULKAN_ERROR("vkGetSwapchainImagesKHR error %d\n", res);
     assert(NumImages == NumSwapChainImages);
-    
     printf("Number of images %d\n", NumSwapChainImages);
 
     m_images.resize(NumSwapChainImages);
@@ -149,7 +148,7 @@ void OgldevVulkanApp::CreateCommandBuffer()
     VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
     cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolCreateInfo.queueFamilyIndex = m_core.GetQueueFamily();
-    
+
     VkResult res = vkCreateCommandPool(m_core.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);    
     CHECK_VULKAN_ERROR("vkCreateCommandPool error %d\n", res);
     
