@@ -29,12 +29,14 @@
 #include <sys/types.h>
 #include <vector>
 
-#include "ogldev_engine_common.h"
+#include "../Common/ogldev_all.cpp"
+
+/*#include "ogldev_engine_common.h"
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_math_3d.h"
-#include "ogldev_xcb_control.h"
+#include "ogldev_xcb_control.h"*/
 
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
