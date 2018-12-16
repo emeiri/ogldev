@@ -29,10 +29,10 @@
 
 // Points to the object implementing the ICallbacks interface which was delivered to
 // GLUTBackendRun(). All events are forwarded to this object.
-static ICallbacks* s_pCallbacks = NULL;
+static ICallbacks* s_glfw_pCallbacks = NULL;
 
-static bool sWithDepth = false;
-static bool sWithStencil = false;
+static bool s_glfw_WithDepth = false;
+static bool s_glfw_WithStencil = false;
 static GLFWwindow* s_pWindow = NULL;
 
 
@@ -122,13 +122,13 @@ static void KeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, 
 {   
     OGLDEV_KEY OgldevKey = GLFWKeyToOGLDEVKey(key);   
     OGLDEV_KEY_STATE OgldevKeyState = (action == GLFW_PRESS) ? OGLDEV_KEY_STATE_PRESS : OGLDEV_KEY_STATE_RELEASE;
-    s_pCallbacks->KeyboardCB(OgldevKey, OgldevKeyState);
+    s_glfw_pCallbacks->KeyboardCB(OgldevKey, OgldevKeyState);
 }
 
 
 static void CursorPosCallback(GLFWwindow* pWindow, double x, double y)
 {
-    s_pCallbacks->PassiveMouseCB((int)x, (int)y);
+    s_glfw_pCallbacks->PassiveMouseCB((int)x, (int)y);
 }
 
 
@@ -142,10 +142,10 @@ static void MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int
 
     glfwGetCursorPos(pWindow, &x, &y);
 
-    s_pCallbacks->MouseCB(OgldevMouse, State, (int)x, (int)y);
+    s_glfw_pCallbacks->MouseCB(OgldevMouse, State, (int)x, (int)y);
 }
 
-static void InitCallbacks()
+static void glfwInitCallbacks()
 {
     glfwSetKeyCallback(s_pWindow, KeyCallback);
     glfwSetCursorPosCallback(s_pWindow, CursorPosCallback);
@@ -168,7 +168,7 @@ void GLFWErrorCallback(int error, const char* description)
 void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
     sWithDepth = WithDepth;
-    sWithStencil = WithStencil;
+    s_glfw_WithStencil = WithStencil;
 
     glfwSetErrorCallback(GLFWErrorCallback);    
     
@@ -232,11 +232,11 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
         glEnable(GL_DEPTH_TEST);
     }
 
-    s_pCallbacks = pCallbacks;
-    InitCallbacks();
+    s_glfw_pCallbacks = pCallbacks;
+    glutInitCallbacks();
 
     while (!glfwWindowShouldClose(s_pWindow)) {
-        s_pCallbacks->RenderSceneCB();        
+        s_glfw_pCallbacks->RenderSceneCB();        
         glfwSwapBuffers(s_pWindow);
         glfwPollEvents();
     }
