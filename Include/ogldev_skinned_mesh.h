@@ -107,17 +107,17 @@ private:
 
 #define INVALID_MATERIAL 0xFFFFFFFF
   
-enum VB_TYPES {
-    INDEX_BUFFER,
-    POS_VB,
-    NORMAL_VB,
-    TEXCOORD_VB,
-    BONE_VB,
-    NUM_VBs            
-};
+    enum VB_TYPES {
+	SKINNED_MESH_INDEX_BUFFER,
+    SKINNED_MESH_POS_VB,
+    SKINNED_MESH_NORMAL_VB,
+    SKINNED_MESH_TEXCOORD_VB,
+    SKINNED_MESH_BONE_VB,
+    SKINNED_MESH_NUM_VBs            
+    };
 
     GLuint m_VAO;
-    GLuint m_Buffers[NUM_VBs];
+    GLuint m_Buffers[SKINNED_MESH_NUM_VBs];
 
     struct MeshEntry {
         MeshEntry()
