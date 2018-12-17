@@ -167,7 +167,7 @@ void GLFWErrorCallback(int error, const char* description)
 
 void GLFWBackendInit(int argc, char** argv, bool WithDepth, bool WithStencil)
 {
-    sWithDepth = WithDepth;
+    s_glfw_WithDepth = WithDepth;
     s_glfw_WithStencil = WithStencil;
 
     glfwSetErrorCallback(GLFWErrorCallback);    
@@ -228,12 +228,12 @@ void GLFWBackendRun(ICallbacks* pCallbacks)
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
 
-    if (sWithDepth) {
+    if (s_glfw_WithDepth) {
         glEnable(GL_DEPTH_TEST);
     }
 
     s_glfw_pCallbacks = pCallbacks;
-    glutInitCallbacks();
+    glfwInitCallbacks();
 
     while (!glfwWindowShouldClose(s_pWindow)) {
         s_glfw_pCallbacks->RenderSceneCB();        
