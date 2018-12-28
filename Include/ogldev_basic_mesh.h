@@ -45,6 +45,13 @@ struct Vertex
         m_tex    = tex;
         m_normal = normal;
     }
+
+    Vertex(const Vector3f& pos, const Vector2f& tex)
+    {
+        m_pos    = pos;
+        m_tex    = tex;
+        m_normal = Vector3f(0.0f, 0.0f, 0.0f);
+    }
 };
 
 

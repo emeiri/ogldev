@@ -22,14 +22,10 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_app.h"
-#include "ogldev_util.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
-#include "ogldev_basic_lighting.h"
-#include "ogldev_glut_backend.h"
-#include "mesh.h"
-#include "skybox.h"
+#include "../Common/ogldev_all.cpp"
+#include "mesh.cpp"
+#include "skybox.cpp"
+#include "skybox_technique.cpp"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200

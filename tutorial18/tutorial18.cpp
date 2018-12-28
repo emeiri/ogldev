@@ -22,33 +22,11 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_app.h"
-#include "ogldev_util.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
-#include "ogldev_texture.h"
-#include "lighting_technique.h"
-#include "ogldev_glut_backend.h"
+#include "../Common/ogldev_all.cpp"
+#include "lighting_technique.cpp"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
-
-struct Vertex
-{
-    Vector3f m_pos;
-    Vector2f m_tex;
-    Vector3f m_normal;
-
-    Vertex() {}
-
-    Vertex(Vector3f pos, Vector2f tex)
-    {
-        m_pos    = pos;
-        m_tex    = tex;
-        m_normal = Vector3f(0.0f, 0.0f, 0.0f);
-    }
-};
-
 
 class Tutorial18 : public ICallbacks, public OgldevApp
 {

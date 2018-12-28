@@ -25,8 +25,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_util.h"
-#include "ogldev_math_3d.h"
+#include "../Common/ogldev_all.cpp"
 
 GLuint VBO;
 GLuint gWorldLocation;
@@ -35,7 +34,7 @@ const char* pVSFileName = "shader.vs";
 const char* pFSFileName = "shader.fs";
 
 
-static void RenderSceneCB()
+static void _RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -66,8 +65,8 @@ static void RenderSceneCB()
 
 static void InitializeGlutCallbacks()
 {
-    glutDisplayFunc(RenderSceneCB);
-    glutIdleFunc(RenderSceneCB);
+    glutDisplayFunc(_RenderSceneCB);
+    glutIdleFunc(_RenderSceneCB);
 }
 
 static void CreateVertexBuffer()

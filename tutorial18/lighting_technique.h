@@ -16,19 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIGHTING_TECHNIQUE_H
-#define	LIGHTING_TECHNIQUE_H
+#ifndef LIGHTING_TECHNIQUE_18_H
+#define	LIGHTING_TECHNIQUE_18_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-
-struct DirectionalLight
-{
-    Vector3f Color;
-    float AmbientIntensity;
-    Vector3f Direction;
-    float DiffuseIntensity;
-};
 
 class LightingTechnique : public Technique
 {
