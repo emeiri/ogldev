@@ -22,15 +22,10 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_util.h"
-#include "ogldev_app.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
-#include "lighting_technique.h"
-#include "shadow_map_technique.h"
-#include "ogldev_glut_backend.h"
-#include "mesh.h"
-#include "ogldev_shadow_map_fbo.h"
+#include "../Common/ogldev_all.cpp"
+#include "mesh.cpp"
+#include "lighting_technique.cpp"
+#include "shadow_map_technique.cpp"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200

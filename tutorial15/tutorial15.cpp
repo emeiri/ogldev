@@ -25,10 +25,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_util.h"
-#include "ogldev_glut_backend.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
+#include "../Common/ogldev_all.cpp"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
@@ -43,7 +40,7 @@ PersProjInfo gPersProjInfo;
 const char* pVSFileName = "shader.vs";
 const char* pFSFileName = "shader.fs";
 
-static void RenderSceneCB()
+static void _RenderSceneCB()
 {
     pGameCamera->OnRender();
 
@@ -74,14 +71,14 @@ static void RenderSceneCB()
 }
 
 
-static void SpecialKeyboardCB(int Key, int x, int y)
+static void _SpecialKeyboardCB(int Key, int x, int y)
 {
     OGLDEV_KEY OgldevKey = GLUTKeyToOGLDEVKey(Key);
     pGameCamera->OnKeyboard(OgldevKey);
 }
 
 
-static void KeyboardCB(unsigned char Key, int x, int y)
+static void _KeyboardCB(unsigned char Key, int x, int y)
 {
     switch (Key) {
         case 'q':
@@ -89,17 +86,17 @@ static void KeyboardCB(unsigned char Key, int x, int y)
     }
 }
 
-static void PassiveMouseCB(int x, int y)
+static void _PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 static void InitializeGlutCallbacks()
 {
-    glutDisplayFunc(RenderSceneCB);
-    glutIdleFunc(RenderSceneCB);
-    glutSpecialFunc(SpecialKeyboardCB);
-    glutPassiveMotionFunc(PassiveMouseCB);
+    glutDisplayFunc(_RenderSceneCB);
+    glutIdleFunc(_RenderSceneCB);
+    glutSpecialFunc(_SpecialKeyboardCB);
+    glutPassiveMotionFunc(_PassiveMouseCB);
     glutKeyboardFunc(KeyboardCB);
 }
 

@@ -25,10 +25,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_util.h"
-#include "ogldev_glut_backend.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
+#include "../Common/ogldev_all.cpp"
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
@@ -43,7 +40,7 @@ PersProjInfo gPersProjInfo;
 const char* pVSFileName = "shader.vs";
 const char* pFSFileName = "shader.fs";
 
-static void RenderSceneCB()
+static void _RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -72,7 +69,7 @@ static void RenderSceneCB()
 }
 
 
-static void SpecialKeyboardCB(int Key, int x, int y)
+static void _SpecialKeyboardCB(int Key, int x, int y)
 {
     OGLDEV_KEY OgldevKey = GLUTKeyToOGLDEVKey(Key);
     pGameCamera->OnKeyboard(OgldevKey);
@@ -81,9 +78,9 @@ static void SpecialKeyboardCB(int Key, int x, int y)
 
 static void InitializeGlutCallbacks()
 {
-    glutDisplayFunc(RenderSceneCB);
-    glutIdleFunc(RenderSceneCB);
-    glutSpecialFunc(SpecialKeyboardCB);
+    glutDisplayFunc(_RenderSceneCB);
+    glutIdleFunc(_RenderSceneCB);
+    glutSpecialFunc(_SpecialKeyboardCB);
 }
 
 static void CreateVertexBuffer()

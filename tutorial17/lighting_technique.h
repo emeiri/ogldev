@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIGHTING_TECHNIQUE_H
-#define	LIGHTING_TECHNIQUE_H
+#ifndef LIGHTING_TECHNIQUE_17_H
+#define	LIGHTING_TECHNIQUE_17_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
