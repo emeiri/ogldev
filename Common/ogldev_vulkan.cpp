@@ -165,7 +165,7 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
 
         assert(NumPresentModes != 0);
 
-        printf("Number of presentation modes %d\n", NumPresentModes);
+        printf("Number of presentation modes %d\n", NumPresentModes);        
     }
 }
 

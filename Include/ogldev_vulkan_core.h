@@ -46,6 +46,8 @@ public:
     VkInstance& GetInstance() { return m_inst; }
     
     VkDevice& GetDevice() { return m_device; }
+       
+    VkSemaphore CreateSemaphore();
     
 private:
     void CreateInstance();

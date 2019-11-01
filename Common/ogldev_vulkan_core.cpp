@@ -216,4 +216,17 @@ void OgldevVulkanCore::CreateLogicalDevice()
     printf("Device created\n");
 }
 
+
+VkSemaphore OgldevVulkanCore::CreateSemaphore()
+{
+    VkSemaphoreCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    
+    VkSemaphore semaphore;
+    VkResult res = vkCreateSemaphore(m_device, &createInfo, NULL, &semaphore);    
+    CHECK_VULKAN_ERROR("vkCreateSemaphore error %d\n", res);
+    return semaphore;
+}
+
+
 #endif

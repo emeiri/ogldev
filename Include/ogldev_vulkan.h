@@ -23,7 +23,7 @@
 
 #include <vector>
 
-//#define ENABLE_DEBUG_LAYERS
+#define ENABLE_DEBUG_LAYERS
 
 #ifdef _WIN32
 #define  VK_USE_PLATFORM_WIN32_KHR

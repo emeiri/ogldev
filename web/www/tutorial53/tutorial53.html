@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <title> Tutorial 53 - Vulkan Semaphores And Other Fixes</title>
+    
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../print.css" media="print">
+  </head>
+  <body>
+    <header id="header">
+      <div>
+        <h2> Tutorial 53: </h2>
+        <h1>Vulkan Semaphores And Other Fixes</h1>
+      </div>
+      
+      <a id="logo" class="small" href="../../index.html" title="Homepage">
+        <img src="..//logo ldpi.png">
+      </a>
+    </header>
+    
+    <article id="content" class="breakpoint">
+      <section>
+	<h3> Background </h3>
+	<p>
+	  So here's the story - I wrote the first three Vulkan tutorials under the assumption that the validation layers are active. The purpose of these layers is to do as much validation on
+	  the Vulkan API calls as posssible and output warning and error messages whenever something is wrong. Since they add some overhead to the execution of the driver with all the extra
+	  checks that they do you are supposed to activate them only during development and then ship the final product to customers with validation disabled to get max performance.
+	  This was one of the design goals of Vulkan. But as I said, I was actually running with validation disabled and missed quite a lot of stuff. Even though the program seemed to
+	  run as expected there were many things done wrong so I decided to do a tutorial about these mistakes and get back to the original subject (which was vertex buffers) in the next
+	  tutorial.
+	</p>
+	<p>
+	  The main problem was that I didn't synchronize access to the swap chain images correctly. If we look at the RenderScene() function we see that we start by acquiring
+	  an image from the swap chain. This will be the target image for the current frame. This function returns immediately (it does not hang until an image is actually available)
+	  with an index to the next free image. The thing is that since the presentation engine may not have finished reading from this image (during some previous frame) it
+	  basically tells us: "Hey! here's a free image for you at index XYZ but make sure you wait on this semaphore before you actually use it". We can get an image without a semaphore (which we
+	  did in the previous tutorials by passing in NULL as the semaphore) but it is risky. If we had more to render we could have encountered some glitches. So that's the first
+	  semaphore that we need to use. After getting the image the next thing we do is submit a command buffer for rendering into the render queue. This is where we need to use
+	  the semaphore so that the command buffer will only be processed in the background after the presentation engine have finished reading from the target image.
+	</p>
+	<p>
+	  The last thing we do in the RenderScene() function is queue a present command. Again, we need to make sure that presentation will only take place after the command
+	  buffer has finished processing.
+	  This is where the second semaphore comes into play. We make the present command wait on a semaphore that will only be signalled after the draw command has finished processing.
+	  When that semaphore is signalled we know it is safe to present the image. So the draw command must wait on a semaphore that will tell it when it can start rendering and
+	  it must signal another semaphore that will trigger the presentation of the finished frame. This is quite a complex chain of dependencies that must be constructed carefully
+	  to make sure everything runs smoothly without glitches.
+	</p>
+</section>
+
+<section>
+  <h3> Source walkthru </h3>
+  <pre><code>OgldevVulkanCore::CreateSemaphore()
+{
+    VkSemaphoreCreateInfo createInfo = {};
+    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    
+    VkSemaphore semaphore;
+    VkResult res = vkCreateSemaphore(m_device, &createInfo, NULL, &semaphore);    
+    CHECK_VULKAN_ERROR("vkCreateSemaphore error %d\n", res);
+    return semaphore;
+}  </code></pre>
+  <p>
+    I've added the member function above to the OgldevVulkanCore class. It is a utility function that wraps the vkCreateSemaphore() API and returns a VkSemaphore handle.
+  </p>
+  <pre><code>class OgldevVulkanApp
+{
+    .
+    .
+    .     
+    private:
+    .
+    .
+    .
+    void CreateSemaphores();
+    .
+    .
+    .
+    VkSemaphore m_renderCompleteSem;
+    VkSemaphore m_presentCompleteSem;
+}
+
+void OgldevVulkanApp::CreateSemaphores() 
+{
+    m_presentCompleteSem = m_core.CreateSemaphore();
+    m_renderCompleteSem = m_core.CreateSemaphore();
+}</code></pre>
+  <p>
+    I've added a couple of semaphores to the private section of the OgldevVulkanApp class - one to signal that rendering has been completed
+    and the other to signal that the presentation engine has finished presenting the frame. There is also a small function that creates the
+    two semaphores (OgldevVulkanApp::CreateSemaphores) using the utility function above. Don't forget to call this function in OgldevVulkanApp::Init() (it will
+    not be specified here again).
+  </p>
+ <pre><code>void OgldevVulkanApp::RenderScene()
+{
+    uint ImageIndex = 0;
+    
+    VkResult res = vkAcquireNextImageKHR(m_core.GetDevice(), m_swapChainKHR, UINT64_MAX, <b>m_presentCompleteSem</b>, NULL, &ImageIndex);
+    CHECK_VULKAN_ERROR("vkAcquireNextImageKHR error %d\n" , res);
+   
+<b>    VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;</b>
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount   = 1;
+    submitInfo.pCommandBuffers      = &m_cmdBufs[ImageIndex];
+<b>    submitInfo.pWaitSemaphores      = &m_presentCompleteSem;  
+    submitInfo.waitSemaphoreCount   = 1;
+    submitInfo.pWaitDstStageMask    = &waitFlags;
+    submitInfo.pSignalSemaphores    = &m_renderCompleteSem;
+    submitInfo.signalSemaphoreCount = 1;</b>
+    
+    res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);    
+    CHECK_VULKAN_ERROR("vkQueueSubmit error %d\n", res);
+    
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.swapchainCount     = 1;
+    presentInfo.pSwapchains        = &m_swapChainKHR;
+    presentInfo.pImageIndices      = &ImageIndex;
+<b>    presentInfo.pWaitSemaphores    = &m_renderCompleteSem;
+    presentInfo.waitSemaphoreCount = 1;</b>
+    
+    res = vkQueuePresentKHR(m_queue, &presentInfo);    
+    CHECK_VULKAN_ERROR("vkQueuePresentKHR error %d\n" , res);
+}</code></pre>
+  <p>
+    With the two semaphores ready let's see how to use them. The above is the updated RenderScene() function with
+    the new stuff in bold face. We start by providing the present-complete semaphore to vkAcquireNextImageKHR() which
+    acquires a free image from the presentation engine. Previously we passed NULL here but now we are asking the
+    presentation engine to signal that semaphore once it has finished presenting the image so it can be rendered
+    again.</p>
+  <p>
+    Next we prepare the submit info structure for the command buffer. We provide the address of the present-complete
+    semaphore in the pWaitSemaphores member. This make the command wait until this semaphore is signalled. pWaitSemaphores
+    actually expects an array of semaphores (giving it the capability to wait on multiple semaphores) so we must also specify the number
+    of semaphores in the waitSemaphoresCount member (just one in our case). We also specify the address of the render-complete semaphore
+    in the pSignalSemaphores member (and don't forget the corresponding member signalSemaphoreCount). This makes the driver
+    signal that semaphore once the command buffer has finished processing. 
+  </p>
+  <p>
+    The last piece of interest in the submit info is the pWaitDstStageMask member. The idea behind wait stage masks is to
+    limit the places where a wait occurs so that unnecessary stalls or cache flushes will be avoided. In our case
+    it is best to wait on the present-complete semaphore only when the pipeline reaches the point where the final color values are written out.
+    Therefore, we specify VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT in the pWaitDstStageMask member. This is also an array
+    and because it must be the same size as the pWaitSemaphores array we don't need to specify its size again.
+  </p>
+  <p>
+    The final call in this function is to the vkQueuePresentKHR() function that takes a VkPresentInfoKHR struct as a parameter. In order
+    to make presentation wait until rendering is complete we must specify the render-complete semaphore in the pWaitSemaphore member (again, remember
+    to set the number of semaphores in the waitSemaphoreCount member).
+  </p>
+  <p>
+    We've finished covering all the synchronization related parts of the tutorial. Now let's review the set of changes that were detected by
+    the validation layers. We will start with the function where most of the changes took place - CreatePipeline(). Here
+    is the complete source with some comments in-lined:
+  </p>
+  <pre><code>void OgldevVulkanApp::CreatePipeline()
+{
+    VkPipelineShaderStageCreateInfo shaderStageCreateInfo[2] = {};
+    
+    shaderStageCreateInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shaderStageCreateInfo[0].module = m_vsModule;
+    shaderStageCreateInfo[0].pName = "main";
+    shaderStageCreateInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStageCreateInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shaderStageCreateInfo[1].module = m_fsModule;
+    shaderStageCreateInfo[1].pName = "main";   
+	    
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    
+    VkPipelineInputAssemblyStateCreateInfo pipelineIACreateInfo = {};
+    pipelineIACreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    pipelineIACreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    
+    VkViewport vp = {};
+    vp.x = 0.0f;
+    vp.y = 0.0f;
+    vp.width  = (float)WINDOW_WIDTH;
+    vp.height = (float)WINDOW_HEIGHT;
+    vp.minDepth = 0.0f;
+    vp.maxDepth = 1.0f;
+    
+<b>    VkRect2D scissor;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;
+    scissor.extent.width = WINDOW_WIDTH;
+    scissor.extent.height = WINDOW_HEIGHT;</b>
+        
+    VkPipelineViewportStateCreateInfo vpCreateInfo = {};
+    vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    vpCreateInfo.viewportCount = 1;
+    vpCreateInfo.pViewports = &vp;
+<b>    vpCreateInfo.scissorCount = 1;
+    vpCreateInfo.pScissors = &scissor;</b></code></pre>
+  <p>
+    Here you can see that I've added a scissor with the same size as the viewport. The scissor is simply yet another
+    test that determines whether a fragment should be dropped (when it is outside of the scissor rectangle). This was detected
+    by a message from the validation layer that said that since the multi viewport feature is disabled the scissor
+    must be specified. In addition, the spec says in section 25.2 that "If the pipeline state object is created without VK_DYNAMIC_STATE_SCISSOR enabled then the scissor rectangles are set by the VkPipelineViewportStateCreateInfo state of the pipeline state object. Otherwise, to dynamically set the scissor rectangles call: vkCmdSetScissor()". In
+    a simple program such as this it makes sense not to use a dynamic scissor and simply specify it when creating the pipeline object. You will later
+    see that I dropped the usage of vkCmdSetScissor(), per the comment from the spec.
+  </p>
+  <pre><code>    VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
+    rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+    rastCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+    rastCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    rastCreateInfo.lineWidth = 1.0f;
+    
+    VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
+    pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    <b>pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;</b></code></pre>
+  <p>
+    I've added the rasterizationSamples here because the spec (section 24) says that we have to put a valid value.
+    This value is the number of samples per pixel during rasterization and is not too important
+    at this point so I just use the minimal value.
+  </p>
+    <pre><code>    VkPipelineColorBlendAttachmentState blendAttachState = {};
+    blendAttachState.colorWriteMask = 0xf;
+    
+    VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
+    blendCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
+    blendCreateInfo.attachmentCount = 1;
+    blendCreateInfo.pAttachments = &blendAttachState;
+    
+<b>    VkPipelineLayoutCreateInfo layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        
+    VkResult res = vkCreatePipelineLayout(m_core.GetDevice(), &layoutInfo, NULL, &m_pipelineLayout);
+    CHECK_VULKAN_ERROR("vkCreatePipelineLayout error %d\n", res);    </b></code></pre>
+  <p>
+    Various resources such as buffers, image views and samplers can be accessed in a shader stage. A descriptor is a data structure
+    which describes these resources and connects them to the pipeline object. Right now our shader is very simple and doesn't need
+    any external data (e.g. transformation matrices) but we are still required to provide some minimal descriptor meta data. In the above
+    highlighted block of code we create that.
+  </p>
+  <p>
+    The object that was missing in the previous tutorial and caused some validation warnings is called <i>Pipeline Layout</i>.
+    This object points to the descriptor sets and the descriptor sets are groups of descriptors. Since we are not going to reference
+    any real resources in this tutorial the only thing that we need to create is a pipeline layout object. This object is mandatory for
+    the creation of the pipeline. The pipeline layout usually points to descriptor set layout but here it is enough
+    to create an empty VkPipelineLayoutCreateInfo struct and only set its type. Next we call vkCreatePipelineLayout() in order
+    to create the pipeline layout.
+  </p>
+    <pre><code>    VkGraphicsPipelineCreateInfo pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.stageCount = ARRAY_SIZE_IN_ELEMENTS(shaderStageCreateInfo);
+    pipelineInfo.pStages = &shaderStageCreateInfo[0];
+    pipelineInfo.pVertexInputState = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &pipelineIACreateInfo;
+    pipelineInfo.pViewportState = &vpCreateInfo;
+    pipelineInfo.pRasterizationState = &rastCreateInfo;
+    pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
+    pipelineInfo.pColorBlendState = &blendCreateInfo;
+<b>    pipelineInfo.layout = m_pipelineLayout;</b>
+    pipelineInfo.renderPass = m_renderPass;
+    pipelineInfo.basePipelineIndex = -1;
+    
+    res = vkCreateGraphicsPipelines(m_core.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &m_pipeline);
+    CHECK_VULKAN_ERROR("vkCreateGraphicsPipelines error %d\n", res);
+} </code></pre>
+  <p>
+    The only thing that remains in order to complete a valid creation of the graphics pipeline is to set the layout
+    member in the pipeline create info struct to point to the pipeline layout that we just created.
+  </p>
+
+  <pre><code>void OgldevVulkanApp::RecordCommandBuffers()
+{
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    
+    VkClearColorValue clearColor = { 164.0f/256.0f, 30.0f/256.0f, 34.0f/256.0f, 0.0f };
+    VkClearValue clearValue = {};
+    clearValue.color = clearColor;
+    
+    VkImageSubresourceRange imageRange = {};
+    imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageRange.levelCount = 1;
+    imageRange.layerCount = 1;
+    
+    VkRenderPassBeginInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = m_renderPass;
+    renderPassInfo.renderArea.offset.x = 0;
+    renderPassInfo.renderArea.offset.y = 0;
+    renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
+    renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearValue;
+
+<s>    VkViewport viewport = { 0 };
+    viewport.height = (float)WINDOW_HEIGHT;
+    viewport.width = (float)WINDOW_WIDTH;
+    viewport.minDepth = (float)0.0f;
+    viewport.maxDepth = (float)1.0f;</s>
+        
+<s>    VkRect2D scissor = { 0 };
+    scissor.extent.width = WINDOW_WIDTH;
+    scissor.extent.height = WINDOW_HEIGHT;
+    scissor.offset.x = 0;
+    scissor.offset.y = 0;</s>
+
+    for (uint i = 0 ; i < m_cmdBufs.size() ; i++) {
+        VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+        CHECK_VULKAN_ERROR("vkBeginCommandBuffer error %d\n", res);
+        renderPassInfo.framebuffer = m_fbs[i];
+
+        vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+        
+<s>        vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
+
+        vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);</s>
+
+        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
+        
+        vkCmdEndRenderPass(m_cmdBufs[i]);
+               
+        res = vkEndCommandBuffer(m_cmdBufs[i]);
+        CHECK_VULKAN_ERROR("vkEndCommandBuffer error %d\n", res);
+    }
+    
+    printf("Command buffers recorded\n"); 
+}</code></pre>
+  <p>
+    Above we have the complete RecordCommandBuffers() function with a major change - I dropped all references to the viewports and scissors here.
+    The reason is that I added the scissor definition to pipeline viewport state (VkPipelineViewportStateCreateInfo) earlier and since
+    we didn't specify that we plan to use a dynamic scissor what we have in the pipeline object is enough and we don't need to specify
+    the viewport and scissor again when we record the command buffers. This makes the command buffer simpler, which is always a good thing.
+    </p>
+</section>
+
+</article>
+
+    </code></pre>
+    <pre><code>
+    </code></pre>
+<script src="../html5shiv.min.js"></script>
+<script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial53/tutorial53.html';
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+</body>
+</html>
