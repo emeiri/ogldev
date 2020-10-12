@@ -23,7 +23,6 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-//#include "../Common/ogldev_all.cpp"
 #include "ogldev_math_3d.h"
 
 
