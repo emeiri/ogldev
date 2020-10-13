@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2010 Etay Meiri
+        Copyright 2010 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
+#include "ogldev_math_3d.h"
 
 GLuint VBO;
 GLuint IBO;
@@ -44,7 +44,7 @@ static void _RenderSceneCB()
     Scale += 0.01f;
 
     Matrix4f World;
-    
+
     World.m[0][0] = cosf(Scale); World.m[0][1] = 0.0f; World.m[0][2] = -sinf(Scale); World.m[0][3] = 0.0f;
     World.m[1][0] = 0.0;         World.m[1][1] = 1.0f; World.m[1][2] = 0.0f        ; World.m[1][3] = 0.0f;
     World.m[2][0] = sinf(Scale); World.m[2][1] = 0.0f; World.m[2][2] = cosf(Scale) ; World.m[2][3] = 0.0f;
@@ -79,9 +79,9 @@ static void CreateVertexBuffer()
     Vertices[2] = Vector3f(1.0f, -1.0f, 0.0f);
     Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);
 
- 	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 }
 
 static void CreateIndexBuffer()
@@ -131,7 +131,7 @@ static void CompileShaders()
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
-	
+
     string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
@@ -150,11 +150,11 @@ static void CompileShaders()
 
     glLinkProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
-	if (Success == 0) {
-		glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-		fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+        if (Success == 0) {
+                glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+                fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         exit(1);
-	}
+        }
 
     glValidateProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
@@ -186,14 +186,14 @@ int main(int argc, char** argv)
       fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
       return 1;
     }
-    
+
     printf("GL version: %s\n", glGetString(GL_VERSION));
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     CreateVertexBuffer();
     CreateIndexBuffer();
-    
+
     CompileShaders();
 
     glutMainLoop();
