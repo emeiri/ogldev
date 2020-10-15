@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2014 Etay Meiri
+        Copyright 2014 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,16 +20,20 @@
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 
+#include "/usr/local/include/freetype-gl-cpp/freetype-gl-cpp.h"
+
 #ifndef WIN32
-Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
+/*Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    {.1,1.0,1.0,.5}, {1,1,1,0},
                    0, {1,0,0,1}, 0, {1,0,0,1},
                    0, {0,0,0,1}, 0, {0,0,0,1} };
+                   FreetypeGl m_textRenderer(true);*/
 #endif
+
 
 OgldevApp::OgldevApp()
 #ifndef WIN32
-           : m_fontRenderer(sMarkup)
+//           : m_fontRenderer(sMarkup)
 #endif
 {
     m_frameCount = 0;
@@ -46,7 +50,7 @@ void OgldevApp::CalcFPS()
     m_frameCount++;
 
     long long time = GetCurrentTimeMillis();
-    
+
     if (time - m_frameTime >= 1000) {
         m_frameTime = time;
         m_fps = m_frameCount;
@@ -57,11 +61,11 @@ void OgldevApp::CalcFPS()
 void OgldevApp::RenderFPS()
 {
     char text[32];
-    ZERO_MEM(text);        
+    ZERO_MEM(text);
     SNPRINTF(text, sizeof(text), "FPS: %d", m_fps);
 
 #ifndef WIN32
-    m_fontRenderer.RenderText(10, 10, text);        
+    //    m_textRenderer.renderText(text);
 #endif
 }
 
