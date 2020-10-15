@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,12 +25,15 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
 
 #define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024
 
-/*struct Vertex
+struct Vertex
 {
     Vector3f m_pos;
     Vector2f m_tex;
@@ -42,7 +45,7 @@
         m_pos = pos;
         m_tex = tex;
     }
-    };*/
+};
 
 
 GLuint VBO;
@@ -128,10 +131,10 @@ static void CreateVertexBuffer()
                            Vertex(Vector3f(0.0f, -1.0f, -1.15475f), Vector2f(0.5f, 0.0f)),
                            Vertex(Vector3f(1.0f, -1.0f, 0.5773f),  Vector2f(1.0f, 0.0f)),
                            Vertex(Vector3f(0.0f, 1.0f, 0.0f),      Vector2f(0.5f, 1.0f)) };
-    
- 	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 }
 
 
@@ -184,7 +187,7 @@ static void CompileShaders()
         fprintf(stderr, "Error creating shader program\n");
         exit(1);
     }
-	
+
     string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
@@ -203,11 +206,11 @@ static void CompileShaders()
 
     glLinkProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
-	if (Success == 0) {
-		glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-		fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+        if (Success == 0) {
+                glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+                fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         exit(1);
-	}
+        }
 
     glValidateProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
@@ -228,7 +231,7 @@ static void CompileShaders()
 
 int main(int argc, char** argv)
 {
-//    Magick::InitializeMagick(*argv);    
+//    Magick::InitializeMagick(*argv);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -265,12 +268,12 @@ int main(int argc, char** argv)
     if (!pTexture->Load()) {
         return 1;
     }
- 
+
     gPersProjInfo.FOV = 60.0f;
     gPersProjInfo.Height = WINDOW_HEIGHT;
     gPersProjInfo.Width = WINDOW_WIDTH;
     gPersProjInfo.zNear = 1.0f;
-    gPersProjInfo.zFar = 100.0f;                
+    gPersProjInfo.zFar = 100.0f;
 
     glutMainLoop();
 
