@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,13 +22,17 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
-#include "lighting_technique.cpp"
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
+#include "lighting_technique.h"
+#include "ogldev_app.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
-/*struct Vertex
+struct Vertex
 {
     Vector3f m_pos;
     Vector2f m_tex;
@@ -41,7 +45,7 @@
         m_tex = tex;
     }
 };
-*/
+
 
 class Tutorial17 : public ICallbacks, public OgldevApp
 {
@@ -55,12 +59,12 @@ public:
         m_scale = 0.0f;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 0.5f;
-        
+
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;                
+        m_persProjInfo.zFar = 100.0f;
     }
 
     ~Tutorial17()
@@ -107,7 +111,7 @@ public:
         m_pGameCamera->OnRender();
 
         glClear(GL_COLOR_BUFFER_BIT);
-       
+
         m_scale += 0.1f;
 
         Pipeline p;
@@ -117,7 +121,7 @@ public:
         p.SetPerspectiveProj(m_persProjInfo);
         m_pEffect->SetWVP(p.GetWVPTrans());
         m_pEffect->SetDirectionalLight(m_directionalLight);
-        
+
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
@@ -190,7 +194,7 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
-    PersProjInfo m_persProjInfo;    
+    PersProjInfo m_persProjInfo;
 };
 
 
@@ -212,6 +216,6 @@ int main(int argc, char** argv)
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
