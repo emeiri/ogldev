@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,11 +22,33 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
-#include "lighting_technique.cpp"
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
+#include "ogldev_lights_common.h"
+#include "ogldev_app.h"
+#include "lighting_technique.h"
+
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
+
+struct Vertex
+{
+    Vector3f m_pos;
+    Vector2f m_tex;
+    Vector3f m_normal;
+
+    Vertex() {}
+
+    Vertex(Vector3f pos, Vector2f tex)
+    {
+        m_pos = pos;
+        m_tex = tex;
+        m_normal = Vector3f(0.0f, 0.0f, 0.0f);
+    }
+};
 
 class Tutorial19 : public ICallbacks, public OgldevApp
 {
@@ -42,12 +64,12 @@ public:
         m_directionalLight.AmbientIntensity = 0.00f;
         m_directionalLight.DiffuseIntensity = 0.2f;
         m_directionalLight.Direction = Vector3f(0.0f, 0.0, 1.0);
-        
+
         m_persProjInfo.FOV = 60.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;                        
+        m_persProjInfo.zFar = 100.0f;
     }
 
     ~Tutorial19()
@@ -72,7 +94,7 @@ public:
         CreateIndexBuffer(Indices, sizeof(Indices));
 
         CreateVertexBuffer(Indices, ARRAY_SIZE_IN_ELEMENTS(Indices));
-        
+
         m_pEffect = new LightingTechnique();
 
         if (!m_pEffect->Init())
@@ -104,7 +126,7 @@ public:
         m_pGameCamera->OnRender();
 
         glClear(GL_COLOR_BUFFER_BIT);
-       
+
         m_scale += 0.1f;
 
         Pipeline p;
@@ -119,7 +141,7 @@ public:
         m_pEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
         m_pEffect->SetMatSpecularIntensity(1.0f);
         m_pEffect->SetMatSpecularPower(32);
-        
+
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
@@ -133,7 +155,7 @@ public:
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2); 
+        glDisableVertexAttribArray(2);
 
         glutSwapBuffers();
     }
@@ -203,7 +225,7 @@ private:
                                Vertex(Vector3f(0.0f, -1.0f, -1.15475f), Vector2f(0.5f, 0.0f)),
                                Vertex(Vector3f(1.0f, -1.0f, 0.5773f),  Vector2f(1.0f, 0.0f)),
                                Vertex(Vector3f(0.0f, 1.0f, 0.0f),      Vector2f(0.5f, 1.0f)) };
-        
+
         unsigned int VertexCount = ARRAY_SIZE_IN_ELEMENTS(Vertices);
 
         CalcNormals(pIndices, IndexCount, Vertices, VertexCount);
@@ -249,6 +271,6 @@ int main(int argc, char** argv)
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
