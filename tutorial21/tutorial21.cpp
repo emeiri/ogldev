@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,14 +22,44 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
-#include "lighting_technique.cpp"
+
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
+#include "ogldev_lights_common.h"
+#include "ogldev_app.h"
+#include "lighting_technique.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
 static const float FieldDepth = 20.0f;
 static const float FieldWidth = 10.0f;
+
+
+struct Vertex
+{
+    Vector3f m_pos;
+    Vector2f m_tex;
+    Vector3f m_normal;
+
+    Vertex() {}
+
+    Vertex(const Vector3f& pos, const Vector2f& tex, const Vector3f& normal)
+    {
+        m_pos    = pos;
+        m_tex    = tex;
+        m_normal = normal;
+    }
+
+    Vertex(const Vector3f& pos, const Vector2f& tex)
+    {
+        m_pos    = pos;
+        m_tex    = tex;
+        m_normal = Vector3f(0.0f, 0.0f, 0.0f);
+    }
+};
 
 class Tutorial21 : public ICallbacks
 {
@@ -50,7 +80,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 50.0f;        
+        m_persProjInfo.zFar = 50.0f;
     }
 
     ~Tutorial21()
@@ -69,7 +99,7 @@ public:
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
 
         CreateVertexBuffer();
-        
+
         m_pEffect = new LightingTechnique();
 
         if (!m_pEffect->Init())
@@ -142,7 +172,7 @@ public:
         m_pEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
         m_pEffect->SetMatSpecularIntensity(0.0f);
         m_pEffect->SetMatSpecularPower(0);
-        
+
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
@@ -155,7 +185,7 @@ public:
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2); 
+        glDisableVertexAttribArray(2);
 
         glutSwapBuffers();
     }
@@ -182,7 +212,7 @@ public:
             m_directionalLight.DiffuseIntensity -= 0.05f;
             break;
         default:
-            m_pGameCamera->OnKeyboard(OgldevKey);				
+            m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
@@ -219,7 +249,7 @@ private:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_directionalLight;
-    PersProjInfo m_persProjInfo;	
+    PersProjInfo m_persProjInfo;
 };
 
 
@@ -240,6 +270,6 @@ int main(int argc, char** argv)
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }

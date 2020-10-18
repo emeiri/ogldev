@@ -16,10 +16,11 @@
  */
 
 #ifndef LIGHTING_TECHNIQUE_20_H
-#define	LIGHTING_TECHNIQUE_20_H
+#define LIGHTING_TECHNIQUE_20_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "ogldev_lights_common.h"
 
 class LightingTechnique : public Technique {
 public:
@@ -71,4 +72,4 @@ private:
 };
 
 
-#endif	/* LIGHTING_TECHNIQUE_H */
+#endif  /* LIGHTING_TECHNIQUE_H */
