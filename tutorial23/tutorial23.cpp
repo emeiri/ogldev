@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,16 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
-#include "mesh.cpp"
-#include "shadow_map_technique.cpp"
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
+#include "ogldev_lights_common.h"
+#include "ogldev_app.h"
+#include "ogldev_basic_lighting.h"
+#include "mesh.h"
+#include "shadow_map_technique.h"
+#include "shadow_map_fbo.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
@@ -53,7 +60,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 50.0f;        
+        m_persProjInfo.zFar = 50.0f;
     }
 
     ~Tutorial23()
@@ -71,25 +78,25 @@ public:
         }
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT/*, Pos, Target, Up*/);
-     
+
         m_pShadowMapTech = new ShadowMapTechnique();
 
         if (!m_pShadowMapTech->Init()) {
             printf("Error initializing the shadow map technique\n");
             return false;
-        }        
-        
+        }
+
         m_pShadowMapTech->Enable();
-       
+
         m_pQuad = new Mesh();
-        
-		if (!m_pQuad->LoadMesh("../Content/quad.obj")) {
+
+                if (!m_pQuad->LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
         m_pMesh = new Mesh();
 
-		return m_pMesh->LoadMesh("../Content/phoenix_ugv.md2");
+                return m_pMesh->LoadMesh("../Content/phoenix_ugv.md2");
     }
 
     void Run()
@@ -104,7 +111,7 @@ public:
 
         ShadowMapPass();
         RenderPass();
-        
+
         glutSwapBuffers();
     }
 
@@ -122,14 +129,14 @@ public:
         p.SetPerspectiveProj(m_persProjInfo);
         m_pShadowMapTech->SetWVP(p.GetWVPTrans());
         m_pMesh->Render();
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-    
+
     virtual void RenderPass()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      
+
         m_pShadowMapTech->SetTextureUnit(0);
         m_shadowMapFBO.BindForReading(GL_TEXTURE0);
 
@@ -139,27 +146,27 @@ public:
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
         m_pShadowMapTech->SetWVP(p.GetWVPTrans());
-        m_pQuad->Render();       
+        m_pQuad->Render();
     }
 
 
-	void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			GLUTBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+        void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
+        {
+                switch (OgldevKey) {
+                case OGLDEV_KEY_ESCAPE:
+                case OGLDEV_KEY_q:
+                        GLUTBackendLeaveMainLoop();
+                        break;
+                default:
+                        m_pGameCamera->OnKeyboard(OgldevKey);
+                }
+        }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
+        virtual void PassiveMouseCB(int x, int y)
+        {
+                m_pGameCamera->OnMouse(x, y);
+        }
 
  private:
 
@@ -170,7 +177,7 @@ public:
     Mesh* m_pMesh;
     Mesh* m_pQuad;
     ShadowMapFBO m_shadowMapFBO;
-    PersProjInfo m_persProjInfo;	
+    PersProjInfo m_persProjInfo;
 };
 
 
@@ -192,6 +199,6 @@ int main(int argc, char** argv)
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
