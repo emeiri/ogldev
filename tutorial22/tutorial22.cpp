@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,13 +22,21 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
-#include "mesh.cpp"
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
+#include "ogldev_lights_common.h"
+#include "ogldev_app.h"
+#include "ogldev_basic_lighting.h"
+#include "mesh.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
 static float FieldDepth = 10.0f;
+
+
 
 class Tutorial22 : public ICallbacks
 {
@@ -48,7 +56,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 50.0f;        
+        m_persProjInfo.zFar = 50.0f;
     }
 
     ~Tutorial22()
@@ -65,7 +73,7 @@ public:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-      
+
         m_pEffect = new BasicLightingTechnique();
 
         if (!m_pEffect->Init()) {
@@ -156,7 +164,7 @@ public:
             m_directionalLight.DiffuseIntensity -= 0.05f;
             break;
         default:
-            m_pGameCamera->OnKeyboard(OgldevKey);				
+            m_pGameCamera->OnKeyboard(OgldevKey);
         }
     }
 
@@ -173,7 +181,7 @@ private:
     float m_scale;
     DirectionalLight m_directionalLight;
     Mesh* m_pMesh;
-    PersProjInfo m_persProjInfo;	
+    PersProjInfo m_persProjInfo;
 };
 
 
@@ -195,6 +203,6 @@ int main(int argc, char** argv)
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
