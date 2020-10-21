@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 */
 
 #ifndef OGLDEV_BASIC_MESH_H
-#define	OGLDEV_BASIC_MESH_H
+#define OGLDEV_BASIC_MESH_H
 
 #include <map>
 #include <vector>
@@ -65,9 +65,9 @@ public:
     bool LoadMesh(const std::string& Filename);
 
     void Render();
-	
+
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
-    
+
     Orientation& GetOrientation() { return m_orientation; }
 
 private:
@@ -82,11 +82,11 @@ private:
     void Clear();
 
 #define INVALID_MATERIAL 0xFFFFFFFF
-   
-#define INDEX_BUFFER 0    
+
+#define INDEX_BUFFER 0
 #define POS_VB       1
 #define NORMAL_VB    2
-#define TEXCOORD_VB  3    
+#define TEXCOORD_VB  3
 #define WVP_MAT_VB   4
 #define WORLD_MAT_VB 5
 
@@ -101,18 +101,17 @@ private:
             BaseIndex = 0;
             MaterialIndex = INVALID_MATERIAL;
         }
-        
+
         unsigned int NumIndices;
-	unsigned int BaseVertex;
+        unsigned int BaseVertex;
         unsigned int BaseIndex;
         unsigned int MaterialIndex;
     };
-    
+
     std::vector<BasicMeshEntry> m_Entries;
     std::vector<Texture*> m_Textures;
     Orientation m_orientation;
 };
 
 
-#endif	/* OGLDEV_BASIC_MESH_H */
-
+#endif  /* OGLDEV_BASIC_MESH_H */
