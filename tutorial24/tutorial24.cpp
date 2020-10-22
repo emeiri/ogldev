@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,10 +22,16 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "../Common/ogldev_all.cpp"
-#include "mesh.cpp"
-#include "lighting_technique.cpp"
-#include "shadow_map_technique.cpp"
+#include "ogldev_pipeline.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_glut_backend.h"
+#include "ogldev_texture.h"
+#include "ogldev_lights_common.h"
+#include "ogldev_app.h"
+#include "lighting_technique.h"
+#include "mesh.h"
+#include "shadow_map_technique.h"
+
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
@@ -57,9 +63,9 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 50.0f;        
+        m_persProjInfo.zFar = 50.0f;
     }
-    
+
 
     ~Tutorial24()
     {
@@ -71,7 +77,7 @@ public:
         SAFE_DELETE(m_pGroundTex);
     }
 
-    
+
     bool Init()
     {
         Vector3f Pos(3.0f, 8.0f, -10.0f);
@@ -83,7 +89,7 @@ public:
         }
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-     
+
         m_pLightingEffect = new LightingTechnique();
 
         if (!m_pLightingEffect->Init()) {
@@ -95,21 +101,21 @@ public:
         m_pLightingEffect->SetSpotLights(1, &m_spotLight);
         m_pLightingEffect->SetTextureUnit(0);
         m_pLightingEffect->SetShadowMapTextureUnit(1);
-        
+
         m_pShadowMapEffect = new ShadowMapTechnique();
 
         if (!m_pShadowMapEffect->Init()) {
             printf("Error initializing the shadow map technique\n");
             return false;
-        }        
-       
+        }
+
         m_pQuad = new Mesh();
-        
-		if (!m_pQuad->LoadMesh("../Content/quad.obj")) {
+
+                if (!m_pQuad->LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
-		m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
+                m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
@@ -117,28 +123,28 @@ public:
 
         m_pMesh = new Mesh();
 
-		return m_pMesh->LoadMesh("../Content/phoenix_ugv.md2");
-	}
+                return m_pMesh->LoadMesh("../Content/phoenix_ugv.md2");
+        }
 
-    
+
     void Run()
     {
         GLUTBackendRun(this);
     }
 
-    
+
     virtual void RenderSceneCB()
     {
         m_pGameCamera->OnRender();
         m_scale += 0.05f;
-        
+
         ShadowMapPass();
         RenderPass();
-     
+
         glutSwapBuffers();
     }
 
-    
+
     void ShadowMapPass()
     {
         m_shadowMapFBO.BindForWriting();
@@ -155,11 +161,11 @@ public:
         p.SetPerspectiveProj(m_persProjInfo);
         m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
         m_pMesh->Render();
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-        
+
     void RenderPass()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -167,7 +173,7 @@ public:
         m_pLightingEffect->Enable();
 
         m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
-       
+
         m_shadowMapFBO.BindForReading(GL_TEXTURE1);
 
         Pipeline p;
@@ -178,12 +184,12 @@ public:
         p.Rotate(90.0f, 0.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
-        m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());        
+        m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
         m_pGroundTex->Bind(GL_TEXTURE0);
         m_pQuad->Render();
- 
+
         p.Scale(0.1f, 0.1f, 0.1f);
         p.Rotate(0.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
@@ -192,27 +198,27 @@ public:
         m_pLightingEffect->SetWorldMatrix(p.GetWorldTrans());
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
-        m_pMesh->Render();        
+        m_pMesh->Render();
     }
 
 
-	void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			GLUTBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+        void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
+        {
+                switch (OgldevKey) {
+                case OGLDEV_KEY_ESCAPE:
+                case OGLDEV_KEY_q:
+                        GLUTBackendLeaveMainLoop();
+                        break;
+                default:
+                        m_pGameCamera->OnKeyboard(OgldevKey);
+                }
+        }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
+        virtual void PassiveMouseCB(int x, int y)
+        {
+                m_pGameCamera->OnMouse(x, y);
+        }
 
  private:
 
@@ -225,7 +231,7 @@ public:
     Mesh* m_pQuad;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
-    PersProjInfo m_persProjInfo;	
+    PersProjInfo m_persProjInfo;
 };
 
 
@@ -246,6 +252,6 @@ int main(int argc, char** argv)
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
