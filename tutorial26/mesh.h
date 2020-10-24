@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
 */
 
 #ifndef MESH_H
-#define	MESH_H
+#define MESH_H
 
 #include <map>
 #include <vector>
 #include <GL/glew.h>
-#include <Importer.hpp>      // C++ importer interface
-#include <scene.h>       // Output data structure
-#include <postprocess.h> // Post processing flags
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>       // Output data structure
+#include <assimp/postprocess.h> // Post processing flags
 
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
@@ -45,7 +45,6 @@ struct Vertex
         m_tex    = tex;
         m_normal = normal;
         m_tangent = Tangent;
-                
     }
 };
 
@@ -88,5 +87,4 @@ private:
 };
 
 
-#endif	/* MESH_H */
-
+#endif  /* MESH_H */
