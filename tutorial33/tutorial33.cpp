@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "ogldev_glut_backend.h"
 #include "mesh.h"
 
-#define WINDOW_WIDTH  1280  
+#define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024
 
 #define NUM_ROWS 50
@@ -57,8 +57,8 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
-        
+        m_persProjInfo.zFar = 100.0f;
+
         m_pMesh = NULL;
     }
 
@@ -67,7 +67,7 @@ public:
         SAFE_DELETE(m_pEffect);
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh);
-    }    
+    }
 
     bool Init()
     {
@@ -76,7 +76,7 @@ public:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-      
+
         m_pEffect = new LightingTechnique();
 
         if (!m_pEffect->Init()) {
@@ -98,17 +98,17 @@ public:
         m_pMesh = new Mesh();
 
         if (!m_pMesh->LoadMesh("../Content/spider.obj")) {
-            return false;            
-        }
-        
-#ifndef WIN32
-        if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
+
+#ifndef WIN32
+        /*        if (!m_fontRenderer.InitFontRenderer()) {
+            return false;
+            }*/
 #endif
-        
+
         CalcPositions();
-        
+
         return true;
     }
 
@@ -116,12 +116,12 @@ public:
     {
         GLUTBackendRun(this);
     }
-    
+
 
     virtual void RenderSceneCB()
-    {   
+    {
         CalcFPS();
-        
+
         m_scale += 0.005f;
 
         m_pGameCamera->OnRender();
@@ -130,53 +130,53 @@ public:
 
         m_pEffect->Enable();
         m_pEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
-        
+
         Pipeline p;
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(m_persProjInfo);   
+        p.SetPerspectiveProj(m_persProjInfo);
         p.Rotate(0.0f, 90.0f, 0.0f);
-        p.Scale(0.005f, 0.005f, 0.005f);                
+        p.Scale(0.005f, 0.005f, 0.005f);
 
         Matrix4f WVPMatrics[NUM_INSTANCES];
         Matrix4f WorldMatrices[NUM_INSTANCES];
-        
+
         for (unsigned int i = 0 ; i < NUM_INSTANCES ; i++) {
             Vector3f Pos(m_positions[i]);
             Pos.y += sinf(m_scale) * m_velocity[i];
-            p.WorldPos(Pos);        
+            p.WorldPos(Pos);
             WVPMatrics[i] = p.GetWVPTrans().Transpose();
             WorldMatrices[i] = p.GetWorldTrans().Transpose();
         }
-        
+
         m_pMesh->Render(NUM_INSTANCES, WVPMatrics, WorldMatrices);
-        
+
         RenderFPS();
-        
+
         glutSwapBuffers();
     }
 
 
-	void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			GLUTBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+        void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
+        {
+                switch (OgldevKey) {
+                case OGLDEV_KEY_ESCAPE:
+                case OGLDEV_KEY_q:
+                        GLUTBackendLeaveMainLoop();
+                        break;
+                default:
+                        m_pGameCamera->OnKeyboard(OgldevKey);
+                }
+        }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
-    
-    
-private:    
-    
+        virtual void PassiveMouseCB(int x, int y)
+        {
+                m_pGameCamera->OnMouse(x, y);
+        }
+
+
+private:
+
     void CalcPositions()
     {
         for (unsigned int i = 0; i < NUM_ROWS ; i++) {
@@ -190,7 +190,7 @@ private:
                     m_velocity[Index] *= (-1.0f);
                 }
             }
-        }                   
+        }
     }
 
     LightingTechnique* m_pEffect;
@@ -199,7 +199,7 @@ private:
     DirectionalLight m_directionalLight;
     Mesh* m_pMesh;
     PersProjInfo m_persProjInfo;
-    Vector3f m_positions[NUM_INSTANCES];            
+    Vector3f m_positions[NUM_INSTANCES];
     float m_velocity[NUM_INSTANCES];
 };
 
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 33")) {
         return 1;
     }
-    
+
     SRANDOM;
 
     Tutorial33* pApp = new Tutorial33();
@@ -219,10 +219,10 @@ int main(int argc, char** argv)
     if (!pApp->Init()) {
         return 1;
     }
-    
+
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
