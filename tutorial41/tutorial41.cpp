@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2013 Etay Meiri
+        Copyright 2013 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,14 +41,14 @@
 
 using namespace std;
 
-#define WINDOW_WIDTH  1280  
+#define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024
 
 class Tutorial41 : public ICallbacks, public OgldevApp
 {
 public:
 
-    Tutorial41() 
+    Tutorial41()
     {
         m_pGameCamera = NULL;
         m_pSkinningTech = NULL;
@@ -62,9 +62,9 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
-        
-        m_position = Vector3f(0.0f, 0.0f, 6.0f);      
+        m_persProjInfo.zFar = 100.0f;
+
+        m_position = Vector3f(0.0f, 0.0f, 6.0f);
     }
 
     ~Tutorial41()
@@ -72,7 +72,7 @@ public:
         SAFE_DELETE(m_pSkinningTech);
         SAFE_DELETE(m_pMotionBlurTech);
         SAFE_DELETE(m_pGameCamera);
-    }    
+    }
 
     bool Init()
     {
@@ -81,12 +81,12 @@ public:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-        
+
         if (!m_intermediateBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             printf("Error initializing the intermediate buffer\n");
             return false;
         }
-      
+
         m_pSkinningTech = new SkinningTechnique();
 
         if (!m_pSkinningTech->Init()) {
@@ -107,28 +107,28 @@ public:
             printf("Error initializing the motion blur technique\n");
             return false;
         }
-        
+
         m_pMotionBlurTech->Enable();
         m_pMotionBlurTech->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_pMotionBlurTech->SetMotionTextureUnit(MOTION_TEXTURE_UNIT_INDEX);
 
         if (!m_mesh.LoadMesh("../Content/boblampclean.md5mesh")) {
             printf("Mesh load failed\n");
-            return false;            
+            return false;
         }
-        
+
         m_mesh.BoneTransform(0.0f, m_prevTransforms);
 
         if (!m_quad.LoadMesh("../Content/quad_r.obj")) {
             printf("Quad mesh load failed\n");
-            return false;            
-        }
-        
-#ifndef WIN32
-        if (!m_fontRenderer.InitFontRenderer()) {
             return false;
         }
-#endif        	      
+
+#ifndef WIN32
+        /*        if (!m_fontRenderer.InitFontRenderer()) {
+            return false;
+            }*/
+#endif
         return true;
     }
 
@@ -136,23 +136,23 @@ public:
     {
         GLUTBackendRun(this);
     }
-    
+
 
     virtual void RenderSceneCB()
-    {   
+    {
         CalcFPS();
-              
+
         m_pGameCamera->OnRender();
 
         RenderPass();
-        
+
         MotionBlurPass();
-                              
-        RenderFPS();       
-        
+
+        RenderFPS();
+
         glutSwapBuffers();
     }
-    
+
     void RenderPass()
     {
         m_intermediateBuffer.BindForWriting();
@@ -160,36 +160,36 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pSkinningTech->Enable();
-        
+
         vector<Matrix4f> Transforms;
-               
+
         float RunningTime = GetRunningTime();
 
         m_mesh.BoneTransform(RunningTime, Transforms);
-        
+
         for (uint i = 0 ; i < Transforms.size() ; i++) {
             m_pSkinningTech->SetBoneTransform(i, Transforms[i]);
             m_pSkinningTech->SetPrevBoneTransform(i, m_prevTransforms[i]);
-        }                
-               
+        }
+
         m_pSkinningTech->SetEyeWorldPos(m_pGameCamera->GetPos());
-        
+
         m_pipeline.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        m_pipeline.SetPerspectiveProj(m_persProjInfo);           
-        m_pipeline.Scale(0.1f, 0.1f, 0.1f);                
-             
+        m_pipeline.SetPerspectiveProj(m_persProjInfo);
+        m_pipeline.Scale(0.1f, 0.1f, 0.1f);
+
         Vector3f Pos(m_position);
-        m_pipeline.WorldPos(Pos);        
-        m_pipeline.Rotate(270.0f, 180.0f, 0.0f);       
+        m_pipeline.WorldPos(Pos);
+        m_pipeline.Rotate(270.0f, 180.0f, 0.0f);
         m_pSkinningTech->SetWVP(m_pipeline.GetWVPTrans());
-        m_pSkinningTech->SetWorldMatrix(m_pipeline.GetWorldTrans());            
-       
-        m_mesh.Render();        
-        
+        m_pSkinningTech->SetWorldMatrix(m_pipeline.GetWorldTrans());
+
+        m_mesh.Render();
+
         m_prevTransforms = Transforms;
     }
-    
-    
+
+
     void MotionBlurPass()
     {
         m_intermediateBuffer.BindForReading();
@@ -197,7 +197,7 @@ public:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         m_pMotionBlurTech->Enable();
-       
+
         m_quad.Render();
     }
 
@@ -219,17 +219,17 @@ public:
     {
         m_pGameCamera->OnMouse(x, y);
     }
-    
-    
+
+
 private:
-        
+
     SkinningTechnique* m_pSkinningTech;
     MotionBlurTechnique* m_pMotionBlurTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
     SkinnedMesh m_mesh;
     SkinnedMesh m_quad;
-    Vector3f m_position;            
+    Vector3f m_position;
     PersProjInfo m_persProjInfo;
     IntermediateBuffer m_intermediateBuffer;
     Pipeline m_pipeline;
@@ -244,18 +244,18 @@ int main(int argc, char** argv)
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 41")) {
         return 1;
     }
-    
+
     SRANDOM;
-    
+
     Tutorial41* pApp = new Tutorial41();
 
     if (!pApp->Init()) {
         return 1;
     }
-    
+
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }
