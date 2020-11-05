@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,15 +17,15 @@
 */
 
 #ifndef MESH_H
-#define	MESH_H
+#define MESH_H
 
 #include <map>
 #include <vector>
 
 #include <GL/glew.h>
-#include <Importer.hpp>      // C++ importer interface
-#include <scene.h>       // Output data structure
-#include <postprocess.h> // Post processing flags
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>       // Output data structure
+#include <assimp/postprocess.h> // Post processing flags
 
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
@@ -39,11 +39,11 @@ struct Edge
     Edge(uint _a, uint _b)
     {
         assert(_a != _b);
-        
+
         if (_a < _b)
         {
             a = _a;
-            b = _b;                   
+            b = _b;
         }
         else
         {
@@ -56,7 +56,7 @@ struct Edge
     {
         printf("Edge %d %d\n", a, b);
     }
-    
+
     uint a;
     uint b;
 };
@@ -65,12 +65,12 @@ struct Neighbors
 {
     uint n1;
     uint n2;
-    
+
     Neighbors()
     {
         n1 = n2 = (uint)-1;
     }
-    
+
     void AddNeigbor(uint n)
     {
         if (n1 == -1) {
@@ -83,7 +83,7 @@ struct Neighbors
             assert(0);
         }
     }
-    
+
     uint GetOther(uint me) const
     {
         if (n1 == me) {
@@ -109,10 +109,10 @@ struct CompareEdges
         }
         else if (Edge1.a == Edge2.a) {
             return (Edge1.b < Edge2.b);
-        }        
+        }
         else {
             return false;
-        }            
+        }
     }
 };
 
@@ -134,7 +134,7 @@ struct CompareVectors
                 }
             }
         }
-        
+
         return false;
     }
 };
@@ -143,17 +143,17 @@ struct CompareVectors
 struct Face
 {
     uint Indices[3];
-    
+
     uint GetOppositeIndex(const Edge& e) const
     {
         for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(Indices) ; i++) {
             uint Index = Indices[i];
-            
+
             if (Index != e.a && Index != e.b) {
                 return Index;
             }
         }
-        
+
         assert(0);
 
         return 0;
@@ -171,31 +171,31 @@ public:
     bool LoadMesh(const string& Filename, bool WithAdjacencies);
 
     void Render();
-	
+
     uint NumBones() const
     {
         return m_NumBones;
     }
-    
+
     void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
-    
+
 private:
     #define NUM_BONES_PER_VEREX 4
 
     struct BoneInfo
     {
         Matrix4f BoneOffset;
-        Matrix4f FinalTransformation;        
+        Matrix4f FinalTransformation;
 
         BoneInfo()
         {
             BoneOffset.SetZero();
-            FinalTransformation.SetZero();            
+            FinalTransformation.SetZero();
         }
     };
-    
+
     struct VertexBoneData
-    {        
+    {
         uint IDs[NUM_BONES_PER_VEREX];
         float Weights[NUM_BONES_PER_VEREX];
 
@@ -203,19 +203,19 @@ private:
         {
             Reset();
         };
-        
+
         void Reset()
         {
             ZERO_MEM(IDs);
-            ZERO_MEM(Weights);        
+            ZERO_MEM(Weights);
         }
-        
+
         void AddBoneData(uint BoneID, float Weight);
     };
 
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);    
+    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -235,14 +235,14 @@ private:
     void Clear();
 
 #define INVALID_MATERIAL 0xFFFFFFFF
-  
+
 enum VB_TYPES {
     INDEX_BUFFER,
     POS_VB,
     NORMAL_VB,
     TEXCOORD_VB,
     BONE_VB,
-    NUM_VBs            
+    NUM_VBs
 };
 
     GLuint m_VAO;
@@ -256,23 +256,23 @@ enum VB_TYPES {
             BaseIndex     = 0;
             MaterialIndex = INVALID_MATERIAL;
         }
-        
+
         unsigned int NumIndices;
         unsigned int BaseVertex;
         unsigned int BaseIndex;
         unsigned int MaterialIndex;
     };
-    
+
     vector<MeshEntry> m_Entries;
     vector<Texture*> m_Textures;
-     
+
     map<string,uint> m_BoneMapping; // maps a bone name to its index
     uint m_NumBones;
     vector<BoneInfo> m_BoneInfo;
     Matrix4f m_GlobalInverseTransform;
 
     std::map<Edge, Neighbors, CompareEdges> m_indexMap;
-    std::map<aiVector3D, uint, CompareVectors> m_posMap;    
+    std::map<aiVector3D, uint, CompareVectors> m_posMap;
     std::vector<Face> m_uniqueFaces;
     bool m_withAdjacencies;
 
@@ -281,5 +281,4 @@ enum VB_TYPES {
 };
 
 
-#endif	/* MESH_H */
-
+#endif  /* MESH_H */
