@@ -34,7 +34,7 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "texture.h"
+//#include "texture.h"
 #include "skinning_technique.h"
 #include "ogldev_glut_backend.h"
 #include "ogldev_skinned_mesh.h"
@@ -100,9 +100,9 @@ public:
         }
         
 #ifndef WIN32
-        if (!m_fontRenderer.InitFontRenderer()) {
-            return false;
-        }
+        /* if (!m_fontRenderer.InitFontRenderer()) { */
+        /*     return false; */
+        /* } */
 #endif        	
         return true;
     }
