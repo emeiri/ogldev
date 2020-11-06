@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2013 Etay Meiri
+        Copyright 2013 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "texture.h"
+#include "ogldev_texture.h"
 #include "lighting_technique.h"
 #include "ogldev_glut_backend.h"
 #include "ogldev_basic_mesh.h"
@@ -46,7 +46,7 @@ class Tutorial42 : public ICallbacks, public OgldevApp
 {
 public:
 
-    Tutorial42() 
+    Tutorial42()
     {
         m_pGameCamera = NULL;
         m_pLightingEffect = NULL;
@@ -64,7 +64,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
+        m_persProjInfo.zFar = 100.0f;
     }
 
     ~Tutorial42()
@@ -72,7 +72,7 @@ public:
         SAFE_DELETE(m_pLightingEffect);
         SAFE_DELETE(m_pShadowMapEffect);
         SAFE_DELETE(m_pGameCamera);
-    }    
+    }
 
     bool Init()
     {
@@ -85,7 +85,7 @@ public:
         }
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-      
+
         m_pLightingEffect = new LightingTechnique();
 
         if (!m_pLightingEffect->Init()) {
@@ -96,7 +96,7 @@ public:
         m_pLightingEffect->Enable();
 
         m_pLightingEffect->SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_pLightingEffect->SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);		
+        m_pLightingEffect->SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
         m_pLightingEffect->SetSpotLights(1, &m_spotLight);
         m_pLightingEffect->SetShadowMapSize((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT);
 
@@ -105,28 +105,28 @@ public:
         if (!m_pShadowMapEffect->Init()) {
             printf("Error initializing the shadow map technique\n");
             return false;
-        }        
+        }
 
-		if (!m_quad.LoadMesh("../Content/quad.obj")) {
+                if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
-		m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
+                m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
         }
 
-		if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
-			return false;
-		}
+                if (!m_mesh.LoadMesh("../Content/phoenix_ugv.md2")) {
+                        return false;
+                }
 
 #ifndef WIN32
-        if (!m_fontRenderer.InitFontRenderer()) {
-            return false;
-        }
+        // if (!m_fontRenderer.InitFontRenderer()) {
+        //     return false;
+        // }
 #endif
-        
+
         return true;
     }
 
@@ -134,19 +134,19 @@ public:
     {
         GLUTBackendRun(this);
     }
-    
+
 
     virtual void RenderSceneCB()
-    {   
+    {
         CalcFPS();
-        
+
         m_scale += 0.05f;
 
         m_pGameCamera->OnRender();
 
         ShadowMapPass();
         RenderPass();
-        
+
         RenderFPS();
 
         glutSwapBuffers();
@@ -155,7 +155,7 @@ public:
     void ShadowMapPass()
     {
         glCullFace(GL_FRONT);
-        
+
         m_shadowMapFBO.BindForWriting();
 
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -170,22 +170,22 @@ public:
         p.SetPerspectiveProj(m_persProjInfo);
         m_pShadowMapEffect->SetWVP(p.GetWVPTrans());
         m_mesh.Render();
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-        
+
     void RenderPass()
     {
         glCullFace(GL_BACK);
-        
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pLightingEffect->Enable();
-             
+
         m_shadowMapFBO.BindForReading(GL_TEXTURE1);
 
         Pipeline p;
-        p.SetPerspectiveProj(m_persProjInfo);           
+        p.SetPerspectiveProj(m_persProjInfo);
         p.Scale(10.0f, 10.0f, 10.0f);
         p.WorldPos(0.0f, 0.0f, 1.0f);
         p.Rotate(90.0f, 0.0f, 0.0f);
@@ -198,7 +198,7 @@ public:
         m_pLightingEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
         m_pGroundTex->Bind(GL_TEXTURE0);
         m_quad.Render();
- 
+
         p.Scale(0.1f, 0.1f, 0.1f);
         p.Rotate(0.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
@@ -208,38 +208,38 @@ public:
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_pLightingEffect->SetLightWVP(p.GetWVPTrans());
 
-        m_mesh.Render();        
+        m_mesh.Render();
     }
 
 
-	void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			OgldevBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+        void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
+        {
+                switch (OgldevKey) {
+                case OGLDEV_KEY_ESCAPE:
+                case OGLDEV_KEY_q:
+                        OgldevBackendLeaveMainLoop();
+                        break;
+                default:
+                        m_pGameCamera->OnKeyboard(OgldevKey);
+                }
+        }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
+        virtual void PassiveMouseCB(int x, int y)
+        {
+                m_pGameCamera->OnMouse(x, y);
+        }
 
-    
+
 private:
-    
+
     LightingTechnique* m_pLightingEffect;
     ShadowMapTechnique* m_pShadowMapEffect;
     Camera* m_pGameCamera;
     float m_scale;
     SpotLight m_spotLight;
     BasicMesh m_mesh;
-    BasicMesh m_quad;	
+    BasicMesh m_quad;
     PersProjInfo m_persProjInfo;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
@@ -253,13 +253,13 @@ int main(int argc, char** argv)
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 42")) {
         return 1;
     }
-      
+
     Tutorial42 App;
 
     if (!App.Init()) {
         return 1;
     }
-        
+
     App.Run();
 
     return 0;
