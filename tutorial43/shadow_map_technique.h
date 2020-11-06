@@ -16,11 +16,11 @@
  */
 
 #ifndef SHADOW_MAP_TECHNIQUE_H
-#define	SHADOW_MAP_TECHNIQUE_H
+#define SHADOW_MAP_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "ogldev_camera.h"
 
 #define NUM_OF_LAYERS 6
@@ -32,11 +32,11 @@ public:
     ShadowMapTechnique();
 
     virtual bool Init();
-    
-    void SetWVP(const Matrix4f& WVP);	
-    void SetWorld(const Matrix4f& World);	
+
+    void SetWVP(const Matrix4f& WVP);
+    void SetWorld(const Matrix4f& World);
     void SetLightWorldPos(const Vector3f& Pos);
-    
+
 private:
 
     GLint m_WVPLocation;
@@ -45,5 +45,4 @@ private:
 };
 
 
-#endif	/* SHADOW_MAP_TECHNIQUE_H */
-
+#endif  /* SHADOW_MAP_TECHNIQUE_H */
