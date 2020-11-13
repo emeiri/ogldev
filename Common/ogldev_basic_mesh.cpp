@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ void BasicMesh::Clear()
     if (m_Buffers[0] != 0) {
         glDeleteBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
     }
-       
+
     if (m_VAO != 0) {
         glDeleteVertexArrays(1, &m_VAO);
         m_VAO = 0;
@@ -61,11 +61,11 @@ bool BasicMesh::LoadMesh(const string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
- 
+
     // Create the VAO
-    glGenVertexArrays(1, &m_VAO);   
+    glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
-    
+
     // Create the buffers for the vertices attributes
     glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
 
@@ -73,7 +73,7 @@ bool BasicMesh::LoadMesh(const string& Filename)
     Assimp::Importer Importer;
 
     const aiScene* pScene = Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
-    
+
     if (pScene) {
         Ret = InitFromScene(pScene, Filename);
     }
@@ -82,13 +82,13 @@ bool BasicMesh::LoadMesh(const string& Filename)
     }
 
     // Make sure the VAO is not changed from the outside
-    glBindVertexArray(0);	
+    glBindVertexArray(0);
 
     return Ret;
 }
 
 bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
-{  
+{
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
@@ -99,18 +99,18 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 
     unsigned int NumVertices = 0;
     unsigned int NumIndices = 0;
-    
+
     // Count the number of vertices and indices
     for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
-        m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;        
+        m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
         m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
         m_Entries[i].BaseVertex = NumVertices;
         m_Entries[i].BaseIndex = NumIndices;
-        
+
         NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices  += m_Entries[i].NumIndices;
     }
-    
+
     // Reserve space in the vectors for the vertex attributes and indices
     Positions.reserve(NumVertices);
     Normals.reserve(NumVertices);
@@ -131,7 +131,7 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);    
+    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(TexCoords[0]) * TexCoords.size(), &TexCoords[0], GL_STATIC_DRAW);
@@ -154,7 +154,7 @@ void BasicMesh::InitMesh(const aiMesh* paiMesh,
                     vector<Vector3f>& Normals,
                     vector<Vector2f>& TexCoords,
                     vector<unsigned int>& Indices)
-{    
+{
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
     // Populate the vertex attribute vectors
@@ -207,13 +207,13 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 
             if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
                 string p(Path.data);
-                
-                if (p.substr(0, 2) == ".\\") {                    
+
+                if (p.substr(0, 2) == ".\\") {
                     p = p.substr(2, p.size() - 2);
                 }
-                               
+
                 string FullPath = Dir + "/" + p;
-                    
+
                 m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
                 if (!m_Textures[i]->Load()) {
@@ -236,29 +236,29 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 void BasicMesh::Render()
 {
     glBindVertexArray(m_VAO);
-    
+
     for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
 
         assert(MaterialIndex < m_Textures.size());
-        
+
         if (m_Textures[MaterialIndex]) {
             m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
         }
 
-        glDrawElementsBaseVertex(GL_TRIANGLES, 
-                         m_Entries[i].NumIndices, 
-                         GL_UNSIGNED_INT, 
-                         (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex), 
+        glDrawElementsBaseVertex(GL_TRIANGLES,
+                         m_Entries[i].NumIndices,
+                         GL_UNSIGNED_INT,
+                         (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex),
                          m_Entries[i].BaseVertex);
     }
 
-    // Make sure the VAO is not changed from the outside    
+    // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
 
 void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
-{        
+{
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
 
@@ -266,25 +266,24 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
 
     glBindVertexArray(m_VAO);
-    
+
     for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
 
         assert(MaterialIndex < m_Textures.size());
-        
+
         if (m_Textures[MaterialIndex]) {
             m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
         }
 
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, 
-                                          m_Entries[i].NumIndices, 
-                                          GL_UNSIGNED_INT, 
-                                          (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex), 
+        glDrawElementsInstancedBaseVertex(GL_TRIANGLES,
+                                          m_Entries[i].NumIndices,
+                                          GL_UNSIGNED_INT,
+                                          (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex),
                                           NumInstances,
                                           m_Entries[i].BaseVertex);
     }
 
-    // Make sure the VAO is not changed from the outside    
+    // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
-
