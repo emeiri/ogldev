@@ -1,7 +1,8 @@
 #!/bin/bash
 
 for filename in tutorial*; do
-	cd $filename
-	make
-	cd ..
+    echo "Building " $filename "..."
+    cd $filename
+    ./build.sh
+    cd ..
 done
