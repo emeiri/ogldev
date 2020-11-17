@@ -110,6 +110,7 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
     PhysDevices.m_qSupportsPresent.resize(NumDevices);
     PhysDevices.m_surfaceFormats.resize(NumDevices);
     PhysDevices.m_surfaceCaps.resize(NumDevices);
+    PhysDevices.m_memProps.resize(NumDevices);
         
     res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
     CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
@@ -165,7 +166,41 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
 
         assert(NumPresentModes != 0);
 
-        printf("Number of presentation modes %d\n", NumPresentModes);        
+        printf("Number of presentation modes %d\n", NumPresentModes);
+        
+        vkGetPhysicalDeviceMemoryProperties(PhysDev, &PhysDevices.m_memProps[i]);
+        
+        printf("Num memory types %d\n", PhysDevices.m_memProps[i].memoryTypeCount);
+        for (int j = 0 ; j < PhysDevices.m_memProps[i].memoryTypeCount ; j++) {
+            printf("%d: (%x) ", j, PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags);
+            
+            if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
+                printf("DEVICE LOCAL ");
+            }
+
+            if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+                printf("HOST VISIBLE ");
+            }
+            
+            if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
+                printf("HOST COHERENT ");
+            }
+
+            if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) {
+                printf("HOST CACHED ");
+            }
+
+            if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) {
+                printf("LAZILY ALLOCATED ");
+            }
+
+            if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_PROTECTED_BIT) {
+                printf("PROTECTED ");
+            }
+            
+            printf("\n");
+        }
+        printf("Num heap types %d\n", PhysDevices.m_memProps[i].memoryHeapCount);
     }
 }
 
