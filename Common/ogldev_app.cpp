@@ -20,7 +20,7 @@
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 
-#include "/usr/local/include/freetype-gl-cpp/freetype-gl-cpp.h"
+//#include "/usr/local/include/freetype-gl-cpp/freetype-gl-cpp.h"
 
 #ifndef WIN32
 /*Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
