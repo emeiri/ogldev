@@ -43,7 +43,7 @@
 /**
  *  Generic vertex attribute.
  */
-typedef struct 
+typedef struct
 {
     /**
      *  a client-side capability.
@@ -66,7 +66,7 @@ typedef struct
      */
     GLint size;
 
-    /** 
+    /**
      *  Data type of each component in the array. Symbolic constants GL_BYTE,
      *  GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT,
      *  GL_FLOAT, or GL_DOUBLE are accepted. The initial value is GL_FLOAT.
@@ -306,7 +306,7 @@ typedef struct
  * @param  count    number of vertices to be appended
  *
  * @note
- * Indices after index will be increased by count. 
+ * Indices after index will be increased by count.
  */
   void
   vertex_buffer_add_vertices ( VertexBuffer *self,
@@ -317,7 +317,7 @@ typedef struct
 
 /**
  * Create an attribute from the given parameters.
- * 
+ *
  * @param index      index of the generic vertex attribute to be modified.
  * @param size       number of component
  * @param type       data type
@@ -341,7 +341,7 @@ vertex_attribute_new( GLuint index,
 /**
  * Create an attribute from the given description.
  *
- * @param index   index of the generic vertex attribute to be modified.* 
+ * @param index   index of the generic vertex attribute to be modified.*
  * @param  format Format string specifies the format of a vertex attribute.
  * @return        an initialized vertex attribute
  *
@@ -387,7 +387,7 @@ vertex_attribute_new( GLuint index,
  * @param  gtype a GL enum type
  * @return       the literal string describing the type
  */
-  char *
+  const char *
   GL_TYPE_STRING( GLenum gtype );
 
 #endif /* __VERTEX_BUFFER_H__ */

@@ -52,7 +52,7 @@ vector_new( size_t item_size )
     self->item_size = item_size;
     self->size      = 0;
     self->capacity  = 1;
-    self->items     = malloc( self->item_size * self->capacity );
+    self->items     = (char*)malloc( self->item_size * self->capacity );
     return self;
 }
 
@@ -152,7 +152,7 @@ vector_reserve( Vector *self,
     assert( self );
     if( self->capacity < size);
     {
-        self->items = realloc( self->items, size * self->item_size );
+        self->items = (char*)realloc( self->items, size * self->item_size );
         self->capacity = size;
     }
 }
@@ -176,7 +176,7 @@ vector_shrink( Vector *self )
     assert( self );
     if( self->capacity > self->size )
     {
-        self->items = realloc( self->items, self->size * self->item_size );
+        self->items = (char*)realloc( self->items, self->size * self->item_size );
     }
     self->capacity = self->size;
 }

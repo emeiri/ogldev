@@ -20,20 +20,16 @@
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 
-//#include "/usr/local/include/freetype-gl-cpp/freetype-gl-cpp.h"
-
 #ifndef WIN32
-/*Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
+Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    {.1,1.0,1.0,.5}, {1,1,1,0},
                    0, {1,0,0,1}, 0, {1,0,0,1},
                    0, {0,0,0,1}, 0, {0,0,0,1} };
-                   FreetypeGl m_textRenderer(true);*/
 #endif
-
 
 OgldevApp::OgldevApp()
 #ifndef WIN32
-//           : m_fontRenderer(sMarkup)
+           : m_fontRenderer(sMarkup)
 #endif
 {
     m_frameCount = 0;
@@ -65,7 +61,7 @@ void OgldevApp::RenderFPS()
     SNPRINTF(text, sizeof(text), "FPS: %d", m_fps);
 
 #ifndef WIN32
-    //    m_textRenderer.renderText(text);
+    m_fontRenderer.RenderText(10, 10, text);        
 #endif
 }
 

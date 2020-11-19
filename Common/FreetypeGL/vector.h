@@ -39,7 +39,7 @@
 typedef struct
  {
      /** Pointer to dynamically allocated items. */
-     void * items;
+     char* items;
 
      /** Number of items that can be held in currently allocated storage. */
      size_t capacity;
@@ -264,7 +264,7 @@ typedef struct
  */
   void
   vector_push_back_data( Vector *self,
-                         const void * data, 
+                         const void * data,
                          const size_t count );
 
 /**

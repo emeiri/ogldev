@@ -38,13 +38,15 @@
 #include "freetypeGL.h"
 
 extern "C" {
-#include "vector.h"
 #include "markup.h"
-#include "texture-font.h"
-#include "texture-glyph.h"
-#include "vertex-buffer.h"
-#include "font_shader.h"
+#include "vector.c"
+#include "texture-font.c"
+#include "texture-glyph.c"
+#include "vertex-buffer.c"
+#include "texture-atlas.c"
+#include "font-manager.c"
 }
+#include "font_shader.cpp"
 
 #define MAX_STRING_LEN 128
 
@@ -56,18 +58,18 @@ Markup sDefaultMarkup = { (char*)"Arial", 64, 0, 0, 0.0, 0.0,
 
 FontRenderer::FontRenderer()
 {
-    m_pManager = NULL;    
-    m_pFont = NULL;    
-    m_pTextBuffer = NULL;    
+    m_pManager = NULL;
+    m_pFont = NULL;
+    m_pTextBuffer = NULL;
     m_markup = sDefaultMarkup;
 }
 
-    
+
 FontRenderer::FontRenderer(const Markup& markup)
 {
-    m_pManager = NULL;    
-    m_pFont = NULL;    
-    m_pTextBuffer = NULL;        
+    m_pManager = NULL;
+    m_pFont = NULL;
+    m_pTextBuffer = NULL;
     m_markup = markup;
 }
 
@@ -76,7 +78,7 @@ FontRenderer::~FontRenderer()
     if (m_pManager) {
         font_manager_delete(m_pManager);
     }
-    
+
     if (m_pTextBuffer) {
         vertex_buffer_delete(m_pTextBuffer);
     }
@@ -86,12 +88,12 @@ FontRenderer::~FontRenderer()
 bool FontRenderer::InitFontRenderer()
 {
     m_pManager = font_manager_new( 512, 512, 1 );
-    
+
     if (!m_pManager) {
         fprintf(stderr, "%s:%d - error initializing the font manager\n", __FILE__, __LINE__);
         return false;
     }
-    
+
     m_pFont = font_manager_get_from_markup( m_pManager, &m_markup );
 
     if (!m_pFont) {
@@ -100,77 +102,76 @@ bool FontRenderer::InitFontRenderer()
     }
 
     m_pTextBuffer = vertex_buffer_new( "v3f:t2f:c4f" );
-    
+
     if (!m_pTextBuffer) {
         fprintf(stderr, "%s:%d - error creating the text buffer\n", __FILE__, __LINE__);
         return false;
     }
-       
+
     if (!m_fontShader.InitFontShader()) {
         fprintf(stderr, "%s:%d - error compiling the shader program\n", __FILE__, __LINE__);
         return false;
-    }    
-    
+    }
+
     m_fontShader.Enable();
     m_fontShader.SetFontMapTextureUnit(0);
-    
-    return true;    
+
+    return true;
 }
 
 
 void FontRenderer::RenderText(unsigned int x, unsigned int y, const char* pText)
 {
     bool IsCullEnabled = glIsEnabled(GL_CULL_FACE);
-    
+
     glDisable(GL_CULL_FACE);
-    
+
     assert(strlen(pText) < MAX_STRING_LEN);
-        
+
     wchar_t text[MAX_STRING_LEN] = { 0 };
-    
+
     int len = mbstowcs(text, pText, strlen(pText));
     assert(len > 0);
 
     vertex_buffer_clear( m_pTextBuffer );
-    
+
     TextureGlyph* pGlyph = texture_font_get_glyph( m_pFont, text[0] );
-    
+
     assert(pGlyph);
 
     Pen pen = {(float)x, (float)y};
     texture_glyph_add_to_vertex_buffer( pGlyph, m_pTextBuffer, &m_markup, &pen, 0 );
-    
+
     for( size_t i=1; i<wcslen(text); ++i )
     {
         pGlyph = texture_font_get_glyph( m_pFont, text[i] );
         assert(pGlyph);
-        
+
         int kerning = texture_glyph_get_kerning( pGlyph, text[i-1] );
         texture_glyph_add_to_vertex_buffer( pGlyph, m_pTextBuffer, &m_markup, &pen, kerning );
     }
-    
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture( GL_TEXTURE_2D, m_pManager->atlas->texid );
 
     m_fontShader.Enable();
-    
+
     int viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
 
     float xScale = 2.0f / (float)viewport[2];
     float yScale = 2.0f / (float)viewport[3];
-    
+
     GLfloat Trans[] = { xScale, 0.0f,   0.0f, -1.0f,
                         0.0f,   yScale, 0.0f, -1.0f,
                         0.0f,   0.0f,   1.0f,  0.0f,
                         0.0f,   0.0f,   0.0f,  1.0f };
 
     m_fontShader.SetTransformation(Trans);
-    
+
     vertex_buffer_render( m_pTextBuffer, GL_TRIANGLES, "vtc" );
-    
+
     if (IsCullEnabled) {
         glEnable(GL_CULL_FACE);
     }
 }
-

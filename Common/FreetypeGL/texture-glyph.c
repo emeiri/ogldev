@@ -95,7 +95,7 @@ texture_glyph_render( TextureGlyph *self,
         glTexCoord2f( u0, v0 ); glVertex2i( x,   y   );
         glTexCoord2f( u0, v1 ); glVertex2i( x,   y-h );
         glTexCoord2f( u1, v1 ); glVertex2i( x+w, y-h );
-        
+
         glTexCoord2f( u0, v0 ); glVertex2i( x,   y   );
         glTexCoord2f( u1, v1 ); glVertex2i( x+w, y-h );
         glTexCoord2f( u1, v0 ); glVertex2i( x+w, y   );
@@ -128,7 +128,7 @@ texture_glyph_add_to_vertex_buffer( const TextureGlyph *self,
         rise = markup->rise;
         spacing = markup->spacing;
     }
-    
+
     pen->x += kerning;
 
     // Background
@@ -149,10 +149,10 @@ texture_glyph_add_to_vertex_buffer( const TextureGlyph *self,
         GLuint index = buffer->vertices->size;
         GLuint indices[] = {index, index+1, index+2,
                             index, index+2, index+3};
-        TextureGlyphVertex vertices[] = { { x0,y0,0,  u0,v0,  r,g,b,a },
-                                          { x0,y1,0,  u0,v1,  r,g,b,a },
-                                          { x1,y1,0,  u1,v1,  r,g,b,a },
-                                          { x1,y0,0,  u1,v0,  r,g,b,a } };
+        TextureGlyphVertex vertices[] = { { (float)x0,(float)y0,0,  u0,v0,  r,g,b,a },
+                                          { (float)x0,(float)y1,0,  u0,v1,  r,g,b,a },
+                                          { (float)x1,(float)y1,0,  u1,v1,  r,g,b,a },
+                                          { (float)x1,(float)y0,0,  u1,v0,  r,g,b,a } };
         vertex_buffer_push_back_indices( buffer, indices, 6 );
         vertex_buffer_push_back_vertices( buffer, vertices, 4 );
     }
@@ -182,7 +182,7 @@ texture_glyph_add_to_vertex_buffer( const TextureGlyph *self,
     float y0 = y0_;
     float x1 = x1_;
     float y1 = y1_;
-    
+
     float u0 = self->u0;
     float v0 = self->v0;
     float u1 = self->u1;
@@ -205,7 +205,7 @@ texture_glyph_add_to_vertex_buffer( const TextureGlyph *self,
 
 
 /* ------------------------------------------------------------------------- */
-float 
+float
 texture_glyph_get_kerning( TextureGlyph *self,
                            wchar_t charcode )
 {

@@ -20,32 +20,29 @@
 #define OGLDEV_APP_H
 
 #ifndef WIN32
-
-//#include "freetypeGL.h"
+#include "freetypeGL.h"
 #endif
 
-//class FreetypeGl;
 
 class OgldevApp
 {
 protected:
-        OgldevApp();
+	OgldevApp();
 
-        void CalcFPS();
+	void CalcFPS();
 
-        void RenderFPS();
+	void RenderFPS();
 
-        float GetRunningTime();
+	float GetRunningTime();
 
 protected:
 #ifndef WIN32
-    //  FontRenderer m_fontRenderer;
-    //  FreetypeGl* m_textRenderer;
+	FontRenderer m_fontRenderer;
 #endif
 private:
-        long long m_frameTime;
-        long long m_startTime;
-        int m_frameCount;
+	long long m_frameTime;
+	long long m_startTime;
+	int m_frameCount;
         int m_fps;
 };
 

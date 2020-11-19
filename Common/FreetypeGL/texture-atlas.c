@@ -65,7 +65,7 @@ texture_atlas_new( size_t width, size_t height, size_t depth )
     self->width = width;
     self->height = height;
     self->depth = depth;
-    Node node = {0,0,width};
+    Node node = {0,0,(int)width};
     vector_push_back( self->nodes, &node );
     self->texid = 0;
     self->data = (unsigned char *)
@@ -123,7 +123,7 @@ texture_atlas_upload( TextureAtlas *self )
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    
+
     if( self->depth == 3 )
     {
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, self->width, self->height,
@@ -155,7 +155,7 @@ texture_atlas_set_region( TextureAtlas *self,
     size_t charsize = sizeof(char);
     for( i=0; i<height; ++i )
     {
-        memcpy( self->data+((y+i)*self->width + x ) * charsize * depth, 
+        memcpy( self->data+((y+i)*self->width + x ) * charsize * depth,
                 data + (i*stride) * charsize, width * charsize * depth  );
     }
 }
@@ -169,25 +169,25 @@ texture_atlas_fit( TextureAtlas *self,
 {
     Node *node = (Node *) (vector_get( self->nodes, index ));
     int x = node->x, y, width_left = width;
-	size_t i = index;
+        size_t i = index;
 
-	if ( (x + width) > self->width )
+        if ( (x + width) > self->width )
     {
-		return -1;
+                return -1;
     }
-	y = node->y;
-	while( width_left > 0 )
-	{
-        node = (Node *) (vector_get( self->nodes, i ));
-		y = max( y, node->y );
-		if( (y + height) > self->height )
+        y = node->y;
+        while( width_left > 0 )
         {
-			return -1;
+        node = (Node *) (vector_get( self->nodes, i ));
+                y = max( y, node->y );
+                if( (y + height) > self->height )
+        {
+                        return -1;
         }
-		width_left -= node->width;
-		++i;
-	}
-	return y;
+                width_left -= node->width;
+                ++i;
+        }
+        return y;
 }
 
 
@@ -199,17 +199,17 @@ texture_atlas_merge( TextureAtlas *self )
     Node *node, *next;
     size_t i;
 
-	for( i=0; i< self->nodes->size-1; ++i )
+        for( i=0; i< self->nodes->size-1; ++i )
     {
         node = (Node *) (vector_get( self->nodes, i ));
         next = (Node *) (vector_get( self->nodes, i+1 ));
 
-		if( node->y == next->y )
-		{
-			node->width += next->width;
+                if( node->y == next->y )
+                {
+                        node->width += next->width;
             vector_erase( self->nodes, i+1 );
-			--i;
-		}
+                        --i;
+                }
     }
 }
 
@@ -225,33 +225,33 @@ texture_atlas_get_region( TextureAtlas *self,
     assert( width );
     assert( height );
 */
-	int y, best_height, best_width, best_index;
+        int y, best_height, best_width, best_index;
     Node *node, *prev;
-    Region region = {0,0,width,height};
+    Region region = {0,0,(int)width,(int)height};
     size_t i;
 
     best_height = INT_MAX;
     best_index  = -1;
     best_width = INT_MAX;
-	for( i=0; i<self->nodes->size; ++i )
-	{
+        for( i=0; i<self->nodes->size; ++i )
+        {
         y = texture_atlas_fit( self, i, width, height );
-		if( y >= 0 )
-		{
+                if( y >= 0 )
+                {
             node = (Node *) vector_get( self->nodes, i );
-			if( ( y + height < best_height ) ||
+                        if( ( y + height < best_height ) ||
                 ( y + height == best_height && node->width < best_width) )
-			{
-				best_height = y + height;
-				best_index = i;
-				best_width = node->width;
-				region.x = node->x;
-				region.y = y;
-			}
+                        {
+                                best_height = y + height;
+                                best_index = i;
+                                best_width = node->width;
+                                region.x = node->x;
+                                region.y = y;
+                        }
         }
     }
-   
-	if( best_index == -1 )
+
+        if( best_index == -1 )
     {
         region.x = -1;
         region.y = -1;
@@ -305,7 +305,7 @@ texture_atlas_clear( TextureAtlas *self )
 
     vector_clear( self->nodes );
     self->used = 0;
-    Node node = {0,0,self->width};
+    Node node = {0,0,(int)self->width};
     vector_push_back( self->nodes, &node );
 
     memset( self->data, 0, self->width*self->height*self->depth );

@@ -32,7 +32,7 @@
  * ========================================================================= */
 
 #ifndef FREETYPEGL_H
-#define	FREETYPEGL_H
+#define FREETYPEGL_H
 
 #include <GL/glew.h>
 #if defined(__APPLE__)
@@ -51,17 +51,17 @@ class FontRenderer
 {
 public:
     FontRenderer();
-    
+
     FontRenderer(const Markup& markup);
-    
+
     ~FontRenderer();
-    
+
     bool InitFontRenderer();
-    
-    void RenderText(unsigned int x, unsigned int y, const char* pText);        
+
+    void RenderText(unsigned int x, unsigned int y, const char* pText);
 
 private:
-        
+
     FontManager* m_pManager;
     TextureFont* m_pFont;
     VertexBuffer* m_pTextBuffer;
@@ -70,5 +70,4 @@ private:
 };
 
 
-#endif	/* FREETYPEGL_H */
-
+#endif  /* FREETYPEGL_H */

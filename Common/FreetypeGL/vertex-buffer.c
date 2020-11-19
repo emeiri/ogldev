@@ -46,7 +46,7 @@ vertex_buffer_new( const char *format )
 {
     size_t i, index = 0, stride = 0;
     const char *start = 0, *end = 0;
-    GLvoid *pointer = 0;
+    GLchar *pointer = 0;
 
     VertexBuffer *self = (VertexBuffer *) malloc (sizeof(VertexBuffer));
     if( !self )
@@ -201,7 +201,7 @@ vertex_buffer_print( VertexBuffer * self )
                      self->attributes[i]->index );
         }
         fprintf(stderr, "%dx%s (+%ld)\n",
-                self->attributes[i]->size, 
+                self->attributes[i]->size,
                 GL_TYPE_STRING( self->attributes[i]->type ),
                 (long) self->attributes[i]->pointer);
 
@@ -254,7 +254,7 @@ void
 vertex_buffer_render ( VertexBuffer *self,
                        GLenum mode,
                        const char *what )
-{ 
+{
     assert( self );
 
     if( !self->vertices->size )
@@ -267,7 +267,7 @@ vertex_buffer_render ( VertexBuffer *self,
         vertex_buffer_upload( self );
         self->dirty = 0;
     }
-    
+
     glBindBuffer( GL_ARRAY_BUFFER, self->vertices_id );
 
     size_t i;
@@ -401,9 +401,9 @@ vertex_buffer_insert_vertices ( VertexBuffer *self,
 // ----------------------------------------------------------------------------
 VertexAttribute *
 vertex_attribute_parse( int index, char *format )
-{   
+{
      char* p = strpbrk ( format, "vcntfse" );
-    
+
     if ( p != 0 )
     {
         int size;
@@ -470,7 +470,7 @@ _GL_TYPE( char ctype )
 
 
 // ----------------------------------------------------------------------------
-GLuint 
+GLuint
 GL_TYPE_SIZE( GLenum gtype )
 {
     switch( gtype )
@@ -490,7 +490,7 @@ GL_TYPE_SIZE( GLenum gtype )
 
 
 
-char *
+const char *
 GL_TYPE_STRING( GLenum gtype )
 {
     switch( gtype )
