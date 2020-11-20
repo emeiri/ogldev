@@ -140,9 +140,9 @@ public:
         }
 
 #ifndef WIN32
-        /*        if (!m_fontRenderer.InitFontRenderer()) {
+        if (!m_fontRenderer.InitFontRenderer()) {
             return false;
-            }*/
+        }
 #endif
         return true;
     }
@@ -277,7 +277,7 @@ private:
 
 int main(int argc, char** argv)
 {
-//    Magick::InitializeMagick(*argv);
+    //    Magick::InitializeMagick(*argv);
 
     OgldevBackendInit(OGLDEV_BACKEND_TYPE_GLFW, argc, argv, true, false);
 
