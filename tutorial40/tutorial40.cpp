@@ -112,9 +112,9 @@ public:
         }
 
 #ifndef WIN32
-        /*        if (!m_fontRenderer.InitFontRenderer()) {
+        if (!m_fontRenderer.InitFontRenderer()) {
             return false;
-            }*/
+        }
 #endif
         if (!m_quad.LoadMesh("../Content/quad.obj", false)) {
             return false;

@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,14 +41,14 @@
 
 using namespace std;
 
-#define WINDOW_WIDTH  1280  
+#define WINDOW_WIDTH  1280
 #define WINDOW_HEIGHT 1024
 
 class Tutorial38 : public ICallbacks, public OgldevApp
 {
 public:
 
-    Tutorial38() 
+    Tutorial38()
     {
         m_pGameCamera = NULL;
         m_pEffect = NULL;
@@ -61,16 +61,16 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
-        
-        m_position = Vector3f(0.0f, 0.0f, 6.0f);      
+        m_persProjInfo.zFar = 100.0f;
+
+        m_position = Vector3f(0.0f, 0.0f, 6.0f);
     }
 
     ~Tutorial38()
     {
         SAFE_DELETE(m_pEffect);
         SAFE_DELETE(m_pGameCamera);
-    }    
+    }
 
     bool Init()
     {
@@ -79,7 +79,7 @@ public:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-      
+
         m_pEffect = new SkinningTechnique();
 
         if (!m_pEffect->Init()) {
@@ -96,14 +96,14 @@ public:
 
         if (!m_mesh.LoadMesh("../Content/boblampclean.md5mesh")) {
             printf("Mesh load failed\n");
-            return false;            
+            return false;
         }
-        
+
 #ifndef WIN32
-        /* if (!m_fontRenderer.InitFontRenderer()) { */
-        /*     return false; */
-        /* } */
-#endif        	
+        if (!m_fontRenderer.InitFontRenderer()) {
+            return false;
+        }
+#endif
         return true;
     }
 
@@ -111,75 +111,75 @@ public:
     {
         GLUTBackendRun(this);
     }
-    
+
 
     virtual void RenderSceneCB()
-    {   
+    {
         CalcFPS();
-        
+
         m_pGameCamera->OnRender();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pEffect->Enable();
-        
+
         vector<Matrix4f> Transforms;
-               
+
         float RunningTime = GetRunningTime();
 
         m_mesh.BoneTransform(RunningTime, Transforms);
-        
+
         for (uint i = 0 ; i < Transforms.size() ; i++) {
             m_pEffect->SetBoneTransform(i, Transforms[i]);
         }
-        
+
         m_pEffect->SetEyeWorldPos(m_pGameCamera->GetPos());
-        
+
         Pipeline p;
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(m_persProjInfo);           
-        p.Scale(0.1f, 0.1f, 0.1f);                
-             
+        p.SetPerspectiveProj(m_persProjInfo);
+        p.Scale(0.1f, 0.1f, 0.1f);
+
         Vector3f Pos(m_position);
-        p.WorldPos(Pos);        
-        p.Rotate(270.0f, 180.0f, 0.0f);       
+        p.WorldPos(Pos);
+        p.Rotate(270.0f, 180.0f, 0.0f);
         m_pEffect->SetWVP(p.GetWVPTrans());
-        m_pEffect->SetWorldMatrix(p.GetWorldTrans());            
+        m_pEffect->SetWorldMatrix(p.GetWorldTrans());
 
         m_mesh.Render();
-                              
+
         RenderFPS();
-        
+
         glutSwapBuffers();
     }
 
 
-	virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			GLUTBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+        virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
+        {
+                switch (OgldevKey) {
+                case OGLDEV_KEY_ESCAPE:
+                case OGLDEV_KEY_q:
+                        GLUTBackendLeaveMainLoop();
+                        break;
+                default:
+                        m_pGameCamera->OnKeyboard(OgldevKey);
+                }
+        }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
-    
-    
-private:      
- 
+        virtual void PassiveMouseCB(int x, int y)
+        {
+                m_pGameCamera->OnMouse(x, y);
+        }
+
+
+private:
+
     SkinningTechnique* m_pEffect;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
     SkinnedMesh m_mesh;
-    Vector3f m_position;            
+    Vector3f m_position;
     PersProjInfo m_persProjInfo;
 };
 
@@ -191,18 +191,18 @@ int main(int argc, char** argv)
     if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 38")) {
         return 1;
     }
-    
+
     SRANDOM;
-    
+
     Tutorial38* pApp = new Tutorial38();
 
     if (!pApp->Init()) {
         return 1;
     }
-    
+
     pApp->Run();
 
     delete pApp;
- 
+
     return 0;
 }

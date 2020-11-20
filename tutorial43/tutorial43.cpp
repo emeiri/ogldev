@@ -144,11 +144,10 @@ public:
         m_mesh2Orientation.m_pos = Vector3f(0.0f, 5.0f, 3.0f);
 
 #ifndef WIN32
-        // if (!m_fontRenderer.InitFontRenderer()) {
-        //     return false;
-        // }
+        if (!m_fontRenderer.InitFontRenderer()) {
+            return false;
+        }
 #endif
-
         glEnable(GL_TEXTURE_CUBE_MAP);
 
         return true;
