@@ -247,9 +247,9 @@
 			&nbsp; &nbsp;    Tangent.y = f * (DeltaV2 * Edge1.y - DeltaV1 * Edge2.y);<br>
 			&nbsp; &nbsp;    Tangent.z = f * (DeltaV2 * Edge1.z - DeltaV1 * Edge2.z);<br>
 			  <br>
-			&nbsp; &nbsp;    Bitangent.x = f * (-DeltaU2 * Edge1.x - DeltaU1 * Edge2.x);<br>
-			&nbsp; &nbsp;    Bitangent.y = f * (-DeltaU2 * Edge1.y - DeltaU1 * Edge2.y);<br>
-			&nbsp; &nbsp;    Bitangent.z = f * (-DeltaU2 * Edge1.z - DeltaU1 * Edge2.z);<br>
+			&nbsp; &nbsp;    Bitangent.x = f * (-DeltaU2 * Edge1.x + DeltaU1 * Edge2.x);<br>
+			&nbsp; &nbsp;    Bitangent.y = f * (-DeltaU2 * Edge1.y + DeltaU1 * Edge2.y);<br>
+			&nbsp; &nbsp;    Bitangent.z = f * (-DeltaU2 * Edge1.z + DeltaU1 * Edge2.z);<br>
 			  <br>
 			&nbsp; &nbsp;    v0.m_tangent += Tangent;<br>
 			&nbsp; &nbsp;    v1.m_tangent += Tangent;<br>
