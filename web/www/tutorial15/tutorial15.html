@@ -41,12 +41,12 @@
       is the 'horizontal axis'. Note that while the vertical axis is constant (0,1,0) the horizontal axis turns around with the gun and is always perpendicular to the target of the gun. This is a key point to understand
       in order to get the math correctly.</li>
       </ol>
-      <p>The plan is to follow the movement of the mouse and change the horizontal angle when the mouse moves left and right and the vertical angle when the mouse moves up and down. Given these two angles we want to 
+      <p>The plan is to follow the movement of the mouse and change the horizontal angle when the mouse moves left and right and the vertical angle when the mouse moves up and down. Given these two angles we want to
       calculate the target and up vectors.</p>
-      <p>Turning the target vector by the horizontal angle is pretty straightforward. Using basic trigonometry we can see that the Z component of the target vector is the sine of the horizontal vector and the X component is the 
+      <p>Turning the target vector by the horizontal angle is pretty straightforward. Using basic trigonometry we can see that the Z component of the target vector is the sine of the horizontal angle and the X component is the
       cosine of the horizontal angle (at this stage the camera looks straight ahead so the Y is zero). Revisit tutorial 7 to see a diagram of that.</p>
-      <p>Turning the target vector by the vertical angle is more complex since the horizontal axis turns along with the camera. The horizontal axis can be calculated using a cross product between the vertical axis and the 
-      target vector after is was turned by the horizontal angle, but turning around an arbitrary vector (lifting the gun up and down) can be tricky.</p> 
+      <p>Turning the target vector by the vertical angle is more complex since the horizontal axis turns along with the camera. The horizontal axis can be calculated using a cross product between the vertical axis and the
+      target vector after is was turned by the horizontal angle, but turning around an arbitrary vector (lifting the gun up and down) can be tricky.</p>
       <p>Luckily, we have an extremely useful mathematical tool for that problem - the quaternion. Quaternions were discovered in 1843 by Sir Willilam Rowan Hamilton, an irish mathematician, and are based on the complex
       number system. The quaternion 'Q' is defined as:</p>
       <img class="center" src="quaternion.png">
@@ -56,7 +56,7 @@
       <img class="center" src="conjugate.png">
       <p>Normalizing a quaternion is the same as normalizing a vector. I'm going to describe the steps required to rotate a vector around an arbitrary vector using a quaternion. More details about the mathematical
       proof behind the steps can be found on the web.</p>
-      <p>The general function to calculate a quaternion 'W' that represents the rotated vector 'V' by the angle 'a' is:</p> 
+      <p>The general function to calculate a quaternion 'W' that represents the rotated vector 'V' by the angle 'a' is:</p>
       <img class="center" src="rotation.png">
       <p>Where Q is the rotation quaternion which is defined as:</p>
       <img class="center" src="rotationq.png">
@@ -67,9 +67,9 @@
       according to the target vector that is supplied to the constructor of the camera. Let's start with the horizontal angle. Take a look at the following diagram which looks down the XZ plane from above:</p>
       <img class="center" src="h_angle.png">
       <p>The target vector is (x,z) and we want to find the horizontal angle which is represented by the letter alpha (the Y component is relevant only for the vertical angle). Since the length of the radius of the circle is 1 it
-      is very easy to see that the sine function of alpha is exactly z. Therefore, calculating the asine of z will provide alpha. Are we done? - not yet. Since z can be in the range [-1,1], the result of asine is 
-      -90 degrees to +90 degrees. But the range of the horizontal angle is 360 degrees. In addition, our quaternion does rotation clockwise. This means that when we rotate 90 degrees with the quaternion 
-      we end up with -1 on the Z axis which is opposite to the actual sine of 90 degrees (which is 1). IMHO, the easiest way to get this right is to always calculate the asine function using the positive value of Z 
+      is very easy to see that the sine function of alpha is exactly z. Therefore, calculating the asine of z will provide alpha. Are we done? - not yet. Since z can be in the range [-1,1], the result of asine is
+      -90 degrees to +90 degrees. But the range of the horizontal angle is 360 degrees. In addition, our quaternion does rotation clockwise. This means that when we rotate 90 degrees with the quaternion
+      we end up with -1 on the Z axis which is opposite to the actual sine of 90 degrees (which is 1). IMHO, the easiest way to get this right is to always calculate the asine function using the positive value of Z
       and combine the result with the specific quarter of the circle where the vector is located. For example, when our target vector is (0,1) we calculate the asine of 1 which is 90 and substract it from 360.
       The result is 270. The asine range of 0 to 1 is 0 to 90 degrees. Combine that with the specific quarter of the circle and you get the final horizontal angle.</p>
       <p>Calculating the vertical angle is a bit simpler. We are going to limit the range of movement to -90 degrees (equal to 270 degrees - looking straight up) to +90 degrees (looking straight down). This means we only
@@ -142,7 +142,7 @@
       </code>
       <p>In the Init() function we start by calculating the horizontal angle. We create a new target vector called HTarget (horizontal target) which is a projection of the original target vector on the XZ plane. Next we normalize
       it (since the math that was described earlier assumes a unit vector on the XZ plane). Then we check which quarter the target vector belongs to and calculate the final angle based on the positive value of the Z component.
-      Next we calculate the vertical angle which is much simpler. 
+      Next we calculate the vertical angle which is much simpler.
       <p>The camera has 4 new flags to indicate whether the mouse is positioned on one of the edges of the screen. We are going to implement an automatic turn in the
       corresponding direction when that happens. This will allow us to turn 360 degrees. We initialize the flags to FALSE since the mouse starts at the center of the screen. The next two lines of code calculate where the center
       of the screen is (based on the window dimension) and the new function glutWarpPointer actually moves the mouse. Starting with the mouse at the center of the screen makes life much simpler.</p>
@@ -254,12 +254,12 @@
        &nbsp; &nbsp;    m_up.Normalize();<br>
       }
       </code>
-      <p>This function updates the target and up vector according to the horizontal and vertical angles. We start with the view vector in a "reset" state. This means it is parallel to the gound (vertical angle is zero) and 
+      <p>This function updates the target and up vector according to the horizontal and vertical angles. We start with the view vector in a "reset" state. This means it is parallel to the gound (vertical angle is zero) and
       looking directly to the right (horizontal angle is zero - see the diagram above). We set the vertical axis to point straight up and then rotate the view vector around it by the horizontal angle. The result
       is a vector which points in the general direction of the intended target but not necessarily in the correct height (i.e. it is on the XZ plane). By doing a cross product of this vector with the vertical axis we
       get another vector on the XZ plane which is perpendicular to the plane created by the view vector and the vertical axis. This is our new horizontal axis and now it is time to rotate the vector up or down around it
       according to the vertical angle. The result is the final target vector and we set it into the corresponding member attribute. Now we must fix the up vector. For example, if the camera is looking up, the up vector
-      must tilt back to compensate (it must be 90 degrees in respect to the target vector). This is similar to the way the back of your head tilts back when you look up to the sky. The new up vector is calculated by 
+      must tilt back to compensate (it must be 90 degrees in respect to the target vector). This is similar to the way the back of your head tilts back when you look up to the sky. The new up vector is calculated by
       simply doing another cross product between the final target vector and the horizontal axis. If the vertical angle is still zero then the target vector remains on the XZ plane and the up vector remains (0,1,0).
       If the target vector is tilted up or down the up vector will tilt backward or forward, respectively.</p>
       <p>(tutorial15.cpp:209)</p>
@@ -306,7 +306,7 @@
       </code>
       <p>Whenever we are in the main render loop we must notify the camera. This gives the camera a chance to turn when the mouse is not moving and is on one of the screen edges.</p>
     </section>
-    
+
     <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=ns9eVfHCYdg&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=12">video tutorial by Frahaan Hussain</a>.</p>
 
     <a href="../tutorial16/tutorial16.html" class="next highlight"> Next tutorial </a>
@@ -314,7 +314,7 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
-    
+
 <div id="disqus_thread"></div>
 <script type="text/javascript">
 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -329,6 +329,6 @@ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
 })();
 </script>
 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-    
+
 </body>
 </html>
