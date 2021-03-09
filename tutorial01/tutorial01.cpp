@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2010 Etay Meiri
+        Copyright 2010 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 */
 
 #include <GL/freeglut.h>
+#include <stdio.h>
+
 
 static void RenderSceneCB()
 {
@@ -26,25 +28,28 @@ static void RenderSceneCB()
     glutSwapBuffers();
 }
 
-static void InitializeGlutCallbacks()
-{
-    glutDisplayFunc(RenderSceneCB);
-}
-
 
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
-    glutInitWindowSize(1024, 768);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("Tutorial 01");
 
-    InitializeGlutCallbacks();
+    int width = 1920;
+    int height = 1080;
+    glutInitWindowSize(width, height);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    int x = 200;
+    int y = 100;
+    glutInitWindowPosition(x, y);
+    int win = glutCreateWindow("Tutorial 01");
+    printf("window id: %d\n", win);
+
+    GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
+    glClearColor(Red, Green, Blue, Alpha);
+
+    glutDisplayFunc(RenderSceneCB);
 
     glutMainLoop();
-    
+
     return 0;
 }
