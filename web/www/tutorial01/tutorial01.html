@@ -1,69 +1,88 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 01 - Create a window </title>
+        <title> Tutorial 01 - Create a window </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 1: </h2>
-			<h1> Open a window </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 1: </h2>
+                        <h1> Open a window </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+            <section>
+                <p>                <big>               A <a href="https://youtu.be/DYuLHRsvZwk"> video tutorial </a> is now available on Youtube</big></p>
+                        <h3> Background </h3>
 
-			<p> Thanks to Mariano Suligoy you can read this tutorial in <a href='tutorial1_spanish.html'>Spanish</a>.</p>
+                        <p> Thanks to Mariano Suligoy you can read this tutorial in <a href='tutorial1_spanish.html'>Spanish</a>.</p>
 
-			<p> The OpenGL spec does not specify any API in order to create and manipulate windows. Modern windowing systems that support OpenGL include a sub-system that provides the binding between an OpenGL context and the windowing system. In the X Window system that interface is called GLX. Microsoft provides WGL (pronounced: Wiggle) for Windows and MacOS has CGL. Working directly with these interfaces in order to create a window in which to display graphics is usually grunt work which is why we use a high level library that abstracts away the fine details. The library we use here is called the 'OpenGL utility library', or GLUT. It provides a simplified API for window management as well as event handling, IO control and a few other services. In addition, GLUT is cross platform which makes portability easier. Alternatives to GLUT include SDL and GLFW. </p>
-		</section>
+                        <p> The OpenGL spec does not specify any API in order to create and manipulate windows. Modern windowing systems that support OpenGL include a sub-system that provides the binding between an OpenGL context and the windowing system. In the X Window system that interface is called GLX. Microsoft provides WGL (pronounced: Wiggle) for Windows and MacOS has CGL. Working directly with these interfaces in order to create a window in which to display graphics is usually grunt work which is why we use a high level library that abstracts away the fine details. The library we use here is called the 'OpenGL utility library', or GLUT. It provides a simplified API for window management as well as event handling, IO control and a few other services. In addition, GLUT is cross platform which makes portability easier. Alternatives to GLUT include SDL and GLFW. </p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<code> glutInit(&amp;argc, argv); </code>
-			<p> This call initializes GLUT. The parameters can be provided directly from the command line and include useful options such as '-sync' and '-gldebug' which disable the asynchronous nature of X and automatically checks for GL errors and displays them (respectively). </p>
+                        <code> glutInit(&amp;argc, argv); </code>
+                        <p> This call initializes GLUT. The parameters can be provided directly from the command line and include useful options such as '-sync' and '-gldebug' which disable the asynchronous nature of X and automatically checks for GL errors and displays them (respectively). </p>
 
-			<code> glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); </code>
-			<p> Here we configure some GLUT options. GLUT_DOUBLE enables double buffering (drawing to a background buffer while another buffer is displayed) and the color buffer where most rendering ends up (i.e. the screen). We will usually want these two as well as other options which we will see later. </p>
+                        <code> glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); </code>
+                        <p> Here we configure some GLUT options. GLUT_DOUBLE enables double buffering (drawing to a background buffer while another buffer is displayed) and the color buffer where most rendering ends up (i.e. the screen). We will usually want these two as well as other options which we will see later. </p>
 
-			<code> glutInitWindowSize(1024, 768); <br>
-			glutInitWindowPosition(100, 100); <br>
-			glutCreateWindow("Tutorial 01"); </code>
-			<p> These calls specify the window parameters and create it. You also have the option to specify the window title. </p>
+                        <code> glutInitWindowSize(1024, 768); <br>
+                        glutInitWindowPosition(100, 100); <br>
+                        glutCreateWindow("Tutorial 01"); </code>
+                        <p> These calls specify the window parameters and create it. You also have the option to specify the window title. </p>
 
-			<code> glutDisplayFunc(RenderSceneCB); </code>
-			<p> Since we are working in a windowing system most of the interaction with the running program occurs via event callback functions. GLUT takes care of interacting with the underlying windowing system and provides us with a few callback options. Here we use just one - a "main" callback to do all the rendering of one frame. This function is continuously called by GLUT internal loop. </p>
+                        <code> glutDisplayFunc(RenderSceneCB); </code>
+                        <p> Since we are working in a windowing system most of the interaction with the running program occurs via event callback functions. GLUT takes care of interacting with the underlying windowing system and provides us with a few callback options. Here we use just one - a "main" callback to do all the rendering of one frame. This function is continuously called by GLUT internal loop. </p>
 
-			<code> glClearColor(0.0f, 0.0f, 0.0f, 0.0f); </code>
-			<p> This is our first encounter with the concept of state in OpenGL. The idea behind state is that rendering is such a complex task that it cannot be treated as a function call that receives a few parameters (and correctly designed functions never receive a lot of parameters). You need to specify shaders, buffers and various flags that affect how rendering will take place. In addition, you would often want to keep the same piece of configuration across several rendering operations (e.g. if you never disable the depth test then there is no point in specifying it for every render call). That is why most of the configuration of rendering operations is done by setting flags and values in the OpenGL state machine and the rendering calls themselves are usually limited to the few parameters that revolve around the number of vertices to draw and their starting offset. After calling a state changing function that particular configuration remains intact until the next call to the same function with a different value. The call above sets the color that will be used when clearing the framebuffer (described later). The color has four channels (RGBA) and it is specified as a normalized value between 0.0 and 1.0. </p>
+                        <code> glClearColor(0.0f, 0.0f, 0.0f, 0.0f); </code>
+                        <p> This is our first encounter with the concept of state in OpenGL. The idea behind state is that rendering is such a complex task that it cannot be treated as a function call that receives a few parameters (and correctly designed functions never receive a lot of parameters). You need to specify shaders, buffers and various flags that affect how rendering will take place. In addition, you would often want to keep the same piece of configuration across several rendering operations (e.g. if you never disable the depth test then there is no point in specifying it for every render call). That is why most of the configuration of rendering operations is done by setting flags and values in the OpenGL state machine and the rendering calls themselves are usually limited to the few parameters that revolve around the number of vertices to draw and their starting offset. After calling a state changing function that particular configuration remains intact until the next call to the same function with a different value. The call above sets the color that will be used when clearing the framebuffer (described later). The color has four channels (RGBA) and it is specified as a normalized value between 0.0 and 1.0. </p>
 
-			<code> glutMainLoop(); </code>
-			<p> This call passes control to GLUT which now begins its own internal loop. In this loop it listens to events from the windowing system and passes them via the callbacks that we configured. In our case GLUT will only call the function we registered as a display callback (RenderSceneCB) to give us a chace to render the frame. </p>
+                        <code> glutMainLoop(); </code>
+                        <p> This call passes control to GLUT which now begins its own internal loop. In this loop it listens to events from the windowing system and passes them via the callbacks that we configured. In our case GLUT will only call the function we registered as a display callback (RenderSceneCB) to give us a chace to render the frame. </p>
 
-			<code> glClear(GL_COLOR_BUFFER_BIT); <br>
-			glutSwapBuffers(); </code>
-			<p> The only thing we do in our render function is to clear the framebuffer (using the color specified above - try changing it). The second call tells GLUT to swap the roles of the backbuffer and the frontbuffer. In the next round through the render callback we will render into the current frames front buffer and the current backbuffer will be displayed. </p>
-		</section>
+                        <code> glClear(GL_COLOR_BUFFER_BIT); <br>
+                        glutSwapBuffers(); </code>
+                        <p> The only thing we do in our render function is to clear the framebuffer (using the color specified above - try changing it). The second call tells GLUT to swap the roles of the backbuffer and the frontbuffer. In the next round through the render callback we will render into the current frames front buffer and the current backbuffer will be displayed. </p>
+                </section>
 
-		<a href="../tutorial02/tutorial02.html" class="next highlight"> Next tutorial </a>
-	</article>
+                <a href="../tutorial02/tutorial02.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial01/tutorial01.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</body>
+</html>
+
 </body>
 </html>

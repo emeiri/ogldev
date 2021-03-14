@@ -7,39 +7,25 @@
 </head>
 <body>
 <h1 style="text-align: center;">Instructions</h1>
-<div style="text-align: justify;"><big><big>The tutorials are written
+<div style="text-align: justify;"><big><big>
+<p>The tutorials are written
 in C++. My assumption is that the reader is experienced in that
-language and in software development in general.<br>
-</div>
-The primary requirement for running the tutorials is a GPU 
+    language and in software development in general.</p>
+<p>
+The primary requirement for running the tutorials is a GPU
 that supports version 3.3 of the OpenGL spec at least (though some of
-the tutorials, e.g. Tessellation, require 4.x support). The code provided by
-the tutorials was developed on Ubuntu Linux using <a href="https://netbeans.org/downloads/">NetBeans</a> as a primary
-development platform (the C/C++ version is enough to be able to build the tutorials). 
-You should be able to compile it without NetBeans
-by simply running 'make' from the command line. In order to install the
-required packages run the following commands:
-<br>
-<ol>
-  <li>On Ubuntu: apt-get install g++ freeglut3-dev glew1.5-dev libmagick++-dev libassimp-dev libglfw-dev</li>
-  <li>On Fedora: yum install gcc-c++ glew-devel freeglut-devel ImageMagick-c++-devel ImageMagick-c++ assimp-devel glfw-devel</li>
-</ol>
-<p>
-Another thing that I did on Ubuntu to make my life easier is to run the following command
-as root: <br><br>ln /usr/lib/pkgconfig/libglfw.pc /usr/lib/pkgconfig/glfw3.pc<br><br>
-The reason is to use the same name for the package config file of GLFW in Ubuntu
-as in Fedora. This allows me to work with the same Netbeans project file for both distributions.
+the tutorials, e.g. Tessellation, require 4.x support). The code is maintained on github and you can get using:
 </p>
 <p>
-Note: since Nov-14, 2013, the source to all the tutorials is provided in a single zip
-package, instead of a package per tutorial. The package contains Netbeans projects
-for Linux and a Visual Studio solution for Windows (&lt;ROOT&gt;/Windows/ogldev/ogldev.sln).
-You can get the source package <a href="ogldev-source.zip">here</a>.
+    git clone https://github.com/emeiri/ogldev.git
+</p>
+<p>Then execute the following in order to install the dependencies:</p>
+<p>
+    cd ogldev && sudo ./install_requirements_ubuntu.sh
 </p>
 <p>
-    To decrease the development time I'm maintaining only the 'Debug' build in
-    both NetBeans and Visual Studio projects. Getting the 'Release' version up
-    and running is simply a matter of copying the configuration there.
+    A video tutorial about this can be found on my Youtube channel <a href="https://youtu.be/h2cP6sQYdf0">here.</a>
+</p>
 </p>
     <p>For more information on setting up OpenGL check out the following video tutorials by Frahaan Hussain on <a href=https://www.youtube.com/watch?v=mGC4T9AG4nc&index=2&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8>Windows</a> and
     on the <a href="https://www.youtube.com/watch?v=Tz0dq2krCW8&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=1">Mac</a>.</p>

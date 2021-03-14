@@ -1,201 +1,219 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 02 - Hello dot! </title>
+        <title> Tutorial 02 - Hello dot! </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 2: </h2>
-			<h1> Hello dot! </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 2: </h2>
+                        <h1> Hello dot! </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+                <section>
+                        <h3> Background </h3>
 
-			<p>This is our first encounter with <a href=http://glew.sourceforge.net/>GLEW</a>,
-			the OpenGL Extension Wrangler Library. GLEW helps you deal with the
-			headache that can accompany the management of extensions in OpenGL.
-			Once initialized it queries for all the available extensions on your
-			platform, dynamically loads them and provides easy access via a single
-			header file.</p>
+                        <p>This is our first encounter with <a href=http://glew.sourceforge.net/>GLEW</a>,
+                        the OpenGL Extension Wrangler Library. GLEW helps you deal with the
+                        headache that can accompany the management of extensions in OpenGL.
+                        Once initialized it queries for all the available extensions on your
+                        platform, dynamically loads them and provides easy access via a single
+                        header file.</p>
 
-			<p>In this tutorial we will see the usage of vertex buffer objects (VBOs)
-			for the first time. As the name implies, they are used to store vertices.
-			The objects that exist in the 3D world you are trying to visualize, be it
-			monsters, castles or a simple revolving cube, are always built by connecting
-			together a group of vertices. VBOs are the most efficient way to load vertices
-			into the GPU. They are buffers that can be stored in video memory and
-			provide the shortest access time to the GPU so they are definitely recommended.</p>
+                        <p>In this tutorial we will see the usage of vertex buffer objects (VBOs)
+                        for the first time. As the name implies, they are used to store vertices.
+                        The objects that exist in the 3D world you are trying to visualize, be it
+                        monsters, castles or a simple revolving cube, are always built by connecting
+                        together a group of vertices. VBOs are the most efficient way to load vertices
+                        into the GPU. They are buffers that can be stored in video memory and
+                        provide the shortest access time to the GPU so they are definitely recommended.</p>
 
-			<p>This tutorial and the next are the only ones in this series where we
-			will rely on the fixed function pipeline instead of the programmable
-			one. Actually, no transformations at all take place in both these
-			tutorials. We simply rely on the way data flows through the pipe. A
-			thorough study of the pipe will follow in the next tutorials but for
-			now it is enough to understand that before reaching the rasterizer
-			(that actually draws points, lines and triangles using screen
-			coordinates) the visible vertices have their X, Y and Z coordinates in
-			the range [-1.0,1.0]. The
-			rasterizer maps these coordinates to screen space (e.g, if the screen
-			width is 1024 then the X coodinate -1.0 is mapped to 0 and 1.0 is
-			mapped to 1023). Finally, the rasterizer draws the primitives according
-			to the topology which is specified in the draw call (see below in the
-			source walkthru). Since we didn't bind any shader to the pipeline our
-			vertices undergo no transformation. This means that we just need to
-			give them a value in the above range in order to make them visible. In
-			fact, selecting zero for both X and Y places the vertex in the exact
-			midpoint of both axis - in other words, the middle of the screen.</p>
+                        <p>This tutorial and the next are the only ones in this series where we
+                        will rely on the fixed function pipeline instead of the programmable
+                        one. Actually, no transformations at all take place in both these
+                        tutorials. We simply rely on the way data flows through the pipe. A
+                        thorough study of the pipe will follow in the next tutorials but for
+                        now it is enough to understand that before reaching the rasterizer
+                        (that actually draws points, lines and triangles using screen
+                        coordinates) the visible vertices have their X, Y and Z coordinates in
+                        the range [-1.0,1.0]. The
+                        rasterizer maps these coordinates to screen space (e.g, if the screen
+                        width is 1024 then the X coodinate -1.0 is mapped to 0 and 1.0 is
+                        mapped to 1023). Finally, the rasterizer draws the primitives according
+                        to the topology which is specified in the draw call (see below in the
+                        source walkthru). Since we didn't bind any shader to the pipeline our
+                        vertices undergo no transformation. This means that we just need to
+                        give them a value in the above range in order to make them visible. In
+                        fact, selecting zero for both X and Y places the vertex in the exact
+                        midpoint of both axis - in other words, the middle of the screen.</p>
 
-			<p><strong>Installing GLEW:</strong> GLEW is available from its main website at
-			<a href=http://glew.sourceforge.net/>http://glew.sourceforge.net/</a>. Most
-			Linux distributions provide prebuilt packages for it. On Ubuntu you can install
-			it by running the following from the command line: </p>
-			<code> apt-get install libglew1.6 libglew1.6-dev </code>
-		</section>
+                        <p><strong>Installing GLEW:</strong> GLEW is available from its main website at
+                        <a href=http://glew.sourceforge.net/>http://glew.sourceforge.net/</a>. Most
+                        Linux distributions provide prebuilt packages for it. On Ubuntu you can install
+                        it by running the following from the command line: </p>
+                        <code> apt-get install libglew1.6 libglew1.6-dev </code>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<code>#include &lt;GL/glew.h&gt;</code>
-			<p>Here we include the single GLEW
-			header. If you include other OpenGL headers you must be careful to
-			include this file before the others else GLEW will complain that about
-			it. In order to link the program with GLEW you need to add '-lGLEW' to
-			the makefile.</p>
-			<code>#include "math_3d.h"</code>
-			<p>In this tutorial we start using helper structures such as vector. We
-			will expand this header as we go along.</p>
-			<code>GLenum res = glewInit();<br/>
-			if (res != GLEW_OK)<br/>
-			{<br/>
-			&nbsp;&nbsp;&nbsp; fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));<br/>
-			&nbsp;&nbsp;&nbsp; return 1;<br/>
-			}</code>
-			<p>Here we initialize GLEW and check for any errors. This must be done
-			after GLUT has been initialized.</p>
-			<code>Vector3f Vertices[1];<br/>
-			Vertices[0] = Vector3f(0.0f, 0.0f, 0.0f);<br/></code>
-			<p>We create an array of one Vector3f structures (this type is defined in
-			math_3d.h) and initialize XYZ to be zero. This will make the dot appear
-			at the middle of the screen.</p>
-			<code>GLuint VBO;</code>
-			<p>We allocate a GLuint in the global part of the program to store the
-			handle of the vertex buffer object. You will see later that most (if
-			not all) OpenGL objects are accessed via a variable of GLuint type.</p>
-			<code>glGenBuffers(1, &amp;VBO);</code>
-			<p>OpenGL defines several glGen* functions for generating objects of
-			various types. They often take two parameters - the first one specifies
-			the number of objects you want to create and the second is the address
-			of an array of GLuints to store the handles that the driver allocates
-			for you (make sure the array is large enough to handle your request!).
-			Future calls to this function will not generate the same object handles
-			unless you delete them first with glDeleteBuffers. Note that at this
-			point you don't specify what you intend to do with the buffers so they
-			can be regarded as "generic". This is the job of the next function.</p>
-			<code>glBindBuffer(GL_ARRAY_BUFFER, VBO);</code>
-			<p>OpenGL has a rather unique way of using handles. In many APIs the
-			handle is simply passed to any relevant function and the action is
-			taken on that handle. In OpenGL we bind the handle to a target name and
-			then execute commands on that target. These commmands affect the
-			bounded handle until another one is bound in its stead or the call
-			above takes zero as the handle. The target GL_ARRAY_BUFFER means that
-			the buffer will contain an array of vertices. Another useful target is
-			GL_ELEMENT_ARRAY_BUFFER which means that the buffer contains the
-			indices of the vertices in another buffer. Other targets are also
-			available and we will see them in future tutorials.</p>
-			<code>glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);</code>
-			<p>After binding our object we fill it with data. The call above takes the
-			target name (same as what we used for binding), the size of the data in
-			bytes, address of the array of vertices and a flag that indicates the
-			usage pattern for this data. Since we are not going to change the
-			buffer contents we specify GL_STATIC_DRAW. The opposite will be
-			GL_DYNAMIC_DRAW. While this is only a hint to OpenGL it is a good thing
-			to give some thought as to the proper flag to use. The driver can rely
-			on it for optimization heuristics (such as what is the best place in
-			memory to store the buffer). </p>
-			<code>glEnableVertexAttribArray(0);</code>
-			<p>In the shaders
-			tutorial you will see that vertex attributes used in the shader
-			(position, normal, etc) have an index mapped to them that enable you to
-			create the binding between the data in the C/C++ program and the
-			attribute name inside the shader. In addition you must also enable each
-			vertex attribute index. In this tutorial we are not yet using any
-			shader but the vertex position we have loaded into the buffer is
-			treated as vertex attribute index 0 in the fixed function pipeline
-			(which becomes active when there is no shader bound). You must enable
-			each vertex attribute or else the data will not be accessible by the
-			pipeline.</p>
-			<code>glBindBuffer(GL_ARRAY_BUFFER, VBO);</code>
-			<p>Here we bind our buffer again as we prepare for making the draw call.
-			In this small program we only have one vertex buffer so making this
-			call every frame is redundent but in more complex programs there are
-			multiple buffers to store your various models and you must update the
-			pipeline state with the buffer you intend to use. </p>
-			<code>glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);</code>
-			<p>This call tells the pipeline how to interpret the data inside the
-			buffer. The first parameter specifies the index of the attribute. In
-			our case we know that it is zero by default but when we start using
-			shaders we will either need to explicitly set the index in the shader
-			or query it. The second parameter is the number of components in the
-			attribute (3 for X, Y and Z). The third parameter is the data type of
-			each component. The next parameter indicates whether we want our
-			attribute to be normalized before it is used in the pipeline. It our
-			case we want the data to pass un-changed. The fifth parameter (called
-			the 'stride') is the number of bytes between two instances of that
-			attribute in the buffer. When there is only one attribute (e.g. the
-			buffer contains only vertex positions) and the data is tightly packed
-			we pass the value zero. If we have an array of structures that contain
-			a position and normal (each one is a vector of 3 floats) we will pass
-			the size of the structure in bytes (6 * 4 = 24). The last parameter is
-			useful in the case of the previous example. We need to specify the
-			offset inside the structure where the pipeline will find our attribute.
-			In the case of the structure with the position and normal the offset of
-			the position is zero while the offset of the normal is 12.</p>
-			<code>glDrawArrays(GL_POINTS, 0, 1);</code>
-			<p>Finally, we make the call to draw the geometry. All the commands that
-			we've seen so far are important but they only set the stage for the draw command.
-			This is where the GPU really starts to work. It will now
-			combine the parameters of the draw call with the state that was built up to
-			this point and render the results to the screen.</p>
-			<p>OpenGL provides several types of draw calls and each one is appropriate for a different case. 
-			In general you can divide them up
-			to two categories - ordered draws and indexed draws. Ordered draws are simpler. The
-			GPU traverses your vertex buffer, going through the vertices one by one, and interprets
-			them according to the topology specified in the draw call. For example, if you specify GL_TRIANGLES then
-			vertices 0-2 become the first triangle, 3-5 the second, etc. If you want the same vertex to appear in
-			more than one triangle you will need to specify it twice in the vertex buffer, which is a waste of space.
-			</p>
-			<p>Indexed draws are more complex and involve an additional buffer called the index buffer. The index buffer contains indices of the vertices in the vertex buffer. The GPU scan the index buffer and in a similar fashion to the description above indices 0-2 become the first triangle and so on. If you want the same vertex in two triangles simply specify its index twice in the index buffer. The vertex buffer needs only to contain one copy. Index draws are more common in games because most models are created from triangles that represent some surface (skin of a person, castle wall, etc) with a lot of vertex sharing between them.</p>
-			<p>In this tutorial we use the simplest draw call - glDrawArrays. This is an ordered draw so there is no index buffer. We specify the topology as points which means every vertex is one point. The next parameter is the index of the first vertex to draw.
-			In our case we want to start at the beginning of the buffer so we
-			specify zero but this enables us to store multiple models in the same
-			buffer and then select the one to draw based on its offset in the
-			buffer. The last parameter is the number of vertices to draw.</p>
-			<code>glDisableVertexAttribArray(0);</code>
-			<p>It is good practice to disable each vertex attribute when it is not
-			immediately used. Leaving it enabled when a shader is not using it is a
-			sure way of asking for trouble.</p>
-		</section>
+                        <code>#include &lt;GL/glew.h&gt;</code>
+                        <p>Here we include the single GLEW
+                        header. If you include other OpenGL headers you must be careful to
+                        include this file before the others else GLEW will complain that about
+                        it. In order to link the program with GLEW you need to add '-lGLEW' to
+                        the makefile.</p>
+                        <code>#include "math_3d.h"</code>
+                        <p>In this tutorial we start using helper structures such as vector. We
+                        will expand this header as we go along.</p>
+                        <code>GLenum res = glewInit();<br/>
+                        if (res != GLEW_OK)<br/>
+                        {<br/>
+                        &nbsp;&nbsp;&nbsp; fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));<br/>
+                        &nbsp;&nbsp;&nbsp; return 1;<br/>
+                        }</code>
+                        <p>Here we initialize GLEW and check for any errors. This must be done
+                        after GLUT has been initialized.</p>
+                        <code>Vector3f Vertices[1];<br/>
+                        Vertices[0] = Vector3f(0.0f, 0.0f, 0.0f);<br/></code>
+                        <p>We create an array of one Vector3f structures (this type is defined in
+                        math_3d.h) and initialize XYZ to be zero. This will make the dot appear
+                        at the middle of the screen.</p>
+                        <code>GLuint VBO;</code>
+                        <p>We allocate a GLuint in the global part of the program to store the
+                        handle of the vertex buffer object. You will see later that most (if
+                        not all) OpenGL objects are accessed via a variable of GLuint type.</p>
+                        <code>glGenBuffers(1, &amp;VBO);</code>
+                        <p>OpenGL defines several glGen* functions for generating objects of
+                        various types. They often take two parameters - the first one specifies
+                        the number of objects you want to create and the second is the address
+                        of an array of GLuints to store the handles that the driver allocates
+                        for you (make sure the array is large enough to handle your request!).
+                        Future calls to this function will not generate the same object handles
+                        unless you delete them first with glDeleteBuffers. Note that at this
+                        point you don't specify what you intend to do with the buffers so they
+                        can be regarded as "generic". This is the job of the next function.</p>
+                        <code>glBindBuffer(GL_ARRAY_BUFFER, VBO);</code>
+                        <p>OpenGL has a rather unique way of using handles. In many APIs the
+                        handle is simply passed to any relevant function and the action is
+                        taken on that handle. In OpenGL we bind the handle to a target name and
+                        then execute commands on that target. These commmands affect the
+                        bounded handle until another one is bound in its stead or the call
+                        above takes zero as the handle. The target GL_ARRAY_BUFFER means that
+                        the buffer will contain an array of vertices. Another useful target is
+                        GL_ELEMENT_ARRAY_BUFFER which means that the buffer contains the
+                        indices of the vertices in another buffer. Other targets are also
+                        available and we will see them in future tutorials.</p>
+                        <code>glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);</code>
+                        <p>After binding our object we fill it with data. The call above takes the
+                        target name (same as what we used for binding), the size of the data in
+                        bytes, address of the array of vertices and a flag that indicates the
+                        usage pattern for this data. Since we are not going to change the
+                        buffer contents we specify GL_STATIC_DRAW. The opposite will be
+                        GL_DYNAMIC_DRAW. While this is only a hint to OpenGL it is a good thing
+                        to give some thought as to the proper flag to use. The driver can rely
+                        on it for optimization heuristics (such as what is the best place in
+                        memory to store the buffer). </p>
+                        <code>glEnableVertexAttribArray(0);</code>
+                        <p>In the shaders
+                        tutorial you will see that vertex attributes used in the shader
+                        (position, normal, etc) have an index mapped to them that enable you to
+                        create the binding between the data in the C/C++ program and the
+                        attribute name inside the shader. In addition you must also enable each
+                        vertex attribute index. In this tutorial we are not yet using any
+                        shader but the vertex position we have loaded into the buffer is
+                        treated as vertex attribute index 0 in the fixed function pipeline
+                        (which becomes active when there is no shader bound). You must enable
+                        each vertex attribute or else the data will not be accessible by the
+                        pipeline.</p>
+                        <code>glBindBuffer(GL_ARRAY_BUFFER, VBO);</code>
+                        <p>Here we bind our buffer again as we prepare for making the draw call.
+                        In this small program we only have one vertex buffer so making this
+                        call every frame is redundent but in more complex programs there are
+                        multiple buffers to store your various models and you must update the
+                        pipeline state with the buffer you intend to use. </p>
+                        <code>glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);</code>
+                        <p>This call tells the pipeline how to interpret the data inside the
+                        buffer. The first parameter specifies the index of the attribute. In
+                        our case we know that it is zero by default but when we start using
+                        shaders we will either need to explicitly set the index in the shader
+                        or query it. The second parameter is the number of components in the
+                        attribute (3 for X, Y and Z). The third parameter is the data type of
+                        each component. The next parameter indicates whether we want our
+                        attribute to be normalized before it is used in the pipeline. It our
+                        case we want the data to pass un-changed. The fifth parameter (called
+                        the 'stride') is the number of bytes between two instances of that
+                        attribute in the buffer. When there is only one attribute (e.g. the
+                        buffer contains only vertex positions) and the data is tightly packed
+                        we pass the value zero. If we have an array of structures that contain
+                        a position and normal (each one is a vector of 3 floats) we will pass
+                        the size of the structure in bytes (6 * 4 = 24). The last parameter is
+                        useful in the case of the previous example. We need to specify the
+                        offset inside the structure where the pipeline will find our attribute.
+                        In the case of the structure with the position and normal the offset of
+                        the position is zero while the offset of the normal is 12.</p>
+                        <code>glDrawArrays(GL_POINTS, 0, 1);</code>
+                        <p>Finally, we make the call to draw the geometry. All the commands that
+                        we've seen so far are important but they only set the stage for the draw command.
+                        This is where the GPU really starts to work. It will now
+                        combine the parameters of the draw call with the state that was built up to
+                        this point and render the results to the screen.</p>
+                        <p>OpenGL provides several types of draw calls and each one is appropriate for a different case.
+                        In general you can divide them up
+                        to two categories - ordered draws and indexed draws. Ordered draws are simpler. The
+                        GPU traverses your vertex buffer, going through the vertices one by one, and interprets
+                        them according to the topology specified in the draw call. For example, if you specify GL_TRIANGLES then
+                        vertices 0-2 become the first triangle, 3-5 the second, etc. If you want the same vertex to appear in
+                        more than one triangle you will need to specify it twice in the vertex buffer, which is a waste of space.
+                        </p>
+                        <p>Indexed draws are more complex and involve an additional buffer called the index buffer. The index buffer contains indices of the vertices in the vertex buffer. The GPU scan the index buffer and in a similar fashion to the description above indices 0-2 become the first triangle and so on. If you want the same vertex in two triangles simply specify its index twice in the index buffer. The vertex buffer needs only to contain one copy. Index draws are more common in games because most models are created from triangles that represent some surface (skin of a person, castle wall, etc) with a lot of vertex sharing between them.</p>
+                        <p>In this tutorial we use the simplest draw call - glDrawArrays. This is an ordered draw so there is no index buffer. We specify the topology as points which means every vertex is one point. The next parameter is the index of the first vertex to draw.
+                        In our case we want to start at the beginning of the buffer so we
+                        specify zero but this enables us to store multiple models in the same
+                        buffer and then select the one to draw based on its offset in the
+                        buffer. The last parameter is the number of vertices to draw.</p>
+                        <code>glDisableVertexAttribArray(0);</code>
+                        <p>It is good practice to disable each vertex attribute when it is not
+                        immediately used. Leaving it enabled when a shader is not using it is a
+                        sure way of asking for trouble.</p>
+                </section>
 
-		<a href="../tutorial03/tutorial03.html" class="next highlight"> Next tutorial </a>
-	</article>
+                <a href="../tutorial03/tutorial03.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial01/tutorial02.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</body>
+</html>
+
 </body>
 </html>
