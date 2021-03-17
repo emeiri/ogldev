@@ -1,65 +1,81 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 03 - First Triangle </title>
+        <title> Tutorial 03 - First Triangle </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 3: </h2>
-			<h1> First Triangle </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 3: </h2>
+                        <h1> First Triangle </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+                <section>
+                        <h3> Background </h3>
 
-			<p>This tutorial is very short. We simply expand the previous
-			tutorial to render a triangle. <p>In this tutorial we rely on the normalized box again. Visible vertices
-			must be inside the box so that viewport transformation will map them to
-			the visible coordinates of the window. When looking down the negative Z
-			axis this box looks like that:</p>
-			<img class="center" src="coord_system.png">
-			<p>Point (-1.0, -1.0) is mapped to the bottom left hand of the window,
-			(-1.0, 1.0) is the upper left and so on. If you extend the position of
-			one of the vertices below outside this box the triangle will be clipped
-			and you will only see a part of it.</p>
-		</section>
+                        <p>This tutorial is very short. We simply expand the previous
+                        tutorial to render a triangle. <p>In this tutorial we rely on the normalized box again. Visible vertices
+                        must be inside the box so that viewport transformation will map them to
+                        the visible coordinates of the window. When looking down the negative Z
+                        axis this box looks like that:</p>
+                        <img class="center" src="coord_system.png">
+                        <p>Point (-1.0, -1.0) is mapped to the bottom left hand of the window,
+                        (-1.0, 1.0) is the upper left and so on. If you extend the position of
+                        one of the vertices below outside this box the triangle will be clipped
+                        and you will only see a part of it.</p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<code>Vector3f Vertices[3];<br>
-			Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);<br>
-			Vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);<br>
-			Vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);<br>
-			</code>
-			<p>We extended the array to contain three vertices. </p>
-			<code>glDrawArrays(GL_TRIANGLES, 0, 3);</code>
-			<p>Two changes were made to the drawing function: we draw triangles instead of points and
-			we draw 3 vertices instead of 1.</p>
-		</section>
+                        <code>Vector3f Vertices[3];<br>
+                        Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);<br>
+                        Vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);<br>
+                        Vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);<br>
+                        </code>
+                        <p>We extended the array to contain three vertices. </p>
+                        <code>glDrawArrays(GL_TRIANGLES, 0, 3);</code>
+                        <p>Two changes were made to the drawing function: we draw triangles instead of points and
+                        we draw 3 vertices instead of 1.</p>
+                </section>
 
         <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=EIpxcNl2WJU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=7">video tutorial by Frahaan Hussain</a>.</p>
-		<a href="../tutorial04/tutorial04.html" class="next highlight"> Next tutorial </a>
-	</article>
-    
-    
+                <a href="../tutorial04/tutorial04.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial03/tutorial03.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </body>
 </html>
