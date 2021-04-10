@@ -28,17 +28,21 @@
 #include "ogldev_math_3d.h"
 
 GLuint VBO;
-GLuint gScaleLocation;
+GLint gScaleLocation;
 
 static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
     static float Scale = 0.0f;
+    static float Delta = 0.005f;
 
-    Scale += 0.001f;
+    Scale += Delta;
+    if ((Scale >= 1.0f) || (Scale <= -1.0f)) {
+        Delta *= -1.0f;
+    }
 
-    glUniform1f(gScaleLocation, sinf(Scale));
+    glUniform1f(gScaleLocation, Scale);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -138,6 +142,12 @@ static void CompileShaders()
         exit(1);
     }
 
+    gScaleLocation = glGetUniformLocation(ShaderProgram, "gScale");
+    if (gScaleLocation == -1) {
+        printf("Error getting uniform location of 'gScale'\n");
+        exit(1);
+    }
+
     glValidateProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
     if (!Success) {
@@ -147,9 +157,6 @@ static void CompileShaders()
     }
 
     glUseProgram(ShaderProgram);
-
-    gScaleLocation = glGetUniformLocation(ShaderProgram, "gScale");
-    assert(gScaleLocation != 0xFFFFFFFF);
 }
 
 int main(int argc, char** argv)
@@ -163,7 +170,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 04");
+    int win = glutCreateWindow("Tutorial 05");
     printf("window id: %d\n", win);
 
     // Must be done after glut is initialized!
