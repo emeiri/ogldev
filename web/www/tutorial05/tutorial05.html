@@ -1,126 +1,147 @@
 <!doctype html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 05 - Uniform Variables </title>
+        <title> Tutorial 05 - Uniform Variables </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
-</head>
-<body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 5: </h2>
-			<h1> Uniform Variables </h1>
-		</div>
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
+    </head>
+    <body>
+        <header id="header">
+            <div>
+                <h2> Tutorial 5: </h2>
+                <h1> Uniform Variables </h1>
+            </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+            <a id="logo" class="small" href="../../index.html" title="Homepage">
+                <img src="..//logo ldpi.png">
+            </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+            <section>
+                <p> <big> A <a href="https://youtu.be/mat3uvF33O0" > video tutorial </a> is now available on Youtube</big></p>
+                <h3> Background </h3>
 
-			<p>In this tutorial we meet a new type of shader variables -
-			uniform variables. The difference between attribute and uniform
-			variable is that attribute variables contain data which is vertex
-			specific so they are reloaded with a new value from the vertex buffer
-			for each shader invocation while the value of uniform variables remains
-			constant accross the entire draw call. This means that you load the
-			value before making the draw call and then you can access the same
-			value in each invocation of the vertex shader. Uniform variables are
-			useful for storing data such as lighting parameters (light position and
-			direction, etc), transformation matrices, texture objects handles and
-			so on. </p>
-			<p> In this tutorial we finally get something moving on the screen. We do
-			it using a combination of a uniform variable whose value we change
-			every frame and the idle callback function supplied by GLUT. The point
-			is that GLUT doesn't call our render callback function repeatedly -
-			unless it has to. GLUT has to call the render callback following events
-			such as minimizing and maximizing the window or uncovering it by
-			another window. If we don't change anything in the windows layout after
-			launching the application the render callback is called just once. You
-			can see for yourself by adding a printf call in the render function.
-			You will see the output only once and you will see it again if you
-			minimize and then maximize the window. Registering only the render
-			callback in GLUT was fine for the previous tutorials but here we want
-			to repeatedly change the value of a variable. We do this by registering
-			an idle function callback. The idle function is called by GLUT when no
-			events are received from the windowing system. You can have a dedicated
-			function for this callback where you will do any bookkeeping such as
-			time update or simply register the render callback function as an idle
-			callback as well. In this tutorial we do the later and update the
-			variable inside the render function.</p>
-		</section>
+                <p>In this tutorial we meet a new type of shader variables -
+                    uniform variables. The difference between attribute and uniform
+                    variable is that attribute variables contain data which is vertex
+                    specific so they are reloaded with a new value from the vertex buffer
+                    for each shader invocation while the value of uniform variables remains
+                    constant accross the entire draw call. This means that you load the
+                    value before making the draw call and then you can access the same
+                    value in each invocation of the vertex shader. Uniform variables are
+                    useful for storing data such as lighting parameters (light position and
+                    direction, etc), transformation matrices, texture objects handles and
+                    so on. </p>
+                <p> In this tutorial we finally get something moving on the screen. We do
+                    it using a combination of a uniform variable whose value we change
+                    every frame and the idle callback function supplied by GLUT. The point
+                    is that GLUT doesn't call our render callback function repeatedly -
+                    unless it has to. GLUT has to call the render callback following events
+                    such as minimizing and maximizing the window or uncovering it by
+                    another window. If we don't change anything in the windows layout after
+                    launching the application the render callback is called just once. You
+                    can see for yourself by adding a printf call in the render function.
+                    You will see the output only once and you will see it again if you
+                    minimize and then maximize the window. Registering only the render
+                    callback in GLUT was fine for the previous tutorials but here we want
+                    to repeatedly change the value of a variable. We do this by registering
+                    an idle function callback. The idle function is called by GLUT when no
+                    events are received from the windowing system. You can have a dedicated
+                    function for this callback where you will do any bookkeeping such as
+                    time update or simply register the render callback function as an idle
+                    callback as well. In this tutorial we do the later and update the
+                    variable inside the render function.</p>
+            </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+            <section>
+                <h3> Source walkthru </h3>
 
-			<code>glutIdleFunc(RenderSceneCB);</code>
-			<p>Here we register the render callback as an idle function. Note that if
-			you decide to use a dedicated idle callback function then you will need
-			to add a call to glutPostRedisplay() at the end of it. Else the idle
-			function will be called again and again but the render function will
-			not. glutPostRedisplay() marks the current window as needed to be
-			redisplayed and during the next round through GLUT's main loop the
-			render callback will be called.</p>
-			<code>gScaleLocation = glGetUniformLocation(ShaderProgram, "gScale");<br/>
-			assert(gScaleLocation != 0xFFFFFFFF);</code>
-			<p>After linking the program we query the program object for the location
-			of the uniform variable. This is another example of a case where the
-			application C/C++ execution environment needs to be mapped to the
-			shader execution environment. You don't have any direct access to
-			shader content and you cannot directly update its variables. When you
-			compile the shader the GLSL compiler assigns an index to each uniform
-			variable. In the internal representation of the shader inside the
-			compiler access to the variable is resolved using its index. That index
-			is also available to the application via the glGetUniformLocation. You
-			call this function with the program object handle and the name of the
-			variable. The function returns the index or -1 if there was an error.
-			It is very important to check for errors (as we do above with the
-			assertion) or else future updates to the variables will not be
-			delivered to the shader. There are mainly two reasons why this function
-			can fail. You either misspelled the name of the variable or it was
-			optimized away by the compiler. If the GLSL compiler finds out that the
-			variable is not actually used in the shader it can simply drop it. In
-			that case glGetUniformLocation will fail. </p>
-			<code>static float Scale = 0.0f;<br/>
-			Scale += 0.001f;<br/>
-			glUniform1f(gScaleLocation, sinf(Scale));</code>
-			<p>We maintain a static floating point variable that we increment a bit in
-			every call to the render function (you may want to play with 0.001 if
-			it runs too slowly or too quickly on your machine). The actual value
-			which is passed to the shader is the sinus of the 'Scale' variable.
-			This is to create a nice loop between -1.0 and 1.0. Note that sinf()
-			takes radians and not degrees as a parameter but at this point we
-			simply don't care. We just want the wave that sinus generates. The
-			result of sinf() is passed to the shader using glUniform1f. OpenGL
-			provides multiple instances of this function with the general form of
-			glUniform{1234}{if}. You can use it to load values into a 1D, 2D, 3D or
-			4D (based on the number that follows the 'glUniform') vector of
-			floating point or integer (this is the 'i' or 'f' suffix). There are
-			also versions that take a vector address as a parameter as well as
-			special version for matrices. The first parameter to the function is
-			the index location that we have extracted using glGetUniformLocation().</p>
-			<p>We will now take a look at changes that were made in the VS (the FS remains unchanged).</p>
-			<code>uniform float gScale;</code>
-			<p>Here we declare the uniform value in the shader.</p>
-			<code>gl_Position = vec4(gScale * Position.x, gScale * Position.y, Position.z, 1.0);</code>
-			<p>We multiply the X and Y values of the position vector with the value
-			that is changed from the application every frame. Can you explain why
-			the triangle is upside down half of the loop?</p>
-		</section>
+                <code>glutIdleFunc(RenderSceneCB);</code>
+                <p>Here we register the render callback as an idle function. Note that if
+                    you decide to use a dedicated idle callback function then you will need
+                    to add a call to glutPostRedisplay() at the end of it. Else the idle
+                    function will be called again and again but the render function will
+                    not. glutPostRedisplay() marks the current window as needed to be
+                    redisplayed and during the next round through GLUT's main loop the
+                    render callback will be called.</p>
+                <code>gScaleLocation = glGetUniformLocation(ShaderProgram, "gScale");<br/>
+                        assert(gScaleLocation != 0xFFFFFFFF);</code>
+                <p>After linking the program we query the program object for the location
+                    of the uniform variable. This is another example of a case where the
+                    application C/C++ execution environment needs to be mapped to the
+                    shader execution environment. You don't have any direct access to
+                    shader content and you cannot directly update its variables. When you
+                    compile the shader the GLSL compiler assigns an index to each uniform
+                    variable. In the internal representation of the shader inside the
+                    compiler access to the variable is resolved using its index. That index
+                    is also available to the application via the glGetUniformLocation. You
+                    call this function with the program object handle and the name of the
+                    variable. The function returns the index or -1 if there was an error.
+                    It is very important to check for errors (as we do above with the
+                    assertion) or else future updates to the variables will not be
+                    delivered to the shader. There are mainly two reasons why this function
+                    can fail. You either misspelled the name of the variable or it was
+                    optimized away by the compiler. If the GLSL compiler finds out that the
+                    variable is not actually used in the shader it can simply drop it. In
+                    that case glGetUniformLocation will fail. </p>
+                <code>static float Scale = 0.0f;<br/>
+                        Scale += 0.001f;<br/>
+                        glUniform1f(gScaleLocation, sinf(Scale));</code>
+                <p>We maintain a static floating point variable that we increment a bit in
+                    every call to the render function (you may want to play with 0.001 if
+                    it runs too slowly or too quickly on your machine). The actual value
+                    which is passed to the shader is the sinus of the 'Scale' variable.
+                    This is to create a nice loop between -1.0 and 1.0. Note that sinf()
+                    takes radians and not degrees as a parameter but at this point we
+                    simply don't care. We just want the wave that sinus generates. The
+                    result of sinf() is passed to the shader using glUniform1f. OpenGL
+                    provides multiple instances of this function with the general form of
+                    glUniform{1234}{if}. You can use it to load values into a 1D, 2D, 3D or
+                    4D (based on the number that follows the 'glUniform') vector of
+                    floating point or integer (this is the 'i' or 'f' suffix). There are
+                    also versions that take a vector address as a parameter as well as
+                    special version for matrices. The first parameter to the function is
+                    the index location that we have extracted using glGetUniformLocation().</p>
+                <p>We will now take a look at changes that were made in the VS (the FS remains unchanged).</p>
+                <code>uniform float gScale;</code>
+                <p>Here we declare the uniform value in the shader.</p>
+                <code>gl_Position = vec4(gScale * Position.x, gScale * Position.y, Position.z, 1.0);</code>
+                <p>We multiply the X and Y values of the position vector with the value
+                    that is changed from the application every frame. Can you explain why
+                    the triangle is upside down half of the loop?</p>
+            </section>
 
-		<a href="../tutorial06/tutorial06.html" class="next highlight"> Next tutorial </a>
-	</article>
+            <a href="../tutorial06/tutorial06.html" class="next highlight"> Next tutorial </a>
+        </article>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial05/tutorial05.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </body>
 </html>
