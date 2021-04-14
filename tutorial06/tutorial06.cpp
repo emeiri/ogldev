@@ -45,7 +45,7 @@ static void RenderSceneCB()
     Matrix4f Translation(1.0f, 0.0f, 0.0f, Scale * 2,
                          0.0f, 1.0f, 0.0f, Scale,
                          0.0f, 0.0f, 1.0f, 0.0,
-                         0.0f, 0.0f, 0.0f, 0.0f);
+                         0.0f, 0.0f, 0.0f, 1.0f);
 
     glUniformMatrix4fv(gTranslationLocation, 1, GL_TRUE, &Translation.m[0][0]);
 
