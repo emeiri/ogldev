@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 06 - translation transform
+    Tutorial 06 - translation transformation
 */
 
 #include <stdio.h>
