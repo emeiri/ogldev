@@ -1,88 +1,105 @@
 <!doctype html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 07 - Rotation Transformation </title>
+        <title> Tutorial 07 - Rotation Transformation </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
-</head>
-<body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 7: </h2>
-			<h1> Rotation Transformation </h1>
-		</div>
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
+    </head>
+    <body>
+        <header id="header">
+            <div>
+                <h2> Tutorial 7: </h2>
+                <h1> Rotation Transformation </h1>
+            </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+            <a id="logo" class="small" href="../../index.html" title="Homepage">
+                <img src="..//logo ldpi.png">
+            </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+            <section>
+                <p> <big> A <a href="https://youtu.be/9egyFOt6PHM" > video tutorial </a> is now available on Youtube</big></p>
+                <h3> Background </h3>
 
-			<p>Next on our transforation
-			list is the rotation, that is, given an angle and a point we want to
-			rotate the point around one of the axis. We will always change two out
-			of the trio X, Y and Z and leave the third component unchanged. This
-			means that the path will lie on one of the three major planes: XY (when
-			turning around Z), YZ (when turning around X) and XZ (when turning
-			around Y). There are more complex rotation transformations that allow
-			you to rotate around an arbitrary vector but we don't need them at this
-			stage.</p>
-			<p>Let's define the problem in general terms. Consider the following diagram:</p>
-			<img class="center" src="rotation.png"><br>
-			<p>We want to move along the circle from (x<sub>1,</sub>y<sub>1</sub>) to (x<sub>2,</sub>y<sub>2</sub>).
-			In other words we want to rotate (x<sub>1,</sub>y<sub>1</sub>) by the
-			angle <span style="font-family: Symbol;">a<sub>2</sub></span>.
-			Let's assume that the radius of the circle is 1. This means the
-			following:</p>
-			<img class="center" src="eq_1.png">
-			<p>We will use the following trigonometric identities to develop x<sub>2</sub> and y<sub>2</sub>:</p>
-			<img class="center" src="eq_2.png">
-			<p>Using the above we can write:</p>
-			<img class="center" src="eq_3.png">
-			<p>In the above diagram we are looking at the XY plane and Z is pointing
-			into the page. If X&amp;Y are part of a 4-vector then the above
-			equation can be written in matrix form (without affecting Z&amp;W):</p>
-			<img class="center" src="07_01.png">
-			<p>If we want to create rotations for the YZ (around the X axis) and XZ (around the Y axis) planes then the equations
-			are basically the same but the matrix is arranged a bit differently.
-			Here's the matrix for the rotation around the Y axis:</p>
-			<img class="center" src="07_02.png">
-			<p>And the rotation matrix around the X axis:</p>
-			<img class="center" src="07_03.png">
-		</section>
+                <p>Next on our transforation
+                    list is the rotation, that is, given an angle and a point we want to
+                    rotate the point around one of the axis. We will always change two out
+                    of the trio X, Y and Z and leave the third component unchanged. This
+                    means that the path will lie on one of the three major planes: XY (when
+                    turning around Z), YZ (when turning around X) and XZ (when turning
+                    around Y). There are more complex rotation transformations that allow
+                    you to rotate around an arbitrary vector but we don't need them at this
+                    stage.</p>
+                <p>Let's define the problem in general terms. Consider the following diagram:</p>
+                <img class="center" src="rotation.png"><br>
+                <p>We want to move along the circle from (x<sub>1,</sub>y<sub>1</sub>) to (x<sub>2,</sub>y<sub>2</sub>).
+                    In other words we want to rotate (x<sub>1,</sub>y<sub>1</sub>) by the
+                    angle <span style="font-family: Symbol;">a<sub>2</sub></span>.
+                    Let's assume that the radius of the circle is 1. This means the
+                    following:</p>
+                <img class="center" src="eq_1.png">
+                <p>We will use the following trigonometric identities to develop x<sub>2</sub> and y<sub>2</sub>:</p>
+                <img class="center" src="eq_2.png">
+                <p>Using the above we can write:</p>
+                <img class="center" src="eq_3.png">
+                <p>In the above diagram we are looking at the XY plane and Z is pointing
+                    into the page. If X&amp;Y are part of a 4-vector then the above
+                    equation can be written in matrix form (without affecting Z&amp;W):</p>
+                <img class="center" src="07_01.png">
+                <p>If we want to create rotations for the YZ (around the X axis) and XZ (around the Y axis) planes then the equations
+                    are basically the same but the matrix is arranged a bit differently.
+                    Here's the matrix for the rotation around the Y axis:</p>
+                <img class="center" src="07_02.png">
+                <p>And the rotation matrix around the X axis:</p>
+                <img class="center" src="07_03.png">
+            </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+            <section>
+                <h3> Source walkthru </h3>
 
-			<p>The code changes in this tutorial are very minor. We only change the contents of the single transformation matrix in the code.</p>
-			<code>
-			World.m[0][0]=cosf(Scale); World.m[0][1]=-sinf(Scale); World.m[0][2]=0.0f; World.m[0][3]=0.0f;<br>
-			World.m[1][0]=sinf(Scale); World.m[1][1]=cosf(Scale);&nbsp;&nbsp;World.m[1][2]=0.0f; World.m[1][3]=0.0f;<br>
-			World.m[2][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][2]=1.0f; World.m[2][3]=0.0f;<br>
-			World.m[3][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][2]=0.0f; World.m[3][3]=1.0f;<br>
-			</code>
-			<p>As you can see we rotate around the Z axis. You can try the other
-			rotations as well but I think that at this point without true
-			projection from 3D to 2D the other rotations look a bit odd. We will
-			complete them in a full transformation pipeline class in the coming
-			tutorials.</p>
-		</section>
-        
-        <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=aJRrgka4dpU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=10">video tutorial by Frahaan Hussain</a>.</p>
+                <p>The code changes in this tutorial are very minor. We only change the contents of the single transformation matrix in the code.</p>
+                <code>
+                        World.m[0][0]=cosf(Scale); World.m[0][1]=-sinf(Scale); World.m[0][2]=0.0f; World.m[0][3]=0.0f;<br>
+                        World.m[1][0]=sinf(Scale); World.m[1][1]=cosf(Scale);&nbsp;&nbsp;World.m[1][2]=0.0f; World.m[1][3]=0.0f;<br>
+                        World.m[2][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][2]=1.0f; World.m[2][3]=0.0f;<br>
+                        World.m[3][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][2]=0.0f; World.m[3][3]=1.0f;<br>
+                </code>
+                <p>As you can see we rotate around the Z axis. You can try the other
+                    rotations as well but I think that at this point without true
+                    projection from 3D to 2D the other rotations look a bit odd. We will
+                    complete them in a full transformation pipeline class in the coming
+                    tutorials.</p>
+            </section>
 
-		<a href="../tutorial08/tutorial08.html" class="next highlight"> Next tutorial </a>
-	</article>
+            <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=aJRrgka4dpU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=10">video tutorial by Frahaan Hussain</a>.</p>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+            <a href="../tutorial08/tutorial08.html" class="next highlight"> Next tutorial </a>
+        </article>
+
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial07/tutorial07.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </body>
 </html>
