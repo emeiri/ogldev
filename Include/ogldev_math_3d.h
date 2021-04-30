@@ -79,8 +79,8 @@ struct Vector3f
     Vector3f(const float* pFloat)
     {
         x = pFloat[0];
-        y = pFloat[0];
-        z = pFloat[0];
+        y = pFloat[1];
+        z = pFloat[2];
     }
 
     Vector3f(float f)
