@@ -30,10 +30,9 @@
 GLuint VBO;
 GLint gScalingLocation;
 
-static void RenderSceneCB()
-{
-    glClear(GL_COLOR_BUFFER_BIT);
 
+static void ScalingExample()
+{
     static float Scale = 1.0f;
     static float Delta = 0.01f;
 
@@ -41,7 +40,6 @@ static void RenderSceneCB()
     if ((Scale >= 1.5f) || (Scale <= 0.5)) {
         Delta *= -1.0f;
     }
-    printf("Scale %f\n", Scale);
 
     Matrix4f Scaling(Scale, 0.0f,  0.0f,  0.0f,
                      0.0f,  Scale, 0.0f,  0.0f,
@@ -49,6 +47,80 @@ static void RenderSceneCB()
                      0.0f,  0.0f,  0.0f,  1.0f);
 
     glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, &Scaling.m[0][0]);
+}
+
+
+static void CombiningTransformationsExample1()
+{
+    static float Scale = 1.5f;
+
+    Matrix4f Scaling(Scale, 0.0f,  0.0f,  0.0f,
+                     0.0f,  Scale, 0.0f,  0.0f,
+                     0.0f,  0.0f,  Scale, 0.0f,
+                     0.0f,  0.0f,  0.0f,  1.0f);
+
+    static float Loc = 0.0f;
+    static float Delta = 0.01f;
+
+    Loc += Delta;
+    if ((Loc >= 0.5f) || (Loc <= -0.5f)) {
+        Delta *= -1.0f;
+    }
+
+    Matrix4f Translation(1.0f, 0.0f, 0.0f, Loc,
+                         0.0f, 1.0f, 0.0f, 0.0,
+                         0.0f, 0.0f, 1.0f, 0.0,
+                         0.0f, 0.0f, 0.0f, 1.0f);
+
+    Matrix4f FinalTransform = Translation * Scaling;
+
+    glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, &FinalTransform.m[0][0]);
+}
+
+
+static void CombiningTransformationsExample2()
+{
+    static float Scale = 0.5f;
+
+    Matrix4f Scaling(Scale, 0.0f,  0.0f,  0.0f,
+                     0.0f,  Scale, 0.0f,  0.0f,
+                     0.0f,  0.0f,  Scale, 0.0f,
+                     0.0f,  0.0f,  0.0f,  1.0f);
+
+    static float AngleInRadians = 0.0f;
+    static float Delta = 0.01f;
+
+    AngleInRadians += Delta;
+
+    Matrix4f Rotation(cosf(AngleInRadians), -sinf(AngleInRadians), 0.0f, 0.0f,
+                      sinf(AngleInRadians), cosf(AngleInRadians),  0.0f, 0.0f,
+                      0.0,                  0.0f,                  1.0f, 0.0f,
+                      0.0f,                 0.0f,                  0.0f, 1.0f);
+
+    static float Loc = 0.45f;
+
+    //    Loc += Delta;
+    if ((Loc >= 1.0f) || (Loc <= -1.0f)) {
+        Delta *= -1.0f;
+    }
+
+    Matrix4f Translation(1.0f, 0.0f, 0.0f, Loc,
+                         0.0f, 1.0f, 0.0f, 0.0,
+                         0.0f, 0.0f, 1.0f, 0.0,
+                         0.0f, 0.0f, 0.0f, 1.0f);
+
+    Matrix4f FinalTransform = Translation * Rotation * Scaling;
+
+    glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, &FinalTransform.m[0][0]);
+}
+
+static void RenderSceneCB()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    //ScalingExample();
+    //CombiningTransformationsExample1();
+    CombiningTransformationsExample2();
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
