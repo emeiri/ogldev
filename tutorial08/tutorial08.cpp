@@ -72,7 +72,8 @@ static void CombiningTransformationsExample1()
                          0.0f, 0.0f, 1.0f, 0.0,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
-    Matrix4f FinalTransform = Translation * Scaling;
+    //Matrix4f FinalTransform = Translation * Scaling;
+    Matrix4f FinalTransform = Scaling * Translation;
 
     glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, &FinalTransform.m[0][0]);
 }
@@ -80,7 +81,7 @@ static void CombiningTransformationsExample1()
 
 static void CombiningTransformationsExample2()
 {
-    static float Scale = 0.5f;
+    static float Scale = 0.25f;
 
     Matrix4f Scaling(Scale, 0.0f,  0.0f,  0.0f,
                      0.0f,  Scale, 0.0f,  0.0f,
@@ -97,19 +98,15 @@ static void CombiningTransformationsExample2()
                       0.0,                  0.0f,                  1.0f, 0.0f,
                       0.0f,                 0.0f,                  0.0f, 1.0f);
 
-    static float Loc = 0.45f;
-
-    //    Loc += Delta;
-    if ((Loc >= 1.0f) || (Loc <= -1.0f)) {
-        Delta *= -1.0f;
-    }
+    static float Loc = 0.5f;
 
     Matrix4f Translation(1.0f, 0.0f, 0.0f, Loc,
                          0.0f, 1.0f, 0.0f, 0.0,
                          0.0f, 0.0f, 1.0f, 0.0,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
-    Matrix4f FinalTransform = Translation * Rotation * Scaling;
+    //Matrix4f FinalTransform = Translation * Rotation * Scaling;
+    Matrix4f FinalTransform = Rotation * Translation * Scaling;
 
     glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, &FinalTransform.m[0][0]);
 }
@@ -118,9 +115,9 @@ static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //ScalingExample();
+    ScalingExample();
     //CombiningTransformationsExample1();
-    CombiningTransformationsExample2();
+    //CombiningTransformationsExample2();
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -241,8 +238,8 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
-    int width = 1920;
-    int height = 1080;
+    int width = 1000;
+    int height = 1000;
     glutInitWindowSize(width, height);
 
     int x = 200;
