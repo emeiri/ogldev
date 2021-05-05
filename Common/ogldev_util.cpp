@@ -19,7 +19,7 @@
 
 #include <iostream>
 #include <fstream>
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #else
 #include <sys/time.h>
@@ -58,7 +58,7 @@ bool ReadFile(const char* pFileName, string& outFile)
 }
 
 
-#ifdef WIN32
+#ifdef _WIN32
 
 char* ReadBinaryFile(const char* pFileName, int& size)
 {
@@ -128,7 +128,7 @@ void OgldevError(const char* pFileName, uint line, const char* format, ...)
     VSNPRINTF(msg, sizeof(msg), format, args);
     va_end(args);
 
-#ifdef WIN32
+#ifdef _WIN32
     char msg2[1000];
     _snprintf_s(msg2, sizeof(msg2), "%s:%d: %s", pFileName, line, msg);
     MessageBoxA(NULL, msg2, NULL, 0);
@@ -140,7 +140,7 @@ void OgldevError(const char* pFileName, uint line, const char* format, ...)
 
 void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 {
-#ifdef WIN32
+#ifdef _WIN32
     char msg[1000];
     _snprintf_s(msg, sizeof(msg), "%s:%d: unable to open file `%s`", pFileName, line, pFileError);
     MessageBoxA(NULL, msg, NULL, 0);
@@ -152,7 +152,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 
 long long GetCurrentTimeMillis()
 {
-#ifdef WIN32
+#ifdef _WIN32
     return GetTickCount();
 #else
     timeval t;
