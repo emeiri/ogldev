@@ -34,7 +34,7 @@ GLint gScalingLocation;
 static void ScalingExample()
 {
     static float Scale = 1.0f;
-    static float Delta = 0.01f;
+    static float Delta = 0.001f;
 
     Scale += Delta;
     if ((Scale >= 1.5f) || (Scale <= 0.5)) {
@@ -160,7 +160,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
     p[0] = pShaderText;
 
     GLint Lengths[1];
-    Lengths[0] = strlen(pShaderText);
+    Lengths[0] = (GLint)strlen(pShaderText);
 
     glShaderSource(ShaderObj, 1, p, Lengths);
 

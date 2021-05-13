@@ -72,7 +72,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
     p[0] = pShaderText;
 
     GLint Lengths[1];
-    Lengths[0] = strlen(pShaderText);
+    Lengths[0] = (GLint)strlen(pShaderText);
 
     glShaderSource(ShaderObj, 1, p, Lengths);
 

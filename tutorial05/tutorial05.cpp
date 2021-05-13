@@ -35,7 +35,7 @@ static void RenderSceneCB()
     glClear(GL_COLOR_BUFFER_BIT);
 
     static float Scale = 0.0f;
-    static float Delta = 0.005f;
+    static float Delta = 0.001f;
 
     Scale += Delta;
     if ((Scale >= 1.0f) || (Scale <= -1.0f)) {
@@ -85,7 +85,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
     p[0] = pShaderText;
 
     GLint Lengths[1];
-    Lengths[0] = strlen(pShaderText);
+    Lengths[0] = (GLint)strlen(pShaderText);
 
     glShaderSource(ShaderObj, 1, p, Lengths);
 
