@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head>
+    <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,66 +10,83 @@
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
         <link rel="stylesheet" href="../style.css">
         <link rel="stylesheet" href="../print.css" media="print">
-</head>
-<body>
+    </head>
+    <body>
         <header id="header">
-                <div>
-                        <h2> Tutorial 8: </h2>
-                        <h1> Scaling Transformation </h1>
-                </div>
+            <div>
+                <h2> Tutorial 8: </h2>
+                <h1> Scaling Transformation </h1>
+            </div>
 
-                <a id="logo" class="small" href="../../index.html" title="Homepage">
-                        <img src="..//logo ldpi.png">
-                </a>
+            <a id="logo" class="small" href="../../index.html" title="Homepage">
+                <img src="..//logo ldpi.png">
+            </a>
         </header>
 
         <article id="content" class="breakpoint">
-                <section>
-                        <h3> Background </h3>
+            <section>
+                <p> <big> A <a href="https://youtu.be/pLFXNmbDZk8" > video tutorial </a> is now available on Youtube</big></p>
+                <h3> Background </h3>
 
-                        <p>The scaling transformation is very simple. Its purpose is to
-                        either increase or decrease the size of the object. You may want to do
-                        that, for example, when you want to create some differentiation using
-                        the same model (large and small trees that are actually the same) or
-                        when you want to match the size of the object to its role in the world.
-                        For the above examples you would probably want to scale the vertices
-                        position in the same amount on all three axis. However, sometimes you
-                        may want to scale just one or two axis, causing the model to become
-                        "thicker" or "leaner". </p>
-                        <p>Developing the transformation matrix is very simple. We start with the
-                        identity matrix and remember that the reason that multiplying it by a
-                        vector leave the vector unchanged is that each of the '1's in the
-                        diagonal is multiplied by one of the components in turn. None of the
-                        components can affect the other. Therefore, replacing any one of that
-                        '1's with another value will cause the object to increase on that axis
-                        if the other value is larger than 1 or decrease on that axis if the
-                        other value is smaller then one. </p>
-                </section>
+                <p>The scaling transformation is very simple. Its purpose is to
+                    either increase or decrease the size of the object. You may want to do
+                    that, for example, when you want to create some differentiation using
+                    the same model (large and small trees that are actually the same) or
+                    when you want to match the size of the object to its role in the world.
+                    For the above examples you would probably want to scale the vertices
+                    position in the same amount on all three axis. However, sometimes you
+                    may want to scale just one or two axis, causing the model to become
+                    "thicker" or "leaner". </p>
+                <p>Developing the transformation matrix is very simple. We start with the
+                    identity matrix and remember that the reason that multiplying it by a
+                    vector leave the vector unchanged is that each of the '1's in the
+                    diagonal is multiplied by one of the components in turn. None of the
+                    components can affect the other. Therefore, replacing any one of that
+                    '1's with another value will cause the object to increase on that axis
+                    if the other value is larger than 1 or decrease on that axis if the
+                    other value is smaller then one. </p>
+            </section>
 
-                <section>
-                        <h3> Source walkthru </h3>
+            <section>
+                <h3> Source walkthru </h3>
 
-                        <code>World.m[0][0]=sinf(Scale); World.m[0][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[0][2]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[0][3]=0.0f;<br>
+                <code>World.m[0][0]=sinf(Scale); World.m[0][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[0][2]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[0][3]=0.0f;<br>
                         World.m[1][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[1][1]=sinf(Scale); World.m[1][2]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[1][3]=0.0f;<br>
                         World.m[2][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[2][2]=sinf(Scale); World.m[2][3]=0.0f;<br>
                         World.m[3][0]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][1]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][2]=0.0f;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; World.m[3][3]=1.0f;
-                        </code>
-                        <p>The only change from the previous tutorial is that we replace the world
-                        transformation matrix according to the above description. As you can
-                        see, we scale each of the three axis by a number that swings between -1
-                        and 1. In the range (0,1] the triangle is anywhere between being very
-                        tiny and its original size and when the diagonal is zero it disappears
-                        completely. In the range [-1,0) looks the same only reversed because
-                        the scaling value in the diagonal actually changed the sign of the
-                        position.</p>
-                </section>
+                </code>
+                <p>The only change from the previous tutorial is that we replace the world
+                    transformation matrix according to the above description. As you can
+                    see, we scale each of the three axis by a number that swings between -1
+                    and 1. In the range (0,1] the triangle is anywhere between being very
+                    tiny and its original size and when the diagonal is zero it disappears
+                    completely. In the range [-1,0) looks the same only reversed because
+                    the scaling value in the diagonal actually changed the sign of the
+                    position.</p>
+            </section>
 
-        <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=aJRrgka4dpU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=10">video tutorial by Frahaan Hussain</a>.</p>
+            <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=aJRrgka4dpU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=10">video tutorial by Frahaan Hussain</a>.</p>
 
-                <a href="../tutorial09/tutorial09.html" class="next highlight"> Next tutorial </a>
+            <a href="../tutorial09/tutorial09.html" class="next highlight"> Next tutorial </a>
         </article>
 
         <script src="../html5shiv.min.js"></script>
         <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial08/tutorial08.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
