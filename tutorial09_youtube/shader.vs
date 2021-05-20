@@ -6,9 +6,9 @@ uniform mat4 gScaling;
 
 out vec4 Color;
 
-vec4 colors[3] = vec4[3]( vec4(1, 0, 0, 1),
-                          vec4(0, 1, 0, 1),
-                          vec4(0, 0, 1, 1) );
+const vec4 colors[3] = vec4[3]( vec4(1, 0, 0, 1),
+                                vec4(0, 1, 0, 1),
+                                vec4(0, 0, 1, 1) );
 
 void main()
 {
