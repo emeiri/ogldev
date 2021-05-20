@@ -1,132 +1,149 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 09 - Interpolation </title>
+        <title> Tutorial 09 - Interpolation </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 9: </h2>
-			<h1> Interpolation </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 9: </h2>
+                        <h1> Interpolation </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+            <section>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/ZVgf_W-X8eM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <h3> Background </h3>
 
-			<p>This tutorial demonstrates
-			a very important part of the 3D pipeline - the interpolation that the
-			rasterizer performs on variables that come out of the vertex shader. As
-			you have already seen, in order to get something meaningful on the
-			screen you need to designate one of the VS output variables as
-			'gl_Position'. This is a 4-vector that contains the homogenuous
-			coordinates of the vertex. The XYZ components of that vector are
-			divided by the W component (a process known as perspective divide and
-			is dealt with in the tutorial dedicated to that subject) and any
-			component which goes outside the normalized box ([-1,1]) gets clipped. 
-			The result is transformed to screen space
-			coordinates and then the triangle (or any other supported primitive
-			type) is rendered to screen by the rasterizer.</p>
-			<p>The rasterizer performs
-			interpolation between the three triangle vertices (either going line by
-			line or any other technique) and "visits" each pixel inside the
-			triangle by executing the fragment shader. The fragment shader is
-			expected to return a pixel color which the rasterizer places in the
-			color buffer for display (after passing a few additional tests like
-			depth test, etc). Any other variable which comes out of the vertex
-			shader does not go through the steps above. If the fragment shader does
-			not explicitly requests that variable (and you can mix and match
-			multiple fragment shaders with the same vertex shader) then a common
-			driver optimization will be to drop any instructions in the VS that
-			only affect this variable (for that particular shader program that
-			combines this VS and FS pair). However, if the FS does use that
-			variable the rasterizer interpolates it during rasterization and each
-			FS invocation is provided a the interpolated value that matches that
-			specific location. This usually means that the values for pixels that
-			are right next to each other will be a bit different (though as the
-			triangle becomes further and further away from the camera that becomes
-			less likely). </p>
-			<p>Two very common variables that often rely on this
-			interpolation are the triangle normal and texture coordinates. The
-			vertex normal is usually calculated as the average between the triangle
-			normals of all triangles that include that vertex. If that object is
-			not completely flat this usually means that the three vertex normals of
-			each triangle will be different from each other. In that case we rely
-			on interpolation to calculate the specific normal at each pixel. That
-			normal is used in lighting calculations in order to generate a more
-			believable representation of lighting effects. The case for texture
-			coordinates is similar. These coordinates are part of the model and are
-			specified per vertex. In order to "cover" the triangle with a texture
-			you need to perform the sample operation for each pixel and specify the
-			correct texture coordinates for that pixel. These coordinates are the
-			result of the interpolation.</p>
-			<p>In this tutorial we will see the effects of interpolation by
-			interpolating different colors across the triangle face. Since I'm lazy
-			we will generate the color in the VS. A more tedious approach is to
-			supply it from the vertex buffer. Usually you don't supply colors from
-			the vertex buffer. You supply texture coordinates and sample a color
-			from a texture. That color is later processed by the lighting
-			calculations.</p>
-		</section>
+                        <p>This tutorial demonstrates
+                        a very important part of the 3D pipeline - the interpolation that the
+                        rasterizer performs on variables that come out of the vertex shader. As
+                        you have already seen, in order to get something meaningful on the
+                        screen you need to designate one of the VS output variables as
+                        'gl_Position'. This is a 4-vector that contains the homogenuous
+                        coordinates of the vertex. The XYZ components of that vector are
+                        divided by the W component (a process known as perspective divide and
+                        is dealt with in the tutorial dedicated to that subject) and any
+                        component which goes outside the normalized box ([-1,1]) gets clipped.
+                        The result is transformed to screen space
+                        coordinates and then the triangle (or any other supported primitive
+                        type) is rendered to screen by the rasterizer.</p>
+                        <p>The rasterizer performs
+                        interpolation between the three triangle vertices (either going line by
+                        line or any other technique) and "visits" each pixel inside the
+                        triangle by executing the fragment shader. The fragment shader is
+                        expected to return a pixel color which the rasterizer places in the
+                        color buffer for display (after passing a few additional tests like
+                        depth test, etc). Any other variable which comes out of the vertex
+                        shader does not go through the steps above. If the fragment shader does
+                        not explicitly requests that variable (and you can mix and match
+                        multiple fragment shaders with the same vertex shader) then a common
+                        driver optimization will be to drop any instructions in the VS that
+                        only affect this variable (for that particular shader program that
+                        combines this VS and FS pair). However, if the FS does use that
+                        variable the rasterizer interpolates it during rasterization and each
+                        FS invocation is provided a the interpolated value that matches that
+                        specific location. This usually means that the values for pixels that
+                        are right next to each other will be a bit different (though as the
+                        triangle becomes further and further away from the camera that becomes
+                        less likely). </p>
+                        <p>Two very common variables that often rely on this
+                        interpolation are the triangle normal and texture coordinates. The
+                        vertex normal is usually calculated as the average between the triangle
+                        normals of all triangles that include that vertex. If that object is
+                        not completely flat this usually means that the three vertex normals of
+                        each triangle will be different from each other. In that case we rely
+                        on interpolation to calculate the specific normal at each pixel. That
+                        normal is used in lighting calculations in order to generate a more
+                        believable representation of lighting effects. The case for texture
+                        coordinates is similar. These coordinates are part of the model and are
+                        specified per vertex. In order to "cover" the triangle with a texture
+                        you need to perform the sample operation for each pixel and specify the
+                        correct texture coordinates for that pixel. These coordinates are the
+                        result of the interpolation.</p>
+                        <p>In this tutorial we will see the effects of interpolation by
+                        interpolating different colors across the triangle face. Since I'm lazy
+                        we will generate the color in the VS. A more tedious approach is to
+                        supply it from the vertex buffer. Usually you don't supply colors from
+                        the vertex buffer. You supply texture coordinates and sample a color
+                        from a texture. That color is later processed by the lighting
+                        calculations.</p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<code>out vec4 Color;</code>
-			<p>Parameters passed between pipeline stages must be declared using the
-			'out' reserved word and in the global scope of the shader. The color is
-			a 4-vector since the XYZ components carry the RGB values (respectively)
-			and W is the alpha value (pixel transparency).</p>
-			<code>Color = vec4(clamp(Position, 0.0, 1.0), 1.0);</code>
-			<p>Color in the graphics pipeline is usually represented using a floating
-			point value in the range [0.0, 1.0]. That value is later mapped to the
-			integer 0 to 255 for each color channel (totaling in 16M colors). We
-			set the vertex color value as a function of the vertex position. First
-			we use the built-in function clamp() to make sure the values do not go
-			outside of the 0.0-1.0 range. The reason is that the lower left vertex
-			of the triangle is located at -1,-1. If we take that value as-is it
-			will be interpolated by the rasterizer and until both X and Y pass zero
-			we will not see anything because every value which is less than or
-			equal to zero will be rendered as black. This means that half of the
-			edge on each direction will be black before the color pass zero and
-			become something meaningful. By clamping we make only the far bottom
-			left black but as we get further away the color quickly becomes more
-			bright. Try playing with the clamp function - remove it all together or
-			change its parameters to see the effect. </p>
-			<p>The result of the clamp function does not go directly to the output
-			variable since it is a 4-vector while the position is a 3-vector (clamp
-			does not change the number of components, only their values). From the
-			point of view of GLSL there is no default conversion here and we have
-			to make this explicit. We do this using the notation 'vec4(vec3, W)'
-			which creates a 4-vector by concatenating a 3-vector with the supplied
-			W value. In our case we use 1.0 because this goes into the alpha part
-			of the color and we want the pixel to be completely opaque.</p>
-			<code>in vec4 Color;</code>
-			<p>The opposite side of the output color in the VS is the input color in
-			the FS. This variable undergoes interpolation by the rasterizer so
-			every FS is (probably) executed with a different color. </p>
-			<code>FragColor = Color;</code>
-			<p>We use the interpolated color as the fragment color with no further
-			changes and this completes this tutorial.</p>
-		</section>
+                        <code>out vec4 Color;</code>
+                        <p>Parameters passed between pipeline stages must be declared using the
+                        'out' reserved word and in the global scope of the shader. The color is
+                        a 4-vector since the XYZ components carry the RGB values (respectively)
+                        and W is the alpha value (pixel transparency).</p>
+                        <code>Color = vec4(clamp(Position, 0.0, 1.0), 1.0);</code>
+                        <p>Color in the graphics pipeline is usually represented using a floating
+                        point value in the range [0.0, 1.0]. That value is later mapped to the
+                        integer 0 to 255 for each color channel (totaling in 16M colors). We
+                        set the vertex color value as a function of the vertex position. First
+                        we use the built-in function clamp() to make sure the values do not go
+                        outside of the 0.0-1.0 range. The reason is that the lower left vertex
+                        of the triangle is located at -1,-1. If we take that value as-is it
+                        will be interpolated by the rasterizer and until both X and Y pass zero
+                        we will not see anything because every value which is less than or
+                        equal to zero will be rendered as black. This means that half of the
+                        edge on each direction will be black before the color pass zero and
+                        become something meaningful. By clamping we make only the far bottom
+                        left black but as we get further away the color quickly becomes more
+                        bright. Try playing with the clamp function - remove it all together or
+                        change its parameters to see the effect. </p>
+                        <p>The result of the clamp function does not go directly to the output
+                        variable since it is a 4-vector while the position is a 3-vector (clamp
+                        does not change the number of components, only their values). From the
+                        point of view of GLSL there is no default conversion here and we have
+                        to make this explicit. We do this using the notation 'vec4(vec3, W)'
+                        which creates a 4-vector by concatenating a 3-vector with the supplied
+                        W value. In our case we use 1.0 because this goes into the alpha part
+                        of the color and we want the pixel to be completely opaque.</p>
+                        <code>in vec4 Color;</code>
+                        <p>The opposite side of the output color in the VS is the input color in
+                        the FS. This variable undergoes interpolation by the rasterizer so
+                        every FS is (probably) executed with a different color. </p>
+                        <code>FragColor = Color;</code>
+                        <p>We use the interpolated color as the fragment color with no further
+                        changes and this completes this tutorial.</p>
+                </section>
 
-		<a href="../tutorial10/tutorial10.html" class="next highlight"> Next tutorial </a>
-	</article>
+                <a href="../tutorial10/tutorial10.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial09/tutorial09.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
