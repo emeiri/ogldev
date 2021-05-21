@@ -42,19 +42,25 @@ static void RenderSceneCB()
 
     Matrix4f World;
 
-    World.m[0][0] = cosf(Scale); World.m[0][1] = 0.0f; World.m[0][2] = -sinf(Scale); World.m[0][3] = 0.0f;
-    World.m[1][0] = 0.0;         World.m[1][1] = 1.0f; World.m[1][2] = 0.0f        ; World.m[1][3] = 0.0f;
-    World.m[2][0] = sinf(Scale); World.m[2][1] = 0.0f; World.m[2][2] = cosf(Scale) ; World.m[2][3] = 0.0f;
-    World.m[3][0] = 0.0f;        World.m[3][1] = 0.0f; World.m[3][2] = 0.0f        ; World.m[3][3] = 1.0f;
+    World.m[0][0] = cosf(Scale); World.m[0][1] = -sinf(Scale); World.m[0][2] = 0.0f; World.m[0][3] = 0.0f;
+    World.m[1][0] = sinf(Scale); World.m[1][1] = cosf(Scale) ; World.m[1][2] = 0.0f; World.m[1][3] = 0.0f;
+    World.m[2][0] = 0.0;         World.m[2][1] = 0.0f;         World.m[2][2] = 1.0f; World.m[2][3] = 0.0f;
+    World.m[3][0] = 0.0f;        World.m[3][1] = 0.0f;         World.m[3][2] = 0.0f; World.m[3][3] = 1.0f;
 
     glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &World.m[0][0]);
 
-    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
-    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    // position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+
+    // color
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    glDrawElements(GL_TRIANGLES, 54, GL_UNSIGNED_INT, 0);
 
     glDisableVertexAttribArray(0);
 
@@ -64,14 +70,51 @@ static void RenderSceneCB()
 }
 
 
+struct Vertex {
+    Vector3f pos;
+    Vector3f color;
+
+    Vertex() {}
+
+    Vertex(float x, float y)
+    {
+        pos = Vector3f(x, y, 0.0f);
+
+        float red   = rand() / (float)RAND_MAX;
+        float green = rand() / (float)RAND_MAX;
+        float blue  = rand() / (float)RAND_MAX;
+        color = Vector3f(red, green, blue);
+    }
+};
+
 
 static void CreateVertexBuffer()
 {
-    Vector3f Vertices[4];
-    Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
-    Vertices[1] = Vector3f(0.0f, -1.0f, 1.0f);
-    Vertices[2] = Vector3f(1.0f, -1.0f, 0.0f);
-    Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);
+    Vertex Vertices[19];
+
+    // Center
+    Vertices[0] = Vertex(0.0f, 0.0);
+
+    // Top row
+    Vertices[1] = Vertex(-1.0f,  1.0f);
+    Vertices[2] = Vertex(-0.75f, 1.0f);
+    Vertices[3] = Vertex(-0.50f, 1.0f);
+    Vertices[4] = Vertex(-0.25f, 1.0f);
+    Vertices[5] = Vertex(-0.0f,  1.0f);
+    Vertices[6] = Vertex(0.25f,  1.0f);
+    Vertices[7] = Vertex(0.50f,  1.0f);
+    Vertices[8] = Vertex(0.75f,  1.0f);
+    Vertices[9] = Vertex(1.0f,   1.0f);
+
+    Vertices[10] = Vertex(-1.0f,  -1.0f);
+    Vertices[11] = Vertex(-0.75f, -1.0f);
+    Vertices[12] = Vertex(-0.50f, -1.0f);
+    Vertices[13] = Vertex(-0.25f, -1.0f);
+    Vertices[14] = Vertex(-0.0f,  -1.0f);
+    Vertices[15] = Vertex(0.25f,  -1.0f);
+    Vertices[16] = Vertex(0.50f,  -1.0f);
+    Vertices[17] = Vertex(0.75f,  -1.0f);
+    Vertices[18] = Vertex(1.0f,   -1.0f);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -80,10 +123,32 @@ static void CreateVertexBuffer()
 
 static void CreateIndexBuffer()
 {
-    unsigned int Indices[] = { 0, 3, 1,
-                               1, 3, 2,
-                               2, 3, 0,
-                               0, 1, 2 };
+    unsigned int Indices[] = { // Top triangles
+                               0, 2, 1,
+                               0, 3, 2,
+                               0, 4, 3,
+                               0, 5, 4,
+                               0, 6, 5,
+                               0, 7, 6,
+                               0, 8, 7,
+                               0, 9, 8,
+
+                               // Bottom triangles
+                               0, 10, 11,
+                               0, 11, 12,
+                               0, 12, 13,
+                               0, 13, 14,
+                               0, 14, 15,
+                               0, 15, 16,
+                               0, 16, 17,
+                               0, 17, 18,
+
+                               // Left triangle
+                               0, 1, 10,
+
+                               // Right triangle
+                               0, 18, 9 };
+
 
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -179,6 +244,8 @@ static void CompileShaders()
 
 int main(int argc, char** argv)
 {
+    srandom(getpid());
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     int width = 1920;
