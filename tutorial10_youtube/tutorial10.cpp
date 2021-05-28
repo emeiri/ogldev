@@ -38,7 +38,7 @@ static void RenderSceneCB()
 
     static float Scale = 0.0f;
 
-    Scale += 0.01f;
+    //    Scale += 0.01f;
 
     Matrix4f World;
 
@@ -80,9 +80,9 @@ struct Vertex {
     {
         pos = Vector3f(x, y, 0.0f);
 
-        float red   = rand() / (float)RAND_MAX;
-        float green = rand() / (float)RAND_MAX;
-        float blue  = rand() / (float)RAND_MAX;
+        float red   = (float)rand() / (float)RAND_MAX;
+        float green = (float)rand() / (float)RAND_MAX;
+        float blue  = (float)rand() / (float)RAND_MAX;
         color = Vector3f(red, green, blue);
     }
 };
@@ -106,6 +106,7 @@ static void CreateVertexBuffer()
     Vertices[8] = Vertex(0.75f,  1.0f);
     Vertices[9] = Vertex(1.0f,   1.0f);
 
+    // Bottom row
     Vertices[10] = Vertex(-1.0f,  -1.0f);
     Vertices[11] = Vertex(-0.75f, -1.0f);
     Vertices[12] = Vertex(-0.50f, -1.0f);
@@ -255,7 +256,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 09");
+    int win = glutCreateWindow("Tutorial 10");
     printf("window id: %d\n", win);
 
     // Must be done after glut is initialized!
