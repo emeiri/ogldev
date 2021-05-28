@@ -1,126 +1,143 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 10 - Indexed Draws </title>
+        <title> Tutorial 10 - Indexed Draws </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 10: </h2>
-			<h1> Indexed Draws </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 10: </h2>
+                        <h1> Indexed Draws </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+            <section>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/kQOwkG15dYo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <h3> Background </h3>
 
-			<p>OpenGL provides several draw functions. glDrawArrays() that we have been using until now falls
-			under the category of "ordered draws". This means that the vertex buffer is scanned from
-			the specified offset and every X (1 for points, 2 for lines, etc)
-			vertices a primitive is emitted. This is very simple to use but the
-			downside is if a vertex is part of several primitives then it must be
-			present several times in the vertex buffer. That is, there is no
-			concept of sharing. Sharing is provided by the draw functions that
-			belong to the "indexed draws" category. Here in addition to the vertex
-			buffer there is also an index buffer that contains indices into the
-			vertex buffer. Scanning the index buffer is similar to scanning the
-			vertex buffer - every X indices a primitive is emitted. To exercise
-			sharing you simply repeat the index of the shared vertex several times.
-			Sharing is very important for memory efficiency because most objects
-			are represented by some closed mesh of triangles and most vertices
-			participate in more than one triangle.</p>
-			<p>Here is an example of an ordered draw:</p>
-			<img class="center" src="ordered_draw.png">
-			<p>If we are rendering triangles the GPU will generate the following set:
-			V0/1/2, V3/4/5, V6/7/8, etc.</p>
-			<p>Here is an example of an indexed draw:</p>
-			<img class="center" src="indexed_draw.png">
-			<p>In this case the GPU will generate the following triangles: V2/0/1,
-			V5/2/4, V6/5/7, etc.</p>
-			<p>Using index draws in OpenGL requires generating and populating an index
-			buffer. That buffer must be bound in addition to the vertex buffer
-			before the draw call and a different API must be used.</p>
-		</section>
+                        <p>OpenGL provides several draw functions. glDrawArrays() that we have been using until now falls
+                        under the category of "ordered draws". This means that the vertex buffer is scanned from
+                        the specified offset and every X (1 for points, 2 for lines, etc)
+                        vertices a primitive is emitted. This is very simple to use but the
+                        downside is if a vertex is part of several primitives then it must be
+                        present several times in the vertex buffer. That is, there is no
+                        concept of sharing. Sharing is provided by the draw functions that
+                        belong to the "indexed draws" category. Here in addition to the vertex
+                        buffer there is also an index buffer that contains indices into the
+                        vertex buffer. Scanning the index buffer is similar to scanning the
+                        vertex buffer - every X indices a primitive is emitted. To exercise
+                        sharing you simply repeat the index of the shared vertex several times.
+                        Sharing is very important for memory efficiency because most objects
+                        are represented by some closed mesh of triangles and most vertices
+                        participate in more than one triangle.</p>
+                        <p>Here is an example of an ordered draw:</p>
+                        <img class="center" src="ordered_draw.png">
+                        <p>If we are rendering triangles the GPU will generate the following set:
+                        V0/1/2, V3/4/5, V6/7/8, etc.</p>
+                        <p>Here is an example of an indexed draw:</p>
+                        <img class="center" src="indexed_draw.png">
+                        <p>In this case the GPU will generate the following triangles: V2/0/1,
+                        V5/2/4, V6/5/7, etc.</p>
+                        <p>Using index draws in OpenGL requires generating and populating an index
+                        buffer. That buffer must be bound in addition to the vertex buffer
+                        before the draw call and a different API must be used.</p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<code>GLuint IBO;</code>
-			<p>We added another buffer object handle for the index buffer.</p>
-			<code>
-			Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);<br>
-			Vertices[1] = Vector3f(0.0f, -1.0f, 1.0f);<br>
-			Vertices[2] = Vector3f(1.0f, -1.0f, 0.0f);<br>
-			Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);</code>
-			<p>To demonstrate vertex sharing we need a mesh which is a bit more
-			complex. Many tutorials use the famous spinning cube for that. This
-			requires 8 vertices and 12 triangles. Since I'm lazy I use the spinning
-			pyramid instead. This requires only 4 vertices and 4 triangles and is
-			much easier to generate manually...</p>
-			<p>When looking at these vertices from the top (along the Y axis) we get
-			the following layout:</p>
-			<img class="center" src="pyramid.png"><br>
-			<code>unsigned int Indices[] = { 0, 3, 1,<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			1, 3, 2,<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			2, 3, 0,<br>
-			&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-			0, 1, 2 };</code>
-			<p>The index buffer is populated using an array of indices. The indices
-			match the location of the vertices in the vertex buffer. When looking
-			at the array and the diagram above you can see that the last triangle
-			is the pyramid base while the other three make up its faces. The
-			pyramid is not symmetric but is very easy to specify.</p>
-			<code>
-			glGenBuffers(1, &amp;IBO);<br>
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);<br>
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
-			</code>
-			<p>We create and then populate the index buffer using the array of
-			indices. You can see that the only difference in creating vertex and
-			index buffers is that vertex buffers take GL_ARRAY_BUFFER as the buffer
-			type while index buffers take GL_ELEMENT_ARRAY_BUFFER. </p>
-			<code>glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);</code>
-			<p>In addition to binding the vertex buffer we must also bind the index
-			buffer prior to drawing. Again, we use the GL_ELEMENT_ARRAY_BUFFER as the buffer type.</p>
-			<code>glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);</code>
-			<p>
-			We use glDrawElements instead of glDrawArrays. The first parameter is
-			the primitive type to render (same as glDrawArrays). The second
-			parameter is the number of indices in the index buffer to use for
-			primitive generation. The next parameter is the type of each index. The
-			GPU must be told the size of each individual index else it will not
-			know how to parse the buffer. Possible values here are
-			GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT. If the index
-			range is small you want the smaller types that are more space efficient
-			and if the index range is large you want the larger types. The final
-			parameter tells the GPU the offset in bytes from the start of the index
-			buffer to the location of the first index to scan. This is useful when
-			the same index buffer contains the indices of multiple objects. By
-			specifying the offset and count you can tell the GPU which object to
-			render. In our case we want to start at the beginning so we specify
-			zero. Note that the type of the last parameter is GLvoid* so if you
-			specify anything other than zero you need to cast it to that type. </p>
-		</section>
+                        <code>GLuint IBO;</code>
+                        <p>We added another buffer object handle for the index buffer.</p>
+                        <code>
+                        Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);<br>
+                        Vertices[1] = Vector3f(0.0f, -1.0f, 1.0f);<br>
+                        Vertices[2] = Vector3f(1.0f, -1.0f, 0.0f);<br>
+                        Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);</code>
+                        <p>To demonstrate vertex sharing we need a mesh which is a bit more
+                        complex. Many tutorials use the famous spinning cube for that. This
+                        requires 8 vertices and 12 triangles. Since I'm lazy I use the spinning
+                        pyramid instead. This requires only 4 vertices and 4 triangles and is
+                        much easier to generate manually...</p>
+                        <p>When looking at these vertices from the top (along the Y axis) we get
+                        the following layout:</p>
+                        <img class="center" src="pyramid.png"><br>
+                        <code>unsigned int Indices[] = { 0, 3, 1,<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        1, 3, 2,<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        2, 3, 0,<br>
+                        &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        0, 1, 2 };</code>
+                        <p>The index buffer is populated using an array of indices. The indices
+                        match the location of the vertices in the vertex buffer. When looking
+                        at the array and the diagram above you can see that the last triangle
+                        is the pyramid base while the other three make up its faces. The
+                        pyramid is not symmetric but is very easy to specify.</p>
+                        <code>
+                        glGenBuffers(1, &amp;IBO);<br>
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);<br>
+                        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+                        </code>
+                        <p>We create and then populate the index buffer using the array of
+                        indices. You can see that the only difference in creating vertex and
+                        index buffers is that vertex buffers take GL_ARRAY_BUFFER as the buffer
+                        type while index buffers take GL_ELEMENT_ARRAY_BUFFER. </p>
+                        <code>glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);</code>
+                        <p>In addition to binding the vertex buffer we must also bind the index
+                        buffer prior to drawing. Again, we use the GL_ELEMENT_ARRAY_BUFFER as the buffer type.</p>
+                        <code>glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);</code>
+                        <p>
+                        We use glDrawElements instead of glDrawArrays. The first parameter is
+                        the primitive type to render (same as glDrawArrays). The second
+                        parameter is the number of indices in the index buffer to use for
+                        primitive generation. The next parameter is the type of each index. The
+                        GPU must be told the size of each individual index else it will not
+                        know how to parse the buffer. Possible values here are
+                        GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT. If the index
+                        range is small you want the smaller types that are more space efficient
+                        and if the index range is large you want the larger types. The final
+                        parameter tells the GPU the offset in bytes from the start of the index
+                        buffer to the location of the first index to scan. This is useful when
+                        the same index buffer contains the indices of multiple objects. By
+                        specifying the offset and count you can tell the GPU which object to
+                        render. In our case we want to start at the beginning so we specify
+                        zero. Note that the type of the last parameter is GLvoid* so if you
+                        specify anything other than zero you need to cast it to that type. </p>
+                </section>
 
-		<a href="../tutorial11/tutorial11.html" class="next highlight"> Next tutorial </a>
-	</article>
+                <a href="../tutorial11/tutorial11.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial10/tutorial10.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
