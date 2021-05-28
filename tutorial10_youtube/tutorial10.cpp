@@ -245,8 +245,12 @@ static void CompileShaders()
 
 int main(int argc, char** argv)
 {
+#ifdef _WIN64
+    srand(GetCurrentProcessId());
+#else
     srandom(getpid());
-
+#endif
+    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     int width = 1920;
