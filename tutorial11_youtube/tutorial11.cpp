@@ -52,7 +52,7 @@ static void _RenderSceneCB()
 
     Pipeline p;
     p.Rotate(0.0f, Scale, 0.0f);
-    //    p.WorldPos(0.0f, 0.0f, 5.0f);
+    p.WorldPos(0.0f, 0.0f, 5.0f);
     p.SetPerspectiveProj(gPersProjInfo);
 
     Matrix4f Rotation(cosf(Scale), 0.0f, -sinf(Scale), 0.0f,
@@ -62,7 +62,7 @@ static void _RenderSceneCB()
 
     Matrix4f Translation(1.0f, 0.0f, 0.0f, 0.0f,
                          0.0f, 1.0f, 0.0f, 0.0f,
-                         0.0f, 0.0f, 1.0,  5.0f,
+                         0.0f, 0.0f, 1.0,  2.0f,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
     float zFar = 100.0f;
@@ -72,10 +72,10 @@ static void _RenderSceneCB()
     const float zRange     = zNear - zFar;
     const float tanHalfFOV = tanf(ToRadian(FOV / 2.0f));
 
-    Matrix4f Projection(1.0f/(tanHalfFOV * ar), 0.0f,            0.0f,                   0.0,
-                        0.0f,                   1.0f/tanHalfFOV, 0.0f,                   0.0,
-                        0.0f,                   0.0f,            (-zNear - zFar)/zRange, 2.0f*zFar*zNear/zRange,
-                        0.0f,                   0.0f,            1.0f,                   0.0);
+    Matrix4f Projection(1.0f/(tanHalfFOV * ar), 0.0f,            0.0f, 0.0,
+                        0.0f,                   1.0f/tanHalfFOV, 0.0f, 0.0,
+                        0.0f,                   0.0f,            0.0f, 0.0f,
+                        0.0f,                   0.0f,            1.0f, 0.0);
 
     Matrix4f FinalMatrix = Projection * Translation * Rotation;
 
