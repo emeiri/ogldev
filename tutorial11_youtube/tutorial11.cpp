@@ -41,7 +41,11 @@ static void RenderSceneCB()
 
     static float Scale = 0.0f;
 
+#ifdef _WIN64
+    Scale += 0.001;
+#else
     Scale += 0.02f;
+#endif
 
     Matrix4f Rotation(cosf(Scale), 0.0f, -sinf(Scale), 0.0f,
                       0.0f,        1.0f, 0.0f        , 0.0f,
