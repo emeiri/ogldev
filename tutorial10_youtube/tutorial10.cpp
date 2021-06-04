@@ -63,6 +63,7 @@ static void RenderSceneCB()
     glDrawElements(GL_TRIANGLES, 54, GL_UNSIGNED_INT, 0);
 
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 
     glutPostRedisplay();
 
