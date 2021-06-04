@@ -62,7 +62,7 @@ static void _RenderSceneCB()
 
     Matrix4f Translation(1.0f, 0.0f, 0.0f, 0.0f,
                          0.0f, 1.0f, 0.0f, 0.0f,
-                         0.0f, 0.0f, 1.0,  2.0f,
+                         0.0f, 0.0f, 1.0,  5.0f,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
     float zFar = 100.0f;
@@ -74,7 +74,7 @@ static void _RenderSceneCB()
 
     Matrix4f Projection(1.0f/(tanHalfFOV * ar), 0.0f,            0.0f, 0.0,
                         0.0f,                   1.0f/tanHalfFOV, 0.0f, 0.0,
-                        0.0f,                   0.0f,            0.0f, 0.0f,
+                        0.0f,                   0.0f,            1.0f, 0.0f,
                         0.0f,                   0.0f,            1.0f, 0.0);
 
     Matrix4f FinalMatrix = Projection * Translation * Rotation;
