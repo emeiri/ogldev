@@ -15,9 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 12 - Perspective Projection
+    Tutorial 11 - Perspective Projection
 */
-
 
 #include <stdio.h>
 #include <string.h>
@@ -26,34 +25,23 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_pipeline.h"
 #include "ogldev_math_3d.h"
 
-
-#define WINDOW_WIDTH 1024
-#define WINDOW_HEIGHT 768
+#define WINDOW_WIDTH  1200
+#define WINDOW_HEIGHT 1200
 
 GLuint VBO;
 GLuint IBO;
 GLuint gWorldLocation;
-PersProjInfo gPersProjInfo;
-
-const char* pVSFileName = "shader.vs";
-const char* pFSFileName = "shader.fs";
 
 
-static void _RenderSceneCB()
+static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
     static float Scale = 0.0f;
 
     Scale += 0.02f;
-
-    Pipeline p;
-    p.Rotate(0.0f, Scale, 0.0f);
-    p.WorldPos(0.0f, 0.0f, 5.0f);
-    p.SetPerspectiveProj(gPersProjInfo);
 
     Matrix4f Rotation(cosf(Scale), 0.0f, -sinf(Scale), 0.0f,
                       0.0f,        1.0f, 0.0f        , 0.0f,
@@ -65,54 +53,70 @@ static void _RenderSceneCB()
                          0.0f, 0.0f, 1.0,  5.0f,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
-    float zFar = 100.0f;
-    float zNear = 1.0f;
     float FOV = 30.0f;
-    const float ar         = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
-    const float zRange     = zNear - zFar;
     const float tanHalfFOV = tanf(ToRadian(FOV / 2.0f));
 
-    Matrix4f Projection(1.0f/(tanHalfFOV * ar), 0.0f,            0.0f, 0.0,
-                        0.0f,                   1.0f/tanHalfFOV, 0.0f, 0.0,
-                        0.0f,                   0.0f,            1.0f, 0.0f,
-                        0.0f,                   0.0f,            1.0f, 0.0);
+    Matrix4f Projection(1.0f/(tanHalfFOV), 0.0f,            0.0f, 0.0,
+                        0.0f,              1.0f/tanHalfFOV, 0.0f, 0.0,
+                        0.0f,              0.0f,            1.0f, 0.0f,
+                        0.0f,              0.0f,            1.0f, 0.0);
 
     Matrix4f FinalMatrix = Projection * Translation * Rotation;
 
     glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &FinalMatrix.m[0][0]);
-    //glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)p.GetWPTrans());
 
-    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+
+    // position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+
+    // color
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+
+    glutPostRedisplay();
 
     glutSwapBuffers();
 }
 
 
-static void InitializeGlutCallbacks()
-{
-    glutDisplayFunc(_RenderSceneCB);
-    glutIdleFunc(_RenderSceneCB);
-}
+struct Vertex {
+    Vector3f pos;
+    Vector3f color;
+
+    Vertex() {}
+
+    Vertex(float x, float y, float z)
+    {
+        pos = Vector3f(x, y, z);
+
+        float red   = (float)rand() / (float)RAND_MAX;
+        float green = (float)rand() / (float)RAND_MAX;
+        float blue  = (float)rand() / (float)RAND_MAX;
+        color = Vector3f(red, green, blue);
+    }
+};
+
 
 static void CreateVertexBuffer()
 {
-    Vector3f Vertices[8];
+    Vertex Vertices[8];
 
-    Vertices[0] = Vector3f(0.5f, 0.5f, 0.5f);
-    Vertices[1] = Vector3f(-0.5f, 0.5f, -0.5f);
-    Vertices[2] = Vector3f(-0.5f, 0.5f, 0.5f);
-    Vertices[3] = Vector3f(0.5f, -0.5f, -0.5f);
-    Vertices[4] = Vector3f(-0.5f, -0.5f, -0.5f);
-    Vertices[5] = Vector3f(0.5f, 0.5f, -0.5f);
-    Vertices[6] = Vector3f(0.5f, -0.5f, 0.5f);
-    Vertices[7] = Vector3f(-0.5f, -0.5f, 0.5f);
+    Vertices[0] = Vertex(0.5f, 0.5f, 0.5f);
+    Vertices[1] = Vertex(-0.5f, 0.5f, -0.5f);
+    Vertices[2] = Vertex(-0.5f, 0.5f, 0.5f);
+    Vertices[3] = Vertex(0.5f, -0.5f, -0.5f);
+    Vertices[4] = Vertex(-0.5f, -0.5f, -0.5f);
+    Vertices[5] = Vertex(0.5f, 0.5f, -0.5f);
+    Vertices[6] = Vertex(0.5f, -0.5f, 0.5f);
+    Vertices[7] = Vertex(-0.5f, -0.5f, 0.5f);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -152,12 +156,17 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
 
     const GLchar* p[1];
     p[0] = pShaderText;
+
     GLint Lengths[1];
-    Lengths[0]= strlen(pShaderText);
+    Lengths[0] = (GLint)strlen(pShaderText);
+
     glShaderSource(ShaderObj, 1, p, Lengths);
+
     glCompileShader(ShaderObj);
+
     GLint success;
     glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
+
     if (!success) {
         GLchar InfoLog[1024];
         glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
@@ -168,6 +177,9 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
     glAttachShader(ShaderProgram, ShaderObj);
 }
 
+const char* pVSFileName = "shader.vs";
+const char* pFSFileName = "shader.fs";
+
 static void CompileShaders()
 {
     GLuint ShaderProgram = glCreateProgram();
@@ -177,29 +189,37 @@ static void CompileShaders()
         exit(1);
     }
 
-    string vs, fs;
+    std::string vs, fs;
 
     if (!ReadFile(pVSFileName, vs)) {
         exit(1);
     };
 
+    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
+
     if (!ReadFile(pFSFileName, fs)) {
         exit(1);
     };
 
-    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
     AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
     GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };
 
     glLinkProgram(ShaderProgram);
+
     glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
-        if (Success == 0) {
-                glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-                fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+    if (Success == 0) {
+        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
+        fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         exit(1);
-        }
+    }
+
+    gWorldLocation = glGetUniformLocation(ShaderProgram, "gWorld");
+    if (gWorldLocation == -1) {
+        printf("Error getting uniform location of 'gWorld'\n");
+        exit(1);
+    }
 
     glValidateProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
@@ -210,29 +230,36 @@ static void CompileShaders()
     }
 
     glUseProgram(ShaderProgram);
-
-    gWorldLocation = glGetUniformLocation(ShaderProgram, "gWorld");
-    assert(gWorldLocation != 0xFFFFFFFF);
 }
 
 int main(int argc, char** argv)
 {
+#ifdef _WIN64
+    srand(GetCurrentProcessId());
+#else
+    srandom(getpid());
+#endif
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("Tutorial 12");
 
-    InitializeGlutCallbacks();
+    int x = 200;
+    int y = 100;
+    glutInitWindowPosition(x, y);
+    int win = glutCreateWindow("Tutorial 11");
+    printf("window id: %d\n", win);
 
     // Must be done after glut is initialized!
     GLenum res = glewInit();
     if (res != GLEW_OK) {
-      fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
-      return 1;
+        fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
+        return 1;
     }
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
+    glClearColor(Red, Green, Blue, Alpha);
+
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
@@ -241,11 +268,7 @@ int main(int argc, char** argv)
 
     CompileShaders();
 
-    gPersProjInfo.FOV = 30.0f;
-    gPersProjInfo.Height = WINDOW_HEIGHT;
-    gPersProjInfo.Width = WINDOW_WIDTH;
-    gPersProjInfo.zNear = 1.0f;
-    gPersProjInfo.zFar = 100.0f;
+    glutDisplayFunc(RenderSceneCB);
 
     glutMainLoop();
 
