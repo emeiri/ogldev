@@ -54,17 +54,17 @@ static void RenderSceneCB()
 
     Matrix4f Translation(1.0f, 0.0f, 0.0f, 0.0f,
                          0.0f, 1.0f, 0.0f, 0.0f,
-                         0.0f, 0.0f, 1.0,  3.0f,
+                         0.0f, 0.0f, 1.0f, 1.5f,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
     float FOV = 90.0f;
     float tanHalfFOV = tanf(ToRadian(FOV / 2.0f));
     float f = 1/tanHalfFOV;
 
-    Matrix4f Projection(1.0,  0.0f, 0.0f, 0.0f,
-                        0.0f, 1.0f, 0.0f, 0.0f,
+    Matrix4f Projection(f,  0.0f, 0.0f, 0.0f,
+                        0.0f, f, 0.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f,
-                        0.0f, 0.0f, 0.0f, 1.0f);
+                        0.0f, 0.0f, 1.0f, 0.0f);
 
     Matrix4f FinalMatrix = Projection * Translation * Rotation;
 
@@ -114,14 +114,14 @@ static void CreateVertexBuffer()
 {
     Vertex Vertices[8];
 
-    Vertices[0] = Vertex(1.0f, 1.0f, 1.0f);
-    Vertices[1] = Vertex(-1.0f, 1.0f, -1.0f);
-    Vertices[2] = Vertex(-1.0f, 1.0f, 1.0f);
-    Vertices[3] = Vertex(1.0f, -1.0f, -1.0f);
-    Vertices[4] = Vertex(-1.0f, -1.0f, -1.0f);
-    Vertices[5] = Vertex(1.0f, 1.0f, -1.0f);
-    Vertices[6] = Vertex(1.0f, -1.0f, 1.0f);
-    Vertices[7] = Vertex(-1.0f, -1.0f, 1.0f);
+    Vertices[0] = Vertex(0.5f, 0.5f, 0.5f);
+    Vertices[1] = Vertex(-0.5f, 0.5f, -0.5f);
+    Vertices[2] = Vertex(-0.5f, 0.5f, 0.5f);
+    Vertices[3] = Vertex(0.5f, -0.5f, -0.5f);
+    Vertices[4] = Vertex(-0.5f, -0.5f, -0.5f);
+    Vertices[5] = Vertex(0.5f, 0.5f, -0.5f);
+    Vertices[6] = Vertex(0.5f, -0.5f, 0.5f);
+    Vertices[7] = Vertex(-0.5f, -0.5f, 0.5f);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -268,6 +268,7 @@ int main(int argc, char** argv)
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
+
     CreateVertexBuffer();
     CreateIndexBuffer();
 
