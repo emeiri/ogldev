@@ -1,184 +1,200 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 11 - Concatenating Transformations </title>
+        <title> Tutorial 11 - Concatenating Transformations </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 11: </h2>
-			<h1> Concatenating Transformations </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 11: </h2>
+                        <h1> Concatenating Transformations </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+                <section>
+                        <h3> Background </h3>
 
-			<p>In the last few tutorials we have developed several
-			transformations that give us the flexibility of moving an object
-			anywhere in the 3D world. We still have a couple more to learn (camera
-			control and perspective projection) but as you probably already
-			guessed, a combination of the transformation is required. In most cases
-			you will want to scale the object to fit your 3D world, rotate it into
-			the required orientation, move it somewhere, etc. Up till now we have
-			been exercising a single transformation at a time. In order to perform
-			the above series of transformations we need to multiply the first
-			transformation matrix by the vertex position and then multiple the next
-			transformation by the result of the previous multiplication. This goes
-			on until all the transformation matrices have been applied on the
-			vertex. One trivial way to do that is to supply each and every
-			transformation matrix to the shader and let it do all the
-			multiplications. This, however, is very inefficient since the matrices
-			are the same for all vertices and only vertex position changes.
-			Luckily, linear algebra provides a set of rules that make our life
-			easier. It tells us that given a set of matrices M<sub>0</sub>...M<sub>n</sub>
-			and a vector V the following holds true: </p>
-			<p> M<sub>n </sub>* M<sub>n-1 </sub>* ...  * M<sub>0</sub> * V = (M<sub>n</sub>* M<sub>n-1 </sub>* ... * M<sub>0</sub>) * V </p>
-			<p>So if you calculate:</p>
-			<p>N = M<sub>n </sub>* M<sub>n-1 </sub>* ... * M<sub>0</sub></p>
-			<p>Then:</p>
-			<p>M<sub>n </sub>* M<sub>n-1 </sub>* ... * M<sub>0</sub> * V = N * V</p>
-			<p>This means that we can calculate N once and then send it to the shader
-			as a uniform variable where it will be multiplied in each vertex. This
-			will require the GPU one matrix/vector multiplication per vertex.</p>
-			<p>How do you order the matrices when generating N? The first thing you
-			need to remember is that the vector is initially multiplied by the
-			matrix on the far right of the series (in our case - M<sub>0</sub>)<sub>.
-			</sub>Then the vector is transformed by each matrix as we travel from
-			the right hand side to the left hand side. In 3D graphics you usually
-			want to scale the object first, then rotate it, then translate it, then
-			apply camera transformation and finally project it to 2D. Let's see what happens
-			when you rotate first and then translate:</p>
-			<img class="center" src="rot_trans.png">
-			<p>Now see what happens when you translate first and then rotate:</p>
-			<img class="center" src="trans_rot.png">
-			<p>As you can see, it is very diffcult to set the object position in the
-			world when you translate it first because if you move it away from the
-			origin and then rotate it goes around the origin which actually means
-			that you translate it again. This second translation is something you
-			want to avoid. By rotating first and then translate you disconnect the
-			dependency between the two operations. This is why it is always best to
-			model around the origin as symmetrically as possible. That way when you
-			later scale or rotate there is no side effect and the rotated or scaled
-			object remains symmetrical as before.</p>
-			<p>Now that we are starting to handle more than one transformation in the
-			demos we have to drop the habit of updating the matrix directly in the
-			render function. This method doesn't scale well and is prone to errors.
-			Instead, the pipeline class is introduced. This class hides the fine
-			details of matrix manipulation under a simple API to change the
-			translation, rotation, etc. After setting all the parameters inside it
-			you simply extract the final matrix that combines all the
-			transformation. This matrix can be fed directly into the shader.</p>
-		</section>
+                        <p>In the last few tutorials we have developed several
+                        transformations that give us the flexibility of moving an object
+                        anywhere in the 3D world. We still have a couple more to learn (camera
+                        control and perspective projection) but as you probably already
+                        guessed, a combination of the transformation is required. In most cases
+                        you will want to scale the object to fit your 3D world, rotate it into
+                        the required orientation, move it somewhere, etc. Up till now we have
+                        been exercising a single transformation at a time. In order to perform
+                        the above series of transformations we need to multiply the first
+                        transformation matrix by the vertex position and then multiple the next
+                        transformation by the result of the previous multiplication. This goes
+                        on until all the transformation matrices have been applied on the
+                        vertex. One trivial way to do that is to supply each and every
+                        transformation matrix to the shader and let it do all the
+                        multiplications. This, however, is very inefficient since the matrices
+                        are the same for all vertices and only vertex position changes.
+                        Luckily, linear algebra provides a set of rules that make our life
+                        easier. It tells us that given a set of matrices M<sub>0</sub>...M<sub>n</sub>
+                        and a vector V the following holds true: </p>
+                        <p> M<sub>n </sub>* M<sub>n-1 </sub>* ...  * M<sub>0</sub> * V = (M<sub>n</sub>* M<sub>n-1 </sub>* ... * M<sub>0</sub>) * V </p>
+                        <p>So if you calculate:</p>
+                        <p>N = M<sub>n </sub>* M<sub>n-1 </sub>* ... * M<sub>0</sub></p>
+                        <p>Then:</p>
+                        <p>M<sub>n </sub>* M<sub>n-1 </sub>* ... * M<sub>0</sub> * V = N * V</p>
+                        <p>This means that we can calculate N once and then send it to the shader
+                        as a uniform variable where it will be multiplied in each vertex. This
+                        will require the GPU one matrix/vector multiplication per vertex.</p>
+                        <p>How do you order the matrices when generating N? The first thing you
+                        need to remember is that the vector is initially multiplied by the
+                        matrix on the far right of the series (in our case - M<sub>0</sub>)<sub>.
+                        </sub>Then the vector is transformed by each matrix as we travel from
+                        the right hand side to the left hand side. In 3D graphics you usually
+                        want to scale the object first, then rotate it, then translate it, then
+                        apply camera transformation and finally project it to 2D. Let's see what happens
+                        when you rotate first and then translate:</p>
+                        <img class="center" src="rot_trans.png">
+                        <p>Now see what happens when you translate first and then rotate:</p>
+                        <img class="center" src="trans_rot.png">
+                        <p>As you can see, it is very diffcult to set the object position in the
+                        world when you translate it first because if you move it away from the
+                        origin and then rotate it goes around the origin which actually means
+                        that you translate it again. This second translation is something you
+                        want to avoid. By rotating first and then translate you disconnect the
+                        dependency between the two operations. This is why it is always best to
+                        model around the origin as symmetrically as possible. That way when you
+                        later scale or rotate there is no side effect and the rotated or scaled
+                        object remains symmetrical as before.</p>
+                        <p>Now that we are starting to handle more than one transformation in the
+                        demos we have to drop the habit of updating the matrix directly in the
+                        render function. This method doesn't scale well and is prone to errors.
+                        Instead, the pipeline class is introduced. This class hides the fine
+                        details of matrix manipulation under a simple API to change the
+                        translation, rotation, etc. After setting all the parameters inside it
+                        you simply extract the final matrix that combines all the
+                        transformation. This matrix can be fed directly into the shader.</p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<code>#define ToRadian(x) ((x) * M_PI / 180.0f)<br>
-			#define ToDegree(x) ((x) * 180.0f / M_PI)
-			</code>
-			<p>We are starting to use the actual values of angles in this tutorials.
-			As it happens, the trigonometric functions of the standard C library
-			take radian as a parameter. The above macros take the angle either in
-			radians or degrees and convert to the other notation.</p>
-			<code>
-			inline Matrix4f operator*(const Matrix4f&amp; Right) const<br>
-			{<br>
-			&nbsp;&nbsp;&nbsp; Matrix4f Ret;<br>
-			&nbsp;&nbsp;&nbsp; for (unsigned int i = 0 ; i &lt; 4 ; i++) {<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for (unsigned int j = 0 ; j &lt; 4 ; j++) {<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ret.m[i][j] = m[i][0] * Right.m[0][j] +<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m[i][1] * Right.m[1][j] +<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m[i][2] * Right.m[2][j] +<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m[i][3] * Right.m[3][j];<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-			&nbsp;&nbsp;&nbsp; }<br><br>
-			&nbsp;&nbsp;&nbsp; return Ret;<br>
-			}<br>
-			</code>
-			<p>This handy operator of the matrix class handles matrix multiplication.
-			As you can see, each entry in the resulting matrix is defined as the
-			dot product of its line in the left matrix with the column in the right
-			matrix. This operator is key in the implementation of the pipeline
-			class.</p>
-			<code>
-			class Pipeline<br>
-			{<br>
-			&nbsp;&nbsp;&nbsp; public:<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pipeline() { ... }<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void Scale(float ScaleX, float ScaleY, float ScaleZ) { ... }<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void WorldPos(float x, float y, float z) { ... }<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void Rotate(float RotateX, float RotateY, float RotateZ) { ... }<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const Matrix4f* GetTrans();<br>
-			&nbsp;&nbsp;&nbsp; private:<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vector3f m_scale;<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vector3f m_worldPos;<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vector3f m_rotateInfo;<br>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Matrix4f m_transformation;<br>
-			};
-			</code>
-			<p>The pipeline class abstracts the details of getting all the
-			transformation required for one single object combined. There are
-			currently 3 private member vectors that store the scaling, position in
-			world space and rotation for each axis. In addition there are APIs to
-			set them and a function to get the matrix that represent the sum of all
-			these transformations.</p>
-			<code>
-			const Matrix4f* Pipeline::GetTrans()<br>
-			{<br>
-			&nbsp;&nbsp;&nbsp; Matrix4f ScaleTrans, RotateTrans, TranslationTrans;<br>
-			&nbsp;&nbsp;&nbsp; InitScaleTransform(ScaleTrans);<br>
-			&nbsp;&nbsp;&nbsp; InitRotateTransform(RotateTrans);<br>
-			&nbsp;&nbsp;&nbsp; InitTranslationTransform(TranslationTrans);<br>
-			&nbsp;&nbsp;&nbsp; m_transformation = TranslationTrans * RotateTrans * ScaleTrans;<br>
-			&nbsp;&nbsp;&nbsp; return &amp;m_transformation;<br>
-			}
-			</code>
-			<p>This function initializes three seperate matrices as the
-			transformations that match the current configuration. It multiplies
-			them one by one and returns the final product. Note that the order is
-			hard coded and follows the description above. If you need some
-			flexibility there you can use a bitmask that specifies the order. Also
-			note that it always stores the final transformation as a member. You
-			can try optimizing this function by checking a dirty flag and returning
-			the stored martix in the case that there was no change in configuration
-			since the last time this function was called.</p>
-			<p>This function uses private methods to generate the different
-			transformations according to what we've learned in the last few
-			tutorials. In the next tutorials this class will be extended to handle
-			camera control and perspective projection.</p>
-			<code>
-			Pipeline p;<br>
-			p.Scale(sinf(Scale * 0.1f), sinf(Scale * 0.1f), sinf(Scale * 0.1f));<br>
-			p.WorldPos(sinf(Scale), 0.0f, 0.0f);<br>
-			p.Rotate(sinf(Scale) * 90.0f, sinf(Scale) * 90.0f, sinf(Scale) * 90.0f);<br>
-			glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)p.GetTrans());
-			</code>
-			<p>These are the changes to the render function. We allocate a pipeline
-			object, configure it and send the resulting transformation down to the
-			shader. Play with the parameters and see their effect on the final
-			image.</p>
-		</section>
-        
+                        <code>#define ToRadian(x) ((x) * M_PI / 180.0f)<br>
+                        #define ToDegree(x) ((x) * 180.0f / M_PI)
+                        </code>
+                        <p>We are starting to use the actual values of angles in this tutorials.
+                        As it happens, the trigonometric functions of the standard C library
+                        take radian as a parameter. The above macros take the angle either in
+                        radians or degrees and convert to the other notation.</p>
+                        <code>
+                        inline Matrix4f operator*(const Matrix4f&amp; Right) const<br>
+                        {<br>
+                        &nbsp;&nbsp;&nbsp; Matrix4f Ret;<br>
+                        &nbsp;&nbsp;&nbsp; for (unsigned int i = 0 ; i &lt; 4 ; i++) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for (unsigned int j = 0 ; j &lt; 4 ; j++) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ret.m[i][j] = m[i][0] * Right.m[0][j] +<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m[i][1] * Right.m[1][j] +<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m[i][2] * Right.m[2][j] +<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m[i][3] * Right.m[3][j];<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+                        &nbsp;&nbsp;&nbsp; }<br><br>
+                        &nbsp;&nbsp;&nbsp; return Ret;<br>
+                        }<br>
+                        </code>
+                        <p>This handy operator of the matrix class handles matrix multiplication.
+                        As you can see, each entry in the resulting matrix is defined as the
+                        dot product of its line in the left matrix with the column in the right
+                        matrix. This operator is key in the implementation of the pipeline
+                        class.</p>
+                        <code>
+                        class Pipeline<br>
+                        {<br>
+                        &nbsp;&nbsp;&nbsp; public:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pipeline() { ... }<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void Scale(float ScaleX, float ScaleY, float ScaleZ) { ... }<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void WorldPos(float x, float y, float z) { ... }<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void Rotate(float RotateX, float RotateY, float RotateZ) { ... }<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const Matrix4f* GetTrans();<br>
+                        &nbsp;&nbsp;&nbsp; private:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vector3f m_scale;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vector3f m_worldPos;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Vector3f m_rotateInfo;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Matrix4f m_transformation;<br>
+                        };
+                        </code>
+                        <p>The pipeline class abstracts the details of getting all the
+                        transformation required for one single object combined. There are
+                        currently 3 private member vectors that store the scaling, position in
+                        world space and rotation for each axis. In addition there are APIs to
+                        set them and a function to get the matrix that represent the sum of all
+                        these transformations.</p>
+                        <code>
+                        const Matrix4f* Pipeline::GetTrans()<br>
+                        {<br>
+                        &nbsp;&nbsp;&nbsp; Matrix4f ScaleTrans, RotateTrans, TranslationTrans;<br>
+                        &nbsp;&nbsp;&nbsp; InitScaleTransform(ScaleTrans);<br>
+                        &nbsp;&nbsp;&nbsp; InitRotateTransform(RotateTrans);<br>
+                        &nbsp;&nbsp;&nbsp; InitTranslationTransform(TranslationTrans);<br>
+                        &nbsp;&nbsp;&nbsp; m_transformation = TranslationTrans * RotateTrans * ScaleTrans;<br>
+                        &nbsp;&nbsp;&nbsp; return &amp;m_transformation;<br>
+                        }
+                        </code>
+                        <p>This function initializes three seperate matrices as the
+                        transformations that match the current configuration. It multiplies
+                        them one by one and returns the final product. Note that the order is
+                        hard coded and follows the description above. If you need some
+                        flexibility there you can use a bitmask that specifies the order. Also
+                        note that it always stores the final transformation as a member. You
+                        can try optimizing this function by checking a dirty flag and returning
+                        the stored martix in the case that there was no change in configuration
+                        since the last time this function was called.</p>
+                        <p>This function uses private methods to generate the different
+                        transformations according to what we've learned in the last few
+                        tutorials. In the next tutorials this class will be extended to handle
+                        camera control and perspective projection.</p>
+                        <code>
+                        Pipeline p;<br>
+                        p.Scale(sinf(Scale * 0.1f), sinf(Scale * 0.1f), sinf(Scale * 0.1f));<br>
+                        p.WorldPos(sinf(Scale), 0.0f, 0.0f);<br>
+                        p.Rotate(sinf(Scale) * 90.0f, sinf(Scale) * 90.0f, sinf(Scale) * 90.0f);<br>
+                        glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)p.GetTrans());
+                        </code>
+                        <p>These are the changes to the render function. We allocate a pipeline
+                        object, configure it and send the resulting transformation down to the
+                        shader. Play with the parameters and see their effect on the final
+                        image.</p>
+                </section>
+
         <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=aJRrgka4dpU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=10">video tutorial by Frahaan Hussain</a>.</p>
 
-		<a href="../tutorial12/tutorial12.html" class="next highlight"> Next tutorial </a>
-	</article>
+                <a href="../tutorial12/tutorial12.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial10/tutorial11.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
