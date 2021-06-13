@@ -27,7 +27,7 @@
 
 #include "ogldev_math_3d.h"
 
-#define WINDOW_WIDTH  300
+#define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
 GLuint VBO;
@@ -57,14 +57,14 @@ static void RenderSceneCB()
                          0.0f, 0.0f, 1.0f, 2.0f,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
-    float VFOV = 60.0f;
+    float VFOV = 90.0f;
     float tanHalfVFOV = tanf(ToRadian(VFOV / 2.0f));
     float d = 1/tanHalfVFOV;
 
     float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
 
-    Matrix4f Projection(d,  0.0f, 0.0f, 0.0f,
-                        0.0f, d*ar, 0.0f, 0.0f,
+    Matrix4f Projection(d,    0.0f, 0.0f, 0.0f,
+                        0.0f, d,    0.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f);
 
