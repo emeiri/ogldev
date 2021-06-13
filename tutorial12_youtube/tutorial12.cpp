@@ -27,7 +27,7 @@
 
 #include "ogldev_math_3d.h"
 
-#define WINDOW_WIDTH  1000
+#define WINDOW_WIDTH  2000
 #define WINDOW_HEIGHT 1000
 
 GLuint VBO;
@@ -63,7 +63,9 @@ static void RenderSceneCB()
 
     float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
 
-    Matrix4f Projection(d,    0.0f, 0.0f, 0.0f,
+    printf("Aspect ratio %f\n", ar);
+
+    Matrix4f Projection(d/ar,    0.0f, 0.0f, 0.0f,
                         0.0f, d,    0.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f,
                         0.0f, 0.0f, 1.0f, 0.0f);
