@@ -27,8 +27,8 @@
 
 #include "ogldev_math_3d.h"
 
-#define WINDOW_WIDTH  700
-#define WINDOW_HEIGHT 1400
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 GLuint VBO;
 GLuint IBO;
@@ -65,9 +65,17 @@ static void RenderSceneCB()
 
     printf("Aspect ratio %f\n", ar);
 
-    Matrix4f Projection(d/ar,    0.0f, 0.0f, 0.0f,
+    float NearZ = 1.0f;
+    float FarZ = 100.0f;
+
+    float zRange = NearZ - FarZ;
+
+    float A = (-FarZ - NearZ) / zRange;
+    float B = 2.0f * FarZ * NearZ / zRange;
+
+    Matrix4f Projection(d/ar, 0.0f, 0.0f, 0.0f,
                         0.0f, d,    0.0f, 0.0f,
-                        0.0f, 0.0f, 1.0f, 0.0f,
+                        0.0f, 0.0f, A,    B,
                         0.0f, 0.0f, 1.0f, 0.0f);
 
     Matrix4f FinalMatrix = Projection * Translation * Rotation;
