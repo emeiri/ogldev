@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 11 - Perspective Projection
+    Tutorial 11 - Perspective Projection - part 1
 */
 
 #include <stdio.h>
