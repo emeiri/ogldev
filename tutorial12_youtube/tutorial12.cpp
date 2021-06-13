@@ -27,8 +27,8 @@
 
 #include "ogldev_math_3d.h"
 
-#define WINDOW_WIDTH  2000
-#define WINDOW_HEIGHT 1000
+#define WINDOW_WIDTH  700
+#define WINDOW_HEIGHT 1400
 
 GLuint VBO;
 GLuint IBO;
