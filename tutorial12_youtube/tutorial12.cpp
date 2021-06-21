@@ -42,7 +42,7 @@ static void RenderSceneCB()
     static float Scale = 0.0f;
 
 #ifdef _WIN64
-    Scale += 0.001;
+    Scale += 0.001f;
 #else
     Scale += 0.02f;
 #endif

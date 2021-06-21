@@ -26,7 +26,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_pipeline.h"
+//#include "ogldev_pipeline.h"
 #include "ogldev_math_3d.h"
 
 
@@ -113,7 +113,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
     const GLchar* p[1];
     p[0] = pShaderText;
     GLint Lengths[1];
-    Lengths[0]= strlen(pShaderText);
+    Lengths[0]= (GLint)strlen(pShaderText);
     glShaderSource(ShaderObj, 1, p, Lengths);
     glCompileShader(ShaderObj);
     GLint success;
