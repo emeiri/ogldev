@@ -38,7 +38,6 @@ GLuint gWVPLocation;
 
 WorldTrans WorldTransformation;
 Camera GameCamera;
-//Camera GameCamera();
 
 float FOV = 90.0f;
 float zNear = 1.0f;
@@ -90,6 +89,12 @@ static void RenderSceneCB()
     glutPostRedisplay();
 
     glutSwapBuffers();
+}
+
+
+static void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+{
+    bool ret = GameCamera.OnKeyboard(key);
 }
 
 
@@ -282,6 +287,7 @@ int main(int argc, char** argv)
     CompileShaders();
 
     glutDisplayFunc(RenderSceneCB);
+    glutKeyboardFunc(KeyboardCB);
     glutSpecialFunc(SpecialKeyboardCB);
 
     glutMainLoop();

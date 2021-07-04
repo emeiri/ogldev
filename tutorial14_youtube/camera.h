@@ -40,6 +40,7 @@ private:
     Vector3f m_pos;
     Vector3f m_target;
     Vector3f m_up;
+    float m_speed = 1.0f;
 };
 
 #endif  /* CAMERA_H */

@@ -20,9 +20,6 @@
 
 #include "camera.h"
 
-const static float STEP_SCALE = 1.0f;
-const static float EDGE_STEP = 0.5f;
-const static int MARGIN = 10;
 
 Camera::Camera()
 {
@@ -53,31 +50,25 @@ void Camera::SetPosition(float x, float y, float z)
 
 bool Camera::OnKeyboard(unsigned char Key)
 {
-    bool Ret = false;
+    bool Ret = true;
 
     switch (Key) {
 
     case GLUT_KEY_UP:
-        {
-            m_pos += (m_target * STEP_SCALE);
-            Ret = true;
-        }
+        m_pos += (m_target * m_speed);
         break;
 
     case GLUT_KEY_DOWN:
-        {
-            m_pos -= (m_target * STEP_SCALE);
-            Ret = true;
-        }
+        m_pos -= (m_target * m_speed);
+        Ret = true;
         break;
 
     case GLUT_KEY_LEFT:
         {
             Vector3f Left = m_target.Cross(m_up);
             Left.Normalize();
-            Left *= STEP_SCALE;
+            Left *= m_speed;
             m_pos += Left;
-            Ret = true;
         }
         break;
 
@@ -85,21 +76,34 @@ bool Camera::OnKeyboard(unsigned char Key)
         {
             Vector3f Right = m_up.Cross(m_target);
             Right.Normalize();
-            Right *= STEP_SCALE;
+            Right *= m_speed;
             m_pos += Right;
-            Ret = true;
         }
         break;
 
     case GLUT_KEY_PAGE_UP:
-        m_pos.y += STEP_SCALE;
+        m_pos.y += m_speed;
         break;
 
     case GLUT_KEY_PAGE_DOWN:
-        m_pos.y -= STEP_SCALE;
+        m_pos.y -= m_speed;
+        break;
+
+    case '+':
+        m_speed += 0.1;
+        printf("Speed changed to %f\n", m_speed);
+        break;
+
+    case '-':
+        m_speed -= 0.1;
+        if (m_speed < 0.0f) {
+            m_speed = 0.0f;
+        }
+        printf("Speed changed to %f\n", m_speed);
         break;
 
     default:
+        Ret = false;
         break;
     }
 
