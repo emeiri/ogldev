@@ -26,7 +26,7 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_math_3d.h"
-//#include "camera.h"
+#include "camera.h"
 #include "world_transform.h"
 
 #define WINDOW_WIDTH  1920
@@ -37,8 +37,14 @@ GLuint IBO;
 GLuint gWVPLocation;
 
 WorldTrans WorldTransformation;
+Camera GameCamera;
 //Camera GameCamera();
-//PersProjInfo gPersProjInfo;
+
+float FOV = 90.0f;
+float zNear = 1.0f;
+float zFar = 10.0f;
+PersProjInfo PersProjInfo = { FOV, WINDOW_WIDTH, WINDOW_HEIGHT, zNear, zFar };
+
 
 static void RenderSceneCB()
 {
@@ -52,45 +58,16 @@ static void RenderSceneCB()
     Scale += 0.02f;
 #endif
 
-    /*Pipeline p;
-    p.Rotate(0.0f, Scale, 0.0f);
-    p.WorldPos(0.0f, 0.0f, 3.0f);
-    p.SetCamera(*pGameCamera);
-    p.SetPerspectiveProj(gPersProjInfo);*/
-
     WorldTransformation.Rotate(0.0f, 1.0f, 0.0f);
     WorldTransformation.SetPosition(0.0f, 0.0f, 2.0f);
     Matrix4f World = WorldTransformation.GetMatrix();
 
-    Vector3f CameraPos(1.0f, -1.0f, -1.0f);
-    Vector3f U(1.0f, 0.0f, 0.0f);
-    Vector3f V(0.0f, 1.0f, 0.0f);
-    Vector3f N(0.0f, 0.0f, 1.0f);
+    Matrix4f View = GameCamera.GetMatrix();
 
-    Matrix4f Camera(U.x,  U.y,  U.z,  -CameraPos.x,
-                    V.x,  V.y,  V.z,  -CameraPos.y,
-                    N.x,  N.y,  N.z,  -CameraPos.z,
-                    0.0f, 0.0f, 0.0f, 1.0f);
+    Matrix4f Projection;
+    Projection.InitPersProjTransform(PersProjInfo);
 
-    float VFOV = 90.0f;
-    float tanHalfVFOV = tanf(ToRadian(VFOV / 2.0f));
-    float d = 1/tanHalfVFOV;
-    float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
-
-    float NearZ = 1.0f;
-    float FarZ = 10.0f;
-
-    float zRange = NearZ - FarZ;
-
-    float A = (-FarZ - NearZ) / zRange;
-    float B = 2.0f * FarZ * NearZ / zRange;
-
-    Matrix4f Projection(d/ar, 0.0f, 0.0f, 0.0f,
-                        0.0f, d,    0.0f, 0.0f,
-                        0.0f, 0.0f, A,    B,
-                        0.0f, 0.0f, 1.0f, 0.0f);
-
-    Matrix4f WVP = Projection * Camera * World;
+    Matrix4f WVP = Projection * View * World;
 
     glUniformMatrix4fv(gWVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
 
@@ -116,10 +93,9 @@ static void RenderSceneCB()
 }
 
 
-static void _SpecialKeyboardCB(int Key, int x, int y)
+static void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    //OGLDEV_KEY OgldevKey = GLUTKeyToOGLDEVKey(Key);
-    //pGameCamera->OnKeyboard(OgldevKey);
+    bool ret = GameCamera.OnKeyboard(key);
 }
 
 
@@ -306,14 +282,7 @@ int main(int argc, char** argv)
     CompileShaders();
 
     glutDisplayFunc(RenderSceneCB);
-    glutSpecialFunc(_SpecialKeyboardCB);
-
-    /*gPersProjInfo.FOV = 60.0f;
-    gPersProjInfo.Height = WINDOW_HEIGHT;
-    gPersProjInfo.Width = WINDOW_WIDTH;
-    gPersProjInfo.zNear = 1.0f;
-    gPersProjInfo.zFar = 100.0f;
-    */
+    glutSpecialFunc(SpecialKeyboardCB);
 
     glutMainLoop();
 

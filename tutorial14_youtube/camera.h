@@ -29,22 +29,11 @@ public:
 
     Camera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
 
+    void SetPosition(float x, float y, float z);
+
     bool OnKeyboard(unsigned char Key);
 
-    const Vector3f& GetPos() const
-    {
-        return m_pos;
-    }
-
-    const Vector3f& GetTarget() const
-    {
-        return m_target;
-    }
-
-    const Vector3f& GetUp() const
-    {
-        return m_up;
-    }
+    Matrix4f GetMatrix();
 
 private:
 

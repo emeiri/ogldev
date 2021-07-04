@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Etay Meiri
+        Copyright 2010 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 */
 
 #ifndef PIPELINE_H
-#define	PIPELINE_H
+#define PIPELINE_H
 
 #include "ogldev_math_3d.h"
 #include "ogldev_camera.h"
@@ -25,8 +25,8 @@ struct Orientation
 {
     Vector3f m_scale;
     Vector3f m_rotation;
-    Vector3f m_pos;       
-    
+    Vector3f m_pos;
+
     Orientation()
     {
         m_scale    = Vector3f(1.0f, 1.0f, 1.0f);
@@ -50,13 +50,13 @@ public:
     {
         Scale(s, s, s);
     }
-    
-    
+
+
     void Scale(const Vector3f& scale)
     {
         Scale(scale.x, scale.y, scale.z);
     }
-    
+
     void Scale(float ScaleX, float ScaleY, float ScaleZ)
     {
         m_scale.x = ScaleX;
@@ -70,7 +70,7 @@ public:
         m_worldPos.y = y;
         m_worldPos.z = z;
     }
-    
+
     void WorldPos(const Vector3f& Pos)
     {
         m_worldPos = Pos;
@@ -82,7 +82,7 @@ public:
         m_rotateInfo.y = RotateY;
         m_rotateInfo.z = RotateZ;
     }
-    
+
     void Rotate(const Vector3f& r)
     {
         Rotate(r.x, r.y, r.z);
@@ -92,11 +92,11 @@ public:
     {
         m_persProjInfo = p;
     }
-    
+
     void SetOrthographicProj(const OrthoProjInfo& p)
     {
         m_orthoProjInfo = p;
-    }    
+    }
 
     void SetCamera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
     {
@@ -104,12 +104,12 @@ public:
         m_camera.Target = Target;
         m_camera.Up = Up;
     }
-    
+
     void SetCamera(const Camera& camera)
     {
         SetCamera(camera.GetPos(), camera.GetTarget(), camera.GetUp());
     }
-    
+
     void Orient(const Orientation& o)
     {
         m_scale      = o.m_scale;
@@ -150,5 +150,4 @@ private:
 };
 
 
-#endif	/* PIPELINE_H */
-
+#endif  /* PIPELINE_H */

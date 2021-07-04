@@ -43,6 +43,13 @@ Camera::Camera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
 }
 
 
+void Camera::SetPosition(float x, float y, float z)
+{
+    m_pos.x = x;
+    m_pos.y = y;
+    m_pos.z = z;
+}
+
 
 bool Camera::OnKeyboard(unsigned char Key)
 {
@@ -97,4 +104,18 @@ bool Camera::OnKeyboard(unsigned char Key)
     }
 
     return Ret;
+}
+
+
+Matrix4f Camera::GetMatrix()
+{
+    Matrix4f Translation;
+    Translation.InitTranslationTransform(-m_pos.x, -m_pos.y, -m_pos.z);
+
+    Matrix4f Rotation;
+    Rotation.InitCameraTransform(m_target, m_up);
+
+    Matrix4f CameraTransformation = Rotation * Translation;
+
+    return CameraTransformation;
 }
