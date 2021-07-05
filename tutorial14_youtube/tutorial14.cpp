@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 13 - Camera Space
+    Tutorial 14 - Camera Control Using the keyboard
 */
 
 #include <stdio.h>
@@ -36,7 +36,7 @@ GLuint VBO;
 GLuint IBO;
 GLuint gWVPLocation;
 
-WorldTrans WorldTransformation;
+WorldTrans CubeWorldTransform;
 Camera GameCamera;
 
 float FOV = 90.0f;
@@ -49,17 +49,11 @@ static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static float Scale = 0.0f;
+    float YRotationAngle = 1.0f;
 
-#ifdef _WIN64
-    Scale += 0.001f;
-#else
-    Scale += 0.02f;
-#endif
-
-    WorldTransformation.Rotate(0.0f, 1.0f, 0.0f);
-    WorldTransformation.SetPosition(0.0f, 0.0f, 2.0f);
-    Matrix4f World = WorldTransformation.GetMatrix();
+    CubeWorldTransform.SetPosition(0.0f, 0.0f, 2.0f);
+    CubeWorldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+    Matrix4f World = CubeWorldTransform.GetMatrix();
 
     Matrix4f View = GameCamera.GetMatrix();
 
@@ -94,13 +88,13 @@ static void RenderSceneCB()
 
 static void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    bool ret = GameCamera.OnKeyboard(key);
+    GameCamera.OnKeyboard(key);
 }
 
 
 static void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    bool ret = GameCamera.OnKeyboard(key);
+    GameCamera.OnKeyboard(key);
 }
 
 
@@ -264,7 +258,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 13");
+    int win = glutCreateWindow("Tutorial 14");
     printf("window id: %d\n", win);
 
     // Must be done after glut is initialized!

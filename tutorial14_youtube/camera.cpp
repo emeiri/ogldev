@@ -29,17 +29,6 @@ Camera::Camera()
 }
 
 
-Camera::Camera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
-{
-    m_pos = Pos;
-    m_target = Target;
-    m_target.Normalize();
-
-    m_up = Up;
-    m_up.Normalize();
-}
-
-
 void Camera::SetPosition(float x, float y, float z)
 {
     m_pos.x = x;
@@ -48,10 +37,8 @@ void Camera::SetPosition(float x, float y, float z)
 }
 
 
-bool Camera::OnKeyboard(unsigned char Key)
+void Camera::OnKeyboard(unsigned char Key)
 {
-    bool Ret = true;
-
     switch (Key) {
 
     case GLUT_KEY_UP:
@@ -60,7 +47,6 @@ bool Camera::OnKeyboard(unsigned char Key)
 
     case GLUT_KEY_DOWN:
         m_pos -= (m_target * m_speed);
-        Ret = true;
         break;
 
     case GLUT_KEY_LEFT:
@@ -96,30 +82,19 @@ bool Camera::OnKeyboard(unsigned char Key)
 
     case '-':
         m_speed -= 0.1;
-        if (m_speed < 0.0f) {
-            m_speed = 0.0f;
+        if (m_speed < 0.1f) {
+            m_speed = 0.1f;
         }
         printf("Speed changed to %f\n", m_speed);
         break;
-
-    default:
-        Ret = false;
-        break;
     }
-
-    return Ret;
 }
 
 
 Matrix4f Camera::GetMatrix()
 {
-    Matrix4f Translation;
-    Translation.InitTranslationTransform(-m_pos.x, -m_pos.y, -m_pos.z);
-
-    Matrix4f Rotation;
-    Rotation.InitCameraTransform(m_target, m_up);
-
-    Matrix4f CameraTransformation = Rotation * Translation;
+    Matrix4f CameraTransformation;
+    CameraTransformation.InitCameraTransform(m_pos, m_target, m_up);
 
     return CameraTransformation;
 }

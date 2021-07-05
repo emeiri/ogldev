@@ -27,11 +27,9 @@ public:
 
     Camera();
 
-    Camera(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
-
     void SetPosition(float x, float y, float z);
 
-    bool OnKeyboard(unsigned char Key);
+    void OnKeyboard(unsigned char key);
 
     Matrix4f GetMatrix();
 
