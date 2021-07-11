@@ -24,14 +24,15 @@
   </header>
 
   <article id="content" class="breakpoint">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/zUpJ2vx3wes" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <section>
       <h3> Background </h3>
 
-      <p>In the previous tutorial we learned how to position the camera anywhere in the 3D world. The next logical step is to allow the user to control it. 
+      <p>In the previous tutorial we learned how to position the camera anywhere in the 3D world. The next logical step is to allow the user to control it.
       Movement will be unrestricted - the user will be able to move in all directions. Controlling the camera will be done using two input devices - the keyboard will
       control our position and the mouse will change our view target. This is very similar to what most first person shooters are doing. This tutorial will focus
       on the keyboard and the next one on the mouse.</p>
-      <p>We are going to support the four directional keys in the conventional manner. Remember that our camera transformation is defined by position, target vector and up vector. 
+      <p>We are going to support the four directional keys in the conventional manner. Remember that our camera transformation is defined by position, target vector and up vector.
       When we move using the keyboard we only change our position. We cannot tilt the camera or turn it so the target and up vectors are uneffected.</p>
       <p>To control the keyboard we will use another GLUT API: glutSpecialFunc(). This function registers a callback that is triggered when a "special" key is clicked.
       The group of special keys include the function, directional and PAGE-UP/PAGE-DOWN/HOME/END/INSERT keys. If you want to trap a regular key (characters and digits)
@@ -118,11 +119,11 @@
       <p>Forward and backward movements are the simplest. Since movement is always along the target vector we only need to add or substract the target vector from the position. The
       target vector itself remains unchanged. Note that before adding or substracting the target vector we scale it by a constant value called 'StepSize'. We do it for all directional keys. StepSize
       provides a central point to change the speed (in the future we may change this into a class attribute). To make StepSize consistent we make sure that we always multiply it by unit length vectors
-      (i.e. we must make sure the target and up vectors are unit length).</p>  
+      (i.e. we must make sure the target and up vectors are unit length).</p>
       <p>Sideways movement is a bit more complex. It is defined as a movement along a vector which is perpendicular to the plane created by the target and up vectors. This plane divides the three-dimensional
       space into two parts and there are two vectors that are perpendicular to it and are opposite to one another. We can call one of them "left" and the other "right". They are generated using a cross
       product of the target and up vectors in the two possible combinations: target cross up and up cross target (cross product is a non commutative operation - changing the order of parameters can generate
-      different result). After getting the left/right vector we normalize it, scale it by the StepSize and add it to the position (which moves it in the left/right direction). 
+      different result). After getting the left/right vector we normalize it, scale it by the StepSize and add it to the position (which moves it in the left/right direction).
       Again, the target and up vectors are uneffected.</p>
       <p>Note that the operations in this function make use of a few new operators such as '+=' and '-=' that have been added to the Vector3f class.</p>
       <p>(tutorial14.cpp:73)</p>
@@ -140,7 +141,7 @@
           &nbsp;&nbsp;&nbsp;  glutSpecialFunc(SpecialKeyboardCB);<br>
       }<br>
       </code>
-      <p>Here we register a new callback to handle the special keyboard events. The callback receives the key and the location of the mouse at the time of the key press. We ignore the mouse position and pass 
+      <p>Here we register a new callback to handle the special keyboard events. The callback receives the key and the location of the mouse at the time of the key press. We ignore the mouse position and pass
       the event on to an instance of the camera class which was already allocated on the global section of the file.</p>
       <p>(tutorial14.cpp:55)</p>
       <code>p.SetCamera(GameCamera.GetPos(), GameCamera.GetTarget(), GameCamera.GetUp());</code>
@@ -148,11 +149,27 @@
     </section>
 
       <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=ns9eVfHCYdg&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=12">video tutorial by Frahaan Hussain</a>.</p>
-      
+
     <a href="../tutorial15/tutorial15.html" class="next highlight"> Next tutorial </a>
   </article>
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial14/tutorial14.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
