@@ -76,12 +76,12 @@ void Camera::OnKeyboard(unsigned char Key)
         break;
 
     case '+':
-        m_speed += 0.1;
+        m_speed += 0.1f;
         printf("Speed changed to %f\n", m_speed);
         break;
 
     case '-':
-        m_speed -= 0.1;
+        m_speed -= 0.1f;
         if (m_speed < 0.1f) {
             m_speed = 0.1f;
         }

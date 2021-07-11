@@ -49,7 +49,11 @@ static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
+#ifdef _WIN64
+    float YRotationAngle = 0.1f;
+#else
     float YRotationAngle = 1.0f;
+#endif
 
     CubeWorldTransform.SetPosition(0.0f, 0.0f, 2.0f);
     CubeWorldTransform.Rotate(0.0f, YRotationAngle, 0.0f);

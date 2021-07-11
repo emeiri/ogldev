@@ -19,7 +19,7 @@
 #ifndef OGLDEV_TYPES_H
 #define OGLDEV_TYPES_H
 
-#ifndef WIN32
+#ifndef _WIN64
 #include <unistd.h>
 #endif
 

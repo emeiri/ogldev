@@ -19,7 +19,7 @@
 #ifndef OGLDEV_UTIL_H
 #define	OGLDEV_UTIL_H
 
-#ifndef WIN32
+#ifndef _WIN64
 #include <unistd.h>
 #endif
 #include <stdlib.h>
@@ -50,7 +50,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #endif
 
-#ifdef WIN32
+#ifdef _WIN64
 #define SNPRINTF _snprintf_s
 #define VSNPRINTF vsnprintf_s
 #define RANDOM rand
