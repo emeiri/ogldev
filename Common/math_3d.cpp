@@ -156,19 +156,13 @@ void Matrix4f::InitCameraTransform(const Vector3f& Target, const Vector3f& Up)
 
 void Matrix4f::InitCameraTransform(const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
 {
-    Vector3f N = Target;
-    N.Normalize();
+    Matrix4f CameraTranslation;
+    CameraTranslation.InitTranslationTransform(-Pos.x, -Pos.y, -Pos.z);
 
-    Vector3f U;
-    U = Up.Cross(N);
-    U.Normalize();
+    Matrix4f CameraRotateTrans;
+    CameraRotateTrans.InitCameraTransform(Target, Up);
 
-    Vector3f V = N.Cross(U);
-
-    m[0][0] = U.x;   m[0][1] = U.y;   m[0][2] = U.z;   m[0][3] = -Pos.x;
-    m[1][0] = V.x;   m[1][1] = V.y;   m[1][2] = V.z;   m[1][3] = -Pos.y;
-    m[2][0] = N.x;   m[2][1] = N.y;   m[2][2] = N.z;   m[2][3] = -Pos.z;
-    m[3][0] = 0.0f;  m[3][1] = 0.0f;  m[3][2] = 0.0f;  m[3][3] = 1.0f;
+    *this = CameraRotateTrans * CameraTranslation;
 }
 
 void Matrix4f::InitPersProjTransform(const PersProjInfo& p)

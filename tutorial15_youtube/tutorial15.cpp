@@ -39,7 +39,7 @@ GLuint gWVPLocation;
 WorldTrans CubeWorldTransform;
 Camera GameCamera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-float FOV = 60.0f;
+float FOV = 45.0f;
 float zNear = 1.0f;
 float zFar = 100.0f;
 PersProjInfo PersProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
