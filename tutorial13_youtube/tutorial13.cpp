@@ -69,7 +69,7 @@ static void RenderSceneCB()
                     N.x,  N.y,  N.z,  -CameraPos.z,
                     0.0f, 0.0f, 0.0f, 1.0f);
 
-    float VFOV = 90.0f;
+    float VFOV = 45.0f;
     float tanHalfVFOV = tanf(ToRadian(VFOV / 2.0f));
     float d = 1/tanHalfVFOV;
     float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
