@@ -29,8 +29,8 @@
 #include "camera.h"
 #include "world_transform.h"
 
-#define WINDOW_WIDTH  2000
-#define WINDOW_HEIGHT 1000
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1200
 
 GLuint VBO;
 GLuint IBO;
@@ -39,7 +39,7 @@ GLuint gWVPLocation;
 WorldTrans CubeWorldTransform;
 Camera GameCamera(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-float FOV = 45.0f;
+float FOV = 60.0f;
 float zNear = 1.0f;
 float zFar = 100.0f;
 PersProjInfo PersProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
@@ -275,12 +275,16 @@ int main(int argc, char** argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    //    glutGameModeString("1920x1200@32");
+    // glutEnterGameMode();
 
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
     int win = glutCreateWindow("Tutorial 15");
     printf("window id: %d\n", win);
+
+    InitializeGlutCallbacks();
 
     // Must be done after glut is initialized!
     GLenum res = glewInit();
@@ -300,8 +304,6 @@ int main(int argc, char** argv)
     CreateIndexBuffer();
 
     CompileShaders();
-
-    InitializeGlutCallbacks();
 
     glutMainLoop();
 
