@@ -44,19 +44,12 @@ Vector3f& Vector3f::Normalize()
     return *this;
 }
 
-void Vector3f::Rotate(float Angle, const Vector3f& Axe)
+void Vector3f::Rotate(float Angle, const Vector3f& V)
 {
-    const float SinHalfAngle = sinf(ToRadian(Angle/2));
-    const float CosHalfAngle = cosf(ToRadian(Angle/2));
-
-    const float Rx = Axe.x * SinHalfAngle;
-    const float Ry = Axe.y * SinHalfAngle;
-    const float Rz = Axe.z * SinHalfAngle;
-    const float Rw = CosHalfAngle;
-    Quaternion RotationQ(Rx, Ry, Rz, Rw);
+    Quaternion RotationQ(Angle, V);
 
     Quaternion ConjugateQ = RotationQ.Conjugate();
-  //  ConjugateQ.Normalize();
+
     Quaternion W = RotationQ * (*this) * ConjugateQ;
 
     x = W.x;
@@ -246,6 +239,20 @@ Matrix4f& Matrix4f::Inverse()
         *this = res;
 
         return *this;
+}
+
+
+Quaternion::Quaternion(float Angle, const Vector3f& V)
+{
+    float HalfAngleInRadians = ToRadian(Angle/2);
+
+    float SinHalfAngle = sinf(HalfAngleInRadians);
+    float CosHalfAngle = cosf(HalfAngleInRadians);
+
+    x = V.x * SinHalfAngle;
+    y = V.y * SinHalfAngle;
+    z = V.z * SinHalfAngle;
+    w = CosHalfAngle;
 }
 
 Quaternion::Quaternion(float _x, float _y, float _z, float _w)

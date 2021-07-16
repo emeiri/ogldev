@@ -231,9 +231,12 @@ struct OrthoProjInfo
     float f;        // z far
 };
 
+
 struct Quaternion
 {
     float x, y, z, w;
+
+    Quaternion(float Angle, const Vector3f& V);
 
     Quaternion(float _x, float _y, float _z, float _w);
 
@@ -242,7 +245,11 @@ struct Quaternion
     Quaternion Conjugate();
 
     Vector3f ToDegrees();
- };
+};
+
+Quaternion operator*(const Quaternion& l, const Quaternion& r);
+
+Quaternion operator*(const Quaternion& q, const Vector3f& v);
 
 
 class Matrix4f
@@ -368,8 +375,5 @@ public:
     void InitOrthoProjTransform(const OrthoProjInfo& p);
 };
 
-Quaternion operator*(const Quaternion& l, const Quaternion& r);
-
-Quaternion operator*(const Quaternion& q, const Vector3f& v);
 
 #endif  /* MATH_3D_H */

@@ -38,7 +38,7 @@ void Camera::Init()
 {
     Vector3f HTarget(m_target.x, 0.0, m_target.z);
     HTarget.Normalize();
-    
+
     if (HTarget.z >= 0.0f)
     {
         if (HTarget.x >= 0.0f)
@@ -61,7 +61,7 @@ void Camera::Init()
             m_AngleH = 180.0f - ToDegree(asin(-HTarget.z));
         }
     }
-    
+
     m_AngleV = -ToDegree(asin(m_target.y));
 
     m_OnUpperEdge = false;
@@ -147,7 +147,7 @@ void Camera::OnMouse(int x, int y)
     m_mousePos.y = y;
 
     m_AngleH += (float)DeltaX / 20.0f;
-    m_AngleV += (float)DeltaY / 20.0f;
+    m_AngleV += (float)DeltaY / 50.0f;
 
     if (DeltaX == 0) {
         if (x <= MARGIN) {
@@ -219,6 +219,7 @@ void Camera::Update()
     // Rotate the view vector by the horizontal angle around the vertical axis
     Vector3f View(1.0f, 0.0f, 0.0f);
     View.Rotate(m_AngleH, Vaxis);
+
     View.Normalize();
 
     // Rotate the view vector by the vertical angle around the horizontal axis

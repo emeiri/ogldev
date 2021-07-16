@@ -30,8 +30,8 @@
 #include "ogldev_glut_backend.h"
 #include "ogldev_texture.h"
 
-#define WINDOW_WIDTH  1280
-#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1200
 
 struct Vertex
 {
@@ -237,8 +237,8 @@ int main(int argc, char** argv)
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("Tutorial 16");
-    glutGameModeString("1280x1024@32");
-  //  glutEnterGameMode();
+    glutGameModeString("1920x12@32");
+    glutEnterGameMode();
 
     InitializeGlutCallbacks();
 

@@ -29,8 +29,8 @@
 #include "camera.h"
 #include "world_transform.h"
 
-#define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1200
+#define WINDOW_WIDTH  2560
+#define WINDOW_HEIGHT 1440
 
 GLuint VBO;
 GLuint IBO;
@@ -94,6 +94,10 @@ static void RenderSceneCB()
 
 static void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
+    if (key == 'q' || key == 27) {
+        exit(0);
+    }
+
     GameCamera.OnKeyboard(key);
 }
 
@@ -275,14 +279,15 @@ int main(int argc, char** argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-    //    glutGameModeString("1920x1200@32");
-    // glutEnterGameMode();
 
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
     int win = glutCreateWindow("Tutorial 15");
     printf("window id: %d\n", win);
+
+    glutGameModeString("2560x1440");
+    glutEnterGameMode();
 
     InitializeGlutCallbacks();
 
