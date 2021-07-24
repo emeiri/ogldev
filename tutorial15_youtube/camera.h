@@ -27,6 +27,8 @@ public:
 
     Camera(int WindowWidth, int WindowHeight);
 
+    Camera(int WindowWidth, int WindowHeight, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
+
     void SetPosition(float x, float y, float z);
 
     void OnKeyboard(unsigned char key);

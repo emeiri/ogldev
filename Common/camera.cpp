@@ -55,7 +55,7 @@ void Camera::Init()
 {
     Vector3f HTarget(m_target.x, 0.0, m_target.z);
     HTarget.Normalize();
-    
+
     if (HTarget.z >= 0.0f)
     {
         if (HTarget.x >= 0.0f)
@@ -78,7 +78,7 @@ void Camera::Init()
             m_AngleH = 180.0f - ToDegree(asin(-HTarget.z));
         }
     }
-    
+
     m_AngleV = -ToDegree(asin(m_target.y));
 
     m_OnUpperEdge = false;
@@ -235,7 +235,7 @@ void Camera::Update()
     Vector3f Haxis = Vaxis.Cross(View);
     Haxis.Normalize();
     View.Rotate(m_AngleV, Haxis);
-       
+
     m_target = View;
     m_target.Normalize();
 

@@ -37,7 +37,10 @@ GLuint IBO;
 GLuint gWVPLocation;
 
 WorldTrans CubeWorldTransform;
-Camera GameCamera(WINDOW_WIDTH, WINDOW_HEIGHT);
+Vector3f CameraPos(0.0f, 0.0f, -1.0f);
+Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
+Vector3f CameraUp(0.0f, 1.0f, 0.0f);
+Camera GameCamera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
 float FOV = 45.0f;
 float zNear = 1.0f;
@@ -286,7 +289,10 @@ int main(int argc, char** argv)
     int win = glutCreateWindow("Tutorial 15");
     printf("window id: %d\n", win);
 
-    glutGameModeString("2560x1440");
+    char game_mode_string[64];
+    // Game mode string example: 1920x1080@32
+    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
+    glutGameModeString(game_mode_string);
     glutEnterGameMode();
 
     InitializeGlutCallbacks();
