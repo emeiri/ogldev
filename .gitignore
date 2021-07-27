@@ -20,11 +20,10 @@
 *.idb
 Makefile-Release.mk
 *.obj
-
 *.log
-
 *.ipch
-
 *.unsuccessfulbuild
-
 *.opensdf
+*.recipe
+*.FileListAbsolute.txt
+*.VC.db
