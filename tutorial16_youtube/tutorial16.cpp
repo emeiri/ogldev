@@ -51,6 +51,20 @@ float zFar = 100.0f;
 PersProjInfo PersProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
 
+struct Vertex {
+    Vector3f pos;
+    Vector2f tex;
+
+    Vertex() {}
+
+    Vertex(const Vector3f& pos_, const Vector2f& tex_)
+    {
+        pos = pos_;
+        tex = tex_;
+    }
+};
+
+
 static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -79,13 +93,15 @@ static void RenderSceneCB()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
+    pTexture->Bind(GL_TEXTURE0);
+
     // position
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
-    // color
+    // tex coords
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
@@ -129,34 +145,23 @@ static void InitializeGlutCallbacks()
 }
 
 
-struct Vertex {
-    Vector3f pos;
-    Vector2f tex;
-
-    Vertex() {}
-
-    Vertex(const Vector3f& pos_, const Vector2f& tex_)
-    {
-        pos = pos_;
-        tex = tex_;
-    }
-};
-
-
 static void CreateVertexBuffer()
 {
     Vertex Vertices[8];
 
-    Vector2f foo;
+    Vector2f t00 = Vector2f(0.0f, 0.0f);
+    Vector2f t01 = Vector2f(0.0f, 1.0f);
+    Vector2f t10 = Vector2f(1.0f, 0.0f);
+    Vector2f t11 = Vector2f(1.0f, 1.0f);
 
-    Vertices[0] = Vertex(Vector3f(0.5f, 0.5f, 0.5f), foo);
-    Vertices[1] = Vertex(Vector3f(-0.5f, 0.5f, -0.5f), foo);
-    Vertices[2] = Vertex(Vector3f(-0.5f, 0.5f, 0.5f), foo);
-    Vertices[3] = Vertex(Vector3f(0.5f, -0.5f, -0.5f), foo);
-    Vertices[4] = Vertex(Vector3f(-0.5f, -0.5f, -0.5f), foo);
-    Vertices[5] = Vertex(Vector3f(0.5f, 0.5f, -0.5f), foo);
-    Vertices[6] = Vertex(Vector3f(0.5f, -0.5f, 0.5f), foo);
-    Vertices[7] = Vertex(Vector3f(-0.5f, -0.5f, 0.5f), foo);
+    Vertices[0] = Vertex(Vector3f(0.5f, 0.5f, 0.5f), t00);
+    Vertices[1] = Vertex(Vector3f(-0.5f, 0.5f, -0.5f), t01);
+    Vertices[2] = Vertex(Vector3f(-0.5f, 0.5f, 0.5f), t10);
+    Vertices[3] = Vertex(Vector3f(0.5f, -0.5f, -0.5f), t11);
+    Vertices[4] = Vertex(Vector3f(-0.5f, -0.5f, -0.5f), t00);
+    Vertices[5] = Vertex(Vector3f(0.5f, 0.5f, -0.5f), t10);
+    Vertices[6] = Vertex(Vector3f(0.5f, -0.5f, 0.5f), t01);
+    Vertices[7] = Vertex(Vector3f(-0.5f, -0.5f, 0.5f), t11);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
