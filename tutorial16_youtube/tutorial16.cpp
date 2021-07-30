@@ -248,13 +248,13 @@ static void CompileShaders()
 
     AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
-    GLint Success = 0;
+    GLint success = 0;
     GLchar ErrorLog[1024] = { 0 };
 
     glLinkProgram(ShaderProgram);
 
-    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
-    if (Success == 0) {
+    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success);
+    if (success == 0) {
         glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         exit(1);
@@ -273,8 +273,8 @@ static void CompileShaders()
     }
 
     glValidateProgram(ShaderProgram);
-    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
-    if (!Success) {
+    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &success);
+    if (!success) {
         glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
         exit(1);
@@ -304,8 +304,8 @@ int main(int argc, char** argv)
     char game_mode_string[64];
     // Game mode string example: 1920x1080@32
     snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
-    glutGameModeString(game_mode_string);
-    glutEnterGameMode();
+    //    glutGameModeString(game_mode_string);
+    //    glutEnterGameMode();
 
     InitializeGlutCallbacks();
 
@@ -330,7 +330,7 @@ int main(int argc, char** argv)
 
     glUniform1i(gSampler, 0);
 
-    pTexture = new Texture(GL_TEXTURE_2D, "../Content/test.png");
+    pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
 
     if (!pTexture->Load()) {
         return 1;

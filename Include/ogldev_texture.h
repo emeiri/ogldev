@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 */
 
 #ifndef TEXTURE_H
-#define	TEXTURE_H
+#define TEXTURE_H
 
 #include <string>
 
 #include <GL/glew.h>
 #include <ImageMagick-6/Magick++.h>
+
 
 class Texture
 {
@@ -42,5 +43,4 @@ private:
 };
 
 
-#endif	/* TEXTURE_H */
-
+#endif  /* TEXTURE_H */
