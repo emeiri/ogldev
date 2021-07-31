@@ -9,7 +9,6 @@
 *.tlog
 *.manifest
 *.res
-*.user
 *.lastbuildstate
 *.sdf
 *.suo
