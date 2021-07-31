@@ -36,7 +36,7 @@
 GLuint VBO;
 GLuint IBO;
 GLuint gWVPLocation;
-GLuint gSampler;
+GLuint gSamplerLocation;
 Texture* pTexture = NULL;
 
 WorldTrans CubeWorldTransform;
@@ -94,6 +94,7 @@ static void RenderSceneCB()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
     pTexture->Bind(GL_TEXTURE0);
+    glUniform1i(gSampler, 0);
 
     // position
     glEnableVertexAttribArray(0);
@@ -248,13 +249,13 @@ static void CompileShaders()
 
     AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
 
-    GLint success = 0;
+    GLint Success = 0;
     GLchar ErrorLog[1024] = { 0 };
 
     glLinkProgram(ShaderProgram);
 
-    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &success);
-    if (success == 0) {
+    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
+    if (Success == 0) {
         glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         exit(1);
@@ -273,8 +274,8 @@ static void CompileShaders()
     }
 
     glValidateProgram(ShaderProgram);
-    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &success);
-    if (!success) {
+    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
+    if (!Success) {
         glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
         exit(1);
@@ -323,12 +324,14 @@ int main(int argc, char** argv)
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
 
+    int texture_units = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
+    printf("Number of texture units %d\n", texture_units);
+
     CreateVertexBuffer();
     CreateIndexBuffer();
 
     CompileShaders();
-
-    glUniform1i(gSampler, 0);
 
     pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
 
