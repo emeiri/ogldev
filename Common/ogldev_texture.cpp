@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include "ogldev_texture.h"
-#include "3dparty/stb_image.h"
+#include "3rdparty/stb_image.h"
 
 Texture::Texture(GLenum TextureTarget, const std::string& FileName)
 {

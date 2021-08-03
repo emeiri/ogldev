@@ -94,7 +94,7 @@ static void RenderSceneCB()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
     pTexture->Bind(GL_TEXTURE0);
-    glUniform1i(gSampler, 0);
+    glUniform1i(gSamplerLocation, 0);
 
     // position
     glEnableVertexAttribArray(0);
@@ -267,8 +267,8 @@ static void CompileShaders()
         exit(1);
     }
 
-    gSampler = glGetUniformLocation(ShaderProgram, "gSampler");
-    if (gSampler == -1) {
+    gSamplerLocation = glGetUniformLocation(ShaderProgram, "gSampler");
+    if (gSamplerLocation == -1) {
         printf("Error getting uniform location of 'gSampler'\n");
         exit(1);
     }
