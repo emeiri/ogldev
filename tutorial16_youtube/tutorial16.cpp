@@ -150,10 +150,10 @@ static void CreateVertexBuffer()
 {
     Vertex Vertices[8];
 
-    Vector2f t00 = Vector2f(0.0f, 0.0f);
-    Vector2f t01 = Vector2f(0.0f, 1.0f);
-    Vector2f t10 = Vector2f(1.0f, 0.0f);
-    Vector2f t11 = Vector2f(1.0f, 1.0f);
+    Vector2f t00 = Vector2f(0.0f, 0.0f);  // Bottom left
+    Vector2f t01 = Vector2f(0.0f, 1.0f);  // Top left
+    Vector2f t10 = Vector2f(1.0f, 0.0f);  // Bottom right
+    Vector2f t11 = Vector2f(1.0f, 1.0f);  // Top right
 
     Vertices[0] = Vertex(Vector3f(0.5f, 0.5f, 0.5f), t00);
     Vertices[1] = Vertex(Vector3f(-0.5f, 0.5f, -0.5f), t01);
@@ -299,7 +299,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 15");
+    int win = glutCreateWindow("Tutorial 16");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];

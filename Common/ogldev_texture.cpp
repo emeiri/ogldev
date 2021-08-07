@@ -61,6 +61,7 @@ bool Texture::Load()
         glTexImage2D(m_textureTarget, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
     } else {
         printf("Support for texture target %x is not implemented\n", m_textureTarget);
+        exit(1);
     }
 
     glTexParameterf(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
