@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{03d3bf34-434a-42d3-b90c-0168e09b9db4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial16_youtube\shader.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial16_youtube\shader.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\tutorial16_youtube\camera.cpp" />
+    <ClCompile Include="..\..\..\tutorial16_youtube\tutorial16.cpp" />
+    <ClCompile Include="..\..\..\tutorial16_youtube\world_transform.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\tutorial16_youtube\camera.h" />
+    <ClInclude Include="..\..\..\tutorial16_youtube\world_transform.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
+  </ItemGroup>
+</Project>
