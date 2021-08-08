@@ -24,10 +24,11 @@
   </header>
 
   <article id="content" class="breakpoint">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/n8t7nvHCqek" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <section>
       <h3> Background </h3>
 
-      <p>Texture mapping means applying any type of picture on one or more faces of a 3D model. The picture (a.k.a 'texture') can be anything but is often a pattern such as bricks, foliage, barren land, etc, that adds realism 
+      <p>Texture mapping means applying any type of picture on one or more faces of a 3D model. The picture (a.k.a 'texture') can be anything but is often a pattern such as bricks, foliage, barren land, etc, that adds realism
       to the scene. For example, compare the following images:</p>
       <img class="center" src="txt_example.png">
       <p>To get texture mapping working you need to do three things: load a texture into OpenGL, supply texture coordinates with the vertices (to map the texture to them) and perform a sampling operation from the texture
@@ -48,7 +49,7 @@
       <p>This image presents the texture space and you can see the origin of that space in the bottom left corner. U grows towards the right and V grows up. Now consider a triangle whose texture coordinates are specified in
       the following picture:</p>
       <img class="center" src="tri1.png">
-      <p>Let's say that we apply a texture such that when using these texture coordinates we get the picture of the small house in the location above. Now the triangle goes through various transformations and when the time 
+      <p>Let's say that we apply a texture such that when using these texture coordinates we get the picture of the small house in the location above. Now the triangle goes through various transformations and when the time
       comes to rasterize it it looks like this:</p>
       <img class="center" src="tri2.png">
       <p>As you can see, the texture coordinates "stick" to the vertices as they are a core attributes and they don't change under the transformations. When interpolating the texture coordinates most pixels get the same texture
@@ -58,7 +59,7 @@
       if our texture coordinates (remember - this is a fraction between 0 and 1) maps us to a texel at (152.34,745.14)? The trivial answer is to round this down to (152,745). Well, this works and provides adequate results but
       in some cases won't look very good. A better approach is to get the 2 by 2 quad of texels ( (152,745), (153,745), (152,744) and (153,744) ) and do some linear interpolation between their colors. This linear interpolation
       must reflect the relative distance between (152.34,745.14) and each one of the texels. The closest the coordinate is to a texel the greater influence it gets on the end result and the further it is the less influence
-      it gets. This looks much better than the original approach.</p>  
+      it gets. This looks much better than the original approach.</p>
       <p>The method by which the final texel value is selected is known as 'filtering'. The simple approach of rounding the texture location is known as 'nearest filtering' and the more complex approach that we saw is called 'linear
       filtering'. Another name for nearest filtering you may come across is 'point filtering'. OpenGL supports several types of filters and you have the option to choose. Usually the filters that provide better results
       demand greater compute power from the GPU and may have an effect on the frame rate. Choosing the filter type is a matter of balancing between the desired result and the capability of the target platform.</p>
@@ -86,11 +87,11 @@
     <section>
       <h3> Source walkthru </h3>
 
-      <p>OpenGL knows how to load texture data in different formats from a memory location but does not 
+      <p>OpenGL knows how to load texture data in different formats from a memory location but does not
       provide any means for loading the texture into memory from image files such as PNG and JPG. We are going to use an external
-      library for that. There are many options in that department and we're going to use 
-      <span style="font-weight: bold;"><a href="http://www.imagemagick.org/script/index.php">ImageMagick</a></span>, 
-      a free software library that supports many image types and is portable across several operating systems. 
+      library for that. There are many options in that department and we're going to use
+      <span style="font-weight: bold;"><a href="http://www.imagemagick.org/script/index.php">ImageMagick</a></span>,
+      a free software library that supports many image types and is portable across several operating systems.
       See the <a href="../../instructions.html">instructions</a> for more info on installing it.
       </p>
       <p>Most of the handling of the texture is encapsulated in the following class:</p>
@@ -106,7 +107,7 @@
        &nbsp;&nbsp;    void Bind(GLenum TextureUnit);<br>
       };
       </code>
-      <p>When creating a Texture object you will need to specify a target (we use GL_TEXTURE_2D) and file name. After that you call the Load() function. This can fail, for example, if the file does not exist or if 
+      <p>When creating a Texture object you will need to specify a target (we use GL_TEXTURE_2D) and file name. After that you call the Load() function. This can fail, for example, if the file does not exist or if
       ImageMagick encountered any other error. When you want to use a specific Texture instance you need to bind it to one of the texture units.</p>
       <p>(ogldev_texture.cpp:31)</p>
       <code>
@@ -121,7 +122,7 @@
       </code>
       <p>This is how we use ImageMagick to load the texture from file and prepare it in memory to be loaded into OpenGL. We start by instantiating a class member with the type Magic::Image using the texture file name.
       This call loads the texture into a memory representation which is private to ImageMagick and cannot be used directly by OpenGL. Next we write the image into a Magick::Blob object using the RGBA (red, green, blue
-      and alpha channels) format. The BLOB (Binary Large Object) is a useful mechanism for storing an encoded image in memory in a way that it can be used by external programs. If there is any error an exception will 
+      and alpha channels) format. The BLOB (Binary Large Object) is a useful mechanism for storing an encoded image in memory in a way that it can be used by external programs. If there is any error an exception will
       be thrown so we need to be prepared for it.</p>
       <p>(ogldev_texture.cpp:40)</p>
       <code>glGenTextures(1, &amp;m_textureObj);</code>
@@ -210,7 +211,7 @@
           &nbsp; &nbsp;    Vertex(Vector3f(1.0f, -1.0f, 0.5773f),  Vector2f(1.0f, 0.0f)),<br>
           &nbsp; &nbsp;    Vertex(Vector3f(0.0f, 1.0f, 0.0f),      Vector2f(0.5f, 1.0f)) };
       </code>
-      <p>Up until this tutorial our vertex buffer was simply a consecutive list of Vector3f structures that contained the position. Now we have the 'Vertex' structure that contains the position as well as the texture 
+      <p>Up until this tutorial our vertex buffer was simply a consecutive list of Vector3f structures that contained the position. Now we have the 'Vertex' structure that contains the position as well as the texture
       coordinates as a Vector2f.</p>
       <p>(tutorial16.cpp:80)</p>
       <code>
@@ -223,11 +224,11 @@
       pTexture->Bind(GL_TEXTURE0);<br>
       ...<br>
       glDisableVertexAttribArray(1);
-      </code> 
+      </code>
       <p>These are the changes and additions to the render loop. We start by enabling vertex attribute 1 for the texture coordinates, in addition to attribute 0 which is already enabled for the position. This corresponds
       to the layout statement in the vertex shader. Next we call glVertexAttribPointer to specify the location of the texture coordinates in the vertex buffer. The texture coordinate is composed of 2 floating point values
-      which corresponds to the second and third paramaters. Note the fifth parameter. This is the size of the vertex structure and is specified for both the position and the texture coordinates. This parameter is known as the 
-      'vertex stride' 
+      which corresponds to the second and third paramaters. Note the fifth parameter. This is the size of the vertex structure and is specified for both the position and the texture coordinates. This parameter is known as the
+      'vertex stride'
       and tells OpenGL the number of bytes between the start of the attribute in a vertex and the start of the same attribute in the next vertex. In our case the buffer contains: pos0, texture coords0, pos1, texture coords1, etc.
       In the previous tutorials we only had position so it was ok to set it to either zero or sizeof(Vector3f). Now that we have more
       than one attribute the stride can only be the number of bytes in the Vertex structure. The last parameter is the offset in bytes from the start of the Vertex structure to the texture attributes. We have to do the casting
@@ -240,14 +241,14 @@
       glCullFace(GL_BACK);<br>
       glEnable(GL_CULL_FACE);<br>
       </code>
-      <p>These OpenGL calls are not really related to texturing, I just added it to make it look better (try disabling...). 
+      <p>These OpenGL calls are not really related to texturing, I just added it to make it look better (try disabling...).
       They enable back face culling, a common optimization used to drop triangles before the heavy process
-      of rasterization. The motivation here is that often 50% of the surface of an object is hidden from us 
+      of rasterization. The motivation here is that often 50% of the surface of an object is hidden from us
       (the back of a person, house, car, etc). The glFrontFace() function tells OpenGL that vertices in a triangle
-      are specifed in clockwise order. That is, when you look at the front face of the triangle, you will find the 
+      are specifed in clockwise order. That is, when you look at the front face of the triangle, you will find the
       vertices in the vertex buffer in clockwise order. The glCullFace() tells the GPU to cull the back
-      of a triangle. This means that the "inside" of an object doesn't need to be rendered, 
-      only the external part. Finally, back face culling itself is enabled (by default it is disabled). Note that in this tutorial 
+      of a triangle. This means that the "inside" of an object doesn't need to be rendered,
+      only the external part. Finally, back face culling itself is enabled (by default it is disabled). Note that in this tutorial
       I reversed the order of the indices of the bottom triangle. The way that it was before made the triangle appear as if it was
       facing the inside of the pyramid (see line 170 in tutorial16.cpp). </p>
       </body>
@@ -268,11 +269,27 @@
     </section>
 
     <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=RnXDUFq7T6A&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=9">video tutorial by Frahaan Hussain</a>.</p>
-    
+
     <a href="../tutorial17/tutorial17.html" class="next highlight"> Next tutorial </a>
   </article>
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial16/tutorial16.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
