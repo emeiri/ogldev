@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 16 - Basic Texturing
+    Tutorial 17 - Vertex Array Objects
 */
 
 #include <stdio.h>
@@ -33,23 +33,6 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-GLuint VBO;
-GLuint IBO;
-GLuint gWVPLocation;
-GLuint gSamplerLocation;
-Texture* pTexture = NULL;
-
-WorldTrans CubeWorldTransform;
-Vector3f CameraPos(0.0f, 0.0f, -1.0f);
-Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
-Vector3f CameraUp(0.0f, 1.0f, 0.0f);
-Camera GameCamera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
-
-float FOV = 45.0f;
-float zNear = 1.0f;
-float zFar = 100.0f;
-PersProjInfo PersProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-
 
 struct Vertex {
     Vector3f pos;
@@ -65,11 +48,96 @@ struct Vertex {
 };
 
 
-static void RenderSceneCB()
+class Tutorial17
+{
+public:
+    Tutorial17();
+    ~Tutorial17();
+
+    bool Init();
+
+    void RenderSceneCB();
+    void KeyboardCB(unsigned char key, int mouse_x, int mouse_y);
+    void SpecialKeyboardCB(int key, int mouse_x, int mouse_y);
+    void PassiveMouseCB(int x, int y);
+
+private:
+
+    void CreateVertexBuffer();
+    void CreateIndexBuffer();
+    void CompileShaders();
+    void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
+
+    GLuint VBO;
+    GLuint IBO;
+    GLuint gWVPLocation;
+    GLuint gSamplerLocation;
+    Texture* pTexture = NULL;
+    Camera* pGameCamera = NULL;
+    WorldTrans CubeWorldTransform;
+    PersProjInfo persProjInfo;
+};
+
+
+Tutorial17::Tutorial17()
+{
+    GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
+    glClearColor(Red, Green, Blue, Alpha);
+
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+
+    float FOV = 45.0f;
+    float zNear = 1.0f;
+    float zFar = 100.0f;
+
+    persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+}
+
+
+Tutorial17::~Tutorial17()
+{
+    if (pTexture) {
+        delete pTexture;
+    }
+
+    if (pGameCamera) {
+        delete pGameCamera;
+    }
+}
+
+
+bool Tutorial17::Init()
+{
+    bool ret = true;
+
+    CreateVertexBuffer();
+    CreateIndexBuffer();
+
+    CompileShaders();
+
+    pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
+
+    if (!pTexture->Load()) {
+        ret = false;
+    }
+
+    Vector3f CameraPos(0.0f, 0.0f, -1.0f);
+    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
+    Vector3f CameraUp(0.0f, 1.0f, 0.0f);
+
+    pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
+
+    return ret;
+}
+
+
+void Tutorial17::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    GameCamera.OnRender();
+    pGameCamera->OnRender();
 
 #ifdef _WIN64
     float YRotationAngle = 0.1f;
@@ -81,10 +149,10 @@ static void RenderSceneCB()
     CubeWorldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
     Matrix4f World = CubeWorldTransform.GetMatrix();
 
-    Matrix4f View = GameCamera.GetMatrix();
+    Matrix4f View = pGameCamera->GetMatrix();
 
     Matrix4f Projection;
-    Projection.InitPersProjTransform(PersProjInfo);
+    Projection.InitPersProjTransform(persProjInfo);
 
     Matrix4f WVP = Projection * View * World;
 
@@ -115,38 +183,29 @@ static void RenderSceneCB()
 }
 
 
-static void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void Tutorial17::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     if (key == 'q' || key == 27) {
         exit(0);
     }
 
-    GameCamera.OnKeyboard(key);
+    pGameCamera->OnKeyboard(key);
 }
 
 
-static void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void Tutorial17::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    GameCamera.OnKeyboard(key);
+    pGameCamera->OnKeyboard(key);
 }
 
 
-static void PassiveMouseCB(int x, int y)
+void Tutorial17::PassiveMouseCB(int x, int y)
 {
-    GameCamera.OnMouse(x, y);
+    pGameCamera->OnMouse(x, y);
 }
 
 
-static void InitializeGlutCallbacks()
-{
-    glutDisplayFunc(RenderSceneCB);
-    glutKeyboardFunc(KeyboardCB);
-    glutSpecialFunc(SpecialKeyboardCB);
-    glutPassiveMotionFunc(PassiveMouseCB);
-}
-
-
-static void CreateVertexBuffer()
+void Tutorial17::CreateVertexBuffer()
 {
     Vertex Vertices[8];
 
@@ -169,7 +228,8 @@ static void CreateVertexBuffer()
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 }
 
-static void CreateIndexBuffer()
+
+void Tutorial17::CreateIndexBuffer()
 {
     unsigned int Indices[] = {
                               0, 1, 2,
@@ -191,7 +251,8 @@ static void CreateIndexBuffer()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 }
 
-static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
+
+void Tutorial17::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
 {
     GLuint ShaderObj = glCreateShader(ShaderType);
 
@@ -226,7 +287,7 @@ static void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum Shad
 const char* pVSFileName = "shader.vs";
 const char* pFSFileName = "shader.fs";
 
-static void CompileShaders()
+void Tutorial17::CompileShaders()
 {
     GLuint ShaderProgram = glCreateProgram();
 
@@ -284,6 +345,44 @@ static void CompileShaders()
     glUseProgram(ShaderProgram);
 }
 
+
+Tutorial17* pTutorial17 = NULL;
+
+
+void RenderSceneCB()
+{
+    pTutorial17->RenderSceneCB();
+}
+
+
+void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+{
+    pTutorial17->KeyboardCB(key, mouse_x, mouse_y);
+}
+
+
+void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+{
+    pTutorial17->SpecialKeyboardCB(key, mouse_x, mouse_y);
+}
+
+
+void PassiveMouseCB(int x, int y)
+{
+    pTutorial17->PassiveMouseCB(x, y);
+}
+
+
+
+void InitializeGlutCallbacks()
+{
+    glutDisplayFunc(RenderSceneCB);
+    glutKeyboardFunc(KeyboardCB);
+    glutSpecialFunc(SpecialKeyboardCB);
+    glutPassiveMotionFunc(PassiveMouseCB);
+}
+
+
 int main(int argc, char** argv)
 {
 #ifdef _WIN64
@@ -299,7 +398,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 16");
+    int win = glutCreateWindow("Tutorial 17");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
@@ -308,8 +407,6 @@ int main(int argc, char** argv)
     //    glutGameModeString(game_mode_string);
     //    glutEnterGameMode();
 
-    InitializeGlutCallbacks();
-
     // Must be done after glut is initialized!
     GLenum res = glewInit();
     if (res != GLEW_OK) {
@@ -317,25 +414,11 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
-    glClearColor(Red, Green, Blue, Alpha);
+    InitializeGlutCallbacks();
 
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
+    pTutorial17 = new Tutorial17();
 
-    int texture_units = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &texture_units);
-    printf("Number of texture units %d\n", texture_units);
-
-    CreateVertexBuffer();
-    CreateIndexBuffer();
-
-    CompileShaders();
-
-    pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
-
-    if (!pTexture->Load()) {
+    if (!pTutorial17->Init()) {
         return 1;
     }
 
