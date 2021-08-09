@@ -63,15 +63,17 @@ public:
 
 private:
 
-    void CreateVertexBuffer();
-    void CreateIndexBuffer();
+    void CreateCubeVAO();
+    void CreatePyramidVAO();
     void CompileShaders();
     void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 
+    GLuint CubeVAO;
+    GLuint PyramidVAO;
     GLuint VBO;
     GLuint IBO;
-    GLuint gWVPLocation;
-    GLuint gSamplerLocation;
+    GLuint WVPLocation;
+    GLuint SamplerLocation;
     Texture* pTexture = NULL;
     Camera* pGameCamera = NULL;
     WorldTrans CubeWorldTransform;
@@ -110,18 +112,22 @@ Tutorial17::~Tutorial17()
 
 bool Tutorial17::Init()
 {
-    bool ret = true;
+    CreateCubeVAO();
+    CreatePyramidVAO();
 
-    CreateVertexBuffer();
-    CreateIndexBuffer();
+    // Bind a default object
+    glBindVertexArray(CubeVAO);
 
     CompileShaders();
 
     pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
 
     if (!pTexture->Load()) {
-        ret = false;
+        return false;
     }
+
+    pTexture->Bind(GL_TEXTURE0);
+    glUniform1i(SamplerLocation, 0);
 
     Vector3f CameraPos(0.0f, 0.0f, -1.0f);
     Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
@@ -129,7 +135,7 @@ bool Tutorial17::Init()
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
-    return ret;
+    return true;
 }
 
 
@@ -155,27 +161,9 @@ void Tutorial17::RenderSceneCB()
     Projection.InitPersProjTransform(persProjInfo);
 
     Matrix4f WVP = Projection * View * World;
-
-    glUniformMatrix4fv(gWVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-
-    pTexture->Bind(GL_TEXTURE0);
-    glUniform1i(gSamplerLocation, 0);
-
-    // position
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-
-    // tex coords
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+    glUniformMatrix4fv(WVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
 
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
 
     glutPostRedisplay();
 
@@ -185,8 +173,18 @@ void Tutorial17::RenderSceneCB()
 
 void Tutorial17::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    if (key == 'q' || key == 27) {
+    switch (key) {
+    case 'q':
+    case 27:    // escape key code
         exit(0);
+
+    case '1':
+        glBindVertexArray(CubeVAO);
+        break;
+
+    case '2':
+        glBindVertexArray(PyramidVAO);
+        break;
     }
 
     pGameCamera->OnKeyboard(key);
@@ -205,8 +203,11 @@ void Tutorial17::PassiveMouseCB(int x, int y)
 }
 
 
-void Tutorial17::CreateVertexBuffer()
+void Tutorial17::CreateCubeVAO()
 {
+    glGenVertexArrays(1, &CubeVAO);
+    glBindVertexArray(CubeVAO);
+
     Vertex Vertices[8];
 
     Vector2f t00 = Vector2f(0.0f, 0.0f);  // Bottom left
@@ -226,11 +227,15 @@ void Tutorial17::CreateVertexBuffer()
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-}
 
+    // position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
-void Tutorial17::CreateIndexBuffer()
-{
+    // tex coords
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+
     unsigned int Indices[] = {
                               0, 1, 2,
                               1, 3, 4,
@@ -249,6 +254,51 @@ void Tutorial17::CreateIndexBuffer()
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+
+void Tutorial17::CreatePyramidVAO()
+{
+    glGenVertexArrays(1, &PyramidVAO);
+    glBindVertexArray(PyramidVAO);
+
+    Vertex Vertices[4] = { Vertex(Vector3f(-1.0f, -1.0f, 0.5773f), Vector2f(0.0f, 0.0f)),
+                           Vertex(Vector3f(0.0f, -1.0f, -1.15475f), Vector2f(0.5f, 0.0f)),
+                           Vertex(Vector3f(1.0f, -1.0f, 0.5773f),  Vector2f(1.0f, 0.0f)),
+                           Vertex(Vector3f(0.0f, 1.0f, 0.0f),      Vector2f(0.5f, 1.0f)) };
+
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+
+    // position
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+    // tex coords
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+
+    unsigned int Indices[] = { 0, 3, 1,
+                               1, 3, 2,
+                               2, 3, 0,
+                               0, 1, 2 };
+
+    glGenBuffers(1, &IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 
@@ -284,8 +334,6 @@ void Tutorial17::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum
     glAttachShader(ShaderProgram, ShaderObj);
 }
 
-const char* pVSFileName = "shader.vs";
-const char* pFSFileName = "shader.fs";
 
 void Tutorial17::CompileShaders()
 {
@@ -298,13 +346,13 @@ void Tutorial17::CompileShaders()
 
     std::string vs, fs;
 
-    if (!ReadFile(pVSFileName, vs)) {
+    if (!ReadFile("shader.vs", vs)) {
         exit(1);
     };
 
     AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
 
-    if (!ReadFile(pFSFileName, fs)) {
+    if (!ReadFile("shader.fs", fs)) {
         exit(1);
     };
 
@@ -322,14 +370,14 @@ void Tutorial17::CompileShaders()
         exit(1);
     }
 
-    gWVPLocation = glGetUniformLocation(ShaderProgram, "gWVP");
-    if (gWVPLocation == -1) {
+    WVPLocation = glGetUniformLocation(ShaderProgram, "gWVP");
+    if (WVPLocation == -1) {
         printf("Error getting uniform location of 'gWVP'\n");
         exit(1);
     }
 
-    gSamplerLocation = glGetUniformLocation(ShaderProgram, "gSampler");
-    if (gSamplerLocation == -1) {
+    SamplerLocation = glGetUniformLocation(ShaderProgram, "gSampler");
+    if (SamplerLocation == -1) {
         printf("Error getting uniform location of 'gSampler'\n");
         exit(1);
     }
