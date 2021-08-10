@@ -426,7 +426,6 @@ void PassiveMouseCB(int x, int y)
 }
 
 
-
 void InitializeGlutCallbacks()
 {
     glutDisplayFunc(RenderSceneCB);
@@ -445,6 +444,8 @@ int main(int argc, char** argv)
 #endif
 
     glutInit(&argc, argv);
+    glutInitContextVersion(3, 3);
+    glutInitContextProfile(GLUT_CORE_PROFILE);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -456,9 +457,10 @@ int main(int argc, char** argv)
 
     char game_mode_string[64];
     // Game mode string example: 1920x1080@32
-    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
-    //    glutGameModeString(game_mode_string);
-    //    glutEnterGameMode();
+    // Enable the following three lines for full screen
+    // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
+    // glutGameModeString(game_mode_string);
+    // glutEnterGameMode();
 
     // Must be done after glut is initialized!
     GLenum res = glewInit();
