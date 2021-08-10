@@ -68,10 +68,14 @@ private:
     void CompileShaders();
     void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
 
-    GLuint CubeVAO;
-    GLuint PyramidVAO;
-    GLuint VBO;
-    GLuint IBO;
+    GLuint CubeVAO = -1;
+    GLuint CubeVBO = -1;
+    GLuint CubeIBO = -1;
+
+    GLuint PyramidVAO = -1;
+    GLuint PyramidVBO = -1;
+    GLuint PyramidIBO = -1;
+
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Texture* pTexture = NULL;
@@ -106,6 +110,30 @@ Tutorial17::~Tutorial17()
 
     if (pGameCamera) {
         delete pGameCamera;
+    }
+
+    if (CubeVAO != -1) {
+        glDeleteVertexArrays(1, &CubeVAO);
+    }
+
+    if (CubeVBO != -1) {
+        glDeleteBuffers(1, &CubeVBO);
+    }
+
+    if (CubeIBO != -1) {
+        glDeleteBuffers(1, &CubeIBO);
+    }
+
+    if (PyramidVAO != -1) {
+        glDeleteVertexArrays(1, &PyramidVAO);
+    }
+
+    if (PyramidVBO != -1) {
+        glDeleteBuffers(1, &PyramidVBO);
+    }
+
+    if (PyramidIBO != -1) {
+        glDeleteBuffers(1, &PyramidIBO);
     }
 }
 
@@ -224,8 +252,8 @@ void Tutorial17::CreateCubeVAO()
     Vertices[6] = Vertex(Vector3f(0.5f, -0.5f, 0.5f), t01);
     Vertices[7] = Vertex(Vector3f(-0.5f, -0.5f, 0.5f), t11);
 
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glGenBuffers(1, &CubeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, CubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 
     // position
@@ -251,8 +279,8 @@ void Tutorial17::CreateCubeVAO()
                               0, 2, 7
     };
 
-    glGenBuffers(1, &IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glGenBuffers(1, &CubeIBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, CubeIBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
     glBindVertexArray(0);
@@ -278,8 +306,8 @@ void Tutorial17::CreatePyramidVAO()
                            Vertex(Vector3f(1.0f, -1.0f, 0.5773f), t10),
                            Vertex(Vector3f(0.0f, 1.0f, 0.0f), t051) };
 
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glGenBuffers(1, &PyramidVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, PyramidVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 
     // position
@@ -295,8 +323,8 @@ void Tutorial17::CreatePyramidVAO()
                                2, 3, 0,
                                0, 1, 2 };
 
-    glGenBuffers(1, &IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glGenBuffers(1, &PyramidIBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, PyramidIBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
     glBindVertexArray(0);
