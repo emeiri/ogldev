@@ -6,4 +6,4 @@ CPPFLAGS="$CPPFLAGS -I../Include -I../Common/FreetypeGL"
 LDFLAGS=`pkg-config --libs glew ImageMagick++ freetype2 glfw3`
 LDFLAGS="$LDFLAGS -lglut ../Lib/libAntTweakBar.a -lX11"
 
-$CC tutorial16.cpp ../Common/ogldev_util.cpp ../Common/pipeline.cpp ../Common/math_3d.cpp ../Common/camera.cpp ../Common/ogldev_atb.cpp ../Common/glut_backend.cpp ../Common/ogldev_texture.cpp $CPPFLAGS $LDFLAGS -o tutorial16
+$CC tutorial16.cpp ../Common/ogldev_util.cpp ../Common/pipeline.cpp ../Common/math_3d.cpp ../Common/camera.cpp ../Common/ogldev_atb.cpp ../Common/glut_backend.cpp ../Common/ogldev_texture.cpp ../Common/3rdparty/stb_image.cpp $CPPFLAGS $LDFLAGS -o tutorial16
