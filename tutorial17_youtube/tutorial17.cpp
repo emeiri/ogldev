@@ -268,10 +268,15 @@ void Tutorial17::CreatePyramidVAO()
     glGenVertexArrays(1, &PyramidVAO);
     glBindVertexArray(PyramidVAO);
 
-    Vertex Vertices[4] = { Vertex(Vector3f(-1.0f, -1.0f, 0.5773f), Vector2f(0.0f, 0.0f)),
-                           Vertex(Vector3f(0.0f, -1.0f, -1.15475f), Vector2f(0.5f, 0.0f)),
-                           Vertex(Vector3f(1.0f, -1.0f, 0.5773f),  Vector2f(1.0f, 0.0f)),
-                           Vertex(Vector3f(0.0f, 1.0f, 0.0f),      Vector2f(0.5f, 1.0f)) };
+    Vector2f t00  = Vector2f(0.0f, 0.0f);
+    Vector2f t050 = Vector2f(0.5f, 0.0f);
+    Vector2f t10  = Vector2f(1.0f, 0.0f);
+    Vector2f t051 = Vector2f(0.5f, 1.0f);
+
+    Vertex Vertices[4] = { Vertex(Vector3f(-1.0f, -1.0f, 0.5773f), t00),
+                           Vertex(Vector3f(0.0f, -1.0f, -1.15475f), t050),
+                           Vertex(Vector3f(1.0f, -1.0f, 0.5773f), t10),
+                           Vertex(Vector3f(0.0f, 1.0f, 0.0f), t051) };
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
