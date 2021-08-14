@@ -24,6 +24,8 @@
   </header>
 
   <article id="content" class="breakpoint">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/JwAH_YGOcVo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
     <section>
       <h3> Background </h3>
 
@@ -34,12 +36,12 @@
       The advantage is that once you set up the VAO for a mesh you can bring in the entire mesh state
       by simply binding the VAO. After that you can render the mesh object and you don't need to worry about
       all of its state. The VAO remembers it for you. If your application needs to deal with meshes whose
-      vertex layout slightly differs from one another the VAO takes care of it also. Just make sure to 
+      vertex layout slightly differs from one another the VAO takes care of it also. Just make sure to
       set up the correct layout when you create the VAO and forget about it. From now on it "sticks" to
       the VAO and becomes active whenever that VAO is used.
       </p>
       <p>
-      When used correctly, VAOs can also represent an optimization opportunity for the driver of the GPU. 
+      When used correctly, VAOs can also represent an optimization opportunity for the driver of the GPU.
       If the VAO is set up once and used multiple times the driver can take advantage of knowing the mapping
       between the index buffer and the vertex buffers as well as the vertex layout in the buffers. Obviously,
       this depends on the specific driver that you are using and it is not guaranteed that all drivers will behave
@@ -93,7 +95,7 @@
       <b>#define INDEX_BUFFER 0    <br>
       #define POS_VB       1<br>
       #define NORMAL_VB    2<br>
-      #define TEXCOORD_VB  3    <br>   
+      #define TEXCOORD_VB  3    <br>
       <br>
        &nbsp; &nbsp;    GLuint m_VAO;<br>
        &nbsp; &nbsp;    GLuint m_Buffers[4];<br>
@@ -164,15 +166,15 @@
       }
       </code>
       <p>
-      Not much has changed in the main function that loads the mesh. We generate the VAO using glGenVertexArrays() by providing the number 
+      Not much has changed in the main function that loads the mesh. We generate the VAO using glGenVertexArrays() by providing the number
       of elements in an array of GLuint and the address of the array itself (in our case we only need one
-      GLuint). After that we bind the VAO using glBindVertexArray(). There can only be one VAO bound 
+      GLuint). After that we bind the VAO using glBindVertexArray(). There can only be one VAO bound
       at any time. From now on, any change to the state of the vertex processor will affect this
       VAO. The four buffers are generated using glGenBuffers() and the mesh is loaded using
-      the Open Asset Import Library (see below). A very important function call is 
+      the Open Asset Import Library (see below). A very important function call is
       glBindVertexArray(0) at the end of the function. By binding zero as the VAO we guarentee that no further
       changes to the vertex processor will affect our VAO (OpenGL will never generate a VAO with
-      the value of zero so this is safe). 
+      the value of zero so this is safe).
       </p>
       <p>(ogldev_basic_mesh.cpp:90)</p>
       <code>
@@ -265,7 +267,7 @@
       </ol>
       </p>
       <p>
-      The index buffer is initialized by binding it to the GL_ELEMENT_ARRAY_BUFFER target. We only need 
+      The index buffer is initialized by binding it to the GL_ELEMENT_ARRAY_BUFFER target. We only need
       to populate it with the indices and that's it. The buffers are now initialized and everything we did
       is encapsulated in the VAO.
       </p>
@@ -302,7 +304,7 @@
       }
       </code>
       <p>
-      This function is responsible for loading each aiMesh structure that is contained in the aiScene. Note how 
+      This function is responsible for loading each aiMesh structure that is contained in the aiScene. Note how
       the vectors are passed by reference and accessed using the push_back() function of the STL vector class.
       </p>
       <p>(ogldev_basic_mesh.cpp:236)</p>
@@ -332,7 +334,7 @@
       }
       </code>
       <p>
-      Finally, we've reached the render function. We start by binding our VAO and...this is all we need to do 
+      Finally, we've reached the render function. We start by binding our VAO and...this is all we need to do
       in terms of setting up the state for the vertex processor! whatever state is already there has
       now been replaced by the state that we have set up when we initialized the VAO.
       Now we need to draw the subcomponents of the mesh and bind the proper texture before
@@ -344,14 +346,14 @@
       base index of the current entry by the size of an index. Since the vertex attributes have also been accumulated
       into their own buffers we do the same with the fifth parameter - the base vertex. Note that we are providing
       it as an index rather than as a byte offset because there can be multiple vertex buffers with different types
-      of attributes (and therefore differen strides). OpenGL will need to multiply the base 
+      of attributes (and therefore differen strides). OpenGL will need to multiply the base
       vertex by the stride of each buffer in order to get the offset of that buffer. Nothing we need to worry
       about.
       </p>
       <p>
-      Before leaving we reset the current VAO back to zero and the reason is the same as when 
+      Before leaving we reset the current VAO back to zero and the reason is the same as when
       we initially created the VAO - we don't want outside code to bind a VB (for example) and
-      change our VAO unintentinally. 
+      change our VAO unintentinally.
       </p>
       <p>(ogldev_basic_mesh.cpp:50)</p>
       <code>
@@ -368,5 +370,21 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial32/tutorial32.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
