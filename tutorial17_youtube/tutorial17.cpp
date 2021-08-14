@@ -181,6 +181,7 @@ void Tutorial17::RenderSceneCB()
 
     CubeWorldTransform.SetPosition(0.0f, 0.0f, 2.0f);
     CubeWorldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+
     Matrix4f World = CubeWorldTransform.GetMatrix();
 
     Matrix4f View = pGameCamera->GetMatrix();
@@ -191,7 +192,14 @@ void Tutorial17::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     glUniformMatrix4fv(WVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
 
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    GLint CurrentVAO;
+    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &CurrentVAO);
+
+    if (CurrentVAO == CubeVAO) {
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    } else {
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    }
 
     glutPostRedisplay();
 
