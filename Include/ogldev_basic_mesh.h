@@ -29,7 +29,6 @@
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
-#include "ogldev_pipeline.h"
 
 struct Vertex
 {
@@ -67,8 +66,6 @@ public:
     void Render();
 
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
-
-    Orientation& GetOrientation() { return m_orientation; }
 
 private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
@@ -110,7 +107,6 @@ private:
 
     std::vector<BasicMeshEntry> m_Entries;
     std::vector<Texture*> m_Textures;
-    Orientation m_orientation;
 };
 
 

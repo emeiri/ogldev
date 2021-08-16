@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "world_transform.h"
+#include "ogldev_world_transform.h"
 
 
 void WorldTrans::SetScale(float scale)
