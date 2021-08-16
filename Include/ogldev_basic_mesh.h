@@ -72,6 +72,7 @@ public:
 
 private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+
     void InitMesh(const aiMesh* paiMesh,
                   std::vector<Vector3f>& Positions,
                   std::vector<Vector3f>& Normals,
@@ -79,7 +80,10 @@ private:
                   std::vector<unsigned int>& Indices);
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+
     void Clear();
+
+    void CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -91,8 +95,8 @@ private:
 #define WORLD_MAT_VB 5
 
     WorldTrans m_worldTransform;
-    GLuint m_VAO;
-    GLuint m_Buffers[6];
+    GLuint m_VAO = 0;
+    GLuint m_Buffers[6] = { 0 };
 
     struct BasicMeshEntry {
         BasicMeshEntry()

@@ -29,8 +29,6 @@ using namespace std;
 
 BasicMesh::BasicMesh()
 {
-    m_VAO = 0;
-    ZERO_MEM(m_Buffers);
 }
 
 
@@ -100,16 +98,7 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
     unsigned int NumVertices = 0;
     unsigned int NumIndices = 0;
 
-    // Count the number of vertices and indices
-    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
-        m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
-        m_Entries[i].BaseVertex = NumVertices;
-        m_Entries[i].BaseIndex = NumIndices;
-
-        NumVertices += pScene->mMeshes[i]->mNumVertices;
-        NumIndices  += m_Entries[i].NumIndices;
-    }
+    CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
     // Reserve space in the vectors for the vertex attributes and indices
     Positions.reserve(NumVertices);
@@ -147,6 +136,20 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 
     return GLCheckError();
+}
+
+
+void BasicMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
+{
+    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
+        m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+        m_Entries[i].BaseVertex = NumVertices;
+        m_Entries[i].BaseIndex = NumIndices;
+
+        NumVertices += pScene->mMeshes[i]->mNumVertices;
+        NumIndices  += m_Entries[i].NumIndices;
+    }
 }
 
 void BasicMesh::InitMesh(const aiMesh* paiMesh,
