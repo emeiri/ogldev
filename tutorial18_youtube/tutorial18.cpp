@@ -59,7 +59,6 @@ private:
     Texture* pTexture = NULL;
     Camera* pGameCamera = NULL;
     BasicMesh* pMesh = NULL;
-    WorldTrans CubeWorldTransform;
     PersProjInfo persProjInfo;
 };
 
@@ -138,11 +137,13 @@ void Tutorial18::RenderSceneCB()
     float YRotationAngle = 1.0f;
 #endif
 
-    CubeWorldTransform.SetScale(0.01f);
-    CubeWorldTransform.SetPosition(0.0f, 0.0f, 2.0f);
-    CubeWorldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+    WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
-    Matrix4f World = CubeWorldTransform.GetMatrix();
+    worldTransform.SetScale(0.01f);
+    worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
+    worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+
+    Matrix4f World = worldTransform.GetMatrix();
 
     Matrix4f View = pGameCamera->GetMatrix();
 
@@ -310,9 +311,6 @@ void InitializeGlutCallbacks()
     glutSpecialFunc(SpecialKeyboardCB);
     glutPassiveMotionFunc(PassiveMouseCB);
 }
-
-
-
 
 int main(int argc, char** argv)
 {

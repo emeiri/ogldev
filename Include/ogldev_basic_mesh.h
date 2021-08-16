@@ -29,6 +29,7 @@
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
+#include "ogldev_world_transform.h"
 
 struct Vertex
 {
@@ -67,6 +68,8 @@ public:
 
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
+    WorldTrans& GetWorldTransform() { return m_worldTransform; }
+
 private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
     void InitMesh(const aiMesh* paiMesh,
@@ -87,6 +90,7 @@ private:
 #define WVP_MAT_VB   4
 #define WORLD_MAT_VB 5
 
+    WorldTrans m_worldTransform;
     GLuint m_VAO;
     GLuint m_Buffers[6];
 
