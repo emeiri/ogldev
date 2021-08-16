@@ -85,6 +85,8 @@ private:
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 
+    void PopulateBuffers();
+
 #define INVALID_MATERIAL 0xFFFFFFFF
 
 #define INDEX_BUFFER 0

@@ -103,24 +103,7 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
         return false;
     }
 
-    // Generate and populate the buffers with vertex attributes and the indices
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Positions[0]) * m_Positions.size(), &m_Positions[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_TexCoords[0]) * m_TexCoords.size(), &m_TexCoords[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(TEX_COORD_LOCATION);
-    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Normals[0]) * m_Normals.size(), &m_Normals[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(NORMAL_LOCATION);
-    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
+    PopulateBuffers();
 
     return GLCheckError();
 }
@@ -147,6 +130,7 @@ void BasicMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
     m_TexCoords.reserve(NumVertices);
     m_Indices.reserve(NumIndices);
 }
+
 
 void BasicMesh::InitAllMeshes(const aiScene* pScene)
 {
@@ -237,12 +221,34 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
+void BasicMesh::PopulateBuffers()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Positions[0]) * m_Positions.size(), &m_Positions[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(POSITION_LOCATION);
+    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_TexCoords[0]) * m_TexCoords.size(), &m_TexCoords[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(TEX_COORD_LOCATION);
+    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Normals[0]) * m_Normals.size(), &m_Normals[0], GL_STATIC_DRAW);
+    glEnableVertexAttribArray(NORMAL_LOCATION);
+    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
+}
+
+
 void BasicMesh::Render()
 {
     glBindVertexArray(m_VAO);
 
     for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
-        const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
+        unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
 
         assert(MaterialIndex < m_Textures.size());
 
@@ -260,6 +266,7 @@ void BasicMesh::Render()
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
+
 
 void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {
