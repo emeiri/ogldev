@@ -95,11 +95,7 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 
     CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
-    // Reserve space in the vectors for the vertex attributes and indices
-    m_Positions.reserve(NumVertices);
-    m_Normals.reserve(NumVertices);
-    m_TexCoords.reserve(NumVertices);
-    m_Indices.reserve(NumIndices);
+    ReserveSpace(NumVertices, NumIndices);
 
     InitAllMeshes(pScene);
 
@@ -141,6 +137,15 @@ void BasicMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& Num
         NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices  += m_Entries[i].NumIndices;
     }
+}
+
+
+void BasicMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
+{
+    m_Positions.reserve(NumVertices);
+    m_Normals.reserve(NumVertices);
+    m_TexCoords.reserve(NumVertices);
+    m_Indices.reserve(NumIndices);
 }
 
 void BasicMesh::InitAllMeshes(const aiScene* pScene)

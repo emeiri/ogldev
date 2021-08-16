@@ -77,6 +77,8 @@ private:
 
     void CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices);
 
+    void ReserveSpace(unsigned int NumVertices, unsigned int NumIndices);
+
     void InitAllMeshes(const aiScene* pScene);
 
     void InitSingleMesh(const aiMesh* paiMesh);
