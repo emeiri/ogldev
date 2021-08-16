@@ -72,6 +72,8 @@ Tutorial18::Tutorial18()
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
 
+    glEnable(GL_DEPTH_TEST);
+
     float FOV = 45.0f;
     float zNear = 1.0f;
     float zFar = 100.0f;
@@ -127,7 +129,7 @@ bool Tutorial18::Init()
 
 void Tutorial18::RenderSceneCB()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     pGameCamera->OnRender();
 
