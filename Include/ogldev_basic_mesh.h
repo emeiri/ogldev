@@ -71,19 +71,17 @@ public:
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
 private:
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
-
-    void InitMesh(const aiMesh* paiMesh,
-                  std::vector<Vector3f>& Positions,
-                  std::vector<Vector3f>& Normals,
-                  std::vector<Vector2f>& TexCoords,
-                  std::vector<unsigned int>& Indices);
-
-    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-
     void Clear();
 
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+
     void CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices);
+
+    void InitAllMeshes(const aiScene* pScene);
+
+    void InitSingleMesh(const aiMesh* paiMesh);
+
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -115,6 +113,12 @@ private:
 
     std::vector<BasicMeshEntry> m_Entries;
     std::vector<Texture*> m_Textures;
+
+    // Temporary space for vertex stuff before we load them into the GPU
+    vector<Vector3f> m_Positions;
+    vector<Vector3f> m_Normals;
+    vector<Vector2f> m_TexCoords;
+    vector<unsigned int> m_Indices;
 };
 
 
