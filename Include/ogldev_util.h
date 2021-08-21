@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2014 Etay Meiri
+        Copyright 2014 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 */
 
 #ifndef OGLDEV_UTIL_H
-#define	OGLDEV_UTIL_H
+#define OGLDEV_UTIL_H
 
 #ifndef _WIN64
 #include <unistd.h>
@@ -84,5 +84,4 @@ long long GetCurrentTimeMillis();
 
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices)
 
-#endif	/* OGLDEV_UTIL_H */
-
+#endif  /* OGLDEV_UTIL_H */

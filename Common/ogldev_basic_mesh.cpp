@@ -16,20 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include "ogldev_basic_mesh.h"
 #include "ogldev_engine_common.h"
 
 using namespace std;
 
-#define POSITION_LOCATION 0
+#define POSITION_LOCATION  0
 #define TEX_COORD_LOCATION 1
-#define NORMAL_LOCATION 2
-
-BasicMesh::BasicMesh()
-{
-}
+#define NORMAL_LOCATION    2
 
 
 BasicMesh::~BasicMesh()
@@ -87,7 +81,7 @@ bool BasicMesh::LoadMesh(const string& Filename)
 
 bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 {
-    m_Entries.resize(pScene->mNumMeshes);
+    m_Meshes.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
     unsigned int NumVertices = 0;
@@ -111,14 +105,14 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 
 void BasicMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
 {
-    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
-        m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        m_Entries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
-        m_Entries[i].BaseVertex = NumVertices;
-        m_Entries[i].BaseIndex = NumIndices;
+    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
+        m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
+        m_Meshes[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+        m_Meshes[i].BaseVertex = NumVertices;
+        m_Meshes[i].BaseIndex = NumIndices;
 
         NumVertices += pScene->mMeshes[i]->mNumVertices;
-        NumIndices  += m_Entries[i].NumIndices;
+        NumIndices  += m_Meshes[i].NumIndices;
     }
 }
 
@@ -134,7 +128,7 @@ void BasicMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
 
 void BasicMesh::InitAllMeshes(const aiScene* pScene)
 {
-    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
+    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
         InitSingleMesh(paiMesh);
     }
@@ -147,13 +141,13 @@ void BasicMesh::InitSingleMesh(const aiMesh* paiMesh)
 
     // Populate the vertex attribute vectors
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-        const aiVector3D* pPos      = &(paiMesh->mVertices[i]);
-        const aiVector3D* pNormal   = &(paiMesh->mNormals[i]);
-        const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
+        const aiVector3D& pPos      = paiMesh->mVertices[i];
+        const aiVector3D& pNormal   = paiMesh->mNormals[i];
+        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
 
-        m_Positions.push_back(Vector3f(pPos->x, pPos->y, pPos->z));
-        m_Normals.push_back(Vector3f(pNormal->x, pNormal->y, pNormal->z));
-        m_TexCoords.push_back(Vector2f(pTexCoord->x, pTexCoord->y));
+        m_Positions.push_back(Vector3f(pPos.x, pPos.y, pPos.z));
+        m_Normals.push_back(Vector3f(pNormal.x, pNormal.y, pNormal.z));
+        m_TexCoords.push_back(Vector2f(pTexCoord.x, pTexCoord.y));
     }
 
     // Populate the index buffer
@@ -247,8 +241,8 @@ void BasicMesh::Render()
 {
     glBindVertexArray(m_VAO);
 
-    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
-        unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
+    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
+        unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
 
         assert(MaterialIndex < m_Textures.size());
 
@@ -257,10 +251,10 @@ void BasicMesh::Render()
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
-                         m_Entries[i].NumIndices,
-                         GL_UNSIGNED_INT,
-                         (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex),
-                         m_Entries[i].BaseVertex);
+                                 m_Meshes[i].NumIndices,
+                                 GL_UNSIGNED_INT,
+                                 (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
+                                 m_Meshes[i].BaseVertex);
     }
 
     // Make sure the VAO is not changed from the outside
@@ -278,8 +272,8 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
 
     glBindVertexArray(m_VAO);
 
-    for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
-        const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
+    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
+        const unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
 
         assert(MaterialIndex < m_Textures.size());
 
@@ -288,11 +282,11 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,
-                                          m_Entries[i].NumIndices,
+                                          m_Meshes[i].NumIndices,
                                           GL_UNSIGNED_INT,
-                                          (void*)(sizeof(unsigned int) * m_Entries[i].BaseIndex),
+                                          (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
                                           NumInstances,
-                                          m_Entries[i].BaseVertex);
+                                          m_Meshes[i].BaseVertex);
     }
 
     // Make sure the VAO is not changed from the outside

@@ -31,34 +31,11 @@
 #include "ogldev_texture.h"
 #include "ogldev_world_transform.h"
 
-struct Vertex
-{
-    Vector3f m_pos;
-    Vector2f m_tex;
-    Vector3f m_normal;
-
-    Vertex() {}
-
-    Vertex(const Vector3f& pos, const Vector2f& tex, const Vector3f& normal)
-    {
-        m_pos    = pos;
-        m_tex    = tex;
-        m_normal = normal;
-    }
-
-    Vertex(const Vector3f& pos, const Vector2f& tex)
-    {
-        m_pos    = pos;
-        m_tex    = tex;
-        m_normal = Vector3f(0.0f, 0.0f, 0.0f);
-    }
-};
-
 
 class BasicMesh
 {
 public:
-    BasicMesh();
+    BasicMesh() {};
 
     ~BasicMesh();
 
@@ -89,16 +66,20 @@ private:
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
-#define INDEX_BUFFER 0
-#define POS_VB       1
-#define NORMAL_VB    2
-#define TEXCOORD_VB  3
-#define WVP_MAT_VB   4
-#define WORLD_MAT_VB 5
+
+    enum BUFFER_TYPE {
+        INDEX_BUFFER = 0,
+        POS_VB       = 1,
+        TEXCOORD_VB  = 2,
+        NORMAL_VB    = 3,
+        WVP_MAT_VB   = 4,
+        WORLD_MAT_VB = 5,
+        NUM_BUFFERS  = 6
+    };
 
     WorldTrans m_worldTransform;
     GLuint m_VAO = 0;
-    GLuint m_Buffers[6] = { 0 };
+    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
     struct BasicMeshEntry {
         BasicMeshEntry()
@@ -115,7 +96,7 @@ private:
         unsigned int MaterialIndex;
     };
 
-    std::vector<BasicMeshEntry> m_Entries;
+    std::vector<BasicMeshEntry> m_Meshes;
     std::vector<Texture*> m_Textures;
 
     // Temporary space for vertex stuff before we load them into the GPU
