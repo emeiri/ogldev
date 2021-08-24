@@ -26,9 +26,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-//#include "ogldev_pipeline.h"
+#include "ogldev_pipeline.h"
 #include "ogldev_math_3d.h"
-
 
 #define WINDOW_WIDTH 1024
 #define WINDOW_HEIGHT 768
