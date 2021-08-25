@@ -19,30 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\tutorial16_youtube\shader.fs" />
-    <None Include="..\..\..\tutorial16_youtube\shader.vs" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
-    <ClCompile Include="..\..\..\tutorial16_youtube\camera.cpp" />
-    <ClCompile Include="..\..\..\tutorial16_youtube\tutorial16.cpp" />
-    <ClCompile Include="..\..\..\tutorial16_youtube\world_transform.cpp" />
+    <ClCompile Include="..\..\..\tutorial17_youtube\camera.cpp" />
+    <ClCompile Include="..\..\..\tutorial17_youtube\tutorial17.cpp" />
+    <ClCompile Include="..\..\..\tutorial17_youtube\world_transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
-    <ClInclude Include="..\..\..\tutorial16_youtube\camera.h" />
-    <ClInclude Include="..\..\..\tutorial16_youtube\world_transform.h" />
+    <ClInclude Include="..\..\..\tutorial17_youtube\camera.h" />
+    <ClInclude Include="..\..\..\tutorial17_youtube\world_transform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial17_youtube\shader.fs" />
+    <None Include="..\..\..\tutorial17_youtube\shader.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{7223D5B2-3FDE-417B-BF9E-3E467D1D9FA5}</ProjectGuid>
+    <ProjectGuid>{95DAED2E-A907-4D44-8F0C-5A985491353F}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial16</ProjectName>
+    <ProjectName>Tutorial17</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
