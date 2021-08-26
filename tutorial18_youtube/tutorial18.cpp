@@ -56,7 +56,6 @@ private:
 
     GLuint WVPLocation;
     GLuint SamplerLocation;
-    Texture* pTexture = NULL;
     Camera* pGameCamera = NULL;
     BasicMesh* pMesh = NULL;
     PersProjInfo persProjInfo;
@@ -84,10 +83,6 @@ Tutorial18::Tutorial18()
 
 Tutorial18::~Tutorial18()
 {
-    if (pTexture) {
-        delete pTexture;
-    }
-
     if (pGameCamera) {
         delete pGameCamera;
     }
@@ -101,15 +96,6 @@ Tutorial18::~Tutorial18()
 bool Tutorial18::Init()
 {
     CompileShaders();
-
-    pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
-
-    if (!pTexture->Load()) {
-        return false;
-    }
-
-    pTexture->Bind(GL_TEXTURE0);
-    glUniform1i(SamplerLocation, 0);
 
     Vector3f CameraPos(0.0f, 0.0f, -1.0f);
     Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
