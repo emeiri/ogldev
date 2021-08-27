@@ -237,6 +237,7 @@ void BasicMesh::PopulateBuffers()
 }
 
 
+// Introduced in youtube tutorial #18
 void BasicMesh::Render()
 {
     glBindVertexArray(m_VAO);
@@ -262,6 +263,7 @@ void BasicMesh::Render()
 }
 
 
+// Used only by instancing
 void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
