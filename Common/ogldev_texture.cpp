@@ -63,14 +63,12 @@ bool Texture::Load()
         printf("Support for texture target %x is not implemented\n", m_textureTarget);
         exit(1);
     }
-
     glTexParameterf(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     glBindTexture(m_textureTarget, 0);
-
 #ifndef USE_IMAGE_MAGICK
     stbi_image_free(image_data);
 #endif
