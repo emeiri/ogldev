@@ -1,151 +1,152 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 22 - Loading models using the Open Asset Import Library </title>
+        <title> Tutorial 22 - Loading models using the Open Asset Import Library </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 22: </h2>
-			<h1> Loading models using the Open Asset Import Library </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 22: </h2>
+                        <h1> Loading models using the Open Asset Import Library </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/sP_kiODC25Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <section>
+                        <h3> Background </h3>
 
-			<p>
-				We have made it thus far using manually generated models. As you can imagine, the process of specifying 
-				the position and other attributes for each and every vertex in an object does not scale well. A box, pyramid and 
-				a simple tiled surface are OK, but what about something like a human face? In the real world of games and commercial
-				applications the process of mesh creation is handled by artists that use modeling programs such as 
-				<a href="http://www.blender.org/">Blender</a>, <a href="http://usa.autodesk.com/maya/">Maya</a> and 
-				<a href="http://usa.autodesk.com/3ds-max/">3ds Max</a>. These applications provide advanced tools that help the artist
-				create extremely sophisticated models. When the model is complete it is saved to a file in one of the many available
-				formats. The file contains the entire geometry definition of the model. It can now be loaded into a game engine 
-				(provided the engine supports the particular format) and its contents can be used to populate vertex and index buffers for rendering.
-				Knowing how to parse the geometry definition file format and load professional models is crucial 
-				in order to take your 3D programming to the next level. 
-			</p>
-			<p>
-				Developing the parser on your own can consume quite a lot of your time. If you want to be able to load models from 
-				different sources, you will need to study each format and develop a specific parser for it. Some of the formats
-				are simple but some are very complex and you might end up spending too much time on something which is not exactly core
-				3D programming.	Therefore, the approach persued by this tutorial is to use an external library to take care of parsing and loading
-				the models from files. 
-			</p>
-			<p>
-				The <a href="http://www.assimp.org/">Open Asset Import Library</a>, or Assimp, is an open source library that
-				can handle many 3D formats, including the most popular ones. It is portable and available for both Linux and Windows.	
-				It is very easy to use and integrate into programs written in C/C++.
-			</p>
-			<p>
-				There is not much theory in this tutorial. Let's dive right in and see how we can integrate Assimp into our 3D programs.<br>
-				(before you start, make sure you install Assimp from the link above).
-			</p>
-		</section>
+                        <p>
+                                We have made it thus far using manually generated models. As you can imagine, the process of specifying
+                                the position and other attributes for each and every vertex in an object does not scale well. A box, pyramid and
+                                a simple tiled surface are OK, but what about something like a human face? In the real world of games and commercial
+                                applications the process of mesh creation is handled by artists that use modeling programs such as
+                                <a href="http://www.blender.org/">Blender</a>, <a href="http://usa.autodesk.com/maya/">Maya</a> and
+                                <a href="http://usa.autodesk.com/3ds-max/">3ds Max</a>. These applications provide advanced tools that help the artist
+                                create extremely sophisticated models. When the model is complete it is saved to a file in one of the many available
+                                formats. The file contains the entire geometry definition of the model. It can now be loaded into a game engine
+                                (provided the engine supports the particular format) and its contents can be used to populate vertex and index buffers for rendering.
+                                Knowing how to parse the geometry definition file format and load professional models is crucial
+                                in order to take your 3D programming to the next level.
+                        </p>
+                        <p>
+                                Developing the parser on your own can consume quite a lot of your time. If you want to be able to load models from
+                                different sources, you will need to study each format and develop a specific parser for it. Some of the formats
+                                are simple but some are very complex and you might end up spending too much time on something which is not exactly core
+                                3D programming. Therefore, the approach persued by this tutorial is to use an external library to take care of parsing and loading
+                                the models from files.
+                        </p>
+                        <p>
+                                The <a href="http://www.assimp.org/">Open Asset Import Library</a>, or Assimp, is an open source library that
+                                can handle many 3D formats, including the most popular ones. It is portable and available for both Linux and Windows.
+                                It is very easy to use and integrate into programs written in C/C++.
+                        </p>
+                        <p>
+                                There is not much theory in this tutorial. Let's dive right in and see how we can integrate Assimp into our 3D programs.<br>
+                                (before you start, make sure you install Assimp from the link above).
+                        </p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<p>(mesh.h:50)</p>
-			<code>
-			class Mesh<br>
-			{<br>
-			public:<br>
-			&nbsp; &nbsp;    Mesh();<br>
-			<br>
-			&nbsp; &nbsp;     ~Mesh();<br>
-			<br>
-			&nbsp; &nbsp;     bool LoadMesh(const std::string&amp; Filename);<br>
-			<br>
-			&nbsp; &nbsp;     void Render();<br>
-			<br>
-			private:<br>
-			&nbsp; &nbsp;     bool InitFromScene(const aiScene* pScene, const std::string&amp; Filename);<br>
-			&nbsp; &nbsp;     void InitMesh(unsigned int Index, const aiMesh* paiMesh);<br>
-			&nbsp; &nbsp;     bool InitMaterials(const aiScene* pScene, const std::string&amp; Filename);<br>
-			&nbsp; &nbsp;     void Clear();<br>
-			<br>
-			#define INVALID_MATERIAL 0xFFFFFFFF<br>
-			<br>
-			&nbsp; &nbsp;     struct MeshEntry {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         MeshEntry();<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         ~MeshEntry();<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         bool Init(const std::vector<Vertex>&amp; Vertices,<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;                   const std::vector<unsigned int>&amp; Indices);<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         GLuint VB;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         GLuint IB;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         unsigned int NumIndices;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         unsigned int MaterialIndex;<br>
-			&nbsp; &nbsp;     };<br>
-			<br>
-			&nbsp; &nbsp;     std::vector<MeshEntry> m_Entries;<br>
-			&nbsp; &nbsp;     std::vector<Texture*> m_Textures;<br>
-			};
-			</code>
-			<p>
-				The Mesh class represents the interface between Assimp and our OpenGL program. An object of this class takes a file name
-				as a parameter to the LoadMesh() function, uses Assimp to load the model and then creates vertex buffers, index bufferss
-				and Texture objects that contain the data of the model in the form that our program understands. In order to render the
-				mesh we use the function Render().
-				The internal structure of the Mesh class matches the way that Assimp loads models. Assimp uses an aiScene object to represent
-				the loaded mesh. The aiScene object contains mesh structures that encapsulate parts of the model. There must be 
-				at least one mesh structure in the aiScene object. Complex models can contain multiple mesh structures. The m_Entries 
-				member of the Mesh class is a vector of the MeshEntry struct where each structure corresponds to one mesh structure 
-				in the aiScene object. That structure contains the vertex buffer, index buffer and the index of the
-				material. For now, a material is simply a texture and since mesh entries can share materials we have a separate vector for
-				them (m_Textures). MeshEntry::MaterialIndex points into one of the textures in m_Textures.
-			</p>
-			<p>(mesh.cpp:77)</p>
-			<code>
-			bool Mesh::LoadMesh(const std::string&amp; Filename)<br>
-			{<br>
-			&nbsp; &nbsp;      // Release the previously loaded mesh (if it exists)<br>
-			&nbsp; &nbsp;      Clear();<br>
-			<br>    
-			&nbsp; &nbsp;      bool Ret = false;<br>
-			&nbsp; &nbsp;      Assimp::Importer Importer;<br>
-			<br>
-			&nbsp; &nbsp;      const aiScene* pScene = Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs |
+                        <p>(mesh.h:50)</p>
+                        <code>
+                        class Mesh<br>
+                        {<br>
+                        public:<br>
+                        &nbsp; &nbsp;    Mesh();<br>
+                        <br>
+                        &nbsp; &nbsp;     ~Mesh();<br>
+                        <br>
+                        &nbsp; &nbsp;     bool LoadMesh(const std::string&amp; Filename);<br>
+                        <br>
+                        &nbsp; &nbsp;     void Render();<br>
+                        <br>
+                        private:<br>
+                        &nbsp; &nbsp;     bool InitFromScene(const aiScene* pScene, const std::string&amp; Filename);<br>
+                        &nbsp; &nbsp;     void InitMesh(unsigned int Index, const aiMesh* paiMesh);<br>
+                        &nbsp; &nbsp;     bool InitMaterials(const aiScene* pScene, const std::string&amp; Filename);<br>
+                        &nbsp; &nbsp;     void Clear();<br>
+                        <br>
+                        #define INVALID_MATERIAL 0xFFFFFFFF<br>
+                        <br>
+                        &nbsp; &nbsp;     struct MeshEntry {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         MeshEntry();<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         ~MeshEntry();<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         bool Init(const std::vector<Vertex>&amp; Vertices,<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;                   const std::vector<unsigned int>&amp; Indices);<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         GLuint VB;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         GLuint IB;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         unsigned int NumIndices;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         unsigned int MaterialIndex;<br>
+                        &nbsp; &nbsp;     };<br>
+                        <br>
+                        &nbsp; &nbsp;     std::vector<MeshEntry> m_Entries;<br>
+                        &nbsp; &nbsp;     std::vector<Texture*> m_Textures;<br>
+                        };
+                        </code>
+                        <p>
+                                The Mesh class represents the interface between Assimp and our OpenGL program. An object of this class takes a file name
+                                as a parameter to the LoadMesh() function, uses Assimp to load the model and then creates vertex buffers, index bufferss
+                                and Texture objects that contain the data of the model in the form that our program understands. In order to render the
+                                mesh we use the function Render().
+                                The internal structure of the Mesh class matches the way that Assimp loads models. Assimp uses an aiScene object to represent
+                                the loaded mesh. The aiScene object contains mesh structures that encapsulate parts of the model. There must be
+                                at least one mesh structure in the aiScene object. Complex models can contain multiple mesh structures. The m_Entries
+                                member of the Mesh class is a vector of the MeshEntry struct where each structure corresponds to one mesh structure
+                                in the aiScene object. That structure contains the vertex buffer, index buffer and the index of the
+                                material. For now, a material is simply a texture and since mesh entries can share materials we have a separate vector for
+                                them (m_Textures). MeshEntry::MaterialIndex points into one of the textures in m_Textures.
+                        </p>
+                        <p>(mesh.cpp:77)</p>
+                        <code>
+                        bool Mesh::LoadMesh(const std::string&amp; Filename)<br>
+                        {<br>
+                        &nbsp; &nbsp;      // Release the previously loaded mesh (if it exists)<br>
+                        &nbsp; &nbsp;      Clear();<br>
+                        <br>
+                        &nbsp; &nbsp;      bool Ret = false;<br>
+                        &nbsp; &nbsp;      Assimp::Importer Importer;<br>
+                        <br>
+                        &nbsp; &nbsp;      const aiScene* pScene = Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs |
                         aiProcess_JoinIdenticalVertices);<br>
-			<br>    
-			&nbsp; &nbsp;      if (pScene) {<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;          Ret = InitFromScene(pScene, Filename);<br>
-			&nbsp; &nbsp;      }<br>
-			&nbsp; &nbsp;      else {<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;          printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());<br>
-			&nbsp; &nbsp;      }<br>
-			<br>
-			&nbsp; &nbsp;      return Ret;<br>
-			}
-			</code>
-			<p>
-				This function is the starting point of loading the mesh. We create an instance of the Assimp::Importer class on the stack
-				and call its ReadFile function. This function takes two parameters: the full path of the model file and a mask of
-				post processing options. Assimp is capable of performing many useful processing actions on the loaded models. For example,
-				it can generate normals for models that lack them, optimize the structure of the model to improve performance, etc. The full
-				list of options is availabe <a href="http://www.assimp.org/lib_html/ai_post_process_8h.html">here</a>. In this tutorial we
-				use the following options:
+                        <br>
+                        &nbsp; &nbsp;      if (pScene) {<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;          Ret = InitFromScene(pScene, Filename);<br>
+                        &nbsp; &nbsp;      }<br>
+                        &nbsp; &nbsp;      else {<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;          printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());<br>
+                        &nbsp; &nbsp;      }<br>
+                        <br>
+                        &nbsp; &nbsp;      return Ret;<br>
+                        }
+                        </code>
+                        <p>
+                                This function is the starting point of loading the mesh. We create an instance of the Assimp::Importer class on the stack
+                                and call its ReadFile function. This function takes two parameters: the full path of the model file and a mask of
+                                post processing options. Assimp is capable of performing many useful processing actions on the loaded models. For example,
+                                it can generate normals for models that lack them, optimize the structure of the model to improve performance, etc. The full
+                                list of options is availabe <a href="http://www.assimp.org/lib_html/ai_post_process_8h.html">here</a>. In this tutorial we
+                                use the following options:
                         <ul>
                             <li>aiProcess_Triangulate - translate models that are made from non triangle polygons into triangle based
-				meshes. For example, a quad mesh can be translated into a triangle mesh by creating two triangles out of each quad. </li>
+                                meshes. For example, a quad mesh can be translated into a triangle mesh by creating two triangles out of each quad. </li>
                             <li>aiProcess_GenSmoothNormals - generates vertex normals in the case that the original model does not already contain them.</li>
                             <li>aiProcess_FlipUVsv - flip the texture coordinates along the Y axis. This was required in order to render
                                 the Quake model that was used for the demo correctly. </li>
@@ -154,277 +155,277 @@
                         </ul>
                         <br>
                         Note that the post processing options are basically non overlapping bitmasks so you can combine multiple options by simply ORing their
-				values. You will need to tailor the options that you use according to the input data.
-				If the mesh was loaded successfully, we get a pointer to an <a href="http://www.assimp.org/lib_html/structai_scene.html">
-				aiScene</a> object. This object contains the entire model contents,	divided into <a href="http://www.assimp.org/lib_html/structai_mesh.html">
-				aiMesh</a> structures. Next we call the InitFromScene() function to initialize the Mesh object.
-			</p>
-			<p>(mesh.cpp:97)</p>
-			<code>
-			bool Mesh::InitFromScene(const aiScene* pScene, const std::string&amp; Filename)<br>
-			{<br>  
-			&nbsp; &nbsp;      m_Entries.resize(pScene->mNumMeshes);<br>
-			&nbsp; &nbsp;      m_Textures.resize(pScene->mNumMaterials);<br>
-			<br>
-			&nbsp; &nbsp;      // Initialize the meshes in the scene one by one<br>
-			&nbsp; &nbsp;      for (unsigned int i = 0 ; i &lt; m_Entries.size() ; i++) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         const aiMesh* paiMesh = pScene->mMeshes[i];<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         InitMesh(i, paiMesh);<br>
-			&nbsp; &nbsp;      }<br>
-			<br>
-			&nbsp; &nbsp;     return InitMaterials(pScene, Filename);<br>
-			}
-			</code>
-			<p>
-				We start the initialization of the Mesh object by setting up space in the mesh entries and texture vectors
-				for all the meshes and materials we will need. The numbers are available in the aiScene object members
-				mNumMeshes and mNumMaterials, respectively. Next we scan the mMeshes array in the aiScene object and initialize
-				the mesh entries one by one. Finally, the materials are initialized.
-			</p>
-			<p>(mesh.cpp:111)</p>
-			<code>
-			void Mesh::InitMesh(unsigned int Index, const aiMesh* paiMesh)<br>
-			{<br>
-			&nbsp; &nbsp;      m_Entries[Index].MaterialIndex = paiMesh->mMaterialIndex;<br>
-			<br>    
-			&nbsp; &nbsp;      std::vector<Vertex> Vertices;<br>
-			&nbsp; &nbsp;      std::vector<unsigned int> Indices;<br>	
-			&nbsp; &nbsp; ...<br>
-			</code>
-			<p>
-				We start the initialization of the mesh by storing its material index. This will be used during
-				rendering to bind the proper texture. Next we create two STL vectors to store the contents of the
-				vertex and index buffers. A STL vector has a nice property of storing its contents in a continuous 
-				buffer. This makes it easy to load the data into the OpenGL buffer (using the glBufferData() function).
-			</p>
-			<p>(mesh.cpp:118)</p>
-			<code>
-			&nbsp; &nbsp;       const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);<br>
-			<br>
-			&nbsp; &nbsp;       for (unsigned int i = 0 ; i &lt; paiMesh->mNumVertices ; i++) {<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;           const aiVector3D* pPos      = &amp;(paiMesh->mVertices[i]);<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;           const aiVector3D* pNormal   = &amp;(paiMesh->mNormals[i]) : &Zero3D;<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;           const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &amp;(paiMesh->mTextureCoords[0][i]) : &Zero3D;<br>
-			<br>
-			&nbsp; &nbsp;   &nbsp; &nbsp;           Vertex v(Vector3f(pPos->x, pPos->y, pPos->z),<br>
-			&nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;                      Vector2f(pTexCoord->x, pTexCoord->y),<br>
-			&nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;                      Vector3f(pNormal->x, pNormal->y, pNormal->z));<br>
-			<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;            Vertices.push_back(v);<br>
-			&nbsp; &nbsp;   }<br>
-			&nbsp; &nbsp; ...<br>
-			</code>
-			<p>
-				Here we prepare the contents of the vertex buffer by populating the Vertices vector. We use the following
-				attributes of the aiMesh class:
-			</p>
-				<ol>
-					<li>mNumVertices - the number of vertices.</li>
-					<li>mVertices - an array of mNumVertices vectors that contain the position.</li>
-					<li>mNormals - an array of mNumVertices vectors that contain the vertex normals.</li>
-					<li>mTextureCoords - an array of mNumVertices vectors that contain the texture coordinates. This is actualy a 
-						two dimensional array because each vertex can hold several texture coordinates.</li>
-				</ol>
-			<p>
-				So basically we have three separate arrays that contain everything we need for the vertices and we
-				need to pick out each attribute from its corresponding array in order to build the final Vertex structure.
-				This structure is pushed back to the vertex vector (maintaining the same index as in the three aiMesh arrays).
-				Note that some models do not have texture coordinates so before accessing the mTextureCoords array (and possibly
-				causing a segmentation fault) we check whether texture coordinates exist by calling HasTextureCoords(). In addition,
-				a mesh can contain multiple texture coordinates per vertex. In this tutorial we take the simple way of using only the
-				first texture coordinate. So the mTextureCoords array (which is 2 dimensional) is always accessed on its first row.
-				Therefore, the HasTextureCoords() function is always called for the first row. If a texture coordinate does not exist
-				the Vertex structure will be initialized with the zero vector.
-			</p>
-			<p>(mesh.cpp:132)</p>
-			<code>
-			&nbsp; &nbsp;  for (unsigned int i = 0 ; i &lt; paiMesh->mNumFaces ; i++) {<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  const aiFace&amp; Face = paiMesh->mFaces[i];<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  assert(Face.mNumIndices == 3);<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  Indices.push_back(Face.mIndices[0]);<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  Indices.push_back(Face.mIndices[1]);<br>
-			&nbsp; &nbsp;  &nbsp; &nbsp;  Indices.push_back(Face.mIndices[2]);<br>
-			&nbsp; &nbsp;  }<br>
-			&nbsp; &nbsp; ...<br>
-			</code>
-			<p>
-				Next we create the index buffer. The mNumFaces member in the aiMesh class tells us how many polygons
-				exist and the array mFaces contains their data (which is indices of the vertices). First we verify that 
-				the number of indices in the polygon is indeed 3 (when loading the model we requested that it will 
-				get triangulated but it is always good to check this). Then we extract the indices from the mIndices 
-				array and push them into the Indices vector.
-			</p>
-			<p>(mesh.cpp:140)</p>
-			<code>
-			&nbsp; &nbsp;  m_Entries[Index].Init(Vertices, Indices);<br>
-			}
-			</code>
-			<p>
-				Finally, the MeshEntry structure is initialized using the vertex and index vectors. There is nothing new in the MeshEntry::Init()
-				function so it is not quoted here. It uses glGenBuffer(), glBindBuffer() and glBufferData() to create and populate
-				the vertex and index buffers. See the source file for more details.
-			</p>
-			<p>(mesh.cpp:143)</p>
-			<code>
-			bool Mesh::InitMaterials(const aiScene* pScene, const std::string&amp; Filename)<br>
-			{<br>
-			&nbsp; &nbsp;     for (unsigned int i = 0 ; i &lt; pScene->mNumMaterials ; i++) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         const aiMaterial* pMaterial = pScene->mMaterials[i];<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;...<br>
-			</code>
-			<p>
-				This function loads all the textures that are used by the model. The mNumMaterials attribute
-				in the aiScene object holds the number of materials and mMaterials is an array of pointers to 
-				<a href="http://www.assimp.org/lib_html/structai_material.html">aiMaterials</a>
-				structures (by that size). The aiMaterial structure is a complex beast, but it hides its complexity
-				behind a small number of API calls. In general the material is organized as a stack of textures
-				and between consecutive textures the configured blend and strength function must be applied. For example,
-				the blend function can tell us to add the color from the two textures and the strength function
-				can tell us to multiply the result by half. The blend and strength functions are part of the aiMaterial
-				structure and can be retrieved. To make our life simpler and to match the way our lighting shader
-				currently works we ignore the blend and strength function and simply use the texture as is.
-			</p>
-			<p>(mesh.cpp:165)</p>
-			<code>
-			&nbsp; &nbsp; &nbsp; &nbsp;         m_Textures[i] = NULL;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;          if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; aiString Path;<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &amp;Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; std::string FullPath = Dir + "/" + Path.data;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if (!m_Textures[i]->Load()) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; printf("Error loading texture '%s'\n", FullPath.c_str());<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; delete m_Textures[i];<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_Textures[i] = NULL;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Ret = false;<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; }<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; ...
-			</code>
-			<p>
-				A material can contain multiple textures, and not all of them have to contain colors. For example, a texture can be
-				a height map, normal map, displacement map, etc. Since our lighting shader currently uses a single texture
-				for all the light types we are interested only in the diffuse texture. Therefore, we check how many diffuse
-				textures exist using the aiMaterial::GetTextureCount() function. This function takes the type of the texture
-				as a parameter and returns the number of textures of that specific type. If at least one diffuse texture
-				is available we fetch it using the aiMaterial::GetTexture() function. The first parameter to that function
-				is the type. Next comes the index and we always use 0. After that we need to specify the address of a string
-				where the texture file name will go. Finally, there are five address parameters that allow us to fetch various
-				configurations of the texture such as the blend factor, map mode, texture operation, etc. These are optional
-				and we ignore them for now so we just pass NULL. We are interested only in the texture file name and we concatenate
-				it to the directory where the model is located. The directory was retrieved at the start of the function (not quoted
-				here) and the assumption is that the model and the texture are in the same subdirectory. If the directory structure 
-				is more complex you may need to search for the texture elsewhere. We create our texture object as usual and load it.
-			</p>
-			<p>(mesh.cpp:187)</p>
-			<code>
-			&nbsp; &nbsp;&nbsp; &nbsp;	        if (!m_Textures[i]) {<br>
-			&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            m_Textures[i] = new Texture(GL_TEXTURE_2D, "../Content/white.png");<br>
-			&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            Ret = m_Textures[i]->Load();<br>
-			&nbsp; &nbsp;&nbsp; &nbsp;        }<br>
-			&nbsp; &nbsp; }<br>
-			<br>
-			&nbsp; &nbsp; return Ret;<br>
-			}
-			</code>
-			<p>
-				The above piece of code is a small workaround to a problem you may encounter if you start loading
-				models you find on the net. Sometimes a model does not include a texture and in cases like that
-				you will not see anything because the color that will be sampled from a non existing texture is by default
-				black. One way to deal with it is to detect this case and treat it with a special case in the shader
-				or a dedicated shader. This tutorial takes a simpler approach of loading a texture that contains a single
-				white texel (you will find this texture in the attached sources). This will make the basic color of
-				all pixels white. It will probably not look great but at least you will see something. This texture takes
-				very little space and allows us to use the same shader for both cases.
-			</p>
-			<p>(mesh.cpp:197)</p>
-			<code>
-			void Mesh::Render()<br>
-			{<br>
-			&nbsp; &nbsp;     glEnableVertexAttribArray(0);<br>
-			&nbsp; &nbsp;     glEnableVertexAttribArray(1);<br>
-			&nbsp; &nbsp;     glEnableVertexAttribArray(2);<br>
-			<br>
-			&nbsp; &nbsp;     for (unsigned int i = 0 ; i &lt; m_Entries.size() ; i++) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         glBindBuffer(GL_ARRAY_BUFFER, m_Entries[i].VB);<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         if (MaterialIndex &lt; m_Textures.size() &amp;&amp; m_Textures[MaterialIndex]) {<br>
-			&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         }<br>
-			<br>
-			&nbsp; &nbsp; &nbsp; &nbsp;         glDrawElements(GL_TRIANGLES, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);<br>
-			&nbsp; &nbsp;     }<br>
-			<br>
-			&nbsp; &nbsp;     glDisableVertexAttribArray(0);<br>
-			&nbsp; &nbsp;     glDisableVertexAttribArray(1);<br>
-			&nbsp; &nbsp;     glDisableVertexAttribArray(2);<br>
-			}
-			</code>
-			<p>
-				This function encapsulates the rendering of a mesh and separates it from the main application (in previous
-				tutorials it was part of the application code itself). The m_Entries array is scanned and the vertex buffer
-				and index buffer in each node are bound. The material index of the node is used to fetch the texture object
-				from the m_Texture array and the texture is also bound. Finally, the draw command is executed. Now you can
-				have multiple mesh objects that have been loaded from files and render them one by one by calling the Mesh::Render()
-				function.
-			</p>
-			<p>(glut_backend.cpp:112)</p>
-			<code>
-			glEnable(GL_DEPTH_TEST);
-			</code>
-			<p>
-				The last thing we need to study is something that was left out in previous tutorials. If you go ahead and load
-				models using the code above you will probably encounter visual anomalies with your scene. The reason is that
-				triangles that are further from the camera are drawn on top of the closer ones. In order to fix this we
-				need to enable the famous depth test (a.k.a Z-test). When the depth test is enabled the rasterizer compares the depth
-				of each pixel prior to rendering with the existing pixel on the same location on the screen. The pixel whose
-				color is eventually used is the one who "wins" the depth test (i.e. closer to the camera). The depth test is
-				not enabled by default and the code above takes care of that (part of the OpenGL initialization code in the function
-				GLUTBackendRun()). This is just one of three pieces of code that are required for the depth test (see below).
-			</p>
-			<p>(glut_backend.cpp:73)</p>
-			<code>
-			glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
-			</code>
-			<p>
-				The second piece is the initialization of the depth buffer. In order to compare depth between two pixels the depth
-				of the "old" pixel must be stored somewhere (the depth of the "new" pixel is available because it was passed from the
-				vertex shader). For this purpose we have a special buffer known as the depth buffer (or Z buffer). It has the same
-				proporations as the screen so that each pixel in the color buffer has a corresponding slot in the depth buffer. 
-				That slot always stores the depth of the closest pixel and it is used in the depth test for the comparison.
-			</p>
-			<p>(tutorial22.cpp:101)</p>
-			<code>
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
-			</code>
-			<p>
-				The last thing we need to do is to clear the depth buffer at the start of a new frame. If we don't do that
-				the buffer will contain old values from the previous frame and the depth of the pixels from the new frame
-				will be compared against the depth of the pixels from the previous frame. As you can imagine, this will cause
-				serious corruptions (try!). The glClear() function takes a bitmask of the buffers it needs to operate on. 
-				Up until now we've only cleared the color buffer. Now it's time to clear the depth buffer as well.
-			</p>
-		</section>
-                
+                                values. You will need to tailor the options that you use according to the input data.
+                                If the mesh was loaded successfully, we get a pointer to an <a href="http://www.assimp.org/lib_html/structai_scene.html">
+                                aiScene</a> object. This object contains the entire model contents,     divided into <a href="http://www.assimp.org/lib_html/structai_mesh.html">
+                                aiMesh</a> structures. Next we call the InitFromScene() function to initialize the Mesh object.
+                        </p>
+                        <p>(mesh.cpp:97)</p>
+                        <code>
+                        bool Mesh::InitFromScene(const aiScene* pScene, const std::string&amp; Filename)<br>
+                        {<br>
+                        &nbsp; &nbsp;      m_Entries.resize(pScene->mNumMeshes);<br>
+                        &nbsp; &nbsp;      m_Textures.resize(pScene->mNumMaterials);<br>
+                        <br>
+                        &nbsp; &nbsp;      // Initialize the meshes in the scene one by one<br>
+                        &nbsp; &nbsp;      for (unsigned int i = 0 ; i &lt; m_Entries.size() ; i++) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         const aiMesh* paiMesh = pScene->mMeshes[i];<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         InitMesh(i, paiMesh);<br>
+                        &nbsp; &nbsp;      }<br>
+                        <br>
+                        &nbsp; &nbsp;     return InitMaterials(pScene, Filename);<br>
+                        }
+                        </code>
+                        <p>
+                                We start the initialization of the Mesh object by setting up space in the mesh entries and texture vectors
+                                for all the meshes and materials we will need. The numbers are available in the aiScene object members
+                                mNumMeshes and mNumMaterials, respectively. Next we scan the mMeshes array in the aiScene object and initialize
+                                the mesh entries one by one. Finally, the materials are initialized.
+                        </p>
+                        <p>(mesh.cpp:111)</p>
+                        <code>
+                        void Mesh::InitMesh(unsigned int Index, const aiMesh* paiMesh)<br>
+                        {<br>
+                        &nbsp; &nbsp;      m_Entries[Index].MaterialIndex = paiMesh->mMaterialIndex;<br>
+                        <br>
+                        &nbsp; &nbsp;      std::vector<Vertex> Vertices;<br>
+                        &nbsp; &nbsp;      std::vector<unsigned int> Indices;<br>
+                        &nbsp; &nbsp; ...<br>
+                        </code>
+                        <p>
+                                We start the initialization of the mesh by storing its material index. This will be used during
+                                rendering to bind the proper texture. Next we create two STL vectors to store the contents of the
+                                vertex and index buffers. A STL vector has a nice property of storing its contents in a continuous
+                                buffer. This makes it easy to load the data into the OpenGL buffer (using the glBufferData() function).
+                        </p>
+                        <p>(mesh.cpp:118)</p>
+                        <code>
+                        &nbsp; &nbsp;       const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);<br>
+                        <br>
+                        &nbsp; &nbsp;       for (unsigned int i = 0 ; i &lt; paiMesh->mNumVertices ; i++) {<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;           const aiVector3D* pPos      = &amp;(paiMesh->mVertices[i]);<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;           const aiVector3D* pNormal   = &amp;(paiMesh->mNormals[i]) : &Zero3D;<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;           const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &amp;(paiMesh->mTextureCoords[0][i]) : &Zero3D;<br>
+                        <br>
+                        &nbsp; &nbsp;   &nbsp; &nbsp;           Vertex v(Vector3f(pPos->x, pPos->y, pPos->z),<br>
+                        &nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;                      Vector2f(pTexCoord->x, pTexCoord->y),<br>
+                        &nbsp; &nbsp;   &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;                      Vector3f(pNormal->x, pNormal->y, pNormal->z));<br>
+                        <br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;            Vertices.push_back(v);<br>
+                        &nbsp; &nbsp;   }<br>
+                        &nbsp; &nbsp; ...<br>
+                        </code>
+                        <p>
+                                Here we prepare the contents of the vertex buffer by populating the Vertices vector. We use the following
+                                attributes of the aiMesh class:
+                        </p>
+                                <ol>
+                                        <li>mNumVertices - the number of vertices.</li>
+                                        <li>mVertices - an array of mNumVertices vectors that contain the position.</li>
+                                        <li>mNormals - an array of mNumVertices vectors that contain the vertex normals.</li>
+                                        <li>mTextureCoords - an array of mNumVertices vectors that contain the texture coordinates. This is actualy a
+                                                two dimensional array because each vertex can hold several texture coordinates.</li>
+                                </ol>
+                        <p>
+                                So basically we have three separate arrays that contain everything we need for the vertices and we
+                                need to pick out each attribute from its corresponding array in order to build the final Vertex structure.
+                                This structure is pushed back to the vertex vector (maintaining the same index as in the three aiMesh arrays).
+                                Note that some models do not have texture coordinates so before accessing the mTextureCoords array (and possibly
+                                causing a segmentation fault) we check whether texture coordinates exist by calling HasTextureCoords(). In addition,
+                                a mesh can contain multiple texture coordinates per vertex. In this tutorial we take the simple way of using only the
+                                first texture coordinate. So the mTextureCoords array (which is 2 dimensional) is always accessed on its first row.
+                                Therefore, the HasTextureCoords() function is always called for the first row. If a texture coordinate does not exist
+                                the Vertex structure will be initialized with the zero vector.
+                        </p>
+                        <p>(mesh.cpp:132)</p>
+                        <code>
+                        &nbsp; &nbsp;  for (unsigned int i = 0 ; i &lt; paiMesh->mNumFaces ; i++) {<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;  const aiFace&amp; Face = paiMesh->mFaces[i];<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;  assert(Face.mNumIndices == 3);<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;  Indices.push_back(Face.mIndices[0]);<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;  Indices.push_back(Face.mIndices[1]);<br>
+                        &nbsp; &nbsp;  &nbsp; &nbsp;  Indices.push_back(Face.mIndices[2]);<br>
+                        &nbsp; &nbsp;  }<br>
+                        &nbsp; &nbsp; ...<br>
+                        </code>
+                        <p>
+                                Next we create the index buffer. The mNumFaces member in the aiMesh class tells us how many polygons
+                                exist and the array mFaces contains their data (which is indices of the vertices). First we verify that
+                                the number of indices in the polygon is indeed 3 (when loading the model we requested that it will
+                                get triangulated but it is always good to check this). Then we extract the indices from the mIndices
+                                array and push them into the Indices vector.
+                        </p>
+                        <p>(mesh.cpp:140)</p>
+                        <code>
+                        &nbsp; &nbsp;  m_Entries[Index].Init(Vertices, Indices);<br>
+                        }
+                        </code>
+                        <p>
+                                Finally, the MeshEntry structure is initialized using the vertex and index vectors. There is nothing new in the MeshEntry::Init()
+                                function so it is not quoted here. It uses glGenBuffer(), glBindBuffer() and glBufferData() to create and populate
+                                the vertex and index buffers. See the source file for more details.
+                        </p>
+                        <p>(mesh.cpp:143)</p>
+                        <code>
+                        bool Mesh::InitMaterials(const aiScene* pScene, const std::string&amp; Filename)<br>
+                        {<br>
+                        &nbsp; &nbsp;     for (unsigned int i = 0 ; i &lt; pScene->mNumMaterials ; i++) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         const aiMaterial* pMaterial = pScene->mMaterials[i];<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;...<br>
+                        </code>
+                        <p>
+                                This function loads all the textures that are used by the model. The mNumMaterials attribute
+                                in the aiScene object holds the number of materials and mMaterials is an array of pointers to
+                                <a href="http://www.assimp.org/lib_html/structai_material.html">aiMaterials</a>
+                                structures (by that size). The aiMaterial structure is a complex beast, but it hides its complexity
+                                behind a small number of API calls. In general the material is organized as a stack of textures
+                                and between consecutive textures the configured blend and strength function must be applied. For example,
+                                the blend function can tell us to add the color from the two textures and the strength function
+                                can tell us to multiply the result by half. The blend and strength functions are part of the aiMaterial
+                                structure and can be retrieved. To make our life simpler and to match the way our lighting shader
+                                currently works we ignore the blend and strength function and simply use the texture as is.
+                        </p>
+                        <p>(mesh.cpp:165)</p>
+                        <code>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         m_Textures[i] = NULL;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;          if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; aiString Path;<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &amp;Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; std::string FullPath = Dir + "/" + Path.data;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; if (!m_Textures[i]->Load()) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; printf("Error loading texture '%s'\n", FullPath.c_str());<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; delete m_Textures[i];<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; m_Textures[i] = NULL;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Ret = false;<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; }<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; ...
+                        </code>
+                        <p>
+                                A material can contain multiple textures, and not all of them have to contain colors. For example, a texture can be
+                                a height map, normal map, displacement map, etc. Since our lighting shader currently uses a single texture
+                                for all the light types we are interested only in the diffuse texture. Therefore, we check how many diffuse
+                                textures exist using the aiMaterial::GetTextureCount() function. This function takes the type of the texture
+                                as a parameter and returns the number of textures of that specific type. If at least one diffuse texture
+                                is available we fetch it using the aiMaterial::GetTexture() function. The first parameter to that function
+                                is the type. Next comes the index and we always use 0. After that we need to specify the address of a string
+                                where the texture file name will go. Finally, there are five address parameters that allow us to fetch various
+                                configurations of the texture such as the blend factor, map mode, texture operation, etc. These are optional
+                                and we ignore them for now so we just pass NULL. We are interested only in the texture file name and we concatenate
+                                it to the directory where the model is located. The directory was retrieved at the start of the function (not quoted
+                                here) and the assumption is that the model and the texture are in the same subdirectory. If the directory structure
+                                is more complex you may need to search for the texture elsewhere. We create our texture object as usual and load it.
+                        </p>
+                        <p>(mesh.cpp:187)</p>
+                        <code>
+                        &nbsp; &nbsp;&nbsp; &nbsp;              if (!m_Textures[i]) {<br>
+                        &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            m_Textures[i] = new Texture(GL_TEXTURE_2D, "../Content/white.png");<br>
+                        &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;            Ret = m_Textures[i]->Load();<br>
+                        &nbsp; &nbsp;&nbsp; &nbsp;        }<br>
+                        &nbsp; &nbsp; }<br>
+                        <br>
+                        &nbsp; &nbsp; return Ret;<br>
+                        }
+                        </code>
+                        <p>
+                                The above piece of code is a small workaround to a problem you may encounter if you start loading
+                                models you find on the net. Sometimes a model does not include a texture and in cases like that
+                                you will not see anything because the color that will be sampled from a non existing texture is by default
+                                black. One way to deal with it is to detect this case and treat it with a special case in the shader
+                                or a dedicated shader. This tutorial takes a simpler approach of loading a texture that contains a single
+                                white texel (you will find this texture in the attached sources). This will make the basic color of
+                                all pixels white. It will probably not look great but at least you will see something. This texture takes
+                                very little space and allows us to use the same shader for both cases.
+                        </p>
+                        <p>(mesh.cpp:197)</p>
+                        <code>
+                        void Mesh::Render()<br>
+                        {<br>
+                        &nbsp; &nbsp;     glEnableVertexAttribArray(0);<br>
+                        &nbsp; &nbsp;     glEnableVertexAttribArray(1);<br>
+                        &nbsp; &nbsp;     glEnableVertexAttribArray(2);<br>
+                        <br>
+                        &nbsp; &nbsp;     for (unsigned int i = 0 ; i &lt; m_Entries.size() ; i++) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         glBindBuffer(GL_ARRAY_BUFFER, m_Entries[i].VB);<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)20);<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         if (MaterialIndex &lt; m_Textures.size() &amp;&amp; m_Textures[MaterialIndex]) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;             m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         }<br>
+                        <br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;         glDrawElements(GL_TRIANGLES, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);<br>
+                        &nbsp; &nbsp;     }<br>
+                        <br>
+                        &nbsp; &nbsp;     glDisableVertexAttribArray(0);<br>
+                        &nbsp; &nbsp;     glDisableVertexAttribArray(1);<br>
+                        &nbsp; &nbsp;     glDisableVertexAttribArray(2);<br>
+                        }
+                        </code>
+                        <p>
+                                This function encapsulates the rendering of a mesh and separates it from the main application (in previous
+                                tutorials it was part of the application code itself). The m_Entries array is scanned and the vertex buffer
+                                and index buffer in each node are bound. The material index of the node is used to fetch the texture object
+                                from the m_Texture array and the texture is also bound. Finally, the draw command is executed. Now you can
+                                have multiple mesh objects that have been loaded from files and render them one by one by calling the Mesh::Render()
+                                function.
+                        </p>
+                        <p>(glut_backend.cpp:112)</p>
+                        <code>
+                        glEnable(GL_DEPTH_TEST);
+                        </code>
+                        <p>
+                                The last thing we need to study is something that was left out in previous tutorials. If you go ahead and load
+                                models using the code above you will probably encounter visual anomalies with your scene. The reason is that
+                                triangles that are further from the camera are drawn on top of the closer ones. In order to fix this we
+                                need to enable the famous depth test (a.k.a Z-test). When the depth test is enabled the rasterizer compares the depth
+                                of each pixel prior to rendering with the existing pixel on the same location on the screen. The pixel whose
+                                color is eventually used is the one who "wins" the depth test (i.e. closer to the camera). The depth test is
+                                not enabled by default and the code above takes care of that (part of the OpenGL initialization code in the function
+                                GLUTBackendRun()). This is just one of three pieces of code that are required for the depth test (see below).
+                        </p>
+                        <p>(glut_backend.cpp:73)</p>
+                        <code>
+                        glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
+                        </code>
+                        <p>
+                                The second piece is the initialization of the depth buffer. In order to compare depth between two pixels the depth
+                                of the "old" pixel must be stored somewhere (the depth of the "new" pixel is available because it was passed from the
+                                vertex shader). For this purpose we have a special buffer known as the depth buffer (or Z buffer). It has the same
+                                proporations as the screen so that each pixel in the color buffer has a corresponding slot in the depth buffer.
+                                That slot always stores the depth of the closest pixel and it is used in the depth test for the comparison.
+                        </p>
+                        <p>(tutorial22.cpp:101)</p>
+                        <code>
+                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                        </code>
+                        <p>
+                                The last thing we need to do is to clear the depth buffer at the start of a new frame. If we don't do that
+                                the buffer will contain old values from the previous frame and the depth of the pixels from the new frame
+                                will be compared against the depth of the pixels from the previous frame. As you can imagine, this will cause
+                                serious corruptions (try!). The glClear() function takes a bitmask of the buffers it needs to operate on.
+                                Up until now we've only cleared the color buffer. Now it's time to clear the depth buffer as well.
+                        </p>
+                </section>
+
 <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=ZbnEMM7vwmU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=21">video tutorial by Frahaan Hussain</a>
-    and also <a href="https://www.youtube.com/watch?v=yQx_pMsYqzU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=22">this one</a>.</p>                
+    and also <a href="https://www.youtube.com/watch?v=yQx_pMsYqzU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=22">this one</a>.</p>
 
-		<a href="../tutorial23/tutorial23.html" class="next highlight"> Next tutorial </a>
-	</article>
+                <a href="../tutorial23/tutorial23.html" class="next highlight"> Next tutorial </a>
+        </article>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
-        
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
 <div id="disqus_thread"></div>
 <script type="text/javascript">
 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -439,7 +440,7 @@ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
 })();
 </script>
 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-        
-        
+
+
 </body>
 </html>
