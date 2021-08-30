@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,11 +62,11 @@ bool Technique::Init()
 bool Technique::AddShader(GLenum ShaderType, const char* pFilename)
 {
     string s;
-    
+
     if (!ReadFile(pFilename, s)) {
         return false;
     }
-    
+
     GLuint ShaderObj = glCreateShader(ShaderType);
 
     if (ShaderObj == 0) {
@@ -111,11 +111,11 @@ bool Technique::Finalize()
     glLinkProgram(m_shaderProg);
 
     glGetProgramiv(m_shaderProg, GL_LINK_STATUS, &Success);
-	if (Success == 0) {
-		glGetProgramInfoLog(m_shaderProg, sizeof(ErrorLog), NULL, ErrorLog);
-		fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+        if (Success == 0) {
+                glGetProgramInfoLog(m_shaderProg, sizeof(ErrorLog), NULL, ErrorLog);
+                fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         return false;
-	}
+        }
 
     glValidateProgram(m_shaderProg);
     glGetProgramiv(m_shaderProg, GL_VALIDATE_STATUS, &Success);
@@ -151,11 +151,4 @@ GLint Technique::GetUniformLocation(const char* pUniformName)
     }
 
     return Location;
-}
-
-GLint Technique::GetProgramParam(GLint param)
-{
-    GLint ret;
-    glGetProgramiv(m_shaderProg, param, &ret);
-    return ret;
 }
