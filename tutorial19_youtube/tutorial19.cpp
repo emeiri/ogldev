@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 18 - Loading models with Assimp
+    Tutorial 19 - Materials and ambient lighting
 */
 
 #include <stdio.h>
@@ -30,17 +30,18 @@
 #include "ogldev_world_transform.h"
 #include "ogldev_basic_mesh.h"
 #include "camera.h"
+#include "lighting_technique.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
 
 
-class Tutorial18
+class Tutorial19
 {
 public:
-    Tutorial18();
-    ~Tutorial18();
+    Tutorial19();
+    ~Tutorial19();
 
     bool Init();
 
@@ -51,18 +52,17 @@ public:
 
 private:
 
-    void CompileShaders();
-    void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
-
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
     BasicMesh* pMesh = NULL;
     PersProjInfo persProjInfo;
+    LightingTechnique* pLightingTech = NULL;
+    BaseLight baseLight;
 };
 
 
-Tutorial18::Tutorial18()
+Tutorial19::Tutorial19()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -78,10 +78,12 @@ Tutorial18::Tutorial18()
     float zFar = 100.0f;
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+
+    baseLight.AmbientIntensity = 0.1f;
 }
 
 
-Tutorial18::~Tutorial18()
+Tutorial19::~Tutorial19()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -90,13 +92,15 @@ Tutorial18::~Tutorial18()
     if (pMesh) {
         delete pMesh;
     }
+
+    if (pLightingTech) {
+        delete pLightingTech;
+    }
 }
 
 
-bool Tutorial18::Init()
+bool Tutorial19::Init()
 {
-    CompileShaders();
-
     Vector3f CameraPos(0.0f, 0.0f, -1.0f);
     Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
@@ -109,11 +113,22 @@ bool Tutorial18::Init()
         return false;
     }
 
+    pLightingTech = new LightingTechnique();
+
+    if (!pLightingTech->Init())
+    {
+        return false;
+    }
+
+    pLightingTech->Enable();
+
+    pLightingTech->SetTextureUnit(0);
+
     return true;
 }
 
 
-void Tutorial18::RenderSceneCB()
+void Tutorial19::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -139,7 +154,8 @@ void Tutorial18::RenderSceneCB()
     Projection.InitPersProjTransform(persProjInfo);
 
     Matrix4f WVP = Projection * View * World;
-    glUniformMatrix4fv(WVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
+    pLightingTech->SetWVP(WVP);
+    pLightingTech->SetLight(baseLight);
 
     pMesh->Render();
 
@@ -149,7 +165,7 @@ void Tutorial18::RenderSceneCB()
 }
 
 
-void Tutorial18::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void Tutorial19::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case 'q':
@@ -161,134 +177,42 @@ void Tutorial18::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void Tutorial18::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void Tutorial19::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial18::PassiveMouseCB(int x, int y)
+void Tutorial19::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-void Tutorial18::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
-{
-    GLuint ShaderObj = glCreateShader(ShaderType);
-
-    if (ShaderObj == 0) {
-        fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(1);
-    }
-
-    const GLchar* p[1];
-    p[0] = pShaderText;
-
-    GLint Lengths[1];
-    Lengths[0] = (GLint)strlen(pShaderText);
-
-    glShaderSource(ShaderObj, 1, p, Lengths);
-
-    glCompileShader(ShaderObj);
-
-    GLint success;
-    glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        GLchar InfoLog[1024];
-        glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
-        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
-        exit(1);
-    }
-
-    glAttachShader(ShaderProgram, ShaderObj);
-}
-
-
-void Tutorial18::CompileShaders()
-{
-    GLuint ShaderProgram = glCreateProgram();
-
-    if (ShaderProgram == 0) {
-        fprintf(stderr, "Error creating shader program\n");
-        exit(1);
-    }
-
-    std::string vs, fs;
-
-    if (!ReadFile("shader.vs", vs)) {
-        exit(1);
-    };
-
-    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
-
-    if (!ReadFile("shader.fs", fs)) {
-        exit(1);
-    };
-
-    AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
-
-    GLint Success = 0;
-    GLchar ErrorLog[1024] = { 0 };
-
-    glLinkProgram(ShaderProgram);
-
-    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
-    if (Success == 0) {
-        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-        fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
-        exit(1);
-    }
-
-    WVPLocation = glGetUniformLocation(ShaderProgram, "gWVP");
-    if (WVPLocation == -1) {
-        printf("Error getting uniform location of 'gWVP'\n");
-        exit(1);
-    }
-
-    SamplerLocation = glGetUniformLocation(ShaderProgram, "gSampler");
-    if (SamplerLocation == -1) {
-        printf("Error getting uniform location of 'gSampler'\n");
-        exit(1);
-    }
-
-    glValidateProgram(ShaderProgram);
-    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
-    if (!Success) {
-        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-        fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
-        exit(1);
-    }
-
-    glUseProgram(ShaderProgram);
-}
-
-
-Tutorial18* pTutorial18 = NULL;
+Tutorial19* pTutorial19 = NULL;
 
 
 void RenderSceneCB()
 {
-    pTutorial18->RenderSceneCB();
+    pTutorial19->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pTutorial18->KeyboardCB(key, mouse_x, mouse_y);
+    pTutorial19->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pTutorial18->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTutorial19->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pTutorial18->PassiveMouseCB(x, y);
+    pTutorial19->PassiveMouseCB(x, y);
 }
 
 
@@ -336,9 +260,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pTutorial18 = new Tutorial18();
+    pTutorial19 = new Tutorial19();
 
-    if (!pTutorial18->Init()) {
+    if (!pTutorial19->Init()) {
         return 1;
     }
 
