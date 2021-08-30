@@ -21,7 +21,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-
+#include "ogldev_material.h"
 
 class BaseLight
 {
@@ -49,6 +49,7 @@ public:
     void SetWVP(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
     void SetLight(const BaseLight& Light);
+    void SetMaterial(const Material& material);
 
 private:
 
@@ -56,6 +57,7 @@ private:
     GLuint samplerLoc;
     GLuint lightColorLoc;
     GLuint lightAmbientIntensityLoc;
+    GLuint materialAmbientColorLoc;
 };
 
 

@@ -79,7 +79,7 @@ Tutorial19::Tutorial19()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    baseLight.AmbientIntensity = 0.1f;
+    baseLight.AmbientIntensity = 1.5f;
 }
 
 
@@ -142,7 +142,7 @@ void Tutorial19::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
-    //    worldTransform.SetScale(0.01f);
+    worldTransform.SetScale(1.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
     worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
 
@@ -156,6 +156,7 @@ void Tutorial19::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
     pLightingTech->SetLight(baseLight);
+    pLightingTech->SetMaterial(pMesh->GetMaterial());
 
     pMesh->Render();
 

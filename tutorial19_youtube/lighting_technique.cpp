@@ -45,11 +45,13 @@ bool LightingTechnique::Init()
     samplerLoc = GetUniformLocation("gSampler");
     lightColorLoc = GetUniformLocation("gLight.Color");
     lightAmbientIntensityLoc = GetUniformLocation("gLight.AmbientIntensity");
+    materialAmbientColorLoc = GetUniformLocation("gMaterial.AmbientColor");
 
     if (lightAmbientIntensityLoc == 0xFFFFFFFF ||
         WVPLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
-        lightColorLoc == 0xFFFFFFFF)
+        lightColorLoc == 0xFFFFFFFF ||
+        materialAmbientColorLoc == 0xFFF)
     {
         return false;
     }
@@ -73,4 +75,10 @@ void LightingTechnique::SetLight(const BaseLight& Light)
 {
     glUniform3f(lightColorLoc, Light.Color.x, Light.Color.y, Light.Color.z);
     glUniform1f(lightAmbientIntensityLoc, Light.AmbientIntensity);
+}
+
+
+void LightingTechnique::SetMaterial(const Material& material)
+{
+    glUniform3f(materialAmbientColorLoc, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b);
 }

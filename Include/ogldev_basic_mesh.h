@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 #include <GL/glew.h>
+
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
@@ -30,7 +31,7 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
 #include "ogldev_world_transform.h"
-
+#include "ogldev_material.h"
 
 class BasicMesh
 {
@@ -46,6 +47,8 @@ public:
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
+
+    const Material& GetMaterial() { return m_material; }
 
 private:
     void Clear();
@@ -65,7 +68,6 @@ private:
     void PopulateBuffers();
 
 #define INVALID_MATERIAL 0xFFFFFFFF
-
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,
@@ -98,6 +100,7 @@ private:
 
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<Texture*> m_Textures;
+    Material m_material;
 
     // Temporary space for vertex stuff before we load them into the GPU
     vector<Vector3f> m_Positions;

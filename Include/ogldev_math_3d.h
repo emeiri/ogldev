@@ -64,9 +64,20 @@ struct Vector2f
 
 struct Vector3f
 {
-    float x;
-    float y;
-    float z;
+    union {
+        float x;
+        float r;
+    };
+
+    union {
+        float y;
+        float g;
+    };
+
+    union {
+        float z;
+        float b;
+    };
 
     Vector3f() {}
 

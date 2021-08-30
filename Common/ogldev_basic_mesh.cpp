@@ -160,10 +160,12 @@ void BasicMesh::InitSingleMesh(const aiMesh* paiMesh)
     }
 }
 
-bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+
+string GetDirFromFilename(const string& Filename)
 {
     // Extract the directory part from the file name
     string::size_type SlashIndex = Filename.find_last_of("/");
+
     string Dir;
 
     if (SlashIndex == string::npos) {
@@ -175,6 +177,14 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
     else {
         Dir = Filename.substr(0, SlashIndex);
     }
+
+    return Dir;
+}
+
+
+bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+{
+    string Dir = GetDirFromFilename(Filename);
 
     bool Ret = true;
 
@@ -208,6 +218,14 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
                     printf("Loaded texture '%s'\n", FullPath.c_str());
                 }
             }
+        }
+
+        aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
+        if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
+            printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
+            m_material.AmbientColor.r = AmbientColor.r;
+            m_material.AmbientColor.g = AmbientColor.g;
+            m_material.AmbientColor.b = AmbientColor.b;
         }
     }
 
