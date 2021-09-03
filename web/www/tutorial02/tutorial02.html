@@ -79,8 +79,11 @@
                         it. In order to link the program with GLEW you need to add '-lGLEW' to
                         the makefile.</p>
                         <code>#include "math_3d.h"</code>
-                        <p>In this tutorial we start using helper structures such as vector. We
-                        will expand this header as we go along.</p>
+                        <p>This header file is located in 'ogldev/Include' and contains helper structures such as vector. We
+                            will expand this header as we go along. Make sure to clone the source repo according to the instructions
+                            <a href="https://ogldev.org/instructions.html"><u>here</u></a>. Note that every tutorial directory contains a 'build.sh' script
+                                that can be used to build the tutorial. If you use your own build system use this script as a reference for
+                                required build/link flags.</p>
                         <code>GLenum res = glewInit();<br/>
                         if (res != GLEW_OK)<br/>
                         {<br/>
