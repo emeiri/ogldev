@@ -48,7 +48,7 @@ public:
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
-    const Material& GetMaterial() { return m_material; }
+    const Material& GetMaterial();
 
 private:
     void Clear();
@@ -100,7 +100,7 @@ private:
 
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<Texture*> m_Textures;
-    Material m_material;
+    std::vector<Material> m_Materials;
 
     // Temporary space for vertex stuff before we load them into the GPU
     vector<Vector3f> m_Positions;

@@ -83,6 +83,7 @@ bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 {
     m_Meshes.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
+    m_Materials.resize(pScene->mNumMaterials);
 
     unsigned int NumVertices = 0;
     unsigned int NumIndices = 0;
@@ -221,11 +222,12 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
         }
 
         aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
+
         if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
             printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
-            m_material.AmbientColor.r = AmbientColor.r;
-            m_material.AmbientColor.g = AmbientColor.g;
-            m_material.AmbientColor.b = AmbientColor.b;
+            m_Materials[i].AmbientColor.r = AmbientColor.r;
+            m_Materials[i].AmbientColor.g = AmbientColor.g;
+            m_Materials[i].AmbientColor.b = AmbientColor.b;
         }
     }
 
@@ -311,4 +313,16 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
+}
+
+
+const Material& BasicMesh::GetMaterial()
+{
+    for (unsigned int i = 0 ; i < m_Materials.size() ; i++) {
+        if (m_Materials[i].AmbientColor != Vector3f(0.0f, 0.0f, 0.0f)) {
+            return m_Materials[i];
+        }
+    }
+
+    assert(0);
 }
