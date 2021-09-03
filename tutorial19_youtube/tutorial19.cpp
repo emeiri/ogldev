@@ -31,6 +31,7 @@
 #include "ogldev_basic_mesh.h"
 #include "camera.h"
 #include "lighting_technique.h"
+#include "ogldev_engine_common.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -79,7 +80,7 @@ Tutorial19::Tutorial19()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    baseLight.AmbientIntensity = 1.5f;
+    baseLight.AmbientIntensity = 1.0f;
 }
 
 
@@ -122,7 +123,7 @@ bool Tutorial19::Init()
 
     pLightingTech->Enable();
 
-    pLightingTech->SetTextureUnit(0);
+    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT);
 
     return true;
 }

@@ -10,12 +10,20 @@ struct BaseLight
     float AmbientIntensity;
 };
 
+struct Material
+{
+    vec3 AmbientColor;
+};
+
 uniform BaseLight gLight;
+uniform Material gMaterial;
 uniform sampler2D gSampler;
 
 void main()
 {
     FragColor = texture2D(gSampler, TexCoord0.xy) *
+                vec4(gMaterial.AmbientColor, 1.0f) *
                 vec4(gLight.Color, 1.0f) *
                 gLight.AmbientIntensity;
+
 }
