@@ -127,6 +127,16 @@ struct Vector3f
         return *this;
     }
 
+    bool operator==(const Vector3f& r)
+    {
+        return ((x == r.x) && (y == r.y) && (z == r.z));
+    }
+
+    bool operator!=(const Vector3f& r)
+    {
+        return !(*this == r);
+    }
+
     operator const float*() const
     {
         return &(x);
