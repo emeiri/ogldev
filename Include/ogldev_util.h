@@ -82,6 +82,6 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 long long GetCurrentTimeMillis();
 
 
-#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices)
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices)
 
 #endif  /* OGLDEV_UTIL_H */
