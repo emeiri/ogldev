@@ -175,6 +175,14 @@ struct Vector4f
         w = _w;
     }
 
+    Vector4f(const Vector3f& v, float _w)
+    {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        w = _w;
+    }
+
     void Print(bool endl = true) const
     {
         printf("(%.02f, %.02f, %.02f, %.02f)", x, y, z, w);
