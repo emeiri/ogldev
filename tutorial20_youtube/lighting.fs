@@ -16,6 +16,7 @@ struct DirectionalLight
 struct Material
 {
     vec3 AmbientColor;
+    vec3 DiffuseColor;
 };
 
 uniform DirectionalLight gDirectionalLight;
@@ -25,7 +26,8 @@ uniform sampler2D gSampler;
 void main()
 {
     vec4 AmbientColor = vec4(gDirectionalLight.Color, 1.0f) *
-                        gDirectionalLight.AmbientIntensity;
+                        gDirectionalLight.AmbientIntensity *
+                        vec4(gMaterial.AmbientColor, 1.0f);
 
     float DiffuseFactor = dot(normalize(Normal0), -gDirectionalLight.Direction);
 
@@ -34,11 +36,10 @@ void main()
     if (DiffuseFactor > 0) {
         DiffuseColor = vec4(gDirectionalLight.Color, 1.0f) *
                        gDirectionalLight.DiffuseIntensity *
+                       vec4(gMaterial.DiffuseColor, 1.0f) *
                        DiffuseFactor;
-
     }
 
     FragColor = texture2D(gSampler, TexCoord0.xy) *
-                vec4(gMaterial.AmbientColor, 1.0f) *
                 (AmbientColor + DiffuseColor);
 }

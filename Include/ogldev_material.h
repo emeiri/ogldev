@@ -23,6 +23,7 @@ class Material {
 
  public:
     Vector3f AmbientColor = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f DiffuseColor = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 

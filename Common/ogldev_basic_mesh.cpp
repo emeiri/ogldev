@@ -229,6 +229,16 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
             m_Materials[i].AmbientColor.g = AmbientColor.g;
             m_Materials[i].AmbientColor.b = AmbientColor.b;
         }
+
+        aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);
+
+        if (pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, DiffuseColor) == AI_SUCCESS) {
+            printf("Loaded Diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
+            m_Materials[i].DiffuseColor.r = DiffuseColor.r;
+            m_Materials[i].DiffuseColor.g = DiffuseColor.g;
+            m_Materials[i].DiffuseColor.b = DiffuseColor.b;
+        }
+
     }
 
     return Ret;

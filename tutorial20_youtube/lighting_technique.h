@@ -60,6 +60,7 @@ private:
     GLuint WorldMatrixLoc;
     GLuint samplerLoc;
     GLuint materialAmbientColorLoc;
+    GLuint materialDiffuseColorLoc;
 
     struct {
         GLuint Color;

@@ -45,6 +45,7 @@ bool LightingTechnique::Init()
     WorldMatrixLoc = GetUniformLocation("gWorld");
     samplerLoc = GetUniformLocation("gSampler");
     materialAmbientColorLoc = GetUniformLocation("gMaterial.AmbientColor");
+    materialDiffuseColorLoc = GetUniformLocation("gMaterial.DiffuseColor");
     m_dirLightLocation.Color = GetUniformLocation("gDirectionalLight.Color");
     m_dirLightLocation.AmbientIntensity = GetUniformLocation("gDirectionalLight.AmbientIntensity");
     m_dirLightLocation.Direction = GetUniformLocation("gDirectionalLight.Direction");
@@ -54,6 +55,7 @@ bool LightingTechnique::Init()
         WorldMatrixLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
         materialAmbientColorLoc == 0xFFFFFFFF ||
+        materialDiffuseColorLoc == 0xFFFFFFFF ||
         m_dirLightLocation.Color == 0xFFFFFFFF ||
         m_dirLightLocation.DiffuseIntensity == 0xFFFFFFFF ||
         m_dirLightLocation.Direction == 0xFFFFFFFF ||
@@ -97,4 +99,5 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 void LightingTechnique::SetMaterial(const Material& material)
 {
     glUniform3f(materialAmbientColorLoc, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b);
+    glUniform3f(materialDiffuseColorLoc, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b);
 }
