@@ -110,7 +110,7 @@ bool Tutorial19::Init()
 
     pMesh = new BasicMesh();
 
-    if (!pMesh->LoadMesh("/home/emeiri/Downloads/wine_barrel_01_4k.blend/wine_barrel_01_4k.obj")) {
+    if (!pMesh->LoadMesh("../Content/spider.obj")) {
         return false;
     }
 
@@ -143,7 +143,7 @@ void Tutorial19::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
-    worldTransform.SetScale(1.0f);
+    worldTransform.SetScale(0.01f);
     worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
     worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
 
