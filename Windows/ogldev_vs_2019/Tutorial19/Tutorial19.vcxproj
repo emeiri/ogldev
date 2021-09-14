@@ -25,24 +25,28 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
-    <ClCompile Include="..\..\..\tutorial18_youtube\camera.cpp" />
-    <ClCompile Include="..\..\..\tutorial18_youtube\tutorial18.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial19_youtube\camera.cpp" />
+    <ClCompile Include="..\..\..\tutorial19_youtube\lighting_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial19_youtube\tutorial19.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
-    <ClInclude Include="..\..\..\tutorial18_youtube\camera.h" />
+    <ClInclude Include="..\..\..\Include\technique.h" />
+    <ClInclude Include="..\..\..\tutorial19_youtube\camera.h" />
+    <ClInclude Include="..\..\..\tutorial19_youtube\lighting_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\tutorial18_youtube\shader.fs" />
-    <None Include="..\..\..\tutorial18_youtube\shader.vs" />
+    <None Include="..\..\..\tutorial19_youtube\lighting.fs" />
+    <None Include="..\..\..\tutorial19_youtube\lighting.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{32A9FC7F-FB44-4984-99FB-E768DD0779D9}</ProjectGuid>
+    <ProjectGuid>{D3CB3C43-18C2-47CD-87D0-72D1D280D408}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial18</ProjectName>
+    <ProjectName>Tutorial19</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
