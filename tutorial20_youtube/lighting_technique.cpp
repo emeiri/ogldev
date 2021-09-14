@@ -52,7 +52,7 @@ bool LightingTechnique::Init()
     m_dirLightLocation.DiffuseIntensity = GetUniformLocation("gDirectionalLight.DiffuseIntensity");
 
     if (WVPLoc == 0xFFFFFFFF ||
-        WorldMatrixLoc == 0xFFFFFFFF ||
+        //        WorldMatrixLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
         materialAmbientColorLoc == 0xFFFFFFFF ||
         materialDiffuseColorLoc == 0xFFFFFFFF ||

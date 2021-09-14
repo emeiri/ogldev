@@ -80,7 +80,7 @@ Tutorial20::Tutorial20()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    dirLight.AmbientIntensity = 0.0f;
+    dirLight.AmbientIntensity = 0.1f;
     dirLight.DiffuseIntensity = 1.0f;
     dirLight.Direction = Vector3f(1.0f, 0.0, 0.0);
 }
@@ -112,7 +112,7 @@ bool Tutorial20::Init()
 
     pMesh = new BasicMesh();
 
-    if (!pMesh->LoadMesh("/home/emeiri/Downloads/wine_barrel_01_4k.blend/wine_barrel_01_4k.obj")) {
+    if (!pMesh->LoadMesh("../Content/box.obj")) {
         return false;
     }
 
@@ -147,9 +147,31 @@ void Tutorial20::RenderSceneCB()
 
     worldTransform.SetScale(1.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
+    //    worldTransform.SetRotation(0.0f, 45.0f, 0.0f);
     worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
 
     Matrix4f World = worldTransform.GetMatrix();
+
+    Matrix4f WorldTranspose = World.Transpose();
+    printf("World\n");
+    World.Print();
+    printf("----\n");
+    printf("Transpose\n");
+    WorldTranspose.m[0][3] = 0.0f;
+    WorldTranspose.m[1][3] = 0.0f;
+    WorldTranspose.m[2][3] = 0.0f;
+    WorldTranspose.m[3][3] = 0.0f;
+    WorldTranspose.m[3][0] = 0.0f;
+    WorldTranspose.m[3][1] = 0.0f;
+    WorldTranspose.m[3][2] = 0.0f;
+    WorldTranspose.Print();
+    printf("----\n");
+
+    Vector3f foo(1.0f, 0.0f, 0.0f);
+    Vector4f LightDirLocal = WorldTranspose * Vector4f(foo, 0.0f);
+    LightDirLocal.Print();
+    //    exit(0);
+    dirLight.Direction = Vector3f(LightDirLocal.x, LightDirLocal.y, LightDirLocal.z);
 
     Matrix4f View = pGameCamera->GetMatrix();
 
@@ -158,7 +180,7 @@ void Tutorial20::RenderSceneCB()
 
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
-    pLightingTech->SetWorldMatrix(World);
+    //    pLightingTech->SetWorldMatrix(World);
     pLightingTech->SetDirectionalLight(dirLight);
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
