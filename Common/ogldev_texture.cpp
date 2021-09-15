@@ -69,8 +69,8 @@ bool Texture::Load()
     }
     glTexParameterf(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glBindTexture(m_textureTarget, 0);
 #ifndef USE_IMAGE_MAGICK
