@@ -56,7 +56,6 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetWorldMatrix(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& Light);
     void SetMaterial(const Material& material);
@@ -64,17 +63,19 @@ public:
 private:
 
     GLuint WVPLoc;
-    GLuint WorldMatrixLoc;
     GLuint samplerLoc;
-    GLuint materialAmbientColorLoc;
-    GLuint materialDiffuseColorLoc;
+
+    struct {
+        GLuint AmbientColor;
+        GLuint DiffuseColor;
+    } materialLoc;
 
     struct {
         GLuint Color;
         GLuint AmbientIntensity;
         GLuint Direction;
         GLuint DiffuseIntensity;
-    } m_dirLightLocation;
+    } dirLightLoc;
 };
 
 
