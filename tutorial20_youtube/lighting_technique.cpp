@@ -26,19 +26,12 @@ void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
     World.Print();
     printf("----\n");
     printf("Transpose\n");
-    WorldTranspose.m[0][3] = 0.0f;
-    WorldTranspose.m[1][3] = 0.0f;
-    WorldTranspose.m[2][3] = 0.0f;
-    WorldTranspose.m[3][3] = 0.0f;
-    WorldTranspose.m[3][0] = 0.0f;
-    WorldTranspose.m[3][1] = 0.0f;
-    WorldTranspose.m[3][2] = 0.0f;
     WorldTranspose.Print();
     printf("----\n");
 
-    Vector4f v = WorldTranspose * Vector4f(WorldDirection, 0.0f);
+    Matrix3f WorldTranspose3f(WorldTranspose);
 
-    LocalDirection = Vector3f(v);
+    LocalDirection = WorldTranspose3f * WorldDirection;
 
     LocalDirection.Print();
 }
