@@ -440,6 +440,18 @@ public:
         return r;
     }
 
+    Matrix3f Transpose() const
+    {
+        Matrix3f n;
+
+        for (unsigned int i = 0 ; i < 3 ; i++) {
+            for (unsigned int j = 0 ; j < 3 ; j++) {
+                n.m[i][j] = m[j][i];
+            }
+        }
+
+        return n;
+    }
 };
 
 #endif  /* MATH_3D_H */
