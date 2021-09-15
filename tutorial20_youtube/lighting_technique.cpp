@@ -27,7 +27,7 @@ void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
 
     LocalDirection = WorldToLocal * WorldDirection;
 
-    LocalDirection.Print();
+    LocalDirection = LocalDirection.Normalize();
 }
 
 
@@ -93,9 +93,8 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
     glUniform3f(dirLightLoc.Color, Light.Color.x, Light.Color.y, Light.Color.z);
     glUniform1f(dirLightLoc.AmbientIntensity, Light.AmbientIntensity);
-    Vector3f Direction = Light.GetLocalDirection();
-    Direction.Normalize();
-    glUniform3f(dirLightLoc.Direction, Direction.x, Direction.y, Direction.z);
+    Vector3f LocalDirection = Light.GetLocalDirection();
+    glUniform3f(dirLightLoc.Direction, LocalDirection.x, LocalDirection.y, LocalDirection.z);
     glUniform1f(dirLightLoc.DiffuseIntensity, Light.DiffuseIntensity);
 }
 
