@@ -61,6 +61,7 @@ struct Vector2f
     }
 };
 
+struct Vector4f;
 
 struct Vector3f
 {
@@ -99,6 +100,8 @@ struct Vector3f
     {
         x = y = z = f;
     }
+
+    Vector3f(const Vector4f& v);
 
     Vector3f& operator+=(const Vector3f& r)
     {
@@ -228,6 +231,12 @@ inline Vector3f operator*(const Vector3f& l, float f)
     return Ret;
 }
 
+inline Vector3f::Vector3f(const Vector4f& v)
+{
+    x = v.x;
+    y = v.y;
+    z = v.z;
+}
 
 inline Vector4f operator/(const Vector4f& l, float f)
 {

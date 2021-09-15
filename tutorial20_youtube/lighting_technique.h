@@ -34,8 +34,15 @@ public:
 class DirectionalLight : public BaseLight
 {
 public:
-    Vector3f Direction = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f WorldDirection = Vector3f(0.0f, 0.0f, 0.0f);
     float DiffuseIntensity = 0.0f;
+
+    void CalcLocalDirection(const Matrix4f& World);
+
+    const Vector3f& GetLocalDirection() const { return LocalDirection; }
+
+private:
+    Vector3f LocalDirection = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 

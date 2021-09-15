@@ -19,6 +19,31 @@
 #include "lighting_technique.h"
 
 
+void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
+{
+    Matrix4f WorldTranspose = World.Transpose();
+    printf("World\n");
+    World.Print();
+    printf("----\n");
+    printf("Transpose\n");
+    WorldTranspose.m[0][3] = 0.0f;
+    WorldTranspose.m[1][3] = 0.0f;
+    WorldTranspose.m[2][3] = 0.0f;
+    WorldTranspose.m[3][3] = 0.0f;
+    WorldTranspose.m[3][0] = 0.0f;
+    WorldTranspose.m[3][1] = 0.0f;
+    WorldTranspose.m[3][2] = 0.0f;
+    WorldTranspose.Print();
+    printf("----\n");
+
+    Vector4f v = WorldTranspose * Vector4f(WorldDirection, 0.0f);
+
+    LocalDirection = Vector3f(v);
+
+    LocalDirection.Print();
+}
+
+
 LightingTechnique::LightingTechnique()
 {
 }
@@ -89,7 +114,7 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
     glUniform3f(m_dirLightLocation.Color, Light.Color.x, Light.Color.y, Light.Color.z);
     glUniform1f(m_dirLightLocation.AmbientIntensity, Light.AmbientIntensity);
-    Vector3f Direction = Light.Direction;
+    Vector3f Direction = Light.GetLocalDirection();
     Direction.Normalize();
     glUniform3f(m_dirLightLocation.Direction, Direction.x, Direction.y, Direction.z);
     glUniform1f(m_dirLightLocation.DiffuseIntensity, Light.DiffuseIntensity);

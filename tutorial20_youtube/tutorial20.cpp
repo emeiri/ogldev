@@ -82,7 +82,7 @@ Tutorial20::Tutorial20()
 
     dirLight.AmbientIntensity = 0.1f;
     dirLight.DiffuseIntensity = 1.0f;
-    dirLight.Direction = Vector3f(1.0f, 0.0, 0.0);
+    dirLight.WorldDirection = Vector3f(1.0f, 0.0, 0.0);
 }
 
 
@@ -152,26 +152,7 @@ void Tutorial20::RenderSceneCB()
 
     Matrix4f World = worldTransform.GetMatrix();
 
-    Matrix4f WorldTranspose = World.Transpose();
-    printf("World\n");
-    World.Print();
-    printf("----\n");
-    printf("Transpose\n");
-    WorldTranspose.m[0][3] = 0.0f;
-    WorldTranspose.m[1][3] = 0.0f;
-    WorldTranspose.m[2][3] = 0.0f;
-    WorldTranspose.m[3][3] = 0.0f;
-    WorldTranspose.m[3][0] = 0.0f;
-    WorldTranspose.m[3][1] = 0.0f;
-    WorldTranspose.m[3][2] = 0.0f;
-    WorldTranspose.Print();
-    printf("----\n");
-
-    Vector3f foo(1.0f, 0.0f, 0.0f);
-    Vector4f LightDirLocal = WorldTranspose * Vector4f(foo, 0.0f);
-    LightDirLocal.Print();
-    //    exit(0);
-    dirLight.Direction = Vector3f(LightDirLocal.x, LightDirLocal.y, LightDirLocal.z);
+    dirLight.CalcLocalDirection(World);
 
     Matrix4f View = pGameCamera->GetMatrix();
 
