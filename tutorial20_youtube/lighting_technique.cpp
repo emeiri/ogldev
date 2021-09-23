@@ -23,6 +23,8 @@ void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
 {
     Matrix3f World3f(World);  // Initialize using the top left corner
 
+    // Inverse local-to-world transformation using transpose
+    // (assuming uniform scaling)
     Matrix3f WorldToLocal = World3f.Transpose();
 
     LocalDirection = WorldToLocal * WorldDirection;

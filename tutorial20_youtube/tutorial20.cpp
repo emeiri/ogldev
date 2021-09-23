@@ -161,7 +161,6 @@ void Tutorial20::RenderSceneCB()
 
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
-    //    pLightingTech->SetWorldMatrix(World);
     pLightingTech->SetDirectionalLight(dirLight);
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
@@ -249,7 +248,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 18");
+    int win = glutCreateWindow("Tutorial 20");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
