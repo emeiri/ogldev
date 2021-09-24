@@ -56,28 +56,26 @@ bool LightingTechnique::Init()
     }
 
     WVPLoc = GetUniformLocation("gWVP");
-    WorldMatrixLoc = GetUniformLocation("gWorld");
     samplerLoc = GetUniformLocation("gSampler");
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
     //    materialLoc.SpecularColor = GetUniformLocation("gMaterial.SpecularColor");
     materialLoc.SpecularIntensity = GetUniformLocation("gMaterial.SpecularIntensity");
     materialLoc.SpecularPower =     GetUniformLocation("gMaterial.SpecularPower");
-    EyeWorldPosLocation = GetUniformLocation("gEyeWorldPos");
+    EyeLocalPosLoc = GetUniformLocation("gEyeLocalPos");
     dirLightLoc.Color = GetUniformLocation("gDirectionalLight.Color");
     dirLightLoc.AmbientIntensity = GetUniformLocation("gDirectionalLight.AmbientIntensity");
     dirLightLoc.Direction = GetUniformLocation("gDirectionalLight.Direction");
     dirLightLoc.DiffuseIntensity = GetUniformLocation("gDirectionalLight.DiffuseIntensity");
 
     if (WVPLoc == 0xFFFFFFFF ||
-        WorldMatrixLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
         materialLoc.AmbientColor == 0xFFFFFFFF ||
         materialLoc.DiffuseColor == 0xFFFFFFFF ||
         materialLoc.SpecularColor == 0xFFFFFFFF ||
         materialLoc.SpecularIntensity == 0xFFFFFFFF ||
         materialLoc.SpecularPower == 0xFFFFFFFF ||
-        EyeWorldPosLocation == 0xFFFFFFFF ||
+        EyeLocalPosLoc == 0xFFFFFFFF ||
         dirLightLoc.Color == 0xFFFFFFFF ||
         dirLightLoc.DiffuseIntensity == 0xFFFFFFFF ||
         dirLightLoc.Direction == 0xFFFFFFFF ||
@@ -92,12 +90,6 @@ bool LightingTechnique::Init()
 void LightingTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
-}
-
-
-void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
-{
-    glUniformMatrix4fv(WorldMatrixLoc, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
 }
 
 
@@ -116,9 +108,10 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
     glUniform1f(dirLightLoc.DiffuseIntensity, Light.DiffuseIntensity);
 }
 
-void LightingTechnique::SetEyeWorldPos(const Vector3f& EyeWorldPos)
+
+void LightingTechnique::SetEyeLocalPos(const Vector3f& EyeLocalPos)
 {
-    glUniform3f(EyeWorldPosLocation, EyeWorldPos.x, EyeWorldPos.y, EyeWorldPos.z);
+    glUniform3f(EyeLocalPosLoc, EyeLocalPos.x, EyeLocalPos.y, EyeLocalPos.z);
 }
 
 

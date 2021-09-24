@@ -2,8 +2,7 @@
 
 in vec2 TexCoord0;
 in vec3 Normal0;
-in vec3 NormalOrig;
-in vec3 WorldPos0;
+in vec3 LocalPos0;
 
 out vec4 FragColor;
 
@@ -26,7 +25,7 @@ struct Material
 uniform DirectionalLight gDirectionalLight;
 uniform Material gMaterial;
 uniform sampler2D gSampler;
-uniform vec3 gEyeWorldPos;
+uniform vec3 gEyeLocalPos;
 
 void main()
 {
@@ -36,7 +35,7 @@ void main()
 
     vec3 Normal = normalize(Normal0);
 
-    float DiffuseFactor = dot(normalize(NormalOrig), -gDirectionalLight.Direction);
+    float DiffuseFactor = dot(Normal, -gDirectionalLight.Direction);
 
     vec4 DiffuseColor = vec4(0, 0, 0, 0);
     vec4 SpecularColor = vec4(0, 0, 0, 0);
@@ -47,7 +46,7 @@ void main()
                        vec4(gMaterial.DiffuseColor, 1.0f) *
                        DiffuseFactor;
 
-        vec3 VertexToEye = normalize(gEyeWorldPos - WorldPos0);
+        vec3 VertexToEye = normalize(gEyeLocalPos - LocalPos0);
         vec3 LightReflect = normalize(reflect(gDirectionalLight.Direction, Normal));
         float SpecularFactor = dot(VertexToEye, LightReflect);
         if (SpecularFactor > 0) {

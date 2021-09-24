@@ -56,18 +56,16 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetWorldMatrix(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& Light);
-    void SetEyeWorldPos(const Vector3f& EyeWorldPos);
+    void SetEyeLocalPos(const Vector3f& EyeLocalPos);
     void SetMaterial(const Material& material);
 
 private:
 
     GLuint WVPLoc;
-    GLuint WorldMatrixLoc;
     GLuint samplerLoc;
-    GLuint EyeWorldPosLocation;
+    GLuint EyeLocalPosLoc;
 
     struct {
         GLuint AmbientColor;

@@ -145,8 +145,10 @@ void Tutorial21::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
+    Vector3f WorldPos(0.0f, 0.0f, 2.0f);
+
     worldTransform.SetScale(1.0f);
-    worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
+    worldTransform.SetPosition(WorldPos);
     worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
 
     Matrix4f World = worldTransform.GetMatrix();
@@ -160,10 +162,32 @@ void Tutorial21::RenderSceneCB()
 
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
-    pLightingTech->SetWorldMatrix(World);
     pLightingTech->SetDirectionalLight(dirLight);
     pLightingTech->SetMaterial(pMesh->GetMaterial());
-    pLightingTech->SetEyeWorldPos(pGameCamera->GetPos());
+
+    Matrix4f EyeToLocalTranslation;
+    EyeToLocalTranslation.InitTranslationTransform(WorldPos.Negate());
+
+    printf("Eye to local translation:\n");
+    EyeToLocalTranslation.Print();
+
+    Matrix4f EyeToLocalRotation = worldTransform.GetReversedRotationMatrix();
+
+    Matrix4f EyeToLocalTransformation = EyeToLocalRotation * EyeToLocalTranslation;
+
+    Vector4f EyeWorldPos = Vector4f(pGameCamera->GetPos().x,
+                                    pGameCamera->GetPos().y,
+                                    pGameCamera->GetPos().z,
+                                    1.0f);
+
+    printf("Eye world pos: "); pGameCamera->GetPos().Print(); printf("\n");
+
+    Vector4f EyeLocalPos = EyeToLocalTransformation * EyeWorldPos;
+    Vector3f EyeLocalPos3f(EyeLocalPos);
+
+    printf("Eye local pos: "); EyeLocalPos3f.Print(); printf("\n");
+
+    pLightingTech->SetEyeLocalPos(EyeLocalPos3f);
 
     pMesh->Render();
 
