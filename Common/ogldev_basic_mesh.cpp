@@ -35,7 +35,8 @@ BasicMesh::~BasicMesh()
 void BasicMesh::Clear()
 {
     for (unsigned int i = 0 ; i < m_Textures.size() ; i++) {
-        SAFE_DELETE(m_Textures[i]);
+        SAFE_DELETE(m_Textures[i].pDiffuse);
+        SAFE_DELETE(m_Textures[i].pSpecular);
     }
 
     if (m_Buffers[0] != 0) {
@@ -193,8 +194,6 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
     for (unsigned int i = 0 ; i < pScene->mNumMaterials ; i++) {
         const aiMaterial* pMaterial = pScene->mMaterials[i];
 
-        m_Textures[i] = NULL;
-
         LoadTextures(Dir, pMaterial, i);
 
         LoadColors(pMaterial, i);
@@ -212,6 +211,8 @@ void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 
 void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index)
 {
+    m_Textures[index].pDiffuse = NULL;
+
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         aiString Path;
 
@@ -224,12 +225,10 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 
             string FullPath = Dir + "/" + p;
 
-            m_Textures[index] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+            m_Textures[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Textures[index]->Load()) {
+            if (!m_Textures[index].pDiffuse->Load()) {
                 printf("Error loading texture '%s'\n", FullPath.c_str());
-                delete m_Textures[index];
-                m_Textures[index] = NULL;
                 exit(0);
             }
             else {
@@ -303,8 +302,8 @@ void BasicMesh::Render()
 
         assert(MaterialIndex < m_Textures.size());
 
-        if (m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
+        if (m_Textures[MaterialIndex].pDiffuse) {
+            m_Textures[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -335,8 +334,8 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
 
         assert(MaterialIndex < m_Textures.size());
 
-        if (m_Textures[MaterialIndex]) {
-            m_Textures[MaterialIndex]->Bind(GL_TEXTURE0);
+        if (m_Textures[MaterialIndex].pDiffuse) {
+            m_Textures[MaterialIndex].pDiffuse->Bind(GL_TEXTURE0);
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,
