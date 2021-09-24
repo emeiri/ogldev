@@ -221,35 +221,41 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
             }
         }
 
-        aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
-
-        if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
-            printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
-            m_Materials[i].AmbientColor.r = AmbientColor.r;
-            m_Materials[i].AmbientColor.g = AmbientColor.g;
-            m_Materials[i].AmbientColor.b = AmbientColor.b;
-        }
-
-        aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);
-
-        if (pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, DiffuseColor) == AI_SUCCESS) {
-            printf("Loaded diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
-            m_Materials[i].DiffuseColor.r = DiffuseColor.r;
-            m_Materials[i].DiffuseColor.g = DiffuseColor.g;
-            m_Materials[i].DiffuseColor.b = DiffuseColor.b;
-        }
-
-        aiColor3D SpecularColor(0.0f, 0.0f, 0.0f);
-
-        if (pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, SpecularColor) == AI_SUCCESS) {
-            printf("Loaded specular color [%f %f %f]\n", SpecularColor.r, SpecularColor.g, SpecularColor.b);
-            m_Materials[i].SpecularColor.r = SpecularColor.r;
-            m_Materials[i].SpecularColor.g = SpecularColor.g;
-            m_Materials[i].SpecularColor.b = SpecularColor.b;
-        }
+        LoadColors(pMaterial, i);
     }
 
     return Ret;
+}
+
+
+void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
+{
+    aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
+
+    if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
+        printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
+        m_Materials[index].AmbientColor.r = AmbientColor.r;
+        m_Materials[index].AmbientColor.g = AmbientColor.g;
+        m_Materials[index].AmbientColor.b = AmbientColor.b;
+    }
+
+    aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);
+
+    if (pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, DiffuseColor) == AI_SUCCESS) {
+        printf("Loaded diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
+        m_Materials[index].DiffuseColor.r = DiffuseColor.r;
+        m_Materials[index].DiffuseColor.g = DiffuseColor.g;
+        m_Materials[index].DiffuseColor.b = DiffuseColor.b;
+    }
+
+    aiColor3D SpecularColor(0.0f, 0.0f, 0.0f);
+
+    if (pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, SpecularColor) == AI_SUCCESS) {
+        printf("Loaded specular color [%f %f %f]\n", SpecularColor.r, SpecularColor.g, SpecularColor.b);
+        m_Materials[index].SpecularColor.r = SpecularColor.r;
+        m_Materials[index].SpecularColor.g = SpecularColor.g;
+        m_Materials[index].SpecularColor.b = SpecularColor.b;
+    }
 }
 
 

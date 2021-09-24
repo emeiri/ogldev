@@ -67,6 +67,8 @@ private:
 
     void PopulateBuffers();
 
+    void LoadColors(const aiMaterial* pMaterial, int index);
+
 #define INVALID_MATERIAL 0xFFFFFFFF
 
     enum BUFFER_TYPE {
