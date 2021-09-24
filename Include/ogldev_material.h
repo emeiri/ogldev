@@ -24,7 +24,7 @@ class Material {
  public:
     Vector3f AmbientColor = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f DiffuseColor = Vector3f(0.0f, 0.0f, 0.0f);
-    float SpecularIntensity = 0.0f;
+    Vector3f SpecularColor = Vector3f(0.0f, 0.0f, 0.0f);
     float SpecularPower = 32.0f;
 };
 

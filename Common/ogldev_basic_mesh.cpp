@@ -233,12 +233,20 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
         aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);
 
         if (pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, DiffuseColor) == AI_SUCCESS) {
-            printf("Loaded Diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
+            printf("Loaded diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
             m_Materials[i].DiffuseColor.r = DiffuseColor.r;
             m_Materials[i].DiffuseColor.g = DiffuseColor.g;
             m_Materials[i].DiffuseColor.b = DiffuseColor.b;
         }
 
+        aiColor3D SpecularColor(0.0f, 0.0f, 0.0f);
+
+        if (pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, SpecularColor) == AI_SUCCESS) {
+            printf("Loaded specular color [%f %f %f]\n", SpecularColor.r, SpecularColor.g, SpecularColor.b);
+            m_Materials[i].SpecularColor.r = SpecularColor.r;
+            m_Materials[i].SpecularColor.g = SpecularColor.g;
+            m_Materials[i].SpecularColor.b = SpecularColor.b;
+        }
     }
 
     return Ret;

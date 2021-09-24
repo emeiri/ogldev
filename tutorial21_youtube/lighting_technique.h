@@ -71,7 +71,6 @@ private:
         GLuint AmbientColor;
         GLuint DiffuseColor;
         GLuint SpecularColor;
-        GLuint SpecularIntensity;
         GLuint SpecularPower;
     } materialLoc;
 
