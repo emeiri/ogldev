@@ -67,6 +67,10 @@ private:
 
     void PopulateBuffers();
 
+    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+
     void LoadColors(const aiMaterial* pMaterial, int index);
 
 #define INVALID_MATERIAL 0xFFFFFFFF

@@ -195,36 +195,48 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 
         m_Textures[i] = NULL;
 
-        if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-            aiString Path;
-
-            if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-                string p(Path.data);
-
-                if (p.substr(0, 2) == ".\\") {
-                    p = p.substr(2, p.size() - 2);
-                }
-
-                string FullPath = Dir + "/" + p;
-
-                m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
-
-                if (!m_Textures[i]->Load()) {
-                    printf("Error loading texture '%s'\n", FullPath.c_str());
-                    delete m_Textures[i];
-                    m_Textures[i] = NULL;
-                    Ret = false;
-                }
-                else {
-                    printf("Loaded texture '%s'\n", FullPath.c_str());
-                }
-            }
-        }
+        LoadTextures(Dir, pMaterial, i);
 
         LoadColors(pMaterial, i);
     }
 
     return Ret;
+}
+
+
+void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
+{
+    LoadDiffuseTexture(Dir, pMaterial, index);
+}
+
+
+void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index)
+{
+    if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+        aiString Path;
+
+        if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            string p(Path.data);
+
+            if (p.substr(0, 2) == ".\\") {
+                p = p.substr(2, p.size() - 2);
+            }
+
+            string FullPath = Dir + "/" + p;
+
+            m_Textures[index] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+            if (!m_Textures[index]->Load()) {
+                printf("Error loading texture '%s'\n", FullPath.c_str());
+                delete m_Textures[index];
+                m_Textures[index] = NULL;
+                exit(0);
+            }
+            else {
+                printf("Loaded texture '%s'\n", FullPath.c_str());
+            }
+        }
+    }
 }
 
 
