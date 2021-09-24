@@ -41,6 +41,12 @@ void WorldTrans::SetPosition(float x, float y, float z)
 }
 
 
+void WorldTrans::SetPosition(const Vector3f& WorldPos)
+{
+    m_pos = WorldPos;
+}
+
+
 void WorldTrans::Rotate(float x, float y, float z)
 {
     m_rotation.x += x;
@@ -63,4 +69,12 @@ Matrix4f WorldTrans::GetMatrix()
     Matrix4f WorldTransformation = Translation * Rotation * Scale;
 
     return WorldTransformation;
+}
+
+
+Matrix4f WorldTrans::GetReversedRotationMatrix()
+{
+    Matrix4f ReversedRotation;
+    ReversedRotation.InitRotateTransform(-m_rotation.x, -m_rotation.y, -m_rotation.z);
+    return ReversedRotation;
 }

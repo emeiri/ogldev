@@ -58,6 +58,13 @@ void Vector3f::Rotate(float Angle, const Vector3f& V)
 }
 
 
+Vector3f Vector3f::Negate() const
+{
+    Vector3f ret(-x, -y, -z);
+    return ret;
+}
+
+
 void Matrix4f::InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ)
 {
     m[0][0] = ScaleX; m[0][1] = 0.0f;   m[0][2] = 0.0f;   m[0][3] = 0.0f;
@@ -120,12 +127,19 @@ void Matrix4f::InitRotateTransform(const Quaternion& quat)
     m[3][3] = 1.0f;
 }
 
+
 void Matrix4f::InitTranslationTransform(float x, float y, float z)
 {
     m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = x;
     m[1][0] = 0.0f; m[1][1] = 1.0f; m[1][2] = 0.0f; m[1][3] = y;
     m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f; m[2][3] = z;
     m[3][0] = 0.0f; m[3][1] = 0.0f; m[3][2] = 0.0f; m[3][3] = 1.0f;
+}
+
+
+void Matrix4f::InitTranslationTransform(const Vector3f& Pos)
+{
+    InitTranslationTransform(Pos.x, Pos.y, Pos.z);
 }
 
 

@@ -152,6 +152,8 @@ struct Vector3f
 
     void Rotate(float Angle, const Vector3f& Axis);
 
+    Vector3f Negate() const;
+
     void Print() const
     {
         printf("(%.02f, %.02f, %.02f)", x, y, z);
@@ -403,6 +405,7 @@ public:
     void InitRotateTransform(const Quaternion& quat);
 
     void InitTranslationTransform(float x, float y, float z);
+    void InitTranslationTransform(const Vector3f& Pos);
 
     void InitCameraTransform(const Vector3f& Target, const Vector3f& Up);
 

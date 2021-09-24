@@ -28,10 +28,13 @@ class WorldTrans {
     void SetScale(float scale);
     void SetRotation(float x, float y, float z);
     void SetPosition(float x, float y, float z);
+    void SetPosition(const Vector3f& WorldPos);
 
     void Rotate(float x, float y, float z);
 
     Matrix4f GetMatrix();
+
+    Matrix4f GetReversedRotationMatrix();
 
  private:
     float    m_scale    = 1.0f;
