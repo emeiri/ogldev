@@ -34,8 +34,15 @@ public:
 class DirectionalLight : public BaseLight
 {
 public:
-    Vector3f Direction = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f WorldDirection = Vector3f(0.0f, 0.0f, 0.0f);
     float DiffuseIntensity = 0.0f;
+
+    void CalcLocalDirection(const Matrix4f& World);
+
+    const Vector3f& GetLocalDirection() const { return LocalDirection; }
+
+private:
+    Vector3f LocalDirection = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 
@@ -53,8 +60,6 @@ public:
     void SetTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& Light);
     void SetEyeWorldPos(const Vector3f& EyeWorldPos);
-    void SetMatSpecularIntensity(float Intensity);
-    void SetMatSpecularPower(float Power);
     void SetMaterial(const Material& material);
 
 private:
@@ -62,17 +67,22 @@ private:
     GLuint WVPLoc;
     GLuint WorldMatrixLoc;
     GLuint samplerLoc;
-    GLuint materialAmbientColorLoc;
-    GLuint m_eyeWorldPosLocation;
-    GLuint m_matSpecularIntensityLocation;
-    GLuint m_matSpecularPowerLocation;
+    GLuint EyeWorldPosLocation;
+
+    struct {
+        GLuint AmbientColor;
+        GLuint DiffuseColor;
+        GLuint SpecularColor;
+        GLuint SpecularIntensity;
+        GLuint SpecularPower;
+    } materialLoc;
 
     struct {
         GLuint Color;
         GLuint AmbientIntensity;
         GLuint Direction;
         GLuint DiffuseIntensity;
-    } m_dirLightLocation;
+    } dirLightLoc;
 };
 
 

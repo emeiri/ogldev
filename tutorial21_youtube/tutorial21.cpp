@@ -80,9 +80,9 @@ Tutorial21::Tutorial21()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    dirLight.AmbientIntensity = 0.0f;
-    dirLight.DiffuseIntensity = 0.0f;
-    dirLight.Direction = Vector3f(1.0f, 0.0, 0.0);
+    dirLight.AmbientIntensity = 0.1f;
+    dirLight.DiffuseIntensity = 1.0f;
+    dirLight.WorldDirection = Vector3f(1.0f, 0.0, 0.0);
 }
 
 
@@ -151,6 +151,8 @@ void Tutorial21::RenderSceneCB()
 
     Matrix4f World = worldTransform.GetMatrix();
 
+    dirLight.CalcLocalDirection(World);
+
     Matrix4f View = pGameCamera->GetMatrix();
 
     Matrix4f Projection;
@@ -162,8 +164,6 @@ void Tutorial21::RenderSceneCB()
     pLightingTech->SetDirectionalLight(dirLight);
     pLightingTech->SetMaterial(pMesh->GetMaterial());
     pLightingTech->SetEyeWorldPos(pGameCamera->GetPos());
-    pLightingTech->SetMatSpecularIntensity(1.0f);
-    pLightingTech->SetMatSpecularPower(32);
 
     pMesh->Render();
 
@@ -246,14 +246,14 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    int x = 210;
+    int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 18");
+    int win = glutCreateWindow("Tutorial 21");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
-    // Game mode string example: 2121x1080@32
+    // Game mode string example: 2020x1080@32
     // Enable the following three lines for full screen
     // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
     // glutGameModeString(game_mode_string);
