@@ -19,7 +19,6 @@ struct Material
     vec3 AmbientColor;
     vec3 DiffuseColor;
     vec3 SpecularColor;
-    float SpecularPower;
 };
 
 uniform DirectionalLight gDirectionalLight;
@@ -51,9 +50,8 @@ void main()
         vec3 LightReflect = normalize(reflect(gDirectionalLight.Direction, Normal));
         float SpecularFactor = dot(VertexToEye, LightReflect);
         if (SpecularFactor > 0) {
-            float SampledSpecularFactor = texture2D(gSamplerSpecularPower, TexCoord0).x * 128.0;
-            SpecularFactor = pow(SpecularFactor, gMaterial.SpecularPower);
-            SpecularFactor = pow(SpecularFactor, SampledSpecularFactor);
+            float SpecularExponent = texture2D(gSamplerSpecularPower, TexCoord0).x * 128.0;
+            SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(gDirectionalLight.Color, 1.0f) *
                             vec4(gMaterial.SpecularColor, 1.0f) *
                             SpecularFactor;

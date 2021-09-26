@@ -61,7 +61,6 @@ bool LightingTechnique::Init()
     materialLoc.AmbientColor  = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor  = GetUniformLocation("gMaterial.DiffuseColor");
     materialLoc.SpecularColor = GetUniformLocation("gMaterial.SpecularColor");
-    materialLoc.SpecularPower = GetUniformLocation("gMaterial.SpecularPower");
     dirLightLoc.Color            = GetUniformLocation("gDirectionalLight.Color");
     dirLightLoc.AmbientIntensity = GetUniformLocation("gDirectionalLight.AmbientIntensity");
     dirLightLoc.Direction        = GetUniformLocation("gDirectionalLight.Direction");
@@ -74,7 +73,6 @@ bool LightingTechnique::Init()
         materialLoc.AmbientColor == 0xFFFFFFFF ||
         materialLoc.DiffuseColor == 0xFFFFFFFF ||
         materialLoc.SpecularColor == 0xFFFFFFFF ||
-        materialLoc.SpecularPower == 0xFFFFFFFF ||
         EyeLocalPosLoc == 0xFFFFFFFF ||
         dirLightLoc.Color == 0xFFFFFFFF ||
         dirLightLoc.DiffuseIntensity == 0xFFFFFFFF ||
@@ -125,5 +123,4 @@ void LightingTechnique::SetMaterial(const Material& material)
     glUniform3f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b);
     glUniform3f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b);
     glUniform3f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b);
-    glUniform1f(materialLoc.SpecularPower, material.SpecularPower);
 }

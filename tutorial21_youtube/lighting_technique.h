@@ -73,7 +73,6 @@ private:
         GLuint AmbientColor;
         GLuint DiffuseColor;
         GLuint SpecularColor;
-        GLuint SpecularPower;
     } materialLoc;
 
     struct {
