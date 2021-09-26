@@ -105,13 +105,6 @@ private:
     };
 
     std::vector<BasicMeshEntry> m_Meshes;
-
-    struct Textures {
-        Texture* pDiffuse = NULL;
-        Texture* pSpecular = NULL;
-    };
-
-    std::vector<Textures> m_Textures;
     std::vector<Material> m_Materials;
 
     // Temporary space for vertex stuff before we load them into the GPU

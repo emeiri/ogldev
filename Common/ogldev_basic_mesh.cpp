@@ -34,11 +34,6 @@ BasicMesh::~BasicMesh()
 
 void BasicMesh::Clear()
 {
-    for (unsigned int i = 0 ; i < m_Textures.size() ; i++) {
-        SAFE_DELETE(m_Textures[i].pDiffuse);
-        SAFE_DELETE(m_Textures[i].pSpecular);
-    }
-
     if (m_Buffers[0] != 0) {
         glDeleteBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
     }
@@ -83,7 +78,6 @@ bool BasicMesh::LoadMesh(const string& Filename)
 bool BasicMesh::InitFromScene(const aiScene* pScene, const string& Filename)
 {
     m_Meshes.resize(pScene->mNumMeshes);
-    m_Textures.resize(pScene->mNumMaterials);
     m_Materials.resize(pScene->mNumMaterials);
 
     unsigned int NumVertices = 0;
@@ -212,7 +206,7 @@ void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 
 void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index)
 {
-    m_Textures[index].pDiffuse = NULL;
+    m_Materials[index].pDiffuse = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         aiString Path;
@@ -226,9 +220,9 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 
             string FullPath = Dir + "/" + p;
 
-            m_Textures[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+            m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Textures[index].pDiffuse->Load()) {
+            if (!m_Materials[index].pDiffuse->Load()) {
                 printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
                 exit(0);
             }
@@ -242,7 +236,7 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 
 void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index)
 {
-    m_Textures[index].pSpecular = NULL;
+    m_Materials[index].pSpecular = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
         aiString Path;
@@ -256,9 +250,9 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
 
             string FullPath = Dir + "/" + p;
 
-            m_Textures[index].pSpecular = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+            m_Materials[index].pSpecular = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Textures[index].pSpecular->Load()) {
+            if (!m_Materials[index].pSpecular->Load()) {
                 printf("Error loading specular texture '%s'\n", FullPath.c_str());
                 exit(0);
             }
@@ -330,14 +324,14 @@ void BasicMesh::Render()
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
 
-        assert(MaterialIndex < m_Textures.size());
+        assert(MaterialIndex < m_Materials.size());
 
-        if (m_Textures[MaterialIndex].pDiffuse) {
-            m_Textures[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        if (m_Materials[MaterialIndex].pDiffuse) {
+            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
         }
 
-        if (m_Textures[MaterialIndex].pSpecular) {
-            m_Textures[MaterialIndex].pSpecular->Bind(SPECULAR_POWER_UNIT);
+        if (m_Materials[MaterialIndex].pSpecular) {
+            m_Materials[MaterialIndex].pSpecular->Bind(SPECULAR_POWER_UNIT);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -366,10 +360,14 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
 
-        assert(MaterialIndex < m_Textures.size());
+        assert(MaterialIndex < m_Materials.size());
 
-        if (m_Textures[MaterialIndex].pDiffuse) {
-            m_Textures[MaterialIndex].pDiffuse->Bind(GL_TEXTURE0);
+        if (m_Materials[MaterialIndex].pDiffuse) {
+            m_Materials[MaterialIndex].pDiffuse->Bind(GL_TEXTURE0);
+        }
+
+        if (m_Materials[MaterialIndex].pSpecular) {
+            m_Materials[MaterialIndex].pSpecular->Bind(SPECULAR_POWER_UNIT);
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,

@@ -19,6 +19,8 @@
 #ifndef OGLDEV_MATERIAL_H
 #define OGLDEV_MATERIAL_H
 
+#include "ogldev_texture.h"
+
 class Material {
 
  public:
@@ -26,6 +28,10 @@ class Material {
     Vector3f DiffuseColor = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f SpecularColor = Vector3f(0.0f, 0.0f, 0.0f);
     float SpecularPower = 1.0f;
+
+    // TODO: need to deallocate these
+    Texture* pDiffuse = NULL;
+    Texture* pSpecular = NULL;
 };
 
 
