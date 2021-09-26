@@ -17,6 +17,7 @@
 */
 
 #include <iostream>
+#include "ogldev_util.h"
 #include "ogldev_texture.h"
 #include "3rdparty/stb_image.h"
 
@@ -61,7 +62,18 @@ bool Texture::Load()
 #ifdef USE_IMAGE_MAGICK
         glTexImage2D(m_textureTarget, 0, GL_RGBA, m_image.columns(), m_image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_blob.data());
 #else
-        glTexImage2D(m_textureTarget, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+        switch (bpp) {
+        case 1:
+            glTexImage2D(m_textureTarget, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+            break;
+
+        case 3:
+            glTexImage2D(m_textureTarget, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+            break;
+
+        default:
+            NOT_IMPLEMENTED;
+        }
 #endif
     } else {
         printf("Support for texture target %x is not implemented\n", m_textureTarget);

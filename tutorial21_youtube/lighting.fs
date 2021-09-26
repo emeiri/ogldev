@@ -25,6 +25,7 @@ struct Material
 uniform DirectionalLight gDirectionalLight;
 uniform Material gMaterial;
 uniform sampler2D gSampler;
+uniform sampler2D gSamplerSpecularPower;
 uniform vec3 gEyeLocalPos;
 
 void main()
@@ -50,13 +51,14 @@ void main()
         vec3 LightReflect = normalize(reflect(gDirectionalLight.Direction, Normal));
         float SpecularFactor = dot(VertexToEye, LightReflect);
         if (SpecularFactor > 0) {
+            float SampledSpecularFactor = texture2D(gSamplerSpecularPower, TexCoord0).x * 128.0;
             SpecularFactor = pow(SpecularFactor, gMaterial.SpecularPower);
+            SpecularFactor = pow(SpecularFactor, SampledSpecularFactor);
             SpecularColor = vec4(gDirectionalLight.Color, 1.0f) *
                             vec4(gMaterial.SpecularColor, 1.0f) *
                             SpecularFactor;
         }
     }
 
-    FragColor = texture2D(gSampler, TexCoord0.xy) *
-                (AmbientColor + DiffuseColor + SpecularColor);
+    FragColor = texture2D(gSampler, TexCoord0.xy) * (AmbientColor + DiffuseColor + SpecularColor);
 }

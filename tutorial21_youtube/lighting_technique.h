@@ -57,6 +57,7 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
+    void SetSpecularPowerTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& Light);
     void SetEyeLocalPos(const Vector3f& EyeLocalPos);
     void SetMaterial(const Material& material);
@@ -65,6 +66,7 @@ private:
 
     GLuint WVPLoc;
     GLuint samplerLoc;
+    GLuint samplerSpecularPowerLoc;
     GLuint EyeLocalPosLoc;
 
     struct {

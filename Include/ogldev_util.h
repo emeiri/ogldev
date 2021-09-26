@@ -82,6 +82,10 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 long long GetCurrentTimeMillis();
 
 
-#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices)
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices )
+
+#define NOT_IMPLEMENTED \
+    printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); \
+    exit(0);
 
 #endif  /* OGLDEV_UTIL_H */

@@ -75,7 +75,7 @@ Tutorial21::Tutorial21()
     glEnable(GL_DEPTH_TEST);
 
     float FOV = 45.0f;
-    float zNear = 1.0f;
+    float zNear = 0.1f;
     float zFar = 100.0f;
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
@@ -83,6 +83,14 @@ Tutorial21::Tutorial21()
     dirLight.AmbientIntensity = 0.1f;
     dirLight.DiffuseIntensity = 1.0f;
     dirLight.WorldDirection = Vector3f(1.0f, 0.0, 0.0);
+
+    /*    Vector4f foo(1.0f, 2.0f, 0.0f, 1.0f);
+    Matrix4f m;
+    m.InitRotateTransform(0.0f, 0.0f, -90.0f);
+    Vector4f bar = m * foo;
+    foo.Print();
+    bar.Print();
+    exit(0);*/
 }
 
 
@@ -112,7 +120,7 @@ bool Tutorial21::Init()
 
     pMesh = new BasicMesh();
 
-    if (!pMesh->LoadMesh("/home/emeiri/Downloads/wine_barrel_01_4k.blend/wine_barrel_01_4k.obj")) {
+    if (!pMesh->LoadMesh("/home/emeiri/Downloads/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj")) {
         return false;
     }
 
@@ -126,6 +134,7 @@ bool Tutorial21::Init()
     pLightingTech->Enable();
 
     pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT);
+    pLightingTech->SetSpecularPowerTextureUnit(SPECULAR_POWER_UNIT);
 
     return true;
 }
@@ -168,8 +177,8 @@ void Tutorial21::RenderSceneCB()
     Matrix4f EyeToLocalTranslation;
     EyeToLocalTranslation.InitTranslationTransform(WorldPos.Negate());
 
-    printf("Eye to local translation:\n");
-    EyeToLocalTranslation.Print();
+    //    printf("Eye to local translation:\n");
+    //    EyeToLocalTranslation.Print();
 
     Matrix4f EyeToLocalRotation = worldTransform.GetReversedRotationMatrix();
 
@@ -180,12 +189,12 @@ void Tutorial21::RenderSceneCB()
                                     pGameCamera->GetPos().z,
                                     1.0f);
 
-    printf("Eye world pos: "); pGameCamera->GetPos().Print(); printf("\n");
+    //    printf("Eye world pos: "); pGameCamera->GetPos().Print(); printf("\n");
 
     Vector4f EyeLocalPos = EyeToLocalTransformation * EyeWorldPos;
     Vector3f EyeLocalPos3f(EyeLocalPos);
 
-    printf("Eye local pos: "); EyeLocalPos3f.Print(); printf("\n");
+    //    printf("Eye local pos: "); EyeLocalPos3f.Print(); printf("\n");
 
     pLightingTech->SetEyeLocalPos(EyeLocalPos3f);
 

@@ -57,6 +57,7 @@ bool LightingTechnique::Init()
 
     WVPLoc = GetUniformLocation("gWVP");
     samplerLoc = GetUniformLocation("gSampler");
+    samplerSpecularPowerLoc = GetUniformLocation("gSamplerSpecularPower");
     materialLoc.AmbientColor  = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor  = GetUniformLocation("gMaterial.DiffuseColor");
     materialLoc.SpecularColor = GetUniformLocation("gMaterial.SpecularColor");
@@ -69,6 +70,7 @@ bool LightingTechnique::Init()
 
     if (WVPLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
+        samplerSpecularPowerLoc == 0xFFFFFFFF ||
         materialLoc.AmbientColor == 0xFFFFFFFF ||
         materialLoc.DiffuseColor == 0xFFFFFFFF ||
         materialLoc.SpecularColor == 0xFFFFFFFF ||
@@ -94,6 +96,11 @@ void LightingTechnique::SetWVP(const Matrix4f& WVP)
 void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerLoc, TextureUnit);
+}
+
+void LightingTechnique::SetSpecularPowerTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(samplerSpecularPowerLoc, TextureUnit);
 }
 
 

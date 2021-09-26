@@ -206,6 +206,7 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
 {
     LoadDiffuseTexture(Dir, pMaterial, index);
+    LoadSpecularTexture(Dir, pMaterial, index);
 }
 
 
@@ -228,16 +229,45 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
             m_Textures[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
             if (!m_Textures[index].pDiffuse->Load()) {
-                printf("Error loading texture '%s'\n", FullPath.c_str());
+                printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
                 exit(0);
             }
             else {
-                printf("Loaded texture '%s'\n", FullPath.c_str());
+                printf("Loaded diffuse texture '%s'\n", FullPath.c_str());
             }
         }
     }
 }
 
+
+void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index)
+{
+    m_Textures[index].pSpecular = NULL;
+
+    if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
+        aiString Path;
+
+        if (pMaterial->GetTexture(aiTextureType_SHININESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            string p(Path.data);
+
+            if (p.substr(0, 2) == ".\\") {
+                p = p.substr(2, p.size() - 2);
+            }
+
+            string FullPath = Dir + "/" + p;
+
+            m_Textures[index].pSpecular = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+            if (!m_Textures[index].pSpecular->Load()) {
+                printf("Error loading specular texture '%s'\n", FullPath.c_str());
+                exit(0);
+            }
+            else {
+                printf("Loaded specular texture '%s'\n", FullPath.c_str());
+            }
+        }
+    }
+}
 
 void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
 {
@@ -304,6 +334,10 @@ void BasicMesh::Render()
 
         if (m_Textures[MaterialIndex].pDiffuse) {
             m_Textures[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        }
+
+        if (m_Textures[MaterialIndex].pSpecular) {
+            m_Textures[MaterialIndex].pSpecular->Bind(SPECULAR_POWER_UNIT);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
