@@ -72,6 +72,14 @@ Matrix4f WorldTrans::GetMatrix()
 }
 
 
+Matrix4f WorldTrans::GetReversedTranslationMatrix()
+{
+    Matrix4f ReversedTranslation;
+    ReversedTranslation.InitTranslationTransform(m_pos.Negate());
+    return ReversedTranslation;
+}
+
+
 Matrix4f WorldTrans::GetReversedRotationMatrix()
 {
     Matrix4f ReversedRotation;

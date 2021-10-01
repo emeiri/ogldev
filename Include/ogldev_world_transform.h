@@ -34,6 +34,7 @@ class WorldTrans {
 
     Matrix4f GetMatrix();
 
+    Matrix4f GetReversedTranslationMatrix();
     Matrix4f GetReversedRotationMatrix();
 
  private:
