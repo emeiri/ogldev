@@ -125,7 +125,7 @@ bool Tutorial20::Init()
 
     pLightingTech->Enable();
 
-    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT);
+    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 
     return true;
 }
@@ -147,7 +147,6 @@ void Tutorial20::RenderSceneCB()
 
     worldTransform.SetScale(1.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
-    //    worldTransform.SetRotation(0.0f, 45.0f, 0.0f);
     worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
 
     Matrix4f World = worldTransform.GetMatrix();

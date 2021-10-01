@@ -123,7 +123,7 @@ bool Tutorial19::Init()
 
     pLightingTech->Enable();
 
-    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT);
+    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 
     return true;
 }
