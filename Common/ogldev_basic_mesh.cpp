@@ -236,7 +236,7 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 
 void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index)
 {
-    m_Materials[index].pSpecular = NULL;
+    m_Materials[index].pSpecularExponent = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
         aiString Path;
@@ -250,9 +250,9 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
 
             string FullPath = Dir + "/" + p;
 
-            m_Materials[index].pSpecular = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+            m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Materials[index].pSpecular->Load()) {
+            if (!m_Materials[index].pSpecularExponent->Load()) {
                 printf("Error loading specular texture '%s'\n", FullPath.c_str());
                 exit(0);
             }
@@ -330,8 +330,8 @@ void BasicMesh::Render()
             m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
         }
 
-        if (m_Materials[MaterialIndex].pSpecular) {
-            m_Materials[MaterialIndex].pSpecular->Bind(SPECULAR_POWER_UNIT);
+        if (m_Materials[MaterialIndex].pSpecularExponent) {
+            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -366,8 +366,8 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
             m_Materials[MaterialIndex].pDiffuse->Bind(GL_TEXTURE0);
         }
 
-        if (m_Materials[MaterialIndex].pSpecular) {
-            m_Materials[MaterialIndex].pSpecular->Bind(SPECULAR_POWER_UNIT);
+        if (m_Materials[MaterialIndex].pSpecularExponent) {
+            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,

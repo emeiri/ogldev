@@ -83,14 +83,6 @@ Tutorial21::Tutorial21()
     dirLight.AmbientIntensity = 0.1f;
     dirLight.DiffuseIntensity = 1.0f;
     dirLight.WorldDirection = Vector3f(1.0f, 0.0, 0.0);
-
-    /*    Vector4f foo(1.0f, 2.0f, 0.0f, 1.0f);
-    Matrix4f m;
-    m.InitRotateTransform(0.0f, 0.0f, -90.0f);
-    Vector4f bar = m * foo;
-    foo.Print();
-    bar.Print();
-    exit(0);*/
 }
 
 
@@ -133,8 +125,8 @@ bool Tutorial21::Init()
 
     pLightingTech->Enable();
 
-    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT);
-    pLightingTech->SetSpecularPowerTextureUnit(SPECULAR_POWER_UNIT);
+    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    pLightingTech->SetSpecularPowerTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     return true;
 }
@@ -174,29 +166,17 @@ void Tutorial21::RenderSceneCB()
     pLightingTech->SetDirectionalLight(dirLight);
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
-    Matrix4f EyeToLocalTranslation;
-    EyeToLocalTranslation.InitTranslationTransform(WorldPos.Negate());
+    Matrix4f CameraToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
+    Matrix4f CameraToLocalRotation = worldTransform.GetReversedRotationMatrix();
 
-    //    printf("Eye to local translation:\n");
-    //    EyeToLocalTranslation.Print();
+    Matrix4f CameraToLocalTransformation = CameraToLocalRotation * CameraToLocalTranslation;
 
-    Matrix4f EyeToLocalRotation = worldTransform.GetReversedRotationMatrix();
+    Vector4f CameraWorldPos = Vector4f(pGameCamera->GetPos(), 1.0f);
 
-    Matrix4f EyeToLocalTransformation = EyeToLocalRotation * EyeToLocalTranslation;
+    Vector4f CameraLocalPos = CameraToLocalTransformation * CameraWorldPos;
+    Vector3f CameraLocalPos3f(CameraLocalPos);
 
-    Vector4f EyeWorldPos = Vector4f(pGameCamera->GetPos().x,
-                                    pGameCamera->GetPos().y,
-                                    pGameCamera->GetPos().z,
-                                    1.0f);
-
-    //    printf("Eye world pos: "); pGameCamera->GetPos().Print(); printf("\n");
-
-    Vector4f EyeLocalPos = EyeToLocalTransformation * EyeWorldPos;
-    Vector3f EyeLocalPos3f(EyeLocalPos);
-
-    //    printf("Eye local pos: "); EyeLocalPos3f.Print(); printf("\n");
-
-    pLightingTech->SetEyeLocalPos(EyeLocalPos3f);
+    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
     pMesh->Render();
 

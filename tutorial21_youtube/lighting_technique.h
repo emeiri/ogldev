@@ -59,7 +59,7 @@ public:
     void SetTextureUnit(unsigned int TextureUnit);
     void SetSpecularPowerTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& Light);
-    void SetEyeLocalPos(const Vector3f& EyeLocalPos);
+    void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
 
 private:
@@ -67,7 +67,7 @@ private:
     GLuint WVPLoc;
     GLuint samplerLoc;
     GLuint samplerSpecularPowerLoc;
-    GLuint EyeLocalPosLoc;
+    GLuint CameraLocalPosLoc;
 
     struct {
         GLuint AmbientColor;

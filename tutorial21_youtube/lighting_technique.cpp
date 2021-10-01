@@ -58,14 +58,14 @@ bool LightingTechnique::Init()
     WVPLoc = GetUniformLocation("gWVP");
     samplerLoc = GetUniformLocation("gSampler");
     samplerSpecularPowerLoc = GetUniformLocation("gSamplerSpecularPower");
-    materialLoc.AmbientColor  = GetUniformLocation("gMaterial.AmbientColor");
-    materialLoc.DiffuseColor  = GetUniformLocation("gMaterial.DiffuseColor");
+    materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
+    materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
     materialLoc.SpecularColor = GetUniformLocation("gMaterial.SpecularColor");
-    dirLightLoc.Color            = GetUniformLocation("gDirectionalLight.Color");
+    dirLightLoc.Color = GetUniformLocation("gDirectionalLight.Color");
     dirLightLoc.AmbientIntensity = GetUniformLocation("gDirectionalLight.AmbientIntensity");
-    dirLightLoc.Direction        = GetUniformLocation("gDirectionalLight.Direction");
+    dirLightLoc.Direction = GetUniformLocation("gDirectionalLight.Direction");
     dirLightLoc.DiffuseIntensity = GetUniformLocation("gDirectionalLight.DiffuseIntensity");
-    EyeLocalPosLoc = GetUniformLocation("gEyeLocalPos");
+    CameraLocalPosLoc = GetUniformLocation("gCameraLocalPos");
 
     if (WVPLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
@@ -73,7 +73,7 @@ bool LightingTechnique::Init()
         materialLoc.AmbientColor == 0xFFFFFFFF ||
         materialLoc.DiffuseColor == 0xFFFFFFFF ||
         materialLoc.SpecularColor == 0xFFFFFFFF ||
-        EyeLocalPosLoc == 0xFFFFFFFF ||
+        CameraLocalPosLoc == 0xFFFFFFFF ||
         dirLightLoc.Color == 0xFFFFFFFF ||
         dirLightLoc.DiffuseIntensity == 0xFFFFFFFF ||
         dirLightLoc.Direction == 0xFFFFFFFF ||
@@ -112,9 +112,9 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 }
 
 
-void LightingTechnique::SetEyeLocalPos(const Vector3f& EyeLocalPos)
+void LightingTechnique::SetCameraLocalPos(const Vector3f& CameraLocalPos)
 {
-    glUniform3f(EyeLocalPosLoc, EyeLocalPos.x, EyeLocalPos.y, EyeLocalPos.z);
+    glUniform3f(CameraLocalPosLoc, CameraLocalPos.x, CameraLocalPos.y, CameraLocalPos.z);
 }
 
 
