@@ -126,7 +126,7 @@ bool Tutorial21::Init()
     pLightingTech->Enable();
 
     pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    pLightingTech->SetSpecularPowerTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    pLightingTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     return true;
 }
@@ -146,10 +146,8 @@ void Tutorial21::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
-    Vector3f WorldPos(0.0f, 0.0f, 2.0f);
-
     worldTransform.SetScale(1.0f);
-    worldTransform.SetPosition(WorldPos);
+    worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
     worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
 
     Matrix4f World = worldTransform.GetMatrix();
@@ -167,6 +165,7 @@ void Tutorial21::RenderSceneCB()
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
     Matrix4f CameraToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
+
     Matrix4f CameraToLocalRotation = worldTransform.GetReversedRotationMatrix();
 
     Matrix4f CameraToLocalTransformation = CameraToLocalRotation * CameraToLocalTranslation;
@@ -174,6 +173,7 @@ void Tutorial21::RenderSceneCB()
     Vector4f CameraWorldPos = Vector4f(pGameCamera->GetPos(), 1.0f);
 
     Vector4f CameraLocalPos = CameraToLocalTransformation * CameraWorldPos;
+
     Vector3f CameraLocalPos3f(CameraLocalPos);
 
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);

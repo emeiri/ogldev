@@ -24,7 +24,7 @@ struct Material
 uniform DirectionalLight gDirectionalLight;
 uniform Material gMaterial;
 uniform sampler2D gSampler;
-uniform sampler2D gSamplerSpecularPower;
+uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
 
 void main()
@@ -46,12 +46,12 @@ void main()
                        vec4(gMaterial.DiffuseColor, 1.0f) *
                        DiffuseFactor;
 
-        vec3 VertexToCamera = normalize(gCameraLocalPos - LocalPos0);
+        vec3 PixelToCamera = normalize(gCameraLocalPos - LocalPos0);
         vec3 LightReflect = normalize(reflect(gDirectionalLight.Direction, Normal));
-        float SpecularFactor = dot(VertexToCamera, LightReflect);
+        float SpecularFactor = dot(PixelToCamera, LightReflect);
         if (SpecularFactor > 0) {
-            float SpecularExponent = texture2D(gSamplerSpecularPower, TexCoord0).r * 256.0;
-            SpecularFactor = pow(SpecularFactor, max(225,SpecularExponent));
+            float SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+            SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(gDirectionalLight.Color, 1.0f) *
                             vec4(gMaterial.SpecularColor, 1.0f) *
                             SpecularFactor;
