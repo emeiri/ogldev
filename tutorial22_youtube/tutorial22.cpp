@@ -81,15 +81,15 @@ Tutorial22::Tutorial22()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    dirLight.AmbientIntensity = 0.1f;
-    dirLight.DiffuseIntensity = 1.0f;
+    dirLight.AmbientIntensity = 0.0f;
+    dirLight.DiffuseIntensity = 0.0f;
     dirLight.WorldDirection = Vector3f(1.0f, 0.0, 0.0);
 
     pointLights[0].DiffuseIntensity = 0.5f;
     pointLights[0].Color = Vector3f(1.0f, 0.5f, 0.0f);
-    pointLights[0].WorldPosition = Vector3f(3.0f, 1.0f, 1.0f);
+    pointLights[0].WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
     pointLights[0].Attenuation.Linear = 0.1f;
-    pointLights[1].DiffuseIntensity = 0.5f;
+    pointLights[1].DiffuseIntensity = 0.01f;
     pointLights[1].Color = Vector3f(0.0f, 0.5f, 1.0f);
     pointLights[1].WorldPosition = Vector3f(7.0f, 1.0f, 1.0f);
     pointLights[1].Attenuation.Linear = 0.1f;
@@ -172,7 +172,9 @@ void Tutorial22::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
     pLightingTech->SetDirectionalLight(dirLight);
-    pLightingTech->SetPointLights(ARRAY_SIZE_IN_ELEMENTS(pointLights), pointLights);
+    pointLights[0].CalcLocalPosition(worldTransform);
+
+    pLightingTech->SetPointLights(1, pointLights);
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
     Matrix4f CameraToLocalTranslation = worldTransform.GetReversedTranslationMatrix();

@@ -34,8 +34,8 @@ class WorldTrans {
 
     Matrix4f GetMatrix();
 
-    Matrix4f GetReversedTranslationMatrix();
-    Matrix4f GetReversedRotationMatrix();
+    Matrix4f GetReversedTranslationMatrix() const;
+    Matrix4f GetReversedRotationMatrix() const;
 
  private:
     float    m_scale    = 1.0f;

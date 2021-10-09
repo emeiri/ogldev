@@ -22,6 +22,7 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_material.h"
+#include "ogldev_world_transform.h"
 
 class BaseLight
 {
@@ -66,6 +67,13 @@ public:
     Vector3f WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
     float DiffuseIntensity = 0.0f;
     LightAttenuation Attenuation;
+
+    void CalcLocalPosition(const WorldTrans& worldTransform);
+
+    const Vector3f& GetLocalPosition() const { return LocalPosition; }
+
+private:
+    Vector3f LocalPosition = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 

@@ -87,7 +87,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
 vec4 CalcDirectionalLight(vec3 Normal)
 {
-    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal) / 1000;
 }
 
 vec4 CalcPointLight(int Index, vec3 Normal)

@@ -33,6 +33,25 @@ void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
 }
 
 
+
+void PointLight::CalcLocalPosition(const WorldTrans& worldTransform)
+{
+    Matrix4f WorldToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
+
+    Matrix4f WorldToLocalRotation = worldTransform.GetReversedRotationMatrix();
+
+    Matrix4f LightToLocalTransformation = WorldToLocalRotation * WorldToLocalTranslation;
+
+    Vector4f LightWorldPos = Vector4f(WorldPosition, 1.0f);
+
+    Vector4f LightLocalPos = LightToLocalTransformation * LightWorldPos;
+
+    Vector3f LightLocalPos3f(LightLocalPos);
+
+    LocalPosition = LightLocalPos3f;
+}
+
+
 LightingTechnique::LightingTechnique()
 {
 }
@@ -170,7 +189,9 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
         glUniform3f(PointLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(PointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(PointLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
-        glUniform3f(PointLightsLocation[i].Position, pLights[i].WorldPosition.x, pLights[i].WorldPosition.y, pLights[i].WorldPosition.z);
+        const Vector3f& LocalPos = pLights[i].GetLocalPosition();
+        LocalPos.Print();printf("\n");
+        glUniform3f(PointLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
         glUniform1f(PointLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
         glUniform1f(PointLightsLocation[i].Atten.Linear, pLights[i].Attenuation.Linear);
         glUniform1f(PointLightsLocation[i].Atten.Exp, pLights[i].Attenuation.Exp);
