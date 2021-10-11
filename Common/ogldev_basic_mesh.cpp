@@ -391,5 +391,5 @@ const Material& BasicMesh::GetMaterial()
         }
     }
 
-    assert(0);
+    return m_Materials[0];
 }
