@@ -48,16 +48,9 @@ private:
 
 struct LightAttenuation
 {
-    float Constant;
-    float Linear;
-    float Exp;
-
-    LightAttenuation()
-    {
-        Constant = 1.0f;
-        Linear = 0.0f;
-        Exp = 0.0f;
-    }
+    float Constant = 1.0f;
+    float Linear = 0.0f;
+    float Exp = 0.0f;
 };
 
 
