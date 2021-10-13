@@ -190,7 +190,7 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
         glUniform1f(PointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(PointLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
         const Vector3f& LocalPos = pLights[i].GetLocalPosition();
-        LocalPos.Print();printf("\n");
+        //LocalPos.Print();printf("\n");
         glUniform3f(PointLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
         glUniform1f(PointLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
         glUniform1f(PointLightsLocation[i].Atten.Linear, pLights[i].Attenuation.Linear);
