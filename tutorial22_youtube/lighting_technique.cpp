@@ -96,7 +96,7 @@ bool LightingTechnique::Init()
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.AmbientIntensity", i);
         PointLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
 
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Position", i);
+        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].LocalPos", i);
         PointLightsLocation[i].Position = GetUniformLocation(Name);
 
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.DiffuseIntensity", i);

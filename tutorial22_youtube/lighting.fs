@@ -32,7 +32,7 @@ struct Attenuation
 struct PointLight
 {
     BaseLight Base;
-    vec3 Position;
+    vec3 LocalPos;
     Attenuation Atten;
 };
 
@@ -93,7 +93,7 @@ vec4 CalcDirectionalLight(vec3 Normal)
 
 vec4 CalcPointLight(int Index, vec3 Normal)
 {
-    vec3 LightDirection = LocalPos0 - gPointLights[Index].Position;
+    vec3 LightDirection = LocalPos0 - gPointLights[Index].LocalPos;
     float Distance = length(LightDirection);
     LightDirection = normalize(LightDirection);
 
