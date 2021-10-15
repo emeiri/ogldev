@@ -81,15 +81,15 @@ Tutorial22::Tutorial22()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    //    pointLights[0].AmbientIntensity = 1.0f;
     pointLights[0].DiffuseIntensity = 1.0f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[0].Attenuation.Linear = 0.0f;
+    pointLights[0].Attenuation.Linear = 0.2f;
     pointLights[0].Attenuation.Exp = 0.0f;
 
     pointLights[1].DiffuseIntensity = 1.0f;
-    pointLights[1].Color = Vector3f(0.0f, 0.0f, 1.0f);
-    pointLights[1].Attenuation.Linear = 0.5f;
+    pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+    pointLights[1].Attenuation.Linear = 0.0f;
+    pointLights[1].Attenuation.Exp = 0.2f;
 }
 
 
@@ -111,8 +111,8 @@ Tutorial22::~Tutorial22()
 
 bool Tutorial22::Init()
 {
-    Vector3f CameraPos(0.0f, 1.0f, 0.0f);
-    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
+    Vector3f CameraPos(0.0f, 5.0f, -8.0f);
+    Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
@@ -153,6 +153,7 @@ void Tutorial22::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
+    worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
 
     Matrix4f World = worldTransform.GetMatrix();
@@ -163,18 +164,17 @@ void Tutorial22::RenderSceneCB()
     pLightingTech->SetWVP(WVP);
 
     counter += 0.01f;
-    //    pointLights[0].WorldPosition.x = min(sinf(counter) * -3, -1.0f);
-    //    pointLights[0].WorldPosition.z = 3 + cosf(counter);
-    pointLights[0].WorldPosition.y = 0.5;
-    pointLights[0].WorldPosition.z = sinf(counter);// * 20.0f + 20.0f;
+    pointLights[0].WorldPosition.x = -10.0f;
+    pointLights[0].WorldPosition.y = sinf(counter) * 4 + 4;
+    pointLights[0].WorldPosition.z = 0.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
-    pLightingTech->SetPointLights(1, pointLights);
 
-    //    pointLights[1].WorldPosition.x = 6 + sinf(counter) * 5;
-    //    pointLights[1].WorldPosition.z = 2.0f;
-    //    pointLights[1].CalcLocalPosition(worldTransform);
-    //    pLightingTech->SetPointLights(ARRAY_SIZE_IN_ELEMENTS(pointLights), pointLights);
-    pLightingTech->SetPointLights(1, pointLights);
+    pointLights[1].WorldPosition.x = 10.0f;
+    pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
+    pointLights[1].WorldPosition.z = 0.0f;
+    pointLights[1].CalcLocalPosition(worldTransform);
+
+    pLightingTech->SetPointLights(2, pointLights);
 
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
@@ -184,12 +184,11 @@ void Tutorial22::RenderSceneCB()
     pMesh->Render();
 
     glutPostRedisplay();
-
     glutSwapBuffers();
 }
 
 
-#define ATTEN_STEP 0.1f
+#define ATTEN_STEP 0.01f
 
 void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
@@ -200,18 +199,22 @@ void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 
     case 'a':
         pointLights[0].Attenuation.Linear += ATTEN_STEP;
+        pointLights[1].Attenuation.Linear += ATTEN_STEP;
         break;
 
     case 'z':
         pointLights[0].Attenuation.Linear -= ATTEN_STEP;
+        pointLights[1].Attenuation.Linear -= ATTEN_STEP;
         break;
 
     case 's':
         pointLights[0].Attenuation.Exp += ATTEN_STEP;
+        pointLights[1].Attenuation.Exp += ATTEN_STEP;
         break;
 
     case 'x':
         pointLights[0].Attenuation.Exp -= ATTEN_STEP;
+        pointLights[1].Attenuation.Exp -= ATTEN_STEP;
         break;
 
     }
