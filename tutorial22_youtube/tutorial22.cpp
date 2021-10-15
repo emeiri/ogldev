@@ -178,18 +178,7 @@ void Tutorial22::RenderSceneCB()
 
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
-    Matrix4f CameraToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
-
-    Matrix4f CameraToLocalRotation = worldTransform.GetReversedRotationMatrix();
-
-    Matrix4f CameraToLocalTransformation = CameraToLocalRotation * CameraToLocalTranslation;
-
-    Vector4f CameraWorldPos = Vector4f(pGameCamera->GetPos(), 1.0f);
-
-    Vector4f CameraLocalPos = CameraToLocalTransformation * CameraWorldPos;
-
-    Vector3f CameraLocalPos3f(CameraLocalPos);
-
+    Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
     pMesh->Render();

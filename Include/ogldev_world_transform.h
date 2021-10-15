@@ -34,6 +34,8 @@ class WorldTrans {
 
     Matrix4f GetMatrix();
 
+    Vector3f WorldPosToLocalPos(const Vector3f& WorldPos) const;
+
     Matrix4f GetReversedTranslationMatrix() const;
     Matrix4f GetReversedRotationMatrix() const;
 

@@ -86,3 +86,15 @@ Matrix4f WorldTrans::GetReversedRotationMatrix() const
     ReversedRotation.InitRotateTransform(-m_rotation.x, -m_rotation.y, -m_rotation.z);
     return ReversedRotation;
 }
+
+
+Vector3f WorldTrans::WorldPosToLocalPos(const Vector3f& WorldPos) const
+{
+    Matrix4f WorldToLocalTranslation = GetReversedTranslationMatrix();
+    Matrix4f WorldToLocalRotation = GetReversedRotationMatrix();
+    Matrix4f WorldToLocalTransformation = WorldToLocalRotation * WorldToLocalTranslation;
+    Vector4f WorldPos4f = Vector4f(WorldPos, 1.0f);
+    Vector4f LocalPos4f = WorldToLocalTransformation * WorldPos4f;
+    Vector3f LocalPos3f(LocalPos4f);
+    return LocalPos3f;
+}

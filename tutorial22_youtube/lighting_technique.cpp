@@ -36,19 +36,7 @@ void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
 
 void PointLight::CalcLocalPosition(const WorldTrans& worldTransform)
 {
-    Matrix4f WorldToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
-
-    Matrix4f WorldToLocalRotation = worldTransform.GetReversedRotationMatrix();
-
-    Matrix4f LightToLocalTransformation = WorldToLocalRotation * WorldToLocalTranslation;
-
-    Vector4f LightWorldPos = Vector4f(WorldPosition, 1.0f);
-
-    Vector4f LightLocalPos = LightToLocalTransformation * LightWorldPos;
-
-    Vector3f LightLocalPos3f(LightLocalPos);
-
-    LocalPosition = LightLocalPos3f;
+    LocalPosition = worldTransform.WorldPosToLocalPos(WorldPosition);
 }
 
 
