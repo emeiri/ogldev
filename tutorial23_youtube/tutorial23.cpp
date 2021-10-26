@@ -62,6 +62,7 @@ private:
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
+    SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
 };
 
@@ -83,15 +84,25 @@ Tutorial22::Tutorial22()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    pointLights[0].DiffuseIntensity = 1.0f;
+    pointLights[0].DiffuseIntensity = 0.0f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 0.0f);
     pointLights[0].Attenuation.Linear = 0.2f;
     pointLights[0].Attenuation.Exp = 0.0f;
 
-    pointLights[1].DiffuseIntensity = 1.0f;
+    pointLights[1].DiffuseIntensity = 0.0f;
     pointLights[1].Color = Vector3f(0.0f, 1.0f, 1.0f);
     pointLights[1].Attenuation.Linear = 0.0f;
     pointLights[1].Attenuation.Exp = 0.2f;
+
+    spotLights[0].DiffuseIntensity = 1.0f;
+    spotLights[0].Color = Vector3f(0.0f, 1.0f, 1.0f);
+    spotLights[0].Attenuation.Linear = 0.1f;
+    spotLights[0].Cutoff = 10.0f;
+
+    spotLights[1].DiffuseIntensity = 1.0f;
+    spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+    spotLights[1].Attenuation.Linear = 0.1f;
+    spotLights[1].Cutoff = 20.0f;
 }
 
 
@@ -188,7 +199,7 @@ void Tutorial22::RenderSceneCB()
 
     counter += 0.01f;
     pointLights[0].WorldPosition.x = -10.0f;
-    pointLights[0].WorldPosition.y = 2;
+    pointLights[0].WorldPosition.y = sinf(counter) * 4 + 4;
     pointLights[0].WorldPosition.z = 0.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
@@ -199,24 +210,15 @@ void Tutorial22::RenderSceneCB()
 
     pLightingTech->SetPointLights(2, pointLights);
 
-    SpotLight sl[2];
-    sl[0].DiffuseIntensity = 0.9f;
-    sl[0].Color = Vector3f(0.0f, 1.0f, 1.0f);
-    sl[0].WorldPosition = pGameCamera->GetPos();
-    sl[0].Direction = pGameCamera->GetTarget();
-    sl[0].Attenuation.Linear = 0.1f;
-    sl[0].Cutoff = 10.0f;
-    sl[0].CalcLocalPosition(worldTransform);
+    spotLights[0].WorldPosition = pGameCamera->GetPos();
+    spotLights[0].WorldDirection = pGameCamera->GetTarget();
+    spotLights[0].CalcLocalDirectionAndPosition(worldTransform);
 
-    sl[1].DiffuseIntensity = 0.9f;
-    sl[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    sl[1].WorldPosition = Vector3f(5.0f, 3.0f, 10.0f);
-    sl[1].Direction = Vector3f(0.0f, -1.0f, 0.0f);
-    sl[1].Attenuation.Linear = 0.1f;
-    sl[1].Cutoff = 20.0f;
-    sl[1].CalcLocalPosition(worldTransform);
+    spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
+    spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+    spotLights[1].CalcLocalDirectionAndPosition(worldTransform);
 
-    pLightingTech->SetSpotLights(2, sl);
+    pLightingTech->SetSpotLights(2, spotLights);
 
     pLightingTech->SetMaterial(pBox->GetMaterial());
 
@@ -233,8 +235,12 @@ void Tutorial22::RenderSceneCB()
 
     pointLights[0].CalcLocalPosition(meshWorldTransform);
     pointLights[1].CalcLocalPosition(meshWorldTransform);
-
     pLightingTech->SetPointLights(2, pointLights);
+
+    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform);
+    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
+    pLightingTech->SetSpotLights(2, spotLights);
+
     pLightingTech->SetMaterial(pMesh1->GetMaterial());
 
     CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
@@ -251,8 +257,12 @@ void Tutorial22::RenderSceneCB()
 
     pointLights[0].CalcLocalPosition(meshWorldTransform2);
     pointLights[1].CalcLocalPosition(meshWorldTransform2);
-
     pLightingTech->SetPointLights(2, pointLights);
+
+    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform2);
+    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
+    pLightingTech->SetSpotLights(2, spotLights);
+
     pLightingTech->SetMaterial(pMesh2->GetMaterial());
 
     CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());

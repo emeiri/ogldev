@@ -38,7 +38,7 @@ class DirectionalLight : public BaseLight
 public:
     Vector3f WorldDirection = Vector3f(0.0f, 0.0f, 0.0f);
 
-    void CalcLocalDirection(const Matrix4f& World);
+    void CalcLocalDirection(const WorldTrans& worldTransform);
 
     const Vector3f& GetLocalDirection() const { return LocalDirection; }
 
@@ -71,10 +71,10 @@ private:
 class SpotLight : public PointLight
 {
 public:
-    Vector3f Direction = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f WorldDirection = Vector3f(0.0f, 0.0f, 0.0f);
     float Cutoff = 0.0f;
 
-    void CalcLocalDirection(const WorldTrans& worldTransform);
+    void CalcLocalDirectionAndPosition(const WorldTrans& worldTransform);
 
     const Vector3f& GetLocalDirection() const { return LocalDirection; }
 

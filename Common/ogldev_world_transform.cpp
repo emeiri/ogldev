@@ -55,7 +55,7 @@ void WorldTrans::Rotate(float x, float y, float z)
 }
 
 
-Matrix4f WorldTrans::GetMatrix()
+Matrix4f WorldTrans::GetMatrix() const
 {
     Matrix4f Scale;
     Scale.InitScaleTransform(m_scale, m_scale, m_scale);
@@ -97,4 +97,20 @@ Vector3f WorldTrans::WorldPosToLocalPos(const Vector3f& WorldPos) const
     Vector4f LocalPos4f = WorldToLocalTransformation * WorldPos4f;
     Vector3f LocalPos3f(LocalPos4f);
     return LocalPos3f;
+}
+
+
+Vector3f WorldTrans::WorldDirToLocalDir(const Vector3f& WorldDirection) const
+{
+    Matrix3f World3f(GetMatrix());  // Initialize using the top left corner
+
+    // Inverse local-to-world transformation using transpose
+    // (assuming uniform scaling)
+    Matrix3f WorldToLocal = World3f.Transpose();
+
+    Vector3f LocalDirection = WorldToLocal * WorldDirection;
+
+    LocalDirection = LocalDirection.Normalize();
+
+    return LocalDirection;
 }

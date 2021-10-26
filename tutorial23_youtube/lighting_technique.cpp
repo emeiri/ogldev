@@ -19,19 +19,10 @@
 #include "lighting_technique.h"
 
 
-void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
+void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
-    Matrix3f World3f(World);  // Initialize using the top left corner
-
-    // Inverse local-to-world transformation using transpose
-    // (assuming uniform scaling)
-    Matrix3f WorldToLocal = World3f.Transpose();
-
-    LocalDirection = WorldToLocal * WorldDirection;
-
-    LocalDirection = LocalDirection.Normalize();
+    LocalDirection = worldTransform.WorldDirToLocalDir(WorldDirection);
 }
-
 
 
 void PointLight::CalcLocalPosition(const WorldTrans& worldTransform)
@@ -40,17 +31,13 @@ void PointLight::CalcLocalPosition(const WorldTrans& worldTransform)
 }
 
 
-void SpotLight::CalcLocalDirection(const WorldTrans& WorldTransform)
+void SpotLight::CalcLocalDirectionAndPosition(const WorldTrans& worldTransform)
 {
-    /*    Matrix3f World3f(World);  // Initialize using the top left corner
+    CalcLocalPosition(worldTransform);
 
-    // Inverse local-to-world transformation using transpose
-    // (assuming uniform scaling)
-    Matrix3f WorldToLocal = World3f.Transpose();
+    LocalDirection = worldTransform.WorldDirToLocalDir(WorldDirection);
 
-    LocalDirection = WorldToLocal * WorldDirection;
-
-    LocalDirection = LocalDirection.Normalize();*/
+    //LocalDirection.Print();
 }
 
 
@@ -257,7 +244,7 @@ void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
         glUniform1f(SpotLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
         const Vector3f& LocalPos = pLights[i].GetLocalPosition();
         glUniform3f(SpotLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
-        Vector3f Direction = pLights[i].Direction;
+        Vector3f Direction = pLights[i].GetLocalDirection();
         Direction.Normalize();
         glUniform3f(SpotLightsLocation[i].Direction, Direction.x, Direction.y, Direction.z);
         glUniform1f(SpotLightsLocation[i].Cutoff, cosf(ToRadian(pLights[i].Cutoff)));
