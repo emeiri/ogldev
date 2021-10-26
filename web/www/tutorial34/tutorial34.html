@@ -1,302 +1,318 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-	<title> Tutorial 34 - GLFX - An OpenGL Effect Library </title>
+        <title> Tutorial 34 - GLFX - An OpenGL Effect Library </title>
 
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
-	<link rel="stylesheet" href="../style.css">
-	<link rel="stylesheet" href="../print.css" media="print">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="../style.css">
+        <link rel="stylesheet" href="../print.css" media="print">
 </head>
 <body>
-	<header id="header">
-		<div>
-			<h2> Tutorial 34: </h2>
-			<h1> GLFX - An OpenGL Effect Library </h1>
-		</div>
+        <header id="header">
+                <div>
+                        <h2> Tutorial 34: </h2>
+                        <h1> GLFX - An OpenGL Effect Library </h1>
+                </div>
 
-		<a id="logo" class="small" href="../../index.html" title="Homepage">
-			<img src="..//logo ldpi.png">
-		</a>
-	</header>
+                <a id="logo" class="small" href="../../index.html" title="Homepage">
+                        <img src="..//logo ldpi.png">
+                </a>
+        </header>
 
-	<article id="content" class="breakpoint">
-		<section>
-			<h3> Background </h3>
+        <article id="content" class="breakpoint">
+                <section>
+                        <h3> Background </h3>
 
-			<p>
-			This tutorial is going to be a bit different than the previous ones. Instead of exploring
-			an OpenGL feature or 3D technique we are going to take a look at GLFX, an effect library
-			for OpenGL. An <i>effect</i> is a text file that can potentially contain multiple shaders
-			and functions and makes it easy to combine them together into programs. This overcomes the
-			limitation of the glShaderSource() function that requires you to specify the text of a single 
-			shader stage. This forces you to use a different text file for each shader (or different
-			buffer as we did in previous tutorials). Placing all shaders in the same file makes it
-			simpler to share structure definitions between them. In addition, GLFX provides an easy to use API
-			to translate effect files into GLSL programs which hides some of the complexity of the underlying
-			OpenGL functions.
-			</p>
-			<p>
-			The idea of effect files is not new. Indeed, Microsoft has had this for years in the DirectX
-			world. I'm sure that gaming studios have their own tools developed inhouse but it's 
-			a shame that this has not yet been standardized in OpenGL. The effect library that we will
-			use is an open source project that was created by Max Aizenshtein. You can find the project
-			homepage <a href="http://code.google.com/p/glfx/">here</a>.
-			</p>
-			<p>
-			To install GLFX simply check out the sources and build them by running the following from
-			the command line:
-			<ol>
-			<li>svn checkout http://glfx.googlecode.com/svn/trunk/ libglfx</li>
-			<li>cd libglfx</li>
-			<li>cmake .</li>
-			<li>make</li>
-			<li>make install   (as root)</li>
-			</ol>
-			<p>
-			<b><u>Note</u></b>: GLFX is dependant on GLEW.
-			This is no problem if you are using the tutorials as a framework or already using GLEW in your application. If
-			not, you can turn to <a href=http://ogldev.atspace.co.uk/www/tutorial02/tutorial02.html>tutorial 2</a>
-			for information on how to initialize GLEW.
-			</p>
-		</section>
+                        <p>
+                        This tutorial is going to be a bit different than the previous ones. Instead of exploring
+                        an OpenGL feature or 3D technique we are going to take a look at GLFX, an effect library
+                        for OpenGL. An <i>effect</i> is a text file that can potentially contain multiple shaders
+                        and functions and makes it easy to combine them together into programs. This overcomes the
+                        limitation of the glShaderSource() function that requires you to specify the text of a single
+                        shader stage. This forces you to use a different text file for each shader (or different
+                        buffer as we did in previous tutorials). Placing all shaders in the same file makes it
+                        simpler to share structure definitions between them. In addition, GLFX provides an easy to use API
+                        to translate effect files into GLSL programs which hides some of the complexity of the underlying
+                        OpenGL functions.
+                        </p>
+                        <p>
+                        The idea of effect files is not new. Indeed, Microsoft has had this for years in the DirectX
+                        world. I'm sure that gaming studios have their own tools developed inhouse but it's
+                        a shame that this has not yet been standardized in OpenGL. The effect library that we will
+                        use is an open source project that was created by Max Aizenshtein. You can find the project
+                        homepage <a href="http://code.google.com/p/glfx/">here</a>.
+                        </p>
+                        <p>
+                        To install GLFX simply check out the sources and build them by running the following from
+                        the command line:
+                        <ol>
+                        <li>svn checkout http://glfx.googlecode.com/svn/trunk/ libglfx</li>
+                        <li>cd libglfx</li>
+                        <li>cmake .</li>
+                        <li>make</li>
+                        <li>make install   (as root)</li>
+                        </ol>
+                        <p>
+                        <b><u>Note</u></b>: GLFX is dependant on GLEW.
+                        This is no problem if you are using the tutorials as a framework or already using GLEW in your application. If
+                        not, you can turn to <a href=http://ogldev.atspace.co.uk/www/tutorial02/tutorial02.html>tutorial 2</a>
+                        for information on how to initialize GLEW.
+                        </p>
+                </section>
 
-		<section>
-			<h3> Source walkthru </h3>
+                <section>
+                        <h3> Source walkthru </h3>
 
-			<strong>Integrating GLFX into the project</strong>
-			<p>
-			Add the following to get access to GLFX api:
-			</p>
-			<code>
-			#include &amp;ltglfx.h&amp;gt
-			</code>
-			<p>
-			Generate an effect handle:
-			</p>
-			<code>
-			int effect = <b>glfxGenEffect</b>();
-			</code>
-			<p>
-			Parse the effect file (we will take a look at its content momentarily):
-			</p>
-			<code>
-			if (!<b>glfxParseEffectFromFile</b>(effect, "effect.glsl")) {<br>
-			#ifdef __cplusplus	// C++ error handling<br>
-			&nbsp; &nbsp;	std::string log = <b>glfxGetEffectLog</b>(effect);<br>
-			&nbsp; &nbsp;	std::cout &lt;&lt; "Error parsing effect: " &lt;&lt; log &lt;&lt; std::endl;<br>
-			#else	// C error handling<br>
-			&nbsp; &nbsp;	char log[10000];<br>
-			&nbsp; &nbsp;	<b>glfxGetEffectLog</b>(effect, log, sizeof(log));<br>
-			&nbsp; &nbsp;	printf("Error parsing effect: %s:\n", log);<br>
-			#endif<br>
-			&nbsp; &nbsp;	return;<br>
-			}
-			</code>
-			<p>
-			Compile a program (combination of VS, FS, etc) defined in the effect file using the following:
-			</p>
-			<code>
-			int shaderProg = <b>glfxCompileProgram</b>(effect, "ProgramName");<br>
-			    <br>
-			if (shaderProg &lt; 0) {<br>
-			&nbsp; &nbsp; // same error handling as above	<br>
-			}
-			</code>
-			<p>
-			The program can now be used by OpenGL as usual:
-			</p>
-			<code>
-			glUseProgram(shaderProg);
-			</code>
-			<p>
-			After the effect is no longer needed release its resources using:
-			</p>
-			<code>
-			<b>glfxDeleteEffect</b>(effect);
-			</code>
-			<strong>Using GLFX</strong>
-			<p>
-			Now that we have the basic infrastructure in place let's dive into the effect files. 
-			The nice thing about GLFX is that you can continue writing GLSL
-			shaders in pretty much the same way that you are used to. There are a few minor changes
-			and additions and we are going to focus on them.</p>
-			<p><b>Place a 'program' section to combine shader stages into a complete GLSL program</b></p>
-			<code>
-			program Lighting<br>
-			{<br>
-			&nbsp; &nbsp;	vs(410)=VSmain();<br>
-			&nbsp; &nbsp;	fs(410)=FSmain();<br>
-			};
-			</code>
-			<p>
-			In the example above the effect file contains the definition of the functions VSmain() and FSmain()
-			somewhere else. The 'program' section defines an OpenGL 
-			program called 'Lighting'. Calling glfxCompileProgram(effect, "Lighting") will cause 
-			a compilation and linkage of VSmain() and FSmain() into a single program. Both shaders will be compiled
-			in version 4.10 of GLSL (same as
-			declaring '#version 410' in standard GLSL). 
-			</p>
-			<p><b>Use 'shader' instead of 'void' to declare main shader functions</b></p>
-			<p>The main entry points to shader stages must be declared as 'shader' instead of 'void'. 
-			Here's an example:</p>
-			<code>
-			<b>void</b> calculate_something()<br>
-			{<br>
-				&nbsp; &nbsp;	...<br>
-			}<br>
-			<br>
-			<b>shader</b> VSmain()<br>
-			{<br>
-				&nbsp; &nbsp;	calculate_something();<br>
-			}
-			</code>
-			<p><b>Include multiple shaders and program in a single effect file</b></p>
-			<p>
-			You can place multiple occurrences of the 'program' section in a single effect file. 
-			Simply call glfxCompileProgram() for each program that you want to use. 
-			</p>
-			<p><b>Use structures to pass vertex attributes between shader stages</b></p>
-			<p>
-			Instead of defining the in/out variables in the global section of the shader we
-			can use GLSL structures and share them across multiple shader stages. Here's an example:
-			</p>
-			<code>
-			struct VSoutput<br>
-			{<br>
-			 &nbsp; &nbsp;  vec2 TexCoord;                                             <br>
-			 &nbsp; &nbsp;  vec3 Normal;                                               <br>
-			};<br>
-			<br>
-			shader VSmain(in vec3 Pos, in vec2 TexCoord, in vec3 Normal, out <b>VSOutput</b> VSout)<br>
-			{                                                       <br>                            
-			&nbsp; &nbsp; // do some transformations and update 'VSout'<br>
-			&nbsp; &nbsp; VSout.TexCoord = TexCoord;<br>
-			&nbsp; &nbsp; VSout.Normal = Normal;<br>
-			 
-			}<br>
-			<br>
-			shader FSmain(in <b>VSOutput</b> FSin, out vec4 FragColor)<br>
-			{<br>
-			&nbsp; &nbsp; // 'FSin' matches 'VSout' from the VS. Use it <br>
-			 &nbsp; &nbsp;   // to do lighting calculations and write the final output to 'FragColor'<br>
-			}
-			</code>
-			<p>
-			Unfortunately, using a structure will only work between shader stages. Input variables to 
-			the VS must be handled as separate attributes as we see in the above example. Well, I have
-			an NVIDIA card and input structures to the VS work for me but this is not explicitly allowed
-			by the GLSL spec and many readers have informed me that it doesn't work for them. If it works - great.
-			If not, simply go with the above code.
-			</p>
-			<p><b>Use include files to share common functionality between effect files</b></p>
-			<p>
-			The keyword 'include' can be used to include one effect file in another:
-			</p>
-			<code>
-			#include "another_effect.glsl"
-			</code>
-			<p>
-			The caveat with include files is that they are not parsed by GLFX. They are simply
-			inserted as-is into the including file at the location of the 'include' keyword. This means
-			that you can only place pure GLSL code in them and not GLFX-only keywords such as program/etc.
-			Tip: since part of GLSL syntax is the same as C/C++ (e.g. #define) you can even share definitions
-			between the effect file and your application code.
-			</p>
-			<p><b>Use structure suffix to define attribute locations</b></p>
-			<p>
-			In the previous tutorials we have used the 'layout(location = ...)' keyword to define the
-			location of an input attribute of the VS. By placing a colon followed by a number after an
-			input VS parameter we can achieve the same goal. Here's an example:
-			</p>
-			<code>
-			struct VSInput2 <br>
-			{<br>
-			 &nbsp; &nbsp;   vec3 Normal;                                               <br>
-			 &nbsp; &nbsp;   vec3 Tangent;                                               <br>
-			};<br>
-			<br>
-			shader VSmain(in vec3 Pos : 5, in vec2 TexCoord : 6, in float colorScale : 10)<br>
-			</code>
-			<p>
-			The VS above gets the position in attribute 5, the texture coordinate in 6 and the color
-			scale in 10. The idea is very simple - the number
-			after the colon determines the location. If there is no location suffix the attributes
-			simply start at zero.
-			</p>
-			<p><b>Use 'interface' instead of 'struct' to place qualifiers on members</b></p>
-			<p>
-			GLSL provides qualifiers such as 'flat' and 'noperspective' that can be placed
-			before attributes that are sent from the VS to the FS. These qualifiers cannot be used on
-			structure members. The solution that GLFX provides is a new keyword called 'interface'
-			that enables what 'struct' does not. An 'interface' can only be passed between shader
-			stages. If you need to pass it as a whole to another function you will need to copy the
-			contents to a struct. For example:
-			</p>
-			<code>
-			interface foo<br>
-			{<br>
-			&nbsp; &nbsp; <b>flat</b> int a;<br>
-			&nbsp; &nbsp; <b>noperspective</b> float b;<br>
-			};<br>
-			<br>
-			struct bar<br>
-			{<br>
-			&nbsp; &nbsp; int a;<br>
-			&nbsp; &nbsp; float b;<br>
-			}<br>
-			<br>
-			shader VSmain(out foo f)<br>
-			{<br>
-			&nbsp; &nbsp; // ...<br>
-			}<br>
-			<br>
-			void Calc(bar c)<br>
-			{<br>
-			&nbsp; &nbsp; // ...<br>
-			}<br>
-			<br>
-			shader FSmain(in foo f)<br>
-			{<br>
-			&nbsp; &nbsp; 	struct bar c;<br>
-			&nbsp; &nbsp; 	c.a = f.a;<br>
-			&nbsp; &nbsp; 	c.b = f.b;<br>
-			<br>
-			&nbsp; &nbsp; 	Calc(c);<br>
-			}<br>
-			</code>
-			<p>
-			<b>Note:</b> 'interface' is a keyword reserved for future use (according to OpenGL 4.2).
-			Its usage in the future in GLFX will be based on changes to the official OpenGL spec.
-			</p>
-			<p>
-			<b>Tip: use 'glfxc' to verify effect files</b>
-			</p>
-			<p>
-			'glfxc' is a utility which is part of GLFX. It parses effect files, compiles them
-			using the local OpenGL installation and reports any error it finds. Run it as follows: 
-			</p>
-			<code>
-			glfxc &lt;effect file name&gt; &lt;program name&gt;
-			</code>
-			<strong>The Demo</strong>
-			<p>
-			The code of this tutorial has been modified to work with GLFX. Since the changes are
-			very simple I won't go over them here. You should take a look at the source, in particular
-			the classes Technique and LightingTechnique. In addition, the shaders that used to be
-			part of 'lighting_technique.cpp' have been removed and there is an effect file called 
-			'lighting.glsl' in the 'shaders' subdirectory. This file contains the same shaders that
-			you are already familiar with. They have been modified slightly to fit the rules above.
-			</p>
-		</section>
+                        <strong>Integrating GLFX into the project</strong>
+                        <p>
+                        Add the following to get access to GLFX api:
+                        </p>
+                        <code>
+                        #include &amp;ltglfx.h&amp;gt
+                        </code>
+                        <p>
+                        Generate an effect handle:
+                        </p>
+                        <code>
+                        int effect = <b>glfxGenEffect</b>();
+                        </code>
+                        <p>
+                        Parse the effect file (we will take a look at its content momentarily):
+                        </p>
+                        <code>
+                        if (!<b>glfxParseEffectFromFile</b>(effect, "effect.glsl")) {<br>
+                        #ifdef __cplusplus      // C++ error handling<br>
+                        &nbsp; &nbsp;   std::string log = <b>glfxGetEffectLog</b>(effect);<br>
+                        &nbsp; &nbsp;   std::cout &lt;&lt; "Error parsing effect: " &lt;&lt; log &lt;&lt; std::endl;<br>
+                        #else   // C error handling<br>
+                        &nbsp; &nbsp;   char log[10000];<br>
+                        &nbsp; &nbsp;   <b>glfxGetEffectLog</b>(effect, log, sizeof(log));<br>
+                        &nbsp; &nbsp;   printf("Error parsing effect: %s:\n", log);<br>
+                        #endif<br>
+                        &nbsp; &nbsp;   return;<br>
+                        }
+                        </code>
+                        <p>
+                        Compile a program (combination of VS, FS, etc) defined in the effect file using the following:
+                        </p>
+                        <code>
+                        int shaderProg = <b>glfxCompileProgram</b>(effect, "ProgramName");<br>
+                            <br>
+                        if (shaderProg &lt; 0) {<br>
+                        &nbsp; &nbsp; // same error handling as above   <br>
+                        }
+                        </code>
+                        <p>
+                        The program can now be used by OpenGL as usual:
+                        </p>
+                        <code>
+                        glUseProgram(shaderProg);
+                        </code>
+                        <p>
+                        After the effect is no longer needed release its resources using:
+                        </p>
+                        <code>
+                        <b>glfxDeleteEffect</b>(effect);
+                        </code>
+                        <strong>Using GLFX</strong>
+                        <p>
+                        Now that we have the basic infrastructure in place let's dive into the effect files.
+                        The nice thing about GLFX is that you can continue writing GLSL
+                        shaders in pretty much the same way that you are used to. There are a few minor changes
+                        and additions and we are going to focus on them.</p>
+                        <p><b>Place a 'program' section to combine shader stages into a complete GLSL program</b></p>
+                        <code>
+                        program Lighting<br>
+                        {<br>
+                        &nbsp; &nbsp;   vs(410)=VSmain();<br>
+                        &nbsp; &nbsp;   fs(410)=FSmain();<br>
+                        };
+                        </code>
+                        <p>
+                        In the example above the effect file contains the definition of the functions VSmain() and FSmain()
+                        somewhere else. The 'program' section defines an OpenGL
+                        program called 'Lighting'. Calling glfxCompileProgram(effect, "Lighting") will cause
+                        a compilation and linkage of VSmain() and FSmain() into a single program. Both shaders will be compiled
+                        in version 4.10 of GLSL (same as
+                        declaring '#version 410' in standard GLSL).
+                        </p>
+                        <p><b>Use 'shader' instead of 'void' to declare main shader functions</b></p>
+                        <p>The main entry points to shader stages must be declared as 'shader' instead of 'void'.
+                        Here's an example:</p>
+                        <code>
+                        <b>void</b> calculate_something()<br>
+                        {<br>
+                                &nbsp; &nbsp;   ...<br>
+                        }<br>
+                        <br>
+                        <b>shader</b> VSmain()<br>
+                        {<br>
+                                &nbsp; &nbsp;   calculate_something();<br>
+                        }
+                        </code>
+                        <p><b>Include multiple shaders and program in a single effect file</b></p>
+                        <p>
+                        You can place multiple occurrences of the 'program' section in a single effect file.
+                        Simply call glfxCompileProgram() for each program that you want to use.
+                        </p>
+                        <p><b>Use structures to pass vertex attributes between shader stages</b></p>
+                        <p>
+                        Instead of defining the in/out variables in the global section of the shader we
+                        can use GLSL structures and share them across multiple shader stages. Here's an example:
+                        </p>
+                        <code>
+                        struct VSoutput<br>
+                        {<br>
+                         &nbsp; &nbsp;  vec2 TexCoord;                                             <br>
+                         &nbsp; &nbsp;  vec3 Normal;                                               <br>
+                        };<br>
+                        <br>
+                        shader VSmain(in vec3 Pos, in vec2 TexCoord, in vec3 Normal, out <b>VSOutput</b> VSout)<br>
+                        {                                                       <br>
+                        &nbsp; &nbsp; // do some transformations and update 'VSout'<br>
+                        &nbsp; &nbsp; VSout.TexCoord = TexCoord;<br>
+                        &nbsp; &nbsp; VSout.Normal = Normal;<br>
 
-		<a href="../tutorial35/tutorial35.html" class="next highlight"> Next tutorial </a>
-	</article>
+                        }<br>
+                        <br>
+                        shader FSmain(in <b>VSOutput</b> FSin, out vec4 FragColor)<br>
+                        {<br>
+                        &nbsp; &nbsp; // 'FSin' matches 'VSout' from the VS. Use it <br>
+                         &nbsp; &nbsp;   // to do lighting calculations and write the final output to 'FragColor'<br>
+                        }
+                        </code>
+                        <p>
+                        Unfortunately, using a structure will only work between shader stages. Input variables to
+                        the VS must be handled as separate attributes as we see in the above example. Well, I have
+                        an NVIDIA card and input structures to the VS work for me but this is not explicitly allowed
+                        by the GLSL spec and many readers have informed me that it doesn't work for them. If it works - great.
+                        If not, simply go with the above code.
+                        </p>
+                        <p><b>Use include files to share common functionality between effect files</b></p>
+                        <p>
+                        The keyword 'include' can be used to include one effect file in another:
+                        </p>
+                        <code>
+                        #include "another_effect.glsl"
+                        </code>
+                        <p>
+                        The caveat with include files is that they are not parsed by GLFX. They are simply
+                        inserted as-is into the including file at the location of the 'include' keyword. This means
+                        that you can only place pure GLSL code in them and not GLFX-only keywords such as program/etc.
+                        Tip: since part of GLSL syntax is the same as C/C++ (e.g. #define) you can even share definitions
+                        between the effect file and your application code.
+                        </p>
+                        <p><b>Use structure suffix to define attribute locations</b></p>
+                        <p>
+                        In the previous tutorials we have used the 'layout(location = ...)' keyword to define the
+                        location of an input attribute of the VS. By placing a colon followed by a number after an
+                        input VS parameter we can achieve the same goal. Here's an example:
+                        </p>
+                        <code>
+                        struct VSInput2 <br>
+                        {<br>
+                         &nbsp; &nbsp;   vec3 Normal;                                               <br>
+                         &nbsp; &nbsp;   vec3 Tangent;                                               <br>
+                        };<br>
+                        <br>
+                        shader VSmain(in vec3 Pos : 5, in vec2 TexCoord : 6, in float colorScale : 10)<br>
+                        </code>
+                        <p>
+                        The VS above gets the position in attribute 5, the texture coordinate in 6 and the color
+                        scale in 10. The idea is very simple - the number
+                        after the colon determines the location. If there is no location suffix the attributes
+                        simply start at zero.
+                        </p>
+                        <p><b>Use 'interface' instead of 'struct' to place qualifiers on members</b></p>
+                        <p>
+                        GLSL provides qualifiers such as 'flat' and 'noperspective' that can be placed
+                        before attributes that are sent from the VS to the FS. These qualifiers cannot be used on
+                        structure members. The solution that GLFX provides is a new keyword called 'interface'
+                        that enables what 'struct' does not. An 'interface' can only be passed between shader
+                        stages. If you need to pass it as a whole to another function you will need to copy the
+                        contents to a struct. For example:
+                        </p>
+                        <code>
+                        interface foo<br>
+                        {<br>
+                        &nbsp; &nbsp; <b>flat</b> int a;<br>
+                        &nbsp; &nbsp; <b>noperspective</b> float b;<br>
+                        };<br>
+                        <br>
+                        struct bar<br>
+                        {<br>
+                        &nbsp; &nbsp; int a;<br>
+                        &nbsp; &nbsp; float b;<br>
+                        }<br>
+                        <br>
+                        shader VSmain(out foo f)<br>
+                        {<br>
+                        &nbsp; &nbsp; // ...<br>
+                        }<br>
+                        <br>
+                        void Calc(bar c)<br>
+                        {<br>
+                        &nbsp; &nbsp; // ...<br>
+                        }<br>
+                        <br>
+                        shader FSmain(in foo f)<br>
+                        {<br>
+                        &nbsp; &nbsp;   struct bar c;<br>
+                        &nbsp; &nbsp;   c.a = f.a;<br>
+                        &nbsp; &nbsp;   c.b = f.b;<br>
+                        <br>
+                        &nbsp; &nbsp;   Calc(c);<br>
+                        }<br>
+                        </code>
+                        <p>
+                        <b>Note:</b> 'interface' is a keyword reserved for future use (according to OpenGL 4.2).
+                        Its usage in the future in GLFX will be based on changes to the official OpenGL spec.
+                        </p>
+                        <p>
+                        <b>Tip: use 'glfxc' to verify effect files</b>
+                        </p>
+                        <p>
+                        'glfxc' is a utility which is part of GLFX. It parses effect files, compiles them
+                        using the local OpenGL installation and reports any error it finds. Run it as follows:
+                        </p>
+                        <code>
+                        glfxc &lt;effect file name&gt; &lt;program name&gt;
+                        </code>
+                        <strong>The Demo</strong>
+                        <p>
+                        The code of this tutorial has been modified to work with GLFX. Since the changes are
+                        very simple I won't go over them here. You should take a look at the source, in particular
+                        the classes Technique and LightingTechnique. In addition, the shaders that used to be
+                        part of 'lighting_technique.cpp' have been removed and there is an effect file called
+                        'lighting.glsl' in the 'shaders' subdirectory. This file contains the same shaders that
+                        you are already familiar with. They have been modified slightly to fit the rules above.
+                        </p>
+                </section>
 
-	<script src="../html5shiv.min.js"></script>
-	<script src="../html5shiv-printshiv.min.js"></script>
+                <a href="../tutorial35/tutorial35.html" class="next highlight"> Next tutorial </a>
+        </article>
+
+        <script src="../html5shiv.min.js"></script>
+        <script src="../html5shiv-printshiv.min.js"></script>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+         /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+         var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+         var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial34/tutorial34.html';
+
+         /* * * DON'T EDIT BELOW THIS LINE * * */
+         (function() {
+             var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+             dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+             (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+         })();
+        </script>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>

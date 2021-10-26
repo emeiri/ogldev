@@ -43,7 +43,7 @@
       in our mini series of tutorials on <a href="../tutorial35/tutorial35.html">Deferred Shading</a>.
       With deferred shading we needed a way to block the light influence and we've used a light volume
       for that purpose. We processed lighting only on stuff within the light volume. Now we are going
-      to do the opposite. We will create a shadow volume and process lighting only on stuff outside 
+      to do the opposite. We will create a shadow volume and process lighting only on stuff outside
       of it. Same as in light volume we will use the stencil buffer as a key component of the algorithm.
       Hence the name - Stencil Shadow Volume.
       </p>
@@ -56,17 +56,17 @@
       </p>
       <p>
       We are going to setup the stencil operation according to a method known as <i>Depth Fail</i>.
-      People often start the description of the shadow volume technique using a more straighforward method 
-      called <i>Depth Pass</i>, however, that method has a known problem when the viewer itself is inside 
+      People often start the description of the shadow volume technique using a more straighforward method
+      called <i>Depth Pass</i>, however, that method has a known problem when the viewer itself is inside
       the shadow volume and Depth Fail fixes that problem. Therefore, I've skipped Depth Pass altogether
       and went directly to Depth Fail. Take a look at the following picture:
       </p>
       <img class="center" src="shadow_volume1.jpg"/>
       <p>
-      We have a light bulb at the bottom left corner and a green object (called an occluder) which casts shadow due to 
+      We have a light bulb at the bottom left corner and a green object (called an occluder) which casts shadow due to
       that light. Three round objects are rendered in this scene as well. Object B is shadowed
       while A &amp; C are not. The red arrows bound the area of the shadow volume (the dashed part
-      of the line is not part of it). 
+      of the line is not part of it).
       </p>
       <p>
       Let's see how we can utilize the stencil buffer to get shadows working here. We start by
@@ -87,7 +87,7 @@
       </ul>
       </p>
       <p>
-      Let's see what happens to the stencil buffer using the above scheme. The front and back facing 
+      Let's see what happens to the stencil buffer using the above scheme. The front and back facing
       triangles of the volume that are covered by object A fail the depth test. We increment
       and decrement the values of the pixels covered by object A in the stencil buffer
       which means they are left at zero. In the case of object B the front facing triangles of the volume
@@ -124,7 +124,7 @@
       <img class="center" src="quad.jpg">
       <p>
       When we repeat this process of emitting quads from all silhouette edges a volume is created. Is that enough?
-      definitely not. The problem is that this volume looks kind of like a truncated cone without its caps. 
+      definitely not. The problem is that this volume looks kind of like a truncated cone without its caps.
       Since our algorithm depends on checking the depth test of the front and back triangles of the
       volume we might end up with a case where the vector from the eye to the pixel goes through only either
       the front or back of the volume:
@@ -135,7 +135,7 @@
       creating a front and a back cap to the volume (the dotted lines in the picture above). Creating the front cap is very easy.
       Every triangle which faces the light becomes part of the front cap. While this may not be the most
       efficient solution and you could probably create a front cap using fewer triangles it is definitely
-      the simplest solution. The back cap is almost as simple. We just need to extend the vertices of 
+      the simplest solution. The back cap is almost as simple. We just need to extend the vertices of
       light facing triangle to infinity (along the vector from the light to each vertex) and reverse their
       order (else the resulting triangle will point inside the volume).
       </p>
@@ -149,7 +149,7 @@
       point 'p' and continues to infinity. In other words, 'p' is extended to infinity. Obviously, at infinity
       the position of point p is simply (infinity, infinity, infinity), but we don't care about that. We need
       to find a way to rasterize the triangles of the shadow volume which means we must project its vertices
-      on the projection plane. This projection plane is in fact the near plane. While 'p' is extended 
+      on the projection plane. This projection plane is in fact the near plane. While 'p' is extended
       to infinity along the light vector we can still project it back on the near plane. This is done by the dotted
       line that goes from the origin and crosses the light vector somewhere. We want to find 'Xp' which is
       the X value of the point where that vector crosses the near plane.
@@ -170,7 +170,7 @@
       (Vx, Vy, Vz, 0) (where 'V' is the vector from the light source to point 'p') by the view/projection matrix
       and apply perspective divide on it. We are not going to prove it here by you can try this yourself
       and see the result. So the bottom line is that whenever we need to rasterize a triangle that contains
-      a vertex which was extended to infinity along some vector we simply multiply that vector by the 
+      a vertex which was extended to infinity along some vector we simply multiply that vector by the
       view/projection matrix while adding a 'w' component with the value of zero to it. We will use that technique
       extensively in the GS below.
       </p>
@@ -225,10 +225,10 @@
       Then we render the shadow volume into the stencil buffer while setting up the stencil
       test as described in the background session. And finally the scene itself is rendered while
       taking into account the values in the stencil buffer (i.e. only those pixels whose stencil value
-      is zero are rendered). 
+      is zero are rendered).
       </p>
       <p>
-      An important difference between this method and shadow map is that 
+      An important difference between this method and shadow map is that
       shadowed pixels in the stencil shadow volume method never reach the fragment shader. When we
       were using shadow map we had the opportunity to calculate ambient lighting on shadowed pixels.
       We don't have that opportunity here. Therefore, we add an ambient pass outside the stencil
@@ -281,7 +281,7 @@
       <br>
       &nbsp; &nbsp;         // Set the stencil test per the depth fail algorithm<br>
       &nbsp; &nbsp;         glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);<br>
-      &nbsp; &nbsp;         glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);   <br>    
+      &nbsp; &nbsp;         glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);   <br>
       <br>
       &nbsp; &nbsp;         m_ShadowVolTech.Enable();<br>
       <br>
@@ -305,7 +305,7 @@
       <p>
       This is where things become interesting. We use a special technique which is based on
       the silhouette technique from the previous tutorial. It generates the volume (and its caps)
-      from the silhouette of the occluder. First we disable writes to the depth buffer 
+      from the silhouette of the occluder. First we disable writes to the depth buffer
       (writes to the color are already disabled from the previous step).
       We are only going to update the stencil buffer. We enable depth clamp which will cause
       our projected-to-infinity-vertices (from the far cap) to be clamped to the maximum depth value.
@@ -320,7 +320,7 @@
       void RenderShadowedScene()<br>
       {<br>
       &nbsp; &nbsp;        glDrawBuffer(GL_BACK);<br>
-      <br>  
+      <br>
       &nbsp; &nbsp;        // Draw only if the corresponding stencil value is zero<br>
       &nbsp; &nbsp;        glStencilFunc(GL_EQUAL, 0x0, 0xFF);<br>
       <br>
@@ -349,14 +349,14 @@
       &nbsp; &nbsp;        m_LightingTech.SetWorldMatrix(p.GetWorldTrans());<br>
       &nbsp; &nbsp;        m_pGroundTex->Bind(COLOR_TEXTURE_UNIT);<br>
       &nbsp; &nbsp;        m_quad.Render();        <br>
-      }        
+      }
       </code>
       <p>
       We can now put the updated stencil buffer into use. Based on our algorithm we
       set rendering to succeed only when the stencil value of the pixel is exactly zero.
       In addition, we also prevent updates to the stencil buffer by setting the stencil test
       action to GL_KEEP.
-      And that's it! We can now use the standard lighting shader to render the scene. Just 
+      And that's it! We can now use the standard lighting shader to render the scene. Just
       remember to enable writing into the color buffer before you start...
       </p>
       <p>(tutorial40.cpp:285)</p>
@@ -393,10 +393,10 @@
       &nbsp; &nbsp;        m_quad.Render();        <br>
       <br>
       &nbsp; &nbsp;        glDisable(GL_BLEND);<br>
-      }        
+      }
       </code>
       <p>
-      The ambient pass helps us avoid completely black pixels that were dropped by the 
+      The ambient pass helps us avoid completely black pixels that were dropped by the
       stencil test. In real life we usually don't see such extreme shadows so we add
       a bit of ambient light to all pixels. This is done by simply doing another lighting
       pass outside the boundaries of the stencil test. Couple of things to note here: we
@@ -529,14 +529,14 @@
       &nbsp; &nbsp; &nbsp; &nbsp;         LightDir = PosL[2] - gLightPos;<br>
       &nbsp; &nbsp; &nbsp; &nbsp;         gl_Position = gWVP * vec4(LightDir, 0.0);<br>
       &nbsp; &nbsp; &nbsp; &nbsp;         EmitVertex();<br>
-      &nbsp; &nbsp;     
+      &nbsp; &nbsp;
       }<br>
       }</code>
       <p>
       The GS starts in pretty much the same way as the silhouette shader in the sense that we
       only care about triangles that are light facing. When we detect a silhouette edge
-      we extend a quad from it towards infinity (see below). Remember that the indices of the 
-      vertices of the original triangles are 0, 2 and 4 and the adjacent vertices are 1, 3, 5 
+      we extend a quad from it towards infinity (see below). Remember that the indices of the
+      vertices of the original triangles are 0, 2 and 4 and the adjacent vertices are 1, 3, 5
       (see picture in the previous tutorial). After we take care of the quads
       we emit the front and back caps. Note that for the front cap we don't use the original
       triangle as-is. Instead, we move it along the light vector by a very small amount (we
@@ -566,5 +566,21 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial40/tutorial40.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>

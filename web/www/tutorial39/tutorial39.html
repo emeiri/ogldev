@@ -30,7 +30,7 @@
       Today we are going to discuss one way in which the silhouette of an object can be detected.
       To make things clearer, I'm referring to the silhouette of a 3D object which is created when
       light falls upon it from an arbitrary direction. Moving the light source will likely change
-      the silhouette accordingly. This is entirely different from silhouette detection in 
+      the silhouette accordingly. This is entirely different from silhouette detection in
       image space that deals with finding the boundaries of an object in a 2D picture (which is usually
       not dependant on the location of the light source). While the subject of silhouette detection
       may be interesting by itself, for me its main goal is as a first
@@ -53,15 +53,15 @@
        to decide whether a triangle edge is part of the silhouette or not we need to find the adjacent triangle
       that shares the same edge and calculate the dot product between the light direction and the normals of
       both the original triangle and its neighbor. An edge is considered a silhouette edge if one triangle faces
-      the light but its neighbor does not. 
+      the light but its neighbor does not.
       </p>
       <p>
       The following picture shows a 2D object for simplicity:
       </p>
       <img class="center" src="silhouette2.jpg">
       <p> The red arrow represents the light ray that hits the
-      three edges (in 3D these would be triangles) whose normals are 1, 2 and 3 (dot product between these normals and 
-      the reverse of the light vector is obviously greater than zero). The edges whose normals are 4, 5 and 6 are facing away from the light 
+      three edges (in 3D these would be triangles) whose normals are 1, 2 and 3 (dot product between these normals and
+      the reverse of the light vector is obviously greater than zero). The edges whose normals are 4, 5 and 6 are facing away from the light
       (here the same dot product would be less than or equal to zero). The two blue circles mark the
       silhouette of the object and the reason is that edge 1 is facing the light but its neighbor edge 6 does not.
       The point between them is therefore a silhoette. Same goes for the other silhouette point. Edges (or points
@@ -73,7 +73,7 @@
       to have knowledge of the three neighbors of each triangle. This is known as the <i>Adjacencies</i> of
       the triangles. Unfortunately, Assimp does not support automatic adjacencies calculation for us so
       we need to implement such an algorithm ourselves. In the coding section we will review a simple algorithm that
-      will satisfy our needs. 
+      will satisfy our needs.
       </p>
       <p>
       What is the best place in the pipeline for the silhouette algorithm itself? remember that we
@@ -97,7 +97,7 @@
       supply an output topology but if there is no GS the rasterizer knows how to deal with such a scheme
       and it rasterizes only the actual triangles (ignoring the adjacent triangles). One of the readers
       informed me that such a setup has produced an error on his Macbook with Intel HD 3000 so if
-      you run into a similar problem simply use a pass thru GS, or change the topology type.  
+      you run into a similar problem simply use a pass thru GS, or change the topology type.
       </p>
       <p>
       Note that the adjacent vertices in the vertex buffer have the same format and attributes as regular
@@ -145,7 +145,7 @@
         &nbsp;  &nbsp; &nbsp;  &nbsp;           m_indexMap[e1].AddNeigbor(i);<br>
         &nbsp;  &nbsp;  &nbsp;  &nbsp;          m_indexMap[e2].AddNeigbor(i);<br>
         &nbsp;  &nbsp;  &nbsp;  &nbsp;          m_indexMap[e3].AddNeigbor(i);<br>
-       &nbsp;  &nbsp;     }   
+       &nbsp;  &nbsp;     }
 
       </code>
       <p>
@@ -156,7 +156,7 @@
       is that sometimes other attributes force Assimp to split the same vertex into two vertices. e.g. the same vertex may have
       different texture attributes for two neighboring triangles that share it. This creates a problem for our adjacency algorithm
       and we prefer to have each vertex appear only once. Therefore, we create this mapping between a position and first index and use
-      only this index from now on. 
+      only this index from now on.
       </p>
       <p>(mesh.cpp:240)</p>
       <code>
@@ -175,15 +175,15 @@
          &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             uint OppositeIndex = OtherFace.GetOppositeIndex(e);<br>
                <br>
          &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(face.Indices[j]);<br>
-         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(OppositeIndex);       <br>     
+         &nbsp;  &nbsp;     &nbsp;  &nbsp;   &nbsp;  &nbsp;             Indices.push_back(OppositeIndex);       <br>
          &nbsp;  &nbsp;      &nbsp;  &nbsp;        }<br>
          &nbsp;  &nbsp;     }    <br>
       }
       </code>
       <p>
       In the second stage we populate the index vector with sets of six vertices each that match the topology
-      of the triangle list with adjacency that we saw earlier. The map that we created in the first stage 
-      helps us here because for each edge in the triangle it is very easy to find the neighboring triangle 
+      of the triangle list with adjacency that we saw earlier. The map that we created in the first stage
+      helps us here because for each edge in the triangle it is very easy to find the neighboring triangle
       that shares it and then the vertex in that triangle which is opposite to this edge. The last two lines
       in the loop alternate the content of the index buffer between vertices from the current triangle
       and vertices from the adjacent triangles that are opposite to edges of the current triangle.
@@ -191,7 +191,7 @@
       <p>
       There are a few additional minor changes to the Mesh class. I suggest you compare it to the
       version from the previous tutorial to make sure you capture all differences. One of the notable
-      changes is that we use GL_TRIANGLES_ADJACENCY instead of GL_TRIANGLES as the topology when calling 
+      changes is that we use GL_TRIANGLES_ADJACENCY instead of GL_TRIANGLES as the topology when calling
       glDrawElementsBaseVertex(). If you forget that the GL will feed incorrectly sized primitives into the GS.
       </p>
       <p>(silhouette.vs)</p>
@@ -280,15 +280,15 @@
       }
       </code>
       <p>
-      All the silhouette logic is contained within the GS. When using the triangle list with adjacencies 
+      All the silhouette logic is contained within the GS. When using the triangle list with adjacencies
       topology the GS receives an array of six vertices. We start by calculating a few selected edges
       that will help us calculate the normal of the current triangle as well as the three adjacent triangles.
       Use the picture above to understand how to map e1-e6 to actual edges. Then we check whether
       the triangle faces the light by calculating a dot product between its normal and the light direction
-      (with the light vector going towards the light). If the result of the dot product is positive 
+      (with the light vector going towards the light). If the result of the dot product is positive
       the answer is yes (we use a small epsilon due to floating point inaccuracies). If the triangle
       does not face the light then this is the end of the way for it, but if it is light facing, we do the same
-      dot product operation between the light vector and every one of the three adjacent triangles. 
+      dot product operation between the light vector and every one of the three adjacent triangles.
       If we hit an adjacent triangle that doesn't face the light we call the EmitLine() function which
       (unsurprisingly) emits the shared edge between the triangle (which faces the light) and its
       neighbor (which does not). The FS simply draws that edge in red.
@@ -299,7 +299,7 @@
           {<br>
        &nbsp;  &nbsp;         // Render the object as-is<br>
        &nbsp;  &nbsp;         m_LightingTech.Enable();<br>
-                                          <br> 
+                                          <br>
        &nbsp;  &nbsp;         Pipeline p;<br>
        &nbsp;  &nbsp;         p.SetPerspectiveProj(m_persProjInfo);<br>
        &nbsp;  &nbsp;         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());        <br>
@@ -318,12 +318,12 @@
        &nbsp;  &nbsp;         glLineWidth(5.0f);<br>
               <br>
        &nbsp;  &nbsp;      <b>   m_mesh.Render();   </b>     <br>
-          }        
+          }
       </code>
       <p>
       This is how we use the silhouette technique. The same object is rendered twice. First with the
       standard lighting shader. Then with the silhouette shader. Note how the function glLightWidth()
-      is used to make the silhouette thicker and thus more noticeable. 
+      is used to make the silhouette thicker and thus more noticeable.
       </p>
       <p>
       If you use the code above as-is to create the demo, you might notice a minor corruption around
@@ -341,5 +341,21 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial39/tutorial39.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
