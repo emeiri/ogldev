@@ -83,7 +83,7 @@ Matrix4f WorldTrans::GetReversedTranslationMatrix() const
 Matrix4f WorldTrans::GetReversedRotationMatrix() const
 {
     Matrix4f ReversedRotation;
-    ReversedRotation.InitRotateTransform(-m_rotation.x, -m_rotation.y, -m_rotation.z);
+    ReversedRotation.InitRotateTransformZYX(-m_rotation.x, -m_rotation.y, -m_rotation.z);
     return ReversedRotation;
 }
 
