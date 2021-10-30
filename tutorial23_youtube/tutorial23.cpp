@@ -38,11 +38,11 @@
 
 
 
-class Tutorial22
+class Tutorial23
 {
 public:
-    Tutorial22();
-    ~Tutorial22();
+    Tutorial23();
+    ~Tutorial23();
 
     bool Init();
 
@@ -67,7 +67,7 @@ private:
 };
 
 
-Tutorial22::Tutorial22()
+Tutorial23::Tutorial23()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -84,7 +84,7 @@ Tutorial22::Tutorial22()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    pointLights[0].DiffuseIntensity = 0.0f;
+    pointLights[0].DiffuseIntensity = 0.5f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 0.0f);
     pointLights[0].Attenuation.Linear = 0.2f;
     pointLights[0].Attenuation.Exp = 0.0f;
@@ -95,18 +95,18 @@ Tutorial22::Tutorial22()
     pointLights[1].Attenuation.Exp = 0.2f;
 
     spotLights[0].DiffuseIntensity = 1.0f;
-    spotLights[0].Color = Vector3f(0.0f, 1.0f, 1.0f);
-    spotLights[0].Attenuation.Linear = 0.1f;
-    spotLights[0].Cutoff = 10.0f;
+    spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
+    spotLights[0].Attenuation.Linear = 0.01f;
+    spotLights[0].Cutoff = 20.0f;
 
     spotLights[1].DiffuseIntensity = 1.0f;
     spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    spotLights[1].Attenuation.Linear = 0.1f;
-    spotLights[1].Cutoff = 20.0f;
+    spotLights[1].Attenuation.Linear = 0.01f;
+    spotLights[1].Cutoff = 30.0f;
 }
 
 
-Tutorial22::~Tutorial22()
+Tutorial23::~Tutorial23()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -130,7 +130,7 @@ Tutorial22::~Tutorial22()
 }
 
 
-bool Tutorial22::Init()
+bool Tutorial23::Init()
 {
     Vector3f CameraPos(0.0f, 5.0f, -8.0f);
     Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
@@ -146,7 +146,8 @@ bool Tutorial22::Init()
 
     pMesh1 = new BasicMesh();
 
-    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/vintage_wooden_drawer_01_4k.blend/vintage_wooden_drawer_01_4k.obj")) {
+    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/Zombie.obj")) {
+    //    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/vintage_wooden_drawer_01_4k.blend/vintage_wooden_drawer_01_4k.obj")) {
         return false;
     }
 
@@ -172,8 +173,9 @@ bool Tutorial22::Init()
     return true;
 }
 
+bool Start = false;
 
-void Tutorial22::RenderSceneCB()
+void Tutorial23::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -184,6 +186,7 @@ void Tutorial22::RenderSceneCB()
 #else
     float YRotationAngle = 1.0f;
 #endif
+    counter += 0.01f;
 
     WorldTrans& worldTransform = pBox->GetWorldTransform();
 
@@ -197,9 +200,8 @@ void Tutorial22::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
 
-    counter += 0.01f;
     pointLights[0].WorldPosition.x = -10.0f;
-    pointLights[0].WorldPosition.y = sinf(counter) * 4 + 4;
+    pointLights[0].WorldPosition.y = 2;
     pointLights[0].WorldPosition.z = 0.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
@@ -228,7 +230,14 @@ void Tutorial22::RenderSceneCB()
     pBox->Render();
 
     WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
-    meshWorldTransform.SetPosition(-10.0f, 1.0f, 1.0f);
+    if (Start) {
+        static float counter2 = 0.0f;
+        counter2 += 0.001;
+        meshWorldTransform.SetPosition(0.0f, -4.0f + abs(sinf(counter2) * 4), 0.0f);
+    } else {
+        meshWorldTransform.SetPosition(0.0f, -4.0f, 0.0f);
+    }
+
     World = meshWorldTransform.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -249,8 +258,8 @@ void Tutorial22::RenderSceneCB()
     pMesh1->Render();
 
     WorldTrans& meshWorldTransform2 = pMesh2->GetWorldTransform();
-    meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
-    meshWorldTransform2.SetPosition(-8.0f, 1.0f, 1.0f);
+    //  meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
+    meshWorldTransform2.SetPosition(0.0f, 1.0f, 1.0f);
     World = meshWorldTransform2.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -277,9 +286,12 @@ void Tutorial22::RenderSceneCB()
 
 #define ATTEN_STEP 0.01f
 
-void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void Tutorial23::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
+    case ' ':
+        Start = true;
+        break;
     case 'q':
     case 27:    // escape key code
         exit(0);
@@ -312,42 +324,42 @@ void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void Tutorial22::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void Tutorial23::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial22::PassiveMouseCB(int x, int y)
+void Tutorial23::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-Tutorial22* pTutorial22 = NULL;
+Tutorial23* pTutorial23 = NULL;
 
 
 void RenderSceneCB()
 {
-    pTutorial22->RenderSceneCB();
+    pTutorial23->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pTutorial22->KeyboardCB(key, mouse_x, mouse_y);
+    pTutorial23->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pTutorial22->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTutorial23->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pTutorial22->PassiveMouseCB(x, y);
+    pTutorial23->PassiveMouseCB(x, y);
 }
 
 
@@ -395,9 +407,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pTutorial22 = new Tutorial22();
+    pTutorial23 = new Tutorial23();
 
-    if (!pTutorial22->Init()) {
+    if (!pTutorial23->Init()) {
         return 1;
     }
 
