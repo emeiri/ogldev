@@ -80,15 +80,15 @@
       &nbsp; &nbsp; <b>       RenderPass();<br>
               <br>
       &nbsp; &nbsp;        MotionBlurPass();</b><br>
-                                   <br> 
+                                   <br>
       &nbsp; &nbsp;        RenderFPS();       <br>
               <br>
       &nbsp; &nbsp;        glutSwapBuffers();<br>
           }
-      </code>    
+      </code>
       <p>This is the main render function and it is very simple. We have a render pass for all the
       objects in the scene and then a post processing pass for the motion blur.</p>
-      <p>(tutorial41.cpp:172)</p>  
+      <p>(tutorial41.cpp:172)</p>
       <code>
       void RenderPass()<br>
       {<br>
@@ -125,7 +125,7 @@
               <br>
       &nbsp; &nbsp;    <b>     m_prevTransforms = Transforms;</b><br>
       }
-      </code>    
+      </code>
       <p>This is our render pass. It is almost identical to the one from the Skeletal Animation tutorial
       with changes marked in bold face. The intermediate buffer is a simple class that combines the color, depth,
       and motion vector buffers under a single frame buffer object. We've seen this already when we studied deferred
@@ -135,9 +135,9 @@
       <p>
         Other than that you can see that we've added a class member to the 'Tutorial41' class that keeps the vector of bone
         transformations from the previous frame. We feed it into the skinning technique along with the current bone transformations.
-        We will see how this is used when we review the GLSL code of the technique. 
+        We will see how this is used when we review the GLSL code of the technique.
       </p>
-      <p>(tutorial41.cpp:209)</p>    
+      <p>(tutorial41.cpp:209)</p>
       <code>
       void MotionBlurPass()<br>
       {<br>
@@ -235,7 +235,7 @@
       &nbsp; &nbsp;     vec3 PrevNDCPos = (PrevClipSpacePos0 / PrevClipSpacePos0.w).xyz;<br>
       &nbsp; &nbsp;     MotionVector = (NDCPos - PrevNDCPos).xy;</b><br>
       }
-      </code>  
+      </code>
       <p>The FS of the skinning technique has been updated to output two vectors into two separate buffers
         (the color and the motion vector buffers). The color is calculated as usual. To calculate the motion vector
         we project the clip space positions of the current and previous frame by doing perspective divide on both
@@ -293,7 +293,7 @@
         current pixel and use it to sample four texels from the color buffer. The color of the current
         pixel is sampled using the original texture coordinates and we give it the highest weight (0.4).
         We then move the texture coordinate backward along the motion vector and sample three more color
-        texels. We combine them together while giving smaller and smaller weights as we move along. 
+        texels. We combine them together while giving smaller and smaller weights as we move along.
       </p>
       <p>
         You can see that I divided the original motion vector by two. You will probably need some fine tuning
@@ -308,5 +308,22 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial41/tutorial41.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
 </body>
 </html>
