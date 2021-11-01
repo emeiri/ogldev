@@ -71,9 +71,9 @@ public:
         m_shadowOrthoProjInfo.n = -10.0f;
         m_shadowOrthoProjInfo.f = 100.0f;
 
-        m_quad.GetOrientation().m_scale    = Vector3f(50.0f, 100.0f, 100.0f);
-        m_quad.GetOrientation().m_pos      = Vector3f(0.0f, 0.0f, 90.0f);
-        m_quad.GetOrientation().m_rotation = Vector3f(90.0f, 0.0f, 0.0f);
+        m_quad.GetWorldTransform().SetScale(10.0f);
+        //        m_quad.GetWorldTransform().SetPosition(0.0f, 0.0f, 0.0f);
+        //        m_quad.GetWorldTransform().SetRotation(90.0f, 0.0f, 0.0f);
 
         for (int i = 0; i < NUM_MESHES ; i++) {
             m_meshOrientation[i].m_scale    = Vector3f(1.0f, 1.0f, 1.0f);
@@ -127,11 +127,11 @@ public:
         //           return false;
         //       }
 #endif
-       if (!m_quad.LoadMesh("../Content/quad.obj")) {
+       if (!m_quad.LoadMesh("../Content/box_terrain.obj")) {
             return false;
         }
 
-       m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/wal67ar_small.jpg");
+       m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/textures/medieval_blocks_05_diff_4k.jpg");
 
         if (!m_pGroundTex->Load()) {
             return false;
@@ -150,7 +150,7 @@ public:
     virtual void RenderSceneCB()
     {
         for (int i = 0; i < NUM_MESHES ; i++) {
-            m_meshOrientation[i].m_rotation.y += 0.5f;
+            m_meshOrientation[i].m_rotation.y += 0.01f;
         }
 
         m_pGameCamera->OnRender();
@@ -195,7 +195,7 @@ public:
 
         Pipeline p;
         p.SetOrthographicProj(m_shadowOrthoProjInfo);
-        p.Orient(m_quad.GetOrientation());
+        p.Orient(m_quad.GetWorldTransform());
         p.SetCamera(Vector3f(0.0f, 0.0f, 0.0f), m_dirLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         m_LightingTech.SetLightWVP(p.GetWVOrthoPTrans());
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
@@ -241,7 +241,7 @@ private:
     DirectionalLight m_dirLight;
     BasicMesh m_mesh;
     Orientation m_meshOrientation[NUM_MESHES];
-        BasicMesh m_quad;
+    BasicMesh m_quad;
     Texture* m_pGroundTex;
     ShadowMapFBO m_shadowMapFBO;
     PersProjInfo m_persProjInfo;

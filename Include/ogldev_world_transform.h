@@ -40,6 +40,10 @@ class WorldTrans {
     Matrix4f GetReversedTranslationMatrix() const;
     Matrix4f GetReversedRotationMatrix() const;
 
+    float GetScale() const { return m_scale; }
+    Vector3f GetPos() const { return m_pos; }
+    Vector3f GetRotation() const { return m_rotation; }
+
  private:
     float    m_scale    = 1.0f;
     Vector3f m_rotation = Vector3f(0.0f, 0.0f, 0.0f);
