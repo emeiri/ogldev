@@ -28,13 +28,13 @@
             <h3> Background </h3>
 <p>
     In the <a href="../tutorial45/tutorial45.html">previous tutorial</a> we studied the
-    Screen Space Ambient Occlusion algorithm. We used a geometry buffer which contained 
-    the view space position of all the pixels as a first step in our calculations. 
+    Screen Space Ambient Occlusion algorithm. We used a geometry buffer which contained
+    the view space position of all the pixels as a first step in our calculations.
     In this tutorial we are going to challenge ourselves by calculating the view space
     position directly from the depth buffer. The advantage of this approach is that
     much less memory is required because we will only need one floating point value
     per pixel instead of three. This tutorial relies heavily on the previous tutorial
-    so make sure you fully understand it before going on. The code here will 
+    so make sure you fully understand it before going on. The code here will
     be presented only as required changes over the original algorithm.
 </p>
 <p>
@@ -42,14 +42,14 @@
     points around each pixel in view space, project them on the near clipping plane
     and compare their Z value with the actual pixel at that location. The view space
     position is generated in a geometry pass at the start of the render loop. In
-    order to populate correctly the geometry buffer with the view space position 
+    order to populate correctly the geometry buffer with the view space position
     we also need a depth buffer (else pixels will be updated based on draw order rather
     than depth). We can use that depth buffer alone to reconstruct the entire view space
-    position vector, thus reducing the space required for it (though some more 
+    position vector, thus reducing the space required for it (though some more
     per-pixel math will be required).
 </p>
 <p>
-    Let's do a short recap on the stages required to populate the depth buffer (if you need a 
+    Let's do a short recap on the stages required to populate the depth buffer (if you need a
     more in-depth review please see <a href="../tutorial12/tutorial12.html">tutorial 12</a>). We begin
     with the object space position of a vertex and multiply it with the WVP matrix which
     is a combined transformations of local-to-world, world-to-view and projection from
@@ -60,13 +60,13 @@
     the view space Z value). Next the GPU performs perspective divide which means that
     the vector is divided by W. Now the first three components are between
     -1 and 1 and the last component is simply 1. We say that at this point the vector is in NDC
-    space (Normalized Device Coordinates). 
+    space (Normalized Device Coordinates).
 </p>
 <p>
     Usually the vertex is just one out of three vertices comprising a triangle so the GPU
     interpolates between the three NDC vectors across the triangle face and executes the fragment shader
     on each pixel. On the way out of the fragment shader the GPU updates the depth buffer
-    with the Z component of the NDC vector (based on several state nobs that must be 
+    with the Z component of the NDC vector (based on several state nobs that must be
     configured correctly such as depth testing, depth write, etc). An important point
     to remember is that before writing the Z value to the depth buffer the GPU transforms
     it from (-1,1) to (0,1). We must handle this correctly or else we will get visual
@@ -74,7 +74,7 @@
 </p>
 <p>
     So this is basically all the math relevant to the Z buffer handling. Now let's say
-    that we have a Z value that we sampled for the pixel and we want to reconstruct 
+    that we have a Z value that we sampled for the pixel and we want to reconstruct
     the entire view space vector from it. Everything we need in order to retrace our steps is
     in the above description but before we dive any further let's see that math
     again only this time with numbers and matrices rather than words. Since we are only
@@ -106,7 +106,7 @@
     <img src="diagram3.jpg">
 </p>
 <p>
-    It is now easy to see that we can extract the view space Z from the above 
+    It is now easy to see that we can extract the view space Z from the above
     formula. I haven't specified all the intermediate steps because you
     should be able to do them yourself. The final result is:
 </p>
@@ -159,7 +159,7 @@ m_SSAOTech.SetTanHalfFOV(TanHalfFOV);  <br>
 <code>
     if (!m_depthBuffer.Init(WINDOW_WIDTH, WINDOW_HEIGHT, true, <b>GL_NONE</b>)) {<br>
 &nbsp; &nbsp;   return false;<br>
-}    
+}
 </code>
 <p>
     Next we need to initialize the geometry buffer (whose class attribute was renamed
@@ -193,7 +193,7 @@ m_SSAOTech.SetTanHalfFOV(TanHalfFOV);  <br>
 &nbsp; &nbsp;      glClear(GL_COLOR_BUFFER_BIT);                <br>
 <br>
 &nbsp; &nbsp;      m_quad.Render();                <br>
- }    
+ }
 </code>
 <p>
     We can see the change from m_gBuffer to m_depthBuffer in the geometry and SSAO
@@ -235,7 +235,7 @@ void main()<br>
     Above we see the revised geometry pass vertex and fragment shaders with
     the stuff that we no longer need commented out. Since we are only writing
     out the depth everything related to view space position was thrown out.
-    In fact, the fragment shader is now empty.    
+    In fact, the fragment shader is now empty.
 </p>
 <p>(ssao.vs)</p>
 <code>
@@ -255,7 +255,7 @@ void main()<br>
 &nbsp; &nbsp;     TexCoord = (Position.xy + vec2(1.0)) / 2.0;<br>
 &nbsp; &nbsp; <b>    ViewRay.x = Position.x * gAspectRatio * gTanHalfFOV;<br>
     &nbsp; &nbsp;     ViewRay.y = Position.y * gTanHalfFOV;</b><br>
-}<br>    
+}<br>
 </code>
 <p>
 Based on the math reviewed above (see the very end of the background section)
@@ -319,7 +319,7 @@ void main()<br>
 &nbsp; &nbsp; AO = 1.0 - AO/64.0;<br>
  <br>
 &nbsp; &nbsp;     FragColor = vec4(pow(AO, 2.0));<br>
-}    
+}
 </code>
 <p>
 The first thing we do in the fragment shader is to calculate the view space Z. We do
@@ -327,7 +327,7 @@ this with the exact same formula we saw in the background section. The projectio
 was already here in the previous tutorial and we just need to be careful when accessing
 the 'S' and 'T' items in the (3,3) and (3,4) locations. Remember that the index goes from
 0 to 3 (vs. 1 to 4 in standard matrix semantics) and that the matrix is transposed so
-we we need to reverse the column/row for the 'T'.   
+we we need to reverse the column/row for the 'T'.
 </p>
 <p>
     Once the Z is ready we multiply it by the view ray in order to retrieve the X and Y.
@@ -339,10 +339,26 @@ we we need to reverse the column/row for the 'T'.
   results as in the previous tutorial... ;-)
 </p>
 </section>
-        <a href="../tutorial47/tutorial47.html" class="next highlight"> Next tutorial </a>                
+        <a href="../tutorial47/tutorial47.html" class="next highlight"> Next tutorial </a>
 </article>
 
 <script src="../html5shiv.min.js"></script>
 <script src="../html5shiv-printshiv.min.js"></script>
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+ /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+ var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+ var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial46/tutorial46.html';
+
+ /* * * DON'T EDIT BELOW THIS LINE * * */
+ (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+ })();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>

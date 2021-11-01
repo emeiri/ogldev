@@ -28,13 +28,13 @@
             <h4> Credits: <a href="http://john-chapman-graphics.blogspot.co.il/2013/01/ssao-tutorial.html">SSAO tutorial by John Chapman</a> </h4><br>
             <h3> Background </h3>
 <p>
-    Do you remember how our lighting model began evolving? Back in <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
+    Do you remember how our lighting model began evolving? Back in <a href="../tutorial17/tutorial17.html">tutorial 17</a>
     we took a first look at the lighting model, starting with the ambient lighting type. The ambient lighting
     which is supposed to mimic the general feeling of "everything is bright" that you
     get in a highly lit, mid-day environment, was implemented using a single floating point
     value that was attached to each lighting source and we multiplied that value by
     the color of the surface which we sampled from the texture bound to that surface.
-    So you could have a single light source in your scene called "sun" and you could 
+    So you could have a single light source in your scene called "sun" and you could
     play with the ambient light to control how well the scene was generally lit - values closer
     to zero produced a darker scene while values closer to 1 produced a lighter
     scene.
@@ -42,7 +42,7 @@
 <p>
     In the following tutorials we implemented diffuse and specular lighting which
     contributed to the overall quality of the scene but the basic ambient light
-    remained the same. In the recent years we see a rise of what is known as 
+    remained the same. In the recent years we see a rise of what is known as
     <a href="http://en.wikipedia.org/wiki/Ambient_occlusion">Ambient Occlusion</a>
     which basically means that instead of going with a fixed ambient light value
     for each pixel we can calculate how much the pixel is exposed to the ambient
@@ -62,10 +62,10 @@
 <p>
     There is a lot of research on the subject of ambient occlusion and many algorithms
     have been developed to approximate it. We are going to study a branch of these algorithms
-    known as <i>Screen Space Ambient Occlusion</i> or SSAO, which was developed by 
+    known as <i>Screen Space Ambient Occlusion</i> or SSAO, which was developed by
     <a href="http://en.wikipedia.org/wiki/Crytek">Crytek</a>
     and became highly popular with their 2007 release of <a href = http://en.wikipedia.org/wiki/Crysis">Crysis</a>.
-    Many games have since implemented SSAO and a lot of variations were created 
+    Many games have since implemented SSAO and a lot of variations were created
     on top of it. We are going to study a simplified version of the algorithm based
     on a <a href="http://john-chapman-graphics.blogspot.co.il/2013/01/ssao-tutorial.html">SSAO tutorial by John Chapman</a>.
 </p>
@@ -84,7 +84,7 @@
 <p>
     We have a surface with two points on it - P0 and P1. Assume that we are looking
     at it from somewhere on the upper left corner of the image. We sample a few points
-    around each point and check whether they fall inside or outside the geometry. 
+    around each point and check whether they fall inside or outside the geometry.
     In the case of P0 there is a greater chance that random points around it will fall inside
     the geometry. For P1 it is the opposite. Therefore we expect to get a greater ambient
     occlusion term for P1 which means it will look lighter in the final frame.
@@ -101,14 +101,14 @@
     to the gbuffer that we saw in deferred rendering will be filled with view space
     position information (and that's it - we don't need normals, color, etc). So now
     getting the view space position for the current pixel in the ambient pass is just one
-    sample operation away. 
+    sample operation away.
 </p>
 <p>
     So now we are in a fragment shader holding the view space position for the current
     pixel. Generating random points around it is very easy. We will pass into the shader
     an array of random vectors (as uniform variables) and add each one to the view space position.
     For every generated point we want to check whether it lies inside or outside the geometry.
-    Remember that these points are virtual, so no match to the actual surface is expected. 
+    Remember that these points are virtual, so no match to the actual surface is expected.
     We are going to do something very similar to what we did in shadow mapping. Compare the Z
     value of the random point to the Z value of the closest point in the actual geometry.
     Naturally, that actual geometry point must lie on the ray that goes from the camera to the virtual
@@ -120,12 +120,12 @@
     The green point lies outside (before) the geometry and the red is inside (thus contributes to
     the ambient occlusion). The circle represents the radius in which random points are
     generated (we don't want them to be too far off point P). R1 and R2 are the rays from the camera
-    (at 0,0,0) to the red and green points. They intersect the geometry somewhere. In order 
-    to calculate the ambient occlusion we must compare the Z values of the red 
+    (at 0,0,0) to the red and green points. They intersect the geometry somewhere. In order
+    to calculate the ambient occlusion we must compare the Z values of the red
     and green points vs the Z value of the corresponding geometry points that are formed
     by the intersection of R1/R2 and the surface. We already have the Z value of the
     red and green points (in view space; after all - this is how we created them). But
-    where's the Z value of the points formed by the above intersection?    
+    where's the Z value of the points formed by the above intersection?
 </p>
 <p>
     Well, there's more than one solution to that question but since we already have a texture
@@ -133,7 +133,7 @@
     to find it somehow in it. To do that we will need the two texture coordinates
     that will sample the view space position for the R1 and R2 rays. Remember that the original
     texture coordinates that were used to find the view space position of P are not
-    what we need. These coordinates were formed based on the interpolation of the 
+    what we need. These coordinates were formed based on the interpolation of the
     full screen quad that we are scanning in that pass. But R1 and R2 don't intersect P.
     They intersect the surface somewhere else.
 </p>
@@ -174,7 +174,7 @@
 &nbsp; &nbsp;        m_pGameCamera->OnRender();      <br>
 <br>
 &nbsp; &nbsp;         m_pipeline.SetCamera(*m_pGameCamera);<br>
-		<br>
+                <br>
 &nbsp; &nbsp;         GeometryPass();<br>
         <br>
 &nbsp; &nbsp;         SSAOPass();<br>
@@ -182,13 +182,13 @@
 &nbsp; &nbsp;         BlurPass();<br>
         <br>
 &nbsp; &nbsp;         LightingPass();                <br>
-		      	<br>
+                        <br>
 &nbsp; &nbsp;         RenderFPS();     <br>
         <br>
 &nbsp; &nbsp;         CalcFPS();<br>
         <br>
 &nbsp; &nbsp;         OgldevBackendSwapBuffers();<br>
-    }    
+    }
 </code>
 <p>
     We will start the source walkthru from the top level and work our way down. This is the main
@@ -202,7 +202,7 @@
 <code>
     void GeometryPass()<br>
     {<br>
-&nbsp; &nbsp; 	m_geomPassTech.Enable();        <br>
+&nbsp; &nbsp;   m_geomPassTech.Enable();        <br>
 <br>
 &nbsp; &nbsp;         m_gBuffer.BindForWriting();<br>
 <br>
@@ -210,9 +210,9 @@
 <br>
 &nbsp; &nbsp;         m_pipeline.Orient(m_mesh.GetOrientation());<br>
 &nbsp; &nbsp;         m_geomPassTech.SetWVP(m_pipeline.GetWVPTrans());        <br>
-&nbsp; &nbsp; 	m_geomPassTech.SetWVMatrix(m_pipeline.GetWVTrans());<br>
+&nbsp; &nbsp;   m_geomPassTech.SetWVMatrix(m_pipeline.GetWVTrans());<br>
 &nbsp; &nbsp;         m_mesh.Render();       <br>
-    }    
+    }
 </code>
 <p>
     In the geometry pass we render the entire scene into a texture. In this
@@ -234,7 +234,7 @@ void main()<br>
 {       <br>
 &nbsp; &nbsp;     gl_Position = gWVP * vec4(Position, 1.0);<br>
 &nbsp; &nbsp;     ViewPos     = (gWV * vec4(Position, 1.0)).xyz;<br>
-}    
+}
 </code>
 <p>(geometry_pass.fs)</p>
 <code>
@@ -257,7 +257,7 @@ divide for this variable but it is a subject to the regular interpolations perfo
 during rasterization.
 </p>
 <p>
-    In the fragment shader we write the interpolated view space position to the 
+    In the fragment shader we write the interpolated view space position to the
     texture. That's it.
 </p>
 <p>(tutorial45.cpp:192)</p>
@@ -273,7 +273,7 @@ during rasterization.
 &nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT);<br>
 <br>
 &nbsp; &nbsp;         m_quad.Render();<br>
-    }   
+    }
 </code>
 <p>
 This is the application code of the SSAO pass and it is very simple. On the
@@ -300,7 +300,7 @@ As in many screen space based techniques in the vertex shader we just need to
 pass-thru the position of the full screen quad. gl_Position will be consumed
 by the GPU for the purposes of rasterization but we use it's XY components for
 the texture coordinates. Remember that the full screen quad coordinates
-range from (-1,-1) to (1,1) so everything in the fragment shader will be interpolated 
+range from (-1,-1) to (1,1) so everything in the fragment shader will be interpolated
 in that range. We want our texture coordinates to be in the (0,1) so we transform
 it here before sending it out to the fragment shader.
 </p>
@@ -342,7 +342,7 @@ void main()<br>
 &nbsp; &nbsp;     AO = 1.0 - AO/128.0;<br>
  <br>
 &nbsp; &nbsp;     FragColor = vec4(pow(AO, 2.0));<br>
-}    
+}
 </code>
 <p>
 Here's the core of the SSAO algorithm. We take the texture coordinates
@@ -357,7 +357,7 @@ it and transform it to the (0,1) range. We can now use it to sample the view spa
 of the actual geometry and compare its Z value to the random point. But before we do
 that we make sure that the distance between the origin point and the one whose Z value
 we just fetched is not too far off. This helps us avoid all kinds of nasty artifacts.
-You can play with the gSampleRad variable for that. 
+You can play with the gSampleRad variable for that.
 </p>
 <p>
 Next we compare the depth of the virtual point with the one from the actual
@@ -381,12 +381,12 @@ opinion. This is another artist variable you may want to play with in your engin
 &nbsp; &nbsp;         glClear(GL_COLOR_BUFFER_BIT);                <br>
         <br>
 &nbsp; &nbsp;         m_quad.Render();                <br>
-    }    
-</code>    
+    }
+</code>
 <p>
 The application code of the blur pass is identical to the SSAO pass. Here the input
 is the ambient occlusionn term we just calculated and the output is a buffer
-containing the blurred results. 
+containing the blurred results.
 </p>
 <p>(blur.vs)</p>
 <code>
@@ -453,7 +453,7 @@ void main()<br>
 &nbsp; &nbsp;         m_lightingTech.SetWVP(m_pipeline.GetWVPTrans());        <br>
 &nbsp; &nbsp;         m_lightingTech.SetWorldMatrix(m_pipeline.GetWorldTrans());        <br>
 &nbsp; &nbsp;         m_mesh.Render();               <br>
-    }    
+    }
 </code>
 <p>
 We have a pretty standard application code for the lighting pass. The only addition
@@ -486,10 +486,26 @@ is a user controlled variable that helps us switch from SSAO to no-SSAO and only
 display. Play with the 'a' key to see how it goes.
 </p>
         </section>
-        <a href="../tutorial46/tutorial46.html" class="next highlight"> Next tutorial </a>        
+        <a href="../tutorial46/tutorial46.html" class="next highlight"> Next tutorial </a>
     </article>
 
     <script src="../html5shiv.min.js"></script>
     <script src="../html5shiv-printshiv.min.js"></script>
+
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+     var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+     var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial45/tutorial45.html';
+
+     /* * * DON'T EDIT BELOW THIS LINE * * */
+     (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+    </script>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
