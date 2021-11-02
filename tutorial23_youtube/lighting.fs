@@ -120,7 +120,8 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal)
 
     if (SpotFactor > l.Cutoff) {
         vec4 Color = CalcPointLight(l.Base, Normal);
-        return Color * (1.0 - (1.0 - SpotFactor)/(1.0 - l.Cutoff));
+        float SpotLightIntensity = (1.0 - (1.0 - SpotFactor)/(1.0 - l.Cutoff));
+        return Color * SpotLightIntensity;
     }
     else {
         return vec4(0,0,0,0);
