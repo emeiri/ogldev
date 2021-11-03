@@ -81,9 +81,9 @@ void Matrix4f::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
     float y = ToRadian(RotateY);
     float z = ToRadian(RotateZ);
 
-    rx.InitRotationX(RotateX);
-    ry.InitRotationY(RotateY);
-    rz.InitRotationZ(RotateZ);
+    rx.InitRotationX(x);
+    ry.InitRotationY(y);
+    rz.InitRotationZ(z);
 
     *this = rz * ry * rx;
 }
@@ -97,9 +97,9 @@ void Matrix4f::InitRotateTransformZYX(float RotateX, float RotateY, float Rotate
     float y = ToRadian(RotateY);
     float z = ToRadian(RotateZ);
 
-    rx.InitRotationX(RotateX);
-    ry.InitRotationY(RotateY);
-    rz.InitRotationZ(RotateZ);
+    rx.InitRotationX(x);
+    ry.InitRotationY(y);
+    rz.InitRotationZ(z);
 
     *this = rx * ry * rz;
 }
