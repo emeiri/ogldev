@@ -70,11 +70,11 @@ static GLuint CreateVertexBuffer()
 
 
 
-class transform_order
+class TransformOrder
 {
 public:
-    transform_order();
-    ~transform_order();
+    TransformOrder();
+    ~TransformOrder();
 
     bool Init();
 
@@ -85,11 +85,16 @@ public:
 
 private:
 
+    void RenderCoordinateSystem();
+
+    void RenderBox();
+
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
     BasicMesh* pMesh = NULL;
     PersProjInfo persProjInfo;
+    Matrix4f Projection;
     SimpleTechnique* pSimpleTech = NULL;
     LightingTechnique* pLightingTech = NULL;
     BaseLight baseLight;
@@ -97,7 +102,7 @@ private:
 };
 
 
-transform_order::transform_order()
+TransformOrder::TransformOrder()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -113,12 +118,13 @@ transform_order::transform_order()
     float zFar = 100.0f;
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+    Projection.InitPersProjTransform(persProjInfo);
 
     baseLight.AmbientIntensity = 1.0f;
 }
 
 
-transform_order::~transform_order()
+TransformOrder::~TransformOrder()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -138,10 +144,10 @@ transform_order::~transform_order()
 }
 
 
-bool transform_order::Init()
+bool TransformOrder::Init()
 {
-    Vector3f CameraPos(0.0f, 0.0f, -3.0f);
-    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
+    Vector3f CameraPos(0.0f, 2.0f, -6.0f);
+    Vector3f CameraTarget(0.0f, -0.4f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
@@ -176,19 +182,28 @@ bool transform_order::Init()
 }
 
 
-void transform_order::RenderSceneCB()
+void TransformOrder::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     pGameCamera->OnRender();
 
+    RenderCoordinateSystem();
+
+    RenderBox();
+
+    glutPostRedisplay();
+
+    glutSwapBuffers();
+}
+
+
+void TransformOrder::RenderCoordinateSystem()
+{
     Matrix4f World;
     World.InitIdentity();
 
     Matrix4f View = pGameCamera->GetMatrix();
-
-    Matrix4f Projection;
-    Projection.InitPersProjTransform(persProjInfo);
 
     Matrix4f WVP = Projection * View * World;
 
@@ -197,21 +212,34 @@ void transform_order::RenderSceneCB()
 
     glBindVertexArray(CoordSystem);
     glDrawArrays(GL_LINES, 0, 6);
+}
+
+
+void TransformOrder::RenderBox()
+{
+    static float RotationAngle = 0.0f;
 
 #ifdef _WIN64
-    float YRotationAngle = 0.1f;
+    float RotationStep = 0.1f;
 #else
-    float YRotationAngle = 1.0f;
+    float RotationStep = 1.0f;
 #endif
 
-    WorldTrans& worldTransform = pMesh->GetWorldTransform();
+    RotationAngle += RotationStep;
 
-    //worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
-    worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+    Matrix4f RotationMatrix;
+    RotationMatrix.InitRotateTransform(RotationAngle, 0.0f, 0.0f);
 
-    World = worldTransform.GetMatrix();
+    Matrix4f TranslationMatrix;
+    TranslationMatrix.InitTranslationTransform(4.0f, 0.0f, 0.0f);
 
-    WVP = Projection * View * World;
+    //Matrix4f World = RotationMatrix;
+    //Matrix4f World = RotationMatrix * TranslationMatrix;
+    Matrix4f World = TranslationMatrix * RotationMatrix;
+
+    Matrix4f View = pGameCamera->GetMatrix();
+
+    Matrix4f WVP = Projection * View * World;
 
     pLightingTech->Enable();
     pLightingTech->SetWVP(WVP);
@@ -220,13 +248,24 @@ void transform_order::RenderSceneCB()
 
     pMesh->Render();
 
-    glutPostRedisplay();
+    RotationMatrix.InitRotateTransform(0.0f, RotationAngle, 0.0f);
+    TranslationMatrix.InitTranslationTransform(-1.0f, 0.0f, 0.0f);
+    World =  RotationMatrix * TranslationMatrix;
+    WVP = Projection * View * World;
+    pLightingTech->SetWVP(WVP);
 
-    glutSwapBuffers();
+    pMesh->Render();
+
+    RotationMatrix.InitRotateTransform(0.0f, RotationAngle, 0.0f);
+    TranslationMatrix.InitTranslationTransform(0.0f, 3.0f, 0.0f);
+    World =  RotationMatrix * TranslationMatrix;
+    WVP = Projection * View * World;
+    pLightingTech->SetWVP(WVP);
+
+    pMesh->Render();
 }
 
-
-void transform_order::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void TransformOrder::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case 'q':
@@ -238,42 +277,42 @@ void transform_order::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void transform_order::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void TransformOrder::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void transform_order::PassiveMouseCB(int x, int y)
+void TransformOrder::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-transform_order* ptransform_order = NULL;
+TransformOrder* pTransformOrder = NULL;
 
 
 void RenderSceneCB()
 {
-    ptransform_order->RenderSceneCB();
+    pTransformOrder->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    ptransform_order->KeyboardCB(key, mouse_x, mouse_y);
+    pTransformOrder->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    ptransform_order->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTransformOrder->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    ptransform_order->PassiveMouseCB(x, y);
+    pTransformOrder->PassiveMouseCB(x, y);
 }
 
 
@@ -321,9 +360,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    ptransform_order = new transform_order();
+    pTransformOrder = new TransformOrder();
 
-    if (!ptransform_order->Init()) {
+    if (!pTransformOrder->Init()) {
         return 1;
     }
 
