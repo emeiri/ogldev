@@ -20,6 +20,9 @@
 #define MATH_3D_H
 
 #ifdef _WIN64
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #else
 #include <math.h>
