@@ -28,13 +28,13 @@
             <h3> Background </h3>
 
             <p>
-            The way we've been doing lighting since <a href="../tutorial17/tutorial17.html">tutorial 17</a> 
-            is known as <i>Forward Rendering (or Shading)</i>. 
+            The way we've been doing lighting since <a href="../tutorial17/tutorial17.html">tutorial 17</a>
+            is known as <i>Forward Rendering (or Shading)</i>.
             This is a straightforward approach where we do a set of transformations on the vertices of every
             object in the VS (mostly translations of the normal and position to clip space) followed by a lighting
-            calculation per pixel in the FS. Since each pixel of every object gets only a single FS invocation we have 
+            calculation per pixel in the FS. Since each pixel of every object gets only a single FS invocation we have
             to provide the FS with information on all light sources and take all of them into account when
-            calculating the light effect per pixel. This is a simple approach but it has its downsides. 
+            calculating the light effect per pixel. This is a simple approach but it has its downsides.
             If the scene is highly complex (as is the case in most modern games) with many objects and a large depth
             complexity (same screen pixel covered by several objects) we get a lot of wasted GPU cycles. For example,
             if the depth complexity is 4 it means that the lighting calculations are executed on 3 pixels for nothing
@@ -43,7 +43,7 @@
             </p>
             <p>
             Another problem with forward rendering is when there are many light sources. In that case the light sources
-            tend to be rather small with a limited area of effect (else it will overwhelm the scene). But our FS 
+            tend to be rather small with a limited area of effect (else it will overwhelm the scene). But our FS
             calculates the effect of every light source, even if it is far away from the pixel.
             You can try to calculate the distance from the pixel to the light source
             but that just adds more overhead and branches into the FS. Forward rendering simply doesn't scale well with
@@ -51,22 +51,22 @@
             sources...
             </p>
             <p>
-            Deferred shading is a popular technique in  
+            Deferred shading is a popular technique in
             <a href="http://en.wikipedia.org/wiki/Deferred_shading#Deferred_shading_in_commercial_games"> many games</a>
             which targets the specific problem above.
-            The key point behind deferred shading is the decoupling of the geometry calculations (position and normal 
+            The key point behind deferred shading is the decoupling of the geometry calculations (position and normal
             transformations) and the lighting calculations. Instead of taking each
             object "all the way", from the vertex buffer into its final resting place in the framebuffer we seperate the
             processing into two major passes. In the first pass we run the usual VS but instead of sending the processed
             attributes into the FS for lighting calculations we forward them into what is known as the <i>G Buffer</i>. This
             is a logical grouping of several 2D textures and we have a texture per vertex attribute. We seperate the attributes
-            and write them into the different textures all at once using a capability of OpenGL called <i>Multiple Render 
+            and write them into the different textures all at once using a capability of OpenGL called <i>Multiple Render
             Targets</i> (MRT). Since we are writing the attributes in the FS the values that end up in the G buffer are
-             the result of the interpolation performed by the rasterizer on the vertex attributes. This stage is called the 
-            <i>Geometry Pass</i>. Every object is processed in this pass. Because of the depth test, when the geometry 
-            pass is complete the textures in the G buffer are populated by the interpolated attributes of the closest 
+             the result of the interpolation performed by the rasterizer on the vertex attributes. This stage is called the
+            <i>Geometry Pass</i>. Every object is processed in this pass. Because of the depth test, when the geometry
+            pass is complete the textures in the G buffer are populated by the interpolated attributes of the closest
             pixels to the camera. This means that all the "irrelevant" pixels that have failed the depth test have been
-            dropped and what is left in the G buffer are only the pixels for which lighting must be calculated. Here's a 
+            dropped and what is left in the G buffer are only the pixels for which lighting must be calculated. Here's a
             typical example of a G buffer of a single frame:
             </p>
             <img class="center" src="gbuffer.jpg">
@@ -77,7 +77,7 @@
             calculations only once per pixel.
             </p>
             <p>
-            How do we traverse the G buffer pixel by pixel? The simplest method is to render a screen space quad. But there is a 
+            How do we traverse the G buffer pixel by pixel? The simplest method is to render a screen space quad. But there is a
             better way. We said earlier that since the light sources are weak with a limited area of influence we expect many
             pixels to be irrelevant to them. When the influence of a light source on a pixel is small enough it is better to
             simply ignore it for peformance reasons. In forward rendering there was no efficient way to do that but in deferred
@@ -86,8 +86,8 @@
             We can use a very rough model of a sphere with a small number of polygons and simply render it with the light
             source at the center. The VS will do nothing except translate the position into clip space. The FS will be executed
             only on the relevant pixels and we will do our lighting calculations there. Some people go even further by calculating
-            a minimal bounding quad that covers that sphere from the point of view of the light. Rendering this quad is even 
-            lighter because there's only two triangles. These methods are useful to limit the number of pixels for which the 
+            a minimal bounding quad that covers that sphere from the point of view of the light. Rendering this quad is even
+            lighter because there's only two triangles. These methods are useful to limit the number of pixels for which the
             FS is executed to only the ones we are really interested in.
             </p>
             <p>
@@ -139,7 +139,7 @@
             The GBuffer class contains all the textures that the G buffer in deferred shading needs.
             We have textures for the vertex attributes as well as a texture to serve as our depth buffer.
             We need this depth buffer because we are going to wrap all the textures in an FBO so the default
-            depth buffer will not be available. FBOs have already been covered in 
+            depth buffer will not be available. FBOs have already been covered in
             <a href="../tutorial23/tutorial23.html">tutorial 23</a> so we will skip that here.
             </p>
             <p>
@@ -197,14 +197,14 @@
             <li>Attaches the texture to the FBO as a target.</li>
             </ul>
             <p>
-            Initialization of the depth texture is done explicitly because it requires a different format 
+            Initialization of the depth texture is done explicitly because it requires a different format
             and is attached to the FBO at a different spot.
             </p>
             <p>
             In order to do MRT we need to enable writing to all four textures. We do that by supplying an array
             of attachment locations to the glDrawBuffers() function. This array allows for some level of flexibility
             because if we put GL_COLOR_ATTACHMENT6 as its first index then when the FS writes to the first output variable
-            it will go into the texture that is attached to GL_COLOR_ATTACHMENT6. We are not interested in this 
+            it will go into the texture that is attached to GL_COLOR_ATTACHMENT6. We are not interested in this
             complexity in this tutorial so we simply line the attachments one after the other.
             </p>
             <p>
@@ -223,7 +223,7 @@
             <br>
             &nbsp; &nbsp; DSGeometryPass();<br>
             &nbsp; &nbsp; DSLightPass();<br>
-                              <br>          
+                              <br>
             &nbsp; &nbsp; RenderFPS();<br>
                     <br>
             &nbsp; &nbsp; glutSwapBuffers();<br>
@@ -305,17 +305,17 @@
             than the other method incurs. The function glBlitFramebuffer() takes the source coordinates, destination
             coordinates and a couple of other variables and performs the copy operation. It requires the source FBO
             to be bound to the GL_READ_FRAMEBUFFER and the destination FBO to the GL_DRAW_FRAMEBUFFER (which we did at
-            the start of the function). Since the FBO can have several textures attached to its various attachment locations 
+            the start of the function). Since the FBO can have several textures attached to its various attachment locations
             we must also bind the specific texture to the GL_READ_BUFFER target (because we can only copy from a single
             texture at a time). This is hidden inside GBuffer::SetReadBuffer()
-            which we will review in a bit. The first four parameters to glBlitframebuffer() defines the source rectangle - 
-            bottom X, bottom Y, top X, top Y. The next four parameters define the destination rectangle in the same way. 
+            which we will review in a bit. The first four parameters to glBlitframebuffer() defines the source rectangle -
+            bottom X, bottom Y, top X, top Y. The next four parameters define the destination rectangle in the same way.
             </p>
             <p>
             The ninth parameter says whether we want to read from the color, depth or stencil buffer and can take the
             values GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, or GL_STENCIL_BUFFER_BIT. The last parameter determines the
             way in which OpenGL will handle possible scaling (when the source and destination parameters are not of the
-            same dimensions) and can be GL_NEAREST or GL_LINEAR (looks better than GL_NEAREST but requires more compute 
+            same dimensions) and can be GL_NEAREST or GL_LINEAR (looks better than GL_NEAREST but requires more compute
             resources). GL_LINEAR is the only valid option in the case of GL_COLOR_BUFFER_BIT. In the example above we
             see how to scale down each source texture into one of the screen quadrants.
             </p>
@@ -329,10 +329,10 @@
             <br>
             uniform mat4 gWVP;<br>
             uniform mat4 gWorld;<br>
-                                    <br>                
-            out vec2 TexCoord0;         <br>                                                        
-            out vec3 Normal0;               <br>                                                    
-            out vec3 WorldPos0;                 <br>                                                
+                                    <br>
+            out vec2 TexCoord0;         <br>
+            out vec3 Normal0;               <br>
+            out vec3 WorldPos0;                 <br>
             <br>
             void main()<br>
             {       <br>
@@ -348,30 +348,30 @@
             <p>(geometry_pass.fs)</p>
             <code>
             #version 330<br>
-                            <br>                                                        
-            in vec2 TexCoord0;  <br>                                                                
-            in vec3 Normal0;        <br>                                                            
-            in vec3 WorldPos0;          <br>                                                        
+                            <br>
+            in vec2 TexCoord0;  <br>
+            in vec3 Normal0;        <br>
+            in vec3 WorldPos0;          <br>
             <br>
             layout (location = 0) out vec3 WorldPosOut;   <br>
             layout (location = 1) out vec3 DiffuseOut;     <br>
             layout (location = 2) out vec3 NormalOut;     <br>
             layout (location = 3) out vec3 TexCoordOut;    <br>
-                                        <br>            
+                                        <br>
             uniform sampler2D gColorMap;                <br>
-                                    <br>                    
-            void main()                     <br>            
-            {                               <br>            
+                                    <br>
+            void main()                     <br>
+            {                               <br>
                   &nbsp; &nbsp; WorldPosOut     = WorldPos0;                    <br>
                   &nbsp; &nbsp; DiffuseOut      = texture(gColorMap, TexCoord0).xyz;    <br>
-                  &nbsp; &nbsp; NormalOut       = normalize(Normal0);               <br>    
+                  &nbsp; &nbsp; NormalOut       = normalize(Normal0);               <br>
                   &nbsp; &nbsp; TexCoordOut     = vec3(TexCoord0, 0.0);             <br>
             }
             </code>
             <p>
             The FS is responsible for doing MRT. Instead
             of outputting a single vector it outputs multiple vectors. Each of these vectors goes to a corresponding
-            index in the array that was previously set by glDrawBuffers(). So in each FS invocation we are writing into 
+            index in the array that was previously set by glDrawBuffers(). So in each FS invocation we are writing into
             the four textures of the G buffer.
             </p>
             <p>(gbuffer.cpp:90)</p>
@@ -392,7 +392,7 @@
             }
             </code>
             <p>
-            The above three functions are used to change the state of the G buffer to fit the current pass by the 
+            The above three functions are used to change the state of the G buffer to fit the current pass by the
             main application code.
             </p>
         </section>
@@ -402,5 +402,21 @@
 
     <script src="../html5shiv.min.js"></script>
     <script src="../html5shiv-printshiv.min.js"></script>
+
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+     var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+     var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial32/tutorial32.html';
+
+     /* * * DON'T EDIT BELOW THIS LINE * * */
+     (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+    </script>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>

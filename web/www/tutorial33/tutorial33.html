@@ -29,10 +29,10 @@
 
       <p>
       Imagine that you want to render a scene where a huge army is moving across the land.
-      You have a model of a soldier and you want to render a few thousand soldiers. One way 
+      You have a model of a soldier and you want to render a few thousand soldiers. One way
       to do it is to dispatch as many draw calls as there are soldiers while changing relevant uniform
       variables in between. For example, each soldier is located in a different spot,
-      each soldier can be up to 10% taller or shorter than the average, etc. Therefore, we must 
+      each soldier can be up to 10% taller or shorter than the average, etc. Therefore, we must
        update the WVP matrix between draw calls as well as any other variable which is pertinent to
       the specific soldier. This scheme can have a large overhead. There has to be a better way.
       </p>
@@ -89,7 +89,7 @@
       ...
       </code>
       <p>
-      These are the changes to the Mesh class. The Render() function now takes two arrays that contain the WVP and world matrices 
+      These are the changes to the Mesh class. The Render() function now takes two arrays that contain the WVP and world matrices
       for all the instances and NumInstances is the number of matrices in each array. We also added two VBs to store them.
       </p>
       <p>(mesh.cpp:91)</p>
@@ -153,13 +153,13 @@
       distance between an attribute in one matrix and the next is exactly the size of a 4x4 matrix.
       In addition, we don't want OpenGL to normalize the input for us. This explains parameters 2-5
       in the function glVertexAttribPointer(). The last parameter is simply the offset of the attribute
-      inside one instance data. The first vector goes to offset 0, the second to 16, etc. 
+      inside one instance data. The first vector goes to offset 0, the second to 16, etc.
       </p>
       <p>
       The function glVertexAttribDivisor() is what makes this an instance data rather than vertex
       data. It takes two parameters - the first one is the vertex array attribute and the second
       tells OpenGL the rate by which the attribute advances during instanced rendering. It basically
-      means the number of times the entire set of vertices is rendered before the attribute is updated 
+      means the number of times the entire set of vertices is rendered before the attribute is updated
       from the buffer. By default, the divisor is zero. This causes regular vertex attributes
       to be updated from vertex to vertex. If the divisor is 10 it means that the first 10 instances
       will use the first piece of data from the buffer, the next 10 instances will use the second, etc.
@@ -206,15 +206,15 @@
       }
       </code>
       <p>
-      This is the updated Render() function of the Mesh class. It now takes two arrays 
+      This is the updated Render() function of the Mesh class. It now takes two arrays
       of matrices - the WVP matrix and the world transformation matrix (NumInstances is
-      the size of both arrays). Before we bind our VAO (check out the 
+      the size of both arrays). Before we bind our VAO (check out the
       <a href="../tutorial32/tutorial32.html">previous tutorial</a> if you
       don't know what VAOs are) we bind and upload the matrices into their corresponding
       vertex buffers. We call glDrawElements<b>Instanced</b>BaseVertex instead of glDrawElementsBaseVertex.
       The only change in this function is that it takes the number of instances as the fifth parameter. This means
       that the same indices (according to the other parameters) will be drawn again and again - NumInstances times altogether.
-      The 
+      The
       OpenGL will fetch new data for each vertex from the VBs whose divisor is 0 (the old ones).
       It will fetch new data from the VBs whose divisor is 1 only after a full instance has been rendered. The general
       algorithm of this draw call is as follows:
@@ -259,16 +259,16 @@
       <p>This is the updated VS. Instead of getting the WVP and world matrics as uniform variables
       they are now coming in as regular vertex attributes. The VS doesn't care that their values will only
       be updated once per instance and not per vertex. As discussed above, the WVP matrix takes up locations 3-6
-      and the world matrix takes up locations 7-10. 
+      and the world matrix takes up locations 7-10.
       </p>
       <p>
-      The last line of the VS is where we see the second way of doing instanced rendering (the first being 
+      The last line of the VS is where we see the second way of doing instanced rendering (the first being
       passing instance data as vertex attributes). 'gl_InstanceID' is a built-in variable which is available
       only in the VS. Since we plan to use it in the FS we have to access it here and pass
       it along in a regular output variable. The type of gl_InstanceID is an integer so we use
       an output variable of the same type. Since integers cannot be interpolated by the rasterizer
       we have to mark the output variable as 'flat' (forgetting to do that will trigger a compiler error).
-      </p> 
+      </p>
       <code>
       flat in int InstanceID;<br>
       ...<br>
@@ -289,7 +289,7 @@
       &nbsp; &nbsp; &nbsp; &nbsp;         TotalLight += CalcSpotLight(gSpotLights[i], Normal);            <br>
       &nbsp; &nbsp;     }                                                                       <br>
                                                                           <br>
-      &nbsp; &nbsp;     FragColor = texture(gColorMap, TexCoord0.xy) * TotalLight <b>* gColor[InstanceID % 4]</b>;<br> 
+      &nbsp; &nbsp;     FragColor = texture(gColorMap, TexCoord0.xy) * TotalLight <b>* gColor[InstanceID % 4]</b>;<br>
       };
       </code>
       <p>
@@ -316,7 +316,7 @@
       &nbsp; &nbsp;    WVPMatrics[i] = p.GetWVPTrans()<b>.Transpose()</b>;<br>
       &nbsp; &nbsp;    WorldMatrices[i] = p.GetWorldTrans().<b>Transpose()</b>;<br>
       }<br>
-           <br>   
+           <br>
       m_pMesh->Render(NUM_INSTANCES, WVPMatrics, WorldMatrices);
       </code>
       <p>
@@ -331,7 +331,7 @@
       which can cause quite a lot of headache for people at first. We have to transpose the matrices.
       </p>
       <p>
-      The thing is that our Matrix class stores its 16 floating point values as a single line in 
+      The thing is that our Matrix class stores its 16 floating point values as a single line in
       memory. We start at the top left corner of the standard matrix and work our way to the right.
       When we reach the end we drop to the next row. So basically we travel row by row until we
       reach the bottom right. You can say that we have four 4-row-vectors one after the other. Each
@@ -340,7 +340,7 @@
       the bottom row vector goes to attribute 6 - this is according to how we setup our VS). On
       the shader side we declare the WVP and world matrices as having the 'mat4' type. The way that
       mat4 types variable are initialized by vertex attributes is that <u>each vertex attribute goes
-      into a column-vector in the matrix</u>. For example, in the case of our WVP matrix OpenGL implicitly calls the 
+      into a column-vector in the matrix</u>. For example, in the case of our WVP matrix OpenGL implicitly calls the
       mat4 constructor like that: mat4 WVP(attribute 3, attribute 4, attribute 5, attribute 6). Attribute 3
       becomes the first column from the left, attribute 4 is the second column, etc. This
       effectively transposes our matrix because each row becomes a column. In order to counter
@@ -352,7 +352,7 @@
       If you compile and run this tutorial demo you will notice the FPS (frames per second) counter
       at the bottom left corner of the window. OpenGL doesn't have a standard library to do font rendering
       so different people use different methods. I recently discovered <a href="http://code.google.com/p/freetype-gl/">
-      freetype-gl</a> by Nicolas Rougier and I really like it. It is available for free under the new BSD license. 
+      freetype-gl</a> by Nicolas Rougier and I really like it. It is available for free under the new BSD license.
       I've modified the sources a bit to make it simpler to use and included them as part of the demo
       so you don't need to install anything. If you're interested in the way it is used in the demo just
       follow 'FontRenderer' in tutorial33.cpp.
@@ -364,5 +364,21 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
+
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+   /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+   var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+   var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial33/tutorial33.html';
+
+   /* * * DON'T EDIT BELOW THIS LINE * * */
+   (function() {
+       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+       dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+   })();
+  </script>
+  <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>

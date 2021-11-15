@@ -21,7 +21,6 @@ struct DirectionalLight
     vec3 Direction;
 };
 
-
 struct Attenuation
 {
     float Constant;
@@ -32,7 +31,7 @@ struct Attenuation
 struct PointLight
 {
     BaseLight Base;
-    vec3 Position;
+    vec3 LocalPos;
     Attenuation Atten;
 };
 
@@ -76,6 +75,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
             float SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
+                            Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular
                             vec4(gMaterial.SpecularColor, 1.0f) *
                             SpecularFactor;
         }
@@ -87,12 +87,12 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
 vec4 CalcDirectionalLight(vec3 Normal)
 {
-    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal) / 1000;
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);
 }
 
 vec4 CalcPointLight(int Index, vec3 Normal)
 {
-    vec3 LightDirection = LocalPos0 - gPointLights[Index].Position;
+    vec3 LightDirection = LocalPos0 - gPointLights[Index].LocalPos;
     float Distance = length(LightDirection);
     LightDirection = normalize(LightDirection);
 

@@ -32,10 +32,17 @@ class WorldTrans {
 
     void Rotate(float x, float y, float z);
 
-    Matrix4f GetMatrix();
+    Matrix4f GetMatrix() const;
+
+    Vector3f WorldPosToLocalPos(const Vector3f& WorldPos) const;
+    Vector3f WorldDirToLocalDir(const Vector3f& WorldDir) const;
 
     Matrix4f GetReversedTranslationMatrix() const;
     Matrix4f GetReversedRotationMatrix() const;
+
+    float GetScale() const { return m_scale; }
+    Vector3f GetPos() const { return m_pos; }
+    Vector3f GetRotation() const { return m_rotation; }
 
  private:
     float    m_scale    = 1.0f;

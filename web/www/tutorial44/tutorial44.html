@@ -52,11 +52,11 @@
                 <li>On Fedora Core: yum install glfw glfw-devel</li>
                 <li>On Ubuntu: apt-get install libglfw3 libglfw3-dev</li>
                 <li>Other Linux distributions also provide binary packages of GLFW. Alternatively, you
-                    can grab the sources directly from GLFW website and build them.</li>        
+                    can grab the sources directly from GLFW website and build them.</li>
             </ul>
             <p>
                 If you're using Windows simply use the GLFW headers
-                and libraries that I provide as part of the <a href="http://ogldev.atspace.co.uk/ogldev-source.zip">source package</a>. 
+                and libraries that I provide as part of the <a href="http://ogldev.atspace.co.uk/ogldev-source.zip">source package</a>.
                 This tutorial should build out of the box (please let me know if it doesn't...).
             </p>
             <p>
@@ -65,7 +65,7 @@
                 pkg-config --cflags --libs glfw3<br><br>
                 The '--cflags' flag tells pkg-config to output the flags GCC needs to compile a file that
                 uses GLFW. The '--libs' flags outputs the flags required for linking. I'm using these
-                flags in the Netbeans project that I provide for Linux and you can use them in your own makefile. 
+                flags in the Netbeans project that I provide for Linux and you can use them in your own makefile.
                 If you're using one of the build systems such as autotools, cmake or scons you
                 will need to check that system documentation for details.
             </p>
@@ -144,10 +144,10 @@
                 the monitor to use. 'GLFWmonitor' is an opaque GLFW object that represents the physical monitor.
                 GLFW support multi-monitor setups and for such cases the function <a href="http://www.glfw.org/docs/latest/group__monitor.html#ga3fba51c8bd36491d4712aa5bd074a537">
                     glfwGetMonitors</a> returns a list of all the available monitors. If we pass a NULL monitor pointer
-                    we will get a regular window; if we pass a pointer to an actual monitor (we get the default using 
+                    we will get a regular window; if we pass a pointer to an actual monitor (we get the default using
                     <a href="http://www.glfw.org/docs/latest/group__monitor.html#ga721867d84c6d18d6790d64d2847ca0b1">glfwGetPrimaryMonitor</a>)
                     we get a full screen window. Very simple. The fifth and last parameter is used for context sharing which is
-                    out of scope for this tutorial.        
+                    out of scope for this tutorial.
             </p>
             <p>
                 Before we start dispatching GL commands we have to make the window current on the
@@ -160,7 +160,7 @@
             &nbsp; &nbsp;         // OpenGL API calls go here...  <br>
             &nbsp; &nbsp;         glfwSwapBuffers(s_pWindow);  <br>
             &nbsp; &nbsp;         glfwPollEvents();  <br>
-            }    
+            }
             </code>
             <p>
                 Unlike GLUT, GLFW doesn't provide its own main loop function. Therefore, we construct
@@ -201,7 +201,7 @@
                 I have created a set of enums to describe the various keyboard and mouse keys and
                 translated GLFW to these enums. I have done the same for GLUT and this provides
                 the commonality which lets the same application code quickly switch from one backend
-                to the other (see the implementation of the above functions in the code for further details).  
+                to the other (see the implementation of the above functions in the code for further details).
             </p>
             <p>(ogldev_glfw_backend.cpp:)</p>
             <code>
@@ -209,11 +209,11 @@
             {<br>
             &nbsp; &nbsp;     glfwDestroyWindow(s_pWindow);<br>
             &nbsp; &nbsp;     glfwTerminate();<br>
-            } 
+            }
             </code>
             <p>
             This is how we shutdown the GLFW backend. First we destroy the window and after that
-            we terminate the GLFW library and free all of its resources. 
+            we terminate the GLFW library and free all of its resources.
             No call to GLFW can be done after that which is why this has to be the last thing we
             do in the main function (graphics-wise).
             </p>
@@ -235,7 +235,7 @@
             void OgldevBackendLeaveMainLoop();<br>
             <br>
             void OgldevBackendSwapBuffers();
-            </code>    
+            </code>
             <p>
                 I have created a new backend interface which we see in the above header file.
                 These functions replace the GLUT specific code which we have been using. They are
@@ -253,5 +253,21 @@
 
     <script src="../html5shiv.min.js"></script>
     <script src="../html5shiv-printshiv.min.js"></script>
+
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+     var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+     var disqus_url = 'http://ogldev.atspace.co.uk/www/tutorial44/tutorial44.html';
+
+     /* * * DON'T EDIT BELOW THIS LINE * * */
+     (function() {
+         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+    </script>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>

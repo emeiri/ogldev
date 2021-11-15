@@ -20,6 +20,7 @@
 
 #include "ogldev_math_3d.h"
 #include "ogldev_camera.h"
+#include "ogldev_world_transform.h"
 
 struct Orientation
 {
@@ -115,6 +116,13 @@ public:
         m_scale      = o.m_scale;
         m_worldPos   = o.m_pos;
         m_rotateInfo = o.m_rotation;
+    }
+
+    void Orient(const WorldTrans& w)
+    {
+        m_scale = w.GetScale();
+        m_rotateInfo = w.GetRotation();
+        m_worldPos = w.GetPos();
     }
 
     const Matrix4f& GetWPTrans();

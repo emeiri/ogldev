@@ -401,6 +401,7 @@ public:
     void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
 
     void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
+    void InitRotateTransformZYX(float RotateX, float RotateY, float RotateZ);
 
     void InitRotateTransform(const Quaternion& quat);
 
@@ -414,6 +415,11 @@ public:
     void InitPersProjTransform(const PersProjInfo& p);
 
     void InitOrthoProjTransform(const OrthoProjInfo& p);
+
+private:
+    void InitRotationX(float RotateX);
+    void InitRotationY(float RotateY);
+    void InitRotationZ(float RotateZ);
 };
 
 

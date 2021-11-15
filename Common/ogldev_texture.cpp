@@ -71,6 +71,10 @@ bool Texture::Load()
             glTexImage2D(m_textureTarget, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
             break;
 
+        case 4:
+            glTexImage2D(m_textureTarget, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+            break;
+
         default:
             NOT_IMPLEMENTED;
         }

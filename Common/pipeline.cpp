@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2010 Etay Meiri
+        Copyright 2010 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 #include "ogldev_pipeline.h"
 
-const Matrix4f& Pipeline::GetProjTrans() 
+const Matrix4f& Pipeline::GetProjTrans()
 {
     m_ProjTransformation.InitPersProjTransform(m_persProjInfo);
     return m_ProjTransformation;
@@ -29,7 +29,7 @@ const Matrix4f& Pipeline::GetVPTrans()
 {
     GetViewTrans();
     GetProjTrans();
-       
+
     m_VPtransformation = m_ProjTransformation * m_Vtransformation;
     return m_VPtransformation;
 }
@@ -52,7 +52,7 @@ const Matrix4f& Pipeline::GetViewTrans()
 
     CameraTranslationTrans.InitTranslationTransform(-m_camera.Pos.x, -m_camera.Pos.y, -m_camera.Pos.z);
     CameraRotateTrans.InitCameraTransform(m_camera.Target, m_camera.Up);
-    
+
     m_Vtransformation = CameraRotateTrans * CameraTranslationTrans;
 
     return m_Vtransformation;
@@ -75,7 +75,7 @@ const Matrix4f& Pipeline::GetWVOrthoPTrans()
 
     Matrix4f P;
     P.InitOrthoProjTransform(m_orthoProjInfo);
-    
+
     m_WVPtransformation = P * m_Vtransformation * m_Wtransformation;
     return m_WVPtransformation;
 }
@@ -83,21 +83,21 @@ const Matrix4f& Pipeline::GetWVOrthoPTrans()
 
 const Matrix4f& Pipeline::GetWVTrans()
 {
-	GetWorldTrans();
+        GetWorldTrans();
     GetViewTrans();
-	
-	m_WVtransformation = m_Vtransformation * m_Wtransformation;
-	return m_WVtransformation;
+
+        m_WVtransformation = m_Vtransformation * m_Wtransformation;
+        return m_WVtransformation;
 }
 
 
 const Matrix4f& Pipeline::GetWPTrans()
 {
-	Matrix4f PersProjTrans;
+        Matrix4f PersProjTrans;
 
-	GetWorldTrans();
-	PersProjTrans.InitPersProjTransform(m_persProjInfo);
+        GetWorldTrans();
+        PersProjTrans.InitPersProjTransform(m_persProjInfo);
 
-	m_WPtransformation = PersProjTrans * m_Wtransformation;
-	return m_WPtransformation;
+        m_WPtransformation = PersProjTrans * m_Wtransformation;
+        return m_WPtransformation;
 }

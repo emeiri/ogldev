@@ -59,8 +59,8 @@ private:
     BasicMesh* pMesh = NULL;
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
-    DirectionalLight dirLight;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
+    float counter = 0;
 };
 
 
@@ -81,18 +81,15 @@ Tutorial22::Tutorial22()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    dirLight.AmbientIntensity = 0.0f;
-    dirLight.DiffuseIntensity = 0.0f;
-    dirLight.WorldDirection = Vector3f(1.0f, 0.0, 0.0);
+    pointLights[0].DiffuseIntensity = 1.0f;
+    pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+    pointLights[0].Attenuation.Linear = 0.2f;
+    pointLights[0].Attenuation.Exp = 0.0f;
 
-    pointLights[0].DiffuseIntensity = 0.5f;
-    pointLights[0].Color = Vector3f(1.0f, 0.5f, 0.0f);
-    pointLights[0].WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
-    pointLights[0].Attenuation.Linear = 0.1f;
-    pointLights[1].DiffuseIntensity = 0.01f;
-    pointLights[1].Color = Vector3f(0.0f, 0.5f, 1.0f);
-    pointLights[1].WorldPosition = Vector3f(7.0f, 1.0f, 1.0f);
-    pointLights[1].Attenuation.Linear = 0.1f;
+    pointLights[1].DiffuseIntensity = 1.0f;
+    pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+    pointLights[1].Attenuation.Linear = 0.0f;
+    pointLights[1].Attenuation.Exp = 0.2f;
 }
 
 
@@ -114,15 +111,15 @@ Tutorial22::~Tutorial22()
 
 bool Tutorial22::Init()
 {
-    Vector3f CameraPos(0.0f, 0.0f, -1.0f);
-    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
+    Vector3f CameraPos(0.0f, 5.0f, -8.0f);
+    Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
     pMesh = new BasicMesh();
 
-    if (!pMesh->LoadMesh("/home/emeiri/Downloads/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj")) {
+    if (!pMesh->LoadMesh("../Content/box_terrain.obj")) {
         return false;
     }
 
@@ -156,48 +153,42 @@ void Tutorial22::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
-    worldTransform.SetScale(1.0f);
-    worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
-    worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+    worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
+    worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
 
     Matrix4f World = worldTransform.GetMatrix();
-
-    dirLight.CalcLocalDirection(World);
-
     Matrix4f View = pGameCamera->GetMatrix();
-
     Matrix4f Projection;
     Projection.InitPersProjTransform(persProjInfo);
-
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
-    pLightingTech->SetDirectionalLight(dirLight);
+
+    counter += 0.01f;
+    pointLights[0].WorldPosition.x = -10.0f;
+    pointLights[0].WorldPosition.y = sinf(counter) * 4 + 4;
+    pointLights[0].WorldPosition.z = 0.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
-    pLightingTech->SetPointLights(1, pointLights);
+    pointLights[1].WorldPosition.x = 10.0f;
+    pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
+    pointLights[1].WorldPosition.z = 0.0f;
+    pointLights[1].CalcLocalPosition(worldTransform);
+
+    pLightingTech->SetPointLights(2, pointLights);
+
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
-    Matrix4f CameraToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
-
-    Matrix4f CameraToLocalRotation = worldTransform.GetReversedRotationMatrix();
-
-    Matrix4f CameraToLocalTransformation = CameraToLocalRotation * CameraToLocalTranslation;
-
-    Vector4f CameraWorldPos = Vector4f(pGameCamera->GetPos(), 1.0f);
-
-    Vector4f CameraLocalPos = CameraToLocalTransformation * CameraWorldPos;
-
-    Vector3f CameraLocalPos3f(CameraLocalPos);
-
+    Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
     pMesh->Render();
 
     glutPostRedisplay();
-
     glutSwapBuffers();
 }
 
+
+#define ATTEN_STEP 0.01f
 
 void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
@@ -205,7 +196,30 @@ void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     case 'q':
     case 27:    // escape key code
         exit(0);
+
+    case 'a':
+        pointLights[0].Attenuation.Linear += ATTEN_STEP;
+        pointLights[1].Attenuation.Linear += ATTEN_STEP;
+        break;
+
+    case 'z':
+        pointLights[0].Attenuation.Linear -= ATTEN_STEP;
+        pointLights[1].Attenuation.Linear -= ATTEN_STEP;
+        break;
+
+    case 's':
+        pointLights[0].Attenuation.Exp += ATTEN_STEP;
+        pointLights[1].Attenuation.Exp += ATTEN_STEP;
+        break;
+
+    case 'x':
+        pointLights[0].Attenuation.Exp -= ATTEN_STEP;
+        pointLights[1].Attenuation.Exp -= ATTEN_STEP;
+        break;
+
     }
+
+    printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
 
     pGameCamera->OnKeyboard(key);
 }

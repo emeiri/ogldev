@@ -45,20 +45,20 @@
     and rasterization state; depth stencil state and much more. We didn't create a graphics pipeline in the previous couple of tutorials
     because we didn't use the draw command. Now - we have to.
 </p>
-	    <p>
-	      Image views are meta data objects that stand between the shaders and the actual resource that is being read from or written to.
-    	      They allow us to limit the access to the resource (for example we can create an image view that represents a single image inside
-	      an array) and some control on the apearance of the resource in terms of format.
-	    </p>
-	    <p>
-	      A render pass maintains a list of all resources that will be used and their dependencies (for example when a resource is changed
-	      from an output to input during shadow mapping). The framebuffer works hand in hand with the render pass by creating a two step connection
-	      from the pipeline to the resource. The render pass is bound to the command buffer and contains indices into the framebuffer. The framebuffer
-	      maps these indices to image views (that in turn reference a real resource).
-	    </p>
-	    <p>
-	      This in a nutshell is an overview of the new objects. Now let's see how to create them and put them to good use.
-	      </p>
+            <p>
+              Image views are meta data objects that stand between the shaders and the actual resource that is being read from or written to.
+              They allow us to limit the access to the resource (for example we can create an image view that represents a single image inside
+              an array) and some control on the apearance of the resource in terms of format.
+            </p>
+            <p>
+              A render pass maintains a list of all resources that will be used and their dependencies (for example when a resource is changed
+              from an output to input during shadow mapping). The framebuffer works hand in hand with the render pass by creating a two step connection
+              from the pipeline to the resource. The render pass is bound to the command buffer and contains indices into the framebuffer. The framebuffer
+              maps these indices to image views (that in turn reference a real resource).
+            </p>
+            <p>
+              This in a nutshell is an overview of the new objects. Now let's see how to create them and put them to good use.
+              </p>
 </section>
 
 <section>
@@ -186,7 +186,7 @@ In the render pass create info struct we specify that we have one attachment and
             programmer to specify how the image will be used. Each GPU vender can then map this to the most optimal method of storing the image in memory. We can often transition
             an image from one layout to another. The attributes 'initialLayout'/'finalLayout' specify in what layout the image will be at the start of the render pass and the
             layout they will transition to when the render pass ends. In our case we start and end with the "presentable" layout. This layout allows a swap chain image to be
-	    presented to the display.
+            presented to the display.
         </li>
     </ul>
 </p>
@@ -244,7 +244,7 @@ void OgldevVulkanApp::CreateFramebuffer()
 <p>
 Image views enable us to access the image using a format which is different than the native image format. For example,
 if the underlying format is 16 bit we can access it as a single 16 bit channel or two 8 bits channel. There are many
-restrictions about valid combinations. They are specified 
+restrictions about valid combinations. They are specified
 <a href="https://www.khronos.org/registry/vulkan/specs/1.0/html/vkspec.html#features-formats-compatibility-classes">here</a>.
 <pre><code>
         ViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -658,13 +658,13 @@ void OgldevVulkanApp::RecordCommandBuffers()
   We begin the command buffer and specify VK_SUBPASS_CONTENTS_INLINE so that everything is recorded in the primary
   command buffer (avoiding the use of secondary command buffers at this time).
 </p>
-	<pre><code>
+        <pre><code>
 <b>        vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
         vkCmdSetViewport(m_cmdBufs[i], 0, 1, &viewport);
 
         vkCmdSetScissor(m_cmdBufs[i], 0, 1, &scissor);</b>
-	</code></pre>
+        </code></pre>
 <p>
   We bind the graphics pipeline and set the viewports and scissor structures.
   </p>
@@ -672,7 +672,7 @@ void OgldevVulkanApp::RecordCommandBuffers()
 <b>        vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
 
         vkCmdEndRenderPass(m_cmdBufs[i]);</b>
-	</code></pre>
+        </code></pre>
 <p>
   Finally, we record a command to draw. The arguments are the command buffer to record to, number of vertices,
   number of instances (for re-running the same drawing ops on different shader parameters), index of the first vertex to
@@ -716,7 +716,7 @@ void OgldevVulkanApp::Init()
 </p>
 <img src="tutorial52.jpg">
 </section>
-
+        <a href="../tutorial53/tutorial53.html" class="next highlight"> Next tutorial </a>
 </article>
 
 <script src="../html5shiv.min.js"></script>

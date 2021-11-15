@@ -29,6 +29,7 @@ class BaseLight
 public:
     Vector3f Color = Vector3f(1.0f, 1.0f, 1.0f);
     float AmbientIntensity = 0.0f;
+    float DiffuseIntensity = 0.0f;
 };
 
 
@@ -36,7 +37,6 @@ class DirectionalLight : public BaseLight
 {
 public:
     Vector3f WorldDirection = Vector3f(0.0f, 0.0f, 0.0f);
-    float DiffuseIntensity = 0.0f;
 
     void CalcLocalDirection(const Matrix4f& World);
 
@@ -48,16 +48,9 @@ private:
 
 struct LightAttenuation
 {
-    float Constant;
-    float Linear;
-    float Exp;
-
-    LightAttenuation()
-    {
-        Constant = 1.0f;
-        Linear = 0.0f;
-        Exp = 0.0f;
-    }
+    float Constant = 1.0f;
+    float Linear = 0.0f;
+    float Exp = 0.0f;
 };
 
 
@@ -65,7 +58,6 @@ class PointLight: public BaseLight
 {
 public:
     Vector3f WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
-    float DiffuseIntensity = 0.0f;
     LightAttenuation Attenuation;
 
     void CalcLocalPosition(const WorldTrans& worldTransform);

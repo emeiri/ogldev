@@ -36,19 +36,7 @@ void DirectionalLight::CalcLocalDirection(const Matrix4f& World)
 
 void PointLight::CalcLocalPosition(const WorldTrans& worldTransform)
 {
-    Matrix4f WorldToLocalTranslation = worldTransform.GetReversedTranslationMatrix();
-
-    Matrix4f WorldToLocalRotation = worldTransform.GetReversedRotationMatrix();
-
-    Matrix4f LightToLocalTransformation = WorldToLocalRotation * WorldToLocalTranslation;
-
-    Vector4f LightWorldPos = Vector4f(WorldPosition, 1.0f);
-
-    Vector4f LightLocalPos = LightToLocalTransformation * LightWorldPos;
-
-    Vector3f LightLocalPos3f(LightLocalPos);
-
-    LocalPosition = LightLocalPos3f;
+    LocalPosition = worldTransform.WorldPosToLocalPos(WorldPosition);
 }
 
 
@@ -96,7 +84,7 @@ bool LightingTechnique::Init()
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.AmbientIntensity", i);
         PointLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
 
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Position", i);
+        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].LocalPos", i);
         PointLightsLocation[i].Position = GetUniformLocation(Name);
 
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.DiffuseIntensity", i);
@@ -190,7 +178,7 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
         glUniform1f(PointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(PointLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
         const Vector3f& LocalPos = pLights[i].GetLocalPosition();
-        LocalPos.Print();printf("\n");
+        //LocalPos.Print();printf("\n");
         glUniform3f(PointLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
         glUniform1f(PointLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
         glUniform1f(PointLightsLocation[i].Atten.Linear, pLights[i].Attenuation.Linear);

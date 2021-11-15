@@ -115,7 +115,14 @@
                         specifying the offset and count you can tell the GPU which object to
                         render. In our case we want to start at the beginning so we specify
                         zero. Note that the type of the last parameter is GLvoid* so if you
-                        specify anything other than zero you need to cast it to that type. </p>
+                            specify anything other than zero you need to cast it to that type. </p>
+                        <h3>Comments</h3>
+                        <p>Oct-23, 2021 - by voytechj on youtube: the OpenGL pipeline includes a post transform
+                            cache that stores the results of the vertex shader. If the same vertex passes through
+                            the pipeline again (a case identified by the reuse of the index) the processing of the
+                            vertex shader can be skipped by fetching the cache results. Therefore, the advantage
+                            of indexed draws is not only in memory saving but in performance as well. More info in the <href a="https://www.khronos.org/opengl/wiki/Post_Transform_Cache">OpenGL wiki</href>
+                        </p>
                 </section>
 
                 <a href="../tutorial11/tutorial11.html" class="next highlight"> Next tutorial </a>
