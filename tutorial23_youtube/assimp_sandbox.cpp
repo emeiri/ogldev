@@ -21,9 +21,15 @@ void count_vertices_and_indices(const aiScene* pScene)
     uint NumIndices = 0;
 
     // Count the number of vertices and indices
-    for (uint i = 0 ; i < pScene->mNumMeshes ; i++) {
+    for (int i = 0 ; i < pScene->mNumMeshes ; i++) {
+        printf("Mesh %s\n", pScene->mMeshes[i]->mName.C_Str());
+        printf("Num animations %d\n", pScene->mNumAnimations);
         NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices  += pScene->mMeshes[i]->mNumFaces * 3;
+        for (int v = 0 ; v < NumVertices ; v++) {
+            const aiVector3D& vertex = pScene->mMeshes[i]->mVertices[v];
+            //   printf("%f %f %f\n", vertex.x, vertex.y, vertex.z);
+        }
     }
 
     printf("Num vertices %d num indices %d\n", NumVertices, NumIndices);
@@ -48,17 +54,60 @@ void parse_bones(const aiMesh* paiMesh)
     }
 }
 
-void load_assimp_scene(const aiScene* pScene)
+
+void parse_bones(const aiScene* pScene)
 {
-    count_vertices_and_indices(pScene);
-
+    printf("Parsing the bones\n");
     for (uint i = 0 ; i < pScene->mNumMeshes ; i++) {
-        const aiMesh* paiMesh = pScene->mMeshes[i];
+        const aiMesh* pMesh = pScene->mMeshes[i];
 
-        if (paiMesh->HasBones()) {
-            parse_bones(paiMesh);
+        if (pMesh->HasBones()) {
+            parse_bones(pMesh);
         }
     }
+    printf("\n");
+}
+
+
+int depth = 0;
+
+
+void parse_heirarchy(const aiNode* pNode)
+{
+    if (!pNode) {
+        return;
+    }
+
+    for (int d = 0 ; d < depth ; d++) {
+        printf(" ");
+    }
+
+    printf("Node: '%s (", pNode->mName.C_Str());
+    //    printf("  ");
+    for (int i = 0 ; i < pNode->mNumChildren ; i++) {
+        printf("%s ", pNode->mChildren[i]->mName.C_Str());
+    }
+    printf(")\n");
+
+    depth++;
+    for (int i = 0 ; i < pNode->mNumChildren ; i++) {
+        parse_heirarchy(pNode->mChildren[i]);
+    }
+    depth--;
+}
+
+void parse_scene(const aiScene* pScene)
+{
+    printf("Global inverse transpose\n");
+    print_assimp_matrix_4x4(pScene->mRootNode->mTransformation);
+
+    count_vertices_and_indices(pScene);
+
+    parse_bones(pScene);
+
+    printf("Parse the heirarchy\n");
+    parse_heirarchy(pScene->mRootNode);
+    printf("\n");
 }
 
 int main(int argc, char* argv[])
@@ -77,7 +126,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    load_assimp_scene(pScene);
+    parse_scene(pScene);
 
     return 0;
 }
