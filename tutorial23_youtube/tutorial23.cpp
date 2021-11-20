@@ -286,6 +286,8 @@ void Tutorial23::RenderSceneCB()
 
 #define ATTEN_STEP 0.01f
 
+#define ANGLE_STEP 1.0f
+
 void Tutorial23::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
@@ -314,6 +316,22 @@ void Tutorial23::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     case 'x':
         pointLights[0].Attenuation.Exp -= ATTEN_STEP;
         pointLights[1].Attenuation.Exp -= ATTEN_STEP;
+        break;
+
+    case 'd':
+        spotLights[0].Cutoff += ANGLE_STEP;
+        break;
+
+    case 'c':
+        spotLights[0].Cutoff -= ANGLE_STEP;
+        break;
+
+    case 'g':
+        spotLights[1].Cutoff += ANGLE_STEP;
+        break;
+
+    case 'b':
+        spotLights[1].Cutoff -= ANGLE_STEP;
         break;
 
     }
@@ -388,7 +406,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 22");
+    int win = glutCreateWindow("Tutorial 23");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
