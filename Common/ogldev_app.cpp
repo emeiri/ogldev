@@ -61,7 +61,7 @@ void OgldevApp::RenderFPS()
     SNPRINTF(text, sizeof(text), "FPS: %d", m_fps);
 
 #ifndef WIN32
-    m_fontRenderer.RenderText(10, 10, text);        
+    m_fontRenderer.RenderText(10, 10, text);
 #endif
 }
 
