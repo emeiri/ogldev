@@ -8,32 +8,23 @@
 
 void parse_single_bone(int bone_index, const aiBone* pBone)
 {
-    printf(" Bone %d: '%s'\n", bone_index, pBone->mName.C_Str());
-    printf("   Num vertices affected by this bone: %d\n", pBone->mNumWeights);
+    printf("      Bone %d: '%s' num vertices affected by this bone: %d\n", bone_index, pBone->mName.C_Str(), pBone->mNumWeights);
+
+    for (int i = 0 ; i < pBone->mNumWeights ; i++) {
+        if (i == 0) printf("\n");
+        const aiVertexWeight& vw = pBone->mWeights[i];
+        printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
+    }
+
+    printf("\n");
 }
 
 
 void parse_mesh_bones(const aiMesh* pMesh)
 {
-    printf("*******************************************************\n");
-    printf("Parsing %d bones in mesh '%s'\n", pMesh->mNumBones, pMesh->mName.C_Str());
-
     for (int i = 0 ; i < pMesh->mNumBones ; i++) {
         parse_single_bone(i, pMesh->mBones[i]);
     }
-}
-
-
-void parse_bones(const aiScene* pScene)
-{
-    for (uint i = 0 ; i < pScene->mNumMeshes ; i++) {
-        const aiMesh* pMesh = pScene->mMeshes[i];
-
-        if (pMesh->HasBones()) {
-            parse_mesh_bones(pMesh);
-        }
-    }
-    printf("\n");
 }
 
 
@@ -42,27 +33,36 @@ void parse_meshes(const aiScene* pScene)
     printf("*******************************************************\n");
     printf("Parsing %d meshes\n\n", pScene->mNumMeshes);
 
-    uint total_vertices = 0;
-    uint total_indices = 0;
+    int total_vertices = 0;
+    int total_indices = 0;
+    int total_bones = 0;
 
     for (int i = 0 ; i < pScene->mNumMeshes ; i++) {
-        int num_vertices = pScene->mMeshes[i]->mNumVertices;
-        int num_indices = pScene->mMeshes[i]->mNumFaces * 3;
-        printf("Mesh %s: vertices %d indices %d\n", pScene->mMeshes[i]->mName.C_Str(), num_vertices, num_indices);
+        const aiMesh* pMesh = pScene->mMeshes[i];
+        int num_vertices = pMesh->mNumVertices;
+        int num_indices = pMesh->mNumFaces * 3;
+        int num_bones = pMesh->mNumBones;
+        printf("  Mesh %d '%s': vertices %d indices %d bones %d\n\n", i, pMesh->mName.C_Str(), num_vertices, num_indices, num_bones);
         total_vertices += num_vertices;
         total_indices  += num_indices;
+        total_bones += num_bones;
+
+        if (pMesh->HasBones()) {
+            parse_mesh_bones(pMesh);
+        }
+
+        printf("\n");
     }
 
-    printf("\nTotal vertices %d total indices %d\n", total_vertices, total_indices);
+    printf("\nTotal vertices %d total indices %d total bones %d\n", total_vertices, total_indices, total_bones);
 }
 
 
 void parse_scene(const aiScene* pScene)
 {
     parse_meshes(pScene);
-
-    parse_bones(pScene);
 }
+
 
 int main(int argc, char* argv[])
 {
