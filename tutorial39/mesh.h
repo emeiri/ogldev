@@ -180,7 +180,7 @@ public:
     void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
 
 private:
-    #define NUM_BONES_PER_VEREX 4
+    #define NUM_BONES_PER_VERTEX 4
 
     struct BoneInfo
     {
@@ -196,8 +196,8 @@ private:
 
     struct VertexBoneData
     {
-        uint IDs[NUM_BONES_PER_VEREX];
-        float Weights[NUM_BONES_PER_VEREX];
+        uint IDs[NUM_BONES_PER_VERTEX];
+        float Weights[NUM_BONES_PER_VERTEX];
 
         VertexBoneData()
         {
