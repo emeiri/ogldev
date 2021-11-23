@@ -40,25 +40,12 @@ struct VertexBoneData
             }
         }
 
-    // should never get here - more bones than we have space for
+        // should never get here - more bones than we have space for
         assert(0);
     }
 };
 
 vector<VertexBoneData> vertex_to_bones;
-
-/*void SkinnedMesh::LoadBones(uint MeshIndex, const aiMesh* pMesh, vector<VertexBoneData>& Bones)
-{
-    for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
-        uint BoneIndex = 0;
-        string BoneName(pMesh->mBones[i]->mName.data);
-
-
-        for (uint j = 0 ; j < pMesh->mBones[i]->mNumWeights ; j++) {
-        }
-    }
-    }*/
-
 
 int get_bone_id(const aiBone* pBone)
 {

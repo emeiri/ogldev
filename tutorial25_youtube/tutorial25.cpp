@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 23 - Spot Light
+    Tutorial 25 - Skeletal Animation - Part 2
 */
 
 #include <stdio.h>
@@ -29,20 +29,21 @@
 #include "ogldev_texture.h"
 #include "ogldev_world_transform.h"
 #include "ogldev_basic_mesh.h"
-#include "camera.h"
-#include "lighting_technique.h"
 #include "ogldev_engine_common.h"
+#include "camera.h"
+#include "skinning_technique.h"
+#include "skinned_mesh.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
 
 
-class Tutorial23
+class Tutorial25
 {
 public:
-    Tutorial23();
-    ~Tutorial23();
+    Tutorial25();
+    ~Tutorial25();
 
     bool Init();
 
@@ -52,22 +53,22 @@ public:
     void PassiveMouseCB(int x, int y);
 
 private:
+    float GetRunningTime();
 
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
-    BasicMesh* pBox = NULL;
-    BasicMesh* pMesh1 = NULL;
-    BasicMesh* pMesh2 = NULL;
+    SkinnedMesh* pMesh1 = NULL;
     PersProjInfo persProjInfo;
-    LightingTechnique* pLightingTech = NULL;
-    PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
-    SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
+    SkinningTechnique* pSkinningTech = NULL;
+    PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
+    SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
+    long long startTime = 0;
 };
 
 
-Tutorial23::Tutorial23()
+Tutorial25::Tutorial25()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -107,31 +108,19 @@ Tutorial23::Tutorial23()
 }
 
 
-Tutorial23::~Tutorial23()
+Tutorial25::~Tutorial25()
 {
     if (pGameCamera) {
         delete pGameCamera;
     }
 
-    if (pBox) {
-        delete pBox;
-    }
-
     if (pMesh1) {
         delete pMesh1;
-    }
-
-    if (pMesh2) {
-        delete pMesh2;
-    }
-
-    if (pLightingTech) {
-        delete pLightingTech;
     }
 }
 
 
-bool Tutorial23::Init()
+bool Tutorial25::Init()
 {
     Vector3f CameraPos(0.0f, 5.0f, -8.0f);
     Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
@@ -139,48 +128,42 @@ bool Tutorial23::Init()
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
-    pBox = new BasicMesh();
+    pMesh1 = new SkinnedMesh();
 
-    if (!pBox->LoadMesh("../Content/box_terrain.obj")) {
+    if (!pMesh1->LoadMesh("../Content/boblampclean.md5mesh")) {
+        printf("Mesh load failed\n");
         return false;
     }
 
-    pMesh1 = new BasicMesh();
+    pSkinningTech = new SkinningTechnique();
 
-    if (!pMesh1->LoadMesh("/home/emeiri/box.dae")) {
-    //    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/vintage_grandfather_clock_01_4k.blend/vintage_grandfather_clock_01_4k.obj")) {
-        //    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/Zombie.obj")) {
-        return false;
-    }
-
-    pMesh2 = new BasicMesh();
-
-    if (!pMesh2->LoadMesh("/home/emeiri/Downloads/vintage_wooden_drawer_01_4k.blend/vintage_wooden_drawer_01_4k.obj")) {
-        return false;
-    }
-
-
-    pLightingTech = new LightingTechnique();
-
-    if (!pLightingTech->Init())
+    if (!pSkinningTech->Init())
     {
         return false;
     }
 
-    pLightingTech->Enable();
+    pSkinningTech->Enable();
 
-    pLightingTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    pLightingTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+
+    startTime = GetCurrentTimeMillis();
 
     return true;
 }
 
-bool Start = false;
 
-void Tutorial23::RenderSceneCB()
+float Tutorial25::GetRunningTime()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)startTime) / 1000.0f;
+    return RunningTime;
+}
 
+
+void Tutorial25::RenderSceneCB()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+;
     pGameCamera->OnRender();
 
 #ifdef _WIN64
@@ -190,7 +173,17 @@ void Tutorial23::RenderSceneCB()
 #endif
     counter += 0.01f;
 
-    WorldTrans& worldTransform = pBox->GetWorldTransform();
+    vector<Matrix4f> Transforms;
+
+    float RunningTime = GetRunningTime();
+
+    pMesh1->BoneTransform(RunningTime, Transforms);
+
+    for (uint i = 0 ; i < Transforms.size() ; i++) {
+        //m_pEffect->SetBoneTransform(i, Transforms[i]);
+    }
+
+    WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
     worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
@@ -200,7 +193,7 @@ void Tutorial23::RenderSceneCB()
     Matrix4f Projection;
     Projection.InitPersProjTransform(persProjInfo);
     Matrix4f WVP = Projection * View * World;
-    pLightingTech->SetWVP(WVP);
+    pSkinningTech->SetWVP(WVP);
 
     pointLights[0].WorldPosition.x = -10.0f;
     pointLights[0].WorldPosition.y = 2;
@@ -212,7 +205,7 @@ void Tutorial23::RenderSceneCB()
     pointLights[1].WorldPosition.z = 0.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
 
-    pLightingTech->SetPointLights(2, pointLights);
+    pSkinningTech->SetPointLights(2, pointLights);
 
     spotLights[0].WorldPosition = pGameCamera->GetPos();
     spotLights[0].WorldDirection = pGameCamera->GetTarget();
@@ -222,64 +215,15 @@ void Tutorial23::RenderSceneCB()
     spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
     spotLights[1].CalcLocalDirectionAndPosition(worldTransform);
 
-    pLightingTech->SetSpotLights(2, spotLights);
+    pSkinningTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(pBox->GetMaterial());
+    pSkinningTech->SetMaterial(pBox->GetMaterial());
 
     Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
-    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
+    pSkinningTech->SetCameraLocalPos(CameraLocalPos3f);
 
     pBox->Render();
 
-    WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
-    if (Start) {
-        static float counter2 = 0.0f;
-        counter2 += 0.001;
-        meshWorldTransform.SetPosition(0.0f, -4.0f + abs(sinf(counter2) * 4), 0.0f);
-    } else {
-        meshWorldTransform.SetPosition(2.0f, 1.0f, 1.0f);
-    }
-
-    World = meshWorldTransform.GetMatrix();
-    WVP = Projection * View * World;
-    pLightingTech->SetWVP(WVP);
-
-    pointLights[0].CalcLocalPosition(meshWorldTransform);
-    pointLights[1].CalcLocalPosition(meshWorldTransform);
-    pLightingTech->SetPointLights(2, pointLights);
-
-    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform);
-    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
-    pLightingTech->SetSpotLights(2, spotLights);
-
-    pLightingTech->SetMaterial(pMesh1->GetMaterial());
-
-    CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
-    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
-
-    pMesh1->Render();
-
-    WorldTrans& meshWorldTransform2 = pMesh2->GetWorldTransform();
-    //  meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
-    meshWorldTransform2.SetPosition(0.0f, 1.0f, 1.0f);
-    World = meshWorldTransform2.GetMatrix();
-    WVP = Projection * View * World;
-    pLightingTech->SetWVP(WVP);
-
-    pointLights[0].CalcLocalPosition(meshWorldTransform2);
-    pointLights[1].CalcLocalPosition(meshWorldTransform2);
-    pLightingTech->SetPointLights(2, pointLights);
-
-    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform2);
-    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
-    pLightingTech->SetSpotLights(2, spotLights);
-
-    pLightingTech->SetMaterial(pMesh2->GetMaterial());
-
-    CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
-    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
-
-    pMesh2->Render();
 
     glutPostRedisplay();
     glutSwapBuffers();
@@ -290,12 +234,9 @@ void Tutorial23::RenderSceneCB()
 
 #define ANGLE_STEP 1.0f
 
-void Tutorial23::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void Tutorial25::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
-    case ' ':
-        Start = true;
-        break;
     case 'q':
     case 27:    // escape key code
         exit(0);
@@ -344,42 +285,42 @@ void Tutorial23::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void Tutorial23::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void Tutorial25::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial23::PassiveMouseCB(int x, int y)
+void Tutorial25::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-Tutorial23* pTutorial23 = NULL;
+Tutorial25* pTutorial25 = NULL;
 
 
 void RenderSceneCB()
 {
-    pTutorial23->RenderSceneCB();
+    pTutorial25->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pTutorial23->KeyboardCB(key, mouse_x, mouse_y);
+    pTutorial25->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pTutorial23->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTutorial25->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pTutorial23->PassiveMouseCB(x, y);
+    pTutorial25->PassiveMouseCB(x, y);
 }
 
 
@@ -408,7 +349,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 23");
+    int win = glutCreateWindow("Tutorial 25");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
@@ -427,9 +368,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pTutorial23 = new Tutorial23();
+    pTutorial25 = new Tutorial25();
 
-    if (!pTutorial23->Init()) {
+    if (!pTutorial25->Init()) {
         return 1;
     }
 
