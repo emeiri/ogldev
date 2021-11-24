@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "lighting_technique.h"
+#include "skinning_technique.h"
 
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
@@ -39,11 +39,11 @@ void SpotLight::CalcLocalDirectionAndPosition(const WorldTrans& worldTransform)
 
 
 
-LightingTechnique::LightingTechnique()
+SkinningTechnique::SkinningTechnique()
 {
 }
 
-bool LightingTechnique::Init()
+bool SkinningTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
@@ -174,24 +174,24 @@ bool LightingTechnique::Init()
     return true;
 }
 
-void LightingTechnique::SetWVP(const Matrix4f& WVP)
+void SkinningTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
-void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
+void SkinningTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerLoc, TextureUnit);
 }
 
-void LightingTechnique::SetSpecularExponentTextureUnit(unsigned int TextureUnit)
+void SkinningTechnique::SetSpecularExponentTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerSpecularExponentLoc, TextureUnit);
 }
 
 
-void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
+void SkinningTechnique::SetDirectionalLight(const DirectionalLight& Light)
 {
     glUniform3f(dirLightLoc.Color, Light.Color.x, Light.Color.y, Light.Color.z);
     glUniform1f(dirLightLoc.AmbientIntensity, Light.AmbientIntensity);
@@ -201,20 +201,20 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
 }
 
 
-void LightingTechnique::SetCameraLocalPos(const Vector3f& CameraLocalPos)
+void SkinningTechnique::SetCameraLocalPos(const Vector3f& CameraLocalPos)
 {
     glUniform3f(CameraLocalPosLoc, CameraLocalPos.x, CameraLocalPos.y, CameraLocalPos.z);
 }
 
 
-void LightingTechnique::SetMaterial(const Material& material)
+void SkinningTechnique::SetMaterial(const Material& material)
 {
     glUniform3f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b);
     glUniform3f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b);
     glUniform3f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b);
 }
 
-void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
+void SkinningTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
 {
     glUniform1i(NumPointLightsLocation, NumLights);
 
@@ -231,7 +231,7 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
     }
 }
 
-void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* pLights)
+void SkinningTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* pLights)
 {
     glUniform1i(NumSpotLightsLocation, NumLights);
 

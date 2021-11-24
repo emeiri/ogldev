@@ -180,13 +180,14 @@ void Tutorial25::RenderSceneCB()
     pMesh1->BoneTransform(RunningTime, Transforms);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
-        //m_pEffect->SetBoneTransform(i, Transforms[i]);
+        //        pSkinningTech->SetBoneTransform(i, Transforms[i]);
     }
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
-    worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
+    worldTransform.SetRotation(270.0f, 180.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
+    worldTransform.SetScale(0.1);
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
@@ -217,12 +218,12 @@ void Tutorial25::RenderSceneCB()
 
     pSkinningTech->SetSpotLights(2, spotLights);
 
-    pSkinningTech->SetMaterial(pBox->GetMaterial());
+    pSkinningTech->SetMaterial(pMesh1->GetMaterial());
 
     Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pSkinningTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    pBox->Render();
+    pMesh1->Render();
 
 
     glutPostRedisplay();

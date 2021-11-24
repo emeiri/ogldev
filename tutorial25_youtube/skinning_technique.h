@@ -85,14 +85,14 @@ private:
 };
 
 
-class LightingTechnique : public Technique
+class SkinningTechnique : public Technique
 {
 public:
 
     static const unsigned int MAX_POINT_LIGHTS = 2;
     static const unsigned int MAX_SPOT_LIGHTS = 2;
 
-    LightingTechnique();
+    SkinningTechnique();
 
     virtual bool Init();
 

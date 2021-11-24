@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+    Copyright 2021 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_SKINNED_MESH_H
-#define	OGLDEV_SKINNED_MESH_H
+#ifndef SKINNED_MESH_H
+#define SKINNED_MESH_H
 
 #include <map>
 #include <vector>
-
 #include <GL/glew.h>
+
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
@@ -30,8 +30,8 @@
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
-
-using namespace std;
+#include "ogldev_world_transform.h"
+#include "ogldev_material.h"
 
 class SkinnedMesh
 {
@@ -40,34 +40,64 @@ public:
 
     ~SkinnedMesh();
 
-    bool LoadMesh(const string& Filename);
+    bool LoadMesh(const std::string& Filename);
 
     void Render();
-	
+
     uint NumBones() const
     {
         return m_NumBones;
     }
-    
+
     void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
-    
+
+    void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
+
+    WorldTrans& GetWorldTransform() { return m_worldTransform; }
+
+    const Material& GetMaterial();
+
 private:
     #define NUM_BONES_PER_VERTEX 4
+
+    void Clear();
+
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+
+    void CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices);
+
+    void ReserveSpace(unsigned int NumVertices, unsigned int NumIndices);
+
+    void InitAllMeshes(const aiScene* pScene);
+
+    void InitSingleMesh(const aiMesh* paiMesh);
+
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+
+    void PopulateBuffers();
+
+    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadColors(const aiMaterial* pMaterial, int index);
 
     struct BoneInfo
     {
         Matrix4f BoneOffset;
-        Matrix4f FinalTransformation;        
+        Matrix4f FinalTransformation;
 
         BoneInfo()
         {
             BoneOffset.SetZero();
-            FinalTransformation.SetZero();            
+            FinalTransformation.SetZero();
         }
     };
-    
+
     struct VertexBoneData
-    {        
+    {
         uint IDs[NUM_BONES_PER_VERTEX];
         float Weights[NUM_BONES_PER_VERTEX];
 
@@ -75,77 +105,76 @@ private:
         {
             Reset();
         };
-        
+
         void Reset()
         {
             ZERO_MEM(IDs);
-            ZERO_MEM(Weights);        
+            ZERO_MEM(Weights);
         }
-        
+
         void AddBoneData(uint BoneID, float Weight);
     };
 
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);    
+    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
     void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
-    bool InitFromScene(const aiScene* pScene, const string& Filename);
-    void InitMesh(uint MeshIndex,
-                  const aiMesh* paiMesh,
-                  vector<Vector3f>& Positions,
-                  vector<Vector3f>& Normals,
-                  vector<Vector2f>& TexCoords,
-                  vector<VertexBoneData>& Bones,
-                  vector<unsigned int>& Indices);
     void LoadBones(uint MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
-    bool InitMaterials(const aiScene* pScene, const string& Filename);
-    void Clear();
 
 #define INVALID_MATERIAL 0xFFFFFFFF
-  
-    enum VB_TYPES {
-	SKINNED_MESH_INDEX_BUFFER,
-        SKINNED_MESH_POS_VB,
-        SKINNED_MESH_NORMAL_VB,
-        SKINNED_MESH_TEXCOORD_VB,
-        SKINNED_MESH_BONE_VB,
-        SKINNED_MESH_NUM_VBs            
+
+    enum BUFFER_TYPE {
+        INDEX_BUFFER = 0,
+        POS_VB       = 1,
+        TEXCOORD_VB  = 2,
+        NORMAL_VB    = 3,
+        BONE_VB      = 4,
+        WVP_MAT_VB   = 5,
+        WORLD_MAT_VB = 6,
+        NUM_BUFFERS  = 7
     };
 
-    GLuint m_VAO;
-    GLuint m_Buffers[SKINNED_MESH_NUM_VBs];
+    WorldTrans m_worldTransform;
+    GLuint m_VAO = 0;
+    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
-    struct MeshEntry {
-        MeshEntry()
+    struct BasicMeshEntry {
+        BasicMeshEntry()
         {
-            NumIndices    = 0;
-            BaseVertex    = 0;
-            BaseIndex     = 0;
+            NumIndices = 0;
+            BaseVertex = 0;
+            BaseIndex = 0;
             MaterialIndex = INVALID_MATERIAL;
         }
-        
+
         unsigned int NumIndices;
         unsigned int BaseVertex;
         unsigned int BaseIndex;
         unsigned int MaterialIndex;
     };
-    
-    vector<MeshEntry> m_Entries;
-    vector<Texture*> m_Textures;
-     
+
+    Assimp::Importer Importer;
+    const aiScene* pScene = NULL;
+    std::vector<BasicMeshEntry> m_Meshes;
+    std::vector<Material> m_Materials;
+
+    // Temporary space for vertex stuff before we load them into the GPU
+    vector<Vector3f> m_Positions;
+    vector<Vector3f> m_Normals;
+    vector<Vector2f> m_TexCoords;
+    vector<unsigned int> m_Indices;
+    vector<VertexBoneData> Bones;
+
     map<string,uint> m_BoneMapping; // maps a bone name to its index
     uint m_NumBones;
     vector<BoneInfo> m_BoneInfo;
     Matrix4f m_GlobalInverseTransform;
-    
-    const aiScene* m_pScene;
-    Assimp::Importer m_Importer;
+
 };
 
 
-#endif	/* OGLDEV_SKINNED_MESH_H */
-
+#endif  /* SKINNED_MESH_H */
