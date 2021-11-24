@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 using namespace std;
 
 SkinningTechnique::SkinningTechnique()
-{   
+{
 }
 
 
@@ -47,7 +47,7 @@ bool SkinningTechnique::Init()
     if (!Finalize()) {
         return false;
     }
-    
+
     m_WVPLocation = GetUniformLocation("gWVP");
     m_WorldMatrixLocation = GetUniformLocation("gWorld");
     m_colorTextureLocation = GetUniformLocation("gColorMap");
@@ -166,7 +166,7 @@ bool SkinningTechnique::Init()
 
 void SkinningTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP);    
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP);
 }
 
 
@@ -214,7 +214,7 @@ void SkinningTechnique::SetMatSpecularPower(float Power)
 void SkinningTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
 {
     glUniform1i(m_numPointLightsLocation, NumLights);
-    
+
     for (unsigned int i = 0 ; i < NumLights ; i++) {
         glUniform3f(m_pointLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(m_pointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
@@ -248,7 +248,10 @@ void SkinningTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
 
 void SkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
 {
-    assert(Index < MAX_BONES);
+    //assert(Index < MAX_BONES);
+    if (Index >= MAX_BONES) {
+        return;
+    }
     //Transform.Print();
-    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);       
+    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);
 }
