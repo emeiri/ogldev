@@ -27,6 +27,7 @@ class WorldTrans {
 
     void SetScale(float scale);
     void SetRotation(float x, float y, float z);
+    void SetRotation(const Vector3f& );
     void SetPosition(float x, float y, float z);
     void SetPosition(const Vector3f& WorldPos);
 
