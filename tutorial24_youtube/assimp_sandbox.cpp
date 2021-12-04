@@ -1,9 +1,6 @@
-#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/Importer.hpp>  // C++ importer interface
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
-
-
-#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals |  aiProcess_JoinIdenticalVertices )
 
 
 void parse_single_bone(int bone_index, const aiBone* pBone)
@@ -63,6 +60,7 @@ void parse_scene(const aiScene* pScene)
     parse_meshes(pScene);
 }
 
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals |  aiProcess_JoinIdenticalVertices )
 
 int main(int argc, char* argv[])
 {
@@ -72,6 +70,7 @@ int main(int argc, char* argv[])
     }
 
     char* filename = argv[1];
+
     Assimp::Importer Importer;
     const aiScene* pScene = Importer.ReadFile(filename, ASSIMP_LOAD_FLAGS);
 
