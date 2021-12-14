@@ -49,15 +49,12 @@ public:
         return m_NumBones;
     }
 
-    void BoneTransform(vector<Matrix4f>& Transforms);
 
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
     const Material& GetMaterial();
-
-    int GetNumBones() const { return m_NumBones; }
 
 private:
     #define NUM_BONES_PER_VERTEX 4
@@ -89,12 +86,10 @@ private:
     struct BoneInfo
     {
         Matrix4f BoneOffset;
-        Matrix4f FinalTransformation;
 
         BoneInfo()
         {
             BoneOffset.SetZero();
-            FinalTransformation.SetZero();
         }
     };
 

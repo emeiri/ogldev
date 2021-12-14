@@ -61,7 +61,6 @@ private:
     SkinningTechnique* pSkinningTech = NULL;
     PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
-    float Counter = 0;
     long long StartTime = 0;
     int DisplayBoneIndex = 0;
 };
@@ -145,6 +144,7 @@ bool Tutorial25::Init()
 
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
 
     StartTime = GetCurrentTimeMillis();
 
@@ -157,21 +157,6 @@ void Tutorial25::RenderSceneCB()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 ;
     pGameCamera->OnRender();
-
-#ifdef _WIN64
-    float YRotationAngle = 0.1f;
-#else
-    float YRotationAngle = 1.0f;
-#endif
-    Counter += 0.01f;
-
-    vector<Matrix4f> Transforms;
-
-    pMesh1->BoneTransform(Transforms);
-
-    for (uint i = 0 ; i < Transforms.size() ; i++) {
-        //        pSkinningTech->SetBoneTransform(i, Transforms[i]);
-    }
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
@@ -192,7 +177,7 @@ void Tutorial25::RenderSceneCB()
     pointLights[0].CalcLocalPosition(worldTransform);
 
     pointLights[1].WorldPosition.x = 10.0f;
-    pointLights[1].WorldPosition.y = sinf(Counter) * 4 + 4;
+    pointLights[1].WorldPosition.y = 1.0f;
     pointLights[1].WorldPosition.z = 0.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
 
@@ -242,7 +227,7 @@ void Tutorial25::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 
     case ' ':
         DisplayBoneIndex++;
-        DisplayBoneIndex = DisplayBoneIndex % pMesh1->GetNumBones();
+        DisplayBoneIndex = DisplayBoneIndex % pMesh1->NumBones();
         pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
         break;
 
@@ -283,8 +268,6 @@ void Tutorial25::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
         break;
 
     }
-
-    printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
 
     pGameCamera->OnKeyboard(key);
 }
