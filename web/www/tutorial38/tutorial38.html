@@ -24,6 +24,7 @@
   </header>
 
   <article id="content" class="breakpoint">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/r6Yv_mh79PI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <section>
       <h3> Background </h3>
 
@@ -39,7 +40,7 @@
       in a way that would mimic actual movement in the real world. This is done by assigning each vertex to one or more bones.
       When a vertex is assigned to a bone a weight is defined that determines the amount of influence that bone has
       on the vertex when it moves. The common practice is to make the sum of all weights 1 (per vertex). For example, if a vertex
-      is located exactly between two bones we would probably want to assign each bone a weight of 0.5 because we expect 
+      is located exactly between two bones we would probably want to assign each bone a weight of 0.5 because we expect
       the bones to be equal in their influence on the vertex. However, if a vertex is entirely within the influence of a single bone
       then the weight would be 1 (which means that bone autonomously controls the movement of the vertex).
       </p>
@@ -51,7 +52,7 @@
       What we see above is actually an important part of the animation. The artist riggs together the bone structure and
       defines a set of key frames for each animation type ("walk", "run", "die", etc). The key frames contain the
       transformations of all bones in critical points along the animation path. The graphics engine interpolates
-      between the transformations of the keyframes and creates a smooth motion between them. 
+      between the transformations of the keyframes and creates a smooth motion between them.
       </p>
       <p>
       The bone structure used for skeletal animation is often heirarchical. This means that the bones have a child/parent
@@ -68,7 +69,7 @@
       mesh and skeleton. Let's see what the graphics engine needs to do in order to make skeletal animation.
       </p>
       <p>
-      The first stage is to augument the vertex buffer with per vertex bone information. There are several options available 
+      The first stage is to augument the vertex buffer with per vertex bone information. There are several options available
       but what we are going to do is pretty straightforward. For each vertex we are going to add an array of slots where each
       slot contains a bone ID and a weight. To make our life simpler we will use an array with four slots which means no
       vertex can be influenced by more than four bones. If you are going to load models with more bones you will need to
@@ -78,7 +79,7 @@
       <img class="center" src="vertex.jpg"/>
       <p>
       The bone IDs are indices into an array of bone transformations. These tranformations will be applied on the position
-      and normal before the WVP matrix (i.e. they transform the vertex from a "bone space" into local space). The weight 
+      and normal before the WVP matrix (i.e. they transform the vertex from a "bone space" into local space). The weight
       will be used to combine the transformations of several bones into a single transformation and in any case the
       total weight must be exactly 1 (responsibility of the modeling software). Usually, we would interpolate between
       animation key frames and update the array of bone transformations in every frame.
@@ -90,14 +91,14 @@
       entry in the array must have a time stamp. The case where the application time will exactly match one of the
       time stamps is probably rare so our code must be able to interpolate the scaling/rotation/translation to get
       the correct transformation for the point in time of the application. We do the same process for each node from
-      the current bone to the root and multiply this chain of transformations together to get the final result. We do 
+      the current bone to the root and multiply this chain of transformations together to get the final result. We do
       that for each bone and then update the shader.
       </p>
       <p>
       Everything that we talked about so far has been pretty generic. But this is a tutorial about skeletal animation
       <b>with Assimp</b>, so we need to dive into that library again and see how to do skinning with it. The good
       thing about Assimp is that it supports loading bone information from several formats. The bad thing is that
-      you still need to do quite a bit of work on the data structures that it creates to generate the bone transformations 
+      you still need to do quite a bit of work on the data structures that it creates to generate the bone transformations
       that you need for the shaders.
       </p>
       <p>
@@ -120,7 +121,7 @@
       <p>
       The vertex weight array is where things start to become interesting. Each entry in this array contains an index into
       the array of vertices in the aiMesh (remember that the vertex is spread across several arrays with the
-      same length) and a weight. The sum of all vertex weights must be 1 but to find them you need to walk through 
+      same length) and a weight. The sum of all vertex weights must be 1 but to find them you need to walk through
       all the bones and accumulate the weights into a kind of list for each particular vertex.
       </p>
       <p>
@@ -136,16 +137,16 @@
       tree back and forth. In addition, the node carries a transformation matrix that transforms from the node
       space into the space of its parent. Finally, the node may or may not have a name. If a node represents
       a bone in the heirarchy then the node name must match the bone name. But sometimes nodes have no name (which
-      means there is not corresponding bone) and their job is simply to help the modeller decompose the model 
+      means there is not corresponding bone) and their job is simply to help the modeller decompose the model
       and place some intermediate transformation along the way.
       </p>
       <p>
-      The last piece of the puzzle is the aiAnimation array which is also stored in the aiScene object. 
+      The last piece of the puzzle is the aiAnimation array which is also stored in the aiScene object.
       A single aiAnimation object represents a sequence of animation frames such as "walk", "run", "shoot", etc.
       By interpolating between the frames we get the desired visual effect which matches the name of the animation.
       An animation has a duration in ticks and the number of ticks per second (e.g 100 ticks and 25 ticks per second
       represent a 4 second animation) which help us time the progression so that the animation will look the same
-      on every hardware. In addition, the animation has an array of aiNodeAnim objects called channels. 
+      on every hardware. In addition, the animation has an array of aiNodeAnim objects called channels.
       Each channel is actually the bone with all its transformations. The channel contains a name which must match
       one of the nodes in the heirarchy and three transformation arrays.
       </p>
@@ -198,7 +199,7 @@
       </code>
       <p>
       Here's the updated entry point to the Mesh class with changes marked in bold face.
-      There are a couple of changes that we need to note. One is that the importer and aiScene object 
+      There are a couple of changes that we need to note. One is that the importer and aiScene object
       are now class members rather then stack variables. The reason is that during runtime
       we are going to go back to the aiScene object again and again and for that we need to extend
       the scope of both the importer and the scene. In a real game you may want to copy the stuff
@@ -213,8 +214,8 @@
       <code>
       struct VertexBoneData<br>
       {        <br>
-         &nbsp;  &nbsp; uint IDs[NUM_BONES_PER_VEREX];<br>
-        &nbsp;  &nbsp;        float Weights[NUM_BONES_PER_VEREX];<br>
+         &nbsp;  &nbsp; uint IDs[NUM_BONES_PER_VERTEX];<br>
+        &nbsp;  &nbsp;        float Weights[NUM_BONES_PER_VERTEX];<br>
       }
       </code>
       <p>(mesh.cpp:107)</p>
@@ -236,7 +237,7 @@
       }
       </code>
       <p>
-      The structure above contains everything we need at the vertex level. By default, we have enough storage 
+      The structure above contains everything we need at the vertex level. By default, we have enough storage
       for four bones (ID and weight per bone). VertexBoneData was structured like that to make it simple
       to pass it on to the shader. We already got position, texture coordinates and normal bound at locations
       0, 1 and 2, respectively. Therefore, we configure our VAO to bind the bone IDs at location 3 and the weights
@@ -381,7 +382,7 @@
       }
       </code>
       <p>
-      This function traverses the node tree and generates the final transformation for each node/bone 
+      This function traverses the node tree and generates the final transformation for each node/bone
       according to the specified animation time. It is limited in the sense that it assumes that the
       mesh has only a single animation sequence. If you want to support multiple animations you will
       need to tell it the animation name and search for it in the m_pScene->mAnimations[] array. The
@@ -396,7 +397,7 @@
       multiply with the matrix we got as a parameter (named GlobablTransformation). This function is
       recursive and is called for the root node with the GlobalTransformation param being the identity
       matrix. Each node recursively calls this function for all of its children and passes its own
-      transformation as GlobalTransformation. Since we start at the top and work our way down, 
+      transformation as GlobalTransformation. Since we start at the top and work our way down,
       we get the combined transformation chain at every node.
       </p>
       <p>
@@ -408,7 +409,7 @@
       that we calculated for the node according to the animation time.
       </p>
       <p>
-      Note that we use Assimp code here to handle the math stuff. I saw no point in duplicating it 
+      Note that we use Assimp code here to handle the math stuff. I saw no point in duplicating it
       into our own code base so I simply used Assimp.
       </p>
       <p>(mesh.cpp:387)</p>
@@ -428,17 +429,17 @@
         &nbsp;  &nbsp;    float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;<br>
         &nbsp;  &nbsp;    assert(Factor >= 0.0f &amp;&amp; Factor &lt;= 1.0f);<br>
         &nbsp;  &nbsp;    const aiQuaternion&amp; StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;<br>
-        &nbsp;  &nbsp;    const aiQuaternion&amp; EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;<br>    
+        &nbsp;  &nbsp;    const aiQuaternion&amp; EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;<br>
         &nbsp;  &nbsp;    aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);<br>
         &nbsp;  &nbsp;    Out = Out.Normalize();<br>
       }
       </code>
       <p>
       This method interpolates the rotation quaternion of the specified channel based on the animation time (remember
-      that the channel contains an array of key quaternions). First we find the index of the key quaternion which 
+      that the channel contains an array of key quaternions). First we find the index of the key quaternion which
       is just before the required animation time. We calculate the ratio between the distance from the animation time to
       the key before it and the distance between that key and the next. We need to interpolate between these two keys
-      using that factor. We use an Assimp code to do the interpolation and normalize the result. The corresponding 
+      using that factor. We use an Assimp code to do the interpolation and normalize the result. The corresponding
       methods for position and scaling are very similar so they are not quoted here.
       </p>
       <p>(mesh.cpp:335)</p>
@@ -458,43 +459,43 @@
       </code>
       <p>
       This utility method finds the key rotation which is immediately before the animation time. If we
-      have N key rotations the result can be 0 to N-2. The animation time is always contained inside 
+      have N key rotations the result can be 0 to N-2. The animation time is always contained inside
       the duration of the channel so the last key (N-1) can never be a valid result.
       </p>
       <p>(skinning.vs)</p>
       <code>
-      #version 330                                                                        <br>       
-                                                                                          <br>       
-      layout (location = 0) in vec3 Position;                                             <br>       
-      layout (location = 1) in vec2 TexCoord;                                             <br>       
-      layout (location = 2) in vec3 Normal;                                               <br>       
-      <b>layout (location = 3) in ivec4 BoneIDs;<br>       
-          layout (location = 4) in vec4 Weights;</b><br>       
-      <br>       
-      out vec2 TexCoord0;<br>       
-      out vec3 Normal0;                                                                   <br>       
-      out vec3 WorldPos0;                                                                 <br>       
-      <br>       
-      const int MAX_BONES = 100;<br>       
-      <br>       
-      uniform mat4 gWVP;<br>       
-      uniform mat4 gWorld;<br>       
-      <b>uniform mat4 gBones[MAX_BONES];</b><br>       
-      <br>       
-      void main()<br>       
-      {       <br>       
-      &nbsp;  &nbsp;  <b>   mat4 BoneTransform = gBones[BoneIDs[0]] * Weights[0];<br>       
-       &nbsp;  &nbsp;     BoneTransform     += gBones[BoneIDs[1]] * Weights[1];<br>       
-       &nbsp;  &nbsp;     BoneTransform     += gBones[BoneIDs[2]] * Weights[2];<br>       
-       &nbsp;  &nbsp;     BoneTransform     += gBones[BoneIDs[3]] * Weights[3];</b><br>       
-      <br>       
-      &nbsp;  &nbsp;     vec4 PosL    = <b>BoneTransform *</b> vec4(Position, 1.0);<br>       
-       &nbsp;  &nbsp;     gl_Position  = gWVP * PosL;<br>       
-       &nbsp;  &nbsp;     TexCoord0    = TexCoord;<br>       
-       &nbsp;  &nbsp;     vec4 NormalL = <b>BoneTransform *</b> vec4(Normal, 0.0);<br>       
-       &nbsp;  &nbsp;     Normal0      = (gWorld * NormalL).xyz;<br>       
-       &nbsp;  &nbsp;     WorldPos0    = (gWorld * PosL).xyz;                                <br>       
-          }<br>       
+      #version 330                                                                        <br>
+                                                                                          <br>
+      layout (location = 0) in vec3 Position;                                             <br>
+      layout (location = 1) in vec2 TexCoord;                                             <br>
+      layout (location = 2) in vec3 Normal;                                               <br>
+      <b>layout (location = 3) in ivec4 BoneIDs;<br>
+          layout (location = 4) in vec4 Weights;</b><br>
+      <br>
+      out vec2 TexCoord0;<br>
+      out vec3 Normal0;                                                                   <br>
+      out vec3 WorldPos0;                                                                 <br>
+      <br>
+      const int MAX_BONES = 100;<br>
+      <br>
+      uniform mat4 gWVP;<br>
+      uniform mat4 gWorld;<br>
+      <b>uniform mat4 gBones[MAX_BONES];</b><br>
+      <br>
+      void main()<br>
+      {       <br>
+      &nbsp;  &nbsp;  <b>   mat4 BoneTransform = gBones[BoneIDs[0]] * Weights[0];<br>
+       &nbsp;  &nbsp;     BoneTransform     += gBones[BoneIDs[1]] * Weights[1];<br>
+       &nbsp;  &nbsp;     BoneTransform     += gBones[BoneIDs[2]] * Weights[2];<br>
+       &nbsp;  &nbsp;     BoneTransform     += gBones[BoneIDs[3]] * Weights[3];</b><br>
+      <br>
+      &nbsp;  &nbsp;     vec4 PosL    = <b>BoneTransform *</b> vec4(Position, 1.0);<br>
+       &nbsp;  &nbsp;     gl_Position  = gWVP * PosL;<br>
+       &nbsp;  &nbsp;     TexCoord0    = TexCoord;<br>
+       &nbsp;  &nbsp;     vec4 NormalL = <b>BoneTransform *</b> vec4(Normal, 0.0);<br>
+       &nbsp;  &nbsp;     Normal0      = (gWorld * NormalL).xyz;<br>
+       &nbsp;  &nbsp;     WorldPos0    = (gWorld * PosL).xyz;                                <br>
+          }<br>
       </code>
       <p>
       Now that we have finished with the changes in the mesh class let's see what we need to do
@@ -516,7 +517,7 @@
       </code>
       <p>
       The last thing we need to do is to integrate all this stuff into the application code.
-      This is done in the above simple code. The function GetCurrentTimeMillis() returns the time in milliseconds 
+      This is done in the above simple code. The function GetCurrentTimeMillis() returns the time in milliseconds
       since the application startup (note the floating point to accomodate fractions).
       </p>
       <p>
@@ -530,7 +531,7 @@
 
   <script src="../html5shiv.min.js"></script>
   <script src="../html5shiv-printshiv.min.js"></script>
-      
+
 <div id="disqus_thread"></div>
 <script type="text/javascript">
 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -546,6 +547,6 @@ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
 </script>
 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
-      
+
 </body>
 </html>
