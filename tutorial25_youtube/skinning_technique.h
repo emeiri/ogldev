@@ -1,5 +1,4 @@
 /*
-
         Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
@@ -16,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIGHTING_TECHNIQUE_17_H
-#define LIGHTING_TECHNIQUE_17_H
+#ifndef SKINNING_TECHNIQUE_H
+#define	SKINNING_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -91,6 +90,7 @@ public:
 
     static const unsigned int MAX_POINT_LIGHTS = 2;
     static const unsigned int MAX_SPOT_LIGHTS = 2;
+    static const unsigned int MAX_BONES = 100;
 
     SkinningTechnique();
 
@@ -104,6 +104,7 @@ public:
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
+    void SetBoneTransform(uint Index, const Matrix4f& Transform);
 
 private:
 
@@ -154,7 +155,9 @@ struct {
             GLuint Exp;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
+
+    GLuint boneLocation[MAX_BONES];
 };
 
 
-#endif  /* LIGHTING_TECHNIQUE_H */
+#endif	/* SKINNING_TECHNIQUE_H */

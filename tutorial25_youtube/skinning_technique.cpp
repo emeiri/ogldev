@@ -49,11 +49,11 @@ bool SkinningTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "lighting.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "skinning.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "lighting.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "skinning.fs")) {
         return false;
     }
 
@@ -171,6 +171,13 @@ bool SkinningTechnique::Init()
         }
     }
 
+    for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(boneLocation) ; i++) {
+        char Name[128];
+        memset(Name, 0, sizeof(Name));
+        SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+        boneLocation[i] = GetUniformLocation(Name);
+    }
+
     return true;
 }
 
@@ -249,4 +256,15 @@ void SkinningTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
         glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
         glUniform1f(SpotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
+}
+
+
+void SkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
+{
+    //assert(Index < MAX_BONES);
+    if (Index >= MAX_BONES) {
+        return;
+    }
+    //Transform.Print();
+    glUniformMatrix4fv(boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);
 }

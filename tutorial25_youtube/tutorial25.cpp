@@ -225,7 +225,6 @@ void Tutorial25::RenderSceneCB()
 
     pMesh1->Render();
 
-
     glutPostRedisplay();
     glutSwapBuffers();
 }

@@ -27,7 +27,6 @@ using namespace std;
 #define BONE_ID_LOCATION     3
 #define BONE_WEIGHT_LOCATION 4
 
-
 void SkinnedMesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
 {
     for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(IDs) ; i++) {
@@ -146,8 +145,8 @@ void SkinnedMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices
     m_Positions.reserve(NumVertices);
     m_Normals.reserve(NumVertices);
     m_TexCoords.reserve(NumVertices);
-    Bones.resize(NumVertices);
     m_Indices.reserve(NumIndices);
+    m_Bones.resize(NumVertices);
 }
 
 
@@ -216,7 +215,7 @@ void SkinnedMesh::LoadBones(uint MeshIndex, const aiMesh* pMesh, vector<VertexBo
         for (uint j = 0 ; j < pMesh->mBones[i]->mNumWeights ; j++) {
             uint VertexID = m_Meshes[MeshIndex].BaseVertex + pMesh->mBones[i]->mWeights[j].mVertexId;
             float Weight  = pMesh->mBones[i]->mWeights[j].mWeight;
-            Bones[VertexID].AddBoneData(BoneIndex, Weight);
+            m_Bones[VertexID].AddBoneData(BoneIndex, Weight);
         }
     }
 }
@@ -384,7 +383,7 @@ void SkinnedMesh::PopulateBuffers()
     glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Bones[0]) * Bones.size(), &Bones[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Bones[0]) * m_Bones.size(), &m_Bones[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(BONE_ID_LOCATION);
     glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);

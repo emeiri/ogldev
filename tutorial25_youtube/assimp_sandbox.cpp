@@ -36,6 +36,7 @@ struct VertexBoneData
             if (Weights[i] == 0.0) {
                 IDs[i]     = BoneID;
                 Weights[i] = Weight;
+                printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
                 return;
             }
         }
@@ -74,10 +75,10 @@ void parse_single_bone(int mesh_index, int bone_index, const aiBone* pBone)
     for (int i = 0 ; i < pBone->mNumWeights ; i++) {
         if (i == 0) printf("\n");
         const aiVertexWeight& vw = pBone->mWeights[i];
-        printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
+        //        printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
 
         uint vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
-        printf("Vertex id %d\n", vertex_id);
+        printf("Vertex id %d ", vertex_id);
 
         vertex_to_bones[vertex_id].AddBoneData(bone_index, vw.mWeight);
     }

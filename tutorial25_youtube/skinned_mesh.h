@@ -167,7 +167,7 @@ private:
     vector<Vector3f> m_Normals;
     vector<Vector2f> m_TexCoords;
     vector<unsigned int> m_Indices;
-    vector<VertexBoneData> Bones;
+    vector<VertexBoneData> m_Bones;
 
     map<string,uint> m_BoneMapping; // maps a bone name to its index
     uint m_NumBones;
