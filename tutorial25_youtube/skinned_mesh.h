@@ -57,6 +57,8 @@ public:
 
     const Material& GetMaterial();
 
+    int GetNumBones() const { return m_NumBones; }
+
 private:
     #define NUM_BONES_PER_VERTEX 4
 

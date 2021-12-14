@@ -60,6 +60,7 @@ uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
+uniform int gDisplayBoneIndex;
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
@@ -142,7 +143,7 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    if (BoneIDs0.x == 2) {
+    if (BoneIDs0.x == gDisplayBoneIndex) {
        FragColor = vec4(1.0, 0.0, 0.0, 0.0);
     } else {
        FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight + vec4(1.0);

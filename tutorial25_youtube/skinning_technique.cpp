@@ -178,6 +178,11 @@ bool SkinningTechnique::Init()
         boneLocation[i] = GetUniformLocation(Name);
     }
 
+    displayBoneIndexLocation = GetUniformLocation("gDisplayBoneIndex");
+    if (displayBoneIndexLocation == INVALID_UNIFORM_LOCATION) {
+        return false;
+    }
+
     return true;
 }
 
@@ -267,4 +272,10 @@ void SkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
     }
     //Transform.Print();
     glUniformMatrix4fv(boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);
+}
+
+
+void SkinningTechnique::SetDisplayBoneIndex(uint DisplayBoneIndex)
+{
+    glUniform1i(displayBoneIndexLocation, DisplayBoneIndex);
 }

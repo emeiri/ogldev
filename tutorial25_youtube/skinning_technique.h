@@ -16,7 +16,7 @@
 */
 
 #ifndef SKINNING_TECHNIQUE_H
-#define	SKINNING_TECHNIQUE_H
+#define SKINNING_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -105,6 +105,7 @@ public:
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
     void SetBoneTransform(uint Index, const Matrix4f& Transform);
+    void SetDisplayBoneIndex(uint DisplayBoneIndex);
 
 private:
 
@@ -157,7 +158,8 @@ struct {
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 
     GLuint boneLocation[MAX_BONES];
+    GLuint displayBoneIndexLocation;
 };
 
 
-#endif	/* SKINNING_TECHNIQUE_H */
+#endif  /* SKINNING_TECHNIQUE_H */

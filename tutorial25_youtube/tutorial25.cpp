@@ -61,7 +61,9 @@ private:
     SkinningTechnique* pSkinningTech = NULL;
     PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
-    float counter = 0;
+    float Counter = 0;
+    long long StartTime = 0;
+    int DisplayBoneIndex = 0;
 };
 
 
@@ -144,6 +146,8 @@ bool Tutorial25::Init()
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
+    StartTime = GetCurrentTimeMillis();
+
     return true;
 }
 
@@ -159,7 +163,7 @@ void Tutorial25::RenderSceneCB()
 #else
     float YRotationAngle = 1.0f;
 #endif
-    counter += 0.01f;
+    Counter += 0.01f;
 
     vector<Matrix4f> Transforms;
 
@@ -188,7 +192,7 @@ void Tutorial25::RenderSceneCB()
     pointLights[0].CalcLocalPosition(worldTransform);
 
     pointLights[1].WorldPosition.x = 10.0f;
-    pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
+    pointLights[1].WorldPosition.y = sinf(Counter) * 4 + 4;
     pointLights[1].WorldPosition.z = 0.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
 
@@ -208,6 +212,15 @@ void Tutorial25::RenderSceneCB()
 
     Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pSkinningTech->SetCameraLocalPos(CameraLocalPos3f);
+
+    long long CurrentTime = GetCurrentTimeMillis();
+
+    if (CurrentTime > StartTime + 500) {
+        pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
+        DisplayBoneIndex++;
+        DisplayBoneIndex = DisplayBoneIndex % pMesh1->GetNumBones();
+        StartTime = CurrentTime;
+    }
 
     pMesh1->Render();
 
