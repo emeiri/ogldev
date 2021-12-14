@@ -53,8 +53,6 @@ public:
     void PassiveMouseCB(int x, int y);
 
 private:
-    float GetRunningTime();
-
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
@@ -64,7 +62,6 @@ private:
     PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
-    long long startTime = 0;
 };
 
 
@@ -147,16 +144,7 @@ bool Tutorial25::Init()
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
-    startTime = GetCurrentTimeMillis();
-
     return true;
-}
-
-
-float Tutorial25::GetRunningTime()
-{
-    float RunningTime = (float)((double)GetCurrentTimeMillis() - (double)startTime) / 1000.0f;
-    return RunningTime;
 }
 
 
@@ -175,9 +163,7 @@ void Tutorial25::RenderSceneCB()
 
     vector<Matrix4f> Transforms;
 
-    float RunningTime = GetRunningTime();
-
-    pMesh1->BoneTransform(RunningTime, Transforms);
+    pMesh1->BoneTransform(Transforms);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
         //        pSkinningTech->SetBoneTransform(i, Transforms[i]);

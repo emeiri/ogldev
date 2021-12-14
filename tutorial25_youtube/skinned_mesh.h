@@ -49,7 +49,7 @@ public:
         return m_NumBones;
     }
 
-    void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
+    void BoneTransform(vector<Matrix4f>& Transforms);
 
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
@@ -70,7 +70,7 @@ private:
 
     void InitAllMeshes(const aiScene* pScene);
 
-    void InitSingleMesh(const aiMesh* paiMesh);
+    void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 
@@ -115,15 +115,7 @@ private:
         void AddBoneData(uint BoneID, float Weight);
     };
 
-    void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
-    void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
-    void LoadBones(uint MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
+    void LoadBones(uint MeshIndex, const aiMesh* paiMesh);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -172,8 +164,6 @@ private:
     map<string,uint> m_BoneMapping; // maps a bone name to its index
     uint m_NumBones;
     vector<BoneInfo> m_BoneInfo;
-    Matrix4f m_GlobalInverseTransform;
-
 };
 
 

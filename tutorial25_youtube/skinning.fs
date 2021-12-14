@@ -6,6 +6,7 @@ const int MAX_SPOT_LIGHTS = 2;
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 LocalPos0;
+flat in ivec4 BoneIDs0;
 
 out vec4 FragColor;
 
@@ -141,5 +142,9 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight + vec4(1.0);
+    if (BoneIDs0.x == 2) {
+       FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+    } else {
+       FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight + vec4(1.0);
+    }
 }
