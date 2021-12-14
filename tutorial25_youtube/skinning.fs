@@ -7,6 +7,7 @@ in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 LocalPos0;
 flat in ivec4 BoneIDs0;
+in vec4 Weights0;
 
 out vec4 FragColor;
 
@@ -143,9 +144,24 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    if (BoneIDs0.x == gDisplayBoneIndex) {
-       FragColor = vec4(1.0, 0.0, 0.0, 0.0);
-    } else {
-       FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight + vec4(1.0);
+    int i;
+
+    for (i = 0 ; i < 4 ; i++) {
+        if (BoneIDs0[i] == gDisplayBoneIndex) {
+           if (Weights0[i] >= 0.7) {
+               FragColor = vec4(1.0, 0.0, 0.0, 0.0) * Weights0[i];
+           }
+           else if (Weights0[i] >= 0.4 && Weights0[i] <= 0.6) {
+               FragColor = vec4(0.0, 1.0, 0.0, 0.0) * Weights0[i];
+           } else if (Weights0[i] >= 0.1) {
+               FragColor = vec4(1.0, 1.0, 0.0, 0.0) * Weights0[i];
+           }
+
+           break;
+        }
+    }
+
+    if (i == 4) {
+         FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * vec4(0.0001) + vec4(0.0, 0.0, 1.0, 0.0);
     }
 }

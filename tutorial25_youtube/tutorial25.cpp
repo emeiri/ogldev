@@ -84,10 +84,10 @@ Tutorial25::Tutorial25()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    pointLights[0].AmbientIntensity = 0.1f;
-    pointLights[0].DiffuseIntensity = 0.0f;
+    pointLights[0].AmbientIntensity = 1.0f;
+    pointLights[0].DiffuseIntensity = 1.0f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 0.0f);
-    pointLights[0].Attenuation.Linear = 0.2f;
+    pointLights[0].Attenuation.Linear = 0.0f;
     pointLights[0].Attenuation.Exp = 0.0f;
 
     pointLights[1].DiffuseIntensity = 0.0f;
@@ -186,9 +186,9 @@ void Tutorial25::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     pSkinningTech->SetWVP(WVP);
 
-    pointLights[0].WorldPosition.x = -10.0f;
-    pointLights[0].WorldPosition.y = 2;
-    pointLights[0].WorldPosition.z = 0.0f;
+    pointLights[0].WorldPosition.x = 0.0f;
+    pointLights[0].WorldPosition.y = 1.0;
+    pointLights[0].WorldPosition.z = 1.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
     pointLights[1].WorldPosition.x = 10.0f;
@@ -215,12 +215,12 @@ void Tutorial25::RenderSceneCB()
 
     long long CurrentTime = GetCurrentTimeMillis();
 
-    if (CurrentTime > StartTime + 500) {
+    /*    if (CurrentTime > StartTime + 500) {
         pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
         DisplayBoneIndex++;
         DisplayBoneIndex = DisplayBoneIndex % pMesh1->GetNumBones();
         StartTime = CurrentTime;
-    }
+        }*/
 
     pMesh1->Render();
 
@@ -239,6 +239,12 @@ void Tutorial25::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     case 'q':
     case 27:    // escape key code
         exit(0);
+
+    case ' ':
+        DisplayBoneIndex++;
+        DisplayBoneIndex = DisplayBoneIndex % pMesh1->GetNumBones();
+        pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
+        break;
 
     case 'a':
         pointLights[0].Attenuation.Linear += ATTEN_STEP;

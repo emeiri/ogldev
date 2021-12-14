@@ -104,7 +104,6 @@ public:
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
-    void SetBoneTransform(uint Index, const Matrix4f& Transform);
     void SetDisplayBoneIndex(uint DisplayBoneIndex);
 
 private:
@@ -157,7 +156,6 @@ struct {
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 
-    GLuint boneLocation[MAX_BONES];
     GLuint displayBoneIndexLocation;
 };
 
