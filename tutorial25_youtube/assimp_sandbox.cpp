@@ -2,39 +2,29 @@
 #include <string>
 #include <vector>
 
-#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/Importer.hpp>  // C++ importer interface
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
 
 #include "ogldev_util.h"
 
 
-std::vector<int> mesh_base_vertex;
-std::map<std::string,uint> bone_name_to_index_map;
-
-#define NUM_BONES_PER_VERTEX 4
+#define MAX_NUM_BONES_PER_VERTEX 4
 
 struct VertexBoneData
 {
-    uint IDs[NUM_BONES_PER_VERTEX];
-    float Weights[NUM_BONES_PER_VERTEX];
+    uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
+    float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0 };
 
     VertexBoneData()
     {
-        Reset();
-    };
-
-    void Reset()
-    {
-        ZERO_MEM(IDs);
-        ZERO_MEM(Weights);
     }
 
     void AddBoneData(uint BoneID, float Weight)
     {
-        for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(IDs) ; i++) {
+        for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(BoneIDs) ; i++) {
             if (Weights[i] == 0.0) {
-                IDs[i]     = BoneID;
+                BoneIDs[i] = BoneID;
                 Weights[i] = Weight;
                 printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
                 return;
@@ -46,7 +36,11 @@ struct VertexBoneData
     }
 };
 
-vector<VertexBoneData> vertex_to_bones;
+
+std::vector<VertexBoneData> vertex_to_bones;
+std::vector<int> mesh_base_vertex;
+std::map<std::string,uint> bone_name_to_index_map;
+
 
 int get_bone_id(const aiBone* pBone)
 {
@@ -80,6 +74,7 @@ void parse_single_bone(int mesh_index, int bone_index, const aiBone* pBone)
         uint vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
         printf("Vertex id %d ", vertex_id);
 
+        assert(vertex_id < vertex_to_bones.size());
         vertex_to_bones[vertex_id].AddBoneData(bone_index, vw.mWeight);
     }
 
@@ -106,8 +101,7 @@ void parse_meshes(const aiScene* pScene)
 
     mesh_base_vertex.resize(pScene->mNumMeshes);
 
-    for (int i = 0 ; i < pScene->mNumMeshes ; i++) {
-        const aiMesh* pMesh = pScene->mMeshes[i];
+    for (int i = 0 ; i < pScene->mNumMeshes ; i++) {        const aiMesh* pMesh = pScene->mMeshes[i];
         int num_vertices = pMesh->mNumVertices;
         int num_indices = pMesh->mNumFaces * 3;
         int num_bones = pMesh->mNumBones;
