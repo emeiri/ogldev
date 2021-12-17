@@ -14,7 +14,7 @@
 struct VertexBoneData
 {
     uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
-    float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0 };
+    float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
 
     VertexBoneData()
     {
@@ -59,9 +59,9 @@ int get_bone_id(const aiBone* pBone)
     return bone_id;
 }
 
-void parse_single_bone(int mesh_index, int bone_index, const aiBone* pBone)
+void parse_single_bone(int mesh_index, const aiBone* pBone)
 {
-    printf("      Bone %d: '%s' num vertices affected by this bone: %d\n", bone_index, pBone->mName.C_Str(), pBone->mNumWeights);
+    printf("      Bone '%s': num vertices affected by this bone: %d\n", pBone->mName.C_Str(), pBone->mNumWeights);
 
     int bone_id = get_bone_id(pBone);
     printf("bone id %d\n", bone_id);
@@ -71,11 +71,11 @@ void parse_single_bone(int mesh_index, int bone_index, const aiBone* pBone)
         const aiVertexWeight& vw = pBone->mWeights[i];
         //        printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
 
-        uint vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
-        printf("Vertex id %d ", vertex_id);
+        uint global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
+        printf("Vertex id %d ", global_vertex_id);
 
-        assert(vertex_id < vertex_to_bones.size());
-        vertex_to_bones[vertex_id].AddBoneData(bone_index, vw.mWeight);
+        assert(global_vertex_id < vertex_to_bones.size());
+        vertex_to_bones[global_vertex_id].AddBoneData(bone_id, vw.mWeight);
     }
 
     printf("\n");
@@ -85,7 +85,7 @@ void parse_single_bone(int mesh_index, int bone_index, const aiBone* pBone)
 void parse_mesh_bones(int mesh_index, const aiMesh* pMesh)
 {
     for (int i = 0 ; i < pMesh->mNumBones ; i++) {
-        parse_single_bone(mesh_index, i, pMesh->mBones[i]);
+        parse_single_bone(mesh_index, pMesh->mBones[i]);
     }
 }
 
