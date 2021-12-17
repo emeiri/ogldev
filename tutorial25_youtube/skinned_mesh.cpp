@@ -170,23 +170,6 @@ void SkinnedMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
-int SkinnedMesh::GetBoneId(const aiBone* pBone)
-{
-    int BoneIndex = 0;
-    string BoneName(pBone->mName.C_Str());
-
-    if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
-        // Allocate an index for a new bone
-        BoneIndex = m_BoneNameToIndexMap.size();
-        m_BoneNameToIndexMap[BoneName] = BoneIndex;
-    }
-    else {
-        BoneIndex = m_BoneNameToIndexMap[BoneName];
-    }
-
-    return BoneIndex;
-}
-
 void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 {
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
@@ -206,6 +189,23 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
     }
 }
 
+
+int SkinnedMesh::GetBoneId(const aiBone* pBone)
+{
+    int BoneIndex = 0;
+    string BoneName(pBone->mName.C_Str());
+
+    if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
+        // Allocate an index for a new bone
+        BoneIndex = m_BoneNameToIndexMap.size();
+        m_BoneNameToIndexMap[BoneName] = BoneIndex;
+    }
+    else {
+        BoneIndex = m_BoneNameToIndexMap[BoneName];
+    }
+
+    return BoneIndex;
+}
 
 
 string GetDirFromFilename(const string& Filename)
@@ -383,9 +383,10 @@ void SkinnedMesh::PopulateBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_Bones[0]) * m_Bones.size(), &m_Bones[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(BONE_ID_LOCATION);
-    glVertexAttribIPointer(BONE_ID_LOCATION, 4, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+    glVertexAttribIPointer(BONE_ID_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
-    glVertexAttribPointer(BONE_WEIGHT_LOCATION, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
+    glVertexAttribPointer(BONE_WEIGHT_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData),
+                          (const GLvoid*)(MAX_NUM_BONES_PER_VERTEX * sizeof(int32_t)));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
