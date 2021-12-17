@@ -27,28 +27,6 @@ using namespace std;
 #define BONE_ID_LOCATION     3
 #define BONE_WEIGHT_LOCATION 4
 
-void SkinnedMesh::VertexBoneData::AddBoneData(uint BoneID, float Weight)
-{
-    for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(IDs) ; i++) {
-        if (Weights[i] == 0.0) {
-            IDs[i]     = BoneID;
-            Weights[i] = Weight;
-            return;
-        }
-    }
-
-    // should never get here - more bones than we have space for
-    //    assert(0);
-}
-
-SkinnedMesh::SkinnedMesh()
-{
-    m_VAO = 0;
-    ZERO_MEM(m_Buffers);
-    m_NumBones = 0;
-    pScene = NULL;
-}
-
 
 SkinnedMesh::~SkinnedMesh()
 {
@@ -82,8 +60,9 @@ bool SkinnedMesh::LoadMesh(const string& Filename)
     glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
 
     bool Ret = false;
+    Assimp::Importer Importer;
 
-    pScene = Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
+    const aiScene* pScene = Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
 
     if (pScene) {
         Ret = InitFromScene(pScene, Filename);
@@ -177,7 +156,7 @@ void SkinnedMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
         m_TexCoords.push_back(Vector2f(pTexCoord.x, pTexCoord.y));
     }
 
-    LoadBones(MeshIndex, paiMesh);
+    LoadMeshBones(MeshIndex, paiMesh);
 
     // Populate the index buffer
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
@@ -191,30 +170,41 @@ void SkinnedMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
-void SkinnedMesh::LoadBones(uint MeshIndex, const aiMesh* pMesh)
+int SkinnedMesh::GetBoneId(const aiBone* pBone)
+{
+    int BoneIndex = 0;
+    string BoneName(pBone->mName.C_Str());
+
+    if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
+        // Allocate an index for a new bone
+        BoneIndex = m_NumBones;
+        m_NumBones++;
+        printf("Num bones %d\n", m_NumBones);
+        m_BoneNameToIndexMap[BoneName] = BoneIndex;
+    }
+    else {
+        BoneIndex = m_BoneNameToIndexMap[BoneName];
+    }
+
+    return BoneIndex;
+}
+
+void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 {
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
-        uint BoneIndex = 0;
-        string BoneName(pMesh->mBones[i]->mName.data);
+        LoadSingleBone(MeshIndex, pMesh->mBones[i]);
+    }
+}
 
-        if (m_BoneMapping.find(BoneName) == m_BoneMapping.end()) {
-            // Allocate an index for a new bone
-            BoneIndex = m_NumBones;
-            m_NumBones++;
-            BoneInfo bi;
-            m_BoneInfo.push_back(bi);
-            m_BoneInfo[BoneIndex].BoneOffset = pMesh->mBones[i]->mOffsetMatrix;
-            m_BoneMapping[BoneName] = BoneIndex;
-        }
-        else {
-            BoneIndex = m_BoneMapping[BoneName];
-        }
 
-        for (uint j = 0 ; j < pMesh->mBones[i]->mNumWeights ; j++) {
-            uint VertexID = m_Meshes[MeshIndex].BaseVertex + pMesh->mBones[i]->mWeights[j].mVertexId;
-            float Weight  = pMesh->mBones[i]->mWeights[j].mWeight;
-            m_Bones[VertexID].AddBoneData(BoneIndex, Weight);
-        }
+void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
+{
+    int BoneId = GetBoneId(pBone);
+
+    for (uint i = 0 ; i < pBone->mNumWeights ; i++) {
+        const aiVertexWeight& vw = pBone->mWeights[i];
+        uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + pBone->mWeights[i].mVertexId;
+        m_Bones[GlobalVertexID].AddBoneData(BoneId, vw.mWeight);
     }
 }
 
@@ -252,6 +242,8 @@ bool SkinnedMesh::InitMaterials(const aiScene* pScene, const string& Filename)
     string Dir = GetDirFromFilename(Filename);
 
     bool Ret = true;
+
+    printf("Num materials: %d\n", pScene->mNumMaterials);
 
     // Initialize the materials
     for (unsigned int i = 0 ; i < pScene->mNumMaterials ; i++) {
@@ -313,7 +305,9 @@ void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMate
         if (pMaterial->GetTexture(aiTextureType_SHININESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             string p(Path.data);
 
-            if (p.substr(0, 2) == ".\\") {
+            if (p == "C:\\\\") {
+                p = "";
+            } else if (p.substr(0, 2) == ".\\") {
                 p = p.substr(2, p.size() - 2);
             }
 
@@ -335,12 +329,20 @@ void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMate
 void SkinnedMesh::LoadColors(const aiMaterial* pMaterial, int index)
 {
     aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
+    Vector3f AllOnes(1.0f, 1.0f, 1.0f);
+
+    int ShadingModel = 0;
+    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) == AI_SUCCESS) {
+        printf("Shading model %d\n", ShadingModel);
+    }
 
     if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
         printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
         m_Materials[index].AmbientColor.r = AmbientColor.r;
         m_Materials[index].AmbientColor.g = AmbientColor.g;
         m_Materials[index].AmbientColor.b = AmbientColor.b;
+    } else {
+        m_Materials[index].AmbientColor = AllOnes;
     }
 
     aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);
@@ -415,53 +417,6 @@ void SkinnedMesh::Render()
                                  GL_UNSIGNED_INT,
                                  (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
                                  m_Meshes[i].BaseVertex);
-    }
-
-    // Make sure the VAO is not changed from the outside
-    glBindVertexArray(0);
-}
-
-
-void SkinnedMesh::BoneTransform(vector<Matrix4f>& Transforms)
-{
-    Transforms.resize(m_NumBones);
-
-    for (uint i = 0 ; i < m_NumBones ; i++) {
-        Transforms[i] = m_BoneInfo[i].FinalTransformation;
-    }
-}
-
-
-// Used only by instancing
-void SkinnedMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WORLD_MAT_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
-
-    glBindVertexArray(m_VAO);
-
-    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-        const unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
-
-        assert(MaterialIndex < m_Materials.size());
-
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(GL_TEXTURE0);
-        }
-
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
-        }
-
-        glDrawElementsInstancedBaseVertex(GL_TRIANGLES,
-                                          m_Meshes[i].NumIndices,
-                                          GL_UNSIGNED_INT,
-                                          (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
-                                          NumInstances,
-                                          m_Meshes[i].BaseVertex);
     }
 
     // Make sure the VAO is not changed from the outside

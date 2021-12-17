@@ -36,7 +36,7 @@
 class SkinnedMesh
 {
 public:
-    SkinnedMesh();
+    SkinnedMesh() {};
 
     ~SkinnedMesh();
 
@@ -49,15 +49,12 @@ public:
         return m_NumBones;
     }
 
-
-    void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
-
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
     const Material& GetMaterial();
 
 private:
-    #define NUM_BONES_PER_VERTEX 4
+    #define MAX_NUM_BONES_PER_VERTEX 4
 
     void Clear();
 
@@ -83,36 +80,34 @@ private:
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
-    struct BoneInfo
-    {
-        Matrix4f BoneOffset;
-
-        BoneInfo()
-        {
-            BoneOffset.SetZero();
-        }
-    };
-
     struct VertexBoneData
     {
-        uint IDs[NUM_BONES_PER_VERTEX];
-        float Weights[NUM_BONES_PER_VERTEX];
+        uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
+        float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
 
         VertexBoneData()
         {
-            Reset();
-        };
-
-        void Reset()
-        {
-            ZERO_MEM(IDs);
-            ZERO_MEM(Weights);
         }
 
-        void AddBoneData(uint BoneID, float Weight);
+        void AddBoneData(uint BoneID, float Weight)
+        {
+            for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(BoneIDs) ; i++) {
+                if (Weights[i] == 0.0) {
+                    BoneIDs[i] = BoneID;
+                    Weights[i] = Weight;
+                    //printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
+                    return;
+                }
+            }
+
+            // should never get here - more bones than we have space for
+            assert(0);
+        }
     };
 
-    void LoadBones(uint MeshIndex, const aiMesh* paiMesh);
+    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
+    void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
+    int GetBoneId(const aiBone* pBone);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -122,9 +117,7 @@ private:
         TEXCOORD_VB  = 2,
         NORMAL_VB    = 3,
         BONE_VB      = 4,
-        WVP_MAT_VB   = 5,
-        WORLD_MAT_VB = 6,
-        NUM_BUFFERS  = 7
+        NUM_BUFFERS  = 5
     };
 
     WorldTrans m_worldTransform;
@@ -146,8 +139,6 @@ private:
         unsigned int MaterialIndex;
     };
 
-    Assimp::Importer Importer;
-    const aiScene* pScene = NULL;
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<Material> m_Materials;
 
@@ -158,9 +149,8 @@ private:
     vector<unsigned int> m_Indices;
     vector<VertexBoneData> m_Bones;
 
-    map<string,uint> m_BoneMapping; // maps a bone name to its index
-    uint m_NumBones;
-    vector<BoneInfo> m_BoneInfo;
+    uint m_NumBones = 0;
+    map<string,uint> m_BoneNameToIndexMap;
 };
 
 

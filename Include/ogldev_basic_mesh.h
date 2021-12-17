@@ -82,8 +82,8 @@ private:
         POS_VB       = 1,
         TEXCOORD_VB  = 2,
         NORMAL_VB    = 3,
-        WVP_MAT_VB   = 4,
-        WORLD_MAT_VB = 5,
+        WVP_MAT_VB   = 4,  // required only for instancing
+        WORLD_MAT_VB = 5,  // required only for instancing
         NUM_BUFFERS  = 6
     };
 
