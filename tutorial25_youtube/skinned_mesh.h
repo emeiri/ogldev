@@ -46,7 +46,7 @@ public:
 
     uint NumBones() const
     {
-        return m_NumBones;
+        return m_BoneNameToIndexMap.size();
     }
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
@@ -149,7 +149,6 @@ private:
     vector<unsigned int> m_Indices;
     vector<VertexBoneData> m_Bones;
 
-    uint m_NumBones = 0;
     map<string,uint> m_BoneNameToIndexMap;
 };
 

@@ -177,9 +177,7 @@ int SkinnedMesh::GetBoneId(const aiBone* pBone)
 
     if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
         // Allocate an index for a new bone
-        BoneIndex = m_NumBones;
-        m_NumBones++;
-        printf("Num bones %d\n", m_NumBones);
+        BoneIndex = m_BoneNameToIndexMap.size();
         m_BoneNameToIndexMap[BoneName] = BoneIndex;
     }
     else {
