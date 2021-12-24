@@ -12,11 +12,20 @@ out vec3 LocalPos0;
 flat out ivec4 BoneIDs0;
 out vec4 Weights0;
 
+const int MAX_BONES = 100;
+
 uniform mat4 gWVP;
+uniform mat4 gBones[MAX_BONES];
 
 void main()
 {
-    gl_Position = gWVP * vec4(Position, 1.0);
+    mat4 BoneTransform = gBones[BoneIDs[0]] * Weights[0];
+    BoneTransform     += gBones[BoneIDs[1]] * Weights[1];
+    BoneTransform     += gBones[BoneIDs[2]] * Weights[2];
+    BoneTransform     += gBones[BoneIDs[3]] * Weights[3];
+
+    vec4 PosL = BoneTransform * vec4(Position, 1.0);
+    gl_Position = gWVP * PosL;
     TexCoord0 = TexCoord;
     Normal0 = Normal;
     LocalPos0 = Position;

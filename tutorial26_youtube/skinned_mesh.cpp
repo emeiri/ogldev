@@ -60,9 +60,8 @@ bool SkinnedMesh::LoadMesh(const string& Filename)
     glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
 
     bool Ret = false;
-    Assimp::Importer Importer;
 
-    const aiScene* pScene = Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
+    pScene = Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
 
     if (pScene) {
         Ret = InitFromScene(pScene, Filename);
@@ -181,6 +180,12 @@ void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
 {
     int BoneId = GetBoneId(pBone);
+
+    if (BoneId == m_BoneInfo.size()) {
+        BoneInfo bi;
+        m_BoneInfo.push_back(bi);
+        m_BoneInfo[BoneId].BoneOffset = pBone->mOffsetMatrix;
+    }
 
     for (uint i = 0 ; i < pBone->mNumWeights ; i++) {
         const aiVertexWeight& vw = pBone->mWeights[i];
@@ -432,4 +437,60 @@ const Material& SkinnedMesh::GetMaterial()
     }
 
     return m_Materials[0];
+}
+
+
+void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentTransform)
+{
+    string NodeName(pNode->mName.data);
+
+    const aiAnimation* pAnimation = pScene->mAnimations[0];
+
+    Matrix4f NodeTransformation(pNode->mTransformation);
+
+    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+
+    if (pNodeAnim) {
+        NodeTransformation.InitIdentity();
+    }
+
+    Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
+
+    if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
+        uint BoneIndex = m_BoneNameToIndexMap[NodeName];
+        m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
+    }
+
+    for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
+        ReadNodeHeirarchy(pNode->mChildren[i], GlobalTransformation);
+    }
+}
+
+
+void SkinnedMesh::BoneTransform(vector<Matrix4f>& Transforms)
+{
+    Matrix4f Identity;
+    Identity.InitIdentity();
+
+    ReadNodeHeirarchy(pScene->mRootNode, Identity);
+
+    Transforms.resize(m_BoneInfo.size());
+
+    for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
+        Transforms[i] = m_BoneInfo[i].FinalTransformation;
+    }
+}
+
+
+const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string NodeName)
+{
+    for (uint i = 0 ; i < pAnimation->mNumChannels ; i++) {
+        const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
+
+        if (string(pNodeAnim->mNodeName.data) == NodeName) {
+            return pNodeAnim;
+        }
+    }
+
+    return NULL;
 }

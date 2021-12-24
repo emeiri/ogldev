@@ -207,6 +207,13 @@ void Tutorial25::RenderSceneCB()
         StartTime = CurrentTime;
         }*/
 
+    vector<Matrix4f> Transforms;
+    pMesh1->BoneTransform(Transforms);
+
+    for (uint i = 0 ; i < Transforms.size() ; i++) {
+        pSkinningTech->SetBoneTransform(i, Transforms[i]);
+    }
+
     pMesh1->Render();
 
     glutPostRedisplay();

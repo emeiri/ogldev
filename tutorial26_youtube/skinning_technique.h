@@ -105,6 +105,7 @@ public:
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
     void SetDisplayBoneIndex(uint DisplayBoneIndex);
+    void SetBoneTransform(uint Index, const Matrix4f& Transform);
 
 private:
 
@@ -157,6 +158,7 @@ struct {
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 
     GLuint displayBoneIndexLocation;
+    GLuint m_boneLocation[MAX_BONES];
 };
 
 

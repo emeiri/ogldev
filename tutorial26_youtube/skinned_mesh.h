@@ -53,6 +53,8 @@ public:
 
     const Material& GetMaterial();
 
+    void BoneTransform(vector<Matrix4f>& Transforms);
+
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4
 
@@ -108,6 +110,8 @@ private:
     void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
     void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
+    void ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentTransform);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -139,6 +143,8 @@ private:
         unsigned int MaterialIndex;
     };
 
+    Assimp::Importer Importer;
+    const aiScene* pScene = NULL;
     std::vector<BasicMeshEntry> m_Meshes;
     std::vector<Material> m_Materials;
 
@@ -150,6 +156,20 @@ private:
     vector<VertexBoneData> m_Bones;
 
     map<string,uint> m_BoneNameToIndexMap;
+
+    struct BoneInfo
+    {
+        Matrix4f BoneOffset;
+        Matrix4f FinalTransformation;
+
+        BoneInfo()
+        {
+            BoneOffset.SetZero();
+            FinalTransformation.SetZero();
+        }
+    };
+
+    vector<BoneInfo> m_BoneInfo;
 };
 
 

@@ -163,6 +163,8 @@ void main()
     }
 
     if (!found ) {
-         FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * vec4(0.0001) + vec4(0.0, 0.0, 1.0, 0.0);
+         FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * vec4(0.0001) + vec4(1.0, 1.0, 1.0, 0.0);
     }
+
+FragColor += vec4(0.5);
 }
