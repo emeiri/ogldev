@@ -12,8 +12,6 @@ out vec3 LocalPos0;
 flat out ivec4 BoneIDs0;
 out vec4 Weights0;
 
-const int MAX_BONES = 100;
-
 uniform mat4 gWVP;
 
 void main()
