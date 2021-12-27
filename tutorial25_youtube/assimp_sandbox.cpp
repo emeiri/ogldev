@@ -69,7 +69,6 @@ void parse_single_bone(int mesh_index, const aiBone* pBone)
     for (int i = 0 ; i < pBone->mNumWeights ; i++) {
         if (i == 0) printf("\n");
         const aiVertexWeight& vw = pBone->mWeights[i];
-        //printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
 
         uint global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
         printf("Vertex id %d ", global_vertex_id);

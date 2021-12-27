@@ -150,8 +150,7 @@ void main()
         if (BoneIDs0[i] == gDisplayBoneIndex) {
            if (Weights0[i] >= 0.7) {
                FragColor = vec4(1.0, 0.0, 0.0, 0.0) * Weights0[i];
-           }
-           else if (Weights0[i] >= 0.4 && Weights0[i] <= 0.6) {
+           } else if (Weights0[i] >= 0.4 && Weights0[i] <= 0.6) {
                FragColor = vec4(0.0, 1.0, 0.0, 0.0) * Weights0[i];
            } else if (Weights0[i] >= 0.1) {
                FragColor = vec4(1.0, 1.0, 0.0, 0.0) * Weights0[i];
