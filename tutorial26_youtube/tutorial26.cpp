@@ -39,11 +39,11 @@
 
 
 
-class Tutorial25
+class Tutorial26
 {
 public:
-    Tutorial25();
-    ~Tutorial25();
+    Tutorial26();
+    ~Tutorial26();
 
     bool Init();
 
@@ -66,7 +66,7 @@ private:
 };
 
 
-Tutorial25::Tutorial25()
+Tutorial26::Tutorial26()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -106,7 +106,7 @@ Tutorial25::Tutorial25()
 }
 
 
-Tutorial25::~Tutorial25()
+Tutorial26::~Tutorial26()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -118,7 +118,7 @@ Tutorial25::~Tutorial25()
 }
 
 
-bool Tutorial25::Init()
+bool Tutorial26::Init()
 {
     Vector3f CameraPos(0.0f, 5.0f, -8.0f);
     Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
@@ -152,7 +152,7 @@ bool Tutorial25::Init()
 }
 
 
-void Tutorial25::RenderSceneCB()
+void Tutorial26::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 ;
@@ -160,7 +160,7 @@ void Tutorial25::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
-    worldTransform.SetRotation(270.0f, 180.0f, 0.0f);
+    worldTransform.SetRotation(0.0f, 180.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
     worldTransform.SetScale(0.1);
 
@@ -225,7 +225,7 @@ void Tutorial25::RenderSceneCB()
 
 #define ANGLE_STEP 1.0f
 
-void Tutorial25::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void Tutorial26::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case 'q':
@@ -280,42 +280,42 @@ void Tutorial25::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void Tutorial25::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void Tutorial26::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial25::PassiveMouseCB(int x, int y)
+void Tutorial26::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-Tutorial25* pTutorial25 = NULL;
+Tutorial26* pTutorial26 = NULL;
 
 
 void RenderSceneCB()
 {
-    pTutorial25->RenderSceneCB();
+    pTutorial26->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pTutorial25->KeyboardCB(key, mouse_x, mouse_y);
+    pTutorial26->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pTutorial25->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTutorial26->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pTutorial25->PassiveMouseCB(x, y);
+    pTutorial26->PassiveMouseCB(x, y);
 }
 
 
@@ -363,9 +363,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pTutorial25 = new Tutorial25();
+    pTutorial26 = new Tutorial26();
 
-    if (!pTutorial25->Init()) {
+    if (!pTutorial26->Init()) {
         return 1;
     }
 
