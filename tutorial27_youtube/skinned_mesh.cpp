@@ -444,29 +444,9 @@ void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentT
 {
     string NodeName(pNode->mName.data);
 
-    const aiAnimation* pAnimation = pScene->mAnimations[0];
-
     Matrix4f NodeTransformation(pNode->mTransformation);
 
-    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
-
-    if (pNodeAnim) {
-        const aiVector3D& Scaling = pNodeAnim->mScalingKeys[0].mValue;
-        Matrix4f ScalingM;
-        ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-
-        // Interpolate rotation and generate rotation transformation matrix
-        const aiQuaternion& RotationQ = pNodeAnim->mRotationKeys[0].mValue;
-        Matrix4f RotationM = Matrix4f(RotationQ.GetMatrix());
-
-        // Interpolate translation and generate translation transformation matrix
-        aiVector3D Translation = pNodeAnim->mPositionKeys[0].mValue;
-        Matrix4f TranslationM;
-        TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-
-        // Combine the above transformations
-        NodeTransformation = TranslationM * RotationM * ScalingM;
-    }
+    printf("%s - ", NodeName.c_str());
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 
