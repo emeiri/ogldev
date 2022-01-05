@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 25 - Skeletal Animation - Part 2
+    Tutorial 27 - Skeletal Animation - Part 4
 */
 
 #include <stdio.h>
@@ -39,11 +39,11 @@
 
 
 
-class Tutorial26
+class Tutorial27
 {
 public:
-    Tutorial26();
-    ~Tutorial26();
+    Tutorial27();
+    ~Tutorial27();
 
     bool Init();
 
@@ -66,7 +66,7 @@ private:
 };
 
 
-Tutorial26::Tutorial26()
+Tutorial27::Tutorial27()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -106,7 +106,7 @@ Tutorial26::Tutorial26()
 }
 
 
-Tutorial26::~Tutorial26()
+Tutorial27::~Tutorial27()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -118,7 +118,7 @@ Tutorial26::~Tutorial26()
 }
 
 
-bool Tutorial26::Init()
+bool Tutorial27::Init()
 {
     Vector3f CameraPos(0.0f, 5.0f, -8.0f);
     Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
@@ -128,6 +128,7 @@ bool Tutorial26::Init()
 
     pMesh1 = new SkinnedMesh();
 
+    //    if (!pMesh1->LoadMesh("models/example1_single_bone.fbx")) {
     if (!pMesh1->LoadMesh("../Content/boblampclean.md5mesh")) {
         printf("Mesh load failed\n");
         return false;
@@ -152,7 +153,7 @@ bool Tutorial26::Init()
 }
 
 
-void Tutorial26::RenderSceneCB()
+void Tutorial27::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 ;
@@ -160,9 +161,9 @@ void Tutorial26::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
-    worldTransform.SetRotation(0.0f, 180.0f, 0.0f);
+    // worldTransform.SetRotation(0.0f, 180.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
-    worldTransform.SetScale(0.1);
+    //    worldTransform.SetScale(0.1);
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
@@ -225,7 +226,7 @@ void Tutorial26::RenderSceneCB()
 
 #define ANGLE_STEP 1.0f
 
-void Tutorial26::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void Tutorial27::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case 'q':
@@ -280,42 +281,42 @@ void Tutorial26::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void Tutorial26::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void Tutorial27::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial26::PassiveMouseCB(int x, int y)
+void Tutorial27::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-Tutorial26* pTutorial26 = NULL;
+Tutorial27* pTutorial27 = NULL;
 
 
 void RenderSceneCB()
 {
-    pTutorial26->RenderSceneCB();
+    pTutorial27->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pTutorial26->KeyboardCB(key, mouse_x, mouse_y);
+    pTutorial27->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pTutorial26->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTutorial27->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pTutorial26->PassiveMouseCB(x, y);
+    pTutorial27->PassiveMouseCB(x, y);
 }
 
 
@@ -363,9 +364,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pTutorial26 = new Tutorial26();
+    pTutorial27 = new Tutorial27();
 
-    if (!pTutorial26->Init()) {
+    if (!pTutorial27->Init()) {
         return 1;
     }
 
