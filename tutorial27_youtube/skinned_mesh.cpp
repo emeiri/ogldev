@@ -474,17 +474,3 @@ void SkinnedMesh::GetBoneTransforms(vector<Matrix4f>& Transforms)
         Transforms[i] = m_BoneInfo[i].FinalTransformation;
     }
 }
-
-
-const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string NodeName)
-{
-    for (uint i = 0 ; i < pAnimation->mNumChannels ; i++) {
-        const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
-
-        if (string(pNodeAnim->mNodeName.data) == NodeName) {
-            return pNodeAnim;
-        }
-    }
-
-    return NULL;
-}

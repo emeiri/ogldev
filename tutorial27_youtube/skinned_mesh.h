@@ -110,7 +110,6 @@ private:
     void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
     void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
     void ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentTransform);
 
 #define INVALID_MATERIAL 0xFFFFFFFF
