@@ -51,7 +51,7 @@ void print_space()
 }
 
 
-void print_assimp_matrix_4x4(const aiMatrix4x4& m)
+void print_assimp_matrix(const aiMatrix4x4& m)
 {
     print_space(); printf("%f %f %f %f\n", m.a1, m.a2, m.a3, m.a4);
     print_space(); printf("%f %f %f %f\n", m.b1, m.b2, m.b3, m.b4);
@@ -82,14 +82,14 @@ void parse_single_bone(int mesh_index, const aiBone* pBone)
     printf("      Bone '%s': num vertices affected by this bone: %d\n", pBone->mName.C_Str(), pBone->mNumWeights);
 
     int bone_id = get_bone_id(pBone);
-    printf("      Bone id %d\n", bone_id);
+    //    printf("      Bone id %d\n", bone_id);
 
-    print_assimp_matrix_4x4(pBone->mOffsetMatrix);
+    print_assimp_matrix(pBone->mOffsetMatrix);
 
     for (int i = 0 ; i < pBone->mNumWeights ; i++) {
         //        if (i == 0) printf("\n");
         const aiVertexWeight& vw = pBone->mWeights[i];
-                printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
+        //          printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
 
         uint global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
         //        printf("Vertex id %d ", global_vertex_id);
@@ -146,9 +146,9 @@ void parse_meshes(const aiScene* pScene)
 
 void parse_node(const aiNode* pNode)
 {
-    print_space(); printf("Node name: %s num children %d num meshes %d\n", pNode->mName.C_Str(), pNode->mNumChildren, pNode->mNumMeshes);
+    print_space(); printf("Node name: '%s' num children %d num meshes %d\n", pNode->mName.C_Str(), pNode->mNumChildren, pNode->mNumMeshes);
     print_space(); printf("Node transformation:\n");
-    print_assimp_matrix_4x4(pNode->mTransformation);
+    print_assimp_matrix(pNode->mTransformation);
 
     space_count += 4;
 
