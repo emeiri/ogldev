@@ -461,7 +461,7 @@ void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentT
 }
 
 
-void SkinnedMesh::BoneTransform(vector<Matrix4f>& Transforms)
+void SkinnedMesh::GetBoneTransforms(vector<Matrix4f>& Transforms)
 {
     Matrix4f Identity;
     Identity.InitIdentity();

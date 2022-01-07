@@ -201,15 +201,8 @@ void Tutorial27::RenderSceneCB()
 
     long long CurrentTime = GetCurrentTimeMillis();
 
-    /*    if (CurrentTime > StartTime + 500) {
-        pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
-        DisplayBoneIndex++;
-        DisplayBoneIndex = DisplayBoneIndex % pMesh1->GetNumBones();
-        StartTime = CurrentTime;
-        }*/
-
     vector<Matrix4f> Transforms;
-    pMesh1->BoneTransform(Transforms);
+    pMesh1->GetBoneTransforms(Transforms);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
         pSkinningTech->SetBoneTransform(i, Transforms[i]);
