@@ -158,12 +158,12 @@ private:
 
     struct BoneInfo
     {
-        Matrix4f BoneOffset;
+        Matrix4f OffsetMatrix;
         Matrix4f FinalTransformation;
 
-        BoneInfo()
+        BoneInfo(const Matrix4f& Offset)
         {
-            BoneOffset.SetZero();
+            OffsetMatrix = Offset;
             FinalTransformation.SetZero();
         }
     };

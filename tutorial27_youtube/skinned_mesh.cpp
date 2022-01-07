@@ -182,9 +182,8 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
     int BoneId = GetBoneId(pBone);
 
     if (BoneId == m_BoneInfo.size()) {
-        BoneInfo bi;
+        BoneInfo bi(pBone->mOffsetMatrix);
         m_BoneInfo.push_back(bi);
-        m_BoneInfo[BoneId].BoneOffset = pBone->mOffsetMatrix;
     }
 
     for (uint i = 0 ; i < pBone->mNumWeights ; i++) {
@@ -440,6 +439,21 @@ const Material& SkinnedMesh::GetMaterial()
 }
 
 
+void SkinnedMesh::GetBoneTransforms(vector<Matrix4f>& Transforms)
+{
+    Transforms.resize(m_BoneInfo.size());
+
+    Matrix4f Identity;
+    Identity.InitIdentity();
+
+    ReadNodeHeirarchy(pScene->mRootNode, Identity);
+
+    for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
+        Transforms[i] = m_BoneInfo[i].FinalTransformation;
+    }
+}
+
+
 void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentTransform)
 {
     string NodeName(pNode->mName.data);
@@ -452,25 +466,10 @@ void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentT
 
     if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
         uint BoneIndex = m_BoneNameToIndexMap[NodeName];
-        m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].BoneOffset;
+        m_BoneInfo[BoneIndex].FinalTransformation = GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
         ReadNodeHeirarchy(pNode->mChildren[i], GlobalTransformation);
-    }
-}
-
-
-void SkinnedMesh::GetBoneTransforms(vector<Matrix4f>& Transforms)
-{
-    Matrix4f Identity;
-    Identity.InitIdentity();
-
-    ReadNodeHeirarchy(pScene->mRootNode, Identity);
-
-    Transforms.resize(m_BoneInfo.size());
-
-    for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
-        Transforms[i] = m_BoneInfo[i].FinalTransformation;
     }
 }
