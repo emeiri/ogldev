@@ -162,11 +162,7 @@ string GetDirFromFilename(const string& Filename)
     // Extract the directory part from the file name
     string::size_type SlashIndex;
     
-#ifdef _WIN64
-    SlashIndex = Filename.find_last_of("\\");
-#else
     SlashIndex = Filename.find_last_of("/");
-#endif
 
     string Dir;
 
