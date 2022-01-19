@@ -79,6 +79,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F
 		..\..\Include\technique.h = ..\..\Include\technique.h
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial22", "Tutorial22\Tutorial22.vcxproj", "{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -255,6 +257,14 @@ Global
 		{88B3273E-DB0F-4211-9F31-D0EED48E0085}.Release|x64.Build.0 = Release|x64
 		{88B3273E-DB0F-4211-9F31-D0EED48E0085}.Release|x86.ActiveCfg = Release|Win32
 		{88B3273E-DB0F-4211-9F31-D0EED48E0085}.Release|x86.Build.0 = Release|Win32
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Debug|x64.ActiveCfg = Debug|x64
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Debug|x64.Build.0 = Debug|x64
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Debug|x86.ActiveCfg = Debug|Win32
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Debug|x86.Build.0 = Debug|Win32
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Release|x64.ActiveCfg = Release|x64
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Release|x64.Build.0 = Release|x64
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Release|x86.ActiveCfg = Release|Win32
+		{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

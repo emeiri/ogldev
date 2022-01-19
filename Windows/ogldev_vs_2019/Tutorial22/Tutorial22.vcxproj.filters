@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{03d3bf34-434a-42d3-b90c-0168e09b9db4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial22_youtube\camera.cpp" />
+    <ClCompile Include="..\..\..\tutorial22_youtube\lighting_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial22_youtube\tutorial22.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
+    <ClInclude Include="..\..\..\Include\technique.h" />
+    <ClInclude Include="..\..\..\tutorial22_youtube\camera.h" />
+    <ClInclude Include="..\..\..\tutorial22_youtube\lighting_technique.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial22_youtube\lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial22_youtube\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

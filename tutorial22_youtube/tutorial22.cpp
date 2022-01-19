@@ -164,12 +164,12 @@ void Tutorial22::RenderSceneCB()
     pLightingTech->SetWVP(WVP);
 
     counter += 0.01f;
-    pointLights[0].WorldPosition.x = -10.0f;
+    pointLights[0].WorldPosition.x = -8.0f;
     pointLights[0].WorldPosition.y = sinf(counter) * 4 + 4;
     pointLights[0].WorldPosition.z = 0.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
-    pointLights[1].WorldPosition.x = 10.0f;
+    pointLights[1].WorldPosition.x = 8.0f;
     pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
     pointLights[1].WorldPosition.z = 0.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
