@@ -161,9 +161,7 @@ void Tutorial27::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
-    // worldTransform.SetRotation(0.0f, 180.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
-    //    worldTransform.SetScale(0.1);
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
