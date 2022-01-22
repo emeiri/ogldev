@@ -63,14 +63,17 @@
             <section>
                 <h3> Source walkthru </h3>
 
-                <code>glutIdleFunc(RenderSceneCB);</code>
-                <p>Here we register the render callback as an idle function. Note that if
-                    you decide to use a dedicated idle callback function then you will need
-                    to add a call to glutPostRedisplay() at the end of it. Else the idle
-                    function will be called again and again but the render function will
-                    not. glutPostRedisplay() marks the current window as needed to be
-                    redisplayed and during the next round through GLUT's main loop the
-                    render callback will be called.</p>
+                <code><b>glutPostRedisplay();<br></b>
+                         glutSwapBuffers();
+                </code>
+                <p>Before the existing call to glutSwapBuffers in our render callback I've added a call to glutPostRedisplay.
+                    In general, FreeGLUT is not required to call the render function repeatedly. It only does this
+                    due to various events in the system. As you shall see below, we are creating a basic "animation"
+                    using a variable which is updated in every call to the render function but if this function
+                    is not called the animation will appear to hang! Therefore, we want to trigger the next call to the
+                    render function and we do this using glutPostRedisplay. This function sets a flag inside FreeGLUT
+                    that forces it to call the render function again (and again, etc).
+                </p>
                 <code>gScaleLocation = glGetUniformLocation(ShaderProgram, "gScale");<br/>
                         assert(gScaleLocation != 0xFFFFFFFF);</code>
                 <p>After linking the program we query the program object for the location
