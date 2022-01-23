@@ -460,7 +460,7 @@ void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentT
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
-    printf("%s - ", NodeName.c_str());
+    //printf("%s - ", NodeName.c_str());
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
 

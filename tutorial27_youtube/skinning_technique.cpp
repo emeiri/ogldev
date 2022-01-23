@@ -171,11 +171,6 @@ bool SkinningTechnique::Init()
         }
     }
 
-    displayBoneIndexLocation = GetUniformLocation("gDisplayBoneIndex");
-    if (displayBoneIndexLocation == INVALID_UNIFORM_LOCATION) {
-        return false;
-    }
-
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation) ; i++) {
         char Name[128];
         memset(Name, 0, sizeof(Name));
@@ -261,12 +256,6 @@ void SkinningTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
         glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
         glUniform1f(SpotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
-}
-
-
-void SkinningTechnique::SetDisplayBoneIndex(uint DisplayBoneIndex)
-{
-    glUniform1i(displayBoneIndexLocation, DisplayBoneIndex);
 }
 
 

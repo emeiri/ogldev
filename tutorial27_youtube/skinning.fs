@@ -61,7 +61,7 @@ uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
-uniform int gDisplayBoneIndex;
+
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
@@ -144,27 +144,5 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    bool found = false;
-
-    for (int i = 0 ; i < 4 ; i++) {
-        if (BoneIDs0[i] == gDisplayBoneIndex) {
-           if (Weights0[i] >= 0.7) {
-               FragColor = vec4(1.0, 0.0, 0.0, 0.0) * Weights0[i];
-           }
-           else if (Weights0[i] >= 0.4 && Weights0[i] <= 0.6) {
-               FragColor = vec4(0.0, 1.0, 0.0, 0.0) * Weights0[i];
-           } else if (Weights0[i] >= 0.1) {
-               FragColor = vec4(1.0, 1.0, 0.0, 0.0) * Weights0[i];
-           }
-
-           found = true;
-           break;
-        }
-    }
-
-    if (!found ) {
-         FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * vec4(0.0001) + vec4(1.0, 1.0, 1.0, 0.0);
-    }
-
-FragColor += vec4(0.5);
+    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
 }
