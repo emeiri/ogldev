@@ -53,7 +53,7 @@ public:
 
     const Material& GetMaterial();
 
-    void GetBoneTransforms(float AnimationTime, vector<Matrix4f>& Transforms);
+    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms);
 
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4

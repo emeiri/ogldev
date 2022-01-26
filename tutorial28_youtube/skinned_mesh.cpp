@@ -441,11 +441,11 @@ const Material& SkinnedMesh::GetMaterial()
 }
 
 
-uint SkinnedMesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
+uint SkinnedMesh::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     for (uint i = 0 ; i < pNodeAnim->mNumPositionKeys - 1 ; i++) {
         float t = (float)pNodeAnim->mPositionKeys[i + 1].mTime - (float)pNodeAnim->mPositionKeys[0].mTime;
-        if (AnimationTime < t) {
+        if (AnimationTimeTicks < t) {
             return i;
         }
     }
@@ -454,13 +454,13 @@ uint SkinnedMesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 }
 
 
-uint SkinnedMesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
+uint SkinnedMesh::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumRotationKeys > 0);
 
     for (uint i = 0 ; i < pNodeAnim->mNumRotationKeys - 1 ; i++) {
         float t = (float)pNodeAnim->mRotationKeys[i + 1].mTime - (float)pNodeAnim->mRotationKeys[0].mTime;
-        if (AnimationTime < t) {
+        if (AnimationTimeTicks < t) {
             return i;
         }
     }
@@ -469,13 +469,13 @@ uint SkinnedMesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 }
 
 
-uint SkinnedMesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
+uint SkinnedMesh::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumScalingKeys > 0);
 
     for (uint i = 0 ; i < pNodeAnim->mNumScalingKeys - 1 ; i++) {
         float t = (float)pNodeAnim->mScalingKeys[i + 1].mTime - (float)pNodeAnim->mScalingKeys[0].mTime;
-        if (AnimationTime < t) {
+        if (AnimationTimeTicks < t) {
             return i;
         }
     }
@@ -484,20 +484,21 @@ uint SkinnedMesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 }
 
 
-void SkinnedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+void SkinnedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
+    // we need at least two values to interpolate...
     if (pNodeAnim->mNumPositionKeys == 1) {
         Out = pNodeAnim->mPositionKeys[0].mValue;
         return;
     }
 
-    uint PositionIndex = FindPosition(AnimationTime, pNodeAnim);
+    uint PositionIndex = FindPosition(AnimationTimeTicks, pNodeAnim);
     uint NextPositionIndex = (PositionIndex + 1);
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
     float t1 = (float)pNodeAnim->mPositionKeys[PositionIndex].mTime - (float)pNodeAnim->mPositionKeys[0].mTime;
     float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime - (float)pNodeAnim->mPositionKeys[0].mTime;
     float DeltaTime = t2 - t1;
-    float Factor = (AnimationTime - t1) / DeltaTime;
+    float Factor = (AnimationTimeTicks - t1) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
     const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
@@ -506,7 +507,7 @@ void SkinnedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime,
 }
 
 
-void SkinnedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+void SkinnedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumRotationKeys == 1) {
@@ -514,35 +515,37 @@ void SkinnedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTim
         return;
     }
 
-    uint RotationIndex = FindRotation(AnimationTime, pNodeAnim);
+    uint RotationIndex = FindRotation(AnimationTimeTicks, pNodeAnim);
     uint NextRotationIndex = (RotationIndex + 1);
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
     float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime - (float)pNodeAnim->mRotationKeys[0].mTime;
     float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime - (float)pNodeAnim->mRotationKeys[0].mTime;
     float DeltaTime = t2 - t1;
-    float Factor = (AnimationTime - t1) / DeltaTime;
+    float Factor = (AnimationTimeTicks - t1) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
     const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
     aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-    Out = StartRotationQ;//Out.Normalize();
+    Out = StartRotationQ;
+    Out.Normalize();
 }
 
 
-void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
+    // we need at least two values to interpolate...
     if (pNodeAnim->mNumScalingKeys == 1) {
         Out = pNodeAnim->mScalingKeys[0].mValue;
         return;
     }
 
-    uint ScalingIndex = FindScaling(AnimationTime, pNodeAnim);
+    uint ScalingIndex = FindScaling(AnimationTimeTicks, pNodeAnim);
     uint NextScalingIndex = (ScalingIndex + 1);
     assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
     float t1 = (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime - (float)pNodeAnim->mScalingKeys[0].mTime;
     float t2 = (float)pNodeAnim->mScalingKeys[NextScalingIndex].mTime - (float)pNodeAnim->mScalingKeys[0].mTime;
     float DeltaTime = t2 - t1;
-    float Factor = (AnimationTime - (float)t1) / DeltaTime;
+    float Factor = (AnimationTimeTicks - (float)t1) / DeltaTime;
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
     const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
@@ -551,7 +554,7 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, 
 }
 
 
-void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
+void SkinnedMesh::ReadNodeHeirarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform)
 {
     string NodeName(pNode->mName.data);
 
@@ -564,18 +567,18 @@ void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, co
     if (pNodeAnim) {
         // Interpolate scaling and generate scaling transformation matrix
         aiVector3D Scaling;
-        CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
+        CalcInterpolatedScaling(Scaling, AnimationTimeTicks, pNodeAnim);
         Matrix4f ScalingM;
         ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
 
         // Interpolate rotation and generate rotation transformation matrix
         aiQuaternion RotationQ;
-        CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
+        CalcInterpolatedRotation(RotationQ, AnimationTimeTicks, pNodeAnim);
         Matrix4f RotationM = Matrix4f(RotationQ.GetMatrix());
 
         // Interpolate translation and generate translation transformation matrix
         aiVector3D Translation;
-        CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
+        CalcInterpolatedPosition(Translation, AnimationTimeTicks, pNodeAnim);
         Matrix4f TranslationM;
         TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
 
@@ -591,7 +594,7 @@ void SkinnedMesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, co
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+        ReadNodeHeirarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation);
     }
 }
 
@@ -603,9 +606,9 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
 
     float TicksPerSecond = (float)(pScene->mAnimations[0]->mTicksPerSecond != 0 ? pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
-    float AnimationTime = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
+    float AnimationTimeTicks = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
 
-    ReadNodeHeirarchy(AnimationTime, pScene->mRootNode, Identity);
+    ReadNodeHeirarchy(AnimationTimeTicks, pScene->mRootNode, Identity);
 
     Transforms.resize(m_BoneInfo.size());
 

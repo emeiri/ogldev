@@ -61,7 +61,7 @@ private:
     SkinningTechnique* pSkinningTech = NULL;
     PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
-    long long StartTime = 0;
+    long long StartTimeMillis = 0;
 };
 
 
@@ -145,7 +145,7 @@ bool Tutorial28::Init()
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
-    StartTime = GetCurrentTimeMillis();
+    StartTimeMillis = GetCurrentTimeMillis();
 
     return true;
 }
@@ -197,13 +197,11 @@ void Tutorial28::RenderSceneCB()
     Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pSkinningTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    long long CurrentTime = GetCurrentTimeMillis();
+    long long CurrentTimeMillis = GetCurrentTimeMillis();
+    float AnimationTimeSec = ((float)(CurrentTimeMillis - StartTimeMillis)) / 1000.0f;
 
-    float AnimationTime = ((float)(CurrentTime - StartTime)) / 1000.0f;
-    printf("%f\n", AnimationTime);
     vector<Matrix4f> Transforms;
-    //    printf("%f\n", CurrentTime);
-    pMesh1->GetBoneTransforms(AnimationTime, Transforms);
+    pMesh1->GetBoneTransforms(AnimationTimeSec, Transforms);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
         pSkinningTech->SetBoneTransform(i, Transforms[i]);
