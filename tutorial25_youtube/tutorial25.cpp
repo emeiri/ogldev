@@ -341,9 +341,9 @@ int main(int argc, char** argv)
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
-    // Game mode string example: 2020x1080@32
+    // Game mode string example: <Width>x<Height>@<FPS>
     // Enable the following three lines for full screen
-    // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
+    // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);
     // glutGameModeString(game_mode_string);
     // glutEnterGameMode();
 

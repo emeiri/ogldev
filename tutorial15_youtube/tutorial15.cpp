@@ -290,8 +290,8 @@ int main(int argc, char** argv)
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
-    // Game mode string example: 1920x1080@32
-    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
+    // Game mode string example: <Width>x<Height>@<FPS>
+    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);
     glutGameModeString(game_mode_string);
     glutEnterGameMode();
 
