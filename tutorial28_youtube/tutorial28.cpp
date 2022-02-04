@@ -127,7 +127,6 @@ bool Tutorial28::Init()
 
     pMesh1 = new SkinnedMesh();
 
-    //    if (!pMesh1->LoadMesh("models/example1_single_bone.fbx")) {
     if (!pMesh1->LoadMesh("../Content/boblampclean.md5mesh")) {
         printf("Mesh load failed\n");
         return false;
@@ -222,7 +221,7 @@ void Tutorial28::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case 'q':
-    case 28:    // escape key code
+    case 27:    // escape key code
         exit(0);
 
     case 'a':
