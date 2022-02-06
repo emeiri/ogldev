@@ -446,7 +446,7 @@ void SkinnedMesh::GetBoneTransforms(vector<Matrix4f>& Transforms)
     Matrix4f Identity;
     Identity.InitIdentity();
 
-    ReadNodeHeirarchy(pScene->mRootNode, Identity);
+    ReadNodeHierarchy(pScene->mRootNode, Identity);
 
     for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
         Transforms[i] = m_BoneInfo[i].FinalTransformation;
@@ -454,7 +454,7 @@ void SkinnedMesh::GetBoneTransforms(vector<Matrix4f>& Transforms)
 }
 
 
-void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentTransform)
+void SkinnedMesh::ReadNodeHierarchy(const aiNode* pNode, const Matrix4f& ParentTransform)
 {
     string NodeName(pNode->mName.data);
 
@@ -470,6 +470,6 @@ void SkinnedMesh::ReadNodeHeirarchy(const aiNode* pNode, const Matrix4f& ParentT
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHeirarchy(pNode->mChildren[i], GlobalTransformation);
+        ReadNodeHierarchy(pNode->mChildren[i], GlobalTransformation);
     }
 }

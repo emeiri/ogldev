@@ -220,7 +220,7 @@ private:
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
-    void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
+    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
     bool InitFromScene(const aiScene* pScene, const string& Filename);
     void FindAdjacencies(const aiMesh* paiMesh, vector<unsigned int>& Indices);
     void InitMesh(uint MeshIndex,

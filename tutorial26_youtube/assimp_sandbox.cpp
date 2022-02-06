@@ -162,10 +162,10 @@ void parse_node(const aiNode* pNode)
 }
 
 
-void parse_heirarchy(const aiScene* pScene)
+void parse_hierarchy(const aiScene* pScene)
 {
     printf("\n*******************************************************\n");
-    printf("Parsing the node heirarchy\n");
+    printf("Parsing the node hierarchy\n");
 
     parse_node(pScene->mRootNode);
 }
@@ -175,7 +175,7 @@ void parse_scene(const aiScene* pScene)
 {
     parse_meshes(pScene);
 
-    parse_heirarchy(pScene);
+    parse_hierarchy(pScene);
 }
 
 

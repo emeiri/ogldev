@@ -514,7 +514,7 @@ void Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const a
 }
 
 
-void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
+void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform)
 {    
     string NodeName(pNode->mName.data);
     
@@ -554,7 +554,7 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Mat
     }
     
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
+        ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
     }
 }
 
@@ -568,7 +568,7 @@ void Mesh::BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms)
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
     float AnimationTime = fmod(TimeInTicks, (float)m_pScene->mAnimations[0]->mDuration);
 
-    ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);
+    ReadNodeHierarchy(AnimationTime, m_pScene->mRootNode, Identity);
 
     Transforms.resize(m_NumBones);
 

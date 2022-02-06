@@ -554,7 +554,7 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTi
 }
 
 
-void SkinnedMesh::ReadNodeHeirarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform)
+void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform)
 {
     string NodeName(pNode->mName.data);
 
@@ -594,7 +594,7 @@ void SkinnedMesh::ReadNodeHeirarchy(float AnimationTimeTicks, const aiNode* pNod
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHeirarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation);
+        ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation);
     }
 }
 
@@ -608,7 +608,7 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
     float AnimationTimeTicks = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
 
-    ReadNodeHeirarchy(AnimationTimeTicks, pScene->mRootNode, Identity);
+    ReadNodeHierarchy(AnimationTimeTicks, pScene->mRootNode, Identity);
     Transforms.resize(m_BoneInfo.size());
 
     for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
