@@ -116,7 +116,7 @@ private:
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
     void ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
 
 #define INVALID_MATERIAL 0xFFFFFFFF

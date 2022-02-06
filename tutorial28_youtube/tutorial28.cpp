@@ -330,7 +330,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 25");
+    int win = glutCreateWindow("Tutorial 28");
     printf("window id: %d\n", win);
 
     char game_mode_string[64];
