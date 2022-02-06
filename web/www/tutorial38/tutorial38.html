@@ -31,6 +31,9 @@
       <iframe width="560" height="315" src="https://www.youtube.com/embed/2tHVDssmUko" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
       <iframe width="560" height="315" src="https://www.youtube.com/embed/SsVJP8Hh_gE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/gnnoPaStVzg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
       <section>
       <h3> Background </h3>
 
@@ -116,10 +119,10 @@
       which we get when we import the mesh file). The aiScene contains an array of aiMesh objects. An aiMesh is a part
       of the model and contains stuff at the vertex level such as position, normal, texture coordinates, etc. Now
       we see that aiMesh also contains an array of aiBone objects. Unsuprisingly, an aiBone represents one bone
-      in the skeleton of the mesh. Each bone has a name by which it can be found in the bone heirarchy (see below), an
+      in the skeleton of the mesh. Each bone has a name by which it can be found in the bone hierarchy (see below), an
       array of vertex weights and a 4x4 offset matrix. The reason why we need this matrix is because the vertices
       are stored in the usual local space. This means that even without skeletal animation support our existing
-      code base can load the model and render it correctly. But the bone transformations in the heirarchy work
+      code base can load the model and render it correctly. But the bone transformations in the hierarchy work
       in a bone space (and every bone has its own space which is why we need to multiply the transformations together).
       So the job of the offset matrix it to move the vertex position from the local space of the mesh into the bone
       space of that particular bone.
@@ -131,18 +134,18 @@
       all the bones and accumulate the weights into a kind of list for each particular vertex.
       </p>
       <p>
-      After we build the bone information at the vertex level we need to process the bone transformation heirarchy
+      After we build the bone information at the vertex level we need to process the bone transformation hierarchy
       and generate the final transformations that we will load into the shader. The following picture displays the
       relevant data structures:
       </p>
       <img class="center" src="assimp2.jpg"/>
       <p>
       Again, we start at the aiScene. The aiScene object contains a pointer to an object of the aiNode class
-      which is the root of the a node heirarchy (in other words - a tree). Each node in the tree has a pointer
+      which is the root of the a node hierarchy (in other words - a tree). Each node in the tree has a pointer
       back to its parent and an array of pointers to its children. This allows us to conveniently traverse the
       tree back and forth. In addition, the node carries a transformation matrix that transforms from the node
       space into the space of its parent. Finally, the node may or may not have a name. If a node represents
-      a bone in the heirarchy then the node name must match the bone name. But sometimes nodes have no name (which
+      a bone in the hierarchy then the node name must match the bone name. But sometimes nodes have no name (which
       means there is not corresponding bone) and their job is simply to help the modeller decompose the model
       and place some intermediate transformation along the way.
       </p>
@@ -154,15 +157,15 @@
       represent a 4 second animation) which help us time the progression so that the animation will look the same
       on every hardware. In addition, the animation has an array of aiNodeAnim objects called channels.
       Each channel is actually the bone with all its transformations. The channel contains a name which must match
-      one of the nodes in the heirarchy and three transformation arrays.
+      one of the nodes in the hierarchy and three transformation arrays.
       </p>
       <p>
       In order to calculate the final bone transformation in a particular point in time we need to find the two
       entries in each of these three arrays that matches the time and interpolate between them. Then we need
       to combine the transformations into a single matrix. Having done that we need to find the corresponding
-      node in the heirarchy and travel to its parent. Then we need the corresponding channel for the parent and do
+      node in the hierarchy and travel to its parent. Then we need the corresponding channel for the parent and do
       the same interpolation process. We multiply the two transformations together and continue until we reach the root
-      of the heirarchy.
+      of the hierarchy.
       </p>
     </section>
 
@@ -212,7 +215,7 @@
       that you need and store it at a more optimized format but for educational purposes this is enough.
       </p>
       <p>
-      The second change is that the transformation matrix of the root of the heirarchy is extracted,
+      The second change is that the transformation matrix of the root of the hierarchy is extracted,
       inversed and stored. We are going to use that further down the road. Note that the matrix inverse
       code has been copied from the Assimp library into our Matrix4f class.
       </p>
@@ -322,7 +325,7 @@
        &nbsp;  &nbsp;    float TimeInTicks = TimeInSeconds * TicksPerSecond;<br>
        &nbsp;  &nbsp;    float AnimationTime = fmod(TimeInTicks, m_pScene->mAnimations[0]->mDuration);<br>
       <br>
-       &nbsp;  &nbsp;    ReadNodeHeirarchy(AnimationTime, m_pScene->mRootNode, Identity);<br>
+       &nbsp;  &nbsp;    ReadNodeHierarchy(AnimationTime, m_pScene->mRootNode, Identity);<br>
       <br>
        &nbsp;  &nbsp;    Transforms.resize(m_NumBones);<br>
       <br>
@@ -337,12 +340,12 @@
       the bone transformations that go into the shader every frame. The function above is the entry
       point to this activity. The caller reports the current time in seconds (which can be a fraction)
       and provides a vector of matrices which we must update. We find the relative time inside the animation
-      cycle and process the node heirarchy. The result is an array of transformations which is returned to
+      cycle and process the node hierarchy. The result is an array of transformations which is returned to
       the caller.
       </p>
       <p>(mesh.cpp:428)</p>
       <code>
-      void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const Matrix4f&amp; ParentTransform)<br>
+      void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f&amp; ParentTransform)<br>
       {    <br>
        &nbsp;  &nbsp;    string NodeName(pNode->mName.data);<br>
           <br>
@@ -383,7 +386,7 @@
        &nbsp;  &nbsp;    }<br>
           <br>
        &nbsp;  &nbsp;    for (uint i = 0 ; i &lt; pNode->mNumChildren ; i++) {<br>
-       &nbsp;  &nbsp; &nbsp;  &nbsp;        ReadNodeHeirarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);<br>
+       &nbsp;  &nbsp; &nbsp;  &nbsp;        ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);<br>
        &nbsp;  &nbsp;    }<br>
       }
       </code>
