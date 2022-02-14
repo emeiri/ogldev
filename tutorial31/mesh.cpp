@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,13 +49,13 @@ bool Mesh::MeshEntry::Init(const std::vector<Vertex>& Vertices,
     NumIndices = Indices.size();
 
     glGenBuffers(1, &VB);
-  	glBindBuffer(GL_ARRAY_BUFFER, VB);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, VB);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &IB);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * NumIndices, &Indices[0], GL_STATIC_DRAW);
-    
+
     return GLCheckError();
 }
 
@@ -82,12 +82,12 @@ bool Mesh::LoadMesh(const std::string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
-    
+
     bool Ret = false;
     Assimp::Importer Importer;
 
     const aiScene* pScene = Importer.ReadFile(Filename.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
-    
+
     if (pScene) {
         Ret = InitFromScene(pScene, Filename);
     }
@@ -99,7 +99,7 @@ bool Mesh::LoadMesh(const std::string& Filename)
 }
 
 bool Mesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
-{  
+{
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
@@ -115,7 +115,7 @@ bool Mesh::InitFromScene(const aiScene* pScene, const std::string& Filename)
 void Mesh::InitMesh(unsigned int Index, const aiMesh* paiMesh)
 {
     m_Entries[Index].MaterialIndex = paiMesh->mMaterialIndex;
-    
+
     std::vector<Vertex> Vertices;
     std::vector<unsigned int> Indices;
 
@@ -160,7 +160,7 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
         Dir = Filename.substr(0, SlashIndex);
     }
 
-    bool Ret = true;    
+    bool Ret = true;
 
     // Initialize the materials
     for (unsigned int i = 0 ; i < pScene->mNumMaterials ; i++) {
@@ -173,13 +173,13 @@ bool Mesh::InitMaterials(const aiScene* pScene, const std::string& Filename)
 
             if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
                 std::string p(Path.data);
-                
-                if (p.substr(0, 2) == ".\\") {                    
+
+                if (p.substr(0, 2) == ".\\") {
                     p = p.substr(2, p.size() - 2);
                 }
-                               
+
                 std::string FullPath = Dir + "/" + p;
-                    
+
                 m_Textures[i] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
                 if (!m_Textures[i]->Load()) {
@@ -204,7 +204,7 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    
+
     for (unsigned int i = 0 ; i < m_Entries.size() ; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, m_Entries[i].VB);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
@@ -213,7 +213,7 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].IB);
 
-        const unsigned int MaterialIndex = m_Entries[i].MaterialIndex;
+        const unsigned int MaterialIndex = m_Entries[i].MaterialIndex - 1;
 
         if (MaterialIndex < m_Textures.size() && m_Textures[MaterialIndex]) {
             m_Textures[MaterialIndex]->Bind(COLOR_TEXTURE_UNIT);
@@ -222,7 +222,7 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
         if (pRenderCallbacks) {
             pRenderCallbacks->DrawStartCB(i);
         }
-        
+
         glDrawElements(GL_PATCHES, m_Entries[i].NumIndices, GL_UNSIGNED_INT, 0);
     }
 
@@ -235,7 +235,7 @@ void Mesh::Render(IRenderCallbacks* pRenderCallbacks)
 void Mesh::Render(unsigned int DrawIndex, unsigned int PrimID)
 {
     assert(DrawIndex < m_Entries.size());
-    
+
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
@@ -252,5 +252,5 @@ void Mesh::Render(unsigned int DrawIndex, unsigned int PrimID)
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);    
+    glDisableVertexAttribArray(2);
 }
