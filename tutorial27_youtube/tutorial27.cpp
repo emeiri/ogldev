@@ -62,7 +62,6 @@ private:
     PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
     long long StartTime = 0;
-    int DisplayBoneIndex = 0;
 };
 
 
@@ -144,8 +143,7 @@ bool Tutorial27::Init()
     pSkinningTech->Enable();
 
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-    pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
+    pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);    
 
     StartTime = GetCurrentTimeMillis();
 
@@ -162,6 +160,7 @@ void Tutorial27::RenderSceneCB()
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
+    worldTransform.SetScale(0.1f);
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
@@ -223,12 +222,6 @@ void Tutorial27::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     case 'q':
     case 27:    // escape key code
         exit(0);
-
-    case ' ':
-        DisplayBoneIndex++;
-        DisplayBoneIndex = DisplayBoneIndex % pMesh1->NumBones();
-        pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
-        break;
 
     case 'a':
         pointLights[0].Attenuation.Linear += ATTEN_STEP;
@@ -339,7 +332,7 @@ int main(int argc, char** argv)
     int win = glutCreateWindow("Tutorial 25");
     printf("window id: %d\n", win);
 
-    char game_mode_string[64];
+    // char game_mode_string[64];
     // Game mode string example: <Width>x<Height>@<FPS>
     // Enable the following three lines for full screen
     // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);

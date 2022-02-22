@@ -46,7 +46,7 @@ public:
 
     uint NumBones() const
     {
-        return m_BoneNameToIndexMap.size();
+        return (uint)m_BoneNameToIndexMap.size();
     }
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
