@@ -151,8 +151,8 @@ bool Tutorial29::Init()
 
 void Tutorial29::RenderSceneCB()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     pGameCamera->OnRender();
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
@@ -202,7 +202,7 @@ void Tutorial29::RenderSceneCB()
         pSkinningTech->SetBoneTransform(i, Transforms[i]);
     }
 
-    glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
+    //    glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 
     glViewport(0, 0, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     Camera Camera1(WINDOW_WIDTH, WINDOW_HEIGHT, Vector3f(0.0f, 0.0f, -10.0f), Vector3f(0.0f, 0.0f, 1.0f), Vector3f(0.0f, 1.0f, 0.0f));
