@@ -157,6 +157,7 @@ void Tutorial27::RenderSceneCB()
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
+    worldTransform.SetScale(0.1f);
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
@@ -328,7 +329,7 @@ int main(int argc, char** argv)
     int win = glutCreateWindow("Tutorial 25");
     printf("window id: %d\n", win);
 
-    char game_mode_string[64];
+    // char game_mode_string[64];
     // Game mode string example: <Width>x<Height>@<FPS>
     // Enable the following three lines for full screen
     // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);

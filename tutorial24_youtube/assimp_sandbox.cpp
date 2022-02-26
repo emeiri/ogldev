@@ -7,7 +7,7 @@ void parse_single_bone(int bone_index, const aiBone* pBone)
 {
     printf("      Bone %d: '%s' num vertices affected by this bone: %d\n", bone_index, pBone->mName.C_Str(), pBone->mNumWeights);
 
-    for (int i = 0 ; i < pBone->mNumWeights ; i++) {
+    for (unsigned int i = 0 ; i < pBone->mNumWeights ; i++) {
         if (i == 0) printf("\n");
         const aiVertexWeight& vw = pBone->mWeights[i];
         printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
@@ -19,7 +19,7 @@ void parse_single_bone(int bone_index, const aiBone* pBone)
 
 void parse_mesh_bones(const aiMesh* pMesh)
 {
-    for (int i = 0 ; i < pMesh->mNumBones ; i++) {
+    for (unsigned int i = 0 ; i < pMesh->mNumBones ; i++) {
         parse_single_bone(i, pMesh->mBones[i]);
     }
 }
@@ -34,7 +34,7 @@ void parse_meshes(const aiScene* pScene)
     int total_indices = 0;
     int total_bones = 0;
 
-    for (int i = 0 ; i < pScene->mNumMeshes ; i++) {
+    for (unsigned int i = 0 ; i < pScene->mNumMeshes ; i++) {
         const aiMesh* pMesh = pScene->mMeshes[i];
         int num_vertices = pMesh->mNumVertices;
         int num_indices = pMesh->mNumFaces * 3;

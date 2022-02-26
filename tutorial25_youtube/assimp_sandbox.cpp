@@ -49,7 +49,7 @@ int get_bone_id(const aiBone* pBone)
 
     if (bone_name_to_index_map.find(bone_name) == bone_name_to_index_map.end()) {
         // Allocate an index for a new bone
-        bone_id = bone_name_to_index_map.size();
+        bone_id = (int)bone_name_to_index_map.size();
         bone_name_to_index_map[bone_name] = bone_id;
     }
     else {
@@ -66,7 +66,7 @@ void parse_single_bone(int mesh_index, const aiBone* pBone)
     int bone_id = get_bone_id(pBone);
     printf("bone id %d\n", bone_id);
 
-    for (int i = 0 ; i < pBone->mNumWeights ; i++) {
+    for (unsigned int i = 0 ; i < pBone->mNumWeights ; i++) {
         if (i == 0) printf("\n");
         const aiVertexWeight& vw = pBone->mWeights[i];
 
@@ -83,7 +83,7 @@ void parse_single_bone(int mesh_index, const aiBone* pBone)
 
 void parse_mesh_bones(int mesh_index, const aiMesh* pMesh)
 {
-    for (int i = 0 ; i < pMesh->mNumBones ; i++) {
+    for (unsigned int i = 0 ; i < pMesh->mNumBones ; i++) {
         parse_single_bone(mesh_index, pMesh->mBones[i]);
     }
 }
@@ -100,7 +100,7 @@ void parse_meshes(const aiScene* pScene)
 
     mesh_base_vertex.resize(pScene->mNumMeshes);
 
-    for (int i = 0 ; i < pScene->mNumMeshes ; i++) {        const aiMesh* pMesh = pScene->mMeshes[i];
+    for (unsigned int i = 0 ; i < pScene->mNumMeshes ; i++) {        const aiMesh* pMesh = pScene->mMeshes[i];
         int num_vertices = pMesh->mNumVertices;
         int num_indices = pMesh->mNumFaces * 3;
         int num_bones = pMesh->mNumBones;
