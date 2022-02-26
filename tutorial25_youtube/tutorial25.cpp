@@ -200,13 +200,6 @@ void Tutorial25::RenderSceneCB()
 
     long long CurrentTime = GetCurrentTimeMillis();
 
-    /*    if (CurrentTime > StartTime + 500) {
-        pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
-        DisplayBoneIndex++;
-        DisplayBoneIndex = DisplayBoneIndex % pMesh1->GetNumBones();
-        StartTime = CurrentTime;
-        }*/
-
     pMesh1->Render();
 
     glutPostRedisplay();

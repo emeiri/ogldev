@@ -61,8 +61,6 @@ private:
     SkinningTechnique* pSkinningTech = NULL;
     PointLight pointLights[SkinningTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[SkinningTechnique::MAX_SPOT_LIGHTS];
-    long long StartTime = 0;
-    int DisplayBoneIndex = 0;
 };
 
 
@@ -145,9 +143,6 @@ bool Tutorial27::Init()
 
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-    pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
-
-    StartTime = GetCurrentTimeMillis();
 
     return true;
 }
@@ -223,12 +218,6 @@ void Tutorial27::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     case 'q':
     case 27:    // escape key code
         exit(0);
-
-    case ' ':
-        DisplayBoneIndex++;
-        DisplayBoneIndex = DisplayBoneIndex % pMesh1->NumBones();
-        pSkinningTech->SetDisplayBoneIndex(DisplayBoneIndex);
-        break;
 
     case 'a':
         pointLights[0].Attenuation.Linear += ATTEN_STEP;
