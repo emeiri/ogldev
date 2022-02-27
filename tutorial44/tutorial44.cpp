@@ -98,7 +98,7 @@ public:
    //         return false;
    //     }
 #endif
-
+        TwInit (TW_OPENGL_CORE, NULL);
         TwBar *bar;
         bar = TwNewBar("NameOfMyTweakBar");
 

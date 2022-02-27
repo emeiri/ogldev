@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 in vec2 TexCoord0;
 in vec3 Normal0;
@@ -17,25 +17,29 @@ struct BaseLight
     float AmbientIntensity;
     float DiffuseIntensity;
 };
-                                                                                   
-struct Attenuation                                                                  
-{                                                                                   
-    float Constant;                                                                 
-    float Linear;                                                                   
-    float Exp;                                                                      
-};                                                                                  
-                                                                                    
-struct PointLight                                                                           
-{                                                                                           
-    BaseLight Base;                                                                  
-    vec3 Position;                                                                          
-    Attenuation Atten;                                                                      
-};                                                                                          
-                                                                                            
-                                                                                           
-uniform PointLight gPointLight;                                          
-uniform sampler2D gColorMap;                                                                
-uniform samplerCube gShadowMap;
+
+struct Attenuation
+{
+    float Constant;
+    float Linear;
+    float Exp;
+};
+
+struct PointLight
+{
+    BaseLight Base;
+    vec3 Position;
+    Attenuation Atten;
+};
+
+
+uniform PointLight gPointLight;
+// The following two layout qualifiers workaround the following error when the window is
+// closed: "active samplers with a different type refer to the same texture image unit".
+// This is probably a bug and will need to be fixed at some point.
+// Thanks to Hisham Sueyllam for working on this.
+layout( binding = 0 ) uniform sampler2D gColorMap;
+layout( binding = 1 ) uniform samplerCube gShadowMap;
 uniform vec3 gEyeWorldPos;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;
@@ -53,59 +57,59 @@ float CalcShadowFactor(vec3 LightDirection)
         return 1.0;
     else
         return 0.5;
-}   
+}
 
-                                                                                        
-vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput In, float ShadowFactor)           
-{                                                                                           
+
+vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput In, float ShadowFactor)
+{
     vec4 AmbientColor = vec4(Light.Color * Light.AmbientIntensity, 1.0);
-    float DiffuseFactor = dot(In.Normal, -LightDirection);                                     
-                                                                                            
-    vec4 DiffuseColor  = vec4(0, 0, 0, 0);                                                  
-    vec4 SpecularColor = vec4(0, 0, 0, 0);                                                  
-                                                                                            
-    if (DiffuseFactor > 0.0) {                                                                
-        DiffuseColor = vec4(Light.Color * Light.DiffuseIntensity * DiffuseFactor, 1.0);
-                                                                                            
-        vec3 VertexToEye = normalize(gEyeWorldPos - In.WorldPos);                             
-        vec3 LightReflect = normalize(reflect(LightDirection, In.Normal));                     
-        float SpecularFactor = dot(VertexToEye, LightReflect);                                      
-        if (SpecularFactor > 0.0) {                                                         
-            SpecularFactor = pow(SpecularFactor, gSpecularPower);                                 
-            SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0);
-        }                                                                                   
-    }                                                                                       
-                                                                                            
-    return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor));                                   
-}                                                                                           
+    float DiffuseFactor = dot(In.Normal, -LightDirection);
 
-                                                                                            
-vec4 CalcPointLight(PointLight l, VSOutput In)                       
-{                                                                                           
+    vec4 DiffuseColor  = vec4(0, 0, 0, 0);
+    vec4 SpecularColor = vec4(0, 0, 0, 0);
+
+    if (DiffuseFactor > 0.0) {
+        DiffuseColor = vec4(Light.Color * Light.DiffuseIntensity * DiffuseFactor, 1.0);
+
+        vec3 VertexToEye = normalize(gEyeWorldPos - In.WorldPos);
+        vec3 LightReflect = normalize(reflect(LightDirection, In.Normal));
+        float SpecularFactor = dot(VertexToEye, LightReflect);
+        if (SpecularFactor > 0.0) {
+            SpecularFactor = pow(SpecularFactor, gSpecularPower);
+            SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0);
+        }
+    }
+
+    return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor));
+}
+
+
+vec4 CalcPointLight(PointLight l, VSOutput In)
+{
     vec3 LightDirection = In.WorldPos - l.Position;
-    float Distance = length(LightDirection);    
+    float Distance = length(LightDirection);
     float ShadowFactor = CalcShadowFactor(LightDirection);
-    LightDirection = normalize(LightDirection);                                                                                            
+    LightDirection = normalize(LightDirection);
     vec4 Color = CalcLightInternal(l.Base, LightDirection, In, ShadowFactor);
-    float Attenuation =  l.Atten.Constant +                                                 
-                         l.Atten.Linear * Distance +                                        
-                         l.Atten.Exp * Distance * Distance;  
-                                                                                           
-    return Color / Attenuation;                                                             
-}                                                                                           
-                                                                                            
+    float Attenuation =  l.Atten.Constant +
+                         l.Atten.Linear * Distance +
+                         l.Atten.Exp * Distance * Distance;
+
+    return Color / Attenuation;
+}
+
 out vec4 FragColor;
-                                                                                            
+
 void main()
-{                                    
+{
     VSOutput In;
     In.TexCoord      = TexCoord0;
     In.Normal        = normalize(Normal0);
     In.WorldPos      = WorldPos0;
-  
-    vec4 TotalLight = CalcPointLight(gPointLight, In);                                         
-                                                                                            
+
+    vec4 TotalLight = CalcPointLight(gPointLight, In);
+
     vec4 SampledColor = texture(gColorMap, TexCoord0.xy);
-                                                                                            
-    FragColor = SampledColor * TotalLight;     
+
+    FragColor = SampledColor * TotalLight;
 }

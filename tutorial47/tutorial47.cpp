@@ -255,7 +255,7 @@ int main(int argc, char** argv)
 
     if (!OgldevBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 47")) {
         OgldevBackendTerminate();
-                return 1;
+        return 1;
     }
 
     SRANDOM;
@@ -263,16 +263,17 @@ int main(int argc, char** argv)
     Tutorial47* pApp = new Tutorial47();
 
     if (!pApp->Init()) {
-                delete pApp;
-                OgldevBackendTerminate();
+        delete pApp;
+        OgldevBackendTerminate();
         return 1;
     }
 
+	TwInit (TW_OPENGL_CORE, NULL);
     pApp->Run();
 
     delete pApp;
 
-        OgldevBackendTerminate();
+    OgldevBackendTerminate();
 
     return 0;
 }

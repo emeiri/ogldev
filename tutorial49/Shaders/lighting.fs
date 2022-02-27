@@ -64,8 +64,14 @@ float CalcShadowFactor(int CascadeIndex, vec4 LightSpacePos)
     vec2 UVCoords;                                                                          
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;                                                  
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;                                                  
-    float z = 0.5 * ProjCoords.z + 0.5;                                                     
-    float Depth = texture(gShadowMap[CascadeIndex], UVCoords).x;                                          
+    float z = 0.5 * ProjCoords.z + 0.5;   
+	float Depth;
+	switch(CascadeIndex) {
+	    case 0: Depth = texture(gShadowMap[0], UVCoords).x; break;
+	    case 1: Depth = texture(gShadowMap[1], UVCoords).x; break;
+	    case 2: Depth = texture(gShadowMap[2], UVCoords).x; break;
+	    default: Depth = 1.0;
+	}
     if (Depth < z + 0.00001)                                                                 
         return 0.5;                                                                         
     else                                                                                    
