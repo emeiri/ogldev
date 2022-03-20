@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 44 - GLFW
+    Tutorial 30 - Debugging
 */
 
 #include <math.h>
@@ -40,11 +40,11 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-class Tutorial44 : public ICallbacks, public OgldevApp
+class Tutorial30 : public ICallbacks, public OgldevApp
 {
 public:
 
-    Tutorial44()
+    Tutorial30()
     {
         m_pGameCamera = NULL;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -63,7 +63,7 @@ public:
         m_pipeline.Scale(0.1f, 0.1f, 0.1f);
     }
 
-    ~Tutorial44()
+    ~Tutorial30()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -206,7 +206,7 @@ int main(int argc, char** argv)
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
     }
 
-    Tutorial44* pApp = new Tutorial44();
+    Tutorial30* pApp = new Tutorial30();
 
     if (!pApp->Init()) {
         delete pApp;

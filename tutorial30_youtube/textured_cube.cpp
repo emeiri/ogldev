@@ -30,17 +30,18 @@
 #include "camera.h"
 #include "lighting_technique.h"
 #include "ogldev_engine_common.h"
+#include "3rdparty/stb_image_write.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 
 
-class Tutorial22
+class TexturedCube
 {
 public:
-    Tutorial22();
-    ~Tutorial22();
+    TexturedCube();
+    ~TexturedCube();
 
     bool Init();
 
@@ -57,19 +58,20 @@ private:
     BasicMesh* pMesh = NULL;
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
-    PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
+    PointLight pointLight;
     float counter = 0;
+    unsigned char buffer[WINDOW_WIDTH * WINDOW_HEIGHT * 3];
 };
 
 
-Tutorial22::Tutorial22()
+TexturedCube::TexturedCube()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
 
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
-    //    glCullFace(GL_BACK);
+    glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -79,19 +81,15 @@ Tutorial22::Tutorial22()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    pointLights[0].DiffuseIntensity = 1.0f;
-    pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[0].Attenuation.Linear = 0.2f;
-    pointLights[0].Attenuation.Exp = 0.0f;
-
-    pointLights[1].DiffuseIntensity = 1.0f;
-    pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[1].Attenuation.Linear = 0.0f;
-    pointLights[1].Attenuation.Exp = 0.2f;
+    pointLight.AmbientIntensity = 1.0f;
+    pointLight.DiffuseIntensity = 1.0f;
+    pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+    pointLight.Attenuation.Linear = 0.02f;
+    pointLight.Attenuation.Exp = 0.0f;
 }
 
 
-Tutorial22::~Tutorial22()
+TexturedCube::~TexturedCube()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -107,17 +105,17 @@ Tutorial22::~Tutorial22()
 }
 
 
-bool Tutorial22::Init()
+bool TexturedCube::Init()
 {
-    Vector3f CameraPos(0.0f, 1.0f, -8.0f);
-    Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
+    Vector3f CameraPos(0.0f, 0.0f, -5.0f);
+    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
     pMesh = new BasicMesh();
 
-    if (!pMesh->LoadMesh("../Content/quad.obj")) {
+    if (!pMesh->LoadMesh("../Content/box.obj")) {
         return false;
     }
 
@@ -137,7 +135,7 @@ bool Tutorial22::Init()
 }
 
 
-void Tutorial22::RenderSceneCB()
+void TexturedCube::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -152,28 +150,23 @@ void Tutorial22::RenderSceneCB()
     WorldTrans& worldTransform = pMesh->GetWorldTransform();
 
     worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
-    worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
-    worldTransform.SetScale(20.0f);
+    worldTransform.SetPosition(0.0f, 0.0f, 1.0f);
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
     Matrix4f Projection;
     Projection.InitPersProjTransform(persProjInfo);
     Matrix4f WVP = Projection * View * World;
+
     pLightingTech->SetWVP(WVP);
 
     counter += 0.01f;
-    pointLights[0].WorldPosition.x = 0.0f;
-    pointLights[0].WorldPosition.y = sinf(counter) * 4 + 1;
-    pointLights[0].WorldPosition.z = 0.0f;
-    pointLights[0].CalcLocalPosition(worldTransform);
+    pointLight.WorldPosition.x = sinf(counter) * 3.0f;
+    pointLight.WorldPosition.y = 0.0f;
+    pointLight.WorldPosition.z = cosf(counter) * 3.0f;
+    pointLight.CalcLocalPosition(worldTransform);
 
-    pointLights[1].WorldPosition.x = 8.0f;
-    pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
-    pointLights[1].WorldPosition.z = 0.0f;
-    pointLights[1].CalcLocalPosition(worldTransform);
-
-    pLightingTech->SetPointLights(1, pointLights);
+    pLightingTech->SetPointLights(1, &pointLight);
 
     pLightingTech->SetMaterial(pMesh->GetMaterial());
 
@@ -184,12 +177,27 @@ void Tutorial22::RenderSceneCB()
 
     glutPostRedisplay();
     glutSwapBuffers();
+
+    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+
+    for (int y = 0 ; y < WINDOW_HEIGHT; y++) {
+        printf("%d ", y);
+        for (int x = 0 ; x < WINDOW_WIDTH; x++) {
+            unsigned char* p = &buffer[(y * WINDOW_WIDTH + x) * 3];
+            if (p[0] != 0) {
+                printf("%d, %d, %d ", p[0], p[1], p[2]);
+            }
+        }
+        printf("\n");
+    }
+
+    stbi_write_png("test.png", WINDOW_WIDTH, WINDOW_HEIGHT, 3, buffer, WINDOW_WIDTH * 3);
 }
 
 
 #define ATTEN_STEP 0.01f
 
-void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void TexturedCube::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case 'q':
@@ -197,69 +205,65 @@ void Tutorial22::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
         exit(0);
 
     case 'a':
-        pointLights[0].Attenuation.Linear += ATTEN_STEP;
-        pointLights[1].Attenuation.Linear += ATTEN_STEP;
+        pointLight.Attenuation.Linear += ATTEN_STEP;
         break;
 
     case 'z':
-        pointLights[0].Attenuation.Linear -= ATTEN_STEP;
-        pointLights[1].Attenuation.Linear -= ATTEN_STEP;
+        pointLight.Attenuation.Linear -= ATTEN_STEP;
         break;
 
     case 's':
-        pointLights[0].Attenuation.Exp += ATTEN_STEP;
-        pointLights[1].Attenuation.Exp += ATTEN_STEP;
+        pointLight.Attenuation.Exp += ATTEN_STEP;
         break;
 
     case 'x':
-        pointLights[0].Attenuation.Exp -= ATTEN_STEP;
-        pointLights[1].Attenuation.Exp -= ATTEN_STEP;
+        pointLight.Attenuation.Exp -= ATTEN_STEP;
         break;
 
     }
 
-    printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
+    printf("Linear %f Exp %f\n", pointLight.Attenuation.Linear, pointLight.Attenuation.Exp);
 
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial22::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void TexturedCube::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void Tutorial22::PassiveMouseCB(int x, int y)
+void TexturedCube::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-Tutorial22* pTutorial22 = NULL;
+TexturedCube* pTexturedCube = NULL;
 
 
 void RenderSceneCB()
 {
-    pTutorial22->RenderSceneCB();
+    pTexturedCube->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pTutorial22->KeyboardCB(key, mouse_x, mouse_y);
+    pTexturedCube->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pTutorial22->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pTexturedCube->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pTutorial22->PassiveMouseCB(x, y);
+    pTexturedCube->PassiveMouseCB(x, y);
 }
 
 
@@ -288,7 +292,7 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 22");
+    int win = glutCreateWindow("Textured Cube");
     printf("window id: %d\n", win);
 
     // char game_mode_string[64];
@@ -307,9 +311,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pTutorial22 = new Tutorial22();
+    pTexturedCube = new TexturedCube();
 
-    if (!pTutorial22->Init()) {
+    if (!pTexturedCube->Init()) {
         return 1;
     }
 
