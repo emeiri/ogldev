@@ -19,6 +19,7 @@
 #ifndef OGLDEV_UTIL_H
 #define OGLDEV_UTIL_H
 
+
 #ifndef _WIN64
 #include <unistd.h>
 #endif
@@ -29,6 +30,7 @@
 #include <string.h>
 #include <assert.h>
 #include "ogldev_types.h"
+
 
 using namespace std;
 
@@ -87,5 +89,16 @@ long long GetCurrentTimeMillis();
 #define NOT_IMPLEMENTED \
     printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); \
     exit(0);
+
+
+void gl_check_error(const char* function, const char *file, int line);
+
+#define CHECK_GL_ERRORS
+
+#ifdef CHECK_GL_ERRORS
+#define GCE gl_check_error(__FUNCTION__, __FILE__, __LINE__);
+#else
+#define GCE
+#endif
 
 #endif  /* OGLDEV_UTIL_H */
