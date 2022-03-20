@@ -26,3 +26,4 @@ Makefile-Release.mk
 *.recipe
 *.FileListAbsolute.txt
 *.VC.db
+*.trace
