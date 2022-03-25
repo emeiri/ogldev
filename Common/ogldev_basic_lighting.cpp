@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ void SpotLight::AddToATB(TwBar *bar)
 
 
 BasicLightingTechnique::BasicLightingTechnique()
-{   
+{
 }
 
 bool BasicLightingTechnique::Init()
@@ -99,6 +99,11 @@ bool BasicLightingTechnique::Init()
     m_matSpecularPowerLocation = GetUniformLocation("gSpecularPower");
     m_numPointLightsLocation = GetUniformLocation("gNumPointLights");
     m_numSpotLightsLocation = GetUniformLocation("gNumSpotLights");
+    m_colorModLocation = GetUniformLocation("gColorMod");
+
+    Enable();
+    glUniform4f(m_colorModLocation, 1.0f, 1.0f, 1.0f, 1.0f); // default color in case no one uses this feature
+    glUseProgram(0);
 
     if (m_dirLightLocation.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
         m_WVPLocation == INVALID_UNIFORM_LOCATION ||
@@ -198,7 +203,7 @@ bool BasicLightingTechnique::Init()
 
 void BasicLightingTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
@@ -246,7 +251,7 @@ void BasicLightingTechnique::SetMatSpecularPower(float Power)
 void BasicLightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
 {
     glUniform1i(m_numPointLightsLocation, NumLights);
-    
+
     for (unsigned int i = 0 ; i < NumLights ; i++) {
         glUniform3f(m_pointLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(m_pointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
@@ -275,4 +280,10 @@ void BasicLightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLig
         glUniform1f(m_spotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
         glUniform1f(m_spotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
+}
+
+
+void BasicLightingTechnique::SetColorMod(const Vector4f& ColorMod)
+{
+    glUniform4f(m_colorModLocation, ColorMod.x, ColorMod.y, ColorMod.z, ColorMod.w);
 }

@@ -16,7 +16,7 @@
  */
 
 #ifndef LIGHTING_TECHNIQUE_H
-#define	LIGHTING_TECHNIQUE_H
+#define LIGHTING_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -42,6 +42,7 @@ public:
     void SetEyeWorldPos(const Vector3f& EyeWorldPos);
     void SetMatSpecularIntensity(float Intensity);
     void SetMatSpecularPower(float Power);
+    void SetColorMod(const Vector4f& ColorMod);
 
 private:
 
@@ -53,6 +54,7 @@ private:
     GLuint m_matSpecularPowerLocation;
     GLuint m_numPointLightsLocation;
     GLuint m_numSpotLightsLocation;
+    GLuint m_colorModLocation;
 
     struct {
         GLuint Color;
@@ -89,4 +91,4 @@ private:
 };
 
 
-#endif	/* LIGHTING_TECHNIQUE_H */
+#endif  /* LIGHTING_TECHNIQUE_H */
