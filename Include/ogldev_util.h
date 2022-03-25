@@ -29,6 +29,7 @@
 #include <vector>
 #include <string.h>
 #include <assert.h>
+#include <GL/glew.h>
 #include "ogldev_types.h"
 
 
@@ -100,5 +101,13 @@ void gl_check_error(const char* function, const char *file, int line);
 #else
 #define GCE
 #endif
+
+void glDebugOutput(GLenum source,
+                   GLenum type,
+                   unsigned int id,
+                   GLenum severity,
+                   GLsizei length,
+                   const char *message,
+                   const void *userParam);
 
 #endif  /* OGLDEV_UTIL_H */

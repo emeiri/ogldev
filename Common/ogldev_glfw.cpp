@@ -26,7 +26,8 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
 
     GLFWmonitor* monitor = is_full_screen ? glfwGetPrimaryMonitor() : NULL;
 
-    //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+
     if (major_ver > 0) {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major_ver);
     }
@@ -51,6 +52,11 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
         OGLDEV_ERROR0((const char*)glewGetErrorString(res));
         exit(1);
     }
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugOutput, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
 
     return window;
 }
