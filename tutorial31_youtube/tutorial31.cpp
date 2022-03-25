@@ -46,7 +46,6 @@ public:
 
     Tutorial31()
     {
-        m_pGameCamera = NULL;
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 1.0f;
         m_directionalLight.DiffuseIntensity = 0.01f;
@@ -54,12 +53,6 @@ public:
         m_leftMouseButton.IsPressed = false;
         m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
         m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
-
-        m_persProjInfo.FOV = 45.0f;
-        m_persProjInfo.Height = WINDOW_HEIGHT;
-        m_persProjInfo.Width = WINDOW_WIDTH;
-        m_persProjInfo.zNear = 0.1f;
-        m_persProjInfo.zFar = 100.0f;
     }
 
     virtual ~Tutorial31()
@@ -92,7 +85,8 @@ public:
         }
     }
 
-     void RenderSceneCB()
+
+    void RenderSceneCB()
     {
         m_pGameCamera->OnRender();
 
@@ -104,8 +98,6 @@ public:
     void PickingPhase()
     {
         WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        worldTransform.SetScale(0.1f);
-        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
@@ -133,8 +125,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        worldTransform.SetScale(0.1f);
-        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
@@ -282,15 +272,19 @@ private:
         pMesh = new Mesh();
 
         pMesh->LoadMesh("../Content/spider.obj");
+
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        worldTransform.SetScale(0.1f);
+        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
     }
 
     GLFWwindow* window = NULL;
     BasicLightingTechnique m_lightingEffect;
     PickingTechnique m_pickingEffect;
     SimpleColorTechnique m_simpleColorEffect;
-    BasicCamera* m_pGameCamera;
+    BasicCamera* m_pGameCamera = NULL;
     DirectionalLight m_directionalLight;
-    Mesh* pMesh;
+    Mesh* pMesh = NULL;
     PickingTexture m_pickingTexture;
     struct {
         bool IsPressed;
@@ -298,7 +292,6 @@ private:
         int y;
     } m_leftMouseButton;
     Vector3f m_worldPos[2];
-    PersProjInfo m_persProjInfo;
 };
 
 
