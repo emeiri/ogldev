@@ -68,42 +68,18 @@ public:
         SAFE_DELETE(pMesh);
     }
 
-    bool Init()
+
+    void Init()
     {
         CreateWindow();
 
-        InitializeCallbacks();
+        InitCallbacks();
 
-        Vector3f Pos(0.0f, 5.0f, -22.0f);
-        Vector3f Target(0.0f, -0.2f, 1.0f);
-        Vector3f Up(0.0, 1.0f, 0.0f);
+        InitCamera();
 
-        m_pGameCamera = new BasicCamera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
+        InitShaders();
 
-        if (!m_lightingEffect.Init()) {
-            printf("Error initializing the lighting technique\n");
-            return false;
-        }
-
-        m_lightingEffect.Enable();
-        m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingEffect.SetDirectionalLight(m_directionalLight);
-
-        if (!m_pickingTexture.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
-            return false;
-        }
-
-        if (!m_pickingEffect.Init()) {
-            return false;
-        }
-
-        if (!m_simpleColorEffect.Init()) {
-            return false;
-        }
-
-        pMesh = new Mesh();
-
-        return pMesh->LoadMesh("../Content/spider.obj");
+        InitMesh();
     }
 
 
@@ -263,11 +239,54 @@ private:
     }
 
 
-    void InitializeCallbacks()
+    void InitCallbacks()
     {
         glfwSetKeyCallback(window, KeyCallback);
         glfwSetCursorPosCallback(window, CursorPosCallback);
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    }
+
+
+    void InitCamera()
+    {
+        Vector3f Pos(0.0f, 5.0f, -22.0f);
+        Vector3f Target(0.0f, -0.2f, 1.0f);
+        Vector3f Up(0.0, 1.0f, 0.0f);
+
+        m_pGameCamera = new BasicCamera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
+
+        if (!m_lightingEffect.Init()) {
+            printf("Error initializing the lighting technique\n");
+            exit(1);
+        }
+    }
+
+
+    void InitShaders()
+    {
+        m_lightingEffect.Enable();
+        m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        m_lightingEffect.SetDirectionalLight(m_directionalLight);
+
+        if (!m_pickingTexture.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
+            exit(1);
+        }
+
+        if (!m_pickingEffect.Init()) {
+            exit(1);
+        }
+
+        if (!m_simpleColorEffect.Init()) {
+            exit(1);
+        }
+    }
+
+
+    void InitMesh()
+    {
+        pMesh = new Mesh();
+
+        pMesh->LoadMesh("../Content/spider.obj");
     }
 
     GLFWwindow* window = NULL;
@@ -317,9 +336,7 @@ int main(int argc, char** argv)
 {
     app = new Tutorial31();
 
-    if (!app->Init()) {
-        return 1;
-    }
+    app->Init();
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glFrontFace(GL_CW);
