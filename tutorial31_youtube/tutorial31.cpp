@@ -53,6 +53,7 @@ public:
         m_leftMouseButton.IsPressed = false;
         m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
         m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
+        m_worldPos[2] = Vector3f(0.0f, 2.0f, 20.0f);
     }
 
     virtual ~Tutorial31()
@@ -303,7 +304,7 @@ private:
         int x;
         int y;
     } m_leftMouseButton;
-    Vector3f m_worldPos[2];
+    Vector3f m_worldPos[3];
 };
 
 
