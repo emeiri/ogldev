@@ -27,7 +27,7 @@ public:
 
     BasicCamera(int WindowWidth, int WindowHeight);
 
-    BasicCamera(int WindowWidth, int WindowHeight, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
+    BasicCamera(const PersProjInfo& persProjInfo, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
 
     void SetPosition(float x, float y, float z);
 
@@ -45,15 +45,18 @@ public:
 
     const Vector3f& GetUp() const { return m_up; }
 
+    const Matrix4f& GetProjectionMat() const { return ProjectionMat; }
+
 private:
 
     void Init();
     void Update();
 
+    PersProjInfo persProjInfo;
     Vector3f m_pos;
-
     Vector3f m_target;
     Vector3f m_up;
+
     float m_speed = 1.0f;
     int m_windowWidth;
     int m_windowHeight;
@@ -67,6 +70,8 @@ private:
     bool m_OnRightEdge;
 
     Vector2i m_mousePos;
+
+    Matrix4f ProjectionMat;
 };
 
 #endif

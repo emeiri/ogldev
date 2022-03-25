@@ -107,12 +107,7 @@ public:
         worldTransform.SetScale(0.1f);
         worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
         Matrix4f View = m_pGameCamera->GetMatrix();
-        Matrix4f Projection;
-        float FOV = 45.0f;
-        float zNear = 0.1f;
-        float zFar = 100.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-        Projection.InitPersProjTransform(persProjInfo);
+        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
         m_pickingTexture.EnableWriting();
 
@@ -141,12 +136,7 @@ public:
         worldTransform.SetScale(0.1f);
         worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
         Matrix4f View = m_pGameCamera->GetMatrix();
-        Matrix4f Projection;
-        float FOV = 45.0f;
-        float zNear = 0.1f;
-        float zFar = 100.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-        Projection.InitPersProjTransform(persProjInfo);
+        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
         // If the left mouse button is clicked check if it hit a triangle
         // and color it red
@@ -253,7 +243,12 @@ private:
         Vector3f Target(0.0f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        m_pGameCamera = new BasicCamera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+
+        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
 
         if (!m_lightingEffect.Init()) {
             printf("Error initializing the lighting technique\n");
