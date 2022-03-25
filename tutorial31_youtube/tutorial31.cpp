@@ -266,9 +266,7 @@ private:
         m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetDirectionalLight(m_directionalLight);
 
-        if (!m_pickingTexture.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
-            exit(1);
-        }
+        m_pickingTexture.Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         if (!m_pickingEffect.Init()) {
             exit(1);

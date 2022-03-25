@@ -16,9 +16,11 @@
 */
 
 #ifndef SHADOWMAPFBO_H
-#define	SHADOWMAPFBO_H
+#define SHADOWMAPFBO_H
 
 #include <GL/glew.h>
+
+#include "ogldev_types.h"
 
 class PickingTexture
 {
@@ -27,32 +29,29 @@ public:
 
     ~PickingTexture();
 
-    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
+    void Init(unsigned int WindowWidth, unsigned int WindowHeight);
 
     void EnableWriting();
-    
+
     void DisableWriting();
-    
+
     struct PixelInfo {
-        float ObjectID;
-        float DrawID;
-        float PrimID;
-        
-        PixelInfo()
+        uint ObjectID = 0;
+        uint DrawID = 0;
+        uint PrimID = 0;
+
+        void Print()
         {
-            ObjectID = 0.0f;
-            DrawID = 0.0f;
-            PrimID = 0.0f;
+            printf("Object %d draw %d prim %d\n", ObjectID, DrawID, PrimID);
         }
     };
 
     PixelInfo ReadPixel(unsigned int x, unsigned int y);
-    
+
 private:
     GLuint m_fbo;
     GLuint m_pickingTexture;
     GLuint m_depthTexture;
 };
 
-#endif	/* SHADOWMAPFBO_H */
-
+#endif  /* SHADOWMAPFBO_H */
