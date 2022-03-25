@@ -1,6 +1,5 @@
 /*
-
-        Copyright 2011 Etay Meiri
+    Copyright 2022 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,16 +19,14 @@
 
 #include <math.h>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 
 
 #include "ogldev_engine_common.h"
-#include "ogldev_app.h"
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
+#include "ogldev_basic_glfw_camera.h"
 #include "ogldev_basic_lighting.h"
-#include "ogldev_glut_backend.h"
+#include "ogldev_glfw.h"
 #include "mesh.h"
 #include "picking_texture.h"
 #include "picking_technique.h"
@@ -38,7 +35,12 @@
 #define WINDOW_WIDTH  1680
 #define WINDOW_HEIGHT 1050
 
-class Tutorial31 : public ICallbacks, public OgldevApp
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+static void CursorPosCallback(GLFWwindow* window, double x, double y);
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
+
+
+class Tutorial31
 {
 public:
 
@@ -53,10 +55,10 @@ public:
         m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
         m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
 
-        m_persProjInfo.FOV = 60.0f;
+        m_persProjInfo.FOV = 45.0f;
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
-        m_persProjInfo.zNear = 1.0f;
+        m_persProjInfo.zNear = 0.1f;
         m_persProjInfo.zFar = 100.0f;
     }
 
@@ -68,11 +70,15 @@ public:
 
     bool Init()
     {
+        CreateWindow();
+
+        InitializeCallbacks();
+
         Vector3f Pos(0.0f, 5.0f, -22.0f);
         Vector3f Target(0.0f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
+        m_pGameCamera = new BasicCamera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
 
         if (!m_lightingEffect.Init()) {
             printf("Error initializing the lighting technique\n");
@@ -100,19 +106,22 @@ public:
         return m_pMesh->LoadMesh("../Content/spider.obj");
     }
 
+
     void Run()
     {
-        GLUTBackendRun(this);
+        while (!glfwWindowShouldClose(window)) {
+            RenderSceneCB();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
     }
 
-    virtual void RenderSceneCB()
+     void RenderSceneCB()
     {
         m_pGameCamera->OnRender();
 
         PickingPhase();
         RenderPhase();
-
-        glutSwapBuffers();
     }
 
 
@@ -155,7 +164,7 @@ public:
         // and color it red
         if (m_leftMouseButton.IsPressed) {
             PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
-            GLExitIfError;
+
             if (Pixel.PrimID != 0) {
                 m_simpleColorEffect.Enable();
                 assert(Pixel.ObjectID < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
@@ -164,6 +173,8 @@ public:
                 // Must compensate for the decrement in the FS!
                 m_pMesh->Render((uint)Pixel.DrawID, (uint)Pixel.PrimID - 1);
             }
+
+            //            m_leftMouseButton.IsPressed = false;
         }
 
         // render the objects as usual
@@ -179,56 +190,76 @@ public:
     }
 
 
-    virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
+     void KeyboardCB(uint key, int state)
     {
-        switch (OgldevKey) {
-                        case OGLDEV_KEY_ESCAPE:
-                        case OGLDEV_KEY_q:
-                                GLUTBackendLeaveMainLoop();
-                                break;
+        switch (key) {
+        case GLFW_KEY_ESCAPE:
+        case GLFW_KEY_Q:
+            glfwDestroyWindow(window);
+            glfwTerminate();
+            exit(0);
+            break;
 
-            case 'a':
-                m_directionalLight.AmbientIntensity += 0.05f;
-                break;
+        case 'a':
+            m_directionalLight.AmbientIntensity += 0.05f;
+            break;
 
-            case 's':
-                m_directionalLight.AmbientIntensity -= 0.05f;
-                break;
+        case 's':
+            m_directionalLight.AmbientIntensity -= 0.05f;
+            break;
 
-            case 'z':
-                m_directionalLight.DiffuseIntensity += 0.05f;
-                break;
+        case 'z':
+            m_directionalLight.DiffuseIntensity += 0.05f;
+            break;
 
-            case 'x':
-                m_directionalLight.DiffuseIntensity -= 0.05f;
-                break;
-                        default:
-                                m_pGameCamera->OnKeyboard(OgldevKey);
+        case 'x':
+            m_directionalLight.DiffuseIntensity -= 0.05f;
+            break;
+        default:
+            m_pGameCamera->OnKeyboard(key);
         }
     }
 
 
-    virtual void PassiveMouseCB(int x, int y)
+    void PassiveMouseCB(int x, int y)
     {
         m_pGameCamera->OnMouse(x, y);
     }
 
 
-    virtual void MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)
+    void MouseCB(int button, int action, int x, int y)
     {
-        if (Button == OGLDEV_MOUSE_BUTTON_LEFT) {
-            m_leftMouseButton.IsPressed = (State == OGLDEV_KEY_STATE_PRESS);
+        if (button == GLFW_MOUSE_BUTTON_LEFT) {
+            m_leftMouseButton.IsPressed = (action == GLFW_PRESS);
             m_leftMouseButton.x = x;
             m_leftMouseButton.y = y;
+            printf("x %d y %d pressed %d\n", x, y, m_leftMouseButton.IsPressed);
         }
     }
 
 private:
 
+    void CreateWindow()
+    {
+        int major_ver = 0;
+        int minor_ver = 0;
+        bool is_full_screen = false;
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 31");
+    }
+
+
+    void InitializeCallbacks()
+    {
+        glfwSetKeyCallback(window, KeyCallback);
+        glfwSetCursorPosCallback(window, CursorPosCallback);
+        glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    }
+
+    GLFWwindow* window = NULL;
     BasicLightingTechnique m_lightingEffect;
     PickingTechnique m_pickingEffect;
     SimpleColorTechnique m_simpleColorEffect;
-    Camera* m_pGameCamera;
+    BasicCamera* m_pGameCamera;
     DirectionalLight m_directionalLight;
     Mesh* m_pMesh;
     PickingTexture m_pickingTexture;
@@ -242,24 +273,48 @@ private:
 };
 
 
+Tutorial31* app = NULL;
+
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    app->KeyboardCB(key, action);
+}
+
+
+static void CursorPosCallback(GLFWwindow* window, double x, double y)
+{
+    app->PassiveMouseCB((int)x, (int)y);
+}
+
+
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
+{
+    double x, y;
+
+    glfwGetCursorPos(window, &x, &y);
+
+    app->MouseCB(Button, Action, (int)x, (int)y);
+}
+
+
+
 int main(int argc, char** argv)
 {
-//    Magick::InitializeMagick(*argv);
-    GLUTBackendInit(argc, argv, true, false);
+    app = new Tutorial31();
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 31")) {
+    if (!app->Init()) {
         return 1;
     }
 
-    Tutorial31* pApp = new Tutorial31();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
-    if (!pApp->Init()) {
-        return 1;
-    }
+    app->Run();
 
-    pApp->Run();
-
-    delete pApp;
+    delete app;
 
     return 0;
 }
