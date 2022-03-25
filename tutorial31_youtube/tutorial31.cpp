@@ -90,7 +90,10 @@ public:
     {
         m_pGameCamera->OnRender();
 
-        PickingPhase();
+        if (m_leftMouseButton.IsPressed) {
+            PickingPhase();
+        }
+
         RenderPhase();
     }
 
@@ -130,12 +133,14 @@ public:
 
         // If the left mouse button is clicked check if it hit a triangle
         // and color it red
+        int clicked_object_id = -1;
         if (m_leftMouseButton.IsPressed) {
             PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
 
             if (Pixel.PrimID != 0) {
                 m_simpleColorEffect.Enable();
                 assert(Pixel.ObjectID < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
+                clicked_object_id = Pixel.ObjectID;
                 worldTransform.SetPosition(m_worldPos[(uint)Pixel.ObjectID]);
                 Matrix4f World = worldTransform.GetMatrix();
                 Matrix4f WVP = Projection * View * World;
@@ -156,6 +161,13 @@ public:
             Matrix4f WVP = Projection * View * World;
             m_lightingEffect.SetWVP(WVP);
             m_lightingEffect.SetWorldMatrix(World);
+
+            if (i == clicked_object_id) {
+                m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
+            } else {
+                m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
+            }
+
             pMesh->Render(NULL);
         }
     }
@@ -204,7 +216,7 @@ public:
             m_leftMouseButton.IsPressed = (action == GLFW_PRESS);
             m_leftMouseButton.x = x;
             m_leftMouseButton.y = y;
-            printf("x %d y %d pressed %d\n", x, y, m_leftMouseButton.IsPressed);
+            //            printf("x %d y %d pressed %d\n", x, y, m_leftMouseButton.IsPressed);
         }
     }
 
