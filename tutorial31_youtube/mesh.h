@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 */
 
 #ifndef MESH_H
-#define	MESH_H
+#define MESH_H
 
 #include <map>
 #include <vector>
@@ -30,6 +30,7 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
 #include "render_callbacks.h"
+#include "ogldev_world_transform.h"
 
 struct Vertex
 {
@@ -58,8 +59,10 @@ public:
     bool LoadMesh(const std::string& Filename);
 
     void Render(IRenderCallbacks* pRenderCallbacks);
-    
+
     void Render(unsigned int DrawIndex, unsigned int PrimID);
+
+    WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
 private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
@@ -85,8 +88,8 @@ private:
 
     std::vector<MeshEntry> m_Entries;
     std::vector<Texture*> m_Textures;
+    WorldTrans m_worldTransform;
 };
 
 
-#endif	/* MESH_H */
-
+#endif  /* MESH_H */

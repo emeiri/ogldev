@@ -23,7 +23,6 @@
 
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
-#include "ogldev_pipeline.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_basic_lighting.h"
 #include "ogldev_glfw.h"
@@ -31,6 +30,7 @@
 #include "picking_texture.h"
 #include "picking_technique.h"
 #include "simple_color_technique.h"
+#include "ogldev_world_transform.h"
 
 #define WINDOW_WIDTH  1680
 #define WINDOW_HEIGHT 1050
@@ -65,7 +65,7 @@ public:
     virtual ~Tutorial31()
     {
         SAFE_DELETE(m_pGameCamera);
-        SAFE_DELETE(m_pMesh);
+        SAFE_DELETE(pMesh);
     }
 
     bool Init()
@@ -101,9 +101,9 @@ public:
             return false;
         }
 
-        m_pMesh = new Mesh();
+        pMesh = new Mesh();
 
-        return m_pMesh->LoadMesh("../Content/spider.obj");
+        return pMesh->LoadMesh("../Content/spider.obj");
     }
 
 
@@ -127,11 +127,16 @@ public:
 
     void PickingPhase()
     {
-        Pipeline p;
-        p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, 90.0f, 0.0f);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(m_persProjInfo);
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        worldTransform.SetScale(0.1f);
+        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
+        Matrix4f View = m_pGameCamera->GetMatrix();
+        Matrix4f Projection;
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+        Projection.InitPersProjTransform(persProjInfo);
 
         m_pickingTexture.EnableWriting();
 
@@ -140,10 +145,12 @@ public:
         m_pickingEffect.Enable();
 
         for (uint i = 0 ; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
-            p.WorldPos(m_worldPos[i]);
+            worldTransform.SetPosition(m_worldPos[i]);
             m_pickingEffect.SetObjectIndex(i);
-            m_pickingEffect.SetWVP(p.GetWVPTrans());
-            m_pMesh->Render(&m_pickingEffect);
+            Matrix4f World = worldTransform.GetMatrix();
+            Matrix4f WVP = Projection * View * World;
+            m_pickingEffect.SetWVP(WVP);
+            pMesh->Render(&m_pickingEffect);
         }
 
         m_pickingTexture.DisableWriting();
@@ -154,11 +161,16 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Pipeline p;
-        p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, 90.0f, 0.0f);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(m_persProjInfo);
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        worldTransform.SetScale(0.1f);
+        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
+        Matrix4f View = m_pGameCamera->GetMatrix();
+        Matrix4f Projection;
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+        Projection.InitPersProjTransform(persProjInfo);
 
         // If the left mouse button is clicked check if it hit a triangle
         // and color it red
@@ -168,13 +180,14 @@ public:
             if (Pixel.PrimID != 0) {
                 m_simpleColorEffect.Enable();
                 assert(Pixel.ObjectID < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
-                p.WorldPos(m_worldPos[(uint)Pixel.ObjectID]);
-                m_simpleColorEffect.SetWVP(p.GetWVPTrans());
-                // Must compensate for the decrement in the FS!
-                m_pMesh->Render((uint)Pixel.DrawID, (uint)Pixel.PrimID - 1);
-            }
+                worldTransform.SetPosition(m_worldPos[(uint)Pixel.ObjectID]);
+                Matrix4f World = worldTransform.GetMatrix();
+                Matrix4f WVP = Projection * View * World;
 
-            //            m_leftMouseButton.IsPressed = false;
+                m_simpleColorEffect.SetWVP(WVP);
+                // Must compensate for the decrement in the FS!
+                pMesh->Render((uint)Pixel.DrawID, (uint)Pixel.PrimID - 1);
+            }
         }
 
         // render the objects as usual
@@ -182,10 +195,12 @@ public:
         m_lightingEffect.SetEyeWorldPos(m_pGameCamera->GetPos());
 
         for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
-            p.WorldPos(m_worldPos[i]);
-            m_lightingEffect.SetWVP(p.GetWVPTrans());
-            m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());
-            m_pMesh->Render(NULL);
+            worldTransform.SetPosition(m_worldPos[i]);
+            Matrix4f World = worldTransform.GetMatrix();
+            Matrix4f WVP = Projection * View * World;
+            m_lightingEffect.SetWVP(WVP);
+            m_lightingEffect.SetWorldMatrix(World);
+            pMesh->Render(NULL);
         }
     }
 
@@ -261,7 +276,7 @@ private:
     SimpleColorTechnique m_simpleColorEffect;
     BasicCamera* m_pGameCamera;
     DirectionalLight m_directionalLight;
-    Mesh* m_pMesh;
+    Mesh* pMesh;
     PickingTexture m_pickingTexture;
     struct {
         bool IsPressed;
