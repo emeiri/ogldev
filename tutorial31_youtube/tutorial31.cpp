@@ -113,7 +113,7 @@ public:
 
         for (uint i = 0 ; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
             worldTransform.SetPosition(m_worldPos[i]);
-            m_pickingEffect.SetObjectIndex(i);
+            m_pickingEffect.SetObjectIndex(i + 1);
             Matrix4f World = worldTransform.GetMatrix();
             Matrix4f WVP = Projection * View * World;
             m_pickingEffect.SetWVP(WVP);
@@ -140,9 +140,9 @@ public:
 
             if (Pixel.PrimID != 0) {
                 m_simpleColorEffect.Enable();
-                assert(Pixel.ObjectID < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
-                clicked_object_id = Pixel.ObjectID;
-                worldTransform.SetPosition(m_worldPos[(uint)Pixel.ObjectID]);
+                clicked_object_id = Pixel.ObjectID - 1;
+                assert(clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
+                worldTransform.SetPosition(m_worldPos[clicked_object_id]);
                 Matrix4f World = worldTransform.GetMatrix();
                 Matrix4f WVP = Projection * View * World;
 
