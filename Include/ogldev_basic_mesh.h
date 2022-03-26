@@ -33,6 +33,13 @@
 #include "ogldev_world_transform.h"
 #include "ogldev_material.h"
 
+class IRenderCallbacks
+{
+public:
+    virtual void DrawStartCB(unsigned int DrawIndex) = 0;
+};
+
+
 class BasicMesh
 {
 public:
@@ -42,7 +49,9 @@ public:
 
     bool LoadMesh(const std::string& Filename);
 
-    void Render();
+    void Render(IRenderCallbacks* pRenderCallbacks = NULL);
+
+    void Render(unsigned int DrawIndex, unsigned int PrimID);
 
     void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 

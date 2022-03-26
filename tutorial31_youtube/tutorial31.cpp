@@ -26,7 +26,7 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_basic_lighting.h"
 #include "ogldev_glfw.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "picking_texture.h"
 #include "picking_technique.h"
 #include "simple_color_technique.h"
@@ -146,7 +146,7 @@ public:
                 Matrix4f World = worldTransform.GetMatrix();
                 Matrix4f WVP = Projection * View * World;
                 m_simpleColorEffect.SetWVP(WVP);
-                pMesh->Render((uint)Pixel.DrawID, (uint)Pixel.PrimID);
+                pMesh->Render(Pixel.DrawID, Pixel.PrimID);
             }
         }
 
@@ -278,7 +278,7 @@ private:
 
     void InitMesh()
     {
-        pMesh = new Mesh();
+        pMesh = new BasicMesh();
 
         pMesh->LoadMesh("../Content/spider.obj");
 
@@ -293,7 +293,7 @@ private:
     SimpleColorTechnique m_simpleColorEffect;
     BasicCamera* m_pGameCamera = NULL;
     DirectionalLight m_directionalLight;
-    Mesh* pMesh = NULL;
+    BasicMesh* pMesh = NULL;
     PickingTexture m_pickingTexture;
     struct {
         bool IsPressed;

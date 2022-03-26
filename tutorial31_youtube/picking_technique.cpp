@@ -15,11 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "picking_technique.h"
 #include "ogldev_util.h"
-
-
-
+#include "picking_technique.h"
 
 PickingTechnique::PickingTechnique()
 {

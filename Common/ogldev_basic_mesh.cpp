@@ -137,19 +137,27 @@ void BasicMesh::InitSingleMesh(const aiMesh* paiMesh)
 
     // Populate the vertex attribute vectors
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-        const aiVector3D& pPos      = paiMesh->mVertices[i];
-        const aiVector3D& pNormal   = paiMesh->mNormals[i];
-        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
 
+        const aiVector3D& pPos      = paiMesh->mVertices[i];
         m_Positions.push_back(Vector3f(pPos.x, pPos.y, pPos.z));
-        m_Normals.push_back(Vector3f(pNormal.x, pNormal.y, pNormal.z));
+
+        if (paiMesh->mNormals) {
+            const aiVector3D& pNormal   = paiMesh->mNormals[i];
+            m_Normals.push_back(Vector3f(pNormal.x, pNormal.y, pNormal.z));
+        } else {
+            aiVector3D Normal(0.0f, 1.0f, 0.0f);
+            m_Normals.push_back(Vector3f(Normal.x, Normal.y, Normal.z));
+        }
+
+        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
         m_TexCoords.push_back(Vector2f(pTexCoord.x, pTexCoord.y));
     }
 
     // Populate the index buffer
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
-        assert(Face.mNumIndices == 3);
+        //        printf("num indices %d\n", Face.mNumIndices);
+        //        assert(Face.mNumIndices == 3);
         m_Indices.push_back(Face.mIndices[0]);
         m_Indices.push_back(Face.mIndices[1]);
         m_Indices.push_back(Face.mIndices[2]);
@@ -161,7 +169,7 @@ string GetDirFromFilename(const string& Filename)
 {
     // Extract the directory part from the file name
     string::size_type SlashIndex;
-    
+
     SlashIndex = Filename.find_last_of("/");
 
     string Dir;
@@ -216,6 +224,12 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             string p(Path.data);
 
+            for (int i = 0 ; i < p.length() ; i++) {
+                if (p[i] == '\\') {
+                    p[i] = '/';
+                }
+            }
+
             if (p.substr(0, 2) == ".\\") {
                 p = p.substr(2, p.size() - 2);
             }
@@ -229,7 +243,7 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
                 exit(0);
             }
             else {
-                printf("Loaded diffuse texture '%s'\n", FullPath.c_str());
+                printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), index);
             }
         }
     }
@@ -319,13 +333,12 @@ void BasicMesh::PopulateBuffers()
 
 
 // Introduced in youtube tutorial #18
-void BasicMesh::Render()
+void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
 {
     glBindVertexArray(m_VAO);
 
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
-
         assert(MaterialIndex < m_Materials.size());
 
         if (m_Materials[MaterialIndex].pDiffuse) {
@@ -334,6 +347,10 @@ void BasicMesh::Render()
 
         if (m_Materials[MaterialIndex].pSpecularExponent) {
             m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        }
+
+        if (pRenderCallbacks) {
+            pRenderCallbacks->DrawStartCB(i);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -346,6 +363,33 @@ void BasicMesh::Render()
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
+
+
+void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
+{
+    glBindVertexArray(m_VAO);
+
+    unsigned int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
+    assert(MaterialIndex < m_Materials.size());
+
+    if (m_Materials[MaterialIndex].pDiffuse) {
+        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pSpecularExponent) {
+        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+    }
+
+    glDrawElementsBaseVertex(GL_TRIANGLES,
+                             3,
+                             GL_UNSIGNED_INT,
+                             (void*)(sizeof(unsigned int) * (m_Meshes[DrawIndex].BaseIndex + PrimID * 3)),
+                             m_Meshes[DrawIndex].BaseVertex);
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
+}
+
 
 
 // Used only by instancing
