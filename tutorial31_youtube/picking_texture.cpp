@@ -22,12 +22,6 @@
 #include "picking_technique.h"
 #include "ogldev_util.h"
 
-PickingTexture::PickingTexture()
-{
-    m_fbo = 0;
-    m_pickingTexture = 0;
-    m_depthTexture = 0;
-}
 
 PickingTexture::~PickingTexture()
 {
@@ -59,15 +53,11 @@ void PickingTexture::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_pickingTexture, 0);
 
-
     // Create the texture object for the depth buffer
     glGenTextures(1, &m_depthTexture);
     glBindTexture(GL_TEXTURE_2D, m_depthTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
-
-    glReadBuffer(GL_NONE);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
     // Verify that the FBO is correct
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

@@ -22,7 +22,7 @@
 
 
 PickingTechnique::PickingTechnique()
-{   
+{
 }
 
 bool PickingTechnique::Init()
@@ -38,7 +38,7 @@ bool PickingTechnique::Init()
     if (!AddShader(GL_FRAGMENT_SHADER, "picking.fs")) {
         return false;
     }
-    
+
     if (!Finalize()) {
         return false;
     }
@@ -59,7 +59,7 @@ bool PickingTechnique::Init()
 
 void PickingTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
@@ -71,7 +71,5 @@ void PickingTechnique::DrawStartCB(uint DrawIndex)
 
 void PickingTechnique::SetObjectIndex(uint ObjectIndex)
 {
-    GLExitIfError;
     glUniform1ui(m_objectIndexLocation, ObjectIndex);
-//    GLExitIfError;
 }

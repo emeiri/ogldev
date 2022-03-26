@@ -20,6 +20,28 @@ static void glfw_lib_init()
     printf("GLFW %d.%d.%d initialized\n", Major, Minor, Rev);
 }
 
+
+static void enable_debug_output()
+{
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugOutput, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
+}
+
+
+    // Must be done after glfw is initialized!
+static void init_glew()
+{
+    glewExperimental = GL_TRUE;
+    GLenum res = glewInit();
+    if (res != GLEW_OK) {
+        OGLDEV_ERROR0((const char*)glewGetErrorString(res));
+        exit(1);
+    }
+}
+
+
 GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool is_full_screen, const char* title)
 {
     glfw_lib_init();
@@ -46,17 +68,9 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
     glfwMakeContextCurrent(window);
 
     // Must be done after glfw is initialized!
-    glewExperimental = GL_TRUE;
-    GLenum res = glewInit();
-    if (res != GLEW_OK) {
-        OGLDEV_ERROR0((const char*)glewGetErrorString(res));
-        exit(1);
-    }
+    init_glew();
 
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(glDebugOutput, nullptr);
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, GL_TRUE);
+    enable_debug_output();
 
     return window;
 }

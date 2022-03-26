@@ -101,15 +101,15 @@ public:
 
     void PickingPhase()
     {
-        WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        Matrix4f View = m_pGameCamera->GetMatrix();
-        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
-
         m_pickingTexture.EnableWriting();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pickingEffect.Enable();
+
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        Matrix4f View = m_pGameCamera->GetMatrix();
+        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
         for (uint i = 0 ; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
             worldTransform.SetPosition(m_worldPos[i]);
@@ -138,17 +138,15 @@ public:
         if (m_leftMouseButton.IsPressed) {
             PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
 
-            if (Pixel.PrimID != 0) {
-                m_simpleColorEffect.Enable();
+            if (Pixel.ObjectID != 0) {
                 clicked_object_id = Pixel.ObjectID - 1;
+                m_simpleColorEffect.Enable();
                 assert(clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
                 worldTransform.SetPosition(m_worldPos[clicked_object_id]);
                 Matrix4f World = worldTransform.GetMatrix();
                 Matrix4f WVP = Projection * View * World;
-
                 m_simpleColorEffect.SetWVP(WVP);
-                // Must compensate for the decrement in the FS!
-                pMesh->Render((uint)Pixel.DrawID, (uint)Pixel.PrimID - 1);
+                pMesh->Render((uint)Pixel.DrawID, (uint)Pixel.PrimID);
             }
         }
 

@@ -25,7 +25,7 @@
 class PickingTexture
 {
 public:
-    PickingTexture();
+    PickingTexture() {}
 
     ~PickingTexture();
 
@@ -49,9 +49,9 @@ public:
     PixelInfo ReadPixel(unsigned int x, unsigned int y);
 
 private:
-    GLuint m_fbo;
-    GLuint m_pickingTexture;
-    GLuint m_depthTexture;
+    GLuint m_fbo = 0;
+    GLuint m_pickingTexture = 0;
+    GLuint m_depthTexture = 0;
 };
 
 #endif  /* SHADOWMAPFBO_H */
