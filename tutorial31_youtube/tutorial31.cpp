@@ -24,7 +24,7 @@
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_basic_lighting.h"
+#include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "picking_texture.h"
@@ -32,8 +32,8 @@
 #include "simple_color_technique.h"
 #include "ogldev_world_transform.h"
 
-#define WINDOW_WIDTH  1680
-#define WINDOW_HEIGHT 1050
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -47,9 +47,9 @@ public:
     Tutorial31()
     {
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_directionalLight.AmbientIntensity = 1.0f;
-        m_directionalLight.DiffuseIntensity = 0.01f;
-        m_directionalLight.Direction = Vector3f(1.0f, -1.0, 0.0);
+        m_directionalLight.AmbientIntensity = 3.0f;
+        m_directionalLight.DiffuseIntensity = 0.1f;
+        m_directionalLight.WorldDirection = Vector3f(-1.0f, 0.0, 0.0);
         m_leftMouseButton.IsPressed = false;
         m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
         m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
@@ -71,9 +71,9 @@ public:
 
         InitCamera();
 
-        InitShaders();
-
         InitMesh();
+
+        InitShaders();
     }
 
 
@@ -152,19 +152,20 @@ public:
 
         // render the objects as usual
         m_lightingEffect.Enable();
-        m_lightingEffect.SetEyeWorldPos(m_pGameCamera->GetPos());
 
         for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
             worldTransform.SetPosition(m_worldPos[i]);
             Matrix4f World = worldTransform.GetMatrix();
             Matrix4f WVP = Projection * View * World;
             m_lightingEffect.SetWVP(WVP);
-            m_lightingEffect.SetWorldMatrix(World);
-
+            Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(m_pGameCamera->GetPos());
+            m_lightingEffect.SetCameraLocalPos(CameraLocalPos3f);
+            m_directionalLight.CalcLocalDirection(worldTransform);
+            m_lightingEffect.SetDirectionalLight(m_directionalLight);
             if (i == clicked_object_id) {
-                m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
+                //m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
             } else {
-                m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
+                //                m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
             }
 
             pMesh->Render(NULL);
@@ -261,8 +262,9 @@ private:
     void InitShaders()
     {
         m_lightingEffect.Enable();
-        m_lightingEffect.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingEffect.SetDirectionalLight(m_directionalLight);
+        m_lightingEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+        m_lightingEffect.SetMaterial(pMesh->GetMaterial());
 
         m_pickingTexture.Init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -288,7 +290,7 @@ private:
     }
 
     GLFWwindow* window = NULL;
-    BasicLightingTechnique m_lightingEffect;
+    LightingTechnique m_lightingEffect;
     PickingTechnique m_pickingEffect;
     SimpleColorTechnique m_simpleColorEffect;
     BasicCamera* m_pGameCamera = NULL;
