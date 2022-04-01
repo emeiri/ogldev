@@ -50,7 +50,8 @@ public:
         m_directionalLight.AmbientIntensity = 3.0f;
         m_directionalLight.DiffuseIntensity = 0.1f;
         m_directionalLight.WorldDirection = Vector3f(-1.0f, 0.0, 0.0);
-        m_leftMouseButton.IsPressed = false;
+
+        // The same mesh will be rendered at the following locations
         m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
         m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
         m_worldPos[2] = Vector3f(0.0f, 2.0f, 20.0f);
@@ -91,6 +92,7 @@ public:
     {
         m_pGameCamera->OnRender();
 
+        // There's no point in the picking phase when the mouse is not pressed
         if (m_leftMouseButton.IsPressed) {
             PickingPhase();
         }
@@ -113,6 +115,7 @@ public:
 
         for (uint i = 0 ; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
             worldTransform.SetPosition(m_worldPos[i]);
+            // Background is zero, the real objects start at 1
             m_pickingEffect.SetObjectIndex(i + 1);
             Matrix4f World = worldTransform.GetMatrix();
             Matrix4f WVP = Projection * View * World;
@@ -139,9 +142,10 @@ public:
             PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
 
             if (Pixel.ObjectID != 0) {
+                // Compensate for the SetObjectindex call in the picking phase
                 clicked_object_id = Pixel.ObjectID - 1;
-                m_simpleColorEffect.Enable();
                 assert(clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
+                m_simpleColorEffect.Enable();
                 worldTransform.SetPosition(m_worldPos[clicked_object_id]);
                 Matrix4f World = worldTransform.GetMatrix();
                 Matrix4f WVP = Projection * View * World;
@@ -162,10 +166,11 @@ public:
             m_lightingEffect.SetCameraLocalPos(CameraLocalPos3f);
             m_directionalLight.CalcLocalDirection(worldTransform);
             m_lightingEffect.SetDirectionalLight(m_directionalLight);
+
             if (i == clicked_object_id) {
-                //m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
+                 m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
             } else {
-                //                m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
+                 m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
             }
 
             pMesh->Render(NULL);
@@ -216,7 +221,6 @@ public:
             m_leftMouseButton.IsPressed = (action == GLFW_PRESS);
             m_leftMouseButton.x = x;
             m_leftMouseButton.y = y;
-            //            printf("x %d y %d pressed %d\n", x, y, m_leftMouseButton.IsPressed);
         }
     }
 
@@ -298,7 +302,7 @@ private:
     BasicMesh* pMesh = NULL;
     PickingTexture m_pickingTexture;
     struct {
-        bool IsPressed;
+        bool IsPressed = false;
         int x;
         int y;
     } m_leftMouseButton;
