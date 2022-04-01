@@ -106,6 +106,7 @@ public:
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
+    void SetColorMod(const Vector4f& ColorMod);
 
 private:
 
@@ -115,6 +116,7 @@ private:
     GLuint CameraLocalPosLoc;
     GLuint NumPointLightsLocation;
     GLuint NumSpotLightsLocation;
+    GLuint ColorModLocation;
 
     struct {
         GLuint AmbientColor;

@@ -59,6 +59,7 @@ uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
+uniform vec4 gColorMod;
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
@@ -141,5 +142,5 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
+    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * gColorMod;
 }

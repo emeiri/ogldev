@@ -74,6 +74,7 @@ bool LightingTechnique::Init()
     CameraLocalPosLoc = GetUniformLocation("gCameraLocalPos");
     NumPointLightsLocation = GetUniformLocation("gNumPointLights");
     NumSpotLightsLocation = GetUniformLocation("gNumSpotLights");
+    ColorModLocation = GetUniformLocation("gColorMod");
 
     if (WVPLoc == 0xFFFFFFFF ||
         samplerLoc == 0xFFFFFFFF ||
@@ -249,4 +250,9 @@ void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
         glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
         glUniform1f(SpotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
+}
+
+void LightingTechnique::SetColorMod(const Vector4f& ColorMod)
+{
+    glUniform4f(ColorModLocation, ColorMod.x, ColorMod.y, ColorMod.z, ColorMod.w);
 }

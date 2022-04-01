@@ -22,6 +22,8 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_lights_common.h"
 
+// This is the old version of the lighting technique which was used for the website before the youtube channel
+// For the newer version see ogldev_new_lighting.h
 
 class BasicLightingTechnique : public Technique {
 public:
