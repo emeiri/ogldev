@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "camera.h"
 #include <GL/freeglut.h>
 
-#include "camera.h"
 
 static int MARGIN = 10;
 static float EDGE_STEP = 1.0f;

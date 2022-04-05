@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <GL/freeglut.h>
 
 #include "camera.h"
+#include <GL/freeglut.h>
 
 
 Camera::Camera()
