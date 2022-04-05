@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SHADOWMAPFBO_H
-#define SHADOWMAPFBO_H
+#ifndef PICKING_TEXTURE_H
+#define PICKING_TEXTURE_H
 
 #include <GL/glew.h>
 
@@ -54,4 +54,4 @@ private:
     GLuint m_depthTexture = 0;
 };
 
-#endif  /* SHADOWMAPFBO_H */
+#endif  /* PICKING_TEXTURE_H */

@@ -81,6 +81,7 @@ void PickingTexture::EnableWriting()
 
 void PickingTexture::DisableWriting()
 {
+    // Bind back the default framebuffer
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
@@ -88,13 +89,14 @@ void PickingTexture::DisableWriting()
 PickingTexture::PixelInfo PickingTexture::ReadPixel(unsigned int x, unsigned int y)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+
     glReadBuffer(GL_COLOR_ATTACHMENT0);
+
     PixelInfo Pixel;
     glReadPixels(x, y, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &Pixel);
 
-    Pixel.Print();
-
     glReadBuffer(GL_NONE);
+
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
     return Pixel;
