@@ -44,7 +44,7 @@ public:
 
     void Render();
 
-    uint NumBones() const
+    size_t NumBones() const
     {
         return m_BoneNameToIndexMap.size();
     }
