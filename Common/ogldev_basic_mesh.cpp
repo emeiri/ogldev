@@ -58,15 +58,14 @@ bool BasicMesh::LoadMesh(const string& Filename)
     glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
 
     bool Ret = false;
-    Assimp::Importer Importer;
 
-    const aiScene* pScene = Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
+    m_pScene = m_Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
 
-    if (pScene) {
-        Ret = InitFromScene(pScene, Filename);
+    if (m_pScene) {
+        Ret = InitFromScene(m_pScene, Filename);
     }
     else {
-        printf("Error parsing '%s': '%s'\n", Filename.c_str(), Importer.GetErrorString());
+        printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
     }
 
     // Make sure the VAO is not changed from the outside
@@ -438,4 +437,24 @@ const Material& BasicMesh::GetMaterial()
     }
 
     return m_Materials[0];
+}
+
+
+void BasicMesh::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex)
+{
+    uint MeshIndex = DrawIndex; // Each mesh is rendered in its own draw call
+
+    assert(MeshIndex < m_pScene->mNumMeshes);
+    const aiMesh* paiMesh = m_pScene->mMeshes[MeshIndex];
+
+    assert(PrimID < paiMesh->mNumFaces);
+    const aiFace& Face = paiMesh->mFaces[PrimID];
+
+    uint LeadingIndex = Face.mIndices[0];
+
+    assert(LeadingIndex < paiMesh->mNumVertices);
+    const aiVector3D& Pos = paiMesh->mVertices[LeadingIndex];
+    Vertex.x = Pos.x;
+    Vertex.y = Pos.y;
+    Vertex.z = Pos.z;
 }

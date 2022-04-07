@@ -36,7 +36,7 @@
 class IRenderCallbacks
 {
 public:
-    virtual void DrawStartCB(unsigned int DrawIndex) = 0;
+    virtual void DrawStartCB(uint DrawIndex) = 0;
 };
 
 
@@ -51,22 +51,24 @@ public:
 
     void Render(IRenderCallbacks* pRenderCallbacks = NULL);
 
-    void Render(unsigned int DrawIndex, unsigned int PrimID);
+    void Render(uint DrawIndex, uint PrimID);
 
-    void Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
+    void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
     const Material& GetMaterial();
+
+    void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
 private:
     void Clear();
 
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 
-    void CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices);
+    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
 
-    void ReserveSpace(unsigned int NumVertices, unsigned int NumIndices);
+    void ReserveSpace(uint NumVertices, uint NumIndices);
 
     void InitAllMeshes(const aiScene* pScene);
 
@@ -109,10 +111,10 @@ private:
             MaterialIndex = INVALID_MATERIAL;
         }
 
-        unsigned int NumIndices;
-        unsigned int BaseVertex;
-        unsigned int BaseIndex;
-        unsigned int MaterialIndex;
+        uint NumIndices;
+        uint BaseVertex;
+        uint BaseIndex;
+        uint MaterialIndex;
     };
 
     std::vector<BasicMeshEntry> m_Meshes;
@@ -122,7 +124,11 @@ private:
     vector<Vector3f> m_Positions;
     vector<Vector3f> m_Normals;
     vector<Vector2f> m_TexCoords;
-    vector<unsigned int> m_Indices;
+    vector<uint> m_Indices;
+
+    const aiScene* m_pScene;
+    Assimp::Importer m_Importer;
+
 };
 
 
