@@ -53,7 +53,7 @@ public:
 
         // The same mesh will be rendered at the following locations
         m_worldPos[0] = Vector3f(-5.0f, 0.0f, 10.0f);
-        m_worldPos[1] = Vector3f(5.0f, 0.0f, 20.0f);
+        m_worldPos[1] = Vector3f(0.0f, 0.0f, 10.0f);
         m_worldPos[2] = Vector3f(0.0f, 5.0f, 10.0f);
     }
 
@@ -208,7 +208,7 @@ public:
             printf("Leading vertex z: %f\n", m_leadingVertexView.z);
             float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
             printf("Z ratio: %f\n", z_ratio);
-            Vector3f ray_view_intesect = ray_view_normalized * z_ratio;
+            Vector4f ray_view_intesect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
             printf("Leading vertex intesect: ");
             ray_view_intesect.Print();
 
@@ -232,19 +232,21 @@ public:
             //            m_translation = ray_view_intesect - m_intersectionPoint;
             //            printf("Translation: ");
             //            m_translation.Print();
+            printf("Step 4 (World space): \n");
+            View.Print();
+            Matrix4f InvView = View.Inverse();
+            InvView.Print();
+            Vector4f point_world = InvView * ray_view_intesect;
+            //            printf("Before normalization: ");
+            point_world.Print();
+            //            printf("After normalization: ");
+
             printf("Previous world pos: ");
             m_worldPos[m_clicked_object_id].Print();
-            m_worldPos[m_clicked_object_id].x = ray_view_intesect.x;
-            m_worldPos[m_clicked_object_id].y = ray_view_intesect.y;
-            /*            printf("Step 4 (World space): \n");
-            Matrix4f InvView = View.Inverse();
-            Vector4f ray_world = InvView * ray_view;
-            printf("Before normalization: ");
-            ray_world.Print();
-            printf("After normalization: ");
-            Vector3f ray_world_normalized(ray_world);
-            ray_world_normalized.Normalize();
-            ray_world_normalized.Print();*/
+            m_worldPos[m_clicked_object_id].x = point_world.x;
+            m_worldPos[m_clicked_object_id].y = point_world.y;
+            m_worldPos[m_clicked_object_id].z = point_world.z;
+
         } else {
             m_clicked_object_id = -1;
         }
