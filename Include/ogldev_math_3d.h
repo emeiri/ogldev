@@ -151,6 +151,27 @@ struct Vector3f
 
     Vector3f Cross(const Vector3f& v) const;
 
+    float Dot(const Vector3f& v) const
+    {
+        float ret = x * v.x + y * v.y + z * v.z;
+        return ret;
+    }
+
+    float Distance(const Vector3f& v) const
+    {
+        float delta_x = x - v.x;
+        float delta_y = y - v.y;
+        float delta_z = z - v.z;
+        float distance = sqrtf(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
+        return distance;
+    }
+
+    float Length() const
+    {
+        float len = sqrtf(x * x + y * y + z * z);
+        return len;
+    }
+
     Vector3f& Normalize();
 
     void Rotate(float Angle, const Vector3f& Axis);
@@ -159,7 +180,7 @@ struct Vector3f
 
     void Print(bool endl = true) const
     {
-        printf("(%.02f, %.02f, %.02f)", x, y, z);
+        printf("(%f, %f, %f)", x, y, z);
 
         if (endl) {
             printf("\n");
@@ -197,7 +218,7 @@ struct Vector4f
 
     void Print(bool endl = true) const
     {
-        printf("(%.02f, %.02f, %.02f, %.02f)", x, y, z, w);
+        printf("(%f, %f, %f, %f)", x, y, z, w);
 
         if (endl) {
             printf("\n");
@@ -403,7 +424,7 @@ public:
 
     float Determinant() const;
 
-    Matrix4f& Inverse();
+    Matrix4f Inverse() const;
 
     void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
 
