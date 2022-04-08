@@ -52,9 +52,9 @@ public:
         m_directionalLight.WorldDirection = Vector3f(-1.0f, 0.0, 0.0);
 
         // The same mesh will be rendered at the following locations
-        m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
-        m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
-        m_worldPos[2] = Vector3f(0.0f, 2.0f, 20.0f);
+        m_worldPos[0] = Vector3f(-5.0f, 0.0f, 10.0f);
+        m_worldPos[1] = Vector3f(5.0f, 0.0f, 10.0f);
+        m_worldPos[2] = Vector3f(0.0f, 1.0f, 10.0f);
     }
 
     virtual ~Tutorial31()
@@ -90,7 +90,9 @@ public:
 
     void RenderSceneCB()
     {
-        m_pGameCamera->OnRender();
+        if (m_mobileCamera) {
+            m_pGameCamera->OnRender();
+        }
 
         // There's no point in the picking phase when the mouse is not pressed
         if (m_leftMouseButton.IsPressed) {
@@ -139,23 +141,67 @@ public:
         // and color it red
         int clicked_object_id = -1;
         if (m_leftMouseButton.IsPressed) {
-            PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
 
-            if (Pixel.ObjectID != 0) {
-                // Compensate for the SetObjectIndex call in the picking phase
-                clicked_object_id = Pixel.ObjectID - 1;
-                assert(clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
-                m_simpleColorEffect.Enable();
-                worldTransform.SetPosition(m_worldPos[clicked_object_id]);
-                Matrix4f World = worldTransform.GetMatrix();
-                Matrix4f WVP = Projection * View * World;
-                m_simpleColorEffect.SetWVP(WVP);
-                pMesh->Render(Pixel.DrawID, Pixel.PrimID);
-                printf("Leading vertex: ");
-                Vector3f LeadingVertex;
-                pMesh->GetLeadingVertex(Pixel.DrawID, Pixel.PrimID, LeadingVertex);
-                LeadingVertex.Print(); printf("\n");
+            if (m_leftMouseButton.FirstTime) {
+                PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
+
+                if (Pixel.ObjectID != 0) {
+                    // Compensate for the SetObjectIndex call in the picking phase
+                    clicked_object_id = Pixel.ObjectID - 1;
+                    assert(clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
+                    m_simpleColorEffect.Enable();
+                    worldTransform.SetPosition(m_worldPos[clicked_object_id]);
+                    Matrix4f World = worldTransform.GetMatrix();
+                    Matrix4f WVP = Projection * View * World;
+                    m_simpleColorEffect.SetWVP(WVP);
+                    pMesh->Render(Pixel.DrawID, Pixel.PrimID);
+                    printf("Leading vertex local: ");
+                    Vector3f LeadingVertex;
+                    pMesh->GetLeadingVertex(Pixel.DrawID, Pixel.PrimID, LeadingVertex);
+                    LeadingVertex.Print(); printf("\n");
+                    worldTransform.SetPosition(m_worldPos[Pixel.ObjectID]);
+                    Vector4f LeadingVertex4(LeadingVertex, 1.0f);
+                    Vector4f LeadingVertexView = View * World * LeadingVertex4;
+                    printf("Leading vertex view: ");
+                    LeadingVertexView.Print(); printf("\n");
+                }
+
+                m_leftMouseButton.FirstTime = false;
             }
+
+            float mouse_x = (float)m_leftMouseButton.x;
+            float mouse_y = (float)m_leftMouseButton.y;
+
+            // step 1
+            float x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
+            float y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
+            float z = 1.0f;
+            Vector3f ray_nds(x, y, z);
+
+            printf("\n");
+            printf("Step 1 (NDC):");
+            ray_nds.Print();
+
+            printf("Step 2 (Clip coordinates): ");
+            Vector4f ray_clip(ray_nds.x, ray_nds.y, 1.0, 1.0);
+            ray_clip.Print();
+
+            printf("Step 3 (View space): ");
+            float FOV = 45.0f;
+            float zNear = 0.1f;
+            float zFar = 100.0f;
+            PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+            Matrix4f projection;
+            projection.InitPersProjTransform(persProjInfo);
+            Matrix4f InvProjection = projection.Inverse();
+            Vector4f ray_eye = InvProjection * ray_clip;
+            ray_eye.z = 1.0f;
+            ray_eye.w = 1.0f;
+            ray_eye.Print();
+
+            printf("Step 4 (World space): ");
+            Matrix4f InvView = View.Inverse();
+
         }
 
         // render the objects as usual
@@ -192,6 +238,13 @@ public:
             exit(0);
             break;
 
+        case ' ':
+            if (state == GLFW_PRESS) {
+                m_mobileCamera = !m_mobileCamera;
+                //                printf("Mobile camera? %d\n", m_mobileCamera);
+            }
+            break;
+
         case 'a':
             m_directionalLight.AmbientIntensity += 0.05f;
             break;
@@ -215,7 +268,9 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-        m_pGameCamera->OnMouse(x, y);
+        if (m_mobileCamera) {
+            m_pGameCamera->OnMouse(x, y);
+        }
     }
 
 
@@ -223,6 +278,11 @@ public:
     {
         if (button == GLFW_MOUSE_BUTTON_LEFT) {
             m_leftMouseButton.IsPressed = (action == GLFW_PRESS);
+
+            if (!m_leftMouseButton.IsPressed) {
+                m_leftMouseButton.FirstTime = true;
+            }
+
             m_leftMouseButton.x = x;
             m_leftMouseButton.y = y;
         }
@@ -249,8 +309,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 5.0f, -22.0f);
-        Vector3f Target(0.0f, -0.2f, 1.0f);
+        Vector3f Pos(0.0f, 0.0f, 0.0f);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -290,11 +350,11 @@ private:
     {
         pMesh = new BasicMesh();
 
-        pMesh->LoadMesh("../Content/spider.obj");
+        pMesh->LoadMesh("../Content/box.obj");
 
         WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        worldTransform.SetScale(0.1f);
-        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
+        //        worldTransform.SetScale(0.1f);
+        //        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
     }
 
     GLFWwindow* window = NULL;
@@ -302,11 +362,13 @@ private:
     PickingTechnique m_pickingEffect;
     SimpleColorTechnique m_simpleColorEffect;
     BasicCamera* m_pGameCamera = NULL;
+    bool m_mobileCamera = true;
     DirectionalLight m_directionalLight;
     BasicMesh* pMesh = NULL;
     PickingTexture m_pickingTexture;
     struct {
         bool IsPressed = false;
+        bool FirstTime = true;
         int x;
         int y;
     } m_leftMouseButton;
@@ -341,42 +403,6 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    float mouse_x = 0.0f;
-    float mouse_y = 0.0f;
-
-    // step 1
-    float x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
-    float y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
-    float z = 1.0f;
-    Vector3f ray_nds(x, y, z);
-
-    printf("\n");
-    printf("Step 1 (NDC):");
-    ray_nds.Print(); printf("\n");
-
-    printf("Step 2 (Clip coordinates): ");
-    Vector4f ray_clip(ray_nds.x, ray_nds.y, 1.0, 1.0);
-    ray_clip.Print(); printf("\n");
-
-    printf("Step 3 (View space): ");
-    float FOV = 45.0f;
-    float zNear = 0.1f;
-    float zFar = 100.0f;
-    PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-    Matrix4f projection;
-    projection.InitPersProjTransform(persProjInfo);
-    Matrix4f InvProjection = projection.Inverse();
-    Vector4f ray_eye = InvProjection * ray_clip;
-    ray_eye.z = 1.0f;
-    ray_eye.w = 1.0f;
-    ray_eye.Print();
-
-    printf("Step 4 (World space): ");
-    Matrix4f InvWorld;
-    //    return 0;
-
-
-
     app = new Tutorial31();
 
     app->Init();
