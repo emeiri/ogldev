@@ -32,8 +32,8 @@
 #include "simple_color_technique.h"
 #include "ogldev_world_transform.h"
 
-#define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH  1200
+#define WINDOW_HEIGHT 1200
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -53,8 +53,8 @@ public:
 
         // The same mesh will be rendered at the following locations
         m_worldPos[0] = Vector3f(-5.0f, 0.0f, 10.0f);
-        m_worldPos[1] = Vector3f(5.0f, 0.0f, 10.0f);
-        m_worldPos[2] = Vector3f(0.0f, 1.0f, 10.0f);
+        m_worldPos[1] = Vector3f(5.0f, 0.0f, 20.0f);
+        m_worldPos[2] = Vector3f(0.0f, 5.0f, 10.0f);
     }
 
     virtual ~Tutorial31()
@@ -136,21 +136,24 @@ public:
         WorldTrans& worldTransform = pMesh->GetWorldTransform();
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
+        //        Projection.Print();
+        //        exit(0);
 
         // If the left mouse button is clicked check if it hit a triangle
         // and color it red
-        int clicked_object_id = -1;
         if (m_leftMouseButton.IsPressed) {
 
             if (m_leftMouseButton.FirstTime) {
+                printf("----------------------------------\n");
                 PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
+                Pixel.Print();
 
                 if (Pixel.ObjectID != 0) {
                     // Compensate for the SetObjectIndex call in the picking phase
-                    clicked_object_id = Pixel.ObjectID - 1;
-                    assert(clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
+                    m_clicked_object_id = Pixel.ObjectID - 1;
+                    assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
                     m_simpleColorEffect.Enable();
-                    worldTransform.SetPosition(m_worldPos[clicked_object_id]);
+                    worldTransform.SetPosition(m_worldPos[m_clicked_object_id]);
                     Matrix4f World = worldTransform.GetMatrix();
                     Matrix4f WVP = Projection * View * World;
                     m_simpleColorEffect.SetWVP(WVP);
@@ -158,20 +161,23 @@ public:
                     printf("Leading vertex local: ");
                     Vector3f LeadingVertex;
                     pMesh->GetLeadingVertex(Pixel.DrawID, Pixel.PrimID, LeadingVertex);
-                    LeadingVertex.Print(); printf("\n");
+                    LeadingVertex.Print();
                     worldTransform.SetPosition(m_worldPos[Pixel.ObjectID]);
                     Vector4f LeadingVertex4(LeadingVertex, 1.0f);
-                    Vector4f LeadingVertexView = View * World * LeadingVertex4;
+                    Vector4f LeadingVertexWorld = World * LeadingVertex4;
+                    printf("Leading vertex world: ");
+                    LeadingVertexWorld.Print();
+                    m_leadingVertexView = View * LeadingVertexWorld;
                     printf("Leading vertex view: ");
-                    LeadingVertexView.Print(); printf("\n");
+                    m_leadingVertexView.Print();
+                    m_leftMouseButton.FirstTime = false;
                 }
-
-                m_leftMouseButton.FirstTime = false;
             }
 
             float mouse_x = (float)m_leftMouseButton.x;
             float mouse_y = (float)m_leftMouseButton.y;
 
+            printf("Mouse: %f %f\n", mouse_x, mouse_y);
             // step 1
             float x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
             float y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
@@ -179,36 +185,79 @@ public:
             Vector3f ray_nds(x, y, z);
 
             printf("\n");
+            printf("Camera target: ");
+            m_pGameCamera->GetTarget().Print();
             printf("Step 1 (NDC):");
             ray_nds.Print();
 
             printf("Step 2 (Clip coordinates): ");
-            Vector4f ray_clip(ray_nds.x, ray_nds.y, 1.0, 1.0);
+            Vector4f ray_clip(ray_nds.x, ray_nds.y, 1.0f, 1.0f);
             ray_clip.Print();
 
-            printf("Step 3 (View space): ");
-            float FOV = 45.0f;
-            float zNear = 0.1f;
-            float zFar = 100.0f;
-            PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-            Matrix4f projection;
-            projection.InitPersProjTransform(persProjInfo);
-            Matrix4f InvProjection = projection.Inverse();
-            Vector4f ray_eye = InvProjection * ray_clip;
-            ray_eye.z = 1.0f;
-            ray_eye.w = 1.0f;
-            ray_eye.Print();
+            printf("Step 3 (View space):\n");
+            Matrix4f InvProjection = Projection.Inverse();
+            Vector4f ray_view = /*InvProjection * */ray_clip;
+            ray_view.z = 2.0f;
+            //            ray_view.w = 1.0f;
+            printf("Before normalization: ");
+            ray_view.Print();
+            printf("After normalization: ");
+            Vector3f ray_view_normalized(ray_view);
+            ray_view_normalized.Normalize();
+            ray_view_normalized.Print();
+            printf("Leading vertex z: %f\n", m_leadingVertexView.z);
+            float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
+            printf("Z ratio: %f\n", z_ratio);
+            Vector3f ray_view_intesect = ray_view_normalized * z_ratio;
+            printf("Leading vertex intesect: ");
+            ray_view_intesect.Print();
 
-            printf("Step 4 (World space): ");
+            /*            if (m_leftMouseButton.FirstTime) {
+                m_intersectionPoint = ray_view_intesect;
+                printf("Intersection point set to: ");
+                m_intersectionPoint.Print();
+                }*/
+
+            /*            Vector3f PlaneNormal(0.0f, 0.0f, 1.0f);
+            float ray_dot_normal = ray_view_normalized.Dot(PlaneNormal);
+            printf("ray dot normal %f\n", ray_dot_normal);
+            float scale = 0.0f;
+            if (ray_dot_normal != 0.0f) {
+                scale = m_leadingVertexView.z / ray_dot_normal;
+            }
+            printf("Scale %f\n", scale);*/
+
+            //            float distance = ray_view_intesect.Distance(m_intersectionPoint);
+            //            printf("Distance: %f\n", distance);
+            //            m_translation = ray_view_intesect - m_intersectionPoint;
+            //            printf("Translation: ");
+            //            m_translation.Print();
+            printf("Previous world pos: ");
+            m_worldPos[m_clicked_object_id].Print();
+            m_worldPos[m_clicked_object_id].x = ray_view_intesect.x;
+            m_worldPos[m_clicked_object_id].y = ray_view_intesect.y;
+            /*            printf("Step 4 (World space): \n");
             Matrix4f InvView = View.Inverse();
-
+            Vector4f ray_world = InvView * ray_view;
+            printf("Before normalization: ");
+            ray_world.Print();
+            printf("After normalization: ");
+            Vector3f ray_world_normalized(ray_world);
+            ray_world_normalized.Normalize();
+            ray_world_normalized.Print();*/
+        } else {
+            m_clicked_object_id = -1;
         }
 
         // render the objects as usual
         m_lightingEffect.Enable();
 
         for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
-            worldTransform.SetPosition(m_worldPos[i]);
+            if (m_clicked_object_id == i) {
+                worldTransform.SetPosition(m_worldPos[i]);
+            } else {
+                worldTransform.SetPosition(m_worldPos[i]);
+            }
             Matrix4f World = worldTransform.GetMatrix();
             Matrix4f WVP = Projection * View * World;
             m_lightingEffect.SetWVP(WVP);
@@ -217,11 +266,11 @@ public:
             m_directionalLight.CalcLocalDirection(worldTransform);
             m_lightingEffect.SetDirectionalLight(m_directionalLight);
 
-            if (i == clicked_object_id) {
+            /*            if (i == m_clicked_object_id) {
                  m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
-            } else {
+                 } else {*/
                  m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
-            }
+                 //            }
 
             pMesh->Render(NULL);
         }
@@ -271,6 +320,11 @@ public:
         if (m_mobileCamera) {
             m_pGameCamera->OnMouse(x, y);
         }
+
+        if (m_leftMouseButton.IsPressed) {
+            m_leftMouseButton.x = x;
+            m_leftMouseButton.y = y;
+        }
     }
 
 
@@ -282,10 +336,11 @@ public:
             if (!m_leftMouseButton.IsPressed) {
                 m_leftMouseButton.FirstTime = true;
             }
-
-            m_leftMouseButton.x = x;
-            m_leftMouseButton.y = y;
         }
+
+                    m_leftMouseButton.x = x;
+            m_leftMouseButton.y = y;
+
     }
 
 private:
@@ -296,6 +351,8 @@ private:
         int minor_ver = 0;
         bool is_full_screen = false;
         window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 31");
+
+        glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
 
 
@@ -313,7 +370,7 @@ private:
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        float FOV = 45.0f;
+        float FOV = 90.0f;
         float zNear = 0.1f;
         float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
@@ -362,7 +419,7 @@ private:
     PickingTechnique m_pickingEffect;
     SimpleColorTechnique m_simpleColorEffect;
     BasicCamera* m_pGameCamera = NULL;
-    bool m_mobileCamera = true;
+    bool m_mobileCamera = false;
     DirectionalLight m_directionalLight;
     BasicMesh* pMesh = NULL;
     PickingTexture m_pickingTexture;
@@ -373,6 +430,10 @@ private:
         int y;
     } m_leftMouseButton;
     Vector3f m_worldPos[3];
+    Vector4f m_leadingVertexView;
+    Vector3f m_intersectionPoint;
+    Vector3f m_translation;
+    int m_clicked_object_id = -1;
 };
 
 
