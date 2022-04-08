@@ -29,13 +29,13 @@
 #endif
 #include <stdio.h>
 
+#include "ogldev_util.h"
 
 
 #include <assimp/vector3.h>
 #include <assimp/matrix3x3.h>
 #include <assimp/matrix4x4.h>
 
-#include "ogldev_util.h"
 
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
@@ -157,9 +157,13 @@ struct Vector3f
 
     Vector3f Negate() const;
 
-    void Print() const
+    void Print(bool endl = true) const
     {
         printf("(%.02f, %.02f, %.02f)", x, y, z);
+
+        if (endl) {
+            printf("\n");
+        }
     }
 };
 
