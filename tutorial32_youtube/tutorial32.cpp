@@ -167,9 +167,8 @@ public:
                     //                    Vector4f LeadingVertexWorld = World * LeadingVertex4;
                     //printf("Leading vertex world: ");
                     //LeadingVertexWorld.Print();
-                    m_leadingVertexView = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);//LeadingVertexWorld;
-                    //                    m_leadingVertexView.z -= LeadingVertex.z;
-                    printf("Leading vertex view: ");
+                    m_leadingVertexView = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);
+                    printf("Object view position: ");
                     m_leadingVertexView.Print();
                     m_leftMouseButton.FirstTime = false;
                 }
@@ -196,18 +195,12 @@ public:
             Vector3f ray_view_normalized(ray_view);
             ray_view_normalized.Normalize();
             ray_view_normalized.Print();
-            printf("Leading vertex z: %f\n", m_leadingVertexView.z);
+            printf("Object z in view space: %f\n", m_leadingVertexView.z);
             float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
             printf("Z ratio: %f\n", z_ratio);
             Vector4f ray_view_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
             printf("Leading vertex intersect: ");
             ray_view_intersect.Print();
-
-            /*            if (m_leftMouseButton.FirstTime) {
-                m_intersectionPoint = ray_view_intersect;
-                printf("Intersection point set to: ");
-                m_intersectionPoint.Print();
-                }*/
 
             /*            Vector3f PlaneNormal(0.0f, 0.0f, 1.0f);
             float ray_dot_normal = ray_view_normalized.Dot(PlaneNormal);
@@ -361,7 +354,7 @@ private:
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        float FOV = 90.0f;
+        float FOV = 45.0f;
         float zNear = 0.1f;
         float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
