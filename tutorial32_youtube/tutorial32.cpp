@@ -32,8 +32,8 @@
 #include "simple_color_technique.h"
 #include "ogldev_world_transform.h"
 
-#define WINDOW_WIDTH  1200
-#define WINDOW_HEIGHT 1200
+#define WINDOW_WIDTH  2000
+#define WINDOW_HEIGHT 1000
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -54,7 +54,7 @@ public:
         // The same mesh will be rendered at the following locations
         m_worldPos[0] = Vector3f(-5.0f, 0.0f, 10.0f);
         m_worldPos[1] = Vector3f(0.0f, 0.0f, 10.0f);
-        m_worldPos[2] = Vector3f(0.0f, 5.0f, 10.0f);
+        m_worldPos[2] = Vector3f(0.0f, 10.0f, 10.0f);
     }
 
     virtual ~Tutorial31()
@@ -136,15 +136,14 @@ public:
         WorldTrans& worldTransform = pMesh->GetWorldTransform();
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
-        //        Projection.Print();
-        //        exit(0);
+        Matrix4f ProjectionInv = Projection.Inverse();
 
         // If the left mouse button is clicked check if it hit a triangle
         // and color it red
         if (m_leftMouseButton.IsPressed) {
+            printf("----------------------------------\n");
 
             if (m_leftMouseButton.FirstTime) {
-                printf("----------------------------------\n");
                 PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
                 Pixel.Print();
 
@@ -178,23 +177,30 @@ public:
             float mouse_y = (float)m_leftMouseButton.y;
 
             printf("Mouse: %f %f\n", mouse_x, mouse_y);
-            // step 1
             float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
             float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
 
-            printf("\n");
             printf("Camera target: ");
             m_pGameCamera->GetTarget().Print();
             printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
 
             printf("Step 2 (View space):\n");
-            Vector3f ray_view(ndc_x, ndc_y, 2.0f);
+            float d = 1.0f/tanf(ToRadian(45.0f / 2.0f));
+            float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
+            Vector3f ray_view(ndc_x, ndc_y, d);
             printf("Before normalization: ");
             ray_view.Print();
+            Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
+            Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
+            printf("With projection inverse: ");
+            ray_view_4d.Print();
+
             printf("After normalization: ");
-            Vector3f ray_view_normalized(ray_view);
+            Vector3f ray_view_normalized(ray_view_4d);
             ray_view_normalized.Normalize();
             ray_view_normalized.Print();
+
+
             printf("Object z in view space: %f\n", m_leadingVertexView.z);
             float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
             printf("Z ratio: %f\n", z_ratio);
@@ -202,24 +208,8 @@ public:
             printf("Leading vertex intersect: ");
             ray_view_intersect.Print();
 
-            /*            Vector3f PlaneNormal(0.0f, 0.0f, 1.0f);
-            float ray_dot_normal = ray_view_normalized.Dot(PlaneNormal);
-            printf("ray dot normal %f\n", ray_dot_normal);
-            float scale = 0.0f;
-            if (ray_dot_normal != 0.0f) {
-                scale = m_leadingVertexView.z / ray_dot_normal;
-            }
-            printf("Scale %f\n", scale);*/
-
-            //            float distance = ray_view_intersect.Distance(m_intersectionPoint);
-            //            printf("Distance: %f\n", distance);
-            //            m_translation = ray_view_intersect - m_intersectionPoint;
-            //            printf("Translation: ");
-            //            m_translation.Print();
-            printf("Step 4 (World space): \n");
-            View.Print();
+            printf("Step 3 (World space): \n");
             Matrix4f InvView = View.Inverse();
-            InvView.Print();
             Vector4f point_world = InvView * ray_view_intersect;
             point_world.Print();
 
@@ -250,11 +240,11 @@ public:
             m_directionalLight.CalcLocalDirection(worldTransform);
             m_lightingEffect.SetDirectionalLight(m_directionalLight);
 
-            /*            if (i == m_clicked_object_id) {
-                 m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
-                 } else {*/
-                 m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
-                 //            }
+            if (i == m_clicked_object_id) {
+                m_lightingEffect.SetColorMod(Vector4f(0.0f, 1.0, 0.0, 1.0f));
+            } else {
+                m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
+            }
 
             pMesh->Render(NULL);
         }
