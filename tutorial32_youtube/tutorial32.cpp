@@ -168,6 +168,7 @@ public:
                     printf("Leading vertex world: ");
                     LeadingVertexWorld.Print();
                     m_leadingVertexView = View * LeadingVertexWorld;
+                    m_leadingVertexView.z -= LeadingVertex.z;
                     printf("Leading vertex view: ");
                     m_leadingVertexView.Print();
                     m_leftMouseButton.FirstTime = false;
