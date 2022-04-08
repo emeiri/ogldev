@@ -16,6 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// #define USE_GLM
+
+#ifdef USE_GLM
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/gtx/string_cast.hpp>
+#endif
+#include <iostream>
 #include <stdlib.h>
 
 
@@ -33,13 +42,13 @@ Vector3f Vector3f::Cross(const Vector3f& v) const
 
 Vector3f& Vector3f::Normalize()
 {
-    const float Length = sqrtf(x * x + y * y + z * z);
+    float len = Length();
 
-    assert(Length != 0);
+    assert(len != 0);
 
-    x /= Length;
-    y /= Length;
-    z /= Length;
+    x /= len;
+    y /= len;
+    z /= len;
 
     return *this;
 }
@@ -206,14 +215,25 @@ void Matrix4f::InitCameraTransform(const Vector3f& Pos, const Vector3f& Target, 
 
 void Matrix4f::InitPersProjTransform(const PersProjInfo& p)
 {
-    const float ar         = p.Width / p.Height;
-    const float zRange     = p.zNear - p.zFar;
-    const float tanHalfFOV = tanf(ToRadian(p.FOV / 2.0f));
+    float ar         = p.Height / p.Width;
+    float zRange     = p.zNear - p.zFar;
+    float tanHalfFOV = tanf(ToRadian(p.FOV / 2.0f));
 
-    m[0][0] = 1.0f/(tanHalfFOV * ar); m[0][1] = 0.0f;            m[0][2] = 0.0f;                        m[0][3] = 0.0;
-    m[1][0] = 0.0f;                   m[1][1] = 1.0f/tanHalfFOV; m[1][2] = 0.0f;                        m[1][3] = 0.0;
-    m[2][0] = 0.0f;                   m[2][1] = 0.0f;            m[2][2] = (-p.zNear - p.zFar)/zRange ; m[2][3] = 2.0f*p.zFar*p.zNear/zRange;
-    m[3][0] = 0.0f;                   m[3][1] = 0.0f;            m[3][2] = 1.0f;                        m[3][3] = 0.0;
+    m[0][0] = 1/tanHalfFOV; m[0][1] = 0.0f;                 m[0][2] = 0.0f;                        m[0][3] = 0.0;
+    m[1][0] = 0.0f;         m[1][1] = 1.0f/(tanHalfFOV*ar); m[1][2] = 0.0f;                        m[1][3] = 0.0;
+    m[2][0] = 0.0f;         m[2][1] = 0.0f;                 m[2][2] = (-p.zNear - p.zFar)/zRange ; m[2][3] = 2.0f*p.zFar*p.zNear/zRange;
+    m[3][0] = 0.0f;         m[3][1] = 0.0f;                 m[3][2] = 1.0f;                        m[3][3] = 0.0;
+
+#ifdef USE_GLM
+    glm::mat4 Projection = glm::perspectiveFovLH(glm::radians(p.FOV), p.Width, p.Height, p.zNear, p.zFar);
+
+    m[0][0] = Projection[0][0]; m[0][1] = Projection[1][0]; m[0][2] = Projection[2][0]; m[0][3] = Projection[3][0];
+    m[1][0] = Projection[0][1]; m[1][1] = Projection[1][1]; m[1][2] = Projection[2][1]; m[1][3] = Projection[3][1];
+    m[2][0] = Projection[0][2]; m[2][1] = Projection[1][2]; m[2][2] = Projection[2][2]; m[2][3] = Projection[3][2];
+    m[3][0] = Projection[0][3]; m[3][1] = Projection[1][3]; m[3][2] = Projection[2][3]; m[3][3] = Projection[3][3];
+#endif
+
+    //    std::cout << glm::to_string(Projection) << std::endl;
 }
 
 
@@ -244,7 +264,7 @@ float Matrix4f::Determinant() const
 }
 
 
-Matrix4f& Matrix4f::Inverse()
+Matrix4f Matrix4f::Inverse() const
 {
         // Compute the reciprocal determinant
         float det = Determinant();
@@ -290,9 +310,7 @@ Matrix4f& Matrix4f::Inverse()
                                  (m[1][2] * m[3][0] - m[1][0] * m[3][2]) + m[0][2] * (m[1][0] * m[3][1] - m[1][1] * m[3][0]));
         res.m[3][3] = invdet  * (m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) + m[0][1] *
                                  (m[1][2] * m[2][0] - m[1][0] * m[2][2]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]));
-        *this = res;
-
-        return *this;
+        return res;
 }
 
 
