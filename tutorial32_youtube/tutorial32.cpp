@@ -152,23 +152,23 @@ public:
                     // Compensate for the SetObjectIndex call in the picking phase
                     m_clicked_object_id = Pixel.ObjectID - 1;
                     assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
-                    m_simpleColorEffect.Enable();
-                    worldTransform.SetPosition(m_worldPos[m_clicked_object_id]);
-                    Matrix4f World = worldTransform.GetMatrix();
-                    Matrix4f WVP = Projection * View * World;
-                    m_simpleColorEffect.SetWVP(WVP);
-                    pMesh->Render(Pixel.DrawID, Pixel.PrimID);
-                    printf("Leading vertex local: ");
-                    Vector3f LeadingVertex;
-                    pMesh->GetLeadingVertex(Pixel.DrawID, Pixel.PrimID, LeadingVertex);
-                    LeadingVertex.Print();
-                    worldTransform.SetPosition(m_worldPos[Pixel.ObjectID]);
-                    Vector4f LeadingVertex4(LeadingVertex, 1.0f);
-                    Vector4f LeadingVertexWorld = World * LeadingVertex4;
-                    printf("Leading vertex world: ");
-                    LeadingVertexWorld.Print();
-                    m_leadingVertexView = View * LeadingVertexWorld;
-                    m_leadingVertexView.z -= LeadingVertex.z;
+                    //                    m_simpleColorEffect.Enable();
+                    //                    worldTransform.SetPosition(m_worldPos[m_clicked_object_id]);
+                    //                    Matrix4f World = worldTransform.GetMatrix();
+                    //                    Matrix4f WVP = Projection * View * World;
+                    //                    m_simpleColorEffect.SetWVP(WVP);
+                    //                    pMesh->Render(Pixel.DrawID, Pixel.PrimID);
+                    //                    printf("Leading vertex local: ");
+                    //                    Vector3f LeadingVertex;
+                    //                    pMesh->GetLeadingVertex(Pixel.DrawID, Pixel.PrimID, LeadingVertex);
+                    //                    LeadingVertex.Print();
+                    //                    worldTransform.SetPosition(m_worldPos[Pixel.ObjectID]);
+                    //                    Vector4f LeadingVertex4(LeadingVertex, 1.0f);
+                    //                    Vector4f LeadingVertexWorld = World * LeadingVertex4;
+                    //printf("Leading vertex world: ");
+                    //LeadingVertexWorld.Print();
+                    m_leadingVertexView = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);//LeadingVertexWorld;
+                    //                    m_leadingVertexView.z -= LeadingVertex.z;
                     printf("Leading vertex view: ");
                     m_leadingVertexView.Print();
                     m_leftMouseButton.FirstTime = false;
@@ -180,26 +180,16 @@ public:
 
             printf("Mouse: %f %f\n", mouse_x, mouse_y);
             // step 1
-            float x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
-            float y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
-            float z = 1.0f;
-            Vector3f ray_nds(x, y, z);
+            float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
+            float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
 
             printf("\n");
             printf("Camera target: ");
             m_pGameCamera->GetTarget().Print();
-            printf("Step 1 (NDC):");
-            ray_nds.Print();
+            printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
 
-            printf("Step 2 (Clip coordinates): ");
-            Vector4f ray_clip(ray_nds.x, ray_nds.y, 1.0f, 1.0f);
-            ray_clip.Print();
-
-            printf("Step 3 (View space):\n");
-            Matrix4f InvProjection = Projection.Inverse();
-            Vector4f ray_view = /*InvProjection * */ray_clip;
-            ray_view.z = 2.0f;
-            //            ray_view.w = 1.0f;
+            printf("Step 2 (View space):\n");
+            Vector3f ray_view(ndc_x, ndc_y, 2.0f);
             printf("Before normalization: ");
             ray_view.Print();
             printf("After normalization: ");
@@ -209,12 +199,12 @@ public:
             printf("Leading vertex z: %f\n", m_leadingVertexView.z);
             float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
             printf("Z ratio: %f\n", z_ratio);
-            Vector4f ray_view_intesect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
-            printf("Leading vertex intesect: ");
-            ray_view_intesect.Print();
+            Vector4f ray_view_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
+            printf("Leading vertex intersect: ");
+            ray_view_intersect.Print();
 
             /*            if (m_leftMouseButton.FirstTime) {
-                m_intersectionPoint = ray_view_intesect;
+                m_intersectionPoint = ray_view_intersect;
                 printf("Intersection point set to: ");
                 m_intersectionPoint.Print();
                 }*/
@@ -228,19 +218,17 @@ public:
             }
             printf("Scale %f\n", scale);*/
 
-            //            float distance = ray_view_intesect.Distance(m_intersectionPoint);
+            //            float distance = ray_view_intersect.Distance(m_intersectionPoint);
             //            printf("Distance: %f\n", distance);
-            //            m_translation = ray_view_intesect - m_intersectionPoint;
+            //            m_translation = ray_view_intersect - m_intersectionPoint;
             //            printf("Translation: ");
             //            m_translation.Print();
             printf("Step 4 (World space): \n");
             View.Print();
             Matrix4f InvView = View.Inverse();
             InvView.Print();
-            Vector4f point_world = InvView * ray_view_intesect;
-            //            printf("Before normalization: ");
+            Vector4f point_world = InvView * ray_view_intersect;
             point_world.Print();
-            //            printf("After normalization: ");
 
             printf("Previous world pos: ");
             m_worldPos[m_clicked_object_id].Print();
@@ -450,6 +438,7 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 
 static void CursorPosCallback(GLFWwindow* window, double x, double y)
 {
+    printf("mouse callback %f %f\n", x, y);
     app->PassiveMouseCB((int)x, (int)y);
 }
 
@@ -459,6 +448,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
     double x, y;
 
     glfwGetCursorPos(window, &x, &y);
+
 
     app->MouseCB(Button, Action, (int)x, (int)y);
 }
