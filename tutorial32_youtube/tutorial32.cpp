@@ -137,7 +137,9 @@ public:
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
         Matrix4f ProjectionInv = Projection.Inverse();
-
+        //        Projection.Print();
+        //        ProjectionInv.Print();
+        //        exit(0);
         // If the left mouse button is clicked check if it hit a triangle
         // and color it red
         if (m_leftMouseButton.IsPressed) {
@@ -186,8 +188,8 @@ public:
 
             printf("Step 2 (View space):\n");
             float d = 1.0f/tanf(ToRadian(45.0f / 2.0f));
-            float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
-            Vector3f ray_view(ndc_x, ndc_y, d);
+            float ar = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
+            Vector3f ray_view(ndc_x/d, (ndc_y * ar)/d, 1.0f);
             printf("Before normalization: ");
             ray_view.Print();
             Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
@@ -196,10 +198,9 @@ public:
             ray_view_4d.Print();
 
             printf("After normalization: ");
-            Vector3f ray_view_normalized(ray_view_4d);
+            Vector3f ray_view_normalized(ray_view);
             ray_view_normalized.Normalize();
             ray_view_normalized.Print();
-
 
             printf("Object z in view space: %f\n", m_leadingVertexView.z);
             float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
