@@ -133,99 +133,94 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        Matrix4f View = m_pGameCamera->GetMatrix();
-        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
-        Matrix4f ProjectionInv = Projection.Inverse();
-        //        Projection.Print();
-        //        ProjectionInv.Print();
-        //        exit(0);
-        // If the left mouse button is clicked check if it hit a triangle
-        // and color it red
         if (m_leftMouseButton.IsPressed) {
-            printf("----------------------------------\n");
-
-            if (m_leftMouseButton.FirstTime) {
-                PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
-                Pixel.Print();
-
-                if (Pixel.ObjectID != 0) {
-                    // Compensate for the SetObjectIndex call in the picking phase
-                    m_clicked_object_id = Pixel.ObjectID - 1;
-                    assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
-                    //                    m_simpleColorEffect.Enable();
-                    //                    worldTransform.SetPosition(m_worldPos[m_clicked_object_id]);
-                    //                    Matrix4f World = worldTransform.GetMatrix();
-                    //                    Matrix4f WVP = Projection * View * World;
-                    //                    m_simpleColorEffect.SetWVP(WVP);
-                    //                    pMesh->Render(Pixel.DrawID, Pixel.PrimID);
-                    //                    printf("Leading vertex local: ");
-                    //                    Vector3f LeadingVertex;
-                    //                    pMesh->GetLeadingVertex(Pixel.DrawID, Pixel.PrimID, LeadingVertex);
-                    //                    LeadingVertex.Print();
-                    //                    worldTransform.SetPosition(m_worldPos[Pixel.ObjectID]);
-                    //                    Vector4f LeadingVertex4(LeadingVertex, 1.0f);
-                    //                    Vector4f LeadingVertexWorld = World * LeadingVertex4;
-                    //printf("Leading vertex world: ");
-                    //LeadingVertexWorld.Print();
-                    m_leadingVertexView = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);
-                    printf("Object view position: ");
-                    m_leadingVertexView.Print();
-                    m_leftMouseButton.FirstTime = false;
-                }
-            }
-
-            float mouse_x = (float)m_leftMouseButton.x;
-            float mouse_y = (float)m_leftMouseButton.y;
-
-            printf("Mouse: %f %f\n", mouse_x, mouse_y);
-            float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
-            float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
-
-            printf("Camera target: ");
-            m_pGameCamera->GetTarget().Print();
-            printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
-
-            printf("Step 2 (View space):\n");
-            float d = 1.0f/tanf(ToRadian(45.0f / 2.0f));
-            float ar = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
-            Vector3f ray_view(ndc_x/d, (ndc_y * ar)/d, 1.0f);
-            printf("Before normalization: ");
-            ray_view.Print();
-            Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
-            Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
-            printf("With projection inverse: ");
-            ray_view_4d.Print();
-
-            printf("After normalization: ");
-            Vector3f ray_view_normalized(ray_view);
-            ray_view_normalized.Normalize();
-            ray_view_normalized.Print();
-
-            printf("Object z in view space: %f\n", m_leadingVertexView.z);
-            float z_ratio = m_leadingVertexView.z / ray_view_normalized.z;
-            printf("Z ratio: %f\n", z_ratio);
-            Vector4f ray_view_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
-            printf("Leading vertex intersect: ");
-            ray_view_intersect.Print();
-
-            printf("Step 3 (World space): \n");
-            Matrix4f InvView = View.Inverse();
-            Vector4f point_world = InvView * ray_view_intersect;
-            point_world.Print();
-
-            printf("Previous world pos: ");
-            m_worldPos[m_clicked_object_id].Print();
-            m_worldPos[m_clicked_object_id].x = point_world.x;
-            m_worldPos[m_clicked_object_id].y = point_world.y;
-            m_worldPos[m_clicked_object_id].z = point_world.z;
-
+            HandleMouseButtonPressed();
         } else {
             m_clicked_object_id = -1;
         }
 
+        RenderObjects();
+    }
+
+    void HandleMouseButtonPressed()
+    {
+        printf("----------------------------------\n");
+
+        Matrix4f View = m_pGameCamera->GetMatrix();
+
+        if (m_leftMouseButton.FirstTime) {
+            PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
+            //            Pixel.Print();
+
+            if (Pixel.ObjectID != 0) {
+                // Compensate for the SetObjectIndex call in the picking phase
+                m_clicked_object_id = Pixel.ObjectID - 1;
+                assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
+                m_objViewSpacePos = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);
+                printf("Object view position: ");
+                m_objViewSpacePos.Print();
+                m_leftMouseButton.FirstTime = false;
+            }
+        }
+
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
+        Matrix4f ProjectionInv = Projection.Inverse();
+
+        float mouse_x = (float)m_leftMouseButton.x;
+        float mouse_y = (float)m_leftMouseButton.y;
+
+        printf("Mouse: %f %f\n", mouse_x, mouse_y);
+        float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
+        float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
+
+        printf("Camera target: ");
+        m_pGameCamera->GetTarget().Print();
+        printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
+
+        printf("Step 2 (View space):\n");
+        float d = 1.0f/tanf(ToRadian(45.0f / 2.0f));
+        float ar = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
+        Vector3f ray_view(ndc_x/d, (ndc_y * ar)/d, 1.0f);
+        printf("Before normalization: ");
+        ray_view.Print();
+        Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
+        Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
+        printf("With projection inverse: ");
+        ray_view_4d.Print();
+
+        printf("After normalization: ");
+        Vector3f ray_view_normalized(ray_view);
+        ray_view_normalized.Normalize();
+        ray_view_normalized.Print();
+
+        printf("Object z in view space: %f\n", m_objViewSpacePos.z);
+        float z_ratio = m_objViewSpacePos.z / ray_view_normalized.z;
+        printf("Z ratio: %f\n", z_ratio);
+        Vector4f ray_view_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
+        printf("Leading vertex intersect: ");
+        ray_view_intersect.Print();
+
+        printf("Step 3 (World space): \n");
+        Matrix4f InvView = View.Inverse();
+        Vector4f point_world = InvView * ray_view_intersect;
+        point_world.Print();
+
+        printf("Previous world pos: ");
+        m_worldPos[m_clicked_object_id].Print();
+        m_worldPos[m_clicked_object_id].x = point_world.x;
+        m_worldPos[m_clicked_object_id].y = point_world.y;
+        m_worldPos[m_clicked_object_id].z = point_world.z;
+    }
+
+    void RenderObjects()
+    {
         // render the objects as usual
         m_lightingEffect.Enable();
+
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        Matrix4f View = m_pGameCamera->GetMatrix();
+        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
         for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
             if (m_clicked_object_id == i) {
@@ -405,7 +400,7 @@ private:
         int y;
     } m_leftMouseButton;
     Vector3f m_worldPos[3];
-    Vector4f m_leadingVertexView;
+    Vector4f m_objViewSpacePos;
     Vector3f m_intersectionPoint;
     Vector3f m_translation;
     int m_clicked_object_id = -1;
