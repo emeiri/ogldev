@@ -157,57 +157,51 @@ public:
                 m_clicked_object_id = Pixel.ObjectID - 1;
                 assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
                 m_objViewSpacePos = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);
-                printf("Object view position: ");
-                m_objViewSpacePos.Print();
+                printf("Object view position: "); m_objViewSpacePos.Print();
                 m_leftMouseButton.FirstTime = false;
             }
         }
 
-        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        DragTheObject();
+    }
+
+    void DragTheObject()
+    {
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
         Matrix4f ProjectionInv = Projection.Inverse();
 
         float mouse_x = (float)m_leftMouseButton.x;
         float mouse_y = (float)m_leftMouseButton.y;
-
         printf("Mouse: %f %f\n", mouse_x, mouse_y);
+
         float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
         float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
-
-        printf("Camera target: ");
-        m_pGameCamera->GetTarget().Print();
         printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
 
         printf("Step 2 (View space):\n");
         float d = 1.0f/tanf(ToRadian(45.0f / 2.0f));
         float ar = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
         Vector3f ray_view(ndc_x/d, (ndc_y * ar)/d, 1.0f);
-        printf("Before normalization: ");
-        ray_view.Print();
+        printf("Before normalization: "); ray_view.Print();
         Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
         Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
-        printf("With projection inverse: ");
-        ray_view_4d.Print();
-
-        printf("After normalization: ");
-        Vector3f ray_view_normalized(ray_view);
-        ray_view_normalized.Normalize();
-        ray_view_normalized.Print();
+        printf("With projection inverse: "); ray_view_4d.Print();
+        Vector3f ray_view_normalized = ray_view.Normalize();
+        printf("After normalization: "); ray_view_normalized.Print();
 
         printf("Object z in view space: %f\n", m_objViewSpacePos.z);
         float z_ratio = m_objViewSpacePos.z / ray_view_normalized.z;
         printf("Z ratio: %f\n", z_ratio);
-        Vector4f ray_view_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
-        printf("Leading vertex intersect: ");
-        ray_view_intersect.Print();
+        Vector4f view_space_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
+        printf("Object view space intersect: "); view_space_intersect.Print();
 
         printf("Step 3 (World space): \n");
+        Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f InvView = View.Inverse();
-        Vector4f point_world = InvView * ray_view_intersect;
+        Vector4f point_world = InvView * view_space_intersect;
         point_world.Print();
 
-        printf("Previous world pos: ");
-        m_worldPos[m_clicked_object_id].Print();
+        printf("Previous world pos: ");  m_worldPos[m_clicked_object_id].Print();
         m_worldPos[m_clicked_object_id].x = point_world.x;
         m_worldPos[m_clicked_object_id].y = point_world.y;
         m_worldPos[m_clicked_object_id].z = point_world.z;
