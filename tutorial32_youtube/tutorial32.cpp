@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 31 - 3D Picking
+    Tutorial 32 - Dragging an object with the mouse
 */
 
 #include <math.h>
@@ -40,11 +40,11 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class Tutorial31
+class Tutorial32
 {
 public:
 
-    Tutorial31()
+    Tutorial32()
     {
         m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_directionalLight.AmbientIntensity = 3.0f;
@@ -54,10 +54,10 @@ public:
         // The same mesh will be rendered at the following locations
         m_worldPos[0] = Vector3f(-5.0f, 0.0f, 10.0f);
         m_worldPos[1] = Vector3f(0.0f, 0.0f, 10.0f);
-        m_worldPos[2] = Vector3f(0.0f, 10.0f, 10.0f);
+        m_worldPos[2] = Vector3f(10.0f, 0.0f, 0.0f);
     }
 
-    virtual ~Tutorial31()
+    virtual ~Tutorial32()
     {
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(pMesh);
@@ -179,9 +179,9 @@ public:
         printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
 
         printf("Step 2 (View space):\n");
-        float d = 1.0f/tanf(ToRadian(45.0f / 2.0f));
+        float focal_length = 1.0f/tanf(ToRadian(45.0f / 2.0f));
         float ar = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
-        Vector3f ray_view(ndc_x/d, (ndc_y * ar)/d, 1.0f);
+        Vector3f ray_view(ndc_x / focal_length, (ndc_y * ar) / focal_length, 1.0f);
         printf("Before normalization: "); ray_view.Print();
         Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
         Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
@@ -195,16 +195,14 @@ public:
         Vector4f view_space_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
         printf("Object view space intersect: "); view_space_intersect.Print();
 
-        printf("Step 3 (World space): \n");
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f InvView = View.Inverse();
         Vector4f point_world = InvView * view_space_intersect;
-        point_world.Print();
+        printf("Step 3 (World space): "); point_world.Print();
+        Vector3f point_world_3d(point_world);
 
         printf("Previous world pos: ");  m_worldPos[m_clicked_object_id].Print();
-        m_worldPos[m_clicked_object_id].x = point_world.x;
-        m_worldPos[m_clicked_object_id].y = point_world.y;
-        m_worldPos[m_clicked_object_id].z = point_world.z;
+        m_worldPos[m_clicked_object_id] = point_world_3d;
     }
 
     void RenderObjects()
@@ -302,9 +300,8 @@ public:
             }
         }
 
-                    m_leftMouseButton.x = x;
-            m_leftMouseButton.y = y;
-
+        m_leftMouseButton.x = x;
+        m_leftMouseButton.y = y;
     }
 
 private:
@@ -314,7 +311,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 31");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 32");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -331,7 +328,7 @@ private:
     void InitCamera()
     {
         Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
+        Vector3f Target(1.0f, 0.0f, 0.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -401,7 +398,7 @@ private:
 };
 
 
-Tutorial31* app = NULL;
+Tutorial32* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -430,7 +427,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial31();
+    app = new Tutorial32();
 
     app->Init();
 
