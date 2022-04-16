@@ -144,27 +144,16 @@ public:
 
     void HandleMouseButtonPressed()
     {
-        printf("----------------------------------\n");
-
         Matrix4f View = m_pGameCamera->GetMatrix();
 
         if (m_leftMouseButton.FirstTime) {
             PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(m_leftMouseButton.x, WINDOW_HEIGHT - m_leftMouseButton.y - 1);
-            //            Pixel.Print();
 
             if (Pixel.ObjectID != 0) {
                 // Compensate for the SetObjectIndex call in the picking phase
                 m_clicked_object_id = Pixel.ObjectID - 1;
                 assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
                 m_objViewSpacePos = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);
-                printf("Object view position: "); m_objViewSpacePos.Print();
-                Vector4f clip_space_pos = m_pGameCamera->GetProjectionMat() * m_objViewSpacePos;
-                printf("Object proj position: "); clip_space_pos.Print();
-                Vector4f ndc_space_pos = clip_space_pos / clip_space_pos.w;
-                printf("Object NDC position: "); ndc_space_pos.Print();
-                float window_x = ndc_space_pos.x * (float)WINDOW_WIDTH / 2.0 + (float)WINDOW_WIDTH / 2.0f;
-                float window_y = ndc_space_pos.y * (float)WINDOW_HEIGHT / 2.0 + (float)WINDOW_HEIGHT / 2.0f;
-                printf("Object window position: %f,%f\n", window_x, window_y);
                 m_leftMouseButton.FirstTime = false;
             }
         }
@@ -177,39 +166,30 @@ public:
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
         Matrix4f ProjectionInv = Projection.Inverse();
 
+        // Step 1 - Viewport to NDC
         float mouse_x = (float)m_leftMouseButton.x;
         float mouse_y = (float)m_leftMouseButton.y;
-        printf("Mouse: %f %f\n", mouse_x, mouse_y);
 
         float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
         float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
-        printf("Step 1 (NDC): [%f,%f]\n", ndc_x, ndc_y);
 
-        printf("Step 2 (View space):\n");
+        // Step 2 - NDC to view (my version)
         float focal_length = 1.0f/tanf(ToRadian(45.0f / 2.0f));
         float ar = (float)WINDOW_HEIGHT / (float)WINDOW_WIDTH;
         Vector3f ray_view(ndc_x / focal_length, (ndc_y * ar) / focal_length, 1.0f);
-        printf("Before normalization: "); ray_view.Print();
+
+        // Step 2 - NDC to view (Anton's version)
         Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
         Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
-        printf("With projection inverse: "); ray_view_4d.Print();
-        Vector3f ray_view_normalized = ray_view;//.Normalize();
-        printf("After normalization: "); ray_view_normalized.Print();
 
-        printf("Object z in view space: %f\n", m_objViewSpacePos.z);
-        float z_ratio = m_objViewSpacePos.z / ray_view_normalized.z;
-        printf("Z ratio: %f\n", z_ratio);
-        Vector4f view_space_intersect = Vector4f(ray_view_normalized * z_ratio, 1.0f);
-        printf("Object view space intersect: "); view_space_intersect.Print();
+        // Step 3 - intersect view vector with object Z plane (in view)
+        Vector4f view_space_intersect = Vector4f(ray_view * m_objViewSpacePos.z, 1.0f);
 
+        // Step 4 - View to World space
         Matrix4f View = m_pGameCamera->GetMatrix();
         Matrix4f InvView = View.Inverse();
         Vector4f point_world = InvView * view_space_intersect;
-        printf("Step 3 (World space): "); point_world.Print();
-        Vector3f point_world_3d(point_world);
-
-        printf("Previous world pos: ");  m_worldPos[m_clicked_object_id].Print();
-        m_worldPos[m_clicked_object_id] = point_world_3d;
+        m_worldPos[m_clicked_object_id] = Vector3f(point_world);
     }
 
     void RenderObjects()
