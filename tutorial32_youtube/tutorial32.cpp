@@ -32,8 +32,8 @@
 #include "simple_color_technique.h"
 #include "ogldev_world_transform.h"
 
-#define WINDOW_WIDTH  2000
-#define WINDOW_HEIGHT 1000
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -52,9 +52,9 @@ public:
         m_directionalLight.WorldDirection = Vector3f(-1.0f, 0.0, 0.0);
 
         // The same mesh will be rendered at the following locations
-        m_worldPos[0] = Vector3f(-5.0f, 0.0f, 10.0f);
-        m_worldPos[1] = Vector3f(0.0f, 0.0f, 10.0f);
-        m_worldPos[2] = Vector3f(10.0f, 0.0f, 0.0f);
+        m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
+        m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
+        m_worldPos[2] = Vector3f(0.0f, 2.0f, 20.0f);
     }
 
     virtual ~Tutorial32()
@@ -158,6 +158,13 @@ public:
                 assert(m_clicked_object_id < ARRAY_SIZE_IN_ELEMENTS(m_worldPos));
                 m_objViewSpacePos = View * Vector4f(m_worldPos[m_clicked_object_id], 1.0f);
                 printf("Object view position: "); m_objViewSpacePos.Print();
+                Vector4f clip_space_pos = m_pGameCamera->GetProjectionMat() * m_objViewSpacePos;
+                printf("Object proj position: "); clip_space_pos.Print();
+                Vector4f ndc_space_pos = clip_space_pos / clip_space_pos.w;
+                printf("Object NDC position: "); ndc_space_pos.Print();
+                float window_x = ndc_space_pos.x * (float)WINDOW_WIDTH / 2.0 + (float)WINDOW_WIDTH / 2.0f;
+                float window_y = ndc_space_pos.y * (float)WINDOW_HEIGHT / 2.0 + (float)WINDOW_HEIGHT / 2.0f;
+                printf("Object window position: %f,%f\n", window_x, window_y);
                 m_leftMouseButton.FirstTime = false;
             }
         }
@@ -186,7 +193,7 @@ public:
         Vector4f ray_ndc_4d(ndc_x, ndc_y, 1.0f, 1.0f);
         Vector4f ray_view_4d = ProjectionInv * ray_ndc_4d;
         printf("With projection inverse: "); ray_view_4d.Print();
-        Vector3f ray_view_normalized = ray_view.Normalize();
+        Vector3f ray_view_normalized = ray_view;//.Normalize();
         printf("After normalization: "); ray_view_normalized.Print();
 
         printf("Object z in view space: %f\n", m_objViewSpacePos.z);
@@ -252,7 +259,6 @@ public:
         case ' ':
             if (state == GLFW_PRESS) {
                 m_mobileCamera = !m_mobileCamera;
-                //                printf("Mobile camera? %d\n", m_mobileCamera);
             }
             break;
 
@@ -327,8 +333,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(1.0f, 0.0f, 0.0f);
+        Vector3f Pos(0.0f, 5.0f, -22.0f);
+        Vector3f Target(0.0f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -408,7 +414,6 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 
 static void CursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    printf("mouse callback %f %f\n", x, y);
     app->PassiveMouseCB((int)x, (int)y);
 }
 
@@ -418,7 +423,6 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
     double x, y;
 
     glfwGetCursorPos(window, &x, &y);
-
 
     app->MouseCB(Button, Action, (int)x, (int)y);
 }
