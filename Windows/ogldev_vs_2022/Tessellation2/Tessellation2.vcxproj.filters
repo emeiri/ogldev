@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_app.cpp" />
+    <ClCompile Include="..\..\..\Common\camera.cpp" />
+    <ClCompile Include="..\..\..\Common\pipeline.cpp" />
+    <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+    <ClCompile Include="..\..\..\tutorial31\lighting_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial31\mesh.cpp" />
+    <ClCompile Include="..\..\..\tutorial31\tutorial31.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
+    <ClInclude Include="..\..\..\tutorial31\lighting_technique.h" />
+    <ClInclude Include="..\..\..\tutorial31\mesh.h" />
+    <ClInclude Include="..\..\..\tutorial31\render_callbacks.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{2427da1a-c9a8-4ec5-838e-60ed3e82a5d0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial31\lighting.cs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial31\lighting.es">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial31\lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial31\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

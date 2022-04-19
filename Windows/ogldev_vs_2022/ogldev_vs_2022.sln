@@ -105,6 +105,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial29", "Tutorial29\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation1", "Tessellation1\Tessellation1.vcxproj", "{49B9E66B-BE50-4137-897C-97793280735F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation2", "Tessellation2\Tessellation2.vcxproj", "{8B19DAE8-A479-4205-B185-122794736B3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -361,6 +363,14 @@ Global
 		{49B9E66B-BE50-4137-897C-97793280735F}.Release|x64.Build.0 = Release|x64
 		{49B9E66B-BE50-4137-897C-97793280735F}.Release|x86.ActiveCfg = Release|Win32
 		{49B9E66B-BE50-4137-897C-97793280735F}.Release|x86.Build.0 = Release|Win32
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Debug|x64.ActiveCfg = Debug|x64
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Debug|x64.Build.0 = Debug|x64
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Debug|x86.ActiveCfg = Debug|Win32
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Debug|x86.Build.0 = Debug|Win32
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Release|x64.ActiveCfg = Release|x64
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Release|x64.Build.0 = Release|x64
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Release|x86.ActiveCfg = Release|Win32
+		{8B19DAE8-A479-4205-B185-122794736B3B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,7 @@
 // define the number of CPs in the output patch                                                 
 layout (vertices = 1) out;                                                                      
                                                                                                 
-uniform float gTessellationLevel;                                                               
+uniform float gTessellationLevel;
                                                                                                 
 // attributes of the input CPs                                                                  
 in vec3 WorldPos_CS_in[];                                                                       
