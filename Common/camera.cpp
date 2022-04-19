@@ -244,9 +244,9 @@ void Camera::Update()
 }
 
 
-void Camera::AddToATB(TwBar* bar)
+/*void Camera::AddToATB(TwBar* bar)
 {
     TwAddButton(bar, "Camera", NULL, NULL, "");                
     TwAddVarRW(bar, "Position", TW_TYPE_OGLDEV_VECTOR3F, (void*)&m_pos, NULL);
     TwAddVarRO(bar, "Direction", TW_TYPE_DIR3F, &m_target, " axisz=-z ");
-}
+}*/

@@ -21,7 +21,7 @@
 
 #include "ogldev_math_3d.h"
 #include "ogldev_keys.h"
-#include "ogldev_atb.h"
+//#include "ogldev_atb.h"
 
 class Camera
 {
@@ -52,7 +52,7 @@ public:
         return m_up;
     }
     
-    void AddToATB(TwBar* bar);
+    //void AddToATB(TwBar* bar);
 
 private:
 

@@ -19,7 +19,7 @@
 #ifndef VULKAN_XCB_CONTROL_H
 #define VULKAN_XCB_CONTROL_H
 
-#ifndef WIN32
+#ifndef _WIN32
 
 #include <xcb/xcb.h>
 

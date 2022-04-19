@@ -20,7 +20,7 @@
 #include "ogldev_app.h"
 #include "ogldev_util.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
                    {.1,1.0,1.0,.5}, {1,1,1,0},
                    0, {1,0,0,1}, 0, {1,0,0,1},
@@ -28,7 +28,7 @@ Markup sMarkup = { (char*)"Arial", 64, 1, 0, 0.0, 0.0,
 #endif
 
 OgldevApp::OgldevApp()
-#ifndef WIN32
+#ifndef _WIN32
            : m_fontRenderer(sMarkup)
 #endif
 {
@@ -60,7 +60,7 @@ void OgldevApp::RenderFPS()
     ZERO_MEM(text);
     SNPRINTF(text, sizeof(text), "FPS: %d", m_fps);
 
-#ifndef WIN32
+#ifndef _WIN32
     m_fontRenderer.RenderText(10, 10, text);
 #endif
 }
