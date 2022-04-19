@@ -12,9 +12,24 @@
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial29_youtube\camera.cpp" />
+    <ClCompile Include="..\..\..\tutorial29_youtube\skinned_mesh.cpp" />
+    <ClCompile Include="..\..\..\tutorial29_youtube\skinning_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial29_youtube\tutorial29.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\..\Include\technique.h" />
+    <ClInclude Include="..\..\..\tutorial29_youtube\camera.h" />
+    <ClInclude Include="..\..\..\tutorial29_youtube\skinned_mesh.h" />
+    <ClInclude Include="..\..\..\tutorial29_youtube\skinning_technique.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial29_youtube\skinning.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial29_youtube\skinning.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

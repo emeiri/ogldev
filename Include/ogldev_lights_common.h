@@ -18,7 +18,7 @@
 #ifndef LIGHTS_COMMON_H
 #define	LIGHTS_COMMON_H
 
-#include "ATB/AntTweakBar.h"
+//#include "ATB/AntTweakBar.h"
 
 #include "ogldev_math_3d.h"
 
@@ -37,7 +37,7 @@ public:
         DiffuseIntensity = 0.0f;
     }
         
-    virtual void AddToATB(TwBar *bar);
+   // virtual void AddToATB(TwBar *bar);
 };
 
 
@@ -51,7 +51,7 @@ public:
         Direction = Vector3f(0.0f, 0.0f, 0.0f);
     }
     
-    virtual void AddToATB(TwBar *bar);
+   // virtual void AddToATB(TwBar *bar);
 };
 
 
@@ -81,7 +81,7 @@ public:
         Position = Vector3f(0.0f, 0.0f, 0.0f);
     }
     
-    virtual void AddToATB(TwBar *bar);
+  //  virtual void AddToATB(TwBar *bar);
 };
 
 
@@ -97,7 +97,7 @@ public:
         Cutoff = 0.0f;
     }
     
-    virtual void AddToATB(TwBar *bar);
+  //  virtual void AddToATB(TwBar *bar);
 };
 
 
