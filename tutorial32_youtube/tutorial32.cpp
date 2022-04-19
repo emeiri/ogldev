@@ -171,7 +171,7 @@ public:
         float mouse_y = (float)m_leftMouseButton.y;
 
         float ndc_x = (2.0f * mouse_x) / WINDOW_WIDTH - 1.0f;
-        float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT;
+        float ndc_y = 1.0f - (2.0f * mouse_y) / WINDOW_HEIGHT; // flip the Y axis
 
         // Step 2 - NDC to view (my version)
         float focal_length = 1.0f/tanf(ToRadian(45.0f / 2.0f));
