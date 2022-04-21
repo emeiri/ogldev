@@ -1,6 +1,5 @@
 /*
-
-        Copyright 2021 Etay Meiri
+    Copyright 2022 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,334 +14,282 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 18 - Loading models with Assimp
+    Sprite Batching
 */
-
-#include <stdio.h>
-#include <string.h>
 
 #include <math.h>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
 
-#include "ogldev_math_3d.h"
-#include "ogldev_texture.h"
-#include "ogldev_world_transform.h"
+
+#include "ogldev_engine_common.h"
+#include "ogldev_util.h"
+#include "ogldev_basic_glfw_camera.h"
+#include "ogldev_new_lighting.h"
+#include "ogldev_flat_passthru_technique.h"
+#include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
-#include "camera.h"
+#include "ogldev_world_transform.h"
+#include "quad_array.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
+
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+static void CursorPosCallback(GLFWwindow* window, double x, double y);
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-
-class Tutorial18
+class Tutorial32
 {
 public:
-    Tutorial18();
-    ~Tutorial18();
 
-    bool Init();
+    Tutorial32()
+    {
+        m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_directionalLight.AmbientIntensity = 3.0f;
+        m_directionalLight.DiffuseIntensity = 0.1f;
+        m_directionalLight.WorldDirection = Vector3f(-1.0f, 0.0, 0.0);
 
-    void RenderSceneCB();
-    void KeyboardCB(unsigned char key, int mouse_x, int mouse_y);
-    void SpecialKeyboardCB(int key, int mouse_x, int mouse_y);
-    void PassiveMouseCB(int x, int y);
+        // The same mesh will be rendered at the following locations
+        m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
+        m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
+        m_worldPos[2] = Vector3f(0.0f, 2.0f, 20.0f);
+    }
+
+    virtual ~Tutorial32()
+    {
+        SAFE_DELETE(m_pGameCamera);
+        SAFE_DELETE(pMesh);
+    }
+
+
+    void Init()
+    {
+        CreateWindow();
+
+        InitCallbacks();
+
+        InitCamera();
+
+        InitMesh();
+
+        InitShaders();
+    }
+
+
+    void Run()
+    {
+        while (!glfwWindowShouldClose(window)) {
+            RenderSceneCB();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
+    }
+
+
+    void RenderSceneCB()
+    {
+        if (m_mobileCamera) {
+            m_pGameCamera->OnRender();
+        }
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // render the objects as usual
+        m_lightingEffect.Enable();
+
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        Matrix4f View = m_pGameCamera->GetMatrix();
+        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
+
+        for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
+            worldTransform.SetPosition(m_worldPos[i]);
+            Matrix4f World = worldTransform.GetMatrix();
+            Matrix4f WVP = Projection * View * World;
+            m_lightingEffect.SetWVP(WVP);
+            Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(m_pGameCamera->GetPos());
+            m_lightingEffect.SetCameraLocalPos(CameraLocalPos3f);
+            m_directionalLight.CalcLocalDirection(worldTransform);
+            m_lightingEffect.SetDirectionalLight(m_directionalLight);
+            m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
+            pMesh->Render(NULL);
+        }
+
+        m_flatPassThruEffect.Enable();
+
+        m_pQuads->Render();
+    }
+
+
+     void KeyboardCB(uint key, int state)
+    {
+        switch (key) {
+        case GLFW_KEY_ESCAPE:
+        case GLFW_KEY_Q:
+            glfwDestroyWindow(window);
+            glfwTerminate();
+            exit(0);
+            break;
+
+        case ' ':
+            if (state == GLFW_PRESS) {
+                m_mobileCamera = !m_mobileCamera;
+            }
+            break;
+
+        case 'a':
+            m_directionalLight.AmbientIntensity += 0.05f;
+            break;
+
+        case 's':
+            m_directionalLight.AmbientIntensity -= 0.05f;
+            break;
+
+        case 'z':
+            m_directionalLight.DiffuseIntensity += 0.05f;
+            break;
+
+        case 'x':
+            m_directionalLight.DiffuseIntensity -= 0.05f;
+            break;
+        default:
+            m_pGameCamera->OnKeyboard(key);
+        }
+    }
+
+
+    void PassiveMouseCB(int x, int y)
+    {
+        if (m_mobileCamera) {
+            m_pGameCamera->OnMouse(x, y);
+        }
+    }
+
+
+    void MouseCB(int button, int action, int x, int y)
+    {
+    }
 
 private:
 
-    void CompileShaders();
-    void AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType);
+    void CreateWindow()
+    {
+        int major_ver = 0;
+        int minor_ver = 0;
+        bool is_full_screen = false;
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 32");
 
-    GLuint WVPLocation;
-    GLuint SamplerLocation;
-    Camera* pGameCamera = NULL;
+        glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    }
+
+
+    void InitCallbacks()
+    {
+        glfwSetKeyCallback(window, KeyCallback);
+        glfwSetCursorPosCallback(window, CursorPosCallback);
+        glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    }
+
+
+    void InitCamera()
+    {
+        Vector3f Pos(0.0f, 5.0f, -22.0f);
+        Vector3f Target(0.0f, -0.2f, 1.0f);
+        Vector3f Up(0.0, 1.0f, 0.0f);
+
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+
+        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+    }
+
+
+    void InitShaders()
+    {
+        if (!m_lightingEffect.Init()) {
+            printf("Error initializing the lighting technique\n");
+            exit(1);
+        }
+
+        m_lightingEffect.Enable();
+        m_lightingEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+        m_lightingEffect.SetMaterial(pMesh->GetMaterial());
+
+        if (!m_flatPassThruEffect.Init()) {
+            printf("Error initializing the flat passthru technique\n");
+            exit(1);
+        }
+    }
+
+
+    void InitMesh()
+    {
+        pMesh = new BasicMesh();
+
+        pMesh->LoadMesh("../Content/box.obj");
+
+        WorldTrans& worldTransform = pMesh->GetWorldTransform();
+        //        worldTransform.SetScale(0.1f);
+        //        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
+
+        m_pQuads = new QuadArray(1);
+    }
+
+    GLFWwindow* window = NULL;
+    LightingTechnique m_lightingEffect;
+    FlatPassThruTechnique m_flatPassThruEffect;
+    BasicCamera* m_pGameCamera = NULL;
+    bool m_mobileCamera = false;
+    DirectionalLight m_directionalLight;
     BasicMesh* pMesh = NULL;
-    PersProjInfo persProjInfo;
+    Vector3f m_worldPos[3];
+    QuadArray* m_pQuads;
 };
 
 
-Tutorial18::Tutorial18()
+Tutorial32* app = NULL;
+
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
-    glClearColor(Red, Green, Blue, Alpha);
-
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-
-    glEnable(GL_DEPTH_TEST);
-
-    float FOV = 45.0f;
-    float zNear = 1.0f;
-    float zFar = 100.0f;
-
-    persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+    app->KeyboardCB(key, action);
 }
 
 
-Tutorial18::~Tutorial18()
+static void CursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    if (pGameCamera) {
-        delete pGameCamera;
-    }
-
-    if (pMesh) {
-        delete pMesh;
-    }
+    app->PassiveMouseCB((int)x, (int)y);
 }
 
 
-bool Tutorial18::Init()
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
 {
-    CompileShaders();
+    double x, y;
 
-    Vector3f CameraPos(0.0f, 0.0f, -1.0f);
-    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
-    Vector3f CameraUp(0.0f, 1.0f, 0.0f);
+    glfwGetCursorPos(window, &x, &y);
 
-    pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
-
-    pMesh = new BasicMesh();
-
-    if (!pMesh->LoadMesh("../Content/spider.obj")) {
-        return false;
-    }
-
-    return true;
+    app->MouseCB(Button, Action, (int)x, (int)y);
 }
 
 
-void Tutorial18::RenderSceneCB()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    pGameCamera->OnRender();
-
-#ifdef _WIN64
-    float YRotationAngle = 0.1f;
-#else
-    float YRotationAngle = 1.0f;
-#endif
-
-    WorldTrans& worldTransform = pMesh->GetWorldTransform();
-
-    worldTransform.SetScale(0.01f);
-    worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
-    worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
-
-    Matrix4f World = worldTransform.GetMatrix();
-
-    Matrix4f View = pGameCamera->GetMatrix();
-
-    Matrix4f Projection;
-    Projection.InitPersProjTransform(persProjInfo);
-
-    Matrix4f WVP = Projection * View * World;
-    glUniformMatrix4fv(WVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
-
-    pMesh->Render();
-
-    glutPostRedisplay();
-
-    glutSwapBuffers();
-}
-
-
-void Tutorial18::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
-{
-    switch (key) {
-    case 'q':
-    case 27:    // escape key code
-        exit(0);
-    }
-
-    pGameCamera->OnKeyboard(key);
-}
-
-
-void Tutorial18::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
-{
-    pGameCamera->OnKeyboard(key);
-}
-
-
-void Tutorial18::PassiveMouseCB(int x, int y)
-{
-    pGameCamera->OnMouse(x, y);
-}
-
-
-void Tutorial18::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
-{
-    GLuint ShaderObj = glCreateShader(ShaderType);
-
-    if (ShaderObj == 0) {
-        fprintf(stderr, "Error creating shader type %d\n", ShaderType);
-        exit(1);
-    }
-
-    const GLchar* p[1];
-    p[0] = pShaderText;
-
-    GLint Lengths[1];
-    Lengths[0] = (GLint)strlen(pShaderText);
-
-    glShaderSource(ShaderObj, 1, p, Lengths);
-
-    glCompileShader(ShaderObj);
-
-    GLint success;
-    glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
-
-    if (!success) {
-        GLchar InfoLog[1024];
-        glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
-        fprintf(stderr, "Error compiling shader type %d: '%s'\n", ShaderType, InfoLog);
-        exit(1);
-    }
-
-    glAttachShader(ShaderProgram, ShaderObj);
-}
-
-
-void Tutorial18::CompileShaders()
-{
-    GLuint ShaderProgram = glCreateProgram();
-
-    if (ShaderProgram == 0) {
-        fprintf(stderr, "Error creating shader program\n");
-        exit(1);
-    }
-
-    std::string vs, fs;
-
-    if (!ReadFile("shader.vs", vs)) {
-        exit(1);
-    };
-
-    AddShader(ShaderProgram, vs.c_str(), GL_VERTEX_SHADER);
-
-    if (!ReadFile("shader.fs", fs)) {
-        exit(1);
-    };
-
-    AddShader(ShaderProgram, fs.c_str(), GL_FRAGMENT_SHADER);
-
-    GLint Success = 0;
-    GLchar ErrorLog[1024] = { 0 };
-
-    glLinkProgram(ShaderProgram);
-
-    glGetProgramiv(ShaderProgram, GL_LINK_STATUS, &Success);
-    if (Success == 0) {
-        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-        fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
-        exit(1);
-    }
-
-    WVPLocation = glGetUniformLocation(ShaderProgram, "gWVP");
-    if (WVPLocation == -1) {
-        printf("Error getting uniform location of 'gWVP'\n");
-        exit(1);
-    }
-
-    SamplerLocation = glGetUniformLocation(ShaderProgram, "gSampler");
-    if (SamplerLocation == -1) {
-        printf("Error getting uniform location of 'gSampler'\n");
-        exit(1);
-    }
-
-    glValidateProgram(ShaderProgram);
-    glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
-    if (!Success) {
-        glGetProgramInfoLog(ShaderProgram, sizeof(ErrorLog), NULL, ErrorLog);
-        fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
-        exit(1);
-    }
-
-    glUseProgram(ShaderProgram);
-}
-
-
-Tutorial18* pTutorial18 = NULL;
-
-
-void RenderSceneCB()
-{
-    pTutorial18->RenderSceneCB();
-}
-
-
-void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
-{
-    pTutorial18->KeyboardCB(key, mouse_x, mouse_y);
-}
-
-
-void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
-{
-    pTutorial18->SpecialKeyboardCB(key, mouse_x, mouse_y);
-}
-
-
-void PassiveMouseCB(int x, int y)
-{
-    pTutorial18->PassiveMouseCB(x, y);
-}
-
-
-void InitializeGlutCallbacks()
-{
-    glutDisplayFunc(RenderSceneCB);
-    glutKeyboardFunc(KeyboardCB);
-    glutSpecialFunc(SpecialKeyboardCB);
-    glutPassiveMotionFunc(PassiveMouseCB);
-}
 
 int main(int argc, char** argv)
 {
-#ifdef _WIN64
-    srand(GetCurrentProcessId());
-#else
-    srandom(getpid());
-#endif
+    app = new Tutorial32();
 
-    glutInit(&argc, argv);
-    glutInitContextVersion(3, 3);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
-    glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    app->Init();
 
-    int x = 200;
-    int y = 100;
-    glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 18");
-    printf("window id: %d\n", win);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
-    // char game_mode_string[64];
-    // Game mode string example: <Width>x<Height>@<FPS>
-    // Enable the following three lines for full screen
-    // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);
-    // glutGameModeString(game_mode_string);
-    // glutEnterGameMode();
+    app->Run();
 
-    // Must be done after glut is initialized!
-    GLenum res = glewInit();
-    if (res != GLEW_OK) {
-        fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
-        return 1;
-    }
-
-    InitializeGlutCallbacks();
-
-    pTutorial18 = new Tutorial18();
-
-    if (!pTutorial18->Init()) {
-        return 1;
-    }
-
-    glutMainLoop();
+    delete app;
 
     return 0;
 }
