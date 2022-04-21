@@ -117,10 +117,12 @@ public:
 
         m_spriteEffect.Enable();
 
-        m_spriteEffect.SetColor(1.0f, 0.0f, 0.0f);
-
-        m_spriteEffect.SetQuad(0, -0.5f, -0.5f, 0.1f, 0.1f);
-        m_spriteEffect.SetQuad(1, 0.0f, 0.0f, 0.1f, 0.1f);
+        m_spriteEffect.SetQuad(0,
+                               -0.5f, -0.5f, 0.5f, 0.5f,
+                               0.0f, 0.0f, 0.1f, 0.1f);
+        m_spriteEffect.SetQuad(1,
+                               0.0f, 0.0f, 0.1f, 0.1f,
+                               0.0f, 0.0f, 0.1f, 0.1f);
 
         m_pQuads->Render();
     }
@@ -224,9 +226,13 @@ private:
         m_lightingEffect.SetMaterial(pMesh->GetMaterial());
 
         if (!m_spriteEffect.Init()) {
-            printf("Error initializing the flat passthru technique\n");
+            printf("Error initializing the sprite technique\n");
             exit(1);
         }
+
+        m_spriteEffect.Enable();
+
+        m_spriteEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     }
 
 

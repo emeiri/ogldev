@@ -71,7 +71,7 @@ void QuadArray::CreatePrimIdBuffer()
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[PRIM_ID_VB]);
-    glBufferData(GL_ARRAY_BUFFER, prim_id_vec.size()* sizeof(GLuint), &prim_id_vec[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, prim_id_vec.size() * sizeof(GLuint), &prim_id_vec[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(PRIM_ID_LOCATION);
     glVertexAttribIPointer(PRIM_ID_LOCATION, 1, GL_UNSIGNED_INT, 0, 0);
 }

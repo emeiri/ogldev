@@ -41,9 +41,9 @@ bool SpriteTechnique::Init()
         return false;
     }
 
-    m_colorLoc = GetUniformLocation("gColor");
+    m_samplerLoc = GetUniformLocation("gSampler");
 
-    if (m_colorLoc == INVALID_UNIFORM_LOCATION) {
+    if (m_samplerLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -51,37 +51,41 @@ bool SpriteTechnique::Init()
 
     for (int i = 0 ; i < MAX_QUADS ; i++) {
         SNPRINTF(name, sizeof(name), "gQuads[%d].BasePos", i);
-        m_quadsLoc[i].BasePosLoc = GetUniformLocation(name);
+        m_quadsLoc[i].BasePos = GetUniformLocation(name);
         SNPRINTF(name, sizeof(name), "gQuads[%d].WidthHeight", i);
-        m_quadsLoc[i].WidthHeightLoc = GetUniformLocation(name);
+        m_quadsLoc[i].WidthHeight = GetUniformLocation(name);
+        SNPRINTF(name, sizeof(name), "gQuads[%d].TexCoords", i);
+        m_quadsLoc[i].TexCoords = GetUniformLocation(name);
+        SNPRINTF(name, sizeof(name), "gQuads[%d].TexWidthHeight", i);
+        m_quadsLoc[i].TexWidthHeight = GetUniformLocation(name);
 
-        if ((m_quadsLoc[i].BasePosLoc == INVALID_UNIFORM_LOCATION) ||
-            (m_quadsLoc[i].WidthHeightLoc == INVALID_UNIFORM_LOCATION)) {
+        if ((m_quadsLoc[i].BasePos == INVALID_UNIFORM_LOCATION) ||
+            (m_quadsLoc[i].WidthHeight == INVALID_UNIFORM_LOCATION) ||
+            (m_quadsLoc[i].TexCoords == INVALID_UNIFORM_LOCATION) ||
+            (m_quadsLoc[i].TexWidthHeight == INVALID_UNIFORM_LOCATION)) {
             return false;
         }
     }
-
-    Enable();
-
-    // default is white
-    SetColor(1.0f, 1.0f, 1.0f);
-
-    glUseProgram(0);
 
     return true;
 }
 
 
-void SpriteTechnique::SetColor(float r, float g, float b)
+void SpriteTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
-    glUniform3f(m_colorLoc, r, g, b);
+    glUniform1i(m_samplerLoc, TextureUnit);
 }
 
 
-void SpriteTechnique::SetQuad(int Index, float x, float y, float Width, float Height)
+void SpriteTechnique::SetQuad(int Index,
+                              float x, float y, float Width, float Height,
+                              float u, float v, float TexWidth, float TexHeight)
 {
     assert(Index < MAX_QUADS);
 
-    glUniform2f(m_quadsLoc[Index].BasePosLoc, x, y);
-    glUniform2f(m_quadsLoc[Index].WidthHeightLoc, Width, Height);
+    glUniform2f(m_quadsLoc[Index].BasePos, x, y);
+    glUniform2f(m_quadsLoc[Index].WidthHeight, Width, Height);
+
+    glUniform2f(m_quadsLoc[Index].TexCoords, u, v);
+    glUniform2f(m_quadsLoc[Index].TexWidthHeight, TexWidth, TexHeight);
 }

@@ -1,4 +1,4 @@
-#version 330
+#version 410
 
 layout (location = 0) in vec2 Position;
 layout (location = 1) in uint PrimID;
@@ -8,9 +8,14 @@ layout (location = 1) in uint PrimID;
 struct Quad {
        vec2 BasePos;
        vec2 WidthHeight;
+       vec2 TexCoords;
+       vec2 TexWidthHeight;
 };
 
 uniform Quad gQuads[MAX_QUADS];
+
+out vec2 TexCoords0;
+
 
 void main()
 {
@@ -20,4 +25,9 @@ void main()
     vec3 NewPosition = BasePos + WidthHeight;
 
     gl_Position = vec4(NewPosition, 1.0);
+
+    vec2 BaseTexCoords = gQuads[PrimID].TexCoords;
+    vec2 TexWidthHeight = Position * gQuads[PrimID].TexWidthHeight;
+
+    TexCoords0 = BaseTexCoords + TexWidthHeight;
 }
