@@ -202,11 +202,7 @@ public:
         Matrix4f Projection = m_pGameCamera->GetProjectionMat();
 
         for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
-            if (m_clicked_object_id == i) {
-                worldTransform.SetPosition(m_worldPos[i]);
-            } else {
-                worldTransform.SetPosition(m_worldPos[i]);
-            }
+            worldTransform.SetPosition(m_worldPos[i]);
             Matrix4f World = worldTransform.GetMatrix();
             Matrix4f WVP = Projection * View * World;
             m_lightingEffect.SetWVP(WVP);
