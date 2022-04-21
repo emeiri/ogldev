@@ -15,38 +15,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef SPRITE_TECHNIQUE_H
+#define SPRITE_TECHNIQUE_H
 
-#ifndef QUAD_ARRAY_H
-#define QUAD_ARRAY_H
+#include "technique.h"
+#include "ogldev_math_3d.h"
 
-#include <GL/glew.h>
-#include "ogldev.h"
-
-class QuadArray
+class SpriteTechnique : public Technique
 {
- public:
-    QuadArray(uint NumQuads);
+public:
 
-    ~QuadArray();
+    SpriteTechnique();
 
-    void Render();
+    virtual bool Init();
 
- private:
+    void SetColor(float r, float g, float b);
 
-    void CreateVertexBuffer();
-    void CreatePrimIdBuffer();
-    void CreateIndexBuffer();
+    void SetQuad(int Index, float x, float y, float Width, float Height);
 
-    enum BUFFER_TYPE {
-        INDEX_BUFFER = 0,
-        POS_VB       = 1,
-        PRIM_ID_VB   = 2,
-        NUM_BUFFERS  = 3
-    };
+private:
 
-    uint m_numQuads = 0;
-    GLuint m_VAO = -1;
-    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
+    GLuint m_colorLoc = -1;
+
+#define MAX_QUADS 100
+
+    struct {
+        GLuint BasePosLoc = -1;
+        GLuint WidthHeightLoc = -1;
+    } m_quadsLoc[MAX_QUADS];
 };
 
-#endif
+#endif  /* SPRITE_TECHNIQUE_H */

@@ -25,7 +25,7 @@
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_new_lighting.h"
-#include "ogldev_flat_passthru_technique.h"
+#include "ogldev_sprite_technique.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
@@ -115,7 +115,12 @@ public:
             pMesh->Render(NULL);
         }
 
-        m_flatPassThruEffect.Enable();
+        m_spriteEffect.Enable();
+
+        m_spriteEffect.SetColor(1.0f, 0.0f, 0.0f);
+
+        m_spriteEffect.SetQuad(0, -0.5f, -0.5f, 0.1f, 0.1f);
+        m_spriteEffect.SetQuad(1, 0.0f, 0.0f, 0.1f, 0.1f);
 
         m_pQuads->Render();
     }
@@ -218,7 +223,7 @@ private:
         m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
         m_lightingEffect.SetMaterial(pMesh->GetMaterial());
 
-        if (!m_flatPassThruEffect.Init()) {
+        if (!m_spriteEffect.Init()) {
             printf("Error initializing the flat passthru technique\n");
             exit(1);
         }
@@ -235,12 +240,12 @@ private:
         //        worldTransform.SetScale(0.1f);
         //        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
 
-        m_pQuads = new QuadArray(1);
+        m_pQuads = new QuadArray(2);
     }
 
     GLFWwindow* window = NULL;
     LightingTechnique m_lightingEffect;
-    FlatPassThruTechnique m_flatPassThruEffect;
+    SpriteTechnique m_spriteEffect;
     BasicCamera* m_pGameCamera = NULL;
     bool m_mobileCamera = false;
     DirectionalLight m_directionalLight;
