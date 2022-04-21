@@ -38,15 +38,15 @@ QuadArray::~QuadArray()
 
 void QuadArray::CreateVertexBuffer()
 {
-    Vector3f vertices[] = { Vector3f(0.0f, 0.0f, 0.5f),   // bottom left
-                            Vector3f(0.0f, 1.0f, 0.5f),   // top left
-                            Vector3f(1.0f, 1.0f, 0.5f),   // top right
-                            Vector3f(1.0f, 0.0f, 0.5f) }; // bottom right
+    Vector2f vertices[] = { Vector2f(0.0f, 0.0f),   // bottom left
+                            Vector2f(0.0f, 1.0f),   // top left
+                            Vector2f(1.0f, 1.0f),   // top right
+                            Vector2f(1.0f, 0.0f) }; // bottom right
 
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(POSITION_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 
