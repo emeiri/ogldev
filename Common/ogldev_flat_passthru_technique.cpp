@@ -54,6 +54,16 @@ bool FlatPassThruTechnique::Init()
     // default is white
     SetColor(1.0f, 1.0f, 1.0f);
 
+    GLuint BasePosLoc = GetUniformLocation("gQuads[0].BasePos");
+    GLuint WidthHeightLoc = GetUniformLocation("gQuads[0].WidthHeight");
+
+    if ((BasePosLoc == INVALID_UNIFORM_LOCATION) || (WidthHeightLoc == INVALID_UNIFORM_LOCATION)) {
+        return false;
+    }
+
+    glUniform2f(BasePosLoc, 0.0f, 0.0f);
+    glUniform2f(WidthHeightLoc, 1.0f, 1.0f);
+
     glUseProgram(0);
 
     return true;

@@ -31,8 +31,11 @@ public:
 
     void SetColor(float r, float g, float b);
 
+
+
 private:
     GLuint m_colorLoc = -1;
+    //    GLuint m_posLoc[4] = { -1 };
 };
 
 #endif  /* FLAT_PASSTHRU_TECHNIQUE_H */
