@@ -35,13 +35,11 @@ class QuadArray
 
     void CreateVertexBuffer();
     void CreatePrimIdBuffer();
-    void CreateIndexBuffer();
 
     enum BUFFER_TYPE {
-        INDEX_BUFFER = 0,
-        POS_VB       = 1,
-        PRIM_ID_VB   = 2,
-        NUM_BUFFERS  = 3
+        POS_VB       = 0,
+        PRIM_ID_VB   = 1,
+        NUM_BUFFERS  = 2
     };
 
     uint m_numQuads = 0;
