@@ -29,8 +29,10 @@ public:
 
     virtual bool Init();
 
-private:
+    void SetColor(float r, float g, float b);
 
+private:
+    GLuint m_colorLoc = -1;
 };
 
 #endif  /* FLAT_PASSTHRU_TECHNIQUE_H */

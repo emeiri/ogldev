@@ -43,5 +43,24 @@ bool FlatPassThruTechnique::Init()
         return false;
     }
 
+    m_colorLoc = GetUniformLocation("gColor");
+
+    if (m_colorLoc == INVALID_UNIFORM_LOCATION) {
+        return false;
+    }
+
+    Enable();
+
+    // default is white
+    SetColor(1.0f, 1.0f, 1.0f);
+
+    glUseProgram(0);
+
     return true;
+}
+
+
+void FlatPassThruTechnique::SetColor(float r, float g, float b)
+{
+    glUniform3f(m_colorLoc, r, g, b);
 }
