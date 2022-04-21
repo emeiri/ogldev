@@ -1,5 +1,5 @@
 /*
-	Copyright 2015 Etay Meiri
+        Copyright 2015 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 #ifndef OGLDEV_H
 #define OGLDEV_H
 
-//#include ""
+#include "ogldev_types.h"
+#include "ogldev_util.h"
+#include "ogldev_math_3d.h"
 
 #endif
