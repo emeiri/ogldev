@@ -333,7 +333,7 @@ int main(int argc, char** argv)
     printf("window id: %d\n", win);
 
 
-    char game_mode_string[64];
+    // char game_mode_string[64];
     // Game mode string example: <Width>x<Height>@<FPS>
     // Enable the following three lines for full screen
     // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -352,10 +352,10 @@ int main(int argc, char** argv)
         printf("OpenGL 4.3 enabled\n");
     }
 
-    //    glEnable(GL_DEBUG_OUTPUT); GCE
-    //    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    //    glDebugMessageCallback(glDebugOutput, nullptr);
-    //    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    glEnable(GL_DEBUG_OUTPUT); 
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugOutput, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
     int flags = 0;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);

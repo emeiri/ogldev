@@ -21,7 +21,7 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <string>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/time.h>
 #include <unistd.h>
 #endif
@@ -32,7 +32,7 @@
 #include "ogldev_util.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_camera.h"
-#include "ogldev_basic_lighting.h"
+#include "ogldev_new_lighting.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
 #include "ogldev_basic_mesh.h"
@@ -194,7 +194,6 @@ int main(int argc, char** argv)
     }
 
     SRANDOM;
-
 
     int flags = 0;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);

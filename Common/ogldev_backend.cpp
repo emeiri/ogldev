@@ -60,7 +60,7 @@ void OgldevBackendTerminate()
 
 bool OgldevBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const char* pTitle)
 {
-    //    TwWindowSize(Width, Height);
+    //TwWindowSize(Width, Height);
 
     switch (sBackendType) {
         case OGLDEV_BACKEND_TYPE_GLUT:

@@ -29,6 +29,7 @@
 #include <vector>
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 #include <GL/glew.h>
 #include "ogldev_types.h"
 
