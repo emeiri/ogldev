@@ -36,11 +36,21 @@ class SpriteBatch
 
     void InitSpriteSheet();
 
+    void CalcSpriteInfo();
+
     void MousePosToNDC(float mouse_x, float mouse_y, float& ndc_x, float& ndc_y);
 
+    // constructor params
     const char* m_pFilename = NULL;
+    float m_numSpritesX = 0.0f;
+    float m_numSpritesY = 0.0f;
     float m_windowWidth = 0.0f;
     float m_windowHeight = 0.0f;
+
+    // internal params
+    float m_spriteAspectRatio = 0.0f;
+    float m_texUSize = 0.0f;
+    float m_texVSize = 0.0f;
     float m_windowAR = 0.0f;
     Texture* m_pSpriteSheet = NULL;
     QuadArray* m_pQuads = NULL;

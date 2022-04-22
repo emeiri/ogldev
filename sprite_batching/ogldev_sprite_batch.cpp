@@ -23,6 +23,8 @@
 SpriteBatch::SpriteBatch(const char* pFilename, uint NumSpritesX, uint NumSpritesY, uint WindowWidth, uint WindowHeight)
 {
     m_pFilename = pFilename;
+    m_numSpritesX = (float)NumSpritesX;
+    m_numSpritesY = (float)NumSpritesY;
     m_windowWidth = (float)WindowWidth;
     m_windowHeight = (float)WindowHeight;
     m_windowAR = m_windowHeight / m_windowWidth;
@@ -33,6 +35,8 @@ SpriteBatch::SpriteBatch(const char* pFilename, uint NumSpritesX, uint NumSprite
     InitSpriteTech();
 
     InitSpriteSheet();
+
+    CalcSpriteInfo();
 }
 
 
@@ -58,6 +62,23 @@ void SpriteBatch::InitSpriteSheet()
 }
 
 
+void SpriteBatch::CalcSpriteInfo()
+{
+    int ImageWidth, ImageHeight;
+    m_pSpriteSheet->GetImageSize(ImageWidth, ImageHeight);
+
+    float SpriteWidth  = (float)ImageWidth / m_numSpritesX;
+    float SpriteHeight = (float)ImageHeight / m_numSpritesY;
+
+    printf("Sprite %f:%f\n", SpriteHeight, SpriteWidth);
+
+    m_spriteAspectRatio = SpriteHeight / SpriteWidth;
+
+    m_texVSize = 1.0f / 8.0f;
+    m_texUSize = 1.0f / 6.0f;
+}
+
+
 void SpriteBatch::MousePosToNDC(float mouse_x, float mouse_y, float& ndc_x, float& ndc_y)
 {
     ndc_x = (2.0f * mouse_x) / m_windowWidth - 1.0f;
@@ -69,16 +90,6 @@ void SpriteBatch::Render()
 {
     m_spriteTech.Enable();
 
-    float SpriteHeight = 3792.0 / 8.0f;
-    float SpriteWidth = 4092.0f / 6.0f;
-
-    //        printf("Sprite %f:%f\n", SpriteHeight, SpriteWidth);
-
-    float SpriteAspectRatio = SpriteHeight / SpriteWidth;
-
-    float TileHeightNorm = 1.0f / 8.0f;
-    float TileWidthNorm = 1.0f / 6.0f;
-
     //        printf("Tile %f:%f\n", TileHeightNorm, TileWidthNorm);
 
     float NDCPixelX = 2.0f / m_windowWidth;
@@ -88,7 +99,7 @@ void SpriteBatch::Render()
     float YStart = 0.0f;
     float Stride = 150.0f;
     float TileWidth = 150.0f;
-    float TileHeight = TileWidth * SpriteAspectRatio;
+    float TileHeight = TileWidth * m_spriteAspectRatio;
 
     float TileWidthNDC = NDCPixelX * TileWidth;
     float TileHeightNDC = NDCPixelY * TileHeight;
@@ -107,23 +118,17 @@ void SpriteBatch::Render()
             float NDCX, NDCY;
             MousePosToNDC(PosX, PosY, NDCX, NDCY);
 
-            float UBase = w * TileWidthNorm;
-            float VBase = h * TileHeightNorm;
+            float UBase = w * m_texUSize;
+            float VBase = h * m_texVSize;
             //                printf("pos %f,%f\n", TilePosX, TilePosY);
 
             m_spriteTech.SetQuad(TileIndex,
-                                   NDCX, NDCY, TileWidthNDC, TileHeightNDC,
-                                   UBase, VBase, TileWidthNorm, TileHeightNorm);
+                                 NDCX, NDCY, TileWidthNDC, TileHeightNDC,
+                                 UBase, VBase, m_texUSize, m_texVSize);
         }
     }
 
-    /*        m_spriteEffect.SetQuad(0,
-              -0.5f, -0.5f, 0.5f * ar, 0.5f,
-              0.0f, 0.0f, 0.1f * ar, 0.1f);
-              m_spriteEffect.SetQuad(1,
-              0.0f, 0.0f, 0.1f * ar, 0.1f,
-              0.0f, 0.0f, 0.1f * ar, 0.1f);*/
-    m_pSpriteSheet->Bind(GL_TEXTURE0);
+    m_pSpriteSheet->Bind(COLOR_TEXTURE_UNIT);
 
     m_pQuads->Render();
 }
