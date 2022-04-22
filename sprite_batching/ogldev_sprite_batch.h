@@ -28,7 +28,7 @@ class SpriteBatch
 
     //    void Set
 
-    void Render();
+    void RenderAll();
 
  private:
 
@@ -52,6 +52,8 @@ class SpriteBatch
     float m_texUSize = 0.0f;
     float m_texVSize = 0.0f;
     float m_windowAR = 0.0f;
+    float m_ndcPixelX = 0.0f;
+    float m_ndcPixelY = 0.0f;
     Texture* m_pSpriteSheet = NULL;
     QuadArray* m_pQuads = NULL;
     SpriteTechnique m_spriteTech;

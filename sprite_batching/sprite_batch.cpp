@@ -31,8 +31,8 @@
 #include "ogldev_sprite_batch.h"
 
 
-#define WINDOW_WIDTH  1200
-#define WINDOW_HEIGHT 1200
+#define WINDOW_WIDTH  2000
+#define WINDOW_HEIGHT 1000
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -117,7 +117,7 @@ public:
             pMesh->Render(NULL);
         }
 
-        m_pSpriteBatch->Render();
+        m_pSpriteBatch->RenderAll();
     }
 
 

@@ -72,10 +72,20 @@ void SpriteBatch::CalcSpriteInfo()
 
     printf("Sprite %f:%f\n", SpriteHeight, SpriteWidth);
 
+    float NumSpritesForWidth = m_windowWidth / SpriteWidth;
+    float NumSpritesForHeight = m_windowHeight / SpriteHeight;
+
+    printf("%f %f\n", NumSpritesForWidth, NumSpritesForHeight);
+
+    //    exit(0);;
+
     m_spriteAspectRatio = SpriteHeight / SpriteWidth;
 
     m_texVSize = 1.0f / 8.0f;
     m_texUSize = 1.0f / 6.0f;
+
+    m_ndcPixelX = 2.0f / m_windowWidth;
+    m_ndcPixelY = 2.0f / m_windowHeight;
 }
 
 
@@ -86,34 +96,51 @@ void SpriteBatch::MousePosToNDC(float mouse_x, float mouse_y, float& ndc_x, floa
 }
 
 
-void SpriteBatch::Render()
+void SpriteBatch::RenderAll()
 {
     m_spriteTech.Enable();
 
-    //        printf("Tile %f:%f\n", TileHeightNorm, TileWidthNorm);
+    int ImageWidth, ImageHeight;
+    m_pSpriteSheet->GetImageSize(ImageWidth, ImageHeight);
 
-    float NDCPixelX = 2.0f / m_windowWidth;
-    float NDCPixelY = 2.0f / m_windowHeight;
+    float ImageWidthToWindowWidthRatio = ImageWidth / m_windowWidth;
+    float ImageHeightToWindowHeightRatio = ImageHeight / m_windowHeight;
+        printf("w %f h %f\n", ImageWidthToWindowWidthRatio, ImageHeightToWindowHeightRatio);
+
+    float TileHeight = 0.0f;
+    float TileWidth = 0.0f;
+
+    //float
+
+    if (ImageWidthToWindowWidthRatio < ImageHeightToWindowHeightRatio) {
+        TileHeight = m_windowHeight / m_numSpritesY;
+        TileWidth = TileHeight / m_spriteAspectRatio;
+    } else {
+        TileWidth = m_windowWidth / m_numSpritesX;
+        TileHeight = TileWidth * m_spriteAspectRatio;
+    }
+
+    //    printf("TileWidth %f TileHeight %f\n", TileWidth, TileHeight);
+    //  exit(0);
+
 
     float XStart = 0.0f;
     float YStart = 0.0f;
-    float Stride = 150.0f;
-    float TileWidth = 150.0f;
-    float TileHeight = TileWidth * m_spriteAspectRatio;
 
-    float TileWidthNDC = NDCPixelX * TileWidth;
-    float TileHeightNDC = NDCPixelY * TileHeight;
+    //    float TileWidth = 150.0f;
+    //    float TileHeight = TileWidth * m_spriteAspectRatio;
+
+    float TileWidthNDC = m_ndcPixelX * TileWidth;
+    float TileHeightNDC = m_ndcPixelY * TileHeight;
 
     //        printf("TileWidthNDC %f TileHeightNDC %f\n", TileWidthNDC, TileHeightNDC);
 
-    for (int h = 0 ; h < 8 ; h++) {
-        for (int w = 0 ; w < 6 ; w++) {
-            uint TileIndex = h * 6 + w;
-            //                float TilePosX = w * TileWidthNorm;
-            //                float TilePosY = h * TileHeightNorm;
+    for (int h = 0 ; h < (uint)m_numSpritesY ; h++) {
+        for (int w = 0 ; w < (uint)m_numSpritesX ; w++) {
+            uint TileIndex = h * m_numSpritesX + w;
 
-            float PosX = XStart + w * Stride;
-            float PosY = YStart + h * Stride;
+            float PosX = XStart + w * TileWidth;
+            float PosY = YStart + h * TileHeight;
 
             float NDCX, NDCY;
             MousePosToNDC(PosX, PosY, NDCX, NDCY);
