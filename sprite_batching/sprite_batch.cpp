@@ -25,14 +25,14 @@
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_new_lighting.h"
-#include "ogldev_sprite_technique.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "quad_array.h"
+#include "ogldev_sprite_batch.h"
 
-#define WINDOW_WIDTH  1000
-#define WINDOW_HEIGHT 1000
+
+#define WINDOW_WIDTH  1200
+#define WINDOW_HEIGHT 1200
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -74,6 +74,8 @@ public:
         InitMesh();
 
         InitShaders();
+
+        InitSpriteBatch();
     }
 
 
@@ -115,39 +117,7 @@ public:
             pMesh->Render(NULL);
         }
 
-        m_spriteEffect.Enable();
-
-        float ar = (float)WINDOW_HEIGHT/(float)WINDOW_WIDTH;
-
-        float TileHeight = 3792.0 / 8.0f;
-        float TileWidth = 4092.0f / 6.0f;
-
-        float TileHeightNorm = 2.0f / 8.0f;
-        float TileWidthNorm = 2.0f / 6.0f;
-
-        //        printf("Tile %f:%f\n", TileHeightNorm, TileWidthNorm);
-
-        for (int h = 0 ; h < 8 ; h++) {
-            for (int w = 0 ; w < 6 ; w++) {
-                uint TileIndex = h * 6 + w;
-                float TilePosX = w * TileWidthNorm;
-                float TilePosY = h * TileHeightNorm;
-                //                printf("pos %f,%f\n", TilePosX, TilePosY);
-
-                m_spriteEffect.SetQuad(TileIndex,
-                                       TilePosX - 1.0f, TilePosY - 1.0f, TileWidthNorm * ar * 2.0f, TileHeightNorm * 2.0f,
-                                       TilePosX, TilePosY, TileWidthNorm, TileHeightNorm);
-            }
-        }
-
-        /*        m_spriteEffect.SetQuad(0,
-                               -0.5f, -0.5f, 0.5f * ar, 0.5f,
-                               0.0f, 0.0f, 0.1f * ar, 0.1f);
-        m_spriteEffect.SetQuad(1,
-                               0.0f, 0.0f, 0.1f * ar, 0.1f,
-                               0.0f, 0.0f, 0.1f * ar, 0.1f);*/
-        m_pSpriteSheet->Bind(GL_TEXTURE0);
-        m_pQuads->Render();
+        m_pSpriteBatch->Render();
     }
 
 
@@ -247,14 +217,6 @@ private:
         m_lightingEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
         m_lightingEffect.SetMaterial(pMesh->GetMaterial());
-
-        if (!m_spriteEffect.Init()) {
-            printf("Error initializing the sprite technique\n");
-            exit(1);
-        }
-
-        m_spriteEffect.Enable();
-        m_spriteEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     }
 
 
@@ -267,24 +229,24 @@ private:
         WorldTrans& worldTransform = pMesh->GetWorldTransform();
         //        worldTransform.SetScale(0.1f);
         //        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
+    }
 
-        m_pQuads = new QuadArray(6 * 8);
-        m_pSpriteSheet = new Texture(GL_TEXTURE_2D, "../Content/spritesheet.png");
-        if (!m_pSpriteSheet->Load()) {
-            printf("Error loading sprite sheet\n");
-        }
+
+    void InitSpriteBatch()
+    {
+        uint NumSpritesX = 6;
+        uint NumSpritesY = 8;
+        m_pSpriteBatch = new SpriteBatch("../Content/spritesheet.png", NumSpritesX, NumSpritesY, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
     GLFWwindow* window = NULL;
     LightingTechnique m_lightingEffect;
-    SpriteTechnique m_spriteEffect;
     BasicCamera* m_pGameCamera = NULL;
     bool m_mobileCamera = false;
     DirectionalLight m_directionalLight;
     BasicMesh* pMesh = NULL;
     Vector3f m_worldPos[3];
-    QuadArray* m_pQuads;
-    Texture* m_pSpriteSheet = NULL;
+    SpriteBatch* m_pSpriteBatch = NULL;
 };
 
 
