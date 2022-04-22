@@ -41,10 +41,19 @@ public:
     // Must be called at least once for the specific texture unit
     void Bind(GLenum TextureUnit);
 
+    void GetImageSize(int& ImageWidth, int& ImageHeight)
+    {
+        ImageWidth = m_imageWidth;
+        ImageHeight = m_imageHeight;
+    }
+
 private:
     std::string m_fileName;
     GLenum m_textureTarget;
     GLuint m_textureObj;
+    int m_imageWidth = 0;
+    int m_imageHeight = 0;
+    int m_imageBPP = 0;
 #ifdef USE_IMAGE_MAGICK
     Magick::Image m_image;
     Magick::Blob m_blob;

@@ -44,15 +44,15 @@ bool Texture::Load()
 #else // STB image
 
     stbi_set_flip_vertically_on_load(1);
-    int width = 0, height = 0, bpp = 0;
-    unsigned char* image_data = stbi_load(m_fileName.c_str(), &width, &height, &bpp, 0);
+
+    unsigned char* image_data = stbi_load(m_fileName.c_str(), &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
 
     if (!image_data) {
         printf("Can't load texture from '%s' - %s\n", m_fileName.c_str(), stbi_failure_reason());
         exit(0);
     }
 
-    printf("Width %d, height %d, bpp %d\n", width, height, bpp);
+    printf("Width %d, height %d, bpp %d\n", m_imageWidth, m_imageHeight, m_imageBPP);
 
 #endif
 
@@ -62,17 +62,17 @@ bool Texture::Load()
 #ifdef USE_IMAGE_MAGICK
         glTexImage2D(m_textureTarget, 0, GL_RGBA, m_image.columns(), m_image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_blob.data());
 #else
-        switch (bpp) {
+        switch (m_imageBPP) {
         case 1:
-            glTexImage2D(m_textureTarget, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RED, m_imageWidth, m_imageHeight, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
             break;
 
         case 3:
-            glTexImage2D(m_textureTarget, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
             break;
 
         case 4:
-            glTexImage2D(m_textureTarget, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
             break;
 
         default:
