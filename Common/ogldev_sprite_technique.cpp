@@ -49,7 +49,7 @@ bool SpriteTechnique::Init()
 
     char name[200] = { 0 };
 
-    for (int i = 0 ; i < MAX_QUADS ; i++) {
+    for (int i = 0 ; i < SPRITE_TECH_MAX_QUADS ; i++) {
         SNPRINTF(name, sizeof(name), "gQuads[%d].BasePos", i);
         m_quadsLoc[i].BasePos = GetUniformLocation(name);
         SNPRINTF(name, sizeof(name), "gQuads[%d].WidthHeight", i);
@@ -81,7 +81,7 @@ void SpriteTechnique::SetQuad(int Index,
                               float x, float y, float Width, float Height,
                               float u, float v, float TexWidth, float TexHeight)
 {
-    assert(Index < MAX_QUADS);
+    assert(Index < SPRITE_TECH_MAX_QUADS);
 
     glUniform2f(m_quadsLoc[Index].BasePos, x, y);
     glUniform2f(m_quadsLoc[Index].WidthHeight, Width, Height);

@@ -21,6 +21,8 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
+#define SPRITE_TECH_MAX_QUADS 100
+
 class SpriteTechnique : public Technique
 {
 public:
@@ -29,20 +31,25 @@ public:
 
     virtual bool Init();
 
-    void SetColor(float r, float g, float b);
+    void SetTextureUnit(unsigned int TextureUnit);
 
-    void SetQuad(int Index, float x, float y, float Width, float Height);
+    void SetQuad(int Index,
+                 float x, float y, float Width, float Height,
+                 float u, float v, float TexWidth, float TexHeight);
 
 private:
 
     GLuint m_colorLoc = -1;
 
-#define MAX_QUADS 100
 
     struct {
-        GLuint BasePosLoc = -1;
-        GLuint WidthHeightLoc = -1;
-    } m_quadsLoc[MAX_QUADS];
+        GLuint BasePos        = -1;
+        GLuint WidthHeight    = -1;
+        GLuint TexCoords      = -1;
+        GLuint TexWidthHeight = -1;
+    } m_quadsLoc[SPRITE_TECH_MAX_QUADS];
+
+    GLuint m_samplerLoc = -1;
 };
 
 #endif  /* SPRITE_TECHNIQUE_H */
