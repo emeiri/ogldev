@@ -25,11 +25,11 @@
 class QuadArray
 {
  public:
-    QuadArray(uint NumQuads);
+    QuadArray(uint MaxNumQuads);
 
     ~QuadArray();
 
-    void Render();
+    void Render(uint NumQuads = 0);
 
  private:
 
@@ -42,7 +42,7 @@ class QuadArray
         NUM_BUFFERS  = 2
     };
 
-    uint m_numQuads = 0;
+    uint m_maxNumQuads = 0;
     GLuint m_VAO = -1;
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 };

@@ -7,11 +7,9 @@
 
 #define NUM_VERTICES 6
 
-QuadArray::QuadArray(uint NumQuads)
+QuadArray::QuadArray(uint MaxNumQuads)
 {
-    m_numQuads = NumQuads;
-
-    assert(NumQuads > 0);
+    m_maxNumQuads = MaxNumQuads;
 
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);
@@ -43,10 +41,10 @@ void QuadArray::CreateVertexBuffer()
                             Vector2f(1.0f, 0.0f) }; // bottom right
 
     vector<Vector2f> vertices_vec;
-    vertices_vec.resize(m_numQuads * NUM_VERTICES);
+    vertices_vec.resize(m_maxNumQuads * NUM_VERTICES);
 
 
-    for (uint i = 0 ; i < m_numQuads ; i++) {
+    for (uint i = 0 ; i < m_maxNumQuads ; i++) {
         for (int j = 0; j < NUM_VERTICES ; j++) {
             vertices_vec[i * NUM_VERTICES + j] = vertices[j];
         }
@@ -62,9 +60,9 @@ void QuadArray::CreateVertexBuffer()
 void QuadArray::CreatePrimIdBuffer()
 {
     vector<GLuint> prim_id_vec;
-    prim_id_vec.resize(m_numQuads * NUM_VERTICES);
+    prim_id_vec.resize(m_maxNumQuads * NUM_VERTICES);
 
-    for (uint i = 0 ; i < m_numQuads ; i++) {
+    for (uint i = 0 ; i < m_maxNumQuads ; i++) {
         for (int j = 0; j < NUM_VERTICES ; j++) {
             prim_id_vec[i * NUM_VERTICES + j] = i;
         }
@@ -77,11 +75,17 @@ void QuadArray::CreatePrimIdBuffer()
 }
 
 
-void QuadArray::Render()
+void QuadArray::Render(uint NumQuads)
 {
+    assert(NumQuads <= m_maxNumQuads);
+
+    if (NumQuads == 0) {
+        NumQuads = m_maxNumQuads;
+    }
+
     glBindVertexArray(m_VAO);
 
-    glDrawArrays(GL_TRIANGLES, 0, m_numQuads * NUM_VERTICES);
+    glDrawArrays(GL_TRIANGLES, 0, NumQuads * NUM_VERTICES);
 
     glBindVertexArray(0);
 }

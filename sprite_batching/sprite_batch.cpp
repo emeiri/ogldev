@@ -97,27 +97,44 @@ public:
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // render the objects as usual
-        m_lightingEffect.Enable();
+        vector<SpriteBatch::SpriteInfo> Sprites;
+        Sprites.resize(2);
 
-        WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        Matrix4f View = m_pGameCamera->GetMatrix();
-        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
+        /*              uint PixelX = 0;
+        uint PixelY = 0;
+        uint SpriteRow = 0;
+        uint SpriteCol = 0;
+        uint SpriteWidth = 0;*/
 
-        for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_worldPos) ; i++) {
-            worldTransform.SetPosition(m_worldPos[i]);
-            Matrix4f World = worldTransform.GetMatrix();
-            Matrix4f WVP = Projection * View * World;
-            m_lightingEffect.SetWVP(WVP);
-            Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(m_pGameCamera->GetPos());
-            m_lightingEffect.SetCameraLocalPos(CameraLocalPos3f);
-            m_directionalLight.CalcLocalDirection(worldTransform);
-            m_lightingEffect.SetDirectionalLight(m_directionalLight);
-            m_lightingEffect.SetColorMod(Vector4f(1.0f, 1.0, 1.0, 1.0f));
-            pMesh->Render(NULL);
+        static int row = 7;
+        static int col = 0;
+        Sprites[0].PixelX = 1000;
+        Sprites[0].PixelY = 0;
+        Sprites[0].SpriteRow = row;
+        Sprites[0].SpriteCol = 5;
+        Sprites[0].SpriteWidth = 1000;
+
+        Sprites[1].PixelX = 550;
+        Sprites[1].PixelY = 0;
+        Sprites[1].SpriteRow = row;
+        Sprites[1].SpriteCol = 5;
+        Sprites[1].SpriteWidth = 100;
+
+        long long CurTime = GetCurrentTimeMillis();
+
+        if ((CurTime - m_prevTime) > 100) {
+            row--;
+            if (row == 0) {
+                row = 7;
+            }
+            m_prevTime = CurTime;
         }
 
-        m_pSpriteBatch->RenderAll();
+
+        m_pSpriteBatch->Render(Sprites);
+        //m_pSpriteBatch->RenderAll();
+
+
     }
 
 
@@ -247,6 +264,7 @@ private:
     BasicMesh* pMesh = NULL;
     Vector3f m_worldPos[3];
     SpriteBatch* m_pSpriteBatch = NULL;
+    long long m_prevTime = 0;
 };
 
 
@@ -287,6 +305,10 @@ int main(int argc, char** argv)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    //    GLint num;
+    //    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE/*GL_MAX_VERTEX_UNIFORM_COMPONENTS*/, &num);
+    //    printf("%d\n", num);
+    //    exit(0);
     app->Run();
 
     delete app;

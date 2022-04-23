@@ -24,9 +24,17 @@ class SpriteBatch
 {
  public:
 
+    struct SpriteInfo {
+        uint PixelX = 0;
+        uint PixelY = 0;
+        uint SpriteRow = 0;
+        uint SpriteCol = 0;
+        uint SpriteWidth = 0;
+    };
+
     SpriteBatch(const char* pFilename, uint NumSpritesX, uint NumSpritesY, uint WindowWidth, uint WindowHeight);
 
-    //    void Set
+    void Render(const vector<SpriteInfo>& sprites);
 
     void RenderAll();
 
@@ -54,6 +62,10 @@ class SpriteBatch
     float m_windowAR = 0.0f;
     float m_ndcPixelX = 0.0f;
     float m_ndcPixelY = 0.0f;
+    float m_tileHeight = 0.0f;
+    float m_tileWidth = 0.0f;
+    float m_tileWidthNDC = 0.0f;
+    float m_tileHeightNDC = 0.0f;
     Texture* m_pSpriteSheet = NULL;
     QuadArray* m_pQuads = NULL;
     SpriteTechnique m_spriteTech;

@@ -86,6 +86,23 @@ void SpriteBatch::CalcSpriteInfo()
 
     m_ndcPixelX = 2.0f / m_windowWidth;
     m_ndcPixelY = 2.0f / m_windowHeight;
+
+    m_tileHeight = 0.0f;
+    m_tileWidth = 0.0f;
+
+    float ImageWidthToWindowWidthRatio = ImageWidth / m_windowWidth;
+    float ImageHeightToWindowHeightRatio = ImageHeight / m_windowHeight;
+
+    if (ImageWidthToWindowWidthRatio < ImageHeightToWindowHeightRatio) {
+        m_tileHeight = m_windowHeight / m_numSpritesY;
+        m_tileWidth = m_tileHeight / m_spriteAspectRatio;
+    } else {
+        m_tileWidth = m_windowWidth / m_numSpritesX;
+        m_tileHeight = m_tileWidth * m_spriteAspectRatio;
+    }
+
+    m_tileWidthNDC = m_ndcPixelX * m_tileWidth;
+    m_tileHeightNDC = m_ndcPixelY * m_tileHeight;
 }
 
 
@@ -96,61 +113,62 @@ void SpriteBatch::MousePosToNDC(float mouse_x, float mouse_y, float& ndc_x, floa
 }
 
 
-void SpriteBatch::RenderAll()
+void SpriteBatch::Render(const vector<SpriteInfo>& sprites)
 {
     m_spriteTech.Enable();
 
-    int ImageWidth, ImageHeight;
-    m_pSpriteSheet->GetImageSize(ImageWidth, ImageHeight);
+    assert(sprites.size() < SPRITE_TECH_MAX_QUADS);
 
-    float ImageWidthToWindowWidthRatio = ImageWidth / m_windowWidth;
-    float ImageHeightToWindowHeightRatio = ImageHeight / m_windowHeight;
-        printf("w %f h %f\n", ImageWidthToWindowWidthRatio, ImageHeightToWindowHeightRatio);
+    float NDCX, NDCY;
 
-    float TileHeight = 0.0f;
-    float TileWidth = 0.0f;
+    for (int SpriteIndex = 0 ; SpriteIndex < sprites.size() ; SpriteIndex++) {
 
-    //float
+        const SpriteInfo& Info = sprites[SpriteIndex];
 
-    if (ImageWidthToWindowWidthRatio < ImageHeightToWindowHeightRatio) {
-        TileHeight = m_windowHeight / m_numSpritesY;
-        TileWidth = TileHeight / m_spriteAspectRatio;
-    } else {
-        TileWidth = m_windowWidth / m_numSpritesX;
-        TileHeight = TileWidth * m_spriteAspectRatio;
+        MousePosToNDC((float)Info.PixelX, (float)Info.PixelY, NDCX, NDCY);
+
+        //        printf("NDC %f %f\n", NDCX, NDCY);
+
+        float TileWidthNDC  = m_ndcPixelX * Info.SpriteWidth;
+        float TileHeightNDC = TileWidthNDC / m_spriteAspectRatio;
+
+        printf("Tile NDC %f %f\n", TileWidthNDC, TileHeightNDC);
+
+        float UBase = (float)Info.SpriteCol * m_texUSize;
+        float VBase = (float)Info.SpriteRow * m_texVSize;
+
+        //        printf("U %f V %f\n", UBase, VBase);
+
+        m_spriteTech.SetQuad(SpriteIndex,
+                             NDCX, NDCY, TileWidthNDC, TileHeightNDC,
+                             UBase, VBase, m_texUSize, m_texVSize);
+
     }
 
-    //    printf("TileWidth %f TileHeight %f\n", TileWidth, TileHeight);
-    //  exit(0);
+    m_pSpriteSheet->Bind(COLOR_TEXTURE_UNIT);
+    m_pQuads->Render(sprites.size());
+}
 
 
-    float XStart = 0.0f;
-    float YStart = 0.0f;
-
-    //    float TileWidth = 150.0f;
-    //    float TileHeight = TileWidth * m_spriteAspectRatio;
-
-    float TileWidthNDC = m_ndcPixelX * TileWidth;
-    float TileHeightNDC = m_ndcPixelY * TileHeight;
-
-    //        printf("TileWidthNDC %f TileHeightNDC %f\n", TileWidthNDC, TileHeightNDC);
+void SpriteBatch::RenderAll()
+{
+    m_spriteTech.Enable();
 
     for (int h = 0 ; h < (uint)m_numSpritesY ; h++) {
         for (int w = 0 ; w < (uint)m_numSpritesX ; w++) {
             uint TileIndex = h * m_numSpritesX + w;
 
-            float PosX = XStart + w * TileWidth;
-            float PosY = YStart + h * TileHeight;
+            float PosX = w * m_tileWidth;
+            float PosY = h * m_tileHeight;
 
             float NDCX, NDCY;
             MousePosToNDC(PosX, PosY, NDCX, NDCY);
 
             float UBase = w * m_texUSize;
             float VBase = h * m_texVSize;
-            //                printf("pos %f,%f\n", TilePosX, TilePosY);
 
             m_spriteTech.SetQuad(TileIndex,
-                                 NDCX, NDCY, TileWidthNDC, TileHeightNDC,
+                                 NDCX, NDCY, m_tileWidthNDC, m_tileHeightNDC,
                                  UBase, VBase, m_texUSize, m_texVSize);
         }
     }
