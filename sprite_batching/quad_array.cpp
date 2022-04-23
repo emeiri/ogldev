@@ -12,6 +12,7 @@ QuadArray::QuadArray(uint MaxNumQuads)
     m_maxNumQuads = MaxNumQuads;
 
     glGenVertexArrays(1, &m_VAO);
+
     glBindVertexArray(m_VAO);
 
     glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
@@ -42,7 +43,6 @@ void QuadArray::CreateVertexBuffer()
 
     vector<Vector2f> vertices_vec;
     vertices_vec.resize(m_maxNumQuads * NUM_VERTICES);
-
 
     for (uint i = 0 ; i < m_maxNumQuads ; i++) {
         for (int j = 0; j < NUM_VERTICES ; j++) {

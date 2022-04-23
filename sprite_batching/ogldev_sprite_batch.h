@@ -27,8 +27,8 @@ class SpriteBatch
     struct SpriteInfo {
         uint PixelX = 0;
         uint PixelY = 0;
-        uint SpriteRow = 0;
-        uint SpriteCol = 0;
+        uint SpriteRow = 0;    // Sprite location in the sprite sheet - row
+        uint SpriteCol = 0;    // Sprite location in the sprite sheet - col
         uint SpriteWidth = 0;
     };
 
@@ -56,15 +56,15 @@ class SpriteBatch
     float m_windowHeight = 0.0f;
 
     // internal params
-    float m_spriteAspectRatio = 0.0f;
-    float m_texUSize = 0.0f;
-    float m_texVSize = 0.0f;
+    float m_spriteAspectRatio = 0.0f;   // height/width of the sprite in the sprite sheet
+    float m_texUSize = 0.0f;  // Sprite size in tex space - U
+    float m_texVSize = 0.0f;  // Sprite size in tex space - V
     float m_windowAR = 0.0f;
-    float m_ndcPixelX = 0.0f;
-    float m_ndcPixelY = 0.0f;
-    float m_tileHeight = 0.0f;
-    float m_tileWidth = 0.0f;
-    float m_tileWidthNDC = 0.0f;
+    float m_ndcPixelX = 0.0f; // Size of pixel in NDC space - X
+    float m_ndcPixelY = 0.0f; // Size of pixel in NDC space - y
+    float m_tileHeightInPixels = 0.0f;
+    float m_tileWidthInPixels  = 0.0f;
+    float m_tileWidthNDC  = 0.0f;
     float m_tileHeightNDC = 0.0f;
     Texture* m_pSpriteSheet = NULL;
     QuadArray* m_pQuads = NULL;

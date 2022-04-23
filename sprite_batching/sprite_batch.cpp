@@ -25,7 +25,6 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
-#include "ogldev_world_transform.h"
 #include "ogldev_sprite_batch.h"
 #include "ogldev_tex_technique.h"
 
@@ -112,7 +111,6 @@ public:
             }
             m_prevTime = CurTime;
         }
-
 
         m_pSpriteBatch->Render(Sprites);
 
@@ -209,7 +207,7 @@ private:
     {
         m_pMesh = new BasicMesh();
 
-        m_pMesh->LoadMesh("../Content/quad.obj");
+        m_pMesh->LoadMesh("../Content/fs_quad.obj");
 
         m_pTexture = new Texture(GL_TEXTURE_2D, "../Content/BG.png");
         m_pTexture->Load();
@@ -229,7 +227,6 @@ private:
     bool m_mobileCamera = false;
     BasicMesh* m_pMesh = NULL;
     Texture* m_pTexture = NULL;
-    Vector3f m_worldPos[3];
     SpriteBatch* m_pSpriteBatch = NULL;
     long long m_prevTime = 0;
 };

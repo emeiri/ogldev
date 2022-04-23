@@ -319,16 +319,16 @@ private:
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
-
-        if (!m_lightingEffect.Init()) {
-            printf("Error initializing the lighting technique\n");
-            exit(1);
-        }
     }
 
 
     void InitShaders()
     {
+        if (!m_lightingEffect.Init()) {
+            printf("Error initializing the lighting technique\n");
+            exit(1);
+        }
+
         m_lightingEffect.Enable();
         m_lightingEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);

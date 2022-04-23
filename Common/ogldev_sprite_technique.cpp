@@ -78,12 +78,12 @@ void SpriteTechnique::SetTextureUnit(unsigned int TextureUnit)
 
 
 void SpriteTechnique::SetQuad(int Index,
-                              float x, float y, float Width, float Height,
+                              float NDCX, float NDCY, float Width, float Height,
                               float u, float v, float TexWidth, float TexHeight)
 {
     assert(Index < SPRITE_TECH_MAX_QUADS);
 
-    glUniform2f(m_quadsLoc[Index].BasePos, x, y);
+    glUniform2f(m_quadsLoc[Index].BasePos, NDCX, NDCY);
     glUniform2f(m_quadsLoc[Index].WidthHeight, Width, Height);
 
     glUniform2f(m_quadsLoc[Index].TexCoords, u, v);

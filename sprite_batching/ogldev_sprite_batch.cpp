@@ -70,39 +70,33 @@ void SpriteBatch::CalcSpriteInfo()
     float SpriteWidth  = (float)ImageWidth / m_numSpritesX;
     float SpriteHeight = (float)ImageHeight / m_numSpritesY;
 
-    printf("Sprite %f:%f\n", SpriteHeight, SpriteWidth);
-
     float NumSpritesForWidth = m_windowWidth / SpriteWidth;
     float NumSpritesForHeight = m_windowHeight / SpriteHeight;
 
-    printf("%f %f\n", NumSpritesForWidth, NumSpritesForHeight);
-
-    //    exit(0);;
-
     m_spriteAspectRatio = SpriteHeight / SpriteWidth;
 
-    m_texVSize = 1.0f / 8.0f;
-    m_texUSize = 1.0f / 6.0f;
+    m_texUSize = 1.0f / m_numSpritesX;
+    m_texVSize = 1.0f / m_numSpritesY;
 
     m_ndcPixelX = 2.0f / m_windowWidth;
     m_ndcPixelY = 2.0f / m_windowHeight;
 
-    m_tileHeight = 0.0f;
-    m_tileWidth = 0.0f;
+    m_tileHeightInPixels = 0.0f;
+    m_tileWidthInPixels  = 0.0f;
 
     float ImageWidthToWindowWidthRatio = ImageWidth / m_windowWidth;
     float ImageHeightToWindowHeightRatio = ImageHeight / m_windowHeight;
 
     if (ImageWidthToWindowWidthRatio < ImageHeightToWindowHeightRatio) {
-        m_tileHeight = m_windowHeight / m_numSpritesY;
-        m_tileWidth = m_tileHeight / m_spriteAspectRatio;
+        m_tileHeightInPixels = m_windowHeight / m_numSpritesY;
+        m_tileWidthInPixels  = m_tileHeightInPixels / m_spriteAspectRatio;
     } else {
-        m_tileWidth = m_windowWidth / m_numSpritesX;
-        m_tileHeight = m_tileWidth * m_spriteAspectRatio;
+        m_tileWidthInPixels  = m_windowWidth / m_numSpritesX;
+        m_tileHeightInPixels = m_tileWidthInPixels * m_spriteAspectRatio;
     }
 
-    m_tileWidthNDC = m_ndcPixelX * m_tileWidth;
-    m_tileHeightNDC = m_ndcPixelY * m_tileHeight;
+    m_tileWidthNDC  = m_ndcPixelX * m_tileWidthInPixels;
+    m_tileHeightNDC = m_ndcPixelY * m_tileHeightInPixels;
 }
 
 
@@ -158,8 +152,8 @@ void SpriteBatch::RenderAll()
         for (int w = 0 ; w < (uint)m_numSpritesX ; w++) {
             uint TileIndex = h * m_numSpritesX + w;
 
-            float PosX = w * m_tileWidth;
-            float PosY = h * m_tileHeight;
+            float PosX = w * m_tileWidthInPixels;
+            float PosY = h * m_tileHeightInPixels;
 
             float NDCX, NDCY;
             MousePosToNDC(PosX, PosY, NDCX, NDCY);

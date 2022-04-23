@@ -34,13 +34,12 @@ public:
     void SetTextureUnit(unsigned int TextureUnit);
 
     void SetQuad(int Index,
-                 float x, float y, float Width, float Height,
-                 float u, float v, float TexWidth, float TexHeight);
+                 float NDCX, float NDCY, float Width, float Height,    // tile base position and dimensions
+                 float u, float v, float TexWidth, float TexHeight);   // texture coordinates
 
 private:
 
     GLuint m_colorLoc = -1;
-
 
     struct {
         GLuint BasePos        = -1;

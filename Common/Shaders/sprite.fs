@@ -10,7 +10,7 @@ void main()
 {
     FragColor = texture2D(gSampler, TexCoords0.xy);
 
-if (FragColor == vec4(0.0)) {
-discard;
-}
+    if (FragColor == vec4(0.0)) {
+        discard;
+    }
 }
