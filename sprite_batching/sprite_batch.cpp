@@ -28,8 +28,8 @@
 #include "ogldev_sprite_batch.h"
 #include "ogldev_tex_technique.h"
 
-#define WINDOW_WIDTH  2000
-#define WINDOW_HEIGHT 1000
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -86,10 +86,11 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         vector<SpriteBatch::SpriteInfo> Sprites;
-        Sprites.resize(2);
+        Sprites.resize(3);
 
         static int row = 7;
         static int col = 0;
+
         Sprites[0].PixelX = 1000;
         Sprites[0].PixelY = 0;
         Sprites[0].SpriteRow = row;
@@ -101,6 +102,12 @@ public:
         Sprites[1].SpriteRow = row;
         Sprites[1].SpriteCol = 5;
         Sprites[1].SpriteWidth = 100;
+
+        Sprites[2].PixelX = 150;
+        Sprites[2].PixelY = 500;
+        Sprites[2].SpriteRow = row;
+        Sprites[2].SpriteCol = 5;
+        Sprites[2].SpriteWidth = 300;
 
         long long CurTime = GetCurrentTimeMillis();
 
