@@ -20,16 +20,14 @@
 #include <math.h>
 #include <GL/glew.h>
 
-
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
 #include "ogldev_sprite_batch.h"
-
+#include "ogldev_tex_technique.h"
 
 #define WINDOW_WIDTH  2000
 #define WINDOW_HEIGHT 1000
@@ -45,21 +43,12 @@ public:
 
     Tutorial32()
     {
-        m_directionalLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_directionalLight.AmbientIntensity = 3.0f;
-        m_directionalLight.DiffuseIntensity = 0.1f;
-        m_directionalLight.WorldDirection = Vector3f(-1.0f, 0.0, 0.0);
-
-        // The same mesh will be rendered at the following locations
-        m_worldPos[0] = Vector3f(-10.0f, 0.0f, 5.0f);
-        m_worldPos[1] = Vector3f(10.0f, 0.0f, 5.0f);
-        m_worldPos[2] = Vector3f(0.0f, 2.0f, 20.0f);
     }
 
     virtual ~Tutorial32()
     {
         SAFE_DELETE(m_pGameCamera);
-        SAFE_DELETE(pMesh);
+        SAFE_DELETE(m_pMesh);
     }
 
 
@@ -100,12 +89,6 @@ public:
         vector<SpriteBatch::SpriteInfo> Sprites;
         Sprites.resize(2);
 
-        /*              uint PixelX = 0;
-        uint PixelY = 0;
-        uint SpriteRow = 0;
-        uint SpriteCol = 0;
-        uint SpriteWidth = 0;*/
-
         static int row = 7;
         static int col = 0;
         Sprites[0].PixelX = 1000;
@@ -132,8 +115,10 @@ public:
 
 
         m_pSpriteBatch->Render(Sprites);
-        //m_pSpriteBatch->RenderAll();
 
+        m_texTech.Enable();
+        m_pTexture->Bind(COLOR_TEXTURE_UNIT);
+        m_pMesh->Render();
 
     }
 
@@ -154,21 +139,6 @@ public:
             }
             break;
 
-        case 'a':
-            m_directionalLight.AmbientIntensity += 0.05f;
-            break;
-
-        case 's':
-            m_directionalLight.AmbientIntensity -= 0.05f;
-            break;
-
-        case 'z':
-            m_directionalLight.DiffuseIntensity += 0.05f;
-            break;
-
-        case 'x':
-            m_directionalLight.DiffuseIntensity -= 0.05f;
-            break;
         default:
             m_pGameCamera->OnKeyboard(key);
         }
@@ -225,27 +195,24 @@ private:
 
     void InitShaders()
     {
-        if (!m_lightingEffect.Init()) {
-            printf("Error initializing the lighting technique\n");
+        if (!m_texTech.Init()) {
+            printf("Error initializing the texture technique\n");
             exit(1);
         }
 
-        m_lightingEffect.Enable();
-        m_lightingEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-        m_lightingEffect.SetMaterial(pMesh->GetMaterial());
+        m_texTech.Enable();
+        m_texTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     }
 
 
     void InitMesh()
     {
-        pMesh = new BasicMesh();
+        m_pMesh = new BasicMesh();
 
-        pMesh->LoadMesh("../Content/box.obj");
+        m_pMesh->LoadMesh("../Content/quad.obj");
 
-        WorldTrans& worldTransform = pMesh->GetWorldTransform();
-        //        worldTransform.SetScale(0.1f);
-        //        worldTransform.SetRotation(0.0f, 90.0f, 0.0f);
+        m_pTexture = new Texture(GL_TEXTURE_2D, "../Content/BG.png");
+        m_pTexture->Load();
     }
 
 
@@ -257,11 +224,11 @@ private:
     }
 
     GLFWwindow* window = NULL;
-    LightingTechnique m_lightingEffect;
+    TexTechnique m_texTech;
     BasicCamera* m_pGameCamera = NULL;
     bool m_mobileCamera = false;
-    DirectionalLight m_directionalLight;
-    BasicMesh* pMesh = NULL;
+    BasicMesh* m_pMesh = NULL;
+    Texture* m_pTexture = NULL;
     Vector3f m_worldPos[3];
     SpriteBatch* m_pSpriteBatch = NULL;
     long long m_prevTime = 0;

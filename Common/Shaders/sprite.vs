@@ -19,14 +19,18 @@ out vec2 TexCoords0;
 
 void main()
 {
+    // Calculate position
     vec3 BasePos = vec3(gQuads[PrimID].BasePos, 0.0);
+
     vec3 WidthHeight =  vec3(Position, 0.5f) * vec3(gQuads[PrimID].WidthHeight, 1.0);
 
     vec3 NewPosition = BasePos + WidthHeight;
 
     gl_Position = vec4(NewPosition, 1.0);
 
+    // Calculate tex coords
     vec2 BaseTexCoords = gQuads[PrimID].TexCoords;
+
     vec2 TexWidthHeight = Position * gQuads[PrimID].TexWidthHeight;
 
     TexCoords0 = BaseTexCoords + TexWidthHeight;
