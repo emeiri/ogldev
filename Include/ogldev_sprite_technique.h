@@ -37,9 +37,9 @@ public:
                  float NDCX, float NDCY, float Width, float Height,    // tile base position and dimensions
                  float u, float v, float TexWidth, float TexHeight);   // texture coordinates
 
-private:
+    void UpdateProgram();
 
-    GLuint m_colorLoc = -1;
+private:
 
     struct {
         GLuint BasePos        = -1;
@@ -48,7 +48,24 @@ private:
         GLuint TexWidthHeight = -1;
     } m_quadsLoc[SPRITE_TECH_MAX_QUADS];
 
+    struct {
+        GLuint BasePos        = -1;
+        GLuint WidthHeight    = -1;
+        GLuint TexCoords      = -1;
+        GLuint TexWidthHeight = -1;
+    } m_quads1Loc;
+
+    struct {
+        GLint BasePos        = 0;
+        GLint WidthHeight    = 0;
+        GLint TexCoords      = 0;
+        GLint TexWidthHeight = 0;
+    } m_quadInfoOffsets;
+
     GLuint m_samplerLoc = -1;
+    GLubyte* m_quadInfoBuffer = NULL;
+    GLuint m_uniformBuffer = 0;
+    GLint m_blockSize = 0;
 };
 
 #endif  /* SPRITE_TECHNIQUE_H */

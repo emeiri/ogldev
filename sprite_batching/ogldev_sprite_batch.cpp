@@ -121,23 +121,18 @@ void SpriteBatch::Render(const vector<SpriteInfo>& sprites)
 
         MousePosToNDC((float)Info.PixelX, (float)Info.PixelY, NDCX, NDCY);
 
-        //        printf("NDC %f %f\n", NDCX, NDCY);
-
         float TileWidthNDC  = m_ndcPixelX * Info.SpriteWidth;
         float TileHeightNDC = TileWidthNDC / m_spriteAspectRatio;
-
-        printf("Tile NDC %f %f\n", TileWidthNDC, TileHeightNDC);
 
         float UBase = (float)Info.SpriteCol * m_texUSize;
         float VBase = (float)Info.SpriteRow * m_texVSize;
 
-        //        printf("U %f V %f\n", UBase, VBase);
-
         m_spriteTech.SetQuad(SpriteIndex,
                              NDCX, NDCY, TileWidthNDC, TileHeightNDC,
                              UBase, VBase, m_texUSize, m_texVSize);
-
     }
+
+    m_spriteTech.UpdateProgram();
 
     m_pSpriteSheet->Bind(COLOR_TEXTURE_UNIT);
     m_pQuads->Render(sprites.size());

@@ -49,7 +49,7 @@ bool SpriteTechnique::Init()
 
     char name[200] = { 0 };
 
-    for (int i = 0 ; i < SPRITE_TECH_MAX_QUADS ; i++) {
+    /*    for (int i = 0 ; i < SPRITE_TECH_MAX_QUADS ; i++) {
         SNPRINTF(name, sizeof(name), "gQuads[%d].BasePos", i);
         m_quadsLoc[i].BasePos = GetUniformLocation(name);
         SNPRINTF(name, sizeof(name), "gQuads[%d].WidthHeight", i);
@@ -65,7 +65,37 @@ bool SpriteTechnique::Init()
             (m_quadsLoc[i].TexWidthHeight == INVALID_UNIFORM_LOCATION)) {
             return false;
         }
+        }*/
+
+    Enable();
+
+    GLuint BlockIndex = glGetUniformBlockIndex(m_shaderProg, "QuadInfo");
+    printf("BlockIndex %d\n", BlockIndex);
+
+    glGetActiveUniformBlockiv(m_shaderProg, BlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &m_blockSize);
+
+    printf("Size %d\n", m_blockSize);
+
+    m_quadInfoBuffer = (GLubyte*)malloc(m_blockSize);
+
+    const GLchar* Names[] = { "BasePos", "WidthHeight", "TexCoords", "TexWidthHeight" };
+    GLuint Indices[4] = { 0 };
+    glGetUniformIndices(m_shaderProg, 4, Names, Indices);
+
+    GLint Offsets[4];
+    glGetActiveUniformsiv(m_shaderProg, 4, Indices, GL_UNIFORM_OFFSET, Offsets);
+
+    m_quadInfoOffsets.BasePos        = Offsets[0];
+    m_quadInfoOffsets.WidthHeight    = Offsets[1];
+    m_quadInfoOffsets.TexCoords      = Offsets[2];
+    m_quadInfoOffsets.TexWidthHeight = Offsets[3];
+
+    for (uint i = 0 ; i < 4 ; i++) {
+        printf("%s: %d %d\n", Names[i], Indices[i], Offsets[i]);
     }
+
+    glGenBuffers(1, &m_uniformBuffer);
+    printf("Uniform buffer %d\n", m_uniformBuffer);
 
     return true;
 }
@@ -83,9 +113,31 @@ void SpriteTechnique::SetQuad(int Index,
 {
     assert(Index < SPRITE_TECH_MAX_QUADS);
 
-    glUniform2f(m_quadsLoc[Index].BasePos, NDCX, NDCY);
+    Vector2f* pBasePos        = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.BasePos);
+    Vector2f* pWidthHeight    = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.WidthHeight);
+    Vector2f* pTexCoords      = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.TexCoords);
+    Vector2f* pTexWidthHeight = (Vector2f*)(m_quadInfoBuffer + m_quadInfoOffsets.TexWidthHeight);
+
+    pBasePos[Index].x = NDCX;
+    pBasePos[Index].y = NDCY;
+    pWidthHeight[Index].x = Width;
+    pWidthHeight[Index].y = Height;
+    pTexCoords[Index].x = u;
+    pTexCoords[Index].y = v;
+    pTexWidthHeight[Index].x = TexWidth;
+    pTexWidthHeight[Index].y = TexHeight;
+
+    /*    glUniform2f(m_quadsLoc[Index].BasePos, NDCX, NDCY);
     glUniform2f(m_quadsLoc[Index].WidthHeight, Width, Height);
 
     glUniform2f(m_quadsLoc[Index].TexCoords, u, v);
-    glUniform2f(m_quadsLoc[Index].TexWidthHeight, TexWidth, TexHeight);
+    glUniform2f(m_quadsLoc[Index].TexWidthHeight, TexWidth, TexHeight);*/
+}
+
+
+void SpriteTechnique::UpdateProgram()
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBuffer);
+    glBufferData(GL_UNIFORM_BUFFER, m_blockSize, m_quadInfoBuffer, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_uniformBuffer);
 }
