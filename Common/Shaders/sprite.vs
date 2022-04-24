@@ -5,13 +5,6 @@ layout (location = 1) in uint PrimID;
 
 #define MAX_QUADS 100
 
-struct Quad {
-       vec2 BasePos;
-       vec2 WidthHeight;
-       vec2 TexCoords;
-       vec2 TexWidthHeight;
-};
-
 layout (binding = 0) uniform QuadInfo {
        vec2 BasePos[MAX_QUADS];
        vec2 WidthHeight[MAX_QUADS];
@@ -19,12 +12,7 @@ layout (binding = 0) uniform QuadInfo {
        vec2 TexWidthHeight[MAX_QUADS];
 };
 
-uniform Quad gQuads[MAX_QUADS];
-
-
-
 out vec2 TexCoords0;
-
 
 void main()
 {

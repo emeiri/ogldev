@@ -47,28 +47,6 @@ bool SpriteTechnique::Init()
         return false;
     }
 
-    char name[200] = { 0 };
-
-    /*    for (int i = 0 ; i < SPRITE_TECH_MAX_QUADS ; i++) {
-        SNPRINTF(name, sizeof(name), "gQuads[%d].BasePos", i);
-        m_quadsLoc[i].BasePos = GetUniformLocation(name);
-        SNPRINTF(name, sizeof(name), "gQuads[%d].WidthHeight", i);
-        m_quadsLoc[i].WidthHeight = GetUniformLocation(name);
-        SNPRINTF(name, sizeof(name), "gQuads[%d].TexCoords", i);
-        m_quadsLoc[i].TexCoords = GetUniformLocation(name);
-        SNPRINTF(name, sizeof(name), "gQuads[%d].TexWidthHeight", i);
-        m_quadsLoc[i].TexWidthHeight = GetUniformLocation(name);
-
-        if ((m_quadsLoc[i].BasePos == INVALID_UNIFORM_LOCATION) ||
-            (m_quadsLoc[i].WidthHeight == INVALID_UNIFORM_LOCATION) ||
-            (m_quadsLoc[i].TexCoords == INVALID_UNIFORM_LOCATION) ||
-            (m_quadsLoc[i].TexWidthHeight == INVALID_UNIFORM_LOCATION)) {
-            return false;
-        }
-        }*/
-
-    Enable();
-
     GLuint BlockIndex = glGetUniformBlockIndex(m_shaderProg, "QuadInfo");
     printf("BlockIndex %d\n", BlockIndex);
 
@@ -126,12 +104,6 @@ void SpriteTechnique::SetQuad(int Index,
     pTexCoords[Index].y = v;
     pTexWidthHeight[Index].x = TexWidth;
     pTexWidthHeight[Index].y = TexHeight;
-
-    /*    glUniform2f(m_quadsLoc[Index].BasePos, NDCX, NDCY);
-    glUniform2f(m_quadsLoc[Index].WidthHeight, Width, Height);
-
-    glUniform2f(m_quadsLoc[Index].TexCoords, u, v);
-    glUniform2f(m_quadsLoc[Index].TexWidthHeight, TexWidth, TexHeight);*/
 }
 
 
