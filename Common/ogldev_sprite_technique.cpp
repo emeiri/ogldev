@@ -18,6 +18,8 @@
 #include "ogldev_util.h"
 #include "ogldev_sprite_technique.h"
 
+#define SPRITE_BUFFER_BINDING 0
+
 
 SpriteTechnique::SpriteTechnique()
 {
@@ -47,7 +49,17 @@ bool SpriteTechnique::Init()
         return false;
     }
 
+    ConfigUniformBlock();
+
+    return true;
+}
+
+
+void SpriteTechnique::ConfigUniformBlock()
+{
     GLuint BlockIndex = glGetUniformBlockIndex(m_shaderProg, "QuadInfo");
+
+    glUniformBlockBinding(m_shaderProg, SPRITE_BUFFER_BINDING, BlockIndex);
     printf("BlockIndex %d\n", BlockIndex);
 
     glGetActiveUniformBlockiv(m_shaderProg, BlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &m_blockSize);
@@ -74,8 +86,6 @@ bool SpriteTechnique::Init()
 
     glGenBuffers(1, &m_uniformBuffer);
     printf("Uniform buffer %d\n", m_uniformBuffer);
-
-    return true;
 }
 
 
@@ -111,5 +121,5 @@ void SpriteTechnique::UpdateProgram()
 {
     glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBuffer);
     glBufferData(GL_UNIFORM_BUFFER, m_blockSize, m_quadInfoBuffer, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_uniformBuffer);
+    glBindBufferBase(GL_UNIFORM_BUFFER, SPRITE_BUFFER_BINDING, m_uniformBuffer);
 }

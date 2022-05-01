@@ -41,6 +41,8 @@ public:
 
 private:
 
+    void ConfigUniformBlock();
+
     struct {
         GLuint BasePos        = -1;
         GLuint WidthHeight    = -1;
