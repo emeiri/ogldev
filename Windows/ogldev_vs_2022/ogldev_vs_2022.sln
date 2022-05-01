@@ -111,6 +111,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial31", "Tutorial31\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial32", "Tutorial32\Tutorial32.vcxproj", "{905B0D85-B00D-42B5-B40E-BEC17188E053}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial33", "Tutorial33\Tutorial33.vcxproj", "{D0095B63-1959-49A8-875C-D3773C463621}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB346B-6660-46F9-91AB-2CC238300A31}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Common\Shaders\basic_lighting.fs = ..\..\Common\Shaders\basic_lighting.fs
+		..\..\Common\Shaders\basic_lighting.vs = ..\..\Common\Shaders\basic_lighting.vs
+		..\..\Common\Shaders\flat_passthru.fs = ..\..\Common\Shaders\flat_passthru.fs
+		..\..\Common\Shaders\flat_passthru.vs = ..\..\Common\Shaders\flat_passthru.vs
+		..\..\Common\Shaders\lighting_new.fs = ..\..\Common\Shaders\lighting_new.fs
+		..\..\Common\Shaders\lighting_new.vs = ..\..\Common\Shaders\lighting_new.vs
+		..\..\Common\Shaders\sprite.fs = ..\..\Common\Shaders\sprite.fs
+		..\..\Common\Shaders\sprite.vs = ..\..\Common\Shaders\sprite.vs
+		..\..\Common\Shaders\tex.fs = ..\..\Common\Shaders\tex.fs
+		..\..\Common\Shaders\tex.vs = ..\..\Common\Shaders\tex.vs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -391,6 +407,14 @@ Global
 		{905B0D85-B00D-42B5-B40E-BEC17188E053}.Release|x64.Build.0 = Release|x64
 		{905B0D85-B00D-42B5-B40E-BEC17188E053}.Release|x86.ActiveCfg = Release|Win32
 		{905B0D85-B00D-42B5-B40E-BEC17188E053}.Release|x86.Build.0 = Release|Win32
+		{D0095B63-1959-49A8-875C-D3773C463621}.Debug|x64.ActiveCfg = Debug|x64
+		{D0095B63-1959-49A8-875C-D3773C463621}.Debug|x64.Build.0 = Debug|x64
+		{D0095B63-1959-49A8-875C-D3773C463621}.Debug|x86.ActiveCfg = Debug|Win32
+		{D0095B63-1959-49A8-875C-D3773C463621}.Debug|x86.Build.0 = Debug|Win32
+		{D0095B63-1959-49A8-875C-D3773C463621}.Release|x64.ActiveCfg = Release|x64
+		{D0095B63-1959-49A8-875C-D3773C463621}.Release|x64.Build.0 = Release|x64
+		{D0095B63-1959-49A8-875C-D3773C463621}.Release|x86.ActiveCfg = Release|Win32
+		{D0095B63-1959-49A8-875C-D3773C463621}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

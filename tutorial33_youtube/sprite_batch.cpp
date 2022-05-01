@@ -132,7 +132,7 @@ void SpriteBatch::Render(const vector<SpriteInfo>& sprites)
     m_spriteTech.UpdateProgram();
 
     m_pSpriteSheet->Bind(COLOR_TEXTURE_UNIT);
-    m_pQuads->Render(sprites.size());
+    m_pQuads->Render((int)sprites.size());
 }
 
 
@@ -140,9 +140,9 @@ void SpriteBatch::RenderAll()
 {
     m_spriteTech.Enable();
 
-    for (int h = 0 ; h < (uint)m_numSpritesY ; h++) {
-        for (int w = 0 ; w < (uint)m_numSpritesX ; w++) {
-            uint TileIndex = h * m_numSpritesX + w;
+    for (uint h = 0 ; h < (uint)m_numSpritesY ; h++) {
+        for (uint w = 0 ; w < (uint)m_numSpritesX ; w++) {
+            uint TileIndex = h * (uint)m_numSpritesX + w;
 
             float PosX = w * m_tileWidthInPixels;
             float PosY = h * m_tileHeightInPixels;
