@@ -59,7 +59,7 @@ uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
-uniform vec4 gColorMod;
+uniform vec4 gColorMod = vec4(1);
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
