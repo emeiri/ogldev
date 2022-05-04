@@ -32,6 +32,11 @@ public:
     Vector3f Color = Vector3f(1.0f, 1.0f, 1.0f);
     float AmbientIntensity = 0.0f;
     float DiffuseIntensity = 0.0f;
+
+    bool IsZero()
+    {
+        return ((AmbientIntensity == 0) && (DiffuseIntensity == 0.0f));
+    }
 };
 
 
@@ -82,8 +87,6 @@ public:
 
 private:
     Vector3f LocalDirection = Vector3f(0.0f, 0.0f, 0.0f);
-
-
 };
 
 
