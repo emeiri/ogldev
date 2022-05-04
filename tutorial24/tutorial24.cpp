@@ -111,7 +111,7 @@ public:
 
         m_pQuad = new Mesh();
 
-                if (!m_pQuad->LoadMesh("../Content/quad.obj")) {
+        if (!m_pQuad->LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
