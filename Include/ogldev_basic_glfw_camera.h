@@ -37,9 +37,9 @@ public:
 
     void OnRender();
 
-    Matrix4f GetMatrix();
+    Matrix4f GetMatrix() const;
 
-    const Vector3f& GetPos() { return m_pos; }
+    const Vector3f& GetPos() const { return m_pos; }
 
     const Vector3f& GetTarget() const { return m_target; }
 

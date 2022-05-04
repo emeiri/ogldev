@@ -254,7 +254,7 @@ void BasicCamera::Update()
 
 
 
-Matrix4f BasicCamera::GetMatrix()
+Matrix4f BasicCamera::GetMatrix() const
 {
     Matrix4f CameraTransformation;
     CameraTransformation.InitCameraTransform(m_pos, m_target, m_up);
