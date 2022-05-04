@@ -144,5 +144,5 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
+    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight + vec4(0.5);
 }

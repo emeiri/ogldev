@@ -221,7 +221,7 @@ string GetDirFromFilename(const string& Filename)
 
 #ifdef _WIN64
     SlashIndex = Filename.find_last_of("\\");
- 
+
     if (SlashIndex == -1) {
         SlashIndex = Filename.find_last_of("/");
     }
@@ -393,7 +393,9 @@ void SkinnedMesh::PopulateBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[BONE_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_Bones[0]) * m_Bones.size(), &m_Bones[0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(BONE_ID_LOCATION);
+
     glVertexAttribIPointer(BONE_ID_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_INT, sizeof(VertexBoneData), (const GLvoid*)0);
+    GLExitIfError;
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
     glVertexAttribPointer(BONE_WEIGHT_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData),
                           (const GLvoid*)(MAX_NUM_BONES_PER_VERTEX * sizeof(int32_t)));
@@ -470,9 +472,18 @@ void SkinnedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeT
     uint NextPositionIndex = PositionIndex + 1;
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
     float t1 = (float)pNodeAnim->mPositionKeys[PositionIndex].mTime;
+    if (AnimationTimeTicks < t1) {
+        AnimationTimeTicks = t1;
+    }
+
     float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
     float DeltaTime = t2 - t1;
     float Factor = (AnimationTimeTicks - t1) / DeltaTime;
+    if (Factor > 1.0f) {
+        double foo;
+        Factor = modf(Factor, &foo);
+    }
+
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
     const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
@@ -508,9 +519,18 @@ void SkinnedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTim
     uint NextRotationIndex = RotationIndex + 1;
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
     float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime;
+    if (AnimationTimeTicks < t1) {
+        AnimationTimeTicks = t1;
+    }
+
     float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
     float DeltaTime = t2 - t1;
     float Factor = (AnimationTimeTicks - t1) / DeltaTime;
+    if (Factor > 1.0f) {
+        double foo;
+        Factor = modf(Factor, &foo);
+    }
+
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
     const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
@@ -547,9 +567,18 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTi
     uint NextScalingIndex = ScalingIndex + 1;
     assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
     float t1 = (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime;
+    if (AnimationTimeTicks < t1) {
+        AnimationTimeTicks = t1;
+    }
     float t2 = (float)pNodeAnim->mScalingKeys[NextScalingIndex].mTime;
     float DeltaTime = t2 - t1;
     float Factor = (AnimationTimeTicks - (float)t1) / DeltaTime;
+    //        printf("Animation time %f\n", AnimationTimeTicks);
+    //        printf("Factor %f t2 %f t1 %f\n", Factor, t2, t1);
+    if (Factor > 1.0f) {
+        double foo;
+        Factor = modf(Factor, &foo);
+    }
     assert(Factor >= 0.0f && Factor <= 1.0f);
     const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
     const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;

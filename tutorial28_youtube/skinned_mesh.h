@@ -84,26 +84,32 @@ private:
 
     struct VertexBoneData
     {
-        uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
+        int BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { -1, -1, -1, -1 };
         float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
 
         VertexBoneData()
         {
         }
 
-        void AddBoneData(uint BoneID, float Weight)
+        void AddBoneData(int BoneID, float Weight)
         {
             for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(BoneIDs) ; i++) {
-                if (Weights[i] == 0.0) {
+                if (BoneIDs[i] == -1) {
                     BoneIDs[i] = BoneID;
                     Weights[i] = Weight;
-                    //printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
+                    //                    printf("%p Adding bone %d weight %f at index %i\n", this, BoneID, Weight, i);
                     return;
+                }
+
+                if (BoneIDs[i] == BoneID) {
+                    //                    printf("Getting bone %d again\n", BoneID);
+                    //                    printf("%f %f\n", Weight, Weights[i]);
                 }
             }
 
-            // should never get here - more bones than we have space for
-            assert(0);
+            printf("%p More than 4 bones for vertex, bone %d: %d %d %d %d\n", this, BoneID, BoneIDs[0], BoneIDs[1], BoneIDs[2], BoneIDs[3]);
+            //            assert(0);
+            //      exit(0);
         }
     };
 
