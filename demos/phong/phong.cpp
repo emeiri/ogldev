@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <string.h>
-
 #include <math.h>
 #include <GL/glew.h>
 
@@ -32,6 +31,7 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
+#include "ogldev_phong_renderer.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -47,11 +47,13 @@ public:
 
     PhongDemo()
     {
+        pointLights[0].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
         pointLights[0].DiffuseIntensity = 2.0f;
         pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
         pointLights[0].Attenuation.Linear = 0.1f;
         pointLights[0].Attenuation.Exp = 0.0f;
 
+        pointLights[1].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
         pointLights[1].DiffuseIntensity = 0.25f;
         pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
         pointLights[1].Attenuation.Linear = 0.0f;
@@ -66,6 +68,8 @@ public:
         spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
         spotLights[1].Attenuation.Linear = 0.01f;
         spotLights[1].Cutoff = 30.0f;
+        spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
+        spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
     }
 
     virtual ~PhongDemo()
@@ -85,7 +89,7 @@ public:
 
         InitMesh();
 
-        InitShaders();
+        InitRenderer();
     }
 
 
@@ -112,45 +116,14 @@ public:
 #endif
         counter += 0.01f;
 
-        pointLights[0].WorldPosition.x = 10.0f;
-        pointLights[0].WorldPosition.y = 0;
-        pointLights[0].WorldPosition.z = 0.0f;
-
-        pointLights[1].WorldPosition.x = 10.0f;
         pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
-        pointLights[1].WorldPosition.z = 0.0f;
 
         spotLights[0].WorldPosition = m_pGameCamera->GetPos();
         spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
 
-        spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
-        spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
-
-        WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
-        meshWorldTransform.SetPosition(0.0f, 0.0f, 10.0f);
-
-        Matrix4f World = meshWorldTransform.GetMatrix();
-        Matrix4f View = m_pGameCamera->GetMatrix();
-        Matrix4f Projection = m_pGameCamera->GetProjectionMat();
-
-        Matrix4f WVP = Projection * View * World;
-
-        m_lightingEffect.SetWVP(WVP);
-
-        pointLights[0].CalcLocalPosition(meshWorldTransform);
-        pointLights[1].CalcLocalPosition(meshWorldTransform);
-        m_lightingEffect.SetPointLights(2, pointLights);
-
-        spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform);
-        spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
-        m_lightingEffect.SetSpotLights(2, spotLights);
-
-        m_lightingEffect.SetMaterial(pMesh1->GetMaterial());
-
-        Vector3f CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(m_pGameCamera->GetPos());
-        m_lightingEffect.SetCameraLocalPos(CameraLocalPos3f);
-
-        pMesh1->Render();
+        m_phongRenderer.SetPointLights(2, pointLights);
+        m_phongRenderer.SetSpotLights(2, spotLights);
+        m_phongRenderer.Render(pMesh1);
     }
 
 
@@ -257,17 +230,11 @@ private:
     }
 
 
-    void InitShaders()
+    void InitRenderer()
     {
-        if (!m_lightingEffect.Init()) {
-            printf("Error initializing the lighting technique\n");
-            exit(1);
-        }
-
-        m_lightingEffect.Enable();
-        m_lightingEffect.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingEffect.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-        m_lightingEffect.SetMaterial(pMesh1->GetMaterial());
+        m_phongRenderer.InitPhongRenderer();
+        m_phongRenderer.SetCamera(m_pGameCamera);
+        m_phongRenderer.Activate();
     }
 
 
@@ -276,11 +243,14 @@ private:
         pMesh1 = new BasicMesh();
 
         pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+
+        WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
+        meshWorldTransform.SetPosition(0.0f, 0.0f, 10.0f);
     }
 
     GLFWwindow* window = NULL;
-    LightingTechnique m_lightingEffect;
     BasicCamera* m_pGameCamera = NULL;
+    PhongRenderer m_phongRenderer;
     BasicMesh* pMesh1 = NULL;
     PersProjInfo persProjInfo;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
