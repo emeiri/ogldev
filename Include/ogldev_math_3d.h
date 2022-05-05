@@ -172,6 +172,11 @@ struct Vector3f
         return len;
     }
 
+    bool IsZero() const
+    {
+        return ((x + y + z) == 0.0f);
+    }
+
     Vector3f& Normalize();
 
     void Rotate(float Angle, const Vector3f& Axis);

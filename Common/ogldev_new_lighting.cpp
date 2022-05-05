@@ -192,13 +192,19 @@ void LightingTechnique::SetSpecularExponentTextureUnit(unsigned int TextureUnit)
 }
 
 
-void LightingTechnique::SetDirectionalLight(const DirectionalLight& Light)
+void LightingTechnique::SetDirectionalLight(const DirectionalLight& DirLight)
 {
-    glUniform3f(dirLightLoc.Color, Light.Color.x, Light.Color.y, Light.Color.z);
-    glUniform1f(dirLightLoc.AmbientIntensity, Light.AmbientIntensity);
-    Vector3f LocalDirection = Light.GetLocalDirection();
+    glUniform3f(dirLightLoc.Color, DirLight.Color.x, DirLight.Color.y, DirLight.Color.z);
+    glUniform1f(dirLightLoc.AmbientIntensity, DirLight.AmbientIntensity);
+    glUniform1f(dirLightLoc.DiffuseIntensity, DirLight.DiffuseIntensity);
+    UpdateDirLightDirection(DirLight);
+}
+
+
+void LightingTechnique::UpdateDirLightDirection(const DirectionalLight& DirLight)
+{
+    Vector3f LocalDirection = DirLight.GetLocalDirection();
     glUniform3f(dirLightLoc.Direction, LocalDirection.x, LocalDirection.y, LocalDirection.z);
-    glUniform1f(dirLightLoc.DiffuseIntensity, Light.DiffuseIntensity);
 }
 
 
@@ -215,6 +221,7 @@ void LightingTechnique::SetMaterial(const Material& material)
     glUniform3f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b);
 }
 
+
 void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights)
 {
     glUniform1i(NumPointLightsLocation, NumLights);
@@ -223,12 +230,18 @@ void LightingTechnique::SetPointLights(unsigned int NumLights, const PointLight*
         glUniform3f(PointLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(PointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(PointLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
-        const Vector3f& LocalPos = pLights[i].GetLocalPosition();
-        //LocalPos.Print();printf("\n");
-        glUniform3f(PointLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
         glUniform1f(PointLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
         glUniform1f(PointLightsLocation[i].Atten.Linear, pLights[i].Attenuation.Linear);
         glUniform1f(PointLightsLocation[i].Atten.Exp, pLights[i].Attenuation.Exp);
+    }
+}
+
+
+void LightingTechnique::UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights)
+{
+    for (unsigned int i = 0 ; i < NumLights ; i++) {
+        const Vector3f& LocalPos = pLights[i].GetLocalPosition();
+        glUniform3f(PointLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
     }
 }
 
@@ -240,15 +253,22 @@ void LightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* p
         glUniform3f(SpotLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
         glUniform1f(SpotLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
         glUniform1f(SpotLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
+        glUniform1f(SpotLightsLocation[i].Cutoff, cosf(ToRadian(pLights[i].Cutoff)));
+        glUniform1f(SpotLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
+        glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
+        glUniform1f(SpotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
+    }
+}
+
+
+void LightingTechnique::UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights)
+{
+    for (unsigned int i = 0 ; i < NumLights ; i++) {
         const Vector3f& LocalPos = pLights[i].GetLocalPosition();
         glUniform3f(SpotLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
         Vector3f Direction = pLights[i].GetLocalDirection();
         Direction.Normalize();
         glUniform3f(SpotLightsLocation[i].Direction, Direction.x, Direction.y, Direction.z);
-        glUniform1f(SpotLightsLocation[i].Cutoff, cosf(ToRadian(pLights[i].Cutoff)));
-        glUniform1f(SpotLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
-        glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
-        glUniform1f(SpotLightsLocation[i].Atten.Exp,      pLights[i].Attenuation.Exp);
     }
 }
 

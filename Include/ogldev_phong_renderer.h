@@ -41,9 +41,15 @@ class PhongRenderer {
 
     void SetDirLight(const DirectionalLight& DirLight);
 
+    void UpdateDirLightDir(const Vector3f& WorldDir);
+
     void SetPointLights(uint NumLights, const PointLight* pPointLights);
 
+    void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
+
     void SetSpotLights(uint NumLights, const SpotLight* pSpotLights);
+
+    void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
 
     void Render(BasicMesh* pMesh);
 
@@ -53,13 +59,14 @@ class PhongRenderer {
 
     bool m_isActive = false;
     const BasicCamera* m_pCamera = NULL;
+    LightingTechnique m_lightingTech;
+
+    // Lighting info
     DirectionalLight m_dirLight;
     uint m_numPointLights = 0;
     PointLight m_pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     uint m_numSpotLights = 0;
     SpotLight m_spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
-
-    LightingTechnique m_lightingTech;
 };
 
 #endif

@@ -104,9 +104,14 @@ public:
     void SetWVP(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
-    void SetDirectionalLight(const DirectionalLight& Light);
+    void SetDirectionalLight(const DirectionalLight& DirLight);
+    void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights);
+    void UpdatePointLight(unsigned int Index, const PointLight& Light);
+    void UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights);
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
+    void UpdateSpotLight(unsigned int Index, const SpotLight& Light);
+    void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
@@ -148,7 +153,7 @@ private:
         } Atten;
     } PointLightsLocation[MAX_POINT_LIGHTS];
 
-struct {
+    struct {
         GLuint Color;
         GLuint AmbientIntensity;
         GLuint DiffuseIntensity;
@@ -161,6 +166,10 @@ struct {
             GLuint Exp;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
+
+    /*    DirectionalLight m_dirLight;
+    PointLight m_pointLights[MAX_POINT_LIGHTS];
+    SpotLight m_spotLights[MAX_POINT_LIGHTS];*/
 };
 
 

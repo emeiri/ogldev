@@ -48,7 +48,7 @@ public:
     PhongDemo()
     {
         pointLights[0].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
-        pointLights[0].DiffuseIntensity = 2.0f;
+        pointLights[0].DiffuseIntensity = 1.0f;
         pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
         pointLights[0].Attenuation.Linear = 0.1f;
         pointLights[0].Attenuation.Exp = 0.0f;
@@ -59,10 +59,11 @@ public:
         pointLights[1].Attenuation.Linear = 0.0f;
         pointLights[1].Attenuation.Exp = 0.2f;
 
-        spotLights[0].DiffuseIntensity = 0.0f;
-        spotLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        spotLights[0].Attenuation.Linear = 0.01f;
-        spotLights[0].Cutoff = 20.0f;
+        spotLights[0].DiffuseIntensity = 1.0f;
+        spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
+        spotLights[0].Attenuation.Linear = 0.1f;
+        spotLights[0].Cutoff = 5.0f;
+        spotLights[0].WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
 
         spotLights[1].DiffuseIntensity = 0.0f;
         spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -117,12 +118,12 @@ public:
         counter += 0.01f;
 
         pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
+        m_phongRenderer.UpdatePointLightPos(1, pointLights[1].WorldPosition);
 
         spotLights[0].WorldPosition = m_pGameCamera->GetPos();
         spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
+        m_phongRenderer.UpdateSpotLightPosAndDir(0, spotLights[0].WorldPosition, spotLights[0].WorldDirection);
 
-        m_phongRenderer.SetPointLights(2, pointLights);
-        m_phongRenderer.SetSpotLights(2, spotLights);
         m_phongRenderer.Render(pMesh1);
     }
 
@@ -233,8 +234,10 @@ private:
     void InitRenderer()
     {
         m_phongRenderer.InitPhongRenderer();
-        m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.Activate();
+        m_phongRenderer.SetCamera(m_pGameCamera);
+        m_phongRenderer.SetPointLights(2, pointLights);
+        m_phongRenderer.SetSpotLights(2, spotLights);
     }
 
 

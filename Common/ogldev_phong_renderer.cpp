@@ -92,6 +92,12 @@ void PhongRenderer::SetDirLight(const DirectionalLight& DirLight)
 }
 
 
+void PhongRenderer::UpdateDirLightDir(const Vector3f& WorldDir)
+{
+    m_dirLight.WorldDirection = WorldDir;
+}
+
+
 void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLights)
 {
     if (!m_isActive) {
@@ -114,6 +120,19 @@ void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLight
     }
 
     m_numPointLights = NumLights;
+
+    m_lightingTech.SetPointLights(NumLights, pPointLights);
+}
+
+
+void PhongRenderer::UpdatePointLightPos(uint Index, const Vector3f& WorldPos)
+{
+    if (Index > m_numPointLights) {
+        printf("Trying to update point light %d while num lights is %d\n", Index, m_numPointLights);
+        exit(0);
+    }
+
+    m_pointLights[Index].WorldPosition = WorldPos;
 }
 
 
@@ -139,6 +158,21 @@ void PhongRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
     }
 
     m_numSpotLights = NumLights;
+
+    m_lightingTech.SetSpotLights(NumLights, pSpotLights);
+}
+
+
+void PhongRenderer::UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir)
+{
+    if (Index > m_numSpotLights) {
+        printf("Trying to update spot light %d while num lights is %d\n", Index, m_numSpotLights);
+        exit(0);
+    }
+
+    m_spotLights[Index].WorldPosition = WorldPos;
+    m_spotLights[Index].WorldDirection = WorldDir;
+
 }
 
 
@@ -162,17 +196,22 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
+    if (!m_dirLight.WorldDirection.IsZero()) {
+        m_dirLight.CalcLocalDirection(meshWorldTransform);
+        m_lightingTech.UpdateDirLightDirection(m_dirLight);
+    }
+
     for (uint i = 0 ; i < m_numPointLights ; i++) {
         m_pointLights[i].CalcLocalPosition(meshWorldTransform);
     }
 
-    m_lightingTech.SetPointLights(m_numPointLights, m_pointLights);
+    m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
 
     for (uint i = 0 ; i < m_numSpotLights ; i++) {
         m_spotLights[i].CalcLocalDirectionAndPosition(meshWorldTransform);
     }
 
-    m_lightingTech.SetSpotLights(m_numSpotLights, m_spotLights);
+    m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
 
     m_lightingTech.SetMaterial(pMesh->GetMaterial());
 
