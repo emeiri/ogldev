@@ -32,15 +32,10 @@
 #include "ogldev_texture.h"
 #include "ogldev_world_transform.h"
 #include "ogldev_material.h"
-
-class IRenderCallbacks
-{
-public:
-    virtual void DrawStartCB(uint DrawIndex) = 0;
-};
+#include "ogldev_mesh_common.h"
 
 
-class BasicMesh
+class BasicMesh : public MeshCommon
 {
 public:
     BasicMesh() {};
@@ -54,8 +49,6 @@ public:
     void Render(uint DrawIndex, uint PrimID);
 
     void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
-
-    WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
     const Material& GetMaterial();
 
@@ -98,7 +91,6 @@ private:
         NUM_BUFFERS  = 6
     };
 
-    WorldTrans m_worldTransform;
     GLuint m_VAO = 0;
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
