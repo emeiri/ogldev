@@ -115,16 +115,20 @@ public:
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
+    void ControlRimLight(bool IsEnabled);
+    void ControlCellShading(bool IsEnabled);
 
 private:
 
-    GLuint WVPLoc;
-    GLuint samplerLoc;
-    GLuint samplerSpecularExponentLoc;
-    GLuint CameraLocalPosLoc;
-    GLuint NumPointLightsLocation;
-    GLuint NumSpotLightsLocation;
-    GLuint ColorModLocation;
+    GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
+    GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
+    GLuint CameraLocalPosLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NumSpotLightsLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ColorModLocation = INVALID_UNIFORM_LOCATION;
+    GLuint EnableRimLightLoc = INVALID_UNIFORM_LOCATION;
+    GLuint EnableCellShadingLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;
@@ -166,10 +170,6 @@ private:
             GLuint Exp;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
-
-    /*    DirectionalLight m_dirLight;
-    PointLight m_pointLights[MAX_POINT_LIGHTS];
-    SpotLight m_spotLights[MAX_POINT_LIGHTS];*/
 };
 
 

@@ -60,6 +60,34 @@ uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
 uniform vec4 gColorMod = vec4(1);
+uniform float gRimLightPower = 1.0;
+uniform bool gRimLightEnabled = false;
+uniform bool gCellShadingEnabled = false;
+
+float DiffuseFactorWithCellShading(float DiffuseFactor)
+{
+    if (DiffuseFactor >= 0.8) {
+       DiffuseFactor = 1.0;
+    } else if (DiffuseFactor >= 0.7) {
+       DiffuseFactor = 0.7;
+    } else if (DiffuseFactor >= 0.4) {
+       DiffuseFactor = 0.4;
+    } else {
+       DiffuseFactor = 0.0;
+    }
+
+    return DiffuseFactor;
+}
+
+float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
+{
+    float RimFactor = dot(PixelToCamera, Normal);
+    RimFactor = 1.0 - RimFactor;
+    RimFactor = max(0.0, RimFactor);
+    RimFactor = pow(RimFactor, gRimLightPower);
+    return RimFactor;
+}
+
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 {
@@ -71,8 +99,13 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
     vec4 DiffuseColor = vec4(0, 0, 0, 0);
     vec4 SpecularColor = vec4(0, 0, 0, 0);
+    vec4 RimColor = vec4(0, 0, 0, 0);
 
     if (DiffuseFactor > 0) {
+        if (gCellShadingEnabled) {
+            DiffuseFactor = DiffuseFactorWithCellShading(DiffuseFactor);
+        }
+
         DiffuseColor = vec4(Light.Color, 1.0f) *
                        Light.DiffuseIntensity *
                        vec4(gMaterial.DiffuseColor, 1.0f) *
@@ -82,16 +115,21 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
         if (SpecularFactor > 0) {
-            float SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+            float SpecularExponent = 128.0;//texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
                             Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular
                             vec4(gMaterial.SpecularColor, 1.0f) *
                             SpecularFactor;
         }
+
+        if (gRimLightEnabled) {
+           float RimFactor = CalcRimLightFactor(PixelToCamera, Normal);
+           RimColor = DiffuseColor * RimFactor;
+        }
     }
 
-    return (AmbientColor + DiffuseColor + SpecularColor);
+    return (AmbientColor + DiffuseColor + SpecularColor + RimColor);
 }
 
 

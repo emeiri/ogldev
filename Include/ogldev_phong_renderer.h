@@ -51,6 +51,10 @@ class PhongRenderer {
 
     void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
 
+    void ControlRimLight(bool IsEnabled);
+
+    void ControlCellShading(bool IsEnabled);
+
     void Render(BasicMesh* pMesh);
 
  private:

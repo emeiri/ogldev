@@ -196,8 +196,9 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
-    if (!m_dirLight.WorldDirection.IsZero()) {
+    if (m_dirLight.DiffuseIntensity > 0.0) {
         m_dirLight.CalcLocalDirection(meshWorldTransform);
+        //        m_dirLight.GetLocalDirection().Print();
         m_lightingTech.UpdateDirLightDirection(m_dirLight);
     }
 
@@ -222,8 +223,6 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 }
 
 
-
-
 void PhongRenderer::SetWVP(BasicMesh* pMesh)
 {
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
@@ -235,4 +234,16 @@ void PhongRenderer::SetWVP(BasicMesh* pMesh)
     Matrix4f WVP = Projection * View * World;
 
     m_lightingTech.SetWVP(WVP);
+}
+
+
+void PhongRenderer::ControlRimLight(bool IsEnabled)
+{
+    m_lightingTech.ControlRimLight(IsEnabled);
+}
+
+
+void PhongRenderer::ControlCellShading(bool IsEnabled)
+{
+    m_lightingTech.ControlCellShading(IsEnabled);
 }
