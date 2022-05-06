@@ -148,7 +148,7 @@ public:
 
         m_mesh.Render();
 
-        RenderFPS();
+        //        RenderFPS();
 
         glutSwapBuffers();
     }
