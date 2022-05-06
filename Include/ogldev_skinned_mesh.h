@@ -21,8 +21,8 @@
 
 #include <map>
 #include <vector>
-
 #include <GL/glew.h>
+
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
@@ -52,7 +52,7 @@ public:
     void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
     
 private:
-    #define NUM_BONES_PER_VEREX 4
+    #define NUM_BONES_PER_VERTEX 4
 
     struct BoneInfo
     {
@@ -68,8 +68,8 @@ private:
     
     struct VertexBoneData
     {        
-        uint IDs[NUM_BONES_PER_VEREX];
-        float Weights[NUM_BONES_PER_VEREX];
+        uint IDs[NUM_BONES_PER_VERTEX];
+        float Weights[NUM_BONES_PER_VERTEX];
 
         VertexBoneData()
         {
