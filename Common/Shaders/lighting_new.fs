@@ -66,14 +66,16 @@ uniform bool gCellShadingEnabled = false;
 
 float DiffuseFactorWithCellShading(float DiffuseFactor)
 {
-    if (DiffuseFactor >= 0.8) {
+    if (DiffuseFactor >= 0.9) {
        DiffuseFactor = 1.0;
-    } else if (DiffuseFactor >= 0.7) {
-       DiffuseFactor = 0.7;
+    } else if (DiffuseFactor >= 0.8) {
+       DiffuseFactor = 0.8;
+    } else if (DiffuseFactor >= 0.6) {
+       DiffuseFactor = 0.6;
     } else if (DiffuseFactor >= 0.4) {
        DiffuseFactor = 0.4;
     } else {
-       DiffuseFactor = 0.0;
+       DiffuseFactor = 0.2;
     }
 
     return DiffuseFactor;
