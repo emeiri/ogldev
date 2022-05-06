@@ -143,12 +143,12 @@ void BasicCamera::OnKeyboard(int Key)
         m_pos.y -= m_speed;
         break;
 
-    case '+':
+    case GLFW_KEY_KP_ADD:
         m_speed += 0.1f;
         printf("Speed changed to %f\n", m_speed);
         break;
 
-    case '-':
+    case GLFW_KEY_KP_SUBTRACT:
         m_speed -= 0.1f;
         if (m_speed < 0.1f) {
             m_speed = 0.1f;

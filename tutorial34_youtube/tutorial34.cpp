@@ -33,8 +33,8 @@
 #include "ogldev_world_transform.h"
 #include "ogldev_phong_renderer.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -47,36 +47,27 @@ public:
 
     Tutorial34()
     {
-        pointLights[0].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
-        pointLights[0].DiffuseIntensity = 1.0f;
-        pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        pointLights[0].Attenuation.Linear = 0.1f;
-        pointLights[0].Attenuation.Exp = 0.0f;
+        m_pointLights[0].WorldPosition = Vector3f(20.0f, 0.0f, 0.0f);
+        m_pointLights[0].DiffuseIntensity = 1.0f;
+        m_pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLights[0].Attenuation.Linear = 0.1f;
+        m_pointLights[0].Attenuation.Exp = 0.0f;
 
-        pointLights[1].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
-        pointLights[1].DiffuseIntensity = 0.25f;
-        pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        pointLights[1].Attenuation.Linear = 0.0f;
-        pointLights[1].Attenuation.Exp = 0.2f;
+        m_pointLights[1].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
+        m_pointLights[1].DiffuseIntensity = 0.25f;
+        m_pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLights[1].Attenuation.Linear = 0.0f;
+        m_pointLights[1].Attenuation.Exp = 0.2f;
 
-        spotLights[0].DiffuseIntensity = 1.0f;
-        spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
-        spotLights[0].Attenuation.Linear = 0.1f;
-        spotLights[0].Cutoff = 5.0f;
-        spotLights[0].WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
-
-        spotLights[1].DiffuseIntensity = 0.0f;
-        spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        spotLights[1].Attenuation.Linear = 0.01f;
-        spotLights[1].Cutoff = 30.0f;
-        spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
-        spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight.DiffuseIntensity = 1.0f;
+        m_dirLight.AmbientIntensity = 0.1f;
     }
 
     virtual ~Tutorial34()
     {
         SAFE_DELETE(m_pGameCamera);
-        SAFE_DELETE(pMesh1);
+        SAFE_DELETE(m_pMesh1);
     }
 
 
@@ -110,11 +101,19 @@ public:
 
         m_pGameCamera->OnRender();
 
-        spotLights[0].WorldPosition = m_pGameCamera->GetPos();
-        spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
-        m_phongRenderer.UpdateSpotLightPosAndDir(0, spotLights[0].WorldPosition, spotLights[0].WorldDirection);
+        static float foo = 0.0f;
+        foo += 0.002f;
 
-        m_phongRenderer.Render(pMesh1);
+        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
+        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
+        m_phongRenderer.ControlRimLight(m_isRimLightEnabled);
+        m_phongRenderer.ControlCellShading(m_isCellShadingEnabled);
+        m_phongRenderer.Render(m_pMesh1);
+
+        // Don't use rim lighting and cell shading for the terrain
+        m_phongRenderer.ControlRimLight(false);
+        m_phongRenderer.ControlCellShading(false);
+        m_phongRenderer.Render(m_pTerrain);
     }
 
 
@@ -129,52 +128,46 @@ public:
 
     void KeyboardCB(uint key, int state)
     {
-        switch (key) {
-        case GLFW_KEY_ESCAPE:
-        case GLFW_KEY_Q:
-            glfwDestroyWindow(window);
-            glfwTerminate();
-            exit(0);
+        if (state == GLFW_PRESS) {
+            switch (key) {
+            case GLFW_KEY_ESCAPE:
+            case GLFW_KEY_Q:
+                glfwDestroyWindow(window);
+                glfwTerminate();
+                exit(0);
 
-        case 'a':
-            pointLights[0].Attenuation.Linear += ATTEN_STEP;
-            pointLights[1].Attenuation.Linear += ATTEN_STEP;
-            break;
+            case 'a':
+                m_pointLights[0].Attenuation.Linear += ATTEN_STEP;
+                m_pointLights[1].Attenuation.Linear += ATTEN_STEP;
+                break;
 
-        case 'z':
-            pointLights[0].Attenuation.Linear -= ATTEN_STEP;
-            pointLights[1].Attenuation.Linear -= ATTEN_STEP;
-            break;
+            case GLFW_KEY_C:
+                m_isCellShadingEnabled = !m_isCellShadingEnabled;
+                break;
 
-        case 's':
-            pointLights[0].Attenuation.Exp += ATTEN_STEP;
-            pointLights[1].Attenuation.Exp += ATTEN_STEP;
-            break;
 
-        case 'x':
-            pointLights[0].Attenuation.Exp -= ATTEN_STEP;
-            pointLights[1].Attenuation.Exp -= ATTEN_STEP;
-            break;
+            case 'z':
+                m_pointLights[0].Attenuation.Linear -= ATTEN_STEP;
+                m_pointLights[1].Attenuation.Linear -= ATTEN_STEP;
+                break;
 
-        case 'd':
-            spotLights[0].Cutoff += ANGLE_STEP;
-            break;
+            case 's':
+                m_pointLights[0].Attenuation.Exp += ATTEN_STEP;
+                m_pointLights[1].Attenuation.Exp += ATTEN_STEP;
+                break;
 
-        case 'c':
-            spotLights[0].Cutoff -= ANGLE_STEP;
-            break;
+            case 'x':
+                m_pointLights[0].Attenuation.Exp -= ATTEN_STEP;
+                m_pointLights[1].Attenuation.Exp -= ATTEN_STEP;
+                break;
 
-        case 'g':
-            spotLights[1].Cutoff += ANGLE_STEP;
-            break;
-
-        case 'b':
-            spotLights[1].Cutoff -= ANGLE_STEP;
-            break;
-
+            case GLFW_KEY_R:
+                m_isRimLightEnabled = !m_isRimLightEnabled;
+                break;
+            }
         }
 
-        printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
+        //        printf("Linear %f Exp %f\n", m_pointLights[0].Attenuation.Linear, m_pointLights[0].Attenuation.Exp);
 
         m_pGameCamera->OnKeyboard(key);
     }
@@ -208,8 +201,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
+        Vector3f Pos(0.0f, 2.0f, 0.0f);
+        Vector3f Target(0.0f, -0.1f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -226,28 +219,36 @@ private:
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.Activate();
         m_phongRenderer.SetCamera(m_pGameCamera);
-        m_phongRenderer.SetPointLights(2, pointLights);
-        m_phongRenderer.SetSpotLights(2, spotLights);
+        //m_phongRenderer.SetPointLights(1, m_pointLights);
+        m_phongRenderer.SetDirLight(m_dirLight);
     }
 
 
     void InitMesh()
     {
-        pMesh1 = new BasicMesh();
+        m_pMesh1 = new BasicMesh();
 
-        pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+        //m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+        m_pMesh1->LoadMesh("../Content/Vanguard.dae");
 
-        WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
-        meshWorldTransform.SetPosition(0.0f, 0.0f, 10.0f);
+        m_pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+
+        m_pTerrain = new BasicMesh();
+        m_pTerrain->LoadMesh("../Content/box_terrain.obj");
+        m_pTerrain->SetPosition(0.0f, 0.0f, 10.0f);
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     PhongRenderer m_phongRenderer;
-    BasicMesh* pMesh1 = NULL;
-    PersProjInfo persProjInfo;
-    PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
-    SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
+    BasicMesh* m_pMesh1 = NULL;
+    BasicMesh* m_pTerrain = NULL;
+    PersProjInfo m_persProjInfo;
+    PointLight m_pointLights[LightingTechnique::MAX_POINT_LIGHTS];
+    bool m_isRimLightEnabled = false;
+    bool m_isCellShadingEnabled = false;
+    DirectionalLight m_dirLight;
 };
 
 Tutorial34* app = NULL;

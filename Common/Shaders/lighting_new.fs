@@ -60,9 +60,12 @@ uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
 uniform vec4 gColorMod = vec4(1);
-uniform float gRimLightPower = 1.0;
+uniform float gRimLightPower = 4.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
+
+const int toon_levels = 4;
+const float toon_scale_factor = 1.0f / toon_levels;
 
 float DiffuseFactorWithCellShading(float DiffuseFactor)
 {
@@ -105,7 +108,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
     if (DiffuseFactor > 0) {
         if (gCellShadingEnabled) {
-            DiffuseFactor = DiffuseFactorWithCellShading(DiffuseFactor);
+              DiffuseFactor = ceil(DiffuseFactor * toon_levels) * toon_scale_factor;
         }
 
         DiffuseColor = vec4(Light.Color, 1.0f) *
@@ -116,7 +119,8 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
         vec3 PixelToCamera = normalize(gCameraLocalPos - LocalPos0);
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
-        if (SpecularFactor > 0) {
+
+        if (!gCellShadingEnabled && (SpecularFactor > 0)) {
             float SpecularExponent = 128.0;//texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
