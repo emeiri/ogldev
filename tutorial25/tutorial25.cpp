@@ -29,7 +29,7 @@
 #include "ogldev_lights_common.h"
 #include "ogldev_app.h"
 #include "ogldev_basic_lighting.h"
-#include "mesh.h"
+#include "ogldev_basic_mesh.h"
 #include "skybox.h"
 #include "skybox_technique.h"
 
@@ -90,9 +90,9 @@ public:
         m_pLightingTechnique->SetDirectionalLight(m_dirLight);
         m_pLightingTechnique->SetColorTextureUnit(0);
 
-        m_pTankMesh = new Mesh();
+        m_pTankMesh = new BasicMesh();
 
-                if (!m_pTankMesh->LoadMesh("../Content/phoenix_ugv.md2")) {
+        if (!m_pTankMesh->LoadMesh("../Content/phoenix_ugv.md2")) {
             return false;
         }
 
@@ -168,7 +168,7 @@ public:
     Camera* m_pGameCamera;
     float m_scale;
     DirectionalLight m_dirLight;
-    Mesh* m_pTankMesh;
+    BasicMesh* m_pTankMesh;
     SkyBox* m_pSkyBox;
     PersProjInfo m_persProjInfo;
 };
