@@ -234,7 +234,6 @@ private:
     void InitRenderer()
     {
         m_phongRenderer.InitPhongRenderer();
-        m_phongRenderer.Activate();
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetPointLights(2, pointLights);
         m_phongRenderer.SetSpotLights(2, spotLights);

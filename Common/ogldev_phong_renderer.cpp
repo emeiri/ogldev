@@ -41,14 +41,20 @@ void PhongRenderer::InitPhongRenderer()
 
     m_lightingTech.Enable();
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+
+    if (!m_skinningTech.Init()) {
+        printf("Error initializing the lighting technique\n");
+        exit(1);
+    }
 
     m_skinningTech.Enable();
     m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    //    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     glUseProgram(0);
 }
+
 
 void PhongRenderer::SwitchToLightingTech()
 {
@@ -59,6 +65,7 @@ void PhongRenderer::SwitchToLightingTech()
         m_lightingTech.Enable();
     }
 }
+
 
 void PhongRenderer::SwitchToSkinningTech()
 {
@@ -71,46 +78,8 @@ void PhongRenderer::SwitchToSkinningTech()
 }
 
 
-void PhongRenderer::Activate()
-{
-    if (m_isActive) {
-        printf("Warning! Trying to activate the Phong Renderer but it is already active\n");
-    }
-
-    m_lightingTech.Enable();
-
-    m_isActive = true;
-}
-
-
-void PhongRenderer::Deactivate()
-{
-    if (!m_isActive) {
-        printf("Warning! Trying to de-activate the Phong Renderer but it is not active\n");
-        return;
-    }
-
-    GLint cur_prog = 0;
-    glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
-
-    if (cur_prog != m_lightingTech.GetProgram()) {
-        printf("Trying to de-activate phong renderer (program %d) but another program is active (%d)\n", m_lightingTech.GetProgram(), cur_prog);
-        exit(0);
-    }
-
-    glUseProgram(0);
-
-    m_isActive = false;
-}
-
-
 void PhongRenderer::SetDirLight(const DirectionalLight& DirLight)
 {
-    if (!m_isActive) {
-        printf("Trying to set the directional light but the program is not active\n");
-        exit(0);
-    }
-
     m_dirLight = DirLight;
 
     SwitchToLightingTech();
@@ -129,11 +98,6 @@ void PhongRenderer::UpdateDirLightDir(const Vector3f& WorldDir)
 
 void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLights)
 {
-    if (!m_isActive) {
-        printf("Trying to set point lights but the program is not active\n");
-        exit(0);
-    }
-
     if (!pPointLights || (NumLights == 0)) {
         m_numPointLights = 0;
         return;
@@ -171,11 +135,6 @@ void PhongRenderer::UpdatePointLightPos(uint Index, const Vector3f& WorldPos)
 
 void PhongRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
 {
-    if (!m_isActive) {
-        printf("Trying to set spot lights but the program is not active\n");
-        exit(0);
-    }
-
     if (!pSpotLights || (NumLights == 0)) {
         m_numSpotLights = 0;
         return;
@@ -220,11 +179,6 @@ void PhongRenderer::Render(BasicMesh* pMesh)
         exit(0);
     }
 
-    if (!m_isActive) {
-        printf("Must activate the Phong Renderer before calling render\n");
-        exit(0);
-    }
-
     if ((m_numPointLights == 0) && (m_numSpotLights == 0) && m_dirLight.IsZero()) {
         printf("Warning! trying to render but all lights are zero\n");
     }
@@ -253,6 +207,48 @@ void PhongRenderer::Render(BasicMesh* pMesh)
     pMesh->Render();
 }
 
+
+void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec)
+{
+    if (!m_pCamera) {
+        printf("PhongRenderer: camera not initialized\n");
+        exit(0);
+    }
+
+    if ((m_numPointLights == 0) && (m_numSpotLights == 0) && m_dirLight.IsZero()) {
+        printf("Warning! trying to render but all lights are zero\n");
+    }
+
+    SwitchToSkinningTech();
+
+    Matrix4f WVP;
+    GetWVP(pMesh, WVP);
+    m_skinningTech.SetWVP(WVP);
+
+    RefreshLightingPosAndDirs(pMesh);
+
+    if (m_dirLight.DiffuseIntensity > 0.0) {
+        m_skinningTech.UpdateDirLightDirection(m_dirLight);
+    }
+
+    m_skinningTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
+
+    m_skinningTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
+
+    m_skinningTech.SetMaterial(pMesh->GetMaterial());
+
+    Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
+    m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);
+
+    vector<Matrix4f> Transforms;
+    pMesh->GetBoneTransforms(AnimationTimeSec, Transforms);
+
+    for (uint i = 0 ; i < Transforms.size() ; i++) {
+        m_skinningTech.SetBoneTransform(i, Transforms[i]);
+    }
+
+    pMesh->Render();
+}
 
 void PhongRenderer::RefreshLightingPosAndDirs(BasicMesh* pMesh)
 {
@@ -287,11 +283,19 @@ void PhongRenderer::GetWVP(BasicMesh* pMesh, Matrix4f& WVP)
 
 void PhongRenderer::ControlRimLight(bool IsEnabled)
 {
+    SwitchToLightingTech();
     m_lightingTech.ControlRimLight(IsEnabled);
+
+    m_skinningTech.Enable();
+    m_skinningTech.ControlRimLight(IsEnabled);
 }
 
 
 void PhongRenderer::ControlCellShading(bool IsEnabled)
 {
+    SwitchToLightingTech();
     m_lightingTech.ControlCellShading(IsEnabled);
+
+    m_skinningTech.Enable();
+    m_skinningTech.ControlCellShading(IsEnabled);
 }

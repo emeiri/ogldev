@@ -36,10 +36,6 @@ class PhongRenderer {
 
     void InitPhongRenderer();
 
-    void Activate();
-
-    void Deactivate();
-
     void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
 
     void SetDirLight(const DirectionalLight& DirLight);
@@ -60,6 +56,8 @@ class PhongRenderer {
 
     void Render(BasicMesh* pMesh);
 
+    void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec);
+
  private:
 
     void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
@@ -69,7 +67,6 @@ class PhongRenderer {
 
     void RefreshLightingPosAndDirs(BasicMesh* pMesh);
 
-    bool m_isActive = false;
     const BasicCamera* m_pCamera = NULL;
     LightingTechnique m_lightingTech;
     SkinningTechnique m_skinningTech;
