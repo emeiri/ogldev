@@ -9,8 +9,6 @@ layout (location = 4) in vec4 Weights;
 out vec2 TexCoord0;
 out vec3 Normal0;
 out vec3 LocalPos0;
-flat out ivec4 BoneIDs0;
-out vec4 Weights0;
 
 const int MAX_BONES = 100;
 
@@ -28,7 +26,5 @@ void main()
     gl_Position = gWVP * PosL;
     TexCoord0 = TexCoord;
     Normal0 = Normal;
-    LocalPos0 = Position;
-    BoneIDs0 = BoneIDs;
-    Weights0 = Weights;
+    LocalPos0 = PosL.xyz;
 }

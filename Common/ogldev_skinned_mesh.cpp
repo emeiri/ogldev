@@ -270,7 +270,7 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
 
     float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
-    // we need to use the integral part of mDuration for the totral length of the animation
+    // we need to use the integral part of mDuration for the total length of the animation
     float Duration = 0.0f;
     float fraction = modf((float)m_pScene->mAnimations[0]->mDuration, &Duration);
     float AnimationTimeTicks = fmod(TimeInTicks, Duration);
