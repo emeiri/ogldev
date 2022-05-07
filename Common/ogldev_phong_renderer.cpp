@@ -42,7 +42,32 @@ void PhongRenderer::InitPhongRenderer()
     m_lightingTech.Enable();
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+
+    m_skinningTech.Enable();
+    m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+
     glUseProgram(0);
+}
+
+void PhongRenderer::SwitchToLightingTech()
+{
+    GLint cur_prog = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
+
+    if (cur_prog != m_lightingTech.GetProgram()) {
+        m_lightingTech.Enable();
+    }
+}
+
+void PhongRenderer::SwitchToSkinningTech()
+{
+    GLint cur_prog = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
+
+    if (cur_prog != m_skinningTech.GetProgram()) {
+        m_skinningTech.Enable();
+    }
 }
 
 
@@ -88,7 +113,11 @@ void PhongRenderer::SetDirLight(const DirectionalLight& DirLight)
 
     m_dirLight = DirLight;
 
+    SwitchToLightingTech();
     m_lightingTech.SetDirectionalLight(m_dirLight);
+
+    m_skinningTech.Enable();
+    m_skinningTech.SetDirectionalLight(m_dirLight);
 }
 
 
@@ -121,7 +150,11 @@ void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLight
 
     m_numPointLights = NumLights;
 
+    SwitchToLightingTech();
     m_lightingTech.SetPointLights(NumLights, pPointLights);
+
+    m_skinningTech.Enable();
+    m_skinningTech.SetPointLights(NumLights, pPointLights);
 }
 
 
@@ -159,7 +192,11 @@ void PhongRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
 
     m_numSpotLights = NumLights;
 
+    SwitchToLightingTech();
     m_lightingTech.SetSpotLights(NumLights, pSpotLights);
+
+    m_skinningTech.Enable();
+    m_skinningTech.SetSpotLights(NumLights, pSpotLights);
 }
 
 
@@ -192,34 +229,45 @@ void PhongRenderer::Render(BasicMesh* pMesh)
         printf("Warning! trying to render but all lights are zero\n");
     }
 
+    SwitchToLightingTech();
+
     SetWVP(pMesh);
 
+    RefreshLightingPosAndDirs(pMesh);
+
+    if (m_dirLight.DiffuseIntensity > 0.0) {
+        m_lightingTech.UpdateDirLightDirection(m_dirLight);
+    }
+
+    m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
+
+    m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
+
+    m_lightingTech.SetMaterial(pMesh->GetMaterial());
+
+    Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
+    m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+
+    pMesh->Render();
+}
+
+
+void PhongRenderer::RefreshLightingPosAndDirs(BasicMesh* pMesh)
+{
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
     if (m_dirLight.DiffuseIntensity > 0.0) {
         m_dirLight.CalcLocalDirection(meshWorldTransform);
         //        m_dirLight.GetLocalDirection().Print();
-        m_lightingTech.UpdateDirLightDirection(m_dirLight);
     }
 
     for (uint i = 0 ; i < m_numPointLights ; i++) {
         m_pointLights[i].CalcLocalPosition(meshWorldTransform);
     }
 
-    m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
-
     for (uint i = 0 ; i < m_numSpotLights ; i++) {
         m_spotLights[i].CalcLocalDirectionAndPosition(meshWorldTransform);
     }
-
-    m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
-
-    m_lightingTech.SetMaterial(pMesh->GetMaterial());
-
-    Vector3f CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(m_pCamera->GetPos());
-    m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
-
-    pMesh->Render();
 }
 
 

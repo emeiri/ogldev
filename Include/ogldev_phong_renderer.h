@@ -22,7 +22,10 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_new_lighting.h"
+#include "ogldev_skinning_technique.h"
 #include "ogldev_basic_mesh.h"
+#include "ogldev_skinned_mesh.h"
+
 
 class PhongRenderer {
  public:
@@ -61,9 +64,15 @@ class PhongRenderer {
 
     void SetWVP(BasicMesh* pMesh);
 
+    void SwitchToLightingTech();
+    void SwitchToSkinningTech();
+
+    void RefreshLightingPosAndDirs(BasicMesh* pMesh);
+
     bool m_isActive = false;
     const BasicCamera* m_pCamera = NULL;
     LightingTechnique m_lightingTech;
+    SkinningTechnique m_skinningTech;
 
     // Lighting info
     DirectionalLight m_dirLight;
