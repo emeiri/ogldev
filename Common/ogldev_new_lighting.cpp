@@ -63,6 +63,11 @@ bool LightingTechnique::Init()
         return false;
     }
 
+    return InitCommon();
+}
+
+bool LightingTechnique::InitCommon()
+{
     WVPLoc = GetUniformLocation("gWVP");
     samplerLoc = GetUniformLocation("gSampler");
     samplerSpecularExponentLoc = GetUniformLocation("gSamplerSpecularExponent");

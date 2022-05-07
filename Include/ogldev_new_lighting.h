@@ -118,6 +118,10 @@ public:
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
 
+protected:
+
+    bool InitCommon();
+
 private:
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
