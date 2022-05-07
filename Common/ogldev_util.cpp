@@ -252,3 +252,34 @@ void glDebugOutput(GLenum source,
     case GL_DEBUG_SEVERITY_NOTIFICATION: printf("Notification\n"); break;
     }
 }
+
+
+string GetDirFromFilename(const string& Filename)
+{
+    // Extract the directory part from the file name
+    string::size_type SlashIndex;
+
+#ifdef _WIN64
+    SlashIndex = Filename.find_last_of("\\");
+
+    if (SlashIndex == -1) {
+        SlashIndex = Filename.find_last_of("/");
+    }
+#else
+    SlashIndex = Filename.find_last_of("/");
+#endif
+
+    string Dir;
+
+    if (SlashIndex == string::npos) {
+        Dir = ".";
+    }
+    else if (SlashIndex == 0) {
+        Dir = "/";
+    }
+    else {
+        Dir = Filename.substr(0, SlashIndex);
+    }
+
+    return Dir;
+}

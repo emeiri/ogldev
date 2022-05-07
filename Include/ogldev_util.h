@@ -111,4 +111,6 @@ void glDebugOutput(GLenum source,
                    const char *message,
                    const void *userParam);
 
+string GetDirFromFilename(const string& Filename);
+
 #endif  /* OGLDEV_UTIL_H */

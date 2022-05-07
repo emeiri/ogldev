@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+    Copyright 2021 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 */
 
 #ifndef OGLDEV_SKINNED_MESH_H
-#define	OGLDEV_SKINNED_MESH_H
+#define OGLDEV_SKINNED_MESH_H
 
 #include <map>
 #include <vector>
@@ -30,122 +30,91 @@
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
+#include "ogldev_world_transform.h"
+#include "ogldev_material.h"
+#include "ogldev_basic_mesh.h"
 
-using namespace std;
-
-class SkinnedMesh
+class SkinnedMesh : public BasicMesh
 {
 public:
-    SkinnedMesh();
+    SkinnedMesh() {};
 
     ~SkinnedMesh();
 
-    bool LoadMesh(const string& Filename);
-
-    void Render();
-	
     uint NumBones() const
     {
-        return m_NumBones;
+        return (uint)m_BoneNameToIndexMap.size();
     }
-    
-    void BoneTransform(float TimeInSeconds, vector<Matrix4f>& Transforms);
-    
+
+    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms);
+
 private:
-    #define NUM_BONES_PER_VERTEX 4
+    #define MAX_NUM_BONES_PER_VERTEX 4
 
-    struct BoneInfo
-    {
-        Matrix4f BoneOffset;
-        Matrix4f FinalTransformation;        
+    virtual void ReserveSpace(unsigned int NumVertices, unsigned int NumIndices);
 
-        BoneInfo()
-        {
-            BoneOffset.SetZero();
-            FinalTransformation.SetZero();            
-        }
-    };
-    
+    virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
+
+    virtual void PopulateBuffers();
+
     struct VertexBoneData
-    {        
-        uint IDs[NUM_BONES_PER_VERTEX];
-        float Weights[NUM_BONES_PER_VERTEX];
+    {
+        uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
+        float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
 
         VertexBoneData()
         {
-            Reset();
-        };
-        
-        void Reset()
-        {
-            ZERO_MEM(IDs);
-            ZERO_MEM(Weights);        
         }
-        
-        void AddBoneData(uint BoneID, float Weight);
+
+        void AddBoneData(uint BoneID, float Weight)
+        {
+            for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(BoneIDs) ; i++) {
+                if (Weights[i] == 0.0) {
+                    BoneIDs[i] = BoneID;
+                    Weights[i] = Weight;
+                    //printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
+                    return;
+                }
+            }
+
+            // should never get here - more bones than we have space for
+            assert(0);
+        }
     };
 
+    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
+    void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
+    int GetBoneId(const aiBone* pBone);
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
-    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);    
+    void CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string NodeName);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
-    bool InitFromScene(const aiScene* pScene, const string& Filename);
-    void InitMesh(uint MeshIndex,
-                  const aiMesh* paiMesh,
-                  vector<Vector3f>& Positions,
-                  vector<Vector3f>& Normals,
-                  vector<Vector2f>& TexCoords,
-                  vector<VertexBoneData>& Bones,
-                  vector<unsigned int>& Indices);
-    void LoadBones(uint MeshIndex, const aiMesh* paiMesh, vector<VertexBoneData>& Bones);
-    bool InitMaterials(const aiScene* pScene, const string& Filename);
-    void Clear();
 
-#define INVALID_MATERIAL 0xFFFFFFFF
-  
-    enum VB_TYPES {
-	SKINNED_MESH_INDEX_BUFFER,
-        SKINNED_MESH_POS_VB,
-        SKINNED_MESH_NORMAL_VB,
-        SKINNED_MESH_TEXCOORD_VB,
-        SKINNED_MESH_BONE_VB,
-        SKINNED_MESH_NUM_VBs            
-    };
+    GLuint m_boneBuffer = 0;
 
-    GLuint m_VAO;
-    GLuint m_Buffers[SKINNED_MESH_NUM_VBs];
+    // Temporary space for vertex stuff before we load them into the GPU
+    vector<VertexBoneData> m_Bones;
 
-    struct MeshEntry {
-        MeshEntry()
+    map<string,uint> m_BoneNameToIndexMap;
+
+    struct BoneInfo
+    {
+        Matrix4f OffsetMatrix;
+        Matrix4f FinalTransformation;
+
+        BoneInfo(const Matrix4f& Offset)
         {
-            NumIndices    = 0;
-            BaseVertex    = 0;
-            BaseIndex     = 0;
-            MaterialIndex = INVALID_MATERIAL;
+            OffsetMatrix = Offset;
+            FinalTransformation.SetZero();
         }
-        
-        unsigned int NumIndices;
-        unsigned int BaseVertex;
-        unsigned int BaseIndex;
-        unsigned int MaterialIndex;
     };
-    
-    vector<MeshEntry> m_Entries;
-    vector<Texture*> m_Textures;
-     
-    map<string,uint> m_BoneMapping; // maps a bone name to its index
-    uint m_NumBones;
+
     vector<BoneInfo> m_BoneInfo;
-    Matrix4f m_GlobalInverseTransform;
-    
-    const aiScene* m_pScene;
-    Assimp::Importer m_Importer;
 };
 
 
-#endif	/* OGLDEV_SKINNED_MESH_H */
-
+#endif  /* OGLDEV_SKINNED_MESH_H */

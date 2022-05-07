@@ -62,6 +62,8 @@ bool BasicMesh::LoadMesh(const string& Filename)
     m_pScene = m_Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
 
     if (m_pScene) {
+        m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
+        m_GlobalInverseTransform.Inverse();
         Ret = InitFromScene(m_pScene, Filename);
     }
     else {
@@ -125,12 +127,12 @@ void BasicMesh::InitAllMeshes(const aiScene* pScene)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
-        InitSingleMesh(paiMesh);
+        InitSingleMesh(i, paiMesh);
     }
 }
 
 
-void BasicMesh::InitSingleMesh(const aiMesh* paiMesh)
+void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -164,27 +166,6 @@ void BasicMesh::InitSingleMesh(const aiMesh* paiMesh)
 }
 
 
-string GetDirFromFilename(const string& Filename)
-{
-    // Extract the directory part from the file name
-    string::size_type SlashIndex;
-
-    SlashIndex = Filename.find_last_of("/");
-
-    string Dir;
-
-    if (SlashIndex == string::npos) {
-        Dir = ".";
-    }
-    else if (SlashIndex == 0) {
-        Dir = "/";
-    }
-    else {
-        Dir = Filename.substr(0, SlashIndex);
-    }
-
-    return Dir;
-}
 
 
 bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
@@ -192,6 +173,8 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
     string Dir = GetDirFromFilename(Filename);
 
     bool Ret = true;
+
+    printf("Num materials: %d\n", pScene->mNumMaterials);
 
     // Initialize the materials
     for (unsigned int i = 0 ; i < pScene->mNumMaterials ; i++) {
@@ -259,7 +242,9 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
         if (pMaterial->GetTexture(aiTextureType_SHININESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             string p(Path.data);
 
-            if (p.substr(0, 2) == ".\\") {
+            if (p == "C:\\\\") {
+                p = "";
+            } else if (p.substr(0, 2) == ".\\") {
                 p = p.substr(2, p.size() - 2);
             }
 
@@ -281,12 +266,20 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
 void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
 {
     aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
+    Vector3f AllOnes(1.0f, 1.0f, 1.0f);
+
+    int ShadingModel = 0;
+    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) == AI_SUCCESS) {
+        printf("Shading model %d\n", ShadingModel);
+    }
 
     if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
         printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
         m_Materials[index].AmbientColor.r = AmbientColor.r;
         m_Materials[index].AmbientColor.g = AmbientColor.g;
         m_Materials[index].AmbientColor.b = AmbientColor.b;
+    } else {
+        m_Materials[index].AmbientColor = AllOnes;
     }
 
     aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);

@@ -34,6 +34,7 @@
 #include "ogldev_material.h"
 #include "ogldev_mesh_common.h"
 
+#define INVALID_MATERIAL 0xFFFFFFFF
 
 class BasicMesh : public MeshCommon
 {
@@ -54,45 +55,15 @@ public:
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
-private:
+protected:
+
     void Clear();
 
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+    virtual void ReserveSpace(uint NumVertices, uint NumIndices);
 
-    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
+    virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
 
-    void ReserveSpace(uint NumVertices, uint NumIndices);
-
-    void InitAllMeshes(const aiScene* pScene);
-
-    void InitSingleMesh(const aiMesh* paiMesh);
-
-    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-
-    void PopulateBuffers();
-
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
-
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-
-    void LoadColors(const aiMaterial* pMaterial, int index);
-
-#define INVALID_MATERIAL 0xFFFFFFFF
-
-    enum BUFFER_TYPE {
-        INDEX_BUFFER = 0,
-        POS_VB       = 1,
-        TEXCOORD_VB  = 2,
-        NORMAL_VB    = 3,
-        WVP_MAT_VB   = 4,  // required only for instancing
-        WORLD_MAT_VB = 5,  // required only for instancing
-        NUM_BUFFERS  = 6
-    };
-
-    GLuint m_VAO = 0;
-    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
+    virtual void PopulateBuffers();
 
     struct BasicMeshEntry {
         BasicMeshEntry()
@@ -110,6 +81,42 @@ private:
     };
 
     std::vector<BasicMeshEntry> m_Meshes;
+
+    const aiScene* m_pScene;
+
+    Matrix4f m_GlobalInverseTransform;
+
+private:
+
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+
+    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
+
+    void InitAllMeshes(const aiScene* pScene);
+
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+
+    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadColors(const aiMaterial* pMaterial, int index);
+
+    enum BUFFER_TYPE {
+        INDEX_BUFFER = 0,
+        POS_VB       = 1,
+        TEXCOORD_VB  = 2,
+        NORMAL_VB    = 3,
+        WVP_MAT_VB   = 4,  // required only for instancing
+        WORLD_MAT_VB = 5,  // required only for instancing
+        NUM_BUFFERS  = 6
+    };
+
+    GLuint m_VAO = 0;
+    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
+
     std::vector<Material> m_Materials;
 
     // Temporary space for vertex stuff before we load them into the GPU
@@ -118,9 +125,7 @@ private:
     vector<Vector2f> m_TexCoords;
     vector<uint> m_Indices;
 
-    const aiScene* m_pScene;
     Assimp::Importer m_Importer;
-
 };
 
 
