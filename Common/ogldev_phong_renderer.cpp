@@ -231,7 +231,9 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
     SwitchToLightingTech();
 
-    SetWVP(pMesh);
+    Matrix4f WVP;
+    GetWVP(pMesh, WVP);
+    m_lightingTech.SetWVP(WVP);
 
     RefreshLightingPosAndDirs(pMesh);
 
@@ -271,7 +273,7 @@ void PhongRenderer::RefreshLightingPosAndDirs(BasicMesh* pMesh)
 }
 
 
-void PhongRenderer::SetWVP(BasicMesh* pMesh)
+void PhongRenderer::GetWVP(BasicMesh* pMesh, Matrix4f& WVP)
 {
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
@@ -279,9 +281,7 @@ void PhongRenderer::SetWVP(BasicMesh* pMesh)
     Matrix4f View = m_pCamera->GetMatrix();
     Matrix4f Projection = m_pCamera->GetProjectionMat();
 
-    Matrix4f WVP = Projection * View * World;
-
-    m_lightingTech.SetWVP(WVP);
+    WVP = Projection * View * World;
 }
 
 

@@ -62,7 +62,7 @@ class PhongRenderer {
 
  private:
 
-    void SetWVP(BasicMesh* pMesh);
+    void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
 
     void SwitchToLightingTech();
     void SwitchToSkinningTech();
