@@ -67,23 +67,6 @@ uniform bool gCellShadingEnabled = false;
 const int toon_levels = 4;
 const float toon_scale_factor = 1.0f / toon_levels;
 
-float DiffuseFactorWithCellShading(float DiffuseFactor)
-{
-    if (DiffuseFactor >= 0.9) {
-       DiffuseFactor = 1.0;
-    } else if (DiffuseFactor >= 0.8) {
-       DiffuseFactor = 0.8;
-    } else if (DiffuseFactor >= 0.6) {
-       DiffuseFactor = 0.6;
-    } else if (DiffuseFactor >= 0.4) {
-       DiffuseFactor = 0.4;
-    } else {
-       DiffuseFactor = 0.2;
-    }
-
-    return DiffuseFactor;
-}
-
 float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
 {
     float RimFactor = dot(PixelToCamera, Normal);
@@ -108,7 +91,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
     if (DiffuseFactor > 0) {
         if (gCellShadingEnabled) {
-              DiffuseFactor = ceil(DiffuseFactor * toon_levels) * toon_scale_factor;
+            DiffuseFactor = ceil(DiffuseFactor * toon_levels) * toon_scale_factor;
         }
 
         DiffuseColor = vec4(Light.Color, 1.0f) *

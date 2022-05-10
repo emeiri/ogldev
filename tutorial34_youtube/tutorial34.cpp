@@ -185,7 +185,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Phong Reflection Model Demo");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 34");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -217,7 +217,6 @@ private:
     void InitRenderer()
     {
         m_phongRenderer.InitPhongRenderer();
-        m_phongRenderer.Activate();
         m_phongRenderer.SetCamera(m_pGameCamera);
         //m_phongRenderer.SetPointLights(1, m_pointLights);
         m_phongRenderer.SetDirLight(m_dirLight);
