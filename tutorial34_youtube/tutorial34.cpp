@@ -104,6 +104,10 @@ public:
         static float foo = 0.0f;
         foo += 0.002f;
 
+        m_pGameCamera->SetPosition(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
+        Vector3f Target(m_pMesh1->GetPosition() - m_pGameCamera->GetPos() + Vector3f(0.0f, 3.0f, 0.0f));
+        m_pGameCamera->SetTarget(Target);
+
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
         m_phongRenderer.ControlRimLight(m_isRimLightEnabled);
@@ -201,7 +205,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 2.0f, 0.0f);
+        Vector3f Pos(0.0f, 10.0f, -10.0f);
         Vector3f Target(0.0f, -0.1f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -230,12 +234,12 @@ private:
         //m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         m_pMesh1->LoadMesh("../Content/Vanguard.dae");
 
-        m_pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pMesh1->SetPosition(0.0f, 0.0f, 0.0f);
         m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         m_pTerrain->LoadMesh("../Content/box_terrain.obj");
-        m_pTerrain->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
     }
 
     GLFWwindow* window = NULL;

@@ -60,12 +60,12 @@ uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform vec3 gCameraLocalPos;
 uniform vec4 gColorMod = vec4(1);
-uniform float gRimLightPower = 4.0;
+uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 
-const int toon_levels = 4;
-const float toon_scale_factor = 1.0f / toon_levels;
+const int toon_color_levels = 4;
+const float toon_scale_factor = 1.0f / toon_color_levels;
 
 float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
 {
@@ -91,7 +91,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
     if (DiffuseFactor > 0) {
         if (gCellShadingEnabled) {
-            DiffuseFactor = ceil(DiffuseFactor * toon_levels) * toon_scale_factor;
+            DiffuseFactor = ceil(DiffuseFactor * toon_color_levels) * toon_scale_factor;
         }
 
         DiffuseColor = vec4(Light.Color, 1.0f) *
