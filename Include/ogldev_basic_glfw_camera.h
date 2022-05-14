@@ -31,6 +31,12 @@ public:
 
     void SetPosition(float x, float y, float z);
 
+    void SetPosition(const Vector3f& pos);
+
+    void SetTarget(float x, float y, float z);
+
+    void SetTarget(const Vector3f& target);
+
     void OnKeyboard(int key);
 
     void OnMouse(int x, int y);

@@ -105,6 +105,26 @@ void BasicCamera::SetPosition(float x, float y, float z)
 }
 
 
+void BasicCamera::SetPosition(const Vector3f& pos)
+{
+    SetPosition(pos.x, pos.y, pos.z);
+}
+
+
+void BasicCamera::SetTarget(float x, float y, float z)
+{
+    m_target.x = x;
+    m_target.y = y;
+    m_target.z = z;
+}
+
+
+void BasicCamera::SetTarget(const Vector3f& target)
+{
+    SetTarget(target.x, target.y, target.z);
+}
+
+
 void BasicCamera::OnKeyboard(int Key)
 {
     switch (Key) {
