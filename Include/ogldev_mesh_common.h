@@ -37,6 +37,8 @@ class MeshCommon {
     void SetRotation(float x, float y, float z);
     void SetPosition(float x, float y, float z);
 
+    Vector3f GetPosition() const;
+
     virtual void Render(IRenderCallbacks* pRenderCallbacks = NULL) = 0;
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
@@ -61,6 +63,12 @@ inline void MeshCommon::SetRotation(float x, float y, float z)
 inline void MeshCommon::SetPosition(float x, float y, float z)
 {
     m_worldTransform.SetPosition(x, y, z);
+}
+
+
+inline Vector3f MeshCommon::GetPosition() const
+{
+    return m_worldTransform.GetPos();
 }
 
 #endif
