@@ -44,7 +44,7 @@ void PhongRenderer::InitPhongRenderer()
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
-        printf("Error initializing the lighting technique\n");
+        printf("Error initializing the skinning technique\n");
         exit(1);
     }
 
@@ -52,7 +52,18 @@ void PhongRenderer::InitPhongRenderer()
     m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     //    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
+    if (!m_shadowMapTech.Init()) {
+        printf("Error initializing the shadow mapping technique\n");
+        exit(1);
+    }
+
     glUseProgram(0);
+}
+
+
+void PhongRenderer::StartShadowPass()
+{
+    m_shadowMapTech.Enable();
 }
 
 
@@ -90,12 +101,6 @@ void PhongRenderer::SetDirLight(const DirectionalLight& DirLight)
 }
 
 
-void PhongRenderer::UpdateDirLightDir(const Vector3f& WorldDir)
-{
-    m_dirLight.WorldDirection = WorldDir;
-}
-
-
 void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLights)
 {
     if (!pPointLights || (NumLights == 0)) {
@@ -122,17 +127,6 @@ void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLight
 }
 
 
-void PhongRenderer::UpdatePointLightPos(uint Index, const Vector3f& WorldPos)
-{
-    if (Index > m_numPointLights) {
-        printf("Trying to update point light %d while num lights is %d\n", Index, m_numPointLights);
-        exit(0);
-    }
-
-    m_pointLights[Index].WorldPosition = WorldPos;
-}
-
-
 void PhongRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
 {
     if (!pSpotLights || (NumLights == 0)) {
@@ -156,6 +150,23 @@ void PhongRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
 
     m_skinningTech.Enable();
     m_skinningTech.SetSpotLights(NumLights, pSpotLights);
+}
+
+
+void PhongRenderer::UpdateDirLightDir(const Vector3f& WorldDir)
+{
+    m_dirLight.WorldDirection = WorldDir;
+}
+
+
+void PhongRenderer::UpdatePointLightPos(uint Index, const Vector3f& WorldPos)
+{
+    if (Index > m_numPointLights) {
+        printf("Trying to update point light %d while num lights is %d\n", Index, m_numPointLights);
+        exit(0);
+    }
+
+    m_pointLights[Index].WorldPosition = WorldPos;
 }
 
 
@@ -249,6 +260,36 @@ void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec)
 
     pMesh->Render();
 }
+
+
+void PhongRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight)
+{
+    Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
+
+    printf("World\n");
+    World.Print();
+
+    Matrix4f View;
+    Vector3f Up(0.0f, 1.0f, 0.0f);
+    View.InitCameraTransform(SpotLight.WorldPosition, SpotLight.WorldDirection, Up);
+
+    printf("View\n");
+    View.Print();
+    //    exit(0);
+    float FOV = 45.0f;
+    float zNear = 0.1f;
+    float zFar = 100.0f;
+    PersProjInfo persProjInfo = { FOV, 1000.0f, 1000.0f, zNear, zFar };
+    Matrix4f Projection;
+    Projection.InitPersProjTransform(persProjInfo);
+
+    Matrix4f WVP = Projection * View * World;
+
+    m_shadowMapTech.SetWVP(WVP);
+
+    pMesh->Render();
+}
+
 
 void PhongRenderer::RefreshLightingPosAndDirs(BasicMesh* pMesh)
 {

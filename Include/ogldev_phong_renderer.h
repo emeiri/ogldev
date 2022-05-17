@@ -25,6 +25,7 @@
 #include "ogldev_skinning_technique.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_skinned_mesh.h"
+#include "ogldev_shadow_mapping_technique.h"
 
 
 class PhongRenderer {
@@ -36,17 +37,19 @@ class PhongRenderer {
 
     void InitPhongRenderer();
 
+    void StartShadowPass();
+
     void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
 
     void SetDirLight(const DirectionalLight& DirLight);
 
-    void UpdateDirLightDir(const Vector3f& WorldDir);
-
     void SetPointLights(uint NumLights, const PointLight* pPointLights);
 
-    void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
-
     void SetSpotLights(uint NumLights, const SpotLight* pSpotLights);
+
+    void UpdateDirLightDir(const Vector3f& WorldDir);
+
+    void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
 
     void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
 
@@ -58,6 +61,7 @@ class PhongRenderer {
 
     void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec);
 
+    void RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight);
  private:
 
     void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
@@ -70,6 +74,7 @@ class PhongRenderer {
     const BasicCamera* m_pCamera = NULL;
     LightingTechnique m_lightingTech;
     SkinningTechnique m_skinningTech;
+    ShadowMappingTechnique m_shadowMapTech;
 
     // Lighting info
     DirectionalLight m_dirLight;
