@@ -41,6 +41,9 @@ ShadowMapFBO::~ShadowMapFBO()
 
 bool ShadowMapFBO::Init(unsigned int Width, unsigned int Height)
 {
+    m_width = Width;
+    m_height = Height;
+
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);
 
@@ -76,6 +79,7 @@ bool ShadowMapFBO::Init(unsigned int Width, unsigned int Height)
 void ShadowMapFBO::BindForWriting()
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glViewport(0, 0, m_width, m_height);
 }
 
 

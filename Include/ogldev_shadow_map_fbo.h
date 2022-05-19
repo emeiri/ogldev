@@ -34,6 +34,8 @@ public:
     void BindForReading(GLenum TextureUnit);
 
 private:
+    uint m_width = 0;
+    uint m_height = 0;
     GLuint m_fbo;
     GLuint m_shadowMap;
 };
