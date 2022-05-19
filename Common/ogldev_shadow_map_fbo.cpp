@@ -39,7 +39,7 @@ ShadowMapFBO::~ShadowMapFBO()
     }
 }
 
-bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
+bool ShadowMapFBO::Init(unsigned int Width, unsigned int Height)
 {
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);
@@ -47,13 +47,11 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
     // Create the depth buffer
     glGenTextures(1, &m_shadowMap);
     glBindTexture(GL_TEXTURE_2D, m_shadowMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Width, Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);
@@ -68,6 +66,8 @@ bool ShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHeight)
         printf("FB error, status: 0x%x\n", Status);
         return false;
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return true;
 }
@@ -106,9 +106,9 @@ bool CascadedShadowMapFBO::Init(unsigned int WindowWidth, unsigned int WindowHei
     // Create the FBO
     glGenFramebuffers(1, &m_fbo);
 
-    // Create the depth buffer    
+    // Create the depth buffer
     glGenTextures(ARRAY_SIZE_IN_ELEMENTS(m_shadowMap), m_shadowMap);
-    
+
     for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_shadowMap) ; i++) {
         glBindTexture(GL_TEXTURE_2D, m_shadowMap[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -141,7 +141,7 @@ void CascadedShadowMapFBO::BindForWriting(uint CascadeIndex)
 {
     assert(CascadeIndex < ARRAY_SIZE_IN_ELEMENTS(m_shadowMap));
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[CascadeIndex], 0);    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap[CascadeIndex], 0);
 }
 
 
