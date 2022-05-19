@@ -51,12 +51,14 @@ public:
 
     Tutorial35()
     {
-        m_spotLight.WorldPosition = Vector3f(20.0f, 5.0f, 0.0f);
-        m_spotLight.WorldDirection = Vector3f(-1.0f, 0.0f, 0.0f);
+        m_spotLight.WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
+        m_spotLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         m_spotLight.DiffuseIntensity = 1.0f;
+        m_spotLight.AmbientIntensity = 1.0f;
         m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_spotLight.Attenuation.Linear = 0.1f;
+        m_spotLight.Attenuation.Linear = 0.0f;
         m_spotLight.Attenuation.Exp = 0.0f;
+        m_spotLight.Cutoff = 30.0f;
     }
 
     virtual ~Tutorial35()
@@ -94,8 +96,8 @@ public:
 
     void RenderSceneCB()
     {
-        ShadowMapPass();
-        //      RenderPass();
+        //        ShadowMapPass();
+        RenderPass();
     }
 
 
@@ -112,6 +114,8 @@ public:
 
     void RenderPass()
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_pGameCamera->OnRender();
@@ -119,17 +123,14 @@ public:
         static float foo = 0.0f;
         foo += 0.002f;
 
-        m_pGameCamera->SetPosition(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
-        Vector3f Target(m_pMesh1->GetPosition() - m_pGameCamera->GetPos() + Vector3f(0.0f, 3.0f, 0.0f));
-        m_pGameCamera->SetTarget(Target);
+        //m_pGameCamera->SetPosition(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
+        //Vector3f Target(m_pMesh1->GetPosition() - m_pGameCamera->GetPos() + Vector3f(0.0f, 3.0f, 0.0f));
+        //m_pGameCamera->SetTarget(Target);
 
         //m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         //        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
         m_phongRenderer.Render(m_pMesh1);
 
-        // Don't use rim lighting and cell shading for the terrain
-        m_phongRenderer.ControlRimLight(false);
-        m_phongRenderer.ControlCellShading(false);
         m_phongRenderer.Render(m_pTerrain);
     }
 
@@ -217,8 +218,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 10.0f, -10.0f);
-        Vector3f Target(0.0f, -0.1f, 1.0f);
+        Vector3f Pos(0.0f, 0.0f, 0.0f);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -234,8 +235,7 @@ private:
     {
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
-        //m_phongRenderer.SetPointLights(1, m_pointLights);
-        //m_phongRenderer.SetDirLight(m_dirLight);
+        m_phongRenderer.SetSpotLights(1, &m_spotLight);
     }
 
 
@@ -244,10 +244,10 @@ private:
         m_pMesh1 = new BasicMesh();
 
         //m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        m_pMesh1->LoadMesh("../Content/Vanguard.dae");
+        m_pMesh1->LoadMesh("../Content/box.obj");
 
-        m_pMesh1->SetPosition(0.0f, 0.0f, 0.0f);
-        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+        m_pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
+        //        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         m_pTerrain->LoadMesh("../Content/box_terrain.obj");
