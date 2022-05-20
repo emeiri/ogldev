@@ -62,6 +62,7 @@ public:
         m_spotLight.Attenuation.Exp = 0.0f;
         m_spotLight.Cutoff = 20.0f;
 
+        // Initialize a perspective projection matrix for the spot light
         float FOV = 60.0f;
         float zNear = 1.0f;
         float zFar = 50.0f;
@@ -118,6 +119,7 @@ public:
         m_shadowMapTech.Enable();
 
         Matrix4f World = m_pMesh1->GetWorldMatrix();
+
         Matrix4f View;
         Vector3f Up(0.0f, 1.0f, 0.0f);
         View.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
@@ -149,6 +151,9 @@ public:
         static float foo = 0.0f;
         foo += 0.002f;
 
+        m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
+        m_spotLight.WorldDirection = m_pMesh1->GetPosition() - m_spotLight.WorldPosition;
+
         ///////////////////////////
         // Render the main object
         ////////////////////////////
@@ -175,8 +180,7 @@ public:
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
         m_pMesh1->Render();
-        //m_pGameCamera->SetPosition(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
-        //Vector3f Target(m_pMesh1->GetPosition() - m_pGameCamera->GetPos() + Vector3f(0.0f, 3.0f, 0.0f));
+
         //m_pGameCamera->SetTarget(Target);
 
         /////////////////////////
