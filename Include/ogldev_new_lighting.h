@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIGHTING_TECHNIQUE_17_H
-#define LIGHTING_TECHNIQUE_17_H
+#ifndef NEW_LIGHTING_TECHNIQUE_H
+#define NEW_LIGHTING_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -102,7 +102,9 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
+    void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
+    void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
@@ -125,7 +127,9 @@ protected:
 private:
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
+    GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
     GLuint CameraLocalPosLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
@@ -177,4 +181,4 @@ private:
 };
 
 
-#endif  /* LIGHTING_TECHNIQUE_H */
+#endif  /* NEW_LIGHTING_TECHNIQUE_H */

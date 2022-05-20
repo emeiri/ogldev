@@ -69,7 +69,9 @@ bool LightingTechnique::Init()
 bool LightingTechnique::InitCommon()
 {
     WVPLoc = GetUniformLocation("gWVP");
+    LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
+    shadowMapLoc = GetUniformLocation("gShadowMap");
     samplerSpecularExponentLoc = GetUniformLocation("gSamplerSpecularExponent");
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
@@ -86,6 +88,7 @@ bool LightingTechnique::InitCommon()
     EnableCellShadingLoc = GetUniformLocation("gCellShadingEnabled");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
+        LightWVPLoc == INVALID_UNIFORM_LOCATION ||  // required only for shadow mapping
         samplerLoc == INVALID_UNIFORM_LOCATION ||
         //        samplerSpecularExponentLoc == INVALID_UNIFORM_LOCATION ||
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
@@ -192,9 +195,16 @@ bool LightingTechnique::InitCommon()
     return true;
 }
 
+
 void LightingTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
+}
+
+
+void LightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
+{
+    glUniformMatrix4fv(LightWVPLoc, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
 }
 
 
@@ -202,6 +212,13 @@ void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerLoc, TextureUnit);
 }
+
+
+void LightingTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(shadowMapLoc, TextureUnit);
+}
+
 
 void LightingTechnique::SetSpecularExponentTextureUnit(unsigned int TextureUnit)
 {
