@@ -104,12 +104,12 @@ public:
     void SetWVP(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
-    void SetDirectionalLight(const DirectionalLight& DirLight);
+    void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
-    void SetPointLights(unsigned int NumLights, const PointLight* pLights);
+    void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
     void UpdatePointLight(unsigned int Index, const PointLight& Light);
     void UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights);
-    void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
+    void SetSpotLights(unsigned int NumLights, const SpotLight* pLights, bool WithPosAndDir = true);
     void UpdateSpotLight(unsigned int Index, const SpotLight& Light);
     void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
