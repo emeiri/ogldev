@@ -58,9 +58,9 @@ public:
         m_spotLight.DiffuseIntensity = 0.9f;
         m_spotLight.AmbientIntensity = 0.1f;
         m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_spotLight.Attenuation.Linear = 0.01f;
+        m_spotLight.Attenuation.Linear = 0.00f;
         m_spotLight.Attenuation.Exp = 0.0f;
-        m_spotLight.Cutoff = 20.0f;
+        m_spotLight.Cutoff = 90.0f;
 
         // Initialize a perspective projection matrix for the spot light
         float FOV = 60.0f;
@@ -151,7 +151,7 @@ public:
         static float foo = 0.0f;
         foo += 0.002f;
 
-        m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
+        m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 10.0f, 8.0f, -cosf(foo) * 10.0f);
         m_spotLight.WorldDirection = m_pMesh1->GetPosition() - m_spotLight.WorldPosition;
 
         ///////////////////////////
@@ -296,9 +296,9 @@ private:
         Vector3f Target(0.0f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        float FOV = 60.0f;
+        float FOV = 45.0f;
         float zNear = 1.0f;
-        float zFar = 50.0f;
+        float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
@@ -329,9 +329,10 @@ private:
         m_pMesh1 = new BasicMesh();
 
         //m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        m_pMesh1->LoadMesh("../Content/box.obj");
-        m_pMesh1->SetPosition(0.0f, 1.0f, 3.0f);
-        //        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+        m_pMesh1->LoadMesh("../Content/Vanguard.dae");
+        //m_pMesh1->LoadMesh("../Content/box.obj");
+        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
+        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         m_pTerrain->LoadMesh("../Content/box_terrain.obj");
