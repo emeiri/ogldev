@@ -61,6 +61,12 @@ public:
         m_spotLight.Attenuation.Linear = 0.01f;
         m_spotLight.Attenuation.Exp = 0.0f;
         m_spotLight.Cutoff = 20.0f;
+
+        float FOV = 60.0f;
+        float zNear = 1.0f;
+        float zFar = 50.0f;
+        PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
+        m_lightPersProjMatrix.InitPersProjTransform(shadowPersProjInfo);
     }
 
     virtual ~Tutorial35()
@@ -116,19 +122,13 @@ public:
         Vector3f Up(0.0f, 1.0f, 0.0f);
         View.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
 
-        float FOV = 60.0f;
-        float zNear = 1.0f;
-        float zFar = 50.0f;
-        PersProjInfo persProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
-        Matrix4f Projection;
-        Projection.InitPersProjTransform(persProjInfo);
-        Matrix4f WVP = Projection * View * World;
+        Matrix4f WVP = m_lightPersProjMatrix * View * World;
         m_shadowMapTech.SetWVP(WVP);
 
         m_pMesh1->Render();
 
         World = m_pTerrain->GetWorldMatrix();
-        WVP = Projection * View * World;
+        WVP = m_lightPersProjMatrix * View * World;
         //m_pTerrain->Render();
     }
 
@@ -164,13 +164,7 @@ public:
         Vector3f Up(0.0f, 1.0f, 0.0f);
         LightView.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
 
-        float FOV = 60.0f;
-        float zNear = 1.0f;
-        float zFar = 50.0f;
-        PersProjInfo persProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
-        Matrix4f LightProjection;
-        LightProjection.InitPersProjTransform(persProjInfo);
-        Matrix4f LightWVP = LightProjection * LightView * World;
+        Matrix4f LightWVP = m_lightPersProjMatrix * LightView * World;
         m_lightingTech.SetLightWVP(LightWVP);
 
         m_spotLight.CalcLocalDirectionAndPosition(m_pMesh1->GetWorldTransform());
@@ -192,7 +186,7 @@ public:
         WVP = CameraProjection * CameraView * World;
         m_lightingTech.SetWVP(WVP);
 
-        LightWVP = LightProjection * LightView * World;
+        LightWVP = m_lightPersProjMatrix * LightView * World;
         m_lightingTech.SetLightWVP(LightWVP);
 
         m_spotLight.CalcLocalDirectionAndPosition(m_pTerrain->GetWorldTransform());
@@ -347,6 +341,7 @@ private:
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
+    Matrix4f m_lightPersProjMatrix;
     SpotLight m_spotLight;
     ShadowMapFBO m_shadowMapFBO;
 };
