@@ -43,6 +43,8 @@ class MeshCommon {
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
+    Matrix4f GetWorldMatrix() { return m_worldTransform.GetMatrix(); }
+
  protected:
     WorldTrans m_worldTransform;
 };
