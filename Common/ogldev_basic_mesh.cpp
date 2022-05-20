@@ -401,7 +401,7 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
         assert(MaterialIndex < m_Materials.size());
 
         if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(GL_TEXTURE0);
+            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
         }
 
         if (m_Materials[MaterialIndex].pSpecularExponent) {
