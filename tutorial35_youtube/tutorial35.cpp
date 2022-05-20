@@ -31,8 +31,10 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_phong_renderer.h"
 #include "ogldev_shadow_map_fbo.h"
+#include "ogldev_new_lighting.h"
+#include "ogldev_shadow_mapping_technique.h"
+
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -80,7 +82,7 @@ public:
 
         InitMesh();
 
-        InitRenderer();
+        InitShaders();
     }
 
 
@@ -96,20 +98,41 @@ public:
 
     void RenderSceneCB()
     {
-        //        ShadowMapPass();
-        RenderPass();
+        ShadowMapPass();
+        //       RenderPass();
     }
 
 
     void ShadowMapPass()
     {
-        m_phongRenderer.StartShadowPass();
-
         m_shadowMapFBO.BindForWriting();
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        m_phongRenderer.RenderToShadowMap(m_pMesh1, m_spotLight);
+        m_shadowMapTech.Enable();
+
+        Matrix4f World = m_pMesh1->GetWorldTransform().GetMatrix();
+    printf("World\n"); World.Print();
+        Matrix4f View;
+        Vector3f Up(0.0f, 1.0f, 0.0f);
+        View.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
+    printf("View\n"); View.Print();
+        //      printf("View\n");
+        //      View.Print();
+    //    exit(0);
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        PersProjInfo persProjInfo = { FOV, 1000.0f, 1000.0f, zNear, zFar };
+        Matrix4f Projection;
+        Projection.InitPersProjTransform(persProjInfo);
+    printf("Proj\n"); Projection.Print();
+        Matrix4f WVP = Projection * View * World;
+    printf("WVP\n"); WVP.Print();
+//exit(0);
+        m_shadowMapTech.SetWVP(WVP);
+
+        m_pMesh1->Render();
     }
 
     void RenderPass()
@@ -129,9 +152,9 @@ public:
 
         //m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         //        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
-        m_phongRenderer.Render(m_pMesh1);
+        //m_phongRenderer.Render(m_pMesh1);
 
-        m_phongRenderer.Render(m_pTerrain);
+        //m_phongRenderer.Render(m_pTerrain);
     }
 
 
@@ -203,6 +226,7 @@ private:
     void CreateShadowMap()
     {
         if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+        //        if (!m_shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             exit(1);
         }
     }
@@ -231,11 +255,21 @@ private:
     }
 
 
-    void InitRenderer()
+    void InitShaders()
     {
-        m_phongRenderer.InitPhongRenderer();
-        m_phongRenderer.SetCamera(m_pGameCamera);
-        m_phongRenderer.SetSpotLights(1, &m_spotLight);
+        if (!m_lightingTech.Init()) {
+            printf("Error initializing the lighting technique\n");
+            exit(1);
+        }
+
+        m_lightingTech.Enable();
+        m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+
+        if (!m_shadowMapTech.Init()) {
+            printf("Error initializing the shadow mapping technique\n");
+            exit(1);
+        }
     }
 
 
@@ -256,7 +290,8 @@ private:
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
-    PhongRenderer m_phongRenderer;
+    LightingTechnique m_lightingTech;
+    ShadowMappingTechnique m_shadowMapTech;
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
