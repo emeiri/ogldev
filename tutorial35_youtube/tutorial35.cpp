@@ -128,10 +128,6 @@ public:
         m_shadowMapTech.SetWVP(WVP);
 
         m_pMesh1->Render();
-
-        World = m_pTerrain->GetWorldMatrix();
-        WVP = m_lightPersProjMatrix * LightView * World;
-        //m_pTerrain->Render();
     }
 
     void LightingPass()
@@ -154,8 +150,10 @@ public:
         m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 10.0f, 8.0f, -cosf(foo) * 10.0f);
         m_spotLight.WorldDirection = m_pMesh1->GetPosition() - m_spotLight.WorldPosition;
 
-        //        m_pGameCamera->SetPosition(m_spotLight.WorldPosition);
-        //        m_pGameCamera->SetTarget(m_spotLight.WorldDirection);
+        if (m_cameraOnLight) {
+            m_pGameCamera->SetPosition(m_spotLight.WorldPosition);
+            m_pGameCamera->SetTarget(m_spotLight.WorldDirection);
+        }
 
         ///////////////////////////
         // Render the main object
@@ -229,22 +227,30 @@ public:
                 glfwTerminate();
                 exit(0);
 
-            case 'a':
+            case GLFW_KEY_L:
+                m_cameraOnLight = !m_cameraOnLight;
+                if (!m_cameraOnLight) {
+                    m_pGameCamera->SetPosition(m_cameraPos);
+                    m_pGameCamera->SetTarget(m_cameraTarget);
+                }
+                break;
+
+            case GLFW_KEY_A:
                 m_spotLight.Attenuation.Linear += ATTEN_STEP;
                 m_spotLight.Attenuation.Linear += ATTEN_STEP;
                 break;
 
-            case 'z':
+            case GLFW_KEY_Z:
                 m_spotLight.Attenuation.Linear -= ATTEN_STEP;
                 m_spotLight.Attenuation.Linear -= ATTEN_STEP;
                 break;
 
-            case 's':
+            case GLFW_KEY_S:
                 m_spotLight.Attenuation.Exp += ATTEN_STEP;
                 m_spotLight.Attenuation.Exp += ATTEN_STEP;
                 break;
 
-            case 'x':
+            case GLFW_KEY_X:
                 m_spotLight.Attenuation.Exp -= ATTEN_STEP;
                 m_spotLight.Attenuation.Exp -= ATTEN_STEP;
                 break;
@@ -291,8 +297,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(3.0f, 8.0f, -10.0f);
-        Vector3f Target(0.0f, -0.2f, 1.0f);
+        m_cameraPos = Vector3f(3.0f, 3.0f, -15.0f);
+        m_cameraTarget = Vector3f(-0.2f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -300,7 +306,7 @@ private:
         float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+        m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
     }
 
 
@@ -328,9 +334,13 @@ private:
         m_pMesh1 = new BasicMesh();
 
         m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+
         //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
+
         //m_pMesh1->LoadMesh("../Content/box.obj");
+
         //        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
+
         //m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
@@ -348,6 +358,9 @@ private:
     Matrix4f m_lightPersProjMatrix;
     SpotLight m_spotLight;
     ShadowMapFBO m_shadowMapFBO;
+    Vector3f m_cameraPos;
+    Vector3f m_cameraTarget;
+    bool m_cameraOnLight = false;
 };
 
 Tutorial35* app = NULL;
