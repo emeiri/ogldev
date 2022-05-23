@@ -39,8 +39,8 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-#define SHADOW_MAP_WIDTH 1920
-#define SHADOW_MAP_HEIGHT 1080
+#define SHADOW_MAP_WIDTH 2048
+#define SHADOW_MAP_HEIGHT 2048
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -53,17 +53,17 @@ public:
 
     Tutorial35()
     {
-        m_spotLight.WorldPosition  = Vector3f(-10.0, 10.0, 1.0f);
+        m_spotLight.WorldPosition  = Vector3f(-15.0, 15.0, 1.0f);
         m_spotLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_spotLight.DiffuseIntensity = 0.9f;
-        m_spotLight.AmbientIntensity = 0.1f;
+        m_spotLight.AmbientIntensity = 0.2f;
         m_spotLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_spotLight.Attenuation.Linear = 0.00f;
         m_spotLight.Attenuation.Exp = 0.0f;
-        m_spotLight.Cutoff = 90.0f;
+        m_spotLight.Cutoff = 30.0f;
 
         // Initialize a perspective projection matrix for the spot light
-        float FOV = 60.0f;
+        float FOV = 45.0f;
         float zNear = 1.0f;
         float zFar = 50.0f;
         PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
@@ -106,7 +106,7 @@ public:
     void RenderSceneCB()
     {
         ShadowMapPass();
-        RenderPass();
+        LightingPass();
     }
 
 
@@ -120,21 +120,21 @@ public:
 
         Matrix4f World = m_pMesh1->GetWorldMatrix();
 
-        Matrix4f View;
+        Matrix4f LightView;
         Vector3f Up(0.0f, 1.0f, 0.0f);
-        View.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
+        LightView.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
 
-        Matrix4f WVP = m_lightPersProjMatrix * View * World;
+        Matrix4f WVP = m_lightPersProjMatrix * LightView * World;
         m_shadowMapTech.SetWVP(WVP);
 
         m_pMesh1->Render();
 
         World = m_pTerrain->GetWorldMatrix();
-        WVP = m_lightPersProjMatrix * View * World;
+        WVP = m_lightPersProjMatrix * LightView * World;
         //m_pTerrain->Render();
     }
 
-    void RenderPass()
+    void LightingPass()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -144,7 +144,7 @@ public:
 
         m_lightingTech.Enable();
 
-        m_shadowMapFBO.BindForReading(GL_TEXTURE1);
+        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         m_pGameCamera->OnRender();
 
@@ -154,42 +154,48 @@ public:
         m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 10.0f, 8.0f, -cosf(foo) * 10.0f);
         m_spotLight.WorldDirection = m_pMesh1->GetPosition() - m_spotLight.WorldPosition;
 
+        //        m_pGameCamera->SetPosition(m_spotLight.WorldPosition);
+        //        m_pGameCamera->SetTarget(m_spotLight.WorldDirection);
+
         ///////////////////////////
         // Render the main object
         ////////////////////////////
 
+        // Set the WVP matrix from the camera point of view
         Matrix4f World = m_pMesh1->GetWorldMatrix();
         Matrix4f CameraView = m_pGameCamera->GetMatrix();
         Matrix4f CameraProjection = m_pGameCamera->GetProjectionMat();
-
         Matrix4f WVP = CameraProjection * CameraView * World;
         m_lightingTech.SetWVP(WVP);
 
+        // Set the WVP matrix from the light point of view
         Matrix4f LightView;
         Vector3f Up(0.0f, 1.0f, 0.0f);
         LightView.InitCameraTransform(m_spotLight.WorldPosition, m_spotLight.WorldDirection, Up);
-
         Matrix4f LightWVP = m_lightPersProjMatrix * LightView * World;
         m_lightingTech.SetLightWVP(LightWVP);
-
-        m_spotLight.CalcLocalDirectionAndPosition(m_pMesh1->GetWorldTransform());
-        m_lightingTech.SetSpotLights(1, &m_spotLight);
-        m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
         Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
-        m_pMesh1->Render();
+        m_spotLight.CalcLocalDirectionAndPosition(m_pMesh1->GetWorldTransform());
 
-        //m_pGameCamera->SetTarget(Target);
+        m_lightingTech.SetSpotLights(1, &m_spotLight);
+
+        m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
+
+        m_pMesh1->Render();
 
         /////////////////////////
         // Render the terrain
         ////////////////////////
+
+        // Set the WVP matrix from the camera point of view
         World = m_pTerrain->GetWorldMatrix();
         WVP = CameraProjection * CameraView * World;
         m_lightingTech.SetWVP(WVP);
 
+        // Set the WVP matrix from the light point of view
         LightWVP = m_lightPersProjMatrix * LightView * World;
         m_lightingTech.SetLightWVP(LightWVP);
 
@@ -245,8 +251,6 @@ public:
             }
         }
 
-        //        printf("Linear %f Exp %f\n", m_pointLights[0].Attenuation.Linear, m_pointLights[0].Attenuation.Exp);
-
         m_pGameCamera->OnKeyboard(key);
     }
 
@@ -272,7 +276,6 @@ private:
     void CreateShadowMap()
     {
         if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
-        //        if (!m_shadowMapFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             exit(1);
         }
     }
@@ -288,10 +291,6 @@ private:
 
     void InitCamera()
     {
-        /*        Vector3f Pos(7.0f, 5.0f, 10.0f);
-        Vector3f Target(-1.0f, -0.25f, 0.0f);
-        Vector3f Up(0.0, 1.0f, 0.0f);*/
-
         Vector3f Pos(3.0f, 8.0f, -10.0f);
         Vector3f Target(0.0f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
@@ -328,11 +327,11 @@ private:
     {
         m_pMesh1 = new BasicMesh();
 
-        //m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        m_pMesh1->LoadMesh("../Content/Vanguard.dae");
+        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+        //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
         //m_pMesh1->LoadMesh("../Content/box.obj");
-        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
-        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+        //        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
+        //m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         m_pTerrain->LoadMesh("../Content/box_terrain.obj");
