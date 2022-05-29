@@ -233,7 +233,7 @@ int main(int argc, char** argv)
 {
 //    Magick::InitializeMagick(*argv);
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("Tutorial 16");

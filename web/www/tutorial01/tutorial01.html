@@ -40,9 +40,11 @@
                         <code> glutInit(&amp;argc, argv); </code>
                         <p> This call initializes GLUT. The parameters can be provided directly from the command line and include useful options such as '-sync' and '-gldebug' which disable the asynchronous nature of X and automatically checks for GL errors and displays them (respectively). </p>
 
-                        <code> glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); </code>
+                        <code> glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH); </code>
                         <p> Here we configure some GLUT options. GLUT_DOUBLE enables double buffering (drawing to a background buffer while another buffer is displayed) and the color buffer where most rendering ends up (i.e. the screen). We will usually want these two as well as other options which we will see later. </p>
-
+                        <p>
+                            May-29, 2022: One of the viewers of my youtube channel informed me that he wasn't able to activate the depth test unless GLUT_DEPTH was explicitly added to the above call. On my machine it's working correctly even without this flag but I've decided to add it across the entire code base just in case. We will talk about depth testing later on so for now just add this flag until we get there.
+                        </p>
                         <code> glutInitWindowSize(1024, 768); <br>
                         glutInitWindowPosition(100, 100); <br>
                         glutCreateWindow("Tutorial 01"); </code>

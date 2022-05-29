@@ -253,7 +253,7 @@ int main(int argc, char** argv)
 #endif
     
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
     int width = 1920;
     int height = 1200;
     glutInitWindowSize(width, height);
