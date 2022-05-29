@@ -88,8 +88,10 @@ float CalcShadowFactor()
     float z = 0.5 * ProjCoords.z + 0.5;
     float Depth = texture(gShadowMap, UVCoords).x;
 
-    if (Depth < z + 0.001)
-        return 0.5;
+    float bias = 0.001;
+
+    if (Depth + bias < z)
+        return 0.25;
     else
         return 1.0;
 }

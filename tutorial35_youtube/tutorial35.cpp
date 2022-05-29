@@ -53,7 +53,7 @@ public:
 
     Tutorial35()
     {
-        m_spotLight.WorldPosition  = Vector3f(-15.0, 15.0, 1.0f);
+        m_spotLight.WorldPosition  = Vector3f(-20.0, 20.0, 0.0f);
         m_spotLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_spotLight.DiffuseIntensity = 0.9f;
         m_spotLight.AmbientIntensity = 0.2f;
@@ -147,7 +147,7 @@ public:
         static float foo = 0.0f;
         foo += 0.002f;
 
-        m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 10.0f, 8.0f, -cosf(foo) * 10.0f);
+        m_spotLight.WorldPosition = Vector3f(-sinf(foo) * 15.0f, 8.0f, -cosf(foo) * 15.0f);
         m_spotLight.WorldDirection = m_pMesh1->GetPosition() - m_spotLight.WorldPosition;
 
         if (m_cameraOnLight) {
@@ -197,10 +197,12 @@ public:
         LightWVP = m_lightPersProjMatrix * LightView * World;
         m_lightingTech.SetLightWVP(LightWVP);
 
+        // Update the shader with the local space pos/dir of the spot light
         m_spotLight.CalcLocalDirectionAndPosition(m_pTerrain->GetWorldTransform());
         m_lightingTech.SetSpotLights(1, &m_spotLight);
         m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
 
+        // Update the shader with the local space pos of the camera
         CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
@@ -335,13 +337,12 @@ private:
 
         m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
 
+        //        m_pMesh1->LoadMesh("../Content/box.obj");
+        //        m_pMesh1->SetPosition(0.0f, 1.0f, 0.0f);
+
         //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
-
-        //m_pMesh1->LoadMesh("../Content/box.obj");
-
         //        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
-
-        //m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+        //        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         m_pTerrain->LoadMesh("../Content/box_terrain.obj");
