@@ -116,7 +116,7 @@ public:
         if (!m_mesh[BUDDHA].LoadMesh("../Content/buddha.obj")) {
             return false;
         }
-        m_mesh[BUDDHA].GetOrientation().m_rotation.y = 180.0f;
+        m_mesh[BUDDHA].GetWorldTransform().SetRotation(0.0f, 180.0f, 0.0f);
 
         if (!m_mesh[BUNNY].LoadMesh("../Content/bunny.obj")) {
             return false;
@@ -127,7 +127,7 @@ public:
         }
 
         for (int i = 0 ; i < 3 ; i++) {
-            m_mesh[i].GetOrientation().m_pos = Vector3f(0.0f, -8.0f, 34.0f);
+            m_mesh[i].GetWorldTransform().SetPosition(0.0f, -8.0f, 34.0f);
         }
 #ifndef WIN32
         // TOOD: not working. Need to debug this.
@@ -186,10 +186,10 @@ public:
         m_pipeline.SetCamera(*m_pGameCamera);
 
         if (gAutoRotate) {
-            m_mesh[m_currentMesh].GetOrientation().m_rotation.y += m_rotationSpeed;
+            m_mesh[m_currentMesh].GetWorldTransform().Rotate(0.0f, m_rotationSpeed, 0.0f);
         }
         else {
-            m_mesh[m_currentMesh].GetOrientation().m_rotation = g_Rotation.ToDegrees();
+            m_mesh[m_currentMesh].GetWorldTransform().SetRotation(g_Rotation.ToDegrees());
         }
 
         m_pipeline.Orient(m_mesh[m_currentMesh].GetOrientation());

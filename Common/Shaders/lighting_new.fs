@@ -3,6 +3,7 @@
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
 
+in vec4 LightSpacePos; // required only for shadow mapping
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 LocalPos0;
@@ -58,10 +59,46 @@ uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
+uniform sampler2D gShadowMap;   // required only for shadow mapping
 uniform vec3 gCameraLocalPos;
-uniform vec4 gColorMod;
+uniform vec4 gColorMod = vec4(1);
+uniform float gRimLightPower = 2.0;
+uniform bool gRimLightEnabled = false;
+uniform bool gCellShadingEnabled = false;
 
-vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
+const int toon_color_levels = 4;
+const float toon_scale_factor = 1.0f / toon_color_levels;
+
+float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
+{
+    float RimFactor = dot(PixelToCamera, Normal);
+    RimFactor = 1.0 - RimFactor;
+    RimFactor = max(0.0, RimFactor);
+    RimFactor = pow(RimFactor, gRimLightPower);
+    return RimFactor;
+}
+
+
+float CalcShadowFactor()
+{
+    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec2 UVCoords;
+    UVCoords.x = 0.5 * ProjCoords.x + 0.5;
+    UVCoords.y = 0.5 * ProjCoords.y + 0.5;
+    float z = 0.5 * ProjCoords.z + 0.5;
+    float Depth = texture(gShadowMap, UVCoords).x;
+
+    float bias = 0.001;
+
+    if (Depth + bias < z)
+        return 0.25;
+    else
+        return 1.0;
+}
+
+
+vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
+                       float ShadowFactor)
 {
     vec4 AmbientColor = vec4(Light.Color, 1.0f) *
                         Light.AmbientIntensity *
@@ -71,8 +108,13 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
 
     vec4 DiffuseColor = vec4(0, 0, 0, 0);
     vec4 SpecularColor = vec4(0, 0, 0, 0);
+    vec4 RimColor = vec4(0, 0, 0, 0);
 
     if (DiffuseFactor > 0) {
+        if (gCellShadingEnabled) {
+            DiffuseFactor = ceil(DiffuseFactor * toon_color_levels) * toon_scale_factor;
+        }
+
         DiffuseColor = vec4(Light.Color, 1.0f) *
                        Light.DiffuseIntensity *
                        vec4(gMaterial.DiffuseColor, 1.0f) *
@@ -81,23 +123,30 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
         vec3 PixelToCamera = normalize(gCameraLocalPos - LocalPos0);
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
-        if (SpecularFactor > 0) {
-            float SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+
+        if (!gCellShadingEnabled && (SpecularFactor > 0)) {
+            float SpecularExponent = 128.0;//texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
                             Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular
                             vec4(gMaterial.SpecularColor, 1.0f) *
                             SpecularFactor;
         }
+
+        if (gRimLightEnabled) {
+           float RimFactor = CalcRimLightFactor(PixelToCamera, Normal);
+           RimColor = DiffuseColor * RimFactor;
+        }
     }
 
-    return (AmbientColor + DiffuseColor + SpecularColor);
+    return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
 }
 
 
 vec4 CalcDirectionalLight(vec3 Normal)
 {
-    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);
+    float ShadowFactor = 1.0; // no shadow due to directional light for now
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);
 }
 
 vec4 CalcPointLight(PointLight l, vec3 Normal)
@@ -105,8 +154,9 @@ vec4 CalcPointLight(PointLight l, vec3 Normal)
     vec3 LightDirection = LocalPos0 - l.LocalPos;
     float Distance = length(LightDirection);
     LightDirection = normalize(LightDirection);
+    float ShadowFactor = CalcShadowFactor();
 
-    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal);
+    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);
     float Attenuation =  l.Atten.Constant +
                          l.Atten.Linear * Distance +
                          l.Atten.Exp * Distance * Distance;

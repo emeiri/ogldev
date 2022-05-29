@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIGHTING_TECHNIQUE_17_H
-#define LIGHTING_TECHNIQUE_17_H
+#ifndef NEW_LIGHTING_TECHNIQUE_H
+#define NEW_LIGHTING_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -32,6 +32,11 @@ public:
     Vector3f Color = Vector3f(1.0f, 1.0f, 1.0f);
     float AmbientIntensity = 0.0f;
     float DiffuseIntensity = 0.0f;
+
+    bool IsZero()
+    {
+        return ((AmbientIntensity == 0) && (DiffuseIntensity == 0.0f));
+    }
 };
 
 
@@ -82,8 +87,6 @@ public:
 
 private:
     Vector3f LocalDirection = Vector3f(0.0f, 0.0f, 0.0f);
-
-
 };
 
 
@@ -99,24 +102,41 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
+    void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
+    void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
-    void SetDirectionalLight(const DirectionalLight& Light);
-    void SetPointLights(unsigned int NumLights, const PointLight* pLights);
-    void SetSpotLights(unsigned int NumLights, const SpotLight* pLights);
+    void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
+    void UpdateDirLightDirection(const DirectionalLight& DirLight);
+    void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
+    void UpdatePointLight(unsigned int Index, const PointLight& Light);
+    void UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights);
+    void SetSpotLights(unsigned int NumLights, const SpotLight* pLights, bool WithPosAndDir = true);
+    void UpdateSpotLight(unsigned int Index, const SpotLight& Light);
+    void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
     void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
+    void ControlRimLight(bool IsEnabled);
+    void ControlCellShading(bool IsEnabled);
+
+protected:
+
+    bool InitCommon();
 
 private:
 
-    GLuint WVPLoc;
-    GLuint samplerLoc;
-    GLuint samplerSpecularExponentLoc;
-    GLuint CameraLocalPosLoc;
-    GLuint NumPointLightsLocation;
-    GLuint NumSpotLightsLocation;
-    GLuint ColorModLocation;
+    GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
+    GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
+    GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;
+    GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
+    GLuint CameraLocalPosLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NumSpotLightsLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ColorModLocation = INVALID_UNIFORM_LOCATION;
+    GLuint EnableRimLightLoc = INVALID_UNIFORM_LOCATION;
+    GLuint EnableCellShadingLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;
@@ -145,7 +165,7 @@ private:
         } Atten;
     } PointLightsLocation[MAX_POINT_LIGHTS];
 
-struct {
+    struct {
         GLuint Color;
         GLuint AmbientIntensity;
         GLuint DiffuseIntensity;
@@ -161,4 +181,4 @@ struct {
 };
 
 
-#endif  /* LIGHTING_TECHNIQUE_H */
+#endif  /* NEW_LIGHTING_TECHNIQUE_H */

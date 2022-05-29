@@ -98,7 +98,7 @@ public:
    //         return false;
    //     }
 #endif
-        TwInit (TW_OPENGL_CORE, NULL);
+        /*        TwInit (TW_OPENGL_CORE, NULL);
         TwBar *bar;
         bar = TwNewBar("NameOfMyTweakBar");
 
@@ -113,7 +113,7 @@ public:
         // Add 'g_Rotation' to 'bar': this is a variable of type TW_TYPE_QUAT4F which defines the object's orientation
         TwAddVarRW(bar, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation,
                   " label='Object rotation' opened=true help='Change the object orientation.' ");
-
+        */
         return true;
     }
 
@@ -174,6 +174,13 @@ private:
     Pipeline m_pipeline;
 };
 
+void glDebugOutput(GLenum source,
+                   GLenum type,
+                   unsigned int id,
+                   GLenum severity,
+                   GLsizei length,
+                   const char *message,
+                   const void *userParam);
 
 int main(int argc, char** argv)
 {
@@ -181,18 +188,28 @@ int main(int argc, char** argv)
 
     OgldevBackendInit(OGLDEV_BACKEND_TYPE_GLFW, argc, argv, true, false);
 
-    if (!OgldevBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, true, "Tutorial 44")) {
+    if (!OgldevBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 44")) {
         OgldevBackendTerminate();
-                return 1;
+        return 1;
     }
 
     SRANDOM;
 
+    int flags = 0;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+        printf("Enable debug output\n");
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(glDebugOutput, NULL);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    }
+
     Tutorial44* pApp = new Tutorial44();
 
     if (!pApp->Init()) {
-                delete pApp;
-                OgldevBackendTerminate();
+        delete pApp;
+        OgldevBackendTerminate();
         return 1;
     }
 
@@ -200,7 +217,7 @@ int main(int argc, char** argv)
 
     delete pApp;
 
-        OgldevBackendTerminate();
+    OgldevBackendTerminate();
 
     return 0;
 }

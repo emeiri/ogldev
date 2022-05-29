@@ -133,9 +133,7 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal)
 
 void main()
 {
-//FragColor = vec4(TexCoord0, 0.0, 1.0);
     vec3 Normal = normalize(Normal0);
-
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {

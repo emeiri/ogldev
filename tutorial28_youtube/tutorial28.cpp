@@ -119,8 +119,8 @@ Tutorial28::~Tutorial28()
 
 bool Tutorial28::Init()
 {
-    Vector3f CameraPos(0.0f, 5.0f, -8.0f);
-    Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
+    Vector3f CameraPos(0.0f, 0.0f, 0.0f);
+    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
@@ -158,8 +158,8 @@ void Tutorial28::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
-    worldTransform.SetRotation(270.0f, 180.0f, 0.0f);
-    worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
+    worldTransform.SetRotation(90.0f, 180.0f, 0.0f);
+    worldTransform.SetPosition(0.0f, -2.5f, 25.0f);
     worldTransform.SetScale(0.1f);
 
     Matrix4f World = worldTransform.GetMatrix();

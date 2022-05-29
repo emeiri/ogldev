@@ -18,6 +18,8 @@
 
 #include "lighting_technique.h"
 
+//#define FAIL_ON_MISSING_LOC
+
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
     LocalDirection = worldTransform.WorldDirToLocalDir(WorldDirection);
@@ -89,7 +91,9 @@ bool LightingTechnique::Init()
         NumPointLightsLocation == INVALID_UNIFORM_LOCATION ||
         NumSpotLightsLocation == INVALID_UNIFORM_LOCATION)
     {
+#ifdef FAIL_ON_MISSING_LOC
         return false;
+#endif
     }
 
 
@@ -124,7 +128,9 @@ bool LightingTechnique::Init()
             PointLightsLocation[i].Atten.Constant == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].Atten.Linear == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].Atten.Exp == INVALID_UNIFORM_LOCATION) {
+#ifdef FAIL_ON_MISSING_LOC
             return false;
+#endif
         }
     }
 
@@ -167,7 +173,9 @@ bool LightingTechnique::Init()
             SpotLightsLocation[i].Atten.Constant == INVALID_UNIFORM_LOCATION ||
             SpotLightsLocation[i].Atten.Linear == INVALID_UNIFORM_LOCATION ||
             SpotLightsLocation[i].Atten.Exp == INVALID_UNIFORM_LOCATION) {
+#ifdef FAIL_ON_MISSING_LOC
             return false;
+#endif
         }
     }
 

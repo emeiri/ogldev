@@ -16,7 +16,7 @@
 */
 
 #ifndef OGLDEV_SHADOW_MAP_FBO_H
-#define	OGLDEV_SHADOW_MAP_FBO_H
+#define OGLDEV_SHADOW_MAP_FBO_H
 
 #include <GL/glew.h>
 
@@ -27,13 +27,15 @@ public:
 
     ~ShadowMapFBO();
 
-    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
+    bool Init(unsigned int Width, unsigned int Height);
 
     void BindForWriting();
 
     void BindForReading(GLenum TextureUnit);
 
 private:
+    uint m_width = 0;
+    uint m_height = 0;
     GLuint m_fbo;
     GLuint m_shadowMap;
 };
@@ -58,5 +60,4 @@ private:
 };
 
 
-#endif	/* OGLDEV_SHADOW_MAP_FBO_H */
-
+#endif  /* OGLDEV_SHADOW_MAP_FBO_H */

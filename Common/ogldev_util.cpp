@@ -215,6 +215,14 @@ void glDebugOutput(GLenum source,
                    const char *message,
                    const void *userParam)
 {
+    GLuint ignore_ids[1] = { 131185 }; // "will use video memory..."
+
+    for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(ignore_ids) ; i++) {
+        if (id == ignore_ids[i]) {
+            return;
+        }
+    }
+
     printf("!!! Debug callback !!!\n");
     printf("Debug message: id %d, %s\n", id, message);
 
@@ -251,4 +259,35 @@ void glDebugOutput(GLenum source,
     case GL_DEBUG_SEVERITY_LOW:          printf("Low\n"); break;
     case GL_DEBUG_SEVERITY_NOTIFICATION: printf("Notification\n"); break;
     }
+}
+
+
+string GetDirFromFilename(const string& Filename)
+{
+    // Extract the directory part from the file name
+    string::size_type SlashIndex;
+
+#ifdef _WIN64
+    SlashIndex = Filename.find_last_of("\\");
+
+    if (SlashIndex == -1) {
+        SlashIndex = Filename.find_last_of("/");
+    }
+#else
+    SlashIndex = Filename.find_last_of("/");
+#endif
+
+    string Dir;
+
+    if (SlashIndex == string::npos) {
+        Dir = ".";
+    }
+    else if (SlashIndex == 0) {
+        Dir = "/";
+    }
+    else {
+        Dir = Filename.substr(0, SlashIndex);
+    }
+
+    return Dir;
 }

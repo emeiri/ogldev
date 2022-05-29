@@ -31,15 +31,21 @@ public:
 
     void SetPosition(float x, float y, float z);
 
+    void SetPosition(const Vector3f& pos);
+
+    void SetTarget(float x, float y, float z);
+
+    void SetTarget(const Vector3f& target);
+
     void OnKeyboard(int key);
 
     void OnMouse(int x, int y);
 
     void OnRender();
 
-    Matrix4f GetMatrix();
+    Matrix4f GetMatrix() const;
 
-    const Vector3f& GetPos() { return m_pos; }
+    const Vector3f& GetPos() const { return m_pos; }
 
     const Vector3f& GetTarget() const { return m_target; }
 
@@ -57,7 +63,7 @@ private:
     Vector3f m_target;
     Vector3f m_up;
 
-    float m_speed = 1.0f;
+    float m_speed = 0.1f;
     int m_windowWidth;
     int m_windowHeight;
 

@@ -11,4 +11,4 @@ newmtl wire_087224198
 	Kd 0.3412 0.8784 0.7765
 	Ks 0.3500 0.3500 0.3500
 
-map_Kd .\wal67ar_small.jpg
+map_Kd wal67ar_small.jpg

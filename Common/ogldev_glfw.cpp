@@ -72,5 +72,7 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
 
     enable_debug_output();
 
+    glfwSwapInterval(1);
+
     return window;
 }

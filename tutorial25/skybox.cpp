@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ SkyBox::SkyBox(const Camera* pCamera,
                const PersProjInfo& p)
 {
     m_pCamera = pCamera;
-    m_persProjInfo = p;            
-    
+    m_persProjInfo = p;
+
     m_pSkyboxTechnique = NULL;
     m_pCubemapTex = NULL;
     m_pMesh = NULL;
@@ -57,7 +57,7 @@ bool SkyBox::Init(const string& Directory,
 
     m_pSkyboxTechnique->Enable();
     m_pSkyboxTechnique->SetTextureUnit(0);
-    
+
     m_pCubemapTex = new CubemapTexture(Directory,
                                        PosXFilename,
                                        NegXFilename,
@@ -69,26 +69,26 @@ bool SkyBox::Init(const string& Directory,
     if (!m_pCubemapTex->Load()) {
         return false;
     }
-        
-    m_pMesh = new Mesh();
 
-    return m_pMesh->LoadMesh("../Content/sphere.obj"); 
+    m_pMesh = new BasicMesh();
+
+    return m_pMesh->LoadMesh("../Content/sphere.obj");
 }
 
 
 void SkyBox::Render()
 {
     m_pSkyboxTechnique->Enable();
-    
+
     GLint OldCullFaceMode;
     glGetIntegerv(GL_CULL_FACE_MODE, &OldCullFaceMode);
     GLint OldDepthFuncMode;
     glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);
-    
+
     glCullFace(GL_FRONT);
     glDepthFunc(GL_LEQUAL);
 
-    Pipeline p;    
+    Pipeline p;
     p.Scale(20.0f, 20.0f, 20.0f);
     p.Rotate(0.0f, 0.0f, 0.0f);
     p.WorldPos(m_pCamera->GetPos().x, m_pCamera->GetPos().y, m_pCamera->GetPos().z);
@@ -96,8 +96,8 @@ void SkyBox::Render()
     p.SetPerspectiveProj(m_persProjInfo);
     m_pSkyboxTechnique->SetWVP(p.GetWVPTrans());
     m_pCubemapTex->Bind(GL_TEXTURE0);
-    m_pMesh->Render();  
-    
-    glCullFace(OldCullFaceMode);        
+    m_pMesh->Render();
+
+    glCullFace(OldCullFaceMode);
     glDepthFunc(OldDepthFuncMode);
 }

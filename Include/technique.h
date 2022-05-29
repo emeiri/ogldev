@@ -34,6 +34,8 @@ public:
 
     void Enable();
 
+    GLuint GetProgram() const { return m_shaderProg; }
+
 protected:
 
     bool AddShader(GLenum ShaderType, const char* pFilename);
@@ -42,7 +44,7 @@ protected:
 
     GLint GetUniformLocation(const char* pUniformName);
 
-    GLuint m_shaderProg;
+    GLuint m_shaderProg = 0;
 
 private:
 
