@@ -94,10 +94,10 @@ void PhongRenderer::SetDirLight(const DirectionalLight& DirLight)
     m_dirLight = DirLight;
 
     SwitchToLightingTech();
-    m_lightingTech.SetDirectionalLight(m_dirLight);
+    m_lightingTech.SetDirectionalLight(m_dirLight, false);
 
     m_skinningTech.Enable();
-    m_skinningTech.SetDirectionalLight(m_dirLight);
+    m_skinningTech.SetDirectionalLight(m_dirLight, false);
 }
 
 
@@ -120,10 +120,10 @@ void PhongRenderer::SetPointLights(uint NumLights, const PointLight* pPointLight
     m_numPointLights = NumLights;
 
     SwitchToLightingTech();
-    m_lightingTech.SetPointLights(NumLights, pPointLights);
+    m_lightingTech.SetPointLights(NumLights, pPointLights, false);
 
     m_skinningTech.Enable();
-    m_skinningTech.SetPointLights(NumLights, pPointLights);
+    m_skinningTech.SetPointLights(NumLights, pPointLights, false);
 }
 
 
@@ -146,10 +146,10 @@ void PhongRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
     m_numSpotLights = NumLights;
 
     SwitchToLightingTech();
-    m_lightingTech.SetSpotLights(NumLights, pSpotLights);
+    m_lightingTech.SetSpotLights(NumLights, pSpotLights, false);
 
     m_skinningTech.Enable();
-    m_skinningTech.SetSpotLights(NumLights, pSpotLights);
+    m_skinningTech.SetSpotLights(NumLights, pSpotLights, false);
 }
 
 
