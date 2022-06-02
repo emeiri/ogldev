@@ -146,14 +146,14 @@ bool Tutorial23::Init()
 
     pMesh1 = new BasicMesh();
 
-    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/Zombie.obj")) {
+    if (!pMesh1->LoadMesh("../Content/Zombie.obj")) {
     //    if (!pMesh1->LoadMesh("/home/emeiri/Downloads/vintage_wooden_drawer_01_4k.blend/vintage_wooden_drawer_01_4k.obj")) {
         return false;
     }
 
     pMesh2 = new BasicMesh();
 
-    if (!pMesh2->LoadMesh("/home/emeiri/Downloads/vintage_grandfather_clock_01_4k.blend/vintage_grandfather_clock_01_4k.obj")) {
+    if (!pMesh2->LoadMesh("/home/emeiri/diskb/emeiri/Downloads/vintage_grandfather_clock_01_4k.blend/vintage_grandfather_clock_01_4k.obj")) {
         return false;
     }
 
