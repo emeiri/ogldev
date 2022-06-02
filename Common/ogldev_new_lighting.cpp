@@ -241,6 +241,9 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& DirLight, bo
 void LightingTechnique::UpdateDirLightDirection(const DirectionalLight& DirLight)
 {
     Vector3f LocalDirection = DirLight.GetLocalDirection();
+
+    LocalDirection.Normalize();
+
     glUniform3f(dirLightLoc.Direction, LocalDirection.x, LocalDirection.y, LocalDirection.z);
 }
 
