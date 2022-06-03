@@ -130,14 +130,18 @@ void SkinnedMesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeT
     uint NextPositionIndex = PositionIndex + 1;
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
     float t1 = (float)pNodeAnim->mPositionKeys[PositionIndex].mTime;
-    float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
-    float DeltaTime = t2 - t1;
-    float Factor = (AnimationTimeTicks - t1) / DeltaTime;
-    assert(Factor >= 0.0f && Factor <= 1.0f);
-    const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
-    const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
-    aiVector3D Delta = End - Start;
-    Out = Start + Factor * Delta;
+    if (t1 > AnimationTimeTicks) {
+        Out = pNodeAnim->mPositionKeys[PositionIndex].mValue;
+    } else {
+        float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
+        float DeltaTime = t2 - t1;
+        float Factor = (AnimationTimeTicks - t1) / DeltaTime;
+        assert(Factor >= 0.0f && Factor <= 1.0f);
+        const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
+        const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
+        aiVector3D Delta = End - Start;
+        Out = Start + Factor * Delta;
+    }
 }
 
 
@@ -168,14 +172,19 @@ void SkinnedMesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTim
     uint NextRotationIndex = RotationIndex + 1;
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
     float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime;
-    float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
-    float DeltaTime = t2 - t1;
-    float Factor = (AnimationTimeTicks - t1) / DeltaTime;
-    assert(Factor >= 0.0f && Factor <= 1.0f);
-    const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-    const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
-    aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-    Out = StartRotationQ;
+    if (t1 > AnimationTimeTicks) {
+        Out = pNodeAnim->mRotationKeys[RotationIndex].mValue;
+    } else {
+        float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
+        float DeltaTime = t2 - t1;
+        float Factor = (AnimationTimeTicks - t1) / DeltaTime;
+        assert(Factor >= 0.0f && Factor <= 1.0f);
+        const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
+        const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
+        aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
+        Out = StartRotationQ;
+    }
+
     Out.Normalize();
 }
 
@@ -207,14 +216,18 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTi
     uint NextScalingIndex = ScalingIndex + 1;
     assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
     float t1 = (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime;
-    float t2 = (float)pNodeAnim->mScalingKeys[NextScalingIndex].mTime;
-    float DeltaTime = t2 - t1;
-    float Factor = (AnimationTimeTicks - (float)t1) / DeltaTime;
-    assert(Factor >= 0.0f && Factor <= 1.0f);
-    const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
-    const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
-    aiVector3D Delta = End - Start;
-    Out = Start + Factor * Delta;
+    if (t1 > AnimationTimeTicks) {
+        Out = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
+    } else {
+        float t2 = (float)pNodeAnim->mScalingKeys[NextScalingIndex].mTime;
+        float DeltaTime = t2 - t1;
+        float Factor = (AnimationTimeTicks - (float)t1) / DeltaTime;
+        assert(Factor >= 0.0f && Factor <= 1.0f);
+        const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
+        const aiVector3D& End   = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
+        aiVector3D Delta = End - Start;
+        Out = Start + Factor * Delta;
+    }
 }
 
 
