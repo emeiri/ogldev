@@ -36,6 +36,7 @@ class MeshCommon {
     void SetScale(float Scale);
     void SetRotation(float x, float y, float z);
     void SetPosition(float x, float y, float z);
+    void SetPosition(const Vector3f& pos) { SetPosition(pos.x, pos.y, pos.z); }
 
     Vector3f GetPosition() const;
 
