@@ -88,10 +88,10 @@ float CalcShadowFactor()
     float z = 0.5 * ProjCoords.z + 0.5;
     float Depth = texture(gShadowMap, UVCoords).x;
 
-    float bias = 0.001;
+    float bias = 0.015;
 
     if (Depth + bias < z)
-        return 0.25;
+        return 0.5;
     else
         return 1.0;
 }
@@ -145,7 +145,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
 
 vec4 CalcDirectionalLight(vec3 Normal)
 {
-    float ShadowFactor = 1.0; // no shadow due to directional light for now
+    float ShadowFactor = CalcShadowFactor();
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);
 }
 
