@@ -41,11 +41,11 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class Tutorial34
+class Tutorial35
 {
 public:
 
-    Tutorial34()
+    Tutorial35()
     {
         m_pointLights[0].WorldPosition = Vector3f(20.0f, 0.0f, 0.0f);
         m_pointLights[0].DiffuseIntensity = 1.0f;
@@ -64,7 +64,7 @@ public:
         m_dirLight.AmbientIntensity = 0.1f;
     }
 
-    virtual ~Tutorial34()
+    virtual ~Tutorial35()
     {
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh1);
@@ -189,7 +189,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 34");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 35");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -205,8 +205,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 10.0f, -10.0f);
-        Vector3f Target(0.0f, -0.1f, 1.0f);
+        Vector3f Pos(0.0f, 0.0f, 0.0f);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -230,11 +230,10 @@ private:
     void InitMesh()
     {
         m_pMesh1 = new BasicMesh();
-
         //m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        m_pMesh1->LoadMesh("../Content/Vanguard.dae");
 
-        m_pMesh1->SetPosition(0.0f, 0.0f, 0.0f);
+        m_pMesh1->LoadMesh("../Content/Vanguard.dae");
+        m_pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
         m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
@@ -254,7 +253,7 @@ private:
     DirectionalLight m_dirLight;
 };
 
-Tutorial34* app = NULL;
+Tutorial35* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -280,7 +279,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial34();
+    app = new Tutorial35();
 
     app->Init();
 
