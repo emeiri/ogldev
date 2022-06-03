@@ -91,6 +91,8 @@ public:
         InitMesh();
 
         InitRenderer();
+
+        m_startTimeMillis = GetCurrentTimeMillis();
     }
 
 
@@ -124,7 +126,10 @@ public:
         spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
         m_phongRenderer.UpdateSpotLightPosAndDir(0, spotLights[0].WorldPosition, spotLights[0].WorldDirection);
 
-        m_phongRenderer.Render(pMesh1);
+        long long CurrentTimeMillis = GetCurrentTimeMillis();
+        float AnimationTimeSec = ((float)(CurrentTimeMillis - m_startTimeMillis)) / 1000.0f;
+
+        m_phongRenderer.RenderAnimation(pMesh1, AnimationTimeSec);
     }
 
 
@@ -184,8 +189,6 @@ public:
 
         }
 
-        printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
-
         m_pGameCamera->OnKeyboard(key);
     }
 
@@ -242,22 +245,25 @@ private:
 
     void InitMesh()
     {
-        pMesh1 = new BasicMesh();
+        //        pMesh1 = new BasicMesh();
+        //        pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+        // pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
 
-        pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-
-        WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
-        meshWorldTransform.SetPosition(0.0f, 0.0f, 10.0f);
+        pMesh1 = new SkinnedMesh();
+        pMesh1->LoadMesh("../Content/Vanguard2.fbx");
+        pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
+        //        pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     PhongRenderer m_phongRenderer;
-    BasicMesh* pMesh1 = NULL;
+    SkinnedMesh* pMesh1 = NULL;
     PersProjInfo persProjInfo;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
+    long long m_startTimeMillis = 0;
 };
 
 PhongDemo* app = NULL;
