@@ -69,6 +69,16 @@ public:
 
         m_lightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
 
+        OrthoProjInfo cameraOrthoProjInfo;
+        cameraOrthoProjInfo.l = -WINDOW_WIDTH / 250.0f;
+        cameraOrthoProjInfo.r = WINDOW_WIDTH / 250.0f;
+        cameraOrthoProjInfo.t = WINDOW_HEIGHT / 250.0f;
+        cameraOrthoProjInfo.b = -WINDOW_HEIGHT / 250.0f;
+        cameraOrthoProjInfo.n = 1.0f;
+        cameraOrthoProjInfo.f = 100.0f;
+
+        m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
+
         m_positions[0] = Vector3f(0.0f, 0.0f, -10.0f);
         m_positions[1] = Vector3f(0.0f, 0.0f, 0.0f);
         m_positions[2] = Vector3f(0.0f, 0.0f, 10.0f);
@@ -166,7 +176,13 @@ public:
         ////////////////////////////
 
         Matrix4f CameraView = m_pGameCamera->GetMatrix();
-        Matrix4f CameraProjection = m_pGameCamera->GetProjectionMat();
+        Matrix4f CameraProjection;
+
+        if (m_isOrthoCamera) {
+            CameraProjection = m_cameraOrthoProjMatrix;
+        } else {
+            CameraProjection = m_pGameCamera->GetProjectionMat();
+        }
 
         Matrix4f LightView;
         Vector3f Origin(0.0f, 0.0f, 0.0f);
@@ -252,6 +268,10 @@ public:
 
             case GLFW_KEY_D:
                 m_dirLight.DiffuseIntensity -= ATTEN_STEP;
+                break;
+
+            case GLFW_KEY_P:
+                m_isOrthoCamera = !m_isOrthoCamera;
                 break;
             }
         }
@@ -355,12 +375,14 @@ private:
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pTerrain = NULL;
     Matrix4f m_lightOrthoProjMatrix;
+    Matrix4f m_cameraOrthoProjMatrix;
     DirectionalLight m_dirLight;
     ShadowMapFBO m_shadowMapFBO;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
     Vector3f m_positions[3];
+    bool m_isOrthoCamera = false;
 };
 
 Tutorial36* app = NULL;
