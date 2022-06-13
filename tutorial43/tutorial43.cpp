@@ -119,7 +119,7 @@ public:
         m_shadowMapEffect.Enable();
         m_shadowMapEffect.SetLightWorldPos(m_pointLight.Position);
 
-                if (!m_quad.LoadMesh("../Content/quad.obj")) {
+        if (!m_quad.LoadMesh("../Content/quad.obj")) {
             return false;
         }
 
@@ -130,7 +130,7 @@ public:
         m_quad2Orientation.m_scale = Vector3f(10.0f, 10.0f, 10.0f);
         m_quad2Orientation.m_pos = Vector3f(0.0f, 0.0f, 7.0f);
 
-                m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
+        m_pGroundTex = new Texture(GL_TEXTURE_2D, "../Content/test.png");
 
         if (!m_pGroundTex->Load()) {
             return false;
@@ -138,7 +138,7 @@ public:
 
         if (!m_mesh.LoadMesh("../Content/sphere.obj")) {
             return false;
-                }
+        }
 
         m_mesh1Orientation.m_pos = Vector3f(0.0f, 3.0f, 0.0f);
         m_mesh2Orientation.m_pos = Vector3f(0.0f, 5.0f, 3.0f);
