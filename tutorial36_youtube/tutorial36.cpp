@@ -56,7 +56,7 @@ public:
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.8f, -0.7f);
 
         // Initialize an orthographic projection matrix for the directional light
         OrthoProjInfo shadowOrthoProjInfo;
@@ -79,9 +79,9 @@ public:
 
         m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
 
-        m_positions[0] = Vector3f(0.0f, 0.0f, -10.0f);
+        m_positions[0] = Vector3f(0.0f, 0.0f, -12.0f);
         m_positions[1] = Vector3f(0.0f, 0.0f, 0.0f);
-        m_positions[2] = Vector3f(0.0f, 0.0f, 10.0f);
+        m_positions[2] = Vector3f(0.0f, 0.0f, 15.0f);
     }
 
 
@@ -292,7 +292,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 35");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 36");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
