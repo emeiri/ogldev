@@ -46,6 +46,24 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
+struct CameraDirection
+{
+    GLenum CubemapFace;
+    Vector3f Target;
+    Vector3f Up;
+};
+
+CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
+{
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, -1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, -1.0f, 0.0f) }
+};
+
+
 
 class Tutorial37
 {
@@ -53,10 +71,10 @@ public:
 
     Tutorial37()
     {
-        m_dirLight.AmbientIntensity = 0.5f;
-        m_dirLight.DiffuseIntensity = 0.9f;
-        m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(1.0f, -0.8f, -0.7f);
+        m_pointLight.AmbientIntensity = 0.5f;
+        m_pointLight.DiffuseIntensity = 0.9f;
+        m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLight.WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
 
         // Initialize an orthographic projection matrix for the directional light
         OrthoProjInfo shadowOrthoProjInfo;
@@ -120,11 +138,6 @@ public:
 
     void RenderSceneCB()
     {
-        static float foo = 0.0f;
-        foo += 0.01f;
-
-        //        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
-
         ShadowMapPass();
         LightingPass();
     }
@@ -141,7 +154,7 @@ public:
         Matrix4f LightView;
         Vector3f Up(0.0f, 1.0f, 0.0f);
 
-        for (uint i = 0 ; i < NUM_OF_LAYERS ; i++) {
+        for (uint i = 0 ; i < NUM_CUBE_MAP_FACES ; i++) {
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             LightView.InitCameraTransform(m_pointLight.WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
 
@@ -170,9 +183,12 @@ public:
 
         m_pGameCamera->OnRender();
 
+        static float foo = 0.0f;
+        foo += 0.01f;
+
         if (m_cameraOnLight) {
-            m_pGameCamera->SetPosition(m_dirLight.WorldDirection * 2.0f + Vector3f(0.0f, 5.0f, 0.0f));
-            m_pGameCamera->SetTarget(Vector3f(0.0f, 0.0f, 0.0f) - m_dirLight.WorldDirection);
+            m_pGameCamera->SetPosition(m_pointLight.WorldPosition);
+            m_pGameCamera->SetTarget(Vector3f(sinf(foo), 0.0f, cosf(foo)));
         }
 
         ///////////////////////////
@@ -188,11 +204,6 @@ public:
             CameraProjection = m_pGameCamera->GetProjectionMat();
         }
 
-        Matrix4f LightView;
-        Vector3f Origin(0.0f, 0.0f, 0.0f);
-        Vector3f Up(0.0f, 1.0f, 0.0f);
-        LightView.InitCameraTransform(Origin, m_dirLight.WorldDirection, Up);
-
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
@@ -202,14 +213,10 @@ public:
             Matrix4f WVP = CameraProjection * CameraView * World;
             m_lightingTech.SetWVP(WVP);
 
-            // Set the WVP matrix from the light point of view
-            Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
-            m_lightingTech.SetLightWVP(LightWVP);
-
             Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
             m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
-            m_dirLight.CalcLocalDirection(m_pMesh1->GetWorldTransform());
-            m_lightingTech.SetDirectionalLight(m_dirLight);
+            m_pointLight.CalcLocalPosition(m_pMesh1->GetWorldTransform());
+            m_lightingTech.SetPointLights(1, &m_pointLight);
             m_pMesh1->Render();
         }
 
@@ -222,13 +229,9 @@ public:
         Matrix4f WVP = CameraProjection * CameraView * World;
         m_lightingTech.SetWVP(WVP);
 
-        // Set the WVP matrix from the light point of view
-        Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
-        m_lightingTech.SetLightWVP(LightWVP);
-
         // Update the shader with the local space pos/dir of the spot light
-        m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
-        m_lightingTech.SetDirectionalLight(m_dirLight);
+        m_pointLight.CalcLocalPosition(m_pTerrain->GetWorldTransform());
+        m_lightingTech.SetPointLights(1, &m_pointLight);
         m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
 
         // Update the shader with the local space pos of the camera
@@ -267,11 +270,11 @@ public:
                 break;
 
             case GLFW_KEY_A:
-                m_dirLight.AmbientIntensity += ATTEN_STEP;
+                m_pointLight.AmbientIntensity += ATTEN_STEP;
                 break;
 
             case GLFW_KEY_D:
-                m_dirLight.DiffuseIntensity -= ATTEN_STEP;
+                m_pointLight.DiffuseIntensity -= ATTEN_STEP;
                 break;
 
             case GLFW_KEY_P:
@@ -380,7 +383,7 @@ private:
     BasicMesh* m_pTerrain = NULL;
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
-    DirectionalLight m_dirLight;
+    PointLight m_pointLight;
     ShadowMapFBO m_shadowMapFBO;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
