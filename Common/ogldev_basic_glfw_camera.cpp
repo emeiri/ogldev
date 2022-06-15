@@ -22,7 +22,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 
-static int MARGIN = 10;
+static int MARGIN = 20;
 static float EDGE_STEP = 1.0f;
 
 BasicCamera::BasicCamera(int WindowWidth, int WindowHeight)
