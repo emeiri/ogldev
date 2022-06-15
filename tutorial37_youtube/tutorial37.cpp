@@ -97,10 +97,14 @@ public:
 
         m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
 
-        m_positions[0] = Vector3f(0.0f, 0.0f, -8.0f);    // far
-        m_positions[1] = Vector3f(-8.0f, 0.0f, 0.0f);    // left
-        m_positions[2] = Vector3f(8.0f, 0.0f, 0.0f);     // right
-        m_positions[3] = Vector3f(0.0f, 0.0f, 8.0f);     // near
+        m_housePositions[0] = Vector3f(0.0f, 0.0f, -8.0f);    // near
+        m_cylinderPositions[0] = Vector3f(0.0f, 0.0f, -4.0f);
+        m_housePositions[1] = Vector3f(-8.0f, 0.0f, 0.0f);    // left
+        m_cylinderPositions[1] = Vector3f(-4.0f, 0.0f, 1.0f);
+        m_housePositions[2] = Vector3f(8.0f, 0.0f, 0.0f);     // right
+        m_cylinderPositions[2] = Vector3f(4.0f, 0.0f, 1.0f);
+        m_housePositions[3] = Vector3f(0.0f, 0.0f, 8.0f);     // far
+        m_cylinderPositions[3] = Vector3f(0.0f, 0.0f, 4.0f);
     }
 
 
@@ -159,12 +163,20 @@ public:
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             LightView.InitCameraTransform(m_pointLight.WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
 
-            for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
-                m_pMesh1->SetPosition(m_positions[i]);
+            for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_housePositions) ; i++) {
+                m_pMesh1->SetPosition(m_housePositions[i]);
                 Matrix4f World = m_pMesh1->GetWorldMatrix();
                 Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
                 m_shadowMapTech.SetWVP(WVP);
                 m_pMesh1->Render();
+            }
+
+            for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_cylinderPositions) ; i++) {
+                m_pMesh2->SetPosition(m_cylinderPositions[i]);
+                Matrix4f World = m_pMesh2->GetWorldMatrix();
+                Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
+                m_shadowMapTech.SetWVP(WVP);
+                m_pMesh2->Render();
             }
         }
     }
@@ -207,9 +219,9 @@ public:
 
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
-        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
+        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_housePositions) ; i++) {
             // Set the WVP matrix from the camera point of view
-            m_pMesh1->SetPosition(m_positions[i]);
+            m_pMesh1->SetPosition(m_housePositions[i]);
             Matrix4f World = m_pMesh1->GetWorldMatrix();
             Matrix4f WVP = CameraProjection * CameraView * World;
             m_lightingTech.SetWVP(WVP);
@@ -220,6 +232,21 @@ public:
             m_lightingTech.SetPointLights(1, &m_pointLight);
             m_pMesh1->Render();
         }
+
+        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_cylinderPositions) ; i++) {
+            // Set the WVP matrix from the camera point of view
+            m_pMesh2->SetPosition(m_cylinderPositions[i]);
+            Matrix4f World = m_pMesh2->GetWorldMatrix();
+            Matrix4f WVP = CameraProjection * CameraView * World;
+            m_lightingTech.SetWVP(WVP);
+
+            Vector3f CameraLocalPos3f = m_pMesh2->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+            m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+            m_pointLight.CalcLocalPosition(m_pMesh2->GetWorldTransform());
+            m_lightingTech.SetPointLights(1, &m_pointLight);
+            m_pMesh2->Render();
+        }
+
 
         /////////////////////////
         // Render the terrain
@@ -361,6 +388,11 @@ private:
         m_pMesh1 = new BasicMesh();
 
         m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj");
+
+        m_pMesh2 = new BasicMesh();
+
+        m_pMesh2->LoadMesh("../Content/cylinder.obj");
+
         //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
 
@@ -381,6 +413,7 @@ private:
     LightingTechnique m_lightingTech;
     ShadowMappingTechnique m_shadowMapTech;
     BasicMesh* m_pMesh1 = NULL;
+    BasicMesh* m_pMesh2 = NULL;
     BasicMesh* m_pTerrain = NULL;
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
@@ -389,7 +422,8 @@ private:
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
-    Vector3f m_positions[4];
+    Vector3f m_housePositions[4] = {};
+    Vector3f m_cylinderPositions[4] = {};
     bool m_isOrthoCamera = false;
 };
 
