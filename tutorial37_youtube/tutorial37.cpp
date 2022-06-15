@@ -97,9 +97,10 @@ public:
 
         m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
 
-        m_positions[0] = Vector3f(0.0f, 0.0f, -12.0f);
-        m_positions[1] = Vector3f(0.0f, 0.0f, 0.0f);
-        m_positions[2] = Vector3f(0.0f, 0.0f, 15.0f);
+        m_positions[0] = Vector3f(0.0f, 0.0f, -8.0f);    // far
+        m_positions[1] = Vector3f(-8.0f, 0.0f, 0.0f);    // left
+        m_positions[2] = Vector3f(8.0f, 0.0f, 0.0f);     // right
+        m_positions[3] = Vector3f(0.0f, 0.0f, 8.0f);     // near
     }
 
 
@@ -388,7 +389,7 @@ private:
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
-    Vector3f m_positions[3];
+    Vector3f m_positions[4];
     bool m_isOrthoCamera = false;
 };
 
