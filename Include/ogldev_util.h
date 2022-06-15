@@ -69,6 +69,8 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define INVALID_UNIFORM_LOCATION 0xffffffff
 #define INVALID_OGL_VALUE 0xffffffff
 
+#define NUM_CUBE_MAP_FACES 6
+
 #define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
 
 #define GLExitIfError                                                          \
