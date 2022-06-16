@@ -232,6 +232,8 @@ public:
             m_pMesh1->Render();
         }
 
+        m_lightingTech.SetMaterial(m_pMesh2->GetMaterial());
+
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_cylinderPositions) ; i++) {
             // Set the WVP matrix from the camera point of view
             m_pMesh2->SetPosition(m_cylinderPositions[i]);
@@ -247,10 +249,10 @@ public:
             m_pMesh2->Render();
         }
 
-
         /////////////////////////
         // Render the terrain
         ////////////////////////
+        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
 
         // Set the WVP matrix from the camera point of view
         Matrix4f World = m_pTerrain->GetWorldMatrix();
@@ -261,7 +263,6 @@ public:
         // Update the shader with the local space pos/dir of the spot light
         m_pointLight.CalcLocalPosition(m_pTerrain->GetWorldTransform());
         m_lightingTech.SetPointLights(1, &m_pointLight);
-        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
 
         // Update the shader with the local space pos of the camera
         Vector3f CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
