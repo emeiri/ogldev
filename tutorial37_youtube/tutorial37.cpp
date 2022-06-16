@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include <GL/glew.h>
-
+#include <float.h>
 
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
@@ -31,7 +31,7 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_shadow_map_fbo.h"
+#include "ogldev_shadow_cube_map_fbo.h"
 #include "ogldev_new_lighting.h"
 #include "ogldev_shadow_mapping_technique_point_light.h"
 
@@ -150,16 +150,17 @@ public:
 
     void ShadowMapPass()
     {
-        m_shadowMapFBO.BindForWriting();
-
-        glClear(GL_DEPTH_BUFFER_BIT);
-
         m_shadowMapTech.Enable();
 
         Matrix4f LightView;
         Vector3f Up(0.0f, 1.0f, 0.0f);
 
+        m_shadowMapTech.SetLightWorldPos(m_pointLight.WorldPosition);
+
+        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+
         for (uint i = 0 ; i < NUM_CUBE_MAP_FACES ; i++) {
+            m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
             LightView.InitCameraTransform(m_pointLight.WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
 
@@ -168,6 +169,7 @@ public:
                 Matrix4f World = m_pMesh1->GetWorldMatrix();
                 Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
                 m_shadowMapTech.SetWVP(WVP);
+                m_shadowMapTech.SetWorld(World);
                 m_pMesh1->Render();
             }
 
@@ -192,7 +194,7 @@ public:
 
         m_lightingTech.Enable();
 
-        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_shadowCubeMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         m_pGameCamera->OnRender();
 
@@ -335,7 +337,7 @@ private:
 
     void CreateShadowMap()
     {
-        if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+        if (!m_shadowCubeMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
             exit(1);
         }
     }
@@ -418,7 +420,7 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
     PointLight m_pointLight;
-    ShadowMapFBO m_shadowMapFBO;
+    ShadowCubeMapFBO m_shadowCubeMapFBO;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
@@ -457,7 +459,6 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
