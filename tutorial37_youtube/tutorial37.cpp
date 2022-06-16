@@ -71,14 +71,14 @@ public:
 
     Tutorial37()
     {
-        m_pointLight.AmbientIntensity = 0.5f;
+        m_pointLight.AmbientIntensity = 0.1f;
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLight.WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
+        m_pointLight.WorldPosition = Vector3f(0.0f, 2.0f, 0.0f);
 
-        float FOV = 45.0f;
+        float FOV = 90.0f;
         float zNear = 0.1f;
-        float zFar = 50.0f;
+        float zFar = 20.0f;
         PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
         m_lightPersProjMatrix.InitPersProjTransform(shadowPersProjInfo);
 
@@ -139,7 +139,7 @@ public:
     void RenderSceneCB()
     {
         ShadowMapPass();
-        //        LightingPass();
+        LightingPass();
     }
 
 
@@ -352,8 +352,8 @@ private:
 
     void InitCamera()
     {
-        m_cameraPos = Vector3f(3.0f, 3.0f, -15.0f);
-        m_cameraTarget = Vector3f(-0.2f, -0.2f, 1.0f);
+        m_cameraPos = Vector3f(0.0f, 15.0f, -15.0f);
+        m_cameraTarget = Vector3f(0.0f, -0.5f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
