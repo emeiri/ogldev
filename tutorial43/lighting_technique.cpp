@@ -90,12 +90,12 @@ bool LightingTechnique::Init()
 
 void LightingTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);    
+    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
-void LightingTechnique::SetWorldMatrix(const Matrix4f& WorldInverse)
+void LightingTechnique::SetWorldMatrix(const Matrix4f& World)
 {
-    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)WorldInverse.m);
+    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World.m);
 }
 
 
