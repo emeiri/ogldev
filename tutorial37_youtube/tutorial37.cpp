@@ -33,7 +33,7 @@
 #include "ogldev_world_transform.h"
 #include "ogldev_shadow_map_fbo.h"
 #include "ogldev_new_lighting.h"
-#include "ogldev_shadow_mapping_technique.h"
+#include "ogldev_shadow_mapping_technique_point_light.h"
 
 
 #define WINDOW_WIDTH  1920
@@ -74,7 +74,7 @@ public:
         m_pointLight.AmbientIntensity = 0.5f;
         m_pointLight.DiffuseIntensity = 0.9f;
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLight.WorldPosition = Vector3f(0.0f, 0.0f, 0.0f);
+        m_pointLight.WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
 
         // Initialize an orthographic projection matrix for the directional light
         OrthoProjInfo shadowOrthoProjInfo;
@@ -411,7 +411,7 @@ private:
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     LightingTechnique m_lightingTech;
-    ShadowMappingTechnique m_shadowMapTech;
+    ShadowMappingPointLightTechnique m_shadowMapTech;
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pMesh2 = NULL;
     BasicMesh* m_pTerrain = NULL;

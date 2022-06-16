@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2022 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,25 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "shadow_map_technique.h"
-#include "ogldev_pipeline.h"
+#include "ogldev_shadow_mapping_technique_point_light.h"
 
-
-ShadowMapTechnique::ShadowMapTechnique()
+ShadowMappingPointLightTechnique::ShadowMappingPointLightTechnique()
 {
+
 }
 
-bool ShadowMapTechnique::Init()
+
+bool ShadowMappingPointLightTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "shaders/shadow_map.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/shadow_map_point_light.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "shaders/shadow_map.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/shadow_map_point_light.fs")) {
         return false;
     }
 
@@ -42,12 +42,12 @@ bool ShadowMapTechnique::Init()
         return false;
     }
 
-    m_WVPLocation = GetUniformLocation("gWVP");
-    m_WorldMatrixLocation = GetUniformLocation("gWorld");
+    m_WVPLoc = GetUniformLocation("gWVP");
+    m_worldMatrixLoc = GetUniformLocation("gWorld");
     m_lightWorldPosLoc = GetUniformLocation("gLightWorldPos");
 
-    if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-	    m_WorldMatrixLocation == INVALID_UNIFORM_LOCATION ||
+    if (m_WVPLoc == INVALID_UNIFORM_LOCATION ||
+        m_worldMatrixLoc == INVALID_UNIFORM_LOCATION ||
         m_lightWorldPosLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
@@ -56,18 +56,19 @@ bool ShadowMapTechnique::Init()
 }
 
 
-void ShadowMapTechnique::SetWVP(const Matrix4f& WVP)
+void ShadowMappingPointLightTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+    glUniformMatrix4fv(m_WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
-void ShadowMapTechnique::SetWorld(const Matrix4f& World)
+void ShadowMappingPointLightTechnique::SetWorld(const Matrix4f& World)
 {
-    glUniformMatrix4fv(m_WorldMatrixLocation, 1, GL_TRUE, (const GLfloat*)World.m);
+    glUniformMatrix4fv(m_worldMatrixLoc, 1, GL_TRUE, (const GLfloat*)World.m);
 }
 
-void ShadowMapTechnique::SetLightWorldPos(const Vector3f& Pos)
+
+void ShadowMappingPointLightTechnique::SetLightWorldPos(const Vector3f& Pos)
 {
-    glUniform3f(m_lightWorldPosLoc, Pos.x, Pos.y, Pos.z);    
+    glUniform3f(m_lightWorldPosLoc, Pos.x, Pos.y, Pos.z);
 }
