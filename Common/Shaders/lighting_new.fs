@@ -85,8 +85,8 @@ float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
 
 float CalcShadowFactorPointLight(vec3 LightDirection)
 {
-vec3 dir = LightDirection;
-dir.y = -dir.y;
+    vec3 dir = LightDirection;
+    dir.y = -dir.y;
     float SampledDistance = texture(gShadowCubeMap, dir).r;
 
     float Distance = length(LightDirection);
