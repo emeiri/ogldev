@@ -69,9 +69,11 @@ bool LightingTechnique::Init()
 bool LightingTechnique::InitCommon()
 {
     WVPLoc = GetUniformLocation("gWVP");
+    WorldMatrixLoc = GetUniformLocation("gWorld");
     LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
+    shadowCubeMapLoc = GetUniformLocation("gShadowMap");
     samplerSpecularExponentLoc = GetUniformLocation("gSamplerSpecularExponent");
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
@@ -88,8 +90,11 @@ bool LightingTechnique::InitCommon()
     EnableCellShadingLoc = GetUniformLocation("gCellShadingEnabled");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
+        WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
         LightWVPLoc == INVALID_UNIFORM_LOCATION ||  // required only for shadow mapping
         samplerLoc == INVALID_UNIFORM_LOCATION ||
+        shadowMapLoc == INVALID_UNIFORM_LOCATION ||
+        shadowCubeMapLoc == INVALID_UNIFORM_LOCATION ||
         //        samplerSpecularExponentLoc == INVALID_UNIFORM_LOCATION ||
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
@@ -120,7 +125,10 @@ bool LightingTechnique::InitCommon()
         PointLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
 
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].LocalPos", i);
-        PointLightsLocation[i].Position = GetUniformLocation(Name);
+        PointLightsLocation[i].LocalPos = GetUniformLocation(Name);
+
+        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].WorldPos", i);
+        PointLightsLocation[i].WorldPos = GetUniformLocation(Name);
 
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.DiffuseIntensity", i);
         PointLightsLocation[i].DiffuseIntensity = GetUniformLocation(Name);
@@ -136,7 +144,8 @@ bool LightingTechnique::InitCommon()
 
         if (PointLightsLocation[i].Color == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].AmbientIntensity == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].Position == INVALID_UNIFORM_LOCATION ||
+            PointLightsLocation[i].LocalPos == INVALID_UNIFORM_LOCATION ||
+            PointLightsLocation[i].WorldPos == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].Atten.Constant == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].Atten.Linear == INVALID_UNIFORM_LOCATION ||
@@ -202,6 +211,12 @@ void LightingTechnique::SetWVP(const Matrix4f& WVP)
 }
 
 
+void LightingTechnique::SetWorldMatrix(const Matrix4f& World)
+{
+    glUniformMatrix4fv(WorldMatrixLoc, 1, GL_TRUE, (const GLfloat*)World.m);
+}
+
+
 void LightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
 {
     glUniformMatrix4fv(LightWVPLoc, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
@@ -217,6 +232,12 @@ void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 void LightingTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(shadowMapLoc, TextureUnit);
+}
+
+
+void LightingTechnique::SetShadowCubeMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(shadowCubeMapLoc, TextureUnit);
 }
 
 
@@ -285,7 +306,9 @@ void LightingTechnique::UpdatePointLightsPos(unsigned int NumLights, const Point
 {
     for (unsigned int i = 0 ; i < NumLights ; i++) {
         const Vector3f& LocalPos = pLights[i].GetLocalPosition();
-        glUniform3f(PointLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
+        glUniform3f(PointLightsLocation[i].LocalPos, LocalPos.x, LocalPos.y, LocalPos.z);
+        const Vector3f& WorldPos = pLights[i].WorldPosition;
+        glUniform3f(PointLightsLocation[i].WorldPos, WorldPos.x, WorldPos.y, WorldPos.z);
     }
 }
 

@@ -102,9 +102,11 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
+    void SetWorldMatrix(const Matrix4f& WVP);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
+    void SetShadowCubeMapTextureUnit(unsigned int TextureUnit);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
@@ -127,9 +129,11 @@ protected:
 private:
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;
+    GLuint shadowCubeMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
     GLuint CameraLocalPosLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
@@ -154,7 +158,8 @@ private:
     struct {
         GLuint Color;
         GLuint AmbientIntensity;
-        GLuint Position;
+        GLuint LocalPos;
+        GLuint WorldPos;
         GLuint DiffuseIntensity;
 
         struct

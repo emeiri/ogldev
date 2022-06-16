@@ -55,12 +55,12 @@ struct CameraDirection
 
 CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
 {
-    { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, -1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0f) },
     { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, -1.0f) },
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f), Vector3f(0.0f, 0.0f, 1.0f) },
-    { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, -1.0f, 0.0f) },
-    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, -1.0f, 0.0f) }
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, 1.0f, 0.0f) }
 };
 
 
@@ -76,16 +76,11 @@ public:
         m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_pointLight.WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
 
-        // Initialize an orthographic projection matrix for the directional light
-        OrthoProjInfo shadowOrthoProjInfo;
-        shadowOrthoProjInfo.l = -20.0f;
-        shadowOrthoProjInfo.r = 20.0f;
-        shadowOrthoProjInfo.t = 20.0f;
-        shadowOrthoProjInfo.b = -20.0f;
-        shadowOrthoProjInfo.n = -20.0f;
-        shadowOrthoProjInfo.f = 20.0f;
-
-        m_lightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 50.0f;
+        PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
+        m_lightPersProjMatrix.InitPersProjTransform(shadowPersProjInfo);
 
         OrthoProjInfo cameraOrthoProjInfo;
         cameraOrthoProjInfo.l = -WINDOW_WIDTH / 250.0f;
@@ -144,7 +139,7 @@ public:
     void RenderSceneCB()
     {
         ShadowMapPass();
-        LightingPass();
+        //        LightingPass();
     }
 
 
@@ -167,7 +162,7 @@ public:
             for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_housePositions) ; i++) {
                 m_pMesh1->SetPosition(m_housePositions[i]);
                 Matrix4f World = m_pMesh1->GetWorldMatrix();
-                Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
+                Matrix4f WVP = m_lightPersProjMatrix * LightView * World;
                 m_shadowMapTech.SetWVP(WVP);
                 m_shadowMapTech.SetWorld(World);
                 m_pMesh1->Render();
@@ -176,8 +171,9 @@ public:
             for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_cylinderPositions) ; i++) {
                 m_pMesh2->SetPosition(m_cylinderPositions[i]);
                 Matrix4f World = m_pMesh2->GetWorldMatrix();
-                Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
+                Matrix4f WVP = m_lightPersProjMatrix * LightView * World;
                 m_shadowMapTech.SetWVP(WVP);
+                m_shadowMapTech.SetWorld(World);
                 m_pMesh2->Render();
             }
         }
@@ -194,7 +190,7 @@ public:
 
         m_lightingTech.Enable();
 
-        m_shadowCubeMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_shadowCubeMapFBO.BindForReading(SHADOW_CUBE_MAP_TEXTURE_UNIT);
 
         m_pGameCamera->OnRender();
 
@@ -226,6 +222,7 @@ public:
             m_pMesh1->SetPosition(m_housePositions[i]);
             Matrix4f World = m_pMesh1->GetWorldMatrix();
             Matrix4f WVP = CameraProjection * CameraView * World;
+            m_lightingTech.SetWorldMatrix(World);
             m_lightingTech.SetWVP(WVP);
 
             Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
@@ -240,6 +237,7 @@ public:
             m_pMesh2->SetPosition(m_cylinderPositions[i]);
             Matrix4f World = m_pMesh2->GetWorldMatrix();
             Matrix4f WVP = CameraProjection * CameraView * World;
+            m_lightingTech.SetWorldMatrix(World);
             m_lightingTech.SetWVP(WVP);
 
             Vector3f CameraLocalPos3f = m_pMesh2->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
@@ -257,6 +255,7 @@ public:
         // Set the WVP matrix from the camera point of view
         Matrix4f World = m_pTerrain->GetWorldMatrix();
         Matrix4f WVP = CameraProjection * CameraView * World;
+        m_lightingTech.SetWorldMatrix(World);
         m_lightingTech.SetWVP(WVP);
 
         // Update the shader with the local space pos/dir of the spot light
@@ -375,7 +374,7 @@ private:
 
         m_lightingTech.Enable();
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
         if (!m_shadowMapTech.Init()) {
@@ -417,7 +416,7 @@ private:
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pMesh2 = NULL;
     BasicMesh* m_pTerrain = NULL;
-    Matrix4f m_lightOrthoProjMatrix;
+    Matrix4f m_lightPersProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
     PointLight m_pointLight;
     ShadowCubeMapFBO m_shadowCubeMapFBO;

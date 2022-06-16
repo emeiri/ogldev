@@ -7,6 +7,7 @@ in vec4 LightSpacePos; // required only for shadow mapping
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 LocalPos0;
+in vec3 WorldPos0;
 
 out vec4 FragColor;
 
@@ -34,6 +35,7 @@ struct PointLight
 {
     BaseLight Base;
     vec3 LocalPos;
+    vec3 WorldPos;
     Attenuation Atten;
 };
 
@@ -60,6 +62,7 @@ uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform sampler2D gShadowMap;   // required only for shadow mapping
+uniform samplerCube gShadowCubeMap;
 uniform vec3 gCameraLocalPos;
 uniform vec4 gColorMod = vec4(1);
 uniform float gRimLightPower = 2.0;
@@ -77,6 +80,21 @@ float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
     RimFactor = pow(RimFactor, gRimLightPower);
     return RimFactor;
 }
+
+#define EPSILON 0.00001
+
+float CalcShadowFactorPointLight(vec3 LightDirection)
+{
+    float SampledDistance = texture(gShadowCubeMap, LightDirection).r;
+
+    float Distance = length(LightDirection);
+
+    if (Distance <= SampledDistance + EPSILON)
+        return 1.0;
+    else
+        return 0.5;
+}
+
 
 
 float CalcShadowFactor()
@@ -149,12 +167,14 @@ vec4 CalcDirectionalLight(vec3 Normal)
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);
 }
 
+
 vec4 CalcPointLight(PointLight l, vec3 Normal)
 {
+    vec3 LightWorldDirection = WorldPos0 - l.WorldPos;
     vec3 LightDirection = LocalPos0 - l.LocalPos;
     float Distance = length(LightDirection);
     LightDirection = normalize(LightDirection);
-    float ShadowFactor = CalcShadowFactor();
+    float ShadowFactor = CalcShadowFactorPointLight(LightWorldDirection);
 
     vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);
     float Attenuation =  l.Atten.Constant +
@@ -163,6 +183,7 @@ vec4 CalcPointLight(PointLight l, vec3 Normal)
 
     return Color / Attenuation;
 }
+
 
 vec4 CalcSpotLight(SpotLight l, vec3 Normal)
 {
@@ -178,6 +199,7 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal)
         return vec4(0,0,0,0);
     }
 }
+
 
 void main()
 {

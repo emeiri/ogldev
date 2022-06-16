@@ -16,9 +16,11 @@
 */
 
 #ifndef SHADOW_CUBE_MAP_FBO_H
-#define	SHADOW_CUBE_MAP_FBO_H
+#define SHADOW_CUBE_MAP_FBO_H
 
 #include <GL/glew.h>
+
+#include "ogldev_types.h"
 
 class ShadowCubeMapFBO
 {
@@ -32,12 +34,14 @@ public:
     void BindForWriting(GLenum CubeFace);
 
     void BindForReading(GLenum TextureUnit);
-    
+
 private:
+    uint m_width = 0;
+    uint m_height = 0;
+
     GLuint m_fbo;
     GLuint m_shadowMap;
     GLuint m_depth;
 };
 
-#endif	/* SHADOW_CUBE_MAP_FBO_H */
-
+#endif  /* SHADOW_CUBE_MAP_FBO_H */
