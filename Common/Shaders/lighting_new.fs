@@ -94,7 +94,7 @@ float CalcShadowFactorPointLight(vec3 LightDirection)
     if (Distance <= SampledDistance + EPSILON)
         return 1.0;
     else
-        return 0.5;
+        return 0.25;
 }
 
 
@@ -111,7 +111,7 @@ float CalcShadowFactor()
     float bias = 0.015;
 
     if (Depth + bias < z)
-        return 0.5;
+        return 0.25;
     else
         return 1.0;
 }

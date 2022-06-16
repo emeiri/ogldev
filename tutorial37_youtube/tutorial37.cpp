@@ -198,8 +198,8 @@ public:
         foo += 0.01f;
 
         if (m_cameraOnLight) {
-            m_pGameCamera->SetPosition(m_pointLight.WorldPosition);
-            m_pGameCamera->SetTarget(Vector3f(sinf(foo), 0.0f, cosf(foo)));
+            m_pGameCamera->SetPosition(m_pointLight.WorldPosition + Vector3f(0.0f, 1.0f, 0.0f));
+            m_pGameCamera->SetTarget(Vector3f(sinf(foo), -0.25f, cosf(foo)));
         }
 
         ///////////////////////////
