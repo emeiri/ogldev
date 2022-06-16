@@ -91,6 +91,7 @@ bool ShadowCubeMapFBO::Init(unsigned int Width, unsigned int Height)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     return GLCheckError();
 }
