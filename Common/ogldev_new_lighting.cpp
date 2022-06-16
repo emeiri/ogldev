@@ -73,7 +73,7 @@ bool LightingTechnique::InitCommon()
     LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
-    shadowCubeMapLoc = GetUniformLocation("gShadowMap");
+    shadowCubeMapLoc = GetUniformLocation("gShadowCubeMap");
     samplerSpecularExponentLoc = GetUniformLocation("gSamplerSpecularExponent");
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
