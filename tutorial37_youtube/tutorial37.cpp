@@ -39,8 +39,7 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-#define SHADOW_MAP_WIDTH 4096
-#define SHADOW_MAP_HEIGHT 4096
+#define SHADOW_MAP_SIZE 4096
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
@@ -79,7 +78,7 @@ public:
         float FOV = 90.0f;
         float zNear = 0.1f;
         float zFar = 20.0f;
-        PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
+        PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, zNear, zFar };
         m_lightPersProjMatrix.InitPersProjTransform(shadowPersProjInfo);
 
         OrthoProjInfo cameraOrthoProjInfo;
@@ -339,7 +338,7 @@ private:
 
     void CreateShadowMap()
     {
-        if (!m_shadowCubeMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+        if (!m_shadowCubeMapFBO.Init(SHADOW_MAP_SIZE)) {
             exit(1);
         }
     }

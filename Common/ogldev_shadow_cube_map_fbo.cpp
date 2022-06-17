@@ -43,15 +43,14 @@ ShadowCubeMapFBO::~ShadowCubeMapFBO()
     }
 }
 
-bool ShadowCubeMapFBO::Init(unsigned int Width, unsigned int Height)
+bool ShadowCubeMapFBO::Init(unsigned int size)
 {
-    m_width = Width;
-    m_height = Height;
+    m_size = size;
 
     // Create the depth buffer
     glGenTextures(1, &m_depth);
     glBindTexture(GL_TEXTURE_2D, m_depth);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Width, Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_size, m_size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -68,7 +67,7 @@ bool ShadowCubeMapFBO::Init(unsigned int Width, unsigned int Height)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     for (uint i = 0 ; i < 6 ; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_R32F, Width, Height, 0, GL_RED, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_R32F, m_size, m_size, 0, GL_RED, GL_FLOAT, NULL);
     }
 
     // Create the FBO
@@ -99,7 +98,7 @@ bool ShadowCubeMapFBO::Init(unsigned int Width, unsigned int Height)
 void ShadowCubeMapFBO::BindForWriting(GLenum CubeFace)
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-    glViewport(0, 0, m_width, m_height);  // set the width/height of the shadow map!
+    glViewport(0, 0, m_size, m_size);  // set the width/height of the shadow map!
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, CubeFace, m_shadowCubeMap, 0);
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 }

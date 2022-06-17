@@ -29,15 +29,14 @@ public:
 
     ~ShadowCubeMapFBO();
 
-    bool Init(unsigned int WindowWidth, unsigned int WindowHeight);
+    bool Init(uint size);
 
     void BindForWriting(GLenum CubeFace);
 
     void BindForReading(GLenum TextureUnit);
 
 private:
-    uint m_width = 0;
-    uint m_height = 0;
+    uint m_size = 0;
 
     GLuint m_fbo;
     GLuint m_shadowCubeMap;
