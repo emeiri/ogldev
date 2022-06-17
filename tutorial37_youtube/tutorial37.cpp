@@ -146,16 +146,15 @@ public:
     {
         m_shadowMapTech.Enable();
 
-        Matrix4f LightView;
-        Vector3f Up(0.0f, 1.0f, 0.0f);
-
         m_shadowMapTech.SetLightWorldPos(m_pointLight.WorldPosition);
 
-        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
-
         for (uint i = 0 ; i < NUM_CUBE_MAP_FACES ; i++) {
+
             m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
+
             glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+            Matrix4f LightView;
             LightView.InitCameraTransform(m_pointLight.WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
 
             for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_housePositions) ; i++) {
