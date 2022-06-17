@@ -40,7 +40,7 @@ private:
     uint m_height = 0;
 
     GLuint m_fbo;
-    GLuint m_shadowMap;
+    GLuint m_shadowCubeMap;
     GLuint m_depth;
 };
 
