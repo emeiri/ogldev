@@ -148,6 +148,8 @@ public:
 
         m_shadowMapTech.SetLightWorldPos(m_pointLight.WorldPosition);
 
+        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+
         for (uint i = 0 ; i < NUM_CUBE_MAP_FACES ; i++) {
 
             m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
