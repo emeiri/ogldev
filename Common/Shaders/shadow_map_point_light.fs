@@ -3,15 +3,12 @@
 in vec3 WorldPos;
 
 uniform vec3 gLightWorldPos;
-          
-out float FragColor;
-        
+
+out float LightToPixelDistance;
+
 void main()
 {
     vec3 LightToVertex = WorldPos - gLightWorldPos;
 
-    float LightToPixelDistance = length(LightToVertex);
-
-    FragColor = LightToPixelDistance;
+    LightToPixelDistance = length(LightToVertex);
 }
-
