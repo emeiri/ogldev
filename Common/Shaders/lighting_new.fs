@@ -81,7 +81,6 @@ float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
     return RimFactor;
 }
 
-#define EPSILON 0.00001
 
 float CalcShadowFactorPointLight(vec3 LightDirection)
 {
@@ -91,10 +90,12 @@ float CalcShadowFactorPointLight(vec3 LightDirection)
 
     float Distance = length(LightDirection);
 
-    if (Distance <= SampledDistance + EPSILON)
-        return 1.0;
-    else
+    float bias = 0.015;
+
+    if (SampledDistance + bias < Distance)
         return 0.25;
+    else
+        return 1.0;
 }
 
 
