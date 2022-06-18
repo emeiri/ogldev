@@ -22,7 +22,7 @@
 #include <string.h>
 #include <math.h>
 #include <GL/glew.h>
-#include <float.h>
+#include <cfloat>
 
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
@@ -185,7 +185,7 @@ public:
 
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_lightingTech.Enable();

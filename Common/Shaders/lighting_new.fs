@@ -34,8 +34,8 @@ struct Attenuation
 struct PointLight
 {
     BaseLight Base;
-    vec3 LocalPos;
-    vec3 WorldPos;
+    vec3 LocalPos; // used for lighting calculations
+    vec3 WorldPos; // used for point light shadow mapping
     Attenuation Atten;
 };
 
@@ -82,13 +82,13 @@ float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
 }
 
 
-float CalcShadowFactorPointLight(vec3 LightDirection)
+float CalcShadowFactorPointLight(vec3 LightToPixel)
 {
-    vec3 dir = LightDirection;
-    dir.y = -dir.y;
-    float SampledDistance = texture(gShadowCubeMap, dir).r;
+    float Distance = length(LightToPixel);
 
-    float Distance = length(LightDirection);
+    LightToPixel.y = -LightToPixel.y;
+
+    float SampledDistance = texture(gShadowCubeMap, LightToPixel).r;
 
     float bias = 0.015;
 
