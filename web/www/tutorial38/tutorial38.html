@@ -193,7 +193,7 @@
           <br>
        &nbsp;  &nbsp;   if (m_pScene) {  <br>
        &nbsp;  &nbsp;&nbsp;  &nbsp;    <b>   m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;<br>
-       &nbsp;  &nbsp;&nbsp;  &nbsp;       m_GlobalInverseTransform.Inverse();<br></b>
+       &nbsp;  &nbsp;&nbsp;  &nbsp;       m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();<br></b>
        &nbsp;  &nbsp;&nbsp;  &nbsp;       Ret = InitFromScene(<b>m_pScene</b>, Filename);<br>
        &nbsp;  &nbsp;   }<br>
        &nbsp;  &nbsp;   else {<br>

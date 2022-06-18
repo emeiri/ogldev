@@ -75,7 +75,7 @@ Tutorial29::Tutorial29()
 
     glEnable(GL_DEPTH_TEST);
 
-    float FOV = 45.0f;
+    float FOV = 90.0f;
     float zNear = 0.1f;
     float zFar = 100.0f;
 

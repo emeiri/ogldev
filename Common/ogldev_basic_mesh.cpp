@@ -63,7 +63,7 @@ bool BasicMesh::LoadMesh(const string& Filename)
 
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
-        m_GlobalInverseTransform.Inverse();
+        m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
         Ret = InitFromScene(m_pScene, Filename);
     }
     else {

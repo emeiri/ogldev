@@ -65,7 +65,7 @@ bool SkinnedMesh::LoadMesh(const string& Filename)
 
     if (pScene) {
         m_GlobalInverseTransform = pScene->mRootNode->mTransformation;
-        m_GlobalInverseTransform.Inverse();
+        m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
         Ret = InitFromScene(pScene, Filename);
     }
     else {

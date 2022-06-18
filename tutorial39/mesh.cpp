@@ -97,7 +97,7 @@ bool Mesh::LoadMesh(const string& Filename, bool WithAdjacencies)
                                                      aiProcess_JoinIdenticalVertices);    
     if (m_pScene) {  
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
-        m_GlobalInverseTransform.Inverse();
+        m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
         Ret = InitFromScene(m_pScene, Filename);
     }
     else {
