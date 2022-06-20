@@ -199,6 +199,10 @@ bool GLFWBackendCreateWindow(uint Width, uint Height, bool isFullScreen, const c
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);*/
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     s_pWindow = glfwCreateWindow(Width, Height, pTitle, pMonitor, NULL);
 
     if (!s_pWindow) {

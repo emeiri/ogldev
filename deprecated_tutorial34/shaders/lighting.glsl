@@ -107,11 +107,11 @@ vec4 CalcPointLight(PointLight l, VSOutput1 In)
     LightDirection = normalize(LightDirection);                                             
                                                                                             
     vec4 Color = CalcLightInternal(l.Base, LightDirection, In);                         
-    float Attenuation =  l.Atten.Constant +                                                 
+    float AttenuationFactor =  l.Atten.Constant +                                                 
                          l.Atten.Linear * Distance +                                        
                          l.Atten.Exp * Distance * Distance;                                 
                                                                                             
-    return Color / Attenuation;                                                             
+    return Color / AttenuationFactor;                                                             
 }                                                                                           
                                                                                             
 vec4 CalcSpotLight(SpotLight l, VSOutput1 In)                                         

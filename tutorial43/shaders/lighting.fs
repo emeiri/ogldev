@@ -91,13 +91,13 @@ vec4 CalcPointLight(PointLight l, VSOutput In)
     float ShadowFactor = CalcShadowFactor(LightDirection);
     LightDirection = normalize(LightDirection);
     vec4 Color = CalcLightInternal(l.Base, LightDirection, In, ShadowFactor);
-    float Attenuation =  l.Atten.Constant +
-                         l.Atten.Linear * Distance +
-                         l.Atten.Exp * Distance * Distance;
-
-    return Color / Attenuation;
-}
-
+    float AttenuationFactor =  l.Atten.Constant +                                                 
+                         l.Atten.Linear * Distance +                                        
+                         l.Atten.Exp * Distance * Distance;  
+                                                                                           
+    return Color / AttenuationFactor;                                                             
+}                                                                                           
+                                                                                            
 out vec4 FragColor;
 
 void main()

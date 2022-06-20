@@ -106,11 +106,11 @@ vec4 CalcPointLight(PointLight l, vec3 Normal, vec4 LightSpacePos)
     float ShadowFactor = CalcShadowFactor(LightSpacePos);                                   
                                                                                             
     vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal, ShadowFactor);           
-    float Attenuation =  l.Atten.Constant +                                                 
+    float AttenuationFactor =  l.Atten.Constant +                                                 
                          l.Atten.Linear * Distance +                                        
                          l.Atten.Exp * Distance * Distance;                                 
                                                                                             
-    return Color / Attenuation;                                                             
+    return Color / AttenuationFactor;                                                             
 }                                                                                           
                                                                                             
 vec4 CalcSpotLight(SpotLight l, vec3 Normal, vec4 LightSpacePos)                     
