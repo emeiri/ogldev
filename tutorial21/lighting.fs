@@ -70,31 +70,31 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
         if (SpecularFactor > 0) {
             SpecularFactor = pow(SpecularFactor, gSpecularPower);
             SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0f);
-        }
-    }
-
-    return (AmbientColor + DiffuseColor + SpecularColor);
-}
-
-vec4 CalcDirectionalLight(vec3 Normal)
-{
-    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);
-}
-
-vec4 CalcPointLight(PointLight l, vec3 Normal)
-{
-    vec3 LightDirection = WorldPos0 - l.Position;
-    float Distance = length(LightDirection);
-    LightDirection = normalize(LightDirection);
-
-    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal);
-    float Attenuation =  l.Atten.Constant +
-                         l.Atten.Linear * Distance +
-                         l.Atten.Exp * Distance * Distance;
-
-    return Color / Attenuation;
-}
-
+        }                                                                                   
+    }                                                                                       
+                                                                                            
+    return (AmbientColor + DiffuseColor + SpecularColor);                                   
+}                                                                                           
+                                                                                            
+vec4 CalcDirectionalLight(vec3 Normal)                                                      
+{                                                                                           
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal);  
+}                                                                                           
+                                                                                            
+vec4 CalcPointLight(PointLight l, vec3 Normal)                                              
+{                                                                                           
+    vec3 LightDirection = WorldPos0 - l.Position;                                           
+    float Distance = length(LightDirection);                                                
+    LightDirection = normalize(LightDirection);                                             
+                                                                                            
+    vec4 Color = CalcLightInternal(l.Base, LightDirection, Normal);                         
+    float AttenuationFactor =  l.Atten.Constant +                                                 
+                         l.Atten.Linear * Distance +                                        
+                         l.Atten.Exp * Distance * Distance;                                 
+                                                                                            
+    return Color / AttenuationFactor;                                                             
+}                                                                                           
+                                                                                            
 vec4 CalcSpotLight(SpotLight l, vec3 Normal)                                                
 {                                                                                           
     vec3 LightToPixel = normalize(WorldPos0 - l.Base.Position);

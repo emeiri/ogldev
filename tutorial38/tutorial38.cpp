@@ -127,7 +127,7 @@ public:
 
         float RunningTime = GetRunningTime();
 
-        m_mesh.BoneTransform(RunningTime, Transforms);
+        m_mesh.GetBoneTransforms(RunningTime, Transforms);
 
         for (uint i = 0 ; i < Transforms.size() ; i++) {
             m_pEffect->SetBoneTransform(i, Transforms[i]);

@@ -296,7 +296,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-	TwInit (TW_OPENGL_CORE, NULL);
     pApp->Run();
 
     delete pApp;

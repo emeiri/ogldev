@@ -117,7 +117,7 @@ public:
             return false;
         }
 
-        m_mesh.BoneTransform(0.0f, m_prevTransforms);
+        m_mesh.GetBoneTransforms(0.0f, m_prevTransforms);
 
         if (!m_quad.LoadMesh("../Content/quad_r.obj")) {
             printf("Quad mesh load failed\n");
@@ -165,7 +165,7 @@ public:
 
         float RunningTime = GetRunningTime();
 
-        m_mesh.BoneTransform(RunningTime, Transforms);
+        m_mesh.GetBoneTransforms(RunningTime, Transforms);
 
         for (uint i = 0 ; i < Transforms.size() ; i++) {
             m_pSkinningTech->SetBoneTransform(i, Transforms[i]);

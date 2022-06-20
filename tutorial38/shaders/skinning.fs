@@ -77,45 +77,45 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, VSOutput In)
         if (SpecularFactor > 0.0) {
             SpecularFactor = pow(SpecularFactor, gSpecularPower);
             SpecularColor = vec4(Light.Color * gMatSpecularIntensity * SpecularFactor, 1.0);
-        }
-    }
-
-    return (AmbientColor + DiffuseColor + SpecularColor);
-}
-
-vec4 CalcDirectionalLight(VSOutput In)
-{
-    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, In);
-}
-
-vec4 CalcPointLight(PointLight l, VSOutput In)
-{
-    vec3 LightDirection = In.WorldPos - l.Position;
-    float Distance = length(LightDirection);
-    LightDirection = normalize(LightDirection);
-
-    vec4 Color = CalcLightInternal(l.Base, LightDirection, In);
-    float Attenuation =  l.Atten.Constant +
-                         l.Atten.Linear * Distance +
-                         l.Atten.Exp * Distance * Distance;
-
-    return Color / Attenuation;
-}
-
-vec4 CalcSpotLight(SpotLight l, VSOutput In)
-{
-    vec3 LightToPixel = normalize(In.WorldPos - l.Base.Position);
-    float SpotFactor = dot(LightToPixel, l.Direction);
-
-    if (SpotFactor > l.Cutoff) {
-        vec4 Color = CalcPointLight(l.Base, In);
-        return Color * (1.0 - (1.0 - SpotFactor) * 1.0/(1.0 - l.Cutoff));
-    }
-    else {
-        return vec4(0,0,0,0);
-    }
-}
-
+        }                                                                                   
+    }                                                                                       
+                                                                                            
+    return (AmbientColor + DiffuseColor + SpecularColor);                                   
+}                                                                                           
+                                                                                            
+vec4 CalcDirectionalLight(VSOutput In)                                                      
+{                                                                                           
+    return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, In);  
+}                                                                                           
+                                                                                            
+vec4 CalcPointLight(PointLight l, VSOutput In)                                       
+{                                                                                           
+    vec3 LightDirection = In.WorldPos - l.Position;                                           
+    float Distance = length(LightDirection);                                                
+    LightDirection = normalize(LightDirection);                                             
+                                                                                            
+    vec4 Color = CalcLightInternal(l.Base, LightDirection, In);                         
+    float AttenuationFactor =  l.Atten.Constant +                                                 
+                         l.Atten.Linear * Distance +                                        
+                         l.Atten.Exp * Distance * Distance;                                 
+                                                                                            
+    return Color / AttenuationFactor;                                                             
+}                                                                                           
+                                                                                            
+vec4 CalcSpotLight(SpotLight l, VSOutput In)                                         
+{                                                                                           
+    vec3 LightToPixel = normalize(In.WorldPos - l.Base.Position);                             
+    float SpotFactor = dot(LightToPixel, l.Direction);                                      
+                                                                                            
+    if (SpotFactor > l.Cutoff) {                                                            
+        vec4 Color = CalcPointLight(l.Base, In);                                        
+        return Color * (1.0 - (1.0 - SpotFactor) * 1.0/(1.0 - l.Cutoff));                   
+    }                                                                                       
+    else {                                                                                  
+        return vec4(0,0,0,0);                                                               
+    }                                                                                       
+}                                                                                           
+                            
 out vec4 FragColor;
 
 void main()
