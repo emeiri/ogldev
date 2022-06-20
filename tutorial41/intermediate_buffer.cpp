@@ -27,7 +27,7 @@ IntermediateBuffer::IntermediateBuffer()
     m_fbo = 0;
     m_colorBuffer = 0;
     m_motionBuffer = 0;
-	m_depthBuffer = 0;
+        m_depthBuffer = 0;
 }
 
 
@@ -41,49 +41,49 @@ IntermediateBuffer::~IntermediateBuffer()
         glDeleteTextures(1, &m_colorBuffer);
     }
 
-	if (m_motionBuffer != 0) {
-		glDeleteTextures(1, &m_motionBuffer);
-	}
+        if (m_motionBuffer != 0) {
+                glDeleteTextures(1, &m_motionBuffer);
+        }
 
-	if (m_depthBuffer != 0) {
-		glDeleteTextures(1, &m_depthBuffer);
-	}	
+        if (m_depthBuffer != 0) {
+                glDeleteTextures(1, &m_depthBuffer);
+        }
 }
 
 
 bool IntermediateBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeight)
 {
     // Create the FBO
-    glGenFramebuffers(1, &m_fbo);    
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 
     // Create the buffers
     glGenTextures(1, &m_colorBuffer);
-	glGenTextures(1, &m_motionBuffer);
-	glGenTextures(1, &m_depthBuffer);
+    glGenTextures(1, &m_motionBuffer);
+    glGenTextures(1, &m_depthBuffer);
 
     // color buffer
     glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorBuffer, 0);
 
     // motion buffer
     glBindTexture(GL_TEXTURE_2D, m_motionBuffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RG, GL_FLOAT, NULL);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_motionBuffer, 0);
-   
-	// depth buffer    
+
+        // depth buffer
     glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
-    
-   	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
+
+    GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
     glDrawBuffers(ARRAY_SIZE_IN_ELEMENTS(DrawBuffers), DrawBuffers);
 
@@ -94,8 +94,8 @@ bool IntermediateBuffer::Init(unsigned int WindowWidth, unsigned int WindowHeigh
         return false;
     }
 
-	// restore default FBO
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    // restore default FBO
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
     return true;
 }
@@ -109,11 +109,11 @@ void IntermediateBuffer::BindForWriting()
 
 void IntermediateBuffer::BindForReading()
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-	glActiveTexture(COLOR_TEXTURE_UNIT);		
-	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);    
-    
-	glActiveTexture(MOTION_TEXTURE_UNIT);		
-	glBindTexture(GL_TEXTURE_2D, m_motionBuffer);    
+        glActiveTexture(COLOR_TEXTURE_UNIT);
+        glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
+
+        glActiveTexture(MOTION_TEXTURE_UNIT);
+        glBindTexture(GL_TEXTURE_2D, m_motionBuffer);
 }
