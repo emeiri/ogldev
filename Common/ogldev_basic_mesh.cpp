@@ -351,6 +351,7 @@ void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
 
         if (pRenderCallbacks) {
             pRenderCallbacks->DrawStartCB(i);
+            pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,

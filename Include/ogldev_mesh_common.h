@@ -27,6 +27,8 @@ public:
     virtual void DrawStartCB(uint DrawIndex) {}
 
     virtual void ControlSpecularExponent(bool IsEnabled) {}
+
+    virtual void SetMaterial(const Material& material) {}
 };
 
 

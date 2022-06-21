@@ -118,7 +118,7 @@ public:
     void UpdateSpotLight(unsigned int Index, const SpotLight& Light);
     void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
-    void SetMaterial(const Material& material);
+    virtual void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);

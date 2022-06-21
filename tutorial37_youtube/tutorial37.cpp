@@ -215,8 +215,6 @@ public:
             CameraProjection = m_pGameCamera->GetProjectionMat();
         }
 
-        m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
-
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_housePositions) ; i++) {
             // Set the WVP matrix from the camera point of view
             m_pMesh1->SetPosition(m_housePositions[i]);
@@ -231,8 +229,6 @@ public:
             m_lightingTech.SetPointLights(1, &m_pointLight);
             m_pMesh1->Render(&m_lightingTech);
         }
-
-        m_lightingTech.SetMaterial(m_pMesh2->GetMaterial());
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_cylinderPositions) ; i++) {
             // Set the WVP matrix from the camera point of view
@@ -252,8 +248,6 @@ public:
         /////////////////////////
         // Render the terrain
         ////////////////////////
-        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
-
         // Set the WVP matrix from the camera point of view
         Matrix4f World = m_pTerrain->GetWorldMatrix();
         Matrix4f WVP = CameraProjection * CameraView * World;
