@@ -229,7 +229,7 @@ public:
             m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
             m_pointLight.CalcLocalPosition(m_pMesh1->GetWorldTransform());
             m_lightingTech.SetPointLights(1, &m_pointLight);
-            m_pMesh1->Render();
+            m_pMesh1->Render(&m_lightingTech);
         }
 
         m_lightingTech.SetMaterial(m_pMesh2->GetMaterial());
@@ -246,7 +246,7 @@ public:
             m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
             m_pointLight.CalcLocalPosition(m_pMesh2->GetWorldTransform());
             m_lightingTech.SetPointLights(1, &m_pointLight);
-            m_pMesh2->Render();
+            m_pMesh2->Render(&m_lightingTech);
         }
 
         /////////////////////////
@@ -268,7 +268,7 @@ public:
         Vector3f CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
-        m_pTerrain->Render();
+        m_pTerrain->Render(&m_lightingTech);
     }
 
 

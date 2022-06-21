@@ -68,6 +68,7 @@ uniform vec4 gColorMod = vec4(1);
 uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
+uniform bool gEnableSpecularExponent = false;
 
 const int toon_color_levels = 4;
 const float toon_scale_factor = 1.0f / toon_color_levels;
@@ -146,7 +147,12 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
         float SpecularFactor = dot(PixelToCamera, LightReflect);
 
         if (!gCellShadingEnabled && (SpecularFactor > 0)) {
-            float SpecularExponent = 128.0;//texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+            float SpecularExponent = 128.0;
+
+            if (gEnableSpecularExponent) {
+                SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+            }
+
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
                             Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular

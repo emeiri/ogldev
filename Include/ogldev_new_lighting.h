@@ -23,6 +23,7 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_material.h"
 #include "ogldev_world_transform.h"
+#include "ogldev_mesh_common.h"
 
 // This version of the lighting technique was updated for youtube
 
@@ -90,7 +91,7 @@ private:
 };
 
 
-class LightingTechnique : public Technique
+class LightingTechnique : public Technique, public IRenderCallbacks
 {
 public:
 
@@ -121,6 +122,7 @@ public:
     void SetColorMod(const Vector4f& ColorMod);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
+    virtual void ControlSpecularExponent(bool IsEnabled);
 
 protected:
 
@@ -141,6 +143,7 @@ private:
     GLuint ColorModLocation = INVALID_UNIFORM_LOCATION;
     GLuint EnableRimLightLoc = INVALID_UNIFORM_LOCATION;
     GLuint EnableCellShadingLoc = INVALID_UNIFORM_LOCATION;
+    GLuint EnableSpecularExponent = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

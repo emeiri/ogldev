@@ -339,6 +339,14 @@ void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
 
         if (m_Materials[MaterialIndex].pSpecularExponent) {
             m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+
+            if (pRenderCallbacks) {
+                pRenderCallbacks->ControlSpecularExponent(true);
+            }
+        } else {
+            if (pRenderCallbacks) {
+                pRenderCallbacks->ControlSpecularExponent(false);
+            }
         }
 
         if (pRenderCallbacks) {

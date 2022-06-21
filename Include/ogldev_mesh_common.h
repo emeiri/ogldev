@@ -24,7 +24,9 @@
 class IRenderCallbacks
 {
 public:
-    virtual void DrawStartCB(uint DrawIndex) = 0;
+    virtual void DrawStartCB(uint DrawIndex) {}
+
+    virtual void ControlSpecularExponent(bool IsEnabled) {}
 };
 
 

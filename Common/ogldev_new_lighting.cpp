@@ -18,7 +18,7 @@
 
 #include "ogldev_new_lighting.h"
 
-//#define FAIL_ON_MISSING_LOC
+#define FAIL_ON_MISSING_LOC
 
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
@@ -88,6 +88,7 @@ bool LightingTechnique::InitCommon()
     ColorModLocation = GetUniformLocation("gColorMod");
     EnableRimLightLoc = GetUniformLocation("gRimLightEnabled");
     EnableCellShadingLoc = GetUniformLocation("gCellShadingEnabled");
+    EnableSpecularExponent = GetUniformLocation("gEnableSpecularExponent");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -95,7 +96,7 @@ bool LightingTechnique::InitCommon()
         samplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowCubeMapLoc == INVALID_UNIFORM_LOCATION ||
-        //        samplerSpecularExponentLoc == INVALID_UNIFORM_LOCATION ||
+        samplerSpecularExponentLoc == INVALID_UNIFORM_LOCATION ||
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.SpecularColor == INVALID_UNIFORM_LOCATION ||
@@ -107,7 +108,8 @@ bool LightingTechnique::InitCommon()
         NumPointLightsLoc == INVALID_UNIFORM_LOCATION ||
         NumSpotLightsLoc == INVALID_UNIFORM_LOCATION ||
         EnableRimLightLoc == INVALID_UNIFORM_LOCATION ||
-        EnableCellShadingLoc == INVALID_UNIFORM_LOCATION)
+        EnableCellShadingLoc == INVALID_UNIFORM_LOCATION ||
+        EnableSpecularExponent == INVALID_UNIFORM_LOCATION)
     {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
@@ -366,5 +368,15 @@ void LightingTechnique::ControlCellShading(bool IsEnabled)
         glUniform1i(EnableCellShadingLoc, 1);
     } else {
         glUniform1i(EnableCellShadingLoc, 0);
+    }
+}
+
+
+void LightingTechnique::ControlSpecularExponent(bool IsEnabled)
+{
+    if (IsEnabled) {
+        glUniform1i(EnableSpecularExponent, 1);
+    } else {
+        glUniform1i(EnableSpecularExponent, 0);
     }
 }
