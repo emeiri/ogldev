@@ -25,6 +25,7 @@
 class ShadowCubeMapFBO
 {
 public:
+
     ShadowCubeMapFBO();
 
     ~ShadowCubeMapFBO();
@@ -36,8 +37,8 @@ public:
     void BindForReading(GLenum TextureUnit);
 
 private:
-    uint m_size = 0;
 
+    uint m_size = 0;
     GLuint m_fbo;
     GLuint m_shadowCubeMap;
     GLuint m_depth;

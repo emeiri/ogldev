@@ -61,8 +61,8 @@ uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform Material gMaterial;
 uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
-uniform sampler2D gShadowMap;   // required only for shadow mapping
-uniform samplerCube gShadowCubeMap;
+uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
+uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 uniform vec3 gCameraLocalPos;
 uniform vec4 gColorMod = vec4(1);
 uniform float gRimLightPower = 2.0;

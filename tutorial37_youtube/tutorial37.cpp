@@ -185,7 +185,7 @@ public:
 
         glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+        glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_lightingTech.Enable();
