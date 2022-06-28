@@ -352,7 +352,10 @@ private:
     {
         m_pMesh1 = new BasicMesh();
 
-        m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj");
+        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
+            printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
+            exit(0);
+        }
         //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
 
@@ -364,7 +367,10 @@ private:
         //        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
-        m_pTerrain->LoadMesh("../Content/box_terrain.obj");
+        if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
+            printf("Error loading mesh ../Content/box_terrain.obj\n");
+            exit(0);
+        }
         m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
     }
 
