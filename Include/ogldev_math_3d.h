@@ -494,6 +494,13 @@ public:
 
         return n;
     }
+
+    void Print() const
+    {
+        for (int i = 0 ; i < 3 ; i++) {
+            printf("%f %f %f\n", m[i][0], m[i][1], m[i][2]);
+        }
+    }
 };
 
 #endif  /* MATH_3D_H */

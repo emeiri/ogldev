@@ -189,8 +189,11 @@ void Matrix4f::InitCameraTransform(const Vector3f& Target, const Vector3f& Up)
     Vector3f N = Target;
     N.Normalize();
 
+    Vector3f UpNorm = Up;
+    UpNorm.Normalize();
+
     Vector3f U;
-    U = Up.Cross(N);
+    U = UpNorm.Cross(N);
     U.Normalize();
 
     Vector3f V = N.Cross(U);
