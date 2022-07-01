@@ -37,10 +37,10 @@ BasicCamera::BasicCamera(int WindowWidth, int WindowHeight)
 }
 
 
-BasicCamera::BasicCamera(const PersProjInfo& persProjInfo_, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
+BasicCamera::BasicCamera(const PersProjInfo& persProjInfo, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up)
 {
-    persProjInfo = persProjInfo_;
-    ProjectionMat.InitPersProjTransform(persProjInfo);
+    m_persProjInfo = persProjInfo;
+    ProjectionMat.InitPersProjTransform(m_persProjInfo);
     m_windowWidth  = (int)persProjInfo.Width;
     m_windowHeight = (int)persProjInfo.Height;
     m_pos = Pos;

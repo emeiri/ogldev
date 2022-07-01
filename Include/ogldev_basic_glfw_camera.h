@@ -53,12 +53,13 @@ public:
 
     const Matrix4f& GetProjectionMat() const { return ProjectionMat; }
 
+    PersProjInfo m_persProjInfo;
+
 private:
 
     void Init();
     void Update();
 
-    PersProjInfo persProjInfo;
     Vector3f m_pos;
     Vector3f m_target;
     Vector3f m_up;
