@@ -100,8 +100,7 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 }
 
 
-
-float CalcShadowFactor()
+float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
 {
     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
     vec2 UVCoords;
@@ -110,10 +109,12 @@ float CalcShadowFactor()
     float z = 0.5 * ProjCoords.z + 0.5;
     float Depth = texture(gShadowMap, UVCoords).x;
 
-    float bias = 0.015;
-
+    float DiffuseFactor = dot(Normal, -LightDirection);
+//    float bias = max(0.05 * (1.0 - DiffuseFactor), 0.005);
+float bias = mix(0.05, 0.0, DiffuseFactor);
+bias = 0.0;
     if (Depth + bias < z)
-        return 0.25;
+        return 0.05;
     else
         return 1.0;
 }
@@ -172,7 +173,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
 
 vec4 CalcDirectionalLight(vec3 Normal)
 {
-    float ShadowFactor = CalcShadowFactor();
+    float ShadowFactor = CalcShadowFactor(gDirectionalLight.Direction, Normal);
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);
 }
 

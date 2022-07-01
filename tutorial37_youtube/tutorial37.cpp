@@ -194,14 +194,6 @@ public:
 
         m_pGameCamera->OnRender();
 
-        static float foo = 0.0f;
-        foo += 0.01f;
-
-        if (m_cameraOnLight) {
-            m_pGameCamera->SetPosition(m_pointLight.WorldPosition + Vector3f(0.0f, 2.0f, 0.0f));
-            m_pGameCamera->SetTarget(Vector3f(sinf(foo), -0.35f, cosf(foo)));
-        }
-
         ///////////////////////////
         // Render the main object
         ////////////////////////////
@@ -467,3 +459,13 @@ int main(int argc, char** argv)
 
     return 0;
 }
+
+/*
+        static float foo = 0.0f;
+        foo += 0.01f;
+
+        if (m_cameraOnLight) {
+            m_pGameCamera->SetPosition(m_pointLight.WorldPosition + Vector3f(0.0f, 2.0f, 0.0f));
+            m_pGameCamera->SetTarget(Vector3f(sinf(foo), -0.35f, cosf(foo)));
+        }
+*/

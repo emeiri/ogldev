@@ -56,18 +56,7 @@ public:
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(1.0f, -0.1f, 0.0f);
-
-        // Initialize an orthographic projection matrix for the directional light
-        OrthoProjInfo shadowOrthoProjInfo;
-        shadowOrthoProjInfo.l = -20.0f;
-        shadowOrthoProjInfo.r = 20.0f;
-        shadowOrthoProjInfo.t = 20.0f;
-        shadowOrthoProjInfo.b = -20.0f;
-        shadowOrthoProjInfo.n = -20.0f;
-        shadowOrthoProjInfo.f = 20.0f;
-
-        m_lightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
 
         OrthoProjInfo cameraOrthoProjInfo;
         cameraOrthoProjInfo.l = -WINDOW_WIDTH / 250.0f;
@@ -121,12 +110,17 @@ public:
     void RenderSceneCB()
     {
         static float foo = 0.001f;
-        foo += 0.005f;
+        foo += 0.01f;
         if (foo >= 1.0f) {
-            foo = 0.001f;
+            //            foo = 0.001f;
         }
 
-        m_dirLight.WorldDirection = Vector3f(foo, -1.0f + foo, 0.0f);
+        if (m_cameraOnLight) {
+            m_pGameCamera->SetPosition(m_dirLight.WorldDirection * 2.0f + Vector3f(0.0f, 5.0f, 0.0f));
+            m_pGameCamera->SetTarget(Vector3f(0.0f, 0.0f, 0.0f) - m_dirLight.WorldDirection);
+        }
+
+        //m_dirLight.WorldDirection = Vector3f(sinf(foo), -1.0f, cosf(foo));
 
         ShadowMapPass();
         LightingPass();
@@ -143,22 +137,22 @@ public:
 
         glCullFace(GL_FRONT);
 
-        Vector3f LightPosWorld;
-        OrthoProjInfo LightOrthoProjMatrix;
-        CalcTightLightProjection(m_pGameCamera->GetMatrix(),
-                                 m_dirLight.WorldDirection,
-                                 m_pGameCamera->m_persProjInfo,
-                                 LightPosWorld,
-                                 LightOrthoProjMatrix);
+        OrthoProjInfo LightOrthoProjInfo;
+        CalcTightLightProjection(m_pGameCamera->GetMatrix(),    // in
+                                 m_dirLight.WorldDirection,     // in
+                                 m_pGameCamera->m_persProjInfo, // in
+                                 m_lightWorldPos,               // out
+                                 LightOrthoProjInfo);           // out
 
         Matrix4f LightView;
-        Vector3f Origin(0.0f, 0.0f, 0.0f);
         Vector3f Up(0.0f, 1.0f, 0.0f);
+
+        m_lightOrthoProjMatrix.InitOrthoProjTransform(LightOrthoProjInfo);
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
             m_pMesh1->SetPosition(m_positions[i]);
             Matrix4f World = m_pMesh1->GetWorldMatrix();
-            LightView.InitCameraTransform(Origin, m_dirLight.WorldDirection, Up);
+            LightView.InitCameraTransform(m_lightWorldPos, m_dirLight.WorldDirection, Up);
             Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
             m_shadowMapTech.SetWVP(WVP);
             m_pMesh1->Render();
@@ -181,11 +175,6 @@ public:
 
         m_pGameCamera->OnRender();
 
-        if (m_cameraOnLight) {
-            m_pGameCamera->SetPosition(m_dirLight.WorldDirection * 2.0f + Vector3f(0.0f, 5.0f, 0.0f));
-            m_pGameCamera->SetTarget(Vector3f(0.0f, 0.0f, 0.0f) - m_dirLight.WorldDirection);
-        }
-
         ///////////////////////////
         // Render the main object
         ////////////////////////////
@@ -200,9 +189,8 @@ public:
         }
 
         Matrix4f LightView;
-        Vector3f Origin(0.0f, 0.0f, 0.0f);
         Vector3f Up(0.0f, 1.0f, 0.0f);
-        LightView.InitCameraTransform(Origin, m_dirLight.WorldDirection, Up);
+        LightView.InitCameraTransform(m_lightWorldPos, m_dirLight.WorldDirection, Up);
 
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
@@ -331,8 +319,8 @@ private:
 
     void InitCamera()
     {
-        m_cameraPos = Vector3f(3.0f, 3.0f, -25.0f);
-        m_cameraTarget = Vector3f(-0.2f, -0.2f, 1.0f);
+        m_cameraPos = Vector3f(0.0f, 0.0f, 0.0f);
+        m_cameraTarget = Vector3f(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -367,11 +355,12 @@ private:
     {
         m_pMesh1 = new BasicMesh();
 
+        //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         //m_pMesh1->LoadMesh("../Content/cylinder.obj");
-                if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
-            printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
-                    exit(0);
-                }
+                        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
+          printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
+                  exit(0);
+              }
         //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
 
@@ -379,8 +368,8 @@ private:
         //        m_pMesh1->SetPosition(0.0f, 1.0f, 0.0f);
 
         //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
-        //        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
-        //        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+        //m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
+        //m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
@@ -396,8 +385,9 @@ private:
     ShadowMappingTechnique m_shadowMapTech;
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pTerrain = NULL;
-    Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
+    Vector3f m_lightWorldPos;
+    Matrix4f m_lightOrthoProjMatrix;
     DirectionalLight m_dirLight;
     ShadowMapFBO m_shadowMapFBO;
     Vector3f m_cameraPos;
@@ -441,7 +431,8 @@ int main(int argc, char** argv)
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.1f, 4.0f);
     app->Run();
 
     delete app;
