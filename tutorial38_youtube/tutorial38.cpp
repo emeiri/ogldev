@@ -143,6 +143,14 @@ public:
 
         glCullFace(GL_FRONT);
 
+        Vector3f LightPosWorld;
+        OrthoProjInfo LightOrthoProjMatrix;
+        CalcTightLightProjection(m_pGameCamera->GetMatrix(),
+                                 m_dirLight.WorldDirection,
+                                 m_pGameCamera->m_persProjInfo,
+                                 LightPosWorld,
+                                 LightOrthoProjMatrix);
+
         Matrix4f LightView;
         Vector3f Origin(0.0f, 0.0f, 0.0f);
         Vector3f Up(0.0f, 1.0f, 0.0f);
