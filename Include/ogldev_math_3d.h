@@ -266,6 +266,17 @@ inline Vector3f operator*(const Vector3f& l, float f)
     return Ret;
 }
 
+
+inline Vector3f operator/(const Vector3f& l, float f)
+{
+    Vector3f Ret(l.x / f,
+                 l.y / f,
+                 l.z / f);
+
+    return Ret;
+}
+
+
 inline Vector3f::Vector3f(const Vector4f& v)
 {
     x = v.x;
