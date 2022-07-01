@@ -19,8 +19,6 @@ float WindowHeight = 1000;
 float WindowWidth = 2000;
 
 
-
-
 int main(int argc, char* argv[])
 {
     PersProjInfo persProjInfo;
@@ -30,49 +28,15 @@ int main(int argc, char* argv[])
     persProjInfo.zNear = NearZ;
     persProjInfo.zFar = FarZ;
 
-    //
-    // Step #1: Calculate frustum corners in view space
-    //
-    Frustum frustum;
-    frustum.Calculate(persProjInfo);
-
-    printf("Frustum in view space\n\n"); frustum.Print(); printf("\n");
-
-    //
-    // Step #2: transform frustum to world space
-    //
-
     Matrix4f View;
     Vector3f Up(0.0f, 1.0f, 0.0f);
     View.InitCameraTransform(CameraPos, CameraTarget, Up);
     printf("View transformations:\n"); View.Print();printf("\n");
 
-    Matrix4f InverseView = View.Inverse();
-    printf("Inverse view transformation\n"); InverseView.Print(); printf("\n");
-
-    frustum.Transform(InverseView);
-    printf("Frustum in world space\n\n"); frustum.Print(); printf("\n");
-
-    Vector3f LightPosWorld = (Vector3f(frustum.NearBottomLeft) + Vector3f(frustum.NearTopRight)) / 2.0f;
-    printf("LightPos: "); LightPosWorld.Print(); printf("\n");
-
-    //
-    // Step #3: Transform frustum to light space
-    //
-
-    Matrix4f LightView;
-    LightView.InitCameraTransform(LightPosWorld, LightDir, Up);
-    frustum.Transform(LightView);
-    printf("Frustum in light space\n\n"); frustum.Print(); printf("\n");
-
-    //
-    // Step #4: Calculate an AABB
-    //
-
-    AABB aabb;
-    frustum.CalcAABB(aabb);
-
-    printf("AABB\n");
-    aabb.Print();
+    Vector3f LightPosWorld;
+    OrthoProjInfo orthoProjInfo;
+    CalcTightLightProjection(View, LightDir, persProjInfo, LightPosWorld, orthoProjInfo);
+    printf("\nFinal orthographic projection params\n");
+    orthoProjInfo.Print();
     return 0;
 }
