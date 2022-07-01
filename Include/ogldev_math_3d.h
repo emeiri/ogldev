@@ -28,9 +28,9 @@
 #include <math.h>
 #endif
 #include <stdio.h>
+#include <cfloat>
 
 #include "ogldev_util.h"
-
 
 #include <assimp/vector3.h>
 #include <assimp/matrix3x3.h>
@@ -313,6 +313,13 @@ struct OrthoProjInfo
     float t;        // top
     float n;        // z near
     float f;        // z far
+
+    void Print()
+    {
+        printf("Left %f   Right %f\n", l, r);
+        printf("Bottom %f Top %f\n", b, t);
+        printf("Near %f   Far %f\n", n, f);
+    }
 };
 
 
@@ -562,13 +569,13 @@ class Frustum
 public:
     Frustum() {}
 
-    void Calculate(const PersProjInfo& persProjInfo)
+    void CalcCorners(const PersProjInfo& persProjInfo)
     {
         float AR = persProjInfo.Height / persProjInfo.Width;
 
         float tanHalfFOV = tanf(ToRadian(persProjInfo.FOV / 2.0f));
 
-        printf("TanHalfFov %f\n", tanHalfFOV);
+        //        printf("TanHalfFov %f\n", tanHalfFOV);
 
         float NearZ = persProjInfo.zNear;
         float NearX = NearZ * tanHalfFOV;
@@ -642,5 +649,11 @@ public:
     Vector4f FarBottomRight;
 };
 
+
+void CalcTightLightProjection(const Matrix4f& CameraView,        // in
+                              const Vector3f& LightDir,          // in
+                              const PersProjInfo& persProjInfo,  // in
+                              Vector3f& LightPosWorld,           // out
+                              OrthoProjInfo& orthoProjInfo);     // out
 
 #endif  /* MATH_3D_H */

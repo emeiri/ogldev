@@ -404,3 +404,52 @@ float RandomFloat()
     float Max = RAND_MAX;
     return ((float)RANDOM() / Max);
 }
+
+
+void CalcTightLightProjection(const Matrix4f& CameraView,        // in
+                              const Vector3f& LightDir,          // in
+                              const PersProjInfo& persProjInfo,  // in
+                              Vector3f& LightPosWorld,           // out
+                              OrthoProjInfo& orthoProjInfo)      // out
+{
+    //
+    // Step #1: Calculate frustum corners in view space
+    //
+    Frustum frustum;
+    frustum.CalcCorners(persProjInfo);
+
+    //    printf("Frustum in view space\n\n"); frustum.Print(); printf("\n");
+
+    //
+    // Step #2: transform frustum to world space
+    //
+
+    Matrix4f InverseCameraView = CameraView.Inverse();
+    //printf("Inverse view transformation\n"); InverseCameraView.Print(); printf("\n");
+
+    frustum.Transform(InverseCameraView);
+    //printf("Frustum in world space\n\n"); frustum.Print(); printf("\n");
+
+    LightPosWorld = (Vector3f(frustum.NearBottomLeft) + Vector3f(frustum.NearTopRight)) / 2.0f;
+    //printf("LightPos: "); LightPosWorld.Print(); printf("\n");
+
+    //
+    // Step #3: Transform frustum to light space
+    //
+
+    Matrix4f LightView;
+    Vector3f Up(0.0f, 1.0f, 0.0f);
+    LightView.InitCameraTransform(LightPosWorld, LightDir, Up);
+    frustum.Transform(LightView);
+    //printf("Frustum in light space\n\n"); frustum.Print(); printf("\n");
+
+    //
+    // Step #4: Calculate an AABB
+    //
+
+    AABB aabb;
+    frustum.CalcAABB(aabb);
+    //    printf("AABB\n"); aabb.Print();
+
+    aabb.UpdateOrthoInfo(orthoProjInfo);
+}
