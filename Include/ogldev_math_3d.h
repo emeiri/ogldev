@@ -514,4 +514,133 @@ public:
     }
 };
 
+
+class AABB
+{
+public:
+    AABB() {}
+
+    void Add(const Vector3f& v)
+    {
+        MinX = min(MinX, v.x);
+        MinY = min(MinY, v.y);
+        MinZ = min(MinZ, v.z);
+
+        MaxX = max(MaxX, v.x);
+        MaxY = max(MaxY, v.y);
+        MaxZ = max(MaxZ, v.z);
+    }
+
+    float MinX = FLT_MAX;
+    float MaxX = FLT_MIN;
+    float MinY = FLT_MAX;
+    float MaxY = FLT_MIN;
+    float MinZ = FLT_MAX;
+    float MaxZ = FLT_MIN;
+
+    void Print()
+    {
+        printf("X: [%f,%f]\n", MinX, MaxX);
+        printf("Y: [%f,%f]\n", MinY, MaxY);
+        printf("Z: [%f,%f]\n", MinZ, MaxZ);
+    }
+
+    void UpdateOrthoInfo(struct OrthoProjInfo& o)
+    {
+        o.r = MaxX;
+        o.l = MinX;
+        o.b = MinY;
+        o.t = MaxY;
+        o.n = MinZ;
+        o.f = MaxZ;
+    }
+};
+
+
+class Frustum
+{
+public:
+    Frustum() {}
+
+    void Calculate(const PersProjInfo& persProjInfo)
+    {
+        float AR = persProjInfo.Height / persProjInfo.Width;
+
+        float tanHalfFOV = tanf(ToRadian(persProjInfo.FOV / 2.0f));
+
+        printf("TanHalfFov %f\n", tanHalfFOV);
+
+        float NearZ = persProjInfo.zNear;
+        float NearX = NearZ * tanHalfFOV;
+        float NearY = NearZ * tanHalfFOV * AR;
+
+        NearTopLeft     = Vector4f(-NearX, NearY, NearZ, 1.0f);
+        NearBottomLeft  = Vector4f(-NearX, -NearY, NearZ, 1.0f);
+        NearTopRight    = Vector4f(NearX, NearY, NearZ, 1.0f);
+        NearBottomRight = Vector4f(NearX, -NearY, NearZ, 1.0f);
+
+        float FarZ = persProjInfo.zFar;
+        float FarX = FarZ * tanHalfFOV;
+        float FarY = FarZ * tanHalfFOV * AR;
+
+        FarTopLeft     = Vector4f(-FarX, FarY, FarZ, 1.0f);
+        FarBottomLeft  = Vector4f(-FarX, -FarY, FarZ, 1.0f);
+        FarTopRight    = Vector4f(FarX, FarY, FarZ, 1.0f);
+        FarBottomRight = Vector4f(FarX, -FarY, FarZ, 1.0f);
+    }
+
+
+    void Transform(const Matrix4f& m)
+    {
+         NearTopLeft     = m * NearTopLeft;
+         NearBottomLeft  = m * NearBottomLeft;
+         NearTopRight    = m * NearTopRight;
+         NearBottomRight = m * NearBottomRight;
+
+         FarTopLeft     = m * FarTopLeft;
+         FarBottomLeft  = m * FarBottomLeft;
+         FarTopRight    = m * FarTopRight;
+         FarBottomRight = m * FarBottomRight;
+    }
+
+
+    void CalcAABB(AABB& aabb)
+    {
+        aabb.Add(NearTopLeft);
+        aabb.Add(NearBottomLeft);
+        aabb.Add(NearTopRight);
+        aabb.Add(NearBottomRight);
+
+        aabb.Add(FarTopLeft);
+        aabb.Add(FarBottomLeft);
+        aabb.Add(FarTopRight);
+        aabb.Add(FarBottomRight);
+    }
+
+
+    void Print()
+    {
+        printf("NearTopLeft "); NearTopLeft.Print();
+        printf("NearBottomLeft "); NearBottomLeft.Print();
+        printf("NearTopRight "); NearTopRight.Print();
+        printf("NearBottomLeft "); NearBottomRight.Print();
+
+        printf("FarTopLeft "); FarTopLeft.Print();
+        printf("FarBottomLeft "); FarBottomLeft.Print();
+        printf("FarTopRight "); FarTopRight.Print();
+        printf("FarBottomLeft "); FarBottomRight.Print();
+    }
+
+    Vector4f NearTopLeft;
+    Vector4f NearBottomLeft;
+    Vector4f NearTopRight;
+    Vector4f NearBottomRight;
+
+    Vector4f FarTopLeft;
+    Vector4f FarBottomLeft;
+    Vector4f FarTopRight;
+    Vector4f FarBottomRight;
+};
+
+
 #endif  /* MATH_3D_H */
