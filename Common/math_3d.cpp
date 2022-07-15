@@ -418,43 +418,32 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
     Frustum frustum;
     frustum.CalcCorners(persProjInfo);
 
-    printf("Frustum in view space\n\n"); frustum.Print(); printf("\n");
-
     //
     // Step #2: transform the view frustum to world space
     //
-
     Matrix4f InverseCameraView = CameraView.Inverse();
-    //printf("Inverse view transformation\n"); InverseCameraView.Print(); printf("\n");
-
     frustum.Transform(InverseCameraView);
-    printf("Frustum in world space\n\n"); frustum.Print(); printf("\n");
 
     Frustum view_frustum_in_world_space = frustum;   // backup for later
 
     //
     // Step #3: Transform the view frustum to light space (1st time)
     //
-
     Matrix4f LightView;
     Vector3f Origin(0.0f, 0.0f, 0.0f);
     Vector3f Up(0.0f, 1.0f, 0.0f);
     LightView.InitCameraTransform(Origin, LightDir, Up);
     frustum.Transform(LightView);
-    printf("Frustum in light space\n\n"); frustum.Print(); printf("\n\n");
 
     //
     // Step #4: Calculate an AABB for the view frustum in light space
     //
-
     AABB aabb;
     frustum.CalcAABB(aabb);
-    aabb.Print();
 
     //
     // Step #5: Calculate the position of the light
     //
-
     Vector3f BottomLeft(aabb.MinX, aabb.MinY, aabb.MinZ);
     Vector3f TopRight(aabb.MaxX, aabb.MaxY, aabb.MinZ);
     Vector4f LightPosWorld4d = Vector4f((BottomLeft + TopRight) / 2.0f, 1.0f);
@@ -462,12 +451,9 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
     //
     // Step #6: transform the position of the light back to world space
     //
-
     Matrix4f LightViewInv = LightView.Inverse();
     LightPosWorld4d = LightViewInv * LightPosWorld4d;
     LightPosWorld = Vector3f(LightPosWorld4d.x, LightPosWorld4d.y, LightPosWorld4d.z);
-
-    printf("Light position in world space: "); LightPosWorld.Print(); printf("\n");
 
     //
     // Step #7: transform the view frustum to light space (2nd time)
@@ -480,9 +466,5 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
     //
     AABB final_aabb;
     view_frustum_in_world_space.CalcAABB(final_aabb);
-
     final_aabb.UpdateOrthoInfo(orthoProjInfo);
-    //    printf("AABB\n"); final_aabb.Print();
-
-    //    exit(0);
 }
