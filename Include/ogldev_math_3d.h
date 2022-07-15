@@ -567,6 +567,16 @@ public:
 class Frustum
 {
 public:
+    Vector4f NearTopLeft;
+    Vector4f NearBottomLeft;
+    Vector4f NearTopRight;
+    Vector4f NearBottomRight;
+
+    Vector4f FarTopLeft;
+    Vector4f FarBottomLeft;
+    Vector4f FarTopRight;
+    Vector4f FarBottomRight;
+
     Frustum() {}
 
     void CalcCorners(const PersProjInfo& persProjInfo)
@@ -574,8 +584,6 @@ public:
         float AR = persProjInfo.Height / persProjInfo.Width;
 
         float tanHalfFOV = tanf(ToRadian(persProjInfo.FOV / 2.0f));
-
-        //        printf("TanHalfFov %f\n", tanHalfFOV);
 
         float NearZ = persProjInfo.zNear;
         float NearX = NearZ * tanHalfFOV;
@@ -637,16 +645,6 @@ public:
         printf("FarTopRight "); FarTopRight.Print();
         printf("FarBottomLeft "); FarBottomRight.Print();
     }
-
-    Vector4f NearTopLeft;
-    Vector4f NearBottomLeft;
-    Vector4f NearTopRight;
-    Vector4f NearBottomRight;
-
-    Vector4f FarTopLeft;
-    Vector4f FarBottomLeft;
-    Vector4f FarTopRight;
-    Vector4f FarBottomRight;
 };
 
 
