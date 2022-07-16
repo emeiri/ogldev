@@ -27,3 +27,6 @@ Makefile-Release.mk
 *.FileListAbsolute.txt
 *.VC.db
 *.trace
+*.vsidx
+fileList.bin
+read.lock
