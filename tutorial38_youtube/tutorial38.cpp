@@ -135,8 +135,9 @@ public:
 
         m_shadowMapTech.Enable();
 
-        glCullFace(GL_FRONT);
+        //        glCullFace(GL_FRONT); // Solution #2 from the video - reverse face culling
 
+        // Solution #5: from the video - calculate a tight light projection matrix
         OrthoProjInfo LightOrthoProjInfo;
         CalcTightLightProjection(m_pGameCamera->GetMatrix(),    // in
                                  m_dirLight.WorldDirection,     // in
@@ -169,7 +170,7 @@ public:
 
         m_lightingTech.Enable();
 
-        glCullFace(GL_BACK);
+        //        glCullFace(GL_BACK); // Solution #2 from the video - reverse face culling
 
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
@@ -319,8 +320,9 @@ private:
 
     void InitCamera()
     {
-        m_cameraPos = Vector3f(0.0f, 0.0f, 0.0f);
-        m_cameraTarget = Vector3f(0.0f, 0.0f, 1.0f);
+        m_cameraPos = Vector3f(3.0f, 5.0f, -31.0f);
+        m_cameraTarget = Vector3f(0.0f, -0.1f, 1.0f);
+
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -431,8 +433,13 @@ int main(int argc, char** argv)
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.1f, 4.0f);
+
+    /*    glEnable(GL_POLYGON_OFFSET_FILL); // Solution #3 from the video: slope scale depth bias
+
+    float factor = 1.0f;  // needs tuning...
+    float units = 1.0f;   // needs tuning...
+    glPolygonOffset(factor, units); */
+
     app->Run();
 
     delete app;

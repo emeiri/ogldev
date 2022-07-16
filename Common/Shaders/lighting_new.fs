@@ -110,9 +110,9 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
     float Depth = texture(gShadowMap, UVCoords).x;
 
     float DiffuseFactor = dot(Normal, -LightDirection);
-//    float bias = max(0.05 * (1.0 - DiffuseFactor), 0.005);
-float bias = mix(0.05, 0.0, DiffuseFactor);
-bias = 0.0;
+
+    float bias = mix(0.001, 0.0, DiffuseFactor);
+
     if (Depth + bias < z)
         return 0.05;
     else
