@@ -41,11 +41,11 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class Tutorial35
+class Tutorial34
 {
 public:
 
-    Tutorial35()
+    Tutorial34()
     {
         m_pointLights[0].WorldPosition = Vector3f(20.0f, 0.0f, 0.0f);
         m_pointLights[0].DiffuseIntensity = 1.0f;
@@ -64,7 +64,7 @@ public:
         m_dirLight.AmbientIntensity = 0.1f;
     }
 
-    virtual ~Tutorial35()
+    virtual ~Tutorial34()
     {
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh1);
@@ -189,7 +189,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 35");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 34");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -253,7 +253,7 @@ private:
     DirectionalLight m_dirLight;
 };
 
-Tutorial35* app = NULL;
+Tutorial34* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -279,7 +279,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial35();
+    app = new Tutorial34();
 
     app->Init();
 
