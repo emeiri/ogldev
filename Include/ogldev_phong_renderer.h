@@ -47,6 +47,8 @@ class PhongRenderer {
 
     void SetSpotLights(uint NumLights, const SpotLight* pSpotLights);
 
+    void SetFog(float FogStart, float FogEnd, const Vector3f& FogColor);
+
     void UpdateDirLightDir(const Vector3f& WorldDir);
 
     void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);

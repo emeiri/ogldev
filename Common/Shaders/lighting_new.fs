@@ -64,11 +64,15 @@ uniform sampler2D gSamplerSpecularExponent;
 uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 uniform vec3 gCameraLocalPos;
+uniform vec3 gCameraWorldPos;
 uniform vec4 gColorMod = vec4(1);
 uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
+uniform float gFogStart = -1.0;
+uniform float gFogEnd = -1.0;
+uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
 
 const int toon_color_levels = 4;
 const float toon_scale_factor = 1.0f / toon_color_levels;
@@ -224,5 +228,16 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * gColorMod;
+    vec4 TempColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
+
+    if ((gFogStart) >= 0 && (gFogEnd >= 0)) {
+        float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
+        float FogRange = gFogEnd - gFogStart;
+        float FogDist = gFogEnd - CameraToPixelDist;
+        float FogFactor = FogDist / FogRange;
+        FogFactor = clamp(FogFactor, 0.0, 1.0);
+        TempColor = FogFactor * TempColor + (1.0 - FogFactor) * vec4(gFogColor, 1.0);
+    }
+
+    FragColor =  TempColor * gColorMod;
 }

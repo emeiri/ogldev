@@ -215,6 +215,11 @@ void PhongRenderer::Render(BasicMesh* pMesh)
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
     m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
+    m_lightingTech.SetCameraWorldPos(m_pCamera->GetPos());
+
+    Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
+    m_lightingTech.SetWorldMatrix(World);
+
     pMesh->Render();
 }
 
@@ -339,4 +344,16 @@ void PhongRenderer::ControlCellShading(bool IsEnabled)
 
     m_skinningTech.Enable();
     m_skinningTech.ControlCellShading(IsEnabled);
+}
+
+
+void PhongRenderer::SetFog(float FogStart, float FogEnd, const Vector3f& FogColor)
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetFogRange(FogStart, FogEnd);
+    m_lightingTech.SetFogColor(FogColor);
+
+    SwitchToSkinningTech();
+    m_skinningTech.SetFogRange(FogStart, FogEnd);
+    m_skinningTech.SetFogColor(FogColor);
 }

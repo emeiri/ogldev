@@ -47,18 +47,6 @@ public:
 
     Tutorial39()
     {
-        m_pointLights[0].WorldPosition = Vector3f(20.0f, 0.0f, 0.0f);
-        m_pointLights[0].DiffuseIntensity = 1.0f;
-        m_pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLights[0].Attenuation.Linear = 0.1f;
-        m_pointLights[0].Attenuation.Exp = 0.0f;
-
-        m_pointLights[1].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
-        m_pointLights[1].DiffuseIntensity = 0.25f;
-        m_pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLights[1].Attenuation.Linear = 0.0f;
-        m_pointLights[1].Attenuation.Exp = 0.2f;
-
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
         m_dirLight.AmbientIntensity = 0.1f;
@@ -110,6 +98,12 @@ public:
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
 
+        if (m_fogEnabled) {
+            m_phongRenderer.SetFog(m_fogStart, m_fogEnd, m_fogColor);
+        } else {
+            m_phongRenderer.SetFog(-1.0f, -1.0f, Vector3f(0.0f, 0.0f, 0.0f));
+        }
+
         m_phongRenderer.Render(m_pTerrain);
     }
 
@@ -133,29 +127,10 @@ public:
                 glfwTerminate();
                 exit(0);
 
-            case 'a':
-                m_pointLights[0].Attenuation.Linear += ATTEN_STEP;
-                m_pointLights[1].Attenuation.Linear += ATTEN_STEP;
-                break;
-
-            case 'z':
-                m_pointLights[0].Attenuation.Linear -= ATTEN_STEP;
-                m_pointLights[1].Attenuation.Linear -= ATTEN_STEP;
-                break;
-
-            case 's':
-                m_pointLights[0].Attenuation.Exp += ATTEN_STEP;
-                m_pointLights[1].Attenuation.Exp += ATTEN_STEP;
-                break;
-
-            case 'x':
-                m_pointLights[0].Attenuation.Exp -= ATTEN_STEP;
-                m_pointLights[1].Attenuation.Exp -= ATTEN_STEP;
-                break;
+            case GLFW_KEY_F:
+                m_fogEnabled = !m_fogEnabled;
             }
         }
-
-        //        printf("Linear %f Exp %f\n", m_pointLights[0].Attenuation.Linear, m_pointLights[0].Attenuation.Exp);
 
         m_pGameCamera->OnKeyboard(key);
     }
@@ -206,8 +181,8 @@ private:
     {
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
-        //m_phongRenderer.SetPointLights(1, m_pointLights);
         m_phongRenderer.SetDirLight(m_dirLight);
+        m_phongRenderer.SetFog(m_fogStart, m_fogEnd, m_fogColor);
     }
 
 
@@ -223,8 +198,11 @@ private:
     PhongRenderer m_phongRenderer;
     BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
-    PointLight m_pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     DirectionalLight m_dirLight;
+    float m_fogStart = 5.0f;
+    float m_fogEnd = 100.0f;
+    Vector3f m_fogColor = Vector3f(152.0f/256.0f, 152.0f/256.0f, 152.0f/256.0f);
+    bool m_fogEnabled = true;
 };
 
 Tutorial39* app = NULL;

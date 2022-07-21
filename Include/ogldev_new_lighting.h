@@ -118,11 +118,14 @@ public:
     void UpdateSpotLight(unsigned int Index, const SpotLight& Light);
     void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraLocalPos(const Vector3f& CameraLocalPos);
+    void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     virtual void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
     virtual void ControlSpecularExponent(bool IsEnabled);
+    void SetFogRange(float FogStart, float FogEnd);
+    void SetFogColor(const Vector3f& FogColor);
 
 protected:
 
@@ -138,12 +141,16 @@ private:
     GLuint shadowCubeMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
     GLuint CameraLocalPosLoc = INVALID_UNIFORM_LOCATION;
+    GLuint CameraWorldPosLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumSpotLightsLoc = INVALID_UNIFORM_LOCATION;
     GLuint ColorModLocation = INVALID_UNIFORM_LOCATION;
     GLuint EnableRimLightLoc = INVALID_UNIFORM_LOCATION;
     GLuint EnableCellShadingLoc = INVALID_UNIFORM_LOCATION;
     GLuint EnableSpecularExponent = INVALID_UNIFORM_LOCATION;
+    GLuint FogStartLoc = INVALID_UNIFORM_LOCATION;
+    GLuint FogEndLoc = INVALID_UNIFORM_LOCATION;
+    GLuint FogColorLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

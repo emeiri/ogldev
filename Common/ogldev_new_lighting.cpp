@@ -83,12 +83,16 @@ bool LightingTechnique::InitCommon()
     dirLightLoc.Direction = GetUniformLocation("gDirectionalLight.Direction");
     dirLightLoc.DiffuseIntensity = GetUniformLocation("gDirectionalLight.Base.DiffuseIntensity");
     CameraLocalPosLoc = GetUniformLocation("gCameraLocalPos");
+    CameraWorldPosLoc = GetUniformLocation("gCameraWorldPos");
     NumPointLightsLoc = GetUniformLocation("gNumPointLights");
     NumSpotLightsLoc = GetUniformLocation("gNumSpotLights");
     ColorModLocation = GetUniformLocation("gColorMod");
     EnableRimLightLoc = GetUniformLocation("gRimLightEnabled");
     EnableCellShadingLoc = GetUniformLocation("gCellShadingEnabled");
     EnableSpecularExponent = GetUniformLocation("gEnableSpecularExponent");
+    FogStartLoc = GetUniformLocation("gFogStart");
+    FogEndLoc = GetUniformLocation("gFogEnd");
+    FogColorLoc = GetUniformLocation("gFogColor");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -101,6 +105,7 @@ bool LightingTechnique::InitCommon()
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.SpecularColor == INVALID_UNIFORM_LOCATION ||
         CameraLocalPosLoc == INVALID_UNIFORM_LOCATION ||
+        CameraWorldPosLoc == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.Color == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.Direction == INVALID_UNIFORM_LOCATION ||
@@ -109,8 +114,10 @@ bool LightingTechnique::InitCommon()
         NumSpotLightsLoc == INVALID_UNIFORM_LOCATION ||
         EnableRimLightLoc == INVALID_UNIFORM_LOCATION ||
         EnableCellShadingLoc == INVALID_UNIFORM_LOCATION ||
-        EnableSpecularExponent == INVALID_UNIFORM_LOCATION)
-    {
+        EnableSpecularExponent == INVALID_UNIFORM_LOCATION ||
+        FogStartLoc == INVALID_UNIFORM_LOCATION ||
+        FogEndLoc == INVALID_UNIFORM_LOCATION ||
+        FogColorLoc == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
@@ -277,6 +284,12 @@ void LightingTechnique::SetCameraLocalPos(const Vector3f& CameraLocalPos)
 }
 
 
+void LightingTechnique::SetCameraWorldPos(const Vector3f& CameraWorldPos)
+{
+    glUniform3f(CameraWorldPosLoc, CameraWorldPos.x, CameraWorldPos.y, CameraWorldPos.z);
+}
+
+
 void LightingTechnique::SetMaterial(const Material& material)
 {
     glUniform3f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b);
@@ -379,4 +392,22 @@ void LightingTechnique::ControlSpecularExponent(bool IsEnabled)
     } else {
         glUniform1i(EnableSpecularExponent, 0);
     }
+}
+
+
+void LightingTechnique::SetFogRange(float FogStart, float FogEnd)
+{
+    if ((FogStart >= 0.0f) && (FogEnd >= 0.0f) && (FogStart >= FogEnd)) {
+        printf("FogStart %f must be smaller than FogEnd %f\n", FogStart, FogEnd);
+        exit(1);
+    }
+
+    glUniform1f(FogStartLoc, FogStart);
+    glUniform1f(FogEndLoc, FogEnd);
+}
+
+
+void LightingTechnique::SetFogColor(const Vector3f& FogColor)
+{
+    glUniform3f(FogColorLoc, FogColor.r, FogColor.g, FogColor.b);
 }
