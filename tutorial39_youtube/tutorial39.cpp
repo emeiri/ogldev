@@ -99,9 +99,9 @@ public:
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
 
         if (m_fogEnabled) {
-            m_phongRenderer.SetFog(m_fogStart, m_fogEnd, m_fogColor);
+            m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
         } else {
-            m_phongRenderer.SetFog(-1.0f, -1.0f, Vector3f(0.0f, 0.0f, 0.0f));
+            m_phongRenderer.SetLinearFog(-1.0f, -1.0f, Vector3f(0.0f, 0.0f, 0.0f));
         }
 
         m_phongRenderer.Render(m_pTerrain);
@@ -182,7 +182,7 @@ private:
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
-        m_phongRenderer.SetFog(m_fogStart, m_fogEnd, m_fogColor);
+        m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
     }
 
 

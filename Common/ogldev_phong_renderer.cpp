@@ -347,13 +347,13 @@ void PhongRenderer::ControlCellShading(bool IsEnabled)
 }
 
 
-void PhongRenderer::SetFog(float FogStart, float FogEnd, const Vector3f& FogColor)
+void PhongRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetFogRange(FogStart, FogEnd);
+    m_lightingTech.SetLinearFog(FogStart, FogEnd);
     m_lightingTech.SetFogColor(FogColor);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetFogRange(FogStart, FogEnd);
+    m_skinningTech.SetLinearFog(FogStart, FogEnd);
     m_skinningTech.SetFogColor(FogColor);
 }

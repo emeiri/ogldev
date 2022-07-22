@@ -124,7 +124,8 @@ public:
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
     virtual void ControlSpecularExponent(bool IsEnabled);
-    void SetFogRange(float FogStart, float FogEnd);
+    void SetLinearFog(float FogStart, float FogEnd);
+    void SetExpFog(float FogEnd);
     void SetFogColor(const Vector3f& FogColor);
 
 protected:

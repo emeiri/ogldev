@@ -395,14 +395,36 @@ void LightingTechnique::ControlSpecularExponent(bool IsEnabled)
 }
 
 
-void LightingTechnique::SetFogRange(float FogStart, float FogEnd)
+void LightingTechnique::SetLinearFog(float FogStart, float FogEnd)
 {
-    if ((FogStart >= 0.0f) && (FogEnd >= 0.0f) && (FogStart >= FogEnd)) {
+    if (FogStart < 0.0f) {
+        printf("Fog start must be positive: %f\n", FogStart);
+        exit(1);
+    }
+
+    if (FogEnd < 0.0f) {
+        printf("Fog end must be positive: %f\n", FogEnd);
+        exit(1);
+    }
+
+    if (FogStart >= FogEnd) {
         printf("FogStart %f must be smaller than FogEnd %f\n", FogStart, FogEnd);
         exit(1);
     }
 
     glUniform1f(FogStartLoc, FogStart);
+    glUniform1f(FogEndLoc, FogEnd);
+}
+
+
+void LightingTechnique::SetExpFog(float FogEnd)
+{
+    if (FogEnd < 0.0f) {
+        printf("Fog end must be positive: %f\n", FogEnd);
+        exit(1);
+    }
+
+    glUniform1f(FogStartLoc, -1.0f);
     glUniform1f(FogEndLoc, FogEnd);
 }
 
