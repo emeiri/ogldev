@@ -236,7 +236,7 @@ void main()
         float FogDist = gFogEnd - CameraToPixelDist;
         float FogFactor = FogDist / FogRange;
         FogFactor = clamp(FogFactor, 0.0, 1.0);
-        TempColor = FogFactor * TempColor + (1.0 - FogFactor) * vec4(gFogColor, 1.0);
+        TempColor = mix(vec4(gFogColor, 1.0), TempColor, FogFactor);
     }
 
     FragColor =  TempColor * gColorMod;
