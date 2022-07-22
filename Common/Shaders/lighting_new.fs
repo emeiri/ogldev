@@ -77,6 +77,7 @@ uniform bool gExpSquaredFogEnabled = false;
 uniform float gLayeredFogTop = -1.0;
 uniform float gFogStart = -1.0;
 uniform float gFogEnd = -1.0;
+uniform float gFogTime = -1.0;
 uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
 
 const int toon_color_levels = 4;
@@ -289,11 +290,39 @@ float CalcLayeredFogFactor()
 }
 
 
+#define PI 3.1415926535897932384626433832795
+
+float CalcAnimatedFogFactor()
+{
+    float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
+
+    float DistRatio = 4.0 * CameraToPixelDist / gFogEnd;
+
+    float ExpFogFactor = exp(-DistRatio * gExpFogDensity);
+
+    float x = WorldPos0.x / 10.0;
+    float y = WorldPos0.y / 10.0;
+    float z = WorldPos0.z / 10.0;
+
+    float AnimFactor = -(1.0 +
+                         0.5 * cos(5.0 * PI * z + gFogTime) +
+                         0.2 * cos(7.0 * PI * (z + 0.1 * x)) +
+                         0.2 * cos(5.0 * PI * (z - 0.05 * x)) +
+                         0.1 * cos(PI * x) * cos(PI * y / 2.0));
+
+    float FogFactor = ExpFogFactor + (CameraToPixelDist / gFogEnd) / 4.0 * AnimFactor;
+
+    return FogFactor;
+}
+
+
 float CalcFogFactor()
 {
     float FogFactor = 1.0;
 
-    if (gLayeredFogTop > 0.0) {
+    if (gFogTime > 0.0) {
+       FogFactor = CalcAnimatedFogFactor();
+    } else if (gLayeredFogTop > 0.0) {
         FogFactor = CalcLayeredFogFactor();
     } else if (gFogStart >= 0.0) {
         FogFactor = CalcLinearFogFactor();

@@ -66,6 +66,10 @@ class PhongRenderer {
 
     void SetLayeredFog(float FogTop, float FogEnd, const Vector3f& FogColor);
 
+    void SetAnimatedFog(float FogEnd, float FogDensity, const Vector3f& FogColor);
+
+    void UpdateAnimatedFogTime(float FogTime);
+
     void DisableFog();
 
     void ControlRimLight(bool IsEnabled);

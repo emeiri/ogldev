@@ -129,6 +129,8 @@ public:
     void SetExpSquaredFog(float FogEnd, float FogDensity);
     void SetLayeredFog(float FogTop, float FogEnd);
     void SetFogColor(const Vector3f& FogColor);
+    void SetAnimatedFog(float FogEnd, float FogDensity);
+    void SetFogTime(float Time);
 
 protected:
 
@@ -158,6 +160,7 @@ private:
     GLuint ExpFogDensityLoc = INVALID_UNIFORM_LOCATION;
     GLuint ExpSquaredFogEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
+    GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

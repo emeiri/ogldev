@@ -96,6 +96,7 @@ bool LightingTechnique::InitCommon()
     ExpFogDensityLoc = GetUniformLocation("gExpFogDensity");
     ExpSquaredFogEnabledLoc = GetUniformLocation("gExpSquaredFogEnabled");
     LayeredFogTopLoc = GetUniformLocation("gLayeredFogTop");
+    FogTimeLoc = GetUniformLocation("gFogTime");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -123,7 +124,8 @@ bool LightingTechnique::InitCommon()
         FogColorLoc == INVALID_UNIFORM_LOCATION ||
         ExpFogDensityLoc == INVALID_UNIFORM_LOCATION ||
         ExpSquaredFogEnabledLoc == INVALID_UNIFORM_LOCATION ||
-        LayeredFogTopLoc == INVALID_UNIFORM_LOCATION) {
+        LayeredFogTopLoc == INVALID_UNIFORM_LOCATION ||
+        FogTimeLoc == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
@@ -418,6 +420,9 @@ void LightingTechnique::SetLinearFog(float FogStart, float FogEnd)
         exit(1);
     }
 
+    glUniform1f(LayeredFogTopLoc, -1.0f);
+    glUniform1f(FogTimeLoc, -1.0f);
+
     glUniform1f(FogStartLoc, FogStart);
     glUniform1f(FogEndLoc, FogEnd);
 }
@@ -451,6 +456,7 @@ void LightingTechnique::SetExpFogCommon(float FogEnd, float FogDensity)
 
     glUniform1f(FogStartLoc, -1.0f);
     glUniform1f(LayeredFogTopLoc, -1.0f);
+    glUniform1f(FogTimeLoc, -1.0f);
 
     glUniform1f(FogEndLoc, FogEnd);
     glUniform1f(ExpFogDensityLoc, FogDensity);
@@ -470,11 +476,30 @@ void LightingTechnique::SetLayeredFog(float FogTop, float FogEnd)
     }
 
     glUniform1f(FogStartLoc, -1.0f);
+    glUniform1f(FogTimeLoc, -1.0f);
 
     glUniform1f(LayeredFogTopLoc, FogTop);
     glUniform1f(FogEndLoc, FogEnd);
 }
+
+
 void LightingTechnique::SetFogColor(const Vector3f& FogColor)
 {
     glUniform3f(FogColorLoc, FogColor.r, FogColor.g, FogColor.b);
+}
+
+
+void LightingTechnique::SetFogTime(float Time)
+{
+    glUniform1f(FogTimeLoc, Time);
+}
+
+
+void LightingTechnique::SetAnimatedFog(float FogEnd, float FogDensity)
+{
+    glUniform1f(FogStartLoc, -1.0f);
+    glUniform1f(LayeredFogTopLoc, -1.0f);
+
+    glUniform1f(FogEndLoc, FogEnd);
+    glUniform1f(ExpFogDensityLoc, FogDensity);
 }

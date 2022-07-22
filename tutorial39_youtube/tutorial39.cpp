@@ -69,6 +69,8 @@ public:
         InitMesh();
 
         InitRenderer();
+
+        m_startTime = GetCurrentTimeMillis();
     }
 
 
@@ -88,6 +90,19 @@ public:
 
         m_pGameCamera->OnRender();
 
+        long long CurrentTime = GetCurrentTimeMillis();
+        float RunningTime = (float)((double)CurrentTime - (double)m_startTime) / 1000.0f;
+
+        if (m_isAnimatedFog) {
+            static float FogTime = 0.0f;
+            FogTime += 0.000035f * ((float)rand()/10.0f) * RunningTime;
+            m_phongRenderer.UpdateAnimatedFogTime(RunningTime);
+            //            printf("%f\n", RunningTime);
+        }
+
+        //        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
+        //        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
+
         m_phongRenderer.Render(m_pTerrain);
     }
 
@@ -104,6 +119,7 @@ public:
     void KeyboardCB(uint key, int state)
     {
         if (state == GLFW_PRESS) {
+
             switch (key) {
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
@@ -113,27 +129,38 @@ public:
 
             case GLFW_KEY_0:
                 printf("No fog\n");
+                m_isAnimatedFog = false;
                 m_phongRenderer.DisableFog();
                 break;
 
             case GLFW_KEY_1:
                 printf("Linear fog\n");
+                m_isAnimatedFog = false;
                 m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
                 break;
 
             case GLFW_KEY_2:
                 printf("Exponential fog\n");
+                m_isAnimatedFog = false;
                 m_phongRenderer.SetExpFog(m_fogEnd, m_fogColor, m_fogDensity);
                 break;
 
             case GLFW_KEY_3:
                 printf("Exponential squared fog\n");
+                m_isAnimatedFog = false;
                 m_phongRenderer.SetExpSquaredFog(m_fogEnd, m_fogColor, m_fogDensity);
                 break;
 
             case GLFW_KEY_4:
                 printf("Layered fog\n");
+                m_isAnimatedFog = false;
                 m_phongRenderer.SetLayeredFog(m_fogTop, m_fogEnd, m_fogColor);
+                break;
+
+            case GLFW_KEY_5:
+                printf("Animated fog\n");
+                m_phongRenderer.SetAnimatedFog(m_fogEnd, m_fogDensity, m_fogColor);
+                m_isAnimatedFog = true;
                 break;
             }
         }
@@ -209,6 +236,8 @@ private:
     float m_fogTop = 2.5f;
     float m_fogDensity = 0.66f;
     Vector3f m_fogColor = Vector3f(152.0f/256.0f, 152.0f/256.0f, 152.0f/256.0f);
+    bool m_isAnimatedFog = false;
+    long long m_startTime = 0;
 };
 
 Tutorial39* app = NULL;

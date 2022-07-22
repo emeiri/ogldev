@@ -395,6 +395,27 @@ void PhongRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& Fo
 }
 
 
+void PhongRenderer::SetAnimatedFog(float FogEnd, float FogDensity, const Vector3f& FogColor)
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetAnimatedFog(FogEnd, FogDensity);
+    m_lightingTech.SetFogColor(FogColor);
+
+    SwitchToSkinningTech();
+    m_skinningTech.SetAnimatedFog(FogEnd, FogDensity);
+    m_skinningTech.SetFogColor(FogColor);
+}
+
+
+void PhongRenderer::UpdateAnimatedFogTime(float FogTime)
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetFogTime(FogTime);
+
+    SwitchToSkinningTech();
+    m_skinningTech.SetFogTime(FogTime);
+}
+
 void PhongRenderer::DisableFog()
 {
     SwitchToLightingTech();
