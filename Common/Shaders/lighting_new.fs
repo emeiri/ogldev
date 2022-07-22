@@ -215,6 +215,17 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal)
 }
 
 
+float CalcLinearFogFactor()
+{
+    float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
+    float FogRange = gFogEnd - gFogStart;
+    float FogDist = gFogEnd - CameraToPixelDist;
+    float FogFactor = FogDist / FogRange;
+    FogFactor = clamp(FogFactor, 0.0, 1.0);
+    return FogFactor;
+}
+
+
 void main()
 {
     vec3 Normal = normalize(Normal0);
@@ -231,12 +242,8 @@ void main()
     vec4 TempColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
 
     if ((gFogStart) >= 0 && (gFogEnd >= 0)) {
-        float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
-        float FogRange = gFogEnd - gFogStart;
-        float FogDist = gFogEnd - CameraToPixelDist;
-        float FogFactor = FogDist / FogRange;
-        FogFactor = clamp(FogFactor, 0.0, 1.0);
-        TempColor = mix(vec4(gFogColor, 1.0), TempColor, FogFactor);
+        float LinearFogFactor = CalcLinearFogFactor();
+        TempColor = mix(vec4(gFogColor, 1.0), TempColor, LinearFogFactor);
     }
 
     FragColor =  TempColor * gColorMod;
