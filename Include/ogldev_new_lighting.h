@@ -125,7 +125,7 @@ public:
     void ControlCellShading(bool IsEnabled);
     virtual void ControlSpecularExponent(bool IsEnabled);
     void SetLinearFog(float FogStart, float FogEnd);
-    void SetExpFog(float FogEnd);
+    void SetExpFog(float FogEnd, float FogDensity);
     void SetFogColor(const Vector3f& FogColor);
 
 protected:
@@ -133,6 +133,7 @@ protected:
     bool InitCommon();
 
 private:
+    void SetExpFogCommon(float FogEnd, float FogDensity);
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
@@ -152,6 +153,7 @@ private:
     GLuint FogStartLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogEndLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogColorLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ExpFogDensityLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

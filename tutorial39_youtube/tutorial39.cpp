@@ -47,7 +47,7 @@ public:
 
     Tutorial39()
     {
-        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
         m_dirLight.AmbientIntensity = 0.1f;
     }
@@ -88,12 +88,6 @@ public:
 
         m_pGameCamera->OnRender();
 
-        static float foo = 0.0f;
-        foo += 0.002f;
-
-        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
-        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
-
         m_phongRenderer.Render(m_pTerrain);
     }
 
@@ -125,6 +119,11 @@ public:
             case GLFW_KEY_1:
                 printf("Linear fog\n");
                 m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
+                break;
+
+            case GLFW_KEY_2:
+                printf("Exponential fog\n");
+                m_phongRenderer.SetExpFog(m_fogEnd, m_fogColor, m_fogDensity);
                 break;
             }
         }
@@ -197,6 +196,7 @@ private:
     DirectionalLight m_dirLight;
     float m_fogStart = 5.0f;
     float m_fogEnd = 100.0f;
+    float m_fogDensity = 0.66f;
     Vector3f m_fogColor = Vector3f(152.0f/256.0f, 152.0f/256.0f, 152.0f/256.0f);
 };
 

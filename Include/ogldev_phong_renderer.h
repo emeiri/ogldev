@@ -41,6 +41,9 @@ class PhongRenderer {
 
     void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
 
+    //
+    // Lighting
+    //
     void SetDirLight(const DirectionalLight& DirLight);
 
     void SetPointLights(uint NumLights, const PointLight* pPointLights);
@@ -56,6 +59,8 @@ class PhongRenderer {
     // Fog
     //
     void SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor);
+
+    void SetExpFog(float FogEnd, const Vector3f& FogColor, float FogDensity);
 
     void DisableFog();
 

@@ -93,6 +93,7 @@ bool LightingTechnique::InitCommon()
     FogStartLoc = GetUniformLocation("gFogStart");
     FogEndLoc = GetUniformLocation("gFogEnd");
     FogColorLoc = GetUniformLocation("gFogColor");
+    ExpFogDensityLoc = GetUniformLocation("gExpFogDensity");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -117,7 +118,8 @@ bool LightingTechnique::InitCommon()
         EnableSpecularExponent == INVALID_UNIFORM_LOCATION ||
         FogStartLoc == INVALID_UNIFORM_LOCATION ||
         FogEndLoc == INVALID_UNIFORM_LOCATION ||
-        FogColorLoc == INVALID_UNIFORM_LOCATION) {
+        FogColorLoc == INVALID_UNIFORM_LOCATION ||
+        ExpFogDensityLoc == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
@@ -417,15 +419,28 @@ void LightingTechnique::SetLinearFog(float FogStart, float FogEnd)
 }
 
 
-void LightingTechnique::SetExpFog(float FogEnd)
+void LightingTechnique::SetExpFog(float FogEnd, float FogDensity)
+{
+    SetExpFogCommon(FogEnd, FogDensity);
+}
+
+
+void LightingTechnique::SetExpFogCommon(float FogEnd, float FogDensity)
 {
     if (FogEnd < 0.0f) {
         printf("Fog end must be positive: %f\n", FogEnd);
         exit(1);
     }
 
+    if (FogDensity < 0.0f) {
+        printf("Fog density must be positive: %f\n", FogDensity);
+        exit(1);
+    }
+
     glUniform1f(FogStartLoc, -1.0f);
+
     glUniform1f(FogEndLoc, FogEnd);
+    glUniform1f(ExpFogDensityLoc, FogDensity);
 }
 
 
