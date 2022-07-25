@@ -383,6 +383,18 @@ void PhongRenderer::SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, flo
 }
 
 
+void PhongRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& FogColor)
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetLayeredFog(FogTop, FogEnd);
+    m_lightingTech.SetFogColor(FogColor);
+
+    SwitchToSkinningTech();
+    m_skinningTech.SetLayeredFog(FogTop, FogEnd);
+    m_skinningTech.SetFogColor(FogColor);
+}
+
+
 void PhongRenderer::DisableFog()
 {
     SwitchToLightingTech();

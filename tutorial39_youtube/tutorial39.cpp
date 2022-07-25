@@ -130,6 +130,11 @@ public:
                 printf("Exponential squared fog\n");
                 m_phongRenderer.SetExpSquaredFog(m_fogEnd, m_fogColor, m_fogDensity);
                 break;
+
+            case GLFW_KEY_4:
+                printf("Layered fog\n");
+                m_phongRenderer.SetLayeredFog(m_fogTop, m_fogEnd, m_fogColor);
+                break;
             }
         }
 
@@ -201,6 +206,7 @@ private:
     DirectionalLight m_dirLight;
     float m_fogStart = 5.0f;
     float m_fogEnd = 100.0f;
+    float m_fogTop = 2.5f;
     float m_fogDensity = 0.66f;
     Vector3f m_fogColor = Vector3f(152.0f/256.0f, 152.0f/256.0f, 152.0f/256.0f);
 };

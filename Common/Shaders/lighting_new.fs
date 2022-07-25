@@ -74,6 +74,7 @@ uniform bool gEnableSpecularExponent = false;
 // Fog
 uniform float gExpFogDensity = 1.0;
 uniform bool gExpSquaredFogEnabled = false;
+uniform float gLayeredFogTop = -1.0;
 uniform float gFogStart = -1.0;
 uniform float gFogEnd = -1.0;
 uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
@@ -246,11 +247,55 @@ float CalcExpFogFactor()
 }
 
 
+float CalcLayeredFogFactor()
+{
+    vec3 CameraProj = gCameraWorldPos;
+    CameraProj.y = 0.0;
+
+    vec3 PixelProj = WorldPos0;
+    PixelProj.y = 0.0;
+
+    float DeltaD = length(CameraProj - PixelProj) / gFogEnd;
+
+    float DeltaY = 0.0f;
+    float DensityIntegral = 0.0f;
+
+    if (gCameraWorldPos.y > gLayeredFogTop) { // The camera is above the top of the fog
+        if (WorldPos0.y < gLayeredFogTop) {   // The pixel is inside the fog
+            DeltaY = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
+            DensityIntegral = DeltaY * DeltaY * 0.5;
+        }
+    } else {
+        if (WorldPos0.y < gLayeredFogTop) {
+            float DeltaA = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
+            float DeltaB = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
+            DeltaY = abs(DeltaA - DeltaB);
+            DensityIntegral = abs((DeltaA * DeltaA * 0.5) - (DeltaB * DeltaB * 0.5));
+        } else {
+            DeltaY = abs(gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
+            DensityIntegral = abs(DeltaY * DeltaY * 0.5);
+        }
+    }
+
+    float FogDensity = 0.0;
+
+    if (DeltaY != 0) {
+        FogDensity = (sqrt(1.0 + ((DeltaD / DeltaY) * (DeltaD / DeltaY)))) * DensityIntegral;
+    }
+
+    float FogFactor = exp(-FogDensity);
+
+    return FogFactor;
+}
+
+
 float CalcFogFactor()
 {
     float FogFactor = 1.0;
 
-    if (gFogStart >= 0.0) {
+    if (gLayeredFogTop > 0.0) {
+        FogFactor = CalcLayeredFogFactor();
+    } else if (gFogStart >= 0.0) {
         FogFactor = CalcLinearFogFactor();
     } else {
         FogFactor = CalcExpFogFactor();
