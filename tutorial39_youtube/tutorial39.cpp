@@ -91,18 +91,8 @@ public:
         static float foo = 0.0f;
         foo += 0.002f;
 
-        //        m_pGameCamera->SetPosition(-sinf(foo) * 13.0f, 8.0f, -cosf(foo) * 13.0f);
-        //        Vector3f Target(m_pMesh1->GetPosition() - m_pGameCamera->GetPos() + Vector3f(0.0f, 3.0f, 0.0f));
-        //        m_pGameCamera->SetTarget(Target);
-
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
-
-        if (m_fogEnabled) {
-            m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
-        } else {
-            m_phongRenderer.SetLinearFog(-1.0f, -1.0f, Vector3f(0.0f, 0.0f, 0.0f));
-        }
 
         m_phongRenderer.Render(m_pTerrain);
     }
@@ -127,8 +117,15 @@ public:
                 glfwTerminate();
                 exit(0);
 
-            case GLFW_KEY_F:
-                m_fogEnabled = !m_fogEnabled;
+            case GLFW_KEY_0:
+                printf("No fog\n");
+                m_phongRenderer.DisableFog();
+                break;
+
+            case GLFW_KEY_1:
+                printf("Linear fog\n");
+                m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
+                break;
             }
         }
 
@@ -182,7 +179,6 @@ private:
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
-        m_phongRenderer.SetLinearFog(m_fogStart, m_fogEnd, m_fogColor);
     }
 
 
@@ -202,7 +198,6 @@ private:
     float m_fogStart = 5.0f;
     float m_fogEnd = 100.0f;
     Vector3f m_fogColor = Vector3f(152.0f/256.0f, 152.0f/256.0f, 152.0f/256.0f);
-    bool m_fogEnabled = true;
 };
 
 Tutorial39* app = NULL;

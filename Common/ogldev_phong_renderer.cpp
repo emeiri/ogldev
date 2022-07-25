@@ -357,3 +357,12 @@ void PhongRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f& F
     m_skinningTech.SetLinearFog(FogStart, FogEnd);
     m_skinningTech.SetFogColor(FogColor);
 }
+
+void PhongRenderer::DisableFog()
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
+
+    SwitchToSkinningTech();
+    m_skinningTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
+}

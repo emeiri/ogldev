@@ -47,13 +47,17 @@ class PhongRenderer {
 
     void SetSpotLights(uint NumLights, const SpotLight* pSpotLights);
 
-    void SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor);
-
     void UpdateDirLightDir(const Vector3f& WorldDir);
 
     void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
 
     void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
+    //
+    // Fog
+    //
+    void SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor);
+
+    void DisableFog();
 
     void ControlRimLight(bool IsEnabled);
 

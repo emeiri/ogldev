@@ -70,6 +70,8 @@ uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
+
+// Fog
 uniform float gFogStart = -1.0;
 uniform float gFogEnd = -1.0;
 uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
@@ -226,6 +228,14 @@ float CalcLinearFogFactor()
 }
 
 
+float CalcFogFactor()
+{
+    float FogFactor = CalcLinearFogFactor();
+
+    return FogFactor;
+}
+
+
 void main()
 {
     vec3 Normal = normalize(Normal0);
@@ -241,9 +251,10 @@ void main()
 
     vec4 TempColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
 
-    if ((gFogStart) >= 0 && (gFogEnd >= 0)) {
-        float LinearFogFactor = CalcLinearFogFactor();
-        TempColor = mix(vec4(gFogColor, 1.0), TempColor, LinearFogFactor);
+    if (gFogColor != vec3(0)) {
+        float FogFactor = CalcFogFactor();
+
+        TempColor = mix(vec4(gFogColor, 1.0), TempColor, FogFactor);
     }
 
     FragColor =  TempColor * gColorMod;
