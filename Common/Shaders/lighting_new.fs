@@ -73,6 +73,7 @@ uniform bool gEnableSpecularExponent = false;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
+uniform bool gExpSquaredFogEnabled = false;
 uniform float gFogStart = -1.0;
 uniform float gFogEnd = -1.0;
 uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
@@ -233,7 +234,13 @@ float CalcExpFogFactor()
 {
     float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
     float DistRatio = 4.0 * CameraToPixelDist / gFogEnd;
-    float FogFactor = exp(-DistRatio * gExpFogDensity);
+    float FogFactor = 1.0;
+
+    if (gExpSquaredFogEnabled) {
+        FogFactor = exp(-DistRatio * gExpFogDensity * DistRatio * gExpFogDensity);
+    } else {
+        FogFactor = exp(-DistRatio * gExpFogDensity);
+    }
 
     return FogFactor;
 }

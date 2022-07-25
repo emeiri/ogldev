@@ -125,6 +125,11 @@ public:
                 printf("Exponential fog\n");
                 m_phongRenderer.SetExpFog(m_fogEnd, m_fogColor, m_fogDensity);
                 break;
+
+            case GLFW_KEY_3:
+                printf("Exponential squared fog\n");
+                m_phongRenderer.SetExpSquaredFog(m_fogEnd, m_fogColor, m_fogDensity);
+                break;
             }
         }
 

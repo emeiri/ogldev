@@ -62,6 +62,8 @@ class PhongRenderer {
 
     void SetExpFog(float FogEnd, const Vector3f& FogColor, float FogDensity);
 
+    void SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, float FogDensity);
+
     void DisableFog();
 
     void ControlRimLight(bool IsEnabled);

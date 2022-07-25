@@ -94,6 +94,7 @@ bool LightingTechnique::InitCommon()
     FogEndLoc = GetUniformLocation("gFogEnd");
     FogColorLoc = GetUniformLocation("gFogColor");
     ExpFogDensityLoc = GetUniformLocation("gExpFogDensity");
+    ExpSquaredFogEnabledLoc = GetUniformLocation("gExpSquaredFogEnabled");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -119,7 +120,8 @@ bool LightingTechnique::InitCommon()
         FogStartLoc == INVALID_UNIFORM_LOCATION ||
         FogEndLoc == INVALID_UNIFORM_LOCATION ||
         FogColorLoc == INVALID_UNIFORM_LOCATION ||
-        ExpFogDensityLoc == INVALID_UNIFORM_LOCATION) {
+        ExpFogDensityLoc == INVALID_UNIFORM_LOCATION ||
+        ExpSquaredFogEnabledLoc == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
@@ -422,6 +424,14 @@ void LightingTechnique::SetLinearFog(float FogStart, float FogEnd)
 void LightingTechnique::SetExpFog(float FogEnd, float FogDensity)
 {
     SetExpFogCommon(FogEnd, FogDensity);
+    glUniform1i(ExpSquaredFogEnabledLoc, 0);
+}
+
+
+void LightingTechnique::SetExpSquaredFog(float FogEnd, float FogDensity)
+{
+    SetExpFogCommon(FogEnd, FogDensity);
+    glUniform1i(ExpSquaredFogEnabledLoc, 1);
 }
 
 

@@ -126,6 +126,7 @@ public:
     virtual void ControlSpecularExponent(bool IsEnabled);
     void SetLinearFog(float FogStart, float FogEnd);
     void SetExpFog(float FogEnd, float FogDensity);
+    void SetExpSquaredFog(float FogEnd, float FogDensity);
     void SetFogColor(const Vector3f& FogColor);
 
 protected:
@@ -154,6 +155,7 @@ private:
     GLuint FogEndLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogColorLoc = INVALID_UNIFORM_LOCATION;
     GLuint ExpFogDensityLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ExpSquaredFogEnabledLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;
