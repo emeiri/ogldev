@@ -267,9 +267,9 @@ float CalcLayeredFogFactor()
         }
     } else {
         if (WorldPos0.y < gLayeredFogTop) {
+            DeltaY = abs(gCameraWorldPos.y - WorldPos0.y) / gLayeredFogTop;
             float DeltaA = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
             float DeltaB = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
-            DeltaY = abs(DeltaA - DeltaB);
             DensityIntegral = abs((DeltaA * DeltaA * 0.5) - (DeltaB * DeltaB * 0.5));
         } else {
             DeltaY = abs(gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
