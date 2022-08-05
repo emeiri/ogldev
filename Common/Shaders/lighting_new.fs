@@ -269,12 +269,14 @@ float CalcLayeredFogFactor()
     } else {
         if (WorldPos0.y < gLayeredFogTop) {
             DeltaY = abs(gCameraWorldPos.y - WorldPos0.y) / gLayeredFogTop;
-            float DeltaA = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
-            float DeltaB = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
-            DensityIntegral = abs((DeltaA * DeltaA * 0.5) - (DeltaB * DeltaB * 0.5));
+            float DeltaCamera = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
+            float DensityIntegralCamera = DeltaCamera * DeltaCamera * 0.5;
+            float DeltaPixel = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
+            float DensityIntegralPixel = DeltaPixel * DeltaPixel * 0.5;
+            DensityIntegral = abs(DensityIntegralCamera - DensityIntegralPixel);
         } else {
-            DeltaY = abs(gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
-            DensityIntegral = abs(DeltaY * DeltaY * 0.5);
+            DeltaY = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
+            DensityIntegral = DeltaY * DeltaY * 0.5;
         }
     }
 
@@ -296,21 +298,21 @@ float CalcAnimatedFogFactor()
 {
     float CameraToPixelDist = length(WorldPos0 - gCameraWorldPos);
 
-    float DistRatio = 4.0 * CameraToPixelDist / gFogEnd;
+    float DistRatio = CameraToPixelDist / gFogEnd;
 
     float ExpFogFactor = exp(-DistRatio * gExpFogDensity);
 
-    float x = WorldPos0.x / 10.0;
-    float y = WorldPos0.y / 10.0;
-    float z = WorldPos0.z / 10.0;
+    float x = WorldPos0.x / 20.0;
+    float y = WorldPos0.y / 20.0;
+    float z = WorldPos0.z / 20.0;
 
     float AnimFactor = -(1.0 +
                          0.5 * cos(5.0 * PI * z + gFogTime) +
                          0.2 * cos(7.0 * PI * (z + 0.1 * x)) +
                          0.2 * cos(5.0 * PI * (z - 0.05 * x)) +
-                         0.1 * cos(PI * x) * cos(PI * y / 2.0));
+                         0.1 * cos(PI * x) * cos(PI * z / 2.0));
 
-    float FogFactor = ExpFogFactor + (CameraToPixelDist / gFogEnd) / 4.0 * AnimFactor;
+    float FogFactor = ExpFogFactor + (CameraToPixelDist / gFogEnd) * AnimFactor;
 
     return FogFactor;
 }
