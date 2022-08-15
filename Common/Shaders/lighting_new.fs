@@ -265,16 +265,16 @@ float CalcLayeredFogFactor()
         if (WorldPos0.y < gLayeredFogTop) {   // The pixel is inside the fog
             DeltaY = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
             DensityIntegral = DeltaY * DeltaY * 0.5;
-        }
-    } else {
-        if (WorldPos0.y < gLayeredFogTop) {
+        }                                     // else - the pixel is above the fog - nothing to do
+    } else {                                  // The camera is inside the fog
+        if (WorldPos0.y < gLayeredFogTop) {   // The pixel is inside the fog
             DeltaY = abs(gCameraWorldPos.y - WorldPos0.y) / gLayeredFogTop;
             float DeltaCamera = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
             float DensityIntegralCamera = DeltaCamera * DeltaCamera * 0.5;
             float DeltaPixel = (gLayeredFogTop - WorldPos0.y) / gLayeredFogTop;
             float DensityIntegralPixel = DeltaPixel * DeltaPixel * 0.5;
             DensityIntegral = abs(DensityIntegralCamera - DensityIntegralPixel);
-        } else {
+        } else {                              // The pixel is above the fog
             DeltaY = (gLayeredFogTop - gCameraWorldPos.y) / gLayeredFogTop;
             DensityIntegral = DeltaY * DeltaY * 0.5;
         }
