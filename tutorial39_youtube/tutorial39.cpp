@@ -95,13 +95,9 @@ public:
 
         if (m_isAnimatedFog) {
             static float FogTime = 0.0f;
-            FogTime += 0.000035f * ((float)rand()/10.0f) * RunningTime;
-            m_phongRenderer.UpdateAnimatedFogTime(RunningTime);
-            //            printf("%f\n", RunningTime);
+            FogTime += 0.0000000000035f * ((float)rand()/10.0f) * RunningTime;
+            m_phongRenderer.UpdateAnimatedFogTime(FogTime);
         }
-
-        //        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
-        //        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
 
         m_phongRenderer.Render(m_pTerrain);
     }
