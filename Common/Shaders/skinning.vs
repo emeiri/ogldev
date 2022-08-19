@@ -6,7 +6,7 @@ layout (location = 2) in vec3 Normal;
 layout (location = 3) in ivec4 BoneIDs;
 layout (location = 4) in vec4 Weights;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 
 uniform mat4 gWVP;
 uniform mat4 gBones[MAX_BONES];

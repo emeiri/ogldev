@@ -47,6 +47,12 @@ void SkinnedMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
 void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 {
+    if (pMesh->mNumBones > MAX_BONES) {
+        printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
+        printf("Make sure to increase the macro MAX_BONES in the C++ header as well as in the shader to the same value\n");
+        assert(0);
+    }
+
     // printf("Loading mesh bones %d\n", MeshIndex);
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
         // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());

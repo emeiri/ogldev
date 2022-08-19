@@ -27,8 +27,6 @@ class SkinningTechnique : public LightingTechnique
 {
 public:
 
-    static const unsigned int MAX_BONES = 100;
-
     SkinningTechnique();
 
     virtual bool Init();

@@ -114,4 +114,6 @@ void glDebugOutput(GLenum source,
 
 string GetDirFromFilename(const string& Filename);
 
+#define MAX_BONES (200)
+
 #endif  /* OGLDEV_UTIL_H */

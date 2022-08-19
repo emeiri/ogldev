@@ -13,7 +13,7 @@ out vec4 ClipSpacePos0;
 out vec4 PrevClipSpacePos0;                                                                
 
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 
 uniform mat4 gWVP;
 uniform mat4 gWorld;
