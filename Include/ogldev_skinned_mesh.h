@@ -61,6 +61,7 @@ private:
     {
         uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
         float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
+        int index = 0;  // slot for the next update
 
         VertexBoneData()
         {
@@ -68,17 +69,22 @@ private:
 
         void AddBoneData(uint BoneID, float Weight)
         {
-            for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(BoneIDs) ; i++) {
-                if (Weights[i] == 0.0) {
-                    BoneIDs[i] = BoneID;
-                    Weights[i] = Weight;
-                    //printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
-                    return;
-                }
+            // I've seen cases where a zero weight will cause an overflow and the
+            // assert below. Not sure where it's coming from but since it has no effect
+            // better ignore it and not assert.
+            if (Weight == 0.0f) {
+                return;
+            }
+            // printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
+
+            if (index == MAX_NUM_BONES_PER_VERTEX) {
+                assert(0);
             }
 
-            // should never get here - more bones than we have space for
-            assert(0);
+            BoneIDs[index] = BoneID;
+            Weights[index] = Weight;
+
+            index++;
         }
     };
 
