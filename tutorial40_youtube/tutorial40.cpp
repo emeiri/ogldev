@@ -101,7 +101,7 @@ public:
         float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
         AnimationTimeSec -= TotalPauseTimeSec;
 
-        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec * 5.0f);
+        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec * 5.0f, m_animationIndex);
     }
 
 
@@ -119,6 +119,22 @@ public:
         if (state == GLFW_PRESS) {
 
             switch (key) {
+            case GLFW_KEY_0:
+                m_animationIndex = 0;
+                break;
+
+            case GLFW_KEY_1:
+                m_animationIndex = 1;
+                break;
+
+            case GLFW_KEY_2:
+                m_animationIndex = 2;
+                break;
+
+            case GLFW_KEY_3:
+                m_animationIndex = 3;
+                break;
+
             case GLFW_KEY_SPACE:
                 m_runAnimation = !m_runAnimation;
                 if (m_runAnimation) {
@@ -213,6 +229,7 @@ private:
     bool m_runAnimation = true;
     long long m_totalPauseTime = 0;
     long long m_pauseStart = 0;
+    int m_animationIndex = 0;
 };
 
 Tutorial40* app = NULL;

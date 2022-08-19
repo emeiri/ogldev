@@ -240,13 +240,13 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTi
 }
 
 
-void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform)
+void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, int AnimationIndex)
 {
     string NodeName(pNode->mName.data);
 
     // printf("Read node %s\n", NodeName.c_str());
 
-    const aiAnimation* pAnimation = m_pScene->mAnimations[0];
+    const aiAnimation* pAnimation = m_pScene->mAnimations[AnimationIndex];
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
@@ -285,24 +285,29 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation);
+        ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, AnimationIndex);
     }
 }
 
 
-void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms)
+void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, int AnimationIndex)
 {
+    if (AnimationIndex >= m_pScene->mNumAnimations) {
+        printf("Invalid animation index %d, max is %d\n", AnimationIndex, m_pScene->mNumAnimations);
+        assert(0);
+    }
+
     Matrix4f Identity;
     Identity.InitIdentity();
 
-    float TicksPerSecond = (float)(m_pScene->mAnimations[0]->mTicksPerSecond != 0 ? m_pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+    float TicksPerSecond = (float)(m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond != 0 ? m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond : 25.0f);
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
     // we need to use the integral part of mDuration for the total length of the animation
     float Duration = 0.0f;
-    float fraction = modf((float)m_pScene->mAnimations[0]->mDuration, &Duration);
+    float fraction = modf((float)m_pScene->mAnimations[AnimationIndex]->mDuration, &Duration);
     float AnimationTimeTicks = fmod(TimeInTicks, Duration);
 
-    ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity);
+    ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity, AnimationIndex);
     Transforms.resize(m_BoneInfo.size());
 
     for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {

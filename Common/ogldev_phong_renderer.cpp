@@ -224,7 +224,7 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 }
 
 
-void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec)
+void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
 {
     if (!m_pCamera) {
         printf("PhongRenderer: camera not initialized\n");
@@ -257,7 +257,7 @@ void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec)
     m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);
 
     vector<Matrix4f> Transforms;
-    pMesh->GetBoneTransforms(AnimationTimeSec, Transforms);
+    pMesh->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
         m_skinningTech.SetBoneTransform(i, Transforms[i]);

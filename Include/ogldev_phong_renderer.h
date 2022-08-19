@@ -78,7 +78,7 @@ class PhongRenderer {
 
     void Render(BasicMesh* pMesh);
 
-    void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec);
+    void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 
     void RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight);
  private:

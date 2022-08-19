@@ -46,7 +46,13 @@ public:
         return (uint)m_BoneNameToIndexMap.size();
     }
 
-    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms);
+    // This is the main function to drive the animation. It receives the animation time
+    // in seconds and a reference to a vector of transformation matrices (one matrix per bone).
+    // It calculates the current transformation for each bone according to the current time
+    // and updates the corresponding matrix in the vector. This must then be updated in the VS
+    // to be accumulated for the final local position (see skinning.vs). The animation index
+    // is an optional param which selects one of the animations.
+    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms, int AnimationIndex = 0);
 
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4
@@ -98,7 +104,7 @@ private:
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
-    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
+    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, int AnimationIndex);
 
     GLuint m_boneBuffer = 0;
 
