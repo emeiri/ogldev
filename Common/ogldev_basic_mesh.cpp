@@ -136,10 +136,11 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
+    // printf("Mesh %d\n", MeshIndex);
     // Populate the vertex attribute vectors
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-
         const aiVector3D& pPos      = paiMesh->mVertices[i];
+        // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
         m_Positions.push_back(Vector3f(pPos.x, pPos.y, pPos.z));
 
         if (paiMesh->mNormals) {
@@ -157,8 +158,11 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
     // Populate the index buffer
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
-        //        printf("num indices %d\n", Face.mNumIndices);
-        //        assert(Face.mNumIndices == 3);
+        //  printf("num indices %d\n", Face.mNumIndices);
+        //  assert(Face.mNumIndices == 3);
+     /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
+        printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
+        printf("%d: %d\n", i * 3 + 2, Face.mIndices[2]);*/
         m_Indices.push_back(Face.mIndices[0]);
         m_Indices.push_back(Face.mIndices[1]);
         m_Indices.push_back(Face.mIndices[2]);

@@ -47,7 +47,9 @@ void SkinnedMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
 void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 {
+    // printf("Loading mesh bones %d\n", MeshIndex);
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
+        // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
         LoadSingleBone(MeshIndex, pMesh->mBones[i]);
     }
 }
@@ -59,12 +61,14 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
 
     if (BoneId == m_BoneInfo.size()) {
         BoneInfo bi(pBone->mOffsetMatrix);
+        // bi.OffsetMatrix.Print();
         m_BoneInfo.push_back(bi);
     }
 
     for (uint i = 0 ; i < pBone->mNumWeights ; i++) {
         const aiVertexWeight& vw = pBone->mWeights[i];
         uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + pBone->mWeights[i].mVertexId;
+        // printf("%d: %d %f\n",i, pBone->mWeights[i].mVertexId, vw.mWeight);
         m_Bones[GlobalVertexID].AddBoneData(BoneId, vw.mWeight);
     }
 }
@@ -234,6 +238,8 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 {
     string NodeName(pNode->mName.data);
 
+    // printf("Read node %s\n", NodeName.c_str());
+
     const aiAnimation* pAnimation = m_pScene->mAnimations[0];
 
     Matrix4f NodeTransformation(pNode->mTransformation);
@@ -260,6 +266,8 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 
         // Combine the above transformations
         NodeTransformation = TranslationM * RotationM * ScalingM;
+
+        // NodeTransformation.Print();
     }
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
@@ -267,6 +275,7 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
     if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
         uint BoneIndex = m_BoneNameToIndexMap[NodeName];
         m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
+        // printf("Final\n"); m_BoneInfo[BoneIndex].FinalTransformation.Print();
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
