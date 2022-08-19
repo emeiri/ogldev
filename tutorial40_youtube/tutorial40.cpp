@@ -72,6 +72,7 @@ public:
         InitRenderer();
 
         m_startTime = GetCurrentTimeMillis();
+        m_currentTime = m_startTime;
     }
 
 
@@ -91,8 +92,14 @@ public:
 
         m_pGameCamera->OnRender();
 
-        long long CurrentTime = GetCurrentTimeMillis();
-        float AnimationTimeSec = (float)((double)CurrentTime - (double)m_startTime) / 1000.0f;
+        if (m_runAnimation) {
+            m_currentTime = GetCurrentTimeMillis();
+        }
+
+        float AnimationTimeSec = (float)((double)m_currentTime - (double)m_startTime) / 1000.0f;
+
+        float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
+        AnimationTimeSec -= TotalPauseTimeSec;
 
         m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec * 5.0f);
     }
@@ -112,6 +119,19 @@ public:
         if (state == GLFW_PRESS) {
 
             switch (key) {
+            case GLFW_KEY_SPACE:
+                m_runAnimation = !m_runAnimation;
+                if (m_runAnimation) {
+                    long long CurrentTime = GetCurrentTimeMillis();
+                    // printf("Resumed at %lld\n", CurrentTime);
+                    m_totalPauseTime += (CurrentTime - m_pauseStart);
+                    // printf("Total pause time %lld\n", m_totalPauseTime);
+                } else {
+                    m_pauseStart = GetCurrentTimeMillis();
+                    // printf("Paused at %lld\n", GetCurrentTimeMillis());
+                }
+                break;
+
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
                 glfwDestroyWindow(window);
@@ -189,6 +209,10 @@ private:
     PersProjInfo m_persProjInfo;
     DirectionalLight m_dirLight;
     long long m_startTime = 0;
+    long long m_currentTime = 0;
+    bool m_runAnimation = true;
+    long long m_totalPauseTime = 0;
+    long long m_pauseStart = 0;
 };
 
 Tutorial40* app = NULL;
