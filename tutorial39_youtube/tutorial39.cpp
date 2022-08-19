@@ -95,7 +95,12 @@ public:
 
         if (m_isAnimatedFog) {
             static float FogTime = 0.0f;
-            FogTime += 0.0000000000035f * ((float)rand()/10.0f) * RunningTime;
+#ifdef _WIN64
+            float scale = 0.000000035f;
+#else
+            float scale = 0.0000000000035f; // need to slow it down a bit on Linux
+#endif
+            FogTime += scale * ((float)rand()/10.0f) * RunningTime;
             m_phongRenderer.UpdateAnimatedFogTime(FogTime);
         }
 

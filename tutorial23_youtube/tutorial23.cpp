@@ -232,7 +232,7 @@ void Tutorial23::RenderSceneCB()
     WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
     if (Start) {
         static float counter2 = 0.0f;
-        counter2 += 0.001;
+        counter2 += 0.001f;
         meshWorldTransform.SetPosition(0.0f, -4.0f + abs(sinf(counter2) * 4), 0.0f);
     } else {
         meshWorldTransform.SetPosition(0.0f, -4.0f, 0.0f);

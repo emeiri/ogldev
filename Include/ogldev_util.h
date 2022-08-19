@@ -59,6 +59,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define VSNPRINTF vsnprintf_s
 #define RANDOM rand
 #define SRANDOM srand((unsigned)time(NULL))
+#pragma warning (disable: 4566)
 #else
 #define SNPRINTF snprintf
 #define VSNPRINTF vsnprintf
@@ -90,9 +91,7 @@ long long GetCurrentTimeMillis();
 
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices )
 
-#define NOT_IMPLEMENTED \
-    printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); \
-    exit(0);
+#define NOT_IMPLEMENTED printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); exit(0);
 
 
 void gl_check_error(const char* function, const char *file, int line);
