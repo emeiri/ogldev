@@ -208,28 +208,37 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
         aiString Path;
 
         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            string p(Path.data);
+            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
-            for (int i = 0 ; i < p.length() ; i++) {
-                if (p[i] == '\\') {
-                    p[i] = '/';
+            if (paiTexture) {
+                printf("Got embeddeded texture %s\n", paiTexture->achFormatHint);
+                m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D);
+                int buffer_size = paiTexture->mWidth;
+                m_Materials[index].pDiffuse->Load(buffer_size, paiTexture->pcData);
+            } else {
+                string p(Path.data);
+
+                for (int i = 0 ; i < p.length() ; i++) {
+                    if (p[i] == '\\') {
+                        p[i] = '/';
+                    }
                 }
-            }
 
-            if (p.substr(0, 2) == ".\\") {
-                p = p.substr(2, p.size() - 2);
-            }
+                if (p.substr(0, 2) == ".\\") {
+                    p = p.substr(2, p.size() - 2);
+                }
 
-            string FullPath = Dir + "/" + p;
+                string FullPath = Dir + "/" + p;
 
-            m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+                m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Materials[index].pDiffuse->Load()) {
-                printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
-                exit(0);
-            }
-            else {
-                printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), index);
+                if (!m_Materials[index].pDiffuse->Load()) {
+                    printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
+                    exit(0);
+                }
+                else {
+                    printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), index);
+                }
             }
         }
     }
@@ -244,24 +253,33 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
         aiString Path;
 
         if (pMaterial->GetTexture(aiTextureType_SHININESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            string p(Path.data);
+            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
-            if (p == "C:\\\\") {
-                p = "";
-            } else if (p.substr(0, 2) == ".\\") {
-                p = p.substr(2, p.size() - 2);
-            }
+            if (paiTexture) {
+                printf("Got embeddeded specular texture\n");
 
-            string FullPath = Dir + "/" + p;
+                m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, "../Content/white.png");
+                m_Materials[index].pSpecularExponent->Load();
+            } else {
+                string p(Path.data);
 
-            m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+                if (p == "C:\\\\") {
+                    p = "";
+                } else if (p.substr(0, 2) == ".\\") {
+                    p = p.substr(2, p.size() - 2);
+                }
 
-            if (!m_Materials[index].pSpecularExponent->Load()) {
-                printf("Error loading specular texture '%s'\n", FullPath.c_str());
-                exit(0);
-            }
-            else {
-                printf("Loaded specular texture '%s'\n", FullPath.c_str());
+                string FullPath = Dir + "/" + p;
+
+                m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+                if (!m_Materials[index].pSpecularExponent->Load()) {
+                    printf("Error loading specular texture '%s'\n", FullPath.c_str());
+                    exit(0);
+                }
+                else {
+                    printf("Loaded specular texture '%s'\n", FullPath.c_str());
+                }
             }
         }
     }
