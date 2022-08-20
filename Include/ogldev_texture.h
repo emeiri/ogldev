@@ -35,8 +35,12 @@ class Texture
 public:
     Texture(GLenum TextureTarget, const std::string& FileName);
 
+    Texture(GLenum TextureTarget);
+
     // Should be called once to load the texture
     bool Load();
+
+    void Load(u32 BufferSize, void* pData);
 
     // Must be called at least once for the specific texture unit
     void Bind(GLenum TextureUnit);
@@ -48,6 +52,8 @@ public:
     }
 
 private:
+    void LoadInternal(u32 Width, u32 Height, int bpp, void* image_data);
+
     std::string m_fileName;
     GLenum m_textureTarget;
     GLuint m_textureObj;

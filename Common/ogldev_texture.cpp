@@ -28,6 +28,21 @@ Texture::Texture(GLenum TextureTarget, const std::string& FileName)
 }
 
 
+Texture::Texture(GLenum TextureTarget)
+{
+    m_textureTarget = TextureTarget;
+}
+
+
+void Texture::Load(u32 BufferSize, void* pData)
+{
+    void* image_data = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
+
+    LoadInternal(m_imageWidth, m_imageHeight, m_imageBPP, image_data);
+
+    stbi_image_free(image_data);
+}
+
 bool Texture::Load()
 {
 #ifdef USE_IMAGE_MAGICK
@@ -56,23 +71,35 @@ bool Texture::Load()
 
 #endif
 
+    LoadInternal(m_imageWidth, m_imageHeight, m_imageBPP, image_data);
+
+#ifndef USE_IMAGE_MAGICK
+    stbi_image_free(image_data);
+#endif
+
+    return true;
+}
+
+
+void Texture::LoadInternal(u32 Width, u32 Height, int bpp, void* image_data)
+{
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);
     if (m_textureTarget == GL_TEXTURE_2D) {
 #ifdef USE_IMAGE_MAGICK
         glTexImage2D(m_textureTarget, 0, GL_RGBA, m_image.columns(), m_image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_blob.data());
 #else
-        switch (m_imageBPP) {
+        switch (bpp) {
         case 1:
-            glTexImage2D(m_textureTarget, 0, GL_RED, m_imageWidth, m_imageHeight, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RED, Width, Height, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
             break;
 
         case 3:
-            glTexImage2D(m_textureTarget, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
             break;
 
         case 4:
-            glTexImage2D(m_textureTarget, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
             break;
 
         default:
@@ -89,11 +116,6 @@ bool Texture::Load()
     glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glBindTexture(m_textureTarget, 0);
-#ifndef USE_IMAGE_MAGICK
-    stbi_image_free(image_data);
-#endif
-
-    return true;
 }
 
 void Texture::Bind(GLenum TextureUnit)
