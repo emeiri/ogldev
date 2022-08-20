@@ -222,7 +222,7 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 
 void BasicMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
-    printf("Embeddeded texture type '%s'\n", paiTexture->achFormatHint);
+    printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
     m_Materials[MaterialIndex].pDiffuse->Load(buffer_size, paiTexture->pcData);
@@ -257,9 +257,9 @@ void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 }
 
 
-void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index)
+void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[index].pSpecularExponent = NULL;
+    m_Materials[MaterialIndex].pSpecularExponent = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
         aiString Path;
@@ -268,32 +268,44 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
             if (paiTexture) {
-                printf("Got embeddeded specular texture\n");
-
-                m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, "../Content/white.png");
-                m_Materials[index].pSpecularExponent->Load();
+                LoadSpecularTextureEmbedded(paiTexture, MaterialIndex);
             } else {
-                string p(Path.data);
-
-                if (p == "C:\\\\") {
-                    p = "";
-                } else if (p.substr(0, 2) == ".\\") {
-                    p = p.substr(2, p.size() - 2);
-                }
-
-                string FullPath = Dir + "/" + p;
-
-                m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
-
-                if (!m_Materials[index].pSpecularExponent->Load()) {
-                    printf("Error loading specular texture '%s'\n", FullPath.c_str());
-                    exit(0);
-                }
-                else {
-                    printf("Loaded specular texture '%s'\n", FullPath.c_str());
-                }
+                LoadSpecularTextureFromFile(Dir, Path, MaterialIndex);
             }
         }
+    }
+}
+
+
+void BasicMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+{
+    printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D);
+    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].pSpecularExponent->Load(buffer_size, paiTexture->pcData);
+}
+
+
+void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    string p(Path.data);
+
+    if (p == "C:\\\\") {
+        p = "";
+    } else if (p.substr(0, 2) == ".\\") {
+        p = p.substr(2, p.size() - 2);
+    }
+
+    string FullPath = Dir + "/" + p;
+
+    m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+    if (!m_Materials[MaterialIndex].pSpecularExponent->Load()) {
+        printf("Error loading specular texture '%s'\n", FullPath.c_str());
+        exit(0);
+    }
+    else {
+        printf("Loaded specular texture '%s'\n", FullPath.c_str());
     }
 }
 

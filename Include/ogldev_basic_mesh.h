@@ -103,6 +103,8 @@ private:
     void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
 
     void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
