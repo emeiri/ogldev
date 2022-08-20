@@ -200,9 +200,9 @@ void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 }
 
 
-void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index)
+void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[index].pDiffuse = NULL;
+    m_Materials[MaterialIndex].pDiffuse = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         aiString Path;
@@ -211,36 +211,48 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
             if (paiTexture) {
-                printf("Got embeddeded texture %s\n", paiTexture->achFormatHint);
-                m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D);
-                int buffer_size = paiTexture->mWidth;
-                m_Materials[index].pDiffuse->Load(buffer_size, paiTexture->pcData);
+                LoadDiffuseTextureEmbedded(paiTexture, MaterialIndex);
             } else {
-                string p(Path.data);
-
-                for (int i = 0 ; i < p.length() ; i++) {
-                    if (p[i] == '\\') {
-                        p[i] = '/';
-                    }
-                }
-
-                if (p.substr(0, 2) == ".\\") {
-                    p = p.substr(2, p.size() - 2);
-                }
-
-                string FullPath = Dir + "/" + p;
-
-                m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
-
-                if (!m_Materials[index].pDiffuse->Load()) {
-                    printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
-                    exit(0);
-                }
-                else {
-                    printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), index);
-                }
+                LoadDiffuseTextureFromFile(Dir, Path, MaterialIndex);
             }
         }
+    }
+}
+
+
+void BasicMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+{
+    printf("Embeddeded texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D);
+    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].pDiffuse->Load(buffer_size, paiTexture->pcData);
+}
+
+
+void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    string p(Path.data);
+
+    for (int i = 0 ; i < p.length() ; i++) {
+        if (p[i] == '\\') {
+            p[i] = '/';
+        }
+    }
+
+    if (p.substr(0, 2) == ".\\") {
+        p = p.substr(2, p.size() - 2);
+    }
+
+    string FullPath = Dir + "/" + p;
+
+    m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+    if (!m_Materials[MaterialIndex].pDiffuse->Load()) {
+        printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
+        exit(0);
+    }
+    else {
+        printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), MaterialIndex);
     }
 }
 

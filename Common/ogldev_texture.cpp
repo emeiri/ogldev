@@ -85,6 +85,7 @@ void Texture::LoadInternal(u32 Width, u32 Height, int bpp, void* image_data)
 {
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);
+
     if (m_textureTarget == GL_TEXTURE_2D) {
 #ifdef USE_IMAGE_MAGICK
         glTexImage2D(m_textureTarget, 0, GL_RGBA, m_image.columns(), m_image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_blob.data());
@@ -110,6 +111,7 @@ void Texture::LoadInternal(u32 Width, u32 Height, int bpp, void* image_data)
         printf("Support for texture target %x is not implemented\n", m_textureTarget);
         exit(1);
     }
+
     glTexParameterf(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
