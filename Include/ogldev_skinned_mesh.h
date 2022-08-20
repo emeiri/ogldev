@@ -23,10 +23,6 @@
 #include <vector>
 #include <GL/glew.h>
 
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>       // Output data structure
-#include <assimp/postprocess.h> // Post processing flags
-
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
