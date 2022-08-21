@@ -13,33 +13,54 @@
 
 struct VertexBoneData
 {
-    uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
-    float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
+    std::vector<uint> BoneIDs;
+    std::vector<float> Weights;
     int index = 0;
 
     VertexBoneData()
     {
+        BoneIDs.resize(MAX_NUM_BONES_PER_VERTEX, 0);
+        Weights.resize(MAX_NUM_BONES_PER_VERTEX, 0);
     }
 
     void AddBoneData(uint BoneID, float Weight)
     {
+        for (int i = 0 ; i < index ; i++) {
+            if (BoneIDs[i] == BoneID) {
+                printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
+                return;
+            }
+        }
         // I've seen cases where a zero weight will cause an overflow and the
         // assert below. Not sure where it's coming from but since it has no effect
         // better ignore it and not assert.
-        if (Weight == 0.0f) {
-            return;
-        }
+        //if (Weight == 0.0f) {
+            //            return;
+        //}
 
         printf("bone %d weight %f at index %i\n", BoneID, Weight, index);
 
         if (index >= MAX_NUM_BONES_PER_VERTEX) {
             printf("Warning: exceeding the maximum number of bones per vertex (current index %d)\n", index);
-        } else {
-            BoneIDs[index] = BoneID;
-            Weights[index] = Weight;
+            BoneIDs.resize(index + 1);
+            Weights.resize(index + 1);
         }
 
+        BoneIDs[index] = BoneID;
+        Weights[index] = Weight;
+
         index++;
+    }
+
+    float GetWeightSum() const
+    {
+        float sum = 0.0f;
+
+        for (int i = 0 ; i < index ; i++) {
+            sum += Weights[i];
+        }
+
+        return sum;
     }
 };
 
@@ -188,6 +209,9 @@ void parse_meshes(const aiScene* pScene)
     mesh_base_vertex.resize(pScene->mNumMeshes);
 
     for (unsigned int i = 0 ; i < pScene->mNumMeshes ; i++) {
+
+        mesh_base_vertex[i] = total_vertices;
+
         const aiMesh* pMesh = pScene->mMeshes[i];
 
         int num_vertices = pMesh->mNumVertices;
@@ -195,6 +219,7 @@ void parse_meshes(const aiScene* pScene)
         int num_bones = pMesh->mNumBones;
 
         printf("  Mesh %d '%s': vertices %d indices %d bones %d\n\n", i, pMesh->mName.C_Str(), num_vertices, num_indices, num_bones);
+
         total_vertices += num_vertices;
         total_indices  += num_indices;
         total_bones += num_bones;
@@ -204,7 +229,6 @@ void parse_meshes(const aiScene* pScene)
 
         parse_single_mesh(i, pMesh);
 
-        mesh_base_vertex[i] = total_vertices;
     }
 
     printf("\nTotal vertices %d total indices %d total bones %d\n", total_vertices, total_indices, total_bones);
@@ -238,9 +262,20 @@ void parse_hierarchy(const aiScene* pScene)
 }
 
 
+void validate_bones()
+{
+    printf("Validating bones\n");
+
+    for (int i = 0 ; i < vertex_to_bones.size() ; i++) {
+        printf("%d: %f\n", i, vertex_to_bones[i].GetWeightSum());
+    }
+}
+
 void parse_scene(const aiScene* pScene)
 {
     parse_meshes(pScene);
+
+    validate_bones();
 
     parse_hierarchy(pScene);
 }
