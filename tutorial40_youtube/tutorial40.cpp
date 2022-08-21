@@ -101,7 +101,7 @@ public:
         float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
         AnimationTimeSec -= TotalPauseTimeSec;
 
-        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec * 5.0f, m_animationIndex);
+        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
     }
 
 
@@ -212,9 +212,12 @@ private:
     void InitMesh()
     {
         m_pMesh = new SkinnedMesh();
-        m_pMesh->LoadMesh("../Assets/iclone-7-raptoid-mascot/scene.gltf");
-        m_pMesh->SetRotation(90.0f, 180.0f, 180.0f);
-        m_pMesh->SetPosition(0.0f, 0.0f, 45.0f);
+        //        m_pMesh->LoadMesh("../Assets/iclone-7-raptoid-mascot/scene.gltf");
+        //        m_pMesh->SetRotation(90.0f, 180.0f, 180.0f);
+
+        m_pMesh->LoadMesh("../Content/mixamo/Walking.dae");
+        m_pMesh->SetRotation(0.0f, 180.0f, 0.0f);
+        m_pMesh->SetPosition(0.0f, 0.0f, 55.0f);
         m_pMesh->SetScale(0.1f);
     }
 
