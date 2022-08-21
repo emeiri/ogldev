@@ -15,6 +15,7 @@ struct VertexBoneData
 {
     uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
     float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
+    int index = 0;
 
     VertexBoneData()
     {
@@ -22,17 +23,23 @@ struct VertexBoneData
 
     void AddBoneData(uint BoneID, float Weight)
     {
-        for (uint i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(BoneIDs) ; i++) {
-            if (Weights[i] == 0.0) {
-                BoneIDs[i] = BoneID;
-                Weights[i] = Weight;
-                //printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
-                return;
-            }
+        // I've seen cases where a zero weight will cause an overflow and the
+        // assert below. Not sure where it's coming from but since it has no effect
+        // better ignore it and not assert.
+        if (Weight == 0.0f) {
+            return;
         }
 
-        // should never get here - more bones than we have space for
-        assert(0);
+        printf("bone %d weight %f at index %i\n", BoneID, Weight, index);
+
+        if (index >= MAX_NUM_BONES_PER_VERTEX) {
+            printf("Warning: exceeding the maximum number of bones per vertex (current index %d)\n", index);
+        } else {
+            BoneIDs[index] = BoneID;
+            Weights[index] = Weight;
+        }
+
+        index++;
     }
 };
 
@@ -89,11 +96,12 @@ void parse_single_bone(int mesh_index, const aiBone* pBone)
     for (unsigned int i = 0 ; i < pBone->mNumWeights ; i++) {
         //        if (i == 0) printf("\n");
         const aiVertexWeight& vw = pBone->mWeights[i];
-        //          printf("       %d: vertex id %d weight %.2f\n", i, vw.mVertexId, vw.mWeight);
+        printf("       %d: vertex id %d ", i, vw.mVertexId);
 
         uint global_vertex_id = mesh_base_vertex[mesh_index] + vw.mVertexId;
-        //        printf("Vertex id %d ", global_vertex_id);
+        //printf("Vertex id %d ", global_vertex_id);
 
+        //printf("%llu\n", vertex_to_bones.size());
         assert(global_vertex_id < vertex_to_bones.size());
         vertex_to_bones[global_vertex_id].AddBoneData(bone_id, vw.mWeight);
     }
@@ -110,6 +118,64 @@ void parse_mesh_bones(int mesh_index, const aiMesh* pMesh)
 }
 
 
+void parse_single_mesh(int mesh_index, const aiMesh* pMesh)
+{
+    printf("Vertex positions\n\n");
+
+    for (unsigned int i = 0 ; i < pMesh->mNumVertices ; i++) {
+        const aiVector3D& pPos      = pMesh->mVertices[i];
+
+        printf("%d: %f %f %f\n", i, pPos.x, pPos.y, pPos.z);
+
+        //m_Positions.push_back(v);
+
+        if (pMesh->mNormals) {
+            const aiVector3D& pNormal   = pMesh->mNormals[i];
+            //m_Normals.push_back(Vector3f(pNormal.x, pNormal.y, pNormal.z));
+        } else {
+            aiVector3D Normal(0.0f, 1.0f, 0.0f);
+            //m_Normals.push_back(Vector3f(Normal.x, Normal.y, Normal.z));
+        }
+
+        //        const aiVector3D& pTexCoord = pMesh->HasTextureCoords(0) ? pMesh->mTextureCoords[0][i] : Zero3D;
+        //m_TexCoords.push_back(Vector2f(pTexCoord.x, pTexCoord.y));
+    }
+
+    printf("\nIndices\n\n");
+
+    // Populate the index buffer
+    for (unsigned int i = 0 ; i < pMesh->mNumFaces ; i++) {
+        const aiFace& Face = pMesh->mFaces[i];
+        switch (Face.mNumIndices) {
+        case 4:
+            printf("%d: %d %d %d %d\n", i, Face.mIndices[0], Face.mIndices[1], Face.mIndices[2], Face.mIndices[3]);
+            break;
+
+        case 3:
+            printf("%d: %d %d %d\n", i, Face.mIndices[0], Face.mIndices[1], Face.mIndices[2]);
+            break;
+
+        case 2:
+            printf("%d: %d %d\n", i, Face.mIndices[0], Face.mIndices[1]);
+            break;
+
+        default:
+            printf("Invalid number of indices %d\n", Face.mNumIndices);
+            assert(0);
+        }
+
+        /*m_Indices.push_back(Face.mIndices[0]);
+        m_Indices.push_back(Face.mIndices[1]);
+        m_Indices.push_back(Face.mIndices[2]);*/
+    }
+
+    if (pMesh->HasBones()) {
+        parse_mesh_bones(mesh_index, pMesh);
+    }
+
+    printf("\n");
+}
+
 void parse_meshes(const aiScene* pScene)
 {
     printf("*******************************************************\n");
@@ -121,23 +187,24 @@ void parse_meshes(const aiScene* pScene)
 
     mesh_base_vertex.resize(pScene->mNumMeshes);
 
-    for (unsigned int i = 0 ; i < pScene->mNumMeshes ; i++) {        const aiMesh* pMesh = pScene->mMeshes[i];
+    for (unsigned int i = 0 ; i < pScene->mNumMeshes ; i++) {
+        const aiMesh* pMesh = pScene->mMeshes[i];
+
         int num_vertices = pMesh->mNumVertices;
         int num_indices = pMesh->mNumFaces * 3;
         int num_bones = pMesh->mNumBones;
-        mesh_base_vertex[i] = total_vertices;
+
         printf("  Mesh %d '%s': vertices %d indices %d bones %d\n\n", i, pMesh->mName.C_Str(), num_vertices, num_indices, num_bones);
         total_vertices += num_vertices;
         total_indices  += num_indices;
         total_bones += num_bones;
 
+        //        printf("total vertices %d\n", total_vertices);
         vertex_to_bones.resize(total_vertices);
 
-        if (pMesh->HasBones()) {
-            parse_mesh_bones(i, pMesh);
-        }
+        parse_single_mesh(i, pMesh);
 
-        printf("\n");
+        mesh_base_vertex[i] = total_vertices;
     }
 
     printf("\nTotal vertices %d total indices %d total bones %d\n", total_vertices, total_indices, total_bones);
