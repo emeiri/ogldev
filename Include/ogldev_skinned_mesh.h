@@ -71,15 +71,24 @@ private:
 
         void AddBoneData(uint BoneID, float Weight)
         {
+            for (int i = 0 ; i < index ; i++) {
+                if (BoneIDs[i] == BoneID) {
+                    //  printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
+                    return;
+                }
+            }
+
             // I've seen cases where a zero weight will cause an overflow and the
             // assert below. Not sure where it's coming from but since it has no effect
             // better ignore it and not assert.
-            if (Weight == 0.0f) {
-                return;
-            }
+            // Currently disabled. Need to understand this better.
+            //if (Weight == 0.0f) {
+                //   return;
+            //}
             // printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
 
             if (index == MAX_NUM_BONES_PER_VERTEX) {
+                //                return;
                 assert(0);
             }
 
