@@ -78,17 +78,15 @@ private:
                 }
             }
 
-            // I've seen cases where a zero weight will cause an overflow and the
-            // assert below. Not sure where it's coming from but since it has no effect
-            // better ignore it and not assert.
-            // Currently disabled. Need to understand this better.
-            //if (Weight == 0.0f) {
-                //   return;
-            //}
+            // The iClone 7 Raptoid Mascot (https://sketchfab.com/3d-models/iclone-7-raptoid-mascot-free-download-56a3e10a73924843949ae7a9800c97c7)
+            // has a problem of zero weights causing an overflow and the assertion below. This fixes it.
+            if (Weight == 0.0f) {
+                return;
+            }
+
             // printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
 
             if (index == MAX_NUM_BONES_PER_VERTEX) {
-                //                return;
                 assert(0);
             }
 
