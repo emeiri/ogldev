@@ -52,7 +52,7 @@ public:
     }
 
 private:
-    void LoadInternal(u32 Width, u32 Height, int bpp, void* image_data);
+    void LoadInternal(void* image_data);
 
     std::string m_fileName;
     GLenum m_textureTarget;

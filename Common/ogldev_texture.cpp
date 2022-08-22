@@ -38,7 +38,7 @@ void Texture::Load(u32 BufferSize, void* pData)
 {
     void* image_data = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
 
-    LoadInternal(m_imageWidth, m_imageHeight, m_imageBPP, image_data);
+    LoadInternal(image_data);
 
     stbi_image_free(image_data);
 }
@@ -71,7 +71,7 @@ bool Texture::Load()
 
 #endif
 
-    LoadInternal(m_imageWidth, m_imageHeight, m_imageBPP, image_data);
+    LoadInternal(image_data);
 
 #ifndef USE_IMAGE_MAGICK
     stbi_image_free(image_data);
@@ -81,7 +81,7 @@ bool Texture::Load()
 }
 
 
-void Texture::LoadInternal(u32 Width, u32 Height, int bpp, void* image_data)
+void Texture::LoadInternal(void* image_data)
 {
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);
@@ -90,17 +90,17 @@ void Texture::LoadInternal(u32 Width, u32 Height, int bpp, void* image_data)
 #ifdef USE_IMAGE_MAGICK
         glTexImage2D(m_textureTarget, 0, GL_RGBA, m_image.columns(), m_image.rows(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_blob.data());
 #else
-        switch (bpp) {
+        switch (m_imageBPP) {
         case 1:
-            glTexImage2D(m_textureTarget, 0, GL_RED, Width, Height, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RED, m_imageWidth, m_imageHeight, 0, GL_RED, GL_UNSIGNED_BYTE, image_data);
             break;
 
         case 3:
-            glTexImage2D(m_textureTarget, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image_data);
             break;
 
         case 4:
-            glTexImage2D(m_textureTarget, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+            glTexImage2D(m_textureTarget, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
             break;
 
         default:
