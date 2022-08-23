@@ -87,7 +87,8 @@ private:
             // printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, index);
 
             if (index == MAX_NUM_BONES_PER_VERTEX) {
-                assert(0);
+                return;
+                                assert(0);
             }
 
             BoneIDs[index] = BoneID;
@@ -108,7 +109,8 @@ private:
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, int AnimationIndex);
-
+    void MarkRequiredNodesForBone(const aiBone* pBone);
+    void InitializeRequiredNodeMap(const aiNode* pNode);
     GLuint m_boneBuffer = 0;
 
     // Temporary space for vertex stuff before we load them into the GPU
@@ -129,6 +131,18 @@ private:
     };
 
     vector<BoneInfo> m_BoneInfo;
+
+    struct NodeInfo {
+
+        NodeInfo() {}
+
+        NodeInfo(const aiNode* n) { pNode = n;}
+
+        const aiNode* pNode = NULL;
+        bool isRequired = false;
+    };
+
+    map<string,NodeInfo> m_requiredNodeMap;
 };
 
 

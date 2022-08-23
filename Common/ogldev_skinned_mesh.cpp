@@ -35,6 +35,7 @@ void SkinnedMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices
 {
     BasicMesh::ReserveSpace(NumVertices, NumIndices);
     m_Bones.resize(NumVertices);
+    InitializeRequiredNodeMap(m_pScene->mRootNode);
 }
 
 
@@ -76,6 +77,54 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
         uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + pBone->mWeights[i].mVertexId;
         // printf("%d: %d %f\n",i, pBone->mWeights[i].mVertexId, vw.mWeight);
         m_Bones[GlobalVertexID].AddBoneData(BoneId, vw.mWeight);
+    }
+
+    MarkRequiredNodesForBone(pBone);
+}
+
+
+void SkinnedMesh::MarkRequiredNodesForBone(const aiBone* pBone)
+{
+    string NodeName(pBone->mName.C_Str());
+
+    const aiNode* pParent = NULL;
+
+    do {
+        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(NodeName);
+
+        if (it == m_requiredNodeMap.end()) {
+            printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
+            assert(0);
+        }
+
+        //if (!it->second.isRequired) {
+        //    printf("%s is required\n", NodeName.c_str());
+        //}
+
+        it->second.isRequired = true;
+
+        pParent = it->second.pNode->mParent;
+
+        if (pParent) {
+            NodeName = string(pParent->mName.C_Str());
+        }
+
+    } while (pParent);
+}
+
+
+void SkinnedMesh::InitializeRequiredNodeMap(const aiNode* pNode)
+{
+    string NodeName(pNode->mName.C_Str());
+
+    printf("Initialize node %s\n", NodeName.c_str());
+
+    NodeInfo info(pNode);
+
+    m_requiredNodeMap[NodeName] = info;
+
+    for (int i = 0 ; i < pNode->mNumChildren ; i++) {
+        InitializeRequiredNodeMap(pNode->mChildren[i]);
     }
 }
 
@@ -272,8 +321,6 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 
         // Combine the above transformations
         NodeTransformation = TranslationM * RotationM * ScalingM;
-
-        // NodeTransformation.Print();
     }
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
@@ -285,7 +332,19 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, AnimationIndex);
+        string ChildName(pNode->mChildren[i]->mName.data);
+        // printf("  %d child %s\n", i, ChildName.c_str());
+
+        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
+
+        if (it == m_requiredNodeMap.end()) {
+            printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
+            assert(0);
+        }
+
+        if (it->second.isRequired) {
+            ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, AnimationIndex);
+        } else { printf("skip %s\n", ChildName.c_str());}
     }
 }
 
