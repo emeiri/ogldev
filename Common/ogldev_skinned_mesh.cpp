@@ -117,7 +117,7 @@ void SkinnedMesh::InitializeRequiredNodeMap(const aiNode* pNode)
 {
     string NodeName(pNode->mName.C_Str());
 
-    printf("Initialize node %s\n", NodeName.c_str());
+    // printf("Initialize node %s\n", NodeName.c_str());
 
     NodeInfo info(pNode);
 
@@ -344,7 +344,9 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 
         if (it->second.isRequired) {
             ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, AnimationIndex);
-        } else { printf("skip %s\n", ChildName.c_str());}
+        } else {
+            //    printf("skip %s\n", ChildName.c_str());
+        }
     }
 }
 
