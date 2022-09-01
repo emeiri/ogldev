@@ -97,10 +97,6 @@ void SkinnedMesh::MarkRequiredNodesForBone(const aiBone* pBone)
             assert(0);
         }
 
-        //if (!it->second.isRequired) {
-        //    printf("%s is required\n", NodeName.c_str());
-        //}
-
         it->second.isRequired = true;
 
         pParent = it->second.pNode->mParent;
@@ -116,8 +112,6 @@ void SkinnedMesh::MarkRequiredNodesForBone(const aiBone* pBone)
 void SkinnedMesh::InitializeRequiredNodeMap(const aiNode* pNode)
 {
     string NodeName(pNode->mName.C_Str());
-
-    // printf("Initialize node %s\n", NodeName.c_str());
 
     NodeInfo info(pNode);
 
@@ -293,8 +287,6 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 {
     string NodeName(pNode->mName.data);
 
-    // printf("Read node %s\n", NodeName.c_str());
-
     const aiAnimation* pAnimation = m_pScene->mAnimations[AnimationIndex];
 
     Matrix4f NodeTransformation(pNode->mTransformation);
@@ -328,12 +320,10 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
     if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
         uint BoneIndex = m_BoneNameToIndexMap[NodeName];
         m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
-        // printf("Final\n"); m_BoneInfo[BoneIndex].FinalTransformation.Print();
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
         string ChildName(pNode->mChildren[i]->mName.data);
-        // printf("  %d child %s\n", i, ChildName.c_str());
 
         map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
 
@@ -344,8 +334,6 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 
         if (it->second.isRequired) {
             ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, AnimationIndex);
-        } else {
-            //    printf("skip %s\n", ChildName.c_str());
         }
     }
 }
