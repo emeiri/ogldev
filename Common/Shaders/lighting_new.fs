@@ -65,6 +65,7 @@ uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/d
 uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
+uniform int gShadowMapFilterSize = 1;
 uniform vec3 gCameraLocalPos;
 uniform vec3 gCameraWorldPos;
 uniform vec4 gColorMod = vec4(1);
@@ -134,8 +135,10 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
 
     float ShadowSum = 0.0;
 
-    for (int y = -1 ; y <= 1 ; y++) {
-        for (int x = -1 ; x <= 1 ; x++) {
+    int HalfFilterSize = gShadowMapFilterSize / 2;
+
+    for (int y = -HalfFilterSize ; y < -HalfFilterSize + gShadowMapFilterSize ; y++) {
+        for (int x = -HalfFilterSize ; x < -HalfFilterSize + gShadowMapFilterSize ; x++) {
             vec2 Offset = vec2(x, y) * TexelSize;
             float Depth = texture(gShadowMap, UVCoords + Offset).x;
 
@@ -147,7 +150,7 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
        }
    }
 
-   float FinalShadowFactor = ShadowSum / 9.0;
+   float FinalShadowFactor = ShadowSum / float(pow(gShadowMapFilterSize, 2));
 
    return FinalShadowFactor;
 }
