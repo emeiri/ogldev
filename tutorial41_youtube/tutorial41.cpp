@@ -300,7 +300,9 @@ private:
 
     void CreateShadowMap()
     {
-        if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+        bool ForPCF = true;
+
+        if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, ForPCF)) {
             exit(1);
         }
     }
