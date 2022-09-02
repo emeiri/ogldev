@@ -127,14 +127,29 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
     float DiffuseFactor = dot(Normal, -LightDirection);
     float bias = mix(0.001, 0.0, DiffuseFactor);
 
-    float Depth = texture(gShadowMap, UVCoords).x;
+    float TexelWidth = 1.0 / gShadowMapWidth;
+    float TexelHeight = 1.0 / gShadowMapHeight;
 
+    vec2 TexelSize = vec2(TexelWidth, TexelHeight);
 
+    float ShadowSum = 0.0;
 
-    if (Depth + bias < z)
-        return 0.05;
-    else
-        return 1.0;
+    for (int y = -1 ; y <= 1 ; y++) {
+        for (int x = -1 ; x <= 1 ; x++) {
+            vec2 Offset = vec2(x, y) * TexelSize;
+            float Depth = texture(gShadowMap, UVCoords + Offset).x;
+
+            if (Depth + bias < z) {
+                ShadowSum += 0.0;
+            } else {
+                ShadowSum += 1.0;
+            }
+       }
+   }
+
+   float FinalShadowFactor = ShadowSum / 9.0;
+
+   return FinalShadowFactor;
 }
 
 
