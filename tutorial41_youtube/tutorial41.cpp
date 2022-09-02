@@ -138,6 +138,8 @@ public:
 
         m_shadowMapTech.Enable();
 
+        glCullFace(GL_FRONT); // Solution #2 from the video - reverse face culling
+
         Matrix4f LightView;
         Vector3f Origin(0.0f, 0.0f, 0.0f);
         Vector3f Up(0.0f, 1.0f, 0.0f);
@@ -161,6 +163,8 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_lightingTech.Enable();
+
+        glCullFace(GL_BACK); // Solution #2 from the video - reverse face culling
 
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
