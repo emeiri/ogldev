@@ -56,7 +56,7 @@ public:
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(1.0f, -0.8f, -0.7f);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.2f, 0.0f);
 
         // Initialize an orthographic projection matrix for the directional light
         OrthoProjInfo shadowOrthoProjInfo;
@@ -79,9 +79,9 @@ public:
 
         m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
 
-        m_positions[0] = Vector3f(0.0f, 0.0f, -12.0f);
-        m_positions[1] = Vector3f(0.0f, 0.0f, 0.0f);
-        m_positions[2] = Vector3f(0.0f, 0.0f, 15.0f);
+        m_positions[0] = Vector3f(0.0f, 1.0f, -12.0f);
+        m_positions[1] = Vector3f(0.0f, 1.0f, 0.0f);
+        m_positions[2] = Vector3f(0.0f, 1.0f, 15.0f);
     }
 
 
@@ -121,9 +121,9 @@ public:
     void RenderSceneCB()
     {
         static float foo = 0.0f;
-        foo += 0.01f;
+        //        foo += 0.01f;
 
-        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
+        //        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
 
         ShadowMapPass();
         LightingPass();
@@ -359,14 +359,14 @@ private:
     {
         m_pMesh1 = new BasicMesh();
 
-        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
-            printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
-            exit(0);
-        }
+        //        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
+        //            printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
+        //            exit(0);
+        //        }
         //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
 
-        //        m_pMesh1->LoadMesh("../Content/box.obj");
+            m_pMesh1->LoadMesh("../Content/box.obj");
         //        m_pMesh1->SetPosition(0.0f, 1.0f, 0.0f);
 
         //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
