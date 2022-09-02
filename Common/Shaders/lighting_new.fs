@@ -63,6 +63,8 @@ uniform sampler2D gSampler;
 uniform sampler2D gSamplerSpecularExponent;
 uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
+uniform int gShadowMapWidth = 0;
+uniform int gShadowMapHeight = 0;
 uniform vec3 gCameraLocalPos;
 uniform vec3 gCameraWorldPos;
 uniform vec4 gColorMod = vec4(1);
@@ -112,16 +114,22 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 
 float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
 {
+    if (gShadowMapWidth == 0 || gShadowMapHeight == 0) {
+        return 1.0;
+    }
+
     vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
     vec2 UVCoords;
     UVCoords.x = 0.5 * ProjCoords.x + 0.5;
     UVCoords.y = 0.5 * ProjCoords.y + 0.5;
     float z = 0.5 * ProjCoords.z + 0.5;
-    float Depth = texture(gShadowMap, UVCoords).x;
 
     float DiffuseFactor = dot(Normal, -LightDirection);
-
     float bias = mix(0.001, 0.0, DiffuseFactor);
+
+    float Depth = texture(gShadowMap, UVCoords).x;
+
+
 
     if (Depth + bias < z)
         return 0.05;

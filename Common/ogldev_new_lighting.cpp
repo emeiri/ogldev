@@ -74,6 +74,8 @@ bool LightingTechnique::InitCommon()
     samplerLoc = GetUniformLocation("gSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
     shadowCubeMapLoc = GetUniformLocation("gShadowCubeMap");
+    shadowMapWidthLoc = GetUniformLocation("gShadowMapWidth");
+    shadowMapHeightLoc = GetUniformLocation("gShadowMapHeight");
     samplerSpecularExponentLoc = GetUniformLocation("gSamplerSpecularExponent");
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
@@ -104,6 +106,8 @@ bool LightingTechnique::InitCommon()
         samplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowCubeMapLoc == INVALID_UNIFORM_LOCATION ||
+        shadowMapWidthLoc == INVALID_UNIFORM_LOCATION ||
+        shadowMapHeightLoc == INVALID_UNIFORM_LOCATION ||
         samplerSpecularExponentLoc == INVALID_UNIFORM_LOCATION ||
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
@@ -245,6 +249,12 @@ void LightingTechnique::SetTextureUnit(unsigned int TextureUnit)
     glUniform1i(samplerLoc, TextureUnit);
 }
 
+
+void LightingTechnique::SetShadowMapSize(unsigned int Width, unsigned int Height)
+{
+    glUniform1i(shadowMapWidthLoc, Width);
+    glUniform1i(shadowMapHeightLoc, Height);
+}
 
 void LightingTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
 {
