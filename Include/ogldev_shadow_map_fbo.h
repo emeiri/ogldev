@@ -27,7 +27,7 @@ public:
 
     ~ShadowMapFBO();
 
-    bool Init(unsigned int Width, unsigned int Height);
+    bool Init(unsigned int Width, unsigned int Height, bool ForPCF = false);
 
     void BindForWriting();
 
