@@ -34,6 +34,7 @@
 #include "ogldev_shadow_map_fbo.h"
 #include "ogldev_new_lighting.h"
 #include "ogldev_shadow_mapping_technique.h"
+#include "ogldev_shadow_map_offset_texture.h"
 
 
 #define WINDOW_WIDTH  1920
@@ -309,6 +310,12 @@ private:
         if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, ForPCF)) {
             exit(1);
         }
+
+        m_pShadowMapOffsetTexture = new ShadowMapOffsetTexture(m_shadowMapOffsetJitterSize,
+                                                               m_shadowMapOffsetNumSamplesU,
+                                                               m_shadowMapOffsetNumSamplesV);
+
+        m_pShadowMapOffsetTexture->Bind(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT);
     }
 
 
@@ -346,7 +353,14 @@ private:
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapSize(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
-        m_lightingTech.SetShadowMapFilterSize(7);
+        m_lightingTech.SetShadowMapFilterSize(4);
+        m_lightingTech.SetShadowMapOffsetTextureUnit(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX);
+
+        float Radius = m_shadowMapSampleRadius / SHADOW_MAP_HEIGHT;
+        Vector3f OffsetTextureSize(m_shadowMapOffsetJitterSize,
+                                   m_shadowMapOffsetJitterSize,
+                                   (m_shadowMapOffsetNumSamplesU * m_shadowMapOffsetNumSamplesV ) / 2.0f);
+        m_lightingTech.SetShadowMapOffsetTextureSizeAndRadius(OffsetTextureSize, Radius);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
         if (!m_shadowMapTech.Init()) {
@@ -397,6 +411,11 @@ private:
     bool m_cameraOnLight = false;
     Vector3f m_positions[3];
     bool m_isOrthoCamera = false;
+    ShadowMapOffsetTexture* m_pShadowMapOffsetTexture = NULL;
+    float m_shadowMapSampleRadius = 7.0f;
+    int m_shadowMapOffsetJitterSize = 8;
+    int m_shadowMapOffsetNumSamplesU = 4;
+    int m_shadowMapOffsetNumSamplesV = 8;
 };
 
 Tutorial41* app = NULL;

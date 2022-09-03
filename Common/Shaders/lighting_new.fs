@@ -66,6 +66,9 @@ uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point 
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 1;
+uniform sampler3D gShadowMapOffsetTexture;
+uniform vec3 gShadowMapOffsetTextureSize;
+uniform float gShadowMapRandomRadius = 0.0;
 uniform vec3 gCameraLocalPos;
 uniform vec3 gCameraWorldPos;
 uniform vec4 gColorMod = vec4(1);
@@ -113,17 +116,21 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 }
 
 
-float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
+vec3 CalcShadowCoords()
+{
+    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
+    return ShadowCoords;
+}
+
+
+float CalcShadowFactorSimple(vec3 LightDirection, vec3 Normal)
 {
     if (gShadowMapWidth == 0 || gShadowMapHeight == 0) {
         return 1.0;
     }
 
-    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
-    vec2 UVCoords;
-    UVCoords.x = 0.5 * ProjCoords.x + 0.5;
-    UVCoords.y = 0.5 * ProjCoords.y + 0.5;
-    float z = 0.5 * ProjCoords.z + 0.5;
+    vec3 ShadowCoords = CalcShadowCoords();
 
     float DiffuseFactor = dot(Normal, -LightDirection);
     float bias = mix(0.001, 0.0, DiffuseFactor);
@@ -140,9 +147,9 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
     for (int y = -HalfFilterSize ; y < -HalfFilterSize + gShadowMapFilterSize ; y++) {
         for (int x = -HalfFilterSize ; x < -HalfFilterSize + gShadowMapFilterSize ; x++) {
             vec2 Offset = vec2(x, y) * TexelSize;
-            float Depth = texture(gShadowMap, UVCoords + Offset).x;
+            float Depth = texture(gShadowMap, ShadowCoords.xy + Offset).x;
 
-            if (Depth + bias < z) {
+            if (Depth + bias < ShadowCoords.z) {
                 ShadowSum += 0.0;
             } else {
                 ShadowSum += 1.0;
@@ -155,6 +162,88 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
    return FinalShadowFactor;
 }
 
+
+float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
+{
+    ivec3 OffsetCoord;
+    vec2 f = mod(gl_FragCoord.xy, gShadowMapOffsetTextureSize.xy);
+    OffsetCoord.xy = ivec2(f);
+    float Sum = 0.0;
+    int SamplesDiv2 = int(gShadowMapOffsetTextureSize.z);
+    vec3 ShadowCoords = CalcShadowCoords();
+    vec4 sc = vec4(ShadowCoords, 1.0);
+
+    float TexelWidth = 1.0 / gShadowMapWidth;
+    float TexelHeight = 1.0 / gShadowMapHeight;
+
+    vec2 TexelSize = vec2(TexelWidth, TexelHeight);
+
+    float DiffuseFactor = dot(Normal, -LightDirection);
+    float bias = mix(0.001, 0.0, DiffuseFactor);
+    float Depth = 0.0;
+
+    for (int i = 0 ; i < 4 ; i++) {
+        OffsetCoord.z = i;
+        vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;// * ShadowCoords.w;
+        sc.xy = ShadowCoords.xy + Offsets.xy;// * TexelSize;
+        Depth = texture(gShadowMap, sc.xy).x;
+        if (Depth + bias < ShadowCoords.z) {
+           Sum += 0.0;
+        } else {
+           Sum += 1.0;
+        }
+
+        sc.xy = ShadowCoords.xy + Offsets.zw;// * TexelSize;
+        Depth = texture(gShadowMap, sc.xy).x;
+        if (Depth + bias < ShadowCoords.z) {
+           Sum += 0.0;
+        } else {
+           Sum += 1.0;
+        }
+    }
+
+    float Shadow = Sum / 8.0;
+
+    if (Shadow != 1.0 && Shadow != 0.0) {
+        for (int i = 4 ; i < SamplesDiv2 ; i++) {
+            OffsetCoord.z = i;
+            vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;// * ShadowCoords.w;
+            sc.xy = ShadowCoords.xy + Offsets.xy;// * TexelSize;
+            Depth = texture(gShadowMap, sc.xy).x;
+            if (Depth + bias < ShadowCoords.z) {
+               Sum += 0.0;
+            } else {
+               Sum += 1.0;
+            }
+
+            sc.xy = ShadowCoords.xy + Offsets.zw;// * TexelSize;
+            Depth = texture(gShadowMap, sc.xy).x;
+            if (Depth + bias < ShadowCoords.z) {
+               Sum += 0.0;
+            } else {
+               Sum += 1.0;
+            }
+        }
+
+        Shadow = Sum / float(SamplesDiv2 * 2.0);
+    }
+
+    return Shadow;
+}
+
+
+float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
+{
+    float ShadowFactor = 0.0;
+
+    if (gShadowMapRandomRadius == 0.0) {
+        ShadowFactor = CalcShadowFactorSimple(LightDirection, Normal);
+    } else {
+        ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);
+    }
+
+    return ShadowFactor;
+}
 
 vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
                        float ShadowFactor)
@@ -383,5 +472,5 @@ void main()
         TempColor = mix(vec4(gFogColor, 1.0), TempColor, FogFactor);
     }
 
-    FragColor =  TempColor * gColorMod;
+    FragColor =  TempColor * gColorMod * 2.0;
 }
