@@ -57,7 +57,7 @@ static void GenOffsetTextureData(int Size, int NumSamplesU, int NumSamplesV, std
 
                 //printf("%f %f %f %f\n", f1, f2, f3, f4);
 
-                int index = ((s / 2) * Size * Size + x * Size + y) * 4;
+                int index = ((s / 2) * Size * Size + y * Size + x) * 4;
 
                 //                printf("index %d\n", index);
 
