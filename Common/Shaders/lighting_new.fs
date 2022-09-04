@@ -184,8 +184,8 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
 
     for (int i = 0 ; i < 4 ; i++) {
         OffsetCoord.z = i;
-        vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;// * ShadowCoords.w;
-        sc.xy = ShadowCoords.xy + Offsets.xy;// * TexelSize;
+        vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;
+        sc.xy = ShadowCoords.xy + Offsets.xy * TexelSize;
         Depth = texture(gShadowMap, sc.xy).x;
         if (Depth + bias < ShadowCoords.z) {
            Sum += 0.0;
@@ -193,7 +193,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
            Sum += 1.0;
         }
 
-        sc.xy = ShadowCoords.xy + Offsets.zw;// * TexelSize;
+        sc.xy = ShadowCoords.xy + Offsets.zw * TexelSize;
         Depth = texture(gShadowMap, sc.xy).x;
         if (Depth + bias < ShadowCoords.z) {
            Sum += 0.0;
@@ -207,8 +207,8 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
     if (Shadow != 1.0 && Shadow != 0.0) {
         for (int i = 4 ; i < SamplesDiv2 ; i++) {
             OffsetCoord.z = i;
-            vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;// * ShadowCoords.w;
-            sc.xy = ShadowCoords.xy + Offsets.xy;// * TexelSize;
+            vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;
+            sc.xy = ShadowCoords.xy + Offsets.xy * TexelSize;
             Depth = texture(gShadowMap, sc.xy).x;
             if (Depth + bias < ShadowCoords.z) {
                Sum += 0.0;
@@ -216,7 +216,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
                Sum += 1.0;
             }
 
-            sc.xy = ShadowCoords.xy + Offsets.zw;// * TexelSize;
+            sc.xy = ShadowCoords.xy + Offsets.zw * TexelSize;
             Depth = texture(gShadowMap, sc.xy).x;
             if (Depth + bias < ShadowCoords.z) {
                Sum += 0.0;
