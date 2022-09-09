@@ -33,8 +33,7 @@ float jitter()
 
 static void GenOffsetTextureData(int TextureSize, int FilterSize, std::vector<float>& Data)
 {
-    int NumFilterSamples = FilterSize * FilterSize;
-    int BufferSize = TextureSize * TextureSize * NumFilterSamples * 2;
+    int BufferSize = TextureSize * TextureSize * FilterSize * FilterSize * 2;
 
     Data.resize(BufferSize);
 
@@ -42,37 +41,17 @@ static void GenOffsetTextureData(int TextureSize, int FilterSize, std::vector<fl
 
     for (int TexY = 0 ; TexY < TextureSize ; TexY++) {
         for (int TexX = 0 ; TexX < TextureSize ; TexX++) {
-            for (int s = 0 ; s < NumFilterSamples ; s += 2) {
-                int u1 = s % FilterSize;
-                int v1 = (NumFilterSamples - 1 - s) / FilterSize;
-                int u2 = (s + 1) % FilterSize;
-                int v2 = (NumFilterSamples - 1 - s - 1) / FilterSize;
+            for (int v = FilterSize -1 ; v >= 0 ; v--) {
+                for (int u = 0 ; u < FilterSize ; u++) {
+                    float x = ((float)u + 0.5f + jitter()) / (float)FilterSize;
+                    float y = ((float)v + 0.5f + jitter()) / (float)FilterSize;
 
-                printf("%d %d\n", u1, v1);
-                printf("%d %d\n", u2, v2);
-                //                printf("%d %d %d %d\n", x1, y1, x2, y2);
+                    assert(Index + 1 < Data.size());
+                    Data[Index]     = sqrtf(y) * cosf(2 * M_PI * x);
+                    Data[Index + 1] = sqrtf(y) * sinf(2 * M_PI * x);
 
-                float f1 = (u1 + 0.5f + jitter()) / FilterSize;
-                float f2 = (v1 + 0.5f + jitter()) / FilterSize;
-                float f3 = (u2 + 0.5f + jitter()) / FilterSize;
-                float f4 = (v2 + 0.5f + jitter()) / FilterSize;
-
-                //printf("%f %f %f %f\n", f1, f2, f3, f4);
-
-                //printf("%f %f\n", f1, f2);
-                //printf("%f %f\n", f3, f4);
-
-                Data[Index]     = sqrtf(f2) * cosf(2 * M_PI * f1);
-                Data[Index + 1] = sqrtf(f2) * sinf(2 * M_PI * f1);
-                Data[Index + 2] = sqrtf(f4) * cosf(2 * M_PI * f3);
-                Data[Index + 3] = sqrtf(f4) * sinf(2 * M_PI * f3);
-
-                //printf("%d %d %d: %f %f %f %f\n", y, x, s, Data[index], Data[index + 1], Data[index + 2], Data[index + 3]);
-
-                printf("%f %f\n", Data[Index], Data[Index + 1]);
-                printf("%f %f\n", Data[Index + 2], Data[Index + 3]);
-
-                Index += 4;
+                    Index += 2;
+                }
             }
         }
     }
