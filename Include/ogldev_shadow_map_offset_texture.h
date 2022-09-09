@@ -24,7 +24,7 @@
 class ShadowMapOffsetTexture {
 
  public:
-    ShadowMapOffsetTexture(int Size, int NumSamplesU, int NumSamplesV);
+    ShadowMapOffsetTexture(int TextureSize, int FilterSize);
 
     void Bind(GLenum TextureUnit);
 

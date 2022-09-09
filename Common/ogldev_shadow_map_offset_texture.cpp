@@ -23,8 +23,6 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_shadow_map_offset_texture.h"
 
-//float jitter = 1.0f;
-
 float jitter()
 {
     static std::default_random_engine generator;
@@ -33,31 +31,36 @@ float jitter()
 }
 
 
-static void GenOffsetTextureData(int Size, int NumSamplesU, int NumSamplesV, std::vector<float>& Data)
+static void GenOffsetTextureData(int TextureSize, int FilterSize, std::vector<float>& Data)
 {
-    int TotalNumSamples = NumSamplesU * NumSamplesV;
-    int BufferSize = Size * Size * TotalNumSamples * 2;
+    int NumFilterSamples = FilterSize * FilterSize;
+    int BufferSize = TextureSize * TextureSize * NumFilterSamples * 2;
 
     Data.resize(BufferSize);
 
-    for (int y = 0 ; y < Size ; y++) {
-        for (int x = 0 ; x < Size ; x++) {
-            for (int s = 0 ; s < TotalNumSamples ; s += 2) {
-                int x1 = s % NumSamplesU;
-                int y1 = (TotalNumSamples - 1 - s) / NumSamplesU;
-                int x2 = (s + 1) % NumSamplesU;
-                int y2 = (TotalNumSamples - 1 - s - 1) / NumSamplesU;
+    for (int y = 0 ; y < TextureSize ; y++) {
+        for (int x = 0 ; x < TextureSize ; x++) {
+            for (int s = 0 ; s < NumFilterSamples ; s += 2) {
+                int x1 = s % FilterSize;
+                int y1 = (NumFilterSamples - 1 - s) / FilterSize;
+                int x2 = (s + 1) % FilterSize;
+                int y2 = (NumFilterSamples - 1 - s - 1) / FilterSize;
 
+                //printf("%d %d\n", x1, y1);
+                //printf("%d %d\n", x2, y2);
                 //                printf("%d %d %d %d\n", x1, y1, x2, y2);
 
-                float f1 = (x1 + 0.5f + jitter()) / NumSamplesU;
-                float f2 = (y1 + 0.5f + jitter()) / NumSamplesV;
-                float f3 = (x2 + 0.5f + jitter()) / NumSamplesU;
-                float f4 = (y2 + 0.5f + jitter()) / NumSamplesV;
+                float f1 = (x1 + 0.5f + jitter()) / FilterSize;
+                float f2 = (y1 + 0.5f + jitter()) / FilterSize;
+                float f3 = (x2 + 0.5f + jitter()) / FilterSize;
+                float f4 = (y2 + 0.5f + jitter()) / FilterSize;
 
                 //printf("%f %f %f %f\n", f1, f2, f3, f4);
 
-                int index = ((s / 2) * Size * Size + y * Size + x) * 4;
+                int index = ((s / 2) * TextureSize * TextureSize + y * TextureSize + x) * 4;
+
+                //printf("%f %f\n", f1, f2);
+                //printf("%f %f\n", f3, f4);
 
                 //                printf("index %d\n", index);
 
@@ -67,35 +70,38 @@ static void GenOffsetTextureData(int Size, int NumSamplesU, int NumSamplesV, std
                 Data[index + 3] = sqrtf(f4) * sinf(2 * M_PI * f3);
 
                 //printf("%d %d %d: %f %f %f %f\n", y, x, s, Data[index], Data[index + 1], Data[index + 2], Data[index + 3]);
+
+                printf("%f %f\n", Data[index], Data[index + 1]);
+                printf("%f %f\n", Data[index + 2], Data[index + 3]);
             }
         }
     }
 }
 
 
-ShadowMapOffsetTexture::ShadowMapOffsetTexture(int Size, int NumSamplesU, int NumSamplesV)
+ShadowMapOffsetTexture::ShadowMapOffsetTexture(int TextureSize, int FilterSize)
 {
     std::vector<float> Data;
 
-    GenOffsetTextureData(Size, NumSamplesU, NumSamplesV, Data);
+    GenOffsetTextureData(TextureSize, FilterSize, Data);
 
-    int TotalNumSamples = NumSamplesU * NumSamplesV;
-
-    CreateTexture(Size, TotalNumSamples, Data);
+    CreateTexture(TextureSize, FilterSize, Data);
 }
 
 
-void ShadowMapOffsetTexture::CreateTexture(int Size, int TotalNumSamples, const vector<float>& Data)
+void ShadowMapOffsetTexture::CreateTexture(int TextureSize, int FilterSize, const vector<float>& Data)
 {
+    int NumFilterSamples = FilterSize * FilterSize;
+
     glActiveTexture(GL_TEXTURE1);
 
     glGenTextures(1, &m_textureObj);
 
     glBindTexture(GL_TEXTURE_3D, m_textureObj);
 
-    glTexStorage3D(GL_TEXTURE_3D, 1, GL_RGBA32F, Size, Size, TotalNumSamples / 2);
+    glTexStorage3D(GL_TEXTURE_3D, 1, GL_RGBA32F, TextureSize, TextureSize, NumFilterSamples / 2);
 
-    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, Size, Size, TotalNumSamples / 2, GL_RGBA, GL_FLOAT, &Data[0]);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, TextureSize, TextureSize, NumFilterSamples / 2, GL_RGBA, GL_FLOAT, &Data[0]);
 
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 

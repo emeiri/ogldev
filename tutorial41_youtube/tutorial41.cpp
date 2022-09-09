@@ -311,9 +311,8 @@ private:
             exit(1);
         }
 
-        m_pShadowMapOffsetTexture = new ShadowMapOffsetTexture(m_shadowMapOffsetJitterSize,
-                                                               m_shadowMapOffsetNumSamplesU,
-                                                               m_shadowMapOffsetNumSamplesV);
+        m_pShadowMapOffsetTexture = new ShadowMapOffsetTexture(m_shadowMapOffsetTextureSize,
+                                                               m_shadowMapOffsetFilterSize);
 
         m_pShadowMapOffsetTexture->Bind(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT);
     }
@@ -356,9 +355,10 @@ private:
         m_lightingTech.SetShadowMapFilterSize(4);
         m_lightingTech.SetShadowMapOffsetTextureUnit(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX);
 
-        Vector3f OffsetTextureSize(m_shadowMapOffsetJitterSize,
-                                   m_shadowMapOffsetJitterSize,
-                                   (m_shadowMapOffsetNumSamplesU * m_shadowMapOffsetNumSamplesV ) / 2.0f);
+        Vector3f OffsetTextureSize(m_shadowMapOffsetTextureSize,
+                                   m_shadowMapOffsetTextureSize,
+                                   (m_shadowMapOffsetFilterSize * m_shadowMapOffsetFilterSize / 2.0f));
+
         m_lightingTech.SetShadowMapOffsetTextureSizeAndRadius(OffsetTextureSize, m_shadowMapSampleRadius);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
@@ -412,9 +412,8 @@ private:
     bool m_isOrthoCamera = false;
     ShadowMapOffsetTexture* m_pShadowMapOffsetTexture = NULL;
     float m_shadowMapSampleRadius = 7.0f;
-    int m_shadowMapOffsetJitterSize = 8;
-    int m_shadowMapOffsetNumSamplesU = 4;
-    int m_shadowMapOffsetNumSamplesV = 8;
+    int m_shadowMapOffsetTextureSize = 8;
+    int m_shadowMapOffsetFilterSize = 4;
 };
 
 Tutorial41* app = NULL;
