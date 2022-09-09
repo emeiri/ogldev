@@ -355,11 +355,9 @@ private:
         m_lightingTech.SetShadowMapFilterSize(4);
         m_lightingTech.SetShadowMapOffsetTextureUnit(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX);
 
-        Vector3f OffsetTextureSize(m_shadowMapOffsetTextureSize,
-                                   m_shadowMapOffsetTextureSize,
-                                   (m_shadowMapOffsetFilterSize * m_shadowMapOffsetFilterSize / 2.0f));
-
-        m_lightingTech.SetShadowMapOffsetTextureSizeAndRadius(OffsetTextureSize, m_shadowMapSampleRadius);
+        m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
+                                                       m_shadowMapOffsetFilterSize,
+                                                       m_shadowMapSampleRadius);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
         if (!m_shadowMapTech.Init()) {
@@ -413,7 +411,7 @@ private:
     ShadowMapOffsetTexture* m_pShadowMapOffsetTexture = NULL;
     float m_shadowMapSampleRadius = 7.0f;
     int m_shadowMapOffsetTextureSize = 8;
-    int m_shadowMapOffsetFilterSize = 4;
+    int m_shadowMapOffsetFilterSize = 8;
 };
 
 Tutorial41* app = NULL;

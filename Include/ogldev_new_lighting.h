@@ -111,7 +111,7 @@ public:
     void SetShadowMapSize(unsigned int Width, unsigned int Height);
     void SetShadowMapFilterSize(unsigned int Size);
     void SetShadowMapOffsetTextureUnit(unsigned int TextureUnit);
-    void SetShadowMapOffsetTextureSizeAndRadius(const Vector3f& Size, float Radius);
+    void SetShadowMapOffsetTextureParams(float TextureSize, float FilterSize, float Radius);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
@@ -154,6 +154,7 @@ private:
     GLuint shadowMapFilterSizeLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowMapOffsetTextureLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowMapOffsetTextureSizeLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ShadowMapOffsetFilterSizeLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowMapRandomRadiusLoc = INVALID_UNIFORM_LOCATION;
     GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
     GLuint CameraLocalPosLoc = INVALID_UNIFORM_LOCATION;

@@ -67,7 +67,8 @@ uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 1;
 uniform sampler3D gShadowMapOffsetTexture;
-uniform vec3 gShadowMapOffsetTextureSize;
+uniform float gShadowMapOffsetTextureSize;
+uniform float gShadowMapOffsetFilterSize;
 uniform float gShadowMapRandomRadius = 0.0;
 uniform vec3 gCameraLocalPos;
 uniform vec3 gCameraWorldPos;
@@ -166,10 +167,10 @@ float CalcShadowFactorSimple(vec3 LightDirection, vec3 Normal)
 float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
 {
     ivec3 OffsetCoord;
-    vec2 f = mod(gl_FragCoord.xy, gShadowMapOffsetTextureSize.xy);
+    vec2 f = mod(gl_FragCoord.xy, vec2(gShadowMapOffsetTextureSize));
     OffsetCoord.yz = ivec2(f);
     float Sum = 0.0;
-    int SamplesDiv2 = int(gShadowMapOffsetTextureSize.z);
+    int SamplesDiv2 = int(gShadowMapOffsetFilterSize * gShadowMapOffsetFilterSize / 2.0);
     vec3 ShadowCoords = CalcShadowCoords();
     vec4 sc = vec4(ShadowCoords, 1.0);
 
