@@ -38,8 +38,8 @@ static void GenOffsetTextureData(int TextureSize, int FilterSize, std::vector<fl
 
     Data.resize(BufferSize);
 
-    for (int y = 0 ; y < TextureSize ; y++) {
-        for (int x = 0 ; x < TextureSize ; x++) {
+    for (int TexY = 0 ; TexY < TextureSize ; TexY++) {
+        for (int TexX = 0 ; TexX < TextureSize ; TexX++) {
             for (int s = 0 ; s < NumFilterSamples ; s += 2) {
                 int x1 = s % FilterSize;
                 int y1 = (NumFilterSamples - 1 - s) / FilterSize;
@@ -57,7 +57,7 @@ static void GenOffsetTextureData(int TextureSize, int FilterSize, std::vector<fl
 
                 //printf("%f %f %f %f\n", f1, f2, f3, f4);
 
-                int index = ((s / 2) * TextureSize * TextureSize + y * TextureSize + x) * 4;
+                int index = ((s / 2) * TextureSize * TextureSize + TexY * TextureSize + TexX) * 4;
 
                 //printf("%f %f\n", f1, f2);
                 //printf("%f %f\n", f3, f4);
