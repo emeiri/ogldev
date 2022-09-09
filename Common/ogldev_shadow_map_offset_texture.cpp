@@ -41,19 +41,19 @@ static void GenOffsetTextureData(int TextureSize, int FilterSize, std::vector<fl
     for (int TexY = 0 ; TexY < TextureSize ; TexY++) {
         for (int TexX = 0 ; TexX < TextureSize ; TexX++) {
             for (int s = 0 ; s < NumFilterSamples ; s += 2) {
-                int x1 = s % FilterSize;
-                int y1 = (NumFilterSamples - 1 - s) / FilterSize;
-                int x2 = (s + 1) % FilterSize;
-                int y2 = (NumFilterSamples - 1 - s - 1) / FilterSize;
+                int u1 = s % FilterSize;
+                int v1 = (NumFilterSamples - 1 - s) / FilterSize;
+                int u2 = (s + 1) % FilterSize;
+                int v2 = (NumFilterSamples - 1 - s - 1) / FilterSize;
 
-                //printf("%d %d\n", x1, y1);
-                //printf("%d %d\n", x2, y2);
+                printf("%d %d\n", u1, v1);
+                printf("%d %d\n", u2, v2);
                 //                printf("%d %d %d %d\n", x1, y1, x2, y2);
 
-                float f1 = (x1 + 0.5f + jitter()) / FilterSize;
-                float f2 = (y1 + 0.5f + jitter()) / FilterSize;
-                float f3 = (x2 + 0.5f + jitter()) / FilterSize;
-                float f4 = (y2 + 0.5f + jitter()) / FilterSize;
+                float f1 = (u1 + 0.5f + jitter()) / FilterSize;
+                float f2 = (v1 + 0.5f + jitter()) / FilterSize;
+                float f3 = (u2 + 0.5f + jitter()) / FilterSize;
+                float f4 = (v2 + 0.5f + jitter()) / FilterSize;
 
                 //printf("%f %f %f %f\n", f1, f2, f3, f4);
 
