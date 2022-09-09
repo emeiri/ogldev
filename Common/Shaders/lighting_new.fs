@@ -167,7 +167,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
 {
     ivec3 OffsetCoord;
     vec2 f = mod(gl_FragCoord.xy, gShadowMapOffsetTextureSize.xy);
-    OffsetCoord.xy = ivec2(f);
+    OffsetCoord.yz = ivec2(f);
     float Sum = 0.0;
     int SamplesDiv2 = int(gShadowMapOffsetTextureSize.z);
     vec3 ShadowCoords = CalcShadowCoords();
@@ -183,7 +183,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
     float Depth = 0.0;
 
     for (int i = 0 ; i < 4 ; i++) {
-        OffsetCoord.z = i;
+        OffsetCoord.x = i;
         vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;
         sc.xy = ShadowCoords.xy + Offsets.xy * TexelSize;
         Depth = texture(gShadowMap, sc.xy).x;
@@ -206,7 +206,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
 
     if (Shadow != 1.0 && Shadow != 0.0) {
         for (int i = 4 ; i < SamplesDiv2 ; i++) {
-            OffsetCoord.z = i;
+            OffsetCoord.x = i;
             vec4 Offsets = texelFetch(gShadowMapOffsetTexture, OffsetCoord, 0) * gShadowMapRandomRadius;
             sc.xy = ShadowCoords.xy + Offsets.xy * TexelSize;
             Depth = texture(gShadowMap, sc.xy).x;
