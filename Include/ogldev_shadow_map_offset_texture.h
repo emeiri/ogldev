@@ -24,14 +24,14 @@
 class ShadowMapOffsetTexture {
 
  public:
-    ShadowMapOffsetTexture(int TextureSize, int FilterSize);
+    ShadowMapOffsetTexture(int WindowSize, int FilterSize);
 
     void Bind(GLenum TextureUnit);
 
  private:
     GLuint m_textureObj;
 
-    void CreateTexture(int Size, int TotalNumSameples, const vector<float>& Data);
+    void CreateTexture(int WindowSize, int FilterSize, const vector<float>& Data);
 };
 
 #endif
