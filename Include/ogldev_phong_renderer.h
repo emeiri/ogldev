@@ -90,6 +90,8 @@ class PhongRenderer {
 
     void RefreshLightingPosAndDirs(BasicMesh* pMesh);
 
+    void RenderAnimationCommon(SkinnedMesh* pMesh);
+
     const BasicCamera* m_pCamera = NULL;
     LightingTechnique m_lightingTech;
     SkinningTechnique m_skinningTech;

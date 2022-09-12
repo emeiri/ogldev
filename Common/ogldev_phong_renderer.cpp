@@ -226,6 +226,20 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
 void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
 {
+    RenderAnimationCommon(pMesh);
+
+    vector<Matrix4f> Transforms;
+    pMesh->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
+
+    for (uint i = 0 ; i < Transforms.size() ; i++) {
+        m_skinningTech.SetBoneTransform(i, Transforms[i]);
+    }
+
+    pMesh->Render();
+}
+
+void PhongRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
+{
     if (!m_pCamera) {
         printf("PhongRenderer: camera not initialized\n");
         exit(0);
@@ -255,17 +269,7 @@ void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, 
 
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
     m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);
-
-    vector<Matrix4f> Transforms;
-    pMesh->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
-
-    for (uint i = 0 ; i < Transforms.size() ; i++) {
-        m_skinningTech.SetBoneTransform(i, Transforms[i]);
-    }
-
-    pMesh->Render();
 }
-
 
 void PhongRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight)
 {
