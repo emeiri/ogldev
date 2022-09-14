@@ -50,6 +50,11 @@ public:
     // is an optional param which selects one of the animations.
     void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms, unsigned int AnimationIndex = 0);
 
+    void GetBoneTransformsBlended(float AnimationTimeSec,
+                                  vector<Matrix4f>& Transforms,
+                                  int StartAnimIndex,
+                                  int EndAnimIndex,
+                                  float BlendFactor);
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4
 
@@ -111,6 +116,8 @@ private:
     void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, int AnimationIndex);
     void MarkRequiredNodesForBone(const aiBone* pBone);
     void InitializeRequiredNodeMap(const aiNode* pNode);
+    float CalcAnimationTimeTicks(float TimeInSeconds, int AnimationIndex);
+
     GLuint m_boneBuffer = 0;
 
     // Temporary space for vertex stuff before we load them into the GPU

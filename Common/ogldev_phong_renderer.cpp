@@ -238,6 +238,30 @@ void PhongRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, 
     pMesh->Render();
 }
 
+
+void PhongRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
+                                           float AnimationTimeSec,
+                                           int StartAnimIndex,
+                                           int EndAnimIndex,
+                                           float BlendFactor)
+{
+    RenderAnimationCommon(pMesh);
+
+    vector<Matrix4f> Transforms;
+    pMesh->GetBoneTransformsBlended(AnimationTimeSec,
+                                    Transforms,
+                                    StartAnimIndex,
+                                    EndAnimIndex,
+                                    BlendFactor);
+
+    for (uint i = 0 ; i < Transforms.size() ; i++) {
+        m_skinningTech.SetBoneTransform(i, Transforms[i]);
+    }
+
+    pMesh->Render();
+}
+
+
 void PhongRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
 {
     if (!m_pCamera) {

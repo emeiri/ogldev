@@ -349,12 +349,7 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
     Matrix4f Identity;
     Identity.InitIdentity();
 
-    float TicksPerSecond = (float)(m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond != 0 ? m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond : 25.0f);
-    float TimeInTicks = TimeInSeconds * TicksPerSecond;
-    // we need to use the integral part of mDuration for the total length of the animation
-    float Duration = 0.0f;
-    float fraction = modf((float)m_pScene->mAnimations[AnimationIndex]->mDuration, &Duration);
-    float AnimationTimeTicks = fmod(TimeInTicks, Duration);
+    float AnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, AnimationIndex);
 
     ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity, AnimationIndex);
     Transforms.resize(m_BoneInfo.size());
@@ -362,6 +357,61 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
     for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
         Transforms[i] = m_BoneInfo[i].FinalTransformation;
     }
+}
+
+
+void SkinnedMesh::GetBoneTransformsBlended(float AnimationTimeSec,
+                                           vector<Matrix4f>& Transforms,
+                                           int StartAnimIndex,
+                                           int EndAnimIndex,
+                                           float BlendFactor)
+{
+    if (StartAnimIndex >= m_pScene->mNumAnimations) {
+        printf("Invalid start animation index %d, max is %d\n", StartAnimIndex, m_pScene->mNumAnimations);
+        assert(0);
+    }
+
+    if (EndAnimIndex >= m_pScene->mNumAnimations) {
+        printf("Invalid end animation index %d, max is %d\n", EndAnimIndex, m_pScene->mNumAnimations);
+        assert(0);
+    }
+
+    if ((BlendFactor > 1.0f) || (BlendFactor < 0.0f)) {
+        printf("Invalid blend factor %f\n", BlendFactor);
+        assert(0);
+    }
+
+    float a = 1.0f;
+    float b = m_pScene->mAnimations[StartAnimIndex]->mDuration / m_pScene->mAnimations[EndAnimIndex]->mDuration;
+
+    float AnimSpeedMultiplierUp = (1.0f - BlendFactor) * a + b * BlendFactor;
+
+    a = m_pScene->mAnimations[EndAnimIndex]->mDuration / m_pScene->mAnimations[StartAnimIndex]->mDuration;
+    b = 1.0f;
+    float AnimSpeedMultiplierDown = (1.0f - BlendFactor) * a + b * BlendFactor;
+
+    // Current time of each animation, "scaled" by the above speed multiplier variables
+    /*    static float currentTimeBase = 0.0f;
+    currentTimeBase += pBaseAnimation->GetTicksPerSecond() * deltaTime * animSpeedMultiplierUp;
+    currentTimeBase = fmod(currentTimeBase, pBaseAnimation->GetDuration());
+
+    static float currentTimeLayered = 0.0f;
+    currentTimeLayered += pLayeredAnimation->GetTicksPerSecond() * deltaTime * animSpeedMultiplierDown;
+    currentTimeLayered = fmod(currentTimeLayered, pLayeredAnimation->GetDuration());
+
+    CalculateBlendedBoneTransform(pBaseAnimation, &pBaseAnimation->GetRootNode(), pLayeredAnimation, &pLayeredAnimation->GetRootNode(), currentTimeBase, currentTimeLayered, glm::mat4(1.0f), blendFactor);*/
+}
+
+
+float SkinnedMesh::CalcAnimationTimeTicks(float TimeInSeconds, int AnimationIndex)
+{
+    float TicksPerSecond = (float)(m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond != 0 ? m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond : 25.0f);
+    float TimeInTicks = TimeInSeconds * TicksPerSecond;
+    // we need to use the integral part of mDuration for the total length of the animation
+    float Duration = 0.0f;
+    float fraction = modf((float)m_pScene->mAnimations[AnimationIndex]->mDuration, &Duration);
+    float AnimationTimeTicks = fmod(TimeInTicks, Duration);
+    return AnimationTimeTicks;
 }
 
 
