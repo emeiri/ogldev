@@ -127,18 +127,15 @@ vec3 CalcShadowCoords()
 
 float CalcShadowFactorBasic(vec3 LightDirection, vec3 Normal)
 {
-    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
-    vec2 UVCoords;
-    UVCoords.x = 0.5 * ProjCoords.x + 0.5;
-    UVCoords.y = 0.5 * ProjCoords.y + 0.5;
-    float z = 0.5 * ProjCoords.z + 0.5;
-    float Depth = texture(gShadowMap, UVCoords).x;
+    vec3 ShadowCoords = CalcShadowCoords();
+
+    float Depth = texture(gShadowMap, ShadowCoords.xy).x;
 
     float DiffuseFactor = dot(Normal, -LightDirection);
 
     float bias = mix(0.001, 0.0, DiffuseFactor);
 
-    if (Depth + bias < z)
+    if (Depth + bias < ShadowCoords.z)
         return 0.05;
     else
         return 1.0;
