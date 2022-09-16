@@ -263,14 +263,34 @@ public:
 
             case GLFW_KEY_A:
                 m_shadowMapFilterSize++;
+                printf("Shadow map filter size increased to %d\n", m_shadowMapFilterSize);
                 m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
                 break;
 
             case GLFW_KEY_Z:
                 if (m_shadowMapFilterSize > 0) {
                     m_shadowMapFilterSize--;
+                    printf("Shadow map filter size decreased to %d\n", m_shadowMapFilterSize);
+                    m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
                 }
-                m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
+                break;
+
+            case GLFW_KEY_S:
+                m_shadowMapSampleRadius++;
+                printf("Shadow map radius increased to %f\n", m_shadowMapSampleRadius);
+                m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
+                                                               m_shadowMapOffsetFilterSize,
+                                                               m_shadowMapSampleRadius);
+                break;
+
+            case GLFW_KEY_X:
+                if (m_shadowMapSampleRadius > 0) {
+                    m_shadowMapSampleRadius--;
+                    printf("Shadow map radius decrease to %f\n", m_shadowMapSampleRadius);
+                    m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
+                                                                   m_shadowMapOffsetFilterSize,
+                                                                   m_shadowMapSampleRadius);
+                }
                 break;
             }
         }
