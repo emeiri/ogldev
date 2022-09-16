@@ -127,14 +127,18 @@ void BasicCamera::SetTarget(const Vector3f& target)
 
 void BasicCamera::OnKeyboard(int Key)
 {
+    bool CameraChangedPos = false;
+
     switch (Key) {
 
     case GLFW_KEY_UP:
         m_pos += (m_target * m_speed);
+        CameraChangedPos = true;
         break;
 
     case GLFW_KEY_DOWN:
         m_pos -= (m_target * m_speed);
+        CameraChangedPos = true;
         break;
 
     case GLFW_KEY_LEFT:
@@ -143,6 +147,7 @@ void BasicCamera::OnKeyboard(int Key)
             Left.Normalize();
             Left *= m_speed;
             m_pos += Left;
+            CameraChangedPos = true;
         }
         break;
 
@@ -152,15 +157,18 @@ void BasicCamera::OnKeyboard(int Key)
             Right.Normalize();
             Right *= m_speed;
             m_pos += Right;
+            CameraChangedPos = true;
         }
         break;
 
     case GLFW_KEY_PAGE_UP:
         m_pos.y += m_speed;
+        CameraChangedPos = true;
         break;
 
     case GLFW_KEY_PAGE_DOWN:
         m_pos.y -= m_speed;
+        CameraChangedPos = true;
         break;
 
     case GLFW_KEY_KP_ADD:
@@ -175,6 +183,15 @@ void BasicCamera::OnKeyboard(int Key)
         }
         printf("Speed changed to %f\n", m_speed);
         break;
+
+    case GLFW_KEY_C:
+        printf("Camera pos: "); m_pos.Print(); printf("\n");
+        printf("Camera target: "); m_target.Print(); printf("\n");
+        break;
+    }
+
+    if (CameraChangedPos) {
+        //        printf("Camera pos: "); m_pos.Print(); printf("\n");
     }
 }
 
@@ -270,6 +287,8 @@ void BasicCamera::Update()
 
     m_up = m_target.Cross(U);
     m_up.Normalize();
+
+    //    printf("Camera target: "); m_target.Print(); printf("\n");
 }
 
 
