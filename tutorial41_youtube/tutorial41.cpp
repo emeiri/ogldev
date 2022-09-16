@@ -57,7 +57,7 @@ public:
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(1.0f, -0.2f, 0.0f);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.75f, 0.0f);
 
         // Initialize an orthographic projection matrix for the directional light
         OrthoProjInfo shadowOrthoProjInfo;
@@ -79,10 +79,6 @@ public:
         cameraOrthoProjInfo.f = 100.0f;
 
         m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
-
-        m_positions[0] = Vector3f(0.0f, 1.0f, -12.0f);
-        m_positions[1] = Vector3f(0.0f, 1.0f, 0.0f);
-        m_positions[2] = Vector3f(0.0f, 1.0f, 15.0f);
     }
 
 
@@ -145,14 +141,11 @@ public:
         Vector3f Origin(0.0f, 0.0f, 0.0f);
         Vector3f Up(0.0f, 1.0f, 0.0f);
 
-        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
-            m_pMesh1->SetPosition(m_positions[i]);
-            Matrix4f World = m_pMesh1->GetWorldMatrix();
-            LightView.InitCameraTransform(Origin, m_dirLight.WorldDirection, Up);
-            Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
-            m_shadowMapTech.SetWVP(WVP);
-            m_pMesh1->Render();
-        }
+        Matrix4f World = m_pMesh1->GetWorldMatrix();
+        LightView.InitCameraTransform(Origin, m_dirLight.WorldDirection, Up);
+        Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
+        m_shadowMapTech.SetWVP(WVP);
+        m_pMesh1->Render();
     }
 
     void LightingPass()
@@ -196,35 +189,32 @@ public:
 
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
-        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
-            // Set the WVP matrix from the camera point of view
-            m_pMesh1->SetPosition(m_positions[i]);
-            Matrix4f World = m_pMesh1->GetWorldMatrix();
-            Matrix4f WVP = CameraProjection * CameraView * World;
-            m_lightingTech.SetWVP(WVP);
+        // Set the WVP matrix from the camera point of view
+        Matrix4f World = m_pMesh1->GetWorldMatrix();
+        Matrix4f WVP = CameraProjection * CameraView * World;
+        m_lightingTech.SetWVP(WVP);
 
-            // Set the WVP matrix from the light point of view
-            Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
-            m_lightingTech.SetLightWVP(LightWVP);
+        // Set the WVP matrix from the light point of view
+        Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
+        m_lightingTech.SetLightWVP(LightWVP);
 
-            Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
-            m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
-            m_dirLight.CalcLocalDirection(m_pMesh1->GetWorldTransform());
-            m_lightingTech.SetDirectionalLight(m_dirLight);
-            m_pMesh1->Render();
-        }
+        Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+        m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+        m_dirLight.CalcLocalDirection(m_pMesh1->GetWorldTransform());
+        m_lightingTech.SetDirectionalLight(m_dirLight);
+        m_pMesh1->Render();
 
         /////////////////////////
         // Render the terrain
         ////////////////////////
 
         // Set the WVP matrix from the camera point of view
-        Matrix4f World = m_pTerrain->GetWorldMatrix();
-        Matrix4f WVP = CameraProjection * CameraView * World;
+        World = m_pTerrain->GetWorldMatrix();
+        WVP = CameraProjection * CameraView * World;
         m_lightingTech.SetWVP(WVP);
 
         // Set the WVP matrix from the light point of view
-        Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
+        LightWVP = m_lightOrthoProjMatrix * LightView * World;
         m_lightingTech.SetLightWVP(LightWVP);
 
         // Update the shader with the local space pos/dir of the spot light
@@ -233,7 +223,7 @@ public:
         m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
 
         // Update the shader with the local space pos of the camera
-        Vector3f CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+        CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
         m_pTerrain->Render();
@@ -328,8 +318,8 @@ private:
 
     void InitCamera()
     {
-        m_cameraPos = Vector3f(3.0f, 3.0f, -15.0f);
-        m_cameraTarget = Vector3f(-0.2f, -0.2f, 1.0f);
+        m_cameraPos = Vector3f(-24.0f, 10.0f, -31.0f);
+        m_cameraTarget = Vector3f(0.5f, -0.2f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -378,12 +368,12 @@ private:
         //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
 
-            m_pMesh1->LoadMesh("../Content/box.obj");
-        //        m_pMesh1->SetPosition(0.0f, 1.0f, 0.0f);
+        m_pMesh1->LoadMesh("../Content/dragon.obj");
+        m_pMesh1->SetPosition(-15.0f, 0.0f, 0.0f);
+        m_pMesh1->SetRotation(0.0f, 90.0f, 0.0f);
 
         //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
         //        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
-        //        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
@@ -406,7 +396,6 @@ private:
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
-    Vector3f m_positions[3];
     bool m_isOrthoCamera = false;
     ShadowMapOffsetTexture* m_pShadowMapOffsetTexture = NULL;
     float m_shadowMapSampleRadius = 7.0f;
