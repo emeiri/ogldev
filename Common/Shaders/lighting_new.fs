@@ -125,7 +125,27 @@ vec3 CalcShadowCoords()
 }
 
 
-float CalcShadowFactorSimple(vec3 LightDirection, vec3 Normal)
+float CalcShadowFactorBasic(vec3 LightDirection, vec3 Normal)
+{
+    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec2 UVCoords;
+    UVCoords.x = 0.5 * ProjCoords.x + 0.5;
+    UVCoords.y = 0.5 * ProjCoords.y + 0.5;
+    float z = 0.5 * ProjCoords.z + 0.5;
+    float Depth = texture(gShadowMap, UVCoords).x;
+
+    float DiffuseFactor = dot(Normal, -LightDirection);
+
+    float bias = mix(0.001, 0.0, DiffuseFactor);
+
+    if (Depth + bias < z)
+        return 0.05;
+    else
+        return 1.0;
+}
+
+
+float CalcShadowFactorPCF(vec3 LightDirection, vec3 Normal)
 {
     if (gShadowMapWidth == 0 || gShadowMapHeight == 0) {
         return 1.0;
@@ -237,10 +257,12 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
 {
     float ShadowFactor = 0.0;
 
-    if (gShadowMapRandomRadius == 0.0) {
-        ShadowFactor = CalcShadowFactorSimple(LightDirection, Normal);
-    } else {
+    if (gShadowMapRandomRadius > 0.0) {
         ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);
+    } else if (gShadowMapFilterSize > 0){
+        ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);
+    } else {
+        ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
     }
 
     return ShadowFactor;

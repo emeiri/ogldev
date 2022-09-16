@@ -257,16 +257,20 @@ public:
                 }
                 break;
 
-            case GLFW_KEY_A:
-                m_dirLight.AmbientIntensity += ATTEN_STEP;
-                break;
-
-            case GLFW_KEY_D:
-                m_dirLight.DiffuseIntensity -= ATTEN_STEP;
-                break;
-
             case GLFW_KEY_P:
                 m_isOrthoCamera = !m_isOrthoCamera;
+                break;
+
+            case GLFW_KEY_A:
+                m_shadowMapFilterSize++;
+                m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
+                break;
+
+            case GLFW_KEY_Z:
+                if (m_shadowMapFilterSize > 0) {
+                    m_shadowMapFilterSize--;
+                }
+                m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
                 break;
             }
         }
@@ -342,7 +346,7 @@ private:
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapSize(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
-        m_lightingTech.SetShadowMapFilterSize(4);
+        m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
         m_lightingTech.SetShadowMapOffsetTextureUnit(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX);
 
         m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
@@ -398,7 +402,8 @@ private:
     bool m_cameraOnLight = false;
     bool m_isOrthoCamera = false;
     ShadowMapOffsetTexture* m_pShadowMapOffsetTexture = NULL;
-    float m_shadowMapSampleRadius = 7.0f;
+    int m_shadowMapFilterSize = 0;
+    float m_shadowMapSampleRadius = 0.0f;
     int m_shadowMapOffsetTextureSize = 8;
     int m_shadowMapOffsetFilterSize = 8;
 };
