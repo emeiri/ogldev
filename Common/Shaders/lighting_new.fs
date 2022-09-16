@@ -148,7 +148,8 @@ float CalcShadowFactorPCF(vec3 LightDirection, vec3 Normal)
         return 1.0;
     }
 
-    vec3 ShadowCoords = CalcShadowCoords();
+    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
 
     float DiffuseFactor = dot(Normal, -LightDirection);
     float bias = mix(0.001, 0.0, DiffuseFactor);
