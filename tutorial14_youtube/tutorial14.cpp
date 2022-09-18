@@ -42,7 +42,7 @@ Camera GameCamera;
 float FOV = 45.0f;
 float zNear = 1.0f;
 float zFar = 10.0f;
-PersProjInfo PersProjInfo = { FOV, WINDOW_WIDTH, WINDOW_HEIGHT, zNear, zFar };
+PersProjInfo persProjInfo = { FOV, WINDOW_WIDTH, WINDOW_HEIGHT, zNear, zFar };
 
 
 static void RenderSceneCB()
@@ -62,7 +62,7 @@ static void RenderSceneCB()
     Matrix4f View = GameCamera.GetMatrix();
 
     Matrix4f Projection;
-    Projection.InitPersProjTransform(PersProjInfo);
+    Projection.InitPersProjTransform(persProjInfo);
 
     Matrix4f WVP = Projection * View * World;
 
