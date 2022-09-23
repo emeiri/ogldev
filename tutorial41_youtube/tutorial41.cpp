@@ -384,26 +384,16 @@ private:
     void InitMesh()
     {
         m_pMesh1 = new BasicMesh();
-
-        //        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
-        //            printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
-        //            exit(0);
-        //        }
-        //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
-
         m_pMesh1->LoadMesh("../Content/dragon.obj");
         m_pMesh1->SetPosition(-15.0f, 0.0f, 0.0f);
         m_pMesh1->SetRotation(0.0f, 90.0f, 0.0f);
-
-        //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
-        //        m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
             printf("Error loading mesh ../Content/box_terrain.obj\n");
             exit(0);
         }
+
         m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
     }
 
@@ -424,7 +414,7 @@ private:
     ShadowMapOffsetTexture* m_pShadowMapOffsetTexture = NULL;
     int m_shadowMapFilterSize = 0;
     float m_shadowMapSampleRadius = 0.0f;
-    int m_shadowMapOffsetTextureSize = 8;
+    int m_shadowMapOffsetTextureSize = 16;
     int m_shadowMapOffsetFilterSize = 8;
 };
 
