@@ -125,6 +125,7 @@ public:
     void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     virtual void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
+    void SetColorAdd(const Vector4f& ColorAdd);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
     virtual void ControlSpecularExponent(bool IsEnabled);
@@ -162,6 +163,7 @@ private:
     GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumSpotLightsLoc = INVALID_UNIFORM_LOCATION;
     GLuint ColorModLocation = INVALID_UNIFORM_LOCATION;
+    GLuint ColorAddLocation = INVALID_UNIFORM_LOCATION;
     GLuint EnableRimLightLoc = INVALID_UNIFORM_LOCATION;
     GLuint EnableCellShadingLoc = INVALID_UNIFORM_LOCATION;
     GLuint EnableSpecularExponent = INVALID_UNIFORM_LOCATION;

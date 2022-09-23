@@ -94,6 +94,7 @@ bool LightingTechnique::InitCommon()
     NumPointLightsLoc = GetUniformLocation("gNumPointLights");
     NumSpotLightsLoc = GetUniformLocation("gNumSpotLights");
     ColorModLocation = GetUniformLocation("gColorMod");
+    ColorAddLocation = GetUniformLocation("gColorAdd");
     EnableRimLightLoc = GetUniformLocation("gRimLightEnabled");
     EnableCellShadingLoc = GetUniformLocation("gCellShadingEnabled");
     EnableSpecularExponent = GetUniformLocation("gEnableSpecularExponent");
@@ -139,7 +140,9 @@ bool LightingTechnique::InitCommon()
         ExpFogDensityLoc == INVALID_UNIFORM_LOCATION ||
         ExpSquaredFogEnabledLoc == INVALID_UNIFORM_LOCATION ||
         LayeredFogTopLoc == INVALID_UNIFORM_LOCATION ||
-        FogTimeLoc == INVALID_UNIFORM_LOCATION) {
+        FogTimeLoc == INVALID_UNIFORM_LOCATION ||
+        ColorModLocation == INVALID_UNIFORM_LOCATION ||
+        ColorAddLocation == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
@@ -408,9 +411,15 @@ void LightingTechnique::UpdateSpotLightsPosAndDir(unsigned int NumLights, const 
 }
 
 
-void LightingTechnique::SetColorMod(const Vector4f& ColorMod)
+void LightingTechnique::SetColorMod(const Vector4f& Color)
 {
-    glUniform4f(ColorModLocation, ColorMod.x, ColorMod.y, ColorMod.z, ColorMod.w);
+    glUniform4f(ColorModLocation, Color.x, Color.y, Color.z, Color.w);
+}
+
+
+void LightingTechnique::SetColorAdd(const Vector4f& Color)
+{
+    glUniform4f(ColorAddLocation, Color.x, Color.y, Color.z, Color.w);
 }
 
 

@@ -73,6 +73,7 @@ uniform float gShadowMapRandomRadius = 0.0;
 uniform vec3 gCameraLocalPos;
 uniform vec3 gCameraWorldPos;
 uniform vec4 gColorMod = vec4(1);
+uniform vec4 gColorAdd = vec4(0);
 uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
@@ -493,5 +494,7 @@ void main()
         TempColor = mix(vec4(gFogColor, 1.0), TempColor, FogFactor);
     }
 
-    FragColor =  TempColor * gColorMod * 2.0;
+    // I'm using gColorMod and gColorAdd to enhance the color in
+    // my youtube thumbnails. They are not an integral part of the lighting equation.
+    FragColor =  TempColor * gColorMod + gColorAdd;
 }
