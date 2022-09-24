@@ -52,8 +52,8 @@ public:
 
     void GetBoneTransformsBlended(float AnimationTimeSec,
                                   vector<Matrix4f>& Transforms,
-                                  int StartAnimIndex,
-                                  int EndAnimIndex,
+                                  unsigned int StartAnimIndex,
+                                  unsigned int EndAnimIndex,
                                   float BlendFactor);
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4
@@ -113,11 +113,14 @@ private:
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
     const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
-    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, int AnimationIndex);
+    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, unsigned int AnimationIndex);
+    void ReadNodeHierarchyBlended(const aiNode* pNode, const Matrix4f& ParentTransform, const vector<Matrix4f>& BlendedLocalTransforms);
     void MarkRequiredNodesForBone(const aiBone* pBone);
     void InitializeRequiredNodeMap(const aiNode* pNode);
-    float CalcAnimationTimeTicks(float TimeInSeconds, int AnimationIndex);
-
+    float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
+    /*void CalculateBlendedBoneTransform(aiAnimation* pAnimationBase, aiAnimation* pAnimationLayer,
+                                       float currentTimeBase, float currentTimeLayered,
+                                       const Matrix4f& parentTransform, float BlendFactor);*/
     GLuint m_boneBuffer = 0;
 
     // Temporary space for vertex stuff before we load them into the GPU
@@ -128,12 +131,20 @@ private:
     struct BoneInfo
     {
         Matrix4f OffsetMatrix;
+        Matrix4f LocalTransformation;
         Matrix4f FinalTransformation;
+        aiVector3D Scaling;
+        aiQuaternion Rotation;
+        aiVector3D Translation;
 
         BoneInfo(const Matrix4f& Offset)
         {
             OffsetMatrix = Offset;
+            LocalTransformation.SetZero();
             FinalTransformation.SetZero();
+            Scaling = aiVector3D(0.0f, 0.0f, 0.0f);
+            Rotation = aiQuaternion(0.0f, 0.0f, 0.0f, 0.0f);
+            Translation = aiVector3D(0.0f, 0.0f, 0.0f);
         }
     };
 

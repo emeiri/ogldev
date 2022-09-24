@@ -101,7 +101,16 @@ public:
         float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
         AnimationTimeSec -= TotalPauseTimeSec;
 
-        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
+        static float BlendFactor = 0.0f;
+        static float BlendDirection = 0.001f;
+        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, BlendFactor);
+        BlendFactor += BlendDirection;
+        if (BlendFactor > 1.0f || BlendFactor < 0.0f) {
+            BlendDirection *= -1.0f;
+        }
+
+        printf("%f\n", BlendFactor);
+        //m_phongRenderer.RenderAnimation(m_pMesh, 0.0f, 0);
     }
 
 
@@ -213,7 +222,7 @@ private:
     {
         m_pMesh = new SkinnedMesh();
         m_pMesh->LoadMesh("../Assets/iclone-7-raptoid-mascot/scene.gltf");
-        m_pMesh->SetRotation(-90.0f, 0.0f, 0.0f);
+        m_pMesh->SetRotation(90.0f, 0.0f, 0.0f);
         m_pMesh->SetPosition(0.0f, 0.0f, 55.0f);
         m_pMesh->SetScale(0.1f);
     }
