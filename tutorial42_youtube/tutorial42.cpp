@@ -102,14 +102,31 @@ public:
         AnimationTimeSec -= TotalPauseTimeSec;
 
         static float BlendFactor = 0.0f;
-        static float BlendDirection = 0.001f;
+        static float BlendDirection = 0.0001f;
+
         m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, BlendFactor);
+
         BlendFactor += BlendDirection;
+
+        if (BlendDirection > 0.0f) {
+            if (BlendFactor >= 0.9f || BlendFactor <= 0.1f) {
+                BlendDirection = 0.0002f;
+            } else {
+                BlendDirection = 0.001f;
+            }
+        } else {
+            if (BlendFactor >= 0.9f || BlendFactor <= 0.1f) {
+                BlendDirection = -0.0002f;
+            } else {
+                BlendDirection = -0.001f;
+            }
+        }
+
         if (BlendFactor > 1.0f || BlendFactor < 0.0f) {
             BlendDirection *= -1.0f;
         }
 
-        printf("%f\n", BlendFactor);
+        printf("%f %f\n", BlendFactor, BlendDirection);
         //m_phongRenderer.RenderAnimation(m_pMesh, 0.0f, 0);
     }
 
