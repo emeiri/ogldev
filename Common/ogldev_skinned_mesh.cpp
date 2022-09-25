@@ -283,15 +283,13 @@ void SkinnedMesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTi
 }
 
 
-void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, unsigned int AnimationIndex)
+void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation)
 {
     string NodeName(pNode->mName.data);
 
-    const aiAnimation* pAnimation = m_pScene->mAnimations[AnimationIndex];
-
     Matrix4f NodeTransformation(pNode->mTransformation);
 
-    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
+    const aiNodeAnim* pNodeAnim = FindNodeAnim(Animation, NodeName);
     aiVector3D Scaling;
     aiQuaternion RotationQ;
     aiVector3D Translation;
@@ -322,10 +320,6 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 
     if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
         uint BoneIndex = m_BoneNameToIndexMap[NodeName];
-        m_BoneInfo[BoneIndex].LocalTransformation = NodeTransformation;
-        m_BoneInfo[BoneIndex].Scaling = Scaling;
-        m_BoneInfo[BoneIndex].Rotation = RotationQ;
-        m_BoneInfo[BoneIndex].Translation = Translation;
         m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
     }
 
@@ -340,21 +334,57 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
         }
 
         if (it->second.isRequired) {
-            ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, AnimationIndex);
+            ReadNodeHierarchy(AnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, Animation);
         }
     }
 }
 
 
-void SkinnedMesh::ReadNodeHierarchyBlended(const aiNode* pNode, const Matrix4f& ParentTransform, const vector<Matrix4f>& BlendedLocalTransforms)
+void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
+                                           const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor)
 {
     string NodeName(pNode->mName.data);
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
-    if (m_BoneNameToIndexMap.find(NodeName) != m_BoneNameToIndexMap.end()) {
-        uint BoneIndex = m_BoneNameToIndexMap[NodeName];
-        NodeTransformation = BlendedLocalTransforms[BoneIndex];
+    const aiNodeAnim* pStartNodeAnim = FindNodeAnim(StartAnimation, NodeName);
+
+    LocalTransform StartTransform;
+
+    if (pStartNodeAnim) {
+        CalcLocalTransform(StartTransform, StartAnimationTimeTicks, pStartNodeAnim);
+    } else {
+        //        printf("%s\n", NodeName.c_str());
+        //        NodeTransformation.Print();
+    }
+
+    LocalTransform EndTransform;
+
+    const aiNodeAnim* pEndNodeAnim = FindNodeAnim(EndAnimation, NodeName);
+
+    if ((pStartNodeAnim && !pEndNodeAnim) || (!pStartNodeAnim && pEndNodeAnim)) {
+        printf("On the node %s there is an animation node for only one of the start/end animations.\n", NodeName.c_str());
+        printf("This case is not supported\n");
+        exit(0);
+    }
+
+    if (pEndNodeAnim) {
+        CalcLocalTransform(EndTransform, EndAnimationTimeTicks, pEndNodeAnim);
+    }
+
+    if (pStartNodeAnim && pEndNodeAnim) {
+        const aiQuaternion& Rot0 = StartTransform.Rotation;
+        const aiQuaternion& Rot1 = EndTransform.Rotation;
+        aiQuaternion BlendedRot;
+        aiQuaternion::Interpolate(BlendedRot, Rot0, Rot1, BlendFactor);
+        Matrix4f RotationM = Matrix4f(BlendedRot.GetMatrix());
+
+        const aiVector3D& Pos0 = StartTransform.Translation;
+        const aiVector3D& Pos1 = EndTransform.Translation;
+        aiVector3D BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
+        Matrix4f TranslationM;
+        TranslationM.InitTranslationTransform(BlendedTranslation.x, BlendedTranslation.y, BlendedTranslation.z);
+        NodeTransformation = TranslationM * RotationM;
     }
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
@@ -375,9 +405,17 @@ void SkinnedMesh::ReadNodeHierarchyBlended(const aiNode* pNode, const Matrix4f& 
         }
 
         if (it->second.isRequired) {
-            ReadNodeHierarchyBlended(pNode->mChildren[i], GlobalTransformation, BlendedLocalTransforms);
+            ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, StartAnimation, EndAnimation, BlendFactor);
         }
     }
+}
+
+
+void SkinnedMesh::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+{
+    CalcInterpolatedScaling(Transform.Scaling, AnimationTimeTicks, pNodeAnim);
+    CalcInterpolatedRotation(Transform.Rotation, AnimationTimeTicks, pNodeAnim);
+    CalcInterpolatedPosition(Transform.Translation, AnimationTimeTicks, pNodeAnim);
 }
 
 
@@ -392,8 +430,9 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
     Identity.InitIdentity();
 
     float AnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, AnimationIndex);
+    const aiAnimation& Animation = *m_pScene->mAnimations[AnimationIndex];
 
-    ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity, AnimationIndex);
+    ReadNodeHierarchy(AnimationTimeTicks, m_pScene->mRootNode, Identity, Animation);
     Transforms.resize(m_BoneInfo.size());
 
     for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
@@ -405,13 +444,43 @@ void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Trans
 }
 
 
-struct LocalTransform {
-    aiVector3D Scaling;
-    aiQuaternion Rotation;
-    aiVector3D Translation;
-};
-
 void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
+                                           vector<Matrix4f>& BlendedTransforms,
+                                           unsigned int StartAnimIndex,
+                                           unsigned int EndAnimIndex,
+                                           float BlendFactor)
+{
+    if (StartAnimIndex >= m_pScene->mNumAnimations) {
+        printf("Invalid start animation index %d, max is %d\n", StartAnimIndex, m_pScene->mNumAnimations);
+        assert(0);
+    }
+
+    if (EndAnimIndex >= m_pScene->mNumAnimations) {
+        printf("Invalid end animation index %d, max is %d\n", EndAnimIndex, m_pScene->mNumAnimations);
+        assert(0);
+    }
+
+    Matrix4f Identity;
+    Identity.InitIdentity();
+
+    float StartAnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, StartAnimIndex);
+    float EndAnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, EndAnimIndex);
+
+    const aiAnimation& StartAnimation = *m_pScene->mAnimations[StartAnimIndex];
+    const aiAnimation& EndAnimation = *m_pScene->mAnimations[EndAnimIndex];
+
+    ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
+    BlendedTransforms.resize(m_BoneInfo.size());
+
+    for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
+        BlendedTransforms[i] = m_BoneInfo[i].FinalTransformation;
+        //  m_BoneInfo[i].FinalTransformation.Print();
+    }
+
+}
+
+
+/*void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
                                            vector<Matrix4f>& BlendedTransforms,
                                            unsigned int StartAnimIndex,
                                            unsigned int EndAnimIndex,
@@ -483,7 +552,7 @@ void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
     }
 
     //    exit(0);
-}
+    }*/
 
 /*void SkinnedMesh::GetBoneTransformsBlended(float AnimationTimeSec,
                                            vector<Matrix4f>& Transforms,
@@ -591,10 +660,11 @@ float SkinnedMesh::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Anim
 }
 
 
-const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName)
+const aiNodeAnim* SkinnedMesh::FindNodeAnim(const aiAnimation&
+                                            Animation, const string& NodeName)
 {
-    for (uint i = 0 ; i < pAnimation->mNumChannels ; i++) {
-        const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
+    for (uint i = 0 ; i < Animation.mNumChannels ; i++) {
+        const aiNodeAnim* pNodeAnim = Animation.mChannels[i];
 
         if (string(pNodeAnim->mNodeName.data) == NodeName) {
             return pNodeAnim;

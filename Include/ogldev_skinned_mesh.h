@@ -112,15 +112,22 @@ private:
     uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
     uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-    const aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, const string& NodeName);
-    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, unsigned int AnimationIndex);
-    void ReadNodeHierarchyBlended(const aiNode* pNode, const Matrix4f& ParentTransform, const vector<Matrix4f>& BlendedLocalTransforms);
+    const aiNodeAnim* FindNodeAnim(const aiAnimation& Animation, const string& NodeName);
+    void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation);
+    void ReadNodeHierarchyBlended(float StartAnimationTimeTicksm, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
+                                  const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor);
     void MarkRequiredNodesForBone(const aiBone* pBone);
     void InitializeRequiredNodeMap(const aiNode* pNode);
     float CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex);
-    /*void CalculateBlendedBoneTransform(aiAnimation* pAnimationBase, aiAnimation* pAnimationLayer,
-                                       float currentTimeBase, float currentTimeLayered,
-                                       const Matrix4f& parentTransform, float BlendFactor);*/
+
+    struct LocalTransform {
+        aiVector3D Scaling;
+        aiQuaternion Rotation;
+        aiVector3D Translation;
+    };
+
+    void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
+
     GLuint m_boneBuffer = 0;
 
     // Temporary space for vertex stuff before we load them into the GPU
@@ -131,20 +138,12 @@ private:
     struct BoneInfo
     {
         Matrix4f OffsetMatrix;
-        Matrix4f LocalTransformation;
         Matrix4f FinalTransformation;
-        aiVector3D Scaling;
-        aiQuaternion Rotation;
-        aiVector3D Translation;
 
         BoneInfo(const Matrix4f& Offset)
         {
             OffsetMatrix = Offset;
-            LocalTransformation.SetZero();
             FinalTransformation.SetZero();
-            Scaling = aiVector3D(0.0f, 0.0f, 0.0f);
-            Rotation = aiQuaternion(0.0f, 0.0f, 0.0f, 0.0f);
-            Translation = aiVector3D(0.0f, 0.0f, 0.0f);
         }
     };
 
