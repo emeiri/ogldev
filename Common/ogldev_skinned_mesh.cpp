@@ -363,6 +363,12 @@ void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float 
     }
 
     if (pStartNodeAnim && pEndNodeAnim) {
+        const aiVector3D& Scale0 = StartTransform.Scaling;
+        const aiVector3D& Scale1 = EndTransform.Scaling;
+        aiVector3D BlendedScaling = (1.0f - BlendFactor) * Scale0 + Scale1 * BlendFactor;
+        Matrix4f ScalingM;
+        ScalingM.InitScaleTransform(BlendedScaling.x, BlendedScaling.y, BlendedScaling.z);
+
         const aiQuaternion& Rot0 = StartTransform.Rotation;
         const aiQuaternion& Rot1 = EndTransform.Rotation;
         aiQuaternion BlendedRot;
@@ -375,7 +381,7 @@ void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float 
         aiVector3D BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
         Matrix4f TranslationM;
         TranslationM.InitTranslationTransform(BlendedTranslation.x, BlendedTranslation.y, BlendedTranslation.z);
-        NodeTransformation = TranslationM * RotationM;
+        NodeTransformation = TranslationM * RotationM * ScalingM;
     }
 
     Matrix4f GlobalTransformation = ParentTransform * NodeTransformation;
