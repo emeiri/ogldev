@@ -104,7 +104,7 @@ public:
         static float BlendFactor = 0.0f;
         static float BlendDirection = 0.0001f;
 
-        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, BlendFactor);
+        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 1, BlendFactor);
 
         BlendFactor += BlendDirection;
 
@@ -127,7 +127,6 @@ public:
         }
 
         printf("%f %f\n", BlendFactor, BlendDirection);
-        //m_phongRenderer.RenderAnimation(m_pMesh, 0.0f, 0);
     }
 
 
