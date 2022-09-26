@@ -104,7 +104,7 @@ public:
         static float BlendFactor = 0.0f;
         static float BlendDirection = 0.0001f;
 
-        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 1, BlendFactor);
+        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, m_blendFactor);
 
         BlendFactor += BlendDirection;
 
@@ -126,7 +126,7 @@ public:
             BlendDirection *= -1.0f;
         }
 
-        printf("%f %f\n", BlendFactor, BlendDirection);
+        //        printf("%f %f\n", BlendFactor, BlendDirection);
     }
 
 
@@ -141,8 +141,23 @@ public:
 
     void KeyboardCB(uint key, int state)
     {
-        if (state == GLFW_PRESS) {
+        if (key == GLFW_KEY_UP) {
+            m_blendFactor += 0.005f;
+            if (m_blendFactor > 1.0f) {
+                m_blendFactor = 1.0f;
+            }
+            printf("%f\n", m_blendFactor);
+            return;
+        } else if (key == GLFW_KEY_DOWN) {
+            m_blendFactor -= 0.005f;
+            if (m_blendFactor < 0.0f) {
+                m_blendFactor = 0.0f;
+            }
+            printf("%f\n", m_blendFactor);
+            return;
+        }
 
+        if (state == GLFW_PRESS) {
             switch (key) {
             case GLFW_KEY_0:
                 m_animationIndex = 0;
@@ -255,6 +270,7 @@ private:
     long long m_totalPauseTime = 0;
     long long m_pauseStart = 0;
     int m_animationIndex = 0;
+    float m_blendFactor = 0.0f;
 };
 
 Tutorial42* app = NULL;
