@@ -292,23 +292,19 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
     const aiNodeAnim* pNodeAnim = FindNodeAnim(Animation, NodeName);
 
     if (pNodeAnim) {
-        // Interpolate scaling and generate scaling transformation matrix
-        aiVector3D Scaling;
-        CalcInterpolatedScaling(Scaling, AnimationTimeTicks, pNodeAnim);
-        Matrix4f ScalingM;
-        ScalingM.InitScaleTransform(Scaling.x, Scaling.y, Scaling.z);
-        //        printf("Scaling %f %f %f\n", Scaling.x, Scaling.y, Scaling.z);
-        // Interpolate rotation and generate rotation transformation matrix
-        aiQuaternion RotationQ;
-        CalcInterpolatedRotation(RotationQ, AnimationTimeTicks, pNodeAnim);
-        Matrix4f RotationM = Matrix4f(RotationQ.GetMatrix());
+        LocalTransform Transform;
+        CalcLocalTransform(Transform, AnimationTimeTicks, pNodeAnim);
 
-        // Interpolate translation and generate translation transformation matrix
-        aiVector3D Translation;
-        CalcInterpolatedPosition(Translation, AnimationTimeTicks, pNodeAnim);
+        Matrix4f ScalingM;
+        ScalingM.InitScaleTransform(Transform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
+        //        printf("Scaling %f %f %f\n", Transoform.Scaling.x, Transform.Scaling.y, Transform.Scaling.z);
+
+        Matrix4f RotationM = Matrix4f(Transform.Rotation.GetMatrix());
+
         Matrix4f TranslationM;
-        TranslationM.InitTranslationTransform(Translation.x, Translation.y, Translation.z);
-        //        printf("Translation %f %f %f\n", Translation.x, Translation.y, Translation.z);
+        TranslationM.InitTranslationTransform(Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
+        //        printf("Translation %f %f %f\n", Transform.Translation.x, Transform.Translation.y, Transform.Translation.z);
+
         // Combine the above transformations
         NodeTransformation = TranslationM * RotationM * ScalingM;
     }
