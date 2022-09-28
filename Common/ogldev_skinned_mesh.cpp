@@ -363,24 +363,28 @@ void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float 
     }
 
     if (pStartNodeAnim && pEndNodeAnim) {
+        // Interpolate scaling
         const aiVector3D& Scale0 = StartTransform.Scaling;
         const aiVector3D& Scale1 = EndTransform.Scaling;
         aiVector3D BlendedScaling = (1.0f - BlendFactor) * Scale0 + Scale1 * BlendFactor;
         Matrix4f ScalingM;
         ScalingM.InitScaleTransform(BlendedScaling.x, BlendedScaling.y, BlendedScaling.z);
 
+        // Interpolate rotation
         const aiQuaternion& Rot0 = StartTransform.Rotation;
         const aiQuaternion& Rot1 = EndTransform.Rotation;
         aiQuaternion BlendedRot;
         aiQuaternion::Interpolate(BlendedRot, Rot0, Rot1, BlendFactor);
         Matrix4f RotationM = Matrix4f(BlendedRot.GetMatrix());
 
-        // TODO: scaling interpolation
+        // Interpolate translation
         const aiVector3D& Pos0 = StartTransform.Translation;
         const aiVector3D& Pos1 = EndTransform.Translation;
         aiVector3D BlendedTranslation = (1.0f - BlendFactor) * Pos0 + Pos1 * BlendFactor;
         Matrix4f TranslationM;
         TranslationM.InitTranslationTransform(BlendedTranslation.x, BlendedTranslation.y, BlendedTranslation.z);
+
+        // Combine it all
         NodeTransformation = TranslationM * RotationM * ScalingM;
     }
 
@@ -454,6 +458,11 @@ void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
         assert(0);
     }
 
+    if ((BlendFactor < 0.0f) || (BlendFactor > 1.0f)) {
+        printf("Invalid blend factor %f\n", BlendFactor);
+        assert(0);
+    }
+
     Matrix4f Identity;
     Identity.InitIdentity();
 
@@ -464,6 +473,7 @@ void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
     const aiAnimation& EndAnimation = *m_pScene->mAnimations[EndAnimIndex];
 
     ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
+
     BlendedTransforms.resize(m_BoneInfo.size());
 
     for (uint i = 0 ; i < m_BoneInfo.size() ; i++) {
