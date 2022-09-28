@@ -113,13 +113,17 @@ void Matrix4f::InitRotateTransformZYX(float RotateX, float RotateY, float Rotate
     *this = rx * ry * rz;
 }
 
+//
+// The following rotation matrices are for a left handed coordinate system.
+// https://butterflyofdream.wordpress.com/2016/07/05/converting-rotation-matrices-of-left-handed-coordinate-system/
+//
 
 void Matrix4f::InitRotationX(float x)
 {
-    m[0][0] = 1.0f; m[0][1] = 0.0f   ; m[0][2] = 0.0f    ; m[0][3] = 0.0f;
-    m[1][0] = 0.0f; m[1][1] = cosf(x); m[1][2] = -sinf(x); m[1][3] = 0.0f;
-    m[2][0] = 0.0f; m[2][1] = sinf(x); m[2][2] = cosf(x) ; m[2][3] = 0.0f;
-    m[3][0] = 0.0f; m[3][1] = 0.0f   ; m[3][2] = 0.0f    ; m[3][3] = 1.0f;
+    m[0][0] = 1.0f; m[0][1] = 0.0f   ;  m[0][2] = 0.0f    ; m[0][3] = 0.0f;
+    m[1][0] = 0.0f; m[1][1] = cosf(x);  m[1][2] = sinf(x);  m[1][3] = 0.0f;
+    m[2][0] = 0.0f; m[2][1] = -sinf(x); m[2][2] = cosf(x) ; m[2][3] = 0.0f;
+    m[3][0] = 0.0f; m[3][1] = 0.0f   ;  m[3][2] = 0.0f    ; m[3][3] = 1.0f;
 }
 
 
@@ -134,10 +138,10 @@ void Matrix4f::InitRotationY(float y)
 
 void Matrix4f::InitRotationZ(float z)
 {
-    m[0][0] = cosf(z); m[0][1] = -sinf(z); m[0][2] = 0.0f; m[0][3] = 0.0f;
-    m[1][0] = sinf(z); m[1][1] = cosf(z) ; m[1][2] = 0.0f; m[1][3] = 0.0f;
-    m[2][0] = 0.0f   ; m[2][1] = 0.0f    ; m[2][2] = 1.0f; m[2][3] = 0.0f;
-    m[3][0] = 0.0f   ; m[3][1] = 0.0f    ; m[3][2] = 0.0f; m[3][3] = 1.0f;
+    m[0][0] = cosf(z);  m[0][1] = sinf(z);  m[0][2] = 0.0f; m[0][3] = 0.0f;
+    m[1][0] = -sinf(z); m[1][1] = cosf(z) ; m[1][2] = 0.0f; m[1][3] = 0.0f;
+    m[2][0] = 0.0f   ;  m[2][1] = 0.0f    ; m[2][2] = 1.0f; m[2][3] = 0.0f;
+    m[3][0] = 0.0f   ;  m[3][1] = 0.0f    ; m[3][2] = 0.0f; m[3][3] = 1.0f;
 }
 
 
