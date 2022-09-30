@@ -126,6 +126,30 @@ public:
             BlendDirection *= -1.0f;
         }
 
+        /////////////////////////
+        // Render the terrain
+        ////////////////////////
+
+        // Set the WVP matrix from the camera point of view
+        //        World = m_pTerrain->GetWorldMatrix();
+        //        WVP = CameraProjection * CameraView * World;
+        //        m_lightingTech.SetWVP(WVP);
+
+        // Set the WVP matrix from the light point of view
+        //        LightWVP = m_lightOrthoProjMatrix * LightView * World;
+        //        m_lightingTech.SetLightWVP(LightWVP);
+
+        // Update the shader with the local space pos/dir of the spot light
+        //        m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
+        //        m_lightingTech.SetDirectionalLight(m_dirLight);
+        //        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
+
+        // Update the shader with the local space pos of the camera
+        //        CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+        //        m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+
+        m_phongRenderer.Render(m_pTerrain);
+
         //        printf("%f %f\n", BlendFactor, BlendDirection);
     }
 
@@ -141,14 +165,14 @@ public:
 
     void KeyboardCB(uint key, int state)
     {
-        if (key == GLFW_KEY_UP) {
+        if (key == GLFW_KEY_A) {
             m_blendFactor += 0.005f;
             if (m_blendFactor > 1.0f) {
                 m_blendFactor = 1.0f;
             }
             printf("%f\n", m_blendFactor);
             return;
-        } else if (key == GLFW_KEY_DOWN) {
+        } else if (key == GLFW_KEY_Z) {
             m_blendFactor -= 0.005f;
             if (m_blendFactor < 0.0f) {
                 m_blendFactor = 0.0f;
@@ -234,7 +258,7 @@ private:
 
         float FOV = 45.0f;
         float zNear = 0.1f;
-        float zFar = 100.0f;
+        float zFar = 1000.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
@@ -254,14 +278,21 @@ private:
         m_pMesh = new SkinnedMesh();
         m_pMesh->LoadMesh("../Assets/iclone-7-raptoid-mascot/scene.gltf");
         m_pMesh->SetRotation(90.0f, 0.0f, 0.0f);
-        m_pMesh->SetPosition(0.0f, 0.0f, 55.0f);
-        m_pMesh->SetScale(0.1f);
+        m_pMesh->SetPosition(0.0f, 0.8f, 5.0f);
+        m_pMesh->SetScale(0.05f);
+
+        m_pTerrain = new BasicMesh();
+        if (!m_pTerrain->LoadMesh("../Content/terrain_rock_boulder_cracked.obj")) {
+            printf("Error loading mesh ../Content/terrain_rock_boulder_cracked.obj");
+            exit(0);
+        }
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     PhongRenderer m_phongRenderer;
     SkinnedMesh* m_pMesh = NULL;
+    BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
     DirectionalLight m_dirLight;
     long long m_startTime = 0;
@@ -303,7 +334,7 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.1f, 0.3f, 0.1f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
