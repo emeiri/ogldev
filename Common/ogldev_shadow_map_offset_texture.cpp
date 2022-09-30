@@ -47,8 +47,8 @@ static void GenOffsetTextureData(int WindowSize, int FilterSize, std::vector<flo
                     float y = ((float)v + 0.5f + jitter()) / (float)FilterSize;
 
                     assert(Index + 1 < Data.size());
-                    Data[Index]     = sqrtf(y) * cosf(2 * M_PI * x);
-                    Data[Index + 1] = sqrtf(y) * sinf(2 * M_PI * x);
+                    Data[Index]     = sqrtf(y) * cosf(2 * (float)M_PI * x);
+                    Data[Index + 1] = sqrtf(y) * sinf(2 * (float)M_PI * x);
 
                     Index += 2;
                 }

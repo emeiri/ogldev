@@ -48,7 +48,7 @@ public:
     // and updates the corresponding matrix in the vector. This must then be updated in the VS
     // to be accumulated for the final local position (see skinning.vs). The animation index
     // is an optional param which selects one of the animations.
-    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms, int AnimationIndex = 0);
+    void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms, unsigned int AnimationIndex = 0);
 
 private:
     #define MAX_NUM_BONES_PER_VERTEX 4
