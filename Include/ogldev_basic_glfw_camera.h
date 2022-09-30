@@ -53,6 +53,8 @@ public:
 
     const Matrix4f& GetProjectionMat() const { return ProjectionMat; }
 
+    void Print() const { printf("Pos "); m_pos.Print(); printf("Target "); m_target.Print(); }
+
     PersProjInfo m_persProjInfo;
 
 private:
@@ -64,7 +66,7 @@ private:
     Vector3f m_target;
     Vector3f m_up;
 
-    float m_speed = 0.1f;
+    float m_speed = 2.0f;
     int m_windowWidth;
     int m_windowHeight;
 
