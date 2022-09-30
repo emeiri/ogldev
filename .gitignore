@@ -30,3 +30,9 @@ Makefile-Release.mk
 *.vsidx
 fileList.bin
 read.lock
+*.fbx
+*.png
+*.dae
+*.zip
+*.jpeg
+*.blend
