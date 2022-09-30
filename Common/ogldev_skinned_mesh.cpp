@@ -117,7 +117,7 @@ void SkinnedMesh::InitializeRequiredNodeMap(const aiNode* pNode)
 
     m_requiredNodeMap[NodeName] = info;
 
-    for (int i = 0 ; i < pNode->mNumChildren ; i++) {
+    for (unsigned int i = 0 ; i < pNode->mNumChildren ; i++) {
         InitializeRequiredNodeMap(pNode->mChildren[i]);
     }
 }
@@ -339,7 +339,7 @@ void SkinnedMesh::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNod
 }
 
 
-void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, int AnimationIndex)
+void SkinnedMesh::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
 {
     if (AnimationIndex >= m_pScene->mNumAnimations) {
         printf("Invalid animation index %d, max is %d\n", AnimationIndex, m_pScene->mNumAnimations);
