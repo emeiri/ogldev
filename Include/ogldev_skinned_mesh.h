@@ -50,6 +50,7 @@ public:
     // is an optional param which selects one of the animations.
     void GetBoneTransforms(float AnimationTimeSec, vector<Matrix4f>& Transforms, unsigned int AnimationIndex = 0);
 
+    // Same as above but this one blends two animations together based on a blending factor
     void GetBoneTransformsBlended(float AnimationTimeSec,
                                   vector<Matrix4f>& Transforms,
                                   unsigned int StartAnimIndex,

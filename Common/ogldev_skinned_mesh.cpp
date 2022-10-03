@@ -406,7 +406,8 @@ void SkinnedMesh::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float 
         }
 
         if (it->second.isRequired) {
-            ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, pNode->mChildren[i], GlobalTransformation, StartAnimation, EndAnimation, BlendFactor);
+            ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks,
+                                     pNode->mChildren[i], GlobalTransformation, StartAnimation, EndAnimation, BlendFactor);
         }
     }
 }
@@ -463,14 +464,14 @@ void SkinnedMesh::GetBoneTransformsBlended(float TimeInSeconds,
         assert(0);
     }
 
-    Matrix4f Identity;
-    Identity.InitIdentity();
-
     float StartAnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, StartAnimIndex);
     float EndAnimationTimeTicks = CalcAnimationTimeTicks(TimeInSeconds, EndAnimIndex);
 
     const aiAnimation& StartAnimation = *m_pScene->mAnimations[StartAnimIndex];
     const aiAnimation& EndAnimation = *m_pScene->mAnimations[EndAnimIndex];
+
+    Matrix4f Identity;
+    Identity.InitIdentity();
 
     ReadNodeHierarchyBlended(StartAnimationTimeTicks, EndAnimationTimeTicks, m_pScene->mRootNode, Identity, StartAnimation, EndAnimation, BlendFactor);
 

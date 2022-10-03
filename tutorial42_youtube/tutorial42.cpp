@@ -92,6 +92,13 @@ public:
 
         m_pGameCamera->OnRender();
 
+        static float foo = 0.0f;
+        foo += 0.003f;
+
+        //Vector3f CameraTarget = m_pMesh->GetPosition() - m_pGameCamera->GetPos();
+        //m_pGameCamera->SetPosition(45.0f * sinf(foo), 12.0f, 45.0 * cosf(foo));
+        //m_pGameCamera->SetTarget(CameraTarget);
+
         if (m_runAnimation) {
             m_currentTime = GetCurrentTimeMillis();
         }
@@ -105,6 +112,7 @@ public:
         static float BlendDirection = 0.0001f;
 
         m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, m_blendFactor);
+        //m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
 
         BlendFactor += BlendDirection;
 
@@ -126,31 +134,13 @@ public:
             BlendDirection *= -1.0f;
         }
 
-        /////////////////////////
-        // Render the terrain
-        ////////////////////////
-
-        // Set the WVP matrix from the camera point of view
-        //        World = m_pTerrain->GetWorldMatrix();
-        //        WVP = CameraProjection * CameraView * World;
-        //        m_lightingTech.SetWVP(WVP);
-
-        // Set the WVP matrix from the light point of view
-        //        LightWVP = m_lightOrthoProjMatrix * LightView * World;
-        //        m_lightingTech.SetLightWVP(LightWVP);
-
-        // Update the shader with the local space pos/dir of the spot light
-        //        m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
-        //        m_lightingTech.SetDirectionalLight(m_dirLight);
-        //        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
-
-        // Update the shader with the local space pos of the camera
-        //        CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
-        //        m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+        if (BlendFactor < 0.0f) {
+            BlendFactor = 0.0f;
+        } else if (BlendFactor > 1.0f) {
+            BlendFactor = 1.0f;
+        }
 
         m_phongRenderer.Render(m_pTerrain);
-
-        //        printf("%f %f\n", BlendFactor, BlendDirection);
     }
 
 
@@ -252,7 +242,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 0.0f, 0.0f);
+        Vector3f Pos(0.0f, 5.0f, -30.0f);
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -278,7 +268,7 @@ private:
         m_pMesh = new SkinnedMesh();
         m_pMesh->LoadMesh("../Assets/iclone-7-raptoid-mascot/scene.gltf");
         m_pMesh->SetRotation(90.0f, 0.0f, 0.0f);
-        m_pMesh->SetPosition(0.0f, 0.8f, 5.0f);
+        m_pMesh->SetPosition(0.0f, 1.2f, 0.0f);
         m_pMesh->SetScale(0.05f);
 
         m_pTerrain = new BasicMesh();
@@ -334,7 +324,7 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.1f, 0.3f, 0.1f, 0.0f);
+    glClearColor(0.1f, 0.2f, 0.1f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
