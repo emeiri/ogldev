@@ -81,6 +81,16 @@ bool Texture::Load()
 }
 
 
+void Texture::Load(const std::string& Filename)
+{
+    m_fileName = Filename;
+
+    if (!Load()) {
+        exit(0);
+    }
+}
+
+
 void Texture::LoadInternal(void* image_data)
 {
     glGenTextures(1, &m_textureObj);

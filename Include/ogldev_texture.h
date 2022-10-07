@@ -42,6 +42,8 @@ public:
 
     void Load(u32 BufferSize, void* pData);
 
+    void Load(const std::string& Filename);
+
     // Must be called at least once for the specific texture unit
     void Bind(GLenum TextureUnit);
 
