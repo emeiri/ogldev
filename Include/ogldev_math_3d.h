@@ -41,6 +41,7 @@
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
 
 float RandomFloat();
+float RandomFloatRange(float Start, float End);
 
 struct Vector2i
 {

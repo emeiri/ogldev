@@ -410,6 +410,21 @@ float RandomFloat()
 }
 
 
+float RandomFloatRange(float Start, float End)
+{
+    if (End == Start) {
+        printf("Invalid random range: (%f, %f)\n", Start, End);
+        exit(0);
+    }
+
+    float Delta = End - Start;
+
+    float RandomValue = RandomFloat() * Delta + Start;
+
+    return RandomValue;
+}
+
+
 void CalcTightLightProjection(const Matrix4f& CameraView,        // in
                               const Vector3f& LightDir,          // in
                               const PersProjInfo& persProjInfo,  // in
