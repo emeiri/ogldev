@@ -49,6 +49,24 @@ struct Vector2i
     int y;
 };
 
+struct Vector3i
+{
+    union {
+        float x;
+        float r;
+    };
+
+    union {
+        float y;
+        float g;
+    };
+
+    union {
+        float z;
+        float b;
+    };
+};
+
 struct Vector2f
 {
     float x;
@@ -64,6 +82,15 @@ struct Vector2f
         y = _y;
     }
 };
+
+
+inline Vector2f operator*(const Vector2f& l, float f)
+{
+    Vector2f Ret(l.x * f, l.y * f);
+
+    return Ret;
+}
+
 
 struct Vector4f;
 
