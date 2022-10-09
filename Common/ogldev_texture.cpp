@@ -91,6 +91,16 @@ void Texture::Load(const std::string& Filename)
 }
 
 
+void Texture::LoadRaw(int Width, int Height, int BPP, unsigned char* pData)
+{
+    m_imageWidth = Width;
+    m_imageHeight = Height;
+    m_imageBPP = BPP;
+
+    LoadInternal(pData);
+}
+
+
 void Texture::LoadInternal(void* image_data)
 {
     glGenTextures(1, &m_textureObj);

@@ -40,9 +40,11 @@ public:
     // Should be called once to load the texture
     bool Load();
 
-    void Load(u32 BufferSize, void* pData);
+    void Load(unsigned int BufferSize, void* pData);
 
     void Load(const std::string& Filename);
+
+    void LoadRaw(int Width, int Height, int BPP, unsigned char* pData);
 
     // Must be called at least once for the specific texture unit
     void Bind(GLenum TextureUnit);
