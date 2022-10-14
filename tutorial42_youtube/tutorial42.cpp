@@ -266,7 +266,7 @@ private:
     void InitMesh()
     {
         m_pMesh = new SkinnedMesh();
-        m_pMesh->LoadMesh("../Assets/iclone-7-raptoid-mascot/scene.gltf");
+        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
         m_pMesh->SetRotation(90.0f, 0.0f, 0.0f);
         m_pMesh->SetPosition(0.0f, 1.2f, 0.0f);
         m_pMesh->SetScale(0.05f);
