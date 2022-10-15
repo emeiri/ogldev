@@ -78,6 +78,7 @@ uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
+uniform bool gIsPBR = true;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -501,7 +502,19 @@ vec4 CalcPhongLighting()
     return FinalColor;
 }
 
+
+vec4 CalcPBR()
+{
+    vec4 FinalColor = vec4(0.0);
+
+    return FinalColor;
+}
+
 void main()
 {
-    FragColor = CalcPhongLighting();
+    if (gIsPBR) {
+       FragColor = CalcPBR();
+    } else {
+        FragColor = CalcPhongLighting();
+    }
 }
