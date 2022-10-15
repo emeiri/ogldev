@@ -473,7 +473,7 @@ float CalcFogFactor()
 }
 
 
-void main()
+vec4 CalcPhongLighting()
 {
     vec3 Normal = normalize(Normal0);
     vec4 TotalLight = CalcDirectionalLight(Normal);
@@ -496,5 +496,12 @@ void main()
 
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    FragColor =  TempColor * gColorMod + gColorAdd;
+    vec4 FinalColor =  TempColor * gColorMod + gColorAdd;
+
+    return FinalColor;
+}
+
+void main()
+{
+    FragColor = CalcPhongLighting();
 }
