@@ -41,6 +41,8 @@ class PhongRenderer {
 
     void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
 
+    void SetPBR(bool IsPBR);
+
     //
     // Lighting
     //
@@ -55,6 +57,7 @@ class PhongRenderer {
     void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
 
     void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
+
     //
     // Fog
     //

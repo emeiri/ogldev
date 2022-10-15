@@ -91,6 +91,20 @@ private:
 };
 
 
+struct PBRLight {
+    Vector4f PosDir;   // if w == 1 position, else direction
+    Vector3f Intensity;
+};
+
+
+struct PBRMaterial
+{
+    float Roughness;
+    bool IsMetal;
+    Vector3f Color;
+};
+
+
 class LightingTechnique : public Technique, public IRenderCallbacks
 {
 public:
@@ -136,6 +150,9 @@ public:
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
     void SetFogTime(float Time);
+    void SetPBR(bool IsPBR);
+    void SetPBRMaterial(const PBRMaterial& Material);
+    void SetPBRLight(const PBRLight& Light);
 
 protected:
 
@@ -174,6 +191,7 @@ private:
     GLuint ExpSquaredFogEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
+    GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;
@@ -216,6 +234,17 @@ private:
             GLuint Exp;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
+
+    struct {
+        GLuint PosDir;
+        GLuint Intensity;
+    } PBRLightLoc;
+
+    struct {
+        GLuint Roughness;
+        GLuint IsMetal;
+        GLuint Color;
+    } PBRMaterialLoc;
 };
 
 

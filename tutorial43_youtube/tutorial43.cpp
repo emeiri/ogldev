@@ -259,6 +259,7 @@ private:
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
+        m_phongRenderer.SetPBR(true);
     }
 
 

@@ -87,9 +87,8 @@ bool LightingTechnique::Init()
         dirLightLoc.Direction == 0xFFFFFFFF ||
         dirLightLoc.AmbientIntensity == 0xFFFFFFFF ||
         NumPointLightsLocation == INVALID_UNIFORM_LOCATION ||
-        NumSpotLightsLocation == INVALID_UNIFORM_LOCATION)
-    {
-        //        return false;
+        NumSpotLightsLocation == INVALID_UNIFORM_LOCATION) {
+        return false;
     }
 
 
