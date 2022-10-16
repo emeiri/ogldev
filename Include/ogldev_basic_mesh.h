@@ -53,6 +53,8 @@ public:
 
     const Material& GetMaterial();
 
+    PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
+
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
 protected:
