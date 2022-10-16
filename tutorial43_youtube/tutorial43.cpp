@@ -128,6 +128,8 @@ public:
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
             m_pMesh->SetPosition(m_meshData[i].Pos);
+            m_pMesh->GetPBRMaterial().Roughness = 0.43f;
+            m_pMesh->GetPBRMaterial().IsMetal = false;
             m_pMesh->GetPBRMaterial().Color = m_meshData[i].Color;
             m_phongRenderer.Render(m_pMesh);
         }
