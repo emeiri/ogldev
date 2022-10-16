@@ -549,14 +549,17 @@ float ggxDistribution(float nDotH)
 
 vec3 CalcPBR()
 {
-    vec3 l = vec3(0.0);
     vec3 LightIntensity = gPBRlight.Intensity;
-    vec3 FinalColor = vec3(0.0);
+
+    vec3 l = vec3(0.0);
 
     if (gPBRlight.PosDir.w == 0.0) {
         l = normalize(-gPBRlight.PosDir.xyz);
     } else {
-        FinalColor = vec3(0.0, 0.1, 0.0);
+        l = gPBRlight.PosDir.xyz - WorldPos0;
+        float LightToPixelDist = length(l);
+        l = normalize(l);
+        LightIntensity /= (LightToPixelDist * LightToPixelDist);
     }
 
     vec3 n = normalize(Normal0);
@@ -588,7 +591,7 @@ vec3 CalcPBR()
         DiffuseBRDF = vec3(1.0) - F;
     }
 
-    FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
+    vec3 FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
 
     return FinalColor;
 }
@@ -600,8 +603,6 @@ void main()
        vec3 PBRColor = CalcPBR();
        PBRColor = PBRColor / (PBRColor + vec3(1.0));
        FragColor = vec4(pow( PBRColor, vec3(1.0/2.2)), 1.0);
-
-
     } else {
         FragColor = CalcPhongLighting();
     }
