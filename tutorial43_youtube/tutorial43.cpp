@@ -129,10 +129,21 @@ public:
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
             m_pMesh->SetPosition(m_meshData[i].Pos);
             m_pMesh->GetPBRMaterial().Roughness = 0.43f;
-            m_pMesh->GetPBRMaterial().IsMetal = false;
+            m_pMesh->GetPBRMaterial().IsMetal = true;
             m_pMesh->GetPBRMaterial().Color = m_meshData[i].Color;
             m_phongRenderer.Render(m_pMesh);
         }
+
+        float RoughnessStep = 1.0f / ARRAY_SIZE_IN_ELEMENTS(m_meshData);
+
+        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
+            m_pMesh->SetPosition(m_meshData[i].Pos + Vector3f(0.0f, 3.0f, 0.0f));
+            m_pMesh->GetPBRMaterial().Roughness = (i + 1) * RoughnessStep;
+            m_pMesh->GetPBRMaterial().IsMetal = false;
+            m_pMesh->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
+            m_phongRenderer.Render(m_pMesh);
+        }
+
 
         BlendFactor += BlendDirection;
 
