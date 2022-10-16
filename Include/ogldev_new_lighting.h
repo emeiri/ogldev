@@ -103,6 +103,7 @@ public:
 
     static const unsigned int MAX_POINT_LIGHTS = 2;
     static const unsigned int MAX_SPOT_LIGHTS = 2;
+    static const unsigned int MAX_PBR_LIGHTS = 4;
 
     LightingTechnique();
 
@@ -144,7 +145,7 @@ public:
     void SetFogTime(float Time);
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
-    void SetPBRLight(const PBRLight& Light);
+    //    void SetPBRLight(const PBRLight& Light);
 
 protected:
 
@@ -227,10 +228,10 @@ private:
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 
-    struct {
+    /*    struct {
         GLuint PosDir;
         GLuint Intensity;
-    } PBRLightLoc;
+        } PBRLightLoc[MAX_PBR_LIGHTS];*/
 
     struct {
         GLuint Roughness;
