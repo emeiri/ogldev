@@ -97,14 +97,6 @@ struct PBRLight {
 };
 
 
-struct PBRMaterial
-{
-    float Roughness;
-    bool IsMetal;
-    Vector3f Color;
-};
-
-
 class LightingTechnique : public Technique, public IRenderCallbacks
 {
 public:
