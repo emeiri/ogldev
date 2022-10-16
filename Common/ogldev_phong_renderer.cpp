@@ -212,11 +212,9 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
     m_lightingTech.SetMaterial(pMesh->GetMaterial());
 
-    PBRMaterial Material;
-    Material.Roughness = 0.43f;
-    Material.IsMetal = false;
-    Material.Color = Vector3f(1.0f, 0.71f, 0.29f); //pMesh->GetMaterial().DiffuseColor;
-    m_lightingTech.SetPBRMaterial(Material);
+    if (m_isPBR) {
+        m_lightingTech.SetPBRMaterial(pMesh->GetPBRMaterial());
+    }
 
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
     m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
@@ -474,6 +472,8 @@ void PhongRenderer::DisableFog()
 
 void PhongRenderer::SetPBR(bool IsPBR)
 {
+    m_isPBR = IsPBR;
+
     SwitchToLightingTech();
     m_lightingTech.SetPBR(IsPBR);
 
