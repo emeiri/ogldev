@@ -595,10 +595,3 @@ void LightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
     glUniform1i(PBRMaterialLoc.IsMetal, Material.IsMetal);
     glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
 }
-
-
-/*void LightingTechnique::SetPBRLight(const PBRLight& Light)
-{
-    glUniform4f(PBRLightLoc.PosDir, Light.PosDir.x, Light.PosDir.y, Light.PosDir.z, Light.PosDir.w);
-    glUniform3f(PBRLightLoc.Intensity, Light.Intensity.r, Light.Intensity.g, Light.Intensity.b);
-    }*/

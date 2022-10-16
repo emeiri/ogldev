@@ -596,6 +596,8 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal,
 
     vec3 FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
 
+
+// TODO: add ambient
     return FinalColor;
 }
 
@@ -608,17 +610,25 @@ vec3 CalcPBRDirectionalLight(vec3 Normal)
 }
 
 
+vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
+{
+    float ShadowFactor = 1.0f;//CalcShadowFactor(gDirectionalLight.Direction, Normal);
+
+    return CalcPBRInternal(l.Base, l.WorldPos, false, Normal, ShadowFactor);
+}
+
+
 vec4 CalcPBRLighting()
 {
     vec3 Normal = normalize(Normal0);
 
     vec3 TotalLight = CalcPBRDirectionalLight(Normal);
 
-/*    for (int i = 0 ;i < gNumPointLights ;i++) {
-        TotalLight += CalcPointLight(gPointLights[i], Normal);
+    for (int i = 0 ;i < gNumPointLights ;i++) {
+        TotalLight += CalcPBRPointLight(gPointLights[i], Normal);
     }
 
-    for (int i = 0 ;i < gNumSpotLights ;i++) {
+/*    for (int i = 0 ;i < gNumSpotLights ;i++) {
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }*/
 
