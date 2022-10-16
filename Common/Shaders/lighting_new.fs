@@ -2,6 +2,7 @@
 
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
+const int MAX_PBR_LIGHTS = 4;
 
 in vec4 LightSpacePos; // required only for shadow mapping
 in vec2 TexCoord0;
@@ -93,7 +94,6 @@ uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
 uniform bool gIsPBR = true;
 uniform PBRMaterial gPBRmaterial;
-uniform PBRLight gPBRlight;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -539,6 +539,7 @@ float geomSmith(float dp)
     return dp / denom;
 }
 
+
 float ggxDistribution(float nDotH)
 {
     float alpha2 = gPBRmaterial.Roughness * gPBRmaterial.Roughness * gPBRmaterial.Roughness * gPBRmaterial.Roughness;
@@ -547,22 +548,24 @@ float ggxDistribution(float nDotH)
     return ggxdistrib;
 }
 
-vec3 CalcPBR()
+
+vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal, float ShadowFactor)
 {
-    vec3 LightIntensity = gPBRlight.Intensity;
+    vec3 LightIntensity = Light.DiffuseIntensity * Light.Color;
 
     vec3 l = vec3(0.0);
 
-    if (gPBRlight.PosDir.w == 0.0) {
-        l = normalize(-gPBRlight.PosDir.xyz);
+    if (IsDirLight) {
+        l = normalize(-PosDir.xyz);
     } else {
-        l = gPBRlight.PosDir.xyz - WorldPos0;
+        l = PosDir - WorldPos0;
         float LightToPixelDist = length(l);
         l = normalize(l);
         LightIntensity /= (LightToPixelDist * LightToPixelDist);
     }
 
-    vec3 n = normalize(Normal0);
+    // TODO: handle normal transformation
+    vec3 n = Normal;
 
     vec3 v = normalize(gCameraWorldPos - WorldPos0);
     vec3 h = normalize(v + l);
@@ -597,12 +600,40 @@ vec3 CalcPBR()
 }
 
 
+vec3 CalcPBRDirectionalLight(vec3 Normal)
+{
+    float ShadowFactor = 1.0f;//CalcShadowFactor(gDirectionalLight.Direction, Normal);
+
+    return CalcPBRInternal(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal, ShadowFactor);
+}
+
+
+vec4 CalcPBRLighting()
+{
+    vec3 Normal = normalize(Normal0);
+
+    vec3 TotalLight = CalcPBRDirectionalLight(Normal);
+
+/*    for (int i = 0 ;i < gNumPointLights ;i++) {
+        TotalLight += CalcPointLight(gPointLights[i], Normal);
+    }
+
+    for (int i = 0 ;i < gNumSpotLights ;i++) {
+        TotalLight += CalcSpotLight(gSpotLights[i], Normal);
+    }*/
+
+    TotalLight = TotalLight / (TotalLight + vec3(1.0));
+
+    vec4 FinalLight = vec4(pow(TotalLight, vec3(1.0/2.2)), 1.0);
+
+    return FinalLight;
+}
+
+
 void main()
 {
     if (gIsPBR) {
-       vec3 PBRColor = CalcPBR();
-       PBRColor = PBRColor / (PBRColor + vec3(1.0));
-       FragColor = vec4(pow( PBRColor, vec3(1.0/2.2)), 1.0);
+        FragColor = CalcPBRLighting();
     } else {
         FragColor = CalcPhongLighting();
     }

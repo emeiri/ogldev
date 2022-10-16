@@ -18,7 +18,7 @@
 
 #include "ogldev_new_lighting.h"
 
-//#define FAIL_ON_MISSING_LOC
+#define FAIL_ON_MISSING_LOC
 
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
@@ -106,8 +106,6 @@ bool LightingTechnique::InitCommon()
     LayeredFogTopLoc = GetUniformLocation("gLayeredFogTop");
     FogTimeLoc = GetUniformLocation("gFogTime");
     IsPBRLoc = GetUniformLocation("gIsPBR");
-    PBRLightLoc.PosDir = GetUniformLocation("gPBRlight.PosDir");
-    PBRLightLoc.Intensity = GetUniformLocation("gPBRlight.Intensity");
     PBRMaterialLoc.Roughness = GetUniformLocation("gPBRmaterial.Roughness");
     PBRMaterialLoc.IsMetal = GetUniformLocation("gPBRmaterial.IsMetal");
     PBRMaterialLoc.Color = GetUniformLocation("gPBRmaterial.Color");
@@ -150,8 +148,6 @@ bool LightingTechnique::InitCommon()
         ColorModLocation == INVALID_UNIFORM_LOCATION ||
         ColorAddLocation == INVALID_UNIFORM_LOCATION ||
         IsPBRLoc == INVALID_UNIFORM_LOCATION ||
-        PBRLightLoc.PosDir == INVALID_UNIFORM_LOCATION ||
-        PBRLightLoc.Intensity == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.Roughness == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.IsMetal == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.Color == INVALID_UNIFORM_LOCATION) {
@@ -248,6 +244,18 @@ bool LightingTechnique::InitCommon()
         }
     }
 
+    /*    for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(PBRLightLoc) ; i++) {
+        PBRLightLoc[i].PosDir = GetUniformLocation("gPBRlight.PosDir");
+        PBRLightLoc[i].Intensity = GetUniformLocation("gPBRlight.Intensity");
+
+#ifdef FAIL_ON_MISSING_LOC
+        if (PBRLightLoc[i].PosDir == INVALID_UNIFORM_LOCATION ||
+            PBRLightLoc[i].Intensity == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
+#endif
+}*/
+
     return true;
 }
 
@@ -327,7 +335,7 @@ void LightingTechnique::SetDirectionalLight(const DirectionalLight& DirLight, bo
     glUniform1f(dirLightLoc.AmbientIntensity, DirLight.AmbientIntensity);
     glUniform1f(dirLightLoc.DiffuseIntensity, DirLight.DiffuseIntensity);
 
-    glUniform3f(PBRLightLoc.Intensity, DirLight.DiffuseIntensity, DirLight.DiffuseIntensity, DirLight.DiffuseIntensity);
+    //    glUniform3f(PBRLightLoc.Intensity, DirLight.DiffuseIntensity, DirLight.DiffuseIntensity, DirLight.DiffuseIntensity);
 
     if (WithDir) {
         UpdateDirLightDirection(DirLight);
@@ -346,7 +354,7 @@ void LightingTechnique::UpdateDirLightDirection(const DirectionalLight& DirLight
     Vector3f WorldDirection = DirLight.WorldDirection;
     WorldDirection.Normalize();
 
-    glUniform4f(PBRLightLoc.PosDir, WorldDirection.x, WorldDirection.y, WorldDirection.z, 0.0f);   // zero for directional light
+    //    glUniform4f(PBRLightLoc.PosDir, WorldDirection.x, WorldDirection.y, WorldDirection.z, 0.0f);   // zero for directional light
 }
 
 
@@ -589,8 +597,8 @@ void LightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
 }
 
 
-void LightingTechnique::SetPBRLight(const PBRLight& Light)
+/*void LightingTechnique::SetPBRLight(const PBRLight& Light)
 {
     glUniform4f(PBRLightLoc.PosDir, Light.PosDir.x, Light.PosDir.y, Light.PosDir.z, Light.PosDir.w);
     glUniform3f(PBRLightLoc.Intensity, Light.Intensity.r, Light.Intensity.g, Light.Intensity.b);
-}
+    }*/
