@@ -112,6 +112,7 @@ class PhongRenderer {
     PointLight m_pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     uint m_numSpotLights = 0;
     SpotLight m_spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
+    bool m_isPBR = false;
 };
 
 #endif
