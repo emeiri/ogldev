@@ -598,8 +598,9 @@ void main()
 {
     if (gIsPBR) {
        vec3 PBRColor = CalcPBR();
+       PBRColor = PBRColor / (PBRColor + vec3(1.0));
        FragColor = vec4(pow( PBRColor, vec3(1.0/2.2)), 1.0);
-//FragColor = vec4(PBRColor, 1.0f);
+
 
     } else {
         FragColor = CalcPhongLighting();
