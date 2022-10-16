@@ -305,6 +305,12 @@ void PhongRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
 
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
     m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);
+
+    m_skinningTech.SetCameraWorldPos(m_pCamera->GetPos());
+
+    Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
+    m_skinningTech.SetWorldMatrix(World);
+
 }
 
 void PhongRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight)
