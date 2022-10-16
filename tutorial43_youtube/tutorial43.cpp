@@ -51,6 +51,10 @@ public:
         m_dirLight.DiffuseIntensity = 1.0f;
         m_dirLight.AmbientIntensity = 0.5f;
 
+        m_pointLight.WorldPosition = Vector3f(5.0f, 0.0f, 0.0f);
+        m_pointLight.DiffuseIntensity = 1.0f;
+        m_pointLight.Color = Vector3f(1.0f, 1.0f, 0.1f);
+
         float metalRough = 0.43f;
 
         // Gold
@@ -290,6 +294,7 @@ private:
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
+        m_phongRenderer.SetPointLights(1, &m_pointLight);
         m_phongRenderer.SetPBR(true);
     }
 
@@ -314,6 +319,7 @@ private:
     BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
     DirectionalLight m_dirLight;
+    PointLight m_pointLight;
     long long m_startTime = 0;
     long long m_currentTime = 0;
     bool m_runAnimation = true;
