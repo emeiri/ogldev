@@ -47,9 +47,22 @@ public:
 
     Tutorial43()
     {
-        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, 1.0f);
+        m_dirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
         m_dirLight.AmbientIntensity = 0.5f;
+
+        float metalRough = 0.43f;
+
+        // Gold
+        m_meshData[0] = { Vector3f(-3.0f, 0.0f, 3.0f), Vector3f(1, 0.71f, 0.29f) };
+        // Copper
+        m_meshData[1] = { Vector3f(-1.5f, 0.0f, 3.0f), Vector3f(0.95f, 0.64f, 0.54f) };
+        // Aluminum
+        m_meshData[2] = { Vector3f(-0.0f, 0.0f, 3.0f), Vector3f(0.91f, 0.92f, 0.92f) };
+        // Titanium
+        m_meshData[3] = { Vector3f(1.5f, 0.0f, 3.0f), Vector3f(0.542f, 0.497f, 0.449f) };
+        // Silver
+        m_meshData[4] = { Vector3f(3.0f, 0.0f, 3.0f), Vector3f(0.95f, 0.93f, 0.88f) };
     }
 
     virtual ~Tutorial43()
@@ -110,8 +123,14 @@ public:
         static float BlendFactor = 0.0f;
         static float BlendDirection = 0.0001f;
 
-        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, m_blendFactor);
+        //        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, m_blendFactor);
         //m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
+
+        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
+            m_pMesh->SetPosition(m_meshData[i].Pos);
+            m_pMesh->GetPBRMaterial().Color = m_meshData[i].Color;
+            m_phongRenderer.Render(m_pMesh);
+        }
 
         BlendFactor += BlendDirection;
 
@@ -139,7 +158,7 @@ public:
             BlendFactor = 1.0f;
         }
 
-        m_phongRenderer.Render(m_pTerrain);
+        //        m_phongRenderer.Render(m_pTerrain);
     }
 
 
@@ -241,7 +260,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 5.0f, -30.0f);
+        Vector3f Pos(0.0f, 0.0f, -10.0f);
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -266,16 +285,14 @@ private:
     void InitMesh()
     {
         m_pMesh = new SkinnedMesh();
-        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
-        m_pMesh->SetRotation(90.0f, 0.0f, 0.0f);
-        m_pMesh->SetPosition(0.0f, 1.2f, 0.0f);
-        m_pMesh->SetScale(0.05f);
+        //        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
+        m_pMesh->LoadMesh("../Content/spot/spot_triangulated.obj");
 
         m_pTerrain = new BasicMesh();
-        if (!m_pTerrain->LoadMesh("../Content/terrain_rock_boulder_cracked.obj")) {
+        /*if (!m_pTerrain->LoadMesh("../Content/terrain_rock_boulder_cracked.obj")) {
             printf("Error loading mesh ../Content/terrain_rock_boulder_cracked.obj");
             exit(0);
-        }
+            }*/
     }
 
     GLFWwindow* window = NULL;
@@ -292,6 +309,10 @@ private:
     long long m_pauseStart = 0;
     int m_animationIndex = 0;
     float m_blendFactor = 0.0f;
+    struct {
+        Vector3f Pos;
+        Vector3f Color;
+    } m_meshData[5];
 };
 
 Tutorial43* app = NULL;
