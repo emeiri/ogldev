@@ -107,9 +107,8 @@ public:
         static float foo = 0.0f;
         foo += 0.003f;
 
-        //Vector3f CameraTarget = m_pMesh->GetPosition() - m_pGameCamera->GetPos();
-        //m_pGameCamera->SetPosition(45.0f * sinf(foo), 12.0f, 45.0 * cosf(foo));
-        //m_pGameCamera->SetTarget(CameraTarget);
+        m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
+        m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
 
         if (m_runAnimation) {
             m_currentTime = GetCurrentTimeMillis();
