@@ -526,7 +526,7 @@ vec3 schlickFresnel(float lDotH)
         F0 = gPBRmaterial.Color;
     }
 
-    vec3 ret = F0 + (1 - F0) * pow(1.0 - lDotH, 5);
+    vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - lDotH, 0.0, 1.0), 5);
 
     return ret;
 }
@@ -536,12 +536,12 @@ float geomSmith(float dp)
 {
     float k = (gPBRmaterial.Roughness + 1.0) * (gPBRmaterial.Roughness + 1.0) / 8.0;
     float denom = dp * (1 - k) + k;
-    return 1.0 / denom;
+    return dp / denom;
 }
 
 float ggxDistribution(float nDotH)
 {
-    float alpha2 = gPBRmaterial.Roughness * gPBRmaterial.Roughness;
+    float alpha2 = gPBRmaterial.Roughness * gPBRmaterial.Roughness * gPBRmaterial.Roughness * gPBRmaterial.Roughness;
     float d = nDotH * nDotH * (alpha2 - 1) + 1;
     float ggxdistrib = alpha2 / (PI * d * d);
     return ggxdistrib;
@@ -549,12 +549,6 @@ float ggxDistribution(float nDotH)
 
 vec3 CalcPBR()
 {
-    vec3 DiffuseBRDF = vec3(0.0);
-
-    if (!gPBRmaterial.IsMetal) {
-        DiffuseBRDF = gPBRmaterial.Color;
-    }
-
     vec3 l = vec3(0.0);
     vec3 LightIntensity = gPBRlight.Intensity;
     vec3 FinalColor = vec3(0.0);
@@ -569,19 +563,34 @@ vec3 CalcPBR()
 
     vec3 v = normalize(gCameraWorldPos - WorldPos0);
     vec3 h = normalize(v + l);
-    float nDotH = dot(n, h);
-    float lDotH = dot(l, h);
+    float nDotH = max(dot(n, h), 0.0);
+    float lDotH = max(dot(l, h), 0.0);
     float nDotL = max(dot(n, l), 0.0);
-    float nDotV = dot(n, v);
+    float nDotV = max(dot(n, v), 0.0);
 
-    vec3 SpecBRDF = 0.25 * ggxDistribution(nDotH) *
-                           schlickFresnel(lDotH) *
-                           geomSmith(nDotL) *
-                           geomSmith(nDotV);
+    vec3 F = schlickFresnel(lDotH);
 
-    FinalColor = (DiffuseBRDF + PI * SpecBRDF) * LightIntensity * nDotL;
-return DiffuseBRDF * v;
-    //return FinalColor;
+    vec3 SpecBRDF_nom  = ggxDistribution(nDotH) *
+                         F *
+                         geomSmith(nDotL) *
+                         geomSmith(nDotV);
+
+    float SpecBRDF_denom = 4.0 * nDotV * nDotL + 0.0001;
+
+    vec3 SpecBRDF = SpecBRDF_nom / SpecBRDF_denom;
+
+    // original:       FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
+    // multiply by PI: FinalColor = (DiffuseBRDF + PI * SpecBRDF) * LightIntensity * nDotL;
+
+    vec3 DiffuseBRDF = vec3(0.0);
+
+    if (!gPBRmaterial.IsMetal) {
+        DiffuseBRDF = vec3(1.0) - F;
+    }
+
+    FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
+
+    return FinalColor;
 }
 
 
@@ -589,8 +598,8 @@ void main()
 {
     if (gIsPBR) {
        vec3 PBRColor = CalcPBR();
-//       FragColor = vec4(pow( PBRColor, vec3(1.0/2.2)), 1.0);
-FragColor = vec4(PBRColor, 1.0f);
+       FragColor = vec4(pow( PBRColor, vec3(1.0/2.2)), 1.0);
+//FragColor = vec4(PBRColor, 1.0f);
 
     } else {
         FragColor = CalcPhongLighting();
