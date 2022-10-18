@@ -594,8 +594,9 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal,
         DiffuseBRDF = vec3(1.0) - F;
     }
 
-    vec3 FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
+    vec3 AmbientLighting = Light.AmbientIntensity * Light.Color;
 
+    vec3 FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL + AmbientLighting;
 
 // TODO: add ambient
     return FinalColor;
