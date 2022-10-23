@@ -53,6 +53,8 @@ public:
 
     const Matrix4f& GetProjectionMat() const { return ProjectionMat; }
 
+    void GetViewProjMatrix(Matrix4f& ViewProj) const;
+
     void Print() const { printf("Pos "); m_pos.Print(); printf("Target "); m_target.Print(); }
 
     PersProjInfo m_persProjInfo;

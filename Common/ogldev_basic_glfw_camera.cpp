@@ -300,3 +300,12 @@ Matrix4f BasicCamera::GetMatrix() const
 
     return CameraTransformation;
 }
+
+
+
+void BasicCamera::GetViewProjMatrix(Matrix4f& ViewProj) const
+{
+    Matrix4f View = GetMatrix();
+    Matrix4f Projection = GetProjectionMat();
+    ViewProj = Projection * View;
+}

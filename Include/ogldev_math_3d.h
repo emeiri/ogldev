@@ -271,6 +271,12 @@ struct Vector4f
     }
 
     Vector4f& Normalize();
+
+    float Dot(const Vector4f& v) const
+    {
+        float ret = x * v.x + y * v.y + z * v.z + w * v.w;
+        return ret;
+    }
 };
 
 
@@ -719,6 +725,96 @@ public:
     }
 };
 
+
+class FrustumCulling
+{
+public:
+
+#define CP_LEFT   0
+#define CP_RIGHT  1
+#define CP_BOTTOM 2
+#define CP_TOP    3
+#define CP_NEAR   4
+#define CP_FAR    5
+
+#define NUM_CLIP_PLANES 6
+
+    FrustumCulling() {}
+
+    FrustumCulling(const Matrix4f& ViewProj)
+    {
+        Update(ViewProj);
+    }
+
+    void Update(const Matrix4f& ViewProj)
+    {
+        ViewProj.CalcClipPlanes(m_clipPlanes[CP_LEFT],
+                                m_clipPlanes[CP_RIGHT],
+                                m_clipPlanes[CP_BOTTOM],
+                                m_clipPlanes[CP_TOP],
+                                m_clipPlanes[CP_NEAR],
+                                m_clipPlanes[CP_FAR]);
+    }
+
+
+    bool IsCubeInside(const Vector3f& Center, float Size)
+    {
+        float HalfSize = Size / 2.0f;
+
+        Vector4f Center4(Center, 1.0f);
+
+        Vector4f TopLeftNear  = Center4 + Vector4f(-HalfSize, HalfSize, -HalfSize, 1.0f);
+        Vector4f TopLeftFar   = Center4 + Vector4f(-HalfSize, HalfSize,  HalfSize, 1.0f);
+        Vector4f TopRightNear = Center4 + Vector4f( HalfSize, HalfSize, -HalfSize, 1.0f);
+        Vector4f TopRightFar  = Center4 + Vector4f( HalfSize, HalfSize,  HalfSize, 1.0f);
+
+        Vector4f BottomLeftNear  = Center4 + Vector4f(-HalfSize, -HalfSize, -HalfSize, 1.0f);
+        Vector4f BottomLeftFar   = Center4 + Vector4f(-HalfSize, -HalfSize,  HalfSize, 1.0f);
+        Vector4f BottomRightNear = Center4 + Vector4f( HalfSize, -HalfSize, -HalfSize, 1.0f);
+        Vector4f BottomRightFar  = Center4 + Vector4f( HalfSize, -HalfSize,  HalfSize, 1.0f);
+
+        for (int i = 0 ; i < NUM_CLIP_PLANES ; i++) {
+
+            if (m_clipPlanes[i].Dot(TopLeftNear) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(TopLeftFar) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(TopRightNear) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(TopRightFar) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(BottomLeftNear) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(BottomLeftFar) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(BottomRightNear) > 0) {
+                return true;
+            }
+
+            if (m_clipPlanes[i].Dot(BottomRightNear) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+private:
+
+    Vector4f m_clipPlanes[NUM_CLIP_PLANES];
+};
 
 void CalcTightLightProjection(const Matrix4f& CameraView,        // in
                               const Vector3f& LightDir,          // in
