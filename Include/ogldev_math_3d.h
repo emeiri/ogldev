@@ -263,6 +263,14 @@ struct Vector4f
         Vector3f v(x, y, z);
         return v;
     }
+
+    float Length() const
+    {
+        float len = sqrtf(x * x + y * y + z * z + w * w);
+        return len;
+    }
+
+    Vector4f& Normalize();
 };
 
 
@@ -312,12 +320,46 @@ inline Vector3f::Vector3f(const Vector4f& v)
     z = v.z;
 }
 
+
+inline Vector4f operator+(const Vector4f& l, const Vector4f& r)
+{
+    Vector4f Ret(l.x + r.x,
+                 l.y + r.y,
+                 l.z + r.z,
+                 l.w + r.w);
+
+    return Ret;
+}
+
+
 inline Vector4f operator/(const Vector4f& l, float f)
 {
     Vector4f Ret(l.x / f,
                  l.y / f,
                  l.z / f,
                  l.w / f);
+
+    return Ret;
+}
+
+
+inline Vector4f operator*(const Vector4f& l, float f)
+{
+    Vector4f Ret(l.x * f,
+                 l.y * f,
+                 l.z * f,
+                 l.w * f);
+
+    return Ret;
+}
+
+
+inline Vector4f operator*(float f, const Vector4f& l)
+{
+    Vector4f Ret(l.x * f,
+                 l.y * f,
+                 l.z * f,
+                 l.w * f);
 
     return Ret;
 }
@@ -494,6 +536,8 @@ public:
     void InitPersProjTransform(const PersProjInfo& p);
 
     void InitOrthoProjTransform(const OrthoProjInfo& p);
+
+    void CalcClipPlanes(Vector4f& l, Vector4f& r, Vector4f& b, Vector4f& t, Vector4f& n, Vector4f& f) const;
 
 private:
     void InitRotationX(float RotateX);

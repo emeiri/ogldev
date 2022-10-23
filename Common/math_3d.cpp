@@ -27,9 +27,23 @@
 #include <iostream>
 #include <stdlib.h>
 
-
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
+
+
+Vector4f& Vector4f::Normalize()
+{
+    float len = Length();
+
+    assert(len != 0);
+
+    x /= len;
+    y /= len;
+    z /= len;
+    w /= len;
+
+    return *this;
+}
 
 Vector3f Vector3f::Cross(const Vector3f& v) const
 {
@@ -320,6 +334,58 @@ Matrix4f Matrix4f::Inverse() const
         return res;
 }
 
+
+void Matrix4f::CalcClipPlanes(Vector4f& l, Vector4f& r, Vector4f& b, Vector4f& t, Vector4f& n, Vector4f& f) const
+{
+    Vector4f Row1(m[0][0], m[0][1], m[0][2], m[0][3]);
+    Vector4f Row2(m[1][0], m[1][1], m[1][2], m[1][3]);
+    Vector4f Row3(m[2][0], m[2][1], m[2][2], m[2][3]);
+    Vector4f Row4(m[3][0], m[3][1], m[3][2], m[2][3]);
+
+    l =         Row1 + Row4;
+    r = -1.0f * Row1 + Row4;
+    b =         Row2 + Row4;
+    t = -1.0f * Row2 + Row4;
+    n =         Row3 + Row4;
+    f = -1.0f * Row3 + Row4;
+
+    l.Normalize();
+    r.Normalize();
+    b.Normalize();
+    t.Normalize();
+    n.Normalize();
+    f.Normalize();
+
+    /*    l.x = m[0][0] + m[3][0];
+    l.y = m[0][1] + m[3][1];
+    l.z = m[0][2] + m[3][2];
+    l.w = m[0][3] + m[3][3];
+
+    r.x = -m[0][0] + m[3][0];
+    r.y = -m[0][1] + m[3][1];
+    r.z = -m[0][2] + m[3][2];
+    r.w = -m[0][3] + m[3][3];
+
+    b.x = m[1][0] + m[3][0];
+    b.y = m[1][1] + m[3][1];
+    b.z = m[1][2] + m[3][2];
+    b.w = m[1][3] + m[3][3];
+
+    t.x = -m[1][0] + m[3][0];
+    t.y = -m[1][1] + m[3][1];
+    t.z = -m[1][2] + m[3][2];
+    t.w = -m[1][3] + m[3][3];
+
+    n.x = m[0][0] + m[3][0];
+    n.y = m[0][1] + m[3][1];
+    n.z = m[0][2] + m[3][2];
+    n.w = m[0][3] + m[3][3];
+
+    f.x = m[0][0] + m[3][0];
+    f.y = m[0][1] + m[3][1];
+    f.z = m[0][2] + m[3][2];
+    f.w = m[0][3] + m[3][3];*/
+}
 
 Quaternion::Quaternion(float Angle, const Vector3f& V)
 {
