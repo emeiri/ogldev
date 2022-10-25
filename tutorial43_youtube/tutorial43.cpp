@@ -48,12 +48,12 @@ public:
     Tutorial43()
     {
         m_dirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
-        m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.DiffuseIntensity = 45.0f;
+        //        m_dirLight.AmbientIntensity = 0.5f;
 
-        m_pointLight.WorldPosition = Vector3f(5.0f, 0.0f, 0.0f);
-        m_pointLight.DiffuseIntensity = 1.0f;
-        m_pointLight.Color = Vector3f(1.0f, 1.0f, 0.1f);
+        m_pointLight.WorldPosition = Vector3f(15.0f, 5.0f, 5.0f);
+        //        m_pointLight.DiffuseIntensity = 45.0f;
+        //        m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
 
         float metalRough = 0.43f;
 
@@ -109,25 +109,10 @@ public:
         m_pGameCamera->OnRender();
 
         static float foo = 0.0f;
-        foo += 0.003f;
+        foo += 0.005f;
 
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
-
-        if (m_runAnimation) {
-            m_currentTime = GetCurrentTimeMillis();
-        }
-
-        float AnimationTimeSec = (float)((double)m_currentTime - (double)m_startTime) / 1000.0f;
-
-        float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
-        AnimationTimeSec -= TotalPauseTimeSec;
-
-        static float BlendFactor = 0.0f;
-        static float BlendDirection = 0.0001f;
-
-        //        m_phongRenderer.RenderAnimationBlended(m_pMesh, AnimationTimeSec, 0, 3, m_blendFactor);
-        //m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
             m_pMesh->SetPosition(m_meshData[i].Pos);
@@ -147,33 +132,6 @@ public:
             m_phongRenderer.Render(m_pMesh);
         }
 
-
-        BlendFactor += BlendDirection;
-
-        if (BlendDirection > 0.0f) {
-            if (BlendFactor >= 0.9f || BlendFactor <= 0.1f) {
-                BlendDirection = 0.0002f;
-            } else {
-                BlendDirection = 0.001f;
-            }
-        } else {
-            if (BlendFactor >= 0.9f || BlendFactor <= 0.1f) {
-                BlendDirection = -0.0002f;
-            } else {
-                BlendDirection = -0.001f;
-            }
-        }
-
-        if (BlendFactor > 1.0f || BlendFactor < 0.0f) {
-            BlendDirection *= -1.0f;
-        }
-
-        if (BlendFactor < 0.0f) {
-            BlendFactor = 0.0f;
-        } else if (BlendFactor > 1.0f) {
-            BlendFactor = 1.0f;
-        }
-
         //        m_phongRenderer.Render(m_pTerrain);
     }
 
@@ -189,53 +147,8 @@ public:
 
     void KeyboardCB(uint key, int state)
     {
-        if (key == GLFW_KEY_A) {
-            m_blendFactor += 0.005f;
-            if (m_blendFactor > 1.0f) {
-                m_blendFactor = 1.0f;
-            }
-            printf("%f\n", m_blendFactor);
-            return;
-        } else if (key == GLFW_KEY_Z) {
-            m_blendFactor -= 0.005f;
-            if (m_blendFactor < 0.0f) {
-                m_blendFactor = 0.0f;
-            }
-            printf("%f\n", m_blendFactor);
-            return;
-        }
-
         if (state == GLFW_PRESS) {
             switch (key) {
-            case GLFW_KEY_0:
-                m_animationIndex = 0;
-                break;
-
-            case GLFW_KEY_1:
-                m_animationIndex = 1;
-                break;
-
-            case GLFW_KEY_2:
-                m_animationIndex = 2;
-                break;
-
-            case GLFW_KEY_3:
-                m_animationIndex = 3;
-                break;
-
-            case GLFW_KEY_SPACE:
-                m_runAnimation = !m_runAnimation;
-                if (m_runAnimation) {
-                    long long CurrentTime = GetCurrentTimeMillis();
-                    // printf("Resumed at %lld\n", CurrentTime);
-                    m_totalPauseTime += (CurrentTime - m_pauseStart);
-                    // printf("Total pause time %lld\n", m_totalPauseTime);
-                } else {
-                    m_pauseStart = GetCurrentTimeMillis();
-                    // printf("Paused at %lld\n", GetCurrentTimeMillis());
-                }
-                break;
-
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
                 glfwDestroyWindow(window);
@@ -322,11 +235,7 @@ private:
     PointLight m_pointLight;
     long long m_startTime = 0;
     long long m_currentTime = 0;
-    bool m_runAnimation = true;
-    long long m_totalPauseTime = 0;
-    long long m_pauseStart = 0;
-    int m_animationIndex = 0;
-    float m_blendFactor = 0.0f;
+
     struct {
         Vector3f Pos;
         Vector3f Color;
@@ -363,7 +272,7 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.1f, 0.2f, 0.1f, 0.0f);
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
