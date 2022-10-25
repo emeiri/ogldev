@@ -47,13 +47,15 @@ public:
 
     Tutorial43()
     {
-        m_dirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
-        m_dirLight.DiffuseIntensity = 45.0f;
-        //        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.WorldDirection = Vector3f(0.0f, 0.15f, -1.0f);
+        m_dirLight.DiffuseIntensity = 5.0f;
+      //  m_dirLight.AmbientIntensity = 0.15f;
 
-        m_pointLight.WorldPosition = Vector3f(15.0f, 5.0f, 5.0f);
-        //        m_pointLight.DiffuseIntensity = 45.0f;
-        //        m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLights[0].WorldPosition = Vector3f(5.0f, 5.0f, 5.0f);
+        //        m_pointLights[0].DiffuseIntensity = 100.0f;
+
+        m_pointLights[1].WorldPosition = Vector3f(-7.0f, 3.0f, 7.0f);
+        //        m_pointLights[1].DiffuseIntensity = 100.0f;
 
         float metalRough = 0.43f;
 
@@ -109,7 +111,10 @@ public:
         m_pGameCamera->OnRender();
 
         static float foo = 0.0f;
-        foo += 0.005f;
+        foo += 0.05f;
+
+        m_pointLights[0].WorldPosition = Vector3f(sinf(foo) * 7, 3.0f, cosf(foo) * 7.0f);
+        m_phongRenderer.UpdatePointLightPos(0, m_pointLights[0].WorldPosition);
 
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
@@ -207,7 +212,7 @@ private:
         m_phongRenderer.InitPhongRenderer();
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
-        m_phongRenderer.SetPointLights(1, &m_pointLight);
+        m_phongRenderer.SetPointLights(ARRAY_SIZE_IN_ELEMENTS(m_pointLights), &m_pointLights[0]);
         m_phongRenderer.SetPBR(true);
     }
 
@@ -234,7 +239,7 @@ private:
     BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
     DirectionalLight m_dirLight;
-    PointLight m_pointLight;
+    PointLight m_pointLights[2];
     long long m_startTime = 0;
     long long m_currentTime = 0;
 
