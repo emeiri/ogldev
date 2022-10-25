@@ -103,7 +103,6 @@ public:
 
     static const unsigned int MAX_POINT_LIGHTS = 2;
     static const unsigned int MAX_SPOT_LIGHTS = 2;
-    static const unsigned int MAX_PBR_LIGHTS = 4;
 
     LightingTechnique();
 
