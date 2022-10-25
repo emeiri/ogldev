@@ -2,7 +2,6 @@
 
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
-const int MAX_PBR_LIGHTS = 4;
 
 in vec4 LightSpacePos; // required only for shadow mapping
 in vec2 TexCoord0;

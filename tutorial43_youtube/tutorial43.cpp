@@ -47,8 +47,8 @@ public:
 
     Tutorial43()
     {
-        m_dirLight.WorldDirection = Vector3f(0.0f, 0.15f, -1.0f);
-        m_dirLight.DiffuseIntensity = 5.0f;
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.15f, 1.0f);
+        m_dirLight.DiffuseIntensity = 4.0f;
       //  m_dirLight.AmbientIntensity = 0.15f;
 
         m_pointLights[0].WorldPosition = Vector3f(5.0f, 5.0f, 5.0f);
@@ -111,7 +111,7 @@ public:
         m_pGameCamera->OnRender();
 
         static float foo = 0.0f;
-        foo += 0.05f;
+        //        foo += 0.05f;
 
         m_pointLights[0].WorldPosition = Vector3f(sinf(foo) * 7, 3.0f, cosf(foo) * 7.0f);
         m_phongRenderer.UpdatePointLightPos(0, m_pointLights[0].WorldPosition);
@@ -127,7 +127,7 @@ public:
             m_phongRenderer.Render(m_pMesh);
         }
 
-        float RoughnessStep = 1.0f / ARRAY_SIZE_IN_ELEMENTS(m_meshData);
+        float RoughnessStep = 0.75f / ARRAY_SIZE_IN_ELEMENTS(m_meshData);
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
             m_pMesh->SetPosition(m_meshData[i].Pos + Vector3f(0.0f, 15.0f, 0.0f));
@@ -136,8 +136,6 @@ public:
             m_pMesh->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
             m_phongRenderer.Render(m_pMesh);
         }
-
-        //        m_phongRenderer.Render(m_pTerrain);
     }
 
 
@@ -220,23 +218,15 @@ private:
     void InitMesh()
     {
         m_pMesh = new SkinnedMesh();
-        //        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
         //        m_pMesh->LoadMesh("../Content/spot/spot_triangulated.obj");
         m_pMesh->LoadMesh("../Content/dragon.obj");
         m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
-
-        m_pTerrain = new BasicMesh();
-        /*if (!m_pTerrain->LoadMesh("../Content/terrain_rock_boulder_cracked.obj")) {
-            printf("Error loading mesh ../Content/terrain_rock_boulder_cracked.obj");
-            exit(0);
-            }*/
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     PhongRenderer m_phongRenderer;
     SkinnedMesh* m_pMesh = NULL;
-    BasicMesh* m_pTerrain = NULL;
     PersProjInfo m_persProjInfo;
     DirectionalLight m_dirLight;
     PointLight m_pointLights[2];
