@@ -58,15 +58,15 @@ public:
         float metalRough = 0.43f;
 
         // Gold
-        m_meshData[0] = { Vector3f(-3.0f, 0.0f, 3.0f), Vector3f(1, 0.71f, 0.29f) };
+        m_meshData[0] = { Vector3f(-20.0f, 0.0f, 75.0f), Vector3f(1, 0.71f, 0.29f) };
         // Copper
-        m_meshData[1] = { Vector3f(-1.5f, 0.0f, 3.0f), Vector3f(0.95f, 0.64f, 0.54f) };
+        m_meshData[1] = { Vector3f(-10.0f, 0.0f, 75.0f), Vector3f(0.95f, 0.64f, 0.54f) };
         // Aluminum
-        m_meshData[2] = { Vector3f(-0.0f, 0.0f, 3.0f), Vector3f(0.91f, 0.92f, 0.92f) };
+        m_meshData[2] = { Vector3f(-0.0f, 0.0f, 75.0f), Vector3f(0.91f, 0.92f, 0.92f) };
         // Titanium
-        m_meshData[3] = { Vector3f(1.5f, 0.0f, 3.0f), Vector3f(0.542f, 0.497f, 0.449f) };
+        m_meshData[3] = { Vector3f(10.0f, 0.0f, 75.0f), Vector3f(0.542f, 0.497f, 0.449f) };
         // Silver
-        m_meshData[4] = { Vector3f(3.0f, 0.0f, 3.0f), Vector3f(0.95f, 0.93f, 0.88f) };
+        m_meshData[4] = { Vector3f(20.0f, 0.0f, 75.0f), Vector3f(0.95f, 0.93f, 0.88f) };
     }
 
     virtual ~Tutorial43()
@@ -125,7 +125,7 @@ public:
         float RoughnessStep = 1.0f / ARRAY_SIZE_IN_ELEMENTS(m_meshData);
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
-            m_pMesh->SetPosition(m_meshData[i].Pos + Vector3f(0.0f, 3.0f, 0.0f));
+            m_pMesh->SetPosition(m_meshData[i].Pos + Vector3f(0.0f, 15.0f, 0.0f));
             m_pMesh->GetPBRMaterial().Roughness = (i + 1) * RoughnessStep;
             m_pMesh->GetPBRMaterial().IsMetal = false;
             m_pMesh->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
@@ -189,8 +189,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 0.0f, -10.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
+        Vector3f Pos(0.0f, 35.0f, 0.0f);
+        Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -216,7 +216,9 @@ private:
     {
         m_pMesh = new SkinnedMesh();
         //        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
-        m_pMesh->LoadMesh("../Content/spot/spot_triangulated.obj");
+        //        m_pMesh->LoadMesh("../Content/spot/spot_triangulated.obj");
+        m_pMesh->LoadMesh("../Content/dragon.obj");
+        m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
         /*if (!m_pTerrain->LoadMesh("../Content/terrain_rock_boulder_cracked.obj")) {
