@@ -46,36 +46,36 @@ public:
 
     ForwardRendererDemo()
     {
-        pointLights[0].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
-        pointLights[0].DiffuseIntensity = 1.0f;
-        pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        pointLights[0].Attenuation.Linear = 0.1f;
-        pointLights[0].Attenuation.Exp = 0.0f;
+        m_pointLights[0].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
+        m_pointLights[0].DiffuseIntensity = 1.0f;
+        m_pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLights[0].Attenuation.Linear = 0.1f;
+        m_pointLights[0].Attenuation.Exp = 0.0f;
 
-        pointLights[1].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
-        pointLights[1].DiffuseIntensity = 0.25f;
-        pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        pointLights[1].Attenuation.Linear = 0.0f;
-        pointLights[1].Attenuation.Exp = 0.2f;
+        m_pointLights[1].WorldPosition = Vector3f(10.0f, 0.0f, 0.0f);
+        m_pointLights[1].DiffuseIntensity = 0.25f;
+        m_pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_pointLights[1].Attenuation.Linear = 0.0f;
+        m_pointLights[1].Attenuation.Exp = 0.2f;
 
-        spotLights[0].DiffuseIntensity = 1.0f;
-        spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
-        spotLights[0].Attenuation.Linear = 0.1f;
-        spotLights[0].Cutoff = 5.0f;
-        spotLights[0].WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
+        m_spotLights[0].DiffuseIntensity = 1.0f;
+        m_spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
+        m_spotLights[0].Attenuation.Linear = 0.1f;
+        m_spotLights[0].Cutoff = 5.0f;
+        m_spotLights[0].WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
 
-        spotLights[1].DiffuseIntensity = 0.0f;
-        spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        spotLights[1].Attenuation.Linear = 0.01f;
-        spotLights[1].Cutoff = 30.0f;
-        spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
-        spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+        m_spotLights[1].DiffuseIntensity = 0.0f;
+        m_spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_spotLights[1].Attenuation.Linear = 0.01f;
+        m_spotLights[1].Cutoff = 30.0f;
+        m_spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
+        m_spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
     }
 
     virtual ~ForwardRendererDemo()
     {
         SAFE_DELETE(m_pGameCamera);
-        SAFE_DELETE(pMesh1);
+        SAFE_DELETE(m_pMesh1);
     }
 
 
@@ -97,9 +97,9 @@ public:
 
     void Run()
     {
-        while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(m_window)) {
             RenderSceneCB();
-            glfwSwapBuffers(window);
+            glfwSwapBuffers(m_window);
             glfwPollEvents();
         }
     }
@@ -116,19 +116,19 @@ public:
 #else
         float YRotationAngle = 1.0f;
 #endif
-        counter += 0.01f;
+        m_counter += 0.01f;
 
-        pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
-        m_renderer.UpdatePointLightPos(1, pointLights[1].WorldPosition);
+        m_pointLights[1].WorldPosition.y = sinf(m_counter) * 4 + 4;
+        m_renderer.UpdatePointLightPos(1, m_pointLights[1].WorldPosition);
 
-        spotLights[0].WorldPosition = m_pGameCamera->GetPos();
-        spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
-        m_renderer.UpdateSpotLightPosAndDir(0, spotLights[0].WorldPosition, spotLights[0].WorldDirection);
+        m_spotLights[0].WorldPosition = m_pGameCamera->GetPos();
+        m_spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
+        m_renderer.UpdateSpotLightPosAndDir(0, m_spotLights[0].WorldPosition, m_spotLights[0].WorldDirection);
 
         long long CurrentTimeMillis = GetCurrentTimeMillis();
         float AnimationTimeSec = ((float)(CurrentTimeMillis - m_startTimeMillis)) / 1000.0f;
 
-        m_renderer.Render(pMesh1);
+        m_renderer.Render(m_pMesh1);
     }
 
 
@@ -146,44 +146,44 @@ public:
         switch (key) {
         case GLFW_KEY_ESCAPE:
         case GLFW_KEY_Q:
-            glfwDestroyWindow(window);
+            glfwDestroyWindow(m_window);
             glfwTerminate();
             exit(0);
 
         case 'a':
-            pointLights[0].Attenuation.Linear += ATTEN_STEP;
-            pointLights[1].Attenuation.Linear += ATTEN_STEP;
+            m_pointLights[0].Attenuation.Linear += ATTEN_STEP;
+            m_pointLights[1].Attenuation.Linear += ATTEN_STEP;
             break;
 
         case 'z':
-            pointLights[0].Attenuation.Linear -= ATTEN_STEP;
-            pointLights[1].Attenuation.Linear -= ATTEN_STEP;
+            m_pointLights[0].Attenuation.Linear -= ATTEN_STEP;
+            m_pointLights[1].Attenuation.Linear -= ATTEN_STEP;
             break;
 
         case 's':
-            pointLights[0].Attenuation.Exp += ATTEN_STEP;
-            pointLights[1].Attenuation.Exp += ATTEN_STEP;
+            m_pointLights[0].Attenuation.Exp += ATTEN_STEP;
+            m_pointLights[1].Attenuation.Exp += ATTEN_STEP;
             break;
 
         case 'x':
-            pointLights[0].Attenuation.Exp -= ATTEN_STEP;
-            pointLights[1].Attenuation.Exp -= ATTEN_STEP;
+            m_pointLights[0].Attenuation.Exp -= ATTEN_STEP;
+            m_pointLights[1].Attenuation.Exp -= ATTEN_STEP;
             break;
 
         case 'd':
-            spotLights[0].Cutoff += ANGLE_STEP;
+            m_spotLights[0].Cutoff += ANGLE_STEP;
             break;
 
         case 'c':
-            spotLights[0].Cutoff -= ANGLE_STEP;
+            m_spotLights[0].Cutoff -= ANGLE_STEP;
             break;
 
         case 'g':
-            spotLights[1].Cutoff += ANGLE_STEP;
+            m_spotLights[1].Cutoff += ANGLE_STEP;
             break;
 
         case 'b':
-            spotLights[1].Cutoff -= ANGLE_STEP;
+            m_spotLights[1].Cutoff -= ANGLE_STEP;
             break;
 
         }
@@ -204,17 +204,17 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "ForwardRenderer Reflection Model Demo");
+        m_window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "ForwardRenderer Reflection Model Demo");
 
-        glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+        glfwSetCursorPos(m_window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
 
 
     void InitCallbacks()
     {
-        glfwSetKeyCallback(window, KeyCallback);
-        glfwSetCursorPosCallback(window, CursorPosCallback);
-        glfwSetMouseButtonCallback(window, MouseButtonCallback);
+        glfwSetKeyCallback(m_window, KeyCallback);
+        glfwSetCursorPosCallback(m_window, CursorPosCallback);
+        glfwSetMouseButtonCallback(m_window, MouseButtonCallback);
     }
 
 
@@ -237,8 +237,8 @@ private:
     {
         m_renderer.InitForwardRenderer();
         m_renderer.SetCamera(m_pGameCamera);
-        m_renderer.SetPointLights(2, pointLights);
-        m_renderer.SetSpotLights(2, spotLights);
+        m_renderer.SetPointLights(2, m_pointLights);
+        m_renderer.SetSpotLights(2, m_spotLights);
     }
 
 
@@ -248,20 +248,21 @@ private:
         //        pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
         // pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
 
-        pMesh1 = new SkinnedMesh();
-        pMesh1->LoadMesh("../Content/sphere.obj");
-        pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
+        m_pMesh1 = new SkinnedMesh();
+        m_pMesh1->LoadMesh("../Content/sphere.obj");
+        m_pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
         //        pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
     }
 
-    GLFWwindow* window = NULL;
+    GLFWwindow* m_window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     ForwardRenderer m_renderer;
-    SkinnedMesh* pMesh1 = NULL;
-    PersProjInfo persProjInfo;
-    PointLight pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
-    SpotLight spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
-    float counter = 0;
+    SkinnedMesh* m_pMesh1 = NULL;
+    PersProjInfo m_persProjInfo;
+    PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
+    SpotLight m_spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
+    DirectionalLight m_dirLight;
+    float m_counter = 0;
     long long m_startTimeMillis = 0;
 };
 
