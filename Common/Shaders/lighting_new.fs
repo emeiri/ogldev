@@ -555,7 +555,7 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     vec3 l = vec3(0.0);
 
     if (IsDirLight) {
-        l = normalize(-PosDir.xyz);
+        l = -PosDir.xyz;
     } else {
         l = PosDir - LocalPos0;
         float LightToPixelDist = length(l);
@@ -563,17 +563,17 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
         LightIntensity /= (LightToPixelDist * LightToPixelDist);
     }
 
-    // TODO: handle normal transformation
     vec3 n = Normal;
-
     vec3 v = normalize(gCameraLocalPos - LocalPos0);
     vec3 h = normalize(v + l);
+
     float nDotH = max(dot(n, h), 0.0);
     float vDotH = max(dot(v, h), 0.0);
     float nDotL = max(dot(n, l), 0.0);
     float nDotV = max(dot(n, v), 0.0);
 
     vec3 F = schlickFresnel(vDotH);
+
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
 
@@ -624,10 +624,7 @@ vec4 CalcPBRLighting()
         TotalLight += CalcPBRPointLight(gPointLights[i], Normal);
     }
 
-/*    for (int i = 0 ;i < gNumSpotLights ;i++) {
-        TotalLight += CalcSpotLight(gSpotLights[i], Normal);
-    }*/
-
+    //
     TotalLight = TotalLight / (TotalLight + vec3(1.0));
 
     vec4 FinalLight = vec4(pow(TotalLight, vec3(1.0/2.2)), 1.0);
