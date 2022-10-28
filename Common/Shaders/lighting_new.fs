@@ -584,9 +584,6 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 
     vec3 SpecBRDF = SpecBRDF_nom / SpecBRDF_denom;
 
-    // original:       FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL;
-    // multiply by PI: FinalColor = (DiffuseBRDF + PI * SpecBRDF) * LightIntensity * nDotL;
-
     vec3 DiffuseBRDF = vec3(0.0);
 
     if (!gPBRmaterial.IsMetal) {
@@ -597,7 +594,6 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 
     vec3 FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL + AmbientLighting;
 
-// TODO: add ambient
     return FinalColor;
 }
 
