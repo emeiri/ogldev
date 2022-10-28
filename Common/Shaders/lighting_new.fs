@@ -548,7 +548,7 @@ float ggxDistribution(float nDotH)
 }
 
 
-vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal, float ShadowFactor)
+vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 {
     vec3 LightIntensity = Light.DiffuseIntensity * Light.Color;
 
@@ -604,17 +604,13 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal,
 
 vec3 CalcPBRDirectionalLight(vec3 Normal)
 {
-    float ShadowFactor = 1.0f;//CalcShadowFactor(gDirectionalLight.Direction, Normal);
-
-    return CalcPBRInternal(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal, ShadowFactor);
+    return CalcPBRInternal(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal);
 }
 
 
 vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
 {
-    float ShadowFactor = 1.0f;//CalcShadowFactor(gDirectionalLight.Direction, Normal);
-
-    return CalcPBRInternal(l.Base, l.LocalPos, false, Normal, ShadowFactor);
+    return CalcPBRInternal(l.Base, l.LocalPos, false, Normal);
 }
 
 
