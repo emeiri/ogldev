@@ -58,6 +58,7 @@ uniform int gNumSpotLights;
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform Material gMaterial;
 uniform sampler2D gSampler;
+uniform bool gHasSampler = false;
 uniform sampler2D gSamplerSpecularExponent;
 uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
@@ -469,7 +470,7 @@ float CalcFogFactor()
 }
 
 
-void main()
+vec4 GetTotalLight()
 {
     vec3 Normal = normalize(Normal0);
     vec4 TotalLight = CalcDirectionalLight(Normal);
@@ -482,15 +483,33 @@ void main()
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
     }
 
-    vec4 TempColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
+    return TotalLight;
+}
 
-    if (gFogColor != vec3(0)) {
+
+void main()
+{
+    vec4 TotalLight = GetTotalLight();
+
+    vec4 TexColor = vec4(0.0);
+
+    if (gHasSampler) {
+        TexColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
+    } else {
+        TexColor = TotalLight;
+    }
+
+    vec4 TempColor = vec4(0.0);
+
+    if (gFogColor == vec3(0)) {
+        TempColor = TexColor;
+    } else {
         float FogFactor = CalcFogFactor();
-
-        TempColor = mix(vec4(gFogColor, 1.0), TempColor, FogFactor);
+        TempColor = mix(vec4(gFogColor, 1.0), TexColor, FogFactor);
     }
 
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    FragColor =  TempColor * gColorMod + gColorAdd + vec4(1.0);
+    FragColor =  TempColor * gColorMod + gColorAdd;
+
 }

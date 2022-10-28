@@ -70,6 +70,9 @@ public:
         m_spotLights[1].Cutoff = 30.0f;
         m_spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
         m_spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+
+        m_dirLight.WorldDirection = Vector3f(1.0f, 0.0f, 1.0f);
+        m_dirLight.DiffuseIntensity = 1.0f;
     }
 
     virtual ~ForwardRendererDemo()
@@ -118,13 +121,13 @@ public:
 #endif
         m_counter += 0.01f;
 
-        m_pointLights[1].WorldPosition.y = sinf(m_counter) * 4 + 4;
+        /*        m_pointLights[1].WorldPosition.y = sinf(m_counter) * 4 + 4;
         m_renderer.UpdatePointLightPos(1, m_pointLights[1].WorldPosition);
 
         m_spotLights[0].WorldPosition = m_pGameCamera->GetPos();
         m_spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
         m_renderer.UpdateSpotLightPosAndDir(0, m_spotLights[0].WorldPosition, m_spotLights[0].WorldDirection);
-
+        */
         long long CurrentTimeMillis = GetCurrentTimeMillis();
         float AnimationTimeSec = ((float)(CurrentTimeMillis - m_startTimeMillis)) / 1000.0f;
 
@@ -237,8 +240,9 @@ private:
     {
         m_renderer.InitForwardRenderer();
         m_renderer.SetCamera(m_pGameCamera);
-        m_renderer.SetPointLights(2, m_pointLights);
-        m_renderer.SetSpotLights(2, m_spotLights);
+        //        m_renderer.SetPointLights(2, m_pointLights);
+        //        m_renderer.SetSpotLights(2, m_spotLights);
+        m_renderer.SetDirLight(m_dirLight);
     }
 
 
