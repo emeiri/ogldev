@@ -557,7 +557,7 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal,
     if (IsDirLight) {
         l = normalize(-PosDir.xyz);
     } else {
-        l = PosDir - WorldPos0;
+        l = PosDir - LocalPos0;
         float LightToPixelDist = length(l);
         l = normalize(l);
         LightIntensity /= (LightToPixelDist * LightToPixelDist);
@@ -566,7 +566,7 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal,
     // TODO: handle normal transformation
     vec3 n = Normal;
 
-    vec3 v = normalize(gCameraWorldPos - WorldPos0);
+    vec3 v = normalize(gCameraLocalPos - LocalPos0);
     vec3 h = normalize(v + l);
     float nDotH = max(dot(n, h), 0.0);
     float lDotH = max(dot(l, h), 0.0);
@@ -614,7 +614,7 @@ vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
 {
     float ShadowFactor = 1.0f;//CalcShadowFactor(gDirectionalLight.Direction, Normal);
 
-    return CalcPBRInternal(l.Base, l.WorldPos, false, Normal, ShadowFactor);
+    return CalcPBRInternal(l.Base, l.LocalPos, false, Normal, ShadowFactor);
 }
 
 
