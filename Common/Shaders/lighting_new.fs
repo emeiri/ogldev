@@ -517,7 +517,7 @@ vec4 CalcPhongLighting()
 }
 
 
-vec3 schlickFresnel(float lDotH)
+vec3 schlickFresnel(float vDotH)
 {
     vec3 F0 = vec3(0.04);
 
@@ -525,7 +525,7 @@ vec3 schlickFresnel(float lDotH)
         F0 = gPBRmaterial.Color;
     }
 
-    vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - lDotH, 0.0, 1.0), 5);
+    vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
 
     return ret;
 }
@@ -569,11 +569,11 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     vec3 v = normalize(gCameraLocalPos - LocalPos0);
     vec3 h = normalize(v + l);
     float nDotH = max(dot(n, h), 0.0);
-    float lDotH = max(dot(l, h), 0.0);
+    float vDotH = max(dot(v, h), 0.0);
     float nDotL = max(dot(n, l), 0.0);
     float nDotV = max(dot(n, v), 0.0);
 
-    vec3 F = schlickFresnel(lDotH);
+    vec3 F = schlickFresnel(vDotH);
 
     vec3 SpecBRDF_nom  = ggxDistribution(nDotH) *
                          F *
