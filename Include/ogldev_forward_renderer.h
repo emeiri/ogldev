@@ -21,8 +21,8 @@
 #define OGLDEV_FORWARD_RENDERER
 
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_new_lighting.h"
-#include "ogldev_skinning_technique.h"
+#include "ogldev_forward_lighting.h"
+//#include "ogldev_skinning_technique.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_skinned_mesh.h"
 #include "ogldev_shadow_mapping_technique.h"
@@ -94,21 +94,19 @@ class ForwardRenderer {
     void SwitchToLightingTech();
     void SwitchToSkinningTech();
 
-    void RefreshLightingPosAndDirs(BasicMesh* pMesh);
-
     void RenderAnimationCommon(SkinnedMesh* pMesh);
 
     const BasicCamera* m_pCamera = NULL;
-    LightingTechnique m_lightingTech;
-    SkinningTechnique m_skinningTech;
+    ForwardLightingTechnique m_lightingTech;
+    //    SkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
 
     // Lighting info
     DirectionalLight m_dirLight;
     uint m_numPointLights = 0;
-    PointLight m_pointLights[LightingTechnique::MAX_POINT_LIGHTS];
+    PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
     uint m_numSpotLights = 0;
-    SpotLight m_spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
+    SpotLight m_spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
 };
 
 #endif

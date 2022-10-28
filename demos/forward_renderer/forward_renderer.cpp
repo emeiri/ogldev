@@ -27,7 +27,6 @@
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
@@ -260,8 +259,8 @@ private:
     ForwardRenderer m_renderer;
     SkinnedMesh* pMesh1 = NULL;
     PersProjInfo persProjInfo;
-    PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
-    SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
+    PointLight pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
+    SpotLight spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
     long long m_startTimeMillis = 0;
 };

@@ -20,26 +20,6 @@
 
 #define FAIL_ON_MISSING_LOC
 
-void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
-{
-    LocalDirection = worldTransform.WorldDirToLocalDir(WorldDirection);
-}
-
-
-void PointLight::CalcLocalPosition(const WorldTrans& worldTransform)
-{
-    LocalPosition = worldTransform.WorldPosToLocalPos(WorldPosition);
-}
-
-
-void SpotLight::CalcLocalDirectionAndPosition(const WorldTrans& worldTransform)
-{
-    CalcLocalPosition(worldTransform);
-
-    LocalDirection = worldTransform.WorldDirToLocalDir(WorldDirection);
-}
-
-
 
 ForwardLightingTechnique::ForwardLightingTechnique()
 {
@@ -89,7 +69,6 @@ bool ForwardLightingTechnique::InitCommon()
     dirLightLoc.AmbientIntensity = GetUniformLocation("gDirectionalLight.Base.AmbientIntensity");
     dirLightLoc.Direction = GetUniformLocation("gDirectionalLight.Direction");
     dirLightLoc.DiffuseIntensity = GetUniformLocation("gDirectionalLight.Base.DiffuseIntensity");
-    CameraLocalPosLoc = GetUniformLocation("gCameraLocalPos");
     CameraWorldPosLoc = GetUniformLocation("gCameraWorldPos");
     NumPointLightsLoc = GetUniformLocation("gNumPointLights");
     NumSpotLightsLoc = GetUniformLocation("gNumSpotLights");
@@ -123,7 +102,6 @@ bool ForwardLightingTechnique::InitCommon()
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.SpecularColor == INVALID_UNIFORM_LOCATION ||
-        CameraLocalPosLoc == INVALID_UNIFORM_LOCATION ||
         CameraWorldPosLoc == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.Color == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
@@ -158,9 +136,6 @@ bool ForwardLightingTechnique::InitCommon()
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.AmbientIntensity", i);
         PointLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
 
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].LocalPos", i);
-        PointLightsLocation[i].LocalPos = GetUniformLocation(Name);
-
         SNPRINTF(Name, sizeof(Name), "gPointLights[%d].WorldPos", i);
         PointLightsLocation[i].WorldPos = GetUniformLocation(Name);
 
@@ -178,7 +153,6 @@ bool ForwardLightingTechnique::InitCommon()
 
         if (PointLightsLocation[i].Color == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].AmbientIntensity == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].LocalPos == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].WorldPos == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
             PointLightsLocation[i].Atten.Constant == INVALID_UNIFORM_LOCATION ||
@@ -198,9 +172,6 @@ bool ForwardLightingTechnique::InitCommon()
 
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.AmbientIntensity", i);
         SpotLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.LocalPos", i);
-        SpotLightsLocation[i].Position = GetUniformLocation(Name);
 
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Direction", i);
         SpotLightsLocation[i].Direction = GetUniformLocation(Name);
@@ -322,17 +293,11 @@ void ForwardLightingTechnique::SetDirectionalLight(const DirectionalLight& DirLi
 
 void ForwardLightingTechnique::UpdateDirLightDirection(const DirectionalLight& DirLight)
 {
-    Vector3f LocalDirection = DirLight.GetLocalDirection();
+    Vector3f LocalDirection = DirLight.WorldDirection;
 
     LocalDirection.Normalize();
 
     glUniform3f(dirLightLoc.Direction, LocalDirection.x, LocalDirection.y, LocalDirection.z);
-}
-
-
-void ForwardLightingTechnique::SetCameraLocalPos(const Vector3f& CameraLocalPos)
-{
-    glUniform3f(CameraLocalPosLoc, CameraLocalPos.x, CameraLocalPos.y, CameraLocalPos.z);
 }
 
 
@@ -372,8 +337,6 @@ void ForwardLightingTechnique::SetPointLights(unsigned int NumLights, const Poin
 void ForwardLightingTechnique::UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights)
 {
     for (unsigned int i = 0 ; i < NumLights ; i++) {
-        const Vector3f& LocalPos = pLights[i].GetLocalPosition();
-        glUniform3f(PointLightsLocation[i].LocalPos, LocalPos.x, LocalPos.y, LocalPos.z);
         const Vector3f& WorldPos = pLights[i].WorldPosition;
         glUniform3f(PointLightsLocation[i].WorldPos, WorldPos.x, WorldPos.y, WorldPos.z);
     }
@@ -402,9 +365,7 @@ void ForwardLightingTechnique::SetSpotLights(unsigned int NumLights, const SpotL
 void ForwardLightingTechnique::UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights)
 {
     for (unsigned int i = 0 ; i < NumLights ; i++) {
-        const Vector3f& LocalPos = pLights[i].GetLocalPosition();
-        glUniform3f(SpotLightsLocation[i].Position, LocalPos.x, LocalPos.y, LocalPos.z);
-        Vector3f Direction = pLights[i].GetLocalDirection();
+        Vector3f Direction = pLights[i].WorldDirection;
         Direction.Normalize();
         glUniform3f(SpotLightsLocation[i].Direction, Direction.x, Direction.y, Direction.z);
     }

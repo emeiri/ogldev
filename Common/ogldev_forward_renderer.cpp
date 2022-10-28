@@ -43,15 +43,15 @@ void ForwardRenderer::InitForwardRenderer()
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
-    if (!m_skinningTech.Init()) {
+    /*    if (!// m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
         exit(1);
     }
 
-    m_skinningTech.Enable();
-    m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    //    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-
+    // m_skinningTech.Enable();
+    // m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    //    // m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    */
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);
@@ -83,9 +83,9 @@ void ForwardRenderer::SwitchToSkinningTech()
     GLint cur_prog = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
 
-    if (cur_prog != m_skinningTech.GetProgram()) {
+    /*    if (cur_prog != m_skinningTech.GetProgram()) {
         m_skinningTech.Enable();
-    }
+        }*/
 }
 
 
@@ -96,8 +96,8 @@ void ForwardRenderer::SetDirLight(const DirectionalLight& DirLight)
     SwitchToLightingTech();
     m_lightingTech.SetDirectionalLight(m_dirLight, false);
 
-    m_skinningTech.Enable();
-    m_skinningTech.SetDirectionalLight(m_dirLight, false);
+    //m_skinningTech.Enable();
+    //m_skinningTech.SetDirectionalLight(m_dirLight, false);
 }
 
 
@@ -108,8 +108,8 @@ void ForwardRenderer::SetPointLights(uint NumLights, const PointLight* pPointLig
         return;
     }
 
-    if (NumLights > LightingTechnique::MAX_POINT_LIGHTS) {
-        printf("Number of point lights (%d) exceeds max (%d)\n", NumLights, LightingTechnique::MAX_POINT_LIGHTS);
+    if (NumLights > ForwardLightingTechnique::MAX_POINT_LIGHTS) {
+        printf("Number of point lights (%d) exceeds max (%d)\n", NumLights, ForwardLightingTechnique::MAX_POINT_LIGHTS);
         exit(0);
     }
 
@@ -122,8 +122,8 @@ void ForwardRenderer::SetPointLights(uint NumLights, const PointLight* pPointLig
     SwitchToLightingTech();
     m_lightingTech.SetPointLights(NumLights, pPointLights, false);
 
-    m_skinningTech.Enable();
-    m_skinningTech.SetPointLights(NumLights, pPointLights, false);
+    //m_skinningTech.Enable();
+    //    m_skinningTech.SetPointLights(NumLights, pPointLights, false);
 }
 
 
@@ -134,8 +134,8 @@ void ForwardRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights
         return;
     }
 
-    if (NumLights > LightingTechnique::MAX_SPOT_LIGHTS) {
-        printf("Number of point lights (%d) exceeds max (%d)\n", NumLights, LightingTechnique::MAX_SPOT_LIGHTS);
+    if (NumLights > ForwardLightingTechnique::MAX_SPOT_LIGHTS) {
+        printf("Number of point lights (%d) exceeds max (%d)\n", NumLights, ForwardLightingTechnique::MAX_SPOT_LIGHTS);
         exit(0);
     }
 
@@ -148,8 +148,8 @@ void ForwardRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights
     SwitchToLightingTech();
     m_lightingTech.SetSpotLights(NumLights, pSpotLights, false);
 
-    m_skinningTech.Enable();
-    m_skinningTech.SetSpotLights(NumLights, pSpotLights, false);
+    // m_skinningTech.Enable();
+    // m_skinningTech.SetSpotLights(NumLights, pSpotLights, false);
 }
 
 
@@ -200,8 +200,6 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
     GetWVP(pMesh, WVP);
     m_lightingTech.SetWVP(WVP);
 
-    RefreshLightingPosAndDirs(pMesh);
-
     if (m_dirLight.DiffuseIntensity > 0.0) {
         m_lightingTech.UpdateDirLightDirection(m_dirLight);
     }
@@ -211,9 +209,6 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
     m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
 
     m_lightingTech.SetMaterial(pMesh->GetMaterial());
-
-    Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
-    m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
     m_lightingTech.SetCameraWorldPos(m_pCamera->GetPos());
 
@@ -232,7 +227,7 @@ void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec
     pMesh->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
-        m_skinningTech.SetBoneTransform(i, Transforms[i]);
+        // m_skinningTech.SetBoneTransform(i, Transforms[i]);
     }
 
     pMesh->Render();
@@ -255,7 +250,7 @@ void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
                                     BlendFactor);
 
     for (uint i = 0 ; i < Transforms.size() ; i++) {
-        m_skinningTech.SetBoneTransform(i, Transforms[i]);
+        // m_skinningTech.SetBoneTransform(i, Transforms[i]);
     }
 
     pMesh->Render();
@@ -277,22 +272,20 @@ void ForwardRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
 
     Matrix4f WVP;
     GetWVP(pMesh, WVP);
-    m_skinningTech.SetWVP(WVP);
-
-    RefreshLightingPosAndDirs(pMesh);
+    // m_skinningTech.SetWVP(WVP);
 
     if (m_dirLight.DiffuseIntensity > 0.0) {
-        m_skinningTech.UpdateDirLightDirection(m_dirLight);
+        // m_skinningTech.UpdateDirLightDirection(m_dirLight);
     }
 
-    m_skinningTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
+    // m_skinningTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
 
-    m_skinningTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
+    // m_skinningTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
 
-    m_skinningTech.SetMaterial(pMesh->GetMaterial());
+    // m_skinningTech.SetMaterial(pMesh->GetMaterial());
 
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
-    m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);
+    // m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);
 }
 
 void ForwardRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight)
@@ -324,25 +317,6 @@ void ForwardRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotL
 }
 
 
-void ForwardRenderer::RefreshLightingPosAndDirs(BasicMesh* pMesh)
-{
-    WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
-
-    if (m_dirLight.DiffuseIntensity > 0.0) {
-        m_dirLight.CalcLocalDirection(meshWorldTransform);
-        //        m_dirLight.GetLocalDirection().Print();
-    }
-
-    for (uint i = 0 ; i < m_numPointLights ; i++) {
-        m_pointLights[i].CalcLocalPosition(meshWorldTransform);
-    }
-
-    for (uint i = 0 ; i < m_numSpotLights ; i++) {
-        m_spotLights[i].CalcLocalDirectionAndPosition(meshWorldTransform);
-    }
-}
-
-
 void ForwardRenderer::GetWVP(BasicMesh* pMesh, Matrix4f& WVP)
 {
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
@@ -360,8 +334,8 @@ void ForwardRenderer::ControlRimLight(bool IsEnabled)
     SwitchToLightingTech();
     m_lightingTech.ControlRimLight(IsEnabled);
 
-    m_skinningTech.Enable();
-    m_skinningTech.ControlRimLight(IsEnabled);
+    // m_skinningTech.Enable();
+    // m_skinningTech.ControlRimLight(IsEnabled);
 }
 
 
@@ -370,8 +344,8 @@ void ForwardRenderer::ControlCellShading(bool IsEnabled)
     SwitchToLightingTech();
     m_lightingTech.ControlCellShading(IsEnabled);
 
-    m_skinningTech.Enable();
-    m_skinningTech.ControlCellShading(IsEnabled);
+    // m_skinningTech.Enable();
+    // m_skinningTech.ControlCellShading(IsEnabled);
 }
 
 
@@ -382,8 +356,8 @@ void ForwardRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f&
     m_lightingTech.SetFogColor(FogColor);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetLinearFog(FogStart, FogEnd);
-    m_skinningTech.SetFogColor(FogColor);
+    // m_skinningTech.SetLinearFog(FogStart, FogEnd);
+    // m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -394,8 +368,8 @@ void ForwardRenderer::SetExpFog(float FogEnd, const Vector3f& FogColor, float Fo
     m_lightingTech.SetFogColor(FogColor);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetExpFog(FogEnd, FogDensity);
-    m_skinningTech.SetFogColor(FogColor);
+    // m_skinningTech.SetExpFog(FogEnd, FogDensity);
+    // m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -406,8 +380,8 @@ void ForwardRenderer::SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, f
     m_lightingTech.SetFogColor(FogColor);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetExpSquaredFog(FogEnd, FogDensity);
-    m_skinningTech.SetFogColor(FogColor);
+    // m_skinningTech.SetExpSquaredFog(FogEnd, FogDensity);
+    // m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -418,8 +392,8 @@ void ForwardRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& 
     m_lightingTech.SetFogColor(FogColor);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetLayeredFog(FogTop, FogEnd);
-    m_skinningTech.SetFogColor(FogColor);
+    // m_skinningTech.SetLayeredFog(FogTop, FogEnd);
+    // m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -430,8 +404,8 @@ void ForwardRenderer::SetAnimatedFog(float FogEnd, float FogDensity, const Vecto
     m_lightingTech.SetFogColor(FogColor);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetAnimatedFog(FogEnd, FogDensity);
-    m_skinningTech.SetFogColor(FogColor);
+    // m_skinningTech.SetAnimatedFog(FogEnd, FogDensity);
+    // m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -441,7 +415,7 @@ void ForwardRenderer::UpdateAnimatedFogTime(float FogTime)
     m_lightingTech.SetFogTime(FogTime);
 
     SwitchToSkinningTech();
-    m_skinningTech.SetFogTime(FogTime);
+    // m_skinningTech.SetFogTime(FogTime);
 }
 
 void ForwardRenderer::DisableFog()
@@ -450,5 +424,5 @@ void ForwardRenderer::DisableFog()
     m_lightingTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
 
     SwitchToSkinningTech();
-    m_skinningTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
+    // m_skinningTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
 }
