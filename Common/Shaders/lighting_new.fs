@@ -574,6 +574,8 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     float nDotV = max(dot(n, v), 0.0);
 
     vec3 F = schlickFresnel(vDotH);
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
 
     vec3 SpecBRDF_nom  = ggxDistribution(nDotH) *
                          F *
@@ -584,15 +586,17 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 
     vec3 SpecBRDF = SpecBRDF_nom / SpecBRDF_denom;
 
-    vec3 DiffuseBRDF = vec3(0.0);
+    vec3 fLambert = vec3(0.0);
 
     if (!gPBRmaterial.IsMetal) {
-        DiffuseBRDF = vec3(1.0) - F;
+        fLambert = gPBRmaterial.Color;
     }
+
+    vec3 DiffuseBRDF = kD * fLambert / PI;
 
     vec3 AmbientLighting = Light.AmbientIntensity * Light.Color;
 
-    vec3 FinalColor = (DiffuseBRDF / PI + SpecBRDF) * LightIntensity * nDotL + AmbientLighting;
+    vec3 FinalColor = (DiffuseBRDF + SpecBRDF) * LightIntensity * nDotL + AmbientLighting;
 
     return FinalColor;
 }
