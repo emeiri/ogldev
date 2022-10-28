@@ -6,7 +6,6 @@ const int MAX_SPOT_LIGHTS = 2;
 in vec4 LightSpacePos; // required only for shadow mapping
 in vec2 TexCoord0;
 in vec3 Normal0;
-in vec3 LocalPos0;
 in vec3 WorldPos0;
 
 out vec4 FragColor;
@@ -34,8 +33,7 @@ struct Attenuation
 struct PointLight
 {
     BaseLight Base;
-    vec3 LocalPos; // used for lighting calculations
-    vec3 WorldPos; // used for point light shadow mapping
+    vec3 WorldPos;
     Attenuation Atten;
 };
 
@@ -70,7 +68,6 @@ uniform sampler3D gShadowMapOffsetTexture;
 uniform float gShadowMapOffsetTextureSize;
 uniform float gShadowMapOffsetFilterSize;
 uniform float gShadowMapRandomRadius = 0.0;
-uniform vec3 gCameraLocalPos;
 uniform vec3 gCameraWorldPos;
 uniform vec4 gColorMod = vec4(1);
 uniform vec4 gColorAdd = vec4(0);
@@ -290,7 +287,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
                        vec4(gMaterial.DiffuseColor, 1.0f) *
                        DiffuseFactor;
 
-        vec3 PixelToCamera = normalize(gCameraLocalPos - LocalPos0);
+        vec3 PixelToCamera = normalize(gCameraWorldPos - WorldPos0);
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
 
@@ -330,10 +327,9 @@ vec4 CalcPointLight(PointLight l, vec3 Normal)
     vec3 LightWorldDir = WorldPos0 - l.WorldPos;
     float ShadowFactor = CalcShadowFactorPointLight(LightWorldDir);
 
-    vec3 LightLocalDir = LocalPos0 - l.LocalPos;
-    float Distance = length(LightLocalDir);
-    LightLocalDir = normalize(LightLocalDir);
-    vec4 Color = CalcLightInternal(l.Base, LightLocalDir, Normal, ShadowFactor);
+    float Distance = length(LightWorldDir);
+    LightWorldDir = normalize(LightWorldDir);
+    vec4 Color = CalcLightInternal(l.Base, LightWorldDir, Normal, ShadowFactor);
     float Attenuation =  l.Atten.Constant +
                          l.Atten.Linear * Distance +
                          l.Atten.Exp * Distance * Distance;
@@ -344,7 +340,7 @@ vec4 CalcPointLight(PointLight l, vec3 Normal)
 
 vec4 CalcSpotLight(SpotLight l, vec3 Normal)
 {
-    vec3 LightToPixel = normalize(LocalPos0 - l.Base.LocalPos);
+    vec3 LightToPixel = normalize(WorldPos0 - l.Base.WorldPos);
     float SpotFactor = dot(LightToPixel, l.Direction);
 
     if (SpotFactor > l.Cutoff) {
