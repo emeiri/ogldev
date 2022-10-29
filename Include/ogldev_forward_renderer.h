@@ -92,9 +92,12 @@ class ForwardRenderer {
     void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
 
     void SwitchToLightingTech();
+
     void SwitchToSkinningTech();
 
     void RenderAnimationCommon(SkinnedMesh* pMesh);
+
+    void UpdateMatrices(BasicMesh* pMesh);
 
     const BasicCamera* m_pCamera = NULL;
     ForwardLightingTechnique m_lightingTech;

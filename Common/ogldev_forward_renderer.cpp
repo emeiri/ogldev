@@ -196,10 +196,6 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
 
     SwitchToLightingTech();
 
-    Matrix4f WVP;
-    GetWVP(pMesh, WVP);
-    m_lightingTech.SetWVP(WVP);
-
     if (m_dirLight.DiffuseIntensity > 0.0) {
         m_lightingTech.UpdateDirLightDirection(m_dirLight);
     }
@@ -212,10 +208,24 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
 
     m_lightingTech.SetCameraWorldPos(m_pCamera->GetPos());
 
+    UpdateMatrices(pMesh);
+
+    pMesh->Render();
+}
+
+
+void ForwardRenderer::UpdateMatrices(BasicMesh* pMesh)
+{
+    Matrix4f WVP;
+    GetWVP(pMesh, WVP);
+    m_lightingTech.SetWVP(WVP);
+
     Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
     m_lightingTech.SetWorldMatrix(World);
 
-    pMesh->Render();
+    Matrix4f World3x3(World);
+    Matrix3f WorldTranspose = World3x3.Transpose();
+    m_lightingTech.SetNormalMatrix(WorldTranspose);
 }
 
 
