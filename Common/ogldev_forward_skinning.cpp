@@ -30,7 +30,7 @@ bool ForwardSkinningTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/forward_lighting.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/forward_skinning.vs")) {
         return false;
     }
 

@@ -22,7 +22,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_forward_lighting.h"
-//#include "ogldev_skinning_technique.h"
+#include "ogldev_forward_skinning.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_skinned_mesh.h"
 #include "ogldev_shadow_mapping_technique.h"
@@ -97,11 +97,11 @@ class ForwardRenderer {
 
     void RenderAnimationCommon(SkinnedMesh* pMesh);
 
-    void UpdateMatrices(BasicMesh* pMesh);
+    void UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicMesh* pMesh);
 
     const BasicCamera* m_pCamera = NULL;
     ForwardLightingTechnique m_lightingTech;
-    //    SkinningTechnique m_skinningTech;
+    ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
 
     // Lighting info
