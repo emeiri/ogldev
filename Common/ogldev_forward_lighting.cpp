@@ -50,6 +50,7 @@ bool ForwardLightingTechnique::InitCommon()
 {
     WVPLoc = GetUniformLocation("gWVP");
     WorldMatrixLoc = GetUniformLocation("gWorld");
+    NormalMatrixLoc = GetUniformLocation("gNormalMatrix");
     LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
@@ -87,6 +88,7 @@ bool ForwardLightingTechnique::InitCommon()
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
+        NormalMatrixLoc == INVALID_UNIFORM_LOCATION ||
         LightWVPLoc == INVALID_UNIFORM_LOCATION ||  // required only for shadow mapping
         samplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
@@ -178,7 +180,6 @@ bool ForwardLightingTechnique::InitCommon()
 
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Cutoff", i);
         SpotLightsLocation[i].Cutoff = GetUniformLocation(Name);
-
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.DiffuseIntensity", i);
         SpotLightsLocation[i].DiffuseIntensity = GetUniformLocation(Name);
 
@@ -219,6 +220,12 @@ void ForwardLightingTechnique::SetWVP(const Matrix4f& WVP)
 void ForwardLightingTechnique::SetWorldMatrix(const Matrix4f& World)
 {
     glUniformMatrix4fv(WorldMatrixLoc, 1, GL_TRUE, (const GLfloat*)World.m);
+}
+
+
+void ForwardLightingTechnique::SetNormalMatrix(const Matrix3f& NormalMatrix)
+{
+    glUniformMatrix3fv(NormalMatrixLoc, 1, GL_TRUE, (const GLfloat*)NormalMatrix.m);
 }
 
 

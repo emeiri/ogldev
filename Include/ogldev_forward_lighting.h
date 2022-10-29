@@ -85,6 +85,7 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
+    void SetNormalMatrix(const Matrix3f& NormalMatrix);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -126,6 +127,7 @@ private:
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;

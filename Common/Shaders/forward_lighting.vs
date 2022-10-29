@@ -7,6 +7,7 @@ layout (location = 2) in vec3 Normal;
 uniform mat4 gWVP;
 uniform mat4 gLightWVP;
 uniform mat4 gWorld;
+uniform mat3 gNormalMatrix;
 
 out vec2 TexCoord0;
 out vec3 Normal0;
@@ -18,7 +19,7 @@ void main()
     vec4 Pos4 = vec4(Position, 1.0);
     gl_Position = gWVP * Pos4;
     TexCoord0 = TexCoord;
-    Normal0 = Normal;
+    Normal0 = gNormalMatrix * Normal;
     WorldPos0 = (gWorld * Pos4).xyz;
     LightSpacePos = gLightWVP * vec4(Position, 1.0);
 }
