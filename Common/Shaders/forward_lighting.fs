@@ -491,13 +491,15 @@ void main()
 {
     vec4 TotalLight = GetTotalLight();
 
-    vec4 TexColor = vec4(0.0);
+    vec4 TexColor;
 
     if (gHasSampler) {
-        TexColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
+        TexColor = texture2D(gSampler, TexCoord0.xy);
     } else {
-        TexColor = TotalLight;
+        TexColor = vec4(1.0);
     }
+
+    TexColor *= TotalLight;
 
     vec4 TempColor = vec4(0.0);
 
