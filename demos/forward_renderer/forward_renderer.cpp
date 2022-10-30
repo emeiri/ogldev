@@ -31,16 +31,13 @@
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
 #include "ogldev_forward_renderer.h"
+#include "ogldev_rendering_subsystem.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-static void CursorPosCallback(GLFWwindow* window, double x, double y);
-static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
-
-class ForwardRendererDemo
+class ForwardRendererDemo : public GameCallbacks
 {
 public:
 
@@ -85,9 +82,11 @@ public:
 
     void Init()
     {
-        CreateWindow();
+        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL);
 
-        InitCallbacks();
+        m_pRenderingSubsystem->InitRenderingSubsystem(this);
+
+        m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         InitCamera();
 
@@ -101,15 +100,10 @@ public:
 
     void Run()
     {
-        while (!glfwWindowShouldClose(m_window)) {
-            RenderSceneCB();
-            glfwSwapBuffers(m_window);
-            glfwPollEvents();
-        }
+        m_pRenderingSubsystem->Execute();
     }
 
-
-    void RenderSceneCB()
+    void OnFrame()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -143,18 +137,17 @@ public:
 
 #define ANGLE_STEP 1.0f
 
-    void PassiveMouseCB(int x, int y)
+    void OnMouseMove(int x, int y)
     {
         m_pGameCamera->OnMouse(x, y);
     }
 
-    void KeyboardCB(uint key, int state)
+    void OnKeyboard(int key, int state)
     {
         switch (key) {
         case GLFW_KEY_ESCAPE:
         case GLFW_KEY_Q:
-            glfwDestroyWindow(m_window);
-            glfwTerminate();
+            m_pRenderingSubsystem->Shutdown();
             exit(0);
 
         case 'a':
@@ -199,31 +192,12 @@ public:
     }
 
 
-    void MouseCB(int button, int action, int x, int y)
+    void OnMouseButton(int button, int x, int y)
     {
     }
 
 
 private:
-
-    void CreateWindow()
-    {
-        int major_ver = 0;
-        int minor_ver = 0;
-        bool is_full_screen = false;
-        m_window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "ForwardRenderer Reflection Model Demo");
-
-        glfwSetCursorPos(m_window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-    }
-
-
-    void InitCallbacks()
-    {
-        glfwSetKeyCallback(m_window, KeyCallback);
-        glfwSetCursorPosCallback(m_window, CursorPosCallback);
-        glfwSetMouseButtonCallback(m_window, MouseButtonCallback);
-    }
-
 
     void InitCamera()
     {
@@ -263,7 +237,6 @@ private:
         m_pMesh1->SetScale(0.05f);
     }
 
-    GLFWwindow* m_window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     ForwardRenderer m_renderer;
     BasicMesh* m_pMesh = NULL;
@@ -274,31 +247,10 @@ private:
     DirectionalLight m_dirLight;
     float m_counter = 0;
     long long m_startTimeMillis = 0;
+    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
 };
 
 ForwardRendererDemo* app = NULL;
-
-static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    app->KeyboardCB(key, action);
-}
-
-
-static void CursorPosCallback(GLFWwindow* window, double x, double y)
-{
-    app->PassiveMouseCB((int)x, (int)y);
-}
-
-
-static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
-{
-    double x, y;
-
-    glfwGetCursorPos(window, &x, &y);
-
-    app->MouseCB(Button, Action, (int)x, (int)y);
-}
-
 
 int main(int argc, char** argv)
 {
