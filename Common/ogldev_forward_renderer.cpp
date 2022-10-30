@@ -223,8 +223,10 @@ void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicM
     Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
     pBaseTech->SetWorldMatrix(World);
 
-    Matrix4f World3x3(World);
+    Matrix4f InverseWorld = World.Inverse();
+    Matrix3f World3x3(InverseWorld);
     Matrix3f WorldTranspose = World3x3.Transpose();
+
     pBaseTech->SetNormalMatrix(WorldTranspose);
 }
 
