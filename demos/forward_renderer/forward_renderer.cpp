@@ -71,13 +71,14 @@ public:
         m_spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
         m_spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
 
-        m_dirLight.WorldDirection = Vector3f(1.0f, 0.0f, 1.0f);
+        m_dirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
     }
 
     virtual ~ForwardRendererDemo()
     {
         SAFE_DELETE(m_pGameCamera);
+        SAFE_DELETE(m_pMesh);
         SAFE_DELETE(m_pMesh1);
     }
 
@@ -119,7 +120,7 @@ public:
 #else
         float YRotationAngle = 1.0f;
 #endif
-        m_counter += 0.01f;
+        m_counter += 0.1f;
 
         /*        m_pointLights[1].WorldPosition.y = sinf(m_counter) * 4 + 4;
         m_renderer.UpdatePointLightPos(1, m_pointLights[1].WorldPosition);
@@ -131,7 +132,10 @@ public:
         long long CurrentTimeMillis = GetCurrentTimeMillis();
         float AnimationTimeSec = ((float)(CurrentTimeMillis - m_startTimeMillis)) / 1000.0f;
 
-        m_renderer.Render(m_pMesh1);
+        m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
+        m_renderer.Render(m_pMesh);
+
+        //m_renderer.RenderAnimation(m_pMesh1, AnimationTimeSec);
     }
 
 
@@ -248,19 +252,21 @@ private:
 
     void InitMesh()
     {
-        //        pMesh1 = new BasicMesh();
-        //        pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        // pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pMesh = new BasicMesh();
+        m_pMesh->LoadMesh("../Content/sphere.obj");
+        m_pMesh->SetPosition(0.0f, 0.0f, 10.0f);
 
         m_pMesh1 = new SkinnedMesh();
-        m_pMesh1->LoadMesh("../Content/sphere.obj");
+        m_pMesh1->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
         m_pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
-        //        pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+        m_pMesh1->SetRotation(90.0f, 0.0f, 0.0f);
+        m_pMesh1->SetScale(0.05f);
     }
 
     GLFWwindow* m_window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     ForwardRenderer m_renderer;
+    BasicMesh* m_pMesh = NULL;
     SkinnedMesh* m_pMesh1 = NULL;
     PersProjInfo m_persProjInfo;
     PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
