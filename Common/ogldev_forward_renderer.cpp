@@ -94,10 +94,10 @@ void ForwardRenderer::SetDirLight(const DirectionalLight& DirLight)
     m_dirLight = DirLight;
 
     SwitchToLightingTech();
-    m_lightingTech.SetDirectionalLight(m_dirLight, false);
+    m_lightingTech.SetDirectionalLight(m_dirLight, true);
 
     m_skinningTech.Enable();
-    m_skinningTech.SetDirectionalLight(m_dirLight, false);
+    m_skinningTech.SetDirectionalLight(m_dirLight, true);
 }
 
 
