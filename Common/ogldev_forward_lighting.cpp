@@ -53,6 +53,7 @@ bool ForwardLightingTechnique::InitCommon()
     NormalMatrixLoc = GetUniformLocation("gNormalMatrix");
     LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
+    hasSamplerLoc = GetUniformLocation("gHasSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
     shadowCubeMapLoc = GetUniformLocation("gShadowCubeMap");
     shadowMapWidthLoc = GetUniformLocation("gShadowMapWidth");
@@ -91,6 +92,7 @@ bool ForwardLightingTechnique::InitCommon()
         NormalMatrixLoc == INVALID_UNIFORM_LOCATION ||
         LightWVPLoc == INVALID_UNIFORM_LOCATION ||  // required only for shadow mapping
         samplerLoc == INVALID_UNIFORM_LOCATION ||
+        hasSamplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowCubeMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapWidthLoc == INVALID_UNIFORM_LOCATION ||
@@ -238,6 +240,7 @@ void ForwardLightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
 void ForwardLightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerLoc, TextureUnit);
+    glUniform1i(hasSamplerLoc, 1);
 }
 
 

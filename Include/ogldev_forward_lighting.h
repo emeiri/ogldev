@@ -130,6 +130,7 @@ private:
     GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
+    GLuint hasSamplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowCubeMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapWidthLoc = INVALID_UNIFORM_LOCATION;
