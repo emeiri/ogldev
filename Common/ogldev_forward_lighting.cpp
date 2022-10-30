@@ -244,6 +244,11 @@ void ForwardLightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 }
 
 
+void ForwardLightingTechnique::DisableDiffuseTexture()
+{
+    glUniform1i(hasSamplerLoc, 0);
+}
+
 void ForwardLightingTechnique::SetShadowMapSize(unsigned int Width, unsigned int Height)
 {
     glUniform1i(shadowMapWidthLoc, Width);

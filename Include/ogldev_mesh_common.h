@@ -29,6 +29,8 @@ public:
     virtual void ControlSpecularExponent(bool IsEnabled) {}
 
     virtual void SetMaterial(const Material& material) {}
+
+    virtual void DisableDiffuseTexture() {}
 };
 
 

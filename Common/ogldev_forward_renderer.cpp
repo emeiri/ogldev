@@ -210,7 +210,7 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
 
     UpdateMatrices(&m_lightingTech, pMesh);
 
-    pMesh->Render();
+    pMesh->Render(&m_lightingTech);
 }
 
 
@@ -242,7 +242,7 @@ void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec
         m_skinningTech.SetBoneTransform(i, Transforms[i]);
     }
 
-    pMesh->Render();
+    pMesh->Render(&m_skinningTech);
 }
 
 
@@ -265,7 +265,7 @@ void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
         m_skinningTech.SetBoneTransform(i, Transforms[i]);
     }
 
-    pMesh->Render();
+    pMesh->Render(&m_skinningTech);
 }
 
 

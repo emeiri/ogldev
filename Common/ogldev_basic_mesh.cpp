@@ -396,8 +396,12 @@ void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
         }
 
         if (pRenderCallbacks) {
-            pRenderCallbacks->DrawStartCB(i);
-            pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
+            if (m_Materials[MaterialIndex].pDiffuse) {
+                pRenderCallbacks->DrawStartCB(i);
+                pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
+            } else {
+                pRenderCallbacks->DisableDiffuseTexture();
+            }
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,

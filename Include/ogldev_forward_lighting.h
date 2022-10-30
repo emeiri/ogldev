@@ -88,6 +88,7 @@ public:
     void SetNormalMatrix(const Matrix3f& NormalMatrix);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
+    void DisableDiffuseTexture();
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetShadowCubeMapTextureUnit(unsigned int TextureUnit);
     void SetShadowMapSize(unsigned int Width, unsigned int Height);
