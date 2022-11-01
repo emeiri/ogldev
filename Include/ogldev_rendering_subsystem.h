@@ -26,15 +26,14 @@
 class GameCallbacks
 {
  public:
-    //    GameCallbacks();
 
-    virtual void OnFrame() = 0;
+    virtual void OnFrame() {}
 
-    virtual void OnKeyboard(int key, int action) = 0;
+    virtual bool OnKeyboard(int key, int action) { return false; }
 
-    virtual void OnMouseMove(int x, int y) = 0;
+    virtual void OnMouseMove(int x, int y) {}
 
-    virtual void OnMouseButton(int Button, int Action, int Mode) = 0;
+    virtual void OnMouseButton(int Button, int Action, int Mode) {}
 };
 
 
@@ -45,6 +44,8 @@ enum RENDERING_SUBSYSTEM {
     RENDERING_SUBSYSTEM_DX11
 };
 
+
+class BasicCamera;
 
 class BaseRenderingSubsystem
 {
@@ -60,10 +61,14 @@ class BaseRenderingSubsystem
 
     virtual void Execute() = 0;
 
+    virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
+
  protected:
 
     BaseRenderingSubsystem();
     ~BaseRenderingSubsystem();
+
+    BasicCamera* m_pCamera = NULL;
 
  private:
 

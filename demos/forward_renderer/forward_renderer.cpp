@@ -107,8 +107,6 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_pGameCamera->OnRender();
-
 #ifdef _WIN64
         float YRotationAngle = 0.1f;
 #else
@@ -137,18 +135,11 @@ public:
 
 #define ANGLE_STEP 1.0f
 
-    void OnMouseMove(int x, int y)
+    bool OnKeyboard(int key, int state)
     {
-        m_pGameCamera->OnMouse(x, y);
-    }
+        bool Handled = true;
 
-    void OnKeyboard(int key, int state)
-    {
         switch (key) {
-        case GLFW_KEY_ESCAPE:
-        case GLFW_KEY_Q:
-            m_pRenderingSubsystem->Shutdown();
-            exit(0);
 
         case 'a':
             m_pointLights[0].Attenuation.Linear += ATTEN_STEP;
@@ -186,9 +177,11 @@ public:
             m_spotLights[1].Cutoff -= ANGLE_STEP;
             break;
 
+        default:
+            Handled = false;
         }
 
-        m_pGameCamera->OnKeyboard(key);
+        return Handled;
     }
 
 
@@ -211,6 +204,8 @@ private:
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+
+        m_pRenderingSubsystem->SetCamera(m_pGameCamera);
     }
 
 

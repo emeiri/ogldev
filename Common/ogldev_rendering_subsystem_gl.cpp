@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "ogldev_rendering_subsystem_gl.h"
+#include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 
 extern BaseRenderingSubsystem* g_pRenderingSubsystem;
@@ -86,7 +87,13 @@ void RenderingSubsystemGL::CreateWindow(uint Width, uint Height)
 
 void RenderingSubsystemGL::Execute()
 {
+    if (!m_pCamera) {
+        printf("%s:%d - camera has not been set\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
     while (!glfwWindowShouldClose(m_pWindow)) {
+        m_pCamera->OnRender();
         m_pGameCallbacks->OnFrame();
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
@@ -103,12 +110,25 @@ void RenderingSubsystemGL::InitCallbacks()
 
 void RenderingSubsystemGL::OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    m_pGameCallbacks->OnKeyboard(key, action);
+    bool Handled = m_pGameCallbacks->OnKeyboard(key, action);
+
+    if (!Handled) {
+        switch (key) {
+        case GLFW_KEY_ESCAPE:
+        case GLFW_KEY_Q:
+            Shutdown();
+            exit(0);
+
+        default:
+            m_pCamera->OnKeyboard(key);
+        }
+    }
 }
 
 
 void RenderingSubsystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double y)
 {
+    m_pCamera->OnMouse(x, y);
     m_pGameCallbacks->OnMouseMove((int)x, (int)y);
 }
 
