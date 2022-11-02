@@ -23,7 +23,6 @@
 #include <math.h>
 #include <GL/glew.h>
 
-
 #include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
@@ -182,11 +181,6 @@ public:
         }
 
         return Handled;
-    }
-
-
-    void OnMouseButton(int button, int x, int y)
-    {
     }
 
 
