@@ -624,9 +624,10 @@ vec4 CalcPBRLighting()
         TotalLight += CalcPBRPointLight(gPointLights[i], Normal);
     }
 
-    //
+    // HDR tone mapping
     TotalLight = TotalLight / (TotalLight + vec3(1.0));
 
+    // Gamma correction
     vec4 FinalLight = vec4(pow(TotalLight, vec3(1.0/2.2)), 1.0);
 
     return FinalLight;
