@@ -213,7 +213,10 @@ void PhongRenderer::Render(BasicMesh* pMesh)
     m_lightingTech.SetMaterial(pMesh->GetMaterial());
 
     if (m_isPBR) {
+        m_lightingTech.SetPBR(true);
         m_lightingTech.SetPBRMaterial(pMesh->GetPBRMaterial());
+    } else {
+        m_lightingTech.SetPBR(false);
     }
 
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
