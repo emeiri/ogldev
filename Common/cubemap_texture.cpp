@@ -69,7 +69,7 @@ bool CubemapTexture::Load()
     Magick::Image* pImage = NULL;
     Magick::Blob blob;
 #else
-    //    stbi_set_flip_vertically_on_load(1);
+    stbi_set_flip_vertically_on_load(1);
 #endif
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(types) ; i++) {
