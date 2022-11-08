@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,18 +17,24 @@
 */
 
 #ifndef OGLDEV_CUBEMAP_TEXTURE_H
-#define	OGLDEV_CUBEMAP_TEXTURE_H
+#define OGLDEV_CUBEMAP_TEXTURE_H
 
 #include <string>
 #include <GL/glew.h>
+
+// In the youtube series I've switch to stb_image
+//#define USE_IMAGE_MAGICK
+
+#ifdef USE_IMAGE_MAGICK
 #include <ImageMagick-6/Magick++.h>
+#endif
 
 using namespace std;
 
 class CubemapTexture
 {
 public:
-    
+
     CubemapTexture(const string& Directory,
                    const string& PosXFilename,
                    const string& NegXFilename,
@@ -38,16 +44,15 @@ public:
                    const string& NegZFilename);
 
     ~CubemapTexture();
-    
+
     bool Load();
 
     void Bind(GLenum TextureUnit);
 
 private:
-   
+
     string m_fileNames[6];
     GLuint m_textureObj;
 };
 
-#endif	/* OGLDEV_CUBEMAP_TEXTURE_H */
-
+#endif  /* OGLDEV_CUBEMAP_TEXTURE_H */
