@@ -34,8 +34,8 @@ public:
 
 private:
 
-    GLuint m_WVPLocation;
-    GLuint m_textureLocation;
+    GLuint m_WVPLoc;
+    GLuint m_textureLoc;
 };
 
 

@@ -45,11 +45,11 @@ bool SkyboxTechnique::Init()
         return false;
     }
 
-    m_WVPLocation = GetUniformLocation("gWVP");
-    m_textureLocation = GetUniformLocation("gCubemapTexture");
+    m_WVPLoc = GetUniformLocation("gWVP");
+    m_textureLoc = GetUniformLocation("gCubemapTexture");
 
-    if (m_WVPLocation == INVALID_UNIFORM_LOCATION ||
-        m_textureLocation == INVALID_UNIFORM_LOCATION) {
+    if (m_WVPLoc == INVALID_UNIFORM_LOCATION ||
+        m_textureLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -59,11 +59,11 @@ bool SkyboxTechnique::Init()
 
 void SkyboxTechnique::SetWVP(const Matrix4f& WVP)
 {
-    glUniformMatrix4fv(m_WVPLocation, 1, GL_TRUE, (const GLfloat*)WVP.m);
+    glUniformMatrix4fv(m_WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
 void SkyboxTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
-    glUniform1i(m_textureLocation, TextureUnit);
+    glUniform1i(m_textureLoc, TextureUnit);
 }
