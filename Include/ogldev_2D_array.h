@@ -117,6 +117,19 @@ class OGLDEV2DArray {
         }
     }
 
+
+    void PrintFloat()
+    {
+        for (int y = 0 ; y < m_rows ; y++) {
+            printf("%d: ", y);
+            for (int x = 0 ; x < m_cols ; x++) {
+                float f = (float)m_p[y * m_cols + x];
+                printf("%.2f ", f);
+            }
+            printf("\n");
+        }
+    }
+
  private:
     Type* m_p = NULL;
     int m_cols = 0;
