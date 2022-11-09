@@ -40,9 +40,11 @@ bool TexTechnique::Init()
         return false;
     }
 
+    m_WVPLoc = GetUniformLocation("gWVP");
     m_samplerLoc = GetUniformLocation("gSampler");
 
-    if (m_samplerLoc == INVALID_UNIFORM_LOCATION) {
+    if (m_WVPLoc == INVALID_UNIFORM_LOCATION ||
+        m_samplerLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -53,4 +55,10 @@ bool TexTechnique::Init()
 void TexTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(m_samplerLoc, TextureUnit);
+}
+
+
+void TexTechnique::SetWVP(const Matrix4f& WVP)
+{
+    glUniformMatrix4fv(m_WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }

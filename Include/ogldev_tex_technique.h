@@ -15,8 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#ifndef TEX_TECHNIQUE_H
-//#define TEX_TECHNIQUE_H
+#ifndef TEX_TECHNIQUE_H
+#define TEX_TECHNIQUE_H
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -29,11 +29,13 @@ public:
 
     virtual bool Init();
 
+    void SetWVP(const Matrix4f& WVP);
     void SetTextureUnit(unsigned int TextureUnit);
 
 private:
 
+    GLuint m_WVPLoc = -1;
     GLuint m_samplerLoc = -1;
 };
 
-//#endif  /* TEX_TECHNIQUE_H */
+#endif  /* TEX_TECHNIQUE_H */
