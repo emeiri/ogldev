@@ -21,12 +21,14 @@
 
 #include <GL/glew.h>
 
+#include "ogldev_tex_technique.h"
+
 class Skydome
 {
  public:
-    Skydome(float Theta, float Phi, float Radius);
+    Skydome(float Theta, float Phi, float Radius, const char* pTextureFilanem);
 
-    void Render();
+    void Render(const BasicCamera& Camera);
 
  private:
 
@@ -43,11 +45,13 @@ class Skydome
 
     void PopulateBuffers(float Theta, float Phi, float Radius);
 
-    int m_numVertices = 0;
+    void LoadTexture(const char* pTextureFilanem);
 
+    int m_numVertices = 0;
     GLuint m_vao;
     GLuint m_vb;
-    //    GLuint m_ib;
+    Texture m_texture;
+    TexTechnique m_texTech;
 };
 
 

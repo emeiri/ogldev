@@ -21,14 +21,21 @@
 #include "ogldev_skydome.h"
 
 
-Skydome::Skydome(float Theta, float Phi, float Radius)
+Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilename) : m_texture(GL_TEXTURE_2D)
 {
     CreateGLState();
 
     PopulateBuffers(Theta, Phi, Radius);
 
+    LoadTexture(pTextureFilename);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    if (!m_texTech.Init()) {
+        exit(0);
+    }
+    m_texTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 }
 
 
@@ -175,11 +182,26 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
 }
 
 
-void Skydome::Render()
+void Skydome::LoadTexture(const char* pTextureFilename)
 {
+    m_texture.Load(pTextureFilename);
+}
+
+
+void Skydome::Render(const BasicCamera& Camera)
+{
+    m_texTech.Enable();
+
+    Matrix4f World;
+    World.InitTranslationTransform(0.0f, 0.0f, 1.0f);
+    Matrix4f View = Camera.GetMatrix();
+    Matrix4f Proj = Camera.GetProjectionMat();
+    Matrix4f WVP = Proj * View * World;
+    m_texTech.SetWVP(WVP);
+
+    m_texture.Bind(COLOR_TEXTURE_UNIT);
+
     glBindVertexArray(m_vao);
-
     glDrawArrays(GL_TRIANGLE_STRIP, 0, m_numVertices);
-
     glBindVertexArray(0);
 }
