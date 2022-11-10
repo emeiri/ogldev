@@ -192,11 +192,13 @@ void Skydome::Render(const BasicCamera& Camera)
 {
     m_texTech.Enable();
 
+    Matrix4f Rotate;
+    Rotate.InitRotateTransform(90.0f, 0.0f, 0.0f);
     Matrix4f World;
-    World.InitTranslationTransform(0.0f, 0.0f, 1.0f);
+    World.InitTranslationTransform(Camera.GetPos() + Vector3f(0.0f, -0.5f, 0.0f));
     Matrix4f View = Camera.GetMatrix();
     Matrix4f Proj = Camera.GetProjectionMat();
-    Matrix4f WVP = Proj * View * World;
+    Matrix4f WVP = Proj * View * World * Rotate;
     m_texTech.SetWVP(WVP);
 
     m_texture.Bind(COLOR_TEXTURE_UNIT);
