@@ -209,9 +209,15 @@ void Skydome::Render(const BasicCamera& Camera)
     glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);
     glDepthFunc(GL_LEQUAL);
 
+    GLint OldCullFaceMode;
+    glGetIntegerv(GL_CULL_FACE_MODE, &OldCullFaceMode);
+
+    glCullFace(GL_FRONT);
+
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, m_numVertices);
     glBindVertexArray(0);
 
     glDepthFunc(OldDepthFuncMode);
+    glCullFace(OldCullFaceMode);
 }
