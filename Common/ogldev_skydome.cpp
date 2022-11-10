@@ -123,6 +123,7 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
         }
 
         //fix the texture-seam problem
+        #if 0
         for (int i = 0 ; i < m_numVertices - 3 ; i++) {
             int i0 = i;
             int i1 = i + 1;
@@ -176,6 +177,7 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
                 Vertices[i1].Tex.v += 1.0f;
             }
         }
+        #endif
     }
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
