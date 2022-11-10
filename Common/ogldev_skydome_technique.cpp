@@ -32,7 +32,7 @@ bool SkydomeTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/tex.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/skydome.fs")) {
         return false;
     }
 
