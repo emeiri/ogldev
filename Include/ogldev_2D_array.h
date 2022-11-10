@@ -124,7 +124,7 @@ class OGLDEV2DArray {
             printf("%d: ", y);
             for (int x = 0 ; x < m_cols ; x++) {
                 float f = (float)m_p[y * m_cols + x];
-                printf("%.2f ", f);
+                printf("%.6f ", f);
             }
             printf("\n");
         }
