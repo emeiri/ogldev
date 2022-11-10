@@ -205,7 +205,13 @@ void Skydome::Render(const BasicCamera& Camera)
 
     m_texture.Bind(COLOR_TEXTURE_UNIT);
 
+    GLint OldDepthFuncMode;
+    glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);
+    glDepthFunc(GL_LEQUAL);
+
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, m_numVertices);
     glBindVertexArray(0);
+
+    glDepthFunc(OldDepthFuncMode);
 }
