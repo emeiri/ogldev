@@ -32,10 +32,11 @@ Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilen
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    if (!m_texTech.Init()) {
+    if (!m_skydomeTech.Init()) {
         exit(0);
     }
-    m_texTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+
+    m_skydomeTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 }
 
 
@@ -192,7 +193,7 @@ void Skydome::LoadTexture(const char* pTextureFilename)
 
 void Skydome::Render(const BasicCamera& Camera)
 {
-    m_texTech.Enable();
+    m_skydomeTech.Enable();
 
     Matrix4f Rotate;
     Rotate.InitRotateTransform(90.0f, 0.0f, 0.0f);
@@ -201,7 +202,7 @@ void Skydome::Render(const BasicCamera& Camera)
     Matrix4f View = Camera.GetMatrix();
     Matrix4f Proj = Camera.GetProjectionMat();
     Matrix4f WVP = Proj * View * World * Rotate;
-    m_texTech.SetWVP(WVP);
+    m_skydomeTech.SetWVP(WVP);
 
     m_texture.Bind(COLOR_TEXTURE_UNIT);
 

@@ -21,7 +21,7 @@
 
 #include <GL/glew.h>
 
-#include "ogldev_tex_technique.h"
+#include "ogldev_skydome_technique.h"
 
 class Skydome
 {
@@ -51,7 +51,7 @@ class Skydome
     GLuint m_vao;
     GLuint m_vb;
     Texture m_texture;
-    TexTechnique m_texTech;
+    SkydomeTechnique m_skydomeTech;
 };
 
 
