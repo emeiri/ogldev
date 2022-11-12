@@ -25,19 +25,33 @@
 #include <unistd.h>
 
 template<typename Type>
-class OGLDEV2DArray {
+class Array2D {
  public:
-    OGLDEV2DArray(int Cols, int Rows)
+    Array2D() {}
+
+    Array2D(int Cols, int Rows)
+    {
+        InitArray2D(Cols, Rows);
+    }
+
+
+    void InitArray2D(int Cols, int Rows)
     {
         m_cols = Cols;
         m_rows = Rows;
 
+        if (m_p) {
+            free(m_p);
+        }
+
         m_p = (Type*)malloc(Cols * Rows * sizeof(Type));
     }
 
-    ~OGLDEV2DArray()
+    ~Array2D()
     {
-        free(m_p);
+        if (m_p) {
+            free(m_p);
+        }
     }
 
     Type* GetAddr(int Col, int Row) const
@@ -66,7 +80,7 @@ class OGLDEV2DArray {
     }
 
 
-    Type* GetAddr() const
+    Type* GetBaseAddr() const
     {
         return m_p;
     }
