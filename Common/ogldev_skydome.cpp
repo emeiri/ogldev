@@ -36,6 +36,8 @@ Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilen
         exit(0);
     }
 
+    m_skydomeTech.Enable();
+
     m_skydomeTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 }
 
