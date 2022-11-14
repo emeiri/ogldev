@@ -47,6 +47,16 @@ class Array2D {
         m_p = (Type*)malloc(Cols * Rows * sizeof(Type));
     }
 
+
+    void InitArray2D(int Cols, int Rows, Type InitVal)
+    {
+        InitArray2D(Cols, Rows);
+
+        for (int i = 0 ; i < Cols * Rows ; i++) {
+            m_p[i] = InitVal;
+        }
+    }
+
     ~Array2D()
     {
         if (m_p) {
@@ -86,15 +96,42 @@ class Array2D {
     }
 
 
+    int GetSize() const
+    {
+        return m_rows * m_cols;
+    }
+
+
     Type Get(int Col, int Row) const
     {
         return *GetAddr(Col, Row);
     }
 
 
+    Type Get(int Index) const
+    {
+        if (Index >= m_rows * m_cols) {
+            printf("%s:%d - index %d is out of bounds (max size %d)\n", __FILE__, __LINE__, Index, m_rows * m_cols);
+            exit(0);
+        }
+
+        return m_p[Index];
+    }
+
     void Set(int Col, int Row, Type Val)
     {
         *GetAddr(Col, Row) = Val;
+    }
+
+
+    void Set(int Index, Type Val)
+    {
+        if (Index >= m_rows * m_cols) {
+            printf("%s:%d - index %d is out of bounds (max size %d)\n", __FILE__, __LINE__, Index, m_rows * m_cols);
+            exit(0);
+        }
+
+        m_p[Index] = Val;
     }
 
 
@@ -114,7 +151,7 @@ class Array2D {
     }
 
 
-    void Normalize(Type MaxRange)
+    void Normalize(Type MinRange, Type MaxRange)
     {
         Type Min, Max;
 
@@ -124,10 +161,11 @@ class Array2D {
             return;
         }
 
-        float Delta = Max - Min;
+        Type MinMaxDelta = Max - Min;
+        Type MinMaxRange = MaxRange - MinRange;
 
         for (int i = 0 ; i < m_rows * m_cols; i++) {
-            m_p[i] = ((m_p[i] - Min)/Delta) * MaxRange;
+            m_p[i] = ((m_p[i] - Min)/MinMaxDelta) * MinMaxRange + MinRange;
         }
     }
 
