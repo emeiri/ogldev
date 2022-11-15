@@ -548,9 +548,9 @@ float ggxDistribution(float nDotH)
 }
 
 
-vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
+vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 {
-    vec3 LightIntensity = Light.DiffuseIntensity * Light.Color;
+    vec3 LightIntensity = Light.Color * Light.DiffuseIntensity;
 
     vec3 l = vec3(0.0);
 
@@ -594,9 +594,7 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 
     vec3 DiffuseBRDF = kD * fLambert / PI;
 
-    vec3 AmbientLighting = Light.AmbientIntensity * Light.Color;
-
-    vec3 FinalColor = (DiffuseBRDF + SpecBRDF) * LightIntensity * nDotL + AmbientLighting;
+    vec3 FinalColor = (DiffuseBRDF + SpecBRDF) * LightIntensity * nDotL;
 
     return FinalColor;
 }
@@ -604,17 +602,17 @@ vec3 CalcPBRInternal(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 
 vec3 CalcPBRDirectionalLight(vec3 Normal)
 {
-    return CalcPBRInternal(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal);
+    return CalcPBRLighting(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal);
 }
 
 
 vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
 {
-    return CalcPBRInternal(l.Base, l.LocalPos, false, Normal);
+    return CalcPBRLighting(l.Base, l.LocalPos, false, Normal);
 }
 
 
-vec4 CalcPBRLighting()
+vec4 CalcTotalPBRLighting()
 {
     vec3 Normal = normalize(Normal0);
 
@@ -637,7 +635,7 @@ vec4 CalcPBRLighting()
 void main()
 {
     if (gIsPBR) {
-        FragColor = CalcPBRLighting();
+        FragColor = CalcTotalPBRLighting();
     } else {
         FragColor = CalcPhongLighting();
     }

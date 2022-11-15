@@ -111,7 +111,7 @@ public:
         m_pGameCamera->OnRender();
 
         static float foo = 0.0f;
-        //        foo += 0.05f;
+        foo += 0.01f;
 
         m_pointLights[0].WorldPosition = Vector3f(sinf(foo) * 7, 3.0f, cosf(foo) * 7.0f);
         m_phongRenderer.UpdatePointLightPos(0, m_pointLights[0].WorldPosition);
@@ -127,11 +127,11 @@ public:
             m_phongRenderer.Render(m_pMesh);
         }
 
-        float RoughnessStep = 0.75f / ARRAY_SIZE_IN_ELEMENTS(m_meshData);
+        float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
 
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
             m_pMesh->SetPosition(m_meshData[i].Pos + Vector3f(0.0f, 15.0f, 0.0f));
-            m_pMesh->GetPBRMaterial().Roughness = (i + 1) * RoughnessStep;
+            m_pMesh->GetPBRMaterial().Roughness = Roughness[i];
             m_pMesh->GetPBRMaterial().IsMetal = false;
             m_pMesh->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
             m_phongRenderer.Render(m_pMesh);

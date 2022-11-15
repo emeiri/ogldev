@@ -24,12 +24,4 @@
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_offset_texture.cpp" />
     <ClCompile Include="..\..\..\tutorial42_youtube\tutorial42.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\Common\Shaders\sprite.vs">
-      <Filter>Shaders</Filter>
-    </None>
-  </ItemGroup>
 </Project>

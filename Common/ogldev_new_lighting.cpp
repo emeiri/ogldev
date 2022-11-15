@@ -18,7 +18,7 @@
 
 #include "ogldev_new_lighting.h"
 
-#define FAIL_ON_MISSING_LOC
+//#define FAIL_ON_MISSING_LOC
 
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
