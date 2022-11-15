@@ -38,8 +38,8 @@
     <ClCompile Include="..\..\..\tutorial43_youtube\tutorial43.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs" />
-    <None Include="..\..\..\Common\Shaders\sprite.vs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

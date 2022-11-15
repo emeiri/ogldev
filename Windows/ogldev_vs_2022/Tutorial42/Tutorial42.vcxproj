@@ -37,10 +37,6 @@
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\tutorial42_youtube\tutorial42.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs" />
-    <None Include="..\..\..\Common\Shaders\sprite.vs" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
