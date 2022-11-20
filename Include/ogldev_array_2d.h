@@ -57,6 +57,20 @@ class Array2D {
         }
     }
 
+
+    void InitArray2D(int Cols, int Rows, void* pData)
+    {
+        m_cols = Cols;
+        m_rows = Rows;
+
+        if (m_p) {
+            free(m_p);
+        }
+
+        m_p = (Type*)pData;
+    }
+
+
     ~Array2D()
     {
         if (m_p) {
@@ -99,6 +113,12 @@ class Array2D {
     int GetSize() const
     {
         return m_rows * m_cols;
+    }
+
+
+    int GetSizeInBytes() const
+    {
+        return GetSize() * sizeof(Type);
     }
 
 
