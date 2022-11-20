@@ -120,6 +120,44 @@ char* ReadBinaryFile(const char* pFileName, int& size)
 
     return p;
 }
+
+
+void WriteBinaryFile(const char* pFilename, const void* pData, int size)
+{
+    FILE* f = fopen(pFilename, "wb");
+
+    if (!f) {
+        OGLDEV_ERROR("Error opening '%s': %s\n", pFilename, strerror(errno));
+        exit(0);
+    }
+
+    int bytes_written = fwrite(pData, 1, size, f);
+
+    if (bytes_written != size) {
+        OGLDEV_ERROR("Error write file: %s\n", strerror(errno));
+        exit(0);
+    }
+
+    fclose(f);
+
+    /*    int f = open(pFilename, O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+
+    if (f == -1) {
+        OGLDEV_ERROR("Error opening '%s': %s\n", pFilename, strerror(errno));
+        exit(0);
+    }
+
+    int write_len = write(f, pData, size);
+    printf("%d\n", write_len);
+    if (write_len != size) {
+        OGLDEV_ERROR("Error write file: %s\n", strerror(errno));
+        exit(0);
+    }
+
+    close(f);*/
+}
+
+
 #endif
 
 void OgldevError(const char* pFileName, uint line, const char* format, ...)
