@@ -87,17 +87,17 @@ char* ReadBinaryFile(const char* pFileName, int& size)
 }
 
 #else
-char* ReadBinaryFile(const char* pFileName, int& size)
+char* ReadBinaryFile(const char* pFilename, int& size)
 {
-    int f = open(pFileName, O_RDONLY);
+    FILE* f = fopen(pFilename, "rb");
 
-    if (f == -1) {
-        OGLDEV_ERROR("Error opening '%s': %s\n", pFileName, strerror(errno));
-        return NULL;
+    if (!f) {
+        OGLDEV_ERROR("Error opening '%s': %s\n", pFilename, strerror(errno));
+        exit(0);
     }
 
     struct stat stat_buf;
-    int error = stat(pFileName, &stat_buf);
+    int error = stat(pFilename, &stat_buf);
 
     if (error) {
         OGLDEV_ERROR("Error getting file stats: %s\n", strerror(errno));
@@ -109,14 +109,14 @@ char* ReadBinaryFile(const char* pFileName, int& size)
     char* p = (char*)malloc(size);
     assert(p);
 
-    int read_len = read(f, p, size);
+    size_t bytes_read = fread(p, 1, size, f);
 
-    if (read_len != size) {
-        OGLDEV_ERROR("Error reading file: %s\n", strerror(errno));
-        return NULL;
+    if (bytes_read != size) {
+        OGLDEV_ERROR("Read file error file: %s\n", strerror(errno));
+        exit(0);
     }
 
-    close(f);
+    fclose(f);
 
     return p;
 }
