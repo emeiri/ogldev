@@ -37,6 +37,8 @@ public:
 
     void SetTarget(const Vector3f& target);
 
+    void SetUp(float x, float y, float z) { m_up.x = x; m_up.y = y; m_up.z = z;}
+
     void OnKeyboard(int key);
 
     void OnMouse(int x, int y);
@@ -53,7 +55,7 @@ public:
 
     const Matrix4f& GetProjectionMat() const { return ProjectionMat; }
 
-    void GetViewProjMatrix(Matrix4f& ViewProj) const;
+    Matrix4f GetViewProjMatrix() const;
 
     void Print() const { printf("Pos "); m_pos.Print(); printf("Target "); m_target.Print(); }
 
