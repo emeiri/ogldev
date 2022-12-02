@@ -149,6 +149,59 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial42", "Tutorial42\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial43", "Tutorial43\Tutorial43.vcxproj", "{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TerrainRendering", "TerrainRendering", "{ACA68C35-1336-405A-85F8-EA7D433F6478}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain1", "Terrain1\Terrain1.vcxproj", "{66919A9A-AF4D-4169-B514-5CA3183A565A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F6553386-4E78-450B-A98D-D17DE590F6AB}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Common\camera.cpp = ..\..\Common\camera.cpp
+		..\..\Common\cubemap_texture.cpp = ..\..\Common\cubemap_texture.cpp
+		..\..\Common\glut_backend.cpp = ..\..\Common\glut_backend.cpp
+		..\..\Common\io_buffer.cpp = ..\..\Common\io_buffer.cpp
+		..\..\Common\math_3d.cpp = ..\..\Common\math_3d.cpp
+		..\..\Common\ogldev_all.cpp = ..\..\Common\ogldev_all.cpp
+		..\..\Common\ogldev_app.cpp = ..\..\Common\ogldev_app.cpp
+		..\..\Common\ogldev_atb.cpp = ..\..\Common\ogldev_atb.cpp
+		..\..\Common\ogldev_backend.cpp = ..\..\Common\ogldev_backend.cpp
+		..\..\Common\ogldev_basic_glfw_camera.cpp = ..\..\Common\ogldev_basic_glfw_camera.cpp
+		..\..\Common\ogldev_basic_lighting.cpp = ..\..\Common\ogldev_basic_lighting.cpp
+		..\..\Common\ogldev_basic_mesh.cpp = ..\..\Common\ogldev_basic_mesh.cpp
+		..\..\Common\ogldev_flat_passthru_technique.cpp = ..\..\Common\ogldev_flat_passthru_technique.cpp
+		..\..\Common\ogldev_forward_lighting.cpp = ..\..\Common\ogldev_forward_lighting.cpp
+		..\..\Common\ogldev_forward_renderer.cpp = ..\..\Common\ogldev_forward_renderer.cpp
+		..\..\Common\ogldev_forward_skinning.cpp = ..\..\Common\ogldev_forward_skinning.cpp
+		..\..\Common\ogldev_glfw.cpp = ..\..\Common\ogldev_glfw.cpp
+		..\..\Common\ogldev_glfw_backend.cpp = ..\..\Common\ogldev_glfw_backend.cpp
+		..\..\Common\ogldev_new_lighting.cpp = ..\..\Common\ogldev_new_lighting.cpp
+		..\..\Common\ogldev_phong_renderer.cpp = ..\..\Common\ogldev_phong_renderer.cpp
+		..\..\Common\ogldev_rendering_subsystem.cpp = ..\..\Common\ogldev_rendering_subsystem.cpp
+		..\..\Common\ogldev_rendering_subsystem_gl.cpp = ..\..\Common\ogldev_rendering_subsystem_gl.cpp
+		..\..\Common\ogldev_shadow_cube_map_fbo.cpp = ..\..\Common\ogldev_shadow_cube_map_fbo.cpp
+		..\..\Common\ogldev_shadow_map_fbo.cpp = ..\..\Common\ogldev_shadow_map_fbo.cpp
+		..\..\Common\ogldev_shadow_map_offset_texture.cpp = ..\..\Common\ogldev_shadow_map_offset_texture.cpp
+		..\..\Common\ogldev_shadow_mapping_technique.cpp = ..\..\Common\ogldev_shadow_mapping_technique.cpp
+		..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp = ..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp
+		..\..\Common\ogldev_skinned_mesh.cpp = ..\..\Common\ogldev_skinned_mesh.cpp
+		..\..\Common\ogldev_skinning_technique.cpp = ..\..\Common\ogldev_skinning_technique.cpp
+		..\..\Common\ogldev_skybox.cpp = ..\..\Common\ogldev_skybox.cpp
+		..\..\Common\ogldev_skybox_technique.cpp = ..\..\Common\ogldev_skybox_technique.cpp
+		..\..\Common\ogldev_skydome.cpp = ..\..\Common\ogldev_skydome.cpp
+		..\..\Common\ogldev_skydome_technique.cpp = ..\..\Common\ogldev_skydome_technique.cpp
+		..\..\Common\ogldev_sprite_technique.cpp = ..\..\Common\ogldev_sprite_technique.cpp
+		..\..\Common\ogldev_tex_technique.cpp = ..\..\Common\ogldev_tex_technique.cpp
+		..\..\Common\ogldev_texture.cpp = ..\..\Common\ogldev_texture.cpp
+		..\..\Common\ogldev_util.cpp = ..\..\Common\ogldev_util.cpp
+		..\..\Common\ogldev_vulkan.cpp = ..\..\Common\ogldev_vulkan.cpp
+		..\..\Common\ogldev_vulkan_core.cpp = ..\..\Common\ogldev_vulkan_core.cpp
+		..\..\Common\ogldev_win32_control.cpp = ..\..\Common\ogldev_win32_control.cpp
+		..\..\Common\ogldev_world_transform.cpp = ..\..\Common\ogldev_world_transform.cpp
+		..\..\Common\ogldev_xcb_control.cpp = ..\..\Common\ogldev_xcb_control.cpp
+		..\..\Common\pipeline.cpp = ..\..\Common\pipeline.cpp
+		..\..\Common\random_texture.cpp = ..\..\Common\random_texture.cpp
+		..\..\Common\technique.cpp = ..\..\Common\technique.cpp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -517,12 +570,21 @@ Global
 		{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}.Release|x64.Build.0 = Release|x64
 		{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}.Release|x86.ActiveCfg = Release|Win32
 		{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}.Release|x86.Build.0 = Release|Win32
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Debug|x64.ActiveCfg = Debug|x64
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Debug|x64.Build.0 = Debug|x64
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Debug|x86.ActiveCfg = Debug|Win32
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Debug|x86.Build.0 = Debug|Win32
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Release|x64.ActiveCfg = Release|x64
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Release|x64.Build.0 = Release|x64
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Release|x86.ActiveCfg = Release|Win32
+		{66919A9A-AF4D-4169-B514-5CA3183A565A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{41A0EE6E-7F4F-4650-B76B-3024308136F3} = {1F4F3822-5B5B-46A8-B8E6-253BB09CFB10}
+		{66919A9A-AF4D-4169-B514-5CA3183A565A} = {ACA68C35-1336-405A-85F8-EA7D433F6478}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
