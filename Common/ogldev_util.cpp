@@ -61,31 +61,47 @@ bool ReadFile(const char* pFileName, string& outFile)
 
 
 #ifdef _WIN32
-
-char* ReadBinaryFile(const char* pFileName, int& size)
+char* ReadBinaryFile(const char* pFilename, int& size)
 {
-    HANDLE f = CreateFileA(pFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    FILE* f = NULL;
 
-    if (f == INVALID_HANDLE_VALUE) {
-        OGLDEV_FILE_ERROR(pFileName);
+    errno_t err = fopen_s(&f, pFilename, "rb");
+
+    if (!f) {
+        char buf[256] = { 0 };
+        strerror_s(buf, sizeof(buf), err);
+        OGLDEV_ERROR("Error opening '%s': %s\n", pFilename, buf);
+        exit(0);
+    }
+
+    struct stat stat_buf;
+    int error = stat(pFilename, &stat_buf);
+
+    if (error) {
+        char buf[256] = { 0 };
+        strerror_s(buf, sizeof(buf), err);
+        OGLDEV_ERROR("Error getting file stats: %s\n", buf);
         return NULL;
     }
 
-    size = GetFileSize(f, NULL);
-
-    if (size == INVALID_FILE_SIZE) {
-        OGLDEV_ERROR("Invalid file size %s\n", pFileName);
-        return NULL;
-    }
+    size = stat_buf.st_size;
 
     char* p = (char*)malloc(size);
+    assert(p);
 
-    DWORD bytes_read = 0;
-    bool b = ReadFile(f, p, size, &bytes_read, NULL);
+    size_t bytes_read = fread(p, 1, size, f);
+
+    if (bytes_read != size) {
+        char buf[256] = { 0 };
+        strerror_s(buf, sizeof(buf), err);
+        OGLDEV_ERROR("Read file error file: %s\n", buf);
+        exit(0);
+    }
+
+    fclose(f);
 
     return p;
 }
-
 #else
 char* ReadBinaryFile(const char* pFilename, int& size)
 {
@@ -159,6 +175,7 @@ void WriteBinaryFile(const char* pFilename, const void* pData, int size)
 
 
 #endif
+
 
 void OgldevError(const char* pFileName, uint line, const char* format, ...)
 {
