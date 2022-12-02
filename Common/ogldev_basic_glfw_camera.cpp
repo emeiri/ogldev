@@ -287,8 +287,6 @@ void BasicCamera::Update()
 
     m_up = m_target.Cross(U);
     m_up.Normalize();
-
-    //    printf("Camera target: "); m_target.Print(); printf("\n");
 }
 
 
