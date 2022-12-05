@@ -36,7 +36,7 @@
 #include "ogldev_camera.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
-#include "ogldev_basic_mesh.h"
+#include "mesh.h"
 #include "ogldev_lights_common.h"
 #include "ogldev_shadow_map_fbo.h"
 #include "lighting_technique.h"
@@ -102,9 +102,9 @@ public:
 
     bool Init()
     {
-        if (!m_atb.Init()) {
+        /*if (!m_atb.Init()) {
             return false;
-        }
+        }*/
 
         if (!m_csmFBO.Init(WINDOW_WIDTH, WINDOW_HEIGHT)) {
             return false;
@@ -166,6 +166,7 @@ public:
             return false;
         }
 
+#if 0
         bar = TwNewBar("OGLDEV");
 
         m_pGameCamera->AddToATB(bar);
@@ -184,7 +185,7 @@ public:
         TwDefine(" GLOBAL help='This example shows how to integrate AntTweakBar with OGLDEV.' "); // Message added to the help bar.
 
         TwAddVarRO(bar, "GL Major Version", TW_TYPE_INT32, &gGLMajorVersion, " label='Major version of GL' ");
-
+#endif
         return true;
     }
 
@@ -274,19 +275,19 @@ public:
     virtual void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE OgldevKeyState)
     {
         if (OgldevKeyState == OGLDEV_KEY_STATE_PRESS) {
-            if (m_atb.KeyboardCB(OgldevKey)) {
+           /* if (m_atb.KeyboardCB(OgldevKey)) {
                 return;
-            }
+            }*/
         }
 
         switch (OgldevKey) {
             case OGLDEV_KEY_A:
             {
-                int Pos[2], Size[2];
+             /*   int Pos[2], Size[2];
                 TwGetParam(bar, NULL, "position", TW_PARAM_INT32, 2, Pos);
                 TwGetParam(bar, NULL, "size", TW_PARAM_INT32, 2, Size);
                 OgldevBackendSetMousePos(Pos[0] + Size[0]/2,
-                                         Pos[1] + Size[1]/2);
+                                         Pos[1] + Size[1]/2);*/
                 break;
             }
             case OGLDEV_KEY_ESCAPE:
@@ -301,15 +302,15 @@ public:
 
     virtual void PassiveMouseCB(int x, int y)
     {
-        if (!m_atb.PassiveMouseCB(x, y)) {
+        //if (!m_atb.PassiveMouseCB(x, y)) {
             m_pGameCamera->OnMouse(x, y);
-        }
+        //}
     }
 
 
     virtual void MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)
     {
-        m_atb.MouseCB(Button, State, x, y);
+        //m_atb.MouseCB(Button, State, x, y);
     }
 
 private:
@@ -395,16 +396,16 @@ private:
     CSMTechnique m_ShadowMapEffect;
     Camera* m_pGameCamera;
     DirectionalLight m_dirLight;
-    BasicMesh m_mesh;
+    Mesh m_mesh;
     Orientation m_meshOrientation[NUM_MESHES];
-        BasicMesh m_quad;
+    Mesh m_quad;
     Texture* m_pGroundTex;
     CascadedShadowMapFBO m_csmFBO;
     PersProjInfo m_persProjInfo;
     OrthoProjInfo m_shadowOrthoProjInfo[NUM_CASCADES];
     float m_cascadeEnd[NUM_CASCADES + 1];
-    ATB m_atb;
-    TwBar *bar;
+//    ATB m_atb;
+ //   TwBar *bar;
 };
 
 
