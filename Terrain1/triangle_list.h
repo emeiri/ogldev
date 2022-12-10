@@ -6,36 +6,38 @@
 
 #include "ogldev_math_3d.h"
 
+// this header is included by terrain.h so we have a forward 
+// declaration for BaseTerrain.
 class BaseTerrain;
 
 class TriangleList {
- public:
-    TriangleList();
+public:
+	TriangleList();
 
-    void CreateTriangleList(int Width, int Depth, const BaseTerrain* pTerrain);
+	void CreateTriangleList(int Width, int Depth, const BaseTerrain* pTerrain);
 
-    void Render();
+	void Render();
 
- private:
+private:
 
-    struct Vertex {
-        Vector3f Pos;
+	struct Vertex {
+		Vector3f Pos;
 
-        void InitVertex(const BaseTerrain* pTerrain, int x, int z);
-    };
+		void InitVertex(const BaseTerrain* pTerrain, int x, int z);
+	};
 
-    void CreateGLState();
+	void CreateGLState();
 
-    void PopulateBuffers(const BaseTerrain* pTerrain);
+	void PopulateBuffers(const BaseTerrain* pTerrain);
 
-    void InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices);
-    void InitIndices(std::vector<uint>& Indices);
+	void InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices);
+	void InitIndices(std::vector<uint>& Indices);
 
-    int m_width = 0;
-    int m_depth = 0;
-    GLuint m_vao;
-    GLuint m_vb;
-    GLuint m_ib;
+	int m_width = 0;
+	int m_depth = 0;
+	GLuint m_vao;
+	GLuint m_vb;
+	GLuint m_ib;
 };
 
 #endif

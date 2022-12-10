@@ -1,4 +1,4 @@
- /*
+/*
 
         Copyright 2022 Etay Meiri
 
@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - Tutorial 1
+    Terrain Rendering - demo 1
 */
 
 #include <stdio.h>
@@ -26,7 +26,6 @@
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
-
 #include "terrain.h"
 
 #define WINDOW_WIDTH  1920
@@ -147,7 +146,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(100.0f, 120.0f, -100.0f);
+        Vector3f Pos(100.0f, 120.0f, 0.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -164,13 +163,17 @@ private:
     {
         float WorldScale = 4.0f;
         m_terrain.InitTerrain(WorldScale);
+#ifdef _WIN32		
+        m_terrain.LoadFromFile("..\\data\\heightmap.save");
+#else 
         m_terrain.LoadFromFile("../TerrainData/heightmap.save");
+#endif		
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
-    BaseTerrain m_terrain;
     bool m_isWireframe = false;
+    BaseTerrain m_terrain;
 };
 
 TerrainDemo* app = NULL;
