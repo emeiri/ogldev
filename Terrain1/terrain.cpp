@@ -17,7 +17,6 @@ void BaseTerrain::InitTerrain(float WorldScale)
     }
 
     m_worldScale = WorldScale;
-
 }
 
 
@@ -42,6 +41,7 @@ void BaseTerrain::LoadHeightMapFile(const char* pFilename)
     m_terrainSize = (int)sqrtf((float)FileSize / (float)sizeof(float));
 
     printf("Terrain size %d\n", m_terrainSize);
+
     if ((m_terrainSize * m_terrainSize) != (FileSize / sizeof(float))) {
         printf("%s:%d - '%s' does not contain a square height map - size %d\n", __FILE__, __LINE__, pFilename, FileSize);
         exit(0);

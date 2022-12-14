@@ -42,9 +42,9 @@ void TriangleList::CreateGLState()
 
 	int POS_LOC = 0;
 
-	glEnableVertexAttribArray(POS_LOC);
-
 	size_t NumFloats = 0;
+	
+	glEnableVertexAttribArray(POS_LOC);
 	glVertexAttribPointer(POS_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
 	NumFloats += 3;
 }

@@ -36,15 +36,15 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class TerrainDemo
+class TerrainDemo1
 {
 public:
 
-    TerrainDemo()
+    TerrainDemo1()
     {
     }
 
-    virtual ~TerrainDemo()
+    virtual ~TerrainDemo1()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -130,7 +130,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Chapter1 - Demo 1");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 1");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -146,7 +146,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(100.0f, 120.0f, 0.0f);
+        Vector3f Pos(100.0f, 220.0f, -400.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -176,7 +176,7 @@ private:
     BaseTerrain m_terrain;
 };
 
-TerrainDemo* app = NULL;
+TerrainDemo1* app = NULL;
 
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -203,7 +203,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new TerrainDemo();
+    app = new TerrainDemo1();
 
     app->Init();
 
