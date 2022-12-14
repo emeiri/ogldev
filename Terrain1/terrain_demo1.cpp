@@ -166,7 +166,7 @@ private:
 #ifdef _WIN32		
         m_terrain.LoadFromFile("..\\data\\heightmap.save");
 #else 
-        m_terrain.LoadFromFile("../TerrainData/heightmap.save");
+        m_terrain.LoadFromFile("../data/heightmap.save");
 #endif		
     }
 
