@@ -70,9 +70,9 @@ Vector3f BaseTerrain::GetColor(int x, int z) const
     float Delta = Height - m_minHeight;
     float MaxDelta = m_maxHeight - m_minHeight;
 
-    float f = Delta / MaxDelta;
+    float f = std::max(Delta / MaxDelta, 0.2f);
 
-    Vector3f Color(f, f, f);
+    Vector3f Color(0.1f, f, 0.1f);
 
     return Color;
 }

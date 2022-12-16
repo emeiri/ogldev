@@ -12,6 +12,9 @@ void FaultFormationTerrain::CreateFaultFormation(int Size, int Iterations, float
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
 
+    m_terrainTech.Enable();
+    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+
     m_heightMap.InitArray2D(Size, Size, 0.0f);
 
     CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight, Filter);
@@ -24,10 +27,10 @@ void FaultFormationTerrain::CreateFaultFormation(int Size, int Iterations, float
 
 void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float MinHeight, float MaxHeight, float Filter)
 {
-    float DeltaHeight = (float)MaxHeight - (float)MinHeight;
+    float DeltaHeight = MaxHeight - MinHeight;
 
     for (int CurIter = 0 ; CurIter < Iterations ; CurIter++) {
-        float Height = (float)MaxHeight - DeltaHeight * ((float)CurIter / (float)Iterations);
+        float Height = MaxHeight - DeltaHeight * ((float)CurIter / (float)Iterations);
 
         TerrainPoint p1, p2;
 

@@ -31,8 +31,12 @@ public:
 
     void SetVP(const Matrix4f& VP);
 
+    void SetMinMaxHeight(float Min, float Max);
+
 private:
     GLuint m_VPLoc = -1;
+    GLuint m_minHeightLoc = -1;
+    GLuint m_maxHeightLoc = -1;
 };
 
 #endif  /* TERRAIN_TECHNIQUE_H */
