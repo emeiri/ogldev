@@ -82,6 +82,7 @@ class Array2D {
 
     Type* GetAddr(int Col, int Row) const
     {
+#ifndef NDEBUG
         if (Col < 0) {
             printf("%s:%d - negative col %d\n", __FILE__, __LINE__, Col);
         }
@@ -99,7 +100,7 @@ class Array2D {
             printf("%s:%d - row overflow (%d vs %d)\n", __FILE__, __LINE__, Row, m_rows);
             exit(0);
         }
-
+#endif
         size_t Index = Row * m_cols + Col;
 
         return &m_p[Index];
@@ -132,10 +133,12 @@ class Array2D {
 
     Type Get(int Index) const
     {
+#ifndef NDEBUG
         if (Index >= m_rows * m_cols) {
             printf("%s:%d - index %d is out of bounds (max size %d)\n", __FILE__, __LINE__, Index, m_rows * m_cols);
             exit(0);
         }
+#endif
 
         return m_p[Index];
     }
@@ -148,10 +151,12 @@ class Array2D {
 
     void Set(int Index, Type Val)
     {
+#ifndef NDEBUG
         if (Index >= m_rows * m_cols) {
             printf("%s:%d - index %d is out of bounds (max size %d)\n", __FILE__, __LINE__, Index, m_rows * m_cols);
             exit(0);
         }
+#endif
 
         m_p[Index] = Val;
     }
