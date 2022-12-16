@@ -15,6 +15,7 @@ class FaultFormationTerrain : public BaseTerrain {
     void GenRandomTerrainPoints(TerrainPoint& p1, TerrainPoint& p2);
     void ApplyFIRFilter(float Filter);
     void ApplyFIRFilterBand(int Start, int Stride, int Count, float Filter);
+    float FIRFilterSinglePoint(int x, int z, float PrevFractalVal, float Filter);
 };
 
 #endif

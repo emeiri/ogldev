@@ -170,7 +170,7 @@ private:
         m_terrain.InitTerrain(WorldScale);
 
         int Size = 256;
-        int Iterations = 20;
+        int Iterations = 50;
         float MinHeight = 0.0f;
         float MaxHeight = 250.0f;
         float Filter = 0.005f;

@@ -70,7 +70,7 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
 #ifdef DEBUG_PRINT
             printf("\n");
 #endif
-       //     ApplyFIRFilter(Filter);
+            ApplyFIRFilter(Filter);
         }
     }
 }
@@ -79,48 +79,46 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
 void FaultFormationTerrain::ApplyFIRFilter(float Filter)
 {
     // left to right
-    for (int y = 0 ; y < m_terrainSize ; y++) {
-        float PrevFractalVal = m_heightMap.Get(0, y);
+    for (int z = 0 ; z < m_terrainSize ; z++) {
+        float PrevFractalVal = m_heightMap.Get(0, z);
         for (int x = 1 ; x < m_terrainSize ; x++) {
-            float CurFractalVal = m_heightMap.Get(x, y);
-            float NewVal = Filter * PrevFractalVal + (1 - Filter) * CurFractalVal;
-            m_heightMap.Set(x, y, NewVal);
-            PrevFractalVal = NewVal;
+            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
         }
     }
 
     // right to left
-    for (int y = 0 ; y < m_terrainSize ; y++) {
-        float PrevFractalVal = m_heightMap.Get(m_terrainSize - 1, y);
+    for (int z = 0 ; z < m_terrainSize ; z++) {
+        float PrevFractalVal = m_heightMap.Get(m_terrainSize - 1, z);
         for (int x = m_terrainSize - 2 ; x >= 0 ; x--) {
-            float CurFractalVal = m_heightMap.Get(x, y);
-            float NewVal = Filter * PrevFractalVal + (1 - Filter) * CurFractalVal;
-            m_heightMap.Set(x, y, NewVal);
-            PrevFractalVal = NewVal;
+            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
         }
     }
 
     // top to bottom
     for (int x = 0 ; x < m_terrainSize ; x++) {
         float PrevFractalVal = m_heightMap.Get(x, 0);
-        for (int y = 1 ; y < m_terrainSize ; y++) {
-            float CurFractalVal = m_heightMap.Get(x, y);
-            float NewVal = Filter * PrevFractalVal + (1 - Filter) * CurFractalVal;
-            m_heightMap.Set(x, y, NewVal);
-            PrevFractalVal = NewVal;
+        for (int z = 1 ; z < m_terrainSize ; z++) {
+            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
         }
     }
 
     // bottom to top
     for (int x = 0 ; x < m_terrainSize ; x++) {
         float PrevFractalVal = m_heightMap.Get(x, m_terrainSize - 1);
-        for (int y = m_terrainSize - 2 ; y >= 0 ; y--) {
-            float CurFractalVal = m_heightMap.Get(x, y);
-            float NewVal = Filter * PrevFractalVal + (1 - Filter) * CurFractalVal;
-            m_heightMap.Set(x, y, NewVal);
-            PrevFractalVal = NewVal;
+        for (int z = m_terrainSize - 2 ; z >= 0 ; z--) {
+            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
         }
     }
+}
+
+
+float FaultFormationTerrain::FIRFilterSinglePoint(int x, int z, float PrevFractalVal, float Filter)
+{
+    float CurFractalVal = m_heightMap.Get(x, z);
+    float NewVal = Filter * PrevFractalVal + (1 - Filter) * CurFractalVal;
+    m_heightMap.Set(x, z, NewVal);
+    PrevFractalVal = NewVal;
+    return PrevFractalVal;
 }
 
 
