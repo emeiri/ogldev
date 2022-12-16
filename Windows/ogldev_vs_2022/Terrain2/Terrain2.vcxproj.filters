@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{03d3bf34-434a-42d3-b90c-0168e09b9db4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI">
+      <UniqueIdentifier>{932f7616-23b9-47a3-909b-90fed7fc74f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
+    <ClCompile Include="..\..\..\Terrain2\fault_formation_terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain2\terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain2\terrain_demo2.cpp" />
+    <ClCompile Include="..\..\..\Terrain2\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain2\triangle_list.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Terrain2\terrain.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain2\terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Terrain2\fault_formation_terrain.h" />
+    <ClInclude Include="..\..\..\Terrain2\terrain.h" />
+    <ClInclude Include="..\..\..\Terrain2\terrain_technique.h" />
+    <ClInclude Include="..\..\..\Terrain2\triangle_list.h" />
+  </ItemGroup>
+</Project>
