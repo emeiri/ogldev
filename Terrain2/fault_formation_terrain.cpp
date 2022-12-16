@@ -1,21 +1,21 @@
 
 #include "fault_formation_terrain.h"
 
-void FaultFormationTerrain::CreateFaultFormation(int Size, int Iterations, float MinHeight, float MaxHeight, float Filter)
+void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations, float MinHeight, float MaxHeight, float Filter)
 {
     if (MinHeight >= MaxHeight) {
         printf("%s: MinHeight (%f) must be less-than MaxHeight (%f\n)", __FUNCTION__, MinHeight, MaxHeight);
         assert(0);
     }
 
-    m_terrainSize = Size;
+    m_terrainSize = TerrainSize;
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
 
     m_terrainTech.Enable();
     m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 
-    m_heightMap.InitArray2D(Size, Size, 0.0f);
+    m_heightMap.InitArray2D(TerrainSize, TerrainSize, 0.0f);
 
     CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight, Filter);
 
@@ -30,7 +30,8 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
     float DeltaHeight = MaxHeight - MinHeight;
 
     for (int CurIter = 0 ; CurIter < Iterations ; CurIter++) {
-        float Height = MaxHeight - DeltaHeight * ((float)CurIter / (float)Iterations);
+        float IterationRatio = ((float)CurIter / (float)Iterations);
+        float Height = MaxHeight - IterationRatio * DeltaHeight;
 
         TerrainPoint p1, p2;
 
@@ -73,9 +74,11 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
 #ifdef DEBUG_PRINT
             printf("\n");
 #endif
-            ApplyFIRFilter(Filter);
-        }
+            
+        }        
     }
+
+    ApplyFIRFilter(Filter);
 }
 
 
@@ -83,45 +86,44 @@ void FaultFormationTerrain::ApplyFIRFilter(float Filter)
 {
     // left to right
     for (int z = 0 ; z < m_terrainSize ; z++) {
-        float PrevFractalVal = m_heightMap.Get(0, z);
+        float PrevVal = m_heightMap.Get(0, z);
         for (int x = 1 ; x < m_terrainSize ; x++) {
-            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
         }
     }
 
     // right to left
     for (int z = 0 ; z < m_terrainSize ; z++) {
-        float PrevFractalVal = m_heightMap.Get(m_terrainSize - 1, z);
+        float PrevVal = m_heightMap.Get(m_terrainSize - 1, z);
         for (int x = m_terrainSize - 2 ; x >= 0 ; x--) {
-            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
-        }
-    }
-
-    // top to bottom
-    for (int x = 0 ; x < m_terrainSize ; x++) {
-        float PrevFractalVal = m_heightMap.Get(x, 0);
-        for (int z = 1 ; z < m_terrainSize ; z++) {
-            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
         }
     }
 
     // bottom to top
     for (int x = 0 ; x < m_terrainSize ; x++) {
-        float PrevFractalVal = m_heightMap.Get(x, m_terrainSize - 1);
+        float PrevVal = m_heightMap.Get(x, 0);
+        for (int z = 1 ; z < m_terrainSize ; z++) {
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
+        }
+    }
+
+    // top to bottom
+    for (int x = 0 ; x < m_terrainSize ; x++) {
+        float PrevVal = m_heightMap.Get(x, m_terrainSize - 1);
         for (int z = m_terrainSize - 2 ; z >= 0 ; z--) {
-            PrevFractalVal = FIRFilterSinglePoint(x, z, PrevFractalVal, Filter);
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
         }
     }
 }
 
 
-float FaultFormationTerrain::FIRFilterSinglePoint(int x, int z, float PrevFractalVal, float Filter)
+float FaultFormationTerrain::FIRFilterSinglePoint(int x, int z, float PrevVal, float Filter)
 {
-    float CurFractalVal = m_heightMap.Get(x, z);
-    float NewVal = Filter * PrevFractalVal + (1 - Filter) * CurFractalVal;
+    float CurVal = m_heightMap.Get(x, z);
+    float NewVal = Filter * PrevVal + (1 - Filter) * CurVal;
     m_heightMap.Set(x, z, NewVal);
-    PrevFractalVal = NewVal;
-    return PrevFractalVal;
+    return NewVal;
 }
 
 
@@ -131,6 +133,7 @@ void FaultFormationTerrain::GenRandomTerrainPoints(TerrainPoint& p1, TerrainPoin
     p1.z = rand() % m_terrainSize;
 
     int Counter = 0;
+
     do {
         p2.x = rand() % m_terrainSize;
         p2.z = rand() % m_terrainSize;

@@ -19,8 +19,6 @@
 #include "terrain_technique.h"
 
 
-
-
 TerrainTechnique::TerrainTechnique()
 {
 }

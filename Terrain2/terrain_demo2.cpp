@@ -170,10 +170,10 @@ private:
         m_terrain.InitTerrain(WorldScale);
 
         int Size = 256;
-        int Iterations = 50;
+        int Iterations = 500;
         float MinHeight = 0.0f;
-        float MaxHeight = 250.0f;
-        float Filter = 0.005f;
+        float MaxHeight = 300.0f;
+        float Filter = 0.1f;
         m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
     }
 
