@@ -36,3 +36,6 @@ read.lock
 *.zip
 *.jpeg
 *.blend
+*.db-shm
+*.db-wal
+*.opendb

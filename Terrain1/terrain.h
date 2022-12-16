@@ -22,6 +22,7 @@ public:
 	float GetHeight(int x, int z) const { return m_heightMap.Get(x, z); }
 
 	float GetWorldScale() const { return m_worldScale; }
+
 protected:
 	void LoadHeightMapFile(const char* pFilename);
 

@@ -21,8 +21,6 @@ class BaseTerrain
 
 	float GetHeight(int x, int z) const { return m_heightMap.Get(x, z); }
 
-    Vector3f GetColor(int x, int z) const;
-
 	float GetWorldScale() const { return m_worldScale; }
 
  protected:
@@ -50,7 +48,6 @@ class BaseTerrain
     TerrainTechnique m_terrainTech;
     float m_minHeight = 0;
     float m_maxHeight = 0;
-    float m_heightScale;
 };
 
 #endif

@@ -22,7 +22,6 @@ class TriangleList {
 
     struct Vertex {
         Vector3f Pos;
-        Vector3f Color;
 
         void InitVertex(const BaseTerrain* pTerrain, int x, int z);
     };

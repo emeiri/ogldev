@@ -21,7 +21,9 @@
 
 #ifdef _WIN64
 #ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
+// For some reason this works on in Debug build of Visual Studio but not in Release build.
+// The solution people suggested was to define this as a preprocessor macro in the project.
+#define _USE_MATH_DEFINES 
 #endif
 #include <cmath>
 #else

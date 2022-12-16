@@ -8,6 +8,7 @@
 
 #include "terrain.h"
 
+//#define DEBUG_PRINT
 
 void BaseTerrain::InitTerrain(float WorldScale)
 {
@@ -60,16 +61,5 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 
     m_triangleList.Render();
 }
-
-
-
-
-
-
-
-
-
-
-
 
 

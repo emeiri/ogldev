@@ -40,16 +40,11 @@ void TriangleList::CreateGLState()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
 
     int POS_LOC = 0;
-    int COLOR_LOC = 1;
 
 	size_t NumFloats = 0;
 	
     glEnableVertexAttribArray(POS_LOC);
     glVertexAttribPointer(POS_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
-	NumFloats += 3;
-
-    glEnableVertexAttribArray(COLOR_LOC);
-    glVertexAttribPointer(COLOR_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
     NumFloats += 3;
 }
 
@@ -79,8 +74,9 @@ void TriangleList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
 	float WorldScale = pTerrain->GetWorldScale();
 
 	Pos = Vector3f(x * WorldScale, y, z * WorldScale);
-    Color = pTerrain->GetColor(x, z);
 }
+
+
 void TriangleList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices)
 {
     int Index = 0;
