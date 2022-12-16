@@ -25,10 +25,6 @@ void TriangleList::CreateTriangleList(int Width, int Depth, const BaseTerrain* p
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-struct Vertex {
-    Vector3f Pos;
-    Vector3f Color;
-};
 
 void TriangleList::CreateGLState()
 {
@@ -37,6 +33,7 @@ void TriangleList::CreateGLState()
     glBindVertexArray(m_vao);
 
     glGenBuffers(1, &m_vb);
+
     glBindBuffer(GL_ARRAY_BUFFER, m_vb);
 
     glGenBuffers(1, &m_ib);
@@ -61,7 +58,7 @@ void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
 {
     std::vector<Vertex> Vertices;
     Vertices.resize(m_width * m_depth);
-    printf("Preparing space for %d vertices\n", (int)Vertices.size());
+
     InitVertices(pTerrain, Vertices);
 
 	std::vector<unsigned int> Indices;
@@ -78,8 +75,9 @@ void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
 void TriangleList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
 {
     float y = pTerrain->GetHeight(x, z);
-    //    printf("%f\n", y);
+
 	float WorldScale = pTerrain->GetWorldScale();
+
 	Pos = Vector3f(x * WorldScale, y, z * WorldScale);
     Color = pTerrain->GetColor(x, z);
 }
@@ -105,7 +103,6 @@ void TriangleList::InitIndices(std::vector<unsigned int>& Indices)
 
     for (int z = 0 ; z < m_depth - 1 ; z++) {
         for (int x = 0 ; x < m_width - 1 ; x++) {
-            //            printf("%d %d\n", x, z);
 			unsigned int IndexBottomLeft = z * m_width + x;
 			unsigned int IndexTopLeft = (z + 1) * m_width + x;
 			unsigned int IndexTopRight = (z + 1) * m_width + x + 1;

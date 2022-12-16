@@ -1,3 +1,4 @@
+
 #include "fault_formation_terrain.h"
 
 void FaultFormationTerrain::CreateFaultFormation(int Size, int Iterations, float MinHeight, float MaxHeight, float Filter)
@@ -13,7 +14,7 @@ void FaultFormationTerrain::CreateFaultFormation(int Size, int Iterations, float
 
     m_heightMap.InitArray2D(Size, Size, 0.0f);
 
-    CreateFaultFormationF32(Iterations, MinHeight, MaxHeight, Filter);
+    CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight, Filter);
 
     m_heightMap.Normalize(MinHeight, MaxHeight);
 
@@ -21,7 +22,7 @@ void FaultFormationTerrain::CreateFaultFormation(int Size, int Iterations, float
 }
 
 
-void FaultFormationTerrain::CreateFaultFormationF32(int Iterations, float MinHeight, float MaxHeight, float Filter)
+void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float MinHeight, float MaxHeight, float Filter)
 {
     float DeltaHeight = (float)MaxHeight - (float)MinHeight;
 
@@ -69,7 +70,7 @@ void FaultFormationTerrain::CreateFaultFormationF32(int Iterations, float MinHei
 #ifdef DEBUG_PRINT
             printf("\n");
 #endif
-            ApplyFIRFilter(Filter);
+       //     ApplyFIRFilter(Filter);
         }
     }
 }
@@ -122,21 +123,6 @@ void FaultFormationTerrain::ApplyFIRFilter(float Filter)
     }
 }
 
-/*
-void FaultFormationTerrain::ApplyFIRFilterBand(Array2D<float>& TempData, int Start, int Stride, int Count, float Filter)
-{
-        assert(Start < TempData.size());
-
-    float v = TempData[Start];
-
-    for (int i = 1 ; i < Count ; i++) {
-        int Index = Start + i * Stride;
-        assert(Index < TempData.size());
-        TempData[Index] = v * Filter + (1 - Filter) * TempData[Index];
-        v = TempData[Index];
-        }
-}*/
-
 
 void FaultFormationTerrain::GenRandomTerrainPoints(TerrainPoint& p1, TerrainPoint& p2)
 {
@@ -152,5 +138,5 @@ void FaultFormationTerrain::GenRandomTerrainPoints(TerrainPoint& p1, TerrainPoin
             printf("Endless loop detected in %s:%d\n", __FILE__, __LINE__);
             assert(0);
         }
-    } while ((p1.x == p2.x) && (p1.z == p2.z));
+    } while (p1.IsEqual(p2));
 }

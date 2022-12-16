@@ -18,6 +18,10 @@
     Terrain Rendering - Chapter 2 - demo 1
 */
 
+#ifdef _WIN64
+#include <Windows.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -53,7 +57,7 @@ public:
 
     void Init()
     {
-        CreateWindow();
+        CreateWindow_(); // added '_' because of conflict with Windows.h
 
         InitCallbacks();
 
@@ -76,8 +80,6 @@ public:
     void RenderScene()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        m_pGameCamera->OnRender();
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -128,7 +130,7 @@ public:
 
 private:
 
-    void CreateWindow()
+    void CreateWindow_()
     {
         int major_ver = 0;
         int minor_ver = 0;
@@ -170,7 +172,7 @@ private:
         int Size = 256;
         int Iterations = 20;
         float MinHeight = 0.0f;
-        float MaxHeight = 50.0f;
+        float MaxHeight = 250.0f;
         float Filter = 0.005f;
         m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
     }
@@ -207,7 +209,11 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-   // srandom(getpid());
+#ifdef _WIN64
+    srand(GetCurrentProcessId());
+#else
+    srand(getpid());
+#endif
 
     app = new TerrainDemo2();
 

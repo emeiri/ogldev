@@ -1,8 +1,6 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#include <vector>
-
 #include "ogldev_types.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_array_2d.h"
@@ -35,6 +33,11 @@ class BaseTerrain
         void Print()
         {
             printf("[%d,%d]", x, z);
+        }
+
+        bool IsEqual(TerrainPoint& p) const
+        {
+            return ((x == p.x) && (z == p.z));
         }
     };
 

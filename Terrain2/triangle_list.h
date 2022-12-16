@@ -6,6 +6,8 @@
 
 #include "ogldev_math_3d.h"
 
+// this header is included by terrain.h so we have a forward 
+// declaration for BaseTerrain.
 class BaseTerrain;
 
 class TriangleList {
@@ -17,6 +19,7 @@ class TriangleList {
     void Render();
 
  private:
+
     struct Vertex {
         Vector3f Pos;
         Vector3f Color;
