@@ -4,6 +4,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{03d3bf34-434a-42d3-b90c-0168e09b9db4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGUI">
+      <UniqueIdentifier>{932f7616-23b9-47a3-909b-90fed7fc74f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
