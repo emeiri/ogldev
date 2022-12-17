@@ -39,3 +39,5 @@ read.lock
 *.db-shm
 *.db-wal
 *.opendb
+/Windows/ogldev_vs_2022/Terrain2/x64/Release/*.iobj
+/Windows/ogldev_vs_2022/Terrain2/x64/Release/*.ipdb
