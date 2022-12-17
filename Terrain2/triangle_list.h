@@ -14,7 +14,11 @@ class TriangleList {
  public:
     TriangleList();
 
+    ~TriangleList();
+
     void CreateTriangleList(int Width, int Depth, const BaseTerrain* pTerrain);
+
+    void Destroy();
 
     void Render();
 
@@ -34,9 +38,9 @@ class TriangleList {
 
     int m_width = 0;
     int m_depth = 0;
-    GLuint m_vao;
-    GLuint m_vb;
-    GLuint m_ib;
+    GLuint m_vao = 0;
+    GLuint m_vb = 0;
+    GLuint m_ib = 0;
 };
 
 #endif

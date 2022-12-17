@@ -18,6 +18,10 @@
     Terrain Rendering - Chapter 2 - demo 1
 */
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #ifdef _WIN64
 #include <Windows.h>
 #endif
@@ -64,22 +68,64 @@ public:
         InitCamera();
 
         InitTerrain();
+
+        InitGUI();
     }
 
 
     void Run()
     {
         while (!glfwWindowShouldClose(window)) {
-            RenderScene();
-            glfwSwapBuffers(window);
             glfwPollEvents();
+
+            if (m_showGui) {
+                // Start the Dear ImGui frame
+                ImGui_ImplOpenGL3_NewFrame();
+                ImGui_ImplGlfw_NewFrame();
+                ImGui::NewFrame();
+
+                static int Iterations = 100;
+                static float MaxHeight = 200.0f;
+                static float Filter = 0.2f;
+
+                ImGui::Begin("Terrain Demo 2");                          // Create a window called "Hello, world!" and append into it.
+
+                ImGui::SliderInt("Iterations", &Iterations, 0, 1000);
+                ImGui::SliderFloat("MaxHeight", &MaxHeight, 0.0f, 1000.0f);
+                ImGui::SliderFloat("Filter", &Filter, 0.0f, 1.0f);
+
+                if (ImGui::Button("Generate")) {
+                    m_terrain.Destroy();
+                    int Size = 256;
+                    float MinHeight = 0.0f;
+                    m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
+                }
+
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::End();
+
+                // Rendering
+                ImGui::Render();
+                int display_w, display_h;
+                glfwGetFramebufferSize(window, &display_w, &display_h);
+                glViewport(0, 0, display_w, display_h);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            }
+
+            RenderScene();            
+
+            glfwSwapBuffers(window);
         }
     }
 
 
     void RenderScene()
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (!m_showGui) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        }
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -87,7 +133,9 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-        m_pGameCamera->OnMouse(x, y);
+        if (!m_showGui) {
+            m_pGameCamera->OnMouse(x, y);
+        }
     }
 
     void KeyboardCB(uint key, int state)
@@ -115,6 +163,8 @@ public:
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
 
+            case GLFW_KEY_SPACE:
+                m_showGui = !m_showGui;
                 break;
             }
         }
@@ -151,7 +201,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(100.0f, 100.0f, -150.0f);
+        Vector3f Pos(100.0f, 200.0f, -150.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -177,10 +227,30 @@ private:
         m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
     }
 
+
+    void InitGUI()
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+
+        // Setup Platform/Renderer backends
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        const char* glsl_version = "#version 130";
+        ImGui_ImplOpenGL3_Init(glsl_version);
+    }
+
+
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     bool m_isWireframe = false;
     FaultFormationTerrain m_terrain;
+    bool m_showGui = false;
 };
 
 TerrainDemo2* app = NULL;

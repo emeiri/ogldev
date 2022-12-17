@@ -13,6 +13,10 @@ class BaseTerrain
  public:
     BaseTerrain() {}
 
+    ~BaseTerrain();
+
+    void Destroy();
+
 	void InitTerrain(float WorldScale);
 
     void Render(const BasicCamera& Camera);

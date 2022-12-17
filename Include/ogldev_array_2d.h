@@ -75,8 +75,15 @@ class Array2D {
 
     ~Array2D()
     {
+        Destroy();
+    }
+
+
+    void Destroy()
+    {
         if (m_p) {
             free(m_p);
+            m_p = NULL;
         }
     }
 

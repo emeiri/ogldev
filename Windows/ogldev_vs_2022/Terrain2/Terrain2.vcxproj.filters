@@ -19,6 +19,24 @@
     <ClCompile Include="..\..\..\Terrain2\terrain_demo2.cpp" />
     <ClCompile Include="..\..\..\Terrain2\terrain_technique.cpp" />
     <ClCompile Include="..\..\..\Terrain2\triangle_list.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Terrain2\terrain.fs">
@@ -33,5 +51,32 @@
     <ClInclude Include="..\..\..\Terrain2\terrain.h" />
     <ClInclude Include="..\..\..\Terrain2\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain2\triangle_list.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
