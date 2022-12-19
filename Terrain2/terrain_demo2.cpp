@@ -98,7 +98,7 @@ public:
                     m_terrain.Destroy();
                     int Size = 256;
                     float MinHeight = 0.0f;
-                    m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
+                    m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight);
                 }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -224,7 +224,7 @@ private:
         float MinHeight = 0.0f;
         float MaxHeight = 300.0f;
         float Filter = 0.1f;
-        m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
+        m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight);
     }
 
 

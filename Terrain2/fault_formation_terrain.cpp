@@ -1,7 +1,7 @@
 
 #include "fault_formation_terrain.h"
 
-void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations, float MinHeight, float MaxHeight, float Filter)
+void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations, float MinHeight, float MaxHeight)
 {
     if (MinHeight >= MaxHeight) {
         printf("%s: MinHeight (%f) must be less-than MaxHeight (%f\n)", __FUNCTION__, MinHeight, MaxHeight);
@@ -12,20 +12,15 @@ void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
 
-    m_terrainTech.Enable();
-    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
-
     m_heightMap.InitArray2D(TerrainSize, TerrainSize, 0.0f);
 
-    CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight, Filter);
-
-    m_heightMap.Normalize(MinHeight, MaxHeight);
+    CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight);
 
     m_triangleList.CreateTriangleList(m_terrainSize, m_terrainSize, this);
 }
 
 
-void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float MinHeight, float MaxHeight, float Filter)
+void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float MinHeight, float MaxHeight)
 {
     float DeltaHeight = MaxHeight - MinHeight;
 
@@ -40,36 +35,17 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
         int DirX = p2.x - p1.x;
         int DirZ = p2.z - p1.z;
 
-        printf("Iter %d Height %f\n", CurIter, Height);
-#ifdef DEBUG_PRINT
-        printf("Random points: "); p1.Print(); printf(" --> "); p2.Print(); printf("\n");
-        printf("   ");
-        for (int i = 0 ; i < m_terrainSize ; i++) {
-            printf("%4d ", i);
-        }
-        printf("\n");
-#endif
-
         for (int z = 0 ; z < m_terrainSize ; z++) {
-#ifdef DEBUG_PRINT
-            printf("%d: ", z);
-#endif
             for (int x = 0 ; x < m_terrainSize ; x++) {
                 int DirX_in = x - p1.x;
                 int DirZ_in = z - p1.z;
 
                 int CrossProduct = DirX_in * DirZ - DirX * DirZ_in;
-#ifdef DEBUG_PRINT
-                //                printf("%4d ", CrossProduct);
-#endif
+
                 if (CrossProduct > 0) {
                     float CurHeight = m_heightMap.Get(x, z);
                     m_heightMap.Set(x, z, CurHeight + Height);
                 }
-
-#ifdef DEBUG_PRINT
-                printf("%f ", m_heightMap.Get(x, z));
-#endif
             }
 #ifdef DEBUG_PRINT
             printf("\n");
@@ -77,53 +53,6 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
             
         }        
     }
-
-    ApplyFIRFilter(Filter);
-}
-
-
-void FaultFormationTerrain::ApplyFIRFilter(float Filter)
-{
-    // left to right
-    for (int z = 0 ; z < m_terrainSize ; z++) {
-        float PrevVal = m_heightMap.Get(0, z);
-        for (int x = 1 ; x < m_terrainSize ; x++) {
-            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
-        }
-    }
-
-    // right to left
-    for (int z = 0 ; z < m_terrainSize ; z++) {
-        float PrevVal = m_heightMap.Get(m_terrainSize - 1, z);
-        for (int x = m_terrainSize - 2 ; x >= 0 ; x--) {
-            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
-        }
-    }
-
-    // bottom to top
-    for (int x = 0 ; x < m_terrainSize ; x++) {
-        float PrevVal = m_heightMap.Get(x, 0);
-        for (int z = 1 ; z < m_terrainSize ; z++) {
-            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
-        }
-    }
-
-    // top to bottom
-    for (int x = 0 ; x < m_terrainSize ; x++) {
-        float PrevVal = m_heightMap.Get(x, m_terrainSize - 1);
-        for (int z = m_terrainSize - 2 ; z >= 0 ; z--) {
-            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
-        }
-    }
-}
-
-
-float FaultFormationTerrain::FIRFilterSinglePoint(int x, int z, float PrevVal, float Filter)
-{
-    float CurVal = m_heightMap.Get(x, z);
-    float NewVal = Filter * PrevVal + (1 - Filter) * CurVal;
-    m_heightMap.Set(x, z, NewVal);
-    return NewVal;
 }
 
 
