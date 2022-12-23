@@ -1,20 +1,37 @@
+/*
+    Copyright 2022 Etay Meiri
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 
 #include "fault_formation_terrain.h"
 
 void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations, float MinHeight, float MaxHeight)
-{
-    if (MinHeight >= MaxHeight) {
-        printf("%s: MinHeight (%f) must be less-than MaxHeight (%f\n)", __FUNCTION__, MinHeight, MaxHeight);
-        assert(0);
-    }
-
+{  
     m_terrainSize = TerrainSize;
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
 
+    m_terrainTech.Enable();
+    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+
     m_heightMap.InitArray2D(TerrainSize, TerrainSize, 0.0f);
 
     CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight);
+
+    m_heightMap.Normalize(MinHeight, MaxHeight);
 
     m_triangleList.CreateTriangleList(m_terrainSize, m_terrainSize, this);
 }
@@ -47,10 +64,6 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
                     m_heightMap.Set(x, z, CurHeight + Height);
                 }
             }
-#ifdef DEBUG_PRINT
-            printf("\n");
-#endif
-            
         }        
     }
 }

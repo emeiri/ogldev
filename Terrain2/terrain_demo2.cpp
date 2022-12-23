@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - Chapter 2 - demo 1
+    Terrain Rendering - demo 2
 */
 
 #include "imgui.h"
@@ -212,7 +212,7 @@ private:
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
-
+    
 
     void InitTerrain()
     {
@@ -223,7 +223,6 @@ private:
         int Iterations = 500;
         float MinHeight = 0.0f;
         float MaxHeight = 300.0f;
-        float Filter = 0.1f;
         m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight);
     }
 
