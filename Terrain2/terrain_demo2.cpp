@@ -83,11 +83,11 @@ public:
                 ImGui_ImplOpenGL3_NewFrame();
                 ImGui_ImplGlfw_NewFrame();
                 ImGui::NewFrame();
-
+                
                 static int Iterations = 100;
                 static float MaxHeight = 200.0f;
                 static float Filter = 0.2f;
-
+                 
                 ImGui::Begin("Terrain Demo 2");                          // Create a window called "Hello, world!" and append into it.
 
                 ImGui::SliderInt("Iterations", &Iterations, 0, 1000);
@@ -98,7 +98,7 @@ public:
                     m_terrain.Destroy();
                     int Size = 256;
                     float MinHeight = 0.0f;
-                    m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight);
+                    m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
                 }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -223,7 +223,8 @@ private:
         int Iterations = 500;
         float MinHeight = 0.0f;
         float MaxHeight = 300.0f;
-        m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight);
+        float Filter = 0.5f;
+        m_terrain.CreateFaultFormation(Size, Iterations, MinHeight, MaxHeight, Filter);
     }
 
 

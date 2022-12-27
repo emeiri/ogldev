@@ -18,7 +18,7 @@
 
 #include "fault_formation_terrain.h"
 
-void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations, float MinHeight, float MaxHeight)
+void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations, float MinHeight, float MaxHeight, float Filter)
 {  
     m_terrainSize = TerrainSize;
     m_minHeight = MinHeight;
@@ -29,7 +29,7 @@ void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations
 
     m_heightMap.InitArray2D(TerrainSize, TerrainSize, 0.0f);
 
-    CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight);
+    CreateFaultFormationInternal(Iterations, MinHeight, MaxHeight, Filter);
 
     m_heightMap.Normalize(MinHeight, MaxHeight);
 
@@ -37,7 +37,7 @@ void FaultFormationTerrain::CreateFaultFormation(int TerrainSize, int Iterations
 }
 
 
-void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float MinHeight, float MaxHeight)
+void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float MinHeight, float MaxHeight, float Filter)
 {
     float DeltaHeight = MaxHeight - MinHeight;
 
@@ -66,6 +66,53 @@ void FaultFormationTerrain::CreateFaultFormationInternal(int Iterations, float M
             }
         }        
     }
+	
+    ApplyFIRFilter(Filter);
+}
+
+
+void FaultFormationTerrain::ApplyFIRFilter(float Filter)
+{
+    // left to right
+    for (int z = 0 ; z < m_terrainSize ; z++) {
+        float PrevVal = m_heightMap.Get(0, z);
+        for (int x = 1 ; x < m_terrainSize ; x++) {
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
+        }
+    }
+
+    // right to left
+    for (int z = 0 ; z < m_terrainSize ; z++) {
+        float PrevVal = m_heightMap.Get(m_terrainSize - 1, z);
+        for (int x = m_terrainSize - 2 ; x >= 0 ; x--) {
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
+        }
+    }
+
+    // bottom to top
+    for (int x = 0 ; x < m_terrainSize ; x++) {
+        float PrevVal = m_heightMap.Get(x, 0);
+        for (int z = 1 ; z < m_terrainSize ; z++) {
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
+        }
+    }
+
+    // top to bottom
+    for (int x = 0 ; x < m_terrainSize ; x++) {
+        float PrevVal = m_heightMap.Get(x, m_terrainSize - 1);
+        for (int z = m_terrainSize - 2 ; z >= 0 ; z--) {
+            PrevVal = FIRFilterSinglePoint(x, z, PrevVal, Filter);
+        }
+    }
+}
+
+
+float FaultFormationTerrain::FIRFilterSinglePoint(int x, int z, float PrevVal, float Filter)
+{
+    float CurVal = m_heightMap.Get(x, z);
+    float NewVal = Filter * PrevVal + (1 - Filter) * CurVal;
+    m_heightMap.Set(x, z, NewVal);
+    return NewVal;
 }
 
 
