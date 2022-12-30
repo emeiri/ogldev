@@ -65,6 +65,8 @@ void MidpointDispTerrain::CreateMidpointDisplacementF32(float Roughness)
 
 void MidpointDispTerrain::DiamondStep(int RectSize, float CurHeight)
 {
+    int HalfRectSize = RectSize / 2;
+
     for (int y = 0 ; y < m_terrainSize ; y += RectSize) {
         for (int x = 0 ; x < m_terrainSize ; x += RectSize) {
             int next_x = (x + RectSize) % m_terrainSize;
@@ -74,15 +76,13 @@ void MidpointDispTerrain::DiamondStep(int RectSize, float CurHeight)
             float TopRight    = m_heightMap.Get(next_x, y);
             float BottomLeft  = m_heightMap.Get(x, next_y);
             float BottomRight = m_heightMap.Get(next_x, next_y);
-            //  printf("(%d, %d): %f (%d, %d): %f\n", x, y, TopLeft, next_x, y, TopRight);
-            //  printf("(%d, %d): %f (%d, %d): %f\n", x, next_y, BottomLeft, next_x, next_y, BottomRight);
 
-            int mid_x = x + RectSize / 2;
-            int mid_y = y + RectSize / 2;
+            int mid_x = x + HalfRectSize;
+            int mid_y = y + HalfRectSize;
 
             float RandValue = RandomFloatRange(CurHeight, -CurHeight);
             float MidPoint = (TopLeft + TopRight + BottomLeft + BottomRight) / 4.0f;
-            // printf("Mid point (%d, %d): %f Rand %f\n", mid_x, mid_y, MidPoint, RandValue);
+
             m_heightMap.Set(mid_x, mid_y, MidPoint + RandValue);
         }
     }
@@ -115,8 +115,10 @@ void MidpointDispTerrain::SquareStep(int RectSize, float CurHeight)
         for (int x = 0 ; x < m_terrainSize ; x += RectSize) {
             int next_x = (x + RectSize) % m_terrainSize;
             int next_y = (y + RectSize) % m_terrainSize;
+
             int mid_x = x + HalfRectSize;
             int mid_y = y + HalfRectSize;
+            
             int prev_mid_x = (x - HalfRectSize + m_terrainSize) % m_terrainSize;
             int prev_mid_y = (y - HalfRectSize + m_terrainSize) % m_terrainSize;
 
