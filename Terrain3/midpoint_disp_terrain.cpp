@@ -42,9 +42,24 @@ void MidpointDispTerrain::CreateMidpointDisplacement(int TerrainSize, float Roug
 }
 
 
+static int GetNextPowerOfTwo(int x)
+{
+    int ret = 1;
+
+    if (x == 1) {
+        return 2;
+    }
+
+    while (ret < x) {
+        ret = ret * 2;
+    }
+
+    return ret;
+}
+
 void MidpointDispTerrain::CreateMidpointDisplacementF32(float Roughness)
 {
-    int RectSize = m_terrainSize;
+    int RectSize = GetNextPowerOfTwo(m_terrainSize);
     float CurHeight = (float)RectSize / 2.0f;
     float HeightReduce = pow(2.0f, -Roughness);
 
@@ -71,6 +86,14 @@ void MidpointDispTerrain::DiamondStep(int RectSize, float CurHeight)
         for (int x = 0 ; x < m_terrainSize ; x += RectSize) {
             int next_x = (x + RectSize) % m_terrainSize;
             int next_y = (y + RectSize) % m_terrainSize;
+
+            if (next_x < x) {
+                next_x = m_terrainSize - 1;
+            }
+
+            if (next_y < y) {
+                next_y = m_terrainSize - 1;
+            }
 
             float TopLeft     = m_heightMap.Get(x, y);
             float TopRight    = m_heightMap.Get(next_x, y);
@@ -115,6 +138,14 @@ void MidpointDispTerrain::SquareStep(int RectSize, float CurHeight)
         for (int x = 0 ; x < m_terrainSize ; x += RectSize) {
             int next_x = (x + RectSize) % m_terrainSize;
             int next_y = (y + RectSize) % m_terrainSize;
+
+            if (next_x < x) {
+                next_x = m_terrainSize - 1;
+            }
+
+            if (next_y < y) {
+                next_y = m_terrainSize - 1;
+            }
 
             int mid_x = (x + HalfRectSize) % m_terrainSize;
             int mid_y = (y + HalfRectSize) % m_terrainSize;
