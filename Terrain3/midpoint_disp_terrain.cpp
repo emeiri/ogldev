@@ -77,8 +77,8 @@ void MidpointDispTerrain::DiamondStep(int RectSize, float CurHeight)
             float BottomLeft  = m_heightMap.Get(x, next_y);
             float BottomRight = m_heightMap.Get(next_x, next_y);
 
-            int mid_x = x + HalfRectSize;
-            int mid_y = y + HalfRectSize;
+            int mid_x = (x + HalfRectSize) % m_terrainSize;
+            int mid_y = (y + HalfRectSize) % m_terrainSize;
 
             float RandValue = RandomFloatRange(CurHeight, -CurHeight);
             float MidPoint = (TopLeft + TopRight + BottomLeft + BottomRight) / 4.0f;
@@ -116,8 +116,8 @@ void MidpointDispTerrain::SquareStep(int RectSize, float CurHeight)
             int next_x = (x + RectSize) % m_terrainSize;
             int next_y = (y + RectSize) % m_terrainSize;
 
-            int mid_x = x + HalfRectSize;
-            int mid_y = y + HalfRectSize;
+            int mid_x = (x + HalfRectSize) % m_terrainSize;
+            int mid_y = (y + HalfRectSize) % m_terrainSize;
             
             int prev_mid_x = (x - HalfRectSize + m_terrainSize) % m_terrainSize;
             int prev_mid_y = (y - HalfRectSize + m_terrainSize) % m_terrainSize;
