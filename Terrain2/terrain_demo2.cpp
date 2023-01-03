@@ -201,8 +201,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(100.0f, 200.0f, -150.0f);
-        Vector3f Target(0.0f, -0.25f, 1.0f);
+        Vector3f Pos(200.0f, 400.0f, -150.0f);
+        Vector3f Target(0.0f, -0.35f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
