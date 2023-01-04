@@ -18,9 +18,11 @@
     Terrain Rendering - demo 2
 */
 
+#ifdef _WIN64 // until I install imgui on Linux...
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#endif
 
 #ifdef _WIN64
 #include <Windows.h>
@@ -78,6 +80,7 @@ public:
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
 
+#ifdef _WIN64
             if (m_showGui) {
                 // Start the Dear ImGui frame
                 ImGui_ImplOpenGL3_NewFrame();
@@ -113,6 +116,7 @@ public:
 
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             }
+#endif
 
             RenderScene();            
 
@@ -230,6 +234,7 @@ private:
 
     void InitGUI()
     {
+#ifdef _WIN64
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -243,6 +248,7 @@ private:
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         const char* glsl_version = "#version 130";
         ImGui_ImplOpenGL3_Init(glsl_version);
+#endif
     }
 
 
