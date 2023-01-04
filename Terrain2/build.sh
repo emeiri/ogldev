@@ -8,6 +8,4 @@ LDFLAGS=`pkg-config --libs glew glfw3`
 LDFLAGS="$LDFLAGS -lX11"
 SOURCES="terrain_demo2.cpp terrain.cpp triangle_list.cpp terrain_technique.cpp fault_formation_terrain.cpp $OGLDEV_DIR/Common/ogldev_util.cpp $OGLDEV_DIR/Common/math_3d.cpp $OGLDEV_DIR/Common/ogldev_basic_glfw_camera.cpp $OGLDEV_DIR/Common/ogldev_glfw.cpp $OGLDEV_DIR/Common/technique.cpp"
 
-echo $SOURCES
-
 $CC $SOURCES $CPPFLAGS $LDFLAGS -o terrain_demo2
