@@ -42,36 +42,18 @@ void MidpointDispTerrain::CreateMidpointDisplacement(int TerrainSize, float Roug
 }
 
 
-static int GetNextPowerOfTwo(int x)
-{
-    int ret = 1;
-
-    if (x == 1) {
-        return 2;
-    }
-
-    while (ret < x) {
-        ret = ret * 2;
-    }
-
-    return ret;
-}
-
 void MidpointDispTerrain::CreateMidpointDisplacementF32(float Roughness)
 {
-    int RectSize = GetNextPowerOfTwo(m_terrainSize);
+    int RectSize = CalcNextPowerOfTwo(m_terrainSize);
     float CurHeight = (float)RectSize / 2.0f;
     float HeightReduce = pow(2.0f, -Roughness);
 
-    printf("Height reduce %f\n", HeightReduce);
-
     while (RectSize > 0) {
-        printf("RectSize %d Height %f\n", RectSize, CurHeight);
 
         DiamondStep(RectSize, CurHeight);
+
         SquareStep(RectSize, CurHeight);
 
-        printf("---------------\n");
         RectSize /= 2;
         CurHeight *= HeightReduce;
     }
@@ -149,7 +131,7 @@ void MidpointDispTerrain::SquareStep(int RectSize, float CurHeight)
 
             int mid_x = (x + HalfRectSize) % m_terrainSize;
             int mid_y = (y + HalfRectSize) % m_terrainSize;
-            
+              
             int prev_mid_x = (x - HalfRectSize + m_terrainSize) % m_terrainSize;
             int prev_mid_y = (y - HalfRectSize + m_terrainSize) % m_terrainSize;
 

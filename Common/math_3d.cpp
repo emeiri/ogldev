@@ -553,3 +553,19 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
     view_frustum_in_world_space.CalcAABB(final_aabb);
     final_aabb.UpdateOrthoInfo(orthoProjInfo);
 }
+
+
+int CalcNextPowerOfTwo(int x)
+{
+    int ret = 1;
+
+    if (x == 1) {
+        return 2;
+    }
+
+    while (ret < x) {
+        ret = ret * 2;
+    }
+
+    return ret;
+}

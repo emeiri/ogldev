@@ -846,4 +846,6 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
                               Vector3f& LightPosWorld,           // out
                               OrthoProjInfo& orthoProjInfo);     // out
 
+int CalcNextPowerOfTwo(int x);
+
 #endif  /* MATH_3D_H */
