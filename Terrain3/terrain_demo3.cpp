@@ -127,6 +127,20 @@ public:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
+      /*  static float foo = 0.0f;
+        float R = 400.0f;
+        float S = 128.0f;
+
+        Vector3f Pos(S + cosf(foo) * R, 250.0f, S + sinf(foo) * R);
+        m_pGameCamera->SetPosition(Pos);
+
+        Vector3f Center(128.0f, 50.0f, 128.0f);
+        Vector3f Target = Center - Pos;
+        m_pGameCamera->SetTarget(Target);
+        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
+
+        foo += 0.001f;*/
+
         m_terrain.Render(*m_pGameCamera);
     }
 
@@ -185,7 +199,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 2");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 3");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -201,7 +215,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(100.0f, 200.0f, -150.0f);
+        Vector3f Pos(500.0f, 300.0f, -150.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -219,10 +233,10 @@ private:
         float WorldScale = 4.0f;
         m_terrain.InitTerrain(WorldScale);
 
-        int Size = 256;
-        float Roughness = 1.5f;
+        int Size = 255;
+        float Roughness = 1.0f;
         float MinHeight = 0.0f;
-        float MaxHeight = 50.0f;
+        float MaxHeight = 250.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
     }
@@ -280,7 +294,8 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 int main(int argc, char** argv)
 {
 #ifdef _WIN64
-    srand(GetCurrentProcessId());
+   // srand(GetCurrentProcessId());
+    srand(0);
 #else
     srand(getpid());
 #endif
