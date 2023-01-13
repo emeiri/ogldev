@@ -43,7 +43,7 @@ void BaseTerrain::Destroy()
 
 
 
-void BaseTerrain::InitTerrain(float WorldScale, const std::vector<string>& TextureFilenames)
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames)
 {
     if (!m_terrainTech.Init()) {
         printf("Error initializing tech\n");
@@ -58,6 +58,7 @@ void BaseTerrain::InitTerrain(float WorldScale, const std::vector<string>& Textu
 
 
     m_worldScale = WorldScale;
+    m_textureScale = TextureScale;
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
@@ -104,7 +105,7 @@ void BaseTerrain::Render(const BasicCamera& Camera)
     m_terrainTech.Enable();
     m_terrainTech.SetVP(VP);
 
-    for (int i = 0 ; i < 4 ; i++) {
+    for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
         m_pTextures[i]->Bind(COLOR_TEXTURE_UNIT_0 + i);
     }
 

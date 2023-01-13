@@ -36,7 +36,7 @@ class BaseTerrain
 
     void Destroy();
 
-	void InitTerrain(float WorldScale, const std::vector<string>& TextureFilenames);
+	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames);
 
     void Render(const BasicCamera& Camera);
 
@@ -45,6 +45,8 @@ class BaseTerrain
 	float GetHeight(int x, int z) const { return m_heightMap.Get(x, z); }
 
 	float GetWorldScale() const { return m_worldScale; }
+
+    float GetTextureScale() const { return m_textureScale; }
 
     int GetSize() const { return m_terrainSize; }
  protected:
@@ -59,6 +61,7 @@ class BaseTerrain
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     Texture* m_pTextures[4] = { 0 };
+    float m_textureScale = 1.0f;
 };
 
 #endif

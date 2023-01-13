@@ -231,7 +231,8 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 10.0f;
+        float WorldScale = 5.0f;
+        float TextureScale = 10.0f;
         std::vector<string> TextureFilenames;
 #ifdef _WIN64
         TextureFilenames.push_back("..\\Content\\textures\\IMGP5525_seamless.jpg");
@@ -242,7 +243,7 @@ private:
         assert(0);
 #endif
 
-        m_terrain.InitTerrain(WorldScale, TextureFilenames);
+        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
         int Size = 255;
         float Roughness = 1.0f;
