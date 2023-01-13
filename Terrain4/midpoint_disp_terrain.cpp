@@ -26,11 +26,8 @@ void MidpointDispTerrain::CreateMidpointDisplacement(int TerrainSize, float Roug
     }
 
     m_terrainSize = TerrainSize;
-    m_minHeight = MinHeight;
-    m_maxHeight = MaxHeight;
 
-    m_terrainTech.Enable();
-    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+    SetMinMaxHeight(MinHeight, MaxHeight);
 
     m_heightMap.InitArray2D(TerrainSize, TerrainSize, 0.0f);
 

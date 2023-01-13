@@ -37,6 +37,7 @@
 
 #include "texture_config.h"
 #include "midpoint_disp_terrain.h"
+#include "texture_generator.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -228,29 +229,44 @@ private:
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
     
+//#define USE_TEXTURE_GENERATOR
 
     void InitTerrain()
     {
-        float WorldScale = 5.0f;
-        float TextureScale = 10.0f;
-        std::vector<string> TextureFilenames;
-#ifdef _WIN64
-        TextureFilenames.push_back("..\\Content\\textures\\IMGP5525_seamless.jpg");
-        TextureFilenames.push_back("..\\Content\\textures\\tilable-IMG_0044-verydark.png");
-        TextureFilenames.push_back("..\\Content\\textures\\Rock6.png");
-        TextureFilenames.push_back("..\\Content\\textures\\water.png");
+        float WorldScale = 5.0f;        
+
+#ifdef USE_TEXTURE_GENERATOR
+        float TextureScale = 1.0f;
+        m_terrain.InitTerrain(WorldScale, TextureScale);
 #else
-        assert(0);
-#endif
+        std::vector<string> TextureFilenames;
+        TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
+        TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
+        TextureFilenames.push_back("../Content/textures/Rock6.png");
+        TextureFilenames.push_back("../Content/textures/water.png");
 
+        float TextureScale = 10.0f;
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
-
+#endif
         int Size = 255;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
         float MaxHeight = 250.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
+
+#ifdef USE_TEXTURE_GENERATOR
+        TextureGenerator TexGen;
+
+        TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
+        TexGen.LoadTile("../Content/Textures/tilable-IMG_0044-verydark.png");
+        TexGen.LoadTile("../Content/Textures/Rock6.png");
+        TexGen.LoadTile("../Content/Textures/water.png");
+        int TextureSize = 1024;
+
+        Texture* pTexture = TexGen.GenerateTexture(TextureSize, &m_terrain);
+        m_terrain.SetTexture(pTexture);
+#endif
     }
 
 
@@ -260,7 +276,6 @@ private:
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -306,8 +321,8 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 int main(int argc, char** argv)
 {
 #ifdef _WIN64
-   // srand(GetCurrentProcessId());
-    srand(0);
+    srand(GetCurrentProcessId());
+   // srand(0);
 #else
     srand(getpid());
 #endif

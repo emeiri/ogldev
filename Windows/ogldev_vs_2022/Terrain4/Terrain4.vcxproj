@@ -29,13 +29,16 @@
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\Terrain4\midpoint_disp_terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain4\single_tex_terrain_technique.cpp" />
     <ClCompile Include="..\..\..\Terrain4\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain4\terrain_demo4.cpp" />
     <ClCompile Include="..\..\..\Terrain4\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain4\texture_generator.cpp" />
     <ClCompile Include="..\..\..\Terrain4\triangle_list.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -49,12 +52,16 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\Terrain4\midpoint_disp_terrain.h" />
+    <ClInclude Include="..\..\..\Terrain4\single_tex_terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain4\terrain.h" />
     <ClInclude Include="..\..\..\Terrain4\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain4\texture_config.h" />
+    <ClInclude Include="..\..\..\Terrain4\texture_generator.h" />
     <ClInclude Include="..\..\..\Terrain4\triangle_list.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Terrain4\single_tex_terrain.fs" />
+    <None Include="..\..\..\Terrain4\single_tex_terrain.vs" />
     <None Include="..\..\..\Terrain4\terrain.fs" />
     <None Include="..\..\..\Terrain4\terrain.vs" />
   </ItemGroup>

@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\..\Terrain4\triangle_list.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+    <ClCompile Include="..\..\..\Terrain4\texture_generator.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
+    <ClCompile Include="..\..\..\Terrain4\single_tex_terrain_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -73,12 +76,20 @@
     <ClInclude Include="..\..\..\Terrain4\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain4\triangle_list.h" />
     <ClInclude Include="..\..\..\Terrain4\texture_config.h" />
+    <ClInclude Include="..\..\..\Terrain4\texture_generator.h" />
+    <ClInclude Include="..\..\..\Terrain4\single_tex_terrain_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Terrain4\terrain.fs">
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\Terrain4\terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain4\single_tex_terrain.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain4\single_tex_terrain.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -25,6 +25,7 @@
 #include "ogldev_texture.h"
 #include "triangle_list.h"
 #include "terrain_technique.h"
+#include "single_tex_terrain_technique.h"
 
 
 class BaseTerrain
@@ -38,30 +39,43 @@ class BaseTerrain
 
 	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames);
 
+    void InitTerrain(float WorldScale, float TextureScale);
+
     void Render(const BasicCamera& Camera);
 
     void LoadFromFile(const char* pFilename);
 
 	float GetHeight(int x, int z) const { return m_heightMap.Get(x, z); }
+	
+    float GetHeightInterpolated(float x, float z) const;
 
 	float GetWorldScale() const { return m_worldScale; }
 
     float GetTextureScale() const { return m_textureScale; }
 
     int GetSize() const { return m_terrainSize; }
+
+    void SetTexture(Texture* pTexture) { m_pTextures[0] = pTexture; }
+
  protected:
 
 	void LoadHeightMapFile(const char* pFilename);
+
+    void SetMinMaxHeight(float MinHeight, float MaxHeight);
 
     int m_terrainSize = 0;
 	float m_worldScale = 1.0f;
     Array2D<float> m_heightMap;
     TriangleList m_triangleList;
-    TerrainTechnique m_terrainTech;
-    float m_minHeight = 0.0f;
-    float m_maxHeight = 0.0f;
     Texture* m_pTextures[4] = { 0 };
     float m_textureScale = 1.0f;
+    bool m_isSingleTexTerrain = false;
+
+private:
+    float m_minHeight = 0.0f;
+    float m_maxHeight = 0.0f;
+    TerrainTechnique m_terrainTech;
+    SingleTexTerrainTechnique m_singleTexTerrainTech;
 };
 
 #endif

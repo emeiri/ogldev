@@ -56,14 +56,54 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         exit(0);
     }
 
-
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
+    m_isSingleTexTerrain = false;
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
+}
+
+
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale)
+{
+    if (!m_singleTexTerrainTech.Init()) {
+        printf("Error initializing tech\n");
+        exit(0);
+    }
+
+    m_worldScale = WorldScale;
+    m_textureScale = TextureScale;
+    m_isSingleTexTerrain = true;
+}
+
+
+
+float BaseTerrain::GetHeightInterpolated(float x, float z) const
+{
+    float BaseHeight = GetHeight((int)x, (int)z);
+
+    if (((int)x + 1 >= m_terrainSize) ||  ((int)z + 1 >= m_terrainSize)) {
+        return BaseHeight;
+    }
+
+    float NextXHeight = GetHeight((int)x + 1, (int)z);
+
+    float RatioX = x - floorf(x);
+
+    float InterpolatedHeightX = (float)(NextXHeight - BaseHeight) * RatioX + (float)BaseHeight;
+
+    float NextZHeight = GetHeight((int)x, (int)z + 1);
+
+    float RatioZ = z - floorf(z);
+
+    float InterpolatedHeightZ = (float)(NextZHeight - BaseHeight) * RatioZ + (float)BaseHeight;
+
+    float FinalHeight = (InterpolatedHeightX + InterpolatedHeightZ) / 2.0f;
+
+    return FinalHeight;
 }
 
 
@@ -102,14 +142,36 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 {
     Matrix4f VP = Camera.GetViewProjMatrix();
 
-    m_terrainTech.Enable();
-    m_terrainTech.SetVP(VP);
+    if (m_isSingleTexTerrain) {  
+        m_singleTexTerrainTech.Enable();
+        m_singleTexTerrainTech.SetVP(VP);
+    }
+    else {
+        m_terrainTech.Enable();
+        m_terrainTech.SetVP(VP);
+    }
 
-    for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
-        m_pTextures[i]->Bind(COLOR_TEXTURE_UNIT_0 + i);
+    for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
+        if (m_pTextures[i]) {
+            m_pTextures[i]->Bind(COLOR_TEXTURE_UNIT_0 + i);
+        }
     }
 
     m_triangleList.Render();
 }
 
 
+void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
+{
+    m_minHeight = MinHeight;
+    m_maxHeight = MaxHeight;
+
+    if (m_isSingleTexTerrain) {
+        m_singleTexTerrainTech.Enable();
+        m_singleTexTerrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+    }
+    else {
+        m_terrainTech.Enable();
+        m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+    }
+}

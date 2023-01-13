@@ -16,25 +16,25 @@
 */
 
 #include "ogldev_util.h"
-#include "terrain_technique.h"
+#include "single_tex_terrain_technique.h"
 #include "texture_config.h"
 
 
-TerrainTechnique::TerrainTechnique()
+SingleTexTerrainTechnique::SingleTexTerrainTechnique()
 {
 }
 
-bool TerrainTechnique::Init()
+bool SingleTexTerrainTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "terrain.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "single_tex_terrain.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "terrain.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "single_tex_terrain.fs")) {
         return false;
     }
 
@@ -43,42 +43,36 @@ bool TerrainTechnique::Init()
     }
 
     m_VPLoc = GetUniformLocation("gVP");
+    m_texUnitLoc = GetUniformLocation("gTerrainTexture");
     m_minHeightLoc = GetUniformLocation("gMinHeight");
     m_maxHeightLoc = GetUniformLocation("gMaxHeight");
-    m_texHeight0UnitLoc = GetUniformLocation("gTextureHeight0");
-    m_texHeight1UnitLoc = GetUniformLocation("gTextureHeight1");
-    m_texHeight2UnitLoc = GetUniformLocation("gTextureHeight2");
-    m_texHeight3UnitLoc = GetUniformLocation("gTextureHeight3");
 
-    if (m_VPLoc == INVALID_UNIFORM_LOCATION||
+    if (m_VPLoc == INVALID_UNIFORM_LOCATION ||
+        m_texUnitLoc == INVALID_UNIFORM_LOCATION ||
         m_minHeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_maxHeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_texHeight0UnitLoc == INVALID_UNIFORM_LOCATION ||
-        m_texHeight1UnitLoc == INVALID_UNIFORM_LOCATION ||
-        m_texHeight2UnitLoc == INVALID_UNIFORM_LOCATION ||
-        m_texHeight3UnitLoc == INVALID_UNIFORM_LOCATION) {
-     //   return false;
+        m_maxHeightLoc == INVALID_UNIFORM_LOCATION) {
+        return false;
     }
 
     Enable();
 
-    glUniform1i(m_texHeight0UnitLoc, COLOR_TEXTURE_UNIT_INDEX_0);
-    glUniform1i(m_texHeight1UnitLoc, COLOR_TEXTURE_UNIT_INDEX_1);
-    glUniform1i(m_texHeight2UnitLoc, COLOR_TEXTURE_UNIT_INDEX_2);
-    glUniform1i(m_texHeight3UnitLoc, COLOR_TEXTURE_UNIT_INDEX_3);
+    glUniform1i(m_texUnitLoc, COLOR_TEXTURE_UNIT_INDEX_0);
 
     return true;
 }
 
 
-void TerrainTechnique::SetVP(const Matrix4f& VP)
+void SingleTexTerrainTechnique::SetVP(const Matrix4f& VP)
 {
     glUniformMatrix4fv(m_VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
 }
 
 
-void TerrainTechnique::SetMinMaxHeight(float Min, float Max)
+void SingleTexTerrainTechnique::SetMinMaxHeight(float Min, float Max)
 {
     glUniform1f(m_minHeightLoc, Min);
     glUniform1f(m_maxHeightLoc, Max);
 }
+
+
+

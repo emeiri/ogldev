@@ -1,5 +1,5 @@
 /*
-    Copyright 2022 Etay Meiri
+    Copyright 2023 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,32 +15,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #version 330
 
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec2 InTex;
+layout(location = 0) out vec4 FragColor;
 
-uniform mat4 gVP;
-uniform float gMinHeight;
-uniform float gMaxHeight;
+in vec4 Color;
+in vec2 Tex;
 
-out vec4 Color;
-out vec2 Tex;
-out vec3 WorldPos;
+uniform sampler2D gTerrainTexture;
 
 void main()
 {
-    gl_Position = gVP * vec4(Position, 1.0);
-
-    float DeltaHeight = gMaxHeight - gMinHeight;
-
-    float HeightRatio = (Position.y - gMinHeight) / DeltaHeight;
-
-    float c = HeightRatio * 0.8 + 0.2;
-
-    Color = vec4(c, c, c, 1.0);
-
-    Tex = InTex;
-    
-    WorldPos = Position;
+    vec4 TexColor = texture(gTerrainTexture, Tex);
+    FragColor = Color * TexColor;
 }

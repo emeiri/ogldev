@@ -1,5 +1,5 @@
 /*
-    Copyright 2022 Etay Meiri
+    Copyright 2023 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ uniform float gMaxHeight;
 
 out vec4 Color;
 out vec2 Tex;
-out vec3 WorldPos;
 
 void main()
 {
@@ -41,6 +40,4 @@ void main()
     Color = vec4(c, c, c, 1.0);
 
     Tex = InTex;
-    
-    WorldPos = Position;
 }
