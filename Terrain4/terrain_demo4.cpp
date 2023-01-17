@@ -223,13 +223,13 @@ private:
 
         float FOV = 45.0f;
         float zNear = 0.1f;
-        float zFar = 2000.0f;
+        float zFar = 5000.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
     
-//#define USE_TEXTURE_GENERATOR
+#define USE_TEXTURE_GENERATOR
 
     void InitTerrain()
     {
@@ -245,7 +245,7 @@ private:
         TextureFilenames.push_back("../Content/textures/Rock6.png");
         TextureFilenames.push_back("../Content/textures/water.png");
 
-        float TextureScale = 10.0f;
+        float TextureScale = 2.0f;
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 #endif
         int Size = 255;
@@ -264,7 +264,7 @@ private:
         TexGen.LoadTile("../Content/Textures/water.png");
         int TextureSize = 1024;
 
-        Texture* pTexture = TexGen.GenerateTexture(TextureSize, &m_terrain);
+        Texture* pTexture = TexGen.GenerateTexture(TextureSize, &m_terrain, MinHeight, MaxHeight);
         m_terrain.SetTexture(pTexture);
 #endif
     }

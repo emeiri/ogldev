@@ -21,14 +21,14 @@ void TextureGenerator::LoadTile(const char* pFilename)
 }
 
 
-Texture* TextureGenerator::GenerateTexture(int TextureSize, BaseTerrain* pTerrain)
+Texture* TextureGenerator::GenerateTexture(int TextureSize, BaseTerrain* pTerrain, float MinHeight, float MaxHeight)
 {
     if (m_numTextureTiles == 0) {
         printf("%s:%d: no texture tiles loaded\n", __FILE__, __LINE__);
         exit(0);
     }
 
-    CalculateTextureRegions();
+    CalculateTextureRegions(MinHeight, MaxHeight);
 
     int BPP = 3;
     int TextureBytes = TextureSize * TextureSize * BPP;
@@ -81,13 +81,15 @@ Texture* TextureGenerator::GenerateTexture(int TextureSize, BaseTerrain* pTerrai
 }
 
 
-void TextureGenerator::CalculateTextureRegions()
+void TextureGenerator::CalculateTextureRegions(float MinHeight, float MaxHeight)
 {
-    int RangePerTile = 255 / m_numTextureTiles;
-    int Remainder = 255 - RangePerTile * m_numTextureTiles;
+    float HeightRange = MaxHeight - MinHeight;
 
-    if (Remainder < 0) {
-        printf("%s:%d: negative remainder %d (num tiles %d range per tile %d)\n", __FILE__, __LINE__, Remainder, m_numTextureTiles, RangePerTile);
+    float RangePerTile = HeightRange / m_numTextureTiles;
+    float Remainder = HeightRange - RangePerTile * m_numTextureTiles;
+
+    if (Remainder < 0.0f) {
+        printf("%s:%d: negative remainder %f (num tiles %d range per tile %f)\n", __FILE__, __LINE__, Remainder, m_numTextureTiles, RangePerTile);
         exit(0);
     }
 

@@ -29,13 +29,13 @@ class TextureGenerator {
 
     void LoadTile(const char* Filename);
 
-    Texture* GenerateTexture(int TextureSize, BaseTerrain* pTerrain);
+    Texture* GenerateTexture(int TextureSize, BaseTerrain* pTerrain, float MinHeight, float MaxHeight);
 
  private:
 
     #define MAX_TEXTURE_TILES 4
 
-    void CalculateTextureRegions();
+    void CalculateTextureRegions(float MinHeight, float MaxHeight);
 
     float RegionPercent(int Tile, float Height);
 
