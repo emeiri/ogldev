@@ -99,7 +99,7 @@ void TextureGenerator::CalculateTextureRegions(float MinHeight, float MaxHeight)
         m_textureTiles[i].HeightDesc.Low = LastHeight + 1;
         LastHeight += RangePerTile;
         m_textureTiles[i].HeightDesc.Optimal = LastHeight;
-        m_textureTiles[i].HeightDesc.High = LastHeight - m_textureTiles[i].HeightDesc.Low + LastHeight;
+        m_textureTiles[i].HeightDesc.High = m_textureTiles[i].HeightDesc.Optimal + RangePerTile;
 
         m_textureTiles[i].HeightDesc.Print(); printf("\n");
     }
@@ -118,12 +118,13 @@ float TextureGenerator::RegionPercent(int Tile, float Height)
         float Nom = (float)Height - (float)m_textureTiles[Tile].HeightDesc.Low;
         float Denom = (float)m_textureTiles[Tile].HeightDesc.Optimal - (float)m_textureTiles[Tile].HeightDesc.Low;
         Percent = Nom / Denom;
-    } else if (Height > m_textureTiles[Tile].HeightDesc.Optimal) {
+    } else if (Height >= m_textureTiles[Tile].HeightDesc.Optimal) {
         float Nom = (float)m_textureTiles[Tile].HeightDesc.High - (float)Height;
         float Denom = (float)m_textureTiles[Tile].HeightDesc.High - (float)m_textureTiles[Tile].HeightDesc.Optimal;
         Percent = Nom / Denom;
     } else {
-        Percent = 1.0f;
+        printf("%s:%d - shouldn't get here! tile %d Height %f\n", __FILE__, __LINE__, Tile, Height);
+        exit(0);
     }
 
     if ((Percent < 0.0f) || (Percent > 1.0f)) {

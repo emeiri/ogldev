@@ -33,11 +33,11 @@ class TextureGenerator {
 
  private:
 
-    #define MAX_TEXTURE_TILES 4
-
     void CalculateTextureRegions(float MinHeight, float MaxHeight);
 
     float RegionPercent(int Tile, float Height);
+
+    #define MAX_TEXTURE_TILES 4
 
     TextureTile m_textureTiles[MAX_TEXTURE_TILES] = {};
     int m_numTextureTiles = 0;
