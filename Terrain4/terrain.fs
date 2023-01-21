@@ -54,5 +54,5 @@ void main()
 {
     vec4 TexColor = CalcTexColor();
 
-    FragColor = 0.01 * Color + TexColor;
+    FragColor = Color * TexColor;
 }
