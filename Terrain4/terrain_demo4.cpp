@@ -233,29 +233,28 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 5.0f;        
-
 #ifdef USE_TEXTURE_GENERATOR
-        float TextureScale = 1.0f;
-        m_terrain.InitTerrain(WorldScale, TextureScale);
+        InitTerrainTextureGenerator();
 #else
-        std::vector<string> TextureFilenames;
-        TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
-        TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
-        TextureFilenames.push_back("../Content/textures/Rock6.png");
-        TextureFilenames.push_back("../Content/textures/water.png");
-
-        float TextureScale = 2.0f;
-        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
+        InitTerrainMultiTextures();
 #endif
-        int Size = 255;
+    }
+
+
+    void InitTerrainTextureGenerator()
+    {
+        float WorldScale = 4.0f;
+        float TextureScale = 1.0f;
+
+        m_terrain.InitTerrain(WorldScale, TextureScale);
+
+        int Size = 256;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
         float MaxHeight = 250.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
 
-#ifdef USE_TEXTURE_GENERATOR
         TextureGenerator TexGen;
 
         TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
@@ -266,7 +265,28 @@ private:
 
         Texture* pTexture = TexGen.GenerateTexture(TextureSize, &m_terrain, MinHeight, MaxHeight);
         m_terrain.SetTexture(pTexture);
-#endif
+    }
+
+
+    void InitTerrainMultiTextures()
+    {
+        float WorldScale = 4.0f;
+        float TextureScale = 4.0f;
+        std::vector<string> TextureFilenames;
+        TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
+        TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
+        TextureFilenames.push_back("../Content/textures/Rock6.png");
+        TextureFilenames.push_back("../Content/textures/water.png");
+
+        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
+
+        int Size = 256;
+        float Roughness = 1.0f;
+        float MinHeight = 0.0f;
+        float MaxHeight = 250.0f;
+
+        m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
+
     }
 
 
@@ -321,7 +341,9 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 int main(int argc, char** argv)
 {
 #ifdef _WIN64
+    int Seed = GetCurrentProcessId();
     srand(GetCurrentProcessId());
+    printf("random seed %d\n", Seed);
    // srand(0);
 #else
     srand(getpid());
