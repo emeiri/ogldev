@@ -233,7 +233,7 @@ private:
         float WorldScale = 4.0f;
         m_terrain.InitTerrain(WorldScale);
 
-        int Size = 255;
+        int Size = 256;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
         float MaxHeight = 250.0f;
@@ -294,8 +294,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 int main(int argc, char** argv)
 {
 #ifdef _WIN64
-   // srand(GetCurrentProcessId());
-    srand(0);
+    srand(GetCurrentProcessId());
 #else
     srand(getpid());
 #endif
