@@ -129,19 +129,19 @@ public:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
-      /*  static float foo = 0.0f;
-        float R = 400.0f;
-        float S = 128.0f;
+        static float foo = 0.0f;
+        float R = 600.0f;
+        float S = 256.0f;
 
-        Vector3f Pos(S + cosf(foo) * R, 250.0f, S + sinf(foo) * R);
+        Vector3f Pos(S + cosf(foo) * R, 300.0f, S + sinf(foo) * R);
         m_pGameCamera->SetPosition(Pos);
 
-        Vector3f Center(128.0f, 50.0f, 128.0f);
+        Vector3f Center(S, 50.0f, S);
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
 
-        foo += 0.001f;*/
+        foo += 0.001f;
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -217,7 +217,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(500.0f, 300.0f, -150.0f);
+        Vector3f Pos(250.0f, 350.0f, -150.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -229,7 +229,7 @@ private:
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
     
-#define USE_TEXTURE_GENERATOR
+//#define USE_TEXTURE_GENERATOR
 
     void InitTerrain()
     {
@@ -243,7 +243,7 @@ private:
 
     void InitTerrainTextureGenerator()
     {
-        float WorldScale = 4.0f;
+        float WorldScale = 2.0f;
         float TextureScale = 1.0f;
 
         m_terrain.InitTerrain(WorldScale, TextureScale);
@@ -251,15 +251,20 @@ private:
         int Size = 256;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
-        float MaxHeight = 250.0f;
+        float MaxHeight = 150.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
 
         TextureGenerator TexGen;
 
+        TexGen.LoadTile("../Content/Textures/IMGP5487_seamless.jpg");
         TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
+        
         TexGen.LoadTile("../Content/Textures/tilable-IMG_0044-verydark.png");
-        TexGen.LoadTile("../Content/Textures/Rock6.png");
+
+       // TexGen.LoadTile("../Content/Textures/grass1.jpg");
+        //TexGen.LoadTile("../Content/Textures/Rock6.png");
+        
         TexGen.LoadTile("../Content/Textures/water.png");
         int TextureSize = 1024;
 
@@ -270,12 +275,13 @@ private:
 
     void InitTerrainMultiTextures()
     {
-        float WorldScale = 4.0f;
+        float WorldScale = 2.0f;
         float TextureScale = 4.0f;
         std::vector<string> TextureFilenames;
+        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
-        TextureFilenames.push_back("../Content/textures/Rock6.png");
+        //TextureFilenames.push_back("../Content/textures/Rock6.png");
         TextureFilenames.push_back("../Content/textures/water.png");
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
@@ -283,7 +289,7 @@ private:
         int Size = 256;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
-        float MaxHeight = 250.0f;
+        float MaxHeight = 175.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
 
@@ -353,7 +359,7 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);

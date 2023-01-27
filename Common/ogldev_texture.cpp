@@ -133,10 +133,14 @@ void Texture::LoadInternal(void* image_data)
         exit(1);
     }
 
-    glTexParameterf(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(m_textureTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    //glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(m_textureTarget, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glGenerateMipmap(m_textureTarget);
 
     glBindTexture(m_textureTarget, 0);
 }
