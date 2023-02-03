@@ -45,6 +45,8 @@ class BaseTerrain
 
     void LoadFromFile(const char* pFilename);
 
+    void SaveToFile(const char* pFilename);
+
 	float GetHeight(int x, int z) const { return m_heightMap.Get(x, z); }
 	
     float GetHeightInterpolated(float x, float z) const;
@@ -57,7 +59,7 @@ class BaseTerrain
 
     void SetTexture(Texture* pTexture) { m_pTextures[0] = pTexture; }
 
- protected:
+protected:
 
 	void LoadHeightMapFile(const char* pFilename);
 

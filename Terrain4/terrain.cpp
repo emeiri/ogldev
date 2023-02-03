@@ -26,6 +26,7 @@
 
 #include "terrain.h"
 #include "texture_config.h"
+#include "3rdparty/stb_image_write.h"
 
 //#define DEBUG_PRINT
 
@@ -135,6 +136,25 @@ void BaseTerrain::LoadHeightMapFile(const char* pFilename)
     }
 
     m_heightMap.InitArray2D(m_terrainSize, m_terrainSize, (float*)p);
+}
+
+
+void BaseTerrain::SaveToFile(const char* pFilename)
+{    
+    unsigned char* p = (unsigned char*)malloc(m_terrainSize * m_terrainSize);
+
+    float* src = m_heightMap.GetBaseAddr();
+
+    float Delta = m_maxHeight - m_minHeight;
+
+    for (int i = 0; i < m_terrainSize * m_terrainSize; i++) {
+        float f = (src[i] - m_minHeight) / Delta;
+        p[i] = (unsigned char)(f * 255.0f);
+    }
+
+    stbi_write_png("heightmap.png", m_terrainSize, m_terrainSize, 1, p, m_terrainSize);
+
+    free(p);
 }
 
 
