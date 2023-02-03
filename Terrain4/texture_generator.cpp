@@ -1,9 +1,30 @@
+/*
+
+        Copyright 2023 Etay Meiri
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "texture_generator.h"
 #include "terrain.h"
 #include "ogldev_stb_image.h"
+
+#include "3rdparty/stb_image_write.h"
 
 TextureGenerator::TextureGenerator()
 {
@@ -42,7 +63,8 @@ Texture* TextureGenerator::GenerateTexture(int TextureSize, BaseTerrain* pTerrai
     for (int y = 0 ; y < TextureSize ; y++) {
         for (int x = 0 ; x < TextureSize ; x++) {
 
-            float InterpolatedHeight = pTerrain->GetHeightInterpolated((float)x * HeightMapToTextureRatio, (float)y * HeightMapToTextureRatio);
+            float InterpolatedHeight = pTerrain->GetHeightInterpolated((float)x * HeightMapToTextureRatio, 
+                                                                       (float)y * HeightMapToTextureRatio);
 
             float Red = 0.0f;
             float Green = 0.0f;
@@ -72,6 +94,8 @@ Texture* TextureGenerator::GenerateTexture(int TextureSize, BaseTerrain* pTerrai
     }
 
     Texture* pTexture = new Texture(GL_TEXTURE_2D);
+
+    stbi_write_png("texture.png", TextureSize, TextureSize, BPP, pTextureData, TextureSize * BPP);
 
     pTexture->LoadRaw(TextureSize, TextureSize, BPP, pTextureData);
 

@@ -133,10 +133,10 @@ public:
         float R = 600.0f;
         float S = 256.0f;
 
-        Vector3f Pos(S + cosf(foo) * R, 300.0f, S + sinf(foo) * R);
+        Vector3f Pos(S + cosf(foo) * R, 200.0f, S + sinf(foo) * R);
         m_pGameCamera->SetPosition(Pos);
 
-        Vector3f Center(S, 50.0f, S);
+        Vector3f Center(S, Pos.y * 0.60f, S);
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
@@ -217,7 +217,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(250.0f, 350.0f, -150.0f);
+        Vector3f Pos(250.0f, 550.0f, -150.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -229,7 +229,7 @@ private:
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
     
-//#define USE_TEXTURE_GENERATOR
+#define USE_TEXTURE_GENERATOR
 
     void InitTerrain()
     {
@@ -238,27 +238,30 @@ private:
 #else
         InitTerrainMultiTextures();
 #endif
+        m_terrain.SaveToFile("heightmap.png");
     }
 
 
     void InitTerrainTextureGenerator()
     {
-        float WorldScale = 2.0f;
-        float TextureScale = 1.0f;
+        float WorldScale = 1.0f;
+        float TextureScale = 4.0f;
 
         m_terrain.InitTerrain(WorldScale, TextureScale);
 
-        int Size = 256;
+        int Size = 512;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
-        float MaxHeight = 150.0f;
+        float MaxHeight = 156.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
 
         TextureGenerator TexGen;
 
-        TexGen.LoadTile("../Content/Textures/IMGP5487_seamless.jpg");
-        TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
+        TexGen.LoadTile("../Content/Textures/rock02_2.jpg");
+        //TexGen.LoadTile("../Content/Textures/IMGP5487_seamless.jpg");
+        //TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
+        TexGen.LoadTile("../Content/Textures/rock01.jpg");
         
         TexGen.LoadTile("../Content/Textures/tilable-IMG_0044-verydark.png");
 
@@ -278,8 +281,8 @@ private:
         float WorldScale = 2.0f;
         float TextureScale = 4.0f;
         std::vector<string> TextureFilenames;
-        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
+        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         //TextureFilenames.push_back("../Content/textures/Rock6.png");
         TextureFilenames.push_back("../Content/textures/water.png");
