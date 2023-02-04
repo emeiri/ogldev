@@ -28,7 +28,7 @@ uniform float gMaxHeight;
 out vec4 Color;
 out vec2 Tex;
 out vec3 WorldPos;
-out vec3 Normal
+out vec3 Normal;
 
 void main()
 {

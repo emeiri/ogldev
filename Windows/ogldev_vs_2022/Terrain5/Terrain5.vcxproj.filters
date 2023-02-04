@@ -36,6 +36,10 @@
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Terrain5\terrain_demo5.cpp" />
+    <ClCompile Include="..\..\..\Terrain5\midpoint_disp_terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain5\terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain5\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain5\triangle_list.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -65,5 +69,18 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Terrain5\midpoint_disp_terrain.h" />
+    <ClInclude Include="..\..\..\Terrain5\terrain.h" />
+    <ClInclude Include="..\..\..\Terrain5\terrain_technique.h" />
+    <ClInclude Include="..\..\..\Terrain5\texture_config.h" />
+    <ClInclude Include="..\..\..\Terrain5\triangle_list.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Terrain5\terrain.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain5\terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

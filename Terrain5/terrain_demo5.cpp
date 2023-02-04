@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - demo 4 - Terrain Texturing
+    Terrain Rendering - demo 5 - Terrain Lighting
 */
 
 #include "imgui.h"
@@ -37,7 +37,6 @@
 
 #include "texture_config.h"
 #include "midpoint_disp_terrain.h"
-#include "texture_generator.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -47,15 +46,15 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class TerrainDemo4
+class TerrainDemo5
 {
 public:
 
-    TerrainDemo4()
+    TerrainDemo5()
     {
     }
 
-    virtual ~TerrainDemo4()
+    virtual ~TerrainDemo5()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -87,20 +86,32 @@ public:
                 ImGui::NewFrame();
                 
                 static int Iterations = 100;
-                static float MaxHeight = 200.0f;
-                static float Roughness = 1.5f;
+                static float MaxHeight = 256.0f;
+                static float Roughness = 1.0f;
                  
-                ImGui::Begin("Terrain Demo 3");                          // Create a window called "Hello, world!" and append into it.
+                ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
 
                 ImGui::SliderInt("Iterations", &Iterations, 0, 1000);
                 ImGui::SliderFloat("MaxHeight", &MaxHeight, 0.0f, 1000.0f);
                 ImGui::SliderFloat("Roughness", &Roughness, 0.0f, 5.0f);
 
+                static float Height0 = 64.0f;
+                static float Height1 = 128.0f;
+                static float Height2 = 192.0f;
+                static float Height3 = 256.0f;
+
+                ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
+                ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
+                ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
+                ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
+
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
-                    int Size = 256;
+                    int Size = 512;
                     float MinHeight = 0.0f;
+                    //srand(4232);
                     m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
+                    m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -142,8 +153,9 @@ public:
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
+        float y = min(-0.1f, cosf(foo));
 
-        Vector3f LightDir(sinf(foo), std::min(-0.1f, cosf(foo)), 0.0f));
+        Vector3f LightDir(sinf(foo), y, 0.0f);
 
         m_terrain.SetLightDir(LightDir);
 
@@ -182,6 +194,11 @@ public:
                 } else {
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
+                break;
+
+            case GLFW_KEY_P:
+                m_isPaused = !m_isPaused;
+                break;
 
             case GLFW_KEY_SPACE:
                 m_showGui = !m_showGui;
@@ -221,7 +238,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(500.0f, 300.0f, -150.0f);
+        Vector3f Pos(250.0f, 450.0f, -150.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -233,64 +250,25 @@ private:
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
     
-#define USE_TEXTURE_GENERATOR
 
     void InitTerrain()
-    {
-#ifdef USE_TEXTURE_GENERATOR
-        InitTerrainTextureGenerator();
-#else
-        InitTerrainMultiTextures();
-#endif
-    }
-
-
-    void InitTerrainTextureGenerator()
-    {
-        float WorldScale = 4.0f;
-        float TextureScale = 1.0f;
-
-        m_terrain.InitTerrain(WorldScale, TextureScale);
-
-        int Size = 256;
-        float Roughness = 1.0f;
-        float MinHeight = 0.0f;
-        float MaxHeight = 250.0f;
-
-        m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
-
-        TextureGenerator TexGen;
-
-        TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
-        TexGen.LoadTile("../Content/Textures/tilable-IMG_0044-verydark.png");
-        TexGen.LoadTile("../Content/Textures/Rock6.png");
-        TexGen.LoadTile("../Content/Textures/water.png");
-        int TextureSize = 1024;
-
-        Texture* pTexture = TexGen.GenerateTexture(TextureSize, &m_terrain, MinHeight, MaxHeight);
-        m_terrain.SetTexture(pTexture);
-    }
-
-
-    void InitTerrainMultiTextures()
     {
         float WorldScale = 4.0f;
         float TextureScale = 4.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
+        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
-        TextureFilenames.push_back("../Content/textures/Rock6.png");
         TextureFilenames.push_back("../Content/textures/water.png");
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
-        int Size = 256;
+        int Size = 512;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
-        float MaxHeight = 250.0f;
+        float MaxHeight = 256.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
-
     }
 
 
@@ -316,9 +294,10 @@ private:
     bool m_isWireframe = false;
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
+    bool m_isPaused = false;
 };
 
-TerrainDemo4* app = NULL;
+TerrainDemo5* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -353,11 +332,11 @@ int main(int argc, char** argv)
     srand(getpid());
 #endif
 
-    app = new TerrainDemo4();
+    app = new TerrainDemo5();
 
     app->Init();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);

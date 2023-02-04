@@ -26,6 +26,7 @@
 
 #include "terrain.h"
 #include "texture_config.h"
+#include "3rdparty/stb_image_write.h"
 
 //#define DEBUG_PRINT
 
@@ -58,27 +59,12 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
-    m_isSingleTexTerrain = false;
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
 }
-
-
-void BaseTerrain::InitTerrain(float WorldScale, float TextureScale)
-{
-    if (!m_singleTexTerrainTech.Init()) {
-        printf("Error initializing tech\n");
-        exit(0);
-    }
-
-    m_worldScale = WorldScale;
-    m_textureScale = TextureScale;
-    m_isSingleTexTerrain = true;
-}
-
 
 
 float BaseTerrain::GetHeightInterpolated(float x, float z) const
@@ -138,18 +124,31 @@ void BaseTerrain::LoadHeightMapFile(const char* pFilename)
 }
 
 
+void BaseTerrain::SaveToFile(const char* pFilename)
+{    
+    unsigned char* p = (unsigned char*)malloc(m_terrainSize * m_terrainSize);
+
+    float* src = m_heightMap.GetBaseAddr();
+
+    float Delta = m_maxHeight - m_minHeight;
+
+    for (int i = 0; i < m_terrainSize * m_terrainSize; i++) {
+        float f = (src[i] - m_minHeight) / Delta;
+        p[i] = (unsigned char)(f * 255.0f);
+    }
+
+    stbi_write_png("heightmap.png", m_terrainSize, m_terrainSize, 1, p, m_terrainSize);
+
+    free(p);
+}
+
+
 void BaseTerrain::Render(const BasicCamera& Camera)
 {
     Matrix4f VP = Camera.GetViewProjMatrix();
 
-    if (m_isSingleTexTerrain) {  
-        m_singleTexTerrainTech.Enable();
-        m_singleTexTerrainTech.SetVP(VP);
-    }
-    else {
-        m_terrainTech.Enable();
-        m_terrainTech.SetVP(VP);
-    }
+    m_terrainTech.Enable();
+    m_terrainTech.SetVP(VP);
 
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
         if (m_pTextures[i]) {
@@ -168,12 +167,12 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
 
-    if (m_isSingleTexTerrain) {
-        m_singleTexTerrainTech.Enable();
-        m_singleTexTerrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
-    }
-    else {
-        m_terrainTech.Enable();
-        m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
-    }
+    m_terrainTech.Enable();
+    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+}
+
+
+void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height)
+{
+    m_terrainTech.SetTextureHeights(Tex0Height, Tex1Height, Tex2Height, Tex3Height); 
 }
