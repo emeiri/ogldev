@@ -59,6 +59,8 @@ class BaseTerrain
 
     void SetTexture(Texture* pTexture) { m_pTextures[0] = pTexture; }
 
+    void SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height);
+
 protected:
 
 	void LoadHeightMapFile(const char* pFilename);

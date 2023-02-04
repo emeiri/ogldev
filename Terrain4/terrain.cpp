@@ -195,3 +195,14 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
         m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
     }
 }
+
+
+void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height)
+{
+    if (m_isSingleTexTerrain) {
+        printf("%s:%d - only for multi texturing\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    m_terrainTech.SetTextureHeights(Tex0Height, Tex1Height, Tex2Height, Tex3Height); 
+}

@@ -87,8 +87,8 @@ public:
                 ImGui::NewFrame();
                 
                 static int Iterations = 100;
-                static float MaxHeight = 200.0f;
-                static float Roughness = 1.5f;
+                static float MaxHeight = 256.0f;
+                static float Roughness = 1.0f;
                  
                 ImGui::Begin("Terrain Demo 3");                          // Create a window called "Hello, world!" and append into it.
 
@@ -96,11 +96,23 @@ public:
                 ImGui::SliderFloat("MaxHeight", &MaxHeight, 0.0f, 1000.0f);
                 ImGui::SliderFloat("Roughness", &Roughness, 0.0f, 5.0f);
 
+                static float Height0 = 64.0f;
+                static float Height1 = 128.0f;
+                static float Height2 = 192.0f;
+                static float Height3 = 256.0f;
+
+                ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
+                ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
+                ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
+                ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
+
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
-                    int Size = 256;
+                    int Size = 512;
                     float MinHeight = 0.0f;
+                    //srand(4232);
                     m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
+                    m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -130,10 +142,10 @@ public:
         }
 
         static float foo = 0.0f;
-        float R = 600.0f;
-        float S = 256.0f;
+        float R = 1100.0f;
+        float S = 512.0f;
 
-        Vector3f Pos(S + cosf(foo) * R, 200.0f, S + sinf(foo) * R);
+        Vector3f Pos(S + cosf(foo) * R, 375.0f, S + sinf(foo) * R);
         m_pGameCamera->SetPosition(Pos);
 
         Vector3f Center(S, Pos.y * 0.60f, S);
@@ -141,7 +153,9 @@ public:
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
 
-        foo += 0.001f;
+        if (!m_isPaused) {
+            foo += 0.001f;
+        }
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -178,6 +192,11 @@ public:
                 } else {
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
+                break;
+
+            case GLFW_KEY_P:
+                m_isPaused = !m_isPaused;
+                break;
 
             case GLFW_KEY_SPACE:
                 m_showGui = !m_showGui;
@@ -217,7 +236,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(250.0f, 550.0f, -150.0f);
+        Vector3f Pos(250.0f, 450.0f, -150.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -229,7 +248,7 @@ private:
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
     }
     
-#define USE_TEXTURE_GENERATOR
+//#define USE_TEXTURE_GENERATOR
 
     void InitTerrain()
     {
@@ -245,7 +264,7 @@ private:
     void InitTerrainTextureGenerator()
     {
         float WorldScale = 1.0f;
-        float TextureScale = 4.0f;
+        float TextureScale = 10.0f;
 
         m_terrain.InitTerrain(WorldScale, TextureScale);
 
@@ -279,23 +298,23 @@ private:
     void InitTerrainMultiTextures()
     {
         float WorldScale = 2.0f;
+
         float TextureScale = 4.0f;
+
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
-        //TextureFilenames.push_back("../Content/textures/Rock6.png");
         TextureFilenames.push_back("../Content/textures/water.png");
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
-        int Size = 256;
+        int Size = 512;
         float Roughness = 1.0f;
         float MinHeight = 0.0f;
-        float MaxHeight = 175.0f;
+        float MaxHeight = 256.0f;
 
         m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
-
     }
 
 
@@ -321,6 +340,7 @@ private:
     bool m_isWireframe = false;
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
+    bool m_isPaused = false;
 };
 
 TerrainDemo4* app = NULL;
@@ -351,7 +371,7 @@ int main(int argc, char** argv)
 {
 #ifdef _WIN64
     int Seed = GetCurrentProcessId();
-    srand(GetCurrentProcessId());
+    srand(Seed);
     printf("random seed %d\n", Seed);
    // srand(0);
 #else
