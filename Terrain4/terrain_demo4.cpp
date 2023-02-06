@@ -90,7 +90,7 @@ public:
                 static float MaxHeight = 256.0f;
                 static float Roughness = 1.0f;
                  
-                ImGui::Begin("Terrain Demo 3");                          // Create a window called "Hello, world!" and append into it.
+                ImGui::Begin("Terrain Demo 4");                          // Create a window called "Hello, world!" and append into it.
 
                 ImGui::SliderInt("Iterations", &Iterations, 0, 1000);
                 ImGui::SliderFloat("MaxHeight", &MaxHeight, 0.0f, 1000.0f);
