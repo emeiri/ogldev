@@ -5,7 +5,7 @@ layout(location = 0) out vec4 FragColor;
 in vec3 Color;
 in vec2 Tex;
 in vec3 WorldPos;
-//in vec3 Normal;
+in float Brightness;
 
 uniform sampler2D gTextureHeight0;
 uniform sampler2D gTextureHeight1;
@@ -16,8 +16,6 @@ uniform float gHeight0 = 80.0;
 uniform float gHeight1 = 110.0;
 uniform float gHeight2 = 150.0;
 uniform float gHeight3 = 180.0;
-
-uniform vec3 gReversedLightDir;
 
 vec4 CalcTexColor()
 {
@@ -57,12 +55,5 @@ void main()
 {
     vec4 TexColor = CalcTexColor();
 
-  //  vec3 Normal_ = normalize(Normal);
-
-   // float Diffuse = dot(Normal_, gReversedLightDir);
-
-  //  Diffuse = max(0.2f, Diffuse);
-
-    //FragColor = Color * TexColor * Diffuse;
-    FragColor = TexColor * vec4(Color, 1.0);
+    FragColor = TexColor * vec4(Color, 1.0) * Brightness;
 }

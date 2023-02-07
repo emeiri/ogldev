@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - demo 5 - Terrain Lighting
+    Terrain Rendering - demo 5.1 - Slope Scale Lighting
 */
 
 #include "imgui.h"
@@ -46,15 +46,15 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class TerrainDemo5
+class TerrainDemo5_1
 {
 public:
 
-    TerrainDemo5()
+    TerrainDemo5_1()
     {
     }
 
-    virtual ~TerrainDemo5()
+    virtual ~TerrainDemo5_1()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -297,7 +297,7 @@ private:
     bool m_isPaused = false;
 };
 
-TerrainDemo5* app = NULL;
+TerrainDemo5_1* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -332,7 +332,7 @@ int main(int argc, char** argv)
     srand(getpid());
 #endif
 
-    app = new TerrainDemo5();
+    app = new TerrainDemo5_1();
 
     app->Init();
 

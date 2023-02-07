@@ -35,8 +35,6 @@ public:
 
     void SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height);
 	
-    void SetLightDir(const Vector3f& Dir);
-	
 private:
     GLuint m_VPLoc = -1;
     GLuint m_minHeightLoc = -1;

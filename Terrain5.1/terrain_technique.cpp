@@ -53,7 +53,6 @@ bool TerrainTechnique::Init()
     m_tex1HeightLoc = GetUniformLocation("gHeight1");
     m_tex2HeightLoc = GetUniformLocation("gHeight2");
     m_tex3HeightLoc = GetUniformLocation("gHeight3");
-    m_reversedLightDirLoc = GetUniformLocation("gReversedLightDir");
 
     if (m_VPLoc == INVALID_UNIFORM_LOCATION||
         m_minHeightLoc == INVALID_UNIFORM_LOCATION ||
@@ -65,9 +64,8 @@ bool TerrainTechnique::Init()
         m_tex0HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex1HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex2HeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_tex3HeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION) {
-      //  return false;
+        m_tex3HeightLoc == INVALID_UNIFORM_LOCATION) {
+        return false;
     }
 
     Enable();
@@ -105,10 +103,4 @@ void TerrainTechnique::SetTextureHeights(float Tex0Height, float Tex1Height, flo
 }
 
 
-void TerrainTechnique::SetLightDir(const Vector3f& Dir)
-{
-    Vector3f ReversedLightDir = Dir * -1.0f;
-    ReversedLightDir = ReversedLightDir.Normalize();
-    glUniform3f(m_reversedLightDirLoc, ReversedLightDir.x, ReversedLightDir.y, ReversedLightDir.z);
-}
 

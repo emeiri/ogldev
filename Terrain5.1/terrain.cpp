@@ -159,8 +159,6 @@ void BaseTerrain::Render(const BasicCamera& Camera)
         }
     }
 	
-    m_terrainTech.SetLightDir(m_lightDir);
-
     m_triangleList.Render();
 }
 
