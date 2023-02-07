@@ -170,6 +170,8 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
 
     m_terrainTech.Enable();
     m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
+
+    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, MinHeight, MaxHeight);
 }
 
 
@@ -181,93 +183,7 @@ void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Te
 
 void BaseTerrain::PrepareSlopeLightInfoParams()
 {
-    /* Slope lighting works by comparing the height of the current vertex with the
-       height of the vertex which is "before" it on the way to the light source. This
-       means that we need to reverse the light vector and in order to improve the accuracy
-       intepolate between the two vertices that are closest to the reversed light vector (since
-       in most cases the light vector will go between two vertices).
 
-       The algorithm works by doing a dot product of the reversed light vector with two vectors:
-       PosX (1, 0, 0) and PosZ (0, 0, 1).
-
-       In order to understand the calculations below we need the following table that shows the
-       two dot products for the eight vertices around the current one (degrees in parenthesis)
-
-       |-------------------------------------------------------|
-       | dpx: -0.707 (135) | dpx: 0 (90)   | dpx: 0.707 (45)   |
-       | dpz: 0.707 (45)   | dpz: 1, (0)   | dpz: 0.707 (45)   |
-       |-------------------|---------------|-------------------|
-       | dpx: -1 (180)     |               | dpx: 1 (0)        |
-       | dpz: 0 (90)       |               | dpz: 0 (90)       |
-       |-------------------|---------------|-------------------|
-       | dpx: -0.707 (135) | dpx: 0 (90)   | dpx: 0.707 (45)   |
-       | dpz: -0.707 (135) | dpz: -1 (180) | dpz: -0.707 (135) |
-       |-------------------------------------------------------|
-    */
-
-    Vector3f PosX(1.0f, 0.0f, 0.0f);
-    float dpx = PosX.Dot(m_lightDir * -1.0f);
-    float cosx = ToDegree(acos(dpx));
-    printf("PosX %f %f\n", dpx, cosx);
-
-    Vector3f PosZ(0.0f, 0.0f, 1.0f);
-    float dpz = PosZ.Dot(m_lightDir * -1.0f);
-     float cosz = ToDegree(acos(dpz));
-    printf("PosZ %f %f\n", dpz, cosz);
-
-    float a45 = cosf(ToRadian(45.0f));
-
-    bool InterpolateOnX = false;
-
-    if (dpz >= a45) {
-        //  printf("foo1\n");
-        m_sli.dz0 = m_sli.dz1 = 1;
-        InterpolateOnX = true;
-    } else if (dpz <= -a45) {
-        //printf("foo2\n");
-        m_sli.dz0 = m_sli.dz1 = -1;
-        InterpolateOnX = true;
-    } else {
-        if (dpz >= 0.0f) {
-            //  printf("foo3\n");
-            m_sli.dz0 = 0;
-            m_sli.dz1 = 1;
-            m_sli.Factor = dpz;
-        } else {
-            // printf("foo4\n");
-            m_sli.dz0 = 0;
-            m_sli.dz1 = -1;
-            m_sli.Factor = -dpz;
-        }
-
-        if (dpx >= 0.0f) {
-            // printf("foo5\n");
-            m_sli.dx0 = m_sli.dx1 = 1;
-        } else {
-            // printf("foo6\n");
-            m_sli.dx0 = m_sli.dx1 = -1;
-        }
-    }
-
-    if (InterpolateOnX) {
-        if (dpx >= 0.0f) {
-            // printf("foo7\n");
-            m_sli.dx0 = 0;
-            m_sli.dx1 = 1;
-            m_sli.Factor = dpx;
-        } else {
-            // printf("foo8\n");
-            m_sli.dx0 = 0;
-            m_sli.dx1 = -1;
-            m_sli.Factor = -dpx;
-        }
-    }
-
-    m_sli.Factor = 1.0f - m_sli.Factor / a45;
-
-    printf("0: dx %d dz %d\n", m_sli.dx0, m_sli.dz0);
-    printf("1: dx %d dz %d\n", m_sli.dx1, m_sli.dz1);
-    printf("Factor %f\n", m_sli.Factor);
 }
 
 
@@ -294,40 +210,6 @@ Vector3f BaseTerrain::GetSimpleLighting(int x, int z) const
 
 Vector3f BaseTerrain::GetSlopeScaleLighting(int x, int z) const
 {
-    float Height = GetHeight(x, z);
-
-    float f = 0.0f;
-
-    int XBefore0 = x + m_sli.dx0 * 5;
-    int ZBefore0 = z + m_sli.dz0 * 5;
-
-    int XBefore1 = x + m_sli.dx1 * 5;
-    int ZBefore1 = z + m_sli.dz1 * 5;
-
-    if ((XBefore0 >= 0) && (XBefore0 < m_terrainSize) && (ZBefore0 >= 0) && (ZBefore0 < m_terrainSize) &&
-        (XBefore1 >= 0) && (XBefore1 < m_terrainSize) && (ZBefore1 >= 0) && (ZBefore1 < m_terrainSize)) {
-
-        float HeightF32 = Height;
-        float HeightBefore0 = GetHeight(XBefore0, ZBefore0);
-        float HeightBefore1 = GetHeight(XBefore1, ZBefore1);
-
-        // Interpolate between the height of the two vertices
-        float HeightBefore = HeightBefore0 * m_sli.Factor + (1.0f - m_sli.Factor) * HeightBefore1;
-
-        float LightSoftness = 2.0f;
-        f = 1.0f - (HeightBefore - HeightF32) / LightSoftness;
-        float min_brightness = 0.2f;
-        f = std::max(std::min(f, 1.0f), min_brightness);
-        //        printf("%f\n", f);
-    } else {
-        float Delta = Height - m_minHeight;
-        float MaxDelta = m_maxHeight - m_minHeight;
-
-        f = (float)Delta / (float)MaxDelta;
-    }
-
-    Vector3f Color(f, f, f);
-
-    return Color;
+    return m_slopeScaleLighter.GetLighting(x, z);
 }
 

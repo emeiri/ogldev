@@ -152,12 +152,10 @@ public:
         Vector3f Center(128.0f, 50.0f, 128.0f);
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
-        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
+        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
         float y = min(-0.1f, cosf(foo));
 
-        Vector3f LightDir(sinf(foo), y, 0.0f);
-
-        m_terrain.SetLightDir(LightDir);
+        Vector3f LightDir(sinf(foo), y, 0.0f);*/        
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -260,7 +258,7 @@ private:
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");
-        Vector3f LightDir(1.0f, -0.5f, 0.0f);
+        Vector3f LightDir(1.0f, -0.5f, 1.3f);
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames, LightDir);
 
         int Size = 512;

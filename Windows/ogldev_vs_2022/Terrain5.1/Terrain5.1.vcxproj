@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\Terrain5.1\midpoint_disp_terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain5.1\slope_scale_lighter.cpp" />
     <ClCompile Include="..\..\..\Terrain5.1\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain5.1\terrain_demo5.1.cpp" />
     <ClCompile Include="..\..\..\Terrain5.1\terrain_technique.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\Terrain5.1\midpoint_disp_terrain.h" />
+    <ClInclude Include="..\..\..\Terrain5.1\slope_scale_lighter.h" />
     <ClInclude Include="..\..\..\Terrain5.1\terrain.h" />
     <ClInclude Include="..\..\..\Terrain5.1\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain5.1\texture_config.h" />

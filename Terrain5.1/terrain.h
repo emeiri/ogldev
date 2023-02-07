@@ -25,11 +25,12 @@
 #include "ogldev_texture.h"
 #include "triangle_list.h"
 #include "terrain_technique.h"
+#include "slope_scale_lighter.h"
 
 class BaseTerrain
 {
  public:
-    BaseTerrain() {}
+    BaseTerrain() : m_slopeScaleLighter(&m_heightMap) {}
 
     ~BaseTerrain();
 
@@ -57,8 +58,6 @@ class BaseTerrain
 	
     void SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height);
 	
-    void SetLightDir(const Vector3f& Dir) { m_lightDir = Dir; }	
-	
     Vector3f GetColor(int x, int z) const;
 
  protected:
@@ -84,19 +83,8 @@ private:
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     TerrainTechnique m_terrainTech;
-    Vector3f m_lightDir;	
-
-    struct SlopeLightInfo {
-        // how much to move to the first vertex towards the light source
-        int dz0 = 0;
-        int dx0 = 0;
-        // how much to move to the second vertex towards the light source
-        int dz1 = 0;
-        int dx1 = 0;
-        float Factor = 0.0f; // the interpolation factor between the two vertices
-    };
-
-    SlopeLightInfo m_sli;
+    SlopeScaleLighter m_slopeScaleLighter;
+    Vector3f m_lightDir = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 #endif
