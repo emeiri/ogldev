@@ -27,7 +27,7 @@ public:
 
     void InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness);
 
-    Vector3f GetLighting(int x, int z) const;
+    float GetLighting(int x, int z) const;
 
 private:
     const Array2D<float>* m_pHeightmap = NULL;
@@ -38,10 +38,10 @@ private:
     float m_softness = 0.0f;
 
     // how much to move to the first vertex towards the light source
-    int dz0 = 0;
-    int dx0 = 0;
+    int m_dz0 = 0;
+    int m_dx0 = 0;
     // how much to move to the second vertex towards the light source
-    int dz1 = 0;
-    int dx1 = 0;
-    float Factor = 0.0f; // the interpolation factor between the two vertices
+    int m_dz1 = 0;
+    int m_dx1 = 0;
+    float m_factor = 0.0f; // the interpolation factor between the two vertices
 };

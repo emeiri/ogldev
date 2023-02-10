@@ -82,7 +82,7 @@ void TriangleList::CreateGLState()
 
     int POS_LOC = 0;
     int TEX_LOC = 1;
-	int COLOR_LOC = 2;
+	int LIGHT_FACTOR_LOC = 2;
 
 	size_t NumFloats = 0;
 	
@@ -94,9 +94,9 @@ void TriangleList::CreateGLState()
     glVertexAttribPointer(TEX_LOC, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
     NumFloats += 2;
 
-    glEnableVertexAttribArray(COLOR_LOC);
-    glVertexAttribPointer(COLOR_LOC, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
-    NumFloats += 3;
+    glEnableVertexAttribArray(LIGHT_FACTOR_LOC);
+    glVertexAttribPointer(LIGHT_FACTOR_LOC, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats++;
 }
 
 
@@ -129,7 +129,7 @@ void TriangleList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
     float TextureScale = pTerrain->GetTextureScale();
     Tex = Vector2f(TextureScale * (float)x / Size, TextureScale * (float)z / Size);	
 	
-    Color = pTerrain->GetColor(x, z);
+    LightFactor = pTerrain->GetSlopeLighting(x, z);
 }
 
 

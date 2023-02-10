@@ -58,7 +58,7 @@ class BaseTerrain
 	
     void SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height);
 	
-    Vector3f GetColor(int x, int z) const;
+    float GetSlopeLighting(int x, int z) const;
 
     void SetLight(const Vector3f& LightDir, float Softness);
 
@@ -76,9 +76,6 @@ class BaseTerrain
     float m_textureScale = 1.0f;
 
 private:
-    Vector3f GetSimpleLighting(int x, int z) const;
-
-    Vector3f GetSlopeLighting(int x, int z) const;
 
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;

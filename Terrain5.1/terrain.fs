@@ -2,10 +2,9 @@
 
 layout(location = 0) out vec4 FragColor;
 
-in vec3 Color;
 in vec2 Tex;
 in vec3 WorldPos;
-in float Brightness;
+in float LightFactor;
 
 uniform sampler2D gTextureHeight0;
 uniform sampler2D gTextureHeight1;
@@ -55,5 +54,5 @@ void main()
 {
     vec4 TexColor = CalcTexColor();
 
-    FragColor = TexColor * vec4(Color, 1.0) * Brightness;
+    FragColor = TexColor * LightFactor;
 }

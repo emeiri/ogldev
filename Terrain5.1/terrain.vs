@@ -19,28 +19,21 @@
 
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 InTex;
-layout (location = 2) in vec3 InColor;
+layout (location = 2) in float InLightFactor;
 
 uniform mat4 gVP;
 uniform float gMinHeight;
 uniform float gMaxHeight;
 
-out vec3 Color;
+out float LightFactor;
 out vec2 Tex;
 out vec3 WorldPos;
-out float Brightness;
 
 void main()
 {
     gl_Position = gVP * vec4(Position, 1.0);
 
-    float DeltaHeight = gMaxHeight - gMinHeight;
-
-    float HeightRatio = (Position.y - gMinHeight) / DeltaHeight;
-
-    Brightness = HeightRatio * 0.8 + 0.2;
-
-    Color = InColor;
+    LightFactor = InLightFactor;
 
     Tex = InTex;
     

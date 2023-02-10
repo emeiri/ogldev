@@ -178,28 +178,7 @@ void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Te
 }
 
 
-Vector3f BaseTerrain::GetColor(int x, int z) const
-{
-    return GetSlopeLighting(x, z);
-}
-
-
-Vector3f BaseTerrain::GetSimpleLighting(int x, int z) const
-{
-    float Height = GetHeight(x, z);
-
-    float Delta = Height - m_minHeight;
-    float MaxDelta = m_maxHeight - m_minHeight;
-
-    float f = Delta / MaxDelta;
-
-    Vector3f Color(f, f, f);
-
-    return Color;
-}
-
-
-Vector3f BaseTerrain::GetSlopeLighting(int x, int z) const
+float BaseTerrain::GetSlopeLighting(int x, int z) const
 {
     return m_slopeLighter.GetLighting(x, z);
 }
