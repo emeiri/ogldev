@@ -25,12 +25,12 @@
 #include "ogldev_texture.h"
 #include "triangle_list.h"
 #include "terrain_technique.h"
-#include "slope_scale_lighter.h"
+#include "slope_lighter.h"
 
 class BaseTerrain
 {
  public:
-    BaseTerrain() : m_slopeScaleLighter(&m_heightMap) {}
+    BaseTerrain() : m_slopeLighter(&m_heightMap) {}
 
     ~BaseTerrain();
 
@@ -78,12 +78,12 @@ class BaseTerrain
 private:
     Vector3f GetSimpleLighting(int x, int z) const;
 
-    Vector3f GetSlopeScaleLighting(int x, int z) const;
+    Vector3f GetSlopeLighting(int x, int z) const;
 
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     TerrainTechnique m_terrainTech;
-    SlopeScaleLighter m_slopeScaleLighter;
+    SlopeLighter m_slopeLighter;
     Vector3f m_lightDir = Vector3f(0.0f, 0.0f, 0.0f);
     float m_lightSoftness = 0.0f;
 };

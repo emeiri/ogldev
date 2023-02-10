@@ -20,10 +20,10 @@
 
 #pragma once
 
-class SlopeScaleLighter
+class SlopeLighter
 {
 public:
-    SlopeScaleLighter(const Array2D<float>* pHeightmap) : m_pHeightmap(pHeightmap) {}
+    SlopeLighter(const Array2D<float>* pHeightmap) : m_pHeightmap(pHeightmap) {}
 
     void InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness);
 

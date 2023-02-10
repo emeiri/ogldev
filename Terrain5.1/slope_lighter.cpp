@@ -17,9 +17,9 @@
 
 //#define SLI_DEBUG_PRINTS
 
-#include "slope_scale_lighter.h"
+#include "slope_lighter.h"
 
-void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness)
+void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness)
 {
     /* Slope lighting works by comparing the height of the current vertex with the
    height of the vertex which is "before" it on the way to the light source. This
@@ -124,7 +124,7 @@ void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, f
 #endif
 }
 
-Vector3f SlopeScaleLighter::GetLighting(int x, int z) const
+Vector3f SlopeLighter::GetLighting(int x, int z) const
 {
     float Height = m_pHeightmap->Get(x, z);
 

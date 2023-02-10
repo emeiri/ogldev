@@ -168,7 +168,7 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_terrainTech.Enable();
     m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 
-    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, m_minHeight, m_maxHeight, m_lightSoftness);
+    m_slopeLighter.InitLighter(m_lightDir, m_terrainSize, m_minHeight, m_maxHeight, m_lightSoftness);
 }
 
 
@@ -180,7 +180,7 @@ void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Te
 
 Vector3f BaseTerrain::GetColor(int x, int z) const
 {
-    return GetSlopeScaleLighting(x, z);
+    return GetSlopeLighting(x, z);
 }
 
 
@@ -199,9 +199,9 @@ Vector3f BaseTerrain::GetSimpleLighting(int x, int z) const
 }
 
 
-Vector3f BaseTerrain::GetSlopeScaleLighting(int x, int z) const
+Vector3f BaseTerrain::GetSlopeLighting(int x, int z) const
 {
-    return m_slopeScaleLighter.GetLighting(x, z);
+    return m_slopeLighter.GetLighting(x, z);
 }
 
 

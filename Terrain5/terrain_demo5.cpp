@@ -140,7 +140,7 @@ public:
         }
 
         static float foo = 0.0f;
-        foo += 0.001f;
+        foo += 0.01f;
 
 /*        float R = 400.0f;
         float S = 128.0f;

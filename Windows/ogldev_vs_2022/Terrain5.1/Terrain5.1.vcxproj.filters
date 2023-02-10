@@ -40,7 +40,7 @@
     <ClCompile Include="..\..\..\Terrain5.1\terrain_demo5.1.cpp" />
     <ClCompile Include="..\..\..\Terrain5.1\terrain_technique.cpp" />
     <ClCompile Include="..\..\..\Terrain5.1\triangle_list.cpp" />
-    <ClCompile Include="..\..\..\Terrain5.1\slope_scale_lighter.cpp" />
+    <ClCompile Include="..\..\..\Terrain5.1\slope_lighter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -75,7 +75,7 @@
     <ClInclude Include="..\..\..\Terrain5.1\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain5.1\texture_config.h" />
     <ClInclude Include="..\..\..\Terrain5.1\triangle_list.h" />
-    <ClInclude Include="..\..\..\Terrain5.1\slope_scale_lighter.h" />
+    <ClInclude Include="..\..\..\Terrain5.1\slope_lighter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Terrain5.1\terrain.fs">
