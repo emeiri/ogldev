@@ -44,7 +44,7 @@ void BaseTerrain::Destroy()
 
 
 
-void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness)
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, float LightSoftness)
 {
     if (!m_terrainTech.Init()) {
         printf("Error initializing tech\n");
@@ -59,7 +59,6 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
-    m_lightDir = LightDir;
     m_lightSoftness = LightSoftness;
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
@@ -170,7 +169,7 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_terrainTech.Enable();
     m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 
-    RefreshLightDir();
+    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, m_minHeight, m_maxHeight, m_lightSoftness);
 }
 
 
@@ -210,12 +209,6 @@ Vector3f BaseTerrain::GetSlopeScaleLighting(int x, int z) const
 void BaseTerrain::SetLightDir(const Vector3f& LightDir)
 {
     m_lightDir = LightDir;
-    RefreshLightDir();
 }
 
-
-void BaseTerrain::RefreshLightDir()
-{
-    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, m_minHeight, m_maxHeight, m_lightSoftness);
-}
 

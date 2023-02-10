@@ -91,7 +91,6 @@ public:
                  
                 ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
 
-                ImGui::SliderInt("Iterations", &Iterations, 0, 1000);
                 ImGui::SliderFloat("MaxHeight", &MaxHeight, 0.0f, 1000.0f);
                 ImGui::SliderFloat("Roughness", &Roughness, 0.0f, 5.0f);
 

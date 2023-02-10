@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//#define SLI_DEBUG_PRINTS
 
 #include "slope_scale_lighter.h"
 
@@ -51,12 +52,15 @@ void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, f
     Vector3f PosX(1.0f, 0.0f, 0.0f);
     float dpx = PosX.Dot(LightDir * -1.0f);
     float cosx = ToDegree(acos(dpx));
-    printf("PosX %f %f\n", dpx, cosx);
-
+    
     Vector3f PosZ(0.0f, 0.0f, 1.0f);
     float dpz = PosZ.Dot(LightDir * -1.0f);
     float cosz = ToDegree(acos(dpz));
+
+#ifdef SLI_DEBUG_PRINTS
+    printf("PosX %f %f\n", dpx, cosx);
     printf("PosZ %f %f\n", dpz, cosz);
+#endif
 
     float a45 = cosf(ToRadian(45.0f));
 
@@ -113,9 +117,11 @@ void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, f
 
     Factor = 1.0f - Factor / a45;
 
+ #ifdef SLI_DEBUG_PRINTS
     printf("0: dx %d dz %d\n", dx0, dz0);
     printf("1: dx %d dz %d\n", dx1, dz1);
     printf("Factor %f\n", Factor);
+#endif
 }
 
 Vector3f SlopeScaleLighter::GetLighting(int x, int z) const
