@@ -36,7 +36,7 @@ class BaseTerrain
 
     void Destroy();
 
-	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir);
+	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness);
 
     void Render(const BasicCamera& Camera);
 
@@ -85,6 +85,7 @@ private:
     TerrainTechnique m_terrainTech;
     SlopeScaleLighter m_slopeScaleLighter;
     Vector3f m_lightDir = Vector3f(0.0f, 0.0f, 0.0f);
+    float m_lightSoftness = 0.0f;
 };
 
 #endif

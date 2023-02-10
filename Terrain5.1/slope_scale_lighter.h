@@ -25,7 +25,7 @@ class SlopeScaleLighter
 public:
     SlopeScaleLighter(const Array2D<float>* pHeightmap) : m_pHeightmap(pHeightmap) {}
 
-    void InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight);
+    void InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness);
 
     Vector3f GetLighting(int x, int z) const;
 
@@ -35,6 +35,7 @@ private:
     int m_terrainSize = 0;
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
+    float m_softness = 0.0f;
 
     // how much to move to the first vertex towards the light source
     int dz0 = 0;

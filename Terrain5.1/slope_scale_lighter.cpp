@@ -18,7 +18,7 @@
 
 #include "slope_scale_lighter.h"
 
-void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight)
+void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness)
 {
     /* Slope lighting works by comparing the height of the current vertex with the
    height of the vertex which is "before" it on the way to the light source. This
@@ -46,6 +46,7 @@ void SlopeScaleLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, f
     m_terrainSize = TerrainSize;
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
+    m_softness = Softness;
 
     Vector3f PosX(1.0f, 0.0f, 0.0f);
     float dpx = PosX.Dot(LightDir * -1.0f);
@@ -139,8 +140,7 @@ Vector3f SlopeScaleLighter::GetLighting(int x, int z) const
         // Interpolate between the height of the two vertices
         float HeightBefore = HeightBefore0 * Factor + (1.0f - Factor) * HeightBefore1;
 
-        float LightSoftness = 2.0f;
-        f = 1.0f - (HeightBefore - HeightF32) / LightSoftness;
+        f = 1.0f - (HeightBefore - HeightF32) / m_softness;
         float min_brightness = 0.2f;
         f = std::max(std::min(f, 1.0f), min_brightness);
         //        printf("%f\n", f);

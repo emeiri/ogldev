@@ -44,7 +44,7 @@ void BaseTerrain::Destroy()
 
 
 
-void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir)
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness)
 {
     if (!m_terrainTech.Init()) {
         printf("Error initializing tech\n");
@@ -60,6 +60,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
     m_lightDir = LightDir;
+    m_lightSoftness = LightSoftness;
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
@@ -171,7 +172,7 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_terrainTech.Enable();
     m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 
-    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, MinHeight, MaxHeight);
+    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, MinHeight, MaxHeight, m_lightSoftness);
 }
 
 

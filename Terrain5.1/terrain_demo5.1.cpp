@@ -259,7 +259,8 @@ private:
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");
         Vector3f LightDir(1.0f, -0.5f, 1.3f);
-        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames, LightDir);
+        float LightSoftness = 10.0f;
+        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames, LightDir, LightSoftness);
 
         int Size = 512;
         float Roughness = 1.0f;
