@@ -36,7 +36,7 @@ class BaseTerrain
 
     void Destroy();
 
-	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, float LightSoftness);
+	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames);
 
     void Render(const BasicCamera& Camera);
 
@@ -60,7 +60,7 @@ class BaseTerrain
 	
     Vector3f GetColor(int x, int z) const;
 
-    void SetLightDir(const Vector3f& LightDir);
+    void SetLight(const Vector3f& LightDir, float Softness);
 
  protected:
 

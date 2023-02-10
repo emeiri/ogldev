@@ -89,8 +89,9 @@ public:
                                
                 ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
 
-                ImGui::SliderFloat("MaxHeight", &this->m_maxHeight, 0.0f, 1000.0f);
-                ImGui::SliderFloat("Roughness", &this->m_roughness, 0.0f, 5.0f);
+                ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
+                ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
+                ImGui::SliderFloat("Light Softness", &this->m_lightSoftness, 0.0f, 50.0f);
 
                 static float Height0 = 64.0f;
                 static float Height1 = 128.0f;
@@ -105,6 +106,7 @@ public:
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
                     srand(g_seed);
+                    m_terrain.SetLight(m_lightDir, m_lightSoftness);
                     m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
@@ -203,7 +205,7 @@ public:
                 m_counter += 0.1f;
                 m_lightDir.x = sinf(m_counter);
                 m_lightDir.z = cosf(m_counter);
-                m_terrain.SetLightDir(m_lightDir);
+                m_terrain.SetLight(m_lightDir, m_lightSoftness);
                 m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
                 break;
             }
@@ -263,9 +265,8 @@ private:
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");        
-        float LightSoftness = 10.0f;
-        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames, LightSoftness);
-        m_terrain.SetLightDir(m_lightDir);
+        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
+        m_terrain.SetLight(m_lightDir, m_lightSoftness);
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
     }
 
@@ -295,6 +296,7 @@ private:
     bool m_isPaused = false;
     int m_terrainSize = 512;
     float m_roughness = 1.0f;
+    float m_lightSoftness = 10.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 256.0f;
     Vector3f m_lightDir = Vector3f(1.0f, -0.5f, 1.3f);
