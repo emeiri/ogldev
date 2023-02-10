@@ -60,6 +60,8 @@ class BaseTerrain
 	
     Vector3f GetColor(int x, int z) const;
 
+    void SetLightDir(const Vector3f& LightDir);
+
  protected:
 
 	void LoadHeightMapFile(const char* pFilename);
@@ -74,11 +76,11 @@ class BaseTerrain
     float m_textureScale = 1.0f;
 
 private:
-    void PrepareSlopeLightInfoParams();
-	
     Vector3f GetSimpleLighting(int x, int z) const;
 
     Vector3f GetSlopeScaleLighting(int x, int z) const;
+
+    void RefreshLightDir();
 	
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;

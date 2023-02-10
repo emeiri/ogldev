@@ -66,8 +66,6 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
-
-    PrepareSlopeLightInfoParams();
 }
 
 
@@ -172,19 +170,13 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_terrainTech.Enable();
     m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 
-    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, MinHeight, MaxHeight, m_lightSoftness);
+    RefreshLightDir();
 }
 
 
 void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height)
 {
     m_terrainTech.SetTextureHeights(Tex0Height, Tex1Height, Tex2Height, Tex3Height); 
-}
-
-
-void BaseTerrain::PrepareSlopeLightInfoParams()
-{
-
 }
 
 
@@ -212,5 +204,18 @@ Vector3f BaseTerrain::GetSimpleLighting(int x, int z) const
 Vector3f BaseTerrain::GetSlopeScaleLighting(int x, int z) const
 {
     return m_slopeScaleLighter.GetLighting(x, z);
+}
+
+
+void BaseTerrain::SetLightDir(const Vector3f& LightDir)
+{
+    m_lightDir = LightDir;
+    RefreshLightDir();
+}
+
+
+void BaseTerrain::RefreshLightDir()
+{
+    m_slopeScaleLighter.InitLighter(m_lightDir, m_terrainSize, m_minHeight, m_maxHeight, m_lightSoftness);
 }
 
