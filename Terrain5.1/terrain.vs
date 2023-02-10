@@ -22,8 +22,6 @@ layout (location = 1) in vec2 InTex;
 layout (location = 2) in float InLightFactor;
 
 uniform mat4 gVP;
-uniform float gMinHeight;
-uniform float gMaxHeight;
 
 out float LightFactor;
 out vec2 Tex;

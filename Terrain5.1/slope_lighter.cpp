@@ -19,7 +19,7 @@
 
 #include "slope_lighter.h"
 
-void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float MinHeight, float MaxHeight, float Softness)
+void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float Softness)
 {
     /* Slope lighting works by comparing the height of the current vertex with the
    height of the vertex which is "before" it on the way to the light source. This
@@ -45,8 +45,6 @@ void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float 
    |-------------------------------------------------------|
 */
     m_terrainSize = TerrainSize;
-    m_minHeight = MinHeight;
-    m_maxHeight = MaxHeight;
     m_softness = Softness;
 
     Vector3f ReversedLightDir = LightDir * -1.0f;
@@ -144,10 +142,7 @@ float SlopeLighter::GetLighting(int x, int z) const
         f = std::max(std::min(f, 1.0f), min_brightness);
     }
     else {
-        float Delta = Height - m_minHeight;
-        float MaxDelta = m_maxHeight - m_minHeight;
-
-        f = (float)Delta / (float)MaxDelta;
+        f = 1.0f;
     }
 
     return f;

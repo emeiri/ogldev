@@ -43,8 +43,6 @@ bool TerrainTechnique::Init()
     }
 
     m_VPLoc = GetUniformLocation("gVP");
-    m_minHeightLoc = GetUniformLocation("gMinHeight");
-    m_maxHeightLoc = GetUniformLocation("gMaxHeight");
     m_tex0UnitLoc = GetUniformLocation("gTextureHeight0");
     m_tex1UnitLoc = GetUniformLocation("gTextureHeight1");
     m_tex2UnitLoc = GetUniformLocation("gTextureHeight2");
@@ -55,8 +53,6 @@ bool TerrainTechnique::Init()
     m_tex3HeightLoc = GetUniformLocation("gHeight3");
 
     if (m_VPLoc == INVALID_UNIFORM_LOCATION||
-        m_minHeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_maxHeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex0UnitLoc == INVALID_UNIFORM_LOCATION ||
         m_tex1UnitLoc == INVALID_UNIFORM_LOCATION ||
         m_tex2UnitLoc == INVALID_UNIFORM_LOCATION ||
@@ -65,7 +61,7 @@ bool TerrainTechnique::Init()
         m_tex1HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex2HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex3HeightLoc == INVALID_UNIFORM_LOCATION) {
-     //   return false;
+        return false;
     }
 
     Enable();
@@ -84,13 +80,6 @@ bool TerrainTechnique::Init()
 void TerrainTechnique::SetVP(const Matrix4f& VP)
 {
     glUniformMatrix4fv(m_VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
-}
-
-
-void TerrainTechnique::SetMinMaxHeight(float Min, float Max)
-{
-    glUniform1f(m_minHeightLoc, Min);
-    glUniform1f(m_maxHeightLoc, Max);
 }
 
 

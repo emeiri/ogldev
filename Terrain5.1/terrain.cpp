@@ -166,9 +166,8 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_maxHeight = MaxHeight;
 
     m_terrainTech.Enable();
-    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 
-    m_slopeLighter.InitLighter(m_lightDir, m_terrainSize, m_minHeight, m_maxHeight, m_lightSoftness);
+    m_slopeLighter.InitLighter(m_lightDir, m_terrainSize, m_lightSoftness);
 }
 
 
