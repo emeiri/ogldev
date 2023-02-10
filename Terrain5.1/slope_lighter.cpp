@@ -64,57 +64,49 @@ void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float 
     printf("DirZ %f %f\n", dpz, cosz);
 #endif
 
-    float RadianOf45Degrees = cosf(ToRadian(45.0f));
+    float RadianOf45Degrees = cosf(ToRadian(45.0f));  // =~ 0.707
 
     bool InterpolateOnX = false;
 
     if (dpz >= RadianOf45Degrees) {
-        //  printf("foo1\n");
-        m_dz0 = m_dz1 = 1;
+            m_dz0 = m_dz1 = 1;
         InterpolateOnX = true;
     }
     else if (dpz <= -RadianOf45Degrees) {
-        //printf("foo2\n");
         m_dz0 = m_dz1 = -1;
         InterpolateOnX = true;
     }
     else {
         if (dpz >= 0.0f) {
-            //  printf("foo3\n");
             m_dz0 = 0;
             m_dz1 = 1;
-            m_factor = dpz;
         }
         else {
-            // printf("foo4\n");
             m_dz0 = 0;
             m_dz1 = -1;
-            m_factor = -dpz;
         }
 
+        m_factor = abs(dpz);
+
         if (dpx >= 0.0f) {
-            // printf("foo5\n");
             m_dx0 = m_dx1 = 1;
         }
         else {
-            // printf("foo6\n");
             m_dx0 = m_dx1 = -1;
         }
     }
 
     if (InterpolateOnX) {
         if (dpx >= 0.0f) {
-            // printf("foo7\n");
             m_dx0 = 0;
             m_dx1 = 1;
-            m_factor = dpx;
         }
         else {
-            // printf("foo8\n");
             m_dx0 = 0;
             m_dx1 = -1;
-            m_factor = -dpx;
         }
+
+        m_factor = abs(dpx);
     }
 
     m_factor = 1.0f - m_factor / RadianOf45Degrees;
@@ -141,17 +133,15 @@ float SlopeLighter::GetLighting(int x, int z) const
     if ((XBefore0 >= 0) && (XBefore0 < m_terrainSize) && (ZBefore0 >= 0) && (ZBefore0 < m_terrainSize) &&
         (XBefore1 >= 0) && (XBefore1 < m_terrainSize) && (ZBefore1 >= 0) && (ZBefore1 < m_terrainSize)) {
 
-        float HeightF32 = Height;
         float HeightBefore0 = m_pHeightmap->Get(XBefore0, ZBefore0);
         float HeightBefore1 = m_pHeightmap->Get(XBefore1, ZBefore1);
 
         // Interpolate between the height of the two vertices
         float HeightBefore = HeightBefore0 * m_factor + (1.0f - m_factor) * HeightBefore1;
 
-        f = 1.0f - (HeightBefore - HeightF32) / m_softness;
+        f = (Height - HeightBefore) / m_softness;
         float min_brightness = 0.2f;
         f = std::max(std::min(f, 1.0f), min_brightness);
-        //        printf("%f\n", f);
     }
     else {
         float Delta = Height - m_minHeight;

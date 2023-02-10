@@ -45,6 +45,8 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
+static int g_seed = 0;
+
 
 class TerrainDemo5
 {
@@ -84,15 +86,11 @@ public:
                 ImGui_ImplOpenGL3_NewFrame();
                 ImGui_ImplGlfw_NewFrame();
                 ImGui::NewFrame();
-                
-                static int Iterations = 100;
-                static float MaxHeight = 256.0f;
-                static float Roughness = 1.0f;
-                 
+                                 
                 ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
 
-                ImGui::SliderFloat("MaxHeight", &MaxHeight, 0.0f, 1000.0f);
-                ImGui::SliderFloat("Roughness", &Roughness, 0.0f, 5.0f);
+                ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
+                ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
 
                 static float Height0 = 64.0f;
                 static float Height1 = 128.0f;
@@ -106,10 +104,8 @@ public:
 
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
-                    int Size = 512;
-                    float MinHeight = 0.0f;
-                    //srand(4232);
-                    m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
+                    srand(g_seed);
+                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
 
@@ -262,12 +258,7 @@ private:
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
-        int Size = 512;
-        float Roughness = 1.0f;
-        float MinHeight = 0.0f;
-        float MaxHeight = 256.0f;
-
-        m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
+        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
     }
 
 
@@ -294,6 +285,11 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
+    int m_terrainSize = 512;
+    float m_roughness = 1.0f;
+    float m_minHeight = 0.0f;
+    float m_maxHeight = 256.0f;
+    float m_counter = 0.0f;
 };
 
 TerrainDemo5* app = NULL;
@@ -323,13 +319,13 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 int main(int argc, char** argv)
 {
 #ifdef _WIN64
-    int Seed = GetCurrentProcessId();
-    srand(GetCurrentProcessId());
-    printf("random seed %d\n", Seed);
-   // srand(0);
+    g_seed = GetCurrentProcessId();    
 #else
-    srand(getpid());
+    g_seed = getpid();
 #endif
+    printf("random seed %d\n", g_seed);
+
+    srand(g_seed);
 
     app = new TerrainDemo5();
 

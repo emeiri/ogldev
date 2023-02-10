@@ -265,6 +265,7 @@ private:
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");        
+
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
         m_terrain.SetLight(m_lightDir, m_lightSoftness);
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
