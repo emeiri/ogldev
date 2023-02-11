@@ -50,6 +50,8 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     void InitCallbacks();
 
+    void SetDefaultGLState();
+
     GameCallbacks* m_pGameCallbacks = NULL;
     GLFWwindow* m_pWindow = NULL;
 };

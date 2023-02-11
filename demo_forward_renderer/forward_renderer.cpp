@@ -239,23 +239,12 @@ private:
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
 };
 
-ForwardRendererDemo* app = NULL;
 
 int main(int argc, char** argv)
 {
-    app = new ForwardRendererDemo();
-
-    app->Init();
-
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-
-    app->Run();
-
-    delete app;
+    ForwardRendererDemo App;
+    App.Init();
+    App.Run();
 
     return 0;
 }

@@ -81,7 +81,19 @@ void RenderingSubsystemGL::CreateWindow(uint Width, uint Height)
 
     glfwSetCursorPos(m_pWindow, Width / 2, Height / 2);
 
+    SetDefaultGLState();
+
     InitCallbacks();
+}
+
+
+void RenderingSubsystemGL::SetDefaultGLState()
+{
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -128,7 +140,7 @@ void RenderingSubsystemGL::OnKeyCallback(GLFWwindow* window, int key, int scanco
 
 void RenderingSubsystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    m_pCamera->OnMouse(x, y);
+    m_pCamera->OnMouse((int)x, (int)y);
     m_pGameCallbacks->OnMouseMove((int)x, (int)y);
 }
 
