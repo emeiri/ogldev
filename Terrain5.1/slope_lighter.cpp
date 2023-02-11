@@ -67,7 +67,7 @@ void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float 
     bool InterpolateOnX = false;
 
     if (dpz >= RadianOf45Degrees) {
-            m_dz0 = m_dz1 = 1;
+        m_dz0 = m_dz1 = 1;
         InterpolateOnX = true;
     }
     else if (dpz <= -RadianOf45Degrees) {

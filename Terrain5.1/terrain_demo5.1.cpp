@@ -266,8 +266,7 @@ private:
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");        
 
-        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
-        m_terrain.SetLight(m_lightDir, m_lightSoftness);
+        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames, m_lightDir, m_lightSoftness);
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
     }
 
@@ -300,7 +299,7 @@ private:
     float m_lightSoftness = 10.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 256.0f;
-    Vector3f m_lightDir = Vector3f(1.0f, -0.5f, 1.3f);
+    Vector3f m_lightDir = Vector3f(1.0f, -0.5f, 0.0f);
     float m_counter = 0.0f;
 };
 

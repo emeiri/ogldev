@@ -44,7 +44,7 @@ void BaseTerrain::Destroy()
 
 
 
-void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames)
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness)
 {
     if (!m_terrainTech.Init()) {
         printf("Error initializing tech\n");
@@ -59,6 +59,8 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
+    m_lightDir = LightDir;
+    m_lightSoftness = LightSoftness;
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
@@ -165,9 +167,7 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_minHeight = MinHeight;
     m_maxHeight = MaxHeight;
 
-    m_terrainTech.Enable();
-
-    m_slopeLighter.InitLighter(m_lightDir, m_terrainSize, m_lightSoftness);
+   // m_terrainTech.Enable();
 }
 
 
@@ -187,6 +187,13 @@ void BaseTerrain::SetLight(const Vector3f& LightDir, float Softness)
 {
     m_lightDir = LightDir;
     m_lightSoftness = Softness;
+}
+
+
+void BaseTerrain::FinalizeTerrain()
+{
+    m_slopeLighter.InitLighter(m_lightDir, m_terrainSize, m_lightSoftness);
+    m_triangleList.CreateTriangleList(m_terrainSize, m_terrainSize, this);
 }
 
 

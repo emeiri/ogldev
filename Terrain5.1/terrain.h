@@ -36,7 +36,7 @@ class BaseTerrain
 
     void Destroy();
 
-	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames);
+	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames, const Vector3f& LightDir, float LightSoftness);
 
     void Render(const BasicCamera& Camera);
 
@@ -68,20 +68,22 @@ class BaseTerrain
 
     void SetMinMaxHeight(float MinHeight, float MaxHeight);
 
+    void FinalizeTerrain();
+
     int m_terrainSize = 0;
 	float m_worldScale = 1.0f;
-    Array2D<float> m_heightMap;
-    TriangleList m_triangleList;
+    Array2D<float> m_heightMap;    
     Texture* m_pTextures[4] = { 0 };
     float m_textureScale = 1.0f;
 
 private:
-
+    
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     TerrainTechnique m_terrainTech;
-    SlopeLighter m_slopeLighter;
-    Vector3f m_lightDir = Vector3f(0.0f, 0.0f, 0.0f);
+    TriangleList m_triangleList;
+    SlopeLighter m_slopeLighter; 
+    Vector3f m_lightDir;
     float m_lightSoftness = 0.0f;
 };
 
