@@ -29,8 +29,9 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_forward_renderer.h"
 #include "ogldev_rendering_subsystem.h"
+#include "ogldev_skinned_mesh.h"
+#include "ogldev_forward_lighting.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -227,7 +228,6 @@ private:
     }
 
     BasicCamera* m_pGameCamera = NULL;
-    ForwardRenderer m_renderer;
     BasicMesh* m_pMesh = NULL;
     SkinnedMesh* m_pMesh1 = NULL;
     PersProjInfo m_persProjInfo;

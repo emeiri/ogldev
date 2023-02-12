@@ -26,6 +26,7 @@
 #include <GLFW/glfw3.h>
 
 #include "ogldev_rendering_subsystem.h"
+#include "ogldev_forward_renderer.h"
 
 class RenderingSubsystemGL : public BaseRenderingSubsystem
 {
@@ -54,6 +55,8 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     GameCallbacks* m_pGameCallbacks = NULL;
     GLFWwindow* m_pWindow = NULL;
+    ForwardRenderer m_forwardRenderer;
+    BasicCamera* m_pCamera = NULL;
 };
 
 #endif

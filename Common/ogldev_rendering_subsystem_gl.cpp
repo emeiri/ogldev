@@ -23,6 +23,7 @@
 #include "ogldev_rendering_subsystem_gl.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
+#include "ogldev_basic_glfw_camera.h"
 
 extern BaseRenderingSubsystem* g_pRenderingSubsystem;
 

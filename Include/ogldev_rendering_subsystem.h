@@ -61,14 +61,14 @@ class BaseRenderingSubsystem
 
     virtual void Execute() = 0;
 
-    virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
+  //  virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
 
  protected:
 
     BaseRenderingSubsystem();
     ~BaseRenderingSubsystem();
 
-    BasicCamera* m_pCamera = NULL;
+   // BasicCamera* m_pCamera = NULL;
 
  private:
 
