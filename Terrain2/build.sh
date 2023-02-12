@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OGLDEV_DIR="/home/emeiri/projects/ogldev"
+OGLDEV_DIR=".."
 CC=g++
 CPPFLAGS=`pkg-config --cflags glew glfw3`
 CPPFLAGS="$CPPFLAGS -I$OGLDEV_DIR/Include -ggdb3"

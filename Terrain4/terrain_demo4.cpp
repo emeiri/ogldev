@@ -277,17 +277,17 @@ private:
 
         TextureGenerator TexGen;
 
-        TexGen.LoadTile("../Content/Textures/rock02_2.jpg");
-        //TexGen.LoadTile("../Content/Textures/IMGP5487_seamless.jpg");
-        //TexGen.LoadTile("../Content/Textures/IMGP5525_seamless.jpg");
-        TexGen.LoadTile("../Content/Textures/rock01.jpg");
+        TexGen.LoadTile("../Content/textures/rock02_2.jpg");
+        //TexGen.LoadTile("../Content/textures/IMGP5487_seamless.jpg");
+        //TexGen.LoadTile("../Content/textures/IMGP5525_seamless.jpg");
+        TexGen.LoadTile("../Content/textures/rock01.jpg");
         
-        TexGen.LoadTile("../Content/Textures/tilable-IMG_0044-verydark.png");
+        TexGen.LoadTile("../Content/textures/tilable-IMG_0044-verydark.png");
 
-       // TexGen.LoadTile("../Content/Textures/grass1.jpg");
-        //TexGen.LoadTile("../Content/Textures/Rock6.png");
+       // TexGen.LoadTile("../Content/textures/grass1.jpg");
+        //TexGen.LoadTile("../Content/textures/Rock6.png");
         
-        TexGen.LoadTile("../Content/Textures/water.png");
+        TexGen.LoadTile("../Content/textures/water.png");
         int TextureSize = 1024;
 
         Texture* pTexture = TexGen.GenerateTexture(TextureSize, &m_terrain, MinHeight, MaxHeight);
@@ -303,7 +303,7 @@ private:
 
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
-        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
+        TextureFilenames.push_back("../Content/textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");
 
