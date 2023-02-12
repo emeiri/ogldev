@@ -31,7 +31,6 @@ Makefile-Release.mk
 fileList.bin
 read.lock
 *.fbx
-*.png
 *.dae
 *.zip
 *.jpeg
