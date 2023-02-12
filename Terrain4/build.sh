@@ -26,6 +26,4 @@ SOURCES="terrain_demo4.cpp \
 	$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW/imgui_impl_glfw.cpp \
 	$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW/imgui_impl_opengl3.cpp "
 
-echo $SOURCES
-
 $CC $SOURCES $CPPFLAGS $LDFLAGS -o terrain_demo4
