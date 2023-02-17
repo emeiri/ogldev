@@ -128,22 +128,29 @@ float SlopeLighter::GetLighting(int x, int z) const
     int XBefore1 = x + m_dx1 * 5;
     int ZBefore1 = z + m_dz1 * 5;
 
-    if ((XBefore0 >= 0) && (XBefore0 < m_terrainSize) && (ZBefore0 >= 0) && (ZBefore0 < m_terrainSize) &&
-        (XBefore1 >= 0) && (XBefore1 < m_terrainSize) && (ZBefore1 >= 0) && (ZBefore1 < m_terrainSize)) {
+    bool V0InsideHeightmap = (XBefore0 >= 0) && (XBefore0 < m_terrainSize) && (ZBefore0 >= 0) && (ZBefore0 < m_terrainSize);
+    bool V1InsideHeightmap = (XBefore1 >= 0) && (XBefore1 < m_terrainSize) && (ZBefore1 >= 0) && (ZBefore1 < m_terrainSize);
 
+    float min_brightness = 0.4f;
+
+    if (V0InsideHeightmap && V1InsideHeightmap) {
         float HeightBefore0 = m_pHeightmap->Get(XBefore0, ZBefore0);
         float HeightBefore1 = m_pHeightmap->Get(XBefore1, ZBefore1);
 
         // Interpolate between the height of the two vertices
         float HeightBefore = HeightBefore0 * m_factor + (1.0f - m_factor) * HeightBefore1;
-
         f = (Height - HeightBefore) / m_softness;
-        float min_brightness = 0.2f;
-        f = std::max(std::min(f, 1.0f), min_brightness);
-    }
-    else {
+    } else if (V0InsideHeightmap) {
+        float HeightBefore = m_pHeightmap->Get(XBefore0, ZBefore0);
+        f = (Height - HeightBefore) / m_softness;
+    } else if (V1InsideHeightmap) {
+        float HeightBefore = m_pHeightmap->Get(XBefore1, ZBefore1);
+        f = (Height - HeightBefore) / m_softness;
+    } else {
         f = 1.0f;
     }
+
+    f = std::min(1.0f, max(f, min_brightness));
 
     return f;
 }
