@@ -103,14 +103,15 @@ void TriangleList::CreateGLState()
 void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
 {
     std::vector<Vertex> Vertices;
-    Vertices.resize(m_width * m_depth);
+    int NumQuads = (m_width - 1) * (m_depth - 1);
+    Vertices.resize(NumQuads * 6);
 
-    InitVertices(pTerrain, Vertices);
+   // InitVertices(pTerrain, Vertices);
 
 	std::vector<unsigned int> Indices;
-    int NumQuads = (m_width - 1) * (m_depth - 1);
+ //   int NumQuads = (m_width - 1) * (m_depth - 1);
     Indices.resize(NumQuads * 6);
-    InitIndices(Indices);
+    InitIndices(pTerrain, Indices, Vertices);
 
     CalcNormals(Vertices, Indices);
 
@@ -149,32 +150,49 @@ void TriangleList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>
 }
 
 
-void TriangleList::InitIndices(std::vector<unsigned int>& Indices)
+void TriangleList::InitIndices(const BaseTerrain* pTerrain, std::vector<unsigned int>& Indices, std::vector<Vertex>& Vertices)
 {
     int Index = 0;
 
     for (int z = 0 ; z < m_depth - 1 ; z++) {
         for (int x = 0 ; x < m_width - 1 ; x++) {
-			unsigned int IndexBottomLeft = z * m_width + x;
-			unsigned int IndexTopLeft = (z + 1) * m_width + x;
-			unsigned int IndexTopRight = (z + 1) * m_width + x + 1;
-			unsigned int IndexBottomRight = z * m_width + x + 1;
+		//	unsigned int IndexBottomLeft = z * m_width + x;
+			//unsigned int IndexTopLeft = (z + 1) * m_width + x;
+		//	unsigned int IndexTopRight = (z + 1) * m_width + x + 1;
+		//	unsigned int IndexBottomRight = z * m_width + x + 1;
 
             // Add "top left" triangle
             assert(Index < Indices.size());
-            Indices[Index++] = IndexBottomLeft;
+            Vertices[Index].InitVertex(pTerrain, x, z);
+            Indices[Index] = Index;
+            Index++;
+            
+            assert(Index < Indices.size());            
+            Vertices[Index].InitVertex(pTerrain, x, z+1);
+            Indices[Index] = Index;
+            Index++;
+
             assert(Index < Indices.size());
-            Indices[Index++] = IndexTopLeft;
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexTopRight;
+            Vertices[Index].InitVertex(pTerrain, x + 1, z + 1);
+            Indices[Index] = Index;
+            Index++;
+
 
             // Add "bottom right" triangle
             assert(Index < Indices.size());
-            Indices[Index++] = IndexBottomLeft;
+            Vertices[Index].InitVertex(pTerrain, x, z);
+            Indices[Index] = Index;
+            Index++;
+
             assert(Index < Indices.size());
-            Indices[Index++] = IndexTopRight;
+            Vertices[Index].InitVertex(pTerrain, x + 1, z + 1);
+            Indices[Index] = Index;
+            Index++;
+
             assert(Index < Indices.size());
-            Indices[Index++] = IndexBottomRight;
+            Vertices[Index].InitVertex(pTerrain, x + 1, z);
+            Indices[Index] = Index;
+            Index++;
         }
     }
 
@@ -196,14 +214,14 @@ void TriangleList::CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>&
         Vector3f Normal = v1.Cross(v2);
         Normal.Normalize();
 
-        Vertices[Index0].Normal += Normal;
-        Vertices[Index1].Normal += Normal;
-        Vertices[Index2].Normal += Normal;
+        Vertices[Index0].Normal = Normal;
+        Vertices[Index1].Normal = Normal;
+        Vertices[Index2].Normal = Normal;
     }
 
     // Normalize all the vertex normals
     for (unsigned int i = 0 ; i < Vertices.size() ; i++) {
-        Vertices[i].Normal.Normalize();
+    //    Vertices[i].Normal.Normalize();
     }
 }
 

@@ -55,7 +55,7 @@ class TriangleList {
 
 	void PopulateBuffers(const BaseTerrain* pTerrain);
     void InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices);
-    void InitIndices(std::vector<uint>& Indices);
+    void InitIndices(const BaseTerrain* pTerrain, std::vector<uint>& Indices, std::vector<Vertex>& Vertices);
     void CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& Indices);
 
     int m_width = 0;
