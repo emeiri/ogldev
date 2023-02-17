@@ -278,8 +278,8 @@ public:
             case GLFW_KEY_S:
                 m_shadowMapSampleRadius++;
                 printf("Shadow map radius increased to %f\n", m_shadowMapSampleRadius);
-                m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
-                                                               m_shadowMapOffsetFilterSize,
+                m_lightingTech.SetShadowMapOffsetTextureParams((float)m_shadowMapOffsetTextureSize,
+                                                               (float)m_shadowMapOffsetFilterSize,
                                                                m_shadowMapSampleRadius);
                 break;
 
@@ -287,8 +287,8 @@ public:
                 if (m_shadowMapSampleRadius > 0) {
                     m_shadowMapSampleRadius--;
                     printf("Shadow map radius decrease to %f\n", m_shadowMapSampleRadius);
-                    m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
-                                                                   m_shadowMapOffsetFilterSize,
+                    m_lightingTech.SetShadowMapOffsetTextureParams((float)m_shadowMapOffsetTextureSize,
+                                                                   (float)m_shadowMapOffsetFilterSize,
                                                                    m_shadowMapSampleRadius);
                 }
                 break;
@@ -369,8 +369,8 @@ private:
         m_lightingTech.SetShadowMapFilterSize(m_shadowMapFilterSize);
         m_lightingTech.SetShadowMapOffsetTextureUnit(SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX);
 
-        m_lightingTech.SetShadowMapOffsetTextureParams(m_shadowMapOffsetTextureSize,
-                                                       m_shadowMapOffsetFilterSize,
+        m_lightingTech.SetShadowMapOffsetTextureParams((float)m_shadowMapOffsetTextureSize,
+                                                       (float)m_shadowMapOffsetFilterSize,
                                                        m_shadowMapSampleRadius);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
