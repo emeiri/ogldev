@@ -46,7 +46,7 @@ class TriangleList {
     struct Vertex {
         Vector3f Pos;
         Vector2f Tex;
-        Vector3f Normal;
+        Vector3f Normal = Vector3f(0.0f, 0.0f, 0.0f);
 
         void InitVertex(const BaseTerrain* pTerrain, int x, int z);
     };
