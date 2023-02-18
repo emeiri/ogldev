@@ -35,7 +35,7 @@ void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float 
 
    |-------------------------------------------------------|
    | dpx: -0.707 (135) | dpx: 0 (90)   | dpx: 0.707 (45)   |
-   | dpz: 0.707 (45)   | dpz: 1, (0)   | dpz: 0.707 (45)   |
+   | dpz: 0.707 (45)   | dpz: 1 (0)    | dpz: 0.707 (45)   |
    |-------------------|---------------|-------------------|
    | dpx: -1 (180)     |               | dpx: 1 (0)        |
    | dpz: 0 (90)       |               | dpz: 0 (90)       |
@@ -112,9 +112,9 @@ void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float 
     m_factor = 1.0f - m_factor / RadianOf45Degrees;
 
  #ifdef SLI_DEBUG_PRINTS
-    printf("0: dx %d dz %d\n", dx0, dz0);
-    printf("1: dx %d dz %d\n", dx1, dz1);
-    printf("Factor %f\n", Factor);
+    printf("0: dx %d dz %d\n", m_dx0, m_dz0);
+    printf("1: dx %d dz %d\n", m_dx1, m_dz1);
+    printf("Factor %f\n", m_factor);
 #endif
 }
 
