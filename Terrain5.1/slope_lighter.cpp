@@ -48,6 +48,8 @@ void SlopeLighter::InitLighter(const Vector3f& LightDir, int TerrainSize, float 
     m_softness = Softness;
 
     Vector3f ReversedLightDir = LightDir * -1.0f;
+    ReversedLightDir.y = 0.0f;    // we want the light dir to be on the XZ plane
+    ReversedLightDir.Normalize();
 
     Vector3f DirX(1.0f, 0.0f, 0.0f);
     float dpx = DirX.Dot(ReversedLightDir);
