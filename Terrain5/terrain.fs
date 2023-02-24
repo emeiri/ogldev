@@ -61,7 +61,7 @@ void main()
 
     float Diffuse = dot(Normal_, gReversedLightDir);
 
-    Diffuse = max(0.2f, Diffuse);
+    Diffuse = max(0.3f, Diffuse);
 
     FragColor = Color * TexColor * Diffuse;
 }

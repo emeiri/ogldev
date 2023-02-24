@@ -136,21 +136,21 @@ public:
         }
 
         static float foo = 0.0f;
-        foo += 0.01f;
+        foo += 0.002f;
 
-/*        float R = 400.0f;
-        float S = 128.0f;
+      /*  float S = (float)m_terrainSize;
+        float R = 2.5f * S;
 
-        Vector3f Pos(S + cosf(foo) * R, 250.0f, S + sinf(foo) * R);
+        Vector3f Pos(S + cosf(foo) * R, m_maxHeight + 250.0f, S + sinf(foo) * R);
         m_pGameCamera->SetPosition(Pos);
 
-        Vector3f Center(128.0f, 50.0f, 128.0f);
+        Vector3f Center(S, Pos.y * 0.50f, S);
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
-        float y = min(-0.1f, cosf(foo));
 
-        Vector3f LightDir(sinf(foo), y, 0.0f);
+        float y = min(-0.4f, cosf(foo));
+        Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
 
         m_terrain.SetLightDir(LightDir);
 
@@ -217,7 +217,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 4");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 5");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -248,7 +248,7 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 4.0f;
+        float WorldScale = 2.0f;
         float TextureScale = 4.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
@@ -259,6 +259,11 @@ private:
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
+
+        Vector3f LightDir(1.0f, -1.0f, 0.0f);
+
+        m_terrain.SetLightDir(LightDir);
+
     }
 
 
@@ -288,7 +293,7 @@ private:
     int m_terrainSize = 512;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
-    float m_maxHeight = 256.0f;
+    float m_maxHeight = 356.0f;
     float m_counter = 0.0f;
 };
 
