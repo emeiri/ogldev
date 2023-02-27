@@ -1,4 +1,4 @@
-#version 330
+#version 420
 
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
@@ -72,10 +72,10 @@ uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform int gNumSpotLights;
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform Material gMaterial;
-uniform sampler2D gSampler;
-uniform sampler2D gSamplerSpecularExponent;
-uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
-uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
+layout(binding = 0) uniform sampler2D gSampler;
+layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
+layout(binding = 2) uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
+layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 1;
