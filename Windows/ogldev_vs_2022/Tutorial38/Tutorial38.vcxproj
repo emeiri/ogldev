@@ -37,10 +37,6 @@
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\..\Include\technique.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs" />
-    <None Include="..\..\..\Common\Shaders\sprite.vs" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
