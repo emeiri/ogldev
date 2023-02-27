@@ -234,8 +234,13 @@ private:
 
         m_pMesh1->LoadMesh("../Content/Vanguard.dae");
         m_pMesh1->SetPosition(0.0f, 0.0f, 10.0f);
-        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
+        // TODO: need to understand why we need different rotations for each OS
+#ifdef _WIN64
+        m_pMesh1->SetRotation(90.0f, 0.0f, 0.0f);
+#else
+        m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+#endif
         m_pTerrain = new BasicMesh();
         m_pTerrain->LoadMesh("../Content/box_terrain.obj");
         m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
