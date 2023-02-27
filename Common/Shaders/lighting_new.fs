@@ -91,7 +91,7 @@ uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
-uniform bool gIsPBR = true;
+uniform bool gIsPBR = false;
 uniform PBRMaterial gPBRmaterial;
 
 // Fog
