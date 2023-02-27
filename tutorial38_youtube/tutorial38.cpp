@@ -344,6 +344,7 @@ private:
         m_lightingTech.Enable();
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetShadowMapSize(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
         if (!m_shadowMapTech.Init()) {
