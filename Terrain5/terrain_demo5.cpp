@@ -160,7 +160,7 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-        if (!m_showGui) {
+        if (!m_showGui && !m_isPaused) {
             m_pGameCamera->OnMouse(x, y);
         }
     }

@@ -240,8 +240,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(250.0f, 450.0f, -150.0f);
-        Vector3f Target(0.0f, -0.25f, 1.0f);
+        Vector3f Pos(545.0f, 550.0f, -600.0f);
+        Vector3f Target(-0.1f, -0.4f, 0.9f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -293,10 +293,10 @@ private:
     bool m_isPaused = false;
     int m_terrainSize = 512;
     float m_roughness = 1.0f;
-    float m_lightSoftness = 10.0f;
+    float m_lightSoftness = 4.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 256.0f;
-    Vector3f m_lightDir = Vector3f(1.0f, -0.5f, 0.0f);
+    Vector3f m_lightDir = Vector3f(1.0f, -0.5f, 1.0f);
     float m_counter = 0.0f;
 };
 
@@ -331,6 +331,8 @@ int main(int argc, char** argv)
 #else
     g_seed = getpid();
 #endif
+
+   // g_seed = 13788;
     printf("random seed %d\n", g_seed);
 
     srand(g_seed);
