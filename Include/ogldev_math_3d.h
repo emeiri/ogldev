@@ -827,7 +827,7 @@ public:
                 return true;
             }
 
-            if (m_clipPlanes[i].Dot(BottomRightNear) > 0) {
+            if (m_clipPlanes[i].Dot(BottomRightFar) > 0) {
                 return true;
             }
         }
