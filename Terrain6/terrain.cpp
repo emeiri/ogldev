@@ -39,7 +39,7 @@ BaseTerrain::~BaseTerrain()
 void BaseTerrain::Destroy()
 {
     m_heightMap.Destroy();
-    m_triangleList.Destroy();
+    m_geomipGrid.Destroy();
 }
 
 
@@ -64,6 +64,12 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
+}
+
+
+void BaseTerrain::Finalize()
+{
+    m_geomipGrid.CreateGeomipGrid(m_terrainSize, m_terrainSize, m_patchSize, this);
 }
 
 
@@ -97,7 +103,10 @@ void BaseTerrain::LoadFromFile(const char* pFilename)
 {
     LoadHeightMapFile(pFilename);
 
-    m_triangleList.CreateTriangleList(m_terrainSize, m_terrainSize, this);
+    // how do we know the patch size at this point?
+    assert(0);
+
+    m_geomipGrid.CreateGeomipGrid(m_terrainSize, m_terrainSize, m_patchSize, this);
 }
 
 
@@ -158,7 +167,7 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 	
     m_terrainTech.SetLightDir(m_lightDir);
 
-    m_triangleList.Render();
+    m_geomipGrid.Render();
 }
 
 

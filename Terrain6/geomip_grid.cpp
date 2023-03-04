@@ -21,22 +21,22 @@
 #include <vector>
 
 #include "ogldev_math_3d.h"
-#include "triangle_list.h"
+#include "geomip_grid.h"
 #include "terrain.h"
 
 
-TriangleList::TriangleList()
+GeomipGrid::GeomipGrid()
 {
 }
 
 
-TriangleList::~TriangleList()
+GeomipGrid::~GeomipGrid()
 {
     Destroy();
 }
 
 
-void TriangleList::Destroy()
+void GeomipGrid::Destroy()
 {
     if (m_vao > 0) {
         glDeleteVertexArrays(1, &m_vao);
@@ -52,10 +52,35 @@ void TriangleList::Destroy()
 }
 
 
-void TriangleList::CreateTriangleList(int Width, int Depth, const BaseTerrain* pTerrain)
+void GeomipGrid::CreateGeomipGrid(int Width, int Depth, int PatchSize, const BaseTerrain* pTerrain)
 {
-	m_width = Width;
+    if ((Width - 1) % (PatchSize - 1) != 0) {
+        int RecommendedWidth = ((Width - 1 + PatchSize - 1) / (PatchSize - 1)) * (PatchSize - 1) + 1;
+        printf("Width minus 1 (%d) must be divisible by PatchSize minus 1 (%d)\n", Width, PatchSize);
+        printf("Try using Width = %d\n", RecommendedWidth);
+        exit(0);
+    }
+
+    if ((Depth - 1) % (PatchSize - 1) != 0) {
+        int RecommendedDepth = ((Depth - 1 + PatchSize - 1) / (PatchSize - 1)) * (PatchSize - 1) + 1;
+        printf("Depth minus 1 (%d) must be divisible by PatchSize minus 1 (%d)\n", Depth, PatchSize);
+        printf("Try using Width = %d\n", RecommendedDepth);
+        exit(0);
+    }
+
+    if (PatchSize < 3) {
+        printf("The minimum patch size is 3 (%d)\n", PatchSize);
+        exit(0);
+    }
+
+    if (PatchSize % 2 == 0) {
+        printf("Patch size must be an odd number (%d)\n", PatchSize);
+        exit(0);
+    }
+
+    m_width = Width;
     m_depth = Depth;
+    m_patchSize = PatchSize;
 
     CreateGLState();
 
@@ -67,7 +92,7 @@ void TriangleList::CreateTriangleList(int Width, int Depth, const BaseTerrain* p
 }
 
 
-void TriangleList::CreateGLState()
+void GeomipGrid::CreateGLState()
 {
     glGenVertexArrays(1, &m_vao);
 
@@ -100,15 +125,15 @@ void TriangleList::CreateGLState()
 }
 
 
-void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
+void GeomipGrid::PopulateBuffers(const BaseTerrain* pTerrain)
 {
     std::vector<Vertex> Vertices;
     Vertices.resize(m_width * m_depth);
 
     InitVertices(pTerrain, Vertices);
 
-	std::vector<unsigned int> Indices;
-    int NumQuads = (m_width - 1) * (m_depth - 1);
+    std::vector<unsigned int> Indices;
+    int NumQuads = (m_patchSize - 1) * (m_patchSize - 1);
     Indices.resize(NumQuads * 6);
     InitIndices(Indices);
 
@@ -120,7 +145,7 @@ void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
 }
 
 
-void TriangleList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
+void GeomipGrid::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
 {
     float y = pTerrain->GetHeight(x, z);
 
@@ -133,7 +158,7 @@ void TriangleList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
 }
 
 
-void TriangleList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices)
+void GeomipGrid::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices)
 {
     int Index = 0;
 
@@ -149,12 +174,12 @@ void TriangleList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>
 }
 
 
-void TriangleList::InitIndices(std::vector<unsigned int>& Indices)
+void GeomipGrid::InitIndices(std::vector<unsigned int>& Indices)
 {
     int Index = 0;
 
-    for (int z = 0 ; z < m_depth - 1 ; z++) {
-        for (int x = 0 ; x < m_width - 1 ; x++) {
+    for (int z = 0 ; z < m_patchSize - 1 ; z++) {
+        for (int x = 0 ; x < m_patchSize - 1 ; x++) {
 			unsigned int IndexBottomLeft = z * m_width + x;
 			unsigned int IndexTopLeft = (z + 1) * m_width + x;
 			unsigned int IndexTopRight = (z + 1) * m_width + x + 1;
@@ -182,23 +207,29 @@ void TriangleList::InitIndices(std::vector<unsigned int>& Indices)
 }
 
 
-void TriangleList::CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& Indices)
+void GeomipGrid::CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& Indices)
 {
     unsigned int Index = 0;
 
     // Accumulate each triangle normal into each of the triangle vertices
-    for (unsigned int i = 0 ; i < Indices.size() ; i += 3) {
-        unsigned int Index0 = Indices[i];
-        unsigned int Index1 = Indices[i + 1];
-        unsigned int Index2 = Indices[i + 2];
-        Vector3f v1 = Vertices[Index1].Pos - Vertices[Index0].Pos;
-        Vector3f v2 = Vertices[Index2].Pos - Vertices[Index0].Pos;
-        Vector3f Normal = v1.Cross(v2);
-        Normal.Normalize();
+    for (int z = 0 ; z < m_depth - 1 ; z += (m_patchSize - 1)) {
+        for (int x = 0 ; x < m_width - 1; x += (m_patchSize - 1)) {
+            int BaseVertex = z * m_width + x;
+            //printf("Base index %d\n", BaseVertex);
+    		for (unsigned int i = 0 ; i < Indices.size() ; i += 3) {
+                unsigned int Index0 = BaseVertex + Indices[i];
+                unsigned int Index1 = BaseVertex + Indices[i + 1];
+                unsigned int Index2 = BaseVertex + Indices[i + 2];
+		        Vector3f v1 = Vertices[Index1].Pos - Vertices[Index0].Pos;
+		        Vector3f v2 = Vertices[Index2].Pos - Vertices[Index0].Pos;
+		        Vector3f Normal = v1.Cross(v2);
+		        Normal.Normalize();
 
-        Vertices[Index0].Normal += Normal;
-        Vertices[Index1].Normal += Normal;
-        Vertices[Index2].Normal += Normal;
+		        Vertices[Index0].Normal += Normal;
+		        Vertices[Index1].Normal += Normal;
+		        Vertices[Index2].Normal += Normal;
+    		}
+        }
     }
 
     // Normalize all the vertex normals
@@ -208,11 +239,16 @@ void TriangleList::CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>&
 }
 
 
-void TriangleList::Render()
+void GeomipGrid::Render()
 {
     glBindVertexArray(m_vao);
 
-    glDrawElements(GL_TRIANGLES, (m_depth - 1) * (m_width - 1) * 6, GL_UNSIGNED_INT, NULL);
+    for (int z = 0 ; z < m_depth - 1 ; z += (m_patchSize - 1)) {
+        for (int x = 0 ; x < m_width - 1 ; x += (m_patchSize - 1)) {
+            int BaseVertex = z * m_width + x;
+            glDrawElementsBaseVertex(GL_TRIANGLES, (m_patchSize - 1) * (m_patchSize - 1) * 6, GL_UNSIGNED_INT, NULL, BaseVertex);
+        }
+    }
 
     glBindVertexArray(0);
 }

@@ -23,7 +23,7 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_array_2d.h"
 #include "ogldev_texture.h"
-#include "triangle_list.h"
+#include "geomip_grid.h"
 #include "terrain_technique.h"
 
 class BaseTerrain
@@ -65,14 +65,17 @@ class BaseTerrain
 
     void SetMinMaxHeight(float MinHeight, float MaxHeight);
 
+    void Finalize();
+
     int m_terrainSize = 0;
+    int m_patchSize = 0;
 	float m_worldScale = 1.0f;
     Array2D<float> m_heightMap;
-    TriangleList m_triangleList;
     Texture* m_pTextures[4] = { 0 };
     float m_textureScale = 1.0f;
 
 private:
+    GeomipGrid m_geomipGrid;
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     TerrainTechnique m_terrainTech;

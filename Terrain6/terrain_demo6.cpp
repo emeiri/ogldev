@@ -105,7 +105,7 @@ public:
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
                     srand(g_seed);
-                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
+                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
 
@@ -258,7 +258,7 @@ private:
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
-        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
+        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
 
         Vector3f LightDir(1.0f, -1.0f, 0.0f);
 
@@ -290,10 +290,11 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
-    int m_terrainSize = 512;
+    int m_terrainSize = 513;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 356.0f;
+    int m_patchSize = 33;
     float m_counter = 0.0f;
 };
 

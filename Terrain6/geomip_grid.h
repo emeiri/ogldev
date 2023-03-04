@@ -29,13 +29,13 @@
 // declaration for BaseTerrain.
 class BaseTerrain;
 
-class TriangleList {
+class GeomipGrid {
  public:
-    TriangleList();
+    GeomipGrid();
 
-    ~TriangleList();
+    ~GeomipGrid();
 
-    void CreateTriangleList(int Width, int Depth, const BaseTerrain* pTerrain);
+    void CreateGeomipGrid(int Width, int Depth, int PatchSize, const BaseTerrain* pTerrain);
 
     void Destroy();
 
@@ -60,6 +60,7 @@ class TriangleList {
 
     int m_width = 0;
     int m_depth = 0;
+    int m_patchSize = 0;
     GLuint m_vao = 0;
     GLuint m_vb = 0;
     GLuint m_ib = 0;

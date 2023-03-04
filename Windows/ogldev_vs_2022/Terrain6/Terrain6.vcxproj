@@ -33,11 +33,11 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain6\geomip_grid.cpp" />
     <ClCompile Include="..\..\..\Terrain6\midpoint_disp_terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain6\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain6\terrain_demo6.cpp" />
     <ClCompile Include="..\..\..\Terrain6\terrain_technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain6\triangle_list.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
@@ -49,11 +49,11 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\Terrain6\geomip_grid.h" />
     <ClInclude Include="..\..\..\Terrain6\midpoint_disp_terrain.h" />
     <ClInclude Include="..\..\..\Terrain6\terrain.h" />
     <ClInclude Include="..\..\..\Terrain6\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain6\texture_config.h" />
-    <ClInclude Include="..\..\..\Terrain6\triangle_list.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Terrain6\terrain.fs" />

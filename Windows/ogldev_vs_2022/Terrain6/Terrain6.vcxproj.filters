@@ -38,8 +38,8 @@
     <ClCompile Include="..\..\..\Terrain6\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain6\terrain_demo6.cpp" />
     <ClCompile Include="..\..\..\Terrain6\terrain_technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain6\triangle_list.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Terrain6\geomip_grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -73,7 +73,7 @@
     <ClInclude Include="..\..\..\Terrain6\terrain.h" />
     <ClInclude Include="..\..\..\Terrain6\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain6\texture_config.h" />
-    <ClInclude Include="..\..\..\Terrain6\triangle_list.h" />
+    <ClInclude Include="..\..\..\Terrain6\geomip_grid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Terrain6\terrain.fs">
