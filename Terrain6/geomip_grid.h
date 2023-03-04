@@ -17,8 +17,8 @@
 */
 
 
-#ifndef TRIANGLE_LIST_H
-#define TRIANGLE_LIST_H
+#ifndef GEOMIP_GRID_H
+#define GEOMIP_GRID_H
 
 #include <GL/glew.h>
 #include <vector>
@@ -57,6 +57,8 @@ class GeomipGrid {
     void InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices);
     void InitIndices(std::vector<uint>& Indices);
     void CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& Indices);
+
+    uint AddTriangle(uint Index, std::vector<uint>& Indices, uint v1, uint v2, uint v3);
 
     int m_width = 0;
     int m_depth = 0;

@@ -178,32 +178,67 @@ void GeomipGrid::InitIndices(std::vector<unsigned int>& Indices)
 {
     int Index = 0;
 
-    for (int z = 0 ; z < m_patchSize - 1 ; z++) {
-        for (int x = 0 ; x < m_patchSize - 1 ; x++) {
-			unsigned int IndexBottomLeft = z * m_width + x;
-			unsigned int IndexTopLeft = (z + 1) * m_width + x;
-			unsigned int IndexTopRight = (z + 1) * m_width + x + 1;
-			unsigned int IndexBottomRight = z * m_width + x + 1;
+    for (int z = 0 ; z < m_patchSize - 1 ; z += 2) {
+        for (int x = 0 ; x < m_patchSize - 1 ; x += 2) {
+            uint IndexCenter = (z + 1) * m_width + x + 1;
 
-            // Add "top left" triangle
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexBottomLeft;
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexTopLeft;
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexTopRight;
+            uint IndexTemp1 = z * m_width + x;
+            uint IndexTemp2 = (z + 1) * m_width + x;
 
-            // Add "bottom right" triangle
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexBottomLeft;
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexTopRight;
-            assert(Index < Indices.size());
-            Indices[Index++] = IndexBottomRight;
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2 += m_width;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2++;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2++;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2 -= m_width;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2 -= m_width;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2--;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
+
+            IndexTemp1 = IndexTemp2;
+            IndexTemp2--;
+
+            Index = AddTriangle(Index, Indices, IndexCenter, IndexTemp1, IndexTemp2);
         }
     }
 
     assert(Index == Indices.size());
+}
+
+
+uint GeomipGrid::AddTriangle(uint Index, std::vector<uint>& Indices, uint v1, uint v2, uint v3)
+{
+    //printf("Add triangle %d %d %d\n", v1, v2, v3);
+    assert(Index < Indices.size());
+    Indices[Index++] = v1;
+    assert(Index < Indices.size());
+    Indices[Index++] = v2;
+    assert(Index < Indices.size());
+    Indices[Index++] = v3;
+
+    return Index;
 }
 
 
