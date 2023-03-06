@@ -43,8 +43,12 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual void Execute();
 
+    virtual void SetCamera(BasicCamera* pCamera) { m_pCamera = pCamera; }
+
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    
     void OnCursorPosCallback(GLFWwindow* window, double x, double y);
+    
     void OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
  private:

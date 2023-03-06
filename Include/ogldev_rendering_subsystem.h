@@ -34,6 +34,8 @@ class GameCallbacks
     virtual void OnMouseMove(int x, int y) {}
 
     virtual void OnMouseButton(int Button, int Action, int Mode) {}
+
+    //virtual void SetCamera(BasicCamera* pCamera) {}
 };
 
 
@@ -61,14 +63,14 @@ class BaseRenderingSubsystem
 
     virtual void Execute() = 0;
 
-  //  virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
+    virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
 
  protected:
 
     BaseRenderingSubsystem();
     ~BaseRenderingSubsystem();
 
-   // BasicCamera* m_pCamera = NULL;
+    BasicCamera* m_pCamera = NULL;
 
  private:
 

@@ -32,6 +32,7 @@
 #include "ogldev_rendering_subsystem.h"
 #include "ogldev_skinned_mesh.h"
 #include "ogldev_forward_lighting.h"
+#include "ogldev_forward_renderer.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -237,6 +238,7 @@ private:
     float m_counter = 0;
     long long m_startTimeMillis = 0;
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    ForwardRenderer m_renderer;
 };
 
 

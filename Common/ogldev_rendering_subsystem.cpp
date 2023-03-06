@@ -29,6 +29,12 @@ BaseRenderingSubsystem::BaseRenderingSubsystem()
 
 }
 
+BaseRenderingSubsystem::~BaseRenderingSubsystem()
+{
+
+}
+
+
 BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem)
 {
     if (g_pRenderingSubsystem) {
