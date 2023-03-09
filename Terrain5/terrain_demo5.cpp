@@ -263,7 +263,6 @@ private:
         Vector3f LightDir(1.0f, -1.0f, 0.0f);
 
         m_terrain.SetLightDir(LightDir);
-
     }
 
 
