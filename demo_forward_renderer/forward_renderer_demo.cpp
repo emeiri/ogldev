@@ -21,17 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <GL/glew.h>
 
-#include "ogldev_engine_common.h"
-#include "ogldev_util.h"
-#include "ogldev_basic_glfw_camera.h"
-#include "ogldev_glfw.h"
-#include "ogldev_basic_mesh.h"
-#include "ogldev_world_transform.h"
 #include "ogldev_rendering_subsystem.h"
-#include "ogldev_skinned_mesh.h"
-#include "ogldev_forward_lighting.h"
 #include "ogldev_forward_renderer.h"
 
 #define WINDOW_WIDTH  2560
