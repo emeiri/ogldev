@@ -63,13 +63,16 @@ class BaseRenderingSubsystem
 
     virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
 
-    void GetWindowSize(int& Width, int& Height) { Width = m_windowWidth; Height = m_windowHeight; }
+    void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
+
+    long long GetElapsedTimeMillis() const { return m_elapsedTimeMillis; }
 
  protected:
 
     BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
     ~BaseRenderingSubsystem();
 
+    long long m_elapsedTimeMillis = 0;
     int m_windowWidth = 0;
     int m_windowHeight = 0;
     BasicCamera* m_pCamera = NULL;

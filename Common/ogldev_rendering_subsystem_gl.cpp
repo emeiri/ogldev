@@ -96,7 +96,11 @@ void RenderingSubsystemGL::Execute()
         exit(0);
     }
 
+    long long StartTimeMillis = GetCurrentTimeMillis();
+
     while (!glfwWindowShouldClose(m_pWindow)) {
+        long long CurrentTimeMillis = GetCurrentTimeMillis();
+        m_elapsedTimeMillis = CurrentTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
         m_pGameCallbacks->OnFrame();
         glfwSwapBuffers(m_pWindow);

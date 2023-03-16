@@ -89,8 +89,6 @@ public:
         InitMesh();
 
         InitRenderer();
-
-        m_startTimeMillis = GetCurrentTimeMillis();
     }
 
 
@@ -117,8 +115,8 @@ public:
         m_spotLights[0].WorldDirection = m_pGameCamera->GetTarget();
         m_renderer.UpdateSpotLightPosAndDir(0, m_spotLights[0].WorldPosition, m_spotLights[0].WorldDirection);
         */
-        long long CurrentTimeMillis = GetCurrentTimeMillis();
-        float AnimationTimeSec = ((float)(CurrentTimeMillis - m_startTimeMillis)) / 1000.0f;
+        
+        float AnimationTimeSec = ((float)(m_pRenderingSubsystem->GetElapsedTimeMillis())) / 1000.0f;
 
         m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
         m_renderer.Render(m_pMesh);
@@ -207,12 +205,11 @@ private:
 
     BasicMesh* m_pMesh = NULL;
     SkinnedMesh* m_pMesh1 = NULL;
-    PersProjInfo m_persProjInfo;
     PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
     SpotLight m_spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
     DirectionalLight m_dirLight;
     float m_counter = 0;
-    long long m_startTimeMillis = 0;
+
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     ForwardRenderer m_renderer;
 };
