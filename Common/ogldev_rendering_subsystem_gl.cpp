@@ -49,19 +49,8 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 }
 
 
-RenderingSubsystemGL::RenderingSubsystemGL()
+RenderingSubsystemGL::RenderingSubsystemGL(GameCallbacks* pGameCallbacks) : BaseRenderingSubsystem(pGameCallbacks)
 {
-
-}
-
-void RenderingSubsystemGL::InitRenderingSubsystem(GameCallbacks* pGameCallbacks)
-{
-    if (!pGameCallbacks) {
-        printf("%s:%d - must specify game callbacks object\n", __FILE__, __LINE__);
-        exit(0);
-    }
-
-    m_pGameCallbacks = pGameCallbacks;
 }
 
 

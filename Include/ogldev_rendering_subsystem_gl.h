@@ -31,11 +31,9 @@
 class RenderingSubsystemGL : public BaseRenderingSubsystem
 {
  public:
-    RenderingSubsystemGL();
+    RenderingSubsystemGL(GameCallbacks* pGameCallbacks);
 
     ~RenderingSubsystemGL();
-
-    virtual void InitRenderingSubsystem(GameCallbacks* pGameCallbacks);
 
     virtual void Shutdown();
 
@@ -57,7 +55,6 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     void SetDefaultGLState();
 
-    GameCallbacks* m_pGameCallbacks = NULL;
     GLFWwindow* m_pWindow = NULL;
     ForwardRenderer m_forwardRenderer;
     BasicCamera* m_pCamera = NULL;

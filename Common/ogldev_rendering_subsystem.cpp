@@ -24,9 +24,9 @@
 
 BaseRenderingSubsystem* g_pRenderingSubsystem = NULL;
 
-BaseRenderingSubsystem::BaseRenderingSubsystem()
+BaseRenderingSubsystem::BaseRenderingSubsystem(GameCallbacks* pGameCallbacks)
 {
-
+    m_pGameCallbacks = pGameCallbacks;
 }
 
 BaseRenderingSubsystem::~BaseRenderingSubsystem()
@@ -35,16 +35,21 @@ BaseRenderingSubsystem::~BaseRenderingSubsystem()
 }
 
 
-BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem)
+BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem, GameCallbacks* pGameCallbacks)
 {
     if (g_pRenderingSubsystem) {
         printf("%s:%d - rendering subsystem already exists\n", __FILE__, __LINE__);
         exit(0);
     }
 
+    if (!pGameCallbacks) {
+        printf("%s:%d - must specify game callbacks object\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
     switch (RenderingSubsystem) {
     case RENDERING_SUBSYSTEM_GL:
-        g_pRenderingSubsystem = new RenderingSubsystemGL();
+        g_pRenderingSubsystem = new RenderingSubsystemGL(pGameCallbacks);
         break;
 
     default:

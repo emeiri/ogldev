@@ -53,11 +53,9 @@ class BaseRenderingSubsystem
 {
  public:
 
-    static BaseRenderingSubsystem* CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem);
+    static BaseRenderingSubsystem* CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem, GameCallbacks* pGameCallbacks);
 
     virtual void Shutdown() = 0;
-
-    virtual void InitRenderingSubsystem(GameCallbacks* pGameCallbacks) = 0;
 
     virtual void CreateWindow(uint Width, uint Height) = 0;
 
@@ -67,10 +65,11 @@ class BaseRenderingSubsystem
 
  protected:
 
-    BaseRenderingSubsystem();
+    BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
     ~BaseRenderingSubsystem();
 
     BasicCamera* m_pCamera = NULL;
+    GameCallbacks* m_pGameCallbacks = NULL;
 
  private:
 
