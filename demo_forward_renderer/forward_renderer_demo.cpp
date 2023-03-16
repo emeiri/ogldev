@@ -75,7 +75,6 @@ public:
 
     virtual ~ForwardRendererDemo()
     {
-        SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh);
         SAFE_DELETE(m_pMesh1);
     }
@@ -86,8 +85,6 @@ public:
         m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this);
 
         m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        InitCamera();
 
         InitMesh();
 
@@ -186,27 +183,9 @@ public:
 
 private:
 
-    void InitCamera()
-    {
-        Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
-        Vector3f Up(0.0, 1.0f, 0.0f);
-
-        float FOV = 45.0f;
-        float zNear = 0.1f;
-        float zFar = 100.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-
-        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
-
-        m_pRenderingSubsystem->SetCamera(m_pGameCamera);
-    }
-
-
     void InitRenderer()
     {
-        m_renderer.InitForwardRenderer();
-        m_renderer.SetCamera(m_pGameCamera);
+        m_renderer.InitForwardRenderer(m_pRenderingSubsystem);
         //        m_renderer.SetPointLights(2, m_pointLights);
         //        m_renderer.SetSpotLights(2, m_spotLights);
         m_renderer.SetDirLight(m_dirLight);
@@ -226,7 +205,6 @@ private:
         m_pMesh1->SetScale(0.05f);
     }
 
-    BasicCamera* m_pGameCamera = NULL;
     BasicMesh* m_pMesh = NULL;
     SkinnedMesh* m_pMesh1 = NULL;
     PersProjInfo m_persProjInfo;

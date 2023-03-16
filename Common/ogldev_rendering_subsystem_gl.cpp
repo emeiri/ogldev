@@ -62,8 +62,10 @@ void RenderingSubsystemGL::Shutdown()
     }
 }
 
-void RenderingSubsystemGL::CreateWindow(uint Width, uint Height)
+void RenderingSubsystemGL::CreateWindow(int Width, int Height)
 {
+    m_windowWidth = Width;
+    m_windowHeight = Height;
     int major_ver = 0;
     int minor_ver = 0;
     bool is_full_screen = false;

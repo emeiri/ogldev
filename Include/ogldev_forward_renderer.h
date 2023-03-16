@@ -26,6 +26,7 @@
 #include "ogldev_basic_mesh.h"
 #include "ogldev_skinned_mesh.h"
 #include "ogldev_shadow_mapping_technique.h"
+#include "ogldev_rendering_subsystem.h"
 
 
 class ForwardRenderer {
@@ -35,11 +36,11 @@ class ForwardRenderer {
 
     ~ForwardRenderer();
 
-    void InitForwardRenderer();
+    void InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubsystem);
 
     void StartShadowPass();
 
-    void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
+    //void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
 
     //
     // Lighting
@@ -87,7 +88,10 @@ class ForwardRenderer {
                                 float BlendFactor);
 
     void RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight);
- private:
+ 
+private:
+
+    void CreateDefaultCamera();
 
     void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
 
@@ -99,7 +103,9 @@ class ForwardRenderer {
 
     void UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicMesh* pMesh);
 
-    const BasicCamera* m_pCamera = NULL;
+    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    BasicCamera* m_pCurCamera = NULL;
+    BasicCamera* m_pDefaultCamera = NULL;
     ForwardLightingTechnique m_lightingTech;
     ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;

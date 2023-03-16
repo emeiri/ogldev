@@ -28,12 +28,19 @@ ForwardRenderer::ForwardRenderer()
 
 ForwardRenderer::~ForwardRenderer()
 {
-
+    SAFE_DELETE(m_pDefaultCamera);
 }
 
 
-void ForwardRenderer::InitForwardRenderer()
+void ForwardRenderer::InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubsystem)
 {
+    if (!pRenderingSubsystem) {
+        printf("%s:%d - must provide a rendering system\n", __FILE__, __LINE__);
+        exit(1);
+    }
+
+    m_pRenderingSubsystem = pRenderingSubsystem;
+
     if (!m_lightingTech.Init()) {
         printf("Error initializing the lighting technique\n");
         exit(1);
@@ -57,7 +64,31 @@ void ForwardRenderer::InitForwardRenderer()
         exit(1);
     }
 
+    CreateDefaultCamera();
+
     glUseProgram(0);
+}
+
+
+void ForwardRenderer::CreateDefaultCamera()
+{
+    Vector3f Pos(0.0f, 0.0f, 0.0f);
+    Vector3f Target(0.0f, 0.0f, 1.0f);
+    Vector3f Up(0.0, 1.0f, 0.0f);
+
+    float FOV = 45.0f;
+    float zNear = 0.1f;
+    float zFar = 100.0f;
+    int WindowWidth = 0;
+    int WindowHeight = 0;
+    m_pRenderingSubsystem->GetWindowSize(WindowWidth, WindowHeight);
+
+    PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
+
+    m_pDefaultCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+    m_pCurCamera = m_pDefaultCamera;
+
+    m_pRenderingSubsystem->SetCamera(m_pDefaultCamera);    
 }
 
 
@@ -185,7 +216,7 @@ void ForwardRenderer::UpdateSpotLightPosAndDir(uint Index, const Vector3f& World
 
 void ForwardRenderer::Render(BasicMesh* pMesh)
 {
-    if (!m_pCamera) {
+    if (!m_pCurCamera) {
         printf("ForwardRenderer: camera not initialized\n");
         exit(0);
     }
@@ -206,7 +237,7 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
 
     m_lightingTech.SetMaterial(pMesh->GetMaterial());
 
-    m_lightingTech.SetCameraWorldPos(m_pCamera->GetPos());
+    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
 
     UpdateMatrices(&m_lightingTech, pMesh);
 
@@ -271,7 +302,7 @@ void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
 
 void ForwardRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
 {
-    if (!m_pCamera) {
+    if (!m_pCurCamera) {
         printf("ForwardRenderer: camera not initialized\n");
         exit(0);
     }
@@ -329,8 +360,8 @@ void ForwardRenderer::GetWVP(BasicMesh* pMesh, Matrix4f& WVP)
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
     Matrix4f World = meshWorldTransform.GetMatrix();
-    Matrix4f View = m_pCamera->GetMatrix();
-    Matrix4f Projection = m_pCamera->GetProjectionMat();
+    Matrix4f View = m_pCurCamera->GetMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
 
     WVP = Projection * View * World;
 }

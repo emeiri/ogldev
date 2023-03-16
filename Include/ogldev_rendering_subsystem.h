@@ -57,17 +57,21 @@ class BaseRenderingSubsystem
 
     virtual void Shutdown() = 0;
 
-    virtual void CreateWindow(uint Width, uint Height) = 0;
+    virtual void CreateWindow(int Width, int Height) = 0;
 
     virtual void Execute() = 0;
 
     virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
+
+    void GetWindowSize(int& Width, int& Height) { Width = m_windowWidth; Height = m_windowHeight; }
 
  protected:
 
     BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
     ~BaseRenderingSubsystem();
 
+    int m_windowWidth = 0;
+    int m_windowHeight = 0;
     BasicCamera* m_pCamera = NULL;
     GameCallbacks* m_pGameCallbacks = NULL;
 

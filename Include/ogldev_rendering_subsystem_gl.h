@@ -37,7 +37,7 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual void Shutdown();
 
-    virtual void CreateWindow(uint Width, uint Height);
+    virtual void CreateWindow(int Width, int Height);
 
     virtual void Execute();
 
