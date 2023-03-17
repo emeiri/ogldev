@@ -167,7 +167,7 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 	
     m_terrainTech.SetLightDir(m_lightDir);
 
-    m_geomipGrid.Render();
+    m_geomipGrid.Render(Camera.GetPos());
 }
 
 
