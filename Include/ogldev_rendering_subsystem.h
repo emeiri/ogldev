@@ -49,6 +49,7 @@ enum RENDERING_SUBSYSTEM {
 
 class BasicCamera;
 
+
 class BaseRenderingSubsystem
 {
  public:
@@ -61,7 +62,9 @@ class BaseRenderingSubsystem
 
     virtual void Execute() = 0;
 
-    virtual void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
+    virtual void ClearWindow() = 0;
+
+    void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
 
     void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
 

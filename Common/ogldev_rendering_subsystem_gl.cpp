@@ -116,6 +116,12 @@ void RenderingSubsystemGL::Execute()
     }
 }
 
+
+void RenderingSubsystemGL::ClearWindow()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 void RenderingSubsystemGL::InitCallbacks()
 {
     glfwSetKeyCallback(m_pWindow, KeyCallback);
