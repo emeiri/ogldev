@@ -54,12 +54,20 @@ RenderingSubsystemGL::RenderingSubsystemGL(GameCallbacks* pGameCallbacks) : Base
 }
 
 
+RenderingSubsystemGL::~RenderingSubsystemGL()
+{
+    SAFE_DELETE(m_pCamera);
+}
+
+
 void RenderingSubsystemGL::Shutdown()
 {
     if (m_pWindow) {
         glfwDestroyWindow(m_pWindow);
         glfwTerminate();
     }
+
+    delete this;
 }
 
 void RenderingSubsystemGL::CreateWindow(int Width, int Height)
