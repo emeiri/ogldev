@@ -57,8 +57,7 @@ class ForwardRenderer {
 
     //
     // Lighting
-    //
-    void SetDirLight(const DirectionalLight& DirLight);
+    //    
 
     void SetPointLights(uint NumLights, const PointLight* pPointLights);
 
@@ -105,6 +104,8 @@ class ForwardRenderer {
     void RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight);
  
 private:
+
+    void SetDirLight(const DirectionalLight& DirLight);
 
     void CreateDefaultCamera();
 

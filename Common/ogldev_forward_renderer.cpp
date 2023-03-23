@@ -255,13 +255,14 @@ void ForwardRenderer::Render(const Scene& Scene)
     if ((Scene.m_pointLights.size() == 0) && (Scene.m_spotLights.size() == 0) && 
         ((Scene.m_dirLight.size() == 0) || (Scene.m_dirLight[0].IsZero()))) {
         printf("Warning! trying to render but all lights are zero\n");
+    }    
+
+    if ((Scene.m_dirLight.size() > 0) && (Scene.m_dirLight[0].DiffuseIntensity > 0.0)) {
+        SetDirLight(Scene.m_dirLight[0]);
+        //m_lightingTech.UpdateDirLightDirection(Scene.m_dirLight[0]);
     }
 
     SwitchToLightingTech();
-
-    if ((Scene.m_dirLight.size() > 0) && (Scene.m_dirLight[0].DiffuseIntensity > 0.0)) {
-        m_lightingTech.UpdateDirLightDirection(Scene.m_dirLight[0]);
-    }
 
     if (Scene.m_pointLights.size() > 0) {
         m_lightingTech.UpdatePointLightsPos((unsigned int)Scene.m_pointLights.size(), &Scene.m_pointLights[0]);

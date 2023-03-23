@@ -60,10 +60,11 @@ public:
         m_spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
         m_spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
 
-        m_dirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
-        m_dirLight.DiffuseIntensity = 1.0f;
+        DirectionalLight DirLight;
+        DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
+        DirLight.DiffuseIntensity = 1.0f;
 
-        m_scene.m_dirLight.push_back(m_dirLight);
+        m_scene.m_dirLight.push_back(DirLight);
     }
 
     virtual ~ForwardRendererDemo()
@@ -181,7 +182,6 @@ private:
         m_renderer.InitForwardRenderer(m_pRenderingSubsystem);
         //        m_renderer.SetPointLights(2, m_pointLights);
         //        m_renderer.SetSpotLights(2, m_spotLights);
-        m_renderer.SetDirLight(m_dirLight);
     }
 
 
@@ -204,7 +204,6 @@ private:
     SkinnedMesh* m_pMesh1 = NULL;
     PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
     SpotLight m_spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
-    DirectionalLight m_dirLight;
     float m_counter = 0;
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
