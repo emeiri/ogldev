@@ -41,8 +41,6 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual void Execute();
 
-    virtual void SetCamera(BasicCamera* pCamera) { m_pCamera = pCamera; }
-
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     
     void OnCursorPosCallback(GLFWwindow* window, double x, double y);
@@ -57,7 +55,6 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     GLFWwindow* m_pWindow = NULL;
     ForwardRenderer m_forwardRenderer;
-    BasicCamera* m_pCamera = NULL;
 };
 
 #endif
