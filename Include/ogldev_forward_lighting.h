@@ -34,7 +34,7 @@ public:
     float AmbientIntensity = 0.0f;
     float DiffuseIntensity = 0.0f;
 
-    bool IsZero()
+    bool IsZero() const
     {
         return ((AmbientIntensity == 0) && (DiffuseIntensity == 0.0f));
     }

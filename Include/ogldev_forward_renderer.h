@@ -29,6 +29,19 @@
 #include "ogldev_rendering_subsystem.h"
 
 
+class Scene
+{
+public:
+    Scene() {};
+
+    std::vector<PointLight> m_pointLights;
+    std::vector<SpotLight> m_spotLights;
+    std::vector<DirectionalLight> m_dirLight;
+    BasicMesh* m_pMesh = NULL;
+};
+
+
+
 class ForwardRenderer {
  public:
 
@@ -78,6 +91,8 @@ class ForwardRenderer {
     void ControlCellShading(bool IsEnabled);
 
     void Render(BasicMesh* pMesh);
+
+    void Render(const Scene& Scene);
 
     void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 

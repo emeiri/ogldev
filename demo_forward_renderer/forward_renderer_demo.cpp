@@ -25,8 +25,8 @@
 #include "ogldev_rendering_subsystem.h"
 #include "ogldev_forward_renderer.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1000
+#define WINDOW_HEIGHT 1000
 
 
 class ForwardRendererDemo : public GameCallbacks
@@ -62,6 +62,8 @@ public:
 
         m_dirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
+
+        m_scene.m_dirLight.push_back(m_dirLight);
     }
 
     virtual ~ForwardRendererDemo()
@@ -90,7 +92,7 @@ public:
 
     void OnFrame()
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_pRenderingSubsystem->ClearWindow();
 
 #ifdef _WIN64
         float YRotationAngle = 0.1f;
@@ -110,7 +112,9 @@ public:
         float AnimationTimeSec = ((float)(m_pRenderingSubsystem->GetElapsedTimeMillis())) / 1000.0f;
 
         m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
-        m_renderer.Render(m_pMesh);
+        //m_renderer.Render(m_pMesh);
+
+        m_renderer.Render(m_scene);
 
         //m_renderer.RenderAnimation(m_pMesh1, AnimationTimeSec);
     }
@@ -192,6 +196,8 @@ private:
         m_pMesh1->SetPosition(0.0f, 0.0f, 15.0f);
         m_pMesh1->SetRotation(90.0f, 0.0f, 0.0f);
         m_pMesh1->SetScale(0.05f);
+
+        m_scene.m_pMesh = m_pMesh;
     }
 
     BasicMesh* m_pMesh = NULL;
@@ -203,6 +209,7 @@ private:
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     ForwardRenderer m_renderer;
+    Scene m_scene;
 };
 
 
