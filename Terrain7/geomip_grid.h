@@ -52,8 +52,6 @@ class GeomipGrid {
         void InitVertex(const BaseTerrain* pTerrain, int x, int z);
     };
 
-    void CalcMaxLOD();
-
     void CreateGLState();
 	
     void PopulateBuffers(const BaseTerrain* pTerrain);
@@ -86,13 +84,16 @@ class GeomipGrid {
         int Start = 0;
         int Count = 0;
     };
+	
     #define LEFT   2
     #define RIGHT  2
     #define TOP    2
     #define BOTTOM 2
+	
     struct LodInfo {
         SingleLodInfo info[LEFT][RIGHT][TOP][BOTTOM];
     };
+	
     std::vector<LodInfo> m_lodInfo;
     int m_numPatchesX = 0;
     int m_numPatchesZ = 0;
