@@ -24,6 +24,8 @@
 #include "geomip_grid.h"
 #include "terrain.h"
 
+extern int gShowPoints = 0;
+
 
 GeomipGrid::GeomipGrid()
 {
@@ -382,10 +384,11 @@ void GeomipGrid::Render(const Vector3f& CameraPos)
 
     static bool foo = false;
 
-    if (foo) {
-        //        printf("render %d points\n", m_width * m_depth);
-        glDrawArrays(GL_POINTS, 0, m_width * m_depth);
-    } else {
+    if (gShowPoints > 0) {
+        glDrawElementsBaseVertex(GL_POINTS, m_lodInfo[0].info[0][0][0][0].Count, GL_UNSIGNED_INT, (void*)0, 0);
+    }
+
+    if (gShowPoints != 2) {
         for (int PatchZ = 0 ; PatchZ < m_numPatchesZ ; PatchZ++) {
             for (int PatchX = 0 ; PatchX < m_numPatchesX ; PatchX++) {
                 LodManager::PatchLod plod = m_lodManager.GetPatchLod(PatchX, PatchZ);

@@ -47,6 +47,8 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 static int g_seed = 0;
 
+extern int gShowPoints;
+
 
 class TerrainDemo7
 {
@@ -198,6 +200,19 @@ public:
             case GLFW_KEY_SPACE:
                 m_showGui = !m_showGui;
                 break;
+
+            case GLFW_KEY_0:
+                gShowPoints = 0;
+                break;
+
+            case GLFW_KEY_1:
+                gShowPoints = 1;
+                break;
+
+            case GLFW_KEY_2:
+                gShowPoints = 2;
+                break;
+
             }
         }
 
