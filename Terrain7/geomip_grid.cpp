@@ -382,8 +382,6 @@ void GeomipGrid::Render(const Vector3f& CameraPos)
 
     glBindVertexArray(m_vao);
 
-    static bool foo = false;
-
     if (gShowPoints > 0) {
         glDrawElementsBaseVertex(GL_POINTS, m_lodInfo[0].info[0][0][0][0].Count, GL_UNSIGNED_INT, (void*)0, 0);
     }
