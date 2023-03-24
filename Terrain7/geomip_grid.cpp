@@ -232,8 +232,8 @@ int GeomipGrid::InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod)
 int GeomipGrid::InitIndicesLODSingle(int Index, std::vector<uint>& Indices, int lodLeft, int lodRight, int lodTop, int lodBottom)
 {
     int lodCore = min(lodLeft, min(lodRight, min(lodTop, lodBottom)));
-    int FanStep = powi(2, lodCore + 1);   // lod = 0 --> 2, lod = 1 --> 4
-    int EndPos = m_patchSize - 1 - FanStep;
+    int FanStep = powi(2, lodCore + 1);   // lod = 0 --> 2, lod = 1 --> 4, lod = 2 --> 8, etc
+    int EndPos = m_patchSize - 1 - FanStep;  // patch size 7, fan step 2 --> EndPos = 4
 
     //printf("Fan step %d\n", FanStep);
     //printf("End pos %d\n", EndPos);
