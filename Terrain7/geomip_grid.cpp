@@ -160,8 +160,8 @@ int GeomipGrid::CalcNumIndices()
 {
     int NumQuads = (m_patchSize - 1) * (m_patchSize - 1);
     int NumIndices = 0;
-    int MaxPermutationsPerLevel = 16; // true/false for each of the four sides
-    int IndicesPerQuad = 6; // two triangles
+    int MaxPermutationsPerLevel = 16;    // true/false for each of the four sides
+    const int IndicesPerQuad = 6;        // two triangles
     for (int lod = 0; lod <= m_maxLOD; lod++) {
         printf("LOD %d: num quads %d\n", lod, NumQuads);
         NumIndices += NumQuads * IndicesPerQuad * MaxPermutationsPerLevel;
