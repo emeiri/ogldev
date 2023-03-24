@@ -214,10 +214,10 @@ int GeomipGrid::InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod)
 {
     int TotalIndicesForLOD = 0;
 
-    for (int l = 0 ; l < 2 ; l++) {
-        for (int r = 0 ; r < 2 ; r++) {
-            for (int t = 0 ; t < 2 ; t++) {
-                for (int b = 0 ; b < 2 ; b++) {
+    for (int l = 0 ; l < LEFT ; l++) {
+        for (int r = 0 ; r < RIGHT ; r++) {
+            for (int t = 0 ; t < TOP ; t++) {
+                for (int b = 0 ; b < BOTTOM ; b++) {
                     m_lodInfo[lod].info[l][r][t][b].Start = Index;
                     Index = InitIndicesLODSingle(Index, Indices, lod + l, lod + r, lod + t, lod + b);
                     m_lodInfo[lod].info[l][r][t][b].Count = Index - m_lodInfo[lod].info[l][r][t][b].Start;
