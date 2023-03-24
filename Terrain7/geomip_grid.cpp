@@ -145,13 +145,14 @@ void GeomipGrid::PopulateBuffers(const BaseTerrain* pTerrain)
 	std::vector<unsigned int> Indices;
     Indices.resize(NumIndices);
 
-    InitIndices(Indices);
+    NumIndices = InitIndices(Indices);
+    printf("Final number of indices %d\n", NumIndices);
 
     CalcNormals(Vertices, Indices);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * NumIndices, &Indices[0], GL_STATIC_DRAW);
 }
 
 
@@ -166,7 +167,7 @@ int GeomipGrid::CalcNumIndices()
         NumIndices += NumQuads * IndicesPerQuad * MaxPermutationsPerLevel;
         NumQuads /= 4;
     }
-    printf("Total indices %d\n", NumIndices);
+    printf("Initial number of indices %d\n", NumIndices);
     return NumIndices;
 }
 
@@ -200,7 +201,7 @@ void GeomipGrid::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& 
 }
 
 
-void GeomipGrid::InitIndices(std::vector<uint>& Indices)
+int GeomipGrid::InitIndices(std::vector<uint>& Indices)
 {
     int Index = 0;
     for (int lod = 0 ; lod <= m_maxLOD ; lod++) {
@@ -208,6 +209,8 @@ void GeomipGrid::InitIndices(std::vector<uint>& Indices)
         Index = InitIndicesLOD(Index, Indices, lod);
         printf("\n");
     }
+
+    return Index;
 }
 
 int GeomipGrid::InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod)

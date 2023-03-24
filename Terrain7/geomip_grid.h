@@ -58,7 +58,7 @@ class GeomipGrid {
     
     void InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices);
    
-    void InitIndices(std::vector<uint>& Indices);
+    int InitIndices(std::vector<uint>& Indices);
     
     int InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod);
     
