@@ -62,7 +62,7 @@ class GeomipGrid {
     
     int InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod);
     
-    int InitIndicesLODSingle(int Index, std::vector<uint>& Indices, int lodLeft, int lodRight, int lodTop, int lodBottom);
+    int InitIndicesLODSingle(int Index, std::vector<uint>& Indices, int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom);
     
     void CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& Indices);
     

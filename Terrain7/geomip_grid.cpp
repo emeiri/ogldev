@@ -201,9 +201,10 @@ void GeomipGrid::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& 
 }
 
 
-int GeomipGrid::InitIndices(std::vector<uint>& Indices)
+int GeomipGrid::InitIndices(std::vector<unsigned int>& Indices)
 {
     int Index = 0;
+
     for (int lod = 0 ; lod <= m_maxLOD ; lod++) {
         printf("*** Init indices lod %d ***\n", lod);
         Index = InitIndicesLOD(Index, Indices, lod);
@@ -213,7 +214,7 @@ int GeomipGrid::InitIndices(std::vector<uint>& Indices)
     return Index;
 }
 
-int GeomipGrid::InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod)
+int GeomipGrid::InitIndicesLOD(int Index, std::vector<unsigned int>& Indices, int lod)
 {
     int TotalIndicesForLOD = 0;
 
@@ -222,7 +223,8 @@ int GeomipGrid::InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod)
             for (int t = 0 ; t < TOP ; t++) {
                 for (int b = 0 ; b < BOTTOM ; b++) {
                     m_lodInfo[lod].info[l][r][t][b].Start = Index;
-                    Index = InitIndicesLODSingle(Index, Indices, lod + l, lod + r, lod + t, lod + b);
+                    Index = InitIndicesLODSingle(Index, Indices, lod, lod + l, lod + r, lod + t, lod + b);
+
                     m_lodInfo[lod].info[l][r][t][b].Count = Index - m_lodInfo[lod].info[l][r][t][b].Start;
                     TotalIndicesForLOD += m_lodInfo[lod].info[l][r][t][b].Count;
                 }
@@ -234,14 +236,12 @@ int GeomipGrid::InitIndicesLOD(int Index, std::vector<uint>& Indices, int lod)
 
     return Index;
 }
-int GeomipGrid::InitIndicesLODSingle(int Index, std::vector<uint>& Indices, int lodLeft, int lodRight, int lodTop, int lodBottom)
-{
-    int lodCore = min(lodLeft, min(lodRight, min(lodTop, lodBottom)));
-    int FanStep = powi(2, lodCore + 1);   // lod = 0 --> 2, lod = 1 --> 4, lod = 2 --> 8, etc
-    int EndPos = m_patchSize - 1 - FanStep;  // patch size 7, fan step 2 --> EndPos = 4
 
-    //printf("Fan step %d\n", FanStep);
-    //printf("End pos %d\n", EndPos);
+
+int GeomipGrid::InitIndicesLODSingle(int Index, std::vector<unsigned int>& Indices, int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom)
+{
+    int FanStep = powi(2, lodCore + 1);   // lod = 0 --> 2, lod = 1 --> 4, lod = 2 --> 8, etc
+    int EndPos = m_patchSize - 1 - FanStep;  // patch size 5, fan step 2 --> EndPos = 2; patch size 9, fan step 2 --> EndPos = 6
 
     for (int z = 0 ; z <= EndPos ; z += FanStep) {
         for (int x = 0 ; x <= EndPos ; x += FanStep) {
@@ -254,16 +254,12 @@ int GeomipGrid::InitIndicesLODSingle(int Index, std::vector<uint>& Indices, int 
         }
     }
 
-    //    printf("Current index %d\n", Index);
-
     return Index;
 }
 
 
-uint GeomipGrid::CreateTriangleFan(int Index, std::vector<uint>& Indices, int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom, int x, int z)
+uint GeomipGrid::CreateTriangleFan(int Index, std::vector<unsigned int>& Indices, int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom, int x, int z)
 {
-    //    printf("Create triangle fan (%d,%d) at %d\n", x, z, Index);
-
     int StepLeft   = powi(2, lodLeft); // because LOD starts at zero...
     int StepRight  = powi(2, lodRight);
     int StepTop    = powi(2, lodTop);
@@ -334,7 +330,6 @@ uint GeomipGrid::CreateTriangleFan(int Index, std::vector<uint>& Indices, int lo
 
 uint GeomipGrid::AddTriangle(uint Index, std::vector<uint>& Indices, uint v1, uint v2, uint v3)
 {
-    //printf("Add triangle %d %d %d\n", v1, v2, v3);
     assert(Index < Indices.size());
     Indices[Index++] = v1;
     assert(Index < Indices.size());
