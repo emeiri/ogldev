@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ogldev_math_3d.h"
+#include "ogldev_array_2d.h"
 
 class LodManager {
  public:
@@ -38,7 +39,7 @@ class LodManager {
     int m_numPatchesZ = 0;
     float m_worldScale = 0.0f;
 
-    std::vector<PatchLod> m_map;
+    Array2D<PatchLod> m_map;
     std::vector<int> m_regions;
 };
 

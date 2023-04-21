@@ -13,7 +13,9 @@ int LodManager::InitLodManager(int PatchSize, int NumPatchesX, int NumPatchesZ, 
 
     CalcMaxLOD();
 
-    m_map.resize(NumPatchesX * NumPatchesZ);
+    PatchLod Zero;
+    m_map.InitArray2D(NumPatchesX, NumPatchesZ, Zero);
+
     m_regions.resize(m_maxLOD + 1);
 
     CalcLodRegions();
@@ -68,12 +70,12 @@ void LodManager::UpdateLodMapPass1(const Vector3f& CameraPos)
 
             float DistanceToCamera = CameraPos.Distance(Pos);
             //            printf("%f ", DistanceToCamera);
-            int Index = LodMapZ * m_numPatchesX + LodMapX;
-            assert(Index < m_map.size());
 
             int CoreLod = DistanceToLod(DistanceToCamera);
 
-            m_map[Index].Core = CoreLod;
+            PatchLod* pPatchLOD = m_map.GetAddr(LodMapX, LodMapZ);
+            pPatchLOD->Core = CoreLod;
+
         }
         // printf("\n");
     }
@@ -87,60 +89,50 @@ void LodManager::UpdateLodMapPass2(const Vector3f& CameraPos)
     for (int LodMapZ = 0 ; LodMapZ < m_numPatchesZ ; LodMapZ++) {
         //        printf("%d: ", LodMapZ);
         for (int LodMapX = 0 ; LodMapX < m_numPatchesX ; LodMapX++) {
-            int Index = LodMapZ * m_numPatchesX + LodMapX;
-            assert(Index < m_map.size());
+            int CoreLod = m_map.Get(LodMapX, LodMapZ).Core;
 
-            int CoreLod = m_map[Index].Core;
-
-            int IndexLeft   = Index;
-            int IndexRight  = Index;
-            int IndexTop    = Index;
-            int IndexBottom = Index;
+            int IndexLeft   = LodMapX;
+            int IndexRight  = LodMapX;
+            int IndexTop    = LodMapZ;
+            int IndexBottom = LodMapZ;
 
             if (LodMapX > 0) {
                 IndexLeft--;
-                assert(IndexLeft < m_map.size());
 
-                if (m_map[IndexLeft].Core > CoreLod) {
-                    m_map[Index].Left = 1;
+                if (m_map.Get(IndexLeft, LodMapZ).Core > CoreLod) {
+                    m_map.At(LodMapX, LodMapZ).Left = 1;
                 } else {
-                    m_map[Index].Left = 0;
+                    m_map.At(LodMapX, LodMapZ).Left = 0;
                 }
             }
 
             if (LodMapX < m_numPatchesX - 1) {
                 IndexRight++;
 
-                assert(IndexRight < m_map.size());
-
-                if (m_map[IndexRight].Core > CoreLod) {
-                    m_map[Index].Right = 1;
+                if (m_map.Get(IndexRight, LodMapZ).Core > CoreLod) {
+                    m_map.At(LodMapX, LodMapZ).Right = 1;
                 } else {
-                    m_map[Index].Right = 0;
+                    m_map.At(LodMapX, LodMapZ).Right = 0;
                 }
             }
 
             if (LodMapZ > 0) {
-                IndexBottom -= m_numPatchesX;
+                IndexBottom--;
 
-                assert(IndexBottom < m_map.size());
-
-                if (m_map[IndexBottom].Core > CoreLod) {
-                    m_map[Index].Bottom = 1;
+                if (m_map.Get(LodMapX, IndexBottom).Core > CoreLod) {
+                    m_map.At(LodMapX, LodMapZ).Bottom = 1;
                 } else {
-                    m_map[Index].Bottom = 0;
+                    m_map.At(LodMapX, LodMapZ).Bottom = 0;
                 }
             }
 
             if (LodMapZ < m_numPatchesZ - 1) {
-                IndexTop += m_numPatchesX;
+                IndexTop++;
 
-                assert(IndexTop < m_map.size());
-
-                if (m_map[IndexTop].Core > CoreLod) {
-                    m_map[Index].Top = 1;
+                if (m_map.Get(LodMapX, IndexTop).Core > CoreLod) {
+                    m_map.At(LodMapX, LodMapZ).Top = 1;
                 } else {
-                    m_map[Index].Top = 0;
+                    m_map.At(LodMapX, LodMapZ).Top = 0;
                 }
             }
         }
@@ -154,8 +146,7 @@ void LodManager::PrintLodMap()
     for (int LodMapZ = m_numPatchesZ - 1 ; LodMapZ >= 0 ; LodMapZ--) {
         printf("%d: ", LodMapZ);
         for (int LodMapX = 0 ; LodMapX < m_numPatchesX ; LodMapX++) {
-            int Index = LodMapZ * m_numPatchesX + LodMapX;
-            printf("%d ", m_map[Index].Core);
+            printf("%d ", m_map.Get(LodMapX, LodMapZ).Core);
         }
         printf("\n");
     }
@@ -179,9 +170,7 @@ int LodManager::DistanceToLod(float Distance)
 
 const LodManager::PatchLod& LodManager::GetPatchLod(int PatchX, int PatchZ) const
 {
-    int LodMapIndex = PatchZ * m_numPatchesX + PatchX;
-    assert(LodMapIndex < m_map.size());
-    return m_map[LodMapIndex];
+    return m_map.Get(PatchX, PatchZ);
 }
 
 
