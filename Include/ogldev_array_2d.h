@@ -89,26 +89,7 @@ class Array2D {
 
     Type* GetAddr(int Col, int Row) const
     {
-#ifndef NDEBUG
-        if (Col < 0) {
-            printf("%s:%d - negative col %d\n", __FILE__, __LINE__, Col);
-        }
-
-        if (Col >= m_cols) {
-            printf("%s:%d - column overflow (%d vs %d)\n", __FILE__, __LINE__, Col, m_cols);
-            exit(0);
-        }
-
-        if (Row < 0) {
-            printf("%s:%d - negative row %d\n", __FILE__, __LINE__, Row);
-        }
-
-        if (Row >= m_rows) {
-            printf("%s:%d - row overflow (%d vs %d)\n", __FILE__, __LINE__, Row, m_rows);
-            exit(0);
-        }
-#endif
-        size_t Index = Row * m_cols + Col;
+        size_t Index = CalcIndex(Col, Row);
 
         return &m_p[Index];
     }
@@ -132,13 +113,13 @@ class Array2D {
     }
 
 
-    Type Get(int Col, int Row) const
+    const Type& Get(int Col, int Row) const
     {
         return *GetAddr(Col, Row);
     }
 
 
-    Type Get(int Index) const
+    const Type& Get(int Index) const
     {
 #ifndef NDEBUG
         if (Index >= m_rows * m_cols) {
@@ -150,13 +131,21 @@ class Array2D {
         return m_p[Index];
     }
 
-    void Set(int Col, int Row, Type Val)
+
+    Type& At(int Col, int Row)
+    {
+        size_t Index = CalcIndex(Col, Row);
+
+        return m_p[Index];
+    }
+
+    void Set(int Col, int Row, const Type& Val)
     {
         *GetAddr(Col, Row) = Val;
     }
 
 
-    void Set(int Index, Type Val)
+    void Set(int Index, const Type& Val)
     {
 #ifndef NDEBUG
         if (Index >= m_rows * m_cols) {
@@ -217,6 +206,33 @@ class Array2D {
     }
 
  private:
+
+    size_t CalcIndex(int Col, int Row) const
+    {
+#ifndef NDEBUG
+        if (Col < 0) {
+            printf("%s:%d - negative col %d\n", __FILE__, __LINE__, Col);
+        }
+
+        if (Col >= m_cols) {
+            printf("%s:%d - column overflow (%d vs %d)\n", __FILE__, __LINE__, Col, m_cols);
+            exit(0);
+        }
+
+        if (Row < 0) {
+            printf("%s:%d - negative row %d\n", __FILE__, __LINE__, Row);
+        }
+
+        if (Row >= m_rows) {
+            printf("%s:%d - row overflow (%d vs %d)\n", __FILE__, __LINE__, Row, m_rows);
+            exit(0);
+        }
+#endif
+        size_t Index = Row * m_cols + Col;
+
+        return Index;
+    }
+
     Type* m_p = NULL;
     int m_cols = 0;
     int m_rows = 0;
