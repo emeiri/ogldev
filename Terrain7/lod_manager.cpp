@@ -51,13 +51,13 @@ void LodManager::Update(const Vector3f& CameraPos)
 
 void LodManager::UpdateLodMapPass1(const Vector3f& CameraPos)
 {
-    int Step = m_patchSize / 2;
+    int CenterStep = m_patchSize / 2;
 
     for (int LodMapZ = 0 ; LodMapZ < m_numPatchesZ ; LodMapZ++) {
         //        printf("%d: ", LodMapZ);
         for (int LodMapX = 0 ; LodMapX < m_numPatchesX ; LodMapX++) {
-            int x = LodMapX * (m_patchSize - 1) + Step;
-            int z = LodMapZ * (m_patchSize - 1) + Step;
+            int x = LodMapX * (m_patchSize - 1) + CenterStep;
+            int z = LodMapZ * (m_patchSize - 1) + CenterStep;
 
             Vector3f Pos = Vector3f(x * (float)m_worldScale, 0.0f, z * (float)m_worldScale);
 
