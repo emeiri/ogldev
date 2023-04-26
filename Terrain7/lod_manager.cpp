@@ -26,25 +26,18 @@ int LodManager::InitLodManager(int PatchSize, int NumPatchesX, int NumPatchesZ, 
 
 void LodManager::CalcMaxLOD()
 {
-    float patchSizeLog2 = log2f((float)m_patchSize);
-    printf("log2 of patch size %d is %f\n", m_patchSize, patchSizeLog2);
-    int TempMaxLOD = (int)floorf(patchSizeLog2) - 1;
-    printf("TempMax LOD %d\n", TempMaxLOD);
-    int MinPatchSizeForLOD = powi(2, TempMaxLOD + 1) + 1;
-    printf("Min patch size for LOD %d\n", MinPatchSizeForLOD);
-    if (m_patchSize > powi(2, TempMaxLOD + 1) + 1) {
-        int SmallerPatch = powi(2, TempMaxLOD) + 1;
-        if ((m_patchSize - 1) % (SmallerPatch - 1) != 0) {
-            int RecommendedPatchSize = powi(2, TempMaxLOD + 2) + 1;
-            printf("Invalid patch size %d. Try to use %d\n", m_patchSize, RecommendedPatchSize);
-            exit(0);
-        }
-        m_maxLOD = TempMaxLOD - 1;
-        printf("Warning! - max LOD reduced to %d (patch size %d > required %d)\n", m_maxLOD, m_patchSize, MinPatchSizeForLOD);
+    int NumSegments = m_patchSize - 1;
+    if (ceilf(log2f((float)NumSegments)) != floorf(log2f((float)NumSegments))) {
+        printf("The number of vertices in the patch minus one must be a power of two\n");
+        printf("%f %f\n", ceilf(log2f((float)NumSegments)), floorf(log2f((float)NumSegments)));
+        exit(0);
     }
-    else {
-        m_maxLOD = TempMaxLOD;
-    }
+
+    int patchSizeLog2 = (int)log2f((float)NumSegments);
+    printf("log2 of patch size %d is %d\n", m_patchSize, patchSizeLog2);
+    m_maxLOD = patchSizeLog2 - 1;
+
+   // printf("max lod %d\n", m_maxLOD);
 }
 
 
