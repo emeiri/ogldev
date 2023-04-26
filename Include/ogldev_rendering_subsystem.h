@@ -22,6 +22,7 @@
 #define OGLDEV_RENDERING_SUBSYSTEM_H
 
 #include "ogldev_types.h"
+#include "demolition.h"
 
 class GameCallbacks
 {
