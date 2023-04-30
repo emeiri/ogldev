@@ -45,7 +45,6 @@ void LodManager::Update(const Vector3f& CameraPos)
 {
     UpdateLodMapPass1(CameraPos);
     UpdateLodMapPass2(CameraPos);
-    //    PrintLodMap();
 }
 
 
@@ -54,23 +53,19 @@ void LodManager::UpdateLodMapPass1(const Vector3f& CameraPos)
     int CenterStep = m_patchSize / 2;
 
     for (int LodMapZ = 0 ; LodMapZ < m_numPatchesZ ; LodMapZ++) {
-        //        printf("%d: ", LodMapZ);
         for (int LodMapX = 0 ; LodMapX < m_numPatchesX ; LodMapX++) {
             int x = LodMapX * (m_patchSize - 1) + CenterStep;
             int z = LodMapZ * (m_patchSize - 1) + CenterStep;
 
-            Vector3f Pos = Vector3f(x * (float)m_worldScale, 0.0f, z * (float)m_worldScale);
+            Vector3f PatchCenter = Vector3f(x * (float)m_worldScale, 0.0f, z * (float)m_worldScale);
 
-            float DistanceToCamera = CameraPos.Distance(Pos);
-            //            printf("%f ", DistanceToCamera);
+            float DistanceToCamera = CameraPos.Distance(PatchCenter);
 
             int CoreLod = DistanceToLod(DistanceToCamera);
 
             PatchLod* pPatchLOD = m_map.GetAddr(LodMapX, LodMapZ);
             pPatchLOD->Core = CoreLod;
-
         }
-        // printf("\n");
     }
 }
 
@@ -80,7 +75,6 @@ void LodManager::UpdateLodMapPass2(const Vector3f& CameraPos)
     int Step = m_patchSize / 2;
 
     for (int LodMapZ = 0 ; LodMapZ < m_numPatchesZ ; LodMapZ++) {
-        //        printf("%d: ", LodMapZ);
         for (int LodMapX = 0 ; LodMapX < m_numPatchesX ; LodMapX++) {
             int CoreLod = m_map.Get(LodMapX, LodMapZ).Core;
 
@@ -129,7 +123,6 @@ void LodManager::UpdateLodMapPass2(const Vector3f& CameraPos)
                 }
             }
         }
-        // printf("\n");
     }
 }
 
@@ -140,7 +133,7 @@ void LodManager::PrintLodMap()
         printf("%d: ", LodMapZ);
         for (int LodMapX = 0 ; LodMapX < m_numPatchesX ; LodMapX++) {
             printf("%d ", m_map.Get(LodMapX, LodMapZ).Core);
-        }
+        }   
         printf("\n");
     }
 }

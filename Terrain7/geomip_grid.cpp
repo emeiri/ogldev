@@ -387,7 +387,7 @@ void GeomipGrid::Render(const Vector3f& CameraPos)
     if (gShowPoints != 2) {
         for (int PatchZ = 0 ; PatchZ < m_numPatchesZ ; PatchZ++) {
             for (int PatchX = 0 ; PatchX < m_numPatchesX ; PatchX++) {
-                LodManager::PatchLod plod = m_lodManager.GetPatchLod(PatchX, PatchZ);
+                const LodManager::PatchLod& plod = m_lodManager.GetPatchLod(PatchX, PatchZ);
                 int C = plod.Core;
                 int L = plod.Left;
                 int R = plod.Right;
@@ -401,7 +401,8 @@ void GeomipGrid::Render(const Vector3f& CameraPos)
                 int BaseVertex = z * m_width + x;
                 //            printf("%d\n", BaseVertex);
 
-                glDrawElementsBaseVertex(GL_TRIANGLES, m_lodInfo[C].info[L][R][T][B].Count, GL_UNSIGNED_INT, (void*)BaseIndex, BaseVertex);
+                glDrawElementsBaseVertex(GL_TRIANGLES, m_lodInfo[C].info[L][R][T][B].Count, 
+                                         GL_UNSIGNED_INT, (void*)BaseIndex, BaseVertex);
             }
         }
     }
