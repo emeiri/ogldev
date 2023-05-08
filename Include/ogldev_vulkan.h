@@ -23,12 +23,10 @@
 
 #include <vector>
 
-#define ENABLE_DEBUG_LAYERS
-
-#ifdef _WIN32
+#ifdef _WIN64
 #define  VK_USE_PLATFORM_WIN32_KHR
 #include "vulkan/vulkan.h"
-#include "vulkan/vk_sdk_platform.h"
+#include "vulkan/vk_platform.h"
 #else
 #define VK_USE_PLATFORM_XCB_KHR
 #include <vulkan/vulkan.h>
@@ -45,6 +43,17 @@
     }
 
 struct VulkanPhysicalDevices {
+    void Init(int NumDevices)
+    {
+        m_devices.resize(NumDevices);
+        m_devProps.resize(NumDevices);
+        m_qFamilyProps.resize(NumDevices);
+        m_qSupportsPresent.resize(NumDevices);
+        m_surfaceFormats.resize(NumDevices);
+        m_surfaceCaps.resize(NumDevices);
+        m_memProps.resize(NumDevices);
+    }
+
     std::vector<VkPhysicalDevice> m_devices;
     std::vector<VkPhysicalDeviceProperties> m_devProps;
     std::vector< std::vector<VkQueueFamilyProperties> > m_qFamilyProps;

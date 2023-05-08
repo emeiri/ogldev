@@ -95,24 +95,25 @@ VkShaderModule VulkanCreateShaderModule(VkDevice& device, const char* pFileName)
 }
 
 
-void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices)
+uint VulkanGetPhysicalDevicesCount(const VkInstance& inst)
 {
     uint NumDevices = 0;
-    
+
     VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, NULL);
     CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
     
+    return NumDevices;
+}
+
+
+void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices)
+{
+    uint NumDevices = VulkanGetPhysicalDevicesCount(inst);
     printf("Num physical devices %d\n", NumDevices);
-    
-    PhysDevices.m_devices.resize(NumDevices);
-    PhysDevices.m_devProps.resize(NumDevices);
-    PhysDevices.m_qFamilyProps.resize(NumDevices);
-    PhysDevices.m_qSupportsPresent.resize(NumDevices);
-    PhysDevices.m_surfaceFormats.resize(NumDevices);
-    PhysDevices.m_surfaceCaps.resize(NumDevices);
-    PhysDevices.m_memProps.resize(NumDevices);
+
+    PhysDevices.Init(NumDevices);
         
-    res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
+    VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, &PhysDevices.m_devices[0]);
     CHECK_VULKAN_ERROR("vkEnumeratePhysicalDevices error %d\n", res);
     
     for (uint i = 0 ; i < NumDevices ; i++) {
@@ -122,8 +123,8 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         printf("Device name: %s\n", PhysDevices.m_devProps[i].deviceName);
         uint32_t apiVer = PhysDevices.m_devProps[i].apiVersion;
         printf("    API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer),
-                                          VK_VERSION_MINOR(apiVer),
-                                          VK_VERSION_PATCH(apiVer));
+                                              VK_VERSION_MINOR(apiVer),
+                                              VK_VERSION_PATCH(apiVer));
         uint NumQFamily = 0;         
         
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, NULL);
@@ -171,7 +172,7 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
         vkGetPhysicalDeviceMemoryProperties(PhysDev, &PhysDevices.m_memProps[i]);
         
         printf("Num memory types %d\n", PhysDevices.m_memProps[i].memoryTypeCount);
-        for (int j = 0 ; j < PhysDevices.m_memProps[i].memoryTypeCount ; j++) {
+        for (uint j = 0 ; j < PhysDevices.m_memProps[i].memoryTypeCount ; j++) {
             printf("%d: (%x) ", j, PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags);
             
             if (PhysDevices.m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {

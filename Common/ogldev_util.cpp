@@ -25,8 +25,10 @@
 #include <sys/time.h>
 #endif
 
+#ifndef VULKAN
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -220,6 +222,7 @@ long long GetCurrentTimeMillis()
 #endif
 }
 
+#ifndef VULKAN
 
 #define EXIT_ON_GL_ERROR
 void gl_check_error(const char* function, const char *file, int line)
@@ -316,6 +319,8 @@ void glDebugOutput(GLenum source,
     }
 }
 
+
+#endif
 
 string GetDirFromFilename(const string& Filename)
 {

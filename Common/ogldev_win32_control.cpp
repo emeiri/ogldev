@@ -18,7 +18,7 @@
 
 #ifdef VULKAN
 
-#ifdef WIN32
+#ifdef _WIN64
 
 #include "ogldev_vulkan.h"
 #include "ogldev_win32_control.h"

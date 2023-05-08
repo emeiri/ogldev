@@ -220,7 +220,7 @@ void OgldevVulkanCore::CreateLogicalDevice()
 u32 OgldevVulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
 {
     const VkPhysicalDeviceMemoryProperties& physDeviceMemProps = m_physDevices.m_memProps[m_gfxDevIndex];
-    for (int i = 0 ; i < physDeviceMemProps.memoryTypeCount ; i++) {
+    for (uint i = 0 ; i < physDeviceMemProps.memoryTypeCount ; i++) {
         if ((memTypeBits & (1 << i)) &&
             ((physDeviceMemProps.memoryTypes[i].propertyFlags & reqMemPropFlags) == reqMemPropFlags)) {
             return i;
