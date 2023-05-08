@@ -850,4 +850,7 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
 
 int CalcNextPowerOfTwo(int x);
 
+
+bool IsPointInsideViewFrustum(const Matrix4f& VP, const Vector3f& p);
+
 #endif  /* MATH_3D_H */

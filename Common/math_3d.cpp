@@ -569,3 +569,4 @@ int CalcNextPowerOfTwo(int x)
 
     return ret;
 }
+bool IsPointInsideViewFrustum(const Matrix4f& VP, const Vector3f& p)bool IsPointInsideViewFrustum(const Matrix4f& VP, const Vector3f& p){    Vector4f p4D(p, 1.0f);    Vector4f ClipSpaceP =VP * p4D;    bool InsideViewFrustum = ((ClipSpaceP.x <= ClipSpaceP.w) &&                              (ClipSpaceP.x >= -ClipSpaceP.w) &&                              (ClipSpaceP.y <= ClipSpaceP.w) &&                              (ClipSpaceP.y >= -ClipSpaceP.w) &&                              (ClipSpaceP.z <= ClipSpaceP.w) &&                              (ClipSpaceP.z >= -ClipSpaceP.w));    return InsideViewFrustum;}
