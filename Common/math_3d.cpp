@@ -340,7 +340,7 @@ void Matrix4f::CalcClipPlanes(Vector4f& l, Vector4f& r, Vector4f& b, Vector4f& t
     Vector4f Row1(m[0][0], m[0][1], m[0][2], m[0][3]);
     Vector4f Row2(m[1][0], m[1][1], m[1][2], m[1][3]);
     Vector4f Row3(m[2][0], m[2][1], m[2][2], m[2][3]);
-    Vector4f Row4(m[3][0], m[3][1], m[3][2], m[2][3]);
+    Vector4f Row4(m[3][0], m[3][1], m[3][2], m[3][3]);
 
     l =         Row1 + Row4;
     r = -1.0f * Row1 + Row4;
@@ -348,138 +348,6 @@ void Matrix4f::CalcClipPlanes(Vector4f& l, Vector4f& r, Vector4f& b, Vector4f& t
     t = -1.0f * Row2 + Row4;
     n =         Row3 + Row4;
     f = -1.0f * Row3 + Row4;
-  
-
-    /*  l.x = m[0][0] + m[3][0];
-    l.y = m[0][1] + m[3][1];
-    l.z = m[0][2] + m[3][2];
-    l.w = m[0][3] + m[3][3];
-
-    r.x = -m[0][0] + m[3][0];
-    r.y = -m[0][1] + m[3][1];
-    r.z = -m[0][2] + m[3][2];
-    r.w = -m[0][3] + m[3][3];
-
-    b.x = m[1][0] + m[3][0];
-    b.y = m[1][1] + m[3][1];
-    b.z = m[1][2] + m[3][2];
-    b.w = m[1][3] + m[3][3];
-
-    t.x = -m[1][0] + m[3][0];
-    t.y = -m[1][1] + m[3][1];
-    t.z = -m[1][2] + m[3][2];
-    t.w = -m[1][3] + m[3][3];
-
-    n.x = m[0][0] + m[3][0];
-    n.y = m[0][1] + m[3][1];
-    n.z = m[0][2] + m[3][2];
-    n.w = m[0][3] + m[3][3];
-
-    f.x = m[0][0] + m[3][0];
-    f.y = m[0][1] + m[3][1];
-    f.z = m[0][2] + m[3][2];
-    f.w = m[0][3] + m[3][3];*/
-
-    l.Normalize();
-    r.Normalize();
-    b.Normalize();
-    t.Normalize();
-    n.Normalize();
-    f.Normalize();
-
-    printf("LEFT:   "); l.Print();
-    printf("RIGHT:  "); r.Print();
-    printf("BOTTOM: "); b.Print();
-    printf("TOP:    "); t.Print();
-    printf("NEAR:   "); n.Print();
-    printf("FAR:    "); f.Print();
-
-    float frustum[6][4];
-
-    const float* clip = &m[0][0];
-    /* Extract the numbers for the RIGHT plane */
-    frustum[0][0] = clip[3] - clip[0];
-    frustum[0][1] = clip[7] - clip[4];
-    frustum[0][2] = clip[11] - clip[8];
-    frustum[0][3] = clip[15] - clip[12];
-    /* Normalize the result */
-    float f1 = sqrt(frustum[0][0] * frustum[0][0] + frustum[0][1] * frustum[0][1] + frustum[0][2] * frustum[0][2]);
-    frustum[0][0] /= f1;
-    frustum[0][1] /= f1;
-    frustum[0][2] /= f1;
-    frustum[0][3] /= f1;
-    /* Extract the numbers for the LEFT plane */
-    frustum[1][0] = clip[3] + clip[0];
-    frustum[1][1] = clip[7] + clip[4];
-    frustum[1][2] = clip[11] + clip[8];
-    frustum[1][3] = clip[15] + clip[12];
-    /* Normalize the result */
-    f1 = sqrt(frustum[1][0] * frustum[1][0] + frustum[1][1] * frustum[1][1] + frustum[1][2] * frustum[1][2]);
-    frustum[1][0] /= f1;
-    frustum[1][1] /= f1;
-    frustum[1][2] /= f1;
-    frustum[1][3] /= f1;
-    /* Extract the BOTTOM plane */
-    frustum[2][0] = clip[3] + clip[1];
-    frustum[2][1] = clip[7] + clip[5];
-    frustum[2][2] = clip[11] + clip[9];
-    frustum[2][3] = clip[15] + clip[13];
-    /* Normalize the result */
-    f1 = sqrt(frustum[2][0] * frustum[2][0] + frustum[2][1] * frustum[2][1] + frustum[2][2] * frustum[2][2]);
-    frustum[2][0] /= f1;
-    frustum[2][1] /= f1;
-    frustum[2][2] /= f1;
-    frustum[2][3] /= f1;
-    /* Extract the TOP plane */
-    frustum[3][0] = clip[3] - clip[1];
-    frustum[3][1] = clip[7] - clip[5];
-    frustum[3][2] = clip[11] - clip[9];
-    frustum[3][3] = clip[15] - clip[13];
-    /* Normalize the result */
-    f1 = sqrt(frustum[3][0] * frustum[3][0] + frustum[3][1] * frustum[3][1] + frustum[3][2] * frustum[3][2]);
-    frustum[3][0] /= f1;
-    frustum[3][1] /= f1;
-    frustum[3][2] /= f1;
-    frustum[3][3] /= f1;
-    /* Extract the FAR plane */
-    frustum[4][0] = clip[3] - clip[2];
-    frustum[4][1] = clip[7] - clip[6];
-    frustum[4][2] = clip[11] - clip[10];
-    frustum[4][3] = clip[15] - clip[14];
-    /* Normalize the result */
-    f1 = sqrt(frustum[4][0] * frustum[4][0] + frustum[4][1] * frustum[4][1] + frustum[4][2] * frustum[4][2]);
-    frustum[4][0] /= f1;
-    frustum[4][1] /= f1;
-    frustum[4][2] /= f1;
-    frustum[4][3] /= f1;
-    /* Extract the NEAR plane */
-    frustum[5][0] = clip[3] + clip[2];
-    frustum[5][1] = clip[7] + clip[6];
-    frustum[5][2] = clip[11] + clip[10];
-    frustum[5][3] = clip[15] + clip[14];
-    /* Normalize the result */
-    f1 = sqrt(frustum[5][0] * frustum[5][0] + frustum[5][1] * frustum[5][1] + frustum[5][2] * frustum[5][2]);
-    frustum[5][0] /= f1;
-    frustum[5][1] /= f1;
-    frustum[5][2] /= f1;
-    frustum[5][3] /= f1;
-
-    printf("LEFT: %f %f %f %f\n", frustum[1][0], frustum[1][1], frustum[1][2], frustum[1][3]);
-    printf("RIGHT: %f %f %f %f\n", frustum[0][0], frustum[0][1], frustum[0][2], frustum[0][3]);
-    printf("BOTTOM: %f %f %f %f\n", frustum[2][0], frustum[2][1], frustum[2][2], frustum[2][3]);
-    printf("TOP: %f %f %f %f\n", frustum[3][0], frustum[3][1], frustum[3][2], frustum[3][3]);
-    printf("NEAR: %f %f %f %f\n", frustum[5][0], frustum[5][1], frustum[5][2], frustum[5][3]);
-    printf("FAR: %f %f %f %f\n", frustum[4][0], frustum[4][1], frustum[4][2], frustum[4][3]);
-
-#if 0
-    l.x = frustum[1][0]; l.y = frustum[1][1]; l.z = frustum[1][2]; l.w = frustum[1][3];
-    r.x = frustum[0][0]; r.y = frustum[0][1]; r.z = frustum[0][2]; r.w = frustum[0][3];
-    b.x = frustum[2][0]; b.y = frustum[2][1]; b.z = frustum[2][2]; b.w = frustum[2][3];
-    t.x = frustum[3][0]; t.y = frustum[3][1]; t.z = frustum[3][2]; t.w = frustum[3][3];
-    n.x = frustum[5][0]; n.y = frustum[5][1]; n.z = frustum[5][2]; n.w = frustum[5][3];
-    f.x = frustum[4][0]; f.y = frustum[4][1]; f.z = frustum[4][2]; f.w = frustum[4][3];
-#endif
-    //exit(0);
 }
 
 Quaternion::Quaternion(float Angle, const Vector3f& V)

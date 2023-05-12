@@ -767,7 +767,7 @@ public:
 
     //FrustumCulling() {}
 
-    FrustumCulling(const Matrix4f& V, const Matrix4f& ViewProj) : View(V)
+    FrustumCulling(const Matrix4f& ViewProj)
     {
         Update(ViewProj);
     }
@@ -798,17 +798,6 @@ public:
         Vector4f TopRightFar  = Center4 + Vector4f( HalfSize, HalfSize,  HalfSize, 1.0f);        
         Vector4f BottomLeftFar   = Center4 + Vector4f(-HalfSize, -HalfSize,  HalfSize, 1.0f);        
         Vector4f BottomRightFar  = Center4 + Vector4f( HalfSize, -HalfSize,  HalfSize, 1.0f);
-
-        TopLeftNear = View * TopLeftNear;
-        TopRightNear = View * TopRightNear;
-        BottomRightNear = View * BottomRightNear;
-        BottomLeftNear = View * BottomLeftNear;
-
-        TopLeftFar = View * TopLeftFar;
-        TopRightFar = View * TopRightFar;
-        BottomRightFar = View * BottomRightFar;
-        BottomLeftFar = View * BottomLeftFar;
-
 
         bool Inside = false;
 
@@ -861,16 +850,17 @@ public:
     }
 
 
-    bool IsPointInside(const Vector3f& p)
+    bool IsPointInsideViewFrustum(const Vector3f& p) const
     {
         Vector4f p4D(p, 1.0f);
 
         for (int i = 0; i < NUM_CLIP_PLANES; i++) {
             if (m_clipPlanes[i].Dot(p4D) > 0) {
-                printf("Inside clip plane %d\n", i);
+               // printf("Inside clip plane %d\n", i);
             }
             else {
-                printf("Outside clip plane %d\n", i);
+                return false;
+              //  printf("Outside clip plane %d\n", i);
             }
         }
 
@@ -880,7 +870,6 @@ public:
 private:
 
     Vector4f m_clipPlanes[NUM_CLIP_PLANES];
-    const Matrix4f& View;
 };
 
 void CalcTightLightProjection(const Matrix4f& CameraView,        // in
