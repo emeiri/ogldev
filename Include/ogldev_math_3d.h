@@ -765,9 +765,9 @@ public:
 
 #define NUM_CLIP_PLANES 6
 
-    FrustumCulling() {}
+    //FrustumCulling() {}
 
-    FrustumCulling(const Matrix4f& ViewProj)
+    FrustumCulling(const Matrix4f& V, const Matrix4f& ViewProj) : View(V)
     {
         Update(ViewProj);
     }
@@ -790,24 +790,42 @@ public:
         Vector4f Center4(Center, 1.0f);
 
         Vector4f TopLeftNear  = Center4 + Vector4f(-HalfSize, HalfSize, -HalfSize, 1.0f);
-        Vector4f TopLeftFar   = Center4 + Vector4f(-HalfSize, HalfSize,  HalfSize, 1.0f);
-        Vector4f TopRightNear = Center4 + Vector4f( HalfSize, HalfSize, -HalfSize, 1.0f);
-        Vector4f TopRightFar  = Center4 + Vector4f( HalfSize, HalfSize,  HalfSize, 1.0f);
+        Vector4f TopRightNear = Center4 + Vector4f(HalfSize, HalfSize, -HalfSize, 1.0f);
+        Vector4f BottomRightNear = Center4 + Vector4f(HalfSize, -HalfSize, -HalfSize, 1.0f);
+        Vector4f BottomLeftNear = Center4 + Vector4f(-HalfSize, -HalfSize, -HalfSize, 1.0f);
 
-        Vector4f BottomLeftNear  = Center4 + Vector4f(-HalfSize, -HalfSize, -HalfSize, 1.0f);
-        Vector4f BottomLeftFar   = Center4 + Vector4f(-HalfSize, -HalfSize,  HalfSize, 1.0f);
-        Vector4f BottomRightNear = Center4 + Vector4f( HalfSize, -HalfSize, -HalfSize, 1.0f);
+        Vector4f TopLeftFar   = Center4 + Vector4f(-HalfSize, HalfSize,  HalfSize, 1.0f);        
+        Vector4f TopRightFar  = Center4 + Vector4f( HalfSize, HalfSize,  HalfSize, 1.0f);        
+        Vector4f BottomLeftFar   = Center4 + Vector4f(-HalfSize, -HalfSize,  HalfSize, 1.0f);        
         Vector4f BottomRightFar  = Center4 + Vector4f( HalfSize, -HalfSize,  HalfSize, 1.0f);
 
-        for (int i = 0 ; i < NUM_CLIP_PLANES ; i++) {
+        TopLeftNear = View * TopLeftNear;
+        TopRightNear = View * TopRightNear;
+        BottomRightNear = View * BottomRightNear;
+        BottomLeftNear = View * BottomLeftNear;
 
-            if (m_clipPlanes[i].Dot(TopLeftNear) > 0) {
-                return true;
-            }
+        TopLeftFar = View * TopLeftFar;
+        TopRightFar = View * TopRightFar;
+        BottomRightFar = View * BottomRightFar;
+        BottomLeftFar = View * BottomLeftFar;
 
-            if (m_clipPlanes[i].Dot(TopLeftFar) > 0) {
-                return true;
-            }
+
+        bool Inside = false;
+
+        Inside = (m_clipPlanes[CP_LEFT].Dot(TopLeftFar) > 0) &&
+                 (m_clipPlanes[CP_RIGHT].Dot(TopLeftFar) > 0) &&
+                 (m_clipPlanes[CP_TOP].Dot(TopLeftFar) > 0) &&
+                 (m_clipPlanes[CP_BOTTOM].Dot(TopLeftFar) > 0) &&
+                 (m_clipPlanes[CP_NEAR].Dot(TopLeftFar) > 0) &&
+                 (m_clipPlanes[CP_FAR].Dot(TopLeftFar) > 0);
+        
+        return Inside;
+
+#if 0
+        if (m_clipPlanes[i].Dot(TopLeftNear) > 0) {
+            return true;
+        }
+
 
             if (m_clipPlanes[i].Dot(TopRightNear) > 0) {
                 return true;
@@ -834,12 +852,35 @@ public:
             }
         }
 
+     //   printf("outside\n");
+
+      //  exit(0);
+
         return false;
+#endif
+    }
+
+
+    bool IsPointInside(const Vector3f& p)
+    {
+        Vector4f p4D(p, 1.0f);
+
+        for (int i = 0; i < NUM_CLIP_PLANES; i++) {
+            if (m_clipPlanes[i].Dot(p4D) > 0) {
+                printf("Inside clip plane %d\n", i);
+            }
+            else {
+                printf("Outside clip plane %d\n", i);
+            }
+        }
+
+        return true;
     }
 
 private:
 
     Vector4f m_clipPlanes[NUM_CLIP_PLANES];
+    const Matrix4f& View;
 };
 
 void CalcTightLightProjection(const Matrix4f& CameraView,        // in
@@ -851,6 +892,6 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
 int CalcNextPowerOfTwo(int x);
 
 
-bool IsPointInsideViewFrustum(const Matrix4f& VP, const Vector3f& p);
+bool IsPointInsideViewFrustum(const Vector3f& p, const Matrix4f& VP);
 
 #endif  /* MATH_3D_H */
