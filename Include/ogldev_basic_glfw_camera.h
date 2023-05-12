@@ -57,6 +57,8 @@ public:
 
     Matrix4f GetViewProjMatrix() const;
 
+    Matrix4f GetViewMatrix() const { return GetMatrix(); }
+
     void Print() const { printf("Pos "); m_pos.Print(); printf("Target "); m_target.Print(); }
 
     PersProjInfo m_persProjInfo;
