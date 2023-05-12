@@ -18,7 +18,7 @@
 
 #ifdef VULKAN
 
-#ifndef WIN32
+#ifndef _WIN64
 
 #include <stdio.h>
 #include <stdlib.h>
