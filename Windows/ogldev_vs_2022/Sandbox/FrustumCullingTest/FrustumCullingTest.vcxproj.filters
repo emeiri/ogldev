@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Sandbox\FrustumCullingTest\frustum_culling_test.cpp" />
+    <ClCompile Include="..\..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
+    <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
+  </ItemGroup>
+</Project>
