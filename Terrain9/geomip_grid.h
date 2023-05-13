@@ -76,6 +76,8 @@ class GeomipGrid {
 
     bool IsPatchInsideViewFrustum_WorldSpace(int X, int Z, const FrustumCulling& FC);
 
+    bool IsCameraInPatch(const Vector3f& CameraPos, int X, int Z);
+
     int m_width = 0;
     int m_depth = 0;
     int m_patchSize = 0;

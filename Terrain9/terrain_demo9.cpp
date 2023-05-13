@@ -254,7 +254,7 @@ private:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
-        float zNear = 0.1f;
+        float zNear = 0.01f;
         float zFar = Z_FAR;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 

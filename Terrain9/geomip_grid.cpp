@@ -396,9 +396,11 @@ void GeomipGrid::Render(const Vector3f& CameraPos, Matrix4f& ViewProj)
 
                 int x = PatchX * (m_patchSize - 1);
                 int z = PatchZ * (m_patchSize - 1);
+
+                if ((float)x * m_worldScale)
               
-                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc)) {
-                //if (!IsPatchInsideViewFrustum_ViewSpace(x, z, ViewProj)) {
+                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc) && !IsCameraInPatch(CameraPos, x, z)) {
+                //if (!IsPatchInsideViewFrustum_ViewSpace(x, z, ViewProj) {
                     printf("0 ");
                     continue;
                 }
@@ -458,17 +460,51 @@ bool GeomipGrid::IsPatchInsideViewFrustum_WorldSpace(int X, int Z, const Frustum
     int z0 = Z;
     int z1 = Z + m_patchSize - 1;
 
-    Vector3f p00((float)x0 * m_worldScale, m_pTerrain->GetHeight(x0, z0), (float)z0 * m_worldScale);
-    Vector3f p01((float)x0 * m_worldScale, m_pTerrain->GetHeight(x0, z1), (float)z1 * m_worldScale);
-    Vector3f p10((float)x1 * m_worldScale, m_pTerrain->GetHeight(x1, z0), (float)z0 * m_worldScale);
-    Vector3f p11((float)x1 * m_worldScale, m_pTerrain->GetHeight(x1, z1), (float)z1 * m_worldScale);
+    float h00 = m_pTerrain->GetHeight(x0, z0);
+    float h01 = m_pTerrain->GetHeight(x0, z1);
+    float h10 = m_pTerrain->GetHeight(x1, z0);
+    float h11 = m_pTerrain->GetHeight(x1, z1);
 
-    bool InsideViewFrustm = fc.IsPointInsideViewFrustum(p00) ||
-                            fc.IsPointInsideViewFrustum(p01) ||
-                            fc.IsPointInsideViewFrustum(p10) ||
-                            fc.IsPointInsideViewFrustum(p11);
+    float MinHeight = std::min(h00, std::min(h01, std::min(h10, h11)));
+    float MaxHeight = std::max(h00, std::max(h01, std::max(h10, h11)));
+
+    Vector3f p00_low((float)x0 * m_worldScale, MinHeight, (float)z0 * m_worldScale);
+    Vector3f p01_low((float)x0 * m_worldScale, MinHeight, (float)z1 * m_worldScale);
+    Vector3f p10_low((float)x1 * m_worldScale, MinHeight, (float)z0 * m_worldScale);
+    Vector3f p11_low((float)x1 * m_worldScale, MinHeight, (float)z1 * m_worldScale);
+
+    Vector3f p00_high((float)x0 * m_worldScale, MaxHeight, (float)z0 * m_worldScale);
+    Vector3f p01_high((float)x0 * m_worldScale, MaxHeight, (float)z1 * m_worldScale);
+    Vector3f p10_high((float)x1 * m_worldScale, MaxHeight, (float)z0 * m_worldScale);
+    Vector3f p11_high((float)x1 * m_worldScale, MaxHeight, (float)z1 * m_worldScale);
+
+    bool InsideViewFrustm = 
+        fc.IsPointInsideViewFrustum(p00_low) ||
+        fc.IsPointInsideViewFrustum(p01_low) ||
+        fc.IsPointInsideViewFrustum(p10_low) ||
+        fc.IsPointInsideViewFrustum(p11_low) ||
+        fc.IsPointInsideViewFrustum(p00_high) ||
+        fc.IsPointInsideViewFrustum(p01_high) ||
+        fc.IsPointInsideViewFrustum(p10_high) ||
+        fc.IsPointInsideViewFrustum(p11_high);
 
     return InsideViewFrustm;
+}
+
+
+bool GeomipGrid::IsCameraInPatch(const Vector3f& CameraPos, int X, int Z)
+{
+    float x0 = (float)(X - 2 * m_patchSize) * m_worldScale;
+    float x1 = (float)(X + 2 * m_patchSize) * m_worldScale;
+    float z0 = (float)(Z - 2 * m_patchSize) * m_worldScale;
+    float z1 = (float)(Z + 2 * m_patchSize) * m_worldScale;
+
+    bool CameraInPatch = (CameraPos.x >= x0) &&
+                         (CameraPos.x <= x1) &&
+                         (CameraPos.z >= z0) &&
+                         (CameraPos.z <= z1);
+
+    return CameraInPatch;
 }
 
 
