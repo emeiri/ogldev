@@ -349,6 +349,17 @@ inline Vector4f operator+(const Vector4f& l, const Vector4f& r)
 }
 
 
+inline Vector4f operator-(const Vector4f& l, const Vector4f& r)
+{
+    Vector4f Ret(l.x - r.x,
+                 l.y - r.y,
+                 l.z - r.z,
+                 l.w - r.w);
+
+    return Ret;
+}
+
+
 inline Vector4f operator/(const Vector4f& l, float f)
 {
     Vector4f Ret(l.x / f,
@@ -756,16 +767,6 @@ class FrustumCulling
 {
 public:
 
-#define CP_LEFT   0
-#define CP_RIGHT  1
-#define CP_BOTTOM 2
-#define CP_TOP    3
-#define CP_NEAR   4
-#define CP_FAR    5
-
-#define NUM_CLIP_PLANES 6
-
-    //FrustumCulling() {}
 
     FrustumCulling(const Matrix4f& ViewProj)
     {
@@ -774,17 +775,18 @@ public:
 
     void Update(const Matrix4f& ViewProj)
     {
-        ViewProj.CalcClipPlanes(m_clipPlanes[CP_LEFT],
-                                m_clipPlanes[CP_RIGHT],
-                                m_clipPlanes[CP_BOTTOM],
-                                m_clipPlanes[CP_TOP],
-                                m_clipPlanes[CP_NEAR],
-                                m_clipPlanes[CP_FAR]);
+        ViewProj.CalcClipPlanes(m_leftClipPlane,
+                                m_rightClipPlane,
+                                m_bottomClipPlane,
+                                m_topClipPlane,
+                                m_nearClipPlane,
+                                m_farClipPlane);
     }
 
 
     bool IsCubeInside(const Vector3f& Center, float Size)
     {
+#if 0
         float HalfSize = Size / 2.0f;
 
         Vector4f Center4(Center, 1.0f);
@@ -801,52 +803,15 @@ public:
 
         bool Inside = false;
 
-        Inside = (m_clipPlanes[CP_LEFT].Dot(TopLeftFar) > 0) &&
-                 (m_clipPlanes[CP_RIGHT].Dot(TopLeftFar) > 0) &&
-                 (m_clipPlanes[CP_TOP].Dot(TopLeftFar) > 0) &&
-                 (m_clipPlanes[CP_BOTTOM].Dot(TopLeftFar) > 0) &&
-                 (m_clipPlanes[CP_NEAR].Dot(TopLeftFar) > 0) &&
-                 (m_clipPlanes[CP_FAR].Dot(TopLeftFar) > 0);
-        
-        return Inside;
+        Inside = (m_clipPlanes[CP_LEFT].Dot(TopLeftFar)   <= 0) &&
+                 (m_clipPlanes[CP_RIGHT].Dot(TopLeftFar)  >= 0) &&
+                 (m_clipPlanes[CP_TOP].Dot(TopLeftFar)    <= 0) &&
+                 (m_clipPlanes[CP_BOTTOM].Dot(TopLeftFar) >= 0) &&
+                 (m_clipPlanes[CP_NEAR].Dot(TopLeftFar)   >= 0) &&
+                 (m_clipPlanes[CP_FAR].Dot(TopLeftFar)    >= 0);
+#endif 
+        return true;// Inside;
 
-#if 0
-        if (m_clipPlanes[i].Dot(TopLeftNear) > 0) {
-            return true;
-        }
-
-
-            if (m_clipPlanes[i].Dot(TopRightNear) > 0) {
-                return true;
-            }
-
-            if (m_clipPlanes[i].Dot(TopRightFar) > 0) {
-                return true;
-            }
-
-            if (m_clipPlanes[i].Dot(BottomLeftNear) > 0) {
-                return true;
-            }
-
-            if (m_clipPlanes[i].Dot(BottomLeftFar) > 0) {
-                return true;
-            }
-
-            if (m_clipPlanes[i].Dot(BottomRightNear) > 0) {
-                return true;
-            }
-
-            if (m_clipPlanes[i].Dot(BottomRightFar) > 0) {
-                return true;
-            }
-        }
-
-     //   printf("outside\n");
-
-      //  exit(0);
-
-        return false;
-#endif
     }
 
 
@@ -854,22 +819,25 @@ public:
     {
         Vector4f p4D(p, 1.0f);
 
-        for (int i = 0; i < NUM_CLIP_PLANES; i++) {
-            if (m_clipPlanes[i].Dot(p4D) > 0) {
-               // printf("Inside clip plane %d\n", i);
-            }
-            else {
-                return false;
-              //  printf("Outside clip plane %d\n", i);
-            }
-        }
+        bool Inside =
+            (m_leftClipPlane.Dot(p4D) >= 0) &&
+            (m_rightClipPlane.Dot(p4D) <= 0) &&
+            (m_topClipPlane.Dot(p4D) <= 0) &&
+            (m_bottomClipPlane.Dot(p4D) >= 0) &&
+            (m_nearClipPlane.Dot(p4D) >= 0) &&
+            (m_farClipPlane.Dot(p4D) <= 0);
 
-        return true;
+        return Inside;
     }
 
 private:
 
-    Vector4f m_clipPlanes[NUM_CLIP_PLANES];
+    Vector4f m_leftClipPlane;
+    Vector4f m_rightClipPlane;
+    Vector4f m_bottomClipPlane;
+    Vector4f m_topClipPlane;
+    Vector4f m_nearClipPlane;
+    Vector4f m_farClipPlane;
 };
 
 void CalcTightLightProjection(const Matrix4f& CameraView,        // in

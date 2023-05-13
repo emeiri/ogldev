@@ -342,12 +342,12 @@ void Matrix4f::CalcClipPlanes(Vector4f& l, Vector4f& r, Vector4f& b, Vector4f& t
     Vector4f Row3(m[2][0], m[2][1], m[2][2], m[2][3]);
     Vector4f Row4(m[3][0], m[3][1], m[3][2], m[3][3]);
 
-    l =         Row1 + Row4;
-    r = -1.0f * Row1 + Row4;
-    b =         Row2 + Row4;
-    t = -1.0f * Row2 + Row4;
-    n =         Row3 + Row4;
-    f = -1.0f * Row3 + Row4;
+    l = Row1 + Row4;
+    r = Row1 - Row4;
+    b = Row2 + Row4;
+    t = Row2 - Row4;
+    n = Row3 + Row4;
+    f = Row3 - Row4;
 }
 
 Quaternion::Quaternion(float Angle, const Vector3f& V)
