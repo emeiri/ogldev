@@ -399,7 +399,7 @@ void GeomipGrid::Render(const Vector3f& CameraPos, Matrix4f& ViewProj)
 
                 if ((float)x * m_worldScale)
               
-                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc) && !IsCameraInPatch(CameraPos, x, z)) {
+                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc)/* && !IsCameraInPatch(CameraPos, x, z)*/) {
                 //if (!IsPatchInsideViewFrustum_ViewSpace(x, z, ViewProj) {
                     printf("0 ");
                     continue;

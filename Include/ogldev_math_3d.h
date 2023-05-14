@@ -784,48 +784,17 @@ public:
     }
 
 
-    bool IsCubeInside(const Vector3f& Center, float Size)
-    {
-#if 0
-        float HalfSize = Size / 2.0f;
-
-        Vector4f Center4(Center, 1.0f);
-
-        Vector4f TopLeftNear  = Center4 + Vector4f(-HalfSize, HalfSize, -HalfSize, 1.0f);
-        Vector4f TopRightNear = Center4 + Vector4f(HalfSize, HalfSize, -HalfSize, 1.0f);
-        Vector4f BottomRightNear = Center4 + Vector4f(HalfSize, -HalfSize, -HalfSize, 1.0f);
-        Vector4f BottomLeftNear = Center4 + Vector4f(-HalfSize, -HalfSize, -HalfSize, 1.0f);
-
-        Vector4f TopLeftFar   = Center4 + Vector4f(-HalfSize, HalfSize,  HalfSize, 1.0f);        
-        Vector4f TopRightFar  = Center4 + Vector4f( HalfSize, HalfSize,  HalfSize, 1.0f);        
-        Vector4f BottomLeftFar   = Center4 + Vector4f(-HalfSize, -HalfSize,  HalfSize, 1.0f);        
-        Vector4f BottomRightFar  = Center4 + Vector4f( HalfSize, -HalfSize,  HalfSize, 1.0f);
-
-        bool Inside = false;
-
-        Inside = (m_clipPlanes[CP_LEFT].Dot(TopLeftFar)   <= 0) &&
-                 (m_clipPlanes[CP_RIGHT].Dot(TopLeftFar)  >= 0) &&
-                 (m_clipPlanes[CP_TOP].Dot(TopLeftFar)    <= 0) &&
-                 (m_clipPlanes[CP_BOTTOM].Dot(TopLeftFar) >= 0) &&
-                 (m_clipPlanes[CP_NEAR].Dot(TopLeftFar)   >= 0) &&
-                 (m_clipPlanes[CP_FAR].Dot(TopLeftFar)    >= 0);
-#endif 
-        return true;// Inside;
-
-    }
-
-
     bool IsPointInsideViewFrustum(const Vector3f& p) const
     {
         Vector4f p4D(p, 1.0f);
 
         bool Inside =
-            (m_leftClipPlane.Dot(p4D) >= 0) &&
-            (m_rightClipPlane.Dot(p4D) <= 0) &&
-            (m_topClipPlane.Dot(p4D) <= 0) &&
+            (m_leftClipPlane.Dot(p4D)   >= 0) &&
+            (m_rightClipPlane.Dot(p4D)  <= 0) &&
+            (m_topClipPlane.Dot(p4D)    <= 0) &&
             (m_bottomClipPlane.Dot(p4D) >= 0) &&
-            (m_nearClipPlane.Dot(p4D) >= 0) &&
-            (m_farClipPlane.Dot(p4D) <= 0);
+            (m_nearClipPlane.Dot(p4D)   >= 0) &&
+            (m_farClipPlane.Dot(p4D)    <= 0);
 
         return Inside;
     }
