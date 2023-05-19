@@ -51,15 +51,15 @@ static int g_seed = 0;
 extern int gShowPoints;
 
 
-class TerrainDemo7
+class TerrainDemo9
 {
 public:
 
-    TerrainDemo7()
+    TerrainDemo9()
     {
     }
 
-    virtual ~TerrainDemo7()
+    virtual ~TerrainDemo9()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -233,7 +233,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 7");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Terrain Rendering - Demo 9");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -314,7 +314,7 @@ private:
     float m_counter = 0.0f;
 };
 
-TerrainDemo7* app = NULL;
+TerrainDemo9* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -349,7 +349,7 @@ int main(int argc, char** argv)
 
     srand(g_seed);
 
-    app = new TerrainDemo7();
+    app = new TerrainDemo9();
 
     app->Init();
 

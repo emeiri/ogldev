@@ -40,7 +40,7 @@ class GeomipGrid {
 
     void Destroy();
 
-    void Render(const Vector3f& CameraPos, Matrix4f& ViewProj);
+    void Render(const Vector3f& CameraPos, const Matrix4f& ViewProj);
 
  private:
 

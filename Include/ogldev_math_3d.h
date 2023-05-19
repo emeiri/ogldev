@@ -767,7 +767,6 @@ class FrustumCulling
 {
 public:
 
-
     FrustumCulling(const Matrix4f& ViewProj)
     {
         Update(ViewProj);
@@ -782,7 +781,6 @@ public:
                                 m_nearClipPlane,
                                 m_farClipPlane);
     }
-
 
     bool IsPointInsideViewFrustum(const Vector3f& p) const
     {

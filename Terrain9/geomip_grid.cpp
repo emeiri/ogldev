@@ -375,7 +375,7 @@ void GeomipGrid::CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& I
 }
 
 
-void GeomipGrid::Render(const Vector3f& CameraPos, Matrix4f& ViewProj)
+void GeomipGrid::Render(const Vector3f& CameraPos, const Matrix4f& ViewProj)
 {
     m_lodManager.Update(CameraPos);
 
@@ -396,11 +396,8 @@ void GeomipGrid::Render(const Vector3f& CameraPos, Matrix4f& ViewProj)
 
                 int x = PatchX * (m_patchSize - 1);
                 int z = PatchZ * (m_patchSize - 1);
-
-                if ((float)x * m_worldScale)
-              
-                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc)/* && !IsCameraInPatch(CameraPos, x, z)*/) {
-                //if (!IsPatchInsideViewFrustum_ViewSpace(x, z, ViewProj) {
+            
+                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc)) {
                     printf("0 ");
                     continue;
                 }
