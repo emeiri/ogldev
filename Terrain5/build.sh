@@ -5,7 +5,7 @@ CC=g++
 CPPFLAGS=`pkg-config --cflags glew glfw3`
 CPPFLAGS="$CPPFLAGS -I$OGLDEV_DIR/Include -I$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW -ggdb3"
 LDFLAGS=`pkg-config --libs glew glfw3`
-LDFLAGS="$LDFLAGS -lX11"
+LDFLAGS="$LDFLAGS -lX11 -ldl"
 SOURCES="terrain_demo5.cpp \
 	triangle_list.cpp \
 	terrain_technique.cpp \
