@@ -24,6 +24,7 @@
     <ProjectGuid>{892bd692-485d-4406-8d87-43eb0f16f290}</ProjectGuid>
     <RootNamespace>DemoLITION</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>DemoLITION_Framework</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -118,7 +119,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\Include;..\..\..\Include\assimp5</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,7 +139,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\Include;..\..\..\Include\assimp5</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -151,13 +152,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DemoLITION\Include\demolition.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_renderer.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem_gl.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\framework.h" />
     <ClInclude Include="..\..\..\Include\ogldev_math_3d.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_rendering_subsystem.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_rendering_subsystem_gl.h" />
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
     <ClInclude Include="..\..\..\Include\ogldev_skinned_mesh.h" />
-    <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
@@ -165,17 +167,17 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_forward_lighting.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_forward_skinning.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_rendering_subsystem.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_rendering_subsystem_gl.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_renderer.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem_gl.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

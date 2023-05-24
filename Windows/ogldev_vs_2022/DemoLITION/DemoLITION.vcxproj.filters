@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_math_3d.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_rendering_subsystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_rendering_subsystem_gl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
@@ -33,7 +24,19 @@
     <ClInclude Include="..\..\..\Include\ogldev_skinned_mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Include\demolition.h">
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem_gl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,19 +56,10 @@
     <ClCompile Include="..\..\..\Common\ogldev_forward_lighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_forward_renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_forward_skinning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_rendering_subsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_rendering_subsystem_gl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
@@ -87,6 +81,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem_gl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

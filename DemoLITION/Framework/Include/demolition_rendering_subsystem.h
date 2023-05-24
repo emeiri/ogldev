@@ -18,8 +18,7 @@
 */
 
 
-#ifndef OGLDEV_RENDERING_SUBSYSTEM_H
-#define OGLDEV_RENDERING_SUBSYSTEM_H
+#pragma once
 
 #include "ogldev_types.h"
 #include "demolition.h"
@@ -51,7 +50,7 @@ enum RENDERING_SUBSYSTEM {
 class BasicCamera;
 
 
-class DEMOLITION_EXPORTS BaseRenderingSubsystem
+class DEMOLITION_API BaseRenderingSubsystem
 {
  public:
 
@@ -86,4 +85,3 @@ class DEMOLITION_EXPORTS BaseRenderingSubsystem
 
 };
 
-#endif

@@ -113,11 +113,10 @@ public:
         float AnimationTimeSec = ((float)(m_pRenderingSubsystem->GetElapsedTimeMillis())) / 1000.0f;
 
         m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
-        //m_renderer.Render(m_pMesh);
 
         m_renderer.Render(m_scene);
 
-        //m_renderer.RenderAnimation(m_pMesh1, AnimationTimeSec);
+      //  m_renderer.RenderAnimation(m_pMesh1, AnimationTimeSec);
     }
 
 
@@ -197,7 +196,7 @@ private:
         m_pMesh1->SetRotation(90.0f, 0.0f, 0.0f);
         m_pMesh1->SetScale(0.05f);
 
-        m_scene.m_pMesh = m_pMesh;
+        m_scene.m_pMesh = m_pMesh1;
     }
 
     BasicMesh* m_pMesh = NULL;
