@@ -63,6 +63,8 @@ public:
 
     PersProjInfo m_persProjInfo;
 
+    void SetSpeed(float Speed);
+
 private:
 
     void Init();

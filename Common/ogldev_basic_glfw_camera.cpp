@@ -308,3 +308,14 @@ Matrix4f BasicCamera::GetViewProjMatrix() const
     Matrix4f ViewProj = Projection * View;
     return ViewProj;
 }
+
+
+void BasicCamera::SetSpeed(float Speed)
+{
+    if (Speed <= 0.0f) {
+        printf("Invalid camera speed %f\n", Speed);
+        exit(0);
+    }
+
+    m_speed = Speed;
+}
