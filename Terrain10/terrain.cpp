@@ -75,25 +75,24 @@ void BaseTerrain::Finalize()
 
 float BaseTerrain::GetHeightInterpolated(float x, float z) const
 {
-    float BaseHeight = GetHeight((int)x, (int)z);
+    float X0Z0Height = (float)GetHeight((int)x, (int)z);
 
     if (((int)x + 1 >= m_terrainSize) ||  ((int)z + 1 >= m_terrainSize)) {
-        return BaseHeight;
+        return X0Z0Height;
     }
 
-    float NextXHeight = GetHeight((int)x + 1, (int)z);
+    float X1Z0Height = (float)GetHeight((int)x + 1, (int)z);
+    float X0Z1Height = (float)GetHeight((int)x, (int)z + 1);
+    float X1Z1Height = (float)GetHeight((int)x + 1, (int)z + 1);
 
     float RatioX = x - floorf(x);
 
-    float InterpolatedHeightX = (float)(NextXHeight - BaseHeight) * RatioX + (float)BaseHeight;
-
-    float NextZHeight = GetHeight((int)x, (int)z + 1);
+    float InterpolatedBottom = (X1Z0Height - X0Z0Height) * RatioX + X0Z0Height;
+    float InterpolatedTop    = (X1Z1Height - X0Z1Height) * RatioX + X0Z1Height;
 
     float RatioZ = z - floorf(z);
 
-    float InterpolatedHeightZ = (float)(NextZHeight - BaseHeight) * RatioZ + (float)BaseHeight;
-
-    float FinalHeight = (InterpolatedHeightX + InterpolatedHeightZ) / 2.0f;
+    float FinalHeight = (InterpolatedTop - InterpolatedBottom) * RatioZ + InterpolatedBottom;
 
     return FinalHeight;
 }
@@ -185,4 +184,13 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
 void BaseTerrain::SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height)
 {
     m_terrainTech.SetTextureHeights(Tex0Height, Tex1Height, Tex2Height, Tex3Height); 
+}
+
+
+float BaseTerrain::GetWorldHeight(float x, float z) const
+{
+    float HeightMapX = x / m_worldScale;
+    float HeightMapZ = z / m_worldScale;
+
+    return GetHeightInterpolated(HeightMapX, HeightMapZ);
 }

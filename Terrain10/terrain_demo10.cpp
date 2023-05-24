@@ -69,11 +69,11 @@ public:
     {
         CreateWindow_(); // added '_' because of conflict with Windows.h
 
-        InitCallbacks();
-
-        InitCamera();
+        InitCallbacks();        
 
         InitTerrain();
+
+        InitCamera();
 
         InitGUI();
     }
@@ -218,6 +218,8 @@ public:
         }
 
         m_pGameCamera->OnKeyboard(key);
+
+        ConstrainCameraToTerrain();
     }
 
 
@@ -249,7 +251,10 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, m_maxHeight + 100.0f, -150.0f);
+        float CameraX = m_terrain.GetWorldSize() / 2.0f;
+        float CameraZ = CameraX;
+        float CameraY = m_terrain.GetWorldHeight(CameraX, CameraZ) + m_cameraHeight;
+        Vector3f Pos(CameraX, CameraY, CameraZ);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -259,13 +264,14 @@ private:
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+        m_pGameCamera->SetSpeed(0.05f);
     }
     
 
     void InitTerrain()
     {
         float WorldScale = 2.0f;
-        float TextureScale = 4.0f;
+        float TextureScale = 10.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
@@ -299,6 +305,33 @@ private:
         ImGui_ImplOpenGL3_Init(glsl_version);
     }
 
+    void ConstrainCameraToTerrain()
+    {
+        Vector3f CameraPos = m_pGameCamera->GetPos();
+
+        if (CameraPos.x < 0.0f) {
+            CameraPos.x = 0.0f;
+        }
+
+        if (CameraPos.z < 0.0f) {
+            CameraPos.z = 0.0f;
+        }
+
+        if (CameraPos.x >= m_terrain.GetWorldSize()) {
+            CameraPos.x = m_terrain.GetWorldSize() - 0.5f;
+        }
+
+        if (CameraPos.z >= m_terrain.GetWorldSize()) {
+            CameraPos.z = m_terrain.GetWorldSize() - 0.5f;
+        }
+
+        if ((CameraPos.y > m_terrain.GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight) ||
+            (CameraPos.y < m_terrain.GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight)) {
+            CameraPos.y = m_terrain.GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight;
+            m_pGameCamera->SetPosition(CameraPos);
+        }
+    }
+
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
@@ -312,6 +345,7 @@ private:
     float m_maxHeight = 150.0f;
     int m_patchSize = 33;
     float m_counter = 0.0f;
+    float m_cameraHeight = 2.0f;
 };
 
 TerrainDemo10* app = NULL;

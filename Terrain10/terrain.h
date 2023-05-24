@@ -61,6 +61,10 @@ class BaseTerrain
 
     float GetMaxHeight() const { return m_maxHeight; }
 
+    float GetWorldSize() const { return m_terrainSize * m_worldScale; }
+
+    float GetWorldHeight(float x, float z) const;
+
  protected:
 
 	void LoadHeightMapFile(const char* pFilename);
