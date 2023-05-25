@@ -214,6 +214,9 @@ public:
                 gShowPoints = 2;
                 break;
 
+            case GLFW_KEY_3:
+                gShowPoints = 3;
+                break;
             }
         }
 

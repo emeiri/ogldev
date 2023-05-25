@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include <conio.h>
 
 #include "ogldev_math_3d.h"
 #include "geomip_grid.h"
@@ -91,6 +92,9 @@ void GeomipGrid::CreateGeomipGrid(int Width, int Depth, int PatchSize, const Bas
     m_worldScale = pTerrain->GetWorldScale();
     m_maxLOD = m_lodManager.InitLodManager(PatchSize, m_numPatchesX, m_numPatchesZ, m_worldScale);
     m_lodInfo.resize(m_maxLOD + 1);
+
+    m_patchWorldSize = (m_patchSize - 1) * m_worldScale;  // m_patchSize is in vertices and PatchSize is the actual size (2 vertices --> size 1)
+    m_patchWorldHalfSize = m_patchWorldSize / 2.0f;
 
     CreateGLState();
 
@@ -375,8 +379,18 @@ void GeomipGrid::CalcNormals(std::vector<Vertex>& Vertices, std::vector<uint>& I
 }
 
 
+void clrscr()
+{
+    std::system("cls");
+}
+
 void GeomipGrid::Render(const Vector3f& CameraPos, const Matrix4f& ViewProj)
 {
+#ifdef _WIN64
+    if (gShowPoints == 3) {
+        clrscr();
+    }
+#endif
     m_lodManager.Update(CameraPos);
 
     FrustumCulling fc(ViewProj);
@@ -388,21 +402,25 @@ void GeomipGrid::Render(const Vector3f& CameraPos, const Matrix4f& ViewProj)
     }
 
     if (gShowPoints != 2) {
-        float PatchSize = ((float)m_patchSize - 1.0f) * m_worldScale;  // m_patchSize is in vertices and PatchSize is the actual size (2 vertices --> size 1)
-        float HalfPatchSize =  PatchSize / 2.0f;
-
         for (int PatchZ = 0 ; PatchZ < m_numPatchesZ ; PatchZ++) {
             for (int PatchX = 0 ; PatchX < m_numPatchesX ; PatchX++) {
 
                 int x = PatchX * (m_patchSize - 1);
-                int z = PatchZ * (m_patchSize - 1);
-            
-                if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc)) {
-                    printf("0 ");
-                    continue;
-                }
-                else {
-                   printf("1 ");
+                int z = PatchZ * (m_patchSize - 1);  
+
+                float x0 = x * m_worldScale;
+                float x1 = (x + m_patchSize - 1) * m_worldScale;
+                float z0 = z * m_worldScale;
+                float z1 = (z + m_patchSize - 1) * m_worldScale;
+
+                if (IsCameraInPatch(CameraPos, x, z)) {
+                    // continue to draw call
+                } else if (!IsPatchInsideViewFrustum_WorldSpace(x, z, fc)) {
+                    if (!IsCameraCloseToPatch(CameraPos, x, z)) {
+                        continue;
+                    }
+                } else {
+                    if (gShowPoints == 3) printf(" (1)  ");
                 }
 
                 const LodManager::PatchLod& plod = m_lodManager.GetPatchLod(PatchX, PatchZ);
@@ -420,11 +438,13 @@ void GeomipGrid::Render(const Vector3f& CameraPos, const Matrix4f& ViewProj)
                                          GL_UNSIGNED_INT, (void*)BaseIndex, BaseVertex);
             }
 
-            printf("\n");
+            if (gShowPoints == 3)  printf("\n");
         }
     }
 
     glBindVertexArray(0);
+
+    gShowPoints = 0;
 }
 
 
@@ -465,43 +485,68 @@ bool GeomipGrid::IsPatchInsideViewFrustum_WorldSpace(int X, int Z, const Frustum
     float MinHeight = std::min(h00, std::min(h01, std::min(h10, h11)));
     float MaxHeight = std::max(h00, std::max(h01, std::max(h10, h11)));
 
-    Vector3f p00_low((float)x0 * m_worldScale, MinHeight, (float)z0 * m_worldScale);
-    Vector3f p01_low((float)x0 * m_worldScale, MinHeight, (float)z1 * m_worldScale);
-    Vector3f p10_low((float)x1 * m_worldScale, MinHeight, (float)z0 * m_worldScale);
-    Vector3f p11_low((float)x1 * m_worldScale, MinHeight, (float)z1 * m_worldScale);
+    Vector3f p00_low((float)x0 * m_worldScale, h00, (float)z0 * m_worldScale);
+    Vector3f p01_low((float)x0 * m_worldScale, h01, (float)z1 * m_worldScale);
+    Vector3f p10_low((float)x1 * m_worldScale, h10, (float)z0 * m_worldScale);
+    Vector3f p11_low((float)x1 * m_worldScale, h11, (float)z1 * m_worldScale);
 
-    Vector3f p00_high((float)x0 * m_worldScale, MaxHeight, (float)z0 * m_worldScale);
+  /*  Vector3f p00_high((float)x0 * m_worldScale, MaxHeight, (float)z0 * m_worldScale);
     Vector3f p01_high((float)x0 * m_worldScale, MaxHeight, (float)z1 * m_worldScale);
     Vector3f p10_high((float)x1 * m_worldScale, MaxHeight, (float)z0 * m_worldScale);
-    Vector3f p11_high((float)x1 * m_worldScale, MaxHeight, (float)z1 * m_worldScale);
+    Vector3f p11_high((float)x1 * m_worldScale, MaxHeight, (float)z1 * m_worldScale);*/
 
-    bool InsideViewFrustm = 
+    bool InsideViewFrustm =
         fc.IsPointInsideViewFrustum(p00_low) ||
         fc.IsPointInsideViewFrustum(p01_low) ||
         fc.IsPointInsideViewFrustum(p10_low) ||
-        fc.IsPointInsideViewFrustum(p11_low) ||
-        fc.IsPointInsideViewFrustum(p00_high) ||
+        fc.IsPointInsideViewFrustum(p11_low);// ||
+     /*   fc.IsPointInsideViewFrustum(p00_high) ||
         fc.IsPointInsideViewFrustum(p01_high) ||
         fc.IsPointInsideViewFrustum(p10_high) ||
-        fc.IsPointInsideViewFrustum(p11_high);
+        fc.IsPointInsideViewFrustum(p11_high);*/
 
     return InsideViewFrustm;
 }
 
 
-bool GeomipGrid::IsCameraInPatch(const Vector3f& CameraPos, int X, int Z)
+bool GeomipGrid::IsCameraInPatch(const Vector3f& CameraPos, int PatchBaseX, int PatchBaseZ)
 {
-    float x0 = (float)(X - 2 * m_patchSize) * m_worldScale;
-    float x1 = (float)(X + 2 * m_patchSize) * m_worldScale;
-    float z0 = (float)(Z - 2 * m_patchSize) * m_worldScale;
-    float z1 = (float)(Z + 2 * m_patchSize) * m_worldScale;
+    float x0 = PatchBaseX * m_worldScale;
+    float x1 = (PatchBaseX + m_patchSize - 1) * m_worldScale;
+    float z0 = PatchBaseZ * m_worldScale;
+    float z1 = (PatchBaseZ + m_patchSize - 1) * m_worldScale;
 
-    bool CameraInPatch = (CameraPos.x >= x0) &&
-                         (CameraPos.x <= x1) &&
-                         (CameraPos.z >= z0) &&
-                         (CameraPos.z <= z1);
+    bool CameraInPatch = ((CameraPos.x >= x0) &&
+                          (CameraPos.x < x1) &&
+                          (CameraPos.z >= z0) &&
+                          (CameraPos.z < z1));
+
+    if (CameraInPatch && (gShowPoints == 3)) {
+        printf(" (C)  ");
+    }
 
     return CameraInPatch;
+}
+
+
+bool GeomipGrid::IsCameraCloseToPatch(const Vector3f& CameraPos, int PatchBaseX, int PatchBaseZ)
+{
+    Vector3f PatchWorldBase(PatchBaseX * m_worldScale, 0.0f, PatchBaseZ * m_worldScale);
+    Vector3f PatchWorldCenter = PatchWorldBase + Vector3f(m_patchWorldHalfSize, 0.0f, m_patchWorldHalfSize);
+    Vector3f CameraPosZeroY = Vector3f(CameraPos.x, 0.0f, CameraPos.z);
+    float CameraToPatchCenter = CameraPosZeroY.Distance(PatchWorldCenter);
+
+    bool CameraCloseToPatch = (CameraToPatchCenter <= m_patchWorldSize * 2.0f);
+
+    if (gShowPoints == 3) {
+        if (CameraCloseToPatch) {
+            printf(" (2)  ");
+        } else {
+            printf("%05.1f ", CameraToPatchCenter);
+        }
+    }
+
+    return CameraCloseToPatch;
 }
 
 
