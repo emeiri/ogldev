@@ -55,6 +55,8 @@ public:
         ImageHeight = m_imageHeight;
     }
 
+    GLuint GetTexture() const { return m_textureObj; }
+
 private:
     void LoadInternal(void* image_data);
 
