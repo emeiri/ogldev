@@ -220,9 +220,11 @@ public:
             }
         }
 
-        m_pGameCamera->OnKeyboard(key);
+        bool CameraChangedPos = m_pGameCamera->OnKeyboard(key);
 
-        ConstrainCameraToTerrain();
+        if (CameraChangedPos) {
+            ConstrainCameraToTerrain();
+        }
     }
 
 
@@ -256,8 +258,8 @@ private:
     {
         float CameraX = m_terrain.GetWorldSize() / 2.0f;
         float CameraZ = CameraX;
-        float CameraY = m_terrain.GetWorldHeight(CameraX, CameraZ) + m_cameraHeight;
-        Vector3f Pos(CameraX, CameraY, CameraZ);
+        Vector3f Pos(CameraX, 0.0f, CameraZ);
+        Pos = m_terrain.ConstrainCameraPosToTerrain(Pos);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -273,8 +275,8 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 2.0f;
-        float TextureScale = 10.0f;
+        float WorldScale = 1.0f;
+        float TextureScale = 12.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
@@ -310,29 +312,9 @@ private:
 
     void ConstrainCameraToTerrain()
     {
-        Vector3f CameraPos = m_pGameCamera->GetPos();
+        Vector3f NewCameraPos = m_terrain.ConstrainCameraPosToTerrain(m_pGameCamera->GetPos());
 
-        if (CameraPos.x < 0.0f) {
-            CameraPos.x = 0.0f;
-        }
-
-        if (CameraPos.z < 0.0f) {
-            CameraPos.z = 0.0f;
-        }
-
-        if (CameraPos.x >= m_terrain.GetWorldSize()) {
-            CameraPos.x = m_terrain.GetWorldSize() - 0.5f;
-        }
-
-        if (CameraPos.z >= m_terrain.GetWorldSize()) {
-            CameraPos.z = m_terrain.GetWorldSize() - 0.5f;
-        }
-
-        if ((CameraPos.y > m_terrain.GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight) ||
-            (CameraPos.y < m_terrain.GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight)) {
-            CameraPos.y = m_terrain.GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight;
-            m_pGameCamera->SetPosition(CameraPos);
-        }
+        m_pGameCamera->SetPosition(NewCameraPos);
     }
 
 
@@ -346,9 +328,8 @@ private:
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 150.0f;
-    int m_patchSize = 33;
+    int m_patchSize = 17;
     float m_counter = 0.0f;
-    float m_cameraHeight = 2.0f;
 };
 
 TerrainDemo10* app = NULL;

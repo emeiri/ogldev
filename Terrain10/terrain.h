@@ -63,7 +63,7 @@ class BaseTerrain
 
     float GetWorldSize() const { return m_terrainSize * m_worldScale; }
 
-    float GetWorldHeight(float x, float z) const;
+    Vector3f ConstrainCameraPosToTerrain(const Vector3f& CameraPos);
 
  protected:
 
@@ -71,7 +71,9 @@ class BaseTerrain
 
     void SetMinMaxHeight(float MinHeight, float MaxHeight);
 
-    void Finalize();
+    void Finalize();    
+
+    float GetWorldHeight(float x, float z) const;
 
     int m_terrainSize = 0;
     int m_patchSize = 0;
@@ -85,7 +87,8 @@ private:
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     TerrainTechnique m_terrainTech;
-    Vector3f m_lightDir;	
+    Vector3f m_lightDir;
+    float m_cameraHeight = 2.0f;
 };
 
 #endif

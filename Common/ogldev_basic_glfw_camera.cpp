@@ -125,7 +125,7 @@ void BasicCamera::SetTarget(const Vector3f& target)
 }
 
 
-void BasicCamera::OnKeyboard(int Key)
+bool BasicCamera::OnKeyboard(int Key)
 {
     bool CameraChangedPos = false;
 
@@ -193,6 +193,8 @@ void BasicCamera::OnKeyboard(int Key)
     if (CameraChangedPos) {
         //        printf("Camera pos: "); m_pos.Print(); printf("\n");
     }
+
+    return CameraChangedPos;
 }
 
 

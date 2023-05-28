@@ -42,7 +42,7 @@ public:
 
     void SetUp(float x, float y, float z) { m_up.x = x; m_up.y = y; m_up.z = z;}
 
-    void OnKeyboard(int key);
+    bool OnKeyboard(int key);
 
     void OnMouse(int x, int y);
 

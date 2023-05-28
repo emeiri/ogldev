@@ -194,3 +194,30 @@ float BaseTerrain::GetWorldHeight(float x, float z) const
 
     return GetHeightInterpolated(HeightMapX, HeightMapZ);
 }
+
+
+Vector3f BaseTerrain::ConstrainCameraPosToTerrain(const Vector3f& CameraPos)
+{
+    Vector3f NewCameraPos = CameraPos;
+
+    // Make sure camera doesn't go outside of the terrain bounds
+    if (CameraPos.x < 0.0f) {
+        NewCameraPos.x = 0.0f;
+    }
+
+    if (CameraPos.z < 0.0f) {
+        NewCameraPos.z = 0.0f;
+    }
+
+    if (CameraPos.x >= GetWorldSize()) {
+        NewCameraPos.x = GetWorldSize() - 0.5f;
+    }
+
+    if (CameraPos.z >= GetWorldSize()) {
+        NewCameraPos.z = GetWorldSize() - 0.5f;
+    }
+
+    NewCameraPos.y = GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight;
+
+    return NewCameraPos;
+}
