@@ -205,7 +205,7 @@ void BasicCamera::OnMouse(int x, int y)
     m_mousePos.y = y;
 
     m_AngleH += (float)DeltaX / 20.0f;
-    m_AngleV += (float)DeltaY / 50.0f;
+    m_AngleV += (float)DeltaY / 20.0f;
 
     if (DeltaX == 0) {
         if (x <= MARGIN) {
