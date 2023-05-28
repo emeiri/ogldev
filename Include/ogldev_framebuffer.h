@@ -40,6 +40,8 @@ public:
 
     GLuint GetTexture() const { return m_textureBuffer; }
 
+    GLuint GetDepthTexture() const { return m_depthBuffer; }
+
 private:
     int m_width = 0;
     int m_height = 0;
