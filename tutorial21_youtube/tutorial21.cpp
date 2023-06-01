@@ -112,7 +112,7 @@ bool Tutorial21::Init()
 
     pMesh = new BasicMesh();
 
-    if (!pMesh->LoadMesh("/home/emeiri/Downloads/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj")) {
+    if (!pMesh->LoadMesh("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj")) {
         return false;
     }
 
