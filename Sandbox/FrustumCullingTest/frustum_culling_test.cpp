@@ -172,23 +172,23 @@ static void IsPointInsideClipSpaceTest()
     Vector4f OutsideBottom(0.0f, -15.0f, 10.0f, 1.0f);
 
     printf("Testing points inside the view frustum\n");
-    printf("Point1: %s\n", IsPointInsideViewFrustum(VP, InsideFrustum1) ? "Inside" : "Outside");
-    printf("Point2: %s\n", IsPointInsideViewFrustum(VP, InsideFrustum2) ? "Inside" : "Outside");
-    printf("Point3: %s\n", IsPointInsideViewFrustum(VP, InsideFrustum3) ? "Inside" : "Outside");
-    printf("Point4: %s\n", IsPointInsideViewFrustum(VP, InsideFrustum4) ? "Inside" : "Outside");
-    printf("Point5: %s\n", IsPointInsideViewFrustum(VP, InsideFrustum5) ? "Inside" : "Outside");
+    printf("Point1: %s\n", IsPointInsideViewFrustum(InsideFrustum1, VP) ? "Inside" : "Outside");
+    printf("Point2: %s\n", IsPointInsideViewFrustum(InsideFrustum2, VP) ? "Inside" : "Outside");
+    printf("Point3: %s\n", IsPointInsideViewFrustum(InsideFrustum3, VP) ? "Inside" : "Outside");
+    printf("Point4: %s\n", IsPointInsideViewFrustum(InsideFrustum4, VP) ? "Inside" : "Outside");
+    printf("Point5: %s\n", IsPointInsideViewFrustum(InsideFrustum5, VP) ? "Inside" : "Outside");
 
-    printf("\nTesting outside near Z: %s\n", IsPointInsideViewFrustum(VP, OutsideNearZ) ? "Inside" : "Outside");
+    printf("\nTesting outside near Z: %s\n", IsPointInsideViewFrustum(OutsideNearZ, VP) ? "Inside" : "Outside");
     
-    printf("\nTesting outside far Z: %s\n", IsPointInsideViewFrustum(VP, OutsideFarZ) ? "Inside" : "Outside");
+    printf("\nTesting outside far Z: %s\n", IsPointInsideViewFrustum(OutsideFarZ, VP) ? "Inside" : "Outside");
 
-    printf("\nTesting outside left: %s\n", IsPointInsideViewFrustum(VP, OutsideLeft) ? "Inside" : "Outside");
+    printf("\nTesting outside left: %s\n", IsPointInsideViewFrustum(OutsideLeft, VP) ? "Inside" : "Outside");
 
-    printf("\nTesting outside right: %s\n", IsPointInsideViewFrustum(VP, OutsideRight) ? "Inside" : "Outside");
+    printf("\nTesting outside right: %s\n", IsPointInsideViewFrustum(OutsideRight, VP) ? "Inside" : "Outside");
 
-    printf("\nTesting outside top: %s\n", IsPointInsideViewFrustum(VP, OutsideTop) ? "Inside" : "Outside");
+    printf("\nTesting outside top: %s\n", IsPointInsideViewFrustum(OutsideTop, VP) ? "Inside" : "Outside");
 
-    printf("\nTesting outside bottom: %s\n", IsPointInsideViewFrustum(VP, OutsideBottom) ? "Inside" : "Outside");
+    printf("\nTesting outside bottom: %s\n", IsPointInsideViewFrustum(OutsideBottom, VP) ? "Inside" : "Outside");
 }
 
 int main(int argc, char* argv[])
