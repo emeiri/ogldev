@@ -155,7 +155,7 @@ public:
         float y = min(-0.4f, cosf(foo));
         Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
 
-        m_terrain.SetLightDir(LightDir);
+      //  m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -275,8 +275,8 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 1.0f;
-        float TextureScale = 12.0f;
+        float WorldScale = 2.0f;
+        float TextureScale = 16.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
         TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        

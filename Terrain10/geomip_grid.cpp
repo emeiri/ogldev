@@ -19,7 +19,6 @@
 
 #include <stdio.h>
 #include <vector>
-#include <conio.h>
 
 #include "ogldev_math_3d.h"
 #include "geomip_grid.h"
