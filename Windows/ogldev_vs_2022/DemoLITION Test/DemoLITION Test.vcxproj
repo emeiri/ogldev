@@ -109,8 +109,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\DLL</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\DLL</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc142-mt.lib;glfw3dll.lib;glew32.lib;assimp-vc142-mt.lib;glfw3dll.lib;glew32.lib;DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -129,7 +129,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\DLL</AdditionalLibraryDirectories>
-      <AdditionalDependencies>DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mt.lib;glfw3dll.lib;glew32.lib;DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

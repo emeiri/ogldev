@@ -50,7 +50,7 @@ enum RENDERING_SUBSYSTEM {
 class BasicCamera;
 
 
-class DEMOLITION_API BaseRenderingSubsystem
+class BaseRenderingSubsystem
 {
  public:
 
