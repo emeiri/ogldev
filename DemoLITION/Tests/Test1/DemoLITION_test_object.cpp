@@ -200,11 +200,9 @@ private:
 };
 
 
-int main(int argc, char** argv)
+void test_object()
 {
     ForwardRendererDemo App;
     App.Init();
     App.Run();
-
-    return 0;
 }

@@ -18,6 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_main.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_minimal.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_object.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -132,9 +137,6 @@
       <AdditionalDependencies>assimp-vc142-mt.lib;glfw3dll.lib;glew32.lib;DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test1.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
