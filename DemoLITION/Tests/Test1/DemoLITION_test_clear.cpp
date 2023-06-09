@@ -25,11 +25,17 @@
 #define WINDOW_HEIGHT 1000
 
 
-void test_minimal()
+
+void test_clear()
 {
     GameCallbacks TestGameCallbacks;
-    BaseRenderingSubsystem* pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, 
+    BaseRenderingSubsystem* pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL,
                                                                                                    &TestGameCallbacks);
     pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+    
+    Scene* pScene = pRenderingSubsystem->CreateScene();
+    pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+    pRenderingSubsystem->SetScene(pScene);
+
     pRenderingSubsystem->Execute();
 }

@@ -43,8 +43,6 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual void Execute();
 
-    virtual void ClearWindow();
-
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     
     void OnCursorPosCallback(GLFWwindow* window, double x, double y);

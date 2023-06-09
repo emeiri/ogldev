@@ -118,17 +118,16 @@ void RenderingSubsystemGL::Execute()
         m_elapsedTimeMillis = CurrentTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
         m_pGameCallbacks->OnFrame();
-        m_forwardRenderer.Render((GLScene*)m_pScene);
+        if (m_pScene) {
+            m_forwardRenderer.Render((GLScene*)m_pScene);
+        } else {
+            printf("Warning! no scene is set in the rendering subsystem\n");
+        }
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
     }
 }
 
-
-void RenderingSubsystemGL::ClearWindow()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
 
 void RenderingSubsystemGL::InitCallbacks()
 {

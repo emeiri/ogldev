@@ -34,10 +34,17 @@ public:
 
     bool RemoveObject(BasicMesh* pObject);
 
+    void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
+    void DisableClear() { m_clearFrame = false;  }
+    bool IsClearFrame() const { return m_clearFrame; }
+    const Vector4f& GetClearColor() { return m_clearColor;  }
+
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
     std::list<BasicMesh*> m_objects;
+    bool m_clearFrame = false;
+    Vector4f m_clearColor;
 };

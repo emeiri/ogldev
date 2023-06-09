@@ -127,12 +127,23 @@ void ForwardRenderer::Render(GLScene* pScene)
         exit(0);
     }
 
+    if (pScene->IsClearFrame()) {
+        const Vector4f& ClearColor = pScene->GetClearColor();
+        glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
     int NumPointLights = (int)pScene->m_pointLights.size();
     int NumSpotLights = (int)pScene->m_spotLights.size();
     int NumDirLights = (int)pScene->m_dirLights.size();
 
     if ((NumPointLights == 0) && (NumSpotLights == 0) && (NumDirLights == 0)) {
         printf("Warning! trying to render but all lights are zero\n");
+    }
+
+    if (pScene->GetObjectList().size() == 0) {
+        printf("Warning! object list is empty\n");
+        return;
     }
 
     BasicMesh* pMesh = pScene->GetObjectList().front();

@@ -27,18 +27,6 @@
 #include "demolition_rendering_subsystem.h"
 #include "GL/gl_scene.h"
 
-class Scene0
-{
-public:
-    Scene0() {};
-
-    std::vector<PointLight> m_pointLights;
-    std::vector<SpotLight> m_spotLights;
-    std::vector<DirectionalLight> m_dirLight;
-    BasicMesh* m_pMesh = NULL;
-};
-
-
 
 class ForwardRenderer {
  public:

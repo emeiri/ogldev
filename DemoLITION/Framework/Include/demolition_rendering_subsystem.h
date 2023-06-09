@@ -34,8 +34,6 @@ class GameCallbacks
     virtual void OnMouseMove(int x, int y) {}
 
     virtual void OnMouseButton(int Button, int Action, int Mode) {}
-
-    //virtual void SetCamera(BasicCamera* pCamera) {}
 };
 
 
@@ -61,8 +59,6 @@ class BaseRenderingSubsystem
     virtual void CreateWindow(int Width, int Height) = 0;
 
     virtual void Execute() = 0;
-
-    virtual void ClearWindow() = 0;
 
     virtual Scene* CreateScene() = 0;
 

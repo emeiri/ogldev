@@ -24,5 +24,8 @@
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_clear.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

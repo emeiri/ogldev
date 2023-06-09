@@ -82,6 +82,8 @@ public:
 
         m_pScene->m_dirLights.push_back(DirLight);
 
+        m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
+
         m_pRenderingSubsystem->SetScene(m_pScene);
 
         InitMesh();
@@ -95,8 +97,6 @@ public:
 
     void OnFrame()
     {
-        m_pRenderingSubsystem->ClearWindow();
-
 #ifdef _WIN64
         float YRotationAngle = 0.1f;
 #else
