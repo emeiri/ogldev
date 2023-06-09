@@ -21,7 +21,7 @@
 #pragma once
 
 #include "ogldev_types.h"
-#include "demolition.h"
+#include "demolition_scene.h"
 
 class GameCallbacks
 {
@@ -64,6 +64,10 @@ class BaseRenderingSubsystem
 
     virtual void ClearWindow() = 0;
 
+    virtual Scene* CreateScene() = 0;
+
+    void SetScene(Scene* pScene) { m_pScene = pScene; }
+
     void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
 
     void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
@@ -80,6 +84,7 @@ class BaseRenderingSubsystem
     int m_windowHeight = 0;
     BasicCamera* m_pCamera = NULL;
     GameCallbacks* m_pGameCallbacks = NULL;
+    Scene* m_pScene = NULL;
 
  private:
 

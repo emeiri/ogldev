@@ -245,7 +245,7 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
 }
 
 
-void ForwardRenderer::Render(const Scene& Scene)
+void ForwardRenderer::Render(const Scene0& Scene)
 {
     if (!m_pCurCamera) {
         printf("ForwardRenderer: camera not initialized\n");

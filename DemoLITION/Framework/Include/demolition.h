@@ -1,8 +1,5 @@
 #pragma once
 
-
-#ifdef DEMOLITION_EXPORTS
-#define DEMOLITION_API __declspec(dllexport)
-#else
-#define DEMOLITION_API __declspec(dllimport)
-#endif
+#include "demolition_rendering_subsystem.h"
+#include "demolition_forward_renderer.h"
+#include "demolition_scene.h"

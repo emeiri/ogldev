@@ -18,15 +18,15 @@
 */
 
 
-#ifndef OGLDEV_RENDERING_SUBSYSTEM_GL_H
-#define OGLDEV_RENDERING_SUBSYSTEM_GL_H
+#pragma once
 
 #include <GL/glew.h>
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
 
-#include "ogldev_rendering_subsystem.h"
-#include "ogldev_forward_renderer.h"
+#include "demolition_rendering_subsystem.h"
+#include "demolition_forward_renderer.h"
+#include "GL/gl_scene.h"
 
 class RenderingSubsystemGL : public BaseRenderingSubsystem
 {
@@ -38,6 +38,8 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
     virtual void Shutdown();
 
     virtual void CreateWindow(int Width, int Height);
+
+    virtual Scene* CreateScene();
 
     virtual void Execute();
 
@@ -59,4 +61,3 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
     ForwardRenderer m_forwardRenderer;
 };
 
-#endif

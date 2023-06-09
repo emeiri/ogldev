@@ -22,8 +22,8 @@
 #include <string.h>
 #include <math.h>
 
-#include "demolition_rendering_subsystem.h"
-#include "demolition_forward_renderer.h"
+#include "demolition.h"
+
 
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
@@ -79,6 +79,15 @@ public:
         m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this);
 
         m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        m_pScene = m_pRenderingSubsystem->CreateScene();
+
+        m_pRenderingSubsystem->SetScene(m_pScene);
+
+        Renderable r;
+        m_pScene->AddObject(&r);
+
+        m_pScene->RemoveObject(&r);
 
         InitMesh();
 
@@ -200,6 +209,7 @@ private:
         m_scene.m_pMesh = m_pMesh;
     }
 
+    Scene* m_pScene = NULL;
     BasicMesh* m_pMesh = NULL;
     SkinnedMesh* m_pMesh1 = NULL;
     PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
@@ -208,7 +218,7 @@ private:
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     ForwardRenderer m_renderer;
-    Scene m_scene;
+    Scene0 m_scene;
 };
 
 

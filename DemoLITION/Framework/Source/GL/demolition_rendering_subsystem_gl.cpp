@@ -20,10 +20,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "demolition_rendering_subsystem_gl.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_glfw_camera.h"
+#include "GL/demolition_rendering_subsystem_gl.h"
 
 extern BaseRenderingSubsystem* g_pRenderingSubsystem;
 
@@ -84,6 +84,12 @@ void RenderingSubsystemGL::CreateWindow(int Width, int Height)
     SetDefaultGLState();
 
     InitCallbacks();
+}
+
+
+Scene* RenderingSubsystemGL::CreateScene()
+{
+    return new GLScene(this);
 }
 
 

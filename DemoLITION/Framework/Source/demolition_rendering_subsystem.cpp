@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "demolition_rendering_subsystem.h"
-#include "demolition_rendering_subsystem_gl.h"
+#include "GL/demolition_rendering_subsystem_gl.h"
 
 BaseRenderingSubsystem* g_pRenderingSubsystem = NULL;
 

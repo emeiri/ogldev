@@ -27,10 +27,10 @@
 #include "demolition_rendering_subsystem.h"
 
 
-class Scene
+class Scene0
 {
 public:
-    Scene() {};
+    Scene0() {};
 
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
@@ -89,7 +89,7 @@ class ForwardRenderer {
 
     void Render(BasicMesh* pMesh);
 
-    void Render(const Scene& Scene);
+    void Render(const Scene0& Scene);
 
     void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 
