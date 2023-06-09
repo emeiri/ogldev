@@ -60,11 +60,6 @@ public:
         m_spotLights[1].WorldPosition = Vector3f(0.0f, 1.0f, 0.0f);
         m_spotLights[1].WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
 
-        DirectionalLight DirLight;
-        DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
-        DirLight.DiffuseIntensity = 1.0f;
-
-        m_scene.m_dirLight.push_back(DirLight);
     }
 
     virtual ~ForwardRendererDemo()
@@ -81,17 +76,15 @@ public:
         m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         m_pScene = m_pRenderingSubsystem->CreateScene();
+        DirectionalLight DirLight;
+        DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
+        DirLight.DiffuseIntensity = 1.0f;
+
+        m_pScene->m_dirLights.push_back(DirLight);
 
         m_pRenderingSubsystem->SetScene(m_pScene);
 
-        Renderable r;
-        m_pScene->AddObject(&r);
-
-        m_pScene->RemoveObject(&r);
-
         InitMesh();
-
-        InitRenderer();
     }
 
 
@@ -119,14 +112,9 @@ public:
         m_renderer.UpdateSpotLightPosAndDir(0, m_spotLights[0].WorldPosition, m_spotLights[0].WorldDirection);
         */
 
-        float AnimationTimeSec = ((float)(m_pRenderingSubsystem->GetElapsedTimeMillis())) / 1000.0f;
+//        float AnimationTimeSec = ((float)(m_pRenderingSubsystem->GetElapsedTimeMillis())) / 1000.0f;
 
         m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
-        //m_renderer.Render(m_pMesh);
-
-        m_renderer.Render(m_scene);
-
-        //m_renderer.RenderAnimation(m_pMesh1, AnimationTimeSec);
     }
 
 
@@ -186,14 +174,6 @@ public:
 
 private:
 
-    void InitRenderer()
-    {
-        m_renderer.InitForwardRenderer(m_pRenderingSubsystem);
-        //        m_renderer.SetPointLights(2, m_pointLights);
-        //        m_renderer.SetSpotLights(2, m_spotLights);
-    }
-
-
     void InitMesh()
     {
         m_pMesh = new BasicMesh();
@@ -206,7 +186,7 @@ private:
         m_pMesh1->SetRotation(90.0f, 0.0f, 0.0f);
         m_pMesh1->SetScale(0.05f);
 
-        m_scene.m_pMesh = m_pMesh;
+        m_pScene->AddObject(m_pMesh);
     }
 
     Scene* m_pScene = NULL;
@@ -217,8 +197,6 @@ private:
     float m_counter = 0;
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
-    ForwardRenderer m_renderer;
-    Scene0 m_scene;
 };
 
 

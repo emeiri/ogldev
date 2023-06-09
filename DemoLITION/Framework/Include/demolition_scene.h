@@ -21,10 +21,8 @@
 
 #include <list>
 
-struct Renderable
-{
-
-};
+#include "ogldev_basic_mesh.h"
+#include "ogldev_forward_lighting.h"
 
 class Scene {
 public:
@@ -32,10 +30,14 @@ public:
 
     virtual ~Scene() {}
 
-    void AddObject(Renderable* pObject);
+    void AddObject(BasicMesh* pObject);
 
-    bool RemoveObject(Renderable* pObject);
+    bool RemoveObject(BasicMesh* pObject);
 
-private:
-    std::list<Renderable*> m_objects;
+    std::vector<PointLight> m_pointLights;
+    std::vector<SpotLight> m_spotLights;
+    std::vector<DirectionalLight> m_dirLights;
+
+protected:
+    std::list<BasicMesh*> m_objects;
 };

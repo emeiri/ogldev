@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2022 Etay Meiri
+        Copyright 2023 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,26 +14,31 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
-
-#pragma once
 
 #include "demolition_scene.h"
 
-class RenderingSubsystemGL;
 
-class GLScene : public Scene
+void Scene::AddObject(BasicMesh* pObject)
 {
-public:
-    GLScene(RenderingSubsystemGL* pRenderingSystem) { m_pRenderingSystem = NULL;  }
+    std::list<BasicMesh*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
 
-    ~GLScene() {}
+    if (it == m_objects.end()) {
+        m_objects.push_back(pObject);
+    }
+}
 
-    void Render();
 
-    std::list<BasicMesh*>& GetObjectList() { return m_objects; }
+bool Scene::RemoveObject(BasicMesh* pObject)
+{
+    std::list<BasicMesh*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
 
-private:
-    RenderingSubsystemGL* m_pRenderingSystem = NULL;
-};
+    bool ret = false;
+
+    if (it != m_objects.end()) {
+        m_objects.erase(it);
+        ret = true;
+    }
+
+    return ret;
+}

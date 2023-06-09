@@ -84,6 +84,8 @@ void RenderingSubsystemGL::CreateWindow(int Width, int Height)
     SetDefaultGLState();
 
     InitCallbacks();
+
+    m_forwardRenderer.InitForwardRenderer(this);
 }
 
 
@@ -117,6 +119,7 @@ void RenderingSubsystemGL::Execute()
         m_elapsedTimeMillis = CurrentTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
         m_pGameCallbacks->OnFrame();
+        m_forwardRenderer.Render((GLScene*)m_pScene);
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
     }

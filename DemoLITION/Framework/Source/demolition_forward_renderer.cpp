@@ -127,8 +127,8 @@ void ForwardRenderer::SetDirLight(const DirectionalLight& DirLight)
     SwitchToLightingTech();
     m_lightingTech.SetDirectionalLight(m_dirLight, true);
 
-    m_skinningTech.Enable();
-    m_skinningTech.SetDirectionalLight(m_dirLight, true);
+  //  m_skinningTech.Enable();
+  //  m_skinningTech.SetDirectionalLight(m_dirLight, true);
 }
 
 
@@ -244,6 +244,45 @@ void ForwardRenderer::Render(BasicMesh* pMesh)
     pMesh->Render(&m_lightingTech);
 }
 
+
+void ForwardRenderer::Render(GLScene* pScene)
+{
+    if (!m_pCurCamera) {
+        printf("ForwardRenderer: camera not initialized\n");
+        exit(0);
+    }
+
+    int NumPointLights = (int)pScene->m_pointLights.size();
+    int NumSpotLights = (int)pScene->m_spotLights.size();
+    int NumDirLights = (int)pScene->m_dirLights.size();
+
+    if ((NumPointLights == 0) && (NumSpotLights == 0) && (NumDirLights == 0)) {
+        printf("Warning! trying to render but all lights are zero\n");
+    }
+
+    BasicMesh* pMesh = pScene->GetObjectList().front();
+
+    SwitchToLightingTech();
+
+    const DirectionalLight& dirLight = pScene->m_dirLights[0];
+
+    if (dirLight.DiffuseIntensity > 0.0) {
+        SetDirLight(dirLight);
+        //m_lightingTech.UpdateDirLightDirection(dirLight);
+    }
+
+    m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
+
+    m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
+
+    m_lightingTech.SetMaterial(pMesh->GetMaterial());
+
+    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+
+    UpdateMatrices(&m_lightingTech, pMesh);
+
+    pMesh->Render(&m_lightingTech);
+}
 
 void ForwardRenderer::Render(const Scene0& Scene)
 {

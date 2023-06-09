@@ -25,7 +25,7 @@
 #include "ogldev_skinned_mesh.h"
 #include "ogldev_shadow_mapping_technique.h"
 #include "demolition_rendering_subsystem.h"
-
+#include "GL/gl_scene.h"
 
 class Scene0
 {
@@ -86,6 +86,8 @@ class ForwardRenderer {
     void ControlRimLight(bool IsEnabled);
 
     void ControlCellShading(bool IsEnabled);
+
+    void Render(GLScene* pScene);
 
     void Render(BasicMesh* pMesh);
 
