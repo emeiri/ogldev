@@ -52,17 +52,6 @@ class ForwardRenderer {
     void StartShadowPass();
 
     //
-    // Lighting
-    //    
-
-    void SetPointLights(uint NumLights, const PointLight* pPointLights);
-
-    void SetSpotLights(uint NumLights, const SpotLight* pSpotLights);
-
-    void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
-
-    void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
-    //
     // Fog
     //
     void SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor);
@@ -115,11 +104,5 @@ private:
     ForwardLightingTechnique m_lightingTech;
     ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
-
-    // Lighting info
-    uint m_numPointLights = 0;
-    PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
-    uint m_numSpotLights = 0;
-    SpotLight m_spotLights[ForwardLightingTechnique::MAX_SPOT_LIGHTS];
 };
 

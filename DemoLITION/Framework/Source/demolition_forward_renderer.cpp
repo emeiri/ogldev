@@ -120,82 +120,6 @@ void ForwardRenderer::SwitchToSkinningTech()
 }
 
 
-void ForwardRenderer::SetPointLights(uint NumLights, const PointLight* pPointLights)
-{
-    if (!pPointLights || (NumLights == 0)) {
-        m_numPointLights = 0;
-        return;
-    }
-
-    if (NumLights > ForwardLightingTechnique::MAX_POINT_LIGHTS) {
-        printf("Number of point lights (%d) exceeds max (%d)\n", NumLights, ForwardLightingTechnique::MAX_POINT_LIGHTS);
-        exit(0);
-    }
-
-    for (uint i = 0 ; i < NumLights ; i++) {
-        m_pointLights[i] = pPointLights[i];
-    }
-
-    m_numPointLights = NumLights;
-
-    SwitchToLightingTech();
-    m_lightingTech.SetPointLights(NumLights, pPointLights, false);
-
-    m_skinningTech.Enable();
-    m_skinningTech.SetPointLights(NumLights, pPointLights, false);
-}
-
-
-void ForwardRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights)
-{
-    if (!pSpotLights || (NumLights == 0)) {
-        m_numSpotLights = 0;
-        return;
-    }
-
-    if (NumLights > ForwardLightingTechnique::MAX_SPOT_LIGHTS) {
-        printf("Number of point lights (%d) exceeds max (%d)\n", NumLights, ForwardLightingTechnique::MAX_SPOT_LIGHTS);
-        exit(0);
-    }
-
-    for (uint i = 0 ; i < NumLights ; i++) {
-        m_spotLights[i] = pSpotLights[i];
-    }
-
-    m_numSpotLights = NumLights;
-
-    SwitchToLightingTech();
-    m_lightingTech.SetSpotLights(NumLights, pSpotLights, false);
-
-    m_skinningTech.Enable();
-    m_skinningTech.SetSpotLights(NumLights, pSpotLights, false);
-}
-
-
-void ForwardRenderer::UpdatePointLightPos(uint Index, const Vector3f& WorldPos)
-{
-    if (Index > m_numPointLights) {
-        printf("Trying to update point light %d while num lights is %d\n", Index, m_numPointLights);
-        exit(0);
-    }
-
-    m_pointLights[Index].WorldPosition = WorldPos;
-}
-
-
-void ForwardRenderer::UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir)
-{
-    if (Index > m_numSpotLights) {
-        printf("Trying to update spot light %d while num lights is %d\n", Index, m_numSpotLights);
-        exit(0);
-    }
-
-    m_spotLights[Index].WorldPosition = WorldPos;
-    m_spotLights[Index].WorldDirection = WorldDir;
-
-}
-
-
 void ForwardRenderer::Render(GLScene* pScene)
 {
     if (!m_pCurCamera) {
@@ -221,9 +145,13 @@ void ForwardRenderer::Render(GLScene* pScene)
         m_lightingTech.SetDirectionalLight(DirLight, true);
     }
 
-    m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
+    if (NumPointLights > 0) {
+        m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
+    }
 
-    m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
+    if (NumSpotLights > 0) {
+        m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
+    }
 
     m_lightingTech.SetMaterial(pMesh->GetMaterial());
 
