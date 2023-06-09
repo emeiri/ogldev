@@ -31,7 +31,7 @@ class GameCallbacks
 
     virtual bool OnKeyboard(int key, int action) { return false; }
 
-    virtual void OnMouseMove(int x, int y) {}
+    virtual bool OnMouseMove(int x, int y) { return false; }
 
     virtual void OnMouseButton(int Button, int Action, int Mode) {}
 };

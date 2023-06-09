@@ -20,11 +20,13 @@
 void test_minimal();
 void test_clear();
 void test_object();
+void test_move_object();
 
 
 int main(int argc, char* arg[])
 {
-    test_clear();
     //test_minimal();
-   // test_object();
+    //test_clear();    
+    //test_object();
+    test_move_object();
 }

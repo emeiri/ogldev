@@ -29,11 +29,11 @@
 #define WINDOW_HEIGHT 1000
 
 
-class ObjectTest : public GameCallbacks
+class MoveObjectTest : public GameCallbacks
 {
 public:
 
-    virtual ~ObjectTest()
+    virtual ~MoveObjectTest()
     {
         SAFE_DELETE(m_pMesh);
     }
@@ -72,6 +72,14 @@ public:
         m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
     }
 
+    bool OnMouseMove(int x, int y) 
+    { 
+        Vector3f Pos((float)x / 200.0f, (float)y / 200.0f, 10.0f);
+        Pos.Print();
+        m_pMesh->SetPosition(Pos);
+        return true; 
+    }
+
 private:
 
     void InitMesh()
@@ -90,9 +98,9 @@ private:
 };
 
 
-void test_object()
+void test_move_object()
 {
-    ObjectTest App;
+    MoveObjectTest App;
     App.Init();
     App.Run();
 }

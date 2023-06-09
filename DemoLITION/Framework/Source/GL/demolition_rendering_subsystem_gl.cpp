@@ -139,9 +139,9 @@ void RenderingSubsystemGL::InitCallbacks()
 
 void RenderingSubsystemGL::OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    bool Handled = m_pGameCallbacks->OnKeyboard(key, action);
+    bool HandledByGame = m_pGameCallbacks->OnKeyboard(key, action);
 
-    if (!Handled) {
+    if (!HandledByGame) {
         switch (key) {
         case GLFW_KEY_ESCAPE:
         case GLFW_KEY_Q:
@@ -157,8 +157,11 @@ void RenderingSubsystemGL::OnKeyCallback(GLFWwindow* window, int key, int scanco
 
 void RenderingSubsystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    m_pCamera->OnMouse((int)x, (int)y);
-    m_pGameCallbacks->OnMouseMove((int)x, (int)y);
+    bool HandledByGame = m_pGameCallbacks->OnMouseMove((int)x, (int)y);
+
+    if (!HandledByGame) {
+        m_pCamera->OnMouse((int)x, (int)y);
+    }
 }
 
 
