@@ -120,18 +120,6 @@ void ForwardRenderer::SwitchToSkinningTech()
 }
 
 
-void ForwardRenderer::SetDirLight(const DirectionalLight& DirLight)
-{
-    m_dirLight = DirLight;
-
-    SwitchToLightingTech();
-    m_lightingTech.SetDirectionalLight(m_dirLight, true);
-
-  //  m_skinningTech.Enable();
-  //  m_skinningTech.SetDirectionalLight(m_dirLight, true);
-}
-
-
 void ForwardRenderer::SetPointLights(uint NumLights, const PointLight* pPointLights)
 {
     if (!pPointLights || (NumLights == 0)) {
@@ -184,12 +172,6 @@ void ForwardRenderer::SetSpotLights(uint NumLights, const SpotLight* pSpotLights
 }
 
 
-void ForwardRenderer::UpdateDirLightDir(const Vector3f& WorldDir)
-{
-    m_dirLight.WorldDirection = WorldDir;
-}
-
-
 void ForwardRenderer::UpdatePointLightPos(uint Index, const Vector3f& WorldPos)
 {
     if (Index > m_numPointLights) {
@@ -214,37 +196,6 @@ void ForwardRenderer::UpdateSpotLightPosAndDir(uint Index, const Vector3f& World
 }
 
 
-void ForwardRenderer::Render(BasicMesh* pMesh)
-{
-    if (!m_pCurCamera) {
-        printf("ForwardRenderer: camera not initialized\n");
-        exit(0);
-    }
-
-    if ((m_numPointLights == 0) && (m_numSpotLights == 0) && m_dirLight.IsZero()) {
-        printf("Warning! trying to render but all lights are zero\n");
-    }
-
-    SwitchToLightingTech();
-
-    if (m_dirLight.DiffuseIntensity > 0.0) {
-        m_lightingTech.UpdateDirLightDirection(m_dirLight);
-    }
-
-    m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
-
-    m_lightingTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
-
-    m_lightingTech.SetMaterial(pMesh->GetMaterial());
-
-    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
-
-    UpdateMatrices(&m_lightingTech, pMesh);
-
-    pMesh->Render(&m_lightingTech);
-}
-
-
 void ForwardRenderer::Render(GLScene* pScene)
 {
     if (!m_pCurCamera) {
@@ -264,11 +215,10 @@ void ForwardRenderer::Render(GLScene* pScene)
 
     SwitchToLightingTech();
 
-    const DirectionalLight& dirLight = pScene->m_dirLights[0];
+    const DirectionalLight& DirLight = pScene->m_dirLights[0];
 
-    if (dirLight.DiffuseIntensity > 0.0) {
-        SetDirLight(dirLight);
-        //m_lightingTech.UpdateDirLightDirection(dirLight);
+    if (DirLight.DiffuseIntensity > 0.0) {
+        m_lightingTech.SetDirectionalLight(DirLight, true);
     }
 
     m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
@@ -283,43 +233,6 @@ void ForwardRenderer::Render(GLScene* pScene)
 
     pMesh->Render(&m_lightingTech);
 }
-
-void ForwardRenderer::Render(const Scene0& Scene)
-{
-    if (!m_pCurCamera) {
-        printf("ForwardRenderer: camera not initialized\n");
-        exit(0);
-    }
-
-    if ((Scene.m_pointLights.size() == 0) && (Scene.m_spotLights.size() == 0) && 
-        ((Scene.m_dirLight.size() == 0) || (Scene.m_dirLight[0].IsZero()))) {
-        printf("Warning! trying to render but all lights are zero\n");
-    }    
-
-    if ((Scene.m_dirLight.size() > 0) && (Scene.m_dirLight[0].DiffuseIntensity > 0.0)) {
-        SetDirLight(Scene.m_dirLight[0]);
-        //m_lightingTech.UpdateDirLightDirection(Scene.m_dirLight[0]);
-    }
-
-    SwitchToLightingTech();
-
-    if (Scene.m_pointLights.size() > 0) {
-        m_lightingTech.UpdatePointLightsPos((unsigned int)Scene.m_pointLights.size(), &Scene.m_pointLights[0]);
-    }
-
-    if (Scene.m_spotLights.size() > 0) {
-        m_lightingTech.UpdateSpotLightsPosAndDir((unsigned int)Scene.m_spotLights.size(), &Scene.m_spotLights[0]);
-    }
-
-    m_lightingTech.SetMaterial(Scene.m_pMesh->GetMaterial());
-
-    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
-
-    UpdateMatrices(&m_lightingTech, Scene.m_pMesh);
-
-    Scene.m_pMesh->Render(&m_lightingTech);
-}
-
 
 
 void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicMesh* pMesh)
@@ -339,7 +252,7 @@ void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicM
 }
 
 
-void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
+/*/void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
 {
     RenderAnimationCommon(pMesh);
 
@@ -351,10 +264,10 @@ void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec
     }
 
     pMesh->Render(&m_skinningTech);
-}
+}*/
 
 
-void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
+/*void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
                                            float AnimationTimeSec,
                                            int StartAnimIndex,
                                            int EndAnimIndex,
@@ -374,10 +287,10 @@ void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
     }
 
     pMesh->Render(&m_skinningTech);
-}
+}*/
 
 
-void ForwardRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
+/*void ForwardRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
 {
     if (!m_pCurCamera) {
         printf("ForwardRenderer: camera not initialized\n");
@@ -401,7 +314,7 @@ void ForwardRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
     m_skinningTech.SetMaterial(pMesh->GetMaterial());
 
     UpdateMatrices(&m_skinningTech, pMesh);
-}
+}*/
 
 void ForwardRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight)
 {

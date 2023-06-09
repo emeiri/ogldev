@@ -59,8 +59,6 @@ class ForwardRenderer {
 
     void SetSpotLights(uint NumLights, const SpotLight* pSpotLights);
 
-    void UpdateDirLightDir(const Vector3f& WorldDir);
-
     void UpdatePointLightPos(uint Index, const Vector3f& WorldPos);
 
     void UpdateSpotLightPosAndDir(uint Index, const Vector3f& WorldPos, const Vector3f& WorldDir);
@@ -87,11 +85,7 @@ class ForwardRenderer {
 
     void Render(GLScene* pScene);
 
-    void Render(BasicMesh* pMesh);
-
-    void Render(const Scene0& Scene);
-
-    void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
+   // void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 
     void RenderAnimationBlended(SkinnedMesh* pMesh,
                                 float AnimationTimeSec,
@@ -103,8 +97,6 @@ class ForwardRenderer {
  
 private:
 
-    void SetDirLight(const DirectionalLight& DirLight);
-
     void CreateDefaultCamera();
 
     void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
@@ -113,7 +105,7 @@ private:
 
     void SwitchToSkinningTech();
 
-    void RenderAnimationCommon(SkinnedMesh* pMesh);
+    //void RenderAnimationCommon(SkinnedMesh* pMesh);
 
     void UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicMesh* pMesh);
 
@@ -125,7 +117,6 @@ private:
     ShadowMappingTechnique m_shadowMapTech;
 
     // Lighting info
-    DirectionalLight m_dirLight;
     uint m_numPointLights = 0;
     PointLight m_pointLights[ForwardLightingTechnique::MAX_POINT_LIGHTS];
     uint m_numSpotLights = 0;
