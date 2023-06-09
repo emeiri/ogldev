@@ -219,5 +219,10 @@ Vector3f BaseTerrain::ConstrainCameraPosToTerrain(const Vector3f& CameraPos)
 
     NewCameraPos.y = GetWorldHeight(CameraPos.x, CameraPos.z) + m_cameraHeight;
 
+    float f = sinf(CameraPos.x * 4.0f) + cosf(CameraPos.z * 4.0f);    
+    f /= 35.0f; 
+
+    NewCameraPos.y += f;
+
     return NewCameraPos;
 }
