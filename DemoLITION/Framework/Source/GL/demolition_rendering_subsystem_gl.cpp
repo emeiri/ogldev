@@ -56,7 +56,6 @@ RenderingSubsystemGL::RenderingSubsystemGL(GameCallbacks* pGameCallbacks) : Base
 
 RenderingSubsystemGL::~RenderingSubsystemGL()
 {
-    SAFE_DELETE(m_pCamera);
 }
 
 
