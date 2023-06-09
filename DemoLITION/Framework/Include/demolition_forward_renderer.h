@@ -51,8 +51,6 @@ class ForwardRenderer {
 
     void StartShadowPass();
 
-    //void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
-
     //
     // Lighting
     //    
