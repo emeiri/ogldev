@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - demo 10 - Basic Collision Detection
+    Terrain Rendering - demo 10 - Ground Collision Detection
 */
 
 #include "imgui.h"
@@ -180,6 +180,11 @@ public:
                 glfwTerminate();
                 exit(0);
 
+            case GLFW_KEY_B:
+                m_constrainCamera = !m_constrainCamera;
+                printf("constrain %d\n", m_constrainCamera);
+                break;
+
             case GLFW_KEY_C:
                 m_pGameCamera->Print();
                 break;
@@ -222,7 +227,7 @@ public:
 
         bool CameraChangedPos = m_pGameCamera->OnKeyboard(key);
 
-        if (CameraChangedPos) {
+        if (m_constrainCamera && CameraChangedPos) {
             ConstrainCameraToTerrain();
         }
     }
@@ -330,6 +335,7 @@ private:
     float m_maxHeight = 150.0f;
     int m_patchSize = 17;
     float m_counter = 0.0f;
+    bool m_constrainCamera = false;
 };
 
 TerrainDemo10* app = NULL;
@@ -371,7 +377,7 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+    glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
