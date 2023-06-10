@@ -26,13 +26,25 @@ using namespace std;
 #define NORMAL_LOCATION    2
 
 
-DemolitionMesh::~DemolitionMesh()
+inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
+{
+    Vector3f ret;
+
+    ret.x = v.x;
+    ret.y = v.y;
+    ret.z = v.z;
+
+    return ret;
+}
+
+
+DemolitionModel::~DemolitionModel()
 {
     Clear();
 }
 
 
-void DemolitionMesh::Clear()
+void DemolitionModel::Clear()
 {
     if (m_Buffers[0] != 0) {
         glDeleteBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
@@ -45,7 +57,7 @@ void DemolitionMesh::Clear()
 }
 
 
-bool DemolitionMesh::LoadMesh(const string& Filename)
+bool DemolitionModel::LoadMesh(const string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -76,7 +88,22 @@ bool DemolitionMesh::LoadMesh(const string& Filename)
     return Ret;
 }
 
-bool DemolitionMesh::InitFromScene(const aiScene* pScene, const string& Filename)
+
+bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filename)
+{
+    if (!InitGeometry(pScene, Filename)) {
+        return false;
+    }
+
+    InitCameras(pScene);
+
+    InitLights(pScene);
+
+    return true;
+}
+
+
+bool DemolitionModel::InitGeometry(const aiScene* pScene, const string& Filename)
 {
     m_Meshes.resize(pScene->mNumMeshes);
     m_Materials.resize(pScene->mNumMaterials);
@@ -94,13 +121,13 @@ bool DemolitionMesh::InitFromScene(const aiScene* pScene, const string& Filename
         return false;
     }
 
-    PopulateBuffers();
+    PopulateBuffers();    
 
     return GLCheckError();
 }
 
 
-void DemolitionMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
+void DemolitionModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
@@ -114,7 +141,7 @@ void DemolitionMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int
 }
 
 
-void DemolitionMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
+void DemolitionModel::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
 {
     m_Positions.reserve(NumVertices);
     m_Normals.reserve(NumVertices);
@@ -123,7 +150,7 @@ void DemolitionMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndi
 }
 
 
-void DemolitionMesh::InitAllMeshes(const aiScene* pScene)
+void DemolitionModel::InitAllMeshes(const aiScene* pScene)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
@@ -132,7 +159,7 @@ void DemolitionMesh::InitAllMeshes(const aiScene* pScene)
 }
 
 
-void DemolitionMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
+void DemolitionModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -172,7 +199,7 @@ void DemolitionMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
 
 
-bool DemolitionMesh::InitMaterials(const aiScene* pScene, const string& Filename)
+bool DemolitionModel::InitMaterials(const aiScene* pScene, const string& Filename)
 {
     string Dir = GetDirFromFilename(Filename);
 
@@ -193,14 +220,14 @@ bool DemolitionMesh::InitMaterials(const aiScene* pScene, const string& Filename
 }
 
 
-void DemolitionMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
+void DemolitionModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
 {
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
 }
 
 
-void DemolitionMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void DemolitionModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].pDiffuse = NULL;
 
@@ -220,7 +247,7 @@ void DemolitionMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMa
 }
 
 
-void DemolitionMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+void DemolitionModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D);
@@ -229,7 +256,7 @@ void DemolitionMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int
 }
 
 
-void DemolitionMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void DemolitionModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
     string p(Path.data);
 
@@ -257,7 +284,7 @@ void DemolitionMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiStrin
 }
 
 
-void DemolitionMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void DemolitionModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].pSpecularExponent = NULL;
 
@@ -277,7 +304,7 @@ void DemolitionMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pM
 }
 
 
-void DemolitionMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+void DemolitionModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D);
@@ -286,7 +313,7 @@ void DemolitionMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, in
 }
 
 
-void DemolitionMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void DemolitionModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
     string p(Path.data);
 
@@ -309,7 +336,7 @@ void DemolitionMesh::LoadSpecularTextureFromFile(const string& Dir, const aiStri
     }
 }
 
-void DemolitionMesh::LoadColors(const aiMaterial* pMaterial, int index)
+void DemolitionModel::LoadColors(const aiMaterial* pMaterial, int index)
 {
     aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
     Vector3f AllOnes(1.0f, 1.0f, 1.0f);
@@ -348,7 +375,7 @@ void DemolitionMesh::LoadColors(const aiMaterial* pMaterial, int index)
 }
 
 
-void DemolitionMesh::PopulateBuffers()
+void DemolitionModel::PopulateBuffers()
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_Positions[0]) * m_Positions.size(), &m_Positions[0], GL_STATIC_DRAW);
@@ -371,7 +398,7 @@ void DemolitionMesh::PopulateBuffers()
 
 
 // Introduced in youtube tutorial #18
-void DemolitionMesh::Render(DemolitionRenderCallbacks* pRenderCallbacks)
+void DemolitionModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
     glBindVertexArray(m_VAO);
 
@@ -416,7 +443,7 @@ void DemolitionMesh::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 }
 
 
-void DemolitionMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
+void DemolitionModel::Render(unsigned int DrawIndex, unsigned int PrimID)
 {
     glBindVertexArray(m_VAO);
 
@@ -444,7 +471,7 @@ void DemolitionMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
 
 
 // Used only by instancing
-void DemolitionMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
+void DemolitionModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
@@ -480,7 +507,7 @@ void DemolitionMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, 
 }
 
 
-const Material& DemolitionMesh::GetMaterial()
+const Material& DemolitionModel::GetMaterial()
 {
     for (unsigned int i = 0 ; i < m_Materials.size() ; i++) {
         if (m_Materials[i].AmbientColor != Vector3f(0.0f, 0.0f, 0.0f)) {
@@ -492,7 +519,7 @@ const Material& DemolitionMesh::GetMaterial()
 }
 
 
-void DemolitionMesh::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex)
+void DemolitionModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex)
 {
     uint MeshIndex = DrawIndex; // Each mesh is rendered in its own draw call
 
@@ -509,4 +536,36 @@ void DemolitionMesh::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Ver
     Vertex.x = Pos.x;
     Vertex.y = Pos.y;
     Vertex.z = Pos.z;
+}
+
+
+void DemolitionModel::InitCameras(const aiScene* pScene)
+{
+    printf("Loading %d cameras\n", pScene->mNumCameras);
+
+    m_cameras.resize(pScene->mNumCameras);
+
+    for (unsigned int i = 0; i < pScene->mNumCameras; i++) {
+        InitSingleCamera(pScene->mCameras[i]);
+    }
+}
+
+
+void DemolitionModel::InitSingleCamera(const aiCamera* pCamera)
+{
+    printf("Camera name: '%s'\n", pCamera->mName.C_Str());
+
+    Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
+    Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
+    Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
+
+    PersProjInfo persProjInfo;
+    persProjInfo.zNear = pCamera->mClipPlaneNear;
+    persProjInfo.zFar = pCamera->mClipPlaneFar;
+}
+
+
+void DemolitionModel::InitLights(const aiScene* pScene)
+{
+
 }

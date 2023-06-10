@@ -32,7 +32,7 @@ public:
 
     void Render();
 
-    std::list<DemolitionMesh*>& GetObjectList() { return m_objects; }
+    std::list<DemolitionModel*>& GetObjectList() { return m_objects; }
 
 private:
     RenderingSubsystemGL* m_pRenderingSystem = NULL;

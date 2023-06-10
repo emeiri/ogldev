@@ -76,7 +76,7 @@ private:
 
     void InitMesh()
     {
-        m_pMesh = new DemolitionMesh();
+        m_pMesh = new DemolitionModel();
         m_pMesh->LoadMesh("../Content/sphere.obj");
         m_pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
 
@@ -85,7 +85,7 @@ private:
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
-    DemolitionMesh* m_pMesh = NULL;
+    DemolitionModel* m_pMesh = NULL;
     float m_counter = 0;    
 };
 

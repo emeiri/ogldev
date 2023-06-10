@@ -21,9 +21,12 @@
 
 #include "ogldev_math_3d.h"
 
+
 class BasicCamera
 {
 public:
+
+    BasicCamera() {}
 
     BasicCamera(int WindowWidth, int WindowHeight);
 
@@ -65,10 +68,16 @@ public:
 
     void SetSpeed(float Speed);
 
+    void SetName(const std::string& Name) { m_name = Name; }
+
+    const std::string& GetName() const { return m_name; }
+
 private:
 
     void Init();
     void Update();
+
+    std::string m_name;
 
     Vector3f m_pos;
     Vector3f m_target;

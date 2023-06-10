@@ -31,9 +31,9 @@ public:
 
     virtual ~Scene() {}
 
-    void AddObject(DemolitionMesh* pObject);
+    void AddObject(DemolitionModel* pObject);
 
-    bool RemoveObject(DemolitionMesh* pObject);
+    bool RemoveObject(DemolitionModel* pObject);
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
     void DisableClear() { m_clearFrame = false;  }
@@ -45,7 +45,7 @@ public:
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
-    std::list<DemolitionMesh*> m_objects;
+    std::list<DemolitionModel*> m_objects;
     bool m_clearFrame = false;
     Vector4f m_clearColor;
 };

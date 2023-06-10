@@ -31,6 +31,7 @@
 #include "ogldev_texture.h"
 #include "ogldev_material.h"
 #include "ogldev_world_transform.h"
+#include "ogldev_basic_glfw_camera.h"
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -47,12 +48,12 @@ public:
 };
 
 
-class DemolitionMesh 
+class DemolitionModel 
 {
 public:
-    DemolitionMesh() {};
+    DemolitionModel() {};
 
-    ~DemolitionMesh();
+    ~DemolitionModel();
 
     bool LoadMesh(const std::string& Filename);
 
@@ -70,7 +71,7 @@ public:
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
-protected:
+private:
 
     void Clear();
 
@@ -79,6 +80,47 @@ protected:
     virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
 
     virtual void PopulateBuffers();
+
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+
+    bool InitGeometry(const aiScene* pScene, const string& Filename);
+
+    void InitLights(const aiScene* pScene);
+
+    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
+
+    void InitAllMeshes(const aiScene* pScene);
+
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+
+    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
+    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
+    void LoadColors(const aiMaterial* pMaterial, int index);
+
+    void InitCameras(const aiScene* pScene);
+
+    void InitSingleCamera(const aiCamera* pCamera);
+
+    enum BUFFER_TYPE {
+        INDEX_BUFFER = 0,
+        POS_VB       = 1,
+        TEXCOORD_VB  = 2,
+        NORMAL_VB    = 3,
+        WVP_MAT_VB   = 4,  // required only for instancing
+        WORLD_MAT_VB = 5,  // required only for instancing
+        NUM_BUFFERS  = 6
+    };
+
+    GLuint m_VAO = 0;
+    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
     struct BasicMeshEntry {
         BasicMeshEntry()
@@ -103,41 +145,6 @@ protected:
 
     WorldTrans m_worldTransform;
 
-private:
-
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
-
-    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
-
-    void InitAllMeshes(const aiScene* pScene);
-
-    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
-
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
-
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
-
-    void LoadColors(const aiMaterial* pMaterial, int index);
-
-    enum BUFFER_TYPE {
-        INDEX_BUFFER = 0,
-        POS_VB       = 1,
-        TEXCOORD_VB  = 2,
-        NORMAL_VB    = 3,
-        WVP_MAT_VB   = 4,  // required only for instancing
-        WORLD_MAT_VB = 5,  // required only for instancing
-        NUM_BUFFERS  = 6
-    };
-
-    GLuint m_VAO = 0;
-    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
-
     std::vector<Material> m_Materials;
 
     // Temporary space for vertex stuff before we load them into the GPU
@@ -147,5 +154,7 @@ private:
     vector<uint> m_Indices;
 
     Assimp::Importer m_Importer;
+
+    std::vector<BasicCamera> m_cameras;
 };
 

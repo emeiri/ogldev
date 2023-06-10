@@ -126,7 +126,7 @@ void ForwardRenderer::Render(GLScene* pScene)
         return;
     }
 
-    DemolitionMesh* pMesh = pScene->GetObjectList().front();
+    DemolitionModel* pMesh = pScene->GetObjectList().front();
 
     SwitchToLightingTech();
 
@@ -154,7 +154,7 @@ void ForwardRenderer::Render(GLScene* pScene)
 }
 
 
-void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, DemolitionMesh* pMesh)
+void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, DemolitionModel* pMesh)
 {
     Matrix4f WVP;
     GetWVP(pMesh, WVP);
@@ -235,7 +235,7 @@ void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, Demoli
     UpdateMatrices(&m_skinningTech, pMesh);
 }*/
 
-void ForwardRenderer::RenderToShadowMap(DemolitionMesh* pMesh, const SpotLight& SpotLight)
+void ForwardRenderer::RenderToShadowMap(DemolitionModel* pMesh, const SpotLight& SpotLight)
 {
     Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
 
@@ -264,7 +264,7 @@ void ForwardRenderer::RenderToShadowMap(DemolitionMesh* pMesh, const SpotLight& 
 }
 
 
-void ForwardRenderer::GetWVP(DemolitionMesh* pMesh, Matrix4f& WVP)
+void ForwardRenderer::GetWVP(DemolitionModel* pMesh, Matrix4f& WVP)
 {
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
