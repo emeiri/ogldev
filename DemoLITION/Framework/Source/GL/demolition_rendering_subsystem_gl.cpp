@@ -94,6 +94,19 @@ Scene* RenderingSubsystemGL::CreateScene()
 }
 
 
+DemolitionModel* RenderingSubsystemGL::LoadModel(const std::string& Filename)
+{
+    DemolitionModel* pModel = new DemolitionModel();
+
+    if (!pModel->LoadMesh(Filename, m_windowWidth, m_windowHeight)) {
+        delete pModel;
+        pModel = NULL;
+    }
+
+    return pModel;
+}
+
+
 void RenderingSubsystemGL::SetDefaultGLState()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

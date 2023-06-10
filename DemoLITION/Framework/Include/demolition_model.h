@@ -55,7 +55,7 @@ public:
 
     ~DemolitionModel();
 
-    bool LoadMesh(const std::string& Filename);
+    bool LoadMesh(const std::string& Filename, int WindowWidth, int WindowHeight);
 
     void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
@@ -81,7 +81,7 @@ private:
 
     virtual void PopulateBuffers();
 
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename, int WindowWidth, int WindowHeight);
 
     bool InitGeometry(const aiScene* pScene, const string& Filename);
 
@@ -105,9 +105,9 @@ private:
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
-    void InitCameras(const aiScene* pScene);
+    void InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight);
 
-    void InitSingleCamera(const aiCamera* pCamera);
+    void InitSingleCamera(int Index, const aiCamera* pCamera, int WindowWidth, int WindowHeight);
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,

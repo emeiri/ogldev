@@ -57,7 +57,7 @@ void DemolitionModel::Clear()
 }
 
 
-bool DemolitionModel::LoadMesh(const string& Filename)
+bool DemolitionModel::LoadMesh(const string& Filename, int WindowWidth, int WindowHeight)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -76,7 +76,7 @@ bool DemolitionModel::LoadMesh(const string& Filename)
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
         m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
-        Ret = InitFromScene(m_pScene, Filename);
+        Ret = InitFromScene(m_pScene, Filename, WindowWidth, WindowHeight);
     }
     else {
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
@@ -89,13 +89,13 @@ bool DemolitionModel::LoadMesh(const string& Filename)
 }
 
 
-bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filename)
+bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filename, int WindowWidth, int WindowHeight)
 {
     if (!InitGeometry(pScene, Filename)) {
         return false;
     }
 
-    InitCameras(pScene);
+    InitCameras(pScene, WindowWidth, WindowHeight);
 
     InitLights(pScene);
 
@@ -539,19 +539,19 @@ void DemolitionModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Ve
 }
 
 
-void DemolitionModel::InitCameras(const aiScene* pScene)
+void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight)
 {
     printf("Loading %d cameras\n", pScene->mNumCameras);
 
     m_cameras.resize(pScene->mNumCameras);
 
     for (unsigned int i = 0; i < pScene->mNumCameras; i++) {
-        InitSingleCamera(pScene->mCameras[i]);
+        InitSingleCamera(i, pScene->mCameras[i], WindowWidth, WindowHeight);
     }
 }
 
 
-void DemolitionModel::InitSingleCamera(const aiCamera* pCamera)
+void DemolitionModel::InitSingleCamera(int Index, const aiCamera* pCamera, int WindowWidth, int WindowHeight)
 {
     printf("Camera name: '%s'\n", pCamera->mName.C_Str());
 
@@ -562,6 +562,17 @@ void DemolitionModel::InitSingleCamera(const aiCamera* pCamera)
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
     persProjInfo.zFar = pCamera->mClipPlaneFar;
+    persProjInfo.Width = (float)WindowWidth;
+    persProjInfo.Height = (float)WindowHeight;
+    persProjInfo.FOV = pCamera->mHorizontalFOV;
+
+    float AspectRatio = (float)WindowWidth / (float)WindowHeight;
+
+    if (AspectRatio != pCamera->mAspect) {
+        printf("Warning! the aspect ratio of the camera is %f while the aspect ratio of the window is %f\n", pCamera->mAspect, AspectRatio);
+    }
+
+    m_cameras[Index] = BasicCamera(persProjInfo, Pos, Target, Up);
 }
 
 

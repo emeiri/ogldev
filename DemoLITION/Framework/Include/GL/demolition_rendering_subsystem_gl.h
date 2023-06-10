@@ -41,6 +41,8 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual Scene* CreateScene();
 
+    virtual DemolitionModel* LoadModel(const std::string& Filename);
+
     virtual void Execute();
 
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

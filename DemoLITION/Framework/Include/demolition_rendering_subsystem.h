@@ -62,9 +62,11 @@ class BaseRenderingSubsystem
 
     virtual Scene* CreateScene() = 0;
 
+    virtual DemolitionModel* LoadModel(const std::string& Filename) = 0;
+
     void SetScene(Scene* pScene) { m_pScene = pScene; }
 
-    void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }
+    void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }    
 
     void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
 

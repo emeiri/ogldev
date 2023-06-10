@@ -83,8 +83,7 @@ private:
 
     void InitMesh()
     {
-        m_pMesh = new DemolitionModel();
-        m_pMesh->LoadMesh("../Content/test.glb");
+        m_pMesh = m_pRenderingSubsystem->LoadModel("../Content/test.glb");
         m_pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
 
         m_pScene->AddObject(m_pMesh);
