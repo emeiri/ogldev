@@ -31,6 +31,8 @@ public:
 
     virtual ~Scene() {}
 
+    void SetMainModel(DemolitionModel* pModel) { m_pMainModel = pModel; }
+
     void AddObject(DemolitionModel* pObject);
 
     bool RemoveObject(DemolitionModel* pObject);
@@ -40,11 +42,14 @@ public:
     bool IsClearFrame() const { return m_clearFrame; }
     const Vector4f& GetClearColor() { return m_clearColor;  }
 
+    DemolitionModel* GetMainModel() const { return m_pMainModel; }
+
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
+    DemolitionModel* m_pMainModel = NULL;
     std::list<DemolitionModel*> m_objects;
     bool m_clearFrame = false;
     Vector4f m_clearColor;

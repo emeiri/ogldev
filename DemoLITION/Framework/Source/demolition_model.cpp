@@ -25,6 +25,8 @@ using namespace std;
 #define TEX_COORD_LOCATION 1
 #define NORMAL_LOCATION    2
 
+#define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices | aiProcess_MakeLeftHanded)
+
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 {
@@ -71,7 +73,7 @@ bool DemolitionModel::LoadMesh(const string& Filename, int WindowWidth, int Wind
 
     bool Ret = false;
 
-    m_pScene = m_Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
+    m_pScene = m_Importer.ReadFile(Filename.c_str(), DEMOLITION_ASSIMP_LOAD_FLAGS);
 
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
@@ -507,7 +509,7 @@ void DemolitionModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats,
 }
 
 
-const Material& DemolitionModel::GetMaterial()
+const Material& DemolitionModel::GetMaterial() const 
 {
     for (unsigned int i = 0 ; i < m_Materials.size() ; i++) {
         if (m_Materials[i].AmbientColor != Vector3f(0.0f, 0.0f, 0.0f)) {

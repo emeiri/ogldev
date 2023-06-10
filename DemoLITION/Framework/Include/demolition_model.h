@@ -63,13 +63,15 @@ public:
 
     void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
-    const Material& GetMaterial();
+    const Material& GetMaterial() const;
 
     PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
     WorldTrans& GetWorldTransform() { return m_worldTransform; }
+
+    const std::vector<BasicCamera> GetCameras() const { return m_cameras; }
 
 private:
 

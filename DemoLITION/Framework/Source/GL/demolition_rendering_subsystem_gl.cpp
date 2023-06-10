@@ -124,6 +124,15 @@ void RenderingSubsystemGL::Execute()
         exit(0);
     }
 
+    const DemolitionModel* pMainModel = NULL;
+    
+    if (m_pScene) {
+        pMainModel = m_pScene->GetMainModel();
+        if (pMainModel && (pMainModel->GetCameras().size() > 0)) {
+            *m_pCamera = pMainModel->GetCameras()[0];
+        }
+    }
+
     long long StartTimeMillis = GetCurrentTimeMillis();
 
     while (!glfwWindowShouldClose(m_pWindow)) {

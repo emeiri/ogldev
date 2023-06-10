@@ -21,6 +21,7 @@ void test_minimal();
 void test_clear();
 void test_object();
 void test_move_object();
+void test_blender_scene();
 
 
 int main(int argc, char* arg[])
@@ -28,5 +29,6 @@ int main(int argc, char* arg[])
     //test_minimal();
     //test_clear();    
     //test_object();
-    test_move_object();
+    //test_move_object();
+    test_blender_scene();
 }

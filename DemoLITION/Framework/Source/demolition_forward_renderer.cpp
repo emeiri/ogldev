@@ -121,13 +121,18 @@ void ForwardRenderer::Render(GLScene* pScene)
         printf("Warning! trying to render but all lights are zero\n");
     }
 
-    if (pScene->GetObjectList().size() == 0) {
-        printf("Warning! object list is empty\n");
-        return;
+
+    DemolitionModel* pMesh = pScene->GetMainModel();
+
+    if (!pMesh) {
+        if (pScene->GetObjectList().size() == 0) {
+            printf("Warning! object list is empty and no main model\n");
+            return;
+        }
+
+        pMesh = pScene->GetObjectList().front();
     }
-
-    DemolitionModel* pMesh = pScene->GetObjectList().front();
-
+     
     SwitchToLightingTech();
 
     const DirectionalLight& DirLight = pScene->m_dirLights[0];
