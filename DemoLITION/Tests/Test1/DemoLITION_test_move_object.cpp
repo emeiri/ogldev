@@ -75,7 +75,6 @@ public:
     bool OnMouseMove(int x, int y) 
     { 
         Vector3f Pos((float)x / 200.0f, (float)y / 200.0f, 10.0f);
-        Pos.Print();
         m_pMesh->SetPosition(Pos);
         return true; 
     }
@@ -85,7 +84,7 @@ private:
     void InitMesh()
     {
         m_pMesh = new BasicMesh();
-        m_pMesh->LoadMesh("../Content/sphere.obj");
+        m_pMesh->LoadMesh("../Content/test.glb");
         m_pMesh->SetPosition(0.0f, 0.0f, 10.0f);
 
         m_pScene->AddObject(m_pMesh);
