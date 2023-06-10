@@ -19,9 +19,9 @@
 #include "demolition_scene.h"
 
 
-void Scene::AddObject(BasicMesh* pObject)
+void Scene::AddObject(DemolitionMesh* pObject)
 {
-    std::list<BasicMesh*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
+    std::list<DemolitionMesh*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
 
     if (it == m_objects.end()) {
         m_objects.push_back(pObject);
@@ -29,9 +29,9 @@ void Scene::AddObject(BasicMesh* pObject)
 }
 
 
-bool Scene::RemoveObject(BasicMesh* pObject)
+bool Scene::RemoveObject(DemolitionMesh* pObject)
 {
-    std::list<BasicMesh*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
+    std::list<DemolitionMesh*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
 
     bool ret = false;
 

@@ -23,7 +23,7 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_material.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_mesh_common.h"
+#include "demolition_model.h"
 
 // This version of the lighting technique was updated for youtube
 
@@ -72,7 +72,7 @@ public:
 };
 
 
-class ForwardLightingTechnique : public Technique, public IRenderCallbacks
+class ForwardLightingTechnique : public Technique, public DemolitionRenderCallbacks
 {
 public:
 

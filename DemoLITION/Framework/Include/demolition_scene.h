@@ -21,8 +21,9 @@
 
 #include <list>
 
-#include "ogldev_basic_mesh.h"
-#include "ogldev_forward_lighting.h"
+#include "demolition_forward_lighting.h"
+#include "demolition_model.h"
+
 
 class Scene {
 public:
@@ -30,9 +31,9 @@ public:
 
     virtual ~Scene() {}
 
-    void AddObject(BasicMesh* pObject);
+    void AddObject(DemolitionMesh* pObject);
 
-    bool RemoveObject(BasicMesh* pObject);
+    bool RemoveObject(DemolitionMesh* pObject);
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
     void DisableClear() { m_clearFrame = false;  }
@@ -44,7 +45,7 @@ public:
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
-    std::list<BasicMesh*> m_objects;
+    std::list<DemolitionMesh*> m_objects;
     bool m_clearFrame = false;
     Vector4f m_clearColor;
 };

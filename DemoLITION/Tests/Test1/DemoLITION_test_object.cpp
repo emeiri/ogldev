@@ -69,23 +69,23 @@ public:
     {
         m_counter += 0.1f;
 
-        m_pMesh->SetRotation(0.0f, m_counter, 0.0f);
+        m_pMesh->GetWorldTransform().SetRotation(0.0f, m_counter, 0.0f);
     }
 
 private:
 
     void InitMesh()
     {
-        m_pMesh = new BasicMesh();
+        m_pMesh = new DemolitionMesh();
         m_pMesh->LoadMesh("../Content/sphere.obj");
-        m_pMesh->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
 
         m_pScene->AddObject(m_pMesh);
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
-    BasicMesh* m_pMesh = NULL;
+    DemolitionMesh* m_pMesh = NULL;
     float m_counter = 0;    
 };
 

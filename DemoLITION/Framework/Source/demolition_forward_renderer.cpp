@@ -50,15 +50,6 @@ void ForwardRenderer::InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubs
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
-    if (!m_skinningTech.Init()) {
-        printf("Error initializing the skinning technique\n");
-        exit(1);
-    }
-
-    m_skinningTech.Enable();
-    m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    //    // m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);
@@ -109,17 +100,6 @@ void ForwardRenderer::SwitchToLightingTech()
 }
 
 
-void ForwardRenderer::SwitchToSkinningTech()
-{
-    GLint cur_prog = 0;
-    glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
-
-    if (cur_prog != m_skinningTech.GetProgram()) {
-        m_skinningTech.Enable();
-    }
-}
-
-
 void ForwardRenderer::Render(GLScene* pScene)
 {
     if (!m_pCurCamera) {
@@ -146,7 +126,7 @@ void ForwardRenderer::Render(GLScene* pScene)
         return;
     }
 
-    BasicMesh* pMesh = pScene->GetObjectList().front();
+    DemolitionMesh* pMesh = pScene->GetObjectList().front();
 
     SwitchToLightingTech();
 
@@ -174,7 +154,7 @@ void ForwardRenderer::Render(GLScene* pScene)
 }
 
 
-void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicMesh* pMesh)
+void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, DemolitionMesh* pMesh)
 {
     Matrix4f WVP;
     GetWVP(pMesh, WVP);
@@ -255,7 +235,7 @@ void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicM
     UpdateMatrices(&m_skinningTech, pMesh);
 }*/
 
-void ForwardRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight)
+void ForwardRenderer::RenderToShadowMap(DemolitionMesh* pMesh, const SpotLight& SpotLight)
 {
     Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
 
@@ -284,7 +264,7 @@ void ForwardRenderer::RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotL
 }
 
 
-void ForwardRenderer::GetWVP(BasicMesh* pMesh, Matrix4f& WVP)
+void ForwardRenderer::GetWVP(DemolitionMesh* pMesh, Matrix4f& WVP)
 {
     WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
 
@@ -300,9 +280,6 @@ void ForwardRenderer::ControlRimLight(bool IsEnabled)
 {
     SwitchToLightingTech();
     m_lightingTech.ControlRimLight(IsEnabled);
-
-    m_skinningTech.Enable();
-    m_skinningTech.ControlRimLight(IsEnabled);
 }
 
 
@@ -310,9 +287,6 @@ void ForwardRenderer::ControlCellShading(bool IsEnabled)
 {
     SwitchToLightingTech();
     m_lightingTech.ControlCellShading(IsEnabled);
-
-    m_skinningTech.Enable();
-    m_skinningTech.ControlCellShading(IsEnabled);
 }
 
 
@@ -321,10 +295,6 @@ void ForwardRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f&
     SwitchToLightingTech();
     m_lightingTech.SetLinearFog(FogStart, FogEnd);
     m_lightingTech.SetFogColor(FogColor);
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetLinearFog(FogStart, FogEnd);
-    m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -333,10 +303,6 @@ void ForwardRenderer::SetExpFog(float FogEnd, const Vector3f& FogColor, float Fo
     SwitchToLightingTech();
     m_lightingTech.SetExpFog(FogEnd, FogDensity);
     m_lightingTech.SetFogColor(FogColor);
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetExpFog(FogEnd, FogDensity);
-    m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -345,10 +311,6 @@ void ForwardRenderer::SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, f
     SwitchToLightingTech();
     m_lightingTech.SetExpSquaredFog(FogEnd, FogDensity);
     m_lightingTech.SetFogColor(FogColor);
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetExpSquaredFog(FogEnd, FogDensity);
-    m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -357,10 +319,6 @@ void ForwardRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& 
     SwitchToLightingTech();
     m_lightingTech.SetLayeredFog(FogTop, FogEnd);
     m_lightingTech.SetFogColor(FogColor);
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetLayeredFog(FogTop, FogEnd);
-    m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -369,10 +327,6 @@ void ForwardRenderer::SetAnimatedFog(float FogEnd, float FogDensity, const Vecto
     SwitchToLightingTech();
     m_lightingTech.SetAnimatedFog(FogEnd, FogDensity);
     m_lightingTech.SetFogColor(FogColor);
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetAnimatedFog(FogEnd, FogDensity);
-    m_skinningTech.SetFogColor(FogColor);
 }
 
 
@@ -380,16 +334,10 @@ void ForwardRenderer::UpdateAnimatedFogTime(float FogTime)
 {
     SwitchToLightingTech();
     m_lightingTech.SetFogTime(FogTime);
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetFogTime(FogTime);
 }
 
 void ForwardRenderer::DisableFog()
 {
     SwitchToLightingTech();
     m_lightingTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
-
-    SwitchToSkinningTech();
-    m_skinningTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
 }

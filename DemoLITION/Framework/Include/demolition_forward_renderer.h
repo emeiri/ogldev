@@ -19,12 +19,10 @@
 #pragma once 
 
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_forward_lighting.h"
-#include "ogldev_forward_skinning.h"
-#include "ogldev_basic_mesh.h"
-#include "ogldev_skinned_mesh.h"
 #include "ogldev_shadow_mapping_technique.h"
 #include "demolition_rendering_subsystem.h"
+#include "demolition_forward_lighting.h"
+#include "demolition_model.h"
 #include "GL/gl_scene.h"
 
 
@@ -64,33 +62,31 @@ class ForwardRenderer {
 
    // void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 
-    void RenderAnimationBlended(SkinnedMesh* pMesh,
+ /*   void RenderAnimationBlended(SkinnedMesh* pMesh,
                                 float AnimationTimeSec,
                                 int StartAnimIndex,
                                 int EndAnimIndex,
-                                float BlendFactor);
+                                float BlendFactor);*/
 
-    void RenderToShadowMap(BasicMesh* pMesh, const SpotLight& SpotLight);
+    void RenderToShadowMap(DemolitionMesh* pMesh, const SpotLight& SpotLight);
  
 private:
 
     void CreateDefaultCamera();
 
-    void GetWVP(BasicMesh* pMesh, Matrix4f& WVP);
+    void GetWVP(DemolitionMesh* pMesh, Matrix4f& WVP);
 
     void SwitchToLightingTech();
 
-    void SwitchToSkinningTech();
-
     //void RenderAnimationCommon(SkinnedMesh* pMesh);
 
-    void UpdateMatrices(ForwardLightingTechnique* pBaseTech, BasicMesh* pMesh);
+    void UpdateMatrices(ForwardLightingTechnique* pBaseTech, DemolitionMesh* pMesh);
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     BasicCamera* m_pCurCamera = NULL;
     BasicCamera* m_pDefaultCamera = NULL;
     ForwardLightingTechnique m_lightingTech;
-    ForwardSkinningTechnique m_skinningTech;
+    //ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
 };
 

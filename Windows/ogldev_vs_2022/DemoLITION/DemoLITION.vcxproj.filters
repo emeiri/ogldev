@@ -16,22 +16,10 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_forward_lighting.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_forward_skinning.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp">
@@ -53,6 +41,12 @@
       <Filter>Source\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_scene.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_model.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_lighting.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,14 +72,17 @@
     <ClInclude Include="..\..\..\Include\ogldev_math_3d.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_skinned_mesh.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\demolition_rendering_subsystem_gl.h">
       <Filter>Include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_lighting.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
