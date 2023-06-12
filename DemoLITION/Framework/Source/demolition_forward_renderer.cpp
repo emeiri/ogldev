@@ -135,6 +135,8 @@ void ForwardRenderer::Render(GLScene* pScene)
      
     SwitchToLightingTech();
 
+    pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
+
     const DirectionalLight& DirLight = pScene->m_dirLights[0];
 
     if (DirLight.DiffuseIntensity > 0.0) {
@@ -276,6 +278,9 @@ void ForwardRenderer::GetWVP(DemolitionModel* pMesh, Matrix4f& WVP)
     Matrix4f World = meshWorldTransform.GetMatrix();
     Matrix4f View = m_pCurCamera->GetMatrix();
     Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+
+   // Projection.Print();
+ //   exit(0);
 
     WVP = Projection * View * World;
 }

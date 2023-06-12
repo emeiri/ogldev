@@ -558,6 +558,16 @@ void DemolitionModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Ve
 }
 
 
+void traverse(aiNode* pNode)
+{
+    printf("%s\n", pNode->mName.C_Str());
+
+    for (uint i = 0; i < pNode->mNumChildren; i++) {
+        traverse(pNode->mChildren[i]);
+    }
+}
+
+
 void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight)
 {
     printf("Loading %d cameras\n", pScene->mNumCameras);
@@ -565,32 +575,63 @@ void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int Wi
     m_cameras.resize(pScene->mNumCameras);
 
     for (unsigned int i = 0; i < pScene->mNumCameras; i++) {
-        InitSingleCamera(i, pScene->mCameras[i], WindowWidth, WindowHeight);
+        InitSingleCamera(i, pScene, WindowWidth, WindowHeight);
     }
+
+
+    aiNode* pNode = pScene->mRootNode;
+
+    traverse(pNode);
+
+    pNode = pScene->mRootNode->FindNode("Camera");
+
+    printf("!!! %s\n", pNode->mName.C_Str());
+
+    Matrix4f foo(pNode->mTransformation);
+    foo.Print();
 }
 
 
-void DemolitionModel::InitSingleCamera(int Index, const aiCamera* pCamera, int WindowWidth, int WindowHeight)
+void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight)
 {
+    const aiCamera* pCamera = pScene->mCameras[Index];
     printf("Camera name: '%s'\n", pCamera->mName.C_Str());
 
-    Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
-    Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
-    Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
+
+    Matrix4f foo(pScene->mRootNode->mTransformation);
+    foo.Print();
+
+    aiNode* pNode = pScene->mRootNode->FindNode(pCamera->mName);
+
+    Matrix4f c(pNode->mTransformation);
+
+    Vector3f Pos(c.m[0][3], c.m[1][3], c.m[2][3]);
+    Vector3f Target(c.m[2][0], c.m[2][1], c.m[2][2]);
+    Vector3f Up(c.m[1][0], c.m[1][1], c.m[1][2]);
+
+    printf("Pos: "); Pos.Print();
+    printf("Target: "); Target.Print();
+    printf("Up: "); Up.Print();
+
+   // exit(0);
+
+    //Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
+    //Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
+   // Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
 
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
     persProjInfo.zFar = pCamera->mClipPlaneFar;
     persProjInfo.Width = (float)WindowWidth;
     persProjInfo.Height = (float)WindowHeight;
-    persProjInfo.FOV = pCamera->mHorizontalFOV;
+    persProjInfo.FOV = 45.0f;// pCamera->mHorizontalFOV;
 
     aiMatrix4x4 CameraMatrix;
     pCamera->GetCameraMatrix(CameraMatrix);
 
-    Matrix4f foo(CameraMatrix);
+   // Matrix4f foo(CameraMatrix);
 
-    foo.Print();
+  //  foo.Print();
 
   //  exit(0);
 

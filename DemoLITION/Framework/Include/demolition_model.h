@@ -128,7 +128,7 @@ private:
 
     void InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight);
 
-    void InitSingleCamera(int Index, const aiCamera* pCamera, int WindowWidth, int WindowHeight);
+    void InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight);
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,

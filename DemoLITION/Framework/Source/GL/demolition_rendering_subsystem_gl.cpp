@@ -129,9 +129,11 @@ void RenderingSubsystemGL::Execute()
     if (m_pScene) {
         pMainModel = m_pScene->GetMainModel();
         if (pMainModel && (pMainModel->GetCameras().size() > 0)) {
-            //*m_pCamera = pMainModel->GetCameras()[0];
+            *m_pCamera = pMainModel->GetCameras()[0];
         }
     }
+
+    //m_pCamera->SetTarget(Vector3f(0.0f, 0.0f, 1.0f));
 
     long long StartTimeMillis = GetCurrentTimeMillis();
 
