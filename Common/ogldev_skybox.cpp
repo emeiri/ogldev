@@ -79,11 +79,11 @@ void SkyBox::Render(const BasicCamera& Camera)
 
     GLint OldCullFaceMode;
     glGetIntegerv(GL_CULL_FACE_MODE, &OldCullFaceMode);
-    GLint OldDepthMask;
-    glGetIntegerv(GL_DEPTH_WRITEMASK, &OldDepthMask);
+    GLint OldDepthFuncMode;
+    glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);
 
     glCullFace(GL_FRONT);
-    glDepthMask(GL_FALSE);
+    glDepthFunc(GL_LEQUAL);
 
     Matrix4f WorldView;
     WorldView.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
@@ -95,5 +95,5 @@ void SkyBox::Render(const BasicCamera& Camera)
     m_pMesh->Render();
 
     glCullFace(OldCullFaceMode);
-    glDepthMask(OldDepthMask);
+    glDepthFunc(OldDepthFuncMode);
 }
