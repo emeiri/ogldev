@@ -163,6 +163,8 @@ void BaseTerrain::SaveToFile(const char* pFilename)
 
 void BaseTerrain::Render(const BasicCamera& Camera)
 {
+    m_skyBox.Render(Camera);
+
     Matrix4f VP = Camera.GetViewProjMatrix();
     Matrix4f View = Camera.GetMatrix();
 
@@ -178,8 +180,6 @@ void BaseTerrain::Render(const BasicCamera& Camera)
     m_terrainTech.SetLightDir(m_lightDir);
 
     m_geomipGrid.Render(Camera.GetPos(), VP);
-
-    m_skyBox.Render(Camera);
 }
 
 
