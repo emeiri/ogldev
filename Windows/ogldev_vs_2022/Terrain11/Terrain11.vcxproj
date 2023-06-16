@@ -63,6 +63,8 @@
     <ClInclude Include="..\..\..\Terrain11\texture_config.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\Common\Shaders\skybox.fs" />
+    <None Include="..\..\..\Common\Shaders\skybox.vs" />
     <None Include="..\..\..\Terrain11\terrain.fs" />
     <None Include="..\..\..\Terrain11\terrain.vs" />
   </ItemGroup>

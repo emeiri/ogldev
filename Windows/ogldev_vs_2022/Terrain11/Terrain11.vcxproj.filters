@@ -89,5 +89,11 @@
     <None Include="..\..\..\Terrain11\terrain.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\..\Common\Shaders\skybox.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\skybox.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -69,7 +69,7 @@ bool SkyBox::Init(const string& Directory,
 
     m_pMesh = new BasicMesh();
 
-    return m_pMesh->LoadMesh("../Content/sphere.obj");
+    return m_pMesh->LoadMesh("../Content/box.obj");
 }
 
 
@@ -85,13 +85,11 @@ void SkyBox::Render(const BasicCamera& Camera)
     glCullFace(GL_FRONT);
     glDepthFunc(GL_LEQUAL);
 
-    Matrix4f Scale;
-    Scale.InitScaleTransform(20.0f, 20.0f, 20.0f);
     Matrix4f WorldView;
     WorldView.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
     Matrix4f Proj;
     Proj.InitPersProjTransform(Camera.m_persProjInfo);
-    Matrix4f WVP = Proj * WorldView * Scale;
+    Matrix4f WVP = Proj * WorldView;
     m_pSkyboxTechnique->SetWVP(WVP);
     m_pCubemapTex->Bind(GL_TEXTURE0);
     m_pMesh->Render();
