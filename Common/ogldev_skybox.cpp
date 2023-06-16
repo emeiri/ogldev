@@ -19,11 +19,10 @@
 #include "ogldev_skybox.h"
 #include "ogldev_pipeline.h"
 #include "ogldev_util.h"
+#include "ogldev_basic_mesh.h"
 
-SkyBox::SkyBox(const BasicCamera* pCamera)
+SkyBox::SkyBox()
 {
-    m_pCamera = pCamera;
-
     m_pSkyboxTechnique = NULL;
     m_pCubemapTex = NULL;
     m_pMesh = NULL;
@@ -70,11 +69,11 @@ bool SkyBox::Init(const string& Directory,
 
     m_pMesh = new BasicMesh();
 
-    return m_pMesh->LoadMesh("../../../../ogldev/Content/sphere.obj");
+    return m_pMesh->LoadMesh("../Content/sphere.obj");
 }
 
 
-void SkyBox::Render()
+void SkyBox::Render(const BasicCamera& Camera)
 {
     m_pSkyboxTechnique->Enable();
 
@@ -89,9 +88,9 @@ void SkyBox::Render()
     Matrix4f Scale;
     Scale.InitScaleTransform(20.0f, 20.0f, 20.0f);
     Matrix4f WorldView;
-    WorldView.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), m_pCamera->GetTarget(), m_pCamera->GetUp());
+    WorldView.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
     Matrix4f Proj;
-    Proj.InitPersProjTransform(m_pCamera->m_persProjInfo);
+    Proj.InitPersProjTransform(Camera.m_persProjInfo);
     Matrix4f WVP = Proj * WorldView * Scale;
     m_pSkyboxTechnique->SetWVP(WVP);
     m_pCubemapTex->Bind(GL_TEXTURE0);

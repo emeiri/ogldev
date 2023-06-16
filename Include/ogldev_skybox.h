@@ -22,12 +22,14 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_skybox_technique.h"
 #include "ogldev_cubemap_texture.h"
-#include "ogldev_basic_mesh.h"
+//#include "ogldev_basic_mesh.h"
+
+class BasicMesh;
 
 class SkyBox
 {
 public:
-    SkyBox(const BasicCamera* pCamera);
+    SkyBox();
 
     ~SkyBox();
 
@@ -39,13 +41,12 @@ public:
               const string& PosZFilename,
               const string& NegZFilename);
 
-    void Render();
+    void Render(const BasicCamera& pCamera);
 
 private:
-    SkyboxTechnique* m_pSkyboxTechnique;
-    const BasicCamera* m_pCamera;
-    CubemapTexture* m_pCubemapTex;
-    BasicMesh* m_pMesh;
+    SkyboxTechnique* m_pSkyboxTechnique = NULL;
+    CubemapTexture* m_pCubemapTex = NULL;
+    BasicMesh* m_pMesh = NULL;
 };
 
 #endif  /* OGLDEV_SKYBOX_H */
