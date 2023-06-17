@@ -65,13 +65,13 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
 
-    if (!m_skyBox.Init("../data/envmap_miramar",
-        "miramar_lf.tga",
-        "miramar_rt.tga",
-        "miramar_dn.tga",
-        "miramar_up.tga",
-        "miramar_ft.tga",
-        "miramar_bk.tga")) {
+    if (!m_skyBox.Init("../Content/envmap_interstellar",
+        "interstellar_lf.tga",
+        "interstellar_rt.tga",
+        "interstellar_dn.tga",
+        "interstellar_up.tga",
+        "interstellar_ft.tga",
+        "interstellar_bk.tga")) {
         exit(0);
     }
 }
