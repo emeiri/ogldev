@@ -22,13 +22,6 @@
 #include <string>
 #include <GL/glew.h>
 
-// In the youtube series I've switch to stb_image
-//#define USE_IMAGE_MAGICK
-
-#ifdef USE_IMAGE_MAGICK
-#include <ImageMagick-6/Magick++.h>
-#endif
-
 using namespace std;
 
 class CubemapTexture
