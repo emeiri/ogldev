@@ -96,6 +96,13 @@ void Matrix4f::InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ)
     m[3][0] = 0.0f;   m[3][1] = 0.0f;   m[3][2] = 0.0f;   m[3][3] = 1.0f;
 }
 
+
+void Matrix4f::InitScaleTransform(float Scale)
+{
+    InitScaleTransform(Scale, Scale, Scale);
+}
+
+
 void Matrix4f::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
 {
     Matrix4f rx, ry, rz;

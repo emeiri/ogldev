@@ -548,6 +548,7 @@ public:
     Matrix4f Inverse() const;
 
     void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
+    void InitScaleTransform(float Scale);
 
     void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
     void InitRotateTransformZYX(float RotateX, float RotateY, float RotateZ);
