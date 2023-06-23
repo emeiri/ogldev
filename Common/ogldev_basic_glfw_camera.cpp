@@ -22,8 +22,8 @@
 
 #include "ogldev_basic_glfw_camera.h"
 
-static int MARGIN = 20;
-static float EDGE_STEP = 1.0f;
+static int MARGIN = 40;
+static float EDGE_STEP = 0.5f;
 
 BasicCamera::BasicCamera(int WindowWidth, int WindowHeight)
 {
@@ -209,28 +209,24 @@ void BasicCamera::OnMouse(int x, int y)
     m_AngleH += (float)DeltaX / 20.0f;
     m_AngleV += (float)DeltaY / 20.0f;
 
-    if (DeltaX == 0) {
-        if (x <= MARGIN) {
-            m_OnLeftEdge = true;
-        }
-        else if (x >= (m_windowWidth - MARGIN)) {
-            m_OnRightEdge = true;
-        }
-    }
-    else {
+    if (x <= MARGIN) {
+        m_OnLeftEdge = true;
+	    m_OnRightEdge = false;
+    }  else if (x >= (m_windowWidth - MARGIN)) {
+        m_OnRightEdge = true;
+	    m_OnLeftEdge = false;
+    } else {
         m_OnLeftEdge = false;
         m_OnRightEdge = false;
     }
 
-    if (DeltaY == 0) {
-        if (y <= MARGIN) {
-            m_OnUpperEdge = true;
-        }
-        else if (y >= (m_windowHeight - MARGIN)) {
-            m_OnLowerEdge = true;
-        }
-    }
-    else {
+    if (y <= MARGIN) {
+        m_OnUpperEdge = true;
+        m_OnLowerEdge = false;
+    } else if (y >= (m_windowHeight - MARGIN)) {
+        m_OnLowerEdge = true;
+        m_OnUpperEdge = false;
+    } else {
         m_OnUpperEdge = false;
         m_OnLowerEdge = false;
     }
