@@ -60,6 +60,8 @@ CubemapTexture::~CubemapTexture()
 
 bool CubemapTexture::Load()
 {
+    stbi_set_flip_vertically_on_load(0);
+
     glGenTextures(1, &m_textureObj);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_textureObj);
 
