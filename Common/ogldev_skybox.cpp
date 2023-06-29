@@ -79,21 +79,29 @@ void SkyBox::Render(const BasicCamera& Camera)
 
     GLint OldCullFaceMode;
     glGetIntegerv(GL_CULL_FACE_MODE, &OldCullFaceMode);
+
     GLint OldDepthFuncMode;
     glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);
 
     glCullFace(GL_FRONT);
+
     glDepthFunc(GL_LEQUAL);
 
-    Matrix4f WorldView;
-    WorldView.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
+    static float r = 0.0f;
+    Matrix4f Rotation;
+    Rotation.InitRotateTransform(0.0f, r, 0.0f);
+    r += 0.01f;
+
+    Matrix4f View;
+    View.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
     Matrix4f Proj;
     Proj.InitPersProjTransform(Camera.m_persProjInfo);
-    Matrix4f WVP = Proj * WorldView;
+    Matrix4f WVP = Proj * View * Rotation;
     m_pSkyboxTechnique->SetWVP(WVP);
     m_pCubemapTex->Bind(GL_TEXTURE0);
     m_pMesh->Render();
 
     glCullFace(OldCullFaceMode);
+
     glDepthFunc(OldDepthFuncMode);
 }
