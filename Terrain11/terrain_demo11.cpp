@@ -140,10 +140,10 @@ public:
 
         m_pGameCamera->OnRender();
 
-        static float foo = 0.0f;
+     /*   static float foo = 0.0f;
         foo += 0.002f;
 
-      /*  float S = (float)m_terrainSize;
+        float S = (float)m_terrainSize;
         float R = 2.5f * S;
 
         Vector3f Pos(S + cosf(foo) * R, m_maxHeight + 250.0f, S + sinf(foo) * R);
@@ -152,12 +152,12 @@ public:
         Vector3f Center(S, Pos.y * 0.50f, S);
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
-        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
+        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
 
         float y = min(-0.4f, cosf(foo));
         Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
 
-      //  m_terrain.SetLightDir(LightDir);
+        m_terrain.SetLightDir(LightDir);*/
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -282,12 +282,12 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 2.0f;
+        float WorldScale = 4.0f;
         float TextureScale = 16.0f;
         std::vector<string> TextureFilenames;
-        TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
-        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
-        TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
+        TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
+        TextureFilenames.push_back("../Content/Textures/coast_sand_rocks_02_diff_2k.jpg");        
+        TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");
         TextureFilenames.push_back("../Content/textures/water.png");
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
@@ -333,7 +333,7 @@ private:
     int m_terrainSize = 513;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
-    float m_maxHeight = 150.0f;
+    float m_maxHeight = 350.0f;
     int m_patchSize = 17;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;
