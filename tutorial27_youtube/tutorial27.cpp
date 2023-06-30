@@ -34,8 +34,8 @@
 #include "skinning_technique.h"
 #include "skinned_mesh.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 
 
@@ -156,6 +156,7 @@ void Tutorial27::RenderSceneCB()
 
     WorldTrans& worldTransform = pMesh1->GetWorldTransform();
 
+    worldTransform.SetRotation(0.0f, 180.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
     worldTransform.SetScale(0.1f);
 
