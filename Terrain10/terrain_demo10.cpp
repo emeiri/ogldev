@@ -48,7 +48,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 static int g_seed = 0;
 
-extern int gShowPoints;
+int gShowPoints;
 
 
 class TerrainDemo10
@@ -284,7 +284,7 @@ private:
         float TextureScale = 16.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/IMGP5525_seamless.jpg");
-        TextureFilenames.push_back("../Content/Textures/IMGP5487_seamless.jpg");        
+        TextureFilenames.push_back("../Content/textures/IMGP5487_seamless.jpg");        
         TextureFilenames.push_back("../Content/textures/tilable-IMG_0044-verydark.png");
         TextureFilenames.push_back("../Content/textures/water.png");
 

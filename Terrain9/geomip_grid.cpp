@@ -24,7 +24,7 @@
 #include "geomip_grid.h"
 #include "terrain.h"
 
-extern int gShowPoints = 0;
+extern int gShowPoints;
 
 
 GeomipGrid::GeomipGrid()
