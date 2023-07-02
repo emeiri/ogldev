@@ -104,7 +104,7 @@ struct Neighbors
 
 struct CompareEdges
 {
-    bool operator()(const Edge& Edge1, const Edge& Edge2)
+    bool operator()(const Edge& Edge1, const Edge& Edge2) const
     {
         if (Edge1.a < Edge2.a) {
             return true;
@@ -121,7 +121,7 @@ struct CompareEdges
 
 struct CompareVectors
 {
-    bool operator()(const aiVector3D& a, const aiVector3D& b)
+    bool operator()(const aiVector3D& a, const aiVector3D& b) const
     {
         if (a.x < b.x) {
             return true;
