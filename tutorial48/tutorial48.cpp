@@ -37,7 +37,7 @@
 #include "ogldev_basic_lighting.h"
 #include "ogldev_backend.h"
 #include "ogldev_camera.h"
-#include "ogldev_basic_mesh.h"
+#include "mesh.h"
 #include "ogldev_atb.h"
 
 #define WINDOW_WIDTH  1280
@@ -116,7 +116,7 @@ public:
         if (!m_mesh[BUDDHA].LoadMesh("../Content/buddha.obj")) {
             return false;
         }
-        m_mesh[BUDDHA].GetWorldTransform().SetRotation(0.0f, 180.0f, 0.0f);
+        m_mesh[BUDDHA].GetOrientation().m_rotation = Vector3f(0.0f, 180.0f, 0.0f);
 
         if (!m_mesh[BUNNY].LoadMesh("../Content/bunny.obj")) {
             return false;
@@ -127,7 +127,7 @@ public:
         }
 
         for (int i = 0 ; i < 3 ; i++) {
-            m_mesh[i].GetWorldTransform().SetPosition(0.0f, -8.0f, 34.0f);
+            m_mesh[i].GetOrientation().m_pos = Vector3f(0.0f, -8.0f, 34.0f);
         }
 #ifndef WIN32
         // TOOD: not working. Need to debug this.
@@ -143,7 +143,7 @@ public:
 
         TwAddSeparator(bar, "", NULL);
 
-        m_pGameCamera->AddToATB(bar);
+//        m_pGameCamera->AddToATB(bar);
 
         TwAddSeparator(bar, "", NULL);
 
@@ -156,7 +156,7 @@ public:
 
         TwAddSeparator(bar, "", NULL);
 
-        m_directionalLight.AddToATB(bar);
+ //       m_directionalLight.AddToATB(bar);
 
         float refresh = 0.1f;
         TwSetParam(bar, NULL, "refresh", TW_PARAM_FLOAT, 1, &refresh);
@@ -186,10 +186,10 @@ public:
         m_pipeline.SetCamera(*m_pGameCamera);
 
         if (gAutoRotate) {
-            m_mesh[m_currentMesh].GetWorldTransform().Rotate(0.0f, m_rotationSpeed, 0.0f);
+            m_mesh[m_currentMesh].GetOrientation().m_rotation = Vector3f(0.0f, m_rotationSpeed, 0.0f);
         }
         else {
-            m_mesh[m_currentMesh].GetWorldTransform().SetRotation(g_Rotation.ToDegrees());
+            m_mesh[m_currentMesh].GetOrientation().m_rotation = Vector3f(g_Rotation.ToDegrees());
         }
 
         m_pipeline.Orient(m_mesh[m_currentMesh].GetOrientation());
@@ -257,7 +257,7 @@ private:
     BasicLightingTechnique m_LightingTech;
     Camera* m_pGameCamera;
     DirectionalLight m_directionalLight;
-    BasicMesh m_mesh[3];
+    Mesh m_mesh[3];
     PersProjInfo m_persProjInfo;
     Pipeline m_pipeline;
     ATB m_atb;
