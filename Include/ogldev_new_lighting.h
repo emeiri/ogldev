@@ -144,7 +144,7 @@ public:
     void SetFogTime(float Time);
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
-    void SetClipPlane(const Vector4f& ClipPlane);
+    void SetClipPlane(const Vector3f& Normal, const Vector3f& PointOnPlane);
     //    void SetPBRLight(const PBRLight& Light);
 
 protected:

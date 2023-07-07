@@ -267,11 +267,19 @@ public:
                 break;
 
             case GLFW_KEY_A:
-                m_dirLight.AmbientIntensity += ATTEN_STEP;
+                m_clipPlaneHeight += 0.1f;
                 break;
 
-            case GLFW_KEY_D:
-                m_dirLight.DiffuseIntensity -= ATTEN_STEP;
+            case GLFW_KEY_Z:
+                m_clipPlaneHeight -= 0.1f;
+                break;
+
+            case GLFW_KEY_X:
+                m_clipPlaneAngle += 0.1f;
+                break;
+
+            case GLFW_KEY_C:
+                m_clipPlaneAngle -= 0.1f;
                 break;
 
             case GLFW_KEY_P:

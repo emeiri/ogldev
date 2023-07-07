@@ -583,8 +583,9 @@ void LightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
 }
 
 
-void LightingTechnique::SetClipPlane(const Vector4f& ClipPlane)
+void LightingTechnique::SetClipPlane(const Vector3f& Normal, const Vector3f& PointOnPlane)
 {
-    glUniform4f(ClipPlaneLoc, ClipPlane.x, ClipPlane.y, ClipPlane.z, ClipPlane.w);
+    float d = -Normal.Dot(PointOnPlane);
+    glUniform4f(ClipPlaneLoc, Normal.x, Normal.y, Normal.z, d);
 }
 
