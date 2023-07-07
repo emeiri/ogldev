@@ -7,6 +7,7 @@ layout (location = 2) in vec3 Normal;
 uniform mat4 gWVP;
 uniform mat4 gLightWVP; // required only for shadow mapping (spot/directional light)
 uniform mat4 gWorld;
+uniform vec4 gClipPlane;
 
 out vec2 TexCoord0;
 out vec3 Normal0;
@@ -24,4 +25,6 @@ void main()
     WorldPos0 = (gWorld * Pos4).xyz;
 
     LightSpacePos = gLightWVP * vec4(Position, 1.0); // required only for shadow mapping (spot/directional light)
+
+    gl_ClipDistance[0] = dot(vec4(Position, 1.0), gClipPlane);
 }

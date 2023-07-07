@@ -144,6 +144,7 @@ public:
     void SetFogTime(float Time);
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
+    void SetClipPlane(const Vector4f& ClipPlane);
     //    void SetPBRLight(const PBRLight& Light);
 
 protected:
@@ -184,6 +185,7 @@ private:
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ClipPlaneLoc = -1;
 
     struct {
         GLuint AmbientColor;

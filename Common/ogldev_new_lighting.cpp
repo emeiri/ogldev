@@ -18,7 +18,7 @@
 
 #include "ogldev_new_lighting.h"
 
-//#define FAIL_ON_MISSING_LOC
+#define FAIL_ON_MISSING_LOC
 
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
@@ -109,6 +109,7 @@ bool LightingTechnique::InitCommon()
     PBRMaterialLoc.Roughness = GetUniformLocation("gPBRmaterial.Roughness");
     PBRMaterialLoc.IsMetal = GetUniformLocation("gPBRmaterial.IsMetal");
     PBRMaterialLoc.Color = GetUniformLocation("gPBRmaterial.Color");
+    ClipPlaneLoc = GetUniformLocation("gClipPlane");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -150,7 +151,8 @@ bool LightingTechnique::InitCommon()
         IsPBRLoc == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.Roughness == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.IsMetal == INVALID_UNIFORM_LOCATION ||
-        PBRMaterialLoc.Color == INVALID_UNIFORM_LOCATION) {
+        PBRMaterialLoc.Color == INVALID_UNIFORM_LOCATION ||
+        ClipPlaneLoc == INVALID_UNIFORM_LOCATION) {
 
 #ifdef FAIL_ON_MISSING_LOC
         return false;
@@ -579,3 +581,10 @@ void LightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
     glUniform1i(PBRMaterialLoc.IsMetal, Material.IsMetal);
     glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
 }
+
+
+void LightingTechnique::SetClipPlane(const Vector4f& ClipPlane)
+{
+    glUniform4f(ClipPlaneLoc, ClipPlane.x, ClipPlane.y, ClipPlane.z, ClipPlane.w);
+}
+
