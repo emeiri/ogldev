@@ -78,7 +78,7 @@ layout(binding = 2) uniform sampler2D gShadowMap;        // required only for sh
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
-uniform int gShadowMapFilterSize = 1;
+uniform int gShadowMapFilterSize = 0;
 uniform sampler3D gShadowMapOffsetTexture;
 uniform float gShadowMapOffsetTextureSize;
 uniform float gShadowMapOffsetFilterSize;
@@ -340,10 +340,16 @@ vec4 CalcDirectionalLight(vec3 Normal)
 }
 
 
-vec4 CalcPointLight(PointLight l, vec3 Normal)
+vec4 CalcPointLight(PointLight l, vec3 Normal, bool IsSpot)
 {
     vec3 LightWorldDir = WorldPos0 - l.WorldPos;
-    float ShadowFactor = CalcShadowFactorPointLight(LightWorldDir);
+    float ShadowFactor = 0.0;
+    
+    if (IsSpot) {
+        ShadowFactor = CalcShadowFactor(LightWorldDir, Normal);
+    } else {
+        ShadowFactor = CalcShadowFactorPointLight(LightWorldDir);
+    }
 
     vec3 LightLocalDir = LocalPos0 - l.LocalPos;
     float Distance = length(LightLocalDir);
@@ -363,7 +369,7 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal)
     float SpotFactor = dot(LightToPixel, l.Direction);
 
     if (SpotFactor > l.Cutoff) {
-        vec4 Color = CalcPointLight(l.Base, Normal);
+        vec4 Color = CalcPointLight(l.Base, Normal, true);
         float SpotLightIntensity = (1.0 - (1.0 - SpotFactor)/(1.0 - l.Cutoff));
         return Color * SpotLightIntensity;
     }
@@ -494,7 +500,7 @@ vec4 CalcPhongLighting()
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {
-        TotalLight += CalcPointLight(gPointLights[i], Normal);
+        TotalLight += CalcPointLight(gPointLights[i], Normal, false);
     }
 
     for (int i = 0 ;i < gNumSpotLights ;i++) {
