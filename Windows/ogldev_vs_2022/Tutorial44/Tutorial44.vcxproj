@@ -19,53 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
-    <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_skybox.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\lod_manager.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\midpoint_disp_terrain.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\terrain.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\terrain_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial44_youtube\tutorial44.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\demo_config.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\geomip_grid.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\lod_manager.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\midpoint_disp_terrain.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\terrain.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\terrain_technique.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\texture_config.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\skybox.fs" />
     <None Include="..\..\..\Common\Shaders\skybox.vs" />
-    <None Include="..\..\..\tutorial44_youtube\imgui.ini" />
     <None Include="..\..\..\tutorial44_youtube\terrain.fs" />
     <None Include="..\..\..\tutorial44_youtube\terrain.vs" />
   </ItemGroup>

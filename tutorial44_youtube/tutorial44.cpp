@@ -15,223 +15,272 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    OpenGL For Beginners - User Clip Planes
+    Tutorial 44 - User Clip Planes
 */
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
-#ifdef _WIN64
-#include <Windows.h>
-#endif
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <GL/glew.h>
 
+
+#include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
+#include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
+#include "ogldev_basic_mesh.h"
+#include "ogldev_world_transform.h"
+#include "ogldev_shadow_map_fbo.h"
+#include "ogldev_new_lighting.h"
+#include "ogldev_shadow_mapping_technique.h"
 
-#include "demo_config.h"
-#include "texture_config.h"
-#include "midpoint_disp_terrain.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
+
+#define SHADOW_MAP_WIDTH 4096
+#define SHADOW_MAP_HEIGHT 4096
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
-static int g_seed = 0;
 
-extern int gShowPoints;
-
-
-class TerrainDemo11
+class Tutorial38
 {
 public:
 
-    TerrainDemo11()
+    Tutorial38()
     {
+        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.DiffuseIntensity = 0.9f;
+        m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
+
+        OrthoProjInfo cameraOrthoProjInfo;
+        cameraOrthoProjInfo.l = -WINDOW_WIDTH / 250.0f;
+        cameraOrthoProjInfo.r = WINDOW_WIDTH / 250.0f;
+        cameraOrthoProjInfo.t = WINDOW_HEIGHT / 250.0f;
+        cameraOrthoProjInfo.b = -WINDOW_HEIGHT / 250.0f;
+        cameraOrthoProjInfo.n = 1.0f;
+        cameraOrthoProjInfo.f = 100.0f;
+
+        m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
+
+        m_positions[0] = Vector3f(0.0f, 0.0f, -12.0f);
+        //  m_positions[1] = Vector3f(0.0f, 0.0f, 0.0f);
+        //  m_positions[2] = Vector3f(0.0f, 0.0f, 15.0f);
     }
 
-    virtual ~TerrainDemo11()
+
+    virtual ~Tutorial38()
     {
         SAFE_DELETE(m_pGameCamera);
+        SAFE_DELETE(m_pMesh1);
     }
 
 
     void Init()
     {
-        CreateWindow_(); // added '_' because of conflict with Windows.h
+        CreateWindow();
 
-        InitCallbacks();        
+        CreateShadowMap();
 
-        InitTerrain();
+        InitCallbacks();
 
         InitCamera();
 
-        InitGUI();
+        InitMesh();
+
+        InitShaders();
     }
 
 
     void Run()
     {
         while (!glfwWindowShouldClose(window)) {
-            glfwPollEvents();
-
-            if (m_showGui) {
-                // Start the Dear ImGui frame
-                ImGui_ImplOpenGL3_NewFrame();
-                ImGui_ImplGlfw_NewFrame();
-                ImGui::NewFrame();
-                                 
-                ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
-
-                ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
-                ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
-
-                static float Height0 = 64.0f;
-                static float Height1 = 128.0f;
-                static float Height2 = 192.0f;
-                static float Height3 = 256.0f;
-
-                ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
-                ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
-                ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
-                ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
-
-                if (ImGui::Button("Generate")) {
-                    m_terrain.Destroy();
-                    srand(g_seed);
-                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
-                    m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
-                }
-
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-                ImGui::End();
-
-                // Rendering
-                ImGui::Render();
-                int display_w, display_h;
-                glfwGetFramebufferSize(window, &display_w, &display_h);
-                glViewport(0, 0, display_w, display_h);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            }
-
-            RenderScene();            
-
+            RenderSceneCB();
             glfwSwapBuffers(window);
+            glfwPollEvents();
         }
     }
 
 
-    void RenderScene()
+    void RenderSceneCB()
     {
-        if (!m_showGui) {
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        static float foo = 0.001f;
+        foo += 0.01f;
+        if (foo >= 1.0f) {
+            //            foo = 0.001f;
         }
+
+        if (m_cameraOnLight) {
+            m_pGameCamera->SetPosition(m_dirLight.WorldDirection * 2.0f + Vector3f(0.0f, 5.0f, 0.0f));
+            m_pGameCamera->SetTarget(Vector3f(0.0f, 0.0f, 0.0f) - m_dirLight.WorldDirection);
+        }
+
+        //m_dirLight.WorldDirection = Vector3f(sinf(foo), -1.0f, cosf(foo));
+
+     //   ShadowMapPass();
+        LightingPass();
+    }
+
+
+    void ShadowMapPass()
+    {
+        m_shadowMapFBO.BindForWriting();
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        m_shadowMapTech.Enable();
+
+                glCullFace(GL_FRONT); // Solution #2 from the video - reverse face culling
+
+        // Solution #5: from the video - calculate a tight light projection matrix
+        OrthoProjInfo LightOrthoProjInfo;
+        CalcTightLightProjection(m_pGameCamera->GetMatrix(),    // in
+                                 m_dirLight.WorldDirection,     // in
+                                 m_pGameCamera->m_persProjInfo, // in
+                                 m_lightWorldPos,               // out
+                                 LightOrthoProjInfo);           // out
+
+        Matrix4f LightView;
+        Vector3f Up(0.0f, 1.0f, 0.0f);
+
+        m_lightOrthoProjMatrix.InitOrthoProjTransform(LightOrthoProjInfo);
+
+        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
+            m_pMesh1->SetPosition(m_positions[i]);
+            Matrix4f World = m_pMesh1->GetWorldMatrix();
+            LightView.InitCameraTransform(m_lightWorldPos, m_dirLight.WorldDirection, Up);
+            Matrix4f WVP = m_lightOrthoProjMatrix * LightView * World;
+            m_shadowMapTech.SetWVP(WVP);
+            m_pMesh1->Render();
+        }
+    }
+
+    void LightingPass()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        m_lightingTech.Enable();
+
+                glCullFace(GL_BACK); // Solution #2 from the video - reverse face culling
+
+        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         m_pGameCamera->OnRender();
 
-        static float foo = 0.0f;
-        foo += 0.002f;
+        ///////////////////////////
+        // Render the main object
+        ////////////////////////////
 
-        float S = (float)m_terrainSize;
-        float R = 2.5f * S;
+        Matrix4f CameraView = m_pGameCamera->GetMatrix();
+        Matrix4f CameraProjection;
 
-        Vector3f Pos(S + cosf(foo) * R, m_maxHeight + 250.0f, S + sinf(foo) * R);
-      //  m_pGameCamera->SetPosition(Pos);
+        if (m_isOrthoCamera) {
+            CameraProjection = m_cameraOrthoProjMatrix;
+        } else {
+            CameraProjection = m_pGameCamera->GetProjectionMat();
+        }
 
-        Vector3f Center(S, Pos.y * 0.50f, S);
-        Vector3f Target = Center - Pos;
-     //   m_pGameCamera->SetTarget(Target);
-     //   m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
+        Matrix4f LightView;
+        Vector3f Up(0.0f, 1.0f, 0.0f);
+        LightView.InitCameraTransform(m_lightWorldPos, m_dirLight.WorldDirection, Up);
 
-        float y = min(-0.4f, cosf(foo));
-        Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
+        m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
-      //  m_terrain.SetLightDir(LightDir);
+        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
+            // Set the WVP matrix from the camera point of view
+            m_pMesh1->SetPosition(m_positions[i]);
+            Matrix4f World = m_pMesh1->GetWorldMatrix();
+            Matrix4f WVP = CameraProjection * CameraView * World;
+            m_lightingTech.SetWVP(WVP);
 
-        m_terrain.Render(*m_pGameCamera);
+            // Set the WVP matrix from the light point of view
+            Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
+            m_lightingTech.SetLightWVP(LightWVP);
+
+            Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+            m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+            m_dirLight.CalcLocalDirection(m_pMesh1->GetWorldTransform());
+            m_lightingTech.SetDirectionalLight(m_dirLight);
+            m_pMesh1->Render();
+        }
+
+        /////////////////////////
+        // Render the terrain
+        ////////////////////////
+
+        // Set the WVP matrix from the camera point of view
+        Matrix4f World = m_pTerrain->GetWorldMatrix();
+        Matrix4f WVP = CameraProjection * CameraView * World;
+        m_lightingTech.SetWVP(WVP);
+
+        // Set the WVP matrix from the light point of view
+        Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
+        m_lightingTech.SetLightWVP(LightWVP);
+
+        // Update the shader with the local space pos/dir of the spot light
+        m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
+        m_lightingTech.SetDirectionalLight(m_dirLight);
+        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
+
+        // Update the shader with the local space pos of the camera
+        Vector3f CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+        m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+
+        m_pTerrain->Render();
     }
 
 
+#define ATTEN_STEP 0.01f
+
+#define ANGLE_STEP 1.0f
+
     void PassiveMouseCB(int x, int y)
     {
-        if (!m_showGui && !m_isPaused) {
-            m_pGameCamera->OnMouse(x, y);
-        }
+        m_pGameCamera->OnMouse(x, y);
     }
 
     void KeyboardCB(uint key, int state)
     {
         if (state == GLFW_PRESS) {
-
             switch (key) {
-
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
                 glfwDestroyWindow(window);
                 glfwTerminate();
                 exit(0);
 
-            case GLFW_KEY_B:
-                m_constrainCamera = !m_constrainCamera;
-                printf("constrain %d\n", m_constrainCamera);
-                break;
-
-            case GLFW_KEY_C:
-                m_pGameCamera->Print();
-                break;
-
-            case GLFW_KEY_W:
-                m_isWireframe = !m_isWireframe;
-
-                if (m_isWireframe) {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                } else {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            case GLFW_KEY_L:
+                m_cameraOnLight = !m_cameraOnLight;
+                if (!m_cameraOnLight) {
+                    m_pGameCamera->SetPosition(m_cameraPos);
+                    m_pGameCamera->SetTarget(m_cameraTarget);
                 }
                 break;
 
+            case GLFW_KEY_A:
+                m_dirLight.AmbientIntensity += ATTEN_STEP;
+                break;
+
+            case GLFW_KEY_D:
+                m_dirLight.DiffuseIntensity -= ATTEN_STEP;
+                break;
+
             case GLFW_KEY_P:
-                m_isPaused = !m_isPaused;
-                break;
-
-            case GLFW_KEY_SPACE:
-                m_showGui = !m_showGui;
-                break;
-
-            case GLFW_KEY_0:
-                gShowPoints = 0;
-                break;
-
-            case GLFW_KEY_1:
-                gShowPoints = 1;
-                break;
-
-            case GLFW_KEY_2:
-                gShowPoints = 2;
-                break;
-
-            case GLFW_KEY_3:
-                gShowPoints = 3;
+                m_isOrthoCamera = !m_isOrthoCamera;
                 break;
             }
         }
 
-        bool CameraChangedPos = m_pGameCamera->OnKeyboard(key);
-
-        if (m_constrainCamera && CameraChangedPos) {
-            ConstrainCameraToTerrain();
-        }
+        m_pGameCamera->OnKeyboard(key);
     }
 
 
@@ -242,14 +291,22 @@ public:
 
 private:
 
-    void CreateWindow_()
+    void CreateWindow()
     {
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 44");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 38");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    }
+
+
+    void CreateShadowMap()
+    {
+        if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+            exit(1);
+        }
     }
 
 
@@ -263,83 +320,87 @@ private:
 
     void InitCamera()
     {
-        float CameraX = m_terrain.GetWorldSize() / 2.0f;
-        float CameraZ = CameraX;
-        Vector3f Pos(CameraX, 0.0f, CameraZ);
-        Pos = m_terrain.ConstrainCameraPosToTerrain(Pos);
-        Vector3f Target(0.0f, -0.25f, 1.0f);
+        m_cameraPos = Vector3f(3.0f, 5.0f, -31.0f);
+        m_cameraTarget = Vector3f(0.0f, -0.1f, 1.0f);
+
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
-        float zNear = 0.01f;
-        float zFar = Z_FAR;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
-        m_pGameCamera->SetSpeed(0.05f);
+        m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
     }
-    
 
-    void InitTerrain()
+
+    void InitShaders()
     {
-        float WorldScale = 4.0f;
-        float TextureScale = 16.0f;
-        std::vector<string> TextureFilenames;
-        TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_2k.jpg");
-        TextureFilenames.push_back("../Content/Textures/coast_sand_rocks_02_diff_2k.jpg");        
-        TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");
-        TextureFilenames.push_back("../Content/textures/water.png");
+        if (!m_lightingTech.Init()) {
+            printf("Error initializing the lighting technique\n");
+            exit(1);
+        }
 
-        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
+        m_lightingTech.Enable();
+        m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetShadowMapSize(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
+        //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
-        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
-
-        Vector3f LightDir(1.0f, -1.0f, 0.0f);
-
-        m_terrain.SetLightDir(LightDir);
+        if (!m_shadowMapTech.Init()) {
+            printf("Error initializing the shadow mapping technique\n");
+            exit(1);
+        }
     }
 
 
-    void InitGUI()
+    void InitMesh()
     {
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+        m_pMesh1 = new BasicMesh();
 
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
+        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+        //m_pMesh1->LoadMesh("../Content/cylinder.obj");
+//                        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
+  //        printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
+    //              exit(0);
+      //        }
+        //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
+        //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
 
-        // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        const char* glsl_version = "#version 130";
-        ImGui_ImplOpenGL3_Init(glsl_version);
+        //        m_pMesh1->LoadMesh("../Content/box.obj");
+        //        m_pMesh1->SetPosition(0.0f, 1.0f, 0.0f);
+
+        //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
+        //m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
+        //m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
+
+        m_pTerrain = new BasicMesh();
+        if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
+            printf("Error loading mesh ../Content/box_terrain.obj\n");
+            exit(0);
+        }
+        m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
     }
-
-    void ConstrainCameraToTerrain()
-    {
-        Vector3f NewCameraPos = m_terrain.ConstrainCameraPosToTerrain(m_pGameCamera->GetPos());
-
-        m_pGameCamera->SetPosition(NewCameraPos);
-    }
-
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
-    bool m_isWireframe = false;
-    MidpointDispTerrain m_terrain;
-    bool m_showGui = false;
-    bool m_isPaused = false;
-    int m_terrainSize = 513;
-    float m_roughness = 1.0f;
-    float m_minHeight = 0.0f;
-    float m_maxHeight = 350.0f;
-    int m_patchSize = 17;
-    float m_counter = 0.0f;
-    bool m_constrainCamera = false;
+    LightingTechnique m_lightingTech;
+    ShadowMappingTechnique m_shadowMapTech;
+    BasicMesh* m_pMesh1 = NULL;
+    BasicMesh* m_pTerrain = NULL;
+    Matrix4f m_cameraOrthoProjMatrix;
+    Vector3f m_lightWorldPos;
+    Matrix4f m_lightOrthoProjMatrix;
+    DirectionalLight m_dirLight;
+    ShadowMapFBO m_shadowMapFBO;
+    Vector3f m_cameraPos;
+    Vector3f m_cameraTarget;
+    bool m_cameraOnLight = false;
+    Vector3f m_positions[1];
+    bool m_isOrthoCamera = false;
 };
 
-TerrainDemo11* app = NULL;
+Tutorial38* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -365,23 +426,12 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-#ifdef _WIN64
-    g_seed = GetCurrentProcessId();    
-#else
-    g_seed = getpid();
-#endif
-    printf("random seed %d\n", g_seed);
-
-    g_seed = 12260;
-    srand(g_seed);
-
-    app = new TerrainDemo11();
+    app = new Tutorial38();
 
     app->Init();
 
-    glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 

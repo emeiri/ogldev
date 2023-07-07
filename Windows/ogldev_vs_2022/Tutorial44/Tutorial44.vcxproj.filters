@@ -4,83 +4,22 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{03d3bf34-434a-42d3-b90c-0168e09b9db4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGUI">
-      <UniqueIdentifier>{932f7616-23b9-47a3-909b-90fed7fc74f4}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
-      <Filter>ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp">
-      <Filter>ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp">
-      <Filter>ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp">
-      <Filter>ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp">
-      <Filter>ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
-      <Filter>ImGUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_skybox.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp" />
-    <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\lod_manager.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\midpoint_disp_terrain.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\terrain.cpp" />
-    <ClCompile Include="..\..\..\tutorial44_youtube\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\tutorial44_youtube\tutorial44.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
-      <Filter>ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\tutorial44_youtube\demo_config.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\geomip_grid.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\lod_manager.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\midpoint_disp_terrain.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\terrain.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\terrain_technique.h" />
-    <ClInclude Include="..\..\..\tutorial44_youtube\texture_config.h" />
+    <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\skybox.vs">
@@ -89,7 +28,6 @@
     <None Include="..\..\..\Common\Shaders\skybox.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\tutorial44_youtube\imgui.ini" />
     <None Include="..\..\..\tutorial44_youtube\terrain.vs">
       <Filter>Shaders</Filter>
     </None>
