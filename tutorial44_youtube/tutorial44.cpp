@@ -137,10 +137,6 @@ public:
             CameraProjection = m_pGameCamera->GetProjectionMat();
         }
 
-        Matrix4f LightView;
-        Vector3f Up(0.0f, 1.0f, 0.0f);
-        LightView.InitCameraTransform(m_lightWorldPos, m_dirLight.WorldDirection, Up);
-
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
         Vector3f PlaneNormal(sinf(m_clipPlaneAngle), -1.0f, 0.0f);
@@ -151,11 +147,8 @@ public:
         // Set the WVP matrix from the camera point of view
         m_pMesh1->SetPosition(m_position);
         Matrix4f World = m_pMesh1->GetWorldMatrix();
-        Matrix4f WVP = CameraProjection * CameraView * World;        m_lightingTech.SetWVP(WVP);
-
-        // Set the WVP matrix from the light point of view
-        Matrix4f LightWVP = m_lightOrthoProjMatrix * LightView * World;
-        m_lightingTech.SetLightWVP(LightWVP);
+        Matrix4f WVP = CameraProjection * CameraView * World;        
+        m_lightingTech.SetWVP(WVP);
 
         Vector3f CameraLocalPos3f = m_pMesh1->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
@@ -174,10 +167,6 @@ public:
         World = m_pTerrain->GetWorldMatrix();
         WVP = CameraProjection * CameraView * World;
         m_lightingTech.SetWVP(WVP);
-
-        // Set the WVP matrix from the light point of view
-        LightWVP = m_lightOrthoProjMatrix * LightView * World;
-        m_lightingTech.SetLightWVP(LightWVP);
 
         // Update the shader with the local space pos/dir of the spot light
         m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
