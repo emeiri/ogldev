@@ -83,8 +83,6 @@ public:
     {
         CreateWindow();
 
-        CreateShadowMap();
-
         InitCallbacks();
 
         InitCamera();
@@ -265,14 +263,6 @@ private:
     }
 
 
-    void CreateShadowMap()
-    {
-        if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
-            exit(1);
-        }
-    }
-
-
     void InitCallbacks()
     {
         glfwSetKeyCallback(window, KeyCallback);
@@ -309,11 +299,6 @@ private:
         m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapSize(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-
-        if (!m_shadowMapTech.Init()) {
-            printf("Error initializing the shadow mapping technique\n");
-            exit(1);
-        }
     }
 
 
@@ -336,14 +321,12 @@ private:
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     LightingTechnique m_lightingTech;
-    ShadowMappingTechnique m_shadowMapTech;
     BasicMesh* m_pMesh1 = NULL;
     BasicMesh* m_pTerrain = NULL;
     Matrix4f m_cameraOrthoProjMatrix;
     Vector3f m_lightWorldPos;
     Matrix4f m_lightOrthoProjMatrix;
     DirectionalLight m_dirLight;
-    ShadowMapFBO m_shadowMapFBO;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
