@@ -122,7 +122,7 @@ public:
 
         //m_dirLight.WorldDirection = Vector3f(sinf(foo), -1.0f, cosf(foo));
 
-     //   ShadowMapPass();
+       // ShadowMapPass();
         LightingPass();
     }
 
@@ -135,7 +135,7 @@ public:
 
         m_shadowMapTech.Enable();
 
-                glCullFace(GL_FRONT); // Solution #2 from the video - reverse face culling
+        //        glCullFace(GL_FRONT); // Solution #2 from the video - reverse face culling
 
         // Solution #5: from the video - calculate a tight light projection matrix
         OrthoProjInfo LightOrthoProjInfo;
@@ -170,11 +170,22 @@ public:
 
         m_lightingTech.Enable();
 
-                glCullFace(GL_BACK); // Solution #2 from the video - reverse face culling
+        // glCullFace(GL_BACK); // Solution #2 from the video - reverse face culling
 
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
 
         m_pGameCamera->OnRender();
+
+        static float foo = 0.0f;
+        foo += 0.002f;
+        float R = 10.0f;
+
+        Vector3f Pos(m_positions[0].x + cosf(foo) * R, 7.0f, m_positions[0].z + sinf(foo) * R);
+      //  m_pGameCamera->SetPosition(Pos);
+        Vector3f Target = m_positions[0] - Pos;
+        Target.y += 1.0f;
+    //    m_pGameCamera->SetTarget(Target);
+     //   m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
 
         ///////////////////////////
         // Render the main object
@@ -195,11 +206,18 @@ public:
 
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
+        Vector3f PlaneNormal(sinf(m_clipPlaneAngle), -1.0f, 0.0f);
+        Vector3f PointOnPlane(0.0f, m_clipPlaneHeight, 0.0f);
+
+        m_lightingTech.SetClipPlane(PlaneNormal, PointOnPlane);
+
         for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_positions) ; i++) {
             // Set the WVP matrix from the camera point of view
             m_pMesh1->SetPosition(m_positions[i]);
+           // Matrix4f Scale;
+           // Scale.InitScaleTransform(0.001f);
             Matrix4f World = m_pMesh1->GetWorldMatrix();
-            Matrix4f WVP = CameraProjection * CameraView * World;
+            Matrix4f WVP = CameraProjection * CameraView * World;// *Scale;
             m_lightingTech.SetWVP(WVP);
 
             // Set the WVP matrix from the light point of view
@@ -216,6 +234,9 @@ public:
         /////////////////////////
         // Render the terrain
         ////////////////////////
+
+        PlaneNormal = Vector3f(0.0f, -1.0f, 0.0f);
+        m_lightingTech.SetClipPlane(PlaneNormal, PointOnPlane);
 
         // Set the WVP matrix from the camera point of view
         Matrix4f World = m_pTerrain->GetWorldMatrix();
@@ -367,26 +388,14 @@ private:
         m_pMesh1 = new BasicMesh();
 
         m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        //m_pMesh1->LoadMesh("../Content/cylinder.obj");
-//                        if (!m_pMesh1->LoadMesh("../Content/low_poly_rpg_collection/rpg_items_3.obj")) {
-  //        printf("Error loading mesh ../Content/low_poly_rpg_collection/rpg_items_3.obj\n");
-    //              exit(0);
-      //        }
-        //        m_pMesh1->LoadMesh("../Content/ordinary_house/ordinary_house.obj");
-        //m_pMesh1->LoadMesh("../Content/simple-afps-level.obj");
-
-        //        m_pMesh1->LoadMesh("../Content/box.obj");
-        //        m_pMesh1->SetPosition(0.0f, 1.0f, 0.0f);
-
-        //m_pMesh1->LoadMesh("../Content/Vanguard.dae");
-        //m_pMesh1->SetPosition(0.0f, 3.5f, 0.0f);
-        //m_pMesh1->SetRotation(270.0f, 180.0f, 0.0f);
 
         m_pTerrain = new BasicMesh();
+
         if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
             printf("Error loading mesh ../Content/box_terrain.obj\n");
             exit(0);
         }
+
         m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
     }
 
@@ -406,6 +415,8 @@ private:
     bool m_cameraOnLight = false;
     Vector3f m_positions[1];
     bool m_isOrthoCamera = false;
+    float m_clipPlaneHeight = 1.0f;
+    float m_clipPlaneAngle = 0.0f;
 };
 
 Tutorial38* app = NULL;
@@ -442,6 +453,7 @@ int main(int argc, char** argv)
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CLIP_DISTANCE0);
 
     app->Run();
 
