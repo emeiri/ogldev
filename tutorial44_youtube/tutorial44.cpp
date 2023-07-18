@@ -56,17 +56,7 @@ public:
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
-
-        OrthoProjInfo cameraOrthoProjInfo;
-        cameraOrthoProjInfo.l = -WINDOW_WIDTH / 250.0f;
-        cameraOrthoProjInfo.r = WINDOW_WIDTH / 250.0f;
-        cameraOrthoProjInfo.t = WINDOW_HEIGHT / 250.0f;
-        cameraOrthoProjInfo.b = -WINDOW_HEIGHT / 250.0f;
-        cameraOrthoProjInfo.n = 1.0f;
-        cameraOrthoProjInfo.f = 100.0f;
-
-        m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
+        m_dirLight.WorldDirection = Vector3f(0.0f, -0.5f, 1.0f);
 
         m_position = Vector3f(0.0f, 0.0f, -12.0f);
     }
@@ -129,13 +119,7 @@ public:
         ////////////////////////////
 
         Matrix4f CameraView = m_pGameCamera->GetMatrix();
-        Matrix4f CameraProjection;
-
-        if (m_isOrthoCamera) {
-            CameraProjection = m_cameraOrthoProjMatrix;
-        } else {
-            CameraProjection = m_pGameCamera->GetProjectionMat();
-        }
+        Matrix4f CameraProjection = m_pGameCamera->GetProjectionMat();
 
         m_lightingTech.SetMaterial(m_pMesh1->GetMaterial());
 
@@ -187,7 +171,9 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-        m_pGameCamera->OnMouse(x, y);
+        if (!m_isPaused) {
+            m_pGameCamera->OnMouse(x, y);
+        }
     }
 
     void KeyboardCB(uint key, int state)
@@ -208,6 +194,10 @@ public:
                 }
                 break;
 
+            case GLFW_KEY_P:
+                m_isPaused = !m_isPaused;
+                break;
+
             case GLFW_KEY_A:
                 m_clipPlaneHeight += 0.1f;
                 break;
@@ -222,10 +212,6 @@ public:
 
             case GLFW_KEY_C:
                 m_clipPlaneAngle -= 0.1f;
-                break;
-
-            case GLFW_KEY_P:
-                m_isOrthoCamera = !m_isOrthoCamera;
                 break;
             }
         }
@@ -246,7 +232,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 38");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 44");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -320,9 +306,9 @@ private:
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
     Vector3f m_position;
-    bool m_isOrthoCamera = false;
     float m_clipPlaneHeight = 1.0f;
     float m_clipPlaneAngle = 0.0f;
+    bool m_isPaused = false;
 };
 
 Tutorial38* app = NULL;
@@ -355,9 +341,9 @@ int main(int argc, char** argv)
 
     app->Init();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
     glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CLIP_DISTANCE0);
 
