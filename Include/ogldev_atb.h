@@ -4,8 +4,6 @@
 #include "ogldev_keys.h"
 #include "ogldev_math_3d.h"
 
-#include "ATB/AntTweakBar.h"
-
 class ATB
 {
 public:
@@ -23,8 +21,5 @@ public:
     
 };
 
-
-extern TwType TW_TYPE_OGLDEV_VECTOR3F;
-extern TwType TW_TYPE_OGLDEV_ATTENUATION;
 
 #endif

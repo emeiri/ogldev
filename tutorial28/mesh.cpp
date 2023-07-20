@@ -45,7 +45,7 @@ Mesh::MeshEntry::~MeshEntry()
 bool Mesh::MeshEntry::Init(const std::vector<Vertex>& Vertices,
                           const std::vector<unsigned int>& Indices)
 {
-    NumIndices = Indices.size();
+    NumIndices = (int)Indices.size();
 
     glGenBuffers(1, &VB);
   	glBindBuffer(GL_ARRAY_BUFFER, VB);

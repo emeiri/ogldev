@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_app.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_lighting.cpp" />
+    <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{6d83d7fd-f1ee-4948-868c-328f6394e299}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial28\billboard.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial28\billboard.gs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial28\billboard.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial28\ps_update.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial28\ps_update.gs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial28\ps_update.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

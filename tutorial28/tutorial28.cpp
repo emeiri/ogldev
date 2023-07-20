@@ -143,7 +143,7 @@ public:
 
         Pipeline p;
         p.Scale(20.0f, 20.0f, 1.0f);
-        p.Rotate(90.0f, 0.0, 0.0f);
+        p.Rotate(-90.0f, 0.0, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
         
