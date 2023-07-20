@@ -21,8 +21,11 @@
 #include "ogldev_skydome.h"
 
 
-Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilename) : m_texture(GL_TEXTURE_2D)
+Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilename, GLenum TextureUnit, int TextureUnitIndex)  : m_texture(GL_TEXTURE_2D)
 {
+    m_textureUnit = TextureUnit;
+    m_textureUnitIndex = TextureUnitIndex;
+
     CreateGLState();
 
     PopulateBuffers(Theta, Phi, Radius);
@@ -38,7 +41,7 @@ Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilen
 
     m_skydomeTech.Enable();
 
-    m_skydomeTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_skydomeTech.SetTextureUnit(TextureUnitIndex);
 }
 
 
@@ -49,8 +52,8 @@ Skydome::Vertex::Vertex(const Vector3f& p)
     Vector3f pn = p;
     pn.Normalize();
 
-    Tex.x = atan2(pn.x, pn.z) / (M_PI * 2) + 0.5f;
-    Tex.y = asinf(pn.y) / M_PI + 0.5f;
+    Tex.x = atan2(pn.x, pn.z) / ((float)M_PI * 2.0f) + 0.5f;
+    Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
 }
 
 
@@ -74,23 +77,21 @@ void Skydome::CreateGLState()
     glEnableVertexAttribArray(tex_loc);
     glVertexAttribPointer(tex_loc, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(Offset * sizeof(float)));
     Offset += 2;
-
-    //    printf("GL state created\n");
 }
 
 
 void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
 {
-#define DTOR M_PI / 180.0f
+#define DTOR (float)M_PI / 180.0f
 
     m_numVertices = (int)((360/Theta) * (90/Phi) * 4);
 
     std::vector<Vertex> Vertices(m_numVertices);
     int i = 0;
 
-    for (int ph = 0 ; ph <= (90.0f - Phi) ; ph += (int)Phi) {
+    for (float ph = 0 ; ph <= (90.0f - Phi) ; ph += Phi) {
 
-        for (int th = 0 ; th <= (360.0f - Theta) ; th += (int)Theta) {
+        for (float th = 0 ; th <= (360.0f - Theta) ; th += Theta) {
             //compute the vertex at phi, theta
             Vector3f Pos0(Radius * sinf(ph * DTOR) * cosf(DTOR * th),
                           Radius * sinf(ph * DTOR) * sinf(DTOR * th),
@@ -206,7 +207,7 @@ void Skydome::Render(const BasicCamera& Camera)
     Matrix4f WVP = Proj * View * World * Rotate;
     m_skydomeTech.SetWVP(WVP);
 
-    m_texture.Bind(COLOR_TEXTURE_UNIT);
+    m_texture.Bind(m_textureUnit);
 
     GLint OldDepthFuncMode;
     glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);

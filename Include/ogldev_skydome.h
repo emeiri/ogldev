@@ -22,11 +22,13 @@
 #include <GL/glew.h>
 
 #include "ogldev_skydome_technique.h"
+#include "ogldev_basic_glfw_camera.h"
+#include "ogldev_texture.h"
 
 class Skydome
 {
  public:
-    Skydome(float Theta, float Phi, float Radius, const char* pTextureFilanem);
+    Skydome(float Theta, float Phi, float Radius, const char* pTextureFilanem, GLenum TextureUnit, int TextureUnitIndex);
 
     void Render(const BasicCamera& Camera);
 
@@ -52,6 +54,8 @@ class Skydome
     GLuint m_vb;
     Texture m_texture;
     SkydomeTechnique m_skydomeTech;
+    int m_textureUnit = 0;
+    GLenum m_textureUnitIndex = 0;
 };
 
 
