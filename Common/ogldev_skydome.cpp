@@ -93,9 +93,9 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
 
     float maxHeight = 0.0f;
 
-    Vector3f Apex(0.0f, 1.0f, 0.0f);
+    Vector3f Apex(0.0f, Radius, 0.0f);
 
-    float p = 90.0f;
+    float Pitch = 90.0f;
 
     for (float h = 0 ; h <= (360.0f - Theta) ; h += Theta) {
         printf("TH %f\n", h);
@@ -104,16 +104,14 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
         Vertices[i++] = v0; 
         Apex.Print();
 
-        Vector3f Pos1(Radius * cos(ToRadian(p - Phi)) * sinf(ToRadian(h)),
-                        Radius * sinf(ToRadian(p - Phi)),
-                        Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h)));
+        Vector3f Pos1;
+        Pos1.InitBySphericalCoords(Radius, Pitch - Phi, h);
         Vertex v1(Pos1);
         Vertices[i++] = v1;
         Pos1.Print();
 
-        Vector3f Pos2(Radius * cosf(ToRadian(p - Phi)) * sinf(ToRadian(h + Theta)),
-                        Radius * sinf(ToRadian(p - Phi)),
-                        Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h + Theta)));
+        Vector3f Pos2;
+        Pos2.InitBySphericalCoords(Radius, Pitch - Phi, h + Theta);        
         Vertex v2(Pos2);
         Vertices[i++] = v2;
         Pos2.Print();
@@ -121,7 +119,30 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
         printf("\n");
     }
 
-        //fix the texture-seam problem
+ /*   for (float h = 0; h <= (360.0f - Theta); h += Theta) {
+        printf("TH %f\n", h);
+
+        Vertex v0(Apex);
+        Vertices[i++] = v0;
+        Apex.Print();
+
+        Vector3f Pos1;
+        Pos1.InitBySphericalCoords(Radius, Pitch - Phi, h);
+        Vertex v1(Pos1);
+        Vertices[i++] = v1;
+        Pos1.Print();
+
+        Vector3f Pos2;
+        Pos2.InitBySphericalCoords(Radius, Pitch - Phi, h + Theta);
+        Vertex v2(Pos2);
+        Vertices[i++] = v2;
+        Pos2.Print();
+
+        printf("\n");
+    }*/
+
+    
+    //fix the texture-seam problem
         #if 0
         for (int i = 0 ; i < m_numVertices - 3 ; i++) {
             int i0 = i;
