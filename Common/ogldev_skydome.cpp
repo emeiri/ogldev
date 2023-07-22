@@ -95,56 +95,31 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
 
     Vector3f Apex(0.0f, 1.0f, 0.0f);
 
-    for (float p = 90.0f ; p >= 0 ; p -= Phi) {
-        printf("PH %f\n", p);
-        for (float h = 0 ; h <= (360.0f - Theta) ; h += Theta) {
-            printf("TH %f\n", h);
-            //compute the vertex at phi, theta
-           // Vector3f Pos0(Radius * sinf(ToRadian(ph)) * cosf(ToRadian(th)),
-          //                Radius * sinf(ToRadian(ph)) * sinf(ToRadian(th)),
-           //               Radius * cosf(ToRadian(ph)));            
+    float p = 90.0f;
 
-            Vertex v0(Apex);
-            Vertices[i++] = v0; 
-            Apex.Print();
+    for (float h = 0 ; h <= (360.0f - Theta) ; h += Theta) {
+        printf("TH %f\n", h);
 
-            //compute the vertex at phi+phi, theta
-            Vector3f Pos1(Radius * cos(ToRadian(p - Phi)) * sinf(ToRadian(h)),
-                          Radius * sinf(ToRadian(p - Phi)),
-                          Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h)));
-         //   Pos1.y = 1.0f;
-            Vertex v1(Pos1);
-            Vertices[i++] = v1;
-            Pos1.Print();
+        Vertex v0(Apex);
+        Vertices[i++] = v0; 
+        Apex.Print();
 
-            //compute the vertex at phi, theta+theta
-            Vector3f Pos2(Radius * cosf(ToRadian(p - Phi)) * sinf(ToRadian(h + Theta)),
-                          Radius * sinf(ToRadian(p - Phi)),
-                          Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h + Theta)));
-       //     Pos2.y = 1.0f;
-            Vertex v2(Pos2);
-            Vertices[i++] = v2;
-            Pos2.Print();
+        Vector3f Pos1(Radius * cos(ToRadian(p - Phi)) * sinf(ToRadian(h)),
+                        Radius * sinf(ToRadian(p - Phi)),
+                        Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h)));
+        Vertex v1(Pos1);
+        Vertices[i++] = v1;
+        Pos1.Print();
 
-            printf("\n");
-            
-#if 0            
-            if (ph > -90.0f && ph < 90.0f) {
-                Vector3f Pos3(Radius * sinf(ToRadian(ph + Phi)) * cosf(ToRadian(th + Theta)),
-                              Radius * sinf(ToRadian(ph + Phi)) * sinf(ToRadian(th + Theta)),
-                              Radius * cosf(ToRadian(ph + Phi)));
-                if (Pos3.y > maxHeight) maxHeight = Pos3.y;
+        Vector3f Pos2(Radius * cosf(ToRadian(p - Phi)) * sinf(ToRadian(h + Theta)),
+                        Radius * sinf(ToRadian(p - Phi)),
+                        Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h + Theta)));
+        Vertex v2(Pos2);
+        Vertices[i++] = v2;
+        Pos2.Print();
 
-                Vertex v3(Pos3);
-           //     Vertices[i++] = v3;
-            }
-            else {
-                printf("skip\n");
-            }
-#endif
-        }
-
-        break;
+        printf("\n");
+    }
 
         //fix the texture-seam problem
         #if 0
@@ -202,7 +177,6 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
             }
         }
         #endif
-    }
 
 
     printf("Max height %f\n", maxHeight);
