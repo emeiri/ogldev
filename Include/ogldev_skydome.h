@@ -28,7 +28,7 @@
 class Skydome
 {
  public:
-    Skydome(float Theta, float Phi, float Radius, const char* pTextureFilanem, GLenum TextureUnit, int TextureUnitIndex);
+    Skydome(int NumPitchStripes, int NumHeadingStripes, float Radius, const char* pTextureFilanem, GLenum TextureUnit, int TextureUnitIndex);
 
     void Render(const BasicCamera& Camera);
 
@@ -45,7 +45,7 @@ class Skydome
 
     void CreateGLState();
 
-    void PopulateBuffers(float Theta, float Phi, float Radius);
+    void PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float Radius);
 
     void LoadTexture(const char* pTextureFilanem);
 

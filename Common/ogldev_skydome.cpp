@@ -21,14 +21,14 @@
 #include "ogldev_skydome.h"
 
 
-Skydome::Skydome(float Theta, float Phi, float Radius, const char* pTextureFilename, GLenum TextureUnit, int TextureUnitIndex)  : m_texture(GL_TEXTURE_2D)
+Skydome::Skydome(int NumPitchStripes, int NumHeadingStripes, float Radius, const char* pTextureFilename, GLenum TextureUnit, int TextureUnitIndex)  : m_texture(GL_TEXTURE_2D)
 {
     m_textureUnit = TextureUnit;
     m_textureUnitIndex = TextureUnitIndex;
 
     CreateGLState();
 
-    PopulateBuffers(Theta, Phi, Radius);
+    PopulateBuffers(NumPitchStripes, NumHeadingStripes, Radius);
 
     LoadTexture(pTextureFilename);
 
@@ -82,36 +82,39 @@ void Skydome::CreateGLState()
 }
 
 
-void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
+void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float Radius)
 {
 //#define DTOR (float)M_PI / 180.0f
 
-    m_numVertices = (int)((360/Theta) * (90/Phi) * 4);
+    int NumVerticesTopStripe = 3 * NumHeadingStripes;
+    int NumVerticesRegularStripe = 6 * NumHeadingStripes;
+    m_numVertices = NumVerticesTopStripe + (NumPitchStripes - 1) * NumVerticesRegularStripe;
 
     std::vector<Vertex> Vertices(m_numVertices);
-    int i = 0;
 
-    float maxHeight = 0.0f;
+    float PitchAngle = 90.0f / (float)NumPitchStripes;
+    float HeadingAngle = 360.0f / (float)NumHeadingStripes;
 
     Vector3f Apex(0.0f, Radius, 0.0f);
 
     float Pitch = 90.0f;
+    int i = 0;
 
-    for (float h = 0 ; h <= (360.0f - Theta) ; h += Theta) {
-        printf("TH %f\n", h);
+    for (float Heading = 0.0f ; Heading <= (360.0f - HeadingAngle) ; Heading += HeadingAngle) {
+        printf("TH %f\n", Heading);
 
         Vertex v0(Apex);
         Vertices[i++] = v0; 
         Apex.Print();
 
         Vector3f Pos1;
-        Pos1.InitBySphericalCoords(Radius, Pitch - Phi, h);
+        Pos1.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
         Vertex v1(Pos1);
         Vertices[i++] = v1;
         Pos1.Print();
 
         Vector3f Pos2;
-        Pos2.InitBySphericalCoords(Radius, Pitch - Phi, h + Theta);        
+        Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
         Vertex v2(Pos2);
         Vertices[i++] = v2;
         Pos2.Print();
@@ -119,27 +122,29 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
         printf("\n");
     }
 
- /*   for (float h = 0; h <= (360.0f - Theta); h += Theta) {
-        printf("TH %f\n", h);
+    for (Pitch = 90.0f - PitchAngle; Pitch >= 0; Pitch -= PitchAngle) {
+        for (float Heading = 0; Heading <= (360.0f - HeadingAngle); Heading += HeadingAngle) {
+            printf("TH %f\n", Heading);
 
-        Vertex v0(Apex);
-        Vertices[i++] = v0;
-        Apex.Print();
+            Vertex v0(Apex);
+            Vertices[i++] = v0;
+            Apex.Print();
 
-        Vector3f Pos1;
-        Pos1.InitBySphericalCoords(Radius, Pitch - Phi, h);
-        Vertex v1(Pos1);
-        Vertices[i++] = v1;
-        Pos1.Print();
+            Vector3f Pos1;
+            Pos1.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
+            Vertex v1(Pos1);
+            Vertices[i++] = v1;
+            Pos1.Print();
 
-        Vector3f Pos2;
-        Pos2.InitBySphericalCoords(Radius, Pitch - Phi, h + Theta);
-        Vertex v2(Pos2);
-        Vertices[i++] = v2;
-        Pos2.Print();
+            Vector3f Pos2;
+            Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
+            Vertex v2(Pos2);
+            Vertices[i++] = v2;
+            Pos2.Print();
 
-        printf("\n");
-    }*/
+            printf("\n");
+        }
+    }
 
     
     //fix the texture-seam problem
@@ -199,8 +204,6 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
         }
         #endif
 
-
-    printf("Max height %f\n", maxHeight);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 }
 
