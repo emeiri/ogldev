@@ -49,6 +49,8 @@ Skydome::Vertex::Vertex(const Vector3f& p)
 {
     Pos = p;
 
+    //Pos.Print();
+
     Vector3f pn = p;
     pn.Normalize();
 
@@ -82,49 +84,67 @@ void Skydome::CreateGLState()
 
 void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
 {
-#define DTOR (float)M_PI / 180.0f
+//#define DTOR (float)M_PI / 180.0f
 
     m_numVertices = (int)((360/Theta) * (90/Phi) * 4);
 
     std::vector<Vertex> Vertices(m_numVertices);
     int i = 0;
 
-    for (float ph = 0 ; ph <= (90.0f - Phi) ; ph += Phi) {
+    float maxHeight = 0.0f;
 
-        for (float th = 0 ; th <= (360.0f - Theta) ; th += Theta) {
+    Vector3f Apex(0.0f, 1.0f, 0.0f);
+
+    for (float p = 90.0f ; p >= 0 ; p -= Phi) {
+        printf("PH %f\n", p);
+        for (float h = 0 ; h <= (360.0f - Theta) ; h += Theta) {
+            printf("TH %f\n", h);
             //compute the vertex at phi, theta
-            Vector3f Pos0(Radius * sinf(ph * DTOR) * cosf(DTOR * th),
-                          Radius * sinf(ph * DTOR) * sinf(DTOR * th),
-                          Radius * cosf(ph * DTOR));
+           // Vector3f Pos0(Radius * sinf(ToRadian(ph)) * cosf(ToRadian(th)),
+          //                Radius * sinf(ToRadian(ph)) * sinf(ToRadian(th)),
+           //               Radius * cosf(ToRadian(ph)));            
 
-            Vertex v0(Pos0);
-            Vertices[i++] = v0;
+            Vertex v0(Apex);
+            Vertices[i++] = v0; 
+            Apex.Print();
 
             //compute the vertex at phi+phi, theta
-            Vector3f Pos1(Radius * sinf((ph + Phi) * DTOR) * cosf(th * DTOR),
-                          Radius * sinf((ph + Phi) * DTOR) * sinf(th * DTOR),
-                          Radius * cosf((ph + Phi) * DTOR));
-
+            Vector3f Pos1(Radius * cos(ToRadian(p - Phi)) * sinf(ToRadian(h)),
+                          Radius * sinf(ToRadian(p - Phi)),
+                          Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h)));
+         //   Pos1.y = 1.0f;
             Vertex v1(Pos1);
             Vertices[i++] = v1;
+            Pos1.Print();
 
             //compute the vertex at phi, theta+theta
-            Vector3f Pos2(Radius * sinf(DTOR * ph) * cosf(DTOR * (th + Theta)),
-                          Radius * sinf(DTOR * ph) * sinf(DTOR * (th + Theta)),
-                          Radius * cosf(DTOR * ph));
-
+            Vector3f Pos2(Radius * cosf(ToRadian(p - Phi)) * sinf(ToRadian(h + Theta)),
+                          Radius * sinf(ToRadian(p - Phi)),
+                          Radius * cosf(ToRadian(p - Phi)) * cosf(ToRadian(h + Theta)));
+       //     Pos2.y = 1.0f;
             Vertex v2(Pos2);
             Vertices[i++] = v2;
+            Pos2.Print();
 
+            printf("\n");
+            
+#if 0            
             if (ph > -90.0f && ph < 90.0f) {
-                Vector3f Pos3(Radius * sinf((ph + Phi) * DTOR) * cosf(DTOR * (th + Theta)),
-                              Radius * sinf((ph + Phi) * DTOR) * sinf(DTOR * (th + Theta)),
-                              Radius * cosf((ph + Phi) * DTOR));
+                Vector3f Pos3(Radius * sinf(ToRadian(ph + Phi)) * cosf(ToRadian(th + Theta)),
+                              Radius * sinf(ToRadian(ph + Phi)) * sinf(ToRadian(th + Theta)),
+                              Radius * cosf(ToRadian(ph + Phi)));
+                if (Pos3.y > maxHeight) maxHeight = Pos3.y;
 
                 Vertex v3(Pos3);
-                Vertices[i++] = v3;
+           //     Vertices[i++] = v3;
             }
+            else {
+                printf("skip\n");
+            }
+#endif
         }
+
+        break;
 
         //fix the texture-seam problem
         #if 0
@@ -184,6 +204,8 @@ void Skydome::PopulateBuffers(float Theta, float Phi, float Radius)
         #endif
     }
 
+
+    printf("Max height %f\n", maxHeight);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 }
 
@@ -199,13 +221,17 @@ void Skydome::Render(const BasicCamera& Camera)
     m_skydomeTech.Enable();
 
     Matrix4f Rotate;
-    Rotate.InitRotateTransform(90.0f, 0.0f, 0.0f);
+
+    static float foo = 0.0f;
+    foo += 0.1f;
+    Rotate.InitRotateTransform(foo, 0.0f, 0.0f);
     Matrix4f World;
-    World.InitTranslationTransform(Camera.GetPos() + Vector3f(0.0f, -0.5f, 0.0f));
+    World.InitTranslationTransform(Vector3f(0.0f, 0.0f, 5.0f));
     Matrix4f View = Camera.GetMatrix();
     Matrix4f Proj = Camera.GetProjectionMat();
-    Matrix4f WVP = Proj * View * World * Rotate;
+    Matrix4f WVP = Proj * View * World;// *Rotate;
     m_skydomeTech.SetWVP(WVP);
+    m_skydomeTech.SetRotate(Rotate);
 
     m_texture.Bind(m_textureUnit);
 
@@ -219,7 +245,7 @@ void Skydome::Render(const BasicCamera& Camera)
     glCullFace(GL_FRONT);
 
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, m_numVertices);
+    glDrawArrays(GL_TRIANGLES, 0, 24);
     glBindVertexArray(0);
 
     glDepthFunc(OldDepthFuncMode);
