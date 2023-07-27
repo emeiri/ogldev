@@ -54,8 +54,10 @@ Skydome::Vertex::Vertex(const Vector3f& p)
     Vector3f pn = p;
     pn.Normalize();
 
-    Tex.x = atan2(pn.x, pn.z) / ((float)M_PI * 2.0f) + 0.5f;
-    Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
+    Tex.x = asin(pn.x) / (float)M_PI + 0.5f;
+    Tex.y = asin(pn.y) / (float)M_PI + 0.5f;
+   // Tex.x = atan2(pn.x, pn.z) / ((float)M_PI * 2.0f) + 0.5f;
+   // Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
 }
 
 
