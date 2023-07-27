@@ -150,8 +150,8 @@ struct Vector3f
 
     void InitBySphericalCoords(float Radius, float Pitch, float Heading)
     {
-        x = Radius * cos(ToRadian(Pitch)) * sinf(ToRadian(Heading));
-        y = Radius * sinf(ToRadian(Pitch));
+        x = Radius * cosf(ToRadian(Pitch)) * sinf(ToRadian(Heading));
+        y = -Radius * sinf(ToRadian(Pitch));
         z = Radius * cosf(ToRadian(Pitch)) * cosf(ToRadian(Heading));
     }
 
