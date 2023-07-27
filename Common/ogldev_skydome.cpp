@@ -86,8 +86,6 @@ void Skydome::CreateGLState()
 
 void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float Radius)
 {
-//#define DTOR (float)M_PI / 180.0f
-
     int NumVerticesTopStripe = 3 * NumHeadingStripes;
     int NumVerticesRegularStripe = 6 * NumHeadingStripes;
     m_numVertices = NumVerticesTopStripe + (NumPitchStripes - 1) * NumVerticesRegularStripe;
@@ -110,13 +108,13 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
         Apex.Print();
 
         Vector3f Pos1;
-        Pos1.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
+        Pos1.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
         Vertex v1(Pos1);
         Vertices[i++] = v1;
         Pos1.Print();
 
         Vector3f Pos2;
-        Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
+        Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
         Vertex v2(Pos2);
         Vertices[i++] = v2;
         Pos2.Print();
@@ -124,87 +122,94 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
         printf("\n");
     }
 
-    for (Pitch = 90.0f - PitchAngle; Pitch >= 0; Pitch -= PitchAngle) {
+    for (Pitch = -90.0f + PitchAngle; Pitch < 0; Pitch += PitchAngle) {
         for (float Heading = 0; Heading <= (360.0f - HeadingAngle); Heading += HeadingAngle) {
             printf("TH %f\n", Heading);
 
-            Vertex v0(Apex);
-            Vertices[i++] = v0;
-            Apex.Print();
+            Vector3f Pos0;
+            Pos0.InitBySphericalCoords(Radius, Pitch, Heading);
+            Vertex v0(Pos0);
 
             Vector3f Pos1;
-            Pos1.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
+            Pos1.InitBySphericalCoords(Radius, Pitch, Heading + HeadingAngle);
             Vertex v1(Pos1);
-            Vertices[i++] = v1;
-            Pos1.Print();
 
             Vector3f Pos2;
-            Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
+            Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
             Vertex v2(Pos2);
+
+            Vector3f Pos3;
+            Pos3.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
+            Vertex v3(Pos3);
+
+            assert(i + 6 <= m_numVertices);
+
+            Vertices[i++] = v0;
+            Vertices[i++] = v1;
             Vertices[i++] = v2;
-            Pos2.Print();
+
+            Vertices[i++] = v1;
+            Vertices[i++] = v3;
+            Vertices[i++] = v2;
 
             printf("\n");
         }
     }
 
     
-    //fix the texture-seam problem
-        #if 0
-        for (int i = 0 ; i < m_numVertices - 3 ; i++) {
-            int i0 = i;
-            int i1 = i + 1;
-            int i2 = i + 2;
+ /*   for (int i = 0; i < m_numVertices; i += 3) {
+        Vertex& v0 = Vertices[i];
+        Vertex& v1 = Vertices[i+1];
+        Vertex& v2 = Vertices[i+2];
 
-            if ((Vertices[i0].Tex.u - Vertices[i1].Tex.u) > 0.9f) {
-                Vertices[i1].Tex.u += 1.0f;
-            }
-
-            if ((Vertices[i1].Tex.u - Vertices[i0].Tex.u) > 0.9f) {
-                Vertices[i0].Tex.u += 1.0f;
-            }
-
-            if ((Vertices[i0].Tex.u - Vertices[i2].Tex.u) > 0.9f) {
-                Vertices[i2].Tex.u += 1.0f;
-            }
-
-            if ((Vertices[i2].Tex.u - Vertices[i0].Tex.u) > 0.9f) {
-                Vertices[i0].Tex.u += 1.0f;
-            }
-
-            if ((Vertices[i1].Tex.u - Vertices[i2].Tex.u) > 0.9f) {
-                Vertices[i2].Tex.u += 1.0f;
-            }
-
-            if ((Vertices[i2].Tex.u - Vertices[i1].Tex.u) > 0.9f) {
-                Vertices[i1].Tex.u += 1.0f;
-            }
-
-            if ((Vertices[i0].Tex.v - Vertices[i1].Tex.v ) > 0.8f) {
-                Vertices[i1].Tex.v += 1.0f;
-            }
-
-            if ((Vertices[i1].Tex.v - Vertices[i0].Tex.v ) > 0.8f) {
-                Vertices[i0].Tex.v += 1.0f;
-            }
-
-            if ((Vertices[i0].Tex.v - Vertices[i2].Tex.v ) > 0.8f) {
-                Vertices[i2].Tex.v += 1.0f;
-            }
-
-            if ((Vertices[i2].Tex.v - Vertices[i0].Tex.v ) > 0.8f) {
-                Vertices[i0].Tex.v += 1.0f;
-            }
-
-            if ((Vertices[i1].Tex.v - Vertices[i2].Tex.v ) > 0.8f) {
-                Vertices[i2].Tex.v += 1.0f;
-            }
-
-            if ((Vertices[i2].Tex.v - Vertices[i1].Tex.v ) > 0.8f) {
-                Vertices[i1].Tex.v += 1.0f;
-            }
+        if ((v0.Tex.x - v1.Tex.x) > 0.9f) {
+            v1.Tex.x += 1.0f;
         }
-        #endif
+
+        if ((v1.Tex.x - v0.Tex.x) > 0.9f) {
+            v0.Tex.x += 1.0f;
+        }
+
+        if ((v0.Tex.x - v2.Tex.x) > 0.9f) {
+            v2.Tex.x += 1.0f;
+        }
+
+        if ((v2.Tex.x - v0.Tex.x) > 0.9f) {
+            v0.Tex.x += 1.0f;
+        }
+
+        if ((v1.Tex.x - v2.Tex.x) > 0.9f) {
+            v2.Tex.x += 1.0f;
+        }
+
+        if ((v2.Tex.x - v1.Tex.x) > 0.9f) {
+            v1.Tex.x += 1.0f;
+        }
+
+        if ((v0.Tex.y - v1.Tex.y ) > 0.8f) {
+            v1.Tex.y += 1.0f;
+        }
+
+        if ((v1.Tex.y - v0.Tex.y ) > 0.8f) {
+            v0.Tex.y += 1.0f;
+        }
+
+        if ((v0.Tex.y - v2.Tex.y ) > 0.8f) {
+            v2.Tex.y += 1.0f;
+        }
+
+        if ((v2.Tex.y - v0.Tex.y ) > 0.8f) {
+            v0.Tex.y += 1.0f;
+        }
+
+        if ((v1.Tex.y - v2.Tex.y ) > 0.8f) {
+            v2.Tex.y += 1.0f;
+        }
+
+        if ((v2.Tex.y - v1.Tex.y ) > 0.8f) {
+            v1.Tex.y += 1.0f;
+        }
+    }*/
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 }
@@ -233,20 +238,13 @@ void Skydome::Render(const BasicCamera& Camera)
     m_skydomeTech.SetWVP(WVP);
 
     m_texture.Bind(m_textureUnit);
-
     GLint OldDepthFuncMode;
     glGetIntegerv(GL_DEPTH_FUNC, &OldDepthFuncMode);
     glDepthFunc(GL_LEQUAL);
 
-    GLint OldCullFaceMode;
-    glGetIntegerv(GL_CULL_FACE_MODE, &OldCullFaceMode);
-
-    glCullFace(GL_FRONT);
-
     glBindVertexArray(m_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 24);
+    glDrawArrays(GL_TRIANGLES, 0, m_numVertices);
     glBindVertexArray(0);
 
     glDepthFunc(OldDepthFuncMode);
-    glCullFace(OldCullFaceMode);
 }
