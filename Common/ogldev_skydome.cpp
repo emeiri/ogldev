@@ -45,6 +45,7 @@ Skydome::Skydome(int NumPitchStripes, int NumHeadingStripes, float Radius, const
 }
 
 
+
 Skydome::Vertex::Vertex(const Vector3f& p)
 {
     Pos = p;
@@ -56,8 +57,8 @@ Skydome::Vertex::Vertex(const Vector3f& p)
 
     Tex.x = asin(pn.x) / (float)M_PI + 0.5f;
     Tex.y = asin(pn.y) / (float)M_PI + 0.5f;
-   // Tex.x = atan2(pn.x, pn.z) / ((float)M_PI * 2.0f) + 0.5f;
-   // Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
+  //  Tex.x = atan2(pn.x, pn.z) / ((float)M_PI * 2.0f) + 0.5f;
+  //  Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
 }
 
 
@@ -97,7 +98,7 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
 
     Vector3f Apex(0.0f, Radius, 0.0f);
 
-    float Pitch = 90.0f;
+    float Pitch = -90.0f;
     int i = 0;
 
     for (float Heading = 0.0f ; Heading <= (360.0f - HeadingAngle) ; Heading += HeadingAngle) {
@@ -108,13 +109,13 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
         Apex.Print();
 
         Vector3f Pos1;
-        Pos1.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
+        Pos1.InitBySphericalCoords(Radius, Pitch + PitchAngle, Heading + HeadingAngle);
         Vertex v1(Pos1);
         Vertices[i++] = v1;
         Pos1.Print();
 
         Vector3f Pos2;
-        Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
+        Pos2.InitBySphericalCoords(Radius, Pitch + PitchAngle, Heading);
         Vertex v2(Pos2);
         Vertices[i++] = v2;
         Pos2.Print();
@@ -145,12 +146,12 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
             assert(i + 6 <= m_numVertices);
 
             Vertices[i++] = v0;
-            Vertices[i++] = v1;
             Vertices[i++] = v2;
+            Vertices[i++] = v1;
 
             Vertices[i++] = v1;
-            Vertices[i++] = v3;
             Vertices[i++] = v2;
+            Vertices[i++] = v3;
 
             printf("\n");
         }
@@ -228,10 +229,11 @@ void Skydome::Render(const BasicCamera& Camera)
     Matrix4f Rotate;
 
     static float foo = 0.0f;
-    foo += 0.1f;
+  //  foo += 0.2f;
     Rotate.InitRotateTransform(foo, 0.0f, 0.0f);
     Matrix4f World;
-    World.InitTranslationTransform(Vector3f(0.0f, 0.0f, 5.0f));
+    World.InitTranslationTransform(Camera.GetPos() - Vector3f(0.0f, 0.75f, 0.0f));
+  // World.InitTranslationTransform(Camera.GetPos() + Vector3f(0.0f, 0.0f, 5.0f));
     Matrix4f View = Camera.GetMatrix();
     Matrix4f Proj = Camera.GetProjectionMat();
     Matrix4f WVP = Proj * View * World;// *Rotate;
