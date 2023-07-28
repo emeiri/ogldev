@@ -136,22 +136,22 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
             Vertex v1(Pos1);
 
             Vector3f Pos2;
-            Pos2.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading);
+            Pos2.InitBySphericalCoords(Radius, Pitch + PitchAngle, Heading);
             Vertex v2(Pos2);
 
             Vector3f Pos3;
-            Pos3.InitBySphericalCoords(Radius, Pitch - PitchAngle, Heading + HeadingAngle);
+            Pos3.InitBySphericalCoords(Radius, Pitch + PitchAngle, Heading + HeadingAngle);
             Vertex v3(Pos3);
 
             assert(i + 6 <= m_numVertices);
 
             Vertices[i++] = v0;
-            Vertices[i++] = v2;
             Vertices[i++] = v1;
+            Vertices[i++] = v2;
 
             Vertices[i++] = v1;
-            Vertices[i++] = v2;
             Vertices[i++] = v3;
+            Vertices[i++] = v2;
 
             printf("\n");
         }
