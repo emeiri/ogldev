@@ -92,6 +92,15 @@ struct Vector2f
         x = _x;
         y = _y;
     }
+
+    void Print(bool endl = true) const
+    {
+        printf("(%f, %f)", x, y);
+
+        if (endl) {
+            printf("\n");
+        }
+    }
 };
 
 
