@@ -23,13 +23,6 @@
 
 #include <GL/glew.h>
 
-// In the youtube series I've switch to stb_image
-//#define USE_IMAGE_MAGICK
-
-#ifdef USE_IMAGE_MAGICK
-#include <ImageMagick-6/Magick++.h>
-#endif
-
 class Texture
 {
 public:
@@ -66,10 +59,6 @@ private:
     int m_imageWidth = 0;
     int m_imageHeight = 0;
     int m_imageBPP = 0;
-#ifdef USE_IMAGE_MAGICK
-    Magick::Image m_image;
-    Magick::Blob m_blob;
-#endif
 };
 
 

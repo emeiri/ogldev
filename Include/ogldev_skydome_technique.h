@@ -30,6 +30,7 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
+    void SetRotate(const Matrix4f& Rotate);
     void SetTextureUnit(unsigned int TextureUnit);
 
 private:
