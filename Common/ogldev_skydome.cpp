@@ -50,15 +50,11 @@ Skydome::Vertex::Vertex(const Vector3f& p)
 {
     Pos = p;
 
-    //Pos.Print();
-
     Vector3f pn = p;
     pn.Normalize();
 
     Tex.x = asinf(pn.x) / (float)M_PI + 0.5f;
     Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
-  //  Tex.x = atan2(pn.x, pn.z) / ((float)M_PI * 2.0f) + 0.5f;
-  //  Tex.y = asinf(pn.y) / (float)M_PI + 0.5f;
 }
 
 
@@ -101,31 +97,24 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
     float Pitch = -90.0f;
     int i = 0;
 
-    for (float Heading = 0.0f ; Heading <= (360.0f - HeadingAngle) ; Heading += HeadingAngle) {
-        printf("TH %f\n", Heading);
+    for (float Heading = 0.0f ; Heading < 360.0f ; Heading += HeadingAngle) {
 
         Vertex v0(Apex);
         Vertices[i++] = v0; 
-        Apex.Print();
 
         Vector3f Pos1;
         Pos1.InitBySphericalCoords(Radius, Pitch + PitchAngle, Heading + HeadingAngle);
         Vertex v1(Pos1);
         Vertices[i++] = v1;
-        Pos1.Print();
 
         Vector3f Pos2;
         Pos2.InitBySphericalCoords(Radius, Pitch + PitchAngle, Heading);
         Vertex v2(Pos2);
         Vertices[i++] = v2;
-        Pos2.Print();
-
-        printf("\n");
     }
 
-    for (Pitch = -90.0f + PitchAngle; Pitch < 0; Pitch += PitchAngle) {
-        for (float Heading = 0; Heading <= (360.0f - HeadingAngle); Heading += HeadingAngle) {
-            printf("TH %f\n", Heading);
+    for (Pitch = -90.0f + PitchAngle; Pitch < 0 ; Pitch += PitchAngle) {
+        for (float Heading = 0.0f; Heading < 360.0f ; Heading += HeadingAngle) {
 
             Vector3f Pos0;
             Pos0.InitBySphericalCoords(Radius, Pitch, Heading);
@@ -152,65 +141,8 @@ void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float 
             Vertices[i++] = v1;
             Vertices[i++] = v3;
             Vertices[i++] = v2;
-
-            printf("\n");
         }
     }
-
-    
- /*   for (int i = 0; i < m_numVertices; i += 3) {
-        Vertex& v0 = Vertices[i];
-        Vertex& v1 = Vertices[i+1];
-        Vertex& v2 = Vertices[i+2];
-
-        if ((v0.Tex.x - v1.Tex.x) > 0.9f) {
-            v1.Tex.x += 1.0f;
-        }
-
-        if ((v1.Tex.x - v0.Tex.x) > 0.9f) {
-            v0.Tex.x += 1.0f;
-        }
-
-        if ((v0.Tex.x - v2.Tex.x) > 0.9f) {
-            v2.Tex.x += 1.0f;
-        }
-
-        if ((v2.Tex.x - v0.Tex.x) > 0.9f) {
-            v0.Tex.x += 1.0f;
-        }
-
-        if ((v1.Tex.x - v2.Tex.x) > 0.9f) {
-            v2.Tex.x += 1.0f;
-        }
-
-        if ((v2.Tex.x - v1.Tex.x) > 0.9f) {
-            v1.Tex.x += 1.0f;
-        }
-
-        if ((v0.Tex.y - v1.Tex.y ) > 0.8f) {
-            v1.Tex.y += 1.0f;
-        }
-
-        if ((v1.Tex.y - v0.Tex.y ) > 0.8f) {
-            v0.Tex.y += 1.0f;
-        }
-
-        if ((v0.Tex.y - v2.Tex.y ) > 0.8f) {
-            v2.Tex.y += 1.0f;
-        }
-
-        if ((v2.Tex.y - v0.Tex.y ) > 0.8f) {
-            v0.Tex.y += 1.0f;
-        }
-
-        if ((v1.Tex.y - v2.Tex.y ) > 0.8f) {
-            v2.Tex.y += 1.0f;
-        }
-
-        if ((v2.Tex.y - v1.Tex.y ) > 0.8f) {
-            v1.Tex.y += 1.0f;
-        }
-    }*/
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 }
