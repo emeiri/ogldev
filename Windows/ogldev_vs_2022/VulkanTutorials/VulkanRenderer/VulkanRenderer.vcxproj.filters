@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\..\..\Common\ogldev_xcb_control.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Include\ogldev_vulkan.h">

@@ -229,7 +229,6 @@ void Skydome::Render(const BasicCamera& Camera)
     Matrix4f Proj = Camera.GetProjectionMat();
     Matrix4f WVP = Proj * View * World;// *Rotate;
     m_skydomeTech.SetWVP(WVP);
-    m_skydomeTech.SetRotate(Rotate);
 
     m_texture.Bind(m_textureUnit);
 
