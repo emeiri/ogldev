@@ -807,8 +807,8 @@ public:
         bool Inside =
             (m_leftClipPlane.Dot(p4D)   >= 0) &&
             (m_rightClipPlane.Dot(p4D)  <= 0) &&
-            (m_topClipPlane.Dot(p4D)    <= 0) &&
-            (m_bottomClipPlane.Dot(p4D) >= 0) &&
+         //   (m_topClipPlane.Dot(p4D)    <= 0) &&
+         //   (m_bottomClipPlane.Dot(p4D) >= 0) &&
             (m_nearClipPlane.Dot(p4D)   >= 0) &&
             (m_farClipPlane.Dot(p4D)    <= 0);
 

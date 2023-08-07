@@ -45,7 +45,7 @@ class Skydome
 
     void CreateGLState();
 
-    void PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float Radius);
+    void PopulateBuffers(int NumRows, int NumCols, float Radius);
 
     void LoadTexture(const char* pTextureFilanem);
 

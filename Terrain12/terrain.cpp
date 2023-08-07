@@ -50,7 +50,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         printf("Error initializing tech\n");
         exit(0);
     }
-	
+
     if (TextureFilenames.size() != ARRAY_SIZE_IN_ELEMENTS(m_pTextures)) {
         printf("%s:%d - number of provided textures (%lld) is not equal to the size of the texture array (%lld)\n",
                __FILE__, __LINE__, TextureFilenames.size(), ARRAY_SIZE_IN_ELEMENTS(m_pTextures));
@@ -60,12 +60,13 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
 
-    for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
+    for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
         m_pTextures[i]->Load(TextureFilenames[i]);
-    }    
+    }
 
-    m_pSkydome = new Skydome(1.0f, 1.0f, 1.0f, "../Content/textures/clouds.png", COLOR_TEXTURE_UNIT_0, COLOR_TEXTURE_UNIT_INDEX_0);
+
+    m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/kloofendal_48d_partly_cloudy_puresky_4k.jpg", COLOR_TEXTURE_UNIT_0, COLOR_TEXTURE_UNIT_INDEX_0);
 }
 
 

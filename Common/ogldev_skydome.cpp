@@ -21,14 +21,14 @@
 #include "ogldev_skydome.h"
 
 
-Skydome::Skydome(int NumPitchStripes, int NumHeadingStripes, float Radius, const char* pTextureFilename, GLenum TextureUnit, int TextureUnitIndex)  : m_texture(GL_TEXTURE_2D)
+Skydome::Skydome(int NumRows, int NumCols, float Radius, const char* pTextureFilename, GLenum TextureUnit, int TextureUnitIndex)  : m_texture(GL_TEXTURE_2D)
 {
     m_textureUnit = TextureUnit;
     m_textureUnitIndex = TextureUnitIndex;
 
     CreateGLState();
 
-    PopulateBuffers(NumPitchStripes, NumHeadingStripes, Radius);
+    PopulateBuffers(NumRows, NumCols, Radius);
 
     LoadTexture(pTextureFilename);
 
@@ -81,16 +81,16 @@ void Skydome::CreateGLState()
 }
 
 
-void Skydome::PopulateBuffers(int NumPitchStripes, int NumHeadingStripes, float Radius)
+void Skydome::PopulateBuffers(int NumRows, int NumCols, float Radius)
 {
-    int NumVerticesTopStripe = 3 * NumHeadingStripes;
-    int NumVerticesRegularStripe = 6 * NumHeadingStripes;
-    m_numVertices = NumVerticesTopStripe + (NumPitchStripes - 1) * NumVerticesRegularStripe;
+    int NumVerticesTopStrip = 3 * NumCols;
+    int NumVerticesRegularStrip = 6 * NumCols;
+    m_numVertices = NumVerticesTopStrip + (NumRows - 1) * NumVerticesRegularStrip;
 
     std::vector<Vertex> Vertices(m_numVertices);
 
-    float PitchAngle = 90.0f / (float)NumPitchStripes;
-    float HeadingAngle = 360.0f / (float)NumHeadingStripes;
+    float PitchAngle = 90.0f / (float)NumRows;
+    float HeadingAngle = 360.0f / (float)NumCols;
 
     Vector3f Apex(0.0f, Radius, 0.0f);
 
@@ -161,14 +161,13 @@ void Skydome::Render(const BasicCamera& Camera)
     Matrix4f Rotate;
 
     static float foo = 0.0f;
-  //  foo += 0.2f;
-    Rotate.InitRotateTransform(foo, 0.0f, 0.0f);
+    foo += 0.02f;
+    Rotate.InitRotateTransform(0.0f, foo, 0.0f);
     Matrix4f World;
-    World.InitTranslationTransform(Camera.GetPos() - Vector3f(0.0f, 0.75f, 0.0f));
-  // World.InitTranslationTransform(Camera.GetPos() + Vector3f(0.0f, 0.0f, 5.0f));
+    World.InitTranslationTransform(Camera.GetPos() - Vector3f(0.0f, 0.2f, 0.0f));
     Matrix4f View = Camera.GetMatrix();
     Matrix4f Proj = Camera.GetProjectionMat();
-    Matrix4f WVP = Proj * View * World;// *Rotate;
+    Matrix4f WVP = Proj * View * World * Rotate;
     m_skydomeTech.SetWVP(WVP);
 
     m_texture.Bind(m_textureUnit);

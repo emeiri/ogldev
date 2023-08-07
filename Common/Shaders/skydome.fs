@@ -3,8 +3,9 @@
 layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D gSampler;
-uniform vec4 gLowColor = vec4(0.6, 0.38, 0.66, 1.0);
-uniform vec4 gHighColor = vec4(0.0, 0.15, 0.66, 1.0);
+
+uniform vec4 gLowColor = vec4(253.0/256.0, 94.0/256.0, 83.0/256.0, 1.0);
+uniform vec4 gHighColor = vec4(21.0/256.0, 40.0/256.0, 82.0/256.0, 1.0);
 
 in vec2 TexCoords0;
 in float Height;
@@ -13,13 +14,7 @@ void main()
 {
       vec4 TexColor = texture2D(gSampler, TexCoords0.xy);
 
-      float H = Height;
+      vec4 SkyColor = mix(gLowColor, gHighColor, Height);
 
-      if (H < 0.0) {
-          H = 0.0;
-      }
-
-      vec4 SkyColor = mix(gLowColor, gHighColor, H);
-
-      FragColor = TexColor;// * SkyColor;
+      FragColor = TexColor * 0.7 + SkyColor * 0.3;
 }
