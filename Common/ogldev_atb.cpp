@@ -18,8 +18,8 @@
 #include "ogldev_atb.h"
 #include "ogldev_lights_common.h"
 
-TwType TW_TYPE_OGLDEV_VECTOR3F;
-TwType TW_TYPE_OGLDEV_ATTENUATION;
+//TwType TW_TYPE_OGLDEV_VECTOR3F;
+//TwType TW_TYPE_OGLDEV_ATTENUATION;
 
 
 
@@ -33,6 +33,7 @@ bool ATB::Init()
 {
     bool ret = false;
     
+#if 0
     if (TwInit(TW_OPENGL_CORE, NULL) == 1)
     {
         TwStructMember Vector3fMembers[] = {
@@ -53,13 +54,14 @@ bool ATB::Init()
         
         ret = true;
     }
-    
+#endif    
     return ret;
 }
 
 
 static int OgldevKeyToATBKey(OGLDEV_KEY OgldevKey)
 {
+#if 0
     if (OgldevKey >= OGLDEV_KEY_SPACE && OgldevKey <= OGLDEV_KEY_RIGHT_BRACKET) {
         return OgldevKey;
     }
@@ -126,10 +128,13 @@ static int OgldevKeyToATBKey(OGLDEV_KEY OgldevKey)
     }
     
     return TW_KEY_LAST;
+#endif
+    return 0;
 }
 
 bool ATB::KeyboardCB(OGLDEV_KEY OgldevKey)
 {
+#if 0
     int ATBKey = OgldevKeyToATBKey(OgldevKey);
     
     if (ATBKey == TW_KEY_LAST) {
@@ -137,20 +142,22 @@ bool ATB::KeyboardCB(OGLDEV_KEY OgldevKey)
     }
     
     return (TwKeyPressed(ATBKey, TW_KMOD_NONE) == 1);
+#endif
+    return false;
 }
 
 
 bool ATB::PassiveMouseCB(int x, int y)
 {
-    return (TwMouseMotion(x, y) == 1);
+    return false; //(TwMouseMotion(x, y) == 1);
 }
 
 
 bool ATB::MouseCB(OGLDEV_MOUSE Button, OGLDEV_KEY_STATE State, int x, int y)
 {    
-    TwMouseButtonID btn = (Button == OGLDEV_MOUSE_BUTTON_LEFT) ? TW_MOUSE_LEFT : TW_MOUSE_RIGHT;
-    TwMouseAction ma = (State == OGLDEV_KEY_STATE_PRESS) ? TW_MOUSE_PRESSED : TW_MOUSE_RELEASED;
+//    TwMouseButtonID btn = (Button == OGLDEV_MOUSE_BUTTON_LEFT) ? TW_MOUSE_LEFT : TW_MOUSE_RIGHT;
+ //   TwMouseAction ma = (State == OGLDEV_KEY_STATE_PRESS) ? TW_MOUSE_PRESSED : TW_MOUSE_RELEASED;
     
-    return (TwMouseButton(ma, btn) == 1);
+    return false; //(TwMouseButton(ma, btn) == 1);
 }
 

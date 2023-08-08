@@ -2,12 +2,12 @@
 
 OGLDEV_DIR="/home/emeiri/projects/ogldev"
 CC=g++
-CPPFLAGS=`pkg-config --cflags glew glfw3`
+CPPFLAGS=`pkg-config --cflags glew glfw3 assimp`
 CPPFLAGS="$CPPFLAGS -I$OGLDEV_DIR/Include -ggdb3"
-LDFLAGS=`pkg-config --libs glew glfw3`
+LDFLAGS=`pkg-config --libs glew glfw3 assimp`
 LDFLAGS="$LDFLAGS -lX11"
-SOURCES="terrain_demo5.cpp terrain.cpp triangle_list.cpp terrain_technique.cpp midpoint_displacement_terrain.cpp $OGLDEV_DIR/Common/ogldev_util.cpp $OGLDEV_DIR/Common/math_3d.cpp $OGLDEV_DIR/Common/ogldev_basic_glfw_camera.cpp $OGLDEV_DIR/Common/ogldev_glfw.cpp $OGLDEV_DIR/Common/technique.cpp"
+SOURCES="tutorial44.cpp $OGLDEV_DIR/Common/ogldev_util.cpp $OGLDEV_DIR/Common/math_3d.cpp $OGLDEV_DIR/Common/ogldev_basic_glfw_camera.cpp $OGLDEV_DIR/Common/ogldev_glfw.cpp $OGLDEV_DIR/Common/technique.cpp $OGLDEV_DIR/Common/ogldev_new_lighting.cpp $OGLDEV_DIR/Common/ogldev_basic_mesh.cpp $OGLDEV_DIR/Common/ogldev_texture.cpp $OGLDEV_DIR/Common/ogldev_world_transform.cpp $OGLDEV_DIR/Common/3rdparty/stb_image.cpp"
 
 echo $SOURCES
 
-$CC $SOURCES $CPPFLAGS $LDFLAGS -o demo5
+$CC $SOURCES $CPPFLAGS $LDFLAGS -o tutorial44
