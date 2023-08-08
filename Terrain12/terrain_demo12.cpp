@@ -51,15 +51,15 @@ static int g_seed = 0;
 extern int gShowPoints;
 
 
-class TerrainDemo11
+class TerrainDemo12
 {
 public:
 
-    TerrainDemo11()
+    TerrainDemo12()
     {
     }
 
-    virtual ~TerrainDemo11()
+    virtual ~TerrainDemo12()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -340,7 +340,7 @@ private:
     bool m_constrainCamera = false;
 };
 
-TerrainDemo11* app = NULL;
+TerrainDemo12* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -375,7 +375,7 @@ int main(int argc, char** argv)
 
     srand(g_seed);
 
-    app = new TerrainDemo11();
+    app = new TerrainDemo12();
 
     app->Init();
 
