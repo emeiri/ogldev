@@ -18,8 +18,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\tutorial44_youtube\tutorial44.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\skybox.vs">
