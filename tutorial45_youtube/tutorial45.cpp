@@ -32,7 +32,7 @@
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
 #include "ogldev_new_lighting.h"
-#include "billboard_list.h"
+#include "ogldev_billboard_list.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -75,11 +75,8 @@ public:
         InitMesh();
 
         InitShaders();
-		
-        if (!m_billboardList.Init("../Content/monster_hellknight.png")) {
-            printf("error\n");
-            exit(0);
-	    }
+
+        InitBillboardList();
 	}
 
 
@@ -209,6 +206,7 @@ private:
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
+        m_pGameCamera->SetSpeed(0.01f);
     }
 
 
@@ -236,6 +234,28 @@ private:
         }
 
         m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
+    }
+
+
+    void InitBillboardList()
+    {
+#define NUM_ROWS 10
+#define NUM_COLUMNS 10
+
+        std::vector<Vector3f> Positions;
+        Positions.resize(NUM_ROWS * NUM_COLUMNS);
+
+        for (unsigned int j = 0; j < NUM_ROWS; j++) {
+            for (unsigned int i = 0; i < NUM_COLUMNS; i++) {
+                Vector3f Pos((float)i, 0.0f, (float)j);
+                Positions[j * NUM_COLUMNS + i] = Pos;
+            }
+        }
+
+        if (!m_billboardList.Init("../Content/monster_hellknight.png", Positions)) {
+            printf("error\n");
+            exit(0);
+        }
     }
 
     GLFWwindow* window = NULL;

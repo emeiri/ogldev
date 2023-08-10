@@ -16,7 +16,7 @@
 */
 
 #include "ogldev_util.h"
-#include "billboard_technique.h"
+#include "ogldev_billboard_technique.h"
 
 
 BillboardTechnique::BillboardTechnique()
@@ -30,15 +30,15 @@ bool BillboardTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "billboard.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/billboard.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_GEOMETRY_SHADER, "billboard.gs")) {
+    if (!AddShader(GL_GEOMETRY_SHADER, "../Common/Shaders/billboard.gs")) {
         return false;
     }
     
-    if (!AddShader(GL_FRAGMENT_SHADER, "billboard.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/billboard.fs")) {
         return false;
     }
 

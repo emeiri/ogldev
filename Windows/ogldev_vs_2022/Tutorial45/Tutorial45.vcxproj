@@ -21,18 +21,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_app.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_billboard_list.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
-    <ClCompile Include="..\..\..\tutorial45_youtube\billboard_list.cpp" />
-    <ClCompile Include="..\..\..\tutorial45_youtube\billboard_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial45_youtube\tutorial45.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

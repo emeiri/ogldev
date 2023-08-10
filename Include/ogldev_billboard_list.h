@@ -20,9 +20,10 @@
 #define	BILLBOARD_LIST_H
 
 #include <string>
+#include <vector>
 
 #include "ogldev_texture.h"
-#include "billboard_technique.h"
+#include "ogldev_billboard_technique.h"
 
 class BillboardList
 {
@@ -30,13 +31,14 @@ public:
     BillboardList();    
     ~BillboardList();
     
-    bool Init(const std::string& TexFilename);
+    bool Init(const std::string& TexFilename, const std::vector<Vector3f>& Positions);
     
     void Render(const Matrix4f& VP, const Vector3f& CameraPos);
 
 private:
-    void CreatePositionBuffer();
+    void CreatePositionBuffer(const std::vector<Vector3f>& Positions);
     
+    int m_numPoints = 0;
     GLuint m_VB;
     Texture* m_pTexture;
     BillboardTechnique m_technique;

@@ -18,10 +18,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_engine_common.h"
-#include "billboard_list.h"
-
-#define NUM_ROWS 10
-#define NUM_COLUMNS 10
+#include "ogldev_billboard_list.h"
 
 
 BillboardList::BillboardList()
@@ -42,7 +39,7 @@ BillboardList::~BillboardList()
 }
     
     
-bool BillboardList::Init(const std::string& TexFilename)
+bool BillboardList::Init(const std::string& TexFilename, const std::vector<Vector3f>& Positions)
 {
     m_pTexture = new Texture(GL_TEXTURE_2D, TexFilename.c_str());
         
@@ -50,7 +47,7 @@ bool BillboardList::Init(const std::string& TexFilename)
         return false;
     }
 
-    CreatePositionBuffer();
+    CreatePositionBuffer(Positions);
     
     if (!m_technique.Init()) {
         return false;
@@ -60,20 +57,12 @@ bool BillboardList::Init(const std::string& TexFilename)
 }
 
 
-void BillboardList::CreatePositionBuffer()
+void BillboardList::CreatePositionBuffer(const std::vector<Vector3f>& Positions)
 {    
-    Vector3f Positions[NUM_ROWS * NUM_COLUMNS];
-    
-    for (unsigned int j = 0 ; j < NUM_ROWS ; j++) {
-        for (unsigned int i = 0 ; i < NUM_COLUMNS ; i++) {
-            Vector3f Pos((float)i, 0.0f, (float)j);            
-            Positions[j * NUM_COLUMNS + i] = Pos;
-        }
-    }
-
+    m_numPoints = (int)Positions.size();
     glGenBuffers(1, &m_VB);
   	glBindBuffer(GL_ARRAY_BUFFER, m_VB);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Positions), &Positions[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
 }
 
 
@@ -90,7 +79,7 @@ void BillboardList::Render(const Matrix4f& VP, const Vector3f& CameraPos)
     glBindBuffer(GL_ARRAY_BUFFER, m_VB);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);   // position
     
-    glDrawArrays(GL_POINTS, 0, NUM_ROWS * NUM_COLUMNS);
+    glDrawArrays(GL_POINTS, 0, m_numPoints);
     
     glDisableVertexAttribArray(0);
 }
