@@ -20,25 +20,6 @@
     <ClCompile Include="..\..\..\tutorial45_youtube\billboard_list.cpp" />
     <ClCompile Include="..\..\..\tutorial45_youtube\billboard_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial45_youtube\tutorial45.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_basic_lighting.cpp" />
-    <ClCompile Include="..\..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_app.cpp" />
-    <ClCompile Include="..\..\..\Common\camera.cpp" />
-    <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
-    <ClCompile Include="..\..\..\tutorial45_youtube\mesh.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\skybox.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\Common\Shaders\skybox.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\tutorial44_youtube\terrain.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\tutorial44_youtube\terrain.fs">
-      <Filter>Shaders</Filter>
-    </None>
   </ItemGroup>
 </Project>

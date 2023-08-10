@@ -1,6 +1,6 @@
 /*
 
-	Copyright 2011 Etay Meiri
+        Copyright 2023 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,191 +15,284 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 27 - Billboarding and the geometry shader
+    Tutorial 45 - Point sprites with the Geometry Shader
 */
 
+#include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <GL/glew.h>
-#include <GL/freeglut.h>
+
 
 #include "ogldev_engine_common.h"
-#include "ogldev_app.h"
 #include "ogldev_util.h"
-#include "ogldev_pipeline.h"
-#include "ogldev_camera.h"
-#include "ogldev_basic_lighting.h"
-#include "ogldev_glut_backend.h"
-#include "mesh.h"
+#include "ogldev_basic_glfw_camera.h"
+#include "ogldev_new_lighting.h"
+#include "ogldev_glfw.h"
+#include "ogldev_basic_mesh.h"
+#include "ogldev_world_transform.h"
+#include "ogldev_new_lighting.h"
 #include "billboard_list.h"
 
 #define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1200
+#define WINDOW_HEIGHT 1080
 
 
-class Tutorial27 : public ICallbacks, public OgldevApp
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+static void CursorPosCallback(GLFWwindow* window, double x, double y);
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
+
+
+class Tutorial45
 {
 public:
 
-    Tutorial27()
+    Tutorial45()
     {
-        m_pLightingTechnique = NULL;        
-        m_pGameCamera = NULL;        
-        m_pGround = NULL;
-        m_pTexture = NULL;
-        m_pNormalMap = NULL;
-
-        m_dirLight.AmbientIntensity = 0.2f;
-        m_dirLight.DiffuseIntensity = 0.8f;
+        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.Direction = Vector3f(1.0f, 0.0f, 0.0f);
-        
-        m_persProjInfo.FOV = 60.0f;
-        m_persProjInfo.Height = WINDOW_HEIGHT;
-        m_persProjInfo.Width = WINDOW_WIDTH;
-        m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;        
-    }
-    
+        m_dirLight.WorldDirection = Vector3f(0.0f, -0.5f, 1.0f);
 
-    ~Tutorial27()
-    {
-        SAFE_DELETE(m_pLightingTechnique);
-        SAFE_DELETE(m_pGameCamera);        
-        SAFE_DELETE(m_pGround);        
-        SAFE_DELETE(m_pTexture);
-        SAFE_DELETE(m_pNormalMap);
+        m_position = Vector3f(0.0f, 0.0f, -12.0f);
     }
 
-    
-    bool Init()
+
+    virtual ~Tutorial45()
     {
-        Vector3f Pos(0.0f, 1.0f, -1.0f);
-        Vector3f Target(0.0f, -0.5f, 1.0f);
-        Vector3f Up(0.0, 1.0f, 0.0f);
+        SAFE_DELETE(m_pGameCamera);
+    }
 
-        m_pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, Pos, Target, Up);
-     
-        m_pLightingTechnique = new BasicLightingTechnique();
 
-        if (!m_pLightingTechnique->Init()) {
-            printf("Error initializing the lighting technique\n");
-            return false;
-        }
+    void Init()
+    {
+        CreateWindow();
 
-        m_pLightingTechnique->Enable();
-        m_pLightingTechnique->SetDirectionalLight(m_dirLight);
-        m_pLightingTechnique->SetColorTextureUnit(0);
-     //   m_pLightingTechnique->SetNormalMapTextureUnit(2);
-              
-        m_pGround = new Mesh();
-        
-        if (!m_pGround->LoadMesh("quad.obj")) {
-            return false;
-        }
-        
+        InitCallbacks();
+
+        InitCamera();
+
+        InitMesh();
+
+        InitShaders();
+		
         if (!m_billboardList.Init("../Content/monster_hellknight.png")) {
-            return false;
-    
-        }
-               
-        m_pTexture = new Texture(GL_TEXTURE_2D, "../Content/bricks.jpg");
-        
-        if (!m_pTexture->Load()) {
-            return false;
-        }
-        
-        m_pTexture->Bind(COLOR_TEXTURE_UNIT);
+            printf("error\n");
+            exit(0);
+	    }
+	}
 
-        m_pNormalMap = new Texture(GL_TEXTURE_2D, "../Content/normal_map.jpg");
-        
-        if (!m_pNormalMap->Load()) {
-            return false;
-        }
 
-        return true;
-    }
-
-    
     void Run()
     {
-        GLUTBackendRun(this);
+        while (!glfwWindowShouldClose(window)) {
+            RenderSceneCB();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
     }
 
-    
-    virtual void RenderSceneCB()
-    {
-        m_pGameCamera->OnRender();
 
+    void RenderSceneCB()
+    {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_pLightingTechnique->Enable();
+        m_pGameCamera->OnRender();
 
-        m_pTexture->Bind(COLOR_TEXTURE_UNIT);       
-        m_pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
+        ///////////////////////////
+        // Render the main object
+        ////////////////////////////
 
-        Pipeline p;
-        p.Scale(20.0f, 20.0f, 1.0f);
-        p.Rotate(90.0f, 0.0, 0.0f);
-        p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
-        p.SetPerspectiveProj(m_persProjInfo);
-        
-        m_pLightingTechnique->SetWVP(p.GetWVPTrans());
-        m_pLightingTechnique->SetWorldMatrix(p.GetWorldTrans());
-        m_pGround->Render();
-                
-        m_billboardList.Render(p.GetVPTrans(), m_pGameCamera->GetPos());
-        glutSwapBuffers();
+        Matrix4f CameraView = m_pGameCamera->GetMatrix();
+        Matrix4f CameraProjection = m_pGameCamera->GetProjectionMat();
+        Matrix4f VP = CameraProjection * CameraView;        
+        m_billboardList.Render(VP, m_pGameCamera->GetPos());
+
+        /////////////////////////
+        // Render the terrain
+        ////////////////////////
+
+        m_lightingTech.Enable();
+
+        // Set the WVP matrix from the camera point of view
+        Matrix4f World = m_pTerrain->GetWorldMatrix();
+        Matrix4f WVP = CameraProjection * CameraView * World;
+        m_lightingTech.SetWVP(WVP);
+
+        // Update the shader with the local space pos/dir of the spot light
+        m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
+        m_lightingTech.SetDirectionalLight(m_dirLight);
+        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
+
+        // Update the shader with the local space pos of the camera
+        Vector3f CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
+        m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
+
+        m_pTerrain->Render();
     }
 
 
-	void KeyboardCB(OGLDEV_KEY OgldevKey, OGLDEV_KEY_STATE State)
-	{
-		switch (OgldevKey) {
-		case OGLDEV_KEY_ESCAPE:
-		case OGLDEV_KEY_q:
-			GLUTBackendLeaveMainLoop();
-			break;
-		default:
-			m_pGameCamera->OnKeyboard(OgldevKey);
-		}
-	}
+#define ATTEN_STEP 0.01f
+
+#define ANGLE_STEP 1.0f
+
+    void PassiveMouseCB(int x, int y)
+    {
+        if (!m_isPaused) {
+            m_pGameCamera->OnMouse(x, y);
+        }
+    }
+
+    void KeyboardCB(uint key, int state)
+    {
+        if (state == GLFW_PRESS) {
+            switch (key) {
+            case GLFW_KEY_ESCAPE:
+            case GLFW_KEY_Q:
+                glfwDestroyWindow(window);
+                glfwTerminate();
+                exit(0);
+
+            case GLFW_KEY_L:
+                m_cameraOnLight = !m_cameraOnLight;
+                if (!m_cameraOnLight) {
+                    m_pGameCamera->SetPosition(m_cameraPos);
+                    m_pGameCamera->SetTarget(m_cameraTarget);
+                }
+                break;
+
+            case GLFW_KEY_P:
+                m_isPaused = !m_isPaused;
+                break;
+            }
+        }
+
+        m_pGameCamera->OnKeyboard(key);
+    }
 
 
-	virtual void PassiveMouseCB(int x, int y)
-	{
-		m_pGameCamera->OnMouse(x, y);
-	}
+    void MouseCB(int button, int action, int x, int y)
+    {
+    }
 
- private:
 
-    BasicLightingTechnique* m_pLightingTechnique;
-    Camera* m_pGameCamera;
-    DirectionalLight m_dirLight;    
-    Mesh* m_pGround;    
-    Texture* m_pTexture;
-    Texture* m_pNormalMap;
-    PersProjInfo m_persProjInfo;
+private:
+
+    void CreateWindow()
+    {
+        int major_ver = 0;
+        int minor_ver = 0;
+        bool is_full_screen = false;
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 44");
+
+        glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    }
+
+
+    void InitCallbacks()
+    {
+        glfwSetKeyCallback(window, KeyCallback);
+        glfwSetCursorPosCallback(window, CursorPosCallback);
+        glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    }
+
+
+    void InitCamera()
+    {
+        m_cameraPos = Vector3f(0.0f, 1.0f, -1.0f);
+        m_cameraTarget = Vector3f(0.0f, -0.5f, 1.0f);
+        Vector3f Up(0.0, 1.0f, 0.0f);
+	
+        float FOV = 45.0f;
+        float zNear = 0.1f;
+        float zFar = 100.0f;
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+
+        m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
+    }
+
+
+    void InitShaders()
+    {
+        if (!m_lightingTech.Init()) {
+            printf("Error initializing the lighting technique\n");
+            exit(1);
+        }
+
+        m_lightingTech.Enable();
+        m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+        m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+        //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    }
+
+
+    void InitMesh()
+    {
+        m_pTerrain = new BasicMesh();
+
+        if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
+            printf("Error loading mesh ../Content/box_terrain.obj\n");
+            exit(0);
+        }
+
+        m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
+    }
+
+    GLFWwindow* window = NULL;
+    BasicCamera* m_pGameCamera = NULL;
+    LightingTechnique m_lightingTech;
+    BasicMesh* m_pTerrain = NULL;
+    Matrix4f m_cameraOrthoProjMatrix;
+    Vector3f m_lightWorldPos;
+    Matrix4f m_lightOrthoProjMatrix;
+    DirectionalLight m_dirLight;
+    Vector3f m_cameraPos;
+    Vector3f m_cameraTarget;
+    bool m_cameraOnLight = false;
+    Vector3f m_position;
     BillboardList m_billboardList;
+	bool m_isPaused = false;
 };
+
+Tutorial45* app = NULL;
+
+static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    app->KeyboardCB(key, action);
+}
+
+
+static void CursorPosCallback(GLFWwindow* window, double x, double y)
+{
+    app->PassiveMouseCB((int)x, (int)y);
+}
+
+
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
+{
+    double x, y;
+
+    glfwGetCursorPos(window, &x, &y);
+
+    app->MouseCB(Button, Action, (int)x, (int)y);
+}
 
 
 int main(int argc, char** argv)
 {
-    GLUTBackendInit(argc, argv, true, false);
+    app = new Tutorial45();
 
-    if (!GLUTBackendCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, false, "Tutorial 27")) {
-        return 1;
-    }
+    app->Init();
 
-    Tutorial27* pApp = new Tutorial27();
+    glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
+    glFrontFace(GL_CW);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CLIP_DISTANCE0);
 
-    if (!pApp->Init()) {
-        return 1;
-    }
+    app->Run();
 
-    pApp->Run();
+    delete app;
 
-    delete pApp;
- 
     return 0;
 }
