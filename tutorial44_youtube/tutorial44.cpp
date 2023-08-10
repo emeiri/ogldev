@@ -31,27 +31,22 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_shadow_map_fbo.h"
 #include "ogldev_new_lighting.h"
-#include "ogldev_shadow_mapping_technique.h"
 
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
-
-#define SHADOW_MAP_WIDTH 4096
-#define SHADOW_MAP_HEIGHT 4096
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class Tutorial38
+class Tutorial44
 {
 public:
 
-    Tutorial38()
+    Tutorial44()
     {
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
@@ -62,7 +57,7 @@ public:
     }
 
 
-    virtual ~Tutorial38()
+    virtual ~Tutorial44()
     {
         SAFE_DELETE(m_pGameCamera);
         SAFE_DELETE(m_pMesh1);
@@ -272,7 +267,6 @@ private:
         m_lightingTech.Enable();
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
         m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
-        m_lightingTech.SetShadowMapSize(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
         //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
     }
 
@@ -311,7 +305,7 @@ private:
     bool m_isPaused = false;
 };
 
-Tutorial38* app = NULL;
+Tutorial44* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -337,7 +331,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial38();
+    app = new Tutorial44();
 
     app->Init();
 
