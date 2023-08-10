@@ -32,9 +32,12 @@ BillboardList::~BillboardList()
 {
     SAFE_DELETE(m_pTexture);
     
-    if (m_VB != INVALID_OGL_VALUE)
-    {
+    if (m_VB != INVALID_OGL_VALUE) {
         glDeleteBuffers(1, &m_VB);
+    }
+
+    if (m_vao != INVALID_OGL_VALUE) {
+        glDeleteVertexArrays(1, &m_vao);
     }
 }
     
@@ -52,6 +55,8 @@ bool BillboardList::Init(const std::string& TexFilename, const std::vector<Vecto
     if (!m_technique.Init()) {
         return false;
     }
+
+    m_technique.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     
     return true;
 }
@@ -60,9 +65,19 @@ bool BillboardList::Init(const std::string& TexFilename, const std::vector<Vecto
 void BillboardList::CreatePositionBuffer(const std::vector<Vector3f>& Positions)
 {    
     m_numPoints = (int)Positions.size();
+
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+
     glGenBuffers(1, &m_VB);
   	glBindBuffer(GL_ARRAY_BUFFER, m_VB);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Positions[0]) * Positions.size(), &Positions[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);   // position
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
@@ -73,13 +88,8 @@ void BillboardList::Render(const Matrix4f& VP, const Vector3f& CameraPos)
     m_technique.SetCameraPosition(CameraPos);
     
     m_pTexture->Bind(COLOR_TEXTURE_UNIT);
-    
-    glEnableVertexAttribArray(0);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, m_VB);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);   // position
-    
+       
+    glBindVertexArray(m_vao);
     glDrawArrays(GL_POINTS, 0, m_numPoints);
-    
-    glDisableVertexAttribArray(0);
+    glBindVertexArray(0);     
 }

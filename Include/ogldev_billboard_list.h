@@ -39,7 +39,8 @@ private:
     void CreatePositionBuffer(const std::vector<Vector3f>& Positions);
     
     int m_numPoints = 0;
-    GLuint m_VB;
+    GLuint m_vao = INVALID_OGL_VALUE;
+    GLuint m_VB = INVALID_OGL_VALUE;
     Texture* m_pTexture;
     BillboardTechnique m_technique;
 };
