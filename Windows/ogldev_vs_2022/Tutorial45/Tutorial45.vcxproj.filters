@@ -20,4 +20,15 @@
     <ClCompile Include="..\..\..\Common\ogldev_billboard_list.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Common\Shaders\billboard.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\billboard.gs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\billboard.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>

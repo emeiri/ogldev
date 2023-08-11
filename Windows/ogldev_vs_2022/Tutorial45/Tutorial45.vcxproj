@@ -33,6 +33,11 @@
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\tutorial45_youtube\tutorial45.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Common\Shaders\billboard.fs" />
+    <None Include="..\..\..\Common\Shaders\billboard.gs" />
+    <None Include="..\..\..\Common\Shaders\billboard.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
