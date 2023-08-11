@@ -252,7 +252,7 @@ private:
             }
         }
 
-        if (!m_billboardList.Init("../Content/monster_hellknight.png", Positions)) {
+        if (!m_billboardList.Init("../Content/textures/death-2026516_1280.png", Positions)) {
             printf("error\n");
             exit(0);
         }

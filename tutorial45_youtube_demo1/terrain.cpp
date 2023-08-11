@@ -170,6 +170,10 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 	
     m_terrainTech.SetLightDir(m_lightDir);
 
+    static float Time = 0.0f;
+    Time += 0.01f;
+    m_terrainTech.SetTime(Time);
+
     m_geomipGrid.Render(Camera.GetPos(), VP);
 
     m_pSkydome->Render(Camera);

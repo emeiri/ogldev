@@ -56,6 +56,7 @@ bool TerrainTechnique::Init()
     m_tex2HeightLoc = GetUniformLocation("gHeight2");
     m_tex3HeightLoc = GetUniformLocation("gHeight3");
     m_reversedLightDirLoc = GetUniformLocation("gReversedLightDir");
+    m_timeLoc = GetUniformLocation("gTime");
 
     if (m_VPLoc == INVALID_UNIFORM_LOCATION||
         m_tex0UnitLoc == INVALID_UNIFORM_LOCATION ||
@@ -66,7 +67,8 @@ bool TerrainTechnique::Init()
         m_tex1HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex2HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex3HeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION) {
+        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION ||
+        m_timeLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -105,3 +107,8 @@ void TerrainTechnique::SetLightDir(const Vector3f& Dir)
     glUniform3f(m_reversedLightDirLoc, ReversedLightDir.x, ReversedLightDir.y, ReversedLightDir.z);
 }
 
+
+void TerrainTechnique::SetTime(float Time)
+{
+    glUniform1f(m_timeLoc, Time);
+}

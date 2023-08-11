@@ -140,24 +140,12 @@ public:
 
         m_pGameCamera->OnRender();
 
-     /*   static float foo = 0.0f;
-        foo += 0.002f;
+        static float foo = 0.0f;
+        foo += 0.01f;
 
-        float S = (float)m_terrainSize;
-        float R = 2.5f * S;
+        Vector3f LightDir(sinf(foo), -1, 0.0f);
 
-        Vector3f Pos(S + cosf(foo) * R, m_maxHeight + 250.0f, S + sinf(foo) * R);
-        m_pGameCamera->SetPosition(Pos);
-
-        Vector3f Center(S, Pos.y * 0.50f, S);
-        Vector3f Target = Center - Pos;
-        m_pGameCamera->SetTarget(Target);
-        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
-
-        float y = min(-0.4f, cosf(foo));
-        Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
-
-        m_terrain.SetLightDir(LightDir);*/
+        m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -286,7 +274,7 @@ private:
         float WorldScale = 4.0f;
         float TextureScale = 16.0f;
         std::vector<string> TextureFilenames;
-        TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
+        TextureFilenames.push_back("../Content/textures/tex_Water.jpg");
         TextureFilenames.push_back("../Content/textures/coast_sand_rocks_02_diff_2k.jpg");        
         TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");
         TextureFilenames.push_back("../Content/textures/water.png");
@@ -295,7 +283,7 @@ private:
 
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
 
-        Vector3f LightDir(0.0f, -1.0f, 0.0f);
+        Vector3f LightDir(1.0f, -1.0f, 0.0f);
 
         m_terrain.SetLightDir(LightDir);
     }
@@ -334,7 +322,7 @@ private:
     int m_terrainSize = 513;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
-    float m_maxHeight = 400.0f;
+    float m_maxHeight = 1.0f;
     int m_patchSize = 17;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;

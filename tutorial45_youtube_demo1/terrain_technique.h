@@ -34,6 +34,8 @@ public:
     void SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height);
 	
     void SetLightDir(const Vector3f& Dir);
+
+    void SetTime(float Time);
 	
 private:
     GLuint m_VPLoc = -1;
@@ -46,6 +48,7 @@ private:
     GLuint m_tex2UnitLoc = -1;
     GLuint m_tex3UnitLoc = -1;
     GLuint m_reversedLightDirLoc = -1;
+    GLuint m_timeLoc = -1;
 };
 
 #endif  /* TERRAIN_TECHNIQUE_H */

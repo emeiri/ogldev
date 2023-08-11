@@ -37,6 +37,8 @@ void LodManager::CalcMaxLOD()
     printf("log2 of patch size %d is %d\n", m_patchSize, patchSizeLog2);
     m_maxLOD = patchSizeLog2 - 1;
 
+    m_maxLOD = 0; // hack for water
+
    // printf("max lod %d\n", m_maxLOD);
 }
 
