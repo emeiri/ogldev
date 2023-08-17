@@ -35,38 +35,33 @@
 #define FREETYPEGL_H
 
 #include <GL/glew.h>
-#if defined(__APPLE__)
-    #include <Glut/glut.h>
-#else
-    #include <GL/glut.h>
-#endif
-
-extern "C" {
 #include "font-manager.h"
-}
+#include "markup.h"
+#include "texture-font.h"
+#include "text-buffer.h"
+#include "mat4.h"
+#include "shader.h"
 
-#include "font_shader.h"
+using namespace ftgl;
 
 class FontRenderer
 {
 public:
     FontRenderer();
 
-    FontRenderer(const Markup& markup);
-
     ~FontRenderer();
 
-    bool InitFontRenderer();
+    void InitFontRenderer(int WindowWidth, int WindowHeight);
 
     void RenderText(unsigned int x, unsigned int y, const char* pText);
 
 private:
 
-    FontManager* m_pManager;
-    TextureFont* m_pFont;
-    VertexBuffer* m_pTextBuffer;
-    FontShader m_fontShader;
-    Markup m_markup;
+    texture_atlas_t* m_pAtlas = NULL;
+    vertex_buffer_t* m_pBuffer = NULL;
+    texture_font_t* m_pFont = NULL;
+    GLuint m_shaderProg = -1;
+    mat4 m_model, m_view, m_projection;
 };
 
 

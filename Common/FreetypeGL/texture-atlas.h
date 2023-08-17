@@ -1,150 +1,214 @@
-/* =========================================================================
- * Freetype GL - A C OpenGL Freetype engine
- * Platform:    Any
- * WWW:         http://code.google.com/p/freetype-gl/
- * -------------------------------------------------------------------------
- * Copyright 2011 Nicolas P. Rougier. All rights reserved.
+/* Freetype GL - A C OpenGL Freetype engine
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Distributed under the OSI-approved BSD 2-Clause License.  See accompanying
+ * file `LICENSE` for more details.
+ *  ============================================================================
  *
- *  1. Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
  *
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
+ * This source is based on the article by Jukka Jylänki :
+ * "A Thousand Ways to Pack the Bin - A Practical Approach to
+ * Two-Dimensional Rectangle Bin Packing", February 27, 2010.
  *
- * THIS SOFTWARE IS PROVIDED BY NICOLAS P. ROUGIER ''AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL NICOLAS P. ROUGIER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * More precisely, this is an implementation of the Skyline Bottom-Left
+ * algorithm based on C++ sources provided by Jukka Jylänki at:
+ * http://clb.demon.fi/files/RectangleBinPack/
  *
- * The views and conclusions contained in the software and documentation are
- * those of the authors and should not be interpreted as representing official
- * policies, either expressed or implied, of Nicolas P. Rougier.
- * =========================================================================
-
-   This source is based on the article by Jukka Jylänki :
-   "A Thousand Ways to Pack the Bin - A Practical Approach to
-    Two-Dimensional Rectangle Bin Packing", February 27, 2010.
-
-   More precisely, this is an implementation of the Skyline Bottom-Left
-   algorithm based on C++ sources provided by Jukka Jylänki at:
-   http://clb.demon.fi/files/RectangleBinPack/
-
-   ========================================================================= */
-#pragma once
+ *  ============================================================================
+ */
 #ifndef __TEXTURE_ATLAS_H__
 #define __TEXTURE_ATLAS_H__
+
+#include <stdlib.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "vector.h"
+#include "vec234.h"
+
+#ifdef __cplusplus
+namespace ftgl {
+#endif
+
+/**
+ * @file   texture-atlas.h
+ * @author Nicolas Rougier (Nicolas.Rougier@inria.fr)
+ *
+ * @defgroup texture-atlas Texture atlas
+ *
+ * A texture atlas is used to pack several small regions into a single texture.
+ *
+ * The actual implementation is based on the article by Jukka Jylänki : "A
+ * Thousand Ways to Pack the Bin - A Practical Approach to Two-Dimensional
+ * Rectangle Bin Packing", February 27, 2010.
+ * More precisely, this is an implementation of the Skyline Bottom-Left
+ * algorithm based on C++ sources provided by Jukka Jylänki at:
+ * http://clb.demon.fi/files/RectangleBinPack/
+ *
+ *
+ * Example Usage:
+ * @code
+ * #include "texture-atlas.h"
+ *
+ * ...
+ *
+ * / Creates a new atlas of 512x512 with a depth of 1
+ * texture_atlas_t * atlas = texture_atlas_new( 512, 512, 1 );
+ *
+ * // Allocates a region of 20x20
+ * ivec4 region = texture_atlas_get_region( atlas, 20, 20 );
+ *
+ * // Fill region with some data
+ * texture_atlas_set_region( atlas, region.x, region.y, region.width, region.height, data, stride )
+ *
+ * ...
+ *
+ * @endcode
+ *
+ * @{
+ */
 
 
 /**
- * A Region describes
- *
- *
+ * A texture atlas is used to pack several small regions into a single texture.
  */
-typedef struct
+typedef struct texture_atlas_t
 {
-    int x;
-    int y;
-    int width;
-    int height;
-} Region;
+    /**
+     * Allocated nodes
+     */
+    vector_t * nodes;
 
-
-typedef struct { float x,y,z,w; }  vec4;
-typedef struct { float x,y,z;   }  vec3;
-typedef struct { float x,y;     }  vec2;
-typedef struct { int x,y,z,w;   } ivec4;
-typedef struct { int x,y,z;     } ivec3;
-typedef struct { int x,y;       } ivec2;
-
-
-typedef struct
-{
-    /** Current allocated nodes */
-    Vector *nodes;
-
-    /** Width (in pixels) of the underlying texture */
+    /**
+     *  Width (in pixels) of the underlying texture
+     */
     size_t width;
 
-    /** Height (in pixels) of the underlying texture */
+    /**
+     * Height (in pixels) of the underlying texture
+     */
     size_t height;
 
-    /** Texture format (1, 3 or 4) */
+    /**
+     * Depth (in bytes) of the underlying texture
+     */
     size_t depth;
 
-    /** Allocated surface  */
+    /**
+     * Allocated surface size
+     */
     size_t used;
 
-    /** Texture identity (OpenGL) */
-    unsigned int texid;
+    /**
+     * Texture identity (OpenGL)
+     */
+    unsigned int id;
 
-    unsigned char *data;
+    /**
+     * Atlas data
+     */
+    unsigned char * data;
 
-    /** A special region */
-    Region black;
+    /**
+     * Atlas has been modified
+     */
+    unsigned char modified;
 
-} TextureAtlas;
+    /**
+     * Atlas special glyph, this is a void*, and will be typecasted as necessary
+     */
+
+    void * special;
+
+} texture_atlas_t;
+
 
 
 /**
+ * Creates a new empty texture atlas.
+ *
+ * @param   width   width of the atlas
+ * @param   height  height of the atlas
+ * @param   depth   bit depth of the atlas
+ * @return          a new empty texture atlas.
  *
  */
-  TextureAtlas *
-  texture_atlas_new( size_t width,
-                     size_t height,
-                     size_t depth );
+  texture_atlas_t *
+  texture_atlas_new( const size_t width,
+                     const size_t height,
+                     const size_t depth );
 
 
 /**
+ *  Deletes a texture atlas.
  *
- */
-  void
-  texture_atlas_delete( TextureAtlas *self );
-
-
-/**
- *
- */
-  void
-  texture_atlas_upload( TextureAtlas *self );
-
-
-/**
- *
- */
-  Region
-  texture_atlas_get_region( TextureAtlas *self,
-                            size_t width,
-                            size_t height );
-
-
-/**
- *
- */
-  void
-  texture_atlas_set_region( TextureAtlas *self,
-                            size_t x,
-                            size_t y,
-                            size_t width,
-                            size_t height,
-                            unsigned char *data,
-                            size_t stride );
-
-/**
+ *  @param self a texture atlas structure
  *
  */
   void
-  texture_atlas_clear( TextureAtlas *self );
+  texture_atlas_delete( texture_atlas_t * self );
 
-  
+
+/**
+ *  Allocate a new region in the atlas.
+ *
+ *  @param self   a texture atlas structure
+ *  @param width  width of the region to allocate
+ *  @param height height of the region to allocate
+ *  @return       Coordinates of the allocated region
+ *
+ */
+  ivec4
+  texture_atlas_get_region( texture_atlas_t * self,
+                            const size_t width,
+                            const size_t height );
+
+
+/**
+ *  Upload data to the specified atlas region.
+ *
+ *  @param self   a texture atlas structure
+ *  @param x      x coordinate the region
+ *  @param y      y coordinate the region
+ *  @param width  width of the region
+ *  @param height height of the region
+ *  @param data   data to be uploaded into the specified region
+ *  @param stride stride of the data
+ *
+ */
+  void
+  texture_atlas_set_region( texture_atlas_t * self,
+                            const size_t x,
+                            const size_t y,
+                            const size_t width,
+                            const size_t height,
+                            const unsigned char *data,
+                            const size_t stride );
+
+/**
+ *  Remove all allocated regions from the atlas.
+ *
+ *  @param self   a texture atlas structure
+ */
+  void
+  texture_atlas_clear( texture_atlas_t * self );
+
+/**
+ *  Enlarge a texture atlas
+ *
+ *  @param self       a texture atlas structure
+ *  @param width_new  new width
+ *  @param height_new new height
+ */
+  void
+  texture_atlas_enlarge_texture ( texture_atlas_t* self, size_t width_new, size_t height_new);
+
+/** @} */
+
+#ifdef __cplusplus
+}
+}
+#endif
+
 #endif /* __TEXTURE_ATLAS_H__ */

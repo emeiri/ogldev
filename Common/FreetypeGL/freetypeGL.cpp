@@ -31,147 +31,134 @@
  * policies, either expressed or implied, of Nicolas P. Rougier.
  * ========================================================================= */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
 #include <assert.h>
 
 #include "freetypeGL.h"
+#include "markup.h"
+#include "vertex-buffer.h"
+#include "text-buffer.h"
 
 extern "C" {
-#include "markup.h"
-#include "vector.c"
-#include "texture-font.c"
-#include "texture-glyph.c"
-#include "vertex-buffer.c"
-#include "texture-atlas.c"
-#include "font-manager.c"
+#include "mat4.c"
+#include "shader.c"
 }
-#include "font_shader.cpp"
+
+using namespace ftgl;
 
 #define MAX_STRING_LEN 128
 
-Markup sDefaultMarkup = { (char*)"Arial", 64, 0, 0, 0.0, 0.0,
-                          {.5,.5,.5,.5}, {1,1,1,0},
-                          0, {0,0,0,1}, 0, {0,0,0,1},
-                          0, {0,0,0,1}, 0, {0,0,0,1} };
+vec4 white = { {1.0f,1.0f,1.0f,1.0f} };
+vec4 black = { {0.0f,0.0f,0.0f,1.0f} };
+vec4 yellow = { {1.0f, 1.0f, 0.0f, 1.0f} };
+vec4 orange1 = { {1.0f, 0.9f, 0.0f, 1.0f} };
+vec4 orange2 = { {1.0f, 0.6f, 0.0f, 1.0f} };
+vec4 none = { {0.0f,0.0f,1.0f,0.0f} };
+
+typedef struct {
+    float x, y, z;
+    float u, v;
+    vec4 color;
+} vertex_t;
+
+
+void add_text(vertex_buffer_t* m_pBuffer, texture_font_t* m_pFont, char* text, vec2 pen, vec4 fg_color_1, vec4 fg_color_2)
+{
+    for (size_t i = 0; i < strlen(text); ++i)
+    {
+        texture_glyph_t* glyph = texture_font_get_glyph(m_pFont, text + i);
+        float kerning = 0.0f;
+        if (i > 0)
+        {
+            kerning = texture_glyph_get_kerning(glyph, text + i - 1);
+        }
+        pen.x += kerning;
+
+        /* Actual glyph */
+        float x0 = (pen.x + glyph->offset_x);
+        float y0 = (float)((int)(pen.y + glyph->offset_y));
+        float x1 = (x0 + glyph->width);
+        float y1 = (float)((int)(y0 - glyph->height));
+        float s0 = glyph->s0;
+        float t0 = glyph->t0;
+        float s1 = glyph->s1;
+        float t1 = glyph->t1;
+        GLuint index = (GLuint)m_pBuffer->vertices->size;
+        GLuint indices[] = { index, index + 1, index + 2,
+                            index, index + 2, index + 3 };
+        vertex_t vertices[] = {
+            { (float)((int)x0),y0,0,  s0,t0,  fg_color_1 },
+            { (float)((int)x0),y1,0,  s0,t1,  fg_color_2 },
+            { (float)((int)x1),y1,0,  s1,t1,  fg_color_2 },
+            { (float)((int)x1),y0,0,  s1,t0,  fg_color_1 } };
+        vertex_buffer_push_back_indices(m_pBuffer, indices, 6);
+        vertex_buffer_push_back_vertices(m_pBuffer, vertices, 4);
+        pen.x += glyph->advance_x;
+    }
+}
 
 
 FontRenderer::FontRenderer()
 {
-    m_pManager = NULL;
-    m_pFont = NULL;
-    m_pTextBuffer = NULL;
-    m_markup = sDefaultMarkup;
 }
 
-
-FontRenderer::FontRenderer(const Markup& markup)
-{
-    m_pManager = NULL;
-    m_pFont = NULL;
-    m_pTextBuffer = NULL;
-    m_markup = markup;
-}
 
 FontRenderer::~FontRenderer()
 {
-    if (m_pManager) {
-        font_manager_delete(m_pManager);
-    }
-
-    if (m_pTextBuffer) {
-        vertex_buffer_delete(m_pTextBuffer);
-    }
 }
 
 
-bool FontRenderer::InitFontRenderer()
+void FontRenderer::InitFontRenderer(int WindowWidth, int WindowHeight)
 {
-    m_pManager = font_manager_new( 512, 512, 1 );
+    m_pAtlas = texture_atlas_new(1024, 1024, 1);
+    m_pBuffer = vertex_buffer_new("vertex:3f,tex_coord:2f,color:4f");
+    m_pFont = texture_font_new_from_file(m_pAtlas, 128, "../Common/FreetypeGL/fonts/LuckiestGuy.ttf");
 
-    if (!m_pManager) {
-        fprintf(stderr, "%s:%d - error initializing the font manager\n", __FILE__, __LINE__);
-        return false;
-    }
+    glGenTextures(1, &m_pAtlas->id);
+    glBindTexture(GL_TEXTURE_2D, m_pAtlas->id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (GLsizei)m_pAtlas->width, (GLsizei)m_pAtlas->height, 0, GL_RED, GL_UNSIGNED_BYTE, m_pAtlas->data);
 
-    m_pFont = font_manager_get_from_markup( m_pManager, &m_markup );
+    m_shaderProg = shader_load("../Common/FreetypeGL/v3f-t2f-c4f.vert", "../Common/FreetypeGL/v3f-t2f-c4f.frag");
 
-    if (!m_pFont) {
-        fprintf(stderr, "%s:%d - error getting the font\n", __FILE__, __LINE__);
-        return false;
-    }
-
-    m_pTextBuffer = vertex_buffer_new( "v3f:t2f:c4f" );
-
-    if (!m_pTextBuffer) {
-        fprintf(stderr, "%s:%d - error creating the text buffer\n", __FILE__, __LINE__);
-        return false;
-    }
-
-    if (!m_fontShader.InitFontShader()) {
-        fprintf(stderr, "%s:%d - error compiling the shader program\n", __FILE__, __LINE__);
-        return false;
-    }
-
-    m_fontShader.Enable();
-    m_fontShader.SetFontMapTextureUnit(0);
-
-    return true;
+    mat4_set_identity(&m_model);
+    mat4_set_identity(&m_view);
+    mat4_set_orthographic(&m_projection, 0, (float)WindowWidth, 0, (float)WindowHeight, -1, 1);
 }
+
 
 
 void FontRenderer::RenderText(unsigned int x, unsigned int y, const char* pText)
 {
-    bool IsCullEnabled = glIsEnabled(GL_CULL_FACE);
+    vec2 pen = { {(float)x, (float)y} };
 
+    m_pFont->rendermode = RENDER_NORMAL;
+    m_pFont->outline_thickness = 0;
+    vertex_buffer_clear(m_pBuffer);
+    add_text(m_pBuffer, m_pFont, (char*)pText, pen, orange1, orange2);    
+
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-
-    assert(strlen(pText) < MAX_STRING_LEN);
-
-    wchar_t text[MAX_STRING_LEN] = { 0 };
-
-    int len = mbstowcs(text, pText, strlen(pText));
-    assert(len > 0);
-
-    vertex_buffer_clear( m_pTextBuffer );
-
-    TextureGlyph* pGlyph = texture_font_get_glyph( m_pFont, text[0] );
-
-    assert(pGlyph);
-
-    Pen pen = {(float)x, (float)y};
-    texture_glyph_add_to_vertex_buffer( pGlyph, m_pTextBuffer, &m_markup, &pen, 0 );
-
-    for( size_t i=1; i<wcslen(text); ++i )
-    {
-        pGlyph = texture_font_get_glyph( m_pFont, text[i] );
-        assert(pGlyph);
-
-        int kerning = texture_glyph_get_kerning( pGlyph, text[i-1] );
-        texture_glyph_add_to_vertex_buffer( pGlyph, m_pTextBuffer, &m_markup, &pen, kerning );
-    }
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture( GL_TEXTURE_2D, m_pManager->atlas->texid );
+    glBindTexture(GL_TEXTURE_2D, m_pAtlas->id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (GLsizei)m_pAtlas->width, (GLsizei)m_pAtlas->height, 0, GL_RED, GL_UNSIGNED_BYTE, m_pAtlas->data);
 
-    m_fontShader.Enable();
+    glUseProgram(m_shaderProg);
 
-    int viewport[4];
-    glGetIntegerv( GL_VIEWPORT, viewport );
+    glUniform1i(glGetUniformLocation(m_shaderProg, "texture"), 0);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProg, "model"), 1, 0, m_model.data);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProg, "view"), 1, 0, m_view.data);
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProg, "projection"), 1, 0, m_projection.data);
+    vertex_buffer_render(m_pBuffer, GL_TRIANGLES);
 
-    float xScale = 2.0f / (float)viewport[2];
-    float yScale = 2.0f / (float)viewport[3];
-
-    GLfloat Trans[] = { xScale, 0.0f,   0.0f, -1.0f,
-                        0.0f,   yScale, 0.0f, -1.0f,
-                        0.0f,   0.0f,   1.0f,  0.0f,
-                        0.0f,   0.0f,   0.0f,  1.0f };
-
-    m_fontShader.SetTransformation(Trans);
-
-    vertex_buffer_render( m_pTextBuffer, GL_TRIANGLES, "vtc" );
-
-    if (IsCullEnabled) {
-        glEnable(GL_CULL_FACE);
-    }
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 }
