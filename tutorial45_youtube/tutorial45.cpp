@@ -180,7 +180,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 44");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 45");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -219,8 +219,6 @@ private:
 
         m_lightingTech.Enable();
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-        m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
-        //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
     }
 
 
@@ -228,8 +226,8 @@ private:
     {
         m_pTerrain = new BasicMesh();
 
-        if (!m_pTerrain->LoadMesh("../Content/box_terrain.obj")) {
-            printf("Error loading mesh ../Content/box_terrain.obj\n");
+        if (!m_pTerrain->LoadMesh("terrain.obj")) {
+            printf("Error loading mesh terrain.obj\n");
             exit(0);
         }
 
@@ -247,12 +245,12 @@ private:
 
         for (unsigned int j = 0; j < NUM_ROWS; j++) {
             for (unsigned int i = 0; i < NUM_COLUMNS; i++) {
-                Vector3f Pos((float)i, 0.0f, (float)j);
+                Vector3f Pos((float)i * 2.0f, 0.0f, (float)j * 2.0f);
                 Positions[j * NUM_COLUMNS + i] = Pos;
             }
         }
 
-        if (!m_billboardList.Init("../Content/textures/death-2026516_1280.png", Positions)) {
+        if (!m_billboardList.Init("../Content/textures/stylizedpaintleves01c.png", Positions)) {
             printf("error\n");
             exit(0);
         }
