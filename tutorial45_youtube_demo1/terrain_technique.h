@@ -39,14 +39,7 @@ public:
 	
 private:
     GLuint m_VPLoc = -1;
-    GLuint m_tex0HeightLoc = -1;
-    GLuint m_tex1HeightLoc = -1;
-    GLuint m_tex2HeightLoc = -1;
-    GLuint m_tex3HeightLoc = -1;
-    GLuint m_tex0UnitLoc = -1;
-    GLuint m_tex1UnitLoc = -1;
-    GLuint m_tex2UnitLoc = -1;
-    GLuint m_tex3UnitLoc = -1;
+    GLuint m_texUnitLoc = -1;
     GLuint m_reversedLightDirLoc = -1;
     GLuint m_timeLoc = -1;
 };

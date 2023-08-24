@@ -48,7 +48,7 @@ class Tutorial45
 public:
 
     Tutorial45()
-    {
+    {    
         m_dirLight.AmbientIntensity = 0.5f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -93,6 +93,21 @@ public:
     void RenderSceneCB()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        static float foo = 0.0f;
+        foo += 0.001f;
+
+        float TerrainSize = 20.0f;
+        float Radius = TerrainSize * 1.4f;
+
+        Vector3f Pos(cosf(foo) * Radius, 3.0f, sinf(foo) * Radius);
+      //  m_pGameCamera->SetPosition(Pos);
+
+        Vector3f Center(0, 0.5f, 0);
+        Vector3f Target = Center - Pos;
+    //    m_pGameCamera->SetTarget(Target);
+    //    m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
+
 
         m_pGameCamera->OnRender();
 
@@ -193,14 +208,14 @@ private:
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
     }
 
-
+    
     void InitCamera()
     {
         m_cameraPos = Vector3f(0.0f, 1.0f, -1.0f);
         m_cameraTarget = Vector3f(0.0f, -0.5f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 	
-        float FOV = 45.0f;
+        float FOV = 75.0f;
         float zNear = 0.1f;
         float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
@@ -237,19 +252,22 @@ private:
 
     void InitBillboardList()
     {
-#define NUM_ROWS 10
-#define NUM_COLUMNS 10
+#define NUM_ROWS 20
+#define NUM_COLUMNS 20
 
         std::vector<Vector3f> Positions;
         Positions.resize(NUM_ROWS * NUM_COLUMNS);
+        Vector3f Base(-20.0f, 0.0f, -20.0f);
 
         for (unsigned int j = 0; j < NUM_ROWS; j++) {
             for (unsigned int i = 0; i < NUM_COLUMNS; i++) {
                 Vector3f Pos((float)i * 2.0f, 0.0f, (float)j * 2.0f);
-                Positions[j * NUM_COLUMNS + i] = Pos;
+                Positions[j * NUM_COLUMNS + i] = Base + Pos;
             }
         }
 
+        //stylizedpaintleves01c
+        //death-159120_1280
         if (!m_billboardList.Init("../Content/textures/stylizedpaintleves01c.png", Positions)) {
             printf("error\n");
             exit(0);
@@ -304,7 +322,7 @@ int main(int argc, char** argv)
 
     glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
     glFrontFace(GL_CW);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CLIP_DISTANCE0);
 

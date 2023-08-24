@@ -8,12 +8,10 @@ uniform mat4 gVP;
 
 in VS_OUT {
     vec2 Tex;
-    vec3 WorldPos;
 } gs_in[];
 
 
 out vec2 Tex;
-out vec3 WorldPos;
 out vec3 Normal;
 
 void main()                                                                         
@@ -29,19 +27,16 @@ void main()
     
     gl_Position = gVP * vec4(Pos0, 1.0);
     Tex = gs_in[0].Tex;
-    WorldPos = gs_in[0].WorldPos;
     EmitVertex();
 
     
     gl_Position = gVP * vec4(Pos1, 1.0);
     Tex = gs_in[1].Tex;
-    WorldPos = gs_in[1].WorldPos;
     EmitVertex();
 
     
     gl_Position = gVP * vec4(Pos2, 1.0);
     Tex = gs_in[2].Tex;
-    WorldPos = gs_in[2].WorldPos;
     EmitVertex();
 
     EndPrimitive();
