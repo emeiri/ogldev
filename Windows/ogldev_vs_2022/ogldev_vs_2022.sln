@@ -303,6 +303,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial45_demo1", "Tutoria
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreetypeGLDemo", "FreetypeGLDemo\FreetypeGLDemo.vcxproj", "{08E626E1-3547-44CE-A23B-B417D72B2455}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Particles", "Tutorial28_Particles\Tutorial28_Particles.vcxproj", "{8386A0C7-439B-450D-8B24-005274173482}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -855,6 +857,14 @@ Global
 		{08E626E1-3547-44CE-A23B-B417D72B2455}.Release|x64.Build.0 = Release|x64
 		{08E626E1-3547-44CE-A23B-B417D72B2455}.Release|x86.ActiveCfg = Release|Win32
 		{08E626E1-3547-44CE-A23B-B417D72B2455}.Release|x86.Build.0 = Release|Win32
+		{8386A0C7-439B-450D-8B24-005274173482}.Debug|x64.ActiveCfg = Debug|x64
+		{8386A0C7-439B-450D-8B24-005274173482}.Debug|x64.Build.0 = Debug|x64
+		{8386A0C7-439B-450D-8B24-005274173482}.Debug|x86.ActiveCfg = Debug|Win32
+		{8386A0C7-439B-450D-8B24-005274173482}.Debug|x86.Build.0 = Debug|Win32
+		{8386A0C7-439B-450D-8B24-005274173482}.Release|x64.ActiveCfg = Release|x64
+		{8386A0C7-439B-450D-8B24-005274173482}.Release|x64.Build.0 = Release|x64
+		{8386A0C7-439B-450D-8B24-005274173482}.Release|x86.ActiveCfg = Release|Win32
+		{8386A0C7-439B-450D-8B24-005274173482}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -933,6 +943,7 @@ Global
 		{AC04242A-DA38-4364-8F78-FF8ED49C29D0} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{C11B6038-3356-48E0-9BB2-1A755572835F} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{08E626E1-3547-44CE-A23B-B417D72B2455} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{8386A0C7-439B-450D-8B24-005274173482} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
