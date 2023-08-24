@@ -20,16 +20,10 @@
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\skybox.vs">
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Common\Shaders\skybox.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\tutorial44_youtube\terrain.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\tutorial44_youtube\terrain.fs">
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

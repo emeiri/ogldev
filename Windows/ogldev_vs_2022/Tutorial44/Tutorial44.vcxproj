@@ -33,10 +33,8 @@
     <ClCompile Include="..\..\..\tutorial44_youtube\tutorial44.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\skybox.fs" />
-    <None Include="..\..\..\Common\Shaders\skybox.vs" />
-    <None Include="..\..\..\tutorial44_youtube\terrain.fs" />
-    <None Include="..\..\..\tutorial44_youtube\terrain.vs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
