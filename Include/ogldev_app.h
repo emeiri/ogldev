@@ -37,7 +37,7 @@ protected:
 
 protected:
 #ifndef _WIN32
-	FontRenderer m_fontRenderer;
+//	FontRenderer m_fontRenderer;
 #endif
 private:
 	long long m_frameTime;

@@ -36,6 +36,9 @@
 #include <GL/glew.h>
 #include <assert.h>
 
+
+#ifdef _WIN64
+
 #include "freetypeGL.h"
 #include "markup.h"
 #include "vertex-buffer.h"
@@ -162,3 +165,5 @@ void FontRenderer::RenderText(unsigned int x, unsigned int y, const char* pText)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 }
+
+#endif

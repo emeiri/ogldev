@@ -119,9 +119,9 @@ public:
         }
 
 #ifndef WIN32
-        if (!m_fontRenderer.InitFontRenderer()) {
-            return false;
-        }
+//        if (!m_fontRenderer.InitFontRenderer()) {
+ //           return false;
+  //      }
 #endif
         
         return true;
