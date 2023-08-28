@@ -1,9 +1,13 @@
 #!/bin/bash
 
+OGLDEV_DIR="/home/emeiri/projects/ogldev"
 CC=g++
-CPPFLAGS=`pkg-config --cflags glew ImageMagick++ freetype2 glfw3 fontconfig assimp`
-CPPFLAGS="$CPPFLAGS -I../Include -I../Common/FreetypeGL -ggdb3"
-LDFLAGS=`pkg-config --libs glew ImageMagick++ freetype2 glfw3 fontconfig assimp`
-LDFLAGS="$LDFLAGS -lglut ../Lib/libAntTweakBar.a -lX11  "
+CPPFLAGS=`pkg-config --cflags glew glfw3 assimp`
+CPPFLAGS="$CPPFLAGS -I$OGLDEV_DIR/Include -ggdb3"
+LDFLAGS=`pkg-config --libs glew glfw3 assimp`
+LDFLAGS="$LDFLAGS -lX11"
+SOURCES="tutorial45.cpp $OGLDEV_DIR/Common/ogldev_util.cpp $OGLDEV_DIR/Common/math_3d.cpp $OGLDEV_DIR/Common/ogldev_basic_glfw_camera.cpp $OGLDEV_DIR/Common/ogldev_glfw.cpp $OGLDEV_DIR/Common/technique.cpp $OGLDEV_DIR/Common/ogldev_new_lighting.cpp $OGLDEV_DIR/Common/ogldev_basic_mesh.cpp $OGLDEV_DIR/Common/ogldev_texture.cpp $OGLDEV_DIR/Common/ogldev_world_transform.cpp $OGLDEV_DIR/Common/3rdparty/stb_image.cpp $OGLDEV_DIR/Common/ogldev_billboard_list.cpp $OGLDEV_DIR/Common/ogldev_billboard_technique.cpp"
 
-$CC tutorial27.cpp  mesh.cpp billboard_list.cpp  billboard_technique.cpp ../Common/cubemap_texture.cpp ../Common/ogldev_util.cpp ../Common/pipeline.cpp ../Common/math_3d.cpp ../Common/camera.cpp ../Common/ogldev_atb.cpp ../Common/glut_backend.cpp ../Common/ogldev_texture.cpp ../Common/ogldev_basic_lighting.cpp ../Common/technique.cpp ../Common/ogldev_app.cpp ../Common/FreetypeGL/freetypeGL.cpp ../Common/3rdparty/stb_image.cpp $CPPFLAGS $LDFLAGS -o tutorial27
+echo $SOURCES
+
+$CC $SOURCES $CPPFLAGS $LDFLAGS -o tutorial45

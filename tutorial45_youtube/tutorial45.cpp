@@ -268,7 +268,7 @@ private:
 
         //stylizedpaintleves01c
         //death-159120_1280
-        if (!m_billboardList.Init("../Content/textures/stylizedpaintleves01c.png", Positions)) {
+        if (!m_billboardList.Init("../Content/textures/death-159120_1280.png", Positions)) {
             printf("error\n");
             exit(0);
         }

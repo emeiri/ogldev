@@ -9,7 +9,7 @@ void main()
 {                                                                                   
     FragColor = texture2D(gColorMap, TexCoord);                                     
                                                                                     
-    if (FragColor.r == 0 && FragColor.g == 0 && FragColor.b == 0) {
+    if (FragColor.r == 1 && FragColor.g == 1 && FragColor.b == 1) {
         discard;                                                                    
     }                                                                               
 }
