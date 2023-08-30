@@ -103,6 +103,12 @@ void Matrix4f::InitScaleTransform(float Scale)
 }
 
 
+void Matrix4f::InitScaleTransform(const Vector3f& Scale)
+{
+    InitScaleTransform(Scale.x, Scale.y, Scale.z);
+}
+
+
 void Matrix4f::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
 {
     Matrix4f rx, ry, rz;
@@ -133,6 +139,13 @@ void Matrix4f::InitRotateTransformZYX(float RotateX, float RotateY, float Rotate
 
     *this = rx * ry * rz;
 }
+
+
+void Matrix4f::InitRotateTransform(const Vector3f& Rotate)
+{
+    InitRotateTransform(Rotate.x, Rotate.y, Rotate.z);
+}
+
 
 //
 // The following rotation matrices are for a left handed coordinate system.

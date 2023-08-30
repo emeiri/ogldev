@@ -566,10 +566,11 @@ public:
 
     void InitScaleTransform(float ScaleX, float ScaleY, float ScaleZ);
     void InitScaleTransform(float Scale);
+    void InitScaleTransform(const Vector3f& Scale);
 
     void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
     void InitRotateTransformZYX(float RotateX, float RotateY, float RotateZ);
-
+    void InitRotateTransform(const Vector3f& Rotate);
     void InitRotateTransform(const Quaternion& quat);
 
     void InitTranslationTransform(float x, float y, float z);
