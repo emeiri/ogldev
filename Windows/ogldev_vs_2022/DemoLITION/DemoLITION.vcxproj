@@ -161,6 +161,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\framework.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\demolition_rendering_subsystem_gl.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
     <ClInclude Include="..\..\..\Include\ogldev_math_3d.h" />
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_scene.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\demolition_rendering_subsystem_gl.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

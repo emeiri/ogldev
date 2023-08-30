@@ -55,6 +55,11 @@ void ForwardRenderer::InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubs
         exit(1);
     }
 
+    if (!m_flatColorTech.Init()) {
+        printf("Error initializing the flat color technique\n");
+        exit(1);
+    }
+
     CreateDefaultCamera();
 
     glUseProgram(0);
@@ -125,32 +130,45 @@ void ForwardRenderer::Render(GLScene* pScene)
     if ((NumPointLights == 0) && (NumSpotLights == 0) && (NumDirLights == 0)) {
         printf("Warning! trying to render but all lights are zero\n");
     }
-   
-    SwitchToLightingTech();
-
-    const DirectionalLight& DirLight = pScene->m_dirLights[0];
-
-    if (DirLight.DiffuseIntensity > 0.0) {
-        m_lightingTech.SetDirectionalLight(DirLight, true);
-    }
-
-    if (NumPointLights > 0) {
-        m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
-    }
-
-    if (NumSpotLights > 0) {
-        m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
-    }
-
-    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
 
     SceneObject* pSceneObject = pScene->GetRenderList().front();
+   
+    const Vector4f& FlatColor = pSceneObject->GetFlatColor();
 
-    m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
+    if (FlatColor.x == -1.0f) {
 
-    UpdateMatrices(&m_lightingTech, pSceneObject);
+        SwitchToLightingTech();
 
-    pSceneObject->GetModel()->Render(&m_lightingTech);
+        const DirectionalLight& DirLight = pScene->m_dirLights[0];
+
+        if (DirLight.DiffuseIntensity > 0.0) {
+            m_lightingTech.SetDirectionalLight(DirLight, true);
+        }
+
+        if (NumPointLights > 0) {
+            m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
+        }
+
+        if (NumSpotLights > 0) {
+            m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
+        }
+
+        m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+
+        m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
+
+        UpdateMatrices(&m_lightingTech, pSceneObject);
+
+        pSceneObject->GetModel()->Render(&m_lightingTech);
+    }
+    else {
+        m_flatColorTech.Enable();
+        m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
+        Matrix4f WVP;
+        GetWVP(pSceneObject, WVP);
+        m_flatColorTech.SetWVP(WVP);
+        pSceneObject->GetModel()->Render();
+    }
 }
 
 

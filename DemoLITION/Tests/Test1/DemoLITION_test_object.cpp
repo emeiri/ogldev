@@ -78,6 +78,7 @@ private:
         m_sceneObjectHandle = m_pScene->CreateSceneObject("square");
         m_pScene->AddToRenderList(m_sceneObjectHandle);
         m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pScene->GetSceneObject(m_sceneObjectHandle)->SetFlatColor(Vector4f(1.0f, 0.0, 0.0, 1.0f));
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;

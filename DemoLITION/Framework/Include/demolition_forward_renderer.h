@@ -24,6 +24,7 @@
 #include "demolition_forward_lighting.h"
 #include "demolition_model.h"
 #include "GL/gl_scene.h"
+#include "GL/flat_color_technique.h"
 
 
 class ForwardRenderer {
@@ -88,5 +89,6 @@ private:
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
+    FlatColorTechnique m_flatColorTech;
 };
 

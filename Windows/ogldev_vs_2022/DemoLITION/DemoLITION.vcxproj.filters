@@ -49,6 +49,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_lighting.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_renderer.h">
@@ -84,6 +87,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_lighting.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h">
+      <Filter>Include\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -100,6 +106,12 @@
     </Filter>
     <Filter Include="Include\Int">
       <UniqueIdentifier>{03eb9034-f3ca-4ff0-9036-25be52c93db6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{e64a050e-fc68-4dc9-b54e-7eb1579f6769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\GL">
+      <UniqueIdentifier>{f0d42b3f-7371-47b6-85c4-845f66bd8646}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
