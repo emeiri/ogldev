@@ -34,8 +34,8 @@ public:
     virtual ~Scene() {}
 
     void SetMainModel(int ModelHandle);
-    void AddObject(DemolitionModel* pObject);
-    bool RemoveObject(DemolitionModel* pObject);
+    void AddObject(int ModelHandle);
+    bool RemoveObject(int ModelHandle);
     DemolitionModel* GetMainModel() const { return m_pMainModel; }
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
@@ -44,6 +44,7 @@ public:
     const Vector4f& GetClearColor() { return m_clearColor;  }  
 
     void SetRotation(int ModelHandle, float x, float y, float z);
+    void SetPosition(int ModelHandle, float x, float y, float z);
 
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;

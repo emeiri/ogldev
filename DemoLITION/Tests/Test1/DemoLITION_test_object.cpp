@@ -34,8 +34,7 @@ class ObjectTest : public GameCallbacks
 public:
 
     virtual ~ObjectTest()
-    {
-        SAFE_DELETE(m_pMesh);
+    {        
     }
 
 
@@ -69,22 +68,22 @@ public:
     {
         m_counter += 0.1f;
 
-        m_pMesh->GetWorldTransform().SetRotation(0.0f, m_counter, 0.0f);
+        m_pScene->SetRotation(m_modelHandle, 0.0f, m_counter, 0.0f);
     }
 
 private:
 
     void InitMesh()
     {
-        m_pMesh = m_pRenderingSubsystem->LoadModel("../Content/sphere.obj");
-        m_pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
+        m_modelHandle = m_pRenderingSubsystem->LoadModelHandle("../Content/sphere.obj");
+        m_pScene->SetPosition(m_modelHandle, 0.0f, 0.0f, 10.0f);
 
-        m_pScene->AddObject(m_pMesh);
+        m_pScene->AddObject(m_modelHandle);
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
-    DemolitionModel* m_pMesh = NULL;
+    int m_modelHandle = -1;
     float m_counter = 0;    
 };
 

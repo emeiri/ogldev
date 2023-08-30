@@ -20,19 +20,21 @@
 #include "demolition_rendering_subsystem.h"
 
 
-void Scene::AddObject(DemolitionModel* pObject)
+void Scene::AddObject(int ModelHandle)
 {
-    std::list<DemolitionModel*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    std::list<DemolitionModel*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pModel);
 
     if (it == m_objects.end()) {
-        m_objects.push_back(pObject);
+        m_objects.push_back(pModel);
     }
 }
 
 
-bool Scene::RemoveObject(DemolitionModel* pObject)
+bool Scene::RemoveObject(int ModelHandle)
 {
-    std::list<DemolitionModel*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pObject);
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    std::list<DemolitionModel*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pModel);
 
     bool ret = false;
 
@@ -56,4 +58,12 @@ void Scene::SetRotation(int ModelHandle, float x, float y, float z)
     DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
 
     pModel->GetWorldTransform().SetRotation(x, y, z);
+}
+
+
+void Scene::SetPosition(int ModelHandle, float x, float y, float z)
+{
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+
+    pModel->GetWorldTransform().SetPosition(x, y, z);
 }
