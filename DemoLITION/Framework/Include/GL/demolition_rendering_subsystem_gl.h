@@ -41,7 +41,7 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual Scene* CreateScene();
 
-    virtual DemolitionModel* LoadModel(const std::string& Filename);
+    virtual DemolitionModel* LoadModelInternal(const std::string& Filename);
 
     virtual void Execute();
 

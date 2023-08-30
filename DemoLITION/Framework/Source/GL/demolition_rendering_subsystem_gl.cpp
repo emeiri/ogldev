@@ -94,7 +94,7 @@ Scene* RenderingSubsystemGL::CreateScene()
 }
 
 
-DemolitionModel* RenderingSubsystemGL::LoadModel(const std::string& Filename)
+DemolitionModel* RenderingSubsystemGL::LoadModelInternal(const std::string& Filename)
 {
     DemolitionModel* pModel = new DemolitionModel();
 

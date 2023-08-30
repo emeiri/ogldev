@@ -81,9 +81,9 @@ private:
 
     void InitMesh()
     {
-        m_modelHandle = m_pRenderingSubsystem->LoadModelHandle("../Content/test.glb");
+        m_modelHandle = m_pRenderingSubsystem->LoadModel("../Content/test.glb");
         m_sceneObjectHandle = m_pScene->CreateSceneObject(m_modelHandle);
-        m_pScene->AddObject(m_sceneObjectHandle);
+        m_pScene->AddToRenderList(m_sceneObjectHandle);
 
         m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 10.0f);
     }

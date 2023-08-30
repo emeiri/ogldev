@@ -107,6 +107,11 @@ void ForwardRenderer::Render(GLScene* pScene)
         exit(0);
     }
 
+    if (pScene->GetRenderList().size() == 0) {
+        printf("Warning! render list is empty and no main model\n");
+        return;
+    }
+
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
         glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
@@ -120,17 +125,8 @@ void ForwardRenderer::Render(GLScene* pScene)
     if ((NumPointLights == 0) && (NumSpotLights == 0) && (NumDirLights == 0)) {
         printf("Warning! trying to render but all lights are zero\n");
     }
-
-    if (pScene->GetRenderList().size() == 0) {
-        printf("Warning! render list is empty and no main model\n");
-        return;
-    }
-
-    SceneObject* pSceneObject = pScene->GetRenderList().front();
    
     SwitchToLightingTech();
-
-  //  pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
 
     const DirectionalLight& DirLight = pScene->m_dirLights[0];
 
@@ -146,9 +142,11 @@ void ForwardRenderer::Render(GLScene* pScene)
         m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
     }
 
-    m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
-
     m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+
+    SceneObject* pSceneObject = pScene->GetRenderList().front();
+
+    m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
 
     UpdateMatrices(&m_lightingTech, pSceneObject);
 

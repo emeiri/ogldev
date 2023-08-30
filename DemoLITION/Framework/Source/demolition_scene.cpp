@@ -27,7 +27,7 @@ Scene::Scene(BaseRenderingSubsystem* pRenderingSystem)
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);
 }
 
-void Scene::AddObject(int SceneObjectHandle)
+void Scene::AddToRenderList(int SceneObjectHandle)
 {
     SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
     std::list<SceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
@@ -38,7 +38,7 @@ void Scene::AddObject(int SceneObjectHandle)
 }
 
 
-bool Scene::RemoveObject(int SceneObjectHandle)
+bool Scene::RemoveFromRenderList(int SceneObjectHandle)
 {
     SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
     std::list<SceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);

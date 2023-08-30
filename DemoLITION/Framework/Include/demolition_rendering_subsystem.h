@@ -60,11 +60,9 @@ class BaseRenderingSubsystem
 
     virtual void Execute() = 0;
 
-    virtual Scene* CreateScene() = 0;
+    virtual Scene* CreateScene() = 0;    
 
-    virtual DemolitionModel* LoadModel(const std::string& Filename) = 0;
-
-    int LoadModelHandle(const std::string& Filename);
+    int LoadModel(const std::string& Filename);
 
     DemolitionModel* GetModel(int ModelHandle);
 
@@ -80,6 +78,8 @@ class BaseRenderingSubsystem
 
     BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
     ~BaseRenderingSubsystem();
+
+    virtual DemolitionModel* LoadModelInternal(const std::string& Filename) = 0;
 
     long long m_elapsedTimeMillis = 0;
     int m_windowWidth = 0;

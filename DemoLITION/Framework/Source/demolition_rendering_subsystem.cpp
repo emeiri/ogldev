@@ -64,14 +64,14 @@ BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERI
 }
 
 
-int BaseRenderingSubsystem::LoadModelHandle(const std::string& Filename)
+int BaseRenderingSubsystem::LoadModel(const std::string& Filename)
 {
     if (m_numModels == m_models.size()) {
         printf("%s:%d: out of models space\n", __FILE__, __LINE__);
         exit(0);
     }
 
-    DemolitionModel* pModel = LoadModel(Filename);
+    DemolitionModel* pModel = LoadModelInternal(Filename);
 
     int ret = -1;
 

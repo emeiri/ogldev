@@ -68,12 +68,16 @@ public:
     void SetRotation(const Vector3f& Rot) { m_rot = Rot; }
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
 
+    void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
+    const Vector4f& GetFlatColor() const { return m_flatColor; }
+
 private:
   //  int m_modelHandle = -1;
     DemolitionModel* m_pModel = NULL;
     Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_rot = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_scale = Vector3f(1.0f, 1.0f, 1.0f);
+    Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
 };
 
 class Scene {
@@ -86,8 +90,8 @@ public:
 
     int CreateSceneObject(int ModelHandle);
     SceneObject* GetSceneObject(int SceneObjectHandle);
-    void AddObject(int SceneObjectHandle);
-    bool RemoveObject(int SceneObjectHandle);
+    void AddToRenderList(int SceneObjectHandle);
+    bool RemoveFromRenderList(int SceneObjectHandle);
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
     void DisableClear() { m_clearFrame = false;  }
