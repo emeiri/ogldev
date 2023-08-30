@@ -19,27 +19,34 @@
 #include "demolition_scene.h"
 #include "demolition_rendering_subsystem.h"
 
+#define NUM_SCENE_OBJECTS 1024
 
-void Scene::AddObject(int ModelHandle)
+Scene::Scene(BaseRenderingSubsystem* pRenderingSystem)
+{ 
+    m_pRenderingSystem = pRenderingSystem; 
+    m_sceneObjects.resize(NUM_SCENE_OBJECTS);
+}
+
+void Scene::AddObject(int SceneObjectHandle)
 {
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
-    std::list<DemolitionModel*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pModel);
+    SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
+    std::list<SceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
 
-    if (it == m_objects.end()) {
-        m_objects.push_back(pModel);
+    if (it == m_renderList.end()) {
+        m_renderList.push_back(pSceneObject);
     }
 }
 
 
-bool Scene::RemoveObject(int ModelHandle)
+bool Scene::RemoveObject(int SceneObjectHandle)
 {
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
-    std::list<DemolitionModel*>::const_iterator it = std::find(m_objects.begin(), m_objects.end(), pModel);
+    SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
+    std::list<SceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
 
     bool ret = false;
 
-    if (it != m_objects.end()) {
-        m_objects.erase(it);
+    if (it != m_renderList.end()) {
+        m_renderList.erase(it);
         ret = true;
     }
 
@@ -47,23 +54,43 @@ bool Scene::RemoveObject(int ModelHandle)
 }
 
 
-void Scene::SetMainModel(int ModelHandle)
+int Scene::CreateSceneObject(int ModelHandle)
 {
-    m_pMainModel = m_pRenderingSystem->GetModel(ModelHandle);
+    if (ModelHandle < 0) {
+        printf("%s:%d - invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
+        exit(0);
+    }
+
+    int ret = -1;
+
+    if (m_numSceneObjects == NUM_SCENE_OBJECTS) {
+        printf("%s:%d - out of scene objects space, model handle %d\n", __FILE__, __LINE__, ModelHandle);
+        exit(0);
+    }
+    
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    m_sceneObjects[m_numSceneObjects].SetModel(pModel);
+
+    ret = m_numSceneObjects;
+    m_numSceneObjects++;
+    
+    return ret;
 }
 
 
-void Scene::SetRotation(int ModelHandle, float x, float y, float z)
+SceneObject* Scene::GetSceneObject(int SceneObjectHandle)
 {
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    if (SceneObjectHandle < 0) {
+        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, SceneObjectHandle);
+        exit(0);
+    }
 
-    pModel->GetWorldTransform().SetRotation(x, y, z);
-}
+    if (SceneObjectHandle >= m_numSceneObjects) {
+        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, SceneObjectHandle);
+        exit(0);
+    }
 
+    SceneObject* p = &m_sceneObjects[SceneObjectHandle];
 
-void Scene::SetPosition(int ModelHandle, float x, float y, float z)
-{
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
-
-    pModel->GetWorldTransform().SetPosition(x, y, z);
+    return p;
 }

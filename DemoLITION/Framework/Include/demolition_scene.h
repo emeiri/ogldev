@@ -27,24 +27,72 @@
 
 class BaseRenderingSubsystem;
 
+class SceneObject {
+public:
+    SceneObject() {}
+
+    void SetModel(DemolitionModel* pModel)
+    {
+        if (m_pModel) {
+            printf("%s:%d - model already initialized\n", __FILE__, __LINE__);
+            exit(0);
+        }
+
+        m_pModel = pModel;
+    }
+
+    Matrix4f GetMatrix() const
+    {
+        Matrix4f Scale;
+        Scale.InitScaleTransform(m_scale);
+
+        Matrix4f Rotation;
+        Rotation.InitRotateTransform(m_rot);
+
+        Matrix4f Translation;
+        Translation.InitTranslationTransform(m_pos);
+
+        Matrix4f WorldTransformation = Translation * Rotation * Scale;
+
+        return WorldTransformation;
+    }
+
+
+    DemolitionModel* GetModel() const { return m_pModel; }
+
+    void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
+    void SetRotation(float x, float y, float z) { m_rot.x = x; m_rot.y = y; m_rot.z = z; }
+    void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }
+
+    void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
+    void SetRotation(const Vector3f& Rot) { m_rot = Rot; }
+    void SetScale(const Vector3f& Scale) { m_scale = Scale; }
+
+private:
+  //  int m_modelHandle = -1;
+    DemolitionModel* m_pModel = NULL;
+    Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f m_rot = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f m_scale = Vector3f(1.0f, 1.0f, 1.0f);
+};
+
 class Scene {
 public:
-    Scene(BaseRenderingSubsystem* pRenderingSystem) { m_pRenderingSystem = pRenderingSystem; }
+    Scene(BaseRenderingSubsystem* pRenderingSystem);
 
     virtual ~Scene() {}
 
-    void SetMainModel(int ModelHandle);
-    void AddObject(int ModelHandle);
-    bool RemoveObject(int ModelHandle);
-    DemolitionModel* GetMainModel() const { return m_pMainModel; }
+    std::list<SceneObject*>& GetRenderList() { return m_renderList; }
+
+    int CreateSceneObject(int ModelHandle);
+    SceneObject* GetSceneObject(int SceneObjectHandle);
+    void AddObject(int SceneObjectHandle);
+    bool RemoveObject(int SceneObjectHandle);
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
     void DisableClear() { m_clearFrame = false;  }
     bool IsClearFrame() const { return m_clearFrame; }
     const Vector4f& GetClearColor() { return m_clearColor;  }  
-
-    void SetRotation(int ModelHandle, float x, float y, float z);
-    void SetPosition(int ModelHandle, float x, float y, float z);
 
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
@@ -52,8 +100,9 @@ public:
 
 protected:
     BaseRenderingSubsystem* m_pRenderingSystem = NULL;
-    DemolitionModel* m_pMainModel = NULL;
-    std::list<DemolitionModel*> m_objects;
+    std::list<SceneObject*> m_renderList;
     bool m_clearFrame = false;
     Vector4f m_clearColor;
+    std::vector<SceneObject> m_sceneObjects;
+    int m_numSceneObjects = 0;
 };

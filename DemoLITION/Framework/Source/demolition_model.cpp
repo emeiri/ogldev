@@ -578,12 +578,16 @@ void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int Wi
         InitSingleCamera(i, pScene, WindowWidth, WindowHeight);
     }
 
-
     aiNode* pNode = pScene->mRootNode;
 
     traverse(pNode);
 
     pNode = pScene->mRootNode->FindNode("Camera");
+
+    if (!pNode) {
+        printf("%s:%d cannot find camera node\n", __FILE__, __LINE__);
+        return;
+    }
 
     printf("!!! %s\n", pNode->mName.C_Str());
 

@@ -91,6 +91,11 @@ int BaseRenderingSubsystem::LoadModelHandle(const std::string& Filename)
 
 DemolitionModel* BaseRenderingSubsystem::GetModel(int ModelHandle)
 {
+    if (ModelHandle < 0) {
+        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
+        exit(0);
+    }
+
     if (ModelHandle >= m_numModels) {
         printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
         exit(0);

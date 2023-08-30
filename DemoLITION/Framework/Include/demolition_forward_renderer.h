@@ -68,19 +68,19 @@ class ForwardRenderer {
                                 int EndAnimIndex,
                                 float BlendFactor);*/
 
-    void RenderToShadowMap(DemolitionModel* pMesh, const SpotLight& SpotLight);
+    void RenderToShadowMap(SceneObject* pSceneObject, const SpotLight& SpotLight);
  
 private:
 
     void CreateDefaultCamera();
 
-    void GetWVP(DemolitionModel* pMesh, Matrix4f& WVP);
+    void GetWVP(SceneObject* pSceneObject, Matrix4f& WVP);
 
     void SwitchToLightingTech();
 
     //void RenderAnimationCommon(SkinnedMesh* pMesh);
 
-    void UpdateMatrices(ForwardLightingTechnique* pBaseTech, DemolitionModel* pMesh);
+    void UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject);
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     BasicCamera* m_pCurCamera = NULL;

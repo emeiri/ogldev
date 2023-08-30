@@ -121,21 +121,16 @@ void ForwardRenderer::Render(GLScene* pScene)
         printf("Warning! trying to render but all lights are zero\n");
     }
 
-
-    DemolitionModel* pMesh = pScene->GetMainModel();
-
-    if (!pMesh) {
-        if (pScene->GetObjectList().size() == 0) {
-            printf("Warning! object list is empty and no main model\n");
-            return;
-        }
-
-        pMesh = pScene->GetObjectList().front();
+    if (pScene->GetRenderList().size() == 0) {
+        printf("Warning! render list is empty and no main model\n");
+        return;
     }
-     
+
+    SceneObject* pSceneObject = pScene->GetRenderList().front();
+   
     SwitchToLightingTech();
 
-    pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
+  //  pMesh->GetWorldTransform().SetPosition(0.0f, 0.0f, 10.0f);
 
     const DirectionalLight& DirLight = pScene->m_dirLights[0];
 
@@ -151,23 +146,23 @@ void ForwardRenderer::Render(GLScene* pScene)
         m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
     }
 
-    m_lightingTech.SetMaterial(pMesh->GetMaterial());
+    m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
 
     m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
 
-    UpdateMatrices(&m_lightingTech, pMesh);
+    UpdateMatrices(&m_lightingTech, pSceneObject);
 
-    pMesh->Render(&m_lightingTech);
+    pSceneObject->GetModel()->Render(&m_lightingTech);
 }
 
 
-void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, DemolitionModel* pMesh)
+void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject)
 {
     Matrix4f WVP;
-    GetWVP(pMesh, WVP);
+    GetWVP(pSceneObject, WVP);
     pBaseTech->SetWVP(WVP);
 
-    Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
+    Matrix4f World = pSceneObject->GetMatrix();
     pBaseTech->SetWorldMatrix(World);
 
     Matrix4f InverseWorld = World.Inverse();
@@ -242,9 +237,9 @@ void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, Demoli
     UpdateMatrices(&m_skinningTech, pMesh);
 }*/
 
-void ForwardRenderer::RenderToShadowMap(DemolitionModel* pMesh, const SpotLight& SpotLight)
+void ForwardRenderer::RenderToShadowMap(SceneObject* pSceneObject, const SpotLight& SpotLight)
 {
-    Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
+    Matrix4f World = pSceneObject->GetMatrix();
 
     printf("World\n");
     World.Print();
@@ -267,15 +262,13 @@ void ForwardRenderer::RenderToShadowMap(DemolitionModel* pMesh, const SpotLight&
 
     m_shadowMapTech.SetWVP(WVP);
 
-    pMesh->Render();
+    pSceneObject->GetModel()->Render();
 }
 
 
-void ForwardRenderer::GetWVP(DemolitionModel* pMesh, Matrix4f& WVP)
+void ForwardRenderer::GetWVP(SceneObject* pSceneObject, Matrix4f& WVP)
 {
-    WorldTrans& meshWorldTransform = pMesh->GetWorldTransform();
-
-    Matrix4f World = meshWorldTransform.GetMatrix();
+    Matrix4f World = pSceneObject->GetMatrix();
     Matrix4f View = m_pCurCamera->GetMatrix();
     Matrix4f Projection = m_pCurCamera->GetProjectionMat();
 

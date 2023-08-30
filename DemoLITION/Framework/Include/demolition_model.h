@@ -30,7 +30,6 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
 #include "ogldev_material.h"
-#include "ogldev_world_transform.h"
 #include "ogldev_basic_glfw_camera.h"
 
 #define INVALID_MATERIAL 0xFFFFFFFF
@@ -68,8 +67,6 @@ public:
     PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
-
-    WorldTrans& GetWorldTransform() { return m_worldTransform; }
 
     const std::vector<BasicCamera> GetCameras() const { return m_cameras; }
 
@@ -163,8 +160,6 @@ private:
     const aiScene* m_pScene;
 
     Matrix4f m_GlobalInverseTransform;
-
-    WorldTrans m_worldTransform;
 
     std::vector<Material> m_Materials;
 

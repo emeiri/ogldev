@@ -31,6 +31,4 @@ public:
     ~GLScene() {}
 
     void Render();
-
-    std::list<DemolitionModel*>& GetObjectList() { return m_objects; }
 };

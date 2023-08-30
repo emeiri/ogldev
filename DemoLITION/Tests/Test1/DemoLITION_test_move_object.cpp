@@ -68,12 +68,12 @@ public:
     {
         m_counter += 0.1f;
 
-        m_pScene->SetRotation(m_modelHandle, 0.0f, m_counter, 0.0f);
+        m_pScene->GetSceneObject(m_sceneObjectHandle)->SetRotation(0.0f, m_counter, 0.0f);
     }
 
     bool OnMouseMove(int x, int y) 
     { 
-        m_pScene->SetPosition(m_modelHandle, (float)x / 200.0f, (float)y / 200.0f, 10.0f);
+        m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition((float)x / 200.0f, (float)y / 200.0f, 10.0f);
         return true; 
     }
 
@@ -82,14 +82,16 @@ private:
     void InitMesh()
     {
         m_modelHandle = m_pRenderingSubsystem->LoadModelHandle("../Content/test.glb");
-        m_pScene->SetPosition(m_modelHandle, 0.0f, 0.0f, 10.0f);
+        m_sceneObjectHandle = m_pScene->CreateSceneObject(m_modelHandle);
+        m_pScene->AddObject(m_sceneObjectHandle);
 
-        m_pScene->AddObject(m_modelHandle);
+        m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 10.0f);
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
     int m_modelHandle = -1;
+    int m_sceneObjectHandle = -1;
     float m_counter = 0;    
 };
 

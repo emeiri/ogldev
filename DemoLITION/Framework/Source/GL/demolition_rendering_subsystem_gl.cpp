@@ -126,9 +126,9 @@ void RenderingSubsystemGL::Execute()
 
     const DemolitionModel* pMainModel = NULL;
     
-    if (m_pScene) {
-        pMainModel = m_pScene->GetMainModel();
-        if (pMainModel && (pMainModel->GetCameras().size() > 0)) {
+    if (m_pScene && (m_pScene->GetRenderList().size() > 0)) {
+        pMainModel = m_pScene->GetRenderList().front()->GetModel();
+        if (pMainModel->GetCameras().size() > 0) {
             *m_pCamera = pMainModel->GetCameras()[0];
         }
     }
