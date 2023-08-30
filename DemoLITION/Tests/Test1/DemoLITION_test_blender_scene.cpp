@@ -35,7 +35,6 @@ public:
 
     virtual ~BlenderSceneTest()
     {
-        SAFE_DELETE(m_pModel);
     }
 
 
@@ -69,20 +68,20 @@ public:
     {
         m_counter += 0.1f;
 
-        m_pModel->GetWorldTransform().SetRotation(0.0f, m_counter, 0.0f);
+        m_pScene->SetRotation(m_modelHandle, 0.0f, m_counter, 0.0f);
     }
 
 private:
 
     void InitMesh()
     {
-        m_pModel = m_pRenderingSubsystem->LoadModel("../Content/test.glb");
-        m_pScene->SetMainModel(m_pModel);
+        m_modelHandle = m_pRenderingSubsystem->LoadModelHandle("../Content/test.glb");
+        m_pScene->SetMainModel(m_modelHandle);
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
-    DemolitionModel* m_pModel = NULL;
+    int m_modelHandle = -1;
     float m_counter = 0;    
 };
 

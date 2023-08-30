@@ -98,5 +98,8 @@
     <Filter Include="Source\GL">
       <UniqueIdentifier>{9cf8ece7-a137-432f-9df8-5ed4521986ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Include\Int">
+      <UniqueIdentifier>{03eb9034-f3ca-4ff0-9036-25be52c93db6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

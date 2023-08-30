@@ -17,6 +17,7 @@
 */
 
 #include "demolition_scene.h"
+#include "demolition_rendering_subsystem.h"
 
 
 void Scene::AddObject(DemolitionModel* pObject)
@@ -41,4 +42,18 @@ bool Scene::RemoveObject(DemolitionModel* pObject)
     }
 
     return ret;
+}
+
+
+void Scene::SetMainModel(int ModelHandle)
+{
+    m_pMainModel = m_pRenderingSystem->GetModel(ModelHandle);
+}
+
+
+void Scene::SetRotation(int ModelHandle, float x, float y, float z)
+{
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+
+    pModel->GetWorldTransform().SetRotation(x, y, z);
 }

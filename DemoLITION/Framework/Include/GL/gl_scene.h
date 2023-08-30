@@ -26,14 +26,11 @@ class RenderingSubsystemGL;
 class GLScene : public Scene
 {
 public:
-    GLScene(RenderingSubsystemGL* pRenderingSystem) { m_pRenderingSystem = NULL;  }
+    GLScene(RenderingSubsystemGL* pRenderingSystem) : Scene((BaseRenderingSubsystem*)pRenderingSystem) {}
 
     ~GLScene() {}
 
     void Render();
 
     std::list<DemolitionModel*>& GetObjectList() { return m_objects; }
-
-private:
-    RenderingSubsystemGL* m_pRenderingSystem = NULL;
 };

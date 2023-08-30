@@ -25,30 +25,32 @@
 #include "demolition_model.h"
 
 
+class BaseRenderingSubsystem;
+
 class Scene {
 public:
-    Scene() {}
+    Scene(BaseRenderingSubsystem* pRenderingSystem) { m_pRenderingSystem = pRenderingSystem; }
 
     virtual ~Scene() {}
 
-    void SetMainModel(DemolitionModel* pModel) { m_pMainModel = pModel; }
-
+    void SetMainModel(int ModelHandle);
     void AddObject(DemolitionModel* pObject);
-
     bool RemoveObject(DemolitionModel* pObject);
+    DemolitionModel* GetMainModel() const { return m_pMainModel; }
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
     void DisableClear() { m_clearFrame = false;  }
     bool IsClearFrame() const { return m_clearFrame; }
-    const Vector4f& GetClearColor() { return m_clearColor;  }
+    const Vector4f& GetClearColor() { return m_clearColor;  }  
 
-    DemolitionModel* GetMainModel() const { return m_pMainModel; }
+    void SetRotation(int ModelHandle, float x, float y, float z);
 
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
+    BaseRenderingSubsystem* m_pRenderingSystem = NULL;
     DemolitionModel* m_pMainModel = NULL;
     std::list<DemolitionModel*> m_objects;
     bool m_clearFrame = false;

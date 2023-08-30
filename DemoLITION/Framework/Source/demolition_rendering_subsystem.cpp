@@ -22,11 +22,14 @@
 #include "demolition_rendering_subsystem.h"
 #include "GL/demolition_rendering_subsystem_gl.h"
 
+#define NUM_MODELS 1024
+
 BaseRenderingSubsystem* g_pRenderingSubsystem = NULL;
 
 BaseRenderingSubsystem::BaseRenderingSubsystem(GameCallbacks* pGameCallbacks)
 {
     m_pGameCallbacks = pGameCallbacks;
+    m_models.resize(NUM_MODELS, 0);
 }
 
 BaseRenderingSubsystem::~BaseRenderingSubsystem()
@@ -58,4 +61,47 @@ BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERI
     }
 
     return g_pRenderingSubsystem;
+}
+
+
+int BaseRenderingSubsystem::LoadModelHandle(const std::string& Filename)
+{
+    if (m_numModels == m_models.size()) {
+        printf("%s:%d: out of models space\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    DemolitionModel* pModel = LoadModel(Filename);
+
+    int ret = -1;
+
+    if (pModel) {
+        m_models[m_numModels] = pModel;
+        ret = m_numModels;
+        m_numModels++;
+    }
+    else {
+        printf("%s:%d: error loading '%s'\n", __FILE__, __LINE__, Filename.c_str());
+        exit(0);
+    }
+
+    return ret;
+}
+ 
+
+DemolitionModel* BaseRenderingSubsystem::GetModel(int ModelHandle)
+{
+    if (ModelHandle >= m_numModels) {
+        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
+        exit(0);
+    }
+
+    DemolitionModel* pModel = m_models[ModelHandle];
+
+    if (!pModel) {
+        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
+        exit(0);
+    }
+
+    return pModel;
 }

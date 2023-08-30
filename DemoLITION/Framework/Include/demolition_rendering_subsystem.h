@@ -64,6 +64,10 @@ class BaseRenderingSubsystem
 
     virtual DemolitionModel* LoadModel(const std::string& Filename) = 0;
 
+    int LoadModelHandle(const std::string& Filename);
+
+    DemolitionModel* GetModel(int ModelHandle);
+
     void SetScene(Scene* pScene) { m_pScene = pScene; }
 
     void SetCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }    
@@ -85,6 +89,7 @@ class BaseRenderingSubsystem
     Scene* m_pScene = NULL;
 
  private:
-
+    std::vector<DemolitionModel*> m_models;
+    int m_numModels = 0;
 };
 
