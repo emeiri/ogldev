@@ -28,7 +28,7 @@ int main(int argc, char* arg[])
 {
     //test_minimal();
     //test_clear();    
-    //test_object();
+    test_object();
     //test_move_object();
-    test_blender_scene();
+    //test_blender_scene();
 }

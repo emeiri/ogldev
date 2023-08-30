@@ -69,7 +69,7 @@ void RenderingSubsystemGL::Shutdown()
     delete this;
 }
 
-void RenderingSubsystemGL::CreateWindow(int Width, int Height)
+void RenderingSubsystemGL::CreateWindowInternal(int Width, int Height)
 {
     m_windowWidth = Width;
     m_windowHeight = Height;

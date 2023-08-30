@@ -52,19 +52,21 @@ class BaseRenderingSubsystem
 {
  public:
 
-    static BaseRenderingSubsystem* CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem, GameCallbacks* pGameCallbacks);
-
-    virtual void Shutdown() = 0;
-
-    virtual void CreateWindow(int Width, int Height) = 0;
+    static BaseRenderingSubsystem* CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem,
+                                                             GameCallbacks* pGameCallbacks,
+                                                             bool LoadBasicShapes);
+    virtual void Shutdown() = 0;    
 
     virtual void Execute() = 0;
 
     virtual Scene* CreateScene() = 0;    
 
+    void CreateWindow(int Width, int Height);
+
     int LoadModel(const std::string& Filename);
 
     DemolitionModel* GetModel(int ModelHandle);
+    DemolitionModel* GetModel(const std::string& BasicShape);
 
     void SetScene(Scene* pScene) { m_pScene = pScene; }
 
@@ -79,6 +81,8 @@ class BaseRenderingSubsystem
     BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
     ~BaseRenderingSubsystem();
 
+    virtual void CreateWindowInternal(int Width, int Height) = 0;
+
     virtual DemolitionModel* LoadModelInternal(const std::string& Filename) = 0;
 
     long long m_elapsedTimeMillis = 0;
@@ -89,7 +93,11 @@ class BaseRenderingSubsystem
     Scene* m_pScene = NULL;
 
  private:
+    void InitializeBasicShapes();
+
     std::vector<DemolitionModel*> m_models;
+    std::map<std::string, int> m_shapeToHandle;
     int m_numModels = 0;
+    bool m_loadBasicShapes = false;
 };
 

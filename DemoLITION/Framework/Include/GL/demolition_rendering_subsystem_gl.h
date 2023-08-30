@@ -37,8 +37,6 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
 
     virtual void Shutdown();
 
-    virtual void CreateWindow(int Width, int Height);
-
     virtual Scene* CreateScene();
 
     virtual DemolitionModel* LoadModelInternal(const std::string& Filename);
@@ -50,6 +48,9 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
     void OnCursorPosCallback(GLFWwindow* window, double x, double y);
     
     void OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
+
+ protected:
+     virtual void CreateWindowInternal(int Width, int Height);
 
  private:
 

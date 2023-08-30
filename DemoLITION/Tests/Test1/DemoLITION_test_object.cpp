@@ -40,13 +40,13 @@ public:
 
     void Init()
     {
-        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this);
-
+        bool LoadBasicShapes = true;
+        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this, LoadBasicShapes);
         m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         m_pScene = m_pRenderingSubsystem->CreateScene();
         DirectionalLight DirLight;
-        DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
+        DirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         DirLight.DiffuseIntensity = 1.0f;
 
         m_pScene->m_dirLights.push_back(DirLight);
@@ -75,16 +75,13 @@ private:
 
     void InitMesh()
     {
-        m_modelHandle = m_pRenderingSubsystem->LoadModel("../Content/sphere.obj");
-        m_sceneObjectHandle = m_pScene->CreateSceneObject(m_modelHandle);
+        m_sceneObjectHandle = m_pScene->CreateSceneObject("square");
         m_pScene->AddToRenderList(m_sceneObjectHandle);
-
         m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 10.0f);
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
-    int m_modelHandle = -1;
     int m_sceneObjectHandle = -1;
     float m_counter = 0;    
 };

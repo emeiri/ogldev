@@ -89,6 +89,7 @@ public:
     std::list<SceneObject*>& GetRenderList() { return m_renderList; }
 
     int CreateSceneObject(int ModelHandle);
+    int CreateSceneObject(const std::string& BasicShape);
     SceneObject* GetSceneObject(int SceneObjectHandle);
     void AddToRenderList(int SceneObjectHandle);
     bool RemoveFromRenderList(int SceneObjectHandle);
@@ -107,6 +108,10 @@ protected:
     std::list<SceneObject*> m_renderList;
     bool m_clearFrame = false;
     Vector4f m_clearColor;
+
+private:
+    int CreateSceneObjectInternal(DemolitionModel* pModel);
+
     std::vector<SceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
 };

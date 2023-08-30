@@ -69,11 +69,30 @@ int Scene::CreateSceneObject(int ModelHandle)
     }
     
     DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+
+    ret = CreateSceneObjectInternal(pModel);
+
+    return ret;
+}
+
+
+int Scene::CreateSceneObject(const std::string& BasicShape)
+{
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(BasicShape);
+
+    int ret = CreateSceneObjectInternal(pModel);
+
+    return ret;
+}
+
+
+int Scene::CreateSceneObjectInternal(DemolitionModel* pModel)
+{
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
-    ret = m_numSceneObjects;
+    int ret = m_numSceneObjects;
     m_numSceneObjects++;
-    
+
     return ret;
 }
 

@@ -29,8 +29,10 @@
 void test_clear()
 {
     GameCallbacks TestGameCallbacks;
+    bool LoadBasicShapes = false;
     BaseRenderingSubsystem* pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL,
-                                                                                                   &TestGameCallbacks);
+                                                                                                   &TestGameCallbacks,
+                                                                                                   LoadBasicShapes);
     pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
     
     Scene* pScene = pRenderingSubsystem->CreateScene();

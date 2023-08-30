@@ -29,8 +29,9 @@ BaseRenderingSubsystem* g_pRenderingSubsystem = NULL;
 BaseRenderingSubsystem::BaseRenderingSubsystem(GameCallbacks* pGameCallbacks)
 {
     m_pGameCallbacks = pGameCallbacks;
-    m_models.resize(NUM_MODELS, 0);
+    m_models.resize(NUM_MODELS, 0);    
 }
+
 
 BaseRenderingSubsystem::~BaseRenderingSubsystem()
 {
@@ -38,7 +39,9 @@ BaseRenderingSubsystem::~BaseRenderingSubsystem()
 }
 
 
-BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem, GameCallbacks* pGameCallbacks)
+BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem, 
+                                                                         GameCallbacks* pGameCallbacks,
+                                                                         bool LoadBasicShapes)
 {
     if (g_pRenderingSubsystem) {
         printf("%s:%d - rendering subsystem already exists\n", __FILE__, __LINE__);
@@ -53,6 +56,7 @@ BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERI
     switch (RenderingSubsystem) {
     case RENDERING_SUBSYSTEM_GL:
         g_pRenderingSubsystem = new RenderingSubsystemGL(pGameCallbacks);
+        g_pRenderingSubsystem->m_loadBasicShapes = LoadBasicShapes;
         break;
 
     default:
@@ -61,6 +65,26 @@ BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERI
     }
 
     return g_pRenderingSubsystem;
+}
+
+
+void BaseRenderingSubsystem::CreateWindow(int Width, int Height)
+{
+    CreateWindowInternal(Width, Height);
+    InitializeBasicShapes();
+}
+
+
+void BaseRenderingSubsystem::InitializeBasicShapes()
+{
+    int ModelHandle = LoadModel("../Content/sphere.obj");
+    m_shapeToHandle["sphere"] = ModelHandle;
+    
+    ModelHandle = LoadModel("../Content/box.obj");
+    m_shapeToHandle["cube"] = ModelHandle;
+
+    ModelHandle = LoadModel("../Content/quad.obj");
+    m_shapeToHandle["square"] = ModelHandle;
 }
 
 
@@ -107,6 +131,21 @@ DemolitionModel* BaseRenderingSubsystem::GetModel(int ModelHandle)
         printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
         exit(0);
     }
+
+    return pModel;
+}
+
+
+DemolitionModel* BaseRenderingSubsystem::GetModel(const std::string& BasicShape)
+{
+    if (m_shapeToHandle.find(BasicShape) == m_shapeToHandle.end()) {
+        printf("%s:%d - cannot find basic shape %s\n", __FILE__, __LINE__, BasicShape.c_str());
+        exit(0);
+    }
+
+    int ModelHandle = m_shapeToHandle[BasicShape];
+
+    DemolitionModel* pModel = m_models[ModelHandle];
 
     return pModel;
 }
