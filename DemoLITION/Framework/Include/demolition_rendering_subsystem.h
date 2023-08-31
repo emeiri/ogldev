@@ -61,6 +61,8 @@ class BaseRenderingSubsystem
 
     virtual Scene* CreateScene() = 0;    
 
+    Scene* CreateDefaultScene();
+
     void CreateWindow(int Width, int Height);
 
     int LoadModel(const std::string& Filename);

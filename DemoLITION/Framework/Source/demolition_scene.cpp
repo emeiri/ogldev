@@ -27,6 +27,17 @@ Scene::Scene(BaseRenderingSubsystem* pRenderingSystem)
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);
 }
 
+
+void Scene::InitializeDefault()
+{
+    int SquareHandle = CreateSceneObject("square");
+    AddToRenderList(SquareHandle);
+    m_sceneObjects[SquareHandle].SetRotation(Vector3f(-90.0f, 0.0f, 0.0f));
+    m_sceneObjects[SquareHandle].SetScale(Vector3f(1000.0f, 1000.0f, 1000.0f));
+    m_sceneObjects[SquareHandle].SetFlatColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
+}
+
+
 void Scene::AddToRenderList(int SceneObjectHandle)
 {
     SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);

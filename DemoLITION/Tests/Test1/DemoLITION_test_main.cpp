@@ -22,13 +22,15 @@ void test_clear();
 void test_object();
 void test_move_object();
 void test_blender_scene();
+void test_default_scene();
 
 
 int main(int argc, char* arg[])
 {
     //test_minimal();
     //test_clear();    
-    test_object();
+    //test_object();
     //test_move_object();
     //test_blender_scene();
+    test_default_scene();
 }

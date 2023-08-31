@@ -88,6 +88,14 @@ void BaseRenderingSubsystem::InitializeBasicShapes()
 }
 
 
+Scene* BaseRenderingSubsystem::CreateDefaultScene()
+{
+    Scene* pScene = CreateScene();
+    pScene->InitializeDefault();
+    return pScene;
+}
+
+
 int BaseRenderingSubsystem::LoadModel(const std::string& Filename)
 {
     if (m_numModels == m_models.size()) {

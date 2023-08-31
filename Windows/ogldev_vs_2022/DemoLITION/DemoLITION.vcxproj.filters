@@ -52,6 +52,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_renderer.h">
@@ -90,6 +93,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h">
+      <Filter>Include\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -113,5 +119,13 @@
     <Filter Include="Shaders\GL">
       <UniqueIdentifier>{f0d42b3f-7371-47b6-85c4-845f66bd8646}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
   </ItemGroup>
 </Project>
