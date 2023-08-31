@@ -68,13 +68,13 @@ void ForwardRenderer::InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubs
 
 void ForwardRenderer::CreateDefaultCamera()
 {
-    Vector3f Pos(0.0f, 0.0f, 0.0f);
-    Vector3f Target(0.0f, 0.0f, 1.0f);
+    Vector3f Pos(0.0f, 1.0f, 0.0f);
+    Vector3f Target(0.0f, -0.3f, 1.0f);
     Vector3f Up(0.0, 1.0f, 0.0f);
 
     float FOV = 45.0f;
     float zNear = 0.1f;
-    float zFar = 100.0f;
+    float zFar = 1000.0f;
     int WindowWidth = 0;
     int WindowHeight = 0;
     m_pRenderingSubsystem->GetWindowSize(WindowWidth, WindowHeight);
@@ -127,7 +127,7 @@ void ForwardRenderer::Render(GLScene* pScene)
 }
 
 
-void ForwardRenderer::RenderAllSceneObjects(GLScene * pScene)
+void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
 {
     const std::list<SceneObject*>& RenderList = pScene->GetRenderList();
 
