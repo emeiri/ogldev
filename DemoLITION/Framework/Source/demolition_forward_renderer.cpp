@@ -112,9 +112,7 @@ void ForwardRenderer::Render(GLScene* pScene)
         exit(0);
     }
 
-    const std::list<SceneObject*>& RenderList = pScene->GetRenderList();
-
-    if (RenderList.size() == 0) {
+    if (pScene->GetRenderList().size() == 0) {
         printf("Warning! render list is empty and no main model\n");
         return;
     }
@@ -124,6 +122,14 @@ void ForwardRenderer::Render(GLScene* pScene)
         glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
+
+    RenderAllSceneObjects(pScene);
+}
+
+
+void ForwardRenderer::RenderAllSceneObjects(GLScene * pScene)
+{
+    const std::list<SceneObject*>& RenderList = pScene->GetRenderList();
 
     for (std::list<SceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         SceneObject* pSceneObject = *it;

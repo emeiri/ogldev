@@ -75,6 +75,7 @@ private:
 
     void CreateDefaultCamera();
 
+    void RenderAllSceneObjects(GLScene* pScene);
     void RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject);
     void RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneObject);
 
