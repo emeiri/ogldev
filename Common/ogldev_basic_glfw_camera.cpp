@@ -131,17 +131,17 @@ bool BasicCamera::OnKeyboard(int Key)
 
     switch (Key) {
 
-    case GLFW_KEY_UP:
+    case GLFW_KEY_W:
         m_pos += (m_target * m_speed);
         CameraChangedPos = true;
         break;
 
-    case GLFW_KEY_DOWN:
+    case GLFW_KEY_S:
         m_pos -= (m_target * m_speed);
         CameraChangedPos = true;
         break;
 
-    case GLFW_KEY_LEFT:
+    case GLFW_KEY_A:
         {
             Vector3f Left = m_target.Cross(m_up);
             Left.Normalize();
@@ -151,7 +151,7 @@ bool BasicCamera::OnKeyboard(int Key)
         }
         break;
 
-    case GLFW_KEY_RIGHT:
+    case GLFW_KEY_D:
         {
             Vector3f Right = m_up.Cross(m_target);
             Right.Normalize();
@@ -159,6 +159,26 @@ bool BasicCamera::OnKeyboard(int Key)
             m_pos += Right;
             CameraChangedPos = true;
         }
+        break;
+
+    case GLFW_KEY_UP:
+        m_AngleV += m_speed;
+        Update();
+        break;
+
+    case GLFW_KEY_DOWN:
+        m_AngleV -= m_speed;
+        Update();
+        break;
+
+    case GLFW_KEY_LEFT:
+        m_AngleH -= m_speed;
+        Update();
+        break;
+
+    case GLFW_KEY_RIGHT:
+        m_AngleH += m_speed;
+        Update();
         break;
 
     case GLFW_KEY_PAGE_UP:
