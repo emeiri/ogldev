@@ -112,7 +112,9 @@ void ForwardRenderer::Render(GLScene* pScene)
         exit(0);
     }
 
-    if (pScene->GetRenderList().size() == 0) {
+    const std::list<SceneObject*>& RenderList = pScene->GetRenderList();
+
+    if (RenderList.size() == 0) {
         printf("Warning! render list is empty and no main model\n");
         return;
     }
@@ -123,6 +125,25 @@ void ForwardRenderer::Render(GLScene* pScene)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
+    for (std::list<SceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
+        SceneObject* pSceneObject = *it;
+
+        const Vector4f& FlatColor = pSceneObject->GetFlatColor();
+
+        if (FlatColor.x == -1.0f) {
+            RenderWithForwardLighting(pScene, pSceneObject);
+        }
+        else {
+            RenderWithFlatColor(pScene, pSceneObject);
+        }
+    }
+}
+
+
+void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject)
+{
+    SwitchToLightingTech();
+
     int NumPointLights = (int)pScene->m_pointLights.size();
     int NumSpotLights = (int)pScene->m_spotLights.size();
     int NumDirLights = (int)pScene->m_dirLights.size();
@@ -131,44 +152,38 @@ void ForwardRenderer::Render(GLScene* pScene)
         printf("Warning! trying to render but all lights are zero\n");
     }
 
-    SceneObject* pSceneObject = pScene->GetRenderList().front();
-   
-    const Vector4f& FlatColor = pSceneObject->GetFlatColor();
+    const DirectionalLight& DirLight = pScene->m_dirLights[0];
 
-    if (FlatColor.x == -1.0f) {
-
-        SwitchToLightingTech();
-
-        const DirectionalLight& DirLight = pScene->m_dirLights[0];
-
-        if (DirLight.DiffuseIntensity > 0.0) {
-            m_lightingTech.SetDirectionalLight(DirLight, true);
-        }
-
-        if (NumPointLights > 0) {
-            m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
-        }
-
-        if (NumSpotLights > 0) {
-            m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
-        }
-
-        m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
-
-        m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
-
-        UpdateMatrices(&m_lightingTech, pSceneObject);
-
-        pSceneObject->GetModel()->Render(&m_lightingTech);
+    if (DirLight.DiffuseIntensity > 0.0) {
+        m_lightingTech.SetDirectionalLight(DirLight, true);
     }
-    else {
-        m_flatColorTech.Enable();
-        m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
-        Matrix4f WVP;
-        GetWVP(pSceneObject, WVP);
-        m_flatColorTech.SetWVP(WVP);
-        pSceneObject->GetModel()->Render();
+
+    if (NumPointLights > 0) {
+        m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
     }
+
+    if (NumSpotLights > 0) {
+        m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
+    }
+
+    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+
+    m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
+
+    UpdateMatrices(&m_lightingTech, pSceneObject);
+
+    pSceneObject->GetModel()->Render(&m_lightingTech);
+}
+
+
+void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneObject)
+{
+    m_flatColorTech.Enable();
+    m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
+    Matrix4f WVP;
+    GetWVP(pSceneObject, WVP);
+    m_flatColorTech.SetWVP(WVP);
+    pSceneObject->GetModel()->Render();
 }
 
 

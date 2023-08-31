@@ -86,7 +86,7 @@ public:
 
     virtual ~Scene() {}
 
-    std::list<SceneObject*>& GetRenderList() { return m_renderList; }
+    const std::list<SceneObject*>& GetRenderList() { return m_renderList; }
 
     int CreateSceneObject(int ModelHandle);
     int CreateSceneObject(const std::string& BasicShape);
