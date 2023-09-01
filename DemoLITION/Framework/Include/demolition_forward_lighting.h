@@ -50,7 +50,7 @@ public:
 
 struct LightAttenuation
 {
-    float Constant = 1.0f;
+    float Constant = 0.1f;
     float Linear = 0.0f;
     float Exp = 0.0f;
 };
