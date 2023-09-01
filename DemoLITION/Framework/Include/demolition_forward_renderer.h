@@ -36,6 +36,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubsystem);
 
+    void ConfigDefaultCamera(const BasicCamera& Camera);
+
     void StartShadowPass();
 
     //
@@ -99,8 +101,8 @@ private:
     void UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject);
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
-    const BasicCamera* m_pCurCamera = NULL;
-    BasicCamera* m_pDefaultCamera = NULL;
+    BasicCamera* m_pCurCamera = NULL;
+    BasicCamera m_defaultCamera;;
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;

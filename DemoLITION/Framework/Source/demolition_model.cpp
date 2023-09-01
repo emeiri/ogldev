@@ -626,22 +626,6 @@ void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int Wi
     for (unsigned int i = 0; i < pScene->mNumCameras; i++) {
         InitSingleCamera(i, pScene, WindowWidth, WindowHeight);
     }
-
-    aiNode* pNode = pScene->mRootNode;
-
-    traverse(0, pNode);
-
-    pNode = pScene->mRootNode->FindNode("Camera");
-
-    if (!pNode) {
-        printf("%s:%d cannot find camera node\n", __FILE__, __LINE__);
-        return;
-    }
-
-    printf("%s node transformation\n", pNode->mName.C_Str());
-
-    Matrix4f NodeTransformation(pNode->mTransformation);
-    NodeTransformation.Print();
 }
 
 
@@ -678,7 +662,7 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
     persProjInfo.zFar = pCamera->mClipPlaneFar;
     persProjInfo.Width = (float)WindowWidth;
     persProjInfo.Height = (float)WindowHeight;
-    persProjInfo.FOV = 45.0f;// pCamera->mHorizontalFOV;
+    persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV);
 
   /*  aiMatrix4x4 CameraMatrix;
     pCamera->GetCameraMatrix(CameraMatrix);

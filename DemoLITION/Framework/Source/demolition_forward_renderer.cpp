@@ -28,7 +28,6 @@ ForwardRenderer::ForwardRenderer()
 
 ForwardRenderer::~ForwardRenderer()
 {
-    SAFE_DELETE(m_pDefaultCamera);
 }
 
 
@@ -81,12 +80,17 @@ void ForwardRenderer::CreateDefaultCamera()
 
     PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
 
-    m_pDefaultCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
-    m_pCurCamera = m_pDefaultCamera;
+    m_defaultCamera = BasicCamera(persProjInfo, Pos, Target, Up);
+    m_pCurCamera = &m_defaultCamera;
 
-    m_pRenderingSubsystem->SetCamera(m_pDefaultCamera);    
+    m_pRenderingSubsystem->UseCamera(m_pCurCamera);
 }
 
+
+void ForwardRenderer::ConfigDefaultCamera(const BasicCamera& Camera)
+{
+    m_defaultCamera = Camera;
+}
 
 void ForwardRenderer::StartShadowPass()
 {
@@ -137,7 +141,6 @@ void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
         const Vector4f& FlatColor = pSceneObject->GetFlatColor();
 
         if (FlatColor.x == -1.0f) {
-            m_pCurCamera = &(pSceneObject->GetModel()->GetCameras()[0]);
             RenderWithForwardLighting(pScene, pSceneObject);
         }
         else {

@@ -107,6 +107,12 @@ DemolitionModel* RenderingSubsystemGL::LoadModelInternal(const std::string& File
 }
 
 
+void RenderingSubsystemGL::ConfigDefaultCamera(const BasicCamera& Camera)
+{
+    m_forwardRenderer.ConfigDefaultCamera(Camera);
+}
+
+
 void RenderingSubsystemGL::SetDefaultGLState()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -124,16 +130,14 @@ void RenderingSubsystemGL::Execute()
         exit(0);
     }
 
-    const DemolitionModel* pMainModel = NULL;
+    /*const DemolitionModel* pMainModel = NULL;
     
     if (m_pScene && (m_pScene->GetRenderList().size() > 0)) {
         pMainModel = m_pScene->GetRenderList().front()->GetModel();
         if (pMainModel->GetCameras().size() > 0) {
             *m_pCamera = pMainModel->GetCameras()[0];
         }
-    }
-
-    //m_pCamera->SetTarget(Vector3f(0.0f, 0.0f, 1.0f));
+    }*/
 
     long long StartTimeMillis = GetCurrentTimeMillis();
 

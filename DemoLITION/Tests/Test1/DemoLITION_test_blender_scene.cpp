@@ -45,18 +45,16 @@ public:
 
         m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        m_pScene = m_pRenderingSubsystem->CreateScene();
+        m_pScene = m_pRenderingSubsystem->CreateScene("../Content/demolition/scene1.fbx");
         
         DirectionalLight DirLight;
-        DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
+        DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
         DirLight.DiffuseIntensity = 1.0f;
         m_pScene->m_dirLights.push_back(DirLight);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
-        m_pRenderingSubsystem->SetScene(m_pScene);
-
-        InitMesh();
+        m_pRenderingSubsystem->SetScene(m_pScene);        
     }
 
 
@@ -68,25 +66,14 @@ public:
     void OnFrame()
     {
         m_counter += 0.1f;
-
-     //   m_pScene->GetSceneObject(m_sceneObjectHandle)->SetRotation(0.0f, m_counter, 0.0f);
     }
 
 private:
 
-    void InitMesh()
-    {
-        m_modelHandle = m_pRenderingSubsystem->LoadModel("../Content/demolition/scene1.fbx");
-        m_sceneObjectHandle = m_pScene->CreateSceneObject(m_modelHandle);
-        m_pScene->AddToRenderList(m_sceneObjectHandle);
-
-      //  m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 5.0f);
-    }
-
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     Scene* m_pScene = NULL;
-    int m_modelHandle = -1;
-    int m_sceneObjectHandle = -1;
+   // int m_modelHandle = -1;
+  //  int m_sceneObjectHandle = -1;
     float m_counter = 0;    
 };
 

@@ -90,6 +90,21 @@ void BaseRenderingSubsystem::InitializeBasicShapes()
 }
 
 
+Scene* BaseRenderingSubsystem::CreateScene(const std::string& Filename)
+{
+    Scene* pScene = CreateScene();
+    pScene->LoadScene(Filename);
+    return pScene;
+}
+
+
+void BaseRenderingSubsystem::ConfigDefaultCamera(int ModelHandle)
+{
+    DemolitionModel* pModel = GetModel(ModelHandle);
+    ConfigDefaultCamera(pModel->GetCameras()[0]);
+}
+
+
 Scene* BaseRenderingSubsystem::CreateDefaultScene()
 {
     Scene* pScene = CreateScene();

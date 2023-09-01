@@ -28,7 +28,5 @@ class GLScene : public Scene
 public:
     GLScene(RenderingSubsystemGL* pRenderingSystem) : Scene((BaseRenderingSubsystem*)pRenderingSystem) {}
 
-    ~GLScene() {}
-
-    void Render();
+    ~GLScene() {}    
 };

@@ -52,6 +52,8 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
  protected:
      virtual void CreateWindowInternal(int Width, int Height);
 
+     virtual void ConfigDefaultCamera(const BasicCamera& Camera);
+
  private:
 
     void InitCallbacks();

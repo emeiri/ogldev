@@ -86,6 +86,8 @@ public:
 
     virtual ~Scene() {}
 
+    void LoadScene(const std::string& Filename);
+
     void InitializeDefault();
 
     const std::list<SceneObject*>& GetRenderList() { return m_renderList; }

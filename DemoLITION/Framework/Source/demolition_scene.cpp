@@ -28,6 +28,15 @@ Scene::Scene(BaseRenderingSubsystem* pRenderingSystem)
 }
 
 
+void Scene::LoadScene(const std::string& Filename)
+{
+    int ModelHandle = m_pRenderingSystem->LoadModel(Filename.c_str());
+    int SceneObjectHandle = CreateSceneObject(ModelHandle);
+    AddToRenderList(SceneObjectHandle);
+    m_pRenderingSystem->ConfigDefaultCamera(ModelHandle);
+}
+
+
 void Scene::InitializeDefault()
 {
     int SquareHandle = CreateSceneObject("square");

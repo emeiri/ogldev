@@ -19,9 +19,3 @@
 
 
 #include "GL/gl_scene.h"
-
-
-void GLScene::Render()
-{
-
-}
