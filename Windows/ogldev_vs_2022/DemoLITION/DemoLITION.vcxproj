@@ -190,6 +190,9 @@
   <ItemGroup>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

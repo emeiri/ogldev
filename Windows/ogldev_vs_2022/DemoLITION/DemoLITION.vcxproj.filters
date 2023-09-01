@@ -127,5 +127,14 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.vs">
       <Filter>Shaders\GL</Filter>
     </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
   </ItemGroup>
 </Project>
