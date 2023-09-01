@@ -71,7 +71,9 @@ BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERI
 void BaseRenderingSubsystem::CreateWindow(int Width, int Height)
 {
     CreateWindowInternal(Width, Height);
-    InitializeBasicShapes();
+    if (m_loadBasicShapes) {
+        InitializeBasicShapes();
+    }
 }
 
 
