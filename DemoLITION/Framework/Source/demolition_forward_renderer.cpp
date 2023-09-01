@@ -137,6 +137,7 @@ void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
         const Vector4f& FlatColor = pSceneObject->GetFlatColor();
 
         if (FlatColor.x == -1.0f) {
+            m_pCurCamera = &(pSceneObject->GetModel()->GetCameras()[0]);
             RenderWithForwardLighting(pScene, pSceneObject);
         }
         else {
@@ -176,9 +177,9 @@ void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pS
 
     m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
 
-    UpdateMatrices(&m_lightingTech, pSceneObject);
+  //  UpdateMatrices(&m_lightingTech, pSceneObject);
 
-    pSceneObject->GetModel()->Render(&m_lightingTech);
+    pSceneObject->GetModel()->Render(this);
 }
 
 
@@ -380,4 +381,45 @@ void ForwardRenderer::DisableFog()
 {
     SwitchToLightingTech();
     m_lightingTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
+}
+
+
+void ForwardRenderer::DrawStartCB(uint DrawIndex)
+{
+    // TODO: picking technique update
+}
+
+
+void ForwardRenderer::ControlSpecularExponent(bool IsEnabled)
+{
+    m_lightingTech.ControlSpecularExponent(IsEnabled);
+}
+
+
+void ForwardRenderer::SetMaterial(const Material& material)
+{
+    m_lightingTech.SetMaterial(material);
+}
+
+
+void ForwardRenderer::DisableDiffuseTexture()
+{
+    m_lightingTech.DisableDiffuseTexture();
+}
+
+
+void ForwardRenderer::SetWorldMatrix(const Matrix4f& World)
+{
+    m_lightingTech.SetWorldMatrix(World);
+
+    Matrix4f View = m_pCurCamera->GetMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+    Matrix4f WVP = Projection * View * World;
+    m_lightingTech.SetWVP(WVP);
+
+    Matrix4f InverseWorld = World.Inverse();
+    Matrix3f World3x3(InverseWorld);
+    Matrix3f WorldTranspose = World3x3.Transpose();
+
+    m_lightingTech.SetNormalMatrix(WorldTranspose);
 }

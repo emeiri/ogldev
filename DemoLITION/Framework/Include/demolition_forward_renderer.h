@@ -27,7 +27,7 @@
 #include "GL/flat_color_technique.h"
 
 
-class ForwardRenderer {
+class ForwardRenderer : public DemolitionRenderCallbacks {
  public:
 
     ForwardRenderer();
@@ -70,6 +70,17 @@ class ForwardRenderer {
                                 float BlendFactor);*/
 
     void RenderToShadowMap(SceneObject* pSceneObject, const SpotLight& SpotLight);
+
+    // Implementation of DemolitionRenderCallbacks interface
+    virtual void DrawStartCB(uint DrawIndex);
+
+    virtual void ControlSpecularExponent(bool IsEnabled);
+
+    virtual void SetMaterial(const Material& material);
+
+    virtual void DisableDiffuseTexture();
+
+    virtual void SetWorldMatrix(const Matrix4f& World);
  
 private:
 
@@ -88,7 +99,7 @@ private:
     void UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject);
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
-    BasicCamera* m_pCurCamera = NULL;
+    const BasicCamera* m_pCurCamera = NULL;
     BasicCamera* m_pDefaultCamera = NULL;
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;

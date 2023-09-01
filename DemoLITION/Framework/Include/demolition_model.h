@@ -37,13 +37,15 @@
 class DemolitionRenderCallbacks
 {
 public:
-    virtual void DrawStartCB(uint DrawIndex) {}
+    virtual void DrawStartCB(uint DrawIndex) = 0;
 
-    virtual void ControlSpecularExponent(bool IsEnabled) {}
+    virtual void ControlSpecularExponent(bool IsEnabled) = 0;
 
-    virtual void SetMaterial(const Material& material) {}
+    virtual void SetMaterial(const Material& material) = 0;
 
-    virtual void DisableDiffuseTexture() {}
+    virtual void DisableDiffuseTexture() = 0;
+
+    virtual void SetWorldMatrix(const Matrix4f& World) = 0;
 };
 
 
@@ -68,7 +70,7 @@ public:
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
-    const std::vector<BasicCamera> GetCameras() const { return m_cameras; }
+    const std::vector<BasicCamera>& GetCameras() const { return m_cameras; }
 
     uint NumBones() const
     {
@@ -95,7 +97,7 @@ private:
 
     virtual void ReserveSpace(uint NumVertices, uint NumIndices);
 
-    virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
+    virtual void InitSingleMesh(const aiScene* pScene, uint MeshIndex, const aiMesh* paiMesh);
 
     virtual void PopulateBuffers();
 
@@ -108,6 +110,9 @@ private:
     void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
 
     void InitAllMeshes(const aiScene* pScene);
+
+    void CalculateMeshTransformations(const aiScene* pScene);
+    void TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode);
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 
@@ -153,6 +158,7 @@ private:
         uint BaseVertex;
         uint BaseIndex;
         uint MaterialIndex;
+        Matrix4f Transformation;
     };
 
     std::vector<BasicMeshEntry> m_Meshes;

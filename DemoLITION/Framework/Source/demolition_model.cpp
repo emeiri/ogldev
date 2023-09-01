@@ -27,9 +27,9 @@ using namespace std;
 #define BONE_ID_LOCATION     3
 #define BONE_WEIGHT_LOCATION 4
 
-
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder)
 
+void traverse(int depth, aiNode* pNode);
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 {
@@ -79,6 +79,9 @@ bool DemolitionModel::LoadMesh(const string& Filename, int WindowWidth, int Wind
     m_pScene = m_Importer.ReadFile(Filename.c_str(), DEMOLITION_ASSIMP_LOAD_FLAGS);
 
     if (m_pScene) {
+        printf("--- START Node Hierarchy ---\n");
+        traverse(0, m_pScene->mRootNode);
+        printf("--- END Node Hierarchy ---\n");
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
         m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
         Ret = InitFromScene(m_pScene, Filename, WindowWidth, WindowHeight);
@@ -98,7 +101,7 @@ bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filenam
 {
     if (!InitGeometry(pScene, Filename)) {
         return false;
-    }
+    }    
 
     InitCameras(pScene, WindowWidth, WindowHeight);
 
@@ -126,7 +129,9 @@ bool DemolitionModel::InitGeometry(const aiScene* pScene, const string& Filename
         return false;
     }
 
-    PopulateBuffers();    
+    PopulateBuffers();   
+
+    CalculateMeshTransformations(pScene);
 
     return GLCheckError();
 }
@@ -161,16 +166,55 @@ void DemolitionModel::InitAllMeshes(const aiScene* pScene)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
-        InitSingleMesh(i, paiMesh);
+        InitSingleMesh(pScene, i, paiMesh);
     }
 }
 
 
-void DemolitionModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
+void DemolitionModel::CalculateMeshTransformations(const aiScene* pScene)
+{
+    Matrix4f Transformation;
+    Transformation.InitIdentity();
+
+    TraverseNodeHierarchy(Transformation, pScene->mRootNode);
+}
+
+
+void DemolitionModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode)
+{
+    printf("Traversing node '%s'\n", pNode->mName.C_Str());
+    Matrix4f NodeTransformation(pNode->mTransformation);
+
+    Matrix4f CombinedTransformation = ParentTransformation * NodeTransformation;
+
+    printf("Combined transformation:\n");
+    CombinedTransformation.Print();
+    
+    if (pNode->mNumMeshes > 0) {
+        printf("Num meshes: %d - ", pNode->mNumMeshes);
+        for (int i = 0; i < (int)pNode->mNumMeshes; i++) {
+            int MeshIndex = pNode->mMeshes[i];
+            printf("%d ", MeshIndex);
+            m_Meshes[MeshIndex].Transformation = CombinedTransformation;
+        }
+        printf("\n");
+    }
+    else {
+        printf("No meshes\n");
+    }
+
+    for (uint i = 0; i < pNode->mNumChildren; i++) {
+        TraverseNodeHierarchy(CombinedTransformation, pNode->mChildren[i]);
+    }
+
+}
+
+
+void DemolitionModel::InitSingleMesh(const aiScene* pScene, uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-    // printf("Mesh %d\n", MeshIndex);
+    printf("Mesh %d %s\n", MeshIndex, paiMesh->mName.C_Str());
     // Populate the vertex attribute vectors
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
         const aiVector3D& pPos      = paiMesh->mVertices[i];
@@ -203,6 +247,18 @@ void DemolitionModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
     }
 
     LoadMeshBones(MeshIndex, paiMesh);
+
+    aiNode* pNode = pScene->mRootNode->FindNode(paiMesh->mName.C_Str());
+
+    if (!pNode) {
+        printf("%s:%d cannot find node for '%s'\n", __FILE__, __LINE__, paiMesh->mName.C_Str());
+        return;
+    }
+
+    printf("%s node transformation\n", pNode->mName.C_Str());
+
+    Matrix4f NodeTransformation(pNode->mTransformation);
+    //NodeTransformation.Print();
 }
 
 
@@ -448,6 +504,8 @@ void DemolitionModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
             } else {
                 pRenderCallbacks->DisableDiffuseTexture();
             }
+
+            pRenderCallbacks->SetWorldMatrix(m_Meshes[i].Transformation);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -558,12 +616,19 @@ void DemolitionModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Ve
 }
 
 
-void traverse(aiNode* pNode)
+static void traverse(int depth, aiNode* pNode)
 {
+    for (int i = 0 ; i < depth ; i++) {
+        printf(" ");
+    }
+
     printf("%s\n", pNode->mName.C_Str());
 
+    Matrix4f NodeTransformation(pNode->mTransformation);
+    NodeTransformation.Print(); 
+
     for (uint i = 0; i < pNode->mNumChildren; i++) {
-        traverse(pNode->mChildren[i]);
+        traverse(depth + 1, pNode->mChildren[i]);
     }
 }
 
@@ -580,7 +645,7 @@ void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int Wi
 
     aiNode* pNode = pScene->mRootNode;
 
-    traverse(pNode);
+    traverse(0, pNode);
 
     pNode = pScene->mRootNode->FindNode("Camera");
 
@@ -589,10 +654,10 @@ void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int Wi
         return;
     }
 
-    printf("!!! %s\n", pNode->mName.C_Str());
+    printf("%s node transformation\n", pNode->mName.C_Str());
 
-    Matrix4f foo(pNode->mTransformation);
-    foo.Print();
+    Matrix4f NodeTransformation(pNode->mTransformation);
+    NodeTransformation.Print();
 }
 
 
@@ -601,27 +666,28 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
     const aiCamera* pCamera = pScene->mCameras[Index];
     printf("Camera name: '%s'\n", pCamera->mName.C_Str());
 
-
-    Matrix4f foo(pScene->mRootNode->mTransformation);
-    foo.Print();
-
     aiNode* pNode = pScene->mRootNode->FindNode(pCamera->mName);
+    Matrix4f NodeTransformation(pNode->mTransformation);
 
-    Matrix4f c(pNode->mTransformation);
-
-    Vector3f Pos(c.m[0][3], c.m[1][3], c.m[2][3]);
-    Vector3f Target(c.m[2][0], c.m[2][1], c.m[2][2]);
-    Vector3f Up(c.m[1][0], c.m[1][1], c.m[1][2]);
+    Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
+    Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
+    Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
 
     printf("Pos: "); Pos.Print();
     printf("Target: "); Target.Print();
     printf("Up: "); Up.Print();
 
-   // exit(0);
+    Vector4f Pos4D(Pos, 1.0f);
+    Pos4D = NodeTransformation * Pos4D;
+    Vector3f FinalPos = Pos4D;
 
-    //Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
-    //Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
-   // Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
+    Vector4f Target4D(Target, 0.0f);
+    Target4D = NodeTransformation * Target4D;
+    Vector3f FinalTarget = Target4D;
+
+    Vector4f Up4D(Up, 0.0f);
+    Up4D = NodeTransformation * Up4D;
+    Vector3f FinalUp = Up4D;
 
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
@@ -630,14 +696,11 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
     persProjInfo.Height = (float)WindowHeight;
     persProjInfo.FOV = 45.0f;// pCamera->mHorizontalFOV;
 
-    aiMatrix4x4 CameraMatrix;
+  /*  aiMatrix4x4 CameraMatrix;
     pCamera->GetCameraMatrix(CameraMatrix);
-
-   // Matrix4f foo(CameraMatrix);
-
-  //  foo.Print();
-
-  //  exit(0);
+    Matrix4f foo(CameraMatrix);
+    foo.Print();
+    exit(0);*/
 
     float AspectRatio = (float)WindowWidth / (float)WindowHeight;
 
@@ -645,7 +708,7 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
         printf("Warning! the aspect ratio of the camera is %f while the aspect ratio of the window is %f\n", pCamera->mAspect, AspectRatio);
     }
 
-    m_cameras[Index] = BasicCamera(persProjInfo, Pos, Target, Up);
+    m_cameras[Index] = BasicCamera(persProjInfo, FinalPos, FinalTarget, FinalUp);
 }
 
 

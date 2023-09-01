@@ -25,8 +25,8 @@
 #include "demolition.h"
 
 
-#define WINDOW_WIDTH  1000
-#define WINDOW_HEIGHT 1000
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 
 class BlenderSceneTest : public GameCallbacks
@@ -40,7 +40,7 @@ public:
 
     void Init()
     {
-        bool LoadBasicShapes = true;
+        bool LoadBasicShapes = false;
         m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this, LoadBasicShapes);
 
         m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -69,18 +69,18 @@ public:
     {
         m_counter += 0.1f;
 
-        m_pScene->GetSceneObject(m_sceneObjectHandle)->SetRotation(0.0f, m_counter, 0.0f);
+     //   m_pScene->GetSceneObject(m_sceneObjectHandle)->SetRotation(0.0f, m_counter, 0.0f);
     }
 
 private:
 
     void InitMesh()
     {
-        m_modelHandle = m_pRenderingSubsystem->LoadModel("../Content/test.glb");
+        m_modelHandle = m_pRenderingSubsystem->LoadModel("../Content/demolition/scene1.fbx");
         m_sceneObjectHandle = m_pScene->CreateSceneObject(m_modelHandle);
         m_pScene->AddToRenderList(m_sceneObjectHandle);
 
-        m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 5.0f);
+      //  m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 5.0f);
     }
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;

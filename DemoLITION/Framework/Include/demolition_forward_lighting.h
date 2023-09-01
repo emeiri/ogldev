@@ -72,7 +72,7 @@ public:
 };
 
 
-class ForwardLightingTechnique : public Technique, public DemolitionRenderCallbacks
+class ForwardLightingTechnique : public Technique
 {
 public:
 
