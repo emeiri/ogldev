@@ -56,7 +56,7 @@ public:
 
     ~DemolitionModel();
 
-    bool LoadMesh(const std::string& Filename, int WindowWidth, int WindowHeight);
+    bool LoadAssimpModel(const std::string& Filename, int WindowWidth, int WindowHeight);
 
     void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
@@ -94,6 +94,8 @@ public:
 private:
 
     void Clear();
+
+    void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
     virtual void ReserveSpace(uint NumVertices, uint NumIndices);
 

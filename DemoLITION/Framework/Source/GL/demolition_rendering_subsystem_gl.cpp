@@ -98,7 +98,7 @@ DemolitionModel* RenderingSubsystemGL::LoadModelInternal(const std::string& File
 {
     DemolitionModel* pModel = new DemolitionModel();
 
-    if (!pModel->LoadMesh(Filename, m_windowWidth, m_windowHeight)) {
+    if (!pModel->LoadAssimpModel(Filename, m_windowWidth, m_windowHeight)) {
         delete pModel;
         pModel = NULL;
     }

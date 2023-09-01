@@ -62,7 +62,7 @@ void DemolitionModel::Clear()
 }
 
 
-bool DemolitionModel::LoadMesh(const string& Filename, int WindowWidth, int WindowHeight)
+bool DemolitionModel::LoadAssimpModel(const string& Filename, int WindowWidth, int WindowHeight)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -247,18 +247,6 @@ void DemolitionModel::InitSingleMesh(const aiScene* pScene, uint MeshIndex, cons
     }
 
     LoadMeshBones(MeshIndex, paiMesh);
-
-    aiNode* pNode = pScene->mRootNode->FindNode(paiMesh->mName.C_Str());
-
-    if (!pNode) {
-        printf("%s:%d cannot find node for '%s'\n", __FILE__, __LINE__, paiMesh->mName.C_Str());
-        return;
-    }
-
-    printf("%s node transformation\n", pNode->mName.C_Str());
-
-    Matrix4f NodeTransformation(pNode->mTransformation);
-    //NodeTransformation.Print();
 }
 
 
@@ -478,45 +466,53 @@ void DemolitionModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
     glBindVertexArray(m_VAO);
 
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-        unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
-        assert(MaterialIndex < m_Materials.size());
-
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
-        }
-
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
-
-            if (pRenderCallbacks) {
-                pRenderCallbacks->ControlSpecularExponent(true);
-            }
-        } else {
-            if (pRenderCallbacks) {
-                pRenderCallbacks->ControlSpecularExponent(false);
-            }
-        }
-
-        if (pRenderCallbacks) {
-            if (m_Materials[MaterialIndex].pDiffuse) {
-                pRenderCallbacks->DrawStartCB(i);
-                pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
-            } else {
-                pRenderCallbacks->DisableDiffuseTexture();
-            }
-
-            pRenderCallbacks->SetWorldMatrix(m_Meshes[i].Transformation);
-        }
-
-        glDrawElementsBaseVertex(GL_TRIANGLES,
-                                 m_Meshes[i].NumIndices,
-                                 GL_UNSIGNED_INT,
-                                 (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
-                                 m_Meshes[i].BaseVertex);
+        RenderMesh(i, pRenderCallbacks);
     }
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
+}
+
+
+void DemolitionModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks)
+{
+    unsigned int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
+    assert(MaterialIndex < m_Materials.size());
+
+    if (m_Materials[MaterialIndex].pDiffuse) {
+        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pSpecularExponent) {
+        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+
+        if (pRenderCallbacks) {
+            pRenderCallbacks->ControlSpecularExponent(true);
+        }
+    }
+    else {
+        if (pRenderCallbacks) {
+            pRenderCallbacks->ControlSpecularExponent(false);
+        }
+    }
+
+    if (pRenderCallbacks) {
+        if (m_Materials[MaterialIndex].pDiffuse) {
+            pRenderCallbacks->DrawStartCB(MeshIndex);
+            pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
+        }
+        else {
+            pRenderCallbacks->DisableDiffuseTexture();
+        }
+
+        pRenderCallbacks->SetWorldMatrix(m_Meshes[MeshIndex].Transformation);
+    }
+
+    glDrawElementsBaseVertex(GL_TRIANGLES,
+                            m_Meshes[MeshIndex].NumIndices,
+                            GL_UNSIGNED_INT,
+                            (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
+                            m_Meshes[MeshIndex].BaseVertex);
 }
 
 
