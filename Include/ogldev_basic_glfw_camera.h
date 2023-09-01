@@ -32,6 +32,8 @@ public:
 
     BasicCamera(const PersProjInfo& persProjInfo, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
 
+    void InitCamera(const PersProjInfo& persProjInfo, const Vector3f& Pos, const Vector3f& Target, const Vector3f& Up);
+
     void SetPosition(float x, float y, float z);
 
     void SetPosition(const Vector3f& pos);
@@ -74,7 +76,7 @@ public:
 
 private:
 
-    void Init();
+    void InitInternal();
     void Update();
 
     std::string m_name;
