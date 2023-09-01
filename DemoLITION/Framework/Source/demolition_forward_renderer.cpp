@@ -175,8 +175,6 @@ void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pS
 
     m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
 
-    m_lightingTech.SetMaterial(pSceneObject->GetModel()->GetMaterial());
-
   //  UpdateMatrices(&m_lightingTech, pSceneObject);
 
     pSceneObject->GetModel()->Render(this);

@@ -580,18 +580,6 @@ void DemolitionModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats,
 }
 
 
-const Material& DemolitionModel::GetMaterial() const 
-{
-    for (unsigned int i = 0 ; i < m_Materials.size() ; i++) {
-        if (m_Materials[i].AmbientColor != Vector3f(0.0f, 0.0f, 0.0f)) {
-            return m_Materials[i];
-        }
-    }
-
-    return m_Materials[0];
-}
-
-
 void DemolitionModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex)
 {
     uint MeshIndex = DrawIndex; // Each mesh is rendered in its own draw call
