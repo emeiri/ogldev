@@ -28,7 +28,7 @@ using namespace std;
 #define BONE_WEIGHT_LOCATION 4
 
 
-#define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices | aiProcess_MakeLeftHanded)
+#define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder)
 
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
