@@ -513,5 +513,4 @@ void main()
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
     FragColor =  TempColor * gColorMod + gColorAdd;
-
 }
