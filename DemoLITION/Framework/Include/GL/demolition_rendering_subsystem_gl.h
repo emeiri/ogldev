@@ -52,7 +52,7 @@ class RenderingSubsystemGL : public BaseRenderingSubsystem
  protected:
      virtual void CreateWindowInternal(int Width, int Height);
 
-     virtual void ConfigDefaultCamera(const BasicCamera& Camera);
+     virtual void SetCamera(BasicCamera* pCamera) { m_forwardRenderer.SetCamera(pCamera); }
 
  private:
 

@@ -88,6 +88,8 @@ public:
 
     void LoadScene(const std::string& Filename);
 
+    BasicCamera* GetCurrentCamera() { return &m_defaultCamera; }
+
     void InitializeDefault();
 
     const std::list<SceneObject*>& GetRenderList() { return m_renderList; }
@@ -114,8 +116,10 @@ protected:
     Vector4f m_clearColor;
 
 private:
+    void CreateDefaultCamera();
     int CreateSceneObjectInternal(DemolitionModel* pModel);
 
+    BasicCamera m_defaultCamera;
     std::vector<SceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
 };

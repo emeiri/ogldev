@@ -107,12 +107,6 @@ DemolitionModel* RenderingSubsystemGL::LoadModelInternal(const std::string& File
 }
 
 
-void RenderingSubsystemGL::ConfigDefaultCamera(const BasicCamera& Camera)
-{
-    m_forwardRenderer.ConfigDefaultCamera(Camera);
-}
-
-
 void RenderingSubsystemGL::SetDefaultGLState()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

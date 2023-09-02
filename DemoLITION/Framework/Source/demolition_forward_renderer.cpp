@@ -59,38 +59,9 @@ void ForwardRenderer::InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubs
         exit(1);
     }
 
-    CreateDefaultCamera();
-
     glUseProgram(0);
 }
 
-
-void ForwardRenderer::CreateDefaultCamera()
-{
-    Vector3f Pos(0.0f, 1.0f, 0.0f);
-    Vector3f Target(0.0f, -0.3f, 1.0f);
-    Vector3f Up(0.0, 1.0f, 0.0f);
-
-    float FOV = 45.0f;
-    float zNear = 0.1f;
-    float zFar = 1000.0f;
-    int WindowWidth = 0;
-    int WindowHeight = 0;
-    m_pRenderingSubsystem->GetWindowSize(WindowWidth, WindowHeight);
-
-    PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
-
-    m_defaultCamera = BasicCamera(persProjInfo, Pos, Target, Up);
-    m_pCurCamera = &m_defaultCamera;
-
-    m_pRenderingSubsystem->UseCamera(m_pCurCamera);
-}
-
-
-void ForwardRenderer::ConfigDefaultCamera(const BasicCamera& Camera)
-{
-    m_defaultCamera = Camera;
-}
 
 void ForwardRenderer::StartShadowPass()
 {

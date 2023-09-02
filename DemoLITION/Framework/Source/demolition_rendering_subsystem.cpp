@@ -98,18 +98,19 @@ Scene* BaseRenderingSubsystem::CreateScene(const std::string& Filename)
 }
 
 
-void BaseRenderingSubsystem::ConfigDefaultCamera(int ModelHandle)
-{
-    DemolitionModel* pModel = GetModel(ModelHandle);
-    ConfigDefaultCamera(pModel->GetCameras()[0]);
-}
-
-
 Scene* BaseRenderingSubsystem::CreateDefaultScene()
 {
     Scene* pScene = CreateScene();
     pScene->InitializeDefault();
     return pScene;
+}
+
+
+void BaseRenderingSubsystem::SetScene(Scene* pScene) 
+{ 
+    m_pScene = pScene; 
+    m_pCamera = pScene->GetCurrentCamera();
+    SetCamera(m_pCamera);
 }
 
 

@@ -25,6 +25,7 @@ Scene::Scene(BaseRenderingSubsystem* pRenderingSystem)
 { 
     m_pRenderingSystem = pRenderingSystem; 
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);
+    CreateDefaultCamera();
 }
 
 
@@ -33,7 +34,8 @@ void Scene::LoadScene(const std::string& Filename)
     int ModelHandle = m_pRenderingSystem->LoadModel(Filename.c_str());
     int SceneObjectHandle = CreateSceneObject(ModelHandle);
     AddToRenderList(SceneObjectHandle);
-    m_pRenderingSystem->ConfigDefaultCamera(ModelHandle);
+    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    m_defaultCamera = pModel->GetCameras()[0];
 }
 
 
@@ -45,6 +47,26 @@ void Scene::InitializeDefault()
     m_sceneObjects[SquareHandle].SetScale(Vector3f(1000.0f, 1000.0f, 1000.0f));
     m_sceneObjects[SquareHandle].SetFlatColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
 }
+
+
+void Scene::CreateDefaultCamera()
+{
+    Vector3f Pos(0.0f, 1.0f, 0.0f);
+    Vector3f Target(0.0f, -0.3f, 1.0f);
+    Vector3f Up(0.0, 1.0f, 0.0f);
+
+    float FOV = 45.0f;
+    float zNear = 0.1f;
+    float zFar = 1000.0f;
+    int WindowWidth = 0;
+    int WindowHeight = 0;
+    m_pRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+
+    PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
+
+    m_defaultCamera = BasicCamera(persProjInfo, Pos, Target, Up);
+}
+
 
 
 void Scene::AddToRenderList(int SceneObjectHandle)

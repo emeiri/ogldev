@@ -36,9 +36,9 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubsystem);
 
-    void ConfigDefaultCamera(const BasicCamera& Camera);
-
     void StartShadowPass();
+
+    void SetCamera(BasicCamera* pCamera) { m_pCurCamera = pCamera; }
 
     //
     // Fog
@@ -86,8 +86,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
  
 private:
 
-    void CreateDefaultCamera();
-
     void RenderAllSceneObjects(GLScene* pScene);
     void RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject);
     void RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneObject);
@@ -101,8 +99,7 @@ private:
     void UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject);
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
-    BasicCamera* m_pCurCamera = NULL;
-    BasicCamera m_defaultCamera;;
+    BasicCamera* m_pCurCamera = NULL;    
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;

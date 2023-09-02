@@ -72,11 +72,7 @@ class BaseRenderingSubsystem
     DemolitionModel* GetModel(int ModelHandle);
     DemolitionModel* GetModel(const std::string& BasicShape);
 
-    void SetScene(Scene* pScene) { m_pScene = pScene; }
-
-    void UseCamera(BasicCamera* pBasicCamera) { m_pCamera = pBasicCamera; }      
-
-    void ConfigDefaultCamera(int ModelHandle);
+    void SetScene(Scene* pScene);
 
     void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
 
@@ -84,14 +80,14 @@ class BaseRenderingSubsystem
 
  protected:
 
-    virtual void ConfigDefaultCamera(const BasicCamera& Camera) = 0;
-
     BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
     ~BaseRenderingSubsystem();
 
     virtual void CreateWindowInternal(int Width, int Height) = 0;
 
     virtual DemolitionModel* LoadModelInternal(const std::string& Filename) = 0;    
+
+    virtual void SetCamera(BasicCamera* pCamera) = 0;
 
     long long m_elapsedTimeMillis = 0;
     int m_windowWidth = 0;
