@@ -53,12 +53,6 @@ using namespace ftgl;
 
 #define MAX_STRING_LEN 128
 
-vec4 white = { {1.0f,1.0f,1.0f,1.0f} };
-vec4 black = { {0.0f,0.0f,0.0f,1.0f} };
-vec4 yellow = { {1.0f, 1.0f, 0.0f, 1.0f} };
-vec4 orange1 = { {1.0f, 0.9f, 0.0f, 1.0f} };
-vec4 orange2 = { {1.0f, 0.6f, 0.0f, 1.0f} };
-vec4 none = { {0.0f,0.0f,1.0f,0.0f} };
 
 typedef struct {
     float x, y, z;
@@ -66,12 +60,25 @@ typedef struct {
     vec4 color;
 } vertex_t;
 
+static const char* FontPaths[NUM_FONTS] = {
+    "../Common/FreetypeGL/fonts/amiri-regular.ttf",
+    "../Common/FreetypeGL/fonts/Liberastika-regular.ttf",
+    "../Common/FreetypeGL/fonts/Lobster-regular.ttf",    
+    "../Common/FreetypeGL/fonts/LuckiestGuy.ttf",
+    "../Common/FreetypeGL/fonts/OldStandard-regular.ttf",
+    "../Common/FreetypeGL/fonts/SourceCodePro-regular.ttf",
+    "../Common/FreetypeGL/fonts/SourceSansPro-regular.ttf",
+    "../Common/FreetypeGL/fonts/Vera.ttf",
+    "../Common/FreetypeGL/fonts/VeraMoBd.ttf",
+    "../Common/FreetypeGL/fonts/VeraMoBI.ttf",
+    "../Common/FreetypeGL/fonts/VeraMono.ttf"
+};
 
-void add_text(vertex_buffer_t* m_pBuffer, texture_font_t* m_pFont, char* text, vec2 pen, vec4 fg_color_1, vec4 fg_color_2)
+void add_text(vertex_buffer_t* m_pBuffer, texture_font_t* pFont, char* text, vec2 pen, vec4 fg_color_1, vec4 fg_color_2)
 {
     for (size_t i = 0; i < strlen(text); ++i)
     {
-        texture_glyph_t* glyph = texture_font_get_glyph(m_pFont, text + i);
+        texture_glyph_t* glyph = texture_font_get_glyph(pFont, text + i);
         float kerning = 0.0f;
         if (i > 0)
         {
@@ -117,7 +124,8 @@ void FontRenderer::InitFontRenderer(int WindowWidth, int WindowHeight)
 {
     m_pAtlas = texture_atlas_new(1024, 1024, 1);
     m_pBuffer = vertex_buffer_new("vertex:3f,tex_coord:2f,color:4f");
-    m_pFont = texture_font_new_from_file(m_pAtlas, 128, "../Common/FreetypeGL/fonts/LuckiestGuy.ttf");
+    
+    LoadFonts();
 
     glGenTextures(1, &m_pAtlas->id);
     glBindTexture(GL_TEXTURE_2D, m_pAtlas->id);
@@ -135,15 +143,37 @@ void FontRenderer::InitFontRenderer(int WindowWidth, int WindowHeight)
 }
 
 
+void FontRenderer::LoadFonts()
+{
+    for (int i = 0; i < NUM_FONTS; i++) {
+        m_pFonts[i] = texture_font_new_from_file(m_pAtlas, 128, FontPaths[i]);
 
-void FontRenderer::RenderText(unsigned int x, unsigned int y, const char* pText)
+        if (!m_pFonts[i]) {
+            printf("Error loading fonts '%s'\n", FontPaths[i]);
+            exit(0);
+        }
+    }
+}
+
+
+
+void FontRenderer::RenderText(FONT_TYPE FontType,
+                              const vec4& TopColor, const vec4& BottomColor,
+                              unsigned int x, unsigned int y, const char* pText)
 {
     vec2 pen = { {(float)x, (float)y} };
 
-    m_pFont->rendermode = RENDER_NORMAL;
-    m_pFont->outline_thickness = 0;
+    if (FontType >= NUM_FONTS) {
+        printf("Invalid font type index %d\n", FontType);
+        exit(0);
+    }
+
+    texture_font_t* pFont = m_pFonts[FontType];
+
+    pFont->rendermode = RENDER_NORMAL;
+    pFont->outline_thickness = 0;
     vertex_buffer_clear(m_pBuffer);
-    add_text(m_pBuffer, m_pFont, (char*)pText, pen, orange1, orange2);    
+    add_text(m_pBuffer, pFont, (char*)pText, pen, TopColor, BottomColor);    
 
     glEnable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);

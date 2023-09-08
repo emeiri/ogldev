@@ -73,10 +73,11 @@ public:
 
     void RenderSceneCB()
     {
+        glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         static int a = 0;
-        m_fontRenderer.RenderText(a, a, "FreetypeGL demo!");
+        m_fontRenderer.RenderText(FONT_TYPE_AMIRI, red, blue, a, a, "FreetypeGL demo!");
         a++;
         if (a == 300) {
             a = 0;
@@ -161,8 +162,7 @@ int main(int argc, char** argv)
     app = new FreetypeGLDemo();
 
     app->Init();
-
-    glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
+    
     glFrontFace(GL_CW);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);

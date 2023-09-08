@@ -24,6 +24,7 @@
     <ProjectGuid>{08e626e1-3547-44ce-a23b-b417d72b2455}</ProjectGuid>
     <RootNamespace>FreetypeGLDemo</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Tutorial46_FreetypeGLDemo</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -137,7 +138,7 @@
     <ClCompile Include="..\..\..\Common\FreetypeGL\freetypeGL.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
-    <ClCompile Include="..\..\..\freetype_demo\freetype_demo.cpp" />
+    <ClCompile Include="..\..\..\tutorial46_youtube\FreetypeGL_demo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\FreetypeGL\freetypeGL.h" />

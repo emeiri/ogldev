@@ -301,9 +301,31 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial45", "Tutorial45\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial45_demo1", "Tutorial45_demo1\Tutorial45_demo1.vcxproj", "{C11B6038-3356-48E0-9BB2-1A755572835F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreetypeGLDemo", "FreetypeGLDemo\FreetypeGLDemo.vcxproj", "{08E626E1-3547-44CE-A23B-B417D72B2455}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial46_FreetypeGLDemo", "FreetypeGLDemo\FreetypeGLDemo.vcxproj", "{08E626E1-3547-44CE-A23B-B417D72B2455}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Particles", "Tutorial28_Particles\Tutorial28_Particles.vcxproj", "{8386A0C7-439B-450D-8B24-005274173482}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FreetypeGL", "FreetypeGL", "{5676DE34-CCBB-449E-9588-BA22483E2351}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Common\FreetypeGL\font-manager.h = ..\..\Common\FreetypeGL\font-manager.h
+		..\..\Common\FreetypeGL\freetypeGL.cpp = ..\..\Common\FreetypeGL\freetypeGL.cpp
+		..\..\Common\FreetypeGL\freetypeGL.h = ..\..\Common\FreetypeGL\freetypeGL.h
+		..\..\Common\FreetypeGL\markup.h = ..\..\Common\FreetypeGL\markup.h
+		..\..\Common\FreetypeGL\mat4.c = ..\..\Common\FreetypeGL\mat4.c
+		..\..\Common\FreetypeGL\mat4.h = ..\..\Common\FreetypeGL\mat4.h
+		..\..\Common\FreetypeGL\opengl.h = ..\..\Common\FreetypeGL\opengl.h
+		..\..\Common\FreetypeGL\shader.c = ..\..\Common\FreetypeGL\shader.c
+		..\..\Common\FreetypeGL\shader.h = ..\..\Common\FreetypeGL\shader.h
+		..\..\Common\FreetypeGL\text-buffer.h = ..\..\Common\FreetypeGL\text-buffer.h
+		..\..\Common\FreetypeGL\texture-atlas.h = ..\..\Common\FreetypeGL\texture-atlas.h
+		..\..\Common\FreetypeGL\texture-font.h = ..\..\Common\FreetypeGL\texture-font.h
+		..\..\Common\FreetypeGL\v3f-t2f-c4f.frag = ..\..\Common\FreetypeGL\v3f-t2f-c4f.frag
+		..\..\Common\FreetypeGL\v3f-t2f-c4f.vert = ..\..\Common\FreetypeGL\v3f-t2f-c4f.vert
+		..\..\Common\FreetypeGL\vec234.h = ..\..\Common\FreetypeGL\vec234.h
+		..\..\Common\FreetypeGL\vector.h = ..\..\Common\FreetypeGL\vector.h
+		..\..\Common\FreetypeGL\vertex-attribute.h = ..\..\Common\FreetypeGL\vertex-attribute.h
+		..\..\Common\FreetypeGL\vertex-buffer.h = ..\..\Common\FreetypeGL\vertex-buffer.h
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -944,6 +966,7 @@ Global
 		{C11B6038-3356-48E0-9BB2-1A755572835F} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{08E626E1-3547-44CE-A23B-B417D72B2455} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{8386A0C7-439B-450D-8B24-005274173482} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{5676DE34-CCBB-449E-9588-BA22483E2351} = {F6553386-4E78-450B-A98D-D17DE590F6AB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
