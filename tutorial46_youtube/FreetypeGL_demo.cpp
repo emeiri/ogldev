@@ -77,9 +77,9 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         static int a = 0;
-        m_fontRenderer.RenderText(FONT_TYPE_AMIRI, red, blue, a, a, "FreetypeGL demo!");
+        m_fontRenderer.RenderText(FONT_TYPE_LOBSTER, red, blue, a, a, "FreetypeGL demo!");
         a++;
-        if (a == 300) {
+        if (a == 1000) {
             a = 0;
         }
     }
@@ -128,7 +128,6 @@ private:
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
     }
 
-
     GLFWwindow* window = NULL;
     FontRenderer m_fontRenderer;
 };
@@ -163,10 +162,6 @@ int main(int argc, char** argv)
 
     app->Init();
     
-    glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-
     app->Run();
 
     delete app;

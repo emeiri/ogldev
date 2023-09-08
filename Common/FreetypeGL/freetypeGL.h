@@ -87,6 +87,15 @@ public:
                     unsigned int y, 
                     const char* pText);
 
+    void RenderText(FONT_TYPE FontType,
+                    const vec4& Color,
+                    unsigned int x,
+                    unsigned int y,
+                    const char* pText)
+    {
+        RenderText(FontType, Color, Color, x, y, pText);
+    }
+
 private:
 
     void LoadFonts();
