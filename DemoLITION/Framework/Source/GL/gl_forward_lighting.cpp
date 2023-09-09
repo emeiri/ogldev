@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "demolition_forward_lighting.h"
+#include "GL/gl_forward_lighting.h"
 
 #define FAIL_ON_MISSING_LOC
 

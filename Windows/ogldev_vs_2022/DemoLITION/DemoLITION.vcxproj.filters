@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_renderer.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -46,27 +43,24 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_model.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_lighting.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp">
+      <Filter>Shaders\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_renderer.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\framework.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h">
@@ -87,9 +81,6 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_lighting.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
@@ -98,6 +89,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h">
+      <Filter>Include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h">
+      <Filter>Include\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

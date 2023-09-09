@@ -25,7 +25,7 @@
 #include <GLFW/glfw3.h>
 
 #include "demolition_rendering_subsystem.h"
-#include "demolition_forward_renderer.h"
+#include "gl_forward_renderer.h"
 #include "GL/gl_scene.h"
 
 class RenderingSubsystemGL : public BaseRenderingSubsystem

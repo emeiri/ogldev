@@ -17,7 +17,7 @@
 */
 
 #include "ogldev_engine_common.h"
-#include "demolition_forward_renderer.h"
+#include "GL/gl_forward_renderer.h"
 
 
 ForwardRenderer::ForwardRenderer()

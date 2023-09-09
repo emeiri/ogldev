@@ -21,10 +21,10 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique.h"
 #include "demolition_rendering_subsystem.h"
-#include "demolition_forward_lighting.h"
 #include "demolition_model.h"
-#include "GL/gl_scene.h"
-#include "GL/flat_color_technique.h"
+#include "gl_forward_lighting.h"
+#include "gl_scene.h"
+#include "flat_color_technique.h"
 
 
 class ForwardRenderer : public DemolitionRenderCallbacks {

@@ -21,7 +21,7 @@
 
 #include <list>
 
-#include "demolition_forward_lighting.h"
+#include "demolition_lights.h"
 #include "demolition_model.h"
 
 
@@ -72,7 +72,6 @@ public:
     const Vector4f& GetFlatColor() const { return m_flatColor; }
 
 private:
-  //  int m_modelHandle = -1;
     DemolitionModel* m_pModel = NULL;
     Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_rot = Vector3f(0.0f, 0.0f, 0.0f);

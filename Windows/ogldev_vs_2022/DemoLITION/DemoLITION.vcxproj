@@ -154,15 +154,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h" />
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_lighting.h" />
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h" />
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\framework.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\demolition_rendering_subsystem_gl.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h" />
     <ClInclude Include="..\..\..\Include\ogldev_math_3d.h" />
@@ -178,13 +177,13 @@
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_lighting.cpp" />
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_model.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_scene.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\demolition_rendering_subsystem_gl.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
   </ItemGroup>
