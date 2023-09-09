@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\demolition_rendering_subsystem_gl.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\math_3d.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -53,6 +47,12 @@
       <Filter>Shaders\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_system.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
   </ItemGroup>

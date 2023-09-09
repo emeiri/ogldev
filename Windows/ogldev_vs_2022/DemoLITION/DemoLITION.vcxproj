@@ -179,12 +179,12 @@
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_model.cpp" />
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_subsystem.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_system.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_scene.cpp" />
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\demolition_rendering_subsystem_gl.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
   </ItemGroup>
