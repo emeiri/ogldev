@@ -57,9 +57,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_subsystem.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -98,6 +95,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\base_rendering_system.h">
       <Filter>Include\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_system.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
