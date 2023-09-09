@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "Int/base_rendering_system.h"
-#include "GL/demolition_rendering_subsystem_gl.h"
+#include "GL/gl_rendering_system.h"
 
 #define NUM_MODELS 1024
 

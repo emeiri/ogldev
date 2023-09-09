@@ -22,7 +22,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
-#include "GL/demolition_rendering_subsystem_gl.h"
+#include "GL/gl_rendering_system.h"
 
 extern BaseRenderingSystem* g_pRenderingSystem;
 

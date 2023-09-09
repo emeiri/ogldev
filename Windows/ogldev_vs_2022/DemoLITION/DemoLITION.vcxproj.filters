@@ -72,9 +72,6 @@
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\demolition_rendering_subsystem_gl.h">
-      <Filter>Include\GL</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -98,6 +95,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_system.h">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h">
+      <Filter>Include\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
