@@ -104,6 +104,8 @@ void ForwardRenderer::Render(GLScene* pScene)
 
 void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
 {
+    bool FirstTimeForwardLighting = true;
+
     const std::list<SceneObject*>& RenderList = pScene->GetRenderList();
 
     for (std::list<SceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
@@ -112,6 +114,10 @@ void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
         const Vector4f& FlatColor = pSceneObject->GetFlatColor();
 
         if (FlatColor.x == -1.0f) {
+            if (FirstTimeForwardLighting) {
+                StartRenderWithForwardLighting(pScene, pSceneObject);
+                FirstTimeForwardLighting = false;
+            }
             RenderWithForwardLighting(pScene, pSceneObject);
         }
         else {
@@ -121,35 +127,68 @@ void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
 }
 
 
-void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject)
+void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject)
 {
     SwitchToLightingTech();
 
+    int NumLightsTotal = 0;
+
     int NumPointLights = (int)pScene->m_pointLights.size();
-    int NumSpotLights = (int)pScene->m_spotLights.size();
-    int NumDirLights = (int)pScene->m_dirLights.size();
-
-    if ((NumPointLights == 0) && (NumSpotLights == 0) && (NumDirLights == 0)) {
-        printf("Warning! trying to render but all lights are zero\n");
-    }
-
-    const DirectionalLight& DirLight = pScene->m_dirLights[0];
-
-    if (DirLight.DiffuseIntensity > 0.0) {
-        m_lightingTech.SetDirectionalLight(DirLight, true);
-    }
 
     if (NumPointLights > 0) {
         m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
+        NumLightsTotal += NumPointLights;
+    } else {
+        const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
+
+        if (PointLights.size() > 0) {
+            m_lightingTech.SetPointLights((unsigned int)PointLights.size(), &PointLights[0], true);
+            NumLightsTotal += (int)PointLights.size();
+        }
     }
+
+    int NumSpotLights = (int)pScene->m_spotLights.size();
 
     if (NumSpotLights > 0) {
         m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
+        NumLightsTotal += NumPointLights;
+    } else {
+        const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
+
+        if (SpotLights.size() > 0) {
+            m_lightingTech.SetSpotLights((unsigned int)SpotLights.size(), &SpotLights[0], true);
+            NumLightsTotal += (int)SpotLights.size();
+        }
     }
 
-    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+    int NumDirLights = (int)pScene->m_dirLights.size();
 
-  //  UpdateMatrices(&m_lightingTech, pSceneObject);
+    if (NumDirLights > 0) {
+        const DirectionalLight& DirLight = pScene->m_dirLights[0];
+        m_lightingTech.SetDirectionalLight(DirLight, true);    
+        NumLightsTotal += NumDirLights;
+    } else {
+        const std::vector<DirectionalLight>& DirLights = pSceneObject->GetModel()->GetDirLights();
+
+        if (DirLights.size() > 0) {
+            const DirectionalLight& DirLight = DirLights[0];
+            m_lightingTech.SetDirectionalLight(DirLight, true);
+            NumLightsTotal += (int)DirLights.size();
+        }
+    }
+
+    if (NumLightsTotal == 0) {
+        printf("Warning! trying to render but all lights are zero\n");
+        exit(0);
+    }    
+
+    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+}
+
+
+void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject)
+{
+    SwitchToLightingTech();
 
     pSceneObject->GetModel()->Render(this);
 }
@@ -166,24 +205,8 @@ void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneOb
 }
 
 
-void ForwardRenderer::UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject)
-{
-    Matrix4f WVP;
-    GetWVP(pSceneObject, WVP);
-    pBaseTech->SetWVP(WVP);
 
-    Matrix4f World = pSceneObject->GetMatrix();
-    pBaseTech->SetWorldMatrix(World);
-
-    Matrix4f InverseWorld = World.Inverse();
-    Matrix3f World3x3(InverseWorld);
-    Matrix3f WorldTranspose = World3x3.Transpose();
-
-    pBaseTech->SetNormalMatrix(WorldTranspose);
-}
-
-
-/*/void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
+/*void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
 {
     RenderAnimationCommon(pMesh);
 

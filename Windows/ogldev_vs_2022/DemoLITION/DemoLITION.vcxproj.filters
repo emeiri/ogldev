@@ -96,6 +96,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

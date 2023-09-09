@@ -18,6 +18,7 @@
 
 #include "ogldev_engine_common.h"
 #include "demolition_model.h"
+#include "demolition_forward_lighting.h"
 
 using namespace std;
 
@@ -113,6 +114,7 @@ bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filenam
 
 bool DemolitionModel::InitGeometry(const aiScene* pScene, const string& Filename)
 {
+    printf("\n*** Initializing geometry ***\n");
     m_Meshes.resize(pScene->mNumMeshes);
     m_Materials.resize(pScene->mNumMaterials);
 
@@ -619,6 +621,7 @@ static void traverse(int depth, aiNode* pNode)
 
 void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight)
 {
+    printf("\n*** Initializing cameras ***\n");
     printf("Loading %d cameras\n", pScene->mNumCameras);
 
     m_cameras.resize(pScene->mNumCameras);
@@ -681,8 +684,152 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
 
 
 void DemolitionModel::InitLights(const aiScene* pScene)
-{
+{   
+    printf("\n*** Initializing lights ***\n");
 
+    for (int i = 0; i < (int)pScene->mNumLights; i++) {
+        InitSingleLight(pScene, *pScene->mLights[i]);
+    }
+}
+
+
+void DemolitionModel::InitSingleLight(const aiScene* pScene, const aiLight& light)
+{
+    printf("Init light '%s'\n", light.mName.C_Str());
+
+    switch (light.mType) {
+
+    case aiLightSource_DIRECTIONAL:
+        InitDirectionalLight(pScene, light);
+        break;
+
+    case aiLightSource_POINT:
+        InitPointLight(pScene, light);
+        break;
+
+    case aiLightSource_SPOT:
+        InitSpotLight(pScene, light);
+        break;
+
+    case aiLightSource_AMBIENT:
+        printf("Ambient light is not implemented\n");
+        exit(0);
+
+    case aiLightSource_AREA:
+        printf("Area light is not implemented\n");
+        exit(0);
+
+    case aiLightSource_UNDEFINED:
+    default:
+        printf("Light type is undefined\n");
+        exit(0);
+    }
+}
+
+
+static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation)
+{
+    Transformation.InitIdentity();
+
+    const aiNode* pNode = pRootNode->FindNode(pName);
+    
+    if (!pNode) {
+        printf("Warning! Cannot find a node for '%s'\n", pName);
+        return false;
+    }    
+
+    while (pNode) {
+        Matrix4f NodeTransformation(pNode->mTransformation);
+        Transformation = NodeTransformation * Transformation;
+        pNode = pNode->mParent;
+    }
+
+    return true;
+}
+
+
+void DemolitionModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light)
+{
+    if (m_dirLights.size() > 0) {
+        printf("The lighting shader currently supports only a single directional light!\n");
+        exit(0);
+    }
+
+    DirectionalLight l;
+    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.DiffuseIntensity = 1.0f; // TODO
+
+    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+    printf("Original direction: "); Direction.Print();
+
+    Matrix4f Transformation;
+    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    Vector4f Dir4D(Direction, 0.0f);
+    Dir4D = Transformation * Dir4D;
+    Vector3f WorldDir = Dir4D;
+    l.WorldDirection = WorldDir;
+
+    m_dirLights.push_back(l);
+}
+
+
+void DemolitionModel::InitPointLight(const aiScene* pScene, const aiLight& light)
+{
+    PointLight l;
+    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.DiffuseIntensity = 1.0f; // TODO
+
+    Vector3f Position = VectorFromAssimpVector(light.mPosition);
+    printf("Original Position: "); Position.Print();
+
+    Matrix4f Transformation;
+
+    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    Vector4f Pos4D(Position, 1.0f);
+    Pos4D = Transformation * Pos4D;
+    Vector3f WorldPosition = Pos4D;
+    printf("World Position: "); WorldPosition.Print();
+    l.WorldPosition = WorldPosition;
+
+    l.Attenuation.Constant = light.mAttenuationConstant;
+    l.Attenuation.Linear = light.mAttenuationLinear;
+    l.Attenuation.Exp = light.mAttenuationQuadratic;
+
+    m_pointLights.push_back(l);
+}
+
+
+void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
+{
+    SpotLight l;
+    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.DiffuseIntensity = 1.0f; // TODO
+
+    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+    printf("Original direction: "); Direction.Print();
+
+    Matrix4f Transformation;
+    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    Vector4f Dir4D(Direction, 0.0f);
+    Dir4D = Transformation * Dir4D;
+    Vector3f WorldDir = Dir4D;
+    l.WorldDirection = WorldDir;
+
+    l.Attenuation.Constant = light.mAttenuationConstant;
+    l.Attenuation.Linear = light.mAttenuationLinear;
+    l.Attenuation.Exp = light.mAttenuationQuadratic;
+
+    if (light.mAngleInnerCone != light.mAngleOuterCone) {
+        printf("Different values for spot light inner/outer cone angles is not supported\n");
+        exit(0);
+    }
+
+    l.Cutoff = ToDegree(light.mAngleOuterCone);
+
+    m_spotLights.push_back(l);
 }
 
 

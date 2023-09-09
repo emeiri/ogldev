@@ -89,14 +89,13 @@ private:
     void RenderAllSceneObjects(GLScene* pScene);
     void RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject);
     void RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneObject);
+    void StartRenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject);
 
     void GetWVP(SceneObject* pSceneObject, Matrix4f& WVP);
 
     void SwitchToLightingTech();
 
     //void RenderAnimationCommon(SkinnedMesh* pMesh);
-
-    void UpdateMatrices(ForwardLightingTechnique* pBaseTech, SceneObject* pSceneObject);
 
     BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
     BasicCamera* m_pCurCamera = NULL;    

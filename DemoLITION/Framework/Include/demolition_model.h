@@ -31,6 +31,8 @@
 #include "ogldev_texture.h"
 #include "ogldev_material.h"
 #include "ogldev_basic_glfw_camera.h"
+#include "demolition_lights.h"
+
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -89,6 +91,11 @@ public:
                                   unsigned int StartAnimIndex,
                                   unsigned int EndAnimIndex,
                                   float BlendFactor);
+
+    const std::vector<DirectionalLight> GetDirLights() const { return m_dirLights; }
+    const std::vector<SpotLight> GetSpotLights() const { return m_spotLights; }
+    const std::vector<PointLight> GetPointLights() const { return m_pointLights; }
+
 private:
 
     void Clear();
@@ -106,6 +113,14 @@ private:
     bool InitGeometry(const aiScene* pScene, const string& Filename);
 
     void InitLights(const aiScene* pScene);
+
+    void InitSingleLight(const aiScene* pScene, const aiLight& light);
+
+    void InitDirectionalLight(const aiScene* pScene, const aiLight& light);
+
+    void InitPointLight(const aiScene* pScene, const aiLight& light);
+
+    void InitSpotLight(const aiScene* pScene, const aiLight& light);
 
     void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
 
@@ -178,6 +193,9 @@ private:
     Assimp::Importer m_Importer;
 
     std::vector<BasicCamera> m_cameras;
+    std::vector<DirectionalLight> m_dirLights;
+    std::vector<PointLight> m_pointLights;
+    std::vector<SpotLight> m_spotLights;
 	
 	// Skeletal animation stuff
     #define MAX_NUM_BONES_PER_VERTEX 4
