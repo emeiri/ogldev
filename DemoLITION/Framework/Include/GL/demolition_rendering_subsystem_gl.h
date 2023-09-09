@@ -24,20 +24,20 @@
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
 
-#include "demolition_rendering_subsystem.h"
+#include "Int/base_rendering_system.h"
 #include "gl_forward_renderer.h"
 #include "GL/gl_scene.h"
 
-class RenderingSubsystemGL : public BaseRenderingSubsystem
+class RenderingSystemGL : public BaseRenderingSystem
 {
  public:
-    RenderingSubsystemGL(GameCallbacks* pGameCallbacks);
+    RenderingSystemGL(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);
 
-    ~RenderingSubsystemGL();
+    ~RenderingSystemGL();
 
     virtual void Shutdown();
 
-    virtual Scene* CreateScene();
+    virtual Scene* CreateEmptyScene();
 
     virtual DemolitionModel* LoadModelInternal(const std::string& Filename);
 

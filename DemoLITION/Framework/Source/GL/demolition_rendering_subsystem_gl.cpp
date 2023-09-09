@@ -22,20 +22,19 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
-#include "ogldev_basic_glfw_camera.h"
 #include "GL/demolition_rendering_subsystem_gl.h"
 
-extern BaseRenderingSubsystem* g_pRenderingSubsystem;
+extern BaseRenderingSystem* g_pRenderingSystem;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    ((RenderingSubsystemGL*)g_pRenderingSubsystem)->OnKeyCallback(window, key, scancode, action, mods);
+    ((RenderingSystemGL*)g_pRenderingSystem)->OnKeyCallback(window, key, scancode, action, mods);
 }
 
 
 static void CursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    ((RenderingSubsystemGL*)g_pRenderingSubsystem)->OnCursorPosCallback(window, x, y);
+    ((RenderingSystemGL*)g_pRenderingSystem)->OnCursorPosCallback(window, x, y);
 }
 
 
@@ -45,21 +44,21 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
     glfwGetCursorPos(window, &x, &y);
 
-    ((RenderingSubsystemGL*)g_pRenderingSubsystem)->OnMouseButtonCallback(window, Button, Action, Mode);
+    ((RenderingSystemGL*)g_pRenderingSystem)->OnMouseButtonCallback(window, Button, Action, Mode);
 }
 
 
-RenderingSubsystemGL::RenderingSubsystemGL(GameCallbacks* pGameCallbacks) : BaseRenderingSubsystem(pGameCallbacks)
+RenderingSystemGL::RenderingSystemGL(GameCallbacks* pGameCallbacks, bool LoadBasicShapes) : BaseRenderingSystem(pGameCallbacks, LoadBasicShapes)
 {
 }
 
 
-RenderingSubsystemGL::~RenderingSubsystemGL()
+RenderingSystemGL::~RenderingSystemGL()
 {
 }
 
 
-void RenderingSubsystemGL::Shutdown()
+void RenderingSystemGL::Shutdown()
 {
     if (m_pWindow) {
         glfwDestroyWindow(m_pWindow);
@@ -69,7 +68,7 @@ void RenderingSubsystemGL::Shutdown()
     delete this;
 }
 
-void RenderingSubsystemGL::CreateWindowInternal(int Width, int Height)
+void RenderingSystemGL::CreateWindowInternal(int Width, int Height)
 {
     m_windowWidth = Width;
     m_windowHeight = Height;
@@ -88,13 +87,13 @@ void RenderingSubsystemGL::CreateWindowInternal(int Width, int Height)
 }
 
 
-Scene* RenderingSubsystemGL::CreateScene()
+Scene* RenderingSystemGL::CreateEmptyScene()
 {
     return new GLScene(this);
 }
 
 
-DemolitionModel* RenderingSubsystemGL::LoadModelInternal(const std::string& Filename)
+DemolitionModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
 {
     DemolitionModel* pModel = new DemolitionModel();
 
@@ -107,7 +106,7 @@ DemolitionModel* RenderingSubsystemGL::LoadModelInternal(const std::string& File
 }
 
 
-void RenderingSubsystemGL::SetDefaultGLState()
+void RenderingSystemGL::SetDefaultGLState()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glFrontFace(GL_CW);
@@ -117,7 +116,7 @@ void RenderingSubsystemGL::SetDefaultGLState()
 }
 
 
-void RenderingSubsystemGL::Execute()
+void RenderingSystemGL::Execute()
 {
     if (!m_pCamera) {
         printf("%s:%d - camera has not been set\n", __FILE__, __LINE__);
@@ -151,7 +150,7 @@ void RenderingSubsystemGL::Execute()
 }
 
 
-void RenderingSubsystemGL::InitCallbacks()
+void RenderingSystemGL::InitCallbacks()
 {
     glfwSetKeyCallback(m_pWindow, KeyCallback);
     glfwSetCursorPosCallback(m_pWindow, CursorPosCallback);
@@ -159,7 +158,7 @@ void RenderingSubsystemGL::InitCallbacks()
 }
 
 
-void RenderingSubsystemGL::OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void RenderingSystemGL::OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     bool HandledByGame = m_pGameCallbacks->OnKeyboard(key, action);
 
@@ -177,7 +176,7 @@ void RenderingSubsystemGL::OnKeyCallback(GLFWwindow* window, int key, int scanco
 }
 
 
-void RenderingSubsystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double y)
+void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double y)
 {
     bool HandledByGame = m_pGameCallbacks->OnMouseMove((int)x, (int)y);
 
@@ -187,7 +186,7 @@ void RenderingSubsystemGL::OnCursorPosCallback(GLFWwindow* window, double x, dou
 }
 
 
-void RenderingSubsystemGL::OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
+void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
 {
     m_pGameCallbacks->OnMouseButton(Button, Action, Mode);
 }

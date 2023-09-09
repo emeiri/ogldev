@@ -41,11 +41,11 @@ public:
     void Init()
     {
         bool LoadBasicShapes = false;
-        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this, LoadBasicShapes);
+        m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
 
-        m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        m_pScene = m_pRenderingSubsystem->CreateScene();
+        m_pScene = m_pRenderingSystem->CreateEmptyScene();
         DirectionalLight DirLight;
         DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         DirLight.DiffuseIntensity = 1.0f;
@@ -54,7 +54,7 @@ public:
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
-        m_pRenderingSubsystem->SetScene(m_pScene);
+        m_pRenderingSystem->SetScene(m_pScene);
 
         InitMesh();
     }
@@ -62,7 +62,7 @@ public:
 
     void Run()
     {
-        m_pRenderingSubsystem->Execute();
+        m_pRenderingSystem->Execute();
     }
 
     void OnFrame()
@@ -82,14 +82,14 @@ private:
 
     void InitMesh()
     {
-        m_modelHandle = m_pRenderingSubsystem->LoadModel("../Content/test.glb");
+        m_modelHandle = m_pRenderingSystem->LoadModel("../Content/test.glb");
         m_sceneObjectHandle = m_pScene->CreateSceneObject(m_modelHandle);
         m_pScene->AddToRenderList(m_sceneObjectHandle);
 
         m_pScene->GetSceneObject(m_sceneObjectHandle)->SetPosition(0.0f, 0.0f, 10.0f);
     }
 
-    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
     int m_modelHandle = -1;
     int m_sceneObjectHandle = -1;

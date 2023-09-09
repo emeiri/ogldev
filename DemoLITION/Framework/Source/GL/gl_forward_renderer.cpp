@@ -31,14 +31,14 @@ ForwardRenderer::~ForwardRenderer()
 }
 
 
-void ForwardRenderer::InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubsystem)
+void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 {
-    if (!pRenderingSubsystem) {
+    if (!pRenderingSystemGL) {
         printf("%s:%d - must provide a rendering system\n", __FILE__, __LINE__);
         exit(1);
     }
 
-    m_pRenderingSubsystem = pRenderingSubsystem;
+    m_pRenderingSystemGL = pRenderingSystemGL;
 
     if (!m_lightingTech.Init()) {
         printf("Error initializing the lighting technique\n");

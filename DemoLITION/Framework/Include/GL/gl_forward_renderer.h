@@ -20,12 +20,12 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique.h"
-#include "demolition_rendering_subsystem.h"
 #include "demolition_model.h"
 #include "gl_forward_lighting.h"
 #include "gl_scene.h"
 #include "flat_color_technique.h"
 
+class RenderingSystemGL;
 
 class ForwardRenderer : public DemolitionRenderCallbacks {
  public:
@@ -34,7 +34,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     ~ForwardRenderer();
 
-    void InitForwardRenderer(BaseRenderingSubsystem* pRenderingSubsystem);
+    void InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL);
 
     void StartShadowPass();
 
@@ -97,7 +97,7 @@ private:
 
     //void RenderAnimationCommon(SkinnedMesh* pMesh);
 
-    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    RenderingSystemGL* m_pRenderingSystemGL = NULL;
     BasicCamera* m_pCurCamera = NULL;    
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;

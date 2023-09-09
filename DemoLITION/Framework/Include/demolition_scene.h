@@ -25,7 +25,7 @@
 #include "demolition_model.h"
 
 
-class BaseRenderingSubsystem;
+class RenderingSystem;
 
 class SceneObject {
 public:
@@ -81,7 +81,7 @@ private:
 
 class Scene {
 public:
-    Scene(BaseRenderingSubsystem* pRenderingSystem);
+    Scene(RenderingSystem* pRenderingSystem);
 
     virtual ~Scene() {}
 
@@ -109,7 +109,7 @@ public:
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
-    BaseRenderingSubsystem* m_pRenderingSystem = NULL;
+    RenderingSystem* m_pRenderingSystem = NULL;
     std::list<SceneObject*> m_renderList;
     bool m_clearFrame = false;
     Vector4f m_clearColor;

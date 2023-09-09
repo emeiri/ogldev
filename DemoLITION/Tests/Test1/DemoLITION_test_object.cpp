@@ -41,14 +41,14 @@ public:
     void Init()
     {
         bool LoadBasicShapes = true;
-        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this, LoadBasicShapes);
-        m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
+        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        m_pScene = m_pRenderingSubsystem->CreateScene();
+        m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
-        m_pRenderingSubsystem->SetScene(m_pScene);
+        m_pRenderingSystem->SetScene(m_pScene);
 
         InitMesh();
     }
@@ -56,7 +56,7 @@ public:
 
     void Run()
     {
-        m_pRenderingSubsystem->Execute();
+        m_pRenderingSystem->Execute();
     }
 
     void OnFrame()
@@ -95,7 +95,7 @@ private:
 
     }
 
-    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
     int m_sceneObjectHandle1 = -1;
     int m_sceneObjectHandle2 = -1;

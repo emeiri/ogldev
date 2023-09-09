@@ -19,32 +19,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "demolition_rendering_subsystem.h"
+#include "Int/base_rendering_system.h"
 #include "GL/demolition_rendering_subsystem_gl.h"
 
 #define NUM_MODELS 1024
 
-BaseRenderingSubsystem* g_pRenderingSubsystem = NULL;
+BaseRenderingSystem* g_pRenderingSystem = NULL;
 
-BaseRenderingSubsystem::BaseRenderingSubsystem(GameCallbacks* pGameCallbacks)
+BaseRenderingSystem::BaseRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes)
 {
+    m_loadBasicShapes = LoadBasicShapes;
     m_pGameCallbacks = pGameCallbacks;
     m_models.resize(NUM_MODELS, 0);    
 }
 
 
-BaseRenderingSubsystem::~BaseRenderingSubsystem()
+BaseRenderingSystem::~BaseRenderingSystem()
 {
 
 }
 
 
-BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem, 
-                                                                         GameCallbacks* pGameCallbacks,
-                                                                         bool LoadBasicShapes)
+RenderingSystem* RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM RenderingSystem, GameCallbacks* pGameCallbacks, bool LoadBasicShapes)
 {
-    if (g_pRenderingSubsystem) {
-        printf("%s:%d - rendering subsystem already exists\n", __FILE__, __LINE__);
+    if (g_pRenderingSystem) {
+        printf("%s:%d - rendering system already exists\n", __FILE__, __LINE__);
         exit(0);
     }
 
@@ -53,22 +52,21 @@ BaseRenderingSubsystem* BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERI
         exit(0);
     }
 
-    switch (RenderingSubsystem) {
-    case RENDERING_SUBSYSTEM_GL:
-        g_pRenderingSubsystem = new RenderingSubsystemGL(pGameCallbacks);
-        g_pRenderingSubsystem->m_loadBasicShapes = LoadBasicShapes;
+    switch (RenderingSystem) {
+    case RENDERING_SYSTEM_GL:
+        g_pRenderingSystem = new RenderingSystemGL(pGameCallbacks, LoadBasicShapes);
         break;
 
     default:
-        printf("%s:%d - rendering system %d not supported\n", __FILE__, __LINE__, RenderingSubsystem);
+        printf("%s:%d - rendering system %d not supported\n", __FILE__, __LINE__, RenderingSystem);
         exit(0);
     }
 
-    return g_pRenderingSubsystem;
+    return g_pRenderingSystem;
 }
 
 
-void BaseRenderingSubsystem::CreateWindow(int Width, int Height)
+void BaseRenderingSystem::CreateWindow(int Width, int Height)
 {
     CreateWindowInternal(Width, Height);
     if (m_loadBasicShapes) {
@@ -77,7 +75,7 @@ void BaseRenderingSubsystem::CreateWindow(int Width, int Height)
 }
 
 
-void BaseRenderingSubsystem::InitializeBasicShapes()
+void BaseRenderingSystem::InitializeBasicShapes()
 {
     int ModelHandle = LoadModel("../Content/sphere.obj");
     m_shapeToHandle["sphere"] = ModelHandle;
@@ -90,23 +88,23 @@ void BaseRenderingSubsystem::InitializeBasicShapes()
 }
 
 
-Scene* BaseRenderingSubsystem::CreateScene(const std::string& Filename)
+Scene* BaseRenderingSystem::CreateScene(const std::string& Filename)
 {
-    Scene* pScene = CreateScene();
+    Scene* pScene = CreateEmptyScene();
     pScene->LoadScene(Filename);
     return pScene;
 }
 
 
-Scene* BaseRenderingSubsystem::CreateDefaultScene()
+Scene* BaseRenderingSystem::CreateDefaultScene()
 {
-    Scene* pScene = CreateScene();
+    Scene* pScene = CreateEmptyScene();
     pScene->InitializeDefault();
     return pScene;
 }
 
 
-void BaseRenderingSubsystem::SetScene(Scene* pScene) 
+void BaseRenderingSystem::SetScene(Scene* pScene) 
 { 
     m_pScene = pScene; 
     m_pCamera = pScene->GetCurrentCamera();
@@ -114,7 +112,7 @@ void BaseRenderingSubsystem::SetScene(Scene* pScene)
 }
 
 
-int BaseRenderingSubsystem::LoadModel(const std::string& Filename)
+int BaseRenderingSystem::LoadModel(const std::string& Filename)
 {
     if (m_numModels == m_models.size()) {
         printf("%s:%d: out of models space\n", __FILE__, __LINE__);
@@ -139,7 +137,7 @@ int BaseRenderingSubsystem::LoadModel(const std::string& Filename)
 }
  
 
-DemolitionModel* BaseRenderingSubsystem::GetModel(int ModelHandle)
+DemolitionModel* BaseRenderingSystem::GetModel(int ModelHandle)
 {
     if (ModelHandle < 0) {
         printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
@@ -162,7 +160,7 @@ DemolitionModel* BaseRenderingSubsystem::GetModel(int ModelHandle)
 }
 
 
-DemolitionModel* BaseRenderingSubsystem::GetModel(const std::string& BasicShape)
+DemolitionModel* BaseRenderingSystem::GetModel(const std::string& BasicShape)
 {
     if (m_shapeToHandle.find(BasicShape) == m_shapeToHandle.end()) {
         printf("%s:%d - cannot find basic shape %s\n", __FILE__, __LINE__, BasicShape.c_str());

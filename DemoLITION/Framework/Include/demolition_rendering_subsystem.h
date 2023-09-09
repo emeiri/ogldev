@@ -37,71 +37,41 @@ class GameCallbacks
 };
 
 
-enum RENDERING_SUBSYSTEM {
-    RENDERING_SUBSYSTEM_GL,
-    RENDERING_SUBSYSTEM_VK,
-    RENDERING_SUBSYSTEM_DX12,
-    RENDERING_SUBSYSTEM_DX11
+enum RENDERING_SYSTEM {
+    RENDERING_SYSTEM_GL,
+    RENDERING_SYSTEM_VK,
+    RENDERING_SYSTEM_DX12,
+    RENDERING_SYSTEM_DX11
 };
 
 
-class BasicCamera;
-
-
-class BaseRenderingSubsystem
+class RenderingSystem
 {
- public:
+public:
 
-    static BaseRenderingSubsystem* CreateRenderingSubsystem(RENDERING_SUBSYSTEM RenderingSubsystem,
-                                                             GameCallbacks* pGameCallbacks,
-                                                             bool LoadBasicShapes);
-    virtual void Shutdown() = 0;    
+    static RenderingSystem* CreateRenderingSystem(RENDERING_SYSTEM RenderingSystem, GameCallbacks* pGameCallbacks, bool LoadBasicShapes);
+
+    virtual void Shutdown() = 0;
 
     virtual void Execute() = 0;
 
-    virtual Scene* CreateScene() = 0;
+    virtual Scene* CreateEmptyScene() = 0;
 
-    Scene* CreateScene(const std::string& Filename);
+    virtual Scene* CreateScene(const std::string& Filename) = 0;
 
-    Scene* CreateDefaultScene();
+    virtual Scene* CreateDefaultScene() = 0;
 
-    void CreateWindow(int Width, int Height);
+    virtual void CreateWindow(int Width, int Height) = 0;
 
-    int LoadModel(const std::string& Filename);
+    virtual int LoadModel(const std::string& Filename) = 0;
 
-    DemolitionModel* GetModel(int ModelHandle);
-    DemolitionModel* GetModel(const std::string& BasicShape);
+    virtual DemolitionModel* GetModel(int ModelHandle) = 0;
 
-    void SetScene(Scene* pScene);
+    virtual DemolitionModel* GetModel(const std::string& BasicShape) = 0;
 
-    void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
+    virtual void SetScene(Scene* pScene) = 0;
 
-    long long GetElapsedTimeMillis() const { return m_elapsedTimeMillis; }
+    virtual void GetWindowSize(int& Width, int& Height) const = 0;
 
- protected:
-
-    BaseRenderingSubsystem(GameCallbacks* pGameCallbacks);
-    ~BaseRenderingSubsystem();
-
-    virtual void CreateWindowInternal(int Width, int Height) = 0;
-
-    virtual DemolitionModel* LoadModelInternal(const std::string& Filename) = 0;    
-
-    virtual void SetCamera(BasicCamera* pCamera) = 0;
-
-    long long m_elapsedTimeMillis = 0;
-    int m_windowWidth = 0;
-    int m_windowHeight = 0;
-    BasicCamera* m_pCamera = NULL;
-    GameCallbacks* m_pGameCallbacks = NULL;
-    Scene* m_pScene = NULL;
-
- private:
-    void InitializeBasicShapes();
-
-    std::vector<DemolitionModel*> m_models;
-    std::map<std::string, int> m_shapeToHandle;
-    int m_numModels = 0;
-    bool m_loadBasicShapes = false;
+    virtual long long GetElapsedTimeMillis() const = 0;
 };
-

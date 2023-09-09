@@ -41,10 +41,10 @@ public:
     void Init()
     {
         bool LoadBasicShapes = false;
-        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this, LoadBasicShapes);
-        m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
+        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        m_pScene = m_pRenderingSubsystem->CreateScene();
+        m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
         m_dirLight.DiffuseIntensity = 0.5f;
@@ -58,7 +58,7 @@ public:
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
-        m_pRenderingSubsystem->SetScene(m_pScene);
+        m_pRenderingSystem->SetScene(m_pScene);
 
         InitObjects();
     }
@@ -66,7 +66,7 @@ public:
 
     void Run()
     {
-        m_pRenderingSubsystem->Execute();
+        m_pRenderingSystem->Execute();
     }
 
     void OnFrame()
@@ -81,15 +81,15 @@ private:
 
     void InitObjects()
     {//"C:\Users\emeir\Documents\ogldev2\Content\antique_ceramic_vase_01_4k.blend\antique_ceramic_vase_01_4k.obj"
-       // m_terrainModelHandle = m_pRenderingSubsystem->LoadModel("../Content/terrain2.obj");
-        m_terrainModelHandle = m_pRenderingSubsystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
+       // m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/terrain2.obj");
+        m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
         m_terrainSceneObjectHandle = m_pScene->CreateSceneObject(m_terrainModelHandle);
         m_pScene->GetSceneObject(m_terrainSceneObjectHandle)->SetPosition(0.0f, 0.0f, 1.0f);
         //m_pScene->GetSceneObject(m_terrainSceneObjectHandle)->SetScale(10.0f, 10.0f, 10.0f);
         m_pScene->AddToRenderList(m_terrainSceneObjectHandle);
     }
 
-    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
     int m_terrainModelHandle = -1;
     int m_terrainSceneObjectHandle = -1;

@@ -17,11 +17,11 @@
 */
 
 #include "demolition_scene.h"
-#include "demolition_rendering_subsystem.h"
+#include "Int/base_rendering_system.h"
 
 #define NUM_SCENE_OBJECTS 1024
 
-Scene::Scene(BaseRenderingSubsystem* pRenderingSystem)
+Scene::Scene(RenderingSystem* pRenderingSystem)
 { 
     m_pRenderingSystem = pRenderingSystem; 
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);

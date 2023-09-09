@@ -41,11 +41,11 @@ public:
     void Init()
     {
         bool LoadBasicShapes = false;
-        m_pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL, this, LoadBasicShapes);
+        m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
 
-        m_pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        m_pScene = m_pRenderingSubsystem->CreateScene("../Content/demolition/scene1.fbx");
+        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/scene1.fbx");
         
         DirectionalLight DirLight;
         DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
@@ -54,13 +54,13 @@ public:
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
-        m_pRenderingSubsystem->SetScene(m_pScene);        
+        m_pRenderingSystem->SetScene(m_pScene);        
     }
 
 
     void Run()
     {
-        m_pRenderingSubsystem->Execute();
+        m_pRenderingSystem->Execute();
     }
 
     void OnFrame()
@@ -70,7 +70,7 @@ public:
 
 private:
 
-    BaseRenderingSubsystem* m_pRenderingSubsystem = NULL;
+    RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
    // int m_modelHandle = -1;
   //  int m_sceneObjectHandle = -1;

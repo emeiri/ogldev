@@ -21,12 +21,12 @@
 
 #include "demolition_scene.h"
 
-class RenderingSubsystemGL;
+class RenderingSystemGL;
 
 class GLScene : public Scene
 {
 public:
-    GLScene(RenderingSubsystemGL* pRenderingSystem) : Scene((BaseRenderingSubsystem*)pRenderingSystem) {}
+    GLScene(RenderingSystemGL* pRenderingSystem) : Scene((RenderingSystem*)pRenderingSystem) {}
 
     ~GLScene() {}    
 };

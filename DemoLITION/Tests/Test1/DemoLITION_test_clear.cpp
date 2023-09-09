@@ -30,14 +30,12 @@ void test_clear()
 {
     GameCallbacks TestGameCallbacks;
     bool LoadBasicShapes = false;
-    BaseRenderingSubsystem* pRenderingSubsystem = BaseRenderingSubsystem::CreateRenderingSubsystem(RENDERING_SUBSYSTEM_GL,
-                                                                                                   &TestGameCallbacks,
-                                                                                                   LoadBasicShapes);
-    pRenderingSubsystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &TestGameCallbacks, LoadBasicShapes);
+    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
     
-    Scene* pScene = pRenderingSubsystem->CreateScene();
+    Scene* pScene = pRenderingSystem->CreateEmptyScene();
     pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
-    pRenderingSubsystem->SetScene(pScene);
+    pRenderingSystem->SetScene(pScene);
 
-    pRenderingSubsystem->Execute();
+    pRenderingSystem->Execute();
 }
