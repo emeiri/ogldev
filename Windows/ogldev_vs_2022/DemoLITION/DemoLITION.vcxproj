@@ -165,7 +165,8 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\base_rendering_system.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_math_3d.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\demolition_model.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\scene.h" />
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
   </ItemGroup>
   <ItemGroup>

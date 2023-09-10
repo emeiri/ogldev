@@ -21,44 +21,12 @@
 
 #include <list>
 
+#include "ogldev_basic_glfw_camera.h"
 #include "demolition_lights.h"
-#include "demolition_model.h"
-
-
-class RenderingSystem;
 
 class SceneObject {
 public:
     SceneObject() {}
-
-    void SetModel(DemolitionModel* pModel)
-    {
-        if (m_pModel) {
-            printf("%s:%d - model already initialized\n", __FILE__, __LINE__);
-            exit(0);
-        }
-
-        m_pModel = pModel;
-    }
-
-    Matrix4f GetMatrix() const
-    {
-        Matrix4f Scale;
-        Scale.InitScaleTransform(m_scale);
-
-        Matrix4f Rotation;
-        Rotation.InitRotateTransform(m_rot);
-
-        Matrix4f Translation;
-        Translation.InitTranslationTransform(m_pos);
-
-        Matrix4f WorldTransformation = Translation * Rotation * Scale;
-
-        return WorldTransformation;
-    }
-
-
-    DemolitionModel* GetModel() const { return m_pModel; }
 
     void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
     void SetRotation(float x, float y, float z) { m_rot.x = x; m_rot.y = y; m_rot.z = z; }
@@ -68,36 +36,36 @@ public:
     void SetRotation(const Vector3f& Rot) { m_rot = Rot; }
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
 
+    Matrix4f GetMatrix() const;
+
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
     const Vector4f& GetFlatColor() const { return m_flatColor; }
 
 private:
-    DemolitionModel* m_pModel = NULL;
     Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_rot = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_scale = Vector3f(1.0f, 1.0f, 1.0f);
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
 };
 
+
 class Scene {
 public:
-    Scene(RenderingSystem* pRenderingSystem);
+    Scene();
 
-    virtual ~Scene() {}
+    ~Scene() {}
 
-    void LoadScene(const std::string& Filename);
+    virtual void LoadScene(const std::string& Filename) = 0;    
 
-    BasicCamera* GetCurrentCamera() { return &m_defaultCamera; }
+    virtual int CreateSceneObject(int ModelHandle) = 0;
 
-    void InitializeDefault();
+    virtual int CreateSceneObject(const std::string& BasicShape) = 0;
+    
+    virtual SceneObject* GetSceneObject(int SceneObjectHandle) = 0;
+    
+    virtual void AddToRenderList(int SceneObjectHandle) = 0;
 
-    const std::list<SceneObject*>& GetRenderList() { return m_renderList; }
-
-    int CreateSceneObject(int ModelHandle);
-    int CreateSceneObject(const std::string& BasicShape);
-    SceneObject* GetSceneObject(int SceneObjectHandle);
-    void AddToRenderList(int SceneObjectHandle);
-    bool RemoveFromRenderList(int SceneObjectHandle);
+    virtual bool RemoveFromRenderList(int SceneObjectHandle) = 0;
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
     void DisableClear() { m_clearFrame = false;  }
@@ -109,16 +77,6 @@ public:
     std::vector<DirectionalLight> m_dirLights;
 
 protected:
-    RenderingSystem* m_pRenderingSystem = NULL;
-    std::list<SceneObject*> m_renderList;
     bool m_clearFrame = false;
     Vector4f m_clearColor;
-
-private:
-    void CreateDefaultCamera();
-    int CreateSceneObjectInternal(DemolitionModel* pModel);
-
-    BasicCamera m_defaultCamera;
-    std::vector<SceneObject> m_sceneObjects;
-    int m_numSceneObjects = 0;
 };

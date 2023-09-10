@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include "Int/base_rendering_system.h"
+#include "Int/scene.h"
 #include "GL/gl_rendering_system.h"
 
 #define NUM_MODELS 1024
@@ -90,7 +91,7 @@ void BaseRenderingSystem::InitializeBasicShapes()
 
 Scene* BaseRenderingSystem::CreateScene(const std::string& Filename)
 {
-    Scene* pScene = CreateEmptyScene();
+    CoreScene* pScene = (CoreScene*)CreateEmptyScene();
     pScene->LoadScene(Filename);
     return pScene;
 }
@@ -98,7 +99,7 @@ Scene* BaseRenderingSystem::CreateScene(const std::string& Filename)
 
 Scene* BaseRenderingSystem::CreateDefaultScene()
 {
-    Scene* pScene = CreateEmptyScene();
+    CoreScene* pScene = (CoreScene*)CreateEmptyScene();
     pScene->InitializeDefault();
     return pScene;
 }
@@ -107,7 +108,7 @@ Scene* BaseRenderingSystem::CreateDefaultScene()
 void BaseRenderingSystem::SetScene(Scene* pScene) 
 { 
     m_pScene = pScene; 
-    m_pCamera = pScene->GetCurrentCamera();
+    m_pCamera = ((CoreScene*)pScene)->GetCurrentCamera();
     SetCamera(m_pCamera);
 }
 

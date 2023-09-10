@@ -17,8 +17,7 @@
 */
 
 #include "ogldev_engine_common.h"
-#include "demolition_model.h"
-//#include "demolition_forward_lighting.h"
+#include "Int/demolition_model.h"
 
 using namespace std;
 

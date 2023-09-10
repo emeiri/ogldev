@@ -106,10 +106,10 @@ void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
 {
     bool FirstTimeForwardLighting = true;
 
-    const std::list<SceneObject*>& RenderList = pScene->GetRenderList();
+    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
 
-    for (std::list<SceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
-        SceneObject* pSceneObject = *it;
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
+        CoreSceneObject* pSceneObject = *it;
 
         const Vector4f& FlatColor = pSceneObject->GetFlatColor();
 
@@ -127,7 +127,7 @@ void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
 }
 
 
-void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject)
+void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject)
 {
     SwitchToLightingTech();
 
@@ -186,7 +186,7 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, SceneObjec
 }
 
 
-void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject)
+void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject)
 {
     SwitchToLightingTech();
 
@@ -194,7 +194,7 @@ void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, SceneObject* pS
 }
 
 
-void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneObject)
+void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, CoreSceneObject* pSceneObject)
 {
     m_flatColorTech.Enable();
     m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
@@ -270,7 +270,7 @@ void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneOb
     UpdateMatrices(&m_skinningTech, pMesh);
 }*/
 
-void ForwardRenderer::RenderToShadowMap(SceneObject* pSceneObject, const SpotLight& SpotLight)
+void ForwardRenderer::RenderToShadowMap(CoreSceneObject* pSceneObject, const SpotLight& SpotLight)
 {
     Matrix4f World = pSceneObject->GetMatrix();
 
@@ -299,7 +299,7 @@ void ForwardRenderer::RenderToShadowMap(SceneObject* pSceneObject, const SpotLig
 }
 
 
-void ForwardRenderer::GetWVP(SceneObject* pSceneObject, Matrix4f& WVP)
+void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 {
     Matrix4f World = pSceneObject->GetMatrix();
     Matrix4f View = m_pCurCamera->GetMatrix();

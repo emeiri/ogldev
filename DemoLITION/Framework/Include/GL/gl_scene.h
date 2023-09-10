@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include "demolition_scene.h"
+#include "Int/scene.h"
 
 class RenderingSystemGL;
 
-class GLScene : public Scene
+class GLScene : public CoreScene
 {
 public:
-    GLScene(RenderingSystemGL* pRenderingSystem) : Scene((RenderingSystem*)pRenderingSystem) {}
+    GLScene(RenderingSystemGL* pRenderingSystem) : CoreScene((BaseRenderingSystem*)pRenderingSystem) {}
 
     ~GLScene() {}    
 };

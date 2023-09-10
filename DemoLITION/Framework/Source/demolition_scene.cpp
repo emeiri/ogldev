@@ -16,30 +16,51 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "demolition_scene.h"
+#include "Int/scene.h"
 #include "Int/base_rendering_system.h"
 
 #define NUM_SCENE_OBJECTS 1024
 
-Scene::Scene(RenderingSystem* pRenderingSystem)
-{ 
-    m_pRenderingSystem = pRenderingSystem; 
-    m_sceneObjects.resize(NUM_SCENE_OBJECTS);
-    CreateDefaultCamera();
+Matrix4f SceneObject::GetMatrix() const
+{
+    Matrix4f Scale;
+    Scale.InitScaleTransform(m_scale);
+
+    Matrix4f Rotation;
+    Rotation.InitRotateTransform(m_rot);
+
+    Matrix4f Translation;
+    Translation.InitTranslationTransform(m_pos);
+
+    Matrix4f WorldTransformation = Translation * Rotation * Scale;
+
+    return WorldTransformation;
 }
 
 
-void Scene::LoadScene(const std::string& Filename)
+Scene::Scene()
+{     
+}
+
+
+CoreScene::CoreScene(BaseRenderingSystem* pRenderingSystem)
 {
-    int ModelHandle = m_pRenderingSystem->LoadModel(Filename.c_str());
+    m_pBaseRenderingSystem = pRenderingSystem;
+    CreateDefaultCamera();
+    m_sceneObjects.resize(NUM_SCENE_OBJECTS);
+}
+
+void CoreScene::LoadScene(const std::string& Filename)
+{
+    int ModelHandle = m_pBaseRenderingSystem->LoadModel(Filename.c_str());
     int SceneObjectHandle = CreateSceneObject(ModelHandle);
     AddToRenderList(SceneObjectHandle);
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
     m_defaultCamera = pModel->GetCameras()[0];
 }
 
 
-void Scene::InitializeDefault()
+void CoreScene::InitializeDefault()
 {
     int SquareHandle = CreateSceneObject("square");
     AddToRenderList(SquareHandle);
@@ -49,7 +70,7 @@ void Scene::InitializeDefault()
 }
 
 
-void Scene::CreateDefaultCamera()
+void CoreScene::CreateDefaultCamera()
 {
     Vector3f Pos(0.0f, 1.0f, 0.0f);
     Vector3f Target(0.0f, -0.3f, 1.0f);
@@ -60,7 +81,7 @@ void Scene::CreateDefaultCamera()
     float zFar = 1000.0f;
     int WindowWidth = 0;
     int WindowHeight = 0;
-    m_pRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+    m_pBaseRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
 
     PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
 
@@ -69,10 +90,10 @@ void Scene::CreateDefaultCamera()
 
 
 
-void Scene::AddToRenderList(int SceneObjectHandle)
+void CoreScene::AddToRenderList(int SceneObjectHandle)
 {
-    SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
-    std::list<SceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
+    CoreSceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
+    std::list<CoreSceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
 
     if (it == m_renderList.end()) {
         m_renderList.push_back(pSceneObject);
@@ -80,10 +101,10 @@ void Scene::AddToRenderList(int SceneObjectHandle)
 }
 
 
-bool Scene::RemoveFromRenderList(int SceneObjectHandle)
+bool CoreScene::RemoveFromRenderList(int SceneObjectHandle)
 {
-    SceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
-    std::list<SceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
+    CoreSceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
+    std::list<CoreSceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
 
     bool ret = false;
 
@@ -96,7 +117,7 @@ bool Scene::RemoveFromRenderList(int SceneObjectHandle)
 }
 
 
-int Scene::CreateSceneObject(int ModelHandle)
+int CoreScene::CreateSceneObject(int ModelHandle)
 {
     if (ModelHandle < 0) {
         printf("%s:%d - invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
@@ -110,7 +131,7 @@ int Scene::CreateSceneObject(int ModelHandle)
         exit(0);
     }
     
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(ModelHandle);
+    DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
 
     ret = CreateSceneObjectInternal(pModel);
 
@@ -118,9 +139,9 @@ int Scene::CreateSceneObject(int ModelHandle)
 }
 
 
-int Scene::CreateSceneObject(const std::string& BasicShape)
+int CoreScene::CreateSceneObject(const std::string& BasicShape)
 {
-    DemolitionModel* pModel = m_pRenderingSystem->GetModel(BasicShape);
+    DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(BasicShape);
 
     int ret = CreateSceneObjectInternal(pModel);
 
@@ -128,7 +149,7 @@ int Scene::CreateSceneObject(const std::string& BasicShape)
 }
 
 
-int Scene::CreateSceneObjectInternal(DemolitionModel* pModel)
+int CoreScene::CreateSceneObjectInternal(DemolitionModel* pModel)
 {
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
@@ -139,7 +160,7 @@ int Scene::CreateSceneObjectInternal(DemolitionModel* pModel)
 }
 
 
-SceneObject* Scene::GetSceneObject(int SceneObjectHandle)
+CoreSceneObject* CoreScene::GetSceneObject(int SceneObjectHandle)
 {
     if (SceneObjectHandle < 0) {
         printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, SceneObjectHandle);
@@ -151,7 +172,7 @@ SceneObject* Scene::GetSceneObject(int SceneObjectHandle)
         exit(0);
     }
 
-    SceneObject* p = &m_sceneObjects[SceneObjectHandle];
+    CoreSceneObject* p = &m_sceneObjects[SceneObjectHandle];
 
     return p;
 }

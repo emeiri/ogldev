@@ -20,7 +20,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique.h"
-#include "demolition_model.h"
+#include "Int/demolition_model.h"
 #include "gl_forward_lighting.h"
 #include "gl_scene.h"
 #include "flat_color_technique.h"
@@ -71,7 +71,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
                                 int EndAnimIndex,
                                 float BlendFactor);*/
 
-    void RenderToShadowMap(SceneObject* pSceneObject, const SpotLight& SpotLight);
+    void RenderToShadowMap(CoreSceneObject* pSceneObject, const SpotLight& SpotLight);
 
     // Implementation of DemolitionRenderCallbacks interface
     virtual void DrawStartCB(uint DrawIndex);
@@ -87,11 +87,11 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 private:
 
     void RenderAllSceneObjects(GLScene* pScene);
-    void RenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject);
-    void RenderWithFlatColor(GLScene* pScene, SceneObject* pSceneObject);
-    void StartRenderWithForwardLighting(GLScene* pScene, SceneObject* pSceneObject);
+    void RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
+    void RenderWithFlatColor(GLScene* pScene, CoreSceneObject* pSceneObject);
+    void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
 
-    void GetWVP(SceneObject* pSceneObject, Matrix4f& WVP);
+    void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
 
     void SwitchToLightingTech();
 
