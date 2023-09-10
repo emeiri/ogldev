@@ -63,44 +63,44 @@ public:
     {
         m_counter += 0.1f;
 
-        m_pScene->GetSceneObject(m_sceneObjectHandle1)->SetRotation(0.0f, m_counter, 0.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle2)->SetRotation(0.0f, m_counter, 0.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle3)->SetRotation(0.0f, m_counter, 0.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle4)->SetRotation(0.0f, m_counter, 0.0f);
+        m_pSceneObject1->SetRotation(0.0f, m_counter, 0.0f);
+        m_pSceneObject2->SetRotation(0.0f, m_counter, 0.0f);
+        m_pSceneObject3->SetRotation(0.0f, m_counter, 0.0f);
+        m_pSceneObject4->SetRotation(0.0f, m_counter, 0.0f);
     }
 
 private:
 
     void InitMesh()
     {
-        m_sceneObjectHandle1 = m_pScene->CreateSceneObject("cube");
-        m_pScene->AddToRenderList(m_sceneObjectHandle1);
-        m_pScene->GetSceneObject(m_sceneObjectHandle1)->SetPosition(0.0f, 0.0f, 10.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle1)->SetFlatColor(Vector4f(1.0f, 0.0, 0.0, 1.0f));
+        m_pSceneObject1 = m_pScene->CreateSceneObject("cube");
+        m_pScene->AddToRenderList(m_pSceneObject1);
+        m_pSceneObject1->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pSceneObject1->SetFlatColor(Vector4f(1.0f, 0.0, 0.0, 1.0f));
 
-        m_sceneObjectHandle2= m_pScene->CreateSceneObject("cube");
-        m_pScene->AddToRenderList(m_sceneObjectHandle2);
-        m_pScene->GetSceneObject(m_sceneObjectHandle2)->SetPosition(10.0f, 0.0f, 0.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle2)->SetFlatColor(Vector4f(1.0f, 1.0, 0.0, 1.0f));
+        m_pSceneObject2= m_pScene->CreateSceneObject("cube");
+        m_pScene->AddToRenderList(m_pSceneObject2);
+        m_pSceneObject2->SetPosition(10.0f, 0.0f, 0.0f);
+        m_pSceneObject2->SetFlatColor(Vector4f(1.0f, 1.0, 0.0, 1.0f));
 
-        m_sceneObjectHandle3 = m_pScene->CreateSceneObject("cube");
-        m_pScene->AddToRenderList(m_sceneObjectHandle3);
-        m_pScene->GetSceneObject(m_sceneObjectHandle3)->SetPosition(-10.0f, 0.0f, 0.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle3)->SetFlatColor(Vector4f(0.0f, 1.0, 1.0, 1.0f));
+        m_pSceneObject3 = m_pScene->CreateSceneObject("cube");
+        m_pScene->AddToRenderList(m_pSceneObject3);
+        m_pSceneObject3->SetPosition(-10.0f, 0.0f, 0.0f);
+        m_pSceneObject3->SetFlatColor(Vector4f(0.0f, 1.0, 1.0, 1.0f));
 
-        m_sceneObjectHandle4 = m_pScene->CreateSceneObject("cube");
-        m_pScene->AddToRenderList(m_sceneObjectHandle4);
-        m_pScene->GetSceneObject(m_sceneObjectHandle4)->SetPosition(0.0f, 0.0f, -10.0f);
-        m_pScene->GetSceneObject(m_sceneObjectHandle4)->SetFlatColor(Vector4f(1.0f, 0.0, 1.0, 1.0f));
+        m_pSceneObject4 = m_pScene->CreateSceneObject("cube");
+        m_pScene->AddToRenderList(m_pSceneObject4);
+        m_pSceneObject4->SetPosition(0.0f, 0.0f, -10.0f);
+        m_pSceneObject4->SetFlatColor(Vector4f(1.0f, 0.0, 1.0, 1.0f));
 
     }
 
     RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
-    int m_sceneObjectHandle1 = -1;
-    int m_sceneObjectHandle2 = -1;
-    int m_sceneObjectHandle3 = -1;
-    int m_sceneObjectHandle4 = -1;
+    SceneObject* m_pSceneObject1 = NULL;
+    SceneObject* m_pSceneObject2 = NULL;
+    SceneObject* m_pSceneObject3 = NULL;
+    SceneObject* m_pSceneObject4 = NULL;
     float m_counter = 0;    
 };
 

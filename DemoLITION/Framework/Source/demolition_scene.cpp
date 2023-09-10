@@ -53,8 +53,8 @@ CoreScene::CoreScene(BaseRenderingSystem* pRenderingSystem)
 void CoreScene::LoadScene(const std::string& Filename)
 {
     int ModelHandle = m_pBaseRenderingSystem->LoadModel(Filename.c_str());
-    int SceneObjectHandle = CreateSceneObject(ModelHandle);
-    AddToRenderList(SceneObjectHandle);
+    SceneObject* pSceneObject = CreateSceneObject(ModelHandle);
+    AddToRenderList(pSceneObject);
     DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
     m_defaultCamera = pModel->GetCameras()[0];
 }
@@ -62,11 +62,11 @@ void CoreScene::LoadScene(const std::string& Filename)
 
 void CoreScene::InitializeDefault()
 {
-    int SquareHandle = CreateSceneObject("square");
-    AddToRenderList(SquareHandle);
-    m_sceneObjects[SquareHandle].SetRotation(Vector3f(-90.0f, 0.0f, 0.0f));
-    m_sceneObjects[SquareHandle].SetScale(Vector3f(1000.0f, 1000.0f, 1000.0f));
-    m_sceneObjects[SquareHandle].SetFlatColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
+    SceneObject* pSceneObject = CreateSceneObject("square");
+    AddToRenderList(pSceneObject);
+    pSceneObject->SetRotation(Vector3f(-90.0f, 0.0f, 0.0f));
+    pSceneObject->SetScale(Vector3f(1000.0f, 1000.0f, 1000.0f));
+    pSceneObject->SetFlatColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
 }
 
 
@@ -90,20 +90,19 @@ void CoreScene::CreateDefaultCamera()
 
 
 
-void CoreScene::AddToRenderList(int SceneObjectHandle)
+void CoreScene::AddToRenderList(SceneObject* pSceneObject)
 {
-    CoreSceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
-    std::list<CoreSceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
+    CoreSceneObject* pCoreSceneObject = (CoreSceneObject*)pSceneObject;
+    std::list<CoreSceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pCoreSceneObject);
 
     if (it == m_renderList.end()) {
-        m_renderList.push_back(pSceneObject);
+        m_renderList.push_back(pCoreSceneObject);
     }
 }
 
 
-bool CoreScene::RemoveFromRenderList(int SceneObjectHandle)
+bool CoreScene::RemoveFromRenderList(SceneObject* pSceneObject)
 {
-    CoreSceneObject* pSceneObject = GetSceneObject(SceneObjectHandle);
     std::list<CoreSceneObject*>::const_iterator it = std::find(m_renderList.begin(), m_renderList.end(), pSceneObject);
 
     bool ret = false;
@@ -117,14 +116,12 @@ bool CoreScene::RemoveFromRenderList(int SceneObjectHandle)
 }
 
 
-int CoreScene::CreateSceneObject(int ModelHandle)
+SceneObject* CoreScene::CreateSceneObject(int ModelHandle)
 {
     if (ModelHandle < 0) {
         printf("%s:%d - invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
         exit(0);
     }
-
-    int ret = -1;
 
     if (m_numSceneObjects == NUM_SCENE_OBJECTS) {
         printf("%s:%d - out of scene objects space, model handle %d\n", __FILE__, __LINE__, ModelHandle);
@@ -133,46 +130,29 @@ int CoreScene::CreateSceneObject(int ModelHandle)
     
     DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
 
-    ret = CreateSceneObjectInternal(pModel);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
 
-    return ret;
+    return pCoreSceneObject;
 }
 
 
-int CoreScene::CreateSceneObject(const std::string& BasicShape)
+SceneObject* CoreScene::CreateSceneObject(const std::string& BasicShape)
 {
     DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(BasicShape);
 
-    int ret = CreateSceneObjectInternal(pModel);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
 
-    return ret;
+    return pCoreSceneObject;
 }
 
 
-int CoreScene::CreateSceneObjectInternal(DemolitionModel* pModel)
+CoreSceneObject* CoreScene::CreateSceneObjectInternal(DemolitionModel* pModel)
 {
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
-    int ret = m_numSceneObjects;
+    CoreSceneObject* pCoreSceneObject = &(m_sceneObjects[m_numSceneObjects]);
+
     m_numSceneObjects++;
 
-    return ret;
-}
-
-
-CoreSceneObject* CoreScene::GetSceneObject(int SceneObjectHandle)
-{
-    if (SceneObjectHandle < 0) {
-        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, SceneObjectHandle);
-        exit(0);
-    }
-
-    if (SceneObjectHandle >= m_numSceneObjects) {
-        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, SceneObjectHandle);
-        exit(0);
-    }
-
-    CoreSceneObject* p = &m_sceneObjects[SceneObjectHandle];
-
-    return p;
+    return pCoreSceneObject;
 }

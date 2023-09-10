@@ -72,8 +72,6 @@ private:
 
     RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
-   // int m_modelHandle = -1;
-  //  int m_sceneObjectHandle = -1;
     float m_counter = 0;    
 };
 

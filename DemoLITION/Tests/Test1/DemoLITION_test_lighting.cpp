@@ -83,16 +83,16 @@ private:
     {//"C:\Users\emeir\Documents\ogldev2\Content\antique_ceramic_vase_01_4k.blend\antique_ceramic_vase_01_4k.obj"
        // m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/terrain2.obj");
         m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
-        m_terrainSceneObjectHandle = m_pScene->CreateSceneObject(m_terrainModelHandle);
-        m_pScene->GetSceneObject(m_terrainSceneObjectHandle)->SetPosition(0.0f, 0.0f, 1.0f);
-        //m_pScene->GetSceneObject(m_terrainSceneObjectHandle)->SetScale(10.0f, 10.0f, 10.0f);
-        m_pScene->AddToRenderList(m_terrainSceneObjectHandle);
+        m_pTerrainSceneObject = m_pScene->CreateSceneObject(m_terrainModelHandle);
+        m_pTerrainSceneObject->SetPosition(0.0f, 0.0f, 1.0f);
+        //m_pScene->GetSceneObject(m_pTerrainSceneObject)->SetScale(10.0f, 10.0f, 10.0f);
+        m_pScene->AddToRenderList(m_pTerrainSceneObject);
     }
 
     RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
     int m_terrainModelHandle = -1;
-    int m_terrainSceneObjectHandle = -1;
+    SceneObject* m_pTerrainSceneObject = NULL;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
     float m_counter = 0;    

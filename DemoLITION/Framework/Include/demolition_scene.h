@@ -57,20 +57,17 @@ public:
 
     virtual void LoadScene(const std::string& Filename) = 0;    
 
-    virtual int CreateSceneObject(int ModelHandle) = 0;
+    virtual SceneObject* CreateSceneObject(int ModelHandle) = 0;
 
-    virtual int CreateSceneObject(const std::string& BasicShape) = 0;
-    
-    virtual SceneObject* GetSceneObject(int SceneObjectHandle) = 0;
-    
-    virtual void AddToRenderList(int SceneObjectHandle) = 0;
+    virtual SceneObject* CreateSceneObject(const std::string& BasicShape) = 0;
+       
+    virtual void AddToRenderList(SceneObject* pSceneObject) = 0;
 
-    virtual bool RemoveFromRenderList(int SceneObjectHandle) = 0;
+    virtual bool RemoveFromRenderList(SceneObject* pSceneObject) = 0;
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
+
     void DisableClear() { m_clearFrame = false;  }
-    bool IsClearFrame() const { return m_clearFrame; }
-    const Vector4f& GetClearColor() { return m_clearColor;  }  
 
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;

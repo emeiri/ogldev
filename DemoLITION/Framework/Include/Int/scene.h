@@ -56,9 +56,9 @@ public:
 
     virtual void LoadScene(const std::string& Filename);
 
-    virtual int CreateSceneObject(int ModelHandle);
+    virtual SceneObject* CreateSceneObject(int ModelHandle);
 
-    virtual int CreateSceneObject(const std::string& BasicShape);
+    virtual SceneObject* CreateSceneObject(const std::string& BasicShape);
 
     BasicCamera* GetCurrentCamera() { return &m_defaultCamera; }
 
@@ -66,9 +66,13 @@ public:
 
     const std::list<CoreSceneObject*>& GetRenderList() { return m_renderList; }
     
-    CoreSceneObject* GetSceneObject(int SceneObjectHandle);
-    void AddToRenderList(int SceneObjectHandle);
-    bool RemoveFromRenderList(int SceneObjectHandle);
+    void AddToRenderList(SceneObject* pSceneObject);
+
+    bool RemoveFromRenderList(SceneObject* pSceneObject);
+
+    bool IsClearFrame() const { return m_clearFrame; }
+
+    const Vector4f& GetClearColor() { return m_clearColor; }
 
 protected:
     BaseRenderingSystem* m_pBaseRenderingSystem = NULL;
@@ -76,7 +80,7 @@ protected:
 
 private:
     void CreateDefaultCamera();
-    int CreateSceneObjectInternal(DemolitionModel* pModel);
+    CoreSceneObject* CreateSceneObjectInternal(DemolitionModel* pModel);
 
     BasicCamera m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;
