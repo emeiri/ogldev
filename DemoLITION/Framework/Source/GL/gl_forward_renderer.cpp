@@ -19,6 +19,10 @@
 #include "ogldev_engine_common.h"
 #include "GL/gl_forward_renderer.h"
 
+#define SHADOW_MAP_WIDTH 2048
+#define SHADOW_MAP_HEIGHT 2048
+
+
 
 ForwardRenderer::ForwardRenderer()
 {
@@ -40,6 +44,16 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_pRenderingSystemGL = pRenderingSystemGL;
 
+    InitTechniques();
+
+    InitShadowMapping();
+
+    glUseProgram(0);
+}
+
+
+void ForwardRenderer::InitTechniques()
+{
     if (!m_lightingTech.Init()) {
         printf("Error initializing the lighting technique\n");
         exit(1);
@@ -58,14 +72,20 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
         printf("Error initializing the flat color technique\n");
         exit(1);
     }
-
-    glUseProgram(0);
 }
 
 
-void ForwardRenderer::StartShadowPass()
+void ForwardRenderer::InitShadowMapping()
 {
-    m_shadowMapTech.Enable();
+    float FOV = 45.0f;
+    float zNear = 1.0f;
+    float zFar = 100.0f;
+    PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
+    m_lightPersProjMatrix.InitPersProjTransform(shadowPersProjInfo);
+
+    if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+        exit(1);
+    }
 }
 
 
@@ -98,12 +118,56 @@ void ForwardRenderer::Render(GLScene* pScene)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    RenderAllSceneObjects(pScene);
+    ShadowMapPass(pScene);
+    LightingPass(pScene);
+
+    m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
 
 
-void ForwardRenderer::RenderAllSceneObjects(GLScene* pScene)
+void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 {
+    m_curRenderPass = RENDER_PASS_SHADOW;
+
+    m_shadowMapFBO.BindForWriting();
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_shadowMapTech.Enable();
+
+    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
+    std::list<CoreSceneObject*>::const_iterator it = RenderList.begin();
+    CoreSceneObject* pSceneObject = *it;
+
+    Vector3f Up(0.0f, 1.0f, 0.0f);
+
+    int NumSpotLights = (int)pScene->m_spotLights.size();
+
+    if (NumSpotLights > 0) {
+        printf("fooo\n");
+        exit(1);
+    }
+    else {
+        const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
+
+        if (SpotLights.size() > 0) {
+            m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, Up);
+        }
+    }
+
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
+        CoreSceneObject* pSceneObject = *it;
+        pSceneObject->GetModel()->Render(this);
+    }
+}
+
+
+void ForwardRenderer::LightingPass(GLScene* pScene)
+{
+    m_curRenderPass = RENDER_PASS_LIGHTING;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     bool FirstTimeForwardLighting = true;
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
@@ -379,31 +443,64 @@ void ForwardRenderer::DisableFog()
 }
 
 
-void ForwardRenderer::DrawStartCB(uint DrawIndex)
+void ForwardRenderer::DrawStart_CB(uint DrawIndex)
 {
     // TODO: picking technique update
 }
 
 
-void ForwardRenderer::ControlSpecularExponent(bool IsEnabled)
+void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
 {
-    m_lightingTech.ControlSpecularExponent(IsEnabled);
+    if (m_curRenderPass == RENDER_PASS_LIGHTING) {
+        m_lightingTech.ControlSpecularExponent(IsEnabled);
+    }
 }
 
 
-void ForwardRenderer::SetMaterial(const Material& material)
+void ForwardRenderer::SetMaterial_CB(const Material& material)
 {
-    m_lightingTech.SetMaterial(material);
+    if (m_curRenderPass == RENDER_PASS_LIGHTING) {
+        m_lightingTech.SetMaterial(material);
+    }
 }
 
 
-void ForwardRenderer::DisableDiffuseTexture()
+void ForwardRenderer::DisableDiffuseTexture_CB()
 {
-    m_lightingTech.DisableDiffuseTexture();
+    if (m_curRenderPass == RENDER_PASS_LIGHTING) {
+        m_lightingTech.DisableDiffuseTexture();
+    }
 }
 
 
-void ForwardRenderer::SetWorldMatrix(const Matrix4f& World)
+void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
+{
+    switch (m_curRenderPass) {
+
+    case RENDER_PASS_SHADOW:
+        SetWorldMatrix_CB_ShadowPass(World);
+        break;
+
+    case RENDER_PASS_LIGHTING:
+        SetWorldMatrix_CB_LightingPass(World);
+        break;
+
+    default:
+        printf("%s:%d - Unknown render pass %d\n", __FILE__, __LINE__, m_curRenderPass);
+        exit(1);
+    }
+}
+
+
+void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
+{
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    m_shadowMapTech.SetWVP(WVP);
+
+}
+
+
+void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
     m_lightingTech.SetWorldMatrix(World);
 

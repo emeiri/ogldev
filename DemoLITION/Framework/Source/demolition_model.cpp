@@ -488,25 +488,25 @@ void DemolitionModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRend
         m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
 
         if (pRenderCallbacks) {
-            pRenderCallbacks->ControlSpecularExponent(true);
+            pRenderCallbacks->ControlSpecularExponent_CB(true);
         }
     }
     else {
         if (pRenderCallbacks) {
-            pRenderCallbacks->ControlSpecularExponent(false);
+            pRenderCallbacks->ControlSpecularExponent_CB(false);
         }
     }
 
     if (pRenderCallbacks) {
         if (m_Materials[MaterialIndex].pDiffuse) {
-            pRenderCallbacks->DrawStartCB(MeshIndex);
-            pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
+            pRenderCallbacks->DrawStart_CB(MeshIndex);
+            pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
         }
         else {
-            pRenderCallbacks->DisableDiffuseTexture();
+            pRenderCallbacks->DisableDiffuseTexture_CB();
         }
 
-        pRenderCallbacks->SetWorldMatrix(m_Meshes[MeshIndex].Transformation);
+        pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].Transformation);
     }
 
     glDrawElementsBaseVertex(GL_TRIANGLES,

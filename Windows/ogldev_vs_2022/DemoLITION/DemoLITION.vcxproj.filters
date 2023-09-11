@@ -7,19 +7,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp">
@@ -55,6 +43,18 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -65,9 +65,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h">
       <Filter>Include\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
-      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
       <Filter>Include</Filter>
@@ -101,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\demolition_model.h">
       <Filter>Include\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
+      <Filter>Shaders\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

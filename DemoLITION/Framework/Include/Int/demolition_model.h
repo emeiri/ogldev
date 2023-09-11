@@ -39,15 +39,15 @@
 class DemolitionRenderCallbacks
 {
 public:
-    virtual void DrawStartCB(uint DrawIndex) = 0;
+    virtual void DrawStart_CB(uint DrawIndex) = 0;
 
-    virtual void ControlSpecularExponent(bool IsEnabled) = 0;
+    virtual void ControlSpecularExponent_CB(bool IsEnabled) = 0;
 
-    virtual void SetMaterial(const Material& material) = 0;
+    virtual void SetMaterial_CB(const Material& material) = 0;
 
-    virtual void DisableDiffuseTexture() = 0;
+    virtual void DisableDiffuseTexture_CB() = 0;
 
-    virtual void SetWorldMatrix(const Matrix4f& World) = 0;
+    virtual void SetWorldMatrix_CB(const Matrix4f& World) = 0;
 };
 
 
