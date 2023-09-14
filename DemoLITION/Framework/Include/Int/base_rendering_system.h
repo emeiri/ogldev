@@ -55,7 +55,7 @@ class BaseRenderingSystem : public RenderingSystem
 
     ~BaseRenderingSystem();
 
-    virtual void CreateWindowInternal(int Width, int Height) = 0;
+    virtual void CreateWindowInternal() = 0;
 
     virtual DemolitionModel* LoadModelInternal(const std::string& Filename) = 0;    
 

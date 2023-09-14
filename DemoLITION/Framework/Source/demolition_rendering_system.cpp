@@ -69,7 +69,11 @@ RenderingSystem* RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM Renderi
 
 void BaseRenderingSystem::CreateWindow(int Width, int Height)
 {
-    CreateWindowInternal(Width, Height);
+    m_windowWidth = Width;
+    m_windowHeight = Height;
+
+    CreateWindowInternal();
+
     if (m_loadBasicShapes) {
         InitializeBasicShapes();
     }

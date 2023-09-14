@@ -18,6 +18,7 @@
 
 #include "ogldev_engine_common.h"
 #include "GL/gl_forward_renderer.h"
+#include "GL/gl_rendering_system.h"
 
 #define SHADOW_MAP_WIDTH 2048
 #define SHADOW_MAP_HEIGHT 2048
@@ -168,6 +169,9 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    int WindowWidth = 0;
+    int WindowHeight = 0;
+    m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
     bool FirstTimeForwardLighting = true;
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();

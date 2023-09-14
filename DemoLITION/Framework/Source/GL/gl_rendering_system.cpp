@@ -68,16 +68,14 @@ void RenderingSystemGL::Shutdown()
     delete this;
 }
 
-void RenderingSystemGL::CreateWindowInternal(int Width, int Height)
+void RenderingSystemGL::CreateWindowInternal()
 {
-    m_windowWidth = Width;
-    m_windowHeight = Height;
     int major_ver = 0;
     int minor_ver = 0;
     bool is_full_screen = false;
-    m_pWindow = glfw_init(major_ver, minor_ver, Width, Height, is_full_screen, "Rendering Subsystem GL demo");
+    m_pWindow = glfw_init(major_ver, minor_ver, m_windowWidth, m_windowHeight, is_full_screen, "Rendering Subsystem GL demo");
 
-    glfwSetCursorPos(m_pWindow, Width / 2, Height / 2);
+    glfwSetCursorPos(m_pWindow, m_windowWidth / 2, m_windowHeight / 2);
 
     SetDefaultGLState();
 
