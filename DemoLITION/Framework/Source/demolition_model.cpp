@@ -808,22 +808,28 @@ void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 
     Vector3f Direction = VectorFromAssimpVector(light.mDirection);
     printf("Original direction: "); Direction.Print();
-
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
-
     Vector4f Dir4D(Direction, 0.0f);
     Dir4D = Transformation * Dir4D;
     Vector3f WorldDir = Dir4D;
     l.WorldDirection = WorldDir;
+
+    Vector3f Position = VectorFromAssimpVector(light.mPosition);
+    printf("Original Position: "); Position.Print();
+    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
+    Vector4f Pos4D(Position, 1.0f);
+    Pos4D = Transformation * Pos4D;
+    Vector3f WorldPosition = Pos4D;
+    printf("World Position: "); WorldPosition.Print();
+    l.WorldPosition = WorldPosition;
 
     l.Attenuation.Constant = light.mAttenuationConstant;
     l.Attenuation.Linear = light.mAttenuationLinear;
     l.Attenuation.Exp = light.mAttenuationQuadratic;
 
     if (light.mAngleInnerCone != light.mAngleOuterCone) {
-        printf("Different values for spot light inner/outer cone angles is not supported\n");
-        exit(0);
+        printf("Warning!!! Different values for spot light inner/outer cone angles is not supported\n");
     }
 
     l.Cutoff = ToDegree(light.mAngleOuterCone);
