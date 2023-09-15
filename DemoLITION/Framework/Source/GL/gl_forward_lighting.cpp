@@ -180,8 +180,12 @@ bool ForwardLightingTechnique::InitCommon()
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Direction", i);
         SpotLightsLocation[i].Direction = GetUniformLocation(Name);
 
+        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.WorldPos", i);
+        SpotLightsLocation[i].Position = GetUniformLocation(Name);
+
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Cutoff", i);
         SpotLightsLocation[i].Cutoff = GetUniformLocation(Name);
+
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.DiffuseIntensity", i);
         SpotLightsLocation[i].DiffuseIntensity = GetUniformLocation(Name);
 
@@ -384,6 +388,8 @@ void ForwardLightingTechnique::UpdateSpotLightsPosAndDir(unsigned int NumLights,
         Vector3f Direction = pLights[i].WorldDirection;
         Direction.Normalize();
         glUniform3f(SpotLightsLocation[i].Direction, Direction.x, Direction.y, Direction.z);
+        const Vector3f& WorldPos = pLights[i].WorldPosition;
+        glUniform3f(SpotLightsLocation[i].Position, WorldPos.x, WorldPos.y, WorldPos.z);
     }
 }
 
