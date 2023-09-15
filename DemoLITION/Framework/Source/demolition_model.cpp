@@ -29,7 +29,8 @@ using namespace std;
 
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices | aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder)
 
-void traverse(int depth, aiNode* pNode);
+static void traverse(int depth, aiNode* pNode);
+static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
 inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 {
@@ -636,28 +637,31 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
     const aiCamera* pCamera = pScene->mCameras[Index];
     printf("Camera name: '%s'\n", pCamera->mName.C_Str());
 
-    aiNode* pNode = pScene->mRootNode->FindNode(pCamera->mName);
-    Matrix4f NodeTransformation(pNode->mTransformation);
-
+    Matrix4f Transformation;
+    GetFullTransformation(pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
     Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
     Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
     Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
 
-    printf("Pos: "); Pos.Print();
-    printf("Target: "); Target.Print();
-    printf("Up: "); Up.Print();
+    printf("Original pos: "); Pos.Print();
+    printf("Original target: "); Target.Print();
+    printf("Original up: "); Up.Print();
 
     Vector4f Pos4D(Pos, 1.0f);
-    Pos4D = NodeTransformation * Pos4D;
+    Pos4D = Transformation * Pos4D;
     Vector3f FinalPos = Pos4D;
 
     Vector4f Target4D(Target, 0.0f);
-    Target4D = NodeTransformation * Target4D;
+    Target4D = Transformation * Target4D;
     Vector3f FinalTarget = Target4D;
 
     Vector4f Up4D(Up, 0.0f);
-    Up4D = NodeTransformation * Up4D;
+    Up4D = Transformation * Up4D;
     Vector3f FinalUp = Up4D;
+
+    printf("Final pos: "); FinalPos.Print();
+    printf("Final target: "); FinalTarget.Print();
+    printf("Final up: "); FinalUp.Print();
 
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
