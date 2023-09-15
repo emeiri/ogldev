@@ -21,5 +21,5 @@ void main()
     TexCoord0 = TexCoord;
     Normal0 = gNormalMatrix * Normal;
     WorldPos0 = (gWorld * Pos4).xyz;
-    LightSpacePos = gLightWVP * vec4(Position, 1.0);
+    LightSpacePos = gLightWVP * Pos4;
 }
