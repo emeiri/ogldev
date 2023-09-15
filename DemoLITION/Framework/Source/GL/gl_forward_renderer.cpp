@@ -78,7 +78,7 @@ void ForwardRenderer::InitTechniques()
 
 void ForwardRenderer::InitShadowMapping()
 {
-    float FOV = 45.0f;
+    float FOV = 45.0f; // TODO: get from light
     float zNear = 1.0f;
     float zFar = 100.0f;
     PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
@@ -140,7 +140,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     std::list<CoreSceneObject*>::const_iterator it = RenderList.begin();
     CoreSceneObject* pSceneObject = *it;
 
-    Vector3f Up(0.0f, 1.0f, 0.0f);
+    Vector3f Up(0.0f, 0.0f, 1.0f);
 
     int NumSpotLights = (int)pScene->m_spotLights.size();
 
@@ -169,9 +169,14 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+
     int WindowWidth = 0;
     int WindowHeight = 0;
     m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
+
+    glViewport(0, 0, WindowWidth, WindowHeight);
+
     bool FirstTimeForwardLighting = true;
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
@@ -512,6 +517,9 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f Projection = m_pCurCamera->GetProjectionMat();
     Matrix4f WVP = Projection * View * World;
     m_lightingTech.SetWVP(WVP);
+
+    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    m_lightingTech.SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = World.Inverse();
     Matrix3f World3x3(InverseWorld);
