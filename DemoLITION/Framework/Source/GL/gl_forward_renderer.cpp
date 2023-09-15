@@ -142,7 +142,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     std::list<CoreSceneObject*>::const_iterator it = RenderList.begin();
     CoreSceneObject* pSceneObject = *it;
 
-    Vector3f Up(0.0f, 0.0f, 1.0f);
+    Vector3f Up(0.0f, 0.0f, 1.0f); // TODO: get it from assimp
 
     int NumSpotLights = (int)pScene->m_spotLights.size();
 

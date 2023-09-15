@@ -51,7 +51,7 @@ bool ForwardLightingTechnique::InitCommon()
     WVPLoc = GetUniformLocation("gWVP");
     WorldMatrixLoc = GetUniformLocation("gWorld");
     NormalMatrixLoc = GetUniformLocation("gNormalMatrix");
-    LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
+    LightWVPLoc = GetUniformLocation("gLightWVP");
     samplerLoc = GetUniformLocation("gSampler");
     hasSamplerLoc = GetUniformLocation("gHasSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
