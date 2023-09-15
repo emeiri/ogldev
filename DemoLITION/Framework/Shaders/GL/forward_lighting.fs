@@ -64,7 +64,7 @@ uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/d
 uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
-uniform int gShadowMapFilterSize = 1;
+uniform int gShadowMapFilterSize = 0;
 uniform sampler3D gShadowMapOffsetTexture;
 uniform float gShadowMapOffsetTextureSize;
 uniform float gShadowMapOffsetFilterSize;
@@ -326,7 +326,7 @@ vec4 CalcDirectionalLight(vec3 Normal)
 vec4 CalcPointLight(PointLight l, vec3 Normal)
 {
     vec3 LightWorldDir = WorldPos0 - l.WorldPos;
-    float ShadowFactor = CalcShadowFactorPointLight(LightWorldDir);
+    float ShadowFactor = CalcShadowFactor(LightWorldDir, Normal);
 
     float Distance = length(LightWorldDir);
     LightWorldDir = normalize(LightWorldDir);
