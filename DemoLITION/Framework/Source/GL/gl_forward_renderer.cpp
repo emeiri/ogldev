@@ -351,7 +351,7 @@ void ForwardRenderer::RenderToShadowMap(CoreSceneObject* pSceneObject, const Spo
     World.Print();
 
     Matrix4f View;
-    Vector3f Up(0.0f, 1.0f, 0.0f);
+    Vector3f Up(0.0f, 0.0f, 1.0f);
     View.InitCameraTransform(SpotLight.WorldPosition, SpotLight.WorldDirection, Up);
 
     printf("View\n");
