@@ -263,8 +263,6 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
 void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject)
 {
-    SwitchToLightingTech();
-
     pSceneObject->GetModel()->Render(this);
 }
 
