@@ -374,7 +374,7 @@ void ForwardLightingTechnique::SetSpotLights(unsigned int NumLights, const SpotL
         glUniform1f(SpotLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
         glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
         // TODO: assimp puts a very small fraction here leading to burnout of the image
-        glUniform1f(SpotLightsLocation[i].Atten.Exp, 1.0f);//      pLights[i].Attenuation.Exp);
+        glUniform1f(SpotLightsLocation[i].Atten.Exp, pLights[i].Attenuation.Exp * 5.0f);
     }
 
     if (WithPosAndDir) {
