@@ -250,7 +250,7 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
 }
 
 
-float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
+float CalcShadowFactor(vec3 LightDirection, vec3 Normal, bool IsPoint)
 {
     float ShadowFactor = 0.0;
 
@@ -259,7 +259,11 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal)
     } else if (gShadowMapFilterSize > 0){
         ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);
     } else {
-        ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
+        if (IsPoint) {
+            ShadowFactor = CalcShadowFactorPointLight(LightDirection);
+        } else {
+            ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
+        }
     }
 
     return ShadowFactor;
@@ -318,15 +322,15 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
 
 vec4 CalcDirectionalLight(vec3 Normal)
 {
-    float ShadowFactor = CalcShadowFactor(gDirectionalLight.Direction, Normal);
+    float ShadowFactor = CalcShadowFactor(gDirectionalLight.Direction, Normal, false);
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);
 }
 
 
-vec4 CalcPointLight(PointLight l, vec3 Normal)
+vec4 CalcPointLight(PointLight l, vec3 Normal, bool IsPoint)
 {
     vec3 LightWorldDir = WorldPos0 - l.WorldPos;
-    float ShadowFactor = CalcShadowFactor(LightWorldDir, Normal);
+    float ShadowFactor = CalcShadowFactor(LightWorldDir, Normal, IsPoint);
 
     float Distance = length(LightWorldDir);
     LightWorldDir = normalize(LightWorldDir);
@@ -345,7 +349,7 @@ vec4 CalcSpotLight(SpotLight l, vec3 Normal)
     float SpotFactor = dot(LightToPixel, l.Direction);
 
     if (SpotFactor > l.Cutoff) {
-        vec4 Color = CalcPointLight(l.Base, Normal);
+        vec4 Color = CalcPointLight(l.Base, Normal, false);
         float SpotLightIntensity = (1.0 - (1.0 - SpotFactor)/(1.0 - l.Cutoff));
         return Color * SpotLightIntensity;
     }
@@ -476,7 +480,7 @@ vec4 GetTotalLight()
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {
-        TotalLight += CalcPointLight(gPointLights[i], Normal);
+        TotalLight += CalcPointLight(gPointLights[i], Normal, true);
     }
 
     for (int i = 0 ;i < gNumSpotLights ;i++) {
