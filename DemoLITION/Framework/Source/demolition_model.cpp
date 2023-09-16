@@ -759,7 +759,8 @@ void DemolitionModel::InitDirectionalLight(const aiScene* pScene, const aiLight&
     }
 
     DirectionalLight l;
-    l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    l.Color = Vector3f(1.0f);
     l.DiffuseIntensity = 1.0f; // TODO
 
     Vector3f Direction = VectorFromAssimpVector(light.mDirection);
