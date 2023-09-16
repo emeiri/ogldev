@@ -117,14 +117,17 @@ private:
 
     RenderingSystemGL* m_pRenderingSystemGL = NULL;    
     BasicCamera* m_pCurCamera = NULL;    
+
+    // Shadow stuff
     ShadowMapFBO m_shadowMapFBO;
     Matrix4f m_lightPersProjMatrix;
+    Matrix4f m_lightOrthoProjMatrix;
+    Matrix4f m_cameraOrthoProjMatrix;
+    Matrix4f m_lightViewMatrix;
 
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
     FlatColorTechnique m_flatColorTech;
-
-    Matrix4f m_lightViewMatrix;
 };
 

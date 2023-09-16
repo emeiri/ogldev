@@ -86,6 +86,31 @@ void ForwardRenderer::InitShadowMapping()
     PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
     m_lightPersProjMatrix.InitPersProjTransform(shadowPersProjInfo);
 
+    // Initialize an orthographic projection matrix for the directional light
+    OrthoProjInfo shadowOrthoProjInfo;
+    shadowOrthoProjInfo.l = -20.0f;
+    shadowOrthoProjInfo.r = 20.0f;
+    shadowOrthoProjInfo.t = 20.0f;
+    shadowOrthoProjInfo.b = -20.0f;
+    shadowOrthoProjInfo.n = -20.0f;
+    shadowOrthoProjInfo.f = 20.0f;
+
+    m_lightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
+
+    int WindowWidth = 0;
+    int WindowHeight = 0;
+    m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
+
+    OrthoProjInfo cameraOrthoProjInfo;
+    cameraOrthoProjInfo.l = -WindowWidth / 250.0f;
+    cameraOrthoProjInfo.r = WindowWidth / 250.0f;
+    cameraOrthoProjInfo.t = WindowHeight / 250.0f;
+    cameraOrthoProjInfo.b = -WindowHeight / 250.0f;
+    cameraOrthoProjInfo.n = zNear;
+    cameraOrthoProjInfo.f = zFar;
+
+    m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
+
     if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
         exit(1);
     }
@@ -145,18 +170,30 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     Vector3f Up(0.0f, 0.0f, 1.0f); // TODO: get it from assimp
 
     int NumSpotLights = (int)pScene->m_spotLights.size();
-
     if (NumSpotLights > 0) {
         printf("fooo\n");
         exit(1);
-    }
-    else {
+    } else {
         const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
 
         if (SpotLights.size() > 0) {
             m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, Up);
         }
     }
+
+    int NumDirLights = (int)pScene->m_dirLights.size();
+    if (NumDirLights > 0) {
+        printf("fooo\n");
+        exit(1);
+    } else {
+        const std::vector<DirectionalLight>& DirLights = pSceneObject->GetModel()->GetDirLights();
+        Vector3f Origin(0.0f, 0.0f, 0.0f);
+        if (DirLights.size() == 1) {
+            m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, Up);
+        } else {
+            printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
+        }
+    } 
 
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         CoreSceneObject* pSceneObject = *it;
@@ -503,7 +540,8 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
 {
-    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
+    //Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
     m_shadowMapTech.SetWVP(WVP);
 
 }
@@ -518,7 +556,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * World;
     m_lightingTech.SetWVP(WVP);
 
-    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    //Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    Matrix4f LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
     m_lightingTech.SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = World.Inverse();
