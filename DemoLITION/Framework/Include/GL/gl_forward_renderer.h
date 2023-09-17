@@ -104,8 +104,8 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene);
     void RenderAllSceneObjects(GLScene* pScene);
-    void RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
-    void RenderWithFlatColor(GLScene* pScene, CoreSceneObject* pSceneObject);
+    void RenderWithForwardLighting(CoreSceneObject* pSceneObject);
+    void RenderWithFlatColor(CoreSceneObject* pSceneObject);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech();

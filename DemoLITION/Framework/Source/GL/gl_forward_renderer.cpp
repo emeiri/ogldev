@@ -293,10 +293,10 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
                 StartRenderWithForwardLighting(pScene, pSceneObject);
                 FirstTimeForwardLighting = false;
             }
-            RenderWithForwardLighting(pScene, pSceneObject);
+            RenderWithForwardLighting(pSceneObject);
         }
         else {
-            RenderWithFlatColor(pScene, pSceneObject);
+            RenderWithFlatColor(pSceneObject);
         }
     }
 }
@@ -361,13 +361,13 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 }
 
 
-void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject)
+void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
 {
     pSceneObject->GetModel()->Render(this);
 }
 
 
-void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, CoreSceneObject* pSceneObject)
+void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
 {
     m_flatColorTech.Enable();
     m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
