@@ -41,9 +41,6 @@ CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
 };
 
 
-
-
-
 ForwardRenderer::ForwardRenderer()
 {
 
@@ -217,30 +214,40 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         NumPointLights = (int)pSceneObject->GetModel()->GetPointLights().size();                   
     }
 
-    if (NumPointLights > 0) {        
-        m_curRenderPass = RENDER_PASS_SHADOW_POINT;
-        const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
-        
-        m_shadowMapPointLightTech.Enable();
-        m_shadowMapPointLightTech.SetLightWorldPos(PointLights[0].WorldPosition);
-        
-        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
-        
-        for (uint i = 0; i < NUM_CUBE_MAP_FACES; i++) {
-            m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
-            glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
-            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            m_lightViewMatrix.InitCameraTransform(PointLights[0].WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
-            RenderEntireRenderList(RenderList);
-        }                
-    } else {       
-        m_curRenderPass = RENDER_PASS_SHADOW;
-        m_shadowMapFBO.BindForWriting();
-        glClear(GL_DEPTH_BUFFER_BIT);
-        m_shadowMapTech.Enable();
+    if (NumPointLights > 0) {
+        ShadowMapPassPoint(RenderList, pSceneObject->GetModel()->GetPointLights());
+    } else {  
+        ShadowMapPassDirAndSpot(RenderList);
+    }
+}
+
+
+void ForwardRenderer::ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights)
+{
+    m_curRenderPass = RENDER_PASS_SHADOW_POINT;
+
+    m_shadowMapPointLightTech.Enable();
+    m_shadowMapPointLightTech.SetLightWorldPos(PointLights[0].WorldPosition);
+
+    glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+
+    for (uint i = 0; i < NUM_CUBE_MAP_FACES; i++) {
+        m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
+        glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        m_lightViewMatrix.InitCameraTransform(PointLights[0].WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
         RenderEntireRenderList(RenderList);
     }
+}
 
+
+void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList)
+{
+    m_curRenderPass = RENDER_PASS_SHADOW;
+    m_shadowMapFBO.BindForWriting();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    m_shadowMapTech.Enable();
+    RenderEntireRenderList(RenderList);
 }
 
 

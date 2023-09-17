@@ -100,6 +100,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 private:
 
     void ShadowMapPass(GLScene* pScene);
+    void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
+    void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene);
     void RenderAllSceneObjects(GLScene* pScene);
     void RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
