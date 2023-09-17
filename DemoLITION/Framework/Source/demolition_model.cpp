@@ -782,6 +782,7 @@ void DemolitionModel::InitPointLight(const aiScene* pScene, const aiLight& light
 {
     PointLight l;
     l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    //l.Color = Vector3f(1.0f);
     l.DiffuseIntensity = 1.0f; // TODO
 
     Vector3f Position = VectorFromAssimpVector(light.mPosition);

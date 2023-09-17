@@ -31,9 +31,6 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp">
-      <Filter>Shaders\GL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
@@ -53,6 +50,15 @@
       <Filter>Source\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
   </ItemGroup>
@@ -100,7 +106,7 @@
       <Filter>Include\Int</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
-      <Filter>Shaders\GL</Filter>
+      <Filter>Include\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

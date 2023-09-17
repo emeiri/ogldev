@@ -20,7 +20,9 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique.h"
+#include "ogldev_shadow_mapping_technique_point_light.h"
 #include "ogldev_shadow_map_fbo.h"
+#include "ogldev_shadow_cube_map_fbo.h"
 #include "Int/demolition_model.h"
 #include "gl_forward_lighting.h"
 #include "gl_scene.h"
@@ -28,8 +30,9 @@
 
 enum RENDER_PASS {
     RENDER_PASS_UNINITIALIZED = 0,
-    RENDER_PASS_SHADOW = 1,
-    RENDER_PASS_LIGHTING = 2
+    RENDER_PASS_LIGHTING = 1,
+    RENDER_PASS_SHADOW = 2,    
+    RENDER_PASS_SHADOW_POINT = 3,
 };
 
 
@@ -81,8 +84,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
                                 int EndAnimIndex,
                                 float BlendFactor);*/
 
-    void RenderToShadowMap(CoreSceneObject* pSceneObject, const SpotLight& SpotLight);
-
     //
     // Implementation of DemolitionRenderCallbacks interface
     //
@@ -109,7 +110,9 @@ private:
     void InitShadowMapping();
     void InitTechniques();
     void SetWorldMatrix_CB_ShadowPass(const Matrix4f& World);
+    void SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World);
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
+    void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
 
     RENDER_PASS m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 
@@ -120,14 +123,15 @@ private:
 
     // Shadow stuff
     ShadowMapFBO m_shadowMapFBO;
+    ShadowCubeMapFBO m_shadowCubeMapFBO;
     Matrix4f m_lightPersProjMatrix;
     Matrix4f m_lightOrthoProjMatrix;
-    Matrix4f m_cameraOrthoProjMatrix;
     Matrix4f m_lightViewMatrix;
 
     ForwardLightingTechnique m_lightingTech;
     //ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
+    ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;
 };
 

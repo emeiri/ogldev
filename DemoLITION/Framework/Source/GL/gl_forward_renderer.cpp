@@ -23,6 +23,25 @@
 #define SHADOW_MAP_WIDTH 2048
 #define SHADOW_MAP_HEIGHT 2048
 
+struct CameraDirection
+{
+    GLenum CubemapFace;
+    Vector3f Target;
+    Vector3f Up;
+};
+
+CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
+{
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_X, Vector3f(1.0f, 0.0f, 0.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_X, Vector3f(-1.0f, 0.0f, 0.0f), Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Y, Vector3f(0.0f, 1.0f, 0.0f),  Vector3f(0.0f, 0.0f, 1.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, Vector3f(0.0f, -1.0f, 0.0f), Vector3f(0.0f, 0.0f, -1.0f) },
+    { GL_TEXTURE_CUBE_MAP_POSITIVE_Z, Vector3f(0.0f, 0.0f, 1.0f),  Vector3f(0.0f, 1.0f, 0.0f) },
+    { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, 1.0f, 0.0f) }
+};
+
+
+
 
 
 ForwardRenderer::ForwardRenderer()
@@ -63,11 +82,17 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.Enable();
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
 
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
+        exit(1);
+    }
+
+    if (!m_shadowMapPointLightTech.Init()) {
+        printf("Error initializing the shadow mapping point light technique\n");
         exit(1);
     }
 
@@ -80,7 +105,7 @@ void ForwardRenderer::InitTechniques()
 
 void ForwardRenderer::InitShadowMapping()
 {
-    float FOV = 45.0f; // TODO: get from light
+    float FOV = 90.0f; // TODO: get from light
     float zNear = 1.0f;
     float zFar = 100.0f;
     PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };
@@ -101,17 +126,11 @@ void ForwardRenderer::InitShadowMapping()
     int WindowHeight = 0;
     m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
 
-    OrthoProjInfo cameraOrthoProjInfo;
-    cameraOrthoProjInfo.l = -WindowWidth / 250.0f;
-    cameraOrthoProjInfo.r = WindowWidth / 250.0f;
-    cameraOrthoProjInfo.t = WindowHeight / 250.0f;
-    cameraOrthoProjInfo.b = -WindowHeight / 250.0f;
-    cameraOrthoProjInfo.n = zNear;
-    cameraOrthoProjInfo.f = zFar;
-
-    m_cameraOrthoProjMatrix.InitOrthoProjTransform(cameraOrthoProjInfo);
-
     if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
+        exit(1);
+    }
+
+    if (!m_shadowCubeMapFBO.Init(SHADOW_MAP_WIDTH)) {
         exit(1);
     }
 }
@@ -154,15 +173,7 @@ void ForwardRenderer::Render(GLScene* pScene)
 
 
 void ForwardRenderer::ShadowMapPass(GLScene* pScene)
-{
-    m_curRenderPass = RENDER_PASS_SHADOW;
-
-    m_shadowMapFBO.BindForWriting();
-
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    m_shadowMapTech.Enable();
-
+{        
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
     std::list<CoreSceneObject*>::const_iterator it = RenderList.begin();
     CoreSceneObject* pSceneObject = *it;
@@ -175,8 +186,9 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         exit(1);
     } else {
         const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
+        NumSpotLights = (int)SpotLights.size();
 
-        if (SpotLights.size() > 0) {
+        if (NumSpotLights > 0) {
             m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, Up);
         }
     }
@@ -189,12 +201,51 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         const std::vector<DirectionalLight>& DirLights = pSceneObject->GetModel()->GetDirLights();
         Vector3f Origin(0.0f, 0.0f, 0.0f);
         if (DirLights.size() == 1) {
+            NumDirLights = 1;
             m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, Up);
-        } else {
+        } else if (DirLights.size() > 1) {
             printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
         }
     } 
 
+    int NumPointLights = (int)pScene->m_pointLights.size();
+    if (NumPointLights > 0) {
+        printf("fooo\n");
+        exit(1);
+    }
+    else {
+        NumPointLights = (int)pSceneObject->GetModel()->GetPointLights().size();                   
+    }
+
+    if (NumPointLights > 0) {        
+        m_curRenderPass = RENDER_PASS_SHADOW_POINT;
+        const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
+        
+        m_shadowMapPointLightTech.Enable();
+        m_shadowMapPointLightTech.SetLightWorldPos(PointLights[0].WorldPosition);
+        
+        glClearColor(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
+        
+        for (uint i = 0; i < NUM_CUBE_MAP_FACES; i++) {
+            m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
+            glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
+            glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            m_lightViewMatrix.InitCameraTransform(PointLights[0].WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
+            RenderEntireRenderList(RenderList);
+        }                
+    } else {       
+        m_curRenderPass = RENDER_PASS_SHADOW;
+        m_shadowMapFBO.BindForWriting();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        m_shadowMapTech.Enable();
+        RenderEntireRenderList(RenderList);
+    }
+
+}
+
+
+void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList)
+{
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         CoreSceneObject* pSceneObject = *it;
         pSceneObject->GetModel()->Render(this);
@@ -204,11 +255,16 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 
 void ForwardRenderer::LightingPass(GLScene* pScene)
 {
-    m_curRenderPass = RENDER_PASS_LIGHTING;
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+    if (m_curRenderPass == RENDER_PASS_SHADOW) {
+        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+    }
+    else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
+        m_shadowCubeMapFBO.BindForReading(SHADOW_CUBE_MAP_TEXTURE_UNIT);
+    }
+
+    m_curRenderPass = RENDER_PASS_LIGHTING;    
 
     int WindowWidth = 0;
     int WindowHeight = 0;
@@ -380,34 +436,6 @@ void ForwardRenderer::RenderWithFlatColor(GLScene* pScene, CoreSceneObject* pSce
     UpdateMatrices(&m_skinningTech, pMesh);
 }*/
 
-void ForwardRenderer::RenderToShadowMap(CoreSceneObject* pSceneObject, const SpotLight& SpotLight)
-{
-    Matrix4f World = pSceneObject->GetMatrix();
-
-    printf("World\n");
-    World.Print();
-
-    Matrix4f View;
-    Vector3f Up(0.0f, 0.0f, 1.0f);
-    View.InitCameraTransform(SpotLight.WorldPosition, SpotLight.WorldDirection, Up);
-
-    printf("View\n");
-    View.Print();
-    //    exit(0);
-    float FOV = 45.0f;
-    float zNear = 0.1f;
-    float zFar = 100.0f;
-    PersProjInfo persProjInfo = { FOV, 1000.0f, 1000.0f, zNear, zFar };
-    Matrix4f Projection;
-    Projection.InitPersProjTransform(persProjInfo);
-
-    Matrix4f WVP = Projection * View * World;
-
-    m_shadowMapTech.SetWVP(WVP);
-
-    pSceneObject->GetModel()->Render();
-}
-
 
 void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 {
@@ -527,6 +555,10 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
         SetWorldMatrix_CB_ShadowPass(World);
         break;
 
+    case RENDER_PASS_SHADOW_POINT:
+        SetWorldMatrix_CB_ShadowPassPoint(World);
+        break;
+
     case RENDER_PASS_LIGHTING:
         SetWorldMatrix_CB_LightingPass(World);
         break;
@@ -543,7 +575,14 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
     Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
     //Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
     m_shadowMapTech.SetWVP(WVP);
+}
 
+
+void ForwardRenderer::SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World)
+{
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    m_shadowMapPointLightTech.SetWorld(World);
+    m_shadowMapPointLightTech.SetWVP(WVP);
 }
 
 
@@ -556,8 +595,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * World;
     m_lightingTech.SetWVP(WVP);
 
-    //Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
-    Matrix4f LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
+    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    //Matrix4f LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
     m_lightingTech.SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = World.Inverse();
