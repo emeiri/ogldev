@@ -40,9 +40,6 @@
 #ifdef _WIN64
 
 #include "freetypeGL.h"
-#include "markup.h"
-#include "vertex-buffer.h"
-#include "text-buffer.h"
 
 extern "C" {
 #include "mat4.c"

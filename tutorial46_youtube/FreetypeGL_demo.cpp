@@ -76,11 +76,13 @@ public:
         glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        static int a = 0;
-        m_fontRenderer.RenderText(FONT_TYPE_LOBSTER, red, blue, a, a, "FreetypeGL demo!");
-        a++;
-        if (a == 1000) {
-            a = 0;
+        static int x = 0;
+        int y = x;
+
+        m_fontRenderer.RenderText(FONT_TYPE_LOBSTER, red, blue, x, y, "FreetypeGL demo!");
+        x++;
+        if (x == 1000) {
+            x = 0;
         }
     }
 
@@ -132,39 +134,29 @@ private:
     FontRenderer m_fontRenderer;
 };
 
-FreetypeGLDemo* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    app->KeyboardCB(key, action);
 }
 
 
 static void CursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    app->PassiveMouseCB((int)x, (int)y);
 }
 
 
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
 {
-    double x, y;
-
-    glfwGetCursorPos(window, &x, &y);
-
-    app->MouseCB(Button, Action, (int)x, (int)y);
 }
 
 
 int main(int argc, char** argv)
 {
-    app = new FreetypeGLDemo();
+    FreetypeGLDemo app;
 
-    app->Init();
-    
-    app->Run();
+    app.Init();
 
-    delete app;
+    app.Run();
 
     return 0;
 }
