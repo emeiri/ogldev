@@ -773,6 +773,7 @@ void DemolitionModel::InitDirectionalLight(const aiScene* pScene, const aiLight&
     Dir4D = Transformation * Dir4D;
     Vector3f WorldDir = Dir4D;
     l.WorldDirection = WorldDir;
+    printf("Final direction: "); WorldDir.Print();
 
     m_dirLights.push_back(l);
 }
@@ -821,6 +822,7 @@ void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     Dir4D = Transformation * Dir4D;
     Vector3f WorldDir = Dir4D;
     l.WorldDirection = WorldDir;
+    printf("Final direction: "); WorldDir.Print();
 
     Vector3f Position = VectorFromAssimpVector(light.mPosition);
     printf("Original Position: "); Position.Print();
