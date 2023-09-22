@@ -50,7 +50,7 @@ public:
         DirLight.WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         DirLight.DiffuseIntensity = 1.0f;
 
-        m_pScene->m_dirLights.push_back(DirLight);
+        m_pScene->GetDirLights().push_back(DirLight);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 

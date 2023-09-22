@@ -20,8 +20,8 @@
 #include "GL/gl_forward_renderer.h"
 #include "GL/gl_rendering_system.h"
 
-#define SHADOW_MAP_WIDTH 2048
-#define SHADOW_MAP_HEIGHT 2048
+#define SHADOW_MAP_WIDTH 1024
+#define SHADOW_MAP_HEIGHT 1024
 
 struct CameraDirection
 {
@@ -177,7 +177,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 
     Vector3f Up(0.0f, 0.0f, 1.0f); // TODO: get it from assimp
 
-    int NumSpotLights = (int)pScene->m_spotLights.size();
+    int NumSpotLights = (int)pScene->GetSpotLights().size();
     if (NumSpotLights > 0) {
         printf("fooo\n");
         exit(1);
@@ -190,7 +190,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         }
     }
 
-    int NumDirLights = (int)pScene->m_dirLights.size();
+    int NumDirLights = (int)pScene->GetDirLights().size();
     if (NumDirLights > 0) {
         printf("fooo\n");
         exit(1);
@@ -205,7 +205,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         }
     } 
 
-    int NumPointLights = (int)pScene->m_pointLights.size();
+    int NumPointLights = (int)pScene->GetPointLights().size();
     if (NumPointLights > 0) {
         printf("fooo\n");
         exit(1);
@@ -308,10 +308,10 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     int NumLightsTotal = 0;
 
-    int NumPointLights = (int)pScene->m_pointLights.size();
+    int NumPointLights = (int)pScene->GetPointLights().size();
 
     if (NumPointLights > 0) {
-        m_lightingTech.SetPointLights(NumPointLights, &pScene->m_pointLights[0], true);
+        m_lightingTech.SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
         NumLightsTotal += NumPointLights;
     } else {
         const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
@@ -322,10 +322,10 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
         }
     }
 
-    int NumSpotLights = (int)pScene->m_spotLights.size();
+    int NumSpotLights = (int)pScene->GetSpotLights().size();
 
     if (NumSpotLights > 0) {
-        m_lightingTech.SetSpotLights(NumSpotLights, &pScene->m_spotLights[0], true);
+        m_lightingTech.SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
         NumLightsTotal += NumPointLights;
     } else {
         const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
@@ -336,10 +336,10 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
         }
     }
 
-    int NumDirLights = (int)pScene->m_dirLights.size();
+    int NumDirLights = (int)pScene->GetDirLights().size();
 
     if (NumDirLights > 0) {
-        const DirectionalLight& DirLight = pScene->m_dirLights[0];
+        const DirectionalLight& DirLight = pScene->GetDirLights()[0];
         m_lightingTech.SetDirectionalLight(DirLight, true);    
         NumLightsTotal += NumDirLights;
     } else {

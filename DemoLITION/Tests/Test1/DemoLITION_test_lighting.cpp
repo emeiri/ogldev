@@ -49,12 +49,12 @@ public:
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
         m_dirLight.DiffuseIntensity = 0.5f;
         m_dirLight.AmbientIntensity = 0.1f;
-        m_pScene->m_dirLights.push_back(m_dirLight);
+        m_pScene->GetDirLights().push_back(m_dirLight);
 
         m_pointLight.DiffuseIntensity = 0.3f;
         m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
 
-        m_pScene->m_pointLights.push_back(m_pointLight);
+        m_pScene->GetPointLights().push_back(m_pointLight);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
@@ -72,8 +72,8 @@ public:
     void OnFrame()
     {
         m_counter += 0.03f;
-        m_pScene->m_dirLights[0].WorldDirection = Vector3f(sinf(m_counter), 0.0f, cosf(m_counter));
-        m_pScene->m_pointLights[0].WorldPosition = Vector3f(1 - sinf(m_counter), 1.0f, 1.0f + cosf(m_counter));
+        m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_counter), 0.0f, cosf(m_counter));
+        m_pScene->GetPointLights()[0].WorldPosition = Vector3f(1 - sinf(m_counter), 1.0f, 1.0f + cosf(m_counter));
        // m_pScene->m_dirLights[0].WorldDirection = Vector3f(0.0f, 0.0f, -1.0f);
     }
 
