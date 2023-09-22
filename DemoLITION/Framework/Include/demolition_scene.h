@@ -65,11 +65,11 @@ public:
 
     virtual bool RemoveFromRenderList(SceneObject* pSceneObject) = 0;
 
-    virtual std::vector<PointLight>& GetPointLights() { return m_pointLights; }
+    std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 
-    virtual std::vector<SpotLight>& GetSpotLights() { return m_spotLights; }
+    std::vector<SpotLight>& GetSpotLights() { return m_spotLights; }
 
-    virtual std::vector<DirectionalLight>& GetDirLights() { return m_dirLights; }
+    std::vector<DirectionalLight>& GetDirLights() { return m_dirLights; }
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
 

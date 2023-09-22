@@ -92,9 +92,9 @@ public:
                                   unsigned int EndAnimIndex,
                                   float BlendFactor);
 
-    const std::vector<DirectionalLight> GetDirLights() const { return m_dirLights; }
-    const std::vector<SpotLight> GetSpotLights() const { return m_spotLights; }
-    const std::vector<PointLight> GetPointLights() const { return m_pointLights; }
+    const std::vector<DirectionalLight>& GetDirLights() const { return m_dirLights; }
+    const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
+    const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
 
 private:
 

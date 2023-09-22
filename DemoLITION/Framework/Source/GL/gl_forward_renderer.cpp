@@ -171,53 +171,31 @@ void ForwardRenderer::Render(GLScene* pScene)
 
 void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 {        
-    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
-    std::list<CoreSceneObject*>::const_iterator it = RenderList.begin();
-    CoreSceneObject* pSceneObject = *it;
-
     Vector3f Up(0.0f, 0.0f, 1.0f); // TODO: get it from assimp
 
-    int NumSpotLights = (int)pScene->GetSpotLights().size();
-    if (NumSpotLights > 0) {
-        printf("fooo\n");
-        exit(1);
-    } else {
-        const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
-        NumSpotLights = (int)SpotLights.size();
+    const std::vector<SpotLight>& SpotLights = pScene->GetSpotLights();
+    int NumSpotLights = (int)SpotLights.size();
 
-        if (NumSpotLights > 0) {
-            m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, Up);
-        }
+    if (NumSpotLights > 0) {
+        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, Up);
     }
 
-    int NumDirLights = (int)pScene->GetDirLights().size();
-    if (NumDirLights > 0) {
-        printf("fooo\n");
-        exit(1);
-    } else {
-        const std::vector<DirectionalLight>& DirLights = pSceneObject->GetModel()->GetDirLights();
-        Vector3f Origin(0.0f, 0.0f, 0.0f);
-        if (DirLights.size() == 1) {
-            NumDirLights = 1;
-            m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, Up);
-        } else if (DirLights.size() > 1) {
-            printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
-        }
-    } 
+    const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
+    Vector3f Origin(0.0f, 0.0f, 0.0f);
+    int NumDirLights = 0;
+    if (DirLights.size() == 1) {
+        NumDirLights = 1;
+        m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, Up);
+    } else if (DirLights.size() > 1) {
+        printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
+    }
 
     int NumPointLights = (int)pScene->GetPointLights().size();
-    if (NumPointLights > 0) {
-        printf("fooo\n");
-        exit(1);
-    }
-    else {
-        NumPointLights = (int)pSceneObject->GetModel()->GetPointLights().size();                   
-    }
 
     if (NumPointLights > 0) {
-        ShadowMapPassPoint(RenderList, pSceneObject->GetModel()->GetPointLights());
+        ShadowMapPassPoint(pScene->GetRenderList(), pScene->GetPointLights());
     } else {  
-        ShadowMapPassDirAndSpot(RenderList);
+        ShadowMapPassDirAndSpot(pScene->GetRenderList());
     }
 }
 
@@ -313,28 +291,14 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
     if (NumPointLights > 0) {
         m_lightingTech.SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
         NumLightsTotal += NumPointLights;
-    } else {
-        const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
-
-        if (PointLights.size() > 0) {
-            m_lightingTech.SetPointLights((unsigned int)PointLights.size(), &PointLights[0], true);
-            NumLightsTotal += (int)PointLights.size();
-        }
-    }
+    } 
 
     int NumSpotLights = (int)pScene->GetSpotLights().size();
 
     if (NumSpotLights > 0) {
         m_lightingTech.SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
-        NumLightsTotal += NumPointLights;
-    } else {
-        const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
-
-        if (SpotLights.size() > 0) {
-            m_lightingTech.SetSpotLights((unsigned int)SpotLights.size(), &SpotLights[0], true);
-            NumLightsTotal += (int)SpotLights.size();
-        }
-    }
+        NumLightsTotal += NumSpotLights;
+    } 
 
     int NumDirLights = (int)pScene->GetDirLights().size();
 
@@ -342,15 +306,7 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
         const DirectionalLight& DirLight = pScene->GetDirLights()[0];
         m_lightingTech.SetDirectionalLight(DirLight, true);    
         NumLightsTotal += NumDirLights;
-    } else {
-        const std::vector<DirectionalLight>& DirLights = pSceneObject->GetModel()->GetDirLights();
-
-        if (DirLights.size() > 0) {
-            const DirectionalLight& DirLight = DirLights[0];
-            m_lightingTech.SetDirectionalLight(DirLight, true);
-            NumLightsTotal += (int)DirLights.size();
-        }
-    }
+    } 
 
     if (NumLightsTotal == 0) {
         printf("Warning! trying to render but all lights are zero\n");

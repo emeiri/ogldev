@@ -156,3 +156,65 @@ CoreSceneObject* CoreScene::CreateSceneObjectInternal(DemolitionModel* pModel)
 
     return pCoreSceneObject;
 }
+
+
+const std::vector<PointLight>& CoreScene::GetPointLights()
+{
+    if (m_pointLights.size() > 0) {
+        return m_pointLights;
+    }
+
+    for (std::list<CoreSceneObject*>::const_iterator it = m_renderList.begin(); it != m_renderList.end(); it++) {
+        CoreSceneObject* pSceneObject = *it;
+
+        const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
+
+        if (PointLights.size() > 0) {
+            return PointLights;
+        }
+    }
+
+    return m_pointLights;
+}
+
+
+const std::vector<SpotLight>& CoreScene::GetSpotLights()
+{ 
+    if (m_spotLights.size() > 0) {
+        return m_spotLights;
+    }
+
+    for (std::list<CoreSceneObject*>::const_iterator it = m_renderList.begin(); it != m_renderList.end(); it++) {
+        CoreSceneObject* pSceneObject = *it;
+
+        const std::vector<SpotLight>& SpotLights = pSceneObject->GetModel()->GetSpotLights();
+
+        if (SpotLights.size() > 0) {
+            return SpotLights;
+        }
+    }
+
+    return m_spotLights;
+}
+
+
+const std::vector<DirectionalLight>& CoreScene::GetDirLights()
+{ 
+    if (m_dirLights.size() > 0) {
+        return m_dirLights;
+    }
+
+    for (std::list<CoreSceneObject*>::const_iterator it = m_renderList.begin(); it != m_renderList.end(); it++) {
+        CoreSceneObject* pSceneObject = *it;
+
+        const std::vector<DirectionalLight>& DirLights = pSceneObject->GetModel()->GetDirLights();
+
+        if (DirLights.size() > 0) {
+            return DirLights;
+        }
+    }
+
+    return m_dirLights;
+
+}
+

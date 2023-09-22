@@ -60,6 +60,12 @@ public:
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape);
 
+    const std::vector<PointLight>& GetPointLights();
+
+    const std::vector<SpotLight>& GetSpotLights();
+
+    const std::vector<DirectionalLight>& GetDirLights();
+
     BasicCamera* GetCurrentCamera() { return &m_defaultCamera; }
 
     void InitializeDefault();
