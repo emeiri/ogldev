@@ -70,6 +70,8 @@ class BaseTerrain
 	
     void SetWaterHeight(float Height) { m_water.SetWaterHeight(Height); }
 
+    void SetWaveParam(int WaveIndex, const WaveParam& Wave) { m_water.SetWaveParam(WaveIndex, Wave); }
+
  protected:
 
 	void LoadHeightMapFile(const char* pFilename);

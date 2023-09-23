@@ -57,7 +57,28 @@ public:
 
     TerrainDemo9()
     {
+        m_waveParams[0].WaveLen = 1.0f;
+        m_waveParams[0].Speed = 1.0f;
+        m_waveParams[0].Amp = 1.0f;
+
+        m_waveParams[1].WaveLen = 1.0f;
+        m_waveParams[1].Speed = 1.0f;
+        m_waveParams[1].Amp = 1.0f;
+
+        m_waveParams[2].WaveLen = 1.0f;
+        m_waveParams[2].Speed = 1.0f;
+        m_waveParams[2].Amp = 1.0f;
+
+        m_waveParams[3].WaveLen = 1.0f;
+        m_waveParams[3].Speed = 1.0f;
+        m_waveParams[3].Amp = 1.0f;
+
+        m_terrain.SetWaveParam(0, m_waveParams[0]);
+        m_terrain.SetWaveParam(1, m_waveParams[1]);
+        m_terrain.SetWaveParam(2, m_waveParams[2]);
+        m_terrain.SetWaveParam(3, m_waveParams[3]);
     }
+
 
     virtual ~TerrainDemo9()
     {
@@ -93,8 +114,28 @@ public:
                 ImGui::Begin("Terrain Water Demo"); 
 
                 ImGui::SliderFloat("Water height", &this->m_waterHeight, 0.0f, m_maxHeight);
-
                 m_terrain.SetWaterHeight(m_waterHeight);
+
+                ImGui::SliderFloat("Wave0: len", &this->m_waveParams[0].WaveLen, 0.0f, 500.0);
+                ImGui::SliderFloat("Wave0: speed", &this->m_waveParams[0].Speed, 0.01f, 50.0);
+                ImGui::SliderFloat("Wave0: amplitude", &this->m_waveParams[0].Amp, 0.1f, 20.0);
+
+                ImGui::SliderFloat("Wave1: len", &this->m_waveParams[1].WaveLen, 0.0f, 500.0);
+                ImGui::SliderFloat("Wave1: speed", &this->m_waveParams[1].Speed, 0.01f, 50.0);
+                ImGui::SliderFloat("Wave1: amplitude", &this->m_waveParams[1].Amp, 0.1f, 20.0);
+
+                ImGui::SliderFloat("Wave2: len", &this->m_waveParams[2].WaveLen, 0.0f, 500.0);
+                ImGui::SliderFloat("Wave2: speed", &this->m_waveParams[2].Speed, 0.01f, 50.0);
+                ImGui::SliderFloat("Wave2: amplitude", &this->m_waveParams[2].Amp, 0.1f, 20.0);
+
+                ImGui::SliderFloat("Wave3: len", &this->m_waveParams[3].WaveLen, 0.0f, 500.0);
+                ImGui::SliderFloat("Wave3: speed", &this->m_waveParams[3].Speed, 0.01f, 50.0);
+                ImGui::SliderFloat("Wave3: amplitude", &this->m_waveParams[3].Amp, 0.1f, 20.0);
+
+                m_terrain.SetWaveParam(0, m_waveParams[0]);
+                m_terrain.SetWaveParam(1, m_waveParams[1]);
+                m_terrain.SetWaveParam(2, m_waveParams[2]);
+                m_terrain.SetWaveParam(3, m_waveParams[3]);
 
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
                 ImGui::End();
@@ -324,6 +365,7 @@ private:
     float m_counter = 0.0f;
     bool m_constrainCamera = false;	
     float m_waterHeight = 200.0f;
+    WaveParam m_waveParams[MAX_WAVES];
 };
 
 TerrainDemo9* app = NULL;

@@ -44,6 +44,14 @@ void SimpleWater::Init(int Size, float WorldScale)
 }
 
 
+void SimpleWater::SetWaveParam(int WaveIndex, const WaveParam& Wave)
+{
+    assert(WaveIndex < MAX_WAVES);
+
+    m_waveParams[WaveIndex] = Wave;
+}
+
+
 void SimpleWater::Render(const Matrix4f& WVP)
 {
     m_waterTech.Enable();
@@ -56,6 +64,11 @@ void SimpleWater::Render(const Matrix4f& WVP)
    // printf("%f\n", m_time);
 
     m_waterTech.SetTime(m_time);
+
+    m_waterTech.SetWaveParam(0, m_waveParams[0]);
+    m_waterTech.SetWaveParam(1, m_waveParams[1]);
+    m_waterTech.SetWaveParam(2, m_waveParams[2]);
+    m_waterTech.SetWaveParam(3, m_waveParams[3]);
 
     m_water.Render();
 

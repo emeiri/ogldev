@@ -21,6 +21,15 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
+#define MAX_WAVES 4
+
+struct WaveParam {
+    float WaveLen = 0.0f;
+    float Speed = 0.0f;
+    float Amp = 0.0f;
+};
+
+
 class SimpleWaterTechnique : public Technique
 {
 public:
@@ -32,11 +41,17 @@ public:
     void SetWVP(const Matrix4f& WVP);
     void SetWaterHeight(float Height);
     void SetTime(float Time);
+    void SetWaveParam(int WaveIndex, const WaveParam& Wave);
 
 private:
     GLuint m_WVPLoc = -1;
     GLuint m_heightLoc = -1;
     GLuint m_timeLoc = -1;
+    struct {
+        GLuint WaveLenLoc = -1;
+        GLuint SpeedLoc = -1;
+        GLuint AmpLoc = -1;
+    } m_waveParams[MAX_WAVES];
 };
 
 #endif  /* SIMPLE_WATER_TECHNIQUE_H */

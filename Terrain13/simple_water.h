@@ -22,6 +22,7 @@
 #include "simple_water_technique.h"
 #include "triangle_list.h"
 
+
 class SimpleWater {
  public:
 
@@ -33,6 +34,8 @@ class SimpleWater {
 
     void SetWaterHeight(float Height) { m_waterHeight = Height; }
 
+    void SetWaveParam(int WaveIndex, const WaveParam& Wave);
+
     float GetWaterHeight() const { return m_waterHeight; }
 
     void Render(const Matrix4f& WVP);
@@ -43,6 +46,7 @@ class SimpleWater {
     float m_waterHeight = 64.0f;
     long long m_prevTime = 0;
     float m_time = 0.0f;
+    WaveParam m_waveParams[MAX_WAVES];
 };
 
 #endif

@@ -52,6 +52,27 @@ bool SimpleWaterTechnique::Init()
         return false;
     }
 
+    for (int i = 0; i < MAX_WAVES; i++) {
+        char Name[128];
+        snprintf(Name, sizeof(Name), "gWaveParam[%d].WaveLen", i);
+        m_waveParams[i].WaveLenLoc = GetUniformLocation(Name);
+        if (m_waveParams[i].WaveLenLoc == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
+
+        snprintf(Name, sizeof(Name), "gWaveParam[%d].Speed", i);
+        m_waveParams[i].SpeedLoc = GetUniformLocation(Name);
+        if (m_waveParams[i].SpeedLoc == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
+
+        snprintf(Name, sizeof(Name), "gWaveParam[%d].Amp", i);
+        m_waveParams[i].AmpLoc = GetUniformLocation(Name);
+        if (m_waveParams[i].AmpLoc == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -71,4 +92,17 @@ void SimpleWaterTechnique::SetWaterHeight(float Height)
 void SimpleWaterTechnique::SetTime(float Time)
 {
     glUniform1f(m_timeLoc, Time);
+}
+
+
+void SimpleWaterTechnique::SetWaveParam(int WaveIndex, const WaveParam& Wave)
+{
+    if (WaveIndex >= MAX_WAVES) {
+        printf("Invalid wave index %d\n", WaveIndex);
+        exit(0);
+    }
+
+    glUniform1f(m_waveParams[WaveIndex].WaveLenLoc, Wave.WaveLen);
+    glUniform1f(m_waveParams[WaveIndex].SpeedLoc, Wave.Speed);
+    glUniform1f(m_waveParams[WaveIndex].AmpLoc, Wave.Amp);
 }
