@@ -5,12 +5,13 @@ layout (location = 1) in vec2 TexCoord;
 
 uniform mat4 gWVP;
 uniform float gHeight = 0.0f;
+uniform float gTime = 0.0f;
 
 out vec2 oTex;
 
 void main()
 {
-    vec3 NewPosition = (Position + vec3(0.0, gHeight, 0.0));
+    vec3 NewPosition = (Position + vec3(0.0, gHeight + 2.0 * sin(Position.x + gTime * 0.5), 0.0));
     gl_Position = gWVP * vec4(NewPosition, 1.0);
     oTex = TexCoord;
 }

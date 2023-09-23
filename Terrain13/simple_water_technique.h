@@ -31,10 +31,12 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
     void SetWaterHeight(float Height);
+    void SetTime(float Time);
 
 private:
     GLuint m_WVPLoc = -1;
     GLuint m_heightLoc = -1;
+    GLuint m_timeLoc = -1;
 };
 
 #endif  /* SIMPLE_WATER_TECHNIQUE_H */

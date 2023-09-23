@@ -19,7 +19,7 @@
 #include "texture_config.h"
 
 SimpleWater::SimpleWater()
-{
+{    
 }
 
 
@@ -38,7 +38,9 @@ void SimpleWater::Init(int Size, float WorldScale)
     m_waterTech.Enable();
     m_waterTech.SetWaterHeight(m_waterHeight);
 
-    m_water.CreateTriangleList(2, 2, Size * WorldScale);
+    m_water.CreateTriangleList(Size, Size, WorldScale);
+
+    m_prevTime = GetCurrentTimeMillis();
 }
 
 
@@ -48,5 +50,17 @@ void SimpleWater::Render(const Matrix4f& WVP)
     m_waterTech.SetWVP(WVP);
     m_waterTech.SetWaterHeight(m_waterHeight);
 
+    long long CurTime = GetCurrentTimeMillis();
+    long long DeltaTime = CurTime - m_prevTime;
+    m_time += DeltaTime / 1000.0f;
+   // printf("%f\n", m_time);
+
+    m_waterTech.SetTime(m_time);
+
     m_water.Render();
+
+    m_prevTime = CurTime;
+    if (m_time >= 8.0f) {
+      //  m_time = 0.0f;
+    }
 }

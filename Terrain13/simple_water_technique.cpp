@@ -44,9 +44,11 @@ bool SimpleWaterTechnique::Init()
 
     m_WVPLoc = GetUniformLocation("gWVP");
     m_heightLoc = GetUniformLocation("gHeight");
+    m_timeLoc = GetUniformLocation("gTime");
 
     if (m_WVPLoc == INVALID_UNIFORM_LOCATION ||
-        m_heightLoc == INVALID_UNIFORM_LOCATION) {
+        m_heightLoc == INVALID_UNIFORM_LOCATION ||
+        m_timeLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -65,3 +67,8 @@ void SimpleWaterTechnique::SetWaterHeight(float Height)
     glUniform1f(m_heightLoc, Height);
 }
 
+
+void SimpleWaterTechnique::SetTime(float Time)
+{
+    glUniform1f(m_timeLoc, Time);
+}

@@ -41,6 +41,8 @@ class SimpleWater {
     TriangleList m_water;
     SimpleWaterTechnique m_waterTech;
     float m_waterHeight = 64.0f;
+    long long m_prevTime = 0;
+    float m_time = 0.0f;
 };
 
 #endif
