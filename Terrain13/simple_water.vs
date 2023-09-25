@@ -29,7 +29,6 @@ float CalcSineFunc(Wave w)
     float x = w.Dir.x * Position.x;
     float z = w.Dir.y * Position.z;
     float xz = dot(Dir, Position);
-    //float Sine = w.Amp * sin(xz * Freq + Phase * gTime);
     float Sine = w.Amp * sin(xz * Freq + Phase * gTime);
     return Sine;
 }
@@ -44,14 +43,11 @@ vec3 CalcNormal(Wave w)
     float xz = dot(Dir, Position);
     float dx = w.Amp * w.Dir.x * cos(xz * Freq + Phase * gTime);
     float dz = w.Amp * w.Dir.y * cos(xz * Freq + Phase * gTime);
-    //float dz = w.Amp * cos(z * Freq + Phase * gTime);
-    vec3 Tangent = vec3(-dx, 0, 0);
-    vec3 Binormal = vec3(0, 0, 1);
+    vec3 Tangent = vec3(1, 0, dx);
+    vec3 Binormal = vec3(0, 1, dz);
     vec3 Normal = cross(Binormal, Tangent);
-    //Normal = normalize(Normal);
+    Normal = normalize(Normal);
     return Normal;
-    //vec3 n = vec3(dx, 1.0, dz);
-    //return normalize(n);
 }
 
 void main()
