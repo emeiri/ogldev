@@ -27,6 +27,7 @@ struct WaveParam {
     float WaveLen = 0.0f;
     float Speed = 0.0f;
     float Amp = 0.0f;
+    Vector2f Dir = { 0.0f, 0.0f };
 };
 
 
@@ -51,6 +52,7 @@ private:
         GLuint WaveLenLoc = -1;
         GLuint SpeedLoc = -1;
         GLuint AmpLoc = -1;
+        GLuint DirLoc = -1;
     } m_waveParams[MAX_WAVES];
 };
 

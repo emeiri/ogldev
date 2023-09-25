@@ -71,6 +71,12 @@ bool SimpleWaterTechnique::Init()
         if (m_waveParams[i].AmpLoc == INVALID_UNIFORM_LOCATION) {
             return false;
         }
+
+        snprintf(Name, sizeof(Name), "gWaveParam[%d].Dir", i);
+        m_waveParams[i].DirLoc = GetUniformLocation(Name);
+        if (m_waveParams[i].DirLoc == INVALID_UNIFORM_LOCATION) {
+            return false;
+        }
     }
 
     return true;
@@ -105,4 +111,5 @@ void SimpleWaterTechnique::SetWaveParam(int WaveIndex, const WaveParam& Wave)
     glUniform1f(m_waveParams[WaveIndex].WaveLenLoc, Wave.WaveLen);
     glUniform1f(m_waveParams[WaveIndex].SpeedLoc, Wave.Speed);
     glUniform1f(m_waveParams[WaveIndex].AmpLoc, Wave.Amp);
+    glUniform2f(m_waveParams[WaveIndex].DirLoc, Wave.Dir.x, Wave.Dir.y);
 }

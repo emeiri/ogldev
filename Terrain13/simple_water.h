@@ -41,12 +41,23 @@ class SimpleWater {
     void Render(const Matrix4f& WVP);
 
  private:
+    void InitWave(int index);
+    void UpdateGeoWaves(float dt);
+    void UpdateGeoWave(int index, float dt);
+    void UpdateWaves();
+
     TriangleList m_water;
     SimpleWaterTechnique m_waterTech;
     float m_waterHeight = 64.0f;
     long long m_prevTime = 0;
     float m_time = 0.0f;
     WaveParam m_waveParams[MAX_WAVES];
+    float m_fade[MAX_WAVES] = { 0 };
+    int m_transIndex = 0;
+    float m_transDel = -1.0f / 6.0f;
+    float m_minWaveLen = 15.0f;
+    float m_maxWaveLen = 125.0f;
+    float m_ampOverLen = 1.0f;
 };
 
 #endif
