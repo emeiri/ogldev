@@ -101,6 +101,23 @@ struct Vector2f
             printf("\n");
         }
     }
+
+    float Length() const
+    {
+        float len = sqrtf(x * x + y * y);
+        return len;
+    }
+
+
+    void Normalize()
+    {
+        float len = Length();
+
+        assert(len != 0);
+
+        x /= len;
+        y /= len;
+    }
 };
 
 
