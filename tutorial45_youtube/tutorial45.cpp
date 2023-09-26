@@ -278,9 +278,6 @@ private:
     BasicCamera* m_pGameCamera = NULL;
     LightingTechnique m_lightingTech;
     BasicMesh* m_pTerrain = NULL;
-    Matrix4f m_cameraOrthoProjMatrix;
-    Vector3f m_lightWorldPos;
-    Matrix4f m_lightOrthoProjMatrix;
     DirectionalLight m_dirLight;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
