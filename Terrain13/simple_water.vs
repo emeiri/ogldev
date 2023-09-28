@@ -26,10 +26,8 @@ float CalcSineFunc(Wave w)
     float Freq = 2.0 / w.WaveLen;
     float Phase = w.Speed * Freq;
     vec3 Dir = vec3(w.Dir.x, 0.0, w.Dir.y);
-    float x = w.Dir.x * Position.x;
-    float z = w.Dir.y * Position.z;
     float xz = dot(Dir, Position);
-    float Sine = w.Amp * sin(xz * Freq + Phase * gTime);
+    float Sine = w.Amp * sin(xz * Freq + Phase * gTime);    
     return Sine;
 }
 
@@ -41,10 +39,10 @@ vec3 CalcNormal(Wave w)
     float z = w.Dir.y * Position.z;
     vec3 Dir = vec3(w.Dir.x, 0.0, w.Dir.y);
     float xz = dot(Dir, Position);
-    float dx = w.Amp * w.Dir.x * cos(xz * Freq + Phase * gTime);
-    float dz = w.Amp * w.Dir.y * cos(xz * Freq + Phase * gTime);
-    vec3 Tangent = vec3(1, 0, dx);
-    vec3 Binormal = vec3(0, 1, dz);
+    float dx = Freq * w.Amp * cos(xz * Freq + Phase * gTime);
+    float dz = Freq * w.Amp * cos(xz * Freq + Phase * gTime);
+    vec3 Tangent = normalize(vec3(dx, 0, 1));
+    vec3 Binormal = normalize(vec3(1, 0, dz));
     vec3 Normal = cross(Binormal, Tangent);
     Normal = normalize(Normal);
     return Normal;

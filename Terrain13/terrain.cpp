@@ -159,11 +159,11 @@ void BaseTerrain::SaveToFile(const char* pFilename)
 
 void BaseTerrain::Render(const BasicCamera& Camera)
 {
-    RenderTerrain(Camera);
+    //RenderTerrain(Camera);
  
     RenderWater(Camera);
  
-    m_pSkydome->Render(Camera);	
+    //m_pSkydome->Render(Camera);	
 }
 
 

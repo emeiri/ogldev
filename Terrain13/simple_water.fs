@@ -12,7 +12,7 @@ void main()
     float Color = oHeight/oMaxHeight;
 
     vec3 Normal = normalize(oNormal);
-    vec3 LightDir = vec3(-1.0f, 1.0f, 0.0f);
+    vec3 LightDir = vec3(1.0f, -1.0f, 0.0f);
 
     float Diffuse = max(dot(Normal, LightDir), 0.0);
     Diffuse = max(Diffuse, 0.3);

@@ -45,7 +45,7 @@ void SimpleWater::Init(int Size, float WorldScale)
     m_waterTech.Enable();
     m_waterTech.SetWaterHeight(m_waterHeight);
 
-    m_water.CreateTriangleList(Size, Size, WorldScale);
+    m_water.CreateTriangleList(500, 500, 0.5f);
 
     m_prevTime = GetCurrentTimeMillis();
 
@@ -83,14 +83,14 @@ void SimpleWater::Render(const Matrix4f& WVP)
 
     m_prevTime = CurTime;
 
-    UpdateWaves((int)DeltaTime);
+   // UpdateWaves((int)DeltaTime);
 }
 
-float medianWavelength = 50.0f;
+float medianWavelength = 10.0f;
 float wavelengthRange = 1.0f;
 float medianDirection = 0.0f;
 float directionalRange = 30.0f;
-float medianAmplitude = 10.0f;
+float medianAmplitude = 1.5f;
 float steepness = 0.0f;
 float wavelengthMin = medianWavelength / (1.0f + wavelengthRange);
 
@@ -106,19 +106,48 @@ void SimpleWater::InitWaves()
         float wavelength = RandZeroToOne() * (wavelengthMax - wavelengthMin) + wavelengthMin;
         float direction = RandZeroToOne() * (directionMax - directionMin) + directionMin;
         float amplitude = wavelength * ampOverLen;
-        float speed = sqrtf(1000.0f * (float)M_PI / wavelength);
+        float speed = sqrtf((float)M_PI / wavelength);
 
         m_waveParams[i].WaveLen = wavelength;
         m_waveParams[i].Dir = Vector2f(cosf(ToRadian(direction)), sinf(ToRadian(direction)));
-       // m_waveParams[i].Dir = Vector2f(1.0f, 0.0f);
+      //  m_waveParams[i].Dir = Vector2f(1.0f, 0.0f);
         m_waveParams[i].Dir.Normalize();
         m_waveParams[i].Amp = amplitude;
-        m_waveParams[i].Speed = speed;
+        m_waveParams[i].Speed = speed * 30.0f;
 
         printf("speed %f\n", speed);
         printf("amp %f\n", amplitude);
         printf("dir %f,%f\n", m_waveParams[i].Dir.x, m_waveParams[i].Dir.y);
     }
+
+ /*   m_waveParams[0].WaveLen = 5.6f;
+    float direction = 57.0f;
+    m_waveParams[0].Dir = Vector2f(cosf(ToRadian(direction)), sinf(ToRadian(direction)));
+    m_waveParams[0].Dir.Normalize();
+    m_waveParams[0].Amp = 0.88f;
+    m_waveParams[0].Speed = 2.91f;
+
+    m_waveParams[1].WaveLen = 4.72f;
+    direction = 100.0f;
+    m_waveParams[1].Dir = Vector2f(cosf(ToRadian(direction)), sinf(ToRadian(direction)));
+    m_waveParams[1].Dir.Normalize();
+    m_waveParams[1].Amp = 1.0f;
+    m_waveParams[1].Speed = 2.38f;
+
+    m_waveParams[2].WaveLen = 4.34f;
+    direction = 24.0f;
+    m_waveParams[2].Dir = Vector2f(cosf(ToRadian(direction)), sinf(ToRadian(direction)));
+    m_waveParams[2].Dir.Normalize();
+    m_waveParams[2].Amp = 1.0f;
+    m_waveParams[2].Speed = 2.38f;
+
+    m_waveParams[3].WaveLen = 1.57f;
+    direction = 24.0f;
+    m_waveParams[3].Dir = Vector2f(cosf(ToRadian(direction)), sinf(ToRadian(direction)));
+    m_waveParams[3].Dir.Normalize();
+    m_waveParams[3].Amp = 1.37f;
+    m_waveParams[3].Speed = 1.1f;*/
+
 }
 
 

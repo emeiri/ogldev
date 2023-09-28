@@ -180,6 +180,8 @@ public:
         float y = min(-0.4f, cosf(foo));
         Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
 
+        Vector3f LightDir2(1.0f, -1.0f, 0.0f);
+
         m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
@@ -292,8 +294,8 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, m_maxHeight + 100.0f, -150.0f);
-        Vector3f Target(0.0f, -0.25f, 1.0f);
+        Vector3f Pos(50.0f, 220.0f, 120.0f);
+        Vector3f Target(0.0f, -0.15f, -1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
