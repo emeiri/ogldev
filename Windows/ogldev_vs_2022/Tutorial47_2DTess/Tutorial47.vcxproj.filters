@@ -17,15 +17,19 @@
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
     <ClCompile Include="..\..\..\tutorial47_youtube\tutorial47.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\billboard.fs">
+    <None Include="..\..\..\Common\Shaders\bezier_curve.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Common\Shaders\billboard.gs">
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tcs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Common\Shaders\billboard.vs">
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tes">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\bezier_curve.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

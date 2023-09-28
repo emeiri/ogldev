@@ -31,7 +31,7 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_new_lighting.h"
+#include "ogldev_bezier_curve_technique.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -40,6 +40,47 @@
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
+
+class VertexBuffer {
+public:
+    VertexBuffer()
+    {
+
+    }
+
+    ~VertexBuffer()
+    {
+
+    }
+
+    void Init(const std::vector<float>& Vertices)
+    {        
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
+
+        glGenBuffers(1, &m_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
+    }
+
+
+    void Render()
+    {
+        glBindVertexArray(m_vao);
+        glDrawArrays(GL_PATCHES, 0, 4);
+    }
+
+private:
+    GLuint m_vbo = -1;
+    GLuint m_vao = -1;
+};
 
 
 class Tutorial45
@@ -54,6 +95,16 @@ public:
         m_dirLight.WorldDirection = Vector3f(0.0f, -0.5f, 1.0f);
 
         m_position = Vector3f(0.0f, 0.0f, -12.0f);
+
+        float c = 3.5f;
+        OrthoProjInfo info;
+        info.l = -0.4f * c;
+        info.r = 0.4f * c;
+        info.b = -0.3f * c;
+        info.t = 0.3f * c;
+        info.n = 0.1f;
+        info.f = 100.0f;
+        m_projection.InitOrthoProjTransform(info);
     }
 
 
@@ -74,6 +125,13 @@ public:
         InitMesh();
 
         InitShaders();
+
+        glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
+        glFrontFace(GL_CW);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CLIP_DISTANCE0);
+        glPointSize(10.0f);
 	}
 
 
@@ -88,6 +146,20 @@ public:
 
 
     void RenderSceneCB()
+    {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        m_pGameCamera->OnRender();
+
+        m_bezierCurveTech.Enable();
+
+        m_bezierCurveTech.SetWVP(m_pGameCamera->GetMatrix());
+
+        m_vertexBuffer.Render();
+    }
+
+
+    /*void RenderSceneCB()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -132,7 +204,7 @@ public:
         m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
 
         m_pTerrain->Render();
-    }
+    }*/
 
 
 #define ATTEN_STEP 0.01f
@@ -194,17 +266,17 @@ private:
     
     void InitCamera()
     {
-        m_cameraPos = Vector3f(0.0f, 1.0f, -1.0f);
-        m_cameraTarget = Vector3f(0.0f, -0.5f, 1.0f);
+        m_cameraPos = Vector3f(0.0f, 0.0f, -1.0f);
+        m_cameraTarget = Vector3f(0.0f, 0.f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 	
-        float FOV = 75.0f;
+        float FOV = 45.0f;
         float zNear = 0.1f;
         float zFar = 100.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
-        m_pGameCamera->SetSpeed(0.01f);
+        m_pGameCamera->SetSpeed(0.1f);
     }
 
 
@@ -217,6 +289,17 @@ private:
 
         m_lightingTech.Enable();
         m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+
+        if (!m_bezierCurveTech.Init()) {
+            printf("Error initializing the bezier curve technique\n");
+            exit(1);
+        }
+
+        m_bezierCurveTech.Enable();
+
+        m_bezierCurveTech.SetNumSegments(50);
+        m_bezierCurveTech.SetNumStrips(1);
+        m_bezierCurveTech.SetLineColor(1.0f, 1.0f, 0.5f, 1.0f);
     }
 
 
@@ -230,6 +313,9 @@ private:
         }
 
         m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
+
+        std::vector<float> Vertices = { -1.0f, -1.0f, -0.85f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f };
+        m_vertexBuffer.Init(Vertices);
     }
 
     GLFWwindow* window = NULL;
@@ -240,7 +326,10 @@ private:
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     Vector3f m_position;
+    Matrix4f m_projection;
 	bool m_isPaused = false;
+    VertexBuffer m_vertexBuffer;
+    BezierCurveTechnique m_bezierCurveTech;
 };
 
 Tutorial45* app = NULL;
@@ -272,12 +361,6 @@ int main(int argc, char** argv)
     app = new Tutorial45();
 
     app->Init();
-
-    glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
-    glFrontFace(GL_CW);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CLIP_DISTANCE0);
 
     app->Run();
 

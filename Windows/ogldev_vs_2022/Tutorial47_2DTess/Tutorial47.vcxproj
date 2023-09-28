@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
@@ -32,9 +33,10 @@
     <ClCompile Include="..\..\..\tutorial47_youtube\tutorial47.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\billboard.fs" />
-    <None Include="..\..\..\Common\Shaders\billboard.gs" />
-    <None Include="..\..\..\Common\Shaders\billboard.vs" />
+    <None Include="..\..\..\Common\Shaders\bezier_curve.fs" />
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tcs" />
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tes" />
+    <None Include="..\..\..\Common\Shaders\bezier_curve.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
