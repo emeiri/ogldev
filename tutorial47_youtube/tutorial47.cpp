@@ -24,13 +24,9 @@
 #include <GL/glew.h>
 
 
-#include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
-#include "ogldev_basic_mesh.h"
-#include "ogldev_world_transform.h"
 #include "ogldev_bezier_curve_technique.h"
 
 #define WINDOW_WIDTH  1920
@@ -89,22 +85,6 @@ public:
 
     Tutorial45()
     {    
-        m_dirLight.AmbientIntensity = 0.5f;
-        m_dirLight.DiffuseIntensity = 0.9f;
-        m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight.WorldDirection = Vector3f(0.0f, -0.5f, 1.0f);
-
-        m_position = Vector3f(0.0f, 0.0f, -12.0f);
-
-        float c = 3.5f;
-        OrthoProjInfo info;
-        info.l = -0.4f * c;
-        info.r = 0.4f * c;
-        info.b = -0.3f * c;
-        info.t = 0.3f * c;
-        info.n = 0.1f;
-        info.f = 100.0f;
-        m_projection.InitOrthoProjTransform(info);
     }
 
 
@@ -153,64 +133,11 @@ public:
 
         m_bezierCurveTech.Enable();
 
-        m_bezierCurveTech.SetWVP(m_pGameCamera->GetMatrix());
+        m_bezierCurveTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
 
         m_vertexBuffer.Render();
     }
-
-
-    /*void RenderSceneCB()
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        static float foo = 0.0f;
-        foo += 0.001f;
-
-        float TerrainSize = 20.0f;
-        float Radius = TerrainSize * 1.4f;
-
-        Vector3f Pos(cosf(foo) * Radius, 3.0f, sinf(foo) * Radius);
-      //  m_pGameCamera->SetPosition(Pos);
-
-        Vector3f Center(0, 0.5f, 0);
-        Vector3f Target = Center - Pos;
-    //    m_pGameCamera->SetTarget(Target);
-    //    m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
-
-
-        m_pGameCamera->OnRender();
-
-        /////////////////////////
-        // Render the terrain
-        ////////////////////////
-
-        m_lightingTech.Enable();
-
-        Matrix4f CameraView = m_pGameCamera->GetMatrix();
-        Matrix4f CameraProjection = m_pGameCamera->GetProjectionMat();
-
-        // Set the WVP matrix from the camera point of view
-        Matrix4f World = m_pTerrain->GetWorldMatrix();
-        Matrix4f WVP = CameraProjection * CameraView * World;
-        m_lightingTech.SetWVP(WVP);
-
-        // Update the shader with the local space pos/dir of the spot light
-        m_dirLight.CalcLocalDirection(m_pTerrain->GetWorldTransform());
-        m_lightingTech.SetDirectionalLight(m_dirLight);
-        m_lightingTech.SetMaterial(m_pTerrain->GetMaterial());
-
-        // Update the shader with the local space pos of the camera
-        Vector3f CameraLocalPos3f = m_pTerrain->GetWorldTransform().WorldPosToLocalPos(m_pGameCamera->GetPos());
-        m_lightingTech.SetCameraLocalPos(CameraLocalPos3f);
-
-        m_pTerrain->Render();
-    }*/
-
-
-#define ATTEN_STEP 0.01f
-
-#define ANGLE_STEP 1.0f
-
+    
     void PassiveMouseCB(int x, int y)
     {
         if (!m_isPaused) {
@@ -266,30 +193,28 @@ private:
     
     void InitCamera()
     {
-        m_cameraPos = Vector3f(0.0f, 0.0f, -1.0f);
-        m_cameraTarget = Vector3f(0.0f, 0.f, 1.0f);
+        Vector3f CameraPos = Vector3f(0.0f, 0.0f, -1.0f);
+        Vector3f CameraTarget = Vector3f(0.0f, 0.f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 	
-        float FOV = 45.0f;
-        float zNear = 0.1f;
-        float zFar = 100.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+        float c = 3.5f;
+        OrthoProjInfo orthoProjinfo;
+        orthoProjinfo.l = -0.4f * c;
+        orthoProjinfo.r = 0.4f * c;
+        orthoProjinfo.b = -0.3f * c;
+        orthoProjinfo.t = 0.3f * c;
+        orthoProjinfo.n = 0.1f;
+        orthoProjinfo.f = 100.0f;
+        orthoProjinfo.Width = WINDOW_WIDTH;
+        orthoProjinfo.Height = WINDOW_HEIGHT;
 
-        m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
+        m_pGameCamera = new BasicCamera(orthoProjinfo, CameraPos, CameraTarget, Up);
         m_pGameCamera->SetSpeed(0.1f);
     }
 
 
     void InitShaders()
     {
-        if (!m_lightingTech.Init()) {
-            printf("Error initializing the lighting technique\n");
-            exit(1);
-        }
-
-        m_lightingTech.Enable();
-        m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-
         if (!m_bezierCurveTech.Init()) {
             printf("Error initializing the bezier curve technique\n");
             exit(1);
@@ -305,28 +230,12 @@ private:
 
     void InitMesh()
     {
-        m_pTerrain = new BasicMesh();
-
-        if (!m_pTerrain->LoadMesh("terrain.obj")) {
-            printf("Error loading mesh terrain.obj\n");
-            exit(0);
-        }
-
-        m_pTerrain->SetPosition(0.0f, 0.0f, 0.0f);
-
         std::vector<float> Vertices = { -1.0f, -1.0f, -0.85f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f };
         m_vertexBuffer.Init(Vertices);
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
-    LightingTechnique m_lightingTech;
-    BasicMesh* m_pTerrain = NULL;
-    DirectionalLight m_dirLight;
-    Vector3f m_cameraPos;
-    Vector3f m_cameraTarget;
-    Vector3f m_position;
-    Matrix4f m_projection;
 	bool m_isPaused = false;
     VertexBuffer m_vertexBuffer;
     BezierCurveTechnique m_bezierCurveTech;
