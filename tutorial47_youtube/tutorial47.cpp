@@ -67,6 +67,14 @@ public:
     }
 
 
+    void Update(const std::vector<float>& Vertices)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+
     void Render()
     {
         glBindVertexArray(m_vao);
@@ -145,8 +153,14 @@ public:
         }
     }
 
+
+#define STEP 0.01f
+
     void KeyboardCB(uint key, int state)
     {
+        bool Handled = true;
+        bool UpdateVertices = false;
+
         if (state == GLFW_PRESS) {
             switch (key) {
             case GLFW_KEY_ESCAPE:
@@ -158,10 +172,55 @@ public:
             case GLFW_KEY_P:
                 m_isPaused = !m_isPaused;
                 break;
+
+            case GLFW_KEY_1:
+                m_curVertex = 0;
+                break;
+
+            case GLFW_KEY_2:
+                m_curVertex = 1;
+                break;
+
+            case GLFW_KEY_3:
+                m_curVertex = 2;
+                break;
+
+            case GLFW_KEY_4:
+                m_curVertex = 3;
+                break;
+
+            case GLFW_KEY_UP:
+                m_vertices[m_curVertex * 2 + 1] += STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_DOWN:
+                m_vertices[m_curVertex * 2 + 1] -= STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_LEFT:
+                m_vertices[m_curVertex * 2] -= STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_RIGHT:
+                m_vertices[m_curVertex * 2] += STEP;
+                UpdateVertices = true;
+                break;
+
+            default:
+                Handled = false;
             }
         }
 
-        m_pGameCamera->OnKeyboard(key);
+        if (UpdateVertices) {
+            m_vertexBuffer.Update(m_vertices);
+        }
+
+        if (!Handled) {
+            m_pGameCamera->OnKeyboard(key);
+        }
     }
 
 
@@ -229,9 +288,8 @@ private:
 
 
     void InitMesh()
-    {
-        std::vector<float> Vertices = { -1.0f, -1.0f, -0.85f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f };
-        m_vertexBuffer.Init(Vertices);
+    {        
+        m_vertexBuffer.Init(m_vertices);
     }
 
     GLFWwindow* window = NULL;
@@ -239,6 +297,8 @@ private:
 	bool m_isPaused = false;
     VertexBuffer m_vertexBuffer;
     BezierCurveTechnique m_bezierCurveTech;
+    std::vector<float> m_vertices = { -1.0f, -1.0f, -0.85f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f };
+    int m_curVertex = 0;
 };
 
 Tutorial45* app = NULL;
