@@ -95,7 +95,7 @@ void SkyBox::Render(const BasicCamera& Camera)
     Matrix4f View;
     View.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
     Matrix4f Proj;
-    Proj.InitPersProjTransform(Camera.m_persProjInfo);
+    Proj.InitPersProjTransform(Camera.GetPersProjInfo());
     Matrix4f WVP = Proj * View * Rotation;
     m_pSkyboxTechnique->SetWVP(WVP);
     m_pCubemapTex->Bind(GL_TEXTURE0);

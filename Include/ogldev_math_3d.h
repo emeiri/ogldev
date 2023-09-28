@@ -446,6 +446,9 @@ struct OrthoProjInfo
     float n;        // z near
     float f;        // z far
 
+    float Width;
+    float Height;    
+
     void Print()
     {
         printf("Left %f   Right %f\n", l, r);

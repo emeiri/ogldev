@@ -139,11 +139,11 @@ public:
 
         // Solution #5: from the video - calculate a tight light projection matrix
         OrthoProjInfo LightOrthoProjInfo;
-        CalcTightLightProjection(m_pGameCamera->GetMatrix(),    // in
-                                 m_dirLight.WorldDirection,     // in
-                                 m_pGameCamera->m_persProjInfo, // in
-                                 m_lightWorldPos,               // out
-                                 LightOrthoProjInfo);           // out
+        CalcTightLightProjection(m_pGameCamera->GetMatrix(),       // in
+                                 m_dirLight.WorldDirection,        // in
+                                 m_pGameCamera->GetPersProjInfo(), // in
+                                 m_lightWorldPos,                  // out
+                                 LightOrthoProjInfo);              // out
 
         Matrix4f LightView;
         Vector3f Up(0.0f, 1.0f, 0.0f);
