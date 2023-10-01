@@ -52,13 +52,11 @@ bool BezierCurveTechnique::Init()
 
     m_wvpLoc = GetUniformLocation("gWVP");
     m_numSegmentsLoc = GetUniformLocation("gNumSegments");
-    m_numStripsLoc = GetUniformLocation("gNumStrips");
     m_lineColorLoc = GetUniformLocation("gLineColor");
 
     return 
         ((m_wvpLoc != INVALID_UNIFORM_LOCATION) &&
         (m_numSegmentsLoc != INVALID_UNIFORM_LOCATION) &&
-        (m_numStripsLoc != INVALID_UNIFORM_LOCATION) &&
         (m_lineColorLoc != INVALID_UNIFORM_LOCATION));
 }
 
@@ -72,12 +70,6 @@ void BezierCurveTechnique::SetWVP(const Matrix4f& WVP)
 void BezierCurveTechnique::SetNumSegments(int NumSegments)
 {
     glUniform1i(m_numSegmentsLoc, NumSegments);
-}
-
-
-void BezierCurveTechnique::SetNumStrips(int NumStrips)
-{
-    glUniform1i(m_numStripsLoc, NumStrips);
 }
 
 

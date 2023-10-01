@@ -10,14 +10,10 @@
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
-    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
     <ClCompile Include="..\..\..\tutorial47_youtube\tutorial47.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_passthru_vec2_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\bezier_curve.fs">

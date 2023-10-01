@@ -28,6 +28,7 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "ogldev_bezier_curve_technique.h"
+#include "ogldev_passthru_vec2_technique.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -75,10 +76,15 @@ public:
     }
 
 
-    void Render()
+    void Render(int topology_type)
     {
+        if ((topology_type != GL_POINTS) && (topology_type != GL_PATCHES)) {
+            printf("Invalid topology type 0x%x\n", topology_type);
+            exit(1);
+        }
+
         glBindVertexArray(m_vao);
-        glDrawArrays(GL_PATCHES, 0, 4);
+        glDrawArrays(topology_type, 0, 4);
     }
 
 private:
@@ -120,6 +126,7 @@ public:
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CLIP_DISTANCE0);
         glPointSize(10.0f);
+        glLineWidth(10.0f);
 	}
 
 
@@ -140,10 +147,12 @@ public:
         m_pGameCamera->OnRender();
 
         m_bezierCurveTech.Enable();
-
         m_bezierCurveTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
+        m_bezierCurveTech.SetNumSegments(m_numSegments);
+        m_vertexBuffer.Render(GL_PATCHES);
 
-        m_vertexBuffer.Render();
+        m_passThruTech.Enable();
+        m_vertexBuffer.Render(GL_POINTS);
     }
     
     void PassiveMouseCB(int x, int y)
@@ -207,6 +216,16 @@ public:
             case GLFW_KEY_RIGHT:
                 m_vertices[m_curVertex * 2] += STEP;
                 UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_A:
+                m_numSegments++;
+                break;
+
+            case GLFW_KEY_Z:
+                if (m_numSegments > 0) {
+                    m_numSegments--;
+                }
                 break;
 
             default:
@@ -281,9 +300,17 @@ private:
 
         m_bezierCurveTech.Enable();
 
-        m_bezierCurveTech.SetNumSegments(50);
-        m_bezierCurveTech.SetNumStrips(1);
+        m_bezierCurveTech.SetNumSegments(m_numSegments);
         m_bezierCurveTech.SetLineColor(1.0f, 1.0f, 0.5f, 1.0f);
+
+        if (!m_passThruTech.Init()) {
+            printf("Error initializing the passthru technique\n");
+            exit(1);
+        }
+
+        m_passThruTech.Enable();
+
+        m_passThruTech.SetColor(1.0f, 0.0f, 0.0f);
     }
 
 
@@ -297,8 +324,10 @@ private:
 	bool m_isPaused = false;
     VertexBuffer m_vertexBuffer;
     BezierCurveTechnique m_bezierCurveTech;
-    std::vector<float> m_vertices = { -1.0f, -1.0f, -0.85f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f };
+    PassthruVec2Technique m_passThruTech;
+    std::vector<float> m_vertices = { -0.95f, -0.95f, -0.85f, 0.95f, 0.5f, -0.95f, 0.95f, 0.95f };
     int m_curVertex = 0;
+    int m_numSegments = 50;
 };
 
 Tutorial45* app = NULL;
