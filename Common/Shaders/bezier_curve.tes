@@ -1,6 +1,6 @@
 #version 400
 
-layout( isolines ) in;
+layout (isolines) in;
 
 uniform mat4 gWVP;
 

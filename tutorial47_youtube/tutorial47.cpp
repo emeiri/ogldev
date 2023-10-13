@@ -325,7 +325,10 @@ private:
     VertexBuffer m_vertexBuffer;
     BezierCurveTechnique m_bezierCurveTech;
     PassthruVec2Technique m_passThruTech;
-    std::vector<float> m_vertices = { -0.95f, -0.95f, -0.85f, 0.95f, 0.5f, -0.95f, 0.95f, 0.95f };
+    std::vector<float> m_vertices = { -0.95f, -0.95f,     // X Y
+                                      -0.85f, 0.95f,      // X Y
+                                      0.5f, -0.95f,       // X Y
+                                      0.95f, 0.95f };     // X Y
     int m_curVertex = 0;
     int m_numSegments = 50;
 };

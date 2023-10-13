@@ -1,6 +1,6 @@
 #version 400
 
-layout (location = 0 ) in vec2 VertexPosition;
+layout (location = 0) in vec2 VertexPosition;
 
 void main()
 {
