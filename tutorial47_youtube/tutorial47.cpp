@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 45 - Point sprites with the Geometry Shader
+    Tutorial 47 - Introduction to Tessellation - Bezier Curve Rendering
 */
 
 #include <stdio.h>
@@ -93,16 +93,16 @@ private:
 };
 
 
-class Tutorial45
+class Tutorial47
 {
 public:
 
-    Tutorial45()
+    Tutorial47()
     {    
     }
 
 
-    virtual ~Tutorial45()
+    virtual ~Tutorial47()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -255,7 +255,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 45");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 47");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -333,7 +333,7 @@ private:
     int m_numSegments = 50;
 };
 
-Tutorial45* app = NULL;
+Tutorial47* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -359,7 +359,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial45();
+    app = new Tutorial47();
 
     app->Init();
 
