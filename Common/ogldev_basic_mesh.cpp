@@ -155,6 +155,8 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
         m_TexCoords.push_back(Vector2f(pTexCoord.x, pTexCoord.y));
     }
 
+    int BaseVertex = m_Meshes[MeshIndex].BaseVertex;
+
     // Populate the index buffer
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
@@ -163,9 +165,9 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
      /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
         printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
         printf("%d: %d\n", i * 3 + 2, Face.mIndices[2]);*/
-        m_Indices.push_back(Face.mIndices[0]);
-        m_Indices.push_back(Face.mIndices[1]);
-        m_Indices.push_back(Face.mIndices[2]);
+        m_Indices.push_back(BaseVertex + Face.mIndices[0]);
+        m_Indices.push_back(BaseVertex + Face.mIndices[1]);
+        m_Indices.push_back(BaseVertex + Face.mIndices[2]);
     }
 }
 
@@ -408,7 +410,7 @@ void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
                                  m_Meshes[i].NumIndices,
                                  GL_UNSIGNED_INT,
                                  (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
-                                 m_Meshes[i].BaseVertex);
+                                 0);
     }
 
     // Make sure the VAO is not changed from the outside
@@ -435,7 +437,7 @@ void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
                              3,
                              GL_UNSIGNED_INT,
                              (void*)(sizeof(unsigned int) * (m_Meshes[DrawIndex].BaseIndex + PrimID * 3)),
-                             m_Meshes[DrawIndex].BaseVertex);
+                             0);
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
@@ -472,7 +474,7 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
                                           GL_UNSIGNED_INT,
                                           (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
                                           NumInstances,
-                                          m_Meshes[i].BaseVertex);
+                                          0);
     }
 
     // Make sure the VAO is not changed from the outside
