@@ -16,6 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define USE_MESH_OPTIMIZER
+
+#include "meshoptimizer.h"
+
 #include "ogldev_basic_mesh.h"
 #include "ogldev_engine_common.h"
 
@@ -138,11 +142,12 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
     // Populate the vertex attribute vectors
     Vertex v;
 
+    std::vector<Vertex> Vertices(paiMesh->mNumVertices);
+
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
         const aiVector3D& pPos      = paiMesh->mVertices[i];
         // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
         v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
-
 
         if (paiMesh->mNormals) {
             const aiVector3D& pNormal   = paiMesh->mNormals[i];
@@ -155,10 +160,18 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
         const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
         v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
         
-        m_Vertices.push_back(v);
+        Vertices[i] = v;
     }
 
+    m_Meshes[MeshIndex].BaseVertex = (uint)m_optVertices.size();
+    m_Meshes[MeshIndex].BaseIndex = (uint)m_optIndices.size();
+
     int BaseVertex = m_Meshes[MeshIndex].BaseVertex;
+
+    int NumIndices = paiMesh->mNumFaces * 3;
+
+    std::vector<uint> Indices;
+    Indices.resize(NumIndices);
 
     // Populate the index buffer
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
@@ -168,10 +181,31 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
      /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
         printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
         printf("%d: %d\n", i * 3 + 2, Face.mIndices[2]);*/
-        m_Indices.push_back(BaseVertex + Face.mIndices[0]);
-        m_Indices.push_back(BaseVertex + Face.mIndices[1]);
-        m_Indices.push_back(BaseVertex + Face.mIndices[2]);
+        Indices[i * 3 + 0] = Face.mIndices[0];
+        Indices[i * 3 + 1] = Face.mIndices[1];
+        Indices[i * 3 + 2] = Face.mIndices[2];
+    }    
+
+    std::vector<unsigned int> remap(NumIndices);
+    size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(), Indices.data(), Indices.size(), Vertices.data(), Indices.size(), sizeof(Vertex));
+
+    std::vector<uint> OptIndices;
+    std::vector<Vertex> OptVertices;
+    OptIndices.resize(NumIndices);
+    OptVertices.resize(OptVertexCount);
+
+    meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), Indices.size(), remap.data());
+    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), Vertices.size(), sizeof(Vertex), remap.data());
+
+    for (int i = 0; i < NumIndices; i++) {
+        m_optIndices.push_back(BaseVertex + OptIndices[i]);
     }
+
+    for (int i = 0; i < OptVertexCount; i++) {
+        m_optVertices.push_back(OptVertices[i]);
+    }
+
+    m_Meshes[MeshIndex].NumIndices = NumIndices;
 }
 
 
@@ -355,8 +389,16 @@ void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
 
 void BasicMesh::PopulateBuffers()
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_VB]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
+
+#ifdef USE_MESH_OPTIMIZER
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_optVertices[0]) * m_optVertices.size(), &m_optVertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_optIndices[0]) * m_optIndices.size(), &m_optIndices[0], GL_STATIC_DRAW);
+#else
     glBufferData(GL_ARRAY_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
+#endif
     
     size_t NumFloats = 0;
 
@@ -370,10 +412,6 @@ void BasicMesh::PopulateBuffers()
 
     glEnableVertexAttribArray(NORMAL_LOCATION);
     glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
-
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
 }
 
 
@@ -453,10 +491,10 @@ void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
 // Used only by instancing
 void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WORLD_MAT_VB]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WORLD_MAT_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
 
     glBindVertexArray(m_VAO);

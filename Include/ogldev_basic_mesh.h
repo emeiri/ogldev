@@ -91,13 +91,10 @@ protected:
 private:
 
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
-
     void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
-
     void InitAllMeshes(const aiScene* pScene);
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-
     void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
 
     void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
@@ -112,9 +109,9 @@ private:
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,
-        VERTEX_VB    = 1,
-        WVP_MAT_VB   = 2,  // required only for instancing
-        WORLD_MAT_VB = 3,  // required only for instancing
+        VERTEX_BUFFER    = 1,
+        WVP_MAT_BUFFER   = 2,  // required only for instancing
+        WORLD_MAT_BUFFER = 3,  // required only for instancing
         NUM_BUFFERS  = 4
     };
 
@@ -132,6 +129,9 @@ private:
     // Temporary space for vertex stuff before we load them into the GPU
     vector<Vertex> m_Vertices;
     vector<uint> m_Indices;
+
+    vector<Vertex> m_optVertices;
+    vector<uint> m_optIndices;
 
     Assimp::Importer m_Importer;
 };
