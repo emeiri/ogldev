@@ -112,12 +112,10 @@ private:
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,
-        POS_VB       = 1,
-        TEXCOORD_VB  = 2,
-        NORMAL_VB    = 3,
-        WVP_MAT_VB   = 4,  // required only for instancing
-        WORLD_MAT_VB = 5,  // required only for instancing
-        NUM_BUFFERS  = 6
+        VERTEX_VB    = 1,
+        WVP_MAT_VB   = 2,  // required only for instancing
+        WORLD_MAT_VB = 3,  // required only for instancing
+        NUM_BUFFERS  = 4
     };
 
     GLuint m_VAO = 0;
@@ -125,10 +123,14 @@ private:
 
     std::vector<Material> m_Materials;
 
+    struct Vertex {
+        Vector3f Position;
+        Vector2f TexCoords;
+        Vector3f Normal;
+    };
+    
     // Temporary space for vertex stuff before we load them into the GPU
-    vector<Vector3f> m_Positions;
-    vector<Vector3f> m_Normals;
-    vector<Vector2f> m_TexCoords;
+    vector<Vertex> m_Vertices;
     vector<uint> m_Indices;
 
     Assimp::Importer m_Importer;
