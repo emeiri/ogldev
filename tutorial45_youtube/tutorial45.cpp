@@ -49,7 +49,7 @@ public:
 
     Tutorial45()
     {    
-        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.AmbientIntensity = 0.7f;
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.WorldDirection = Vector3f(0.0f, -0.5f, 1.0f);
@@ -118,7 +118,7 @@ public:
         Matrix4f CameraView = m_pGameCamera->GetMatrix();
         Matrix4f CameraProjection = m_pGameCamera->GetProjectionMat();
         Matrix4f VP = CameraProjection * CameraView;        
-        m_billboardList.Render(VP, m_pGameCamera->GetPos());
+      //  m_billboardList.Render(VP, m_pGameCamera->GetPos());
 
         /////////////////////////
         // Render the terrain
@@ -128,7 +128,9 @@ public:
 
         // Set the WVP matrix from the camera point of view
         Matrix4f World = m_pTerrain->GetWorldMatrix();
-        Matrix4f WVP = CameraProjection * CameraView * World;
+        Matrix4f Scale;
+        Scale.InitScaleTransform(0.1f);
+        Matrix4f WVP = CameraProjection * CameraView * World * Scale;
         m_lightingTech.SetWVP(WVP);
 
         // Update the shader with the local space pos/dir of the spot light
@@ -217,7 +219,7 @@ private:
 	
         float FOV = 75.0f;
         float zNear = 0.1f;
-        float zFar = 100.0f;
+        float zFar = 500.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, m_cameraPos, m_cameraTarget, Up);
@@ -241,7 +243,7 @@ private:
     {
         m_pTerrain = new BasicMesh();
 
-        if (!m_pTerrain->LoadMesh("terrain.obj")) {
+        if (!m_pTerrain->LoadMesh("G:/McGuire/CrytekSponza/sponza.obj")) {
             printf("Error loading mesh terrain.obj\n");
             exit(0);
         }
