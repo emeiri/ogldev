@@ -197,15 +197,32 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
     meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), Indices.size(), remap.data());
     meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), Vertices.size(), sizeof(Vertex), remap.data());
 
-    for (int i = 0; i < NumIndices; i++) {
+    meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), Indices.size(), OptVertexCount);
+
+    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), Indices.size(), &(OptVertices[0].Position.x), OptVertexCount, sizeof(Vertex), 1.05f);
+
+    meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(Vertex));
+
+    float Threshold = 0.01f;
+    size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
+    float TargetError = 1.0f;
+    std::vector<unsigned int> IndicesLod(OptIndices.size());
+    size_t OptIndexCount = meshopt_simplify(&IndicesLod[0], OptIndices.data(), OptIndices.size(),
+                                            &OptVertices[0].Position.x, OptVertexCount, sizeof(Vertex), TargetIndexCount, TargetError);
+
+    OptIndices = IndicesLod;
+    OptIndices.resize(OptIndexCount);
+    
+    for (int i = 0; i < OptIndexCount; i++) {
         m_optIndices.push_back(BaseVertex + OptIndices[i]);
     }
 
     for (int i = 0; i < OptVertexCount; i++) {
         m_optVertices.push_back(OptVertices[i]);
     }
-
-    m_Meshes[MeshIndex].NumIndices = NumIndices;
+    
+    m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
+    printf("%d: %d\n", MeshIndex, OptIndexCount);
 }
 
 
