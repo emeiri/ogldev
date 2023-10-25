@@ -36,6 +36,8 @@
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
+#define USE_MESH_OPTIMIZER
+
 class BasicMesh : public MeshCommon
 {
 public:
@@ -60,11 +62,9 @@ public:
 protected:
 
     void Clear();
-
     virtual void ReserveSpace(uint NumVertices, uint NumIndices);
-
     virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
-
+    virtual void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
     virtual void PopulateBuffers();
 
     struct BasicMeshEntry {
@@ -110,7 +110,7 @@ private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
     void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
     void InitAllMeshes(const aiScene* pScene);
-
+    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<Vertex>& Vertices);
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
     void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
 
@@ -127,7 +127,7 @@ private:
     GLuint m_VAO = 0;
 
     std::vector<Material> m_Materials;
-
+    
     // Temporary space for vertex stuff before we load them into the GPU
     vector<Vertex> m_Vertices;
 

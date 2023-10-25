@@ -19,6 +19,8 @@
 #include "ogldev_engine_common.h"
 #include "ogldev_skinned_mesh.h"
 
+#include "3rdparty/meshoptimizer/src/meshoptimizer.h"
+
 using namespace std;
 
 #define POSITION_LOCATION    0
@@ -77,11 +79,107 @@ void SkinnedMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
         m_Indices.push_back(Face.mIndices[2]);
     }
 
-    LoadMeshBones(MeshIndex, paiMesh);
+    LoadMeshBones(MeshIndex, paiMesh, m_SkinnedVertices, m_Meshes[MeshIndex].BaseVertex);
 }
 
 
-void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
+void SkinnedMesh::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
+{
+    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+    // printf("Mesh %d\n", MeshIndex);
+    // Populate the vertex attribute vectors
+    SkinnedVertex v;
+
+    std::vector<SkinnedVertex> SkinnedVertices(paiMesh->mNumVertices);
+
+    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
+        const aiVector3D& pPos = paiMesh->mVertices[i];
+        // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
+        v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
+
+        if (paiMesh->mNormals) {
+            const aiVector3D& pNormal = paiMesh->mNormals[i];
+            v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
+        }
+        else {
+            aiVector3D Normal(0.0f, 1.0f, 0.0f);
+            v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
+        }
+
+        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
+        v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+
+        SkinnedVertices[i] = v;
+    }
+
+    m_Meshes[MeshIndex].BaseVertex = (uint)m_SkinnedVertices.size();
+    m_Meshes[MeshIndex].BaseIndex = (uint)m_Indices.size();    
+
+    int NumIndices = paiMesh->mNumFaces * 3;
+
+    std::vector<uint> Indices;
+    Indices.resize(NumIndices);
+
+    // Populate the index buffer
+    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
+        const aiFace& Face = paiMesh->mFaces[i];
+        Indices[i * 3 + 0] = Face.mIndices[0];
+        Indices[i * 3 + 1] = Face.mIndices[1];
+        Indices[i * 3 + 2] = Face.mIndices[2];
+    }
+
+    LoadMeshBones(MeshIndex, paiMesh, SkinnedVertices, 0);
+
+    OptimizeMesh(MeshIndex, Indices, SkinnedVertices);
+}
+
+
+void SkinnedMesh::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<SkinnedVertex>& SkinnedVertices)
+{
+    size_t NumIndices = Indices.size();
+
+    std::vector<unsigned int> remap(NumIndices);
+    size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(), Indices.data(), Indices.size(), SkinnedVertices.data(), Indices.size(), sizeof(SkinnedVertex));
+
+    std::vector<uint> OptIndices;
+    std::vector<SkinnedVertex> OptVertices;
+    OptIndices.resize(NumIndices);
+    OptVertices.resize(OptVertexCount);
+
+    meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), Indices.size(), remap.data());
+
+    meshopt_remapVertexBuffer(OptVertices.data(), SkinnedVertices.data(), SkinnedVertices.size(), sizeof(SkinnedVertex), remap.data());
+
+    meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), Indices.size(), OptVertexCount);
+
+    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), Indices.size(), &(OptVertices[0].Position.x), OptVertexCount, sizeof(SkinnedVertex), 1.05f);
+
+    meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(SkinnedVertex));
+
+    float Threshold = 1.0f;
+    size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
+    float TargetError = 1.0f;
+    std::vector<unsigned int> IndicesLod(OptIndices.size());
+    size_t OptIndexCount = meshopt_simplify(&IndicesLod[0], OptIndices.data(), OptIndices.size(),
+        &OptVertices[0].Position.x, OptVertexCount, sizeof(SkinnedVertex), TargetIndexCount, TargetError);
+
+    OptIndices = IndicesLod;
+    OptIndices.resize(OptIndexCount);
+
+    for (int i = 0; i < OptIndexCount; i++) {
+        m_Indices.push_back(OptIndices[i]);
+    }
+
+    for (int i = 0; i < OptVertexCount; i++) {
+        m_SkinnedVertices.push_back(OptVertices[i]);
+    }
+
+    m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
+}
+
+
+void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex)
 {
     if (pMesh->mNumBones > MAX_BONES) {
         printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
@@ -92,12 +190,12 @@ void SkinnedMesh::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
     // printf("Loading mesh bones %d\n", MeshIndex);
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
         // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
-        LoadSingleBone(MeshIndex, pMesh->mBones[i]);
+        LoadSingleBone(MeshIndex, pMesh->mBones[i], SkinnedVertices, BaseVertex);
     }
 }
 
 
-void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
+void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex)
 {
     int BoneId = GetBoneId(pBone);
 
@@ -109,9 +207,9 @@ void SkinnedMesh::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
 
     for (uint i = 0 ; i < pBone->mNumWeights ; i++) {
         const aiVertexWeight& vw = pBone->mWeights[i];
-        uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + pBone->mWeights[i].mVertexId;
+        uint GlobalVertexID = BaseVertex + pBone->mWeights[i].mVertexId;
         // printf("%d: %d %f\n",i, pBone->mWeights[i].mVertexId, vw.mWeight);
-        m_SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
+        SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
     }
 
     MarkRequiredNodesForBone(pBone);
