@@ -63,8 +63,6 @@ private:
 
     virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
 
-    virtual void PopulateBuffers();
-
     struct VertexBoneData
     {
         uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
@@ -104,6 +102,15 @@ private:
         }
     };
 
+    struct SkinnedVertex {
+        Vector3f Position;
+        Vector2f TexCoords;
+        Vector3f Normal;
+        VertexBoneData Bones;
+    };
+
+    virtual void PopulateBuffers();
+
     void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
     void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
@@ -129,10 +136,10 @@ private:
 
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
-    GLuint m_boneBuffer = 0;
-
     // Temporary space for vertex stuff before we load them into the GPU
-    vector<VertexBoneData> m_Bones;
+    vector<SkinnedVertex> m_SkinnedVertices;
+
+    GLuint m_boneBuffer = 0;
 
     map<string,uint> m_BoneNameToIndexMap;
 
