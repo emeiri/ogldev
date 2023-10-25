@@ -167,13 +167,9 @@ void SkinnedMesh::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::v
     OptIndices = IndicesLod;
     OptIndices.resize(OptIndexCount);
 
-    for (int i = 0; i < OptIndexCount; i++) {
-        m_Indices.push_back(OptIndices[i]);
-    }
+    m_Indices.insert(m_Indices.end(), OptIndices.begin(), OptIndices.end());
 
-    for (int i = 0; i < OptVertexCount; i++) {
-        m_SkinnedVertices.push_back(OptVertices[i]);
-    }
+    m_SkinnedVertices.insert(m_SkinnedVertices.end(), OptVertices.begin(), OptVertices.end());
 
     m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
 }
