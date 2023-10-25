@@ -75,7 +75,7 @@ private:
 
         void AddBoneData(uint BoneID, float Weight)
         {
-            for (int i = 0 ; i < index ; i++) {
+            for (int i = 0; i < index; i++) {
                 if (BoneIDs[i] == BoneID) {
                     //  printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
                     return;
@@ -92,7 +92,7 @@ private:
 
             if (index == MAX_NUM_BONES_PER_VERTEX) {
                 return;
-                                assert(0);
+                assert(0);
             }
 
             BoneIDs[index] = BoneID;
@@ -109,10 +109,13 @@ private:
         VertexBoneData Bones;
     };
 
+    virtual void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
+    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<SkinnedVertex>& Vertices);
+
     virtual void PopulateBuffers();
 
-    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
-    void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
+    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
+    void LoadSingleBone(uint MeshIndex, const aiBone* pBone, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
     int GetBoneId(const aiBone* pBone);
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
@@ -136,7 +139,6 @@ private:
 
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
-    // Temporary space for vertex stuff before we load them into the GPU
     vector<SkinnedVertex> m_SkinnedVertices;
 
     GLuint m_boneBuffer = 0;

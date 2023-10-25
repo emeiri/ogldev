@@ -19,6 +19,8 @@
 #include "ogldev_basic_mesh.h"
 #include "ogldev_engine_common.h"
 
+#include "3rdparty/meshoptimizer/src/meshoptimizer.h"
+
 using namespace std;
 
 #define POSITION_LOCATION  0
@@ -125,7 +127,11 @@ void BasicMesh::InitAllMeshes(const aiScene* pScene)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
+#ifdef USE_MESH_OPTIMIZER
+        InitSingleMeshOpt(i, paiMesh);
+#else
         InitSingleMesh(i, paiMesh);
+#endif
     }
 }
 
@@ -138,13 +144,13 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
     // Populate the vertex attribute vectors
     Vertex v;
 
-    for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-        const aiVector3D& pPos      = paiMesh->mVertices[i];
+    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
+        const aiVector3D& pPos = paiMesh->mVertices[i];
         // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
         v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
 
         if (paiMesh->mNormals) {
-            const aiVector3D& pNormal   = paiMesh->mNormals[i];
+            const aiVector3D& pNormal = paiMesh->mNormals[i];
             v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
         } else {
             aiVector3D Normal(0.0f, 1.0f, 0.0f);
@@ -153,11 +159,12 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
         const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
         v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+
         m_Vertices.push_back(v);
     }
 
     // Populate the index buffer
-    for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
+    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
         m_Indices.push_back(Face.mIndices[0]);
         m_Indices.push_back(Face.mIndices[1]);
@@ -166,6 +173,98 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
+void BasicMesh::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
+{
+    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+
+    // printf("Mesh %d\n", MeshIndex);
+    // Populate the vertex attribute vectors
+    Vertex v;
+
+    std::vector<Vertex> Vertices(paiMesh->mNumVertices);
+
+    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
+        const aiVector3D& pPos = paiMesh->mVertices[i];
+        // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
+        v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
+
+        if (paiMesh->mNormals) {
+            const aiVector3D& pNormal = paiMesh->mNormals[i];
+            v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
+        }
+        else {
+            aiVector3D Normal(0.0f, 1.0f, 0.0f);
+            v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
+        }
+
+        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
+        v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+
+        Vertices[i] = v;
+    }
+
+    m_Meshes[MeshIndex].BaseVertex = (uint)m_Vertices.size();
+    m_Meshes[MeshIndex].BaseIndex = (uint)m_Indices.size();
+
+    int NumIndices = paiMesh->mNumFaces * 3;
+
+    std::vector<uint> Indices;
+    Indices.resize(NumIndices);
+
+    // Populate the index buffer
+    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
+        const aiFace& Face = paiMesh->mFaces[i];
+        Indices[i * 3 + 0] = Face.mIndices[0];
+        Indices[i * 3 + 1] = Face.mIndices[1];
+        Indices[i * 3 + 2] = Face.mIndices[2];
+    }
+
+    OptimizeMesh(MeshIndex, Indices, Vertices);
+}
+
+
+void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<Vertex>&Vertices)
+{
+    size_t NumIndices = Indices.size();
+
+    std::vector<unsigned int> remap(NumIndices);
+    size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(), Indices.data(), Indices.size(), Vertices.data(), Indices.size(), sizeof(Vertex));
+
+    std::vector<uint> OptIndices;
+    std::vector<Vertex> OptVertices;
+    OptIndices.resize(NumIndices);
+    OptVertices.resize(OptVertexCount);
+
+    meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), Indices.size(), remap.data());
+
+    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), Vertices.size(), sizeof(Vertex), remap.data());
+
+    meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), Indices.size(), OptVertexCount);
+
+    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), Indices.size(), &(OptVertices[0].Position.x), OptVertexCount, sizeof(Vertex), 1.05f);
+
+    meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(Vertex));
+
+    float Threshold = 1.0f;
+    size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
+    float TargetError = 1.0f;
+    std::vector<unsigned int> IndicesLod(OptIndices.size());
+    size_t OptIndexCount = meshopt_simplify(&IndicesLod[0], OptIndices.data(), OptIndices.size(),
+                                            &OptVertices[0].Position.x, OptVertexCount, sizeof(Vertex), TargetIndexCount, TargetError);
+
+    OptIndices = IndicesLod;
+    OptIndices.resize(OptIndexCount);
+    
+    for (int i = 0; i < OptIndexCount; i++) {
+        m_Indices.push_back(OptIndices[i]);
+    }
+
+    for (int i = 0; i < OptVertexCount; i++) {
+        m_Vertices.push_back(OptVertices[i]);
+    }
+    
+    m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
+}
 
 
 bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
