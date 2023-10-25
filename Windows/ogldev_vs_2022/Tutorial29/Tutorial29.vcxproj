@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
