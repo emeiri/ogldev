@@ -28,10 +28,10 @@
     <ClInclude Include="..\..\..\Include\technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs">
+    <None Include="..\..\..\Common\Shaders\skinning.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Common\Shaders\sprite.vs">
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
