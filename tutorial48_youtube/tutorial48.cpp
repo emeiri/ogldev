@@ -148,6 +148,18 @@ public:
                 }
                 break;
 
+
+            case GLFW_KEY_Z:
+                m_isWireframe = !m_isWireframe;
+
+                if (m_isWireframe) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                else {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
+                break;            
+
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
                 glfwDestroyWindow(window);
@@ -230,6 +242,7 @@ private:
     long long m_totalPauseTime = 0;
     long long m_pauseStart = 0;
     int m_animationIndex = 0;
+    bool m_isWireframe = false;
 };
 
 Tutorial40* app = NULL;
