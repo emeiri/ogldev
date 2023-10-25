@@ -116,9 +116,7 @@ void BasicMesh::CountVerticesAndIndices(const aiScene* pScene, unsigned int& Num
 
 void BasicMesh::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
 {
-    m_Positions.reserve(NumVertices);
-    m_Normals.reserve(NumVertices);
-    m_TexCoords.reserve(NumVertices);
+    m_Vertices.reserve(NumVertices);
     m_Indices.reserve(NumIndices);
 }
 
@@ -138,31 +136,29 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
     // printf("Mesh %d\n", MeshIndex);
     // Populate the vertex attribute vectors
+    Vertex v;
+
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
         const aiVector3D& pPos      = paiMesh->mVertices[i];
         // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
-        m_Positions.push_back(Vector3f(pPos.x, pPos.y, pPos.z));
+        v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
 
         if (paiMesh->mNormals) {
             const aiVector3D& pNormal   = paiMesh->mNormals[i];
-            m_Normals.push_back(Vector3f(pNormal.x, pNormal.y, pNormal.z));
+            v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
         } else {
             aiVector3D Normal(0.0f, 1.0f, 0.0f);
-            m_Normals.push_back(Vector3f(Normal.x, Normal.y, Normal.z));
+            v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
         }
 
         const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
-        m_TexCoords.push_back(Vector2f(pTexCoord.x, pTexCoord.y));
+        v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+        m_Vertices.push_back(v);
     }
 
     // Populate the index buffer
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
-        //  printf("num indices %d\n", Face.mNumIndices);
-        //  assert(Face.mNumIndices == 3);
-     /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
-        printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
-        printf("%d: %d\n", i * 3 + 2, Face.mIndices[2]);*/
         m_Indices.push_back(Face.mIndices[0]);
         m_Indices.push_back(Face.mIndices[1]);
         m_Indices.push_back(Face.mIndices[2]);
@@ -350,23 +346,24 @@ void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
 
 void BasicMesh::PopulateBuffers()
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[POS_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Positions[0]) * m_Positions.size(), &m_Positions[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[TEXCOORD_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_TexCoords[0]) * m_TexCoords.size(), &m_TexCoords[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(TEX_COORD_LOCATION);
-    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[NORMAL_VB]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Normals[0]) * m_Normals.size(), &m_Normals[0], GL_STATIC_DRAW);
-    glEnableVertexAttribArray(NORMAL_LOCATION);
-    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
+    
+    size_t NumFloats = 0;
+
+    glEnableVertexAttribArray(POSITION_LOCATION);
+    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += 3;
+
+    glEnableVertexAttribArray(TEX_COORD_LOCATION);
+    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += 2;
+
+    glEnableVertexAttribArray(NORMAL_LOCATION);
+    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
 }
 
 
@@ -446,10 +443,10 @@ void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
 // Used only by instancing
 void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_VB]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WORLD_MAT_VB]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WORLD_MAT_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
 
     glBindVertexArray(m_VAO);
