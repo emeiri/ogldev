@@ -176,6 +176,17 @@ public:
             case GLFW_KEY_P:
                 m_isPaused = !m_isPaused;
                 break;
+
+            case GLFW_KEY_Z:
+                m_isWireframe = !m_isWireframe;
+
+                if (m_isWireframe) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                else {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
+                break;
             }
         }
 
@@ -285,6 +296,7 @@ private:
     Vector3f m_position;
     BillboardList m_billboardList;
 	bool m_isPaused = false;
+    bool m_isWireframe = false;
 };
 
 Tutorial45* app = NULL;

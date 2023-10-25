@@ -31,8 +31,8 @@
 #include "ogldev_basic_mesh.h"
 #include "camera.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 
 
