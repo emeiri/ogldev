@@ -226,36 +226,44 @@ void BasicMesh::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
 void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<Vertex>&Vertices)
 {
     size_t NumIndices = Indices.size();
+    size_t NumVertices = Vertices.size();
 
     std::vector<unsigned int> remap(NumIndices);
-    size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(), Indices.data(), Indices.size(), Vertices.data(), Indices.size(), sizeof(Vertex));
-
+    size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(),    // dst addr
+                                                        Indices.data(),  // src indices
+                                                        NumIndices,      // ...and size
+                                                        Vertices.data(), // src vertices
+                                                        NumVertices,     // ...and size
+                                                        sizeof(Vertex)); // stride
     std::vector<uint> OptIndices;
     std::vector<Vertex> OptVertices;
     OptIndices.resize(NumIndices);
     OptVertices.resize(OptVertexCount);
 
-    meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), Indices.size(), remap.data());
+    // Optimization #1: remove duplicate vertices    
+    meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), NumIndices, remap.data());
 
-    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), Vertices.size(), sizeof(Vertex), remap.data());
+    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), NumVertices, sizeof(Vertex), remap.data());
 
-    meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), Indices.size(), OptVertexCount);
+    // Optimization #2: improve the locality of the vertices
+    meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), NumIndices, OptVertexCount);
 
-    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), Indices.size(), &(OptVertices[0].Position.x), OptVertexCount, sizeof(Vertex), 1.05f);
+    // Optimization #3: reduce pixel overdraw
+    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), NumIndices, &(OptVertices[0].Position.x), OptVertexCount, sizeof(Vertex), 1.05f);
 
+    // Optimization #4: 
     meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(Vertex));
 
-    float Threshold = 1.0f;
+    float Threshold = 0.1f;
     size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
-    float TargetError = 1.0f;
-    std::vector<unsigned int> IndicesLod(OptIndices.size());
-    size_t OptIndexCount = meshopt_simplify(&IndicesLod[0], OptIndices.data(), OptIndices.size(),
+    float TargetError = 0.1f;
+    std::vector<unsigned int> SimplifiedIndices(OptIndices.size());
+    size_t OptIndexCount = meshopt_simplify(SimplifiedIndices.data(), OptIndices.data(), NumIndices,
                                             &OptVertices[0].Position.x, OptVertexCount, sizeof(Vertex), TargetIndexCount, TargetError);
 
-    OptIndices = IndicesLod;
-    OptIndices.resize(OptIndexCount);
+    SimplifiedIndices.resize(OptIndexCount);
     
-    m_Indices.insert(m_Indices.end(), OptIndices.begin(), OptIndices.end());
+    m_Indices.insert(m_Indices.end(), SimplifiedIndices.begin(), SimplifiedIndices.end());
 
     m_Vertices.insert(m_Vertices.end(), OptVertices.begin(), OptVertices.end());
 
