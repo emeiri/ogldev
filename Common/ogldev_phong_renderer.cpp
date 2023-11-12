@@ -203,7 +203,7 @@ void PhongRenderer::Render(BasicMesh* pMesh)
     RefreshLightingPosAndDirs(pMesh);
 
     if (m_dirLight.DiffuseIntensity > 0.0) {
-        m_lightingTech.UpdateDirLightDirection(m_dirLight);
+        m_lightingTech.SetDirectionalLight(m_dirLight);
     }
 
     m_lightingTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
