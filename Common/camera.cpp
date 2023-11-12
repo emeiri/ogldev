@@ -18,7 +18,7 @@
 
 #include "ogldev_camera.h"
 
-const static float STEP_SCALE = 1.0f;
+const static float STEP_SCALE = 0.1f;
 const static float EDGE_STEP = 0.5f;
 const static int MARGIN = 10;
 
