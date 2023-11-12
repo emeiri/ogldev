@@ -228,6 +228,7 @@ void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
     size_t NumIndices = Indices.size();
     size_t NumVertices = Vertices.size();
 
+    // Create a remap table
     std::vector<unsigned int> remap(NumIndices);
     size_t OptVertexCount = meshopt_generateVertexRemap(remap.data(),    // dst addr
                                                         Indices.data(),  // src indices
@@ -235,6 +236,7 @@ void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
                                                         Vertices.data(), // src vertices
                                                         NumVertices,     // ...and size
                                                         sizeof(Vertex)); // stride
+    // Allocate a local index/vertex arrays
     std::vector<uint> OptIndices;
     std::vector<Vertex> OptVertices;
     OptIndices.resize(NumIndices);
@@ -251,18 +253,28 @@ void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
     // Optimization #3: reduce pixel overdraw
     meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), NumIndices, &(OptVertices[0].Position.x), OptVertexCount, sizeof(Vertex), 1.05f);
 
-    // Optimization #4: 
+    // Optimization #4: optimize access to the vertex buffer
     meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(Vertex));
 
-    float Threshold = 0.1f;
+    // Optimization #5: create a simplified version of the model
+    float Threshold = 1.0f;
     size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
-    float TargetError = 0.1f;
+    
+    float TargetError = 0.0f;
     std::vector<unsigned int> SimplifiedIndices(OptIndices.size());
     size_t OptIndexCount = meshopt_simplify(SimplifiedIndices.data(), OptIndices.data(), NumIndices,
                                             &OptVertices[0].Position.x, OptVertexCount, sizeof(Vertex), TargetIndexCount, TargetError);
 
+    static int num_indices = 0;
+    num_indices += NumIndices;
+    static int opt_indices = 0;
+    opt_indices += OptIndexCount;
+    printf("Num indices %d\n", num_indices);
+    //printf("Target num indices %d\n", TargetIndexCount);
+    printf("Optimized number of indices %d\n", opt_indices);
     SimplifiedIndices.resize(OptIndexCount);
     
+    // Concatenate the local arrays into the class attributes arrays
     m_Indices.insert(m_Indices.end(), SimplifiedIndices.begin(), SimplifiedIndices.end());
 
     m_Vertices.insert(m_Vertices.end(), OptVertices.begin(), OptVertices.end());

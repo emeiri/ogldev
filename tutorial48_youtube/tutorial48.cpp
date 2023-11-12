@@ -42,18 +42,18 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class Tutorial40
+class Tutorial48
 {
 public:
 
-    Tutorial40()
+    Tutorial48()
     {
-        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, 1.0f);
-        m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight.DiffuseIntensity = 1.2f;
+        m_dirLight.AmbientIntensity = 0.4f;
     }
 
-    virtual ~Tutorial40()
+    virtual ~Tutorial48()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -101,7 +101,11 @@ public:
         float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
         AnimationTimeSec -= TotalPauseTimeSec;
 
-        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
+        static float foo = 0.0f;
+        m_pMesh->SetRotation(0.0f, 180.0f + foo, 0.0f);
+        foo += 0.5f;
+      //  m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
+        m_phongRenderer.Render(m_pMesh);
     }
 
 
@@ -111,7 +115,9 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-        m_pGameCamera->OnMouse(x, y);
+        if (m_interactive) {
+            m_pGameCamera->OnMouse(x, y);
+        }        
     }
 
     void KeyboardCB(uint key, int state)
@@ -158,7 +164,11 @@ public:
                 else {
                     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
-                break;            
+                break; 
+
+            case GLFW_KEY_P:
+                m_interactive = !m_interactive;
+                break;
 
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
@@ -184,7 +194,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 40");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 48");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -205,8 +215,8 @@ private:
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
-        float zNear = 0.1f;
-        float zFar = 100.0f;
+        float zNear = 1.0f;
+        float zFar = 1000.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
@@ -223,17 +233,18 @@ private:
 
     void InitMesh()
     {
-        m_pMesh = new SkinnedMesh();
-        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
-        m_pMesh->SetRotation(90.0f, -45.0f, 0.0f);
-        m_pMesh->SetPosition(0.0f, 0.0f, 55.0f);
+        m_pMesh = new BasicMesh();
+      
+        m_pMesh->LoadMesh("../Content/dragon.obj");
         m_pMesh->SetScale(0.1f);
+
+        m_pMesh->SetPosition(0.0f, 0.0f, 3.0f);      
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     PhongRenderer m_phongRenderer;
-    SkinnedMesh* m_pMesh = NULL;
+    BasicMesh* m_pMesh = NULL;
     PersProjInfo m_persProjInfo;
     DirectionalLight m_dirLight;
     long long m_startTime = 0;
@@ -243,9 +254,10 @@ private:
     long long m_pauseStart = 0;
     int m_animationIndex = 0;
     bool m_isWireframe = false;
+    bool m_interactive = true;
 };
 
-Tutorial40* app = NULL;
+Tutorial48* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -271,7 +283,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial40();
+    app = new Tutorial48();
 
     app->Init();
 
