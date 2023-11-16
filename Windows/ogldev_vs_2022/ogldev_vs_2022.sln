@@ -62,8 +62,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F
 		..\..\Include\ogldev_cubemap_texture.h = ..\..\Include\ogldev_cubemap_texture.h
 		..\..\Include\ogldev_engine_common.h = ..\..\Include\ogldev_engine_common.h
 		..\..\Include\ogldev_flat_passthru_technique.h = ..\..\Include\ogldev_flat_passthru_technique.h
-		..\..\Include\ogldev_forward_lighting.h = ..\..\Include\ogldev_forward_lighting.h
-		..\..\Include\ogldev_forward_skinning.h = ..\..\Include\ogldev_forward_skinning.h
 		..\..\Include\ogldev_framebuffer.h = ..\..\Include\ogldev_framebuffer.h
 		..\..\Include\ogldev_glfw.h = ..\..\Include\ogldev_glfw.h
 		..\..\Include\ogldev_glfw_backend.h = ..\..\Include\ogldev_glfw_backend.h
@@ -157,6 +155,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\guitex.vs = ..\..\Common\Shaders\guitex.vs
 		..\..\Common\Shaders\lighting_new.fs = ..\..\Common\Shaders\lighting_new.fs
 		..\..\Common\Shaders\lighting_new.vs = ..\..\Common\Shaders\lighting_new.vs
+		..\..\Common\Shaders\lighting_new_to_gs.vs = ..\..\Common\Shaders\lighting_new_to_gs.vs
+		..\..\Common\Shaders\passthru.gs = ..\..\Common\Shaders\passthru.gs
 		..\..\Common\Shaders\passthru_vec2.vs = ..\..\Common\Shaders\passthru_vec2.vs
 		..\..\Common\Shaders\shadow_map.vs = ..\..\Common\Shaders\shadow_map.vs
 		..\..\Common\Shaders\shadow_map_point_light.fs = ..\..\Common\Shaders\shadow_map_point_light.fs
@@ -212,8 +212,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F65533
 		..\..\Common\ogldev_basic_mesh.cpp = ..\..\Common\ogldev_basic_mesh.cpp
 		..\..\Common\ogldev_bezier_curve_technique.cpp = ..\..\Common\ogldev_bezier_curve_technique.cpp
 		..\..\Common\ogldev_flat_passthru_technique.cpp = ..\..\Common\ogldev_flat_passthru_technique.cpp
-		..\..\Common\ogldev_forward_lighting.cpp = ..\..\Common\ogldev_forward_lighting.cpp
-		..\..\Common\ogldev_forward_skinning.cpp = ..\..\Common\ogldev_forward_skinning.cpp
 		..\..\Common\ogldev_framebuffer.cpp = ..\..\Common\ogldev_framebuffer.cpp
 		..\..\Common\ogldev_glfw.cpp = ..\..\Common\ogldev_glfw.cpp
 		..\..\Common\ogldev_glfw_backend.cpp = ..\..\Common\ogldev_glfw_backend.cpp
@@ -339,6 +337,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30", "Tutorial30\Tutorial30.vcxproj", "{369B38BC-3A9B-40E4-A24F-75265E574EE2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial48_MeshOptimizer", "Tutorial48_MeshOptimizer\Tutorial48.vcxproj", "{F7F975F0-C197-4A9A-B4AA-0EF215183B8B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial49_WireframeOnMesh", "Tutorial49_WireframeOnMesh\Tutorial49.vcxproj", "{86FD712A-2EB7-4461-A3C7-BD080E6FC350}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -932,6 +932,14 @@ Global
 		{F7F975F0-C197-4A9A-B4AA-0EF215183B8B}.Release|x64.Build.0 = Release|x64
 		{F7F975F0-C197-4A9A-B4AA-0EF215183B8B}.Release|x86.ActiveCfg = Release|Win32
 		{F7F975F0-C197-4A9A-B4AA-0EF215183B8B}.Release|x86.Build.0 = Release|Win32
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Debug|x64.ActiveCfg = Debug|x64
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Debug|x64.Build.0 = Debug|x64
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Debug|x86.ActiveCfg = Debug|Win32
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Debug|x86.Build.0 = Debug|Win32
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Release|x64.ActiveCfg = Release|x64
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Release|x64.Build.0 = Release|x64
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Release|x86.ActiveCfg = Release|Win32
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1016,6 +1024,7 @@ Global
 		{A245B570-737B-4F9C-9BF9-C1FC0C3472E1} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{369B38BC-3A9B-40E4-A24F-75265E574EE2} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{F7F975F0-C197-4A9A-B4AA-0EF215183B8B} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{86FD712A-2EB7-4461-A3C7-BD080E6FC350} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}

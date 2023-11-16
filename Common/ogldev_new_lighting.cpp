@@ -45,14 +45,33 @@ LightingTechnique::LightingTechnique()
 {
 }
 
-bool LightingTechnique::Init()
+bool LightingTechnique::Init(int SubTech)
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/lighting_new.vs")) {
-        return false;
+    switch (SubTech) {
+    case SUBTECH_DEFAULT:
+        if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/lighting_new.vs")) {
+            return false;
+        }
+
+        break;
+
+    case SUBTECH_PASSTHRU_GS:
+        if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/lighting_new_to_gs.vs")) {
+            return false;
+        }
+
+        if (!AddShader(GL_GEOMETRY_SHADER, "../Common/Shaders/passthru.gs")) {
+            return false;
+        }
+        break;
+
+    default:
+        printf("Invalid lighting subtechnique %d\n", SubTech);
+        exit(0);
     }
 
     if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/lighting_new.fs")) {

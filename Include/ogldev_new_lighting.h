@@ -104,9 +104,12 @@ public:
     static const unsigned int MAX_POINT_LIGHTS = 2;
     static const unsigned int MAX_SPOT_LIGHTS = 2;
 
+    static const int SUBTECH_DEFAULT = 0;
+    static const int SUBTECH_PASSTHRU_GS = 1;
+
     LightingTechnique();
 
-    virtual bool Init();
+    virtual bool Init(int SubTech = SUBTECH_DEFAULT);
 
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
