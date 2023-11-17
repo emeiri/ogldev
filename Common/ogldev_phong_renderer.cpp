@@ -32,9 +32,11 @@ PhongRenderer::~PhongRenderer()
 }
 
 
-void PhongRenderer::InitPhongRenderer()
+void PhongRenderer::InitPhongRenderer(int SubTech)
 {
-    if (!m_lightingTech.Init()) {
+    m_subTech = SubTech;
+
+    if (!m_lightingTech.Init(SubTech)) {
         printf("Error initializing the lighting technique\n");
         exit(1);
     }
@@ -226,6 +228,10 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
     Matrix4f World = pMesh->GetWorldTransform().GetMatrix();
     m_lightingTech.SetWorldMatrix(World);
+    
+    if (m_subTech == LightingTechnique::SUBTECH_WIREFRAME_ON_MESH) {
+        m_lightingTech.SetViewportMatrix(m_pCamera->GetViewportMatrix());
+    }
 
     pMesh->Render();
 }

@@ -51,6 +51,8 @@ bool LightingTechnique::Init(int SubTech)
         return false;
     }
 
+    m_subTech = SubTech;
+
     switch (SubTech) {
     case SUBTECH_DEFAULT:
         if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/lighting_new.vs")) {
@@ -65,6 +67,16 @@ bool LightingTechnique::Init(int SubTech)
         }
 
         if (!AddShader(GL_GEOMETRY_SHADER, "../Common/Shaders/passthru.gs")) {
+            return false;
+        }
+        break;
+
+    case SUBTECH_WIREFRAME_ON_MESH:
+        if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/lighting_new_to_gs.vs")) {
+            return false;
+        }
+
+        if (!AddShader(GL_GEOMETRY_SHADER, "../Common/Shaders/wireframe_on_mesh.gs")) {
             return false;
         }
         break;
@@ -89,6 +101,7 @@ bool LightingTechnique::InitCommon()
 {
     WVPLoc = GetUniformLocation("gWVP");
     WorldMatrixLoc = GetUniformLocation("gWorld");
+    ViewportMatrixLoc = GetUniformLocation("gViewportMatrix");
     LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
@@ -178,6 +191,11 @@ bool LightingTechnique::InitCommon()
 #endif
     }
 
+    if ((m_subTech == SUBTECH_WIREFRAME_ON_MESH) && (ViewportMatrixLoc == INVALID_UNIFORM_LOCATION)) {
+#ifdef FAIL_ON_MISSING_LOC
+        return false;
+#endif
+    }
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(PointLightsLocation) ; i++) {
         char Name[128];
@@ -278,6 +296,12 @@ void LightingTechnique::SetWVP(const Matrix4f& WVP)
 void LightingTechnique::SetWorldMatrix(const Matrix4f& World)
 {
     glUniformMatrix4fv(WorldMatrixLoc, 1, GL_TRUE, (const GLfloat*)World.m);
+}
+
+
+void LightingTechnique::SetViewportMatrix(const Matrix4f& ViewportMatrix)
+{
+    glUniformMatrix4fv(ViewportMatrixLoc, 1, GL_TRUE, (const GLfloat*)ViewportMatrix.m);
 }
 
 

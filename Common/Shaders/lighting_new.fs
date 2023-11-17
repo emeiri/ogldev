@@ -3,11 +3,12 @@
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
 
-in vec4 LightSpacePos; // required only for shadow mapping
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 LocalPos0;
 in vec3 WorldPos0;
+in vec4 LightSpacePos0; // required only for shadow mapping
+noperspective in vec3 EdgeDistance0;
 
 out vec4 FragColor;
 
@@ -135,7 +136,7 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 
 vec3 CalcShadowCoords()
 {
-    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ProjCoords = LightSpacePos0.xyz / LightSpacePos0.w;
     vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
     return ShadowCoords;
 }
@@ -164,7 +165,7 @@ float CalcShadowFactorPCF(vec3 LightDirection, vec3 Normal)
         return 1.0;
     }
 
-    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ProjCoords = LightSpacePos0.xyz / LightSpacePos0.w;
     vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
 
     float DiffuseFactor = dot(Normal, -LightDirection);
@@ -644,5 +645,11 @@ void main()
         FragColor = CalcTotalPBRLighting();
     } else {
         FragColor = CalcPhongLighting();
+    }
+
+    if (EdgeDistance0.x >= 0) {
+        float d = min(EdgeDistance0.x, min(EdgeDistance0.y, EdgeDistance0.z));
+        float mixVal = smoothstep(0.75 - 1.0, 0.75 + 1.0, d);
+        FragColor = mix(vec4(0.05f,0.0f,0.05f,1.0f), FragColor, mixVal);
     }
 }

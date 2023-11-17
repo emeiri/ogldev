@@ -106,6 +106,7 @@ public:
 
     static const int SUBTECH_DEFAULT = 0;
     static const int SUBTECH_PASSTHRU_GS = 1;
+    static const int SUBTECH_WIREFRAME_ON_MESH = 2;
 
     LightingTechnique();
 
@@ -113,6 +114,7 @@ public:
 
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
+    void SetViewportMatrix(const Matrix4f& ViewportMatrix);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -157,8 +159,11 @@ protected:
 private:
     void SetExpFogCommon(float FogEnd, float FogDensity);
 
+    int m_subTech = SUBTECH_DEFAULT;
+
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ViewportMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;

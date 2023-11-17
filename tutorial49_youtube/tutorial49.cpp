@@ -225,7 +225,7 @@ private:
 
     void InitRenderer()
     {
-        m_phongRenderer.InitPhongRenderer();
+        m_phongRenderer.InitPhongRenderer(LightingTechnique::SUBTECH_WIREFRAME_ON_MESH);
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
     }

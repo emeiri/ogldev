@@ -35,7 +35,7 @@ class PhongRenderer {
 
     ~PhongRenderer();
 
-    void InitPhongRenderer();
+    void InitPhongRenderer(int SubTech = LightingTechnique::SUBTECH_DEFAULT);
 
     void StartShadowPass();
 
@@ -102,6 +102,7 @@ class PhongRenderer {
     void RenderAnimationCommon(SkinnedMesh* pMesh);
 
     const BasicCamera* m_pCamera = NULL;
+    int m_subTech = LightingTechnique::SUBTECH_DEFAULT;
     LightingTechnique m_lightingTech;
     SkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
