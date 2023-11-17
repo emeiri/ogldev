@@ -357,6 +357,20 @@ Matrix4f BasicCamera::GetViewProjMatrix() const
 }
 
 
+Matrix4f BasicCamera::GetViewportMatrix() const
+{
+    float w2 = m_windowWidth / 2.0f;
+    float h2 = m_windowHeight / 2.0f;
+
+    Matrix4f Viewport = Matrix4f(w2, 0.0f, 0.0f, 0.0f,
+                                 0.0f, h2, 0.0f, 0.0f,
+                                 0.0f, 0.0f, 1.0f, 0.0f,
+                                 w2 + 0, h2 + 0, 0.0f, 1.0f);
+
+    return Viewport;
+}
+
+
 void BasicCamera::SetSpeed(float Speed)
 {
     if (Speed <= 0.0f) {

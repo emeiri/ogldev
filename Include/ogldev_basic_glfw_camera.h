@@ -70,6 +70,8 @@ public:
 
     Matrix4f GetViewMatrix() const { return GetMatrix(); }
 
+    Matrix4f GetViewportMatrix() const;
+
     void Print() const { printf("Pos "); m_pos.Print(); printf("Target "); m_target.Print(); }
 
     void SetSpeed(float Speed);
