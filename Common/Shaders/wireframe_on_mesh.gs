@@ -25,13 +25,13 @@ void main()
     vec4 p;
 
     p = gl_in[0].gl_Position;
-    vec3 p0 = vec3(gViewportMatrix * p / p.w);
+    vec3 p0 = vec3(gViewportMatrix * (p / p.w));
 
     p = gl_in[1].gl_Position;
-    vec3 p1 = vec3(gViewportMatrix * p / p.w);
+    vec3 p1 = vec3(gViewportMatrix * (p / p.w));
 
     p = gl_in[2].gl_Position;
-    vec3 p2 = vec3(gViewportMatrix * p / p.w);
+    vec3 p2 = vec3(gViewportMatrix * (p / p.w));
 
     float a = length(p1 - p2);
     float b = length(p2 - p0);

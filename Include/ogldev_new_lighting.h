@@ -151,6 +151,7 @@ public:
     void SetPBRMaterial(const PBRMaterial& Material);
     void SetClipPlane(const Vector3f& Normal, const Vector3f& PointOnPlane);
     //    void SetPBRLight(const PBRLight& Light);
+    void SetWireframeWidth(float Width);
 
 protected:
 
@@ -193,7 +194,8 @@ private:
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
-    GLuint ClipPlaneLoc = -1;
+    GLuint ClipPlaneLoc = INVALID_UNIFORM_LOCATION;
+    GLuint WireframeWidthLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

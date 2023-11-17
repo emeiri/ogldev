@@ -94,6 +94,7 @@ uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
 uniform bool gIsPBR = false;
 uniform PBRMaterial gPBRmaterial;
+uniform float gWireframeWidth = 0.75;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -648,8 +649,19 @@ void main()
     }
 
     if (EdgeDistance0.x >= 0) {
-        float d = min(EdgeDistance0.x, min(EdgeDistance0.y, EdgeDistance0.z));
-        float mixVal = smoothstep(0.75 - 1.0, 0.75 + 1.0, d);
-        FragColor = mix(vec4(0.05f,0.0f,0.05f,1.0f), FragColor, mixVal);
-    }
+        float d = min( EdgeDistance0.x, EdgeDistance0.y );
+        d = min( d, EdgeDistance0.z );
+
+        float mixVal;
+        if (d < gWireframeWidth - 1) {
+            mixVal = 1.0;
+        } else if (d > gWireframeWidth + 1) {
+            mixVal = 0.0;
+        } else {
+            float x = d - (gWireframeWidth - 1);
+            mixVal = exp2(-2.0 * (x*x));
+        }        
+
+        FragColor = mix( FragColor, vec4(0.05f,0.0f,0.05f,1.0f), mixVal );    
+    }    
 }

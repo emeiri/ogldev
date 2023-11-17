@@ -79,6 +79,8 @@ class PhongRenderer {
 
     void ControlCellShading(bool IsEnabled);
 
+    void SetWireframeLineWidth(float Width);
+
     void Render(BasicMesh* pMesh);
 
     void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);

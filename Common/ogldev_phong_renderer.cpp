@@ -488,5 +488,11 @@ void PhongRenderer::SetPBR(bool IsPBR)
 
     SwitchToSkinningTech();
     m_skinningTech.SetPBR(IsPBR);
+}
 
+
+void PhongRenderer::SetWireframeLineWidth(float Width)
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetWireframeWidth(Width);
 }

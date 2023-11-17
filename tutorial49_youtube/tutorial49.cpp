@@ -49,8 +49,8 @@ public:
     Tutorial49()
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 1.2f;
-        m_dirLight.AmbientIntensity = 0.4f;
+        m_dirLight.DiffuseIntensity = 2.2f;
+        m_dirLight.AmbientIntensity = 0.5f;
     }
 
     virtual ~Tutorial49()
@@ -103,7 +103,7 @@ public:
 
         static float foo = 0.0f;
         m_pMesh->SetRotation(0.0f, 180.0f + foo, 0.0f);
-        foo += 0.5f;
+      //  foo += 0.5f;
       //  m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
         m_phongRenderer.Render(m_pMesh);
     }
@@ -228,6 +228,7 @@ private:
         m_phongRenderer.InitPhongRenderer(LightingTechnique::SUBTECH_WIREFRAME_ON_MESH);
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
+        m_phongRenderer.SetWireframeLineWidth(0.5f);
     }
 
 
@@ -236,9 +237,10 @@ private:
         m_pMesh = new BasicMesh();
       
         m_pMesh->LoadMesh("../Content/dragon.obj");
-        m_pMesh->SetScale(0.1f);
+        //         //m_pMesh->LoadMesh("../Content/bs_ears.obj");
+       // m_pMesh->SetScale(0.1f);
 
-        m_pMesh->SetPosition(0.0f, 0.0f, 3.0f);      
+        m_pMesh->SetPosition(0.0f, 0.0f, 23.0f);      
     }
 
     GLFWwindow* window = NULL;
