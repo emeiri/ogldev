@@ -266,9 +266,9 @@ void BasicMesh::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
                                             &OptVertices[0].Position.x, OptVertexCount, sizeof(Vertex), TargetIndexCount, TargetError);
 
     static int num_indices = 0;
-    num_indices += NumIndices;
+    num_indices += (int)NumIndices;
     static int opt_indices = 0;
-    opt_indices += OptIndexCount;
+    opt_indices += (int)OptIndexCount;
     printf("Num indices %d\n", num_indices);
     //printf("Target num indices %d\n", TargetIndexCount);
     printf("Optimized number of indices %d\n", opt_indices);
