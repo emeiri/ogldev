@@ -9,7 +9,6 @@ in vec3 VNormal[];
 in vec3 VLocalPos[];
 in vec3 VWorldPos[];
 in vec4 VLightSpacePos[]; // required only for shadow mapping (spot/directional light)
-in vec3 VViewPos[];
 
 out vec2 TexCoord0;
 out vec3 Normal0;
@@ -25,13 +24,13 @@ void main()
     vec4 p;
 
     p = gl_in[0].gl_Position;
-    vec3 p0 = vec3(gViewportMatrix * (p / p.w));
+    vec2 p0 = vec2(gViewportMatrix * (p / p.w));
 
     p = gl_in[1].gl_Position;
-    vec3 p1 = vec3(gViewportMatrix * (p / p.w));
+    vec2 p1 = vec2(gViewportMatrix * (p / p.w));
 
     p = gl_in[2].gl_Position;
-    vec3 p2 = vec3(gViewportMatrix * (p / p.w));
+    vec2 p2 = vec2(gViewportMatrix * (p / p.w));
 
     float a = length(p1 - p2);
     float b = length(p2 - p0);
