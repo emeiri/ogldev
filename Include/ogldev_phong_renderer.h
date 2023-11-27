@@ -80,6 +80,7 @@ class PhongRenderer {
     void ControlCellShading(bool IsEnabled);
 
     void SetWireframeLineWidth(float Width);
+    void SetWireframeColor(const Vector4f& Color);
 
     void Render(BasicMesh* pMesh);
 

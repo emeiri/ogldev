@@ -101,7 +101,9 @@ bool LightingTechnique::InitCommon()
 {
     WVPLoc = GetUniformLocation("gWVP");
     WorldMatrixLoc = GetUniformLocation("gWorld");
-    ViewportMatrixLoc = GetUniformLocation("gViewportMatrix");
+    if (m_subTech == SUBTECH_WIREFRAME_ON_MESH) {
+        ViewportMatrixLoc = GetUniformLocation("gViewportMatrix");
+    }
     LightWVPLoc = GetUniformLocation("gLightWVP"); // required only for shadow mapping
     samplerLoc = GetUniformLocation("gSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
@@ -143,6 +145,7 @@ bool LightingTechnique::InitCommon()
     PBRMaterialLoc.Color = GetUniformLocation("gPBRmaterial.Color");
     ClipPlaneLoc = GetUniformLocation("gClipPlane");
     WireframeWidthLoc = GetUniformLocation("gWireframeWidth");
+    WireframeColorLoc = GetUniformLocation("gWireframeColor");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -194,7 +197,8 @@ bool LightingTechnique::InitCommon()
 
     if (m_subTech == SUBTECH_WIREFRAME_ON_MESH) {
         if (ViewportMatrixLoc == INVALID_UNIFORM_LOCATION ||
-            WireframeWidthLoc == INVALID_UNIFORM_LOCATION) {
+            WireframeWidthLoc == INVALID_UNIFORM_LOCATION ||
+            WireframeColorLoc == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
             return false;
 #endif
@@ -647,3 +651,13 @@ void LightingTechnique::SetWireframeWidth(float Width)
     glUniform1f(WireframeWidthLoc, Width);
 }
 
+
+void LightingTechnique::SetWireframeColor(const Vector4f& Color)
+{
+    if (WireframeColorLoc == INVALID_UNIFORM_LOCATION) {
+        printf("Invalid call to SetWireframeColor\n");
+        exit(0);
+    }
+
+    glUniform4f(WireframeColorLoc, Color.x, Color.y, Color.z, Color.w);
+}

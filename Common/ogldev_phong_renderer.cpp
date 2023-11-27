@@ -496,3 +496,10 @@ void PhongRenderer::SetWireframeLineWidth(float Width)
     SwitchToLightingTech();
     m_lightingTech.SetWireframeWidth(Width);
 }
+
+
+void PhongRenderer::SetWireframeColor(const Vector4f& Color)
+{
+    SwitchToLightingTech();
+    m_lightingTech.SetWireframeColor(Color);
+}

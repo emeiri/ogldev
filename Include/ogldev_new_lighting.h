@@ -152,6 +152,7 @@ public:
     void SetClipPlane(const Vector3f& Normal, const Vector3f& PointOnPlane);
     //    void SetPBRLight(const PBRLight& Light);
     void SetWireframeWidth(float Width);
+    void SetWireframeColor(const Vector4f& Color);
 
 protected:
 
@@ -196,6 +197,7 @@ private:
     GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
     GLuint ClipPlaneLoc = INVALID_UNIFORM_LOCATION;
     GLuint WireframeWidthLoc = INVALID_UNIFORM_LOCATION;
+    GLuint WireframeColorLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

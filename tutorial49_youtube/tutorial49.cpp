@@ -229,6 +229,7 @@ private:
         m_phongRenderer.SetCamera(m_pGameCamera);
         m_phongRenderer.SetDirLight(m_dirLight);
         m_phongRenderer.SetWireframeLineWidth(0.5f);
+        m_phongRenderer.SetWireframeColor(Vector4f(.0f, 0.0f, 1.0f, 1.0f));
     }
 
 
