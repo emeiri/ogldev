@@ -120,4 +120,9 @@ string GetDirFromFilename(const string& Filename);
 
 #define CLAMP(Val, Start, End) Val = std::min(std::max((Val), (Start)), (End));
 
+int GetGLMajorVersion();
+int GetGLMinorVersion();
+
+int IsGLVersionHigher(int MajorVer, int MinorVer);
+
 #endif  /* OGLDEV_UTIL_H */

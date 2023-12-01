@@ -6,6 +6,25 @@
 #include "ogldev_util.h"
 #include "ogldev_glfw.h"
 
+static int glMajorVersion = 0;
+static int glMinorVersion = 0;
+
+int GetGLMajorVersion()
+{
+    return glMajorVersion;
+}
+
+int GetGLMinorVersion()
+{
+    return glMinorVersion;
+}
+
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return ((glMajorVersion >= MajorVer) && (glMinorVersion >= MinorVer));
+}
+
+
 static void glfw_lib_init()
 {
     if (glfwInit() != 1) {
@@ -61,11 +80,32 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
     GLFWwindow* window = glfwCreateWindow(width, height, title, monitor, NULL);
 
     if (!window) {
-        OGLDEV_ERROR0("error creating window");
+        const char* pDesc = NULL;
+        int error_code = glfwGetError(&pDesc);
+
+        OGLDEV_ERROR("Error creating window: %s", pDesc);
         exit(1);
     }
 
     glfwMakeContextCurrent(window);
+
+    // The following functions must be called after the context is made current
+    glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
+    glGetIntegerv(GL_MINOR_VERSION, &glMinorVersion);
+
+    if (major_ver > 0) {
+        if (major_ver != glMajorVersion) {
+            OGLDEV_ERROR("Requested major version %d is not the same as created version %d", major_ver, glMajorVersion);
+            exit(0);
+        }
+    }
+
+    if (minor_ver > 0) {
+        if (minor_ver != glMinorVersion) {
+            OGLDEV_ERROR("Requested minor version %d is not the same as created version %d", minor_ver, glMinorVersion);
+            exit(0);
+        }
+    }
 
     // Must be done after glfw is initialized!
     init_glew();
