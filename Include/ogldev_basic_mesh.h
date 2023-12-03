@@ -66,6 +66,8 @@ protected:
     virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
     virtual void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
     virtual void PopulateBuffers();
+    virtual void PopulateBuffersNonDSA();
+    virtual void PopulateBuffersDSA();
 
     struct BasicMeshEntry {
         BasicMeshEntry()

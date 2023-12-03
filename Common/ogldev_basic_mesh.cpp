@@ -53,11 +53,14 @@ bool BasicMesh::LoadMesh(const string& Filename)
     Clear();
 
     // Create the VAO
-    glGenVertexArrays(1, &m_VAO);
-    glBindVertexArray(m_VAO);
-
-    // Create the buffers for the vertices attributes
-    glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
+    if (IsGLVersionHigher(4, 5)) {
+        glCreateVertexArrays(1, &m_VAO);
+        glCreateBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
+    } else {
+        glGenVertexArrays(1, &m_VAO);
+        glBindVertexArray(m_VAO);
+        glGenBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
+    }
 
     bool Ret = false;
 
@@ -73,7 +76,9 @@ bool BasicMesh::LoadMesh(const string& Filename)
     }
 
     // Make sure the VAO is not changed from the outside
-    glBindVertexArray(0);
+    if (!IsGLVersionHigher(4, 5)) {
+        glBindVertexArray(0);
+    }
 
     return Ret;
 }
@@ -461,6 +466,16 @@ void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
 
 void BasicMesh::PopulateBuffers()
 {
+    if (IsGLVersionHigher(4, 5)) {
+        PopulateBuffersDSA();
+    } else {
+        PopulateBuffersNonDSA();
+    }
+}
+
+
+void BasicMesh::PopulateBuffersNonDSA()
+{
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
 
@@ -479,6 +494,32 @@ void BasicMesh::PopulateBuffers()
 
     glEnableVertexAttribArray(NORMAL_LOCATION);
     glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+}
+
+
+void BasicMesh::PopulateBuffersDSA()
+{
+    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(m_Vertices[0]) * m_Vertices.size(), m_Vertices.data(), 0);
+    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), GL_DYNAMIC_STORAGE_BIT);
+
+    glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(Vertex));
+    glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
+
+    size_t NumFloats = 0;
+
+    glEnableVertexArrayAttrib(m_VAO, POSITION_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, POSITION_LOCATION, 0);
+    NumFloats += 3;
+
+    glEnableVertexArrayAttrib(m_VAO, TEX_COORD_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, TEX_COORD_LOCATION, 0);
+    NumFloats += 2;
+
+    glEnableVertexArrayAttrib(m_VAO, NORMAL_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, NORMAL_LOCATION, 0);
 }
 
 
