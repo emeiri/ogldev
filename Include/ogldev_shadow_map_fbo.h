@@ -34,6 +34,13 @@ public:
     void BindForReading(GLenum TextureUnit);
 
 private:
+
+    bool InitNonDSA(unsigned int Width, unsigned int Height, bool ForPCF = false);
+    bool InitDSA(unsigned int Width, unsigned int Height, bool ForPCF = false);
+
+    void BindForReadingNonDSA(GLenum TextureUnit);
+    void BindForReadingDSA(GLenum TextureUnit);
+
     uint m_width = 0;
     uint m_height = 0;
     GLuint m_fbo;

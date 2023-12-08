@@ -36,7 +36,7 @@
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
-#define USE_MESH_OPTIMIZER
+//#define USE_MESH_OPTIMIZER
 
 class BasicMesh : public MeshCommon
 {
