@@ -87,12 +87,10 @@ void Texture::LoadInternal(void* pImageData)
 {
     if (IsGLVersionHigher(4, 5)) {
         LoadInternalDSA(pImageData);
-    }
-    else {
+    } else {
         LoadInternalNonDSA(pImageData);
     }
 }
-
 
 
 void Texture::LoadInternalNonDSA(void* pImageData)
@@ -141,7 +139,7 @@ void Texture::LoadInternalDSA(void* pImageData)
 {
     glCreateTextures(m_textureTarget, 1, &m_textureObj);
 
-    int Levels = 1;
+    int Levels = std::min(5, (int)log2f((float)std::max(m_imageWidth, m_imageHeight)));
 
     if (m_textureTarget == GL_TEXTURE_2D) {
         switch (m_imageBPP) {

@@ -110,7 +110,7 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
     glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowMap);
 
     int Levels = 1;
-    glTextureStorage2D(m_shadowMap, Levels, GL_DEPTH_COMPONENT, Width, Height);
+    glTextureStorage2D(m_shadowMap, Levels, GL_DEPTH_COMPONENT24, Width, Height);
 
     GLint FilterType = ForPCF ? GL_LINEAR : GL_NEAREST;
 
