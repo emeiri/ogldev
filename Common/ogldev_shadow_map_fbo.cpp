@@ -110,7 +110,7 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
     glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowMap);
 
     int Levels = 1;
-    glTextureStorage2D(m_shadowMap, Levels, GL_DEPTH_COMPONENT24, Width, Height);
+    glTextureStorage2D(m_shadowMap, Levels, GL_DEPTH_COMPONENT32, Width, Height);
 
     GLint FilterType = ForPCF ? GL_LINEAR : GL_NEAREST;
 
@@ -128,7 +128,7 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
     glNamedFramebufferReadBuffer(m_fbo, GL_NONE);
     glNamedFramebufferDrawBuffer(m_fbo, GL_NONE);
 
-    GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    GLenum Status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER);
 
     if (Status != GL_FRAMEBUFFER_COMPLETE) {
         printf("FB error, status: 0x%x\n", Status);
