@@ -64,6 +64,12 @@ struct Vertex {
     }
 };
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 
 static void RenderSceneCB()
 {
