@@ -113,6 +113,8 @@ private:
     void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<SkinnedVertex>& Vertices);
 
     virtual void PopulateBuffers();
+    void PopulateBuffersNonDSA();
+    void PopulateBuffersDSA();
 
     void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);
     void LoadSingleBone(uint MeshIndex, const aiBone* pBone, vector<SkinnedVertex>& SkinnedVertices, int BaseVertex);

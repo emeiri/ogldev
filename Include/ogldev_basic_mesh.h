@@ -100,6 +100,8 @@ protected:
         NUM_BUFFERS = 4
     };
 
+    GLuint m_VAO = 0;
+
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
 private:
@@ -125,8 +127,6 @@ private:
     void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
-
-    GLuint m_VAO = 0;
 
     std::vector<Material> m_Materials;
     

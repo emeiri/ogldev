@@ -270,8 +270,18 @@ int SkinnedMesh::GetBoneId(const aiBone* pBone)
 }
 
 
-
 void SkinnedMesh::PopulateBuffers()
+{
+    if (IsGLVersionHigher(4, 5)) {
+        PopulateBuffersDSA();
+    }
+    else {
+        PopulateBuffersNonDSA();
+    }
+}
+
+
+void SkinnedMesh::PopulateBuffersNonDSA()
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
@@ -299,6 +309,43 @@ void SkinnedMesh::PopulateBuffers()
 
     glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
     glVertexAttribPointer(BONE_WEIGHT_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(SkinnedVertex), (const void*)(NumFloats * sizeof(float)));
+}
+
+
+void SkinnedMesh::PopulateBuffersDSA()
+{
+    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(m_SkinnedVertices[0]) * m_SkinnedVertices.size(), m_SkinnedVertices.data(), 0);
+    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), GL_DYNAMIC_STORAGE_BIT);
+
+    glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(SkinnedVertex));
+    glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
+
+    size_t NumFloats = 0;
+
+    glEnableVertexArrayAttrib(m_VAO, POSITION_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, POSITION_LOCATION, 0);
+    NumFloats += 3;
+
+    glEnableVertexArrayAttrib(m_VAO, TEX_COORD_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, TEX_COORD_LOCATION, 0);
+    NumFloats += 2;
+
+    glEnableVertexArrayAttrib(m_VAO, NORMAL_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, NORMAL_LOCATION, 0);
+    NumFloats += 3;
+
+    glEnableVertexArrayAttrib(m_VAO, BONE_ID_LOCATION);
+    glVertexArrayAttribIFormat(m_VAO, BONE_ID_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_INT, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, BONE_ID_LOCATION, 0);
+
+    NumFloats += MAX_NUM_BONES_PER_VERTEX;
+
+    glEnableVertexArrayAttrib(m_VAO, BONE_WEIGHT_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, BONE_WEIGHT_LOCATION, MAX_NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, BONE_WEIGHT_LOCATION, 0);
 }
 
 
