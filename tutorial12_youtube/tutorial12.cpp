@@ -63,7 +63,7 @@ static void RenderSceneCB()
 
     float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
 
-    printf("Aspect ratio %f\n", ar);
+    //printf("Aspect ratio %f\n", ar);
 
     float NearZ = 1.0f;
     float FarZ = 100.0f;
