@@ -33,9 +33,14 @@
 #include "lighting_technique.h"
 #include "ogldev_engine_common.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
 
 
 class Tutorial23
