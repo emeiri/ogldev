@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2022 Etay Meiri
+        Copyright 2023 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Quad Tessellation
-
+    Tutorial 51 - Quad Tessellation
 */
 
 #include <stdio.h>
@@ -25,35 +24,85 @@
 #include <GL/glew.h>
 
 
-#include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
-#include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
-#include "ogldev_basic_mesh.h"
-#include "ogldev_world_transform.h"
-#include "ogldev_phong_renderer.h"
+#include "ogldev_bezier_curve_technique.h"
+#include "ogldev_passthru_vec2_technique.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
+
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
+class VertexBuffer {
+public:
+    VertexBuffer()
+    {
 
-class Tutorial51
+    }
+
+    ~VertexBuffer()
+    {
+
+    }
+
+    void Init(const std::vector<float>& Vertices)
+    {
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
+
+        glGenBuffers(1, &m_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+
+        glBindVertexArray(0);
+
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
+    }
+
+
+    void Update(const std::vector<float>& Vertices)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+
+    void Render(int topology_type)
+    {
+        if ((topology_type != GL_POINTS) && (topology_type != GL_PATCHES)) {
+            printf("Invalid topology type 0x%x\n", topology_type);
+            exit(1);
+        }
+
+        glBindVertexArray(m_vao);
+        glDrawArrays(topology_type, 0, 4);
+    }
+
+private:
+    GLuint m_vbo = -1;
+    GLuint m_vao = -1;
+};
+
+
+class Tutorial47
 {
 public:
 
-    Tutorial51()
+    Tutorial47()
     {
-        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 2.2f;
-        m_dirLight.AmbientIntensity = 1.5f;
     }
 
-    virtual ~Tutorial51()
+
+    virtual ~Tutorial47()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -69,10 +118,15 @@ public:
 
         InitMesh();
 
-        InitRenderer();
+        InitShaders();
 
-        m_startTime = GetCurrentTimeMillis();
-        m_currentTime = m_startTime;
+        glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
+        glFrontFace(GL_CW);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CLIP_DISTANCE0);
+        glPointSize(10.0f);
+        glLineWidth(10.0f);
     }
 
 
@@ -92,93 +146,100 @@ public:
 
         m_pGameCamera->OnRender();
 
-        if (m_runAnimation) {
-            m_currentTime = GetCurrentTimeMillis();
-        }
+        m_bezierCurveTech.Enable();
+        m_bezierCurveTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
+        m_bezierCurveTech.SetNumSegments(m_numSegments);
+        m_vertexBuffer.Render(GL_PATCHES);
 
-        float AnimationTimeSec = (float)((double)m_currentTime - (double)m_startTime) / 1000.0f;
-
-        float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
-        AnimationTimeSec -= TotalPauseTimeSec;
-
-        static float YAngle = 0.0f;
-     //   m_pMesh->SetRotation(90.0f, 0.0f, 0.0f);
-        YAngle += 0.25f;
-
-        m_phongRenderer.Render(m_pMesh);
+        m_passThruTech.Enable();
+        m_vertexBuffer.Render(GL_POINTS);
     }
-
-
-#define ATTEN_STEP 0.01f
-
-#define ANGLE_STEP 1.0f
 
     void PassiveMouseCB(int x, int y)
     {
-        if (m_interactive) {
+        if (!m_isPaused) {
             m_pGameCamera->OnMouse(x, y);
-        }        
+        }
     }
+
+
+#define STEP 0.01f
 
     void KeyboardCB(uint key, int state)
     {
+        bool Handled = true;
+        bool UpdateVertices = false;
+
         if (state == GLFW_PRESS) {
-
             switch (key) {
-            case GLFW_KEY_0:
-                m_animationIndex = 0;
-                break;
-
-            case GLFW_KEY_1:
-                m_animationIndex = 1;
-                break;
-
-            case GLFW_KEY_2:
-                m_animationIndex = 2;
-                break;
-
-            case GLFW_KEY_3:
-                m_animationIndex = 3;
-                break;
-
-            case GLFW_KEY_SPACE:
-                m_runAnimation = !m_runAnimation;
-                if (m_runAnimation) {
-                    long long CurrentTime = GetCurrentTimeMillis();
-                    // printf("Resumed at %lld\n", CurrentTime);
-                    m_totalPauseTime += (CurrentTime - m_pauseStart);
-                    // printf("Total pause time %lld\n", m_totalPauseTime);
-                } else {
-                    m_pauseStart = GetCurrentTimeMillis();
-                    // printf("Paused at %lld\n", GetCurrentTimeMillis());
-                }
-                break;
-
-
-            case GLFW_KEY_Z:
-                m_isWireframe = !m_isWireframe;
-
-                if (m_isWireframe) {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                }
-                else {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                }
-                break; 
-
-            case GLFW_KEY_P:
-                m_interactive = !m_interactive;
-                break;
-
             case GLFW_KEY_ESCAPE:
             case GLFW_KEY_Q:
                 glfwDestroyWindow(window);
                 glfwTerminate();
                 exit(0);
+
+            case GLFW_KEY_P:
+                m_isPaused = !m_isPaused;
+                break;
+
+            case GLFW_KEY_1:
+                m_curVertex = 0;
+                break;
+
+            case GLFW_KEY_2:
+                m_curVertex = 1;
+                break;
+
+            case GLFW_KEY_3:
+                m_curVertex = 2;
+                break;
+
+            case GLFW_KEY_4:
+                m_curVertex = 3;
+                break;
+
+            case GLFW_KEY_UP:
+                m_vertices[m_curVertex * 2 + 1] += STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_DOWN:
+                m_vertices[m_curVertex * 2 + 1] -= STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_LEFT:
+                m_vertices[m_curVertex * 2] -= STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_RIGHT:
+                m_vertices[m_curVertex * 2] += STEP;
+                UpdateVertices = true;
+                break;
+
+            case GLFW_KEY_A:
+                m_numSegments++;
+                break;
+
+            case GLFW_KEY_Z:
+                if (m_numSegments > 0) {
+                    m_numSegments--;
+                }
+                break;
+
+            default:
+                Handled = false;
             }
         }
 
-        m_pGameCamera->OnKeyboard(key);
+        if (UpdateVertices) {
+            m_vertexBuffer.Update(m_vertices);
+        }
+
+        if (!Handled) {
+            m_pGameCamera->OnKeyboard(key);
+        }
     }
 
 
@@ -194,7 +255,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 51");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 47");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -210,55 +271,69 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
+        Vector3f CameraPos = Vector3f(0.0f, 0.0f, -1.0f);
+        Vector3f CameraTarget = Vector3f(0.0f, 0.f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        float FOV = 45.0f;
-        float zNear = 1.0f;
-        float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+        float c = 3.5f;
+        OrthoProjInfo orthoProjinfo;
+        orthoProjinfo.l = -0.4f * c;
+        orthoProjinfo.r = 0.4f * c;
+        orthoProjinfo.b = -0.3f * c;
+        orthoProjinfo.t = 0.3f * c;
+        orthoProjinfo.n = 0.1f;
+        orthoProjinfo.f = 100.0f;
+        orthoProjinfo.Width = WINDOW_WIDTH;
+        orthoProjinfo.Height = WINDOW_HEIGHT;
 
-        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+        m_pGameCamera = new BasicCamera(orthoProjinfo, CameraPos, CameraTarget, Up);
+        m_pGameCamera->SetSpeed(0.1f);
     }
 
 
-    void InitRenderer()
+    void InitShaders()
     {
-        m_phongRenderer.InitPhongRenderer();
-        m_phongRenderer.SetCamera(m_pGameCamera);
-        m_phongRenderer.SetDirLight(m_dirLight);
-        m_phongRenderer.SetWireframeLineWidth(1.0f);
-        m_phongRenderer.SetWireframeColor(Vector4f(.0f, 0.0f, 1.0f, 1.0f));
+        if (!m_bezierCurveTech.Init()) {
+            printf("Error initializing the bezier curve technique\n");
+            exit(1);
+        }
+
+        m_bezierCurveTech.Enable();
+
+        m_bezierCurveTech.SetNumSegments(m_numSegments);
+        m_bezierCurveTech.SetLineColor(1.0f, 1.0f, 0.5f, 1.0f);
+
+        if (!m_passThruTech.Init()) {
+            printf("Error initializing the passthru technique\n");
+            exit(1);
+        }
+
+        m_passThruTech.Enable();
+
+        m_passThruTech.SetColor(1.0f, 0.0f, 0.0f);
     }
 
 
     void InitMesh()
     {
-        m_pMesh = new BasicMesh();
-      
-        m_pMesh->LoadMesh("../Content/quad.obj");
-
-        m_pMesh->SetPosition(0.0f, 0.0f, 5.0f);      
+        m_vertexBuffer.Init(m_vertices);
     }
 
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
-    PhongRenderer m_phongRenderer;
-    BasicMesh* m_pMesh = NULL;
-    PersProjInfo m_persProjInfo;
-    DirectionalLight m_dirLight;
-    long long m_startTime = 0;
-    long long m_currentTime = 0;
-    bool m_runAnimation = true;
-    long long m_totalPauseTime = 0;
-    long long m_pauseStart = 0;
-    int m_animationIndex = 0;
-    bool m_isWireframe = false;
-    bool m_interactive = true;
+    bool m_isPaused = false;
+    VertexBuffer m_vertexBuffer;
+    BezierCurveTechnique m_bezierCurveTech;
+    PassthruVec2Technique m_passThruTech;
+    std::vector<float> m_vertices = { -0.95f, -0.95f,     // X Y
+                                      -0.85f, 0.95f,      // X Y
+                                      0.5f, -0.95f,       // X Y
+                                      0.95f, 0.95f };     // X Y
+    int m_curVertex = 0;
+    int m_numSegments = 50;
 };
 
-Tutorial51* app = NULL;
+Tutorial47* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -284,15 +359,9 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial51();
+    app = new Tutorial47();
 
     app->Init();
-
-    glClearColor(0.1f, 0.1f, 0.5f, 0.0f);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
 
     app->Run();
 
