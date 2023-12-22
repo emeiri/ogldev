@@ -1,3 +1,21 @@
+/*
+        Copyright 2023 Etay Meiri
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 #pragma once
 
 class VertexBuffer {
@@ -12,8 +30,9 @@ public:
 
     }
 
-    void Init(const std::vector<float>& Vertices)
+    void Init(const std::vector<float>& Vertices, GLuint TopologyType)
     {
+        m_topologyType = TopologyType;
         m_numVertices = (int)Vertices.size();
 
         glGenVertexArrays(1, &m_vao);
@@ -27,8 +46,6 @@ public:
         glEnableVertexAttribArray(0);
 
         glBindVertexArray(0);
-
-        glPatchParameteri(GL_PATCH_VERTICES, 4);
     }
 
 
@@ -52,17 +69,24 @@ public:
 
     void Render(int topology_type)
     {
-        if ((topology_type != GL_POINTS) && (topology_type != GL_PATCHES)) {
-            printf("Invalid topology type 0x%x\n", topology_type);
-            exit(1);
+        glBindVertexArray(m_vao);
+
+        if (topology_type == GL_PATCHES) {
+            glPatchParameteri(GL_PATCH_VERTICES, m_numVertices);
         }
 
-        glBindVertexArray(m_vao);
         glDrawArrays(topology_type, 0, m_numVertices);
+    }
+
+
+    void Render()
+    {
+        Render(m_topologyType);
     }
 
 private:
     GLuint m_vbo = -1;
     GLuint m_vao = -1;
     int m_numVertices = 0;
+    GLuint m_topologyType = -1;
 };

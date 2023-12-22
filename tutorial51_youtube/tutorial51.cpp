@@ -95,7 +95,7 @@ public:
         int OuterLevel = 4;
         int InnerLevel = 4;
         m_quadTessTech.SetLevels(OuterLevel, InnerLevel);
-        m_vertexBuffer.Render(GL_PATCHES);
+        m_vertexBuffer.Render();
     }
 
     void PassiveMouseCB(int x, int y)
@@ -207,7 +207,7 @@ private:
 
     void InitMesh()
     {
-        m_vertexBuffer.Init(m_vertices);
+        m_vertexBuffer.Init(m_vertices, GL_PATCHES);
     }
 
     GLFWwindow* window = NULL;
