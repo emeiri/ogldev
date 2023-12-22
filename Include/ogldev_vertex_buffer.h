@@ -30,7 +30,7 @@ public:
 
     }
 
-    void Init(const std::vector<float>& Vertices, GLuint TopologyType)
+    void Init(const std::vector<float>& Vertices, int NumVertexElements, GLuint TopologyType)
     {
         m_topologyType = TopologyType;
         m_numVertices = (int)Vertices.size();
@@ -42,7 +42,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(0, NumVertexElements, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(0);
 
         glBindVertexArray(0);

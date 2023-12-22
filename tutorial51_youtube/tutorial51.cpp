@@ -241,7 +241,8 @@ private:
 
     void InitMesh()
     {
-        m_vertexBuffer.Init(m_vertices, GL_PATCHES);
+        int NumVertexElements = 2;
+        m_vertexBuffer.Init(m_vertices, NumVertexElements, GL_PATCHES);
     }
 
 
@@ -270,7 +271,7 @@ private:
     std::vector<float> m_vertices = { -1.0f, -1.0f,     // Bottom left
                                       1.0f, -1.0f,      // Bottom right
                                       1.0f, 1.0f,       // Top right
-                                      -1.0f, 1.0f };     // Top left
+                                      -1.0f, 1.0f };    // Top left
     bool m_isWireframe = true;
 
     int m_outerLevelLeft = 4;
