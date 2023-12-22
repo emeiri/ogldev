@@ -16,9 +16,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_passthru_vec2_technique.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\bezier_curve.fs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\..\..\Common\Shaders\bezier_curve.tcs">
       <Filter>Shaders</Filter>
     </None>
@@ -26,6 +23,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\Common\Shaders\passthru_vec2.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\color.fs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

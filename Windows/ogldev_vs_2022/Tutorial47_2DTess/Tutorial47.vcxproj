@@ -29,9 +29,9 @@
     <ClCompile Include="..\..\..\tutorial47_youtube\tutorial47.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\bezier_curve.fs" />
     <None Include="..\..\..\Common\Shaders\bezier_curve.tcs" />
     <None Include="..\..\..\Common\Shaders\bezier_curve.tes" />
+    <None Include="..\..\..\Common\Shaders\color.fs" />
     <None Include="..\..\..\Common\Shaders\passthru_vec2.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

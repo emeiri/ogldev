@@ -42,7 +42,7 @@ bool BezierCurveTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/bezier_curve.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/color.fs")) {
         return false;
     }
 
