@@ -42,3 +42,5 @@ read.lock
 /Windows/ogldev_vs_2022/Terrain2/x64/Release/*.ipdb
 *.dll
 *.lib
+*.pch
+*.iobj

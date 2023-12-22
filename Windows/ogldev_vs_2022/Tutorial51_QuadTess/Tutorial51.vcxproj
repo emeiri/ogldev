@@ -25,7 +25,9 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_passthru_vec2_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_phong_renderer.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_quad_tess_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp" />
@@ -43,6 +45,9 @@
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\lighting_new.fs" />
     <None Include="..\..\..\Common\Shaders\lighting_new_to_gs.vs" />
+    <None Include="..\..\..\Common\Shaders\passthru_vec2.vs" />
+    <None Include="..\..\..\Common\Shaders\quad_tess.tcs" />
+    <None Include="..\..\..\Common\Shaders\quad_tess.tes" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

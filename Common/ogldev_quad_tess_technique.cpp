@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ogldev_bezier_curve_technique.h"
+#include "ogldev_quad_tess_technique.h"
 
-BezierCurveTechnique::BezierCurveTechnique()
+QuadTessTechnique::QuadTessTechnique()
 {
 
 }
 
 
-bool BezierCurveTechnique::Init()
+bool QuadTessTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
@@ -34,13 +34,17 @@ bool BezierCurveTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_TESS_EVALUATION_SHADER, "../Common/Shaders/bezier_curve.tes")) {
+    if (!AddShader(GL_TESS_CONTROL_SHADER, "../Common/Shaders/quad_tess.tcs")) {
         return false;
     }
 
-    if (!AddShader(GL_TESS_CONTROL_SHADER, "../Common/Shaders/bezier_curve.tcs")) {
+    if (!AddShader(GL_TESS_EVALUATION_SHADER, "../Common/Shaders/quad_tess.tes")) {
         return false;
     }
+
+   // if (!AddShader(GL_GEOMETRY_SHADER, "../Common/Shaders/wireframe_on_mesh.gs")) {
+   //     return false;
+   // }
 
     if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/bezier_curve.fs")) {
         return false;
@@ -51,29 +55,26 @@ bool BezierCurveTechnique::Init()
     }
 
     m_wvpLoc = GetUniformLocation("gWVP");
-    m_numSegmentsLoc = GetUniformLocation("gNumSegments");
-    m_lineColorLoc = GetUniformLocation("gLineColor");
+    m_outerLevelLoc = GetUniformLocation("gOuterLevel");
+    m_innerLevelLoc = GetUniformLocation("gInnerLevel");
 
     return 
         ((m_wvpLoc != INVALID_UNIFORM_LOCATION) &&
-        (m_numSegmentsLoc != INVALID_UNIFORM_LOCATION) &&
-        (m_lineColorLoc != INVALID_UNIFORM_LOCATION));
+        (m_outerLevelLoc != INVALID_UNIFORM_LOCATION) &&
+        (m_innerLevelLoc != INVALID_UNIFORM_LOCATION));
 }
 
 
-void BezierCurveTechnique::SetWVP(const Matrix4f& WVP)
+void QuadTessTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_wvpLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
-void BezierCurveTechnique::SetNumSegments(int NumSegments)
+void QuadTessTechnique::SetLevels(int OuterLevel, int InnerLevel)
 {
-    glUniform1i(m_numSegmentsLoc, NumSegments);
+    glUniform1i(m_outerLevelLoc, OuterLevel);
+    glUniform1i(m_innerLevelLoc, InnerLevel);
 }
 
 
-void BezierCurveTechnique::SetLineColor(float r, float g, float b, float a)
-{
-    glUniform4f(m_lineColorLoc, r, g, b, a);
-}

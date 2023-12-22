@@ -25,7 +25,7 @@
     <None Include="..\..\..\Common\Shaders\bezier_curve.tes">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Common\Shaders\bezier_curve.vs">
+    <None Include="..\..\..\Common\Shaders\passthru_vec2.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

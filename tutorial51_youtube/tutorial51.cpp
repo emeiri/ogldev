@@ -27,8 +27,9 @@
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
-#include "ogldev_bezier_curve_technique.h"
+#include "ogldev_quad_tess_technique.h"
 #include "ogldev_passthru_vec2_technique.h"
+#include "ogldev_vertex_buffer.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -38,71 +39,17 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
-class VertexBuffer {
-public:
-    VertexBuffer()
-    {
 
-    }
-
-    ~VertexBuffer()
-    {
-
-    }
-
-    void Init(const std::vector<float>& Vertices)
-    {
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
-
-        glGenBuffers(1, &m_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0);
-
-        glBindVertexArray(0);
-
-        glPatchParameteri(GL_PATCH_VERTICES, 4);
-    }
-
-
-    void Update(const std::vector<float>& Vertices)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-
-    void Render(int topology_type)
-    {
-        if ((topology_type != GL_POINTS) && (topology_type != GL_PATCHES)) {
-            printf("Invalid topology type 0x%x\n", topology_type);
-            exit(1);
-        }
-
-        glBindVertexArray(m_vao);
-        glDrawArrays(topology_type, 0, 4);
-    }
-
-private:
-    GLuint m_vbo = -1;
-    GLuint m_vao = -1;
-};
-
-
-class Tutorial47
+class Tutorial51
 {
 public:
 
-    Tutorial47()
+    Tutorial51()
     {
     }
 
 
-    virtual ~Tutorial47()
+    virtual ~Tutorial51()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -121,12 +68,12 @@ public:
         InitShaders();
 
         glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
-        glFrontFace(GL_CW);
+        glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CLIP_DISTANCE0);
-        glPointSize(10.0f);
-        glLineWidth(10.0f);
+     //   glPointSize(10.0f);
+     //   glLineWidth(10.0f);
     }
 
 
@@ -146,13 +93,15 @@ public:
 
         m_pGameCamera->OnRender();
 
-        m_bezierCurveTech.Enable();
-        m_bezierCurveTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
-        m_bezierCurveTech.SetNumSegments(m_numSegments);
+        m_quadTessTech.Enable();
+        m_quadTessTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
+        int OuterLevel = 4;
+        int InnerLevel = 4;
+        m_quadTessTech.SetLevels(OuterLevel, InnerLevel);
         m_vertexBuffer.Render(GL_PATCHES);
 
-        m_passThruTech.Enable();
-        m_vertexBuffer.Render(GL_POINTS);
+      //  m_passThruTech.Enable();
+      //  m_vertexBuffer.Render(GL_POINTS);
     }
 
     void PassiveMouseCB(int x, int y)
@@ -219,12 +168,16 @@ public:
                 break;
 
             case GLFW_KEY_A:
-                m_numSegments++;
                 break;
 
             case GLFW_KEY_Z:
-                if (m_numSegments > 0) {
-                    m_numSegments--;
+                m_isWireframe = !m_isWireframe;
+
+                if (m_isWireframe) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                else {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 }
                 break;
 
@@ -255,7 +208,7 @@ private:
         int major_ver = 0;
         int minor_ver = 0;
         bool is_full_screen = false;
-        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 47");
+        window = glfw_init(major_ver, minor_ver, WINDOW_WIDTH, WINDOW_HEIGHT, is_full_screen, "Tutorial 51");
 
         glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
     }
@@ -293,15 +246,12 @@ private:
 
     void InitShaders()
     {
-        if (!m_bezierCurveTech.Init()) {
+        if (!m_quadTessTech.Init()) {
             printf("Error initializing the bezier curve technique\n");
             exit(1);
         }
 
-        m_bezierCurveTech.Enable();
-
-        m_bezierCurveTech.SetNumSegments(m_numSegments);
-        m_bezierCurveTech.SetLineColor(1.0f, 1.0f, 0.5f, 1.0f);
+        m_quadTessTech.Enable();
 
         if (!m_passThruTech.Init()) {
             printf("Error initializing the passthru technique\n");
@@ -323,17 +273,17 @@ private:
     BasicCamera* m_pGameCamera = NULL;
     bool m_isPaused = false;
     VertexBuffer m_vertexBuffer;
-    BezierCurveTechnique m_bezierCurveTech;
+    QuadTessTechnique m_quadTessTech;
     PassthruVec2Technique m_passThruTech;
-    std::vector<float> m_vertices = { -0.95f, -0.95f,     // X Y
-                                      -0.85f, 0.95f,      // X Y
-                                      0.5f, -0.95f,       // X Y
-                                      0.95f, 0.95f };     // X Y
+    std::vector<float> m_vertices = { -1.0f, -1.0f,     // X Y
+                                      1.0f, -1.0f,      // X Y
+                                      1.0f, 1.0f,       // X Y
+                                      -1.0f, 1.0f };     // X Y
     int m_curVertex = 0;
-    int m_numSegments = 50;
+    bool m_isWireframe = false;
 };
 
-Tutorial47* app = NULL;
+Tutorial51* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -359,7 +309,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial47();
+    app = new Tutorial51();
 
     app->Init();
 
