@@ -28,7 +28,6 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "ogldev_quad_tess_technique.h"
-#include "ogldev_passthru_vec2_technique.h"
 #include "ogldev_vertex_buffer.h"
 
 #define WINDOW_WIDTH  1920
@@ -71,9 +70,8 @@ public:
         glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CLIP_DISTANCE0);
-     //   glPointSize(10.0f);
-     //   glLineWidth(10.0f);
+        glLineWidth(5.0f);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
 
@@ -93,15 +91,11 @@ public:
 
         m_pGameCamera->OnRender();
 
-        m_quadTessTech.Enable();
         m_quadTessTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
         int OuterLevel = 4;
         int InnerLevel = 4;
         m_quadTessTech.SetLevels(OuterLevel, InnerLevel);
         m_vertexBuffer.Render(GL_PATCHES);
-
-      //  m_passThruTech.Enable();
-      //  m_vertexBuffer.Render(GL_POINTS);
     }
 
     void PassiveMouseCB(int x, int y)
@@ -117,7 +111,6 @@ public:
     void KeyboardCB(uint key, int state)
     {
         bool Handled = true;
-        bool UpdateVertices = false;
 
         if (state == GLFW_PRESS) {
             switch (key) {
@@ -129,45 +122,6 @@ public:
 
             case GLFW_KEY_P:
                 m_isPaused = !m_isPaused;
-                break;
-
-            case GLFW_KEY_1:
-                m_curVertex = 0;
-                break;
-
-            case GLFW_KEY_2:
-                m_curVertex = 1;
-                break;
-
-            case GLFW_KEY_3:
-                m_curVertex = 2;
-                break;
-
-            case GLFW_KEY_4:
-                m_curVertex = 3;
-                break;
-
-            case GLFW_KEY_UP:
-                m_vertices[m_curVertex * 2 + 1] += STEP;
-                UpdateVertices = true;
-                break;
-
-            case GLFW_KEY_DOWN:
-                m_vertices[m_curVertex * 2 + 1] -= STEP;
-                UpdateVertices = true;
-                break;
-
-            case GLFW_KEY_LEFT:
-                m_vertices[m_curVertex * 2] -= STEP;
-                UpdateVertices = true;
-                break;
-
-            case GLFW_KEY_RIGHT:
-                m_vertices[m_curVertex * 2] += STEP;
-                UpdateVertices = true;
-                break;
-
-            case GLFW_KEY_A:
                 break;
 
             case GLFW_KEY_Z:
@@ -184,10 +138,6 @@ public:
             default:
                 Handled = false;
             }
-        }
-
-        if (UpdateVertices) {
-            m_vertexBuffer.Update(m_vertices);
         }
 
         if (!Handled) {
@@ -252,15 +202,6 @@ private:
         }
 
         m_quadTessTech.Enable();
-
-        if (!m_passThruTech.Init()) {
-            printf("Error initializing the passthru technique\n");
-            exit(1);
-        }
-
-        m_passThruTech.Enable();
-
-        m_passThruTech.SetColor(1.0f, 0.0f, 0.0f);
     }
 
 
@@ -274,13 +215,11 @@ private:
     bool m_isPaused = false;
     VertexBuffer m_vertexBuffer;
     QuadTessTechnique m_quadTessTech;
-    PassthruVec2Technique m_passThruTech;
     std::vector<float> m_vertices = { -1.0f, -1.0f,     // X Y
                                       1.0f, -1.0f,      // X Y
                                       1.0f, 1.0f,       // X Y
                                       -1.0f, 1.0f };     // X Y
-    int m_curVertex = 0;
-    bool m_isWireframe = false;
+    bool m_isWireframe = true;
 };
 
 Tutorial51* app = NULL;
