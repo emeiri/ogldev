@@ -237,6 +237,7 @@ private:
         }
 
         m_quadTessTech.Enable();
+        m_quadTessTech.SetColor(Vector4f(1.0f, 1.0f, 0.0f, 0.0f));
     }
 
 
