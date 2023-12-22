@@ -23,6 +23,11 @@
 #include <math.h>
 #include <GL/glew.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+
 
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
@@ -66,6 +71,8 @@ public:
 
         InitShaders();
 
+        InitGUI();
+
         glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
         glFrontFace(GL_CCW);
         glEnable(GL_CULL_FACE);
@@ -78,7 +85,8 @@ public:
     void Run()
     {
         while (!glfwWindowShouldClose(window)) {
-            RenderSceneCB();
+            RenderGui();
+            RenderSceneCB();            
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
@@ -87,22 +95,38 @@ public:
 
     void RenderSceneCB()
     {
+        m_quadTessTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
+        m_quadTessTech.SetLevels(m_outerLevel, m_innerLevel);
+        m_vertexBuffer.Render();
+    }
+
+
+    void RenderGui()
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Terrain Water Demo");
+
+        ImGui::SliderInt("Outer Tessellation Level", &this->m_outerLevel, 0, 100);
+        ImGui::SliderInt("Inner Tessellation Level", &this->m_innerLevel, 0, 100);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+
+        // Rendering
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_pGameCamera->OnRender();
-
-        m_quadTessTech.SetWVP(m_pGameCamera->GetViewProjMatrix());
-        int OuterLevel = 4;
-        int InnerLevel = 4;
-        m_quadTessTech.SetLevels(OuterLevel, InnerLevel);
-        m_vertexBuffer.Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     void PassiveMouseCB(int x, int y)
     {
-        if (!m_isPaused) {
-            m_pGameCamera->OnMouse(x, y);
-        }
     }
 
 
@@ -210,16 +234,36 @@ private:
         m_vertexBuffer.Init(m_vertices, GL_PATCHES);
     }
 
+
+    void InitGUI()
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+
+        // Setup Platform/Renderer backends
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        const char* glsl_version = "#version 130";
+        ImGui_ImplOpenGL3_Init(glsl_version);
+    }
+
+
     GLFWwindow* window = NULL;
     BasicCamera* m_pGameCamera = NULL;
     bool m_isPaused = false;
     VertexBuffer m_vertexBuffer;
     QuadTessTechnique m_quadTessTech;
-    std::vector<float> m_vertices = { -1.0f, -1.0f,     // X Y
-                                      1.0f, -1.0f,      // X Y
-                                      1.0f, 1.0f,       // X Y
-                                      -1.0f, 1.0f };     // X Y
+    std::vector<float> m_vertices = { -1.0f, -1.0f,     // Bottom left
+                                      1.0f, -1.0f,      // Bottom right
+                                      1.0f, 1.0f,       // Top right
+                                      -1.0f, 1.0f };     // Top left
     bool m_isWireframe = true;
+    int m_outerLevel = 4;
+    int m_innerLevel = 4;
 };
 
 Tutorial51* app = NULL;
