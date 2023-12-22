@@ -42,11 +42,7 @@ bool QuadTessTechnique::Init()
         return false;
     }
 
-   // if (!AddShader(GL_GEOMETRY_SHADER, "../Common/Shaders/wireframe_on_mesh.gs")) {
-   //     return false;
-   // }
-
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/bezier_curve.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/color.fs")) {
         return false;
     }
 
@@ -55,13 +51,26 @@ bool QuadTessTechnique::Init()
     }
 
     m_wvpLoc = GetUniformLocation("gWVP");
-    m_outerLevelLoc = GetUniformLocation("gOuterLevel");
-    m_innerLevelLoc = GetUniformLocation("gInnerLevel");
+
+    m_outerLevelLeftLoc = GetUniformLocation("gOuterLevelLeft");
+    m_outerLevelBottomLoc = GetUniformLocation("gOuterLevelBottom");
+    m_outerLevelRightLoc = GetUniformLocation("gOuterLevelRight");
+    m_outerLevelTopLoc = GetUniformLocation("gOuterLevelTop");
+    
+    m_innerLevelLeftRightLoc = GetUniformLocation("gInnerLevelLeftRight");
+    m_innerLevelTopBottomLoc = GetUniformLocation("gInnerLevelTopBottom");
+    
+    m_colorLoc = GetUniformLocation("gColor");
 
     return 
         ((m_wvpLoc != INVALID_UNIFORM_LOCATION) &&
-        (m_outerLevelLoc != INVALID_UNIFORM_LOCATION) &&
-        (m_innerLevelLoc != INVALID_UNIFORM_LOCATION));
+         (m_colorLoc != INVALID_UNIFORM_LOCATION) &&
+         (m_outerLevelRightLoc != INVALID_UNIFORM_LOCATION) &&
+         (m_outerLevelBottomLoc != INVALID_UNIFORM_LOCATION) &&
+         (m_outerLevelLeftLoc != INVALID_UNIFORM_LOCATION) &&
+         (m_outerLevelTopLoc != INVALID_UNIFORM_LOCATION) &&
+         (m_innerLevelLeftRightLoc != INVALID_UNIFORM_LOCATION) &&
+         (m_innerLevelTopBottomLoc != INVALID_UNIFORM_LOCATION));
 }
 
 
@@ -71,10 +80,26 @@ void QuadTessTechnique::SetWVP(const Matrix4f& WVP)
 }
 
 
-void QuadTessTechnique::SetLevels(int OuterLevel, int InnerLevel)
+void QuadTessTechnique::SetLevels(int OuterLevelLeft,
+                                  int OuterLevelBottom,
+                                  int OuterLevelRight,
+                                  int OuterLevelTop,
+                                  int InnerLevelLeftRight,
+                                  int InnerLevelTopBottom)
 {
-    glUniform1i(m_outerLevelLoc, OuterLevel);
-    glUniform1i(m_innerLevelLoc, InnerLevel);
+    glUniform1i(m_outerLevelLeftLoc, OuterLevelLeft);
+    glUniform1i(m_outerLevelBottomLoc, OuterLevelBottom);
+    glUniform1i(m_outerLevelRightLoc, OuterLevelRight);
+    glUniform1i(m_outerLevelTopLoc, OuterLevelTop);
+
+    glUniform1i(m_innerLevelLeftRightLoc, InnerLevelLeftRight);
+    glUniform1i(m_innerLevelTopBottomLoc, InnerLevelTopBottom);
+}
+
+
+void QuadTessTechnique::SetColor(const Vector4f& Color)
+{
+    glUniform4f(m_colorLoc, Color.x, Color.y, Color.z, Color.w);
 }
 
 

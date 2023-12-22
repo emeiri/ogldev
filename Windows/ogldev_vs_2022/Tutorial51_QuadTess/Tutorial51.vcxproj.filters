@@ -66,12 +66,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\lighting_new.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\Common\Shaders\lighting_new_to_gs.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\..\..\Common\Shaders\passthru_vec2.vs">
       <Filter>Shaders</Filter>
     </None>
@@ -79,6 +73,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\Common\Shaders\quad_tess.tes">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\color.fs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

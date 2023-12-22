@@ -32,11 +32,27 @@ class QuadTessTechnique : public Technique
 
     void SetWVP(const Matrix4f& WVP);
 
-    void SetLevels(int OuterLevel, int InnerLevel);
+    void SetLevels(
+        int OuterLevelLeft,
+        int OuterLevelBottom,
+        int OuterLevelRight,
+        int OuterLevelTop,
+        int InnerLevelLeftRight,
+        int InnerLevelTopBottom);
+
+    void SetColor(const Vector4f& Color);
 
  private:
 
     GLuint m_wvpLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_outerLevelLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_innerLevelLoc = INVALID_UNIFORM_LOCATION;
+
+    GLuint m_outerLevelLeftLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_outerLevelBottomLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_outerLevelRightLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_outerLevelTopLoc = INVALID_UNIFORM_LOCATION;
+
+    GLuint m_innerLevelLeftRightLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_innerLevelTopBottomLoc = INVALID_UNIFORM_LOCATION;
+
+    GLuint m_colorLoc = INVALID_UNIFORM_LOCATION;
 };
