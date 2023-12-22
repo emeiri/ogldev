@@ -85,8 +85,9 @@ public:
     void Run()
     {
         while (!glfwWindowShouldClose(window)) {
-            RenderGui();
-            RenderSceneCB();            
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            RenderSceneCB();
+            RenderGui();            
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
@@ -130,7 +131,7 @@ public:
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
@@ -251,7 +252,6 @@ private:
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
-        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
