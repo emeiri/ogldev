@@ -80,20 +80,20 @@ void QuadTessTechnique::SetWVP(const Matrix4f& WVP)
 }
 
 
-void QuadTessTechnique::SetLevels(int OuterLevelLeft,
-                                  int OuterLevelBottom,
-                                  int OuterLevelRight,
-                                  int OuterLevelTop,
-                                  int InnerLevelLeftRight,
-                                  int InnerLevelTopBottom)
+void QuadTessTechnique::SetLevels(float OuterLevelLeft,
+                                  float OuterLevelBottom,
+                                  float OuterLevelRight,
+                                  float OuterLevelTop,
+                                  float InnerLevelLeftRight,
+                                  float InnerLevelTopBottom)
 {
-    glUniform1i(m_outerLevelLeftLoc, OuterLevelLeft);
-    glUniform1i(m_outerLevelBottomLoc, OuterLevelBottom);
-    glUniform1i(m_outerLevelRightLoc, OuterLevelRight);
-    glUniform1i(m_outerLevelTopLoc, OuterLevelTop);
+    glUniform1f(m_outerLevelLeftLoc, OuterLevelLeft);
+    glUniform1f(m_outerLevelBottomLoc, OuterLevelBottom);
+    glUniform1f(m_outerLevelRightLoc, OuterLevelRight);
+    glUniform1f(m_outerLevelTopLoc, OuterLevelTop);
 
-    glUniform1i(m_innerLevelLeftRightLoc, InnerLevelLeftRight);
-    glUniform1i(m_innerLevelTopBottomLoc, InnerLevelTopBottom);
+    glUniform1f(m_innerLevelLeftRightLoc, InnerLevelLeftRight);
+    glUniform1f(m_innerLevelTopBottomLoc, InnerLevelTopBottom);
 }
 
 

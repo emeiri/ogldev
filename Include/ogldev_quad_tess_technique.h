@@ -33,12 +33,12 @@ class QuadTessTechnique : public Technique
     void SetWVP(const Matrix4f& WVP);
 
     void SetLevels(
-        int OuterLevelLeft,
-        int OuterLevelBottom,
-        int OuterLevelRight,
-        int OuterLevelTop,
-        int InnerLevelLeftRight,
-        int InnerLevelTopBottom);
+        float OuterLevelLeft,
+        float OuterLevelBottom,
+        float OuterLevelRight,
+        float OuterLevelTop,
+        float InnerLevelLeftRight,
+        float InnerLevelTopBottom);
 
     void SetColor(const Vector4f& Color);
 

@@ -115,13 +115,13 @@ public:
 
         ImGui::Begin("Terrain Water Demo");
 
-        ImGui::SliderInt("Outer Left Tessellation Level", &this->m_outerLevelLeft, 0, 100);
-        ImGui::SliderInt("Outer Bottom Tessellation Level", &this->m_outerLevelBottom, 0, 100);
-        ImGui::SliderInt("Outer Right Tessellation Level", &this->m_outerLevelRight, 0, 100);
-        ImGui::SliderInt("Outer Top Tessellation Level", &this->m_outerLevelTop, 0, 100);
+        ImGui::SliderFloat("Outer Left Tessellation Level", &this->m_outerLevelLeft, 0.0f, 100.0f);
+        ImGui::SliderFloat ("Outer Bottom Tessellation Level", &this->m_outerLevelBottom, 0.0f, 100.0f);
+        ImGui::SliderFloat ("Outer Right Tessellation Level", &this->m_outerLevelRight, 0.0f, 100.0f);
+        ImGui::SliderFloat("Outer Top Tessellation Level", &this->m_outerLevelTop, 0.0f, 100.0f);
 
-        ImGui::SliderInt("Inner Left/Right Tessellation Level", &this->m_innerLevelLeftRight, 0, 100);
-        ImGui::SliderInt("Inner Top/Bottom Tessellation Level", &this->m_innerLevelTopBottom, 0, 100);
+        ImGui::SliderFloat("Inner Left/Right Tessellation Level", &this->m_innerLevelLeftRight, 0.0f, 100.0f);
+        ImGui::SliderFloat("Inner Top/Bottom Tessellation Level", &this->m_innerLevelTopBottom, 0.0f, 100.0f);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
@@ -275,13 +275,13 @@ private:
                                       -1.0f, 1.0f };    // Top left
     bool m_isWireframe = true;
 
-    int m_outerLevelLeft = 4;
-    int m_outerLevelBottom = 4;
-    int m_outerLevelRight = 4;
-    int m_outerLevelTop = 4;
+    float m_outerLevelLeft = 4;
+    float m_outerLevelBottom = 4;
+    float m_outerLevelRight = 4;
+    float m_outerLevelTop = 4;
 
-    int m_innerLevelLeftRight = 4;
-    int m_innerLevelTopBottom = 4;
+    float m_innerLevelLeftRight = 4;
+    float m_innerLevelTopBottom = 4;
 };
 
 Tutorial51* app = NULL;
