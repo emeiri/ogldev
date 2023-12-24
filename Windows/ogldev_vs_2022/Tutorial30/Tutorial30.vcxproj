@@ -26,15 +26,14 @@
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\tutorial29_youtube\camera.cpp" />
-    <ClCompile Include="..\..\..\tutorial29_youtube\skinned_mesh.cpp" />
     <ClCompile Include="..\..\..\tutorial29_youtube\skinning_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial30_youtube\skinned_mesh.cpp" />
     <ClCompile Include="..\..\..\tutorial30_youtube\tutorial30.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
     <ClInclude Include="..\..\..\Include\technique.h" />
     <ClInclude Include="..\..\..\tutorial29_youtube\camera.h" />
-    <ClInclude Include="..\..\..\tutorial29_youtube\skinned_mesh.h" />
     <ClInclude Include="..\..\..\tutorial29_youtube\skinning_technique.h" />
   </ItemGroup>
   <ItemGroup>
@@ -149,7 +148,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;glew32.lib;freeglutd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>meshoptimizer.lib;assimp-vc142-mt.lib;glew32.lib;freeglutd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

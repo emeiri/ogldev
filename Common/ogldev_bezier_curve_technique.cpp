@@ -52,7 +52,7 @@ bool BezierCurveTechnique::Init()
 
     m_wvpLoc = GetUniformLocation("gWVP");
     m_numSegmentsLoc = GetUniformLocation("gNumSegments");
-    m_lineColorLoc = GetUniformLocation("gLineColor");
+    m_lineColorLoc = GetUniformLocation("gColor");
 
     return 
         ((m_wvpLoc != INVALID_UNIFORM_LOCATION) &&

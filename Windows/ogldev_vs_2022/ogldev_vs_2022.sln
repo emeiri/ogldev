@@ -157,6 +157,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\lighting_new_to_gs.vs = ..\..\Common\Shaders\lighting_new_to_gs.vs
 		..\..\Common\Shaders\passthru.gs = ..\..\Common\Shaders\passthru.gs
 		..\..\Common\Shaders\passthru_vec2.vs = ..\..\Common\Shaders\passthru_vec2.vs
+		..\..\Common\Shaders\passthru_vec3.vs = ..\..\Common\Shaders\passthru_vec3.vs
 		..\..\Common\Shaders\quad_tess.tcs = ..\..\Common\Shaders\quad_tess.tcs
 		..\..\Common\Shaders\quad_tess.tes = ..\..\Common\Shaders\quad_tess.tes
 		..\..\Common\Shaders\shadow_map.vs = ..\..\Common\Shaders\shadow_map.vs
