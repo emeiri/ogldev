@@ -21,7 +21,6 @@
 
 #include "ogldev_math_3d.h"
 #include "ogldev_keys.h"
-//#include "ogldev_atb.h"
 
 class Camera
 {

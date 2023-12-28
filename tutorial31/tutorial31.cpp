@@ -147,6 +147,10 @@ public:
                     m_tessellationLevel -= 1.0f;                    
                 }
                 break;
+
+            case OGLDEV_KEY_p:
+                m_pauseMouse = !m_pauseMouse;
+                break;
                 
             case OGLDEV_KEY_z:
                 m_isWireframe = !m_isWireframe;
@@ -166,7 +170,9 @@ public:
 
 	virtual void PassiveMouseCB(int x, int y)
 	{
-		m_pGameCamera->OnMouse(x, y);
+        if (!m_pauseMouse) {
+            m_pGameCamera->OnMouse(x, y);
+        }
 	}
 
     
@@ -179,6 +185,7 @@ private:
     PersProjInfo m_persProjInfo;
     float m_tessellationLevel;
     bool m_isWireframe;
+    bool m_pauseMouse = false;
 };
 
 

@@ -18,7 +18,7 @@
 
 #include "ogldev_camera.h"
 
-const static float STEP_SCALE = 0.1f;
+const static float STEP_SCALE = 0.01f;
 const static float EDGE_STEP = 0.5f;
 const static int MARGIN = 10;
 
@@ -242,11 +242,3 @@ void Camera::Update()
     m_up = m_target.Cross(Haxis);
     m_up.Normalize();
 }
-
-
-/*void Camera::AddToATB(TwBar* bar)
-{
-    TwAddButton(bar, "Camera", NULL, NULL, "");                
-    TwAddVarRW(bar, "Position", TW_TYPE_OGLDEV_VECTOR3F, (void*)&m_pos, NULL);
-    TwAddVarRO(bar, "Direction", TW_TYPE_DIR3F, &m_target, " axisz=-z ");
-}*/
