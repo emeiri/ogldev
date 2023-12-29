@@ -35,17 +35,17 @@ public:
         m_topologyType = TopologyType;
         m_numVertices = (int)Vertices.size();
 
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
+        glCreateVertexArrays(1, &m_vao);
+        glCreateBuffers(1, &m_vbo);
 
-        glGenBuffers(1, &m_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
+        glNamedBufferStorage(m_vbo, sizeof(Vertices[0]) * Vertices.size(), Vertices.data(), 0);
 
-        glVertexAttribPointer(0, NumVertexElements, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0);
+        glVertexArrayVertexBuffer(m_vao, 0, m_vbo, 0, NumVertexElements * sizeof(float));
 
-        glBindVertexArray(0);
+        int attrib_location = 0;
+        glEnableVertexArrayAttrib(m_vao, attrib_location);
+        glVertexArrayAttribFormat(m_vao, attrib_location, NumVertexElements, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(m_vao, attrib_location, 0);
     }
 
 
@@ -61,9 +61,7 @@ public:
             exit(0);
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glNamedBufferStorage(m_vbo, sizeof(Vertices[0]) * Vertices.size(), Vertices.data(), 0);
     }
 
 
@@ -76,6 +74,8 @@ public:
         }
 
         glDrawArrays(topology_type, 0, m_numVertices);
+
+        glBindVertexArray(0);
     }
 
 
