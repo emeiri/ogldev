@@ -29,56 +29,23 @@
 #define WINDOW_HEIGHT 1080
 
 
-class BlenderSceneTest : public GameCallbacks
-{
-public:
-
-    virtual ~BlenderSceneTest()
-    {
-    }
-
-
-    void Init()
-    {
-        bool LoadBasicShapes = false;
-        m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
-
-        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/spot_light2.fbx");
-        
-        DirectionalLight DirLight;
-        DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
-        DirLight.DiffuseIntensity = 1.0f;
-    //    m_pScene->m_dirLights.push_back(DirLight);
-
-        m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
-
-        m_pRenderingSystem->SetScene(m_pScene);        
-    }
-
-
-    void Run()
-    {
-        m_pRenderingSystem->Execute();
-    }
-
-    void OnFrame()
-    {
-        m_counter += 0.1f;
-    }
-
-private:
-
-    RenderingSystem* m_pRenderingSystem = NULL;
-    Scene* m_pScene = NULL;
-    float m_counter = 0;    
-};
-
-
 void test_blender_scene()
 {
-    BlenderSceneTest App;
-    App.Init();
-    App.Run();
+    bool LoadBasicShapes = false;
+    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
+
+    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    Scene* pScene = pRenderingSystem->CreateScene("../Content/demolition/spot_light2.glb");
+
+    DirectionalLight DirLight;
+    DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+    DirLight.DiffuseIntensity = 1.0f;
+    // m_pScene->m_dirLights.push_back(DirLight);
+
+    pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
+
+    pRenderingSystem->SetScene(pScene);
+
+    pRenderingSystem->Execute();
 }
