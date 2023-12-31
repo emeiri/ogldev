@@ -175,7 +175,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     int NumSpotLights = (int)SpotLights.size();
 
     if (NumSpotLights > 0) {
-        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, SpotLights[0].Up);
+        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection * -1.0f, SpotLights[0].Up);
     }
 
     const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
@@ -534,8 +534,8 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
-    //Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+   // Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
     m_shadowMapTech.SetWVP(WVP);
 }
 
@@ -560,8 +560,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
     m_lightingTech.SetWVP(WVP);
 
-    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
     //Matrix4f LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
+    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;    
     m_lightingTech.SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = FinalWorldMatrix.Inverse();
