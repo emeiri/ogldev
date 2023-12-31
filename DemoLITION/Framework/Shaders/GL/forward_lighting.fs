@@ -3,10 +3,10 @@
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
 
-in vec4 LightSpacePos;
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 WorldPos0;
+in vec4 LightSpacePos;
 
 out vec4 FragColor;
 
@@ -338,7 +338,7 @@ vec4 CalcPointLight(PointLight l, vec3 Normal, bool IsPoint)
     float Attenuation =  l.Atten.Constant +
                          l.Atten.Linear * Distance +
                          l.Atten.Exp * Distance * Distance;
-Attenuation = 1.0;
+Attenuation = 1.0;      // TODO: how to import correctly from blender
     return Color / Attenuation;
 }
 
@@ -516,5 +516,7 @@ void main()
 
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    FragColor =  TempColor * gColorMod + gColorAdd;
+    FragColor = TempColor * gColorMod + gColorAdd;
+    //FragColor = texture2D(gSampler, TexCoord0.xy);
+    //FragColor = TotalLight;
 }
