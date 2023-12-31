@@ -16,6 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//-----------
+// DEPRECATED
+//-----------
+
 #ifndef OGLDEV_APP_H
 #define OGLDEV_APP_H
 
