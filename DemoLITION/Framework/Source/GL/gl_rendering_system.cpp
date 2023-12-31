@@ -118,7 +118,7 @@ void RenderingSystemGL::Execute()
 {
     if (!m_pCamera) {
         printf("%s:%d - camera has not been set\n", __FILE__, __LINE__);
-        exit(0);
+        return;
     }
 
     /*const DemolitionModel* pMainModel = NULL;
