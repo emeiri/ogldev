@@ -3,9 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2021, assimp team
-
-
+Copyright (c) 2006-2022, assimp team
 
 All rights reserved.
 
@@ -55,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "defs.h"
-#include <stdint.h>
+#include <cstdint>
 #include <cstddef>
 
 struct aiTexture;
@@ -64,6 +62,10 @@ namespace Assimp {
 
 class IOStream;
 
+// ---------------------------------------------------------------------------
+/**
+ *  This class is used to store and write bitmap information.
+ */
 class ASSIMP_API Bitmap {
 protected:
 
@@ -76,11 +78,11 @@ protected:
 
         // We define the struct size because sizeof(Header) might return a wrong result because of structure padding.
         static constexpr std::size_t header_size =
-            sizeof(type) +
-            sizeof(size) +
-            sizeof(reserved1) +
-            sizeof(reserved2) +
-            sizeof(offset);
+            sizeof(uint16_t) +
+            sizeof(uint32_t) +
+            sizeof(uint16_t) +
+            sizeof(uint16_t) +
+            sizeof(uint32_t);
     };
 
     struct DIB {
@@ -98,23 +100,27 @@ protected:
 
         // We define the struct size because sizeof(DIB) might return a wrong result because of structure padding.
         static constexpr std::size_t dib_size =
-            sizeof(size) +
-            sizeof(width) +
-            sizeof(height) +
-            sizeof(planes) +
-            sizeof(bits_per_pixel) +
-            sizeof(compression) +
-            sizeof(image_size) +
-            sizeof(x_resolution) +
-            sizeof(y_resolution) +
-            sizeof(nb_colors) +
-            sizeof(nb_important_colors);
+            sizeof(uint32_t) +
+            sizeof(int32_t) +
+            sizeof(int32_t) +
+            sizeof(uint16_t) +
+            sizeof(uint16_t) +
+            sizeof(uint32_t) +
+            sizeof(uint32_t) +
+            sizeof(int32_t) +
+            sizeof(int32_t) +
+            sizeof(uint32_t) +
+            sizeof(uint32_t);
     };
 
     static constexpr std::size_t mBytesPerPixel = 4;
 
 public:
-    static void Save(aiTexture* texture, IOStream* file);
+    /// @brief  Will save an aiTexture instance as a bitmap.
+    /// @param texture  The pointer to the texture instance
+    /// @param file     The filename to save into.
+    /// @return true if successfully saved, false if not.
+    static bool Save(aiTexture* texture, IOStream* file);
 
 protected:
     static void WriteHeader(Header& header, IOStream* file);

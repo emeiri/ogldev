@@ -18,7 +18,7 @@
 
 #include "GL/gl_forward_lighting.h"
 
-#define FAIL_ON_MISSING_LOC
+//#define FAIL_ON_MISSING_LOC
 
 
 ForwardLightingTechnique::ForwardLightingTechnique()

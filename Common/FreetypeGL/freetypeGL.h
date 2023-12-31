@@ -52,6 +52,10 @@ static vec4 black = { {0.0f,0.0f,0.0f,1.0f} };
 static vec4 yellow = { {1.0f, 1.0f, 0.0f, 1.0f} };
 static vec4 orange1 = { {1.0f, 0.9f, 0.0f, 1.0f} };
 static vec4 orange2 = { {1.0f, 0.6f, 0.0f, 1.0f} };
+static vec4 green = { {0.0f,1.0f,0.0f,1.0f} };
+static vec4 gray = { {0.5f,0.5f,0.5f,1.0f} };
+static vec4 cyan = { {0.0f,1.0f,1.0f,1.0f} };
+static vec4 purple = { {0.5f,0.0f,0.5f,1.0f} };
 static vec4 none = { {0.0f,0.0f,1.0f,0.0f} };
 
 

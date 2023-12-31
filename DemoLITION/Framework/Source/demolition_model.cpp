@@ -639,6 +639,23 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
 
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
+
+    aiMatrix4x4 aiCameraMatrix;
+    pCamera->GetCameraMatrix(aiCameraMatrix);
+    Matrix4f CameraMatrix(aiCameraMatrix);
+    printf("Camera internal transformation:\n");
+    CameraMatrix.Print();
+
+    Matrix4f ChangeSystem;
+    ChangeSystem.InitIdentity();
+    ChangeSystem.m[2][2] = -1;
+
+    printf("Final camera transformation:\n");
+    //Transformation = Transformation * ChangeSystem * CameraMatrix;
+    Transformation.Print();
+
+  //  Transformation =  CameraMatrix * Transformation;
+
     Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
     Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
     Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
@@ -670,11 +687,7 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
     persProjInfo.Height = (float)WindowHeight;
     persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV);
 
-  /*  aiMatrix4x4 CameraMatrix;
-    pCamera->GetCameraMatrix(CameraMatrix);
-    Matrix4f foo(CameraMatrix);
-    foo.Print();
-    exit(0);*/
+    //exit(0);*/
 
     float AspectRatio = (float)WindowWidth / (float)WindowHeight;
 

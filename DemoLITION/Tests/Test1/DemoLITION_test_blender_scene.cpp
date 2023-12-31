@@ -25,8 +25,8 @@
 #include "demolition.h"
 
 
-#define WINDOW_WIDTH  1024
-#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 
 class BlenderSceneTest : public GameCallbacks
@@ -45,7 +45,7 @@ public:
 
         m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/point_light.fbx");
+        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/spot_light2.fbx");
         
         DirectionalLight DirLight;
         DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);

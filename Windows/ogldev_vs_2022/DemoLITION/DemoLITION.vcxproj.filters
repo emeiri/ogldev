@@ -72,9 +72,6 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
