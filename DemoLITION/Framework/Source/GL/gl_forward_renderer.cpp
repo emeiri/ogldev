@@ -171,13 +171,11 @@ void ForwardRenderer::Render(GLScene* pScene)
 
 void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 {        
-    Vector3f Up(0.0f, 0.0f, 1.0f); // TODO: get it from assimp
-
     const std::vector<SpotLight>& SpotLights = pScene->GetSpotLights();
     int NumSpotLights = (int)SpotLights.size();
 
     if (NumSpotLights > 0) {
-        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, Up);
+        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, SpotLights[0].Up);
     }
 
     const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
@@ -185,7 +183,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     int NumDirLights = 0;
     if (DirLights.size() == 1) {
         NumDirLights = 1;
-        m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, Up);
+        m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, DirLights[0].Up);
     } else if (DirLights.size() > 1) {
         printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
     }

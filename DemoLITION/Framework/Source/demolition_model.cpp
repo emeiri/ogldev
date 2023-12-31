@@ -776,17 +776,22 @@ void DemolitionModel::InitDirectionalLight(const aiScene* pScene, const aiLight&
     l.Color = Vector3f(1.0f);
     l.DiffuseIntensity = 1.0f; // TODO
 
-    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
-    printf("Original direction: "); Direction.Print();
-
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
 
+    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+    printf("Original direction: "); Direction.Print();
     Vector4f Dir4D(Direction, 0.0f);
     Dir4D = Transformation * Dir4D;
-    Vector3f WorldDir = Dir4D;
-    l.WorldDirection = WorldDir;
-    printf("Final direction: "); WorldDir.Print();
+    l.WorldDirection = Dir4D;
+    printf("Final direction: "); l.WorldDirection.Print();
+
+    Vector3f Up = VectorFromAssimpVector(light.mUp);
+    printf("Original up: "); Up.Print();
+    Vector4f Up4D(Up, 0.0f);
+    Up4D = Transformation * Up4D;
+    l.Up = Up4D;
+    printf("Final up: "); l.Up.Print();
 
     m_dirLights.push_back(l);
 }
@@ -827,19 +832,25 @@ void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     l.Color = Vector3f(1.0f);
     l.DiffuseIntensity = 1.0f; // TODO
 
-    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
-    printf("Original direction: "); Direction.Print();
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
+
+    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+    printf("Original direction: "); Direction.Print();
     Vector4f Dir4D(Direction, 0.0f);
     Dir4D = Transformation * Dir4D;
-    Vector3f WorldDir = Dir4D;
-    l.WorldDirection = WorldDir;
-    printf("Final direction: "); WorldDir.Print();
+    l.WorldDirection = Dir4D;
+    printf("Final direction: "); l.WorldDirection.Print();
+
+    Vector3f Up = VectorFromAssimpVector(light.mUp);
+    printf("Original up: "); Up.Print();
+    Vector4f Up4D(Up, 0.0f);
+    Up4D = Transformation * Up4D;
+    l.Up = Up4D;
+    printf("Final up: "); l.Up.Print();
 
     Vector3f Position = VectorFromAssimpVector(light.mPosition);
     printf("Original Position: "); Position.Print();
-    GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
     Vector4f Pos4D(Position, 1.0f);
     Pos4D = Transformation * Pos4D;
     Vector3f WorldPosition = Pos4D;
