@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_base_app.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_quad_tess_technique.cpp" />
