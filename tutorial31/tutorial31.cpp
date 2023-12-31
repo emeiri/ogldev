@@ -109,7 +109,7 @@ public:
         Pipeline p;
         p.WorldPos(-3.0f, 0.0f, 0.0f);
         p.Scale(2.0f, 2.0f, 2.0f);               
-        p.Rotate(-90.0f, 15.0f, 0.0f);
+        p.Rotate(90.0f, 15.0f, 0.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
         m_lightingEffect.SetEyeWorldPos(m_pGameCamera->GetPos());        
@@ -120,7 +120,7 @@ public:
         m_pMesh->Render(NULL);
         
         p.WorldPos(3.0f, 0.0f, 0.0f);
-        p.Rotate(-90.0f, -15.0f, 0.0f);
+        p.Rotate(90.0f, 15.0f, 0.0f);
         m_lightingEffect.SetVP(p.GetVPTrans());
         m_lightingEffect.SetWorldMatrix(p.GetWorldTrans());                
         m_lightingEffect.SetTessellationLevel(1.0f);

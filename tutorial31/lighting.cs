@@ -86,6 +86,8 @@ void main()
     // Calculate the tessellation levels                                                        
     gl_TessLevelOuter[0] = gTessellationLevel;                                                  
     gl_TessLevelOuter[1] = gTessellationLevel;                                                  
-    gl_TessLevelOuter[2] = gTessellationLevel;                                                  
-    gl_TessLevelInner[0] = gTessellationLevel;                                                  
+    gl_TessLevelOuter[2] = gTessellationLevel;
+    gl_TessLevelOuter[3] = gTessellationLevel;
+    gl_TessLevelInner[0] = gTessellationLevel;
+    gl_TessLevelInner[1] = gTessellationLevel;
 }                                                                                               
