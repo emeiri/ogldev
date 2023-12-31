@@ -464,12 +464,12 @@ void DemolitionModel::PopulateBuffers()
 }
 
 
-// Introduced in youtube tutorial #18
 void DemolitionModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
     glBindVertexArray(m_VAO);
 
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
+//if (i == 1)
         RenderMesh(i, pRenderCallbacks);
     }
 
