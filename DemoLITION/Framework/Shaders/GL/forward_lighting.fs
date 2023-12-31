@@ -346,7 +346,7 @@ Attenuation = 1.0;
 vec4 CalcSpotLight(SpotLight l, vec3 Normal)
 {
     vec3 LightToPixel = normalize(WorldPos0 - l.Base.WorldPos);
-    float SpotFactor = dot(LightToPixel, l.Direction);
+    float SpotFactor = dot(LightToPixel, -l.Direction);             // TODO: why negative direction?
 
     if (SpotFactor > l.Cutoff) {
         vec4 Color = CalcPointLight(l.Base, Normal, false);
