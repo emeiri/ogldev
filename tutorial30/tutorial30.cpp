@@ -57,7 +57,7 @@ public:
         m_persProjInfo.Height = WINDOW_HEIGHT;
         m_persProjInfo.Width = WINDOW_WIDTH;
         m_persProjInfo.zNear = 1.0f;
-        m_persProjInfo.zFar = 100.0f;  
+        m_persProjInfo.zFar = 1000.0f;  
         
         m_pDisplacementMap = NULL;
         m_dispFactor = 0.25f;
