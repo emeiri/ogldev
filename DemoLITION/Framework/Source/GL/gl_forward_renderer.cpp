@@ -146,9 +146,10 @@ void ForwardRenderer::SwitchToLightingTech()
 
 void ForwardRenderer::Render(GLScene* pScene)
 {
-    if (!m_pCurCamera) {
-        printf("ForwardRenderer: camera not initialized\n");
-        exit(0);
+    if (pScene->IsClearFrame()) {
+        const Vector4f& ClearColor = pScene->GetClearColor();
+        glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     if (pScene->GetRenderList().size() == 0) {
@@ -156,10 +157,9 @@ void ForwardRenderer::Render(GLScene* pScene)
         return;
     }
 
-    if (pScene->IsClearFrame()) {
-        const Vector4f& ClearColor = pScene->GetClearColor();
-        glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (!m_pCurCamera) {
+        printf("ForwardRenderer: camera not initialized\n");
+        return;
     }
 
     ShadowMapPass(pScene);
