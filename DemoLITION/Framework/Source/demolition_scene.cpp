@@ -72,12 +72,12 @@ void CoreScene::InitializeDefault()
 
 void CoreScene::CreateDefaultCamera()
 {
-    Vector3f Pos(0.0f, 1.0f, 0.0f);
-    Vector3f Target(0.0f, -0.3f, 1.0f);
+    Vector3f Pos(0.0f, 0.0f, 0.0f);
+    Vector3f Target(0.0f, 0.f, 1.0f);
     Vector3f Up(0.0, 1.0f, 0.0f);
 
     float FOV = 45.0f;
-    float zNear = 0.1f;
+    float zNear = 1.0f;
     float zFar = 1000.0f;
     int WindowWidth = 0;
     int WindowHeight = 0;
