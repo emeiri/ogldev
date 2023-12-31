@@ -230,8 +230,8 @@ void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>&
 void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList)
 {
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
-        CoreSceneObject* pSceneObject = *it;
-        pSceneObject->GetModel()->Render(this);
+        m_pcurSceneObject = *it;
+        m_pcurSceneObject->GetModel()->Render(this);
     }
 }
 
@@ -533,7 +533,8 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
 {
-    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
     //Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
     m_shadowMapTech.SetWVP(WVP);
 }
@@ -541,7 +542,8 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World)
 {
-    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
     m_shadowMapPointLightTech.SetWorld(World);
     m_shadowMapPointLightTech.SetWVP(WVP);
 }
@@ -549,18 +551,20 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
-    m_lightingTech.SetWorldMatrix(World);
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f FinalWorldMatrix = World * ObjectMatrix;
+    m_lightingTech.SetWorldMatrix(FinalWorldMatrix);
 
     Matrix4f View = m_pCurCamera->GetMatrix();
     Matrix4f Projection = m_pCurCamera->GetProjectionMat();
-    Matrix4f WVP = Projection * View * World;
+    Matrix4f WVP = Projection * View * FinalWorldMatrix;
     m_lightingTech.SetWVP(WVP);
 
-    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
     //Matrix4f LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
     m_lightingTech.SetLightWVP(LightWVP);
 
-    Matrix4f InverseWorld = World.Inverse();
+    Matrix4f InverseWorld = FinalWorldMatrix.Inverse();
     Matrix3f World3x3(InverseWorld);
     Matrix3f WorldTranspose = World3x3.Transpose();
 

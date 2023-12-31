@@ -51,7 +51,9 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void LightingPass();
 
-    void SetCamera(BasicCamera* pCamera) { m_pCurCamera = pCamera; }
+    void SetCamera(BasicCamera* pCamera) { 
+        m_pCurCamera = pCamera; 
+    }
 
     //
     // Fog
@@ -117,6 +119,7 @@ private:
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
 
     RENDER_PASS m_curRenderPass = RENDER_PASS_UNINITIALIZED;
+    CoreSceneObject* m_pcurSceneObject = NULL;
 
     //void RenderAnimationCommon(SkinnedMesh* pMesh);
 
