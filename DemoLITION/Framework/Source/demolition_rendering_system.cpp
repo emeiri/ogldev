@@ -29,8 +29,14 @@ BaseRenderingSystem* g_pRenderingSystem = NULL;
 
 BaseRenderingSystem::BaseRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes)
 {
+    if (pGameCallbacks) {
+        m_pGameCallbacks = pGameCallbacks;
+    } else {
+        printf("%s:%d - using the default game callbacks\n", __FILE__, __LINE__);
+        m_pGameCallbacks = &m_defaultGameCallbacks;
+    }
+
     m_loadBasicShapes = LoadBasicShapes;
-    m_pGameCallbacks = pGameCallbacks;
     m_models.resize(NUM_MODELS, 0);    
 }
 
@@ -45,11 +51,6 @@ RenderingSystem* RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM Renderi
 {
     if (g_pRenderingSystem) {
         printf("%s:%d - rendering system already exists\n", __FILE__, __LINE__);
-        exit(0);
-    }
-
-    if (!pGameCallbacks) {
-        printf("%s:%d - must specify game callbacks object\n", __FILE__, __LINE__);
         exit(0);
     }
 

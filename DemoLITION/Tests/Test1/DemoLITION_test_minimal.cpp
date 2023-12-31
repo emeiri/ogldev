@@ -27,9 +27,8 @@
 
 void test_minimal()
 {
-    GameCallbacks TestGameCallbacks;
     bool LoadBasicShapes = false;
-    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &TestGameCallbacks, LoadBasicShapes);
+    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
     pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
     pRenderingSystem->Execute();
 }

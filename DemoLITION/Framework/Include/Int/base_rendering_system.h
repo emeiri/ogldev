@@ -66,6 +66,7 @@ class BaseRenderingSystem : public RenderingSystem
     int m_windowHeight = 0;
     BasicCamera* m_pCamera = NULL;
     GameCallbacks* m_pGameCallbacks = NULL;
+    GameCallbacks m_defaultGameCallbacks;
     Scene* m_pScene = NULL;
 
  private:
