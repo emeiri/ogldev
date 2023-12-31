@@ -38,7 +38,7 @@ class DirectionalLight : public BaseLight
 {
 public:
     Vector3f WorldDirection = Vector3f(0.0f, 0.0f, 0.0f);
-    Vector3f Up = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f Up = Vector3f(0.0f, 1.0f, 0.0f);
 };
 
 
