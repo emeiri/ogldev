@@ -45,20 +45,10 @@ public:
         m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
-        
-        m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
-        m_dirLight.DiffuseIntensity = 0.5f;
-        m_dirLight.AmbientIntensity = 0.1f;
-        m_pScene->GetDirLights().push_back(m_dirLight);
-
-        m_pointLight.DiffuseIntensity = 0.3f;
-        m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
-
-        m_pScene->GetPointLights().push_back(m_pointLight);
-
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
-
         m_pRenderingSystem->SetScene(m_pScene);
+        
+        InitLights();                
 
         InitObjects();
     }
@@ -74,18 +64,28 @@ public:
         m_counter += 0.03f;
         m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_counter), 0.0f, cosf(m_counter));
         m_pScene->GetPointLights()[0].WorldPosition = Vector3f(1 - sinf(m_counter), 1.0f, 1.0f + cosf(m_counter));
-       // m_pScene->m_dirLights[0].WorldDirection = Vector3f(0.0f, 0.0f, -1.0f);
     }
 
 private:
 
+    void InitLights()
+    {
+        m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
+        m_dirLight.DiffuseIntensity = 0.5f;
+        m_dirLight.AmbientIntensity = 0.1f;
+        m_pScene->GetDirLights().push_back(m_dirLight);
+
+        m_pointLight.DiffuseIntensity = 0.3f;
+        m_pointLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
+
+        m_pScene->GetPointLights().push_back(m_pointLight);
+    }
+
     void InitObjects()
-    {//"C:\Users\emeir\Documents\ogldev2\Content\antique_ceramic_vase_01_4k.blend\antique_ceramic_vase_01_4k.obj"
-       // m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/terrain2.obj");
+    {
         m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
         m_pTerrainSceneObject = m_pScene->CreateSceneObject(m_terrainModelHandle);
-        m_pTerrainSceneObject->SetPosition(0.0f, 0.0f, 1.0f);
-        //m_pScene->GetSceneObject(m_pTerrainSceneObject)->SetScale(10.0f, 10.0f, 10.0f);
+        m_pTerrainSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
         m_pScene->AddToRenderList(m_pTerrainSceneObject);
     }
 
