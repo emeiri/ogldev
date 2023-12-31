@@ -175,6 +175,8 @@ void DemolitionModel::InitAllMeshes(const aiScene* pScene)
 
 void DemolitionModel::CalculateMeshTransformations(const aiScene* pScene)
 {
+    printf("----------------------------------------\n");
+    printf("Calculating mesh transformations\n");
     Matrix4f Transformation;
     Transformation.InitIdentity();
 
@@ -861,11 +863,15 @@ void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     l.Attenuation.Linear = light.mAttenuationLinear;
     l.Attenuation.Exp = light.mAttenuationQuadratic;
 
+    printf("Attenuation: constant %f linear %f exp %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
+
     if (light.mAngleInnerCone != light.mAngleOuterCone) {
         printf("Warning!!! Different values for spot light inner/outer cone angles is not supported\n");
     }
 
     l.Cutoff = ToDegree(light.mAngleOuterCone);
+
+    printf("Cutoff angle %f\n", l.Cutoff);
 
     m_spotLights.push_back(l);
 }
