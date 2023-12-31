@@ -24,7 +24,7 @@ void main()
     Normal0 = Normal;
     LocalPos0 = Position;
     WorldPos0 = (gWorld * Pos4).xyz;
-    LightSpacePos0 = gLightWVP * vec4(Position, 1.0); // required only for shadow mapping (spot/directional light)
+    LightSpacePos0 = gLightWVP * Pos4; // required only for shadow mapping (spot/directional light)
     EdgeDistance0 = vec3(-1.0, -1.0, -1.0);   // used only by wireframe_on_mesh.gs
 
     gl_ClipDistance[0] = dot(vec4(Position, 1.0), gClipPlane);
