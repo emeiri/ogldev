@@ -145,6 +145,7 @@ void OgldevBaseApp::MouseCB(int button, int action, int x, int y)
 
 void OgldevBaseApp::PassiveMouseCB(int x, int y)
 {
+    m_pGameCamera->OnMouse(x, y);
 }
 
 
