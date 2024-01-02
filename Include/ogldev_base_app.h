@@ -59,5 +59,5 @@ protected:
     int m_windowHeight = 0;
     BasicCamera* m_pGameCamera = NULL;
     bool m_isPaused = false;
-    bool m_isWireframe = true;
+    bool m_isWireframe = false;
 };

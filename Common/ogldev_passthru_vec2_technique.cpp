@@ -33,7 +33,7 @@ bool PassthruVec2Technique::Init()
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/flat_passthru.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/color.fs")) {
         return false;
     }
 
