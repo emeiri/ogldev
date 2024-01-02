@@ -101,7 +101,7 @@ public:
         float TotalPauseTimeSec = (float)((double)m_totalPauseTime / 1000.0f);
         AnimationTimeSec -= TotalPauseTimeSec;
 
-        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec * 10.0f, m_animationIndex);
+        m_phongRenderer.RenderAnimation(m_pMesh, AnimationTimeSec, m_animationIndex);
     }
 
 
@@ -111,7 +111,7 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-     //   m_pGameCamera->OnMouse(x, y);
+        m_pGameCamera->OnMouse(x, y);
     }
 
     void KeyboardCB(uint key, int state)
@@ -189,7 +189,7 @@ private:
     void InitCamera()
     {
         Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(0.0f, 0.2f, 1.0f);
+        Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
         float FOV = 45.0f;
@@ -212,14 +212,13 @@ private:
     void InitMesh()
     {
         m_pMesh = new SkinnedMesh();
-        //m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
-        m_pMesh->LoadMesh("../foobar/Run.dae");
-    //    m_pMesh->SetRotation(90.0f, -45.0f, 0.0f);
+        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
+        m_pMesh->SetRotation(90.0f, -45.0f, 0.0f);
 
        // m_pMesh->LoadMesh("../Content/boblampclean.md5mesh");
       //  m_pMesh->SetRotation(0.0f, 180.0f, 0.0f);
-        m_pMesh->SetPosition(0.0f, 0.0f, 5.0f);
-        //m_pMesh->SetScale(0.1f);
+        m_pMesh->SetPosition(0.0f, 0.0f, 55.0f);
+        m_pMesh->SetScale(0.1f);
     }
 
     GLFWwindow* window = NULL;
