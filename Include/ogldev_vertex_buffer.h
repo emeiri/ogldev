@@ -20,14 +20,11 @@
 
 class VertexBuffer {
 public:
-    VertexBuffer()
+    VertexBuffer() {}
+
+    ~VertexBuffer() 
     {
-
-    }
-
-    ~VertexBuffer()
-    {
-
+        // TODO...
     }
 
     void Init(const std::vector<float>& Vertices, int NumVertexElements, GLuint TopologyType)
@@ -89,4 +86,27 @@ private:
     GLuint m_vao = -1;
     int m_numVertices = 0;
     GLuint m_topologyType = -1;
+};
+
+
+class FullScreenVB : public VertexBuffer {
+public:
+    FullScreenVB() {}
+
+    ~FullScreenVB() {}
+
+    void Init()
+    {
+        std::vector<float> Vertices = { -1.0f, -1.0f,     // Bottom left
+                                         1.0f,  1.0f,     // Top right
+                                        -1.0f,  1.0f,     // Top left                                        
+                                        -1.0f, -1.0f,     // Bottom left
+                                         1.0f, -1.0f,     // Bottom right
+                                         1.0f, 1.0f       // Top right
+                                      };                  
+                                        
+
+        int NumVertexElements = 2;
+        VertexBuffer::Init(Vertices, NumVertexElements, GL_TRIANGLES);
+    }
 };
