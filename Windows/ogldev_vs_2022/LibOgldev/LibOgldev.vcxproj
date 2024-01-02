@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)\..\Lib\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -119,6 +122,10 @@
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glew32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -140,6 +147,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\Include\ogldev.h" />
     <ClInclude Include="..\..\..\Include\ogldev_app.h" />
     <ClInclude Include="..\..\..\Include\ogldev_array_2d.h" />
@@ -205,6 +221,12 @@
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\Common\camera.cpp" />
     <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
