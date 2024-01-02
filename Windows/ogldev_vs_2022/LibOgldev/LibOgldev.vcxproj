@@ -218,6 +218,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_world_transform.h" />
     <ClInclude Include="..\..\..\Include\ogldev_xcb_control.h" />
     <ClInclude Include="..\..\..\Include\technique.h" />
+    <ClInclude Include="..\..\..\Include\Techniques\ogldev_ray_marching_technique.h" />
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +278,7 @@
     <ClCompile Include="..\..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\..\Common\random_texture.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

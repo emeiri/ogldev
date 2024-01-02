@@ -16,6 +16,12 @@
     <Filter Include="Source Files\ImGui">
       <UniqueIdentifier>{bd908341-18ea-4d91-bfa7-acb51b35dcbf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Techniques">
+      <UniqueIdentifier>{d2b1c03e-91cb-491e-8aa1-679b31a69c36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Techniques">
+      <UniqueIdentifier>{1cdbfcc6-0425-4563-9d57-bc2ae8656246}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -234,6 +240,9 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\Techniques\ogldev_ray_marching_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -403,6 +412,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
       <Filter>Source Files\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
