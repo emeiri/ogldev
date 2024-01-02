@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{82c3a59c-96db-4b6a-9d4b-e08723d016f4}</ProjectGuid>
+    <RootNamespace>LibOgldev</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Common\3rdparty\ImGui\GLFW;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Include\ogldev.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_app.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_array_2d.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_atb.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_backend.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_base_app.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_basic_glfw_camera.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_basic_lighting.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_basic_mesh.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_bezier_curve_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_billboard_list.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_billboard_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_callbacks.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_camera.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_cubemap_texture.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_engine_common.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_forward_skinning.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_glfw.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_glfw_backend.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_glut_backend.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_guitex_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_gui_texture.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_io_buffer.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_keys.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_lights_common.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_material.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_math_3d.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_mesh_common.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_new_lighting.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_passthru_vec2_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_phong_renderer.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_pipeline.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_quad_tess_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_random_texture.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_save_viewport.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_screen_quad.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_cube_map_fbo.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique_point_light.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_map_fbo.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_map_offset_texture.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_skinned_mesh.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_skinning_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_skybox.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_skybox_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_skydome.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_skydome_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_sprite_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_stb_image.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_tex_technique.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_types.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_util.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_vertex_buffer.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_vulkan.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_vulkan_core.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_win32_control.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_world_transform.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_xcb_control.h" />
+    <ClInclude Include="..\..\..\Include\technique.h" />
+    <ClInclude Include="framework.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\camera.cpp" />
+    <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
+    <ClCompile Include="..\..\..\Common\io_buffer.cpp" />
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_app.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_atb.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_backend.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_base_app.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_lighting.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_billboard_list.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_flat_passthru_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_glfw_backend.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_guitex_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_gui_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_passthru_vec2_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_phong_renderer.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_quad_tess_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_screen_quad.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_offset_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skinning_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skybox.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_sprite_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_tex_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_vulkan.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_vulkan_core.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_win32_control.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_xcb_control.cpp" />
+    <ClCompile Include="..\..\..\Common\pipeline.cpp" />
+    <ClCompile Include="..\..\..\Common\random_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
