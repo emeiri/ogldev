@@ -212,7 +212,11 @@ int main(int argc, char** argv)
     char game_mode_string[64];
     snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@60", WINDOW_WIDTH, WINDOW_HEIGHT);
     glutGameModeString(game_mode_string);
-    glutEnterGameMode();
+    if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE))
+        glutEnterGameMode();
+    else {
+        fprintf(stderr, "Error: Requested game mode, '%s', not available.\n", game_mode_string);
+    }
 
     InitializeGlutCallbacks();
 
