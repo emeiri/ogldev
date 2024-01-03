@@ -44,6 +44,12 @@
 
 #define NUM_MESHES 5
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 class Tutorial47 : public ICallbacks, public OgldevApp
 {
 public:

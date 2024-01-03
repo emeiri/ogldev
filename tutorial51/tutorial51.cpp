@@ -39,6 +39,14 @@
 #define WINDOW_WIDTH  1024  
 #define WINDOW_HEIGHT 1024
 
+
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
+
 class OgldevVulkanApp
 {
 public:

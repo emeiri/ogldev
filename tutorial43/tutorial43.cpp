@@ -40,6 +40,12 @@ using namespace std;
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 struct CameraDirection
 {
     GLenum CubemapFace;

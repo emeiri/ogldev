@@ -47,6 +47,11 @@ struct Vertex
     }
 };
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
 
 GLuint VBO;
 GLuint IBO;

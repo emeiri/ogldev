@@ -54,6 +54,14 @@ Quaternion g_Rotation = Quaternion(0.707f, 0.0f, 0.0f, 0.707f);
 int gGLMajorVersion = 0;
 
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
+
+
 
 class Tutorial49 : public ICallbacks, public OgldevApp
 {

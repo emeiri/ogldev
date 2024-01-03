@@ -26,7 +26,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_glfw.h"
-#include "freetypeGL.h"
+#include "../Common/FreetypeGL/freetypeGL.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080

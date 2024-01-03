@@ -4,7 +4,7 @@ CC=g++
 CPPFLAGS=`pkg-config --cflags glew assimp glfw3`
 CPPFLAGS="$CPPFLAGS -I../Include -ggdb3"
 LDFLAGS=`pkg-config --libs glew assimp glfw3`
-LDFLAGS="$LDFLAGS -lglut -lX11"
+LDFLAGS="$LDFLAGS -lglut -lX11 -lmeshoptimizer"
 ROOTDIR=".."
 
 $CC tutorial37.cpp \

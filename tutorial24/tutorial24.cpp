@@ -36,6 +36,12 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 
 class Tutorial24 : public ICallbacks, public OgldevApp
 {
@@ -76,7 +82,6 @@ public:
         SAFE_DELETE(m_pQuad);
         SAFE_DELETE(m_pGroundTex);
     }
-
 
     bool Init()
     {
@@ -155,7 +160,7 @@ public:
 
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, m_scale, 0.0f);
+        p.Rotate(90.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_spotLight.Position, m_spotLight.Direction, Vector3f(0.0f, 1.0f, 0.0f));
         p.SetPerspectiveProj(m_persProjInfo);

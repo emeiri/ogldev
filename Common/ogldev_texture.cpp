@@ -17,6 +17,7 @@
 */
 
 #include <iostream>
+#include <math.h>
 #include "ogldev_util.h"
 #include "ogldev_texture.h"
 #include "3rdparty/stb_image.h"

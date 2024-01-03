@@ -5,7 +5,7 @@ CC=g++
 CPPFLAGS=`pkg-config --cflags glew glfw3 assimp`
 CPPFLAGS="$CPPFLAGS -I$OGLDEV_DIR/Include -I$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW -ggdb3"
 LDFLAGS=`pkg-config --libs glew glfw3 assimp`
-LDFLAGS="$LDFLAGS -lX11 -ldl"
+LDFLAGS="$LDFLAGS -lX11 -ldl -lmeshoptimizer"
 SOURCES="terrain_demo11.cpp \
 	geomip_grid.cpp \
 	terrain_technique.cpp \

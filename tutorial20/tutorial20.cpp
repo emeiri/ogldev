@@ -37,6 +37,13 @@
 static const float FieldDepth = 20.0f;
 static const float FieldWidth = 10.0f;
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
+
 
 struct Vertex
 {

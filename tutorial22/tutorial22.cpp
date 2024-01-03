@@ -36,6 +36,12 @@
 
 static float FieldDepth = 10.0f;
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 
 
 class Tutorial22 : public ICallbacks
@@ -126,7 +132,7 @@ public:
 
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, m_scale, 0.0f);
+        p.Rotate(90.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 10.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);

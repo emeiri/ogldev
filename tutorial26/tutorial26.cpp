@@ -34,6 +34,12 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 
 class Tutorial26 : public ICallbacks, public OgldevApp
 {

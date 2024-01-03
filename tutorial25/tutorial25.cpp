@@ -36,6 +36,12 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1200
 
+// Workaround for tutorials prior to switching to GLFW
+int IsGLVersionHigher(int MajorVer, int MinorVer)
+{
+    return false;
+}
+
 
 class Tutorial25 : public ICallbacks, public OgldevApp
 {
@@ -129,7 +135,7 @@ public:
 
         Pipeline p;
         p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, m_scale, 0.0f);
+        p.Rotate(90.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, -5.0f, 3.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         p.SetPerspectiveProj(m_persProjInfo);
