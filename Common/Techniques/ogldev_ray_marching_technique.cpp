@@ -33,7 +33,7 @@ bool RayMarchingTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/color.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/ray_marching.fs")) {
         return false;
     }
 
@@ -41,22 +41,17 @@ bool RayMarchingTechnique::Init()
         return false;
     }
 
-    m_colorLoc = GetUniformLocation("gColor");
+    m_cameraPos = GetUniformLocation("gCameraPos");
 
-    if (m_colorLoc == INVALID_UNIFORM_LOCATION) {
+    if (m_cameraPos == INVALID_UNIFORM_LOCATION) {
         return false;
     }
-
-    Enable();
-
-    // default is white
-    SetColor(1.0f, 1.0f, 1.0f);
 
     return true;
 }
 
 
-void RayMarchingTechnique::SetColor(float r, float g, float b)
+void RayMarchingTechnique::SetCameraPos(const Vector3f& CameraPos)
 {
-    glUniform4f(m_colorLoc, r, g, b, 1.0f);
+    glUniform3f(m_cameraPos, CameraPos.x, CameraPos.y, CameraPos.z);
 }

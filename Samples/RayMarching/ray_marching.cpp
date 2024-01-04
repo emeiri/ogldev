@@ -28,8 +28,8 @@
 #include "ogldev_vertex_buffer.h"
 #include "ogldev_base_app.h"
 
-#define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH  1000
+#define WINDOW_HEIGHT 1000
 
 
 class RayMarching : public OgldevBaseApp
@@ -56,7 +56,9 @@ public:
 
         DefaultInitGUI();
 
-        InitShaders();        
+        InitShaders();      
+
+        m_rayMarchingTech.Enable();
 
         m_vertexBuffer.Init();
 
@@ -72,6 +74,7 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        m_rayMarchingTech.SetCameraPos(m_pGameCamera->GetPos());
         m_vertexBuffer.Render();
 
         RenderGui();

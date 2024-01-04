@@ -132,6 +132,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Samples\RayMarching\ray_marching.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Common\Shaders\ray_marching.fs" />
+    <None Include="..\..\..\Common\Shaders\ray_marching.vs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
