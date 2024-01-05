@@ -33,6 +33,12 @@ public:
 	void Init(const char* pAppName);
 
 private:
+
+	void CreateInstance(const char* pAppName);
+	void InitDebugCallbacks();
+
 	VkInstance m_instance;
+	VkDebugUtilsMessengerEXT m_messenger;
+	VkDebugReportCallbackEXT m_reportCallback;
 };
 }
