@@ -21,8 +21,9 @@
 
 namespace OgldevVK {
 
-VulkanCore::VulkanCore()
+VulkanCore::VulkanCore(GLFWwindow* pWindow)
 {
+	m_pWindow = pWindow;
 }
 
 
@@ -36,6 +37,7 @@ void VulkanCore::Init(const char* pAppName)
 {
 	CreateInstance(pAppName);
 	InitDebugCallbacks();
+	CreateSurface();
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -154,4 +156,14 @@ void VulkanCore::InitDebugCallbacks()
 	printf("Debug callbacks initialized\n");
 }
 
+
+void VulkanCore::CreateSurface()
+{
+	if (glfwCreateWindowSurface(m_instance, m_pWindow, NULL, &m_surface)) {
+		fprintf(stderr, "Error creating GLFW window surface\n");
+		exit(1);
+	}
+
+	printf("GLFW window surface created\n");
+}
 }

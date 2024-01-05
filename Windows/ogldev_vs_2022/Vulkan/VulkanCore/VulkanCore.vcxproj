@@ -122,7 +122,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\Include;$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

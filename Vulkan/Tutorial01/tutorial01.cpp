@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
 	glfwSetKeyCallback(window, GLFW_KeyCallback);
 
-	OgldevVK::VulkanCore VkCore;
+	OgldevVK::VulkanCore VkCore(window);
 	VkCore.Init("Tutorial 01");
 
 	while (!glfwWindowShouldClose(window)) {
