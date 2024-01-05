@@ -23,6 +23,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "vulkan_core.h"
+
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
 
@@ -56,6 +58,9 @@ int main(int argc, char* argv[])
 	}
 
 	glfwSetKeyCallback(window, GLFW_KeyCallback);
+
+	OgldevVK::VulkanCore VkCore;
+	VkCore.Init("Tutorial 01");
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
