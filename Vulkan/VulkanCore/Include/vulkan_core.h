@@ -24,7 +24,7 @@
 #include <GLFW/glfw3.h>
 
 #include "vulkan_utils.h"
-
+#include "vk_device.h"
 
 namespace OgldevVK {
 
@@ -46,5 +46,7 @@ private:
 	VkDebugReportCallbackEXT m_reportCallback;
 	GLFWwindow* m_pWindow = NULL;
 	VkSurfaceKHR m_surface;
+	VulkanPhysicalDevices m_physDevices;
+	DeviceAndQueue m_devAndQueue;
 };
 }

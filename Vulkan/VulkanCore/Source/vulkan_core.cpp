@@ -38,6 +38,8 @@ void VulkanCore::Init(const char* pAppName)
 	CreateInstance(pAppName);
 	InitDebugCallbacks();
 	CreateSurface();
+	m_physDevices.Init(m_instance, m_surface);
+	m_devAndQueue = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)

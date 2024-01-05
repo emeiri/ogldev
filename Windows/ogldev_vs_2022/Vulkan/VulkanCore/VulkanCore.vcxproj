@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vk_device.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vulkan_core.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
