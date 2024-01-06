@@ -35,6 +35,12 @@ public:
 
 	void Init(const char* pAppName);
 
+	int GetQueue() const { return m_devAndQueue.Queue; }
+
+	VkDevice GetDevice() const { return m_device; }
+
+	int GetNumImages() const { return (int)m_images.size(); }
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -52,7 +58,6 @@ private:
 	DeviceAndQueue m_devAndQueue;
 	VkDevice m_device;
 	VkSwapchainKHR m_swapChain;
-	std::vector<VkImage> m_images;
-	std::vector<VkCommandBuffer> m_cmdBufs;
+	std::vector<VkImage> m_images;	
 };
 }

@@ -82,7 +82,7 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		.pNext = NULL,
 		.flags = 0,
 		.pApplicationInfo = &AppInfo,
-		.enabledLayerCount = static_cast<uint32_t>(ValidationLayers.size()),
+		.enabledLayerCount = (uint32_t)(ValidationLayers.size()),
 		.ppEnabledLayerNames = ValidationLayers.data(),
 		.enabledExtensionCount = (uint32_t)(Extensions.size()),
 		.ppEnabledExtensionNames = Extensions.data()
@@ -177,14 +177,14 @@ void VulkanCore::CreateDevice()
 {
 	VkDeviceQueueCreateInfo qInfo = {};
 	qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-
 	float qPriorities = 1.0f;
 	qInfo.queueCount = 1;
 	qInfo.pQueuePriorities = &qPriorities;
 	qInfo.queueFamilyIndex = m_devAndQueue.Queue;
 
 	std::vector<const char*> DevExts = {
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
 	};
 
 	VkDeviceCreateInfo devInfo = {};
@@ -241,7 +241,6 @@ void VulkanCore::CreateSwapChain()
 	printf("Number of images %d\n", NumSwapChainImages);
 
 	m_images.resize(NumSwapChainImages);
-	m_cmdBufs.resize(NumSwapChainImages);
 
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, &(m_images[0]));
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");

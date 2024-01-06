@@ -37,6 +37,69 @@ void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int
 	}
 }
 
+
+class VulkanApp
+{
+public:
+
+	VulkanApp(GLFWwindow* pWindow) : m_vkCore(pWindow)
+	{
+	}
+
+	~VulkanApp()
+	{
+	}
+
+	void Init(const char* pAppName)
+	{
+		m_vkCore.Init(pAppName);
+		CreateCommandBuffer();
+		RecordCommandBuffers();
+	}
+
+	void RenderScene()
+	{
+
+	}
+
+private:
+
+	void CreateCommandBuffer()
+	{
+		VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
+		cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		cmdPoolCreateInfo.queueFamilyIndex = m_vkCore.GetQueue();
+
+		VkResult res = vkCreateCommandPool(m_vkCore.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
+		CHECK_VK_RESULT(res, "vkCreateCommandPool\n");
+
+		printf("Command buffer pool created\n");
+
+		VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+		cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		cmdBufAllocInfo.commandPool = m_cmdBufPool;
+		cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		cmdBufAllocInfo.commandBufferCount = m_vkCore.GetNumImages();
+
+		m_cmdBufs.resize(m_vkCore.GetNumImages());
+
+		res = vkAllocateCommandBuffers(m_vkCore.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);
+		CHECK_VK_RESULT(res, "vkAllocateCommandBuffers\n");
+
+		printf("Created command buffers\n");
+	}
+
+	void RecordCommandBuffers()
+	{
+
+	}
+
+	OgldevVK::VulkanCore m_vkCore;
+	VkCommandPool m_cmdBufPool;
+	std::vector<VkCommandBuffer> m_cmdBufs;
+};
+
+
 int main(int argc, char* argv[])
 {
 	if (!glfwInit()) {
@@ -59,10 +122,11 @@ int main(int argc, char* argv[])
 
 	glfwSetKeyCallback(window, GLFW_KeyCallback);
 
-	OgldevVK::VulkanCore VkCore(window);
-	VkCore.Init("Tutorial 01");
+	VulkanApp App(window);
+	App.Init("Tutorial 01");
 
 	while (!glfwWindowShouldClose(window)) {
+		App.RenderScene();
 		glfwPollEvents();
 	}
 
