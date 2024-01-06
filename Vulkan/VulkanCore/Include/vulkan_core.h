@@ -41,6 +41,7 @@ private:
 	void InitDebugCallbacks();
 	void CreateSurface();
 	void CreateDevice();
+	void CreateSwapChain();
 
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_messenger;
@@ -50,5 +51,8 @@ private:
 	VulkanPhysicalDevices m_physDevices;
 	DeviceAndQueue m_devAndQueue;
 	VkDevice m_device;
+	VkSwapchainKHR m_swapChain;
+	std::vector<VkImage> m_images;
+	std::vector<VkCommandBuffer> m_cmdBufs;
 };
 }

@@ -16,6 +16,7 @@
 */
 
 #include <vector>
+#include <assert.h>
 
 #include "vulkan_core.h"
 
@@ -41,6 +42,7 @@ void VulkanCore::Init(const char* pAppName)
 	m_physDevices.Init(m_instance, m_surface);
 	m_devAndQueue = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
 	CreateDevice();
+	CreateSwapChain();
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -196,6 +198,53 @@ void VulkanCore::CreateDevice()
 	CHECK_VK_RESULT(res, "Create device\n");
 
 	printf("Device created\n");
+}
+
+
+void VulkanCore::CreateSwapChain()
+{
+	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.m_surfaceCaps[m_devAndQueue.Device];
+
+	assert(SurfaceCaps.currentExtent.width != -1);
+
+	uint NumImages = 2;
+
+	assert(NumImages >= SurfaceCaps.minImageCount);
+	assert(NumImages <= SurfaceCaps.maxImageCount);
+
+	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
+
+	SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	SwapChainCreateInfo.surface = m_surface;
+	SwapChainCreateInfo.minImageCount = NumImages;
+	SwapChainCreateInfo.imageFormat = m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0].format;
+	SwapChainCreateInfo.imageColorSpace = m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0].colorSpace;
+	SwapChainCreateInfo.imageExtent = SurfaceCaps.currentExtent;
+	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	SwapChainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+	SwapChainCreateInfo.imageArrayLayers = 1;
+	SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	SwapChainCreateInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+	SwapChainCreateInfo.clipped = true;
+	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+
+	VkResult res = vkCreateSwapchainKHR(m_device, &SwapChainCreateInfo, NULL, &m_swapChain);
+	CHECK_VK_RESULT(res, "vkCreateSwapchainKHR\n");
+
+	printf("Swap chain created\n");
+
+	uint NumSwapChainImages = 0;
+	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, NULL);
+	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
+	assert(NumImages == NumSwapChainImages);
+
+	printf("Number of images %d\n", NumSwapChainImages);
+
+	m_images.resize(NumSwapChainImages);
+	m_cmdBufs.resize(NumSwapChainImages);
+
+	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, &(m_images[0]));
+	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 }
 
 }
