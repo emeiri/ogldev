@@ -40,6 +40,7 @@ void VulkanCore::Init(const char* pAppName)
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
 	m_devAndQueue = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
+	CreateDevice();
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -168,4 +169,33 @@ void VulkanCore::CreateSurface()
 
 	printf("GLFW window surface created\n");
 }
+
+
+void VulkanCore::CreateDevice()
+{
+	VkDeviceQueueCreateInfo qInfo = {};
+	qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+
+	float qPriorities = 1.0f;
+	qInfo.queueCount = 1;
+	qInfo.pQueuePriorities = &qPriorities;
+	qInfo.queueFamilyIndex = m_devAndQueue.Queue;
+
+	std::vector<const char*> DevExts = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+	};
+
+	VkDeviceCreateInfo devInfo = {};
+	devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	devInfo.enabledExtensionCount = (uint32_t)DevExts.size();
+	devInfo.ppEnabledExtensionNames = DevExts.data();
+	devInfo.queueCreateInfoCount = 1;
+	devInfo.pQueueCreateInfos = &qInfo;
+
+	VkResult res = vkCreateDevice(m_physDevices.m_devices[m_devAndQueue.Device], &devInfo, NULL, &m_device);
+	CHECK_VK_RESULT(res, "Create device\n");
+
+	printf("Device created\n");
+}
+
 }
