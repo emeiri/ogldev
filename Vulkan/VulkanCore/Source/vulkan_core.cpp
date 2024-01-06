@@ -198,6 +198,10 @@ void VulkanCore::CreateDevice()
 	CHECK_VK_RESULT(res, "Create device\n");
 
 	printf("Device created\n");
+
+	vkGetDeviceQueue(m_device, m_devAndQueue.Queue, 0, &m_queue);
+
+	printf("Queue acquired\n");
 }
 
 
@@ -244,6 +248,57 @@ void VulkanCore::CreateSwapChain()
 
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, &(m_images[0]));
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
+}
+
+uint32_t VulkanCore::AcquireNextImage(VkSemaphore Semaphore)
+{
+	uint32_t ImageIndex = 0;
+	VkResult res = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, Semaphore, NULL, &ImageIndex);
+	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR\n");
+	return ImageIndex;
+}
+
+
+void VulkanCore::Submit(VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem)
+{
+	VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = pCmbBuf;
+	submitInfo.pWaitSemaphores = &PresentCompleteSem;
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitDstStageMask = &waitFlags;
+	submitInfo.pSignalSemaphores = &RenderCompleteSem;
+	submitInfo.signalSemaphoreCount = 1;
+
+	VkResult res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
+	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
+}
+
+void VulkanCore::QueuePresent(uint32_t ImageIndex, VkSemaphore RenderCompleteSem)
+{
+	VkPresentInfoKHR presentInfo = {};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &m_swapChain;
+	presentInfo.pImageIndices = &ImageIndex;
+	presentInfo.pWaitSemaphores = &RenderCompleteSem;
+	presentInfo.waitSemaphoreCount = 1;
+
+	VkResult res = vkQueuePresentKHR(m_queue, &presentInfo);
+	CHECK_VK_RESULT(res, "vkQueuePresentKHR\n");
+}
+
+VkSemaphore VulkanCore::CreateSemaphore()
+{
+	VkSemaphoreCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	VkSemaphore semaphore;
+	VkResult res = vkCreateSemaphore(m_device, &createInfo, NULL, &semaphore);
+	CHECK_VK_RESULT(res, "vkCreateSemaphore\n");
+	return semaphore;
 }
 
 }

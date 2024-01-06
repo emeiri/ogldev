@@ -43,6 +43,14 @@ public:
 
 	std::vector<VkImage>& GetImages() { return m_images;  }
 
+	uint32_t AcquireNextImage(VkSemaphore Semaphore);
+
+	void Submit(VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem);
+
+	void QueuePresent(uint32_t ImageIndex, VkSemaphore RenderCompleteSem);
+
+	VkSemaphore CreateSemaphore();
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -59,6 +67,7 @@ private:
 	VulkanPhysicalDevices m_physDevices;
 	DeviceAndQueue m_devAndQueue;
 	VkDevice m_device;
+	VkQueue m_queue;
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 };

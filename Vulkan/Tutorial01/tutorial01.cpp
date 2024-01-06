@@ -55,11 +55,16 @@ public:
 		m_vkCore.Init(pAppName);
 		CreateCommandBuffer();
 		RecordCommandBuffers();
+		CreateSemaphores();
 	}
 
 	void RenderScene()
 	{
+		uint32_t ImageIndex = m_vkCore.AcquireNextImage(m_presentCompleteSem);
 
+		m_vkCore.Submit(&m_cmdBufs[ImageIndex], m_presentCompleteSem, m_renderCompleteSem);
+
+		m_vkCore.QueuePresent(ImageIndex, m_renderCompleteSem);
 	}
 
 private:
@@ -117,9 +122,17 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+	void CreateSemaphores()
+	{
+		m_presentCompleteSem = m_vkCore.CreateSemaphore();
+		m_renderCompleteSem = m_vkCore.CreateSemaphore();
+	}
+
 	OgldevVK::VulkanCore m_vkCore;
 	VkCommandPool m_cmdBufPool;
 	std::vector<VkCommandBuffer> m_cmdBufs;
+	VkSemaphore m_renderCompleteSem;
+	VkSemaphore m_presentCompleteSem;
 };
 
 
