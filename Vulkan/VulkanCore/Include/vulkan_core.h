@@ -41,6 +41,8 @@ public:
 
 	int GetNumImages() const { return (int)m_images.size(); }
 
+	std::vector<VkImage>& GetImages() { return m_images;  }
+
 private:
 
 	void CreateInstance(const char* pAppName);

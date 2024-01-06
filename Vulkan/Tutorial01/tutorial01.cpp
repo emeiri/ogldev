@@ -91,7 +91,30 @@ private:
 
 	void RecordCommandBuffers()
 	{
+		VkCommandBufferBeginInfo beginInfo = {};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 
+		VkClearColorValue clearColor = { 164.0f / 256.0f, 30.0f / 256.0f, 34.0f / 256.0f, 0.0f };
+		VkClearValue clearValue = {};
+		clearValue.color = clearColor;
+
+		VkImageSubresourceRange imageRange = {};
+		imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageRange.levelCount = 1;
+		imageRange.layerCount = 1;
+
+		for (uint i = 0; i < m_cmdBufs.size(); i++) {
+			VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
+			CHECK_VK_RESULT(res, "vkBeginCommandBuffer\n");
+
+			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImages()[i], VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);
+
+			res = vkEndCommandBuffer(m_cmdBufs[i]);
+			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
+		}
+
+		printf("Command buffers recorded\n");
 	}
 
 	OgldevVK::VulkanCore m_vkCore;
