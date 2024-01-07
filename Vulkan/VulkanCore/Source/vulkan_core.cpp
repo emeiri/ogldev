@@ -218,6 +218,22 @@ static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& P
 }
 
 
+static uint32_t ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
+{
+	uint32_t RequestedNumImages = Capabilities.minImageCount + 1;
+
+	int FinalNumImages = 0;
+	
+	if ((Capabilities.maxImageCount > 0) && (RequestedNumImages > Capabilities.maxImageCount)) {
+		FinalNumImages = Capabilities.maxImageCount;
+	}
+	else {
+		FinalNumImages = RequestedNumImages;
+	}
+
+	return FinalNumImages;
+}
+
 
 void VulkanCore::CreateSwapChain()
 {
@@ -225,10 +241,7 @@ void VulkanCore::CreateSwapChain()
 
 	assert(SurfaceCaps.currentExtent.width != -1);
 
-	uint NumImages = 2;
-
-	assert(NumImages >= SurfaceCaps.minImageCount);
-	assert(NumImages <= SurfaceCaps.maxImageCount);
+	uint NumImages = ChooseNumImages(SurfaceCaps);
 
 	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.m_presentModes[m_devAndQueue.Device];
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
