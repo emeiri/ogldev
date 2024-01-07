@@ -235,6 +235,38 @@ static uint32_t ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 }
 
 
+void CreateImageView(VkDevice device, 					 
+					 VkImage image, 					 
+					 VkFormat format,
+					 VkImageAspectFlags aspectFlags, 
+					 VkImageView* imageView, 
+					 VkImageViewType viewType, 
+					 uint32_t layerCount, 
+					 uint32_t mipLevels)
+{
+	VkImageViewCreateInfo ViewInfo =
+	{
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = 0,
+		.image = image,
+		.viewType = viewType,
+		.format = format,
+		.subresourceRange =
+		{
+			.aspectMask = aspectFlags,
+			.baseMipLevel = 0,
+			.levelCount = mipLevels,
+			.baseArrayLayer = 0,
+			.layerCount = layerCount
+		}
+	};
+
+	VkResult res = vkCreateImageView(device, &ViewInfo, NULL, imageView);
+	CHECK_VK_RESULT(res, "vkCreateImageView");
+}
+
+
 void VulkanCore::CreateSwapChain()
 {
 	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.m_surfaceCaps[m_devAndQueue.Device];
@@ -277,12 +309,17 @@ void VulkanCore::CreateSwapChain()
 	printf("Number of images %d\n", NumSwapChainImages);
 
 	m_images.resize(NumSwapChainImages);
+	m_imageViews.resize(NumSwapChainImages);
 
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, &(m_images[0]));
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
+
+	int LayerCount = 1;
+	int MipLevels = 1;
+	for (uint i = 0; i < NumSwapChainImages; i++) {
+		CreateImageView(m_device, m_images[i], VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT,	&m_imageViews[i], VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+	}
 }
-
-
 
 
 uint32_t VulkanCore::AcquireNextImage(VkSemaphore Semaphore)

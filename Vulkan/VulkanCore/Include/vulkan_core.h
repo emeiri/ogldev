@@ -70,5 +70,6 @@ private:
 	VkQueue m_queue;
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
+	std::vector<VkImageView> m_imageViews;
 };
 }
