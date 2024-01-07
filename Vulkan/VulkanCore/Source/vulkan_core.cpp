@@ -254,13 +254,15 @@ void VulkanCore::CreateSwapChain()
 	SwapChainCreateInfo.imageFormat = m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0].format;
 	SwapChainCreateInfo.imageColorSpace = m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0].colorSpace;
 	SwapChainCreateInfo.imageExtent = SurfaceCaps.currentExtent;
-	SwapChainCreateInfo.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
-	SwapChainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+	SwapChainCreateInfo.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
+	SwapChainCreateInfo.preTransform = SurfaceCaps.currentTransform;
 	SwapChainCreateInfo.imageArrayLayers = 1;
 	SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	SwapChainCreateInfo.presentMode = PresentMode;
-	SwapChainCreateInfo.clipped = true;
+	SwapChainCreateInfo.clipped = VK_TRUE;
 	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	SwapChainCreateInfo.queueFamilyIndexCount = 1;
+	SwapChainCreateInfo.pQueueFamilyIndices = &m_devAndQueue.Queue;
 
 	VkResult res = vkCreateSwapchainKHR(m_device, &SwapChainCreateInfo, NULL, &m_swapChain);
 	CHECK_VK_RESULT(res, "vkCreateSwapchainKHR\n");

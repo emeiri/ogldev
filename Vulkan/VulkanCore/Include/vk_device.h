@@ -24,8 +24,8 @@
 namespace OgldevVK {
 
 struct DeviceAndQueue {
-	int Device = -1;
-	int Queue = -1;
+	uint32_t Device = UINT_MAX;
+	uint32_t Queue = UINT_MAX;
 };
 
 class VulkanPhysicalDevices {
