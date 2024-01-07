@@ -44,6 +44,7 @@ public:
     std::vector< std::vector<VkSurfaceFormatKHR> > m_surfaceFormats;
     std::vector<VkSurfaceCapabilitiesKHR> m_surfaceCaps;
     std::vector<VkPhysicalDeviceMemoryProperties> m_memProps;
+    std::vector< std::vector<VkPresentModeKHR> > m_presentModes;
 
 private:
     void Allocate(int NumDevices);

@@ -205,6 +205,20 @@ void VulkanCore::CreateDevice()
 }
 
 
+static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& PresentModes)
+{
+	for (int i = 0; i < PresentModes.size(); i++) {
+		if (PresentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
+			return PresentModes[i];
+		}
+	}
+
+	// Fallback to FIFO which is always supported
+	return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+
+
 void VulkanCore::CreateSwapChain()
 {
 	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.m_surfaceCaps[m_devAndQueue.Device];
@@ -215,6 +229,9 @@ void VulkanCore::CreateSwapChain()
 
 	assert(NumImages >= SurfaceCaps.minImageCount);
 	assert(NumImages <= SurfaceCaps.maxImageCount);
+
+	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.m_presentModes[m_devAndQueue.Device];
+	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
 	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
 
@@ -228,7 +245,7 @@ void VulkanCore::CreateSwapChain()
 	SwapChainCreateInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 	SwapChainCreateInfo.imageArrayLayers = 1;
 	SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	SwapChainCreateInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+	SwapChainCreateInfo.presentMode = PresentMode;
 	SwapChainCreateInfo.clipped = true;
 	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
@@ -249,6 +266,9 @@ void VulkanCore::CreateSwapChain()
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, &(m_images[0]));
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 }
+
+
+
 
 uint32_t VulkanCore::AcquireNextImage(VkSemaphore Semaphore)
 {

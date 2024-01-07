@@ -74,6 +74,7 @@ void VulkanPhysicalDevices::Allocate(int NumDevices)
     m_surfaceFormats.resize(NumDevices);
     m_surfaceCaps.resize(NumDevices);
     m_memProps.resize(NumDevices);
+    m_presentModes.resize(NumDevices);
 }
 
 
@@ -132,9 +133,14 @@ void VulkanPhysicalDevices::Init(const VkInstance& inst, const VkSurfaceKHR& Sur
         uint NumPresentModes = 0;
 
         res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, NULL);
-        CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfacePresentModesKHR error\n");
+        CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfacePresentModesKHR (1) error\n");
 
         assert(NumPresentModes != 0);
+
+        m_presentModes[i].resize(NumPresentModes);
+
+        res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, m_presentModes[i].data());
+        CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfacePresentModesKHR (2) error\n");
 
         printf("Number of presentation modes %d\n", NumPresentModes);
 
