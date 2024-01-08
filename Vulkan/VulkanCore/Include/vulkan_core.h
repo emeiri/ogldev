@@ -51,6 +51,12 @@ public:
 
 	VkSemaphore CreateSemaphore();
 
+	const VkSurfaceFormatKHR& GetSurfaceFormat() const;
+
+	const VkRenderPass& GetRenderPass() const { return m_renderPass; }
+
+	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -58,6 +64,8 @@ private:
 	void CreateSurface();
 	void CreateDevice();
 	void CreateSwapChain();
+	void CreateRenderPass();
+	void CreateFramebuffer();
 
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_messenger;
@@ -71,5 +79,7 @@ private:
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
+	VkRenderPass m_renderPass;
+	std::vector<VkFramebuffer> m_fbs;
 };
 }

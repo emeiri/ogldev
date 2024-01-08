@@ -43,6 +43,8 @@ void VulkanCore::Init(const char* pAppName)
 	m_devAndQueue = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
 	CreateDevice();
 	CreateSwapChain();
+	CreateRenderPass();
+	CreateFramebuffer();
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -372,5 +374,76 @@ VkSemaphore VulkanCore::CreateSemaphore()
 	CHECK_VK_RESULT(res, "vkCreateSemaphore\n");
 	return semaphore;
 }
+
+
+const VkSurfaceFormatKHR& VulkanCore::GetSurfaceFormat() const
+{
+	return m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0];
+}
+
+
+void VulkanCore::CreateRenderPass()
+{
+	VkAttachmentReference attachRef = {};
+	attachRef.attachment = 0;
+	attachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpassDesc = {};
+	subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpassDesc.colorAttachmentCount = 1;
+	subpassDesc.pColorAttachments = &attachRef;
+
+	VkAttachmentDescription attachDesc = {};
+	attachDesc.format = GetSurfaceFormat().format;
+	attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	attachDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+
+	VkRenderPassCreateInfo renderPassCreateInfo = {};
+	renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassCreateInfo.attachmentCount = 1;
+	renderPassCreateInfo.pAttachments = &attachDesc;
+	renderPassCreateInfo.subpassCount = 1;
+	renderPassCreateInfo.pSubpasses = &subpassDesc;
+
+	VkResult res = vkCreateRenderPass(m_device, &renderPassCreateInfo, NULL, &m_renderPass);
+	CHECK_VK_RESULT(res, "vkCreateRenderPass\n");
+
+	printf("Created a render pass\n");
+}
+
+
+void VulkanCore::CreateFramebuffer()
+{
+	m_fbs.resize(m_images.size());
+
+	int WindowWidth, WindowHeight;
+	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
+
+	VkResult res;
+
+	for (uint i = 0; i < m_images.size(); i++) {
+
+		VkFramebufferCreateInfo fbCreateInfo = {};
+		fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		fbCreateInfo.renderPass = m_renderPass;
+		fbCreateInfo.attachmentCount = 1;
+		fbCreateInfo.pAttachments = &m_imageViews[i];
+		fbCreateInfo.width = WindowWidth;
+		fbCreateInfo.height = WindowHeight;
+		fbCreateInfo.layers = 1;
+
+		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fbs[i]);
+		CHECK_VK_RESULT(res, "vkCreateFramebuffer\n");
+	}
+
+	printf("Framebuffers created\n");
+}
+
+
 
 }

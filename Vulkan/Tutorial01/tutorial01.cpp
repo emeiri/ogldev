@@ -56,6 +56,8 @@ public:
 		CreateCommandBuffer();
 		RecordCommandBuffers();
 		CreateSemaphores();
+
+	//	exit(0);
 	}
 
 	void RenderScene()
@@ -109,11 +111,27 @@ private:
 		imageRange.levelCount = 1;
 		imageRange.layerCount = 1;
 
+		VkRenderPassBeginInfo renderPassInfo = {};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = m_vkCore.GetRenderPass();
+		renderPassInfo.renderArea.offset.x = 0;
+		renderPassInfo.renderArea.offset.y = 0;
+		renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
+		renderPassInfo.renderArea.extent.height = WINDOW_HEIGHT;
+		renderPassInfo.clearValueCount = 1;
+		renderPassInfo.pClearValues = &clearValue;
+
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
 			VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
 			CHECK_VK_RESULT(res, "vkBeginCommandBuffer\n");
 
-			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImages()[i], VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &imageRange);
+			renderPassInfo.framebuffer = m_vkCore.GetFramebuffers()[i];
+
+			vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			//vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+			vkCmdEndRenderPass(m_cmdBufs[i]);
 
 			res = vkEndCommandBuffer(m_cmdBufs[i]);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
@@ -121,6 +139,7 @@ private:
 
 		printf("Command buffers recorded\n");
 	}
+
 
 	void CreateSemaphores()
 	{
