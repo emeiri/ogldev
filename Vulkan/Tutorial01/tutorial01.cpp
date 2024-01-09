@@ -56,6 +56,7 @@ public:
 		CreateCommandBuffer();
 		RecordCommandBuffers();
 		CreateSemaphores();
+		CreateVertexBuffer();
 
 	//	exit(0);
 	}
@@ -82,18 +83,26 @@ private:
 
 		printf("Command buffer pool created\n");
 
+		m_cmdBufs.resize(m_vkCore.GetNumImages());
+		CreateCommandBufferInternal(m_vkCore.GetNumImages(), &m_cmdBufs[0]);
+
+		CreateCommandBufferInternal(1, &m_copyCmdBuf);
+
+		printf("Created command buffers\n");
+	}
+
+	void CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs)
+	{
 		VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
 		cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		cmdBufAllocInfo.commandPool = m_cmdBufPool;
 		cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		cmdBufAllocInfo.commandBufferCount = m_vkCore.GetNumImages();
+		cmdBufAllocInfo.commandBufferCount = count;
 
-		m_cmdBufs.resize(m_vkCore.GetNumImages());
-
-		res = vkAllocateCommandBuffers(m_vkCore.GetDevice(), &cmdBufAllocInfo, &m_cmdBufs[0]);
+		VkResult res = vkAllocateCommandBuffers(m_vkCore.GetDevice(), &cmdBufAllocInfo, cmdBufs);
 		CHECK_VK_RESULT(res, "vkAllocateCommandBuffers\n");
 
-		printf("Created command buffers\n");
+		printf("Created %d command buffers\n", count);
 	}
 
 	void RecordCommandBuffers()
@@ -147,9 +156,20 @@ private:
 		m_renderCompleteSem = m_vkCore.CreateSemaphore();
 	}
 
+
+	void CreateVertexBuffer()
+	{
+		std::vector<Vector3f> Vertices = {(-1.0f, -1.0f, 0.0f),
+						 (1.0f, -1.0f, 0.0f),
+						 (0.0f,  1.0f, 0.0f), };
+
+		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices, m_copyCmdBuf);
+	}
+
 	OgldevVK::VulkanCore m_vkCore;
 	VkCommandPool m_cmdBufPool;
 	std::vector<VkCommandBuffer> m_cmdBufs;
+	VkCommandBuffer m_copyCmdBuf;
 	VkSemaphore m_renderCompleteSem;
 	VkSemaphore m_presentCompleteSem;
 };

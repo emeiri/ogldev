@@ -23,6 +23,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_math_3d.h"
+
 #include "vulkan_utils.h"
 #include "vk_device.h"
 
@@ -57,6 +59,8 @@ public:
 
 	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
 
+	VkBuffer CreateVertexBuffer(const std::vector<Vector3f>& Vertices, VkCommandBuffer CopyCmdBuf);
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -66,6 +70,8 @@ private:
 	void CreateSwapChain();
 	void CreateRenderPass();
 	void CreateFramebuffer();
+
+	uint32_t GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_messenger;
