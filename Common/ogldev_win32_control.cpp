@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifdef VULKAN
+//#ifdef VULKAN
 
-#ifdef _WIN64
+#ifdef _WIN32
 
 #include "ogldev_vulkan.h"
 #include "ogldev_win32_control.h"
@@ -96,4 +96,4 @@ VkSurfaceKHR Win32Control::CreateSurface(VkInstance& inst)
 
 #endif
 
-#endif
+//#endif

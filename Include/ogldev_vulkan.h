@@ -19,7 +19,7 @@
 #ifndef OGLDEV_VULKAN_H
 #define OGLDEV_VULKAN_H
 
-#ifdef VULKAN
+#ifdef OGLDEV_VULKAN
 
 #include <vector>
 

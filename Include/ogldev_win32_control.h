@@ -19,7 +19,7 @@
 #ifndef VULKAN_WIN32_CONTROL_H
 #define VULKAN_WIN32_CONTROL_H
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #include "ogldev_vulkan.h"
 

@@ -212,11 +212,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_types.h" />
     <ClInclude Include="..\..\..\Include\ogldev_util.h" />
     <ClInclude Include="..\..\..\Include\ogldev_vertex_buffer.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_vulkan.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_vulkan_core.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_win32_control.h" />
     <ClInclude Include="..\..\..\Include\ogldev_world_transform.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_xcb_control.h" />
     <ClInclude Include="..\..\..\Include\technique.h" />
     <ClInclude Include="..\..\..\Include\Techniques\ogldev_ray_marching_technique.h" />
     <ClInclude Include="framework.h" />
@@ -270,11 +266,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_tex_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_vulkan.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_vulkan_core.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_win32_control.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_xcb_control.cpp" />
     <ClCompile Include="..\..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\..\Common\random_texture.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
