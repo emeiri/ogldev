@@ -52,5 +52,6 @@ private:
 
 
 void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices);
+VkShaderModule CreateShaderModule(VkDevice& device, const char* pFileName);
 
 }

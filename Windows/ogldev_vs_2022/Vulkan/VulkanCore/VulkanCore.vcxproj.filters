@@ -32,5 +32,8 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

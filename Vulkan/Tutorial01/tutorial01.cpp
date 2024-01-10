@@ -57,7 +57,7 @@ public:
 		RecordCommandBuffers();
 		CreateSemaphores();
 		CreateVertexBuffer();
-
+		CreateShaders();
 	//	exit(0);
 	}
 
@@ -164,6 +164,11 @@ private:
 						 (0.0f,  1.0f, 0.0f), };
 
 		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices, m_copyCmdBuf);
+	void CreateShaders()
+	{
+		m_vs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/vs.spv");
+
+		m_fs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/fs.spv");
 	}
 
 	OgldevVK::VulkanCore m_vkCore;
@@ -172,6 +177,8 @@ private:
 	VkCommandBuffer m_copyCmdBuf;
 	VkSemaphore m_renderCompleteSem;
 	VkSemaphore m_presentCompleteSem;
+	VkShaderModule m_vs;
+	VkShaderModule m_fs;
 };
 
 
