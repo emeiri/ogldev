@@ -39,7 +39,7 @@ public:
 
 	int GetQueue() const { return m_devAndQueue.Queue; }
 
-	VkDevice GetDevice() const { return m_device; }
+	VkDevice& GetDevice() { return m_device; }
 
 	int GetNumImages() const { return (int)m_images.size(); }
 
@@ -59,7 +59,9 @@ public:
 
 	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
 
-	VkBuffer CreateVertexBuffer(const std::vector<Vector3f>& Vertices, VkCommandBuffer CopyCmdBuf);
+	VkBuffer CreateVertexBuffer(const std::vector<Vector3f>& Vertices);
+
+	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
 
 private:
 
@@ -70,6 +72,7 @@ private:
 	void CreateSwapChain();
 	void CreateRenderPass();
 	void CreateFramebuffer();
+	void CreateCommandBufferPool();
 
 	uint32_t GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
@@ -87,5 +90,7 @@ private:
 	std::vector<VkImageView> m_imageViews;
 	VkRenderPass m_renderPass;
 	std::vector<VkFramebuffer> m_fbs;
+	VkCommandPool m_cmdBufPool;
+	VkCommandBuffer m_copyCmdBuf;
 };
 }

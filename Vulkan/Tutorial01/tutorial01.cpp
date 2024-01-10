@@ -74,36 +74,12 @@ private:
 
 	void CreateCommandBuffer()
 	{
-		VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
-		cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		cmdPoolCreateInfo.queueFamilyIndex = m_vkCore.GetQueue();
-
-		VkResult res = vkCreateCommandPool(m_vkCore.GetDevice(), &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
-		CHECK_VK_RESULT(res, "vkCreateCommandPool\n");
-
-		printf("Command buffer pool created\n");
-
 		m_cmdBufs.resize(m_vkCore.GetNumImages());
-		CreateCommandBufferInternal(m_vkCore.GetNumImages(), &m_cmdBufs[0]);
-
-		CreateCommandBufferInternal(1, &m_copyCmdBuf);
-
+		m_vkCore.CreateCommandBuffers(m_vkCore.GetNumImages(), &m_cmdBufs[0]);
+			
 		printf("Created command buffers\n");
 	}
 
-	void CreateCommandBufferInternal(int count, VkCommandBuffer* cmdBufs)
-	{
-		VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
-		cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		cmdBufAllocInfo.commandPool = m_cmdBufPool;
-		cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		cmdBufAllocInfo.commandBufferCount = count;
-
-		VkResult res = vkAllocateCommandBuffers(m_vkCore.GetDevice(), &cmdBufAllocInfo, cmdBufs);
-		CHECK_VK_RESULT(res, "vkAllocateCommandBuffers\n");
-
-		printf("Created %d command buffers\n", count);
-	}
 
 	void RecordCommandBuffers()
 	{
@@ -163,7 +139,9 @@ private:
 						 (1.0f, -1.0f, 0.0f),
 						 (0.0f,  1.0f, 0.0f), };
 
-		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices, m_copyCmdBuf);
+		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices);
+	}
+
 	void CreateShaders()
 	{
 		m_vs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/vs.spv");
@@ -171,10 +149,8 @@ private:
 		m_fs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/fs.spv");
 	}
 
-	OgldevVK::VulkanCore m_vkCore;
-	VkCommandPool m_cmdBufPool;
+	OgldevVK::VulkanCore m_vkCore;	
 	std::vector<VkCommandBuffer> m_cmdBufs;
-	VkCommandBuffer m_copyCmdBuf;
 	VkSemaphore m_renderCompleteSem;
 	VkSemaphore m_presentCompleteSem;
 	VkShaderModule m_vs;

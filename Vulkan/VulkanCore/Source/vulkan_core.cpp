@@ -45,6 +45,8 @@ void VulkanCore::Init(const char* pAppName)
 	CreateSwapChain();
 	CreateRenderPass();
 	CreateFramebuffer();
+	CreateCommandBufferPool();
+	CreateCommandBuffers(1, &m_copyCmdBuf);
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -445,7 +447,7 @@ void VulkanCore::CreateFramebuffer()
 }
 
 
-VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices, VkCommandBuffer CopyCmdBuf)
+VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 {
 	size_t verticesSize = sizeof(Vertices);
 
@@ -502,14 +504,14 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices, V
 	VkCommandBufferBeginInfo cmdBufBeginInfo = {};
 	cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-	res = vkBeginCommandBuffer(CopyCmdBuf, &cmdBufBeginInfo);
+	res = vkBeginCommandBuffer(m_copyCmdBuf, &cmdBufBeginInfo);
 	CHECK_VK_RESULT(res, "vkBeginCommandBuffer error %d\n");
 
 	VkBufferCopy bufferCopy = {};
 	bufferCopy.size = verticesSize;
-	vkCmdCopyBuffer(CopyCmdBuf, stagingVB, vb, 1, &bufferCopy);
+	vkCmdCopyBuffer(m_copyCmdBuf, stagingVB, vb, 1, &bufferCopy);
 
-	vkEndCommandBuffer(CopyCmdBuf);
+	vkEndCommandBuffer(m_copyCmdBuf);
 
 	return vb;
 }
@@ -529,6 +531,34 @@ uint32_t VulkanCore::GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFl
 	printf("Cannot find memory type for type %x requested mem props %x\n", memTypeBits, reqMemPropFlags);
 	exit(1);
 	return -1;
+}
+
+
+void VulkanCore::CreateCommandBufferPool()
+{
+	VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
+	cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	cmdPoolCreateInfo.queueFamilyIndex = m_devAndQueue.Queue;
+
+	VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
+	CHECK_VK_RESULT(res, "vkCreateCommandPool\n");
+
+	printf("Command buffer pool created\n");
+}
+
+
+void VulkanCore::CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs)
+{
+	VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+	cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	cmdBufAllocInfo.commandPool = m_cmdBufPool;
+	cmdBufAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	cmdBufAllocInfo.commandBufferCount = count;
+
+	VkResult res = vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, cmdBufs);
+	CHECK_VK_RESULT(res, "vkAllocateCommandBuffers\n");
+
+	printf("Created %d command buffers\n", count);
 }
 
 }
