@@ -453,6 +453,8 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices, V
 	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	vbCreateInfo.size = verticesSize;
 	vbCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	vbCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
 	VkBuffer stagingVB;
 	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &stagingVB);
 	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
@@ -471,6 +473,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices, V
 	VkDeviceMemory stagingDevMem;
 	res = vkAllocateMemory(m_device, &memAllocInfo, NULL, &stagingDevMem);
 	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
+
 	res = vkBindBufferMemory(m_device, stagingVB, stagingDevMem, 0);
 	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
 
@@ -514,10 +517,11 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices, V
 
 uint32_t VulkanCore::GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
 {
-	const VkPhysicalDeviceMemoryProperties& physDeviceMemProps = m_physDevices.m_memProps[m_devAndQueue.Device];
-	for (uint i = 0; i < physDeviceMemProps.memoryTypeCount; i++) {
+	VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.m_memProps[m_devAndQueue.Device];
+
+	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
 		if ((memTypeBits & (1 << i)) &&
-			((physDeviceMemProps.memoryTypes[i].propertyFlags & reqMemPropFlags) == reqMemPropFlags)) {
+			((MemProps.memoryTypes[i].propertyFlags & reqMemPropFlags) == reqMemPropFlags)) {
 			return i;
 		}
 	}
