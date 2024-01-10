@@ -53,7 +53,7 @@ public:
 	void Init(const char* pAppName)
 	{
 		m_vkCore.Init(pAppName);
-		CreateCommandBuffer();
+		CreateCommandBuffer();		
 		CreateSemaphores();
 		CreateVertexBuffer();
 		CreateShaders();
@@ -115,7 +115,9 @@ private:
 
 			vkCmdBeginRenderPass(m_cmdBufs[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			//vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+			vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+			vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
 
 			vkCmdEndRenderPass(m_cmdBufs[i]);
 
