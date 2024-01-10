@@ -63,6 +63,8 @@ public:
 
 	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
 
+	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs);
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -92,5 +94,6 @@ private:
 	std::vector<VkFramebuffer> m_fbs;
 	VkCommandPool m_cmdBufPool;
 	VkCommandBuffer m_copyCmdBuf;
+	VkPipelineLayout m_pipelineLayout;
 };
 }

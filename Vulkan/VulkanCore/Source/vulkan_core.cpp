@@ -561,4 +561,116 @@ void VulkanCore::CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs)
 	printf("Created %d command buffers\n", count);
 }
 
+
+VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
+{
+	VkPipelineShaderStageCreateInfo shaderStageCreateInfo[2] = {};
+
+	shaderStageCreateInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStageCreateInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+	shaderStageCreateInfo[0].module = vs;
+	shaderStageCreateInfo[0].pName = "main";
+	shaderStageCreateInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStageCreateInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+	shaderStageCreateInfo[1].module = fs;
+	shaderStageCreateInfo[1].pName = "main";
+
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+	VkPipelineInputAssemblyStateCreateInfo pipelineIACreateInfo = {};
+	pipelineIACreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	pipelineIACreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+	int WindowWidth, WindowHeight;
+	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
+
+	VkViewport vp = {};
+	vp.x = 0.0f;
+	vp.y = 0.0f;
+	vp.width = (float)WindowWidth;
+	vp.height = (float)WindowHeight;
+	vp.minDepth = 0.0f;
+	vp.maxDepth = 1.0f;
+
+	VkRect2D scissor;
+	scissor.offset.x = 0;
+	scissor.offset.y = 0;
+	scissor.extent.width = WindowWidth;
+	scissor.extent.height = WindowHeight;
+
+	VkPipelineViewportStateCreateInfo vpCreateInfo = {};
+	vpCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	vpCreateInfo.viewportCount = 1;
+	vpCreateInfo.pViewports = &vp;
+	vpCreateInfo.scissorCount = 1;
+	vpCreateInfo.pScissors = &scissor;
+
+	VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
+	rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+	rastCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	rastCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+	rastCreateInfo.lineWidth = 1.0f;
+
+	VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
+	pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+	VkPipelineColorBlendAttachmentState blendAttachState = {};
+	blendAttachState.colorWriteMask = 0xf;
+
+	VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
+	blendCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
+	blendCreateInfo.attachmentCount = 1;
+	blendCreateInfo.pAttachments = &blendAttachState;
+
+	VkDescriptorSetLayoutBinding layoutBinding = {};
+	layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	layoutBinding.descriptorCount = 1;
+	layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	layoutBinding.pImmutableSamplers = NULL;
+
+	VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
+	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorLayout.pNext = NULL;
+	descriptorLayout.bindingCount = 1;
+	descriptorLayout.pBindings = &layoutBinding;
+
+	VkDescriptorSetLayout descriptorSetLayout;
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &descriptorLayout, NULL, &descriptorSetLayout);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout\n");
+
+	VkPipelineLayoutCreateInfo layoutInfo = {};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	layoutInfo.setLayoutCount = 1;
+	layoutInfo.pSetLayouts = &descriptorSetLayout;
+
+	res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &m_pipelineLayout);
+	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
+
+	VkGraphicsPipelineCreateInfo pipelineInfo = {};
+	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	pipelineInfo.stageCount = ARRAY_SIZE_IN_ELEMENTS(shaderStageCreateInfo);
+	pipelineInfo.pStages = &shaderStageCreateInfo[0];
+	pipelineInfo.pVertexInputState = &vertexInputInfo;
+	pipelineInfo.pInputAssemblyState = &pipelineIACreateInfo;
+	pipelineInfo.pViewportState = &vpCreateInfo;
+	pipelineInfo.pRasterizationState = &rastCreateInfo;
+	pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
+	pipelineInfo.pColorBlendState = &blendCreateInfo;
+	pipelineInfo.layout = m_pipelineLayout;
+	pipelineInfo.renderPass = m_renderPass;
+	pipelineInfo.basePipelineIndex = -1;
+
+	VkPipeline Pipeline;
+	res = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &Pipeline);
+	CHECK_VK_RESULT(res, "vkCreateGraphicsPipelines\n");
+
+	printf("Graphics pipeline created\n");
+
+	return Pipeline;
+}
+
 }

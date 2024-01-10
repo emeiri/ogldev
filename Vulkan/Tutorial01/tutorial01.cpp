@@ -54,10 +54,11 @@ public:
 	{
 		m_vkCore.Init(pAppName);
 		CreateCommandBuffer();
-		RecordCommandBuffers();
 		CreateSemaphores();
 		CreateVertexBuffer();
 		CreateShaders();
+		CreatePipeline();
+		RecordCommandBuffers();
 	//	exit(0);
 	}
 
@@ -149,12 +150,18 @@ private:
 		m_fs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/fs.spv");
 	}
 
+	void CreatePipeline()
+	{
+		m_pipeline = m_vkCore.CreatePipeline(m_vs, m_fs);
+	}
+
 	OgldevVK::VulkanCore m_vkCore;	
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkSemaphore m_renderCompleteSem;
 	VkSemaphore m_presentCompleteSem;
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
+	VkPipeline m_pipeline;
 };
 
 
