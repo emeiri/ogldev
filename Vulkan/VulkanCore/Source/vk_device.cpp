@@ -211,23 +211,4 @@ DeviceAndQueue VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueTyp
     fprintf(stderr, "Required queue type %x and supports present %d not found\n", RequiredQueueType, SupportsPresent);
     exit(1);
 }
-
-
-VkShaderModule CreateShaderModuleFromBinary(VkDevice& device, const char* pFileName)
-{
-    int codeSize = 0;
-    char* pShaderCode = ReadBinaryFile(pFileName, codeSize);
-    assert(pShaderCode);
-
-    VkShaderModuleCreateInfo shaderCreateInfo = {};
-    shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shaderCreateInfo.codeSize = codeSize;
-    shaderCreateInfo.pCode = (const uint32_t*)pShaderCode;
-
-    VkShaderModule shaderModule;
-    VkResult res = vkCreateShaderModule(device, &shaderCreateInfo, NULL, &shaderModule);
-    CHECK_VK_RESULT(res, "vkCreateShaderModule\n");
-    printf("Created shader %s\n", pFileName);
-    return shaderModule;
-}
 }

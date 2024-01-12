@@ -24,6 +24,7 @@
 #include <GLFW/glfw3.h>
 
 #include "vulkan_core.h"
+#include "shader.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -37,7 +38,6 @@ void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int
 	}
 }
 
-void foo();
 
 class VulkanApp
 {
@@ -148,8 +148,8 @@ private:
 
 	void CreateShaders()
 	{
-		foo();
-		m_vs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/vs.spv");
+		//m_vs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/vs.spv");
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "Shaders/test.vs");
 
 		m_fs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/fs.spv");
 	}
