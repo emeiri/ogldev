@@ -104,6 +104,28 @@ char* ReadBinaryFile(const char* pFilename, int& size)
 
     return p;
 }
+
+void WriteBinaryFile(const char* pFilename, const void* pData, int size)
+{
+    FILE* f = NULL;
+    
+    errno_t err = fopen_s(&f, pFilename, "wb"); 
+
+    if (!f) {
+        OGLDEV_ERROR("Error opening '%s'\n", pFilename);
+        exit(0);
+    }
+
+    size_t bytes_written = fwrite(pData, 1, size, f);
+
+    if (bytes_written != size) {
+        OGLDEV_ERROR("Error write file\n");
+        exit(0);
+    }
+
+    fclose(f);
+}
+
 #else
 char* ReadBinaryFile(const char* pFilename, int& size)
 {
