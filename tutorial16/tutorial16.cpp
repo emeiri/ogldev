@@ -244,9 +244,9 @@ int main(int argc, char** argv)
     glutCreateWindow("Tutorial 16");
     const char* game_mode_string = "1920x12@32";
     glutGameModeString(game_mode_string);
-    if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE))
+    if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
         glutEnterGameMode();
-    else {
+    } else {
         fprintf(stderr, "Error: Requested game mode, '%s', not available.\n", game_mode_string);
     }
 
