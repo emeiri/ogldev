@@ -47,7 +47,7 @@ public:
 
 	uint32_t AcquireNextImage(VkSemaphore Semaphore);
 
-	void Submit(VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem);
+	void Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem);
 
 	void QueuePresent(uint32_t ImageIndex, VkSemaphore RenderCompleteSem);
 
@@ -77,6 +77,8 @@ private:
 	void CreateCommandBufferPool();
 
 	uint32_t GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags memPropFlags);
+
+	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_messenger;

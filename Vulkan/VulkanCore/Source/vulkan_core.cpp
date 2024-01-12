@@ -335,18 +335,24 @@ uint32_t VulkanCore::AcquireNextImage(VkSemaphore Semaphore)
 }
 
 
-void VulkanCore::Submit(VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem)
-{
-	VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+void VulkanCore::Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem)
+{		
 	VkSubmitInfo submitInfo = {};
+	
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = pCmbBuf;
-	submitInfo.pWaitSemaphores = &PresentCompleteSem;
-	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitDstStageMask = &waitFlags;
-	submitInfo.pSignalSemaphores = &RenderCompleteSem;
-	submitInfo.signalSemaphoreCount = 1;
+	if (PresentCompleteSem) {
+		submitInfo.pWaitSemaphores = &PresentCompleteSem;
+		submitInfo.waitSemaphoreCount = 1;
+		VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		submitInfo.pWaitDstStageMask = &waitFlags;
+	}	
+
+	if (RenderCompleteSem) {
+		submitInfo.pSignalSemaphores = &RenderCompleteSem;
+		submitInfo.signalSemaphoreCount = 1;
+	}
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
 	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
@@ -501,20 +507,35 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 	res = vkBindBufferMemory(m_device, vb, devMem, 0);
 	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
 
-	VkCommandBufferBeginInfo cmdBufBeginInfo = {};
-	cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-	res = vkBeginCommandBuffer(m_copyCmdBuf, &cmdBufBeginInfo);
-	CHECK_VK_RESULT(res, "vkBeginCommandBuffer error %d\n");
-
-	VkBufferCopy bufferCopy = {};
-	bufferCopy.size = verticesSize;
-	vkCmdCopyBuffer(m_copyCmdBuf, stagingVB, vb, 1, &bufferCopy);
-
-	vkEndCommandBuffer(m_copyCmdBuf);
+	CopyBuffer(vb, stagingVB, verticesSize);
 
 	return vb;
 }
+
+
+void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
+{
+	VkCommandBufferBeginInfo cmdBufBeginInfo = {};
+	cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmdBufBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	VkResult res = vkBeginCommandBuffer(m_copyCmdBuf, &cmdBufBeginInfo);
+	CHECK_VK_RESULT(res, "vkBeginCommandBuffer error %d\n");
+
+	VkBufferCopy bufferCopy = {};
+	bufferCopy.srcOffset = 0;
+	bufferCopy.dstOffset = 0;
+	bufferCopy.size = Size;
+	vkCmdCopyBuffer(m_copyCmdBuf, Src, Dst, 1, &bufferCopy);
+
+	vkEndCommandBuffer(m_copyCmdBuf);
+
+	Submit(&m_copyCmdBuf, NULL, NULL);
+
+	vkQueueWaitIdle(m_queue);	
+}
+
+
 
 
 uint32_t VulkanCore::GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
