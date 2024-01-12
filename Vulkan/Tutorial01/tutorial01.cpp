@@ -37,6 +37,7 @@ void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int
 	}
 }
 
+void foo();
 
 class VulkanApp
 {
@@ -147,9 +148,10 @@ private:
 
 	void CreateShaders()
 	{
-		m_vs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/vs.spv");
+		foo();
+		m_vs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/vs.spv");
 
-		m_fs = OgldevVK::CreateShaderModule(m_vkCore.GetDevice(), "Shaders/fs.spv");
+		m_fs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/fs.spv");
 	}
 
 	void CreatePipeline()

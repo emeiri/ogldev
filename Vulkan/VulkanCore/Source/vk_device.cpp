@@ -213,7 +213,7 @@ DeviceAndQueue VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueTyp
 }
 
 
-VkShaderModule CreateShaderModule(VkDevice& device, const char* pFileName)
+VkShaderModule CreateShaderModuleFromBinary(VkDevice& device, const char* pFileName)
 {
     int codeSize = 0;
     char* pShaderCode = ReadBinaryFile(pFileName, codeSize);

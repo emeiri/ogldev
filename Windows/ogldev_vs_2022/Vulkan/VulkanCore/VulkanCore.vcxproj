@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\shader.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vk_device.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vulkan_core.cpp" />
   </ItemGroup>
@@ -134,8 +136,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;SPIRVd.lib;SPIRV-Toolsd.lib;SPIRV-Tools-diffd.lib;SPIRV-Tools-optd.lib;OGLCompilerd.lib;glslangd.lib;OSDependentd.lib;GenericCodeGend.lib;MachineIndependentd.lib;glslang-default-resource-limitsd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;C:\Program Files (x86)\glslang\lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
