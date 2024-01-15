@@ -80,6 +80,9 @@ private:
 
 	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
+	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
+					  VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_messenger;
 	VkDebugReportCallbackEXT m_reportCallback;

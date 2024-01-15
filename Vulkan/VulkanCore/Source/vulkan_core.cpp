@@ -457,60 +457,60 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 {
 	size_t verticesSize = sizeof(Vertices);
 
-	VkBufferCreateInfo vbCreateInfo = {};
-	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	vbCreateInfo.size = verticesSize;
-	vbCreateInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	vbCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VkBuffer StagingVB;
+	VkDeviceMemory StagingVBMem;
+	VkDeviceSize AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+											   StagingVB, StagingVBMem);
 
-	VkBuffer stagingVB;
-	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &stagingVB);
-	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
-	printf("Create vertex buffer\n");
-
-	VkMemoryRequirements memReqs = {};
-	vkGetBufferMemoryRequirements(m_device, stagingVB, &memReqs);
-	printf("Vertex buffer requires %d bytes\n", (int)memReqs.size);
-
-	VkMemoryAllocateInfo memAllocInfo = {};
-	memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	printf("Memory type index %d\n", memAllocInfo.memoryTypeIndex);
-
-	VkDeviceMemory stagingDevMem;
-	res = vkAllocateMemory(m_device, &memAllocInfo, NULL, &stagingDevMem);
-	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
-
-	res = vkBindBufferMemory(m_device, stagingVB, stagingDevMem, 0);
-	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
-
-	void* mappedMemAddr = NULL;
-	res = vkMapMemory(m_device, stagingDevMem, 0, memAllocInfo.allocationSize, 0, &mappedMemAddr);
-	memcpy(mappedMemAddr, &Vertices[0], verticesSize);
-	vkUnmapMemory(m_device, stagingDevMem);
+	void* MappedMemAddr = NULL;	
+	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
+	memcpy(MappedMemAddr, &Vertices[0], verticesSize);
+	vkUnmapMemory(m_device, StagingVBMem);
 
 	VkBuffer vb;
-	vbCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &vb);
-	CHECK_VK_RESULT(res, "vkCreateBuffer error %d\n");
+	VkDeviceMemory vbMem;
+	AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
-	vkGetBufferMemoryRequirements(m_device, vb, &memReqs);
-	printf("Vertex buffer requires %d bytes\n", (int)memReqs.size);
-	memAllocInfo.allocationSize = memReqs.size;
-	memAllocInfo.memoryTypeIndex = GetMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	printf("Memory type index %d\n", memAllocInfo.memoryTypeIndex);
-
-	VkDeviceMemory devMem;
-	res = vkAllocateMemory(m_device, &memAllocInfo, NULL, &devMem);
-	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
-	res = vkBindBufferMemory(m_device, vb, devMem, 0);
-	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
-
-	CopyBuffer(vb, stagingVB, verticesSize);
+	CopyBuffer(vb, StagingVB, verticesSize);
 
 	return vb;
 }
+
+
+VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
+							  VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
+{
+	VkBufferCreateInfo vbCreateInfo = {};
+	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vbCreateInfo.size = Size;
+	vbCreateInfo.usage = Usage;
+	vbCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &Buffer);
+	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
+	printf("Create vertex buffer\n");
+
+	VkMemoryRequirements MemReqs = {};
+	vkGetBufferMemoryRequirements(m_device, Buffer, &MemReqs);
+	printf("Vertex buffer requires %d bytes\n", (int)MemReqs.size);
+
+	uint32_t MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, Properties);
+	VkMemoryAllocateInfo MemAllocInfo = {};
+	MemAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	MemAllocInfo.allocationSize = MemReqs.size;
+	MemAllocInfo.memoryTypeIndex = MemoryTypeIndex;
+	printf("Memory type index %d\n", MemAllocInfo.memoryTypeIndex);
+
+	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &BufferMemory);
+	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
+
+	res = vkBindBufferMemory(m_device, Buffer, BufferMemory, 0);
+	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
+
+	return MemAllocInfo.allocationSize;
+}
+
 
 
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
