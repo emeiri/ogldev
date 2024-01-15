@@ -30,12 +30,28 @@
 
 namespace OgldevVK {
 
+
+class BufferAndMemory {
+public:
+	BufferAndMemory() {}
+	BufferAndMemory(VkDevice* pDevice) : m_pDevice(pDevice) {}
+
+	VkBuffer m_buffer = NULL;
+	VkDeviceMemory m_mem = NULL;
+	VkDeviceSize m_allocationSize = 0;
+
+	void Update(const void* pData, size_t Size);
+
+private:
+	VkDevice* m_pDevice = NULL;
+};
+
 class VulkanCore {
 public:
 	VulkanCore(GLFWwindow* pWindow);
 	~VulkanCore();
 
-	void Init(const char* pAppName);
+	void Init(const char* pAppName, int NumUniformBuffers, size_t UniformDataSize);
 
 	int GetQueue() const { return m_devAndQueue.Queue; }
 
@@ -61,6 +77,10 @@ public:
 
 	VkBuffer CreateVertexBuffer(const std::vector<Vector3f>& Vertices);
 
+	BufferAndMemory CreateUniformBuffer(int Size);
+
+	void UpdateUniformBuffer(BufferAndMemory& Buffer, const void* pData, size_t Size);
+
 	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
 
 	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs);
@@ -75,6 +95,7 @@ private:
 	void CreateRenderPass();
 	void CreateFramebuffer();
 	void CreateCommandBufferPool();
+	void CreateUniformBuffers();
 
 	uint32_t GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
@@ -100,5 +121,8 @@ private:
 	VkCommandPool m_cmdBufPool;
 	VkCommandBuffer m_copyCmdBuf;
 	VkPipelineLayout m_pipelineLayout;
+	int m_numUniformBuffers = 0;
+	size_t m_uniformDataSize = 0;
+	std::vector< std::vector<BufferAndMemory> > m_uniformBuffers;
 };
 }

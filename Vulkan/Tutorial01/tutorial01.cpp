@@ -53,7 +53,8 @@ public:
 
 	void Init(const char* pAppName)
 	{
-		m_vkCore.Init(pAppName);
+		int NumUniformBuffers = 1;
+		m_vkCore.Init(pAppName, NumUniformBuffers, sizeof(UniformData));
 		CreateCommandBuffer();		
 		CreateSemaphores();
 		CreateVertexBuffer();

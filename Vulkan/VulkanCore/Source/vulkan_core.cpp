@@ -34,8 +34,10 @@ VulkanCore::~VulkanCore()
 }
 
 
-void VulkanCore::Init(const char* pAppName)
+void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t UniformDataSize)
 {
+	m_numUniformBuffers = NumUniformBuffers;
+	m_uniformDataSize = UniformDataSize;
 	CreateInstance(pAppName);
 	InitDebugCallbacks();
 	CreateSurface();
@@ -47,6 +49,7 @@ void VulkanCore::Init(const char* pAppName)
 	CreateFramebuffer();
 	CreateCommandBufferPool();
 	CreateCommandBuffers(1, &m_copyCmdBuf);
+	CreateUniformBuffers();
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -470,11 +473,23 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 	VkBuffer vb;
 	VkDeviceMemory vbMem;
 	AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+							      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
 	CopyBuffer(vb, StagingVB, verticesSize);
 
 	return vb;
+}
+
+
+BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
+{
+	BufferAndMemory Buffer(&m_device);
+
+	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
+			   					         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+										 Buffer.m_buffer, Buffer.m_mem);
+
+	return Buffer;
 }
 
 
@@ -692,6 +707,33 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
 	printf("Graphics pipeline created\n");
 
 	return Pipeline;
+}
+
+
+void VulkanCore::CreateUniformBuffers()
+{
+	m_uniformBuffers.resize(m_images.size());
+
+	for (int i = 0; i < m_uniformBuffers.size(); i++) {
+		m_uniformBuffers[i].resize(m_numUniformBuffers);
+
+		for (int j = 0; j < m_numUniformBuffers; j++) {
+			m_uniformBuffers[i][j] = CreateUniformBuffer((int)m_uniformDataSize);
+		}
+	}
+}
+
+
+void BufferAndMemory::Update(const void* pData, size_t Size)
+{
+	if (!m_pDevice) {
+		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
+	}
+
+	void* pMem = NULL;
+	vkMapMemory(*m_pDevice, m_mem, 0, Size, 0, &pMem);
+	memcpy(pMem, pData, Size);
+	vkUnmapMemory(*m_pDevice, m_mem);
 }
 
 }
