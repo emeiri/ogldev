@@ -96,6 +96,8 @@ private:
 	void CreateFramebuffer();
 	void CreateCommandBufferPool();
 	void CreateUniformBuffers();
+	void CreateDescriptorPool();
+	void CreateDescriptorSet();
 
 	uint32_t GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
@@ -124,5 +126,8 @@ private:
 	int m_numUniformBuffers = 0;
 	size_t m_uniformDataSize = 0;
 	std::vector< std::vector<BufferAndMemory> > m_uniformBuffers;
+	VkDescriptorPool m_descriptorPool;
+	VkDescriptorSetLayout m_descriptorSetLayout;
+	std::vector<VkDescriptorSet> m_descriptorSets;
 };
 }

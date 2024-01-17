@@ -50,6 +50,8 @@ void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t Unifor
 	CreateCommandBufferPool();
 	CreateCommandBuffers(1, &m_copyCmdBuf);
 	CreateUniformBuffers();
+	CreateDescriptorPool();
+	CreateDescriptorSet();
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -724,7 +726,86 @@ void VulkanCore::CreateUniformBuffers()
 }
 
 
+void VulkanCore::CreateDescriptorPool()
+{
+	std::vector<VkDescriptorPoolSize> PoolSizes;
 
+	if (m_numUniformBuffers > 0) {
+		PoolSizes.push_back(VkDescriptorPoolSize{ .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+													.descriptorCount = (uint32_t)m_images.size() * m_numUniformBuffers });
+	}
+
+	VkDescriptorPoolCreateInfo PoolInfo = { };
+
+	PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	PoolInfo.maxSets = (uint32_t)m_images.size();
+	PoolInfo.poolSizeCount = (uint32_t)PoolSizes.size();
+	PoolInfo.pPoolSizes = PoolSizes.data();
+
+	VkResult res = vkCreateDescriptorPool(m_device, &PoolInfo, NULL, &m_descriptorPool);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
+	printf("Descriptor pool created\n");
+}
+
+
+void VulkanCore::CreateDescriptorSet()
+{
+	std::vector<VkDescriptorSetLayoutBinding> Bindings;
+
+	VkDescriptorSetLayoutBinding LayoutBinding = {};
+
+	LayoutBinding.binding = 0;
+	LayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	LayoutBinding.descriptorCount = 1;
+	LayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	Bindings.push_back(LayoutBinding);
+
+	VkDescriptorSetLayoutCreateInfo LayoutInfo = {};
+
+	LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	LayoutInfo.flags = 0;
+	LayoutInfo.bindingCount = static_cast<uint32_t>(Bindings.size());
+	LayoutInfo.pBindings = Bindings.data();
+
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+
+	std::vector<VkDescriptorSetLayout> Layouts(m_images.size(), m_descriptorSetLayout);
+
+	VkDescriptorSetAllocateInfo AllocInfo = {};
+	AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	AllocInfo.descriptorPool = m_descriptorPool;
+	AllocInfo.descriptorSetCount = (uint32_t)(m_images.size());
+	AllocInfo.pSetLayouts = Layouts.data();
+
+	m_descriptorSets.resize(m_images.size());
+
+	res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
+	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+
+/*	for (size_t i = 0; i < m_images.size(); i++) {
+		VkDescriptorBufferInfo BufferInfo = {};
+		BufferInfo.buffer = vkState.uniformBuffers[i],
+			.offset = 0,
+			.range = sizeof(UniformBuffer)
+	};
+
+	const std::array<VkWriteDescriptorSet, 4> descriptorWrites = {
+		VkWriteDescriptorSet {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = vkState.descriptorSets[i],
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &bufferInfo
+		},
+	};
+
+	vkUpdateDescriptorSets(vkDev.device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+}*/
+}
 
 
 void VulkanCore::UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size)
