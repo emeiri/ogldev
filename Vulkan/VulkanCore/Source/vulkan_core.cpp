@@ -104,9 +104,9 @@ void VulkanCore::CreateInstance(const char* pAppName)
 
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
-												    VkDebugUtilsMessageTypeFlagsEXT Type,
-													const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-													void* pUserData)
+	VkDebugUtilsMessageTypeFlagsEXT Type,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData)
 {
 	printf("Validation layer: %s\n", pCallbackData->pMessage);
 	return VK_FALSE;
@@ -114,13 +114,13 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
 
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL ReportCallback(VkDebugReportFlagsEXT      flags,
-													 VkDebugReportObjectTypeEXT objectType,
-													 uint64_t                   object,
-													 size_t                     location,
-													 int32_t                    messageCode,
-													 const char* pLayerPrefix,
-													 const char* pMessage,
-													 void* PUserData)
+	VkDebugReportObjectTypeEXT objectType,
+	uint64_t                   object,
+	size_t                     location,
+	int32_t                    messageCode,
+	const char* pLayerPrefix,
+	const char* pMessage,
+	void* PUserData)
 {
 	if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
 		return VK_FALSE;
@@ -136,10 +136,10 @@ void VulkanCore::InitDebugCallbacks()
 	VkDebugUtilsMessengerCreateInfoEXT MessengerCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-			           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-			           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+						VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+						VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
 		.pfnUserCallback = &DebugCallback,
 		.pUserData = nullptr
 	};
@@ -154,9 +154,9 @@ void VulkanCore::InitDebugCallbacks()
 		.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
 		.pNext = NULL,
 		.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
- 				 VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
-				 VK_DEBUG_REPORT_ERROR_BIT_EXT |
-				 VK_DEBUG_REPORT_DEBUG_BIT_EXT,
+					VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+					VK_DEBUG_REPORT_ERROR_BIT_EXT |
+					VK_DEBUG_REPORT_DEBUG_BIT_EXT,
 		.pfnCallback = &ReportCallback,
 		.pUserData = NULL
 	};
@@ -232,7 +232,7 @@ static uint32_t ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 	uint32_t RequestedNumImages = Capabilities.minImageCount + 1;
 
 	int FinalNumImages = 0;
-	
+
 	if ((Capabilities.maxImageCount > 0) && (RequestedNumImages > Capabilities.maxImageCount)) {
 		FinalNumImages = Capabilities.maxImageCount;
 	}
@@ -244,14 +244,14 @@ static uint32_t ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 }
 
 
-void CreateImageView(VkDevice device, 					 
-					 VkImage image, 					 
-					 VkFormat format,
-					 VkImageAspectFlags aspectFlags, 
-					 VkImageView* imageView, 
-					 VkImageViewType viewType, 
-					 uint32_t layerCount, 
-					 uint32_t mipLevels)
+void CreateImageView(VkDevice device,
+	VkImage image,
+	VkFormat format,
+	VkImageAspectFlags aspectFlags,
+	VkImageView* imageView,
+	VkImageViewType viewType,
+	uint32_t layerCount,
+	uint32_t mipLevels)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -326,7 +326,7 @@ void VulkanCore::CreateSwapChain()
 	int LayerCount = 1;
 	int MipLevels = 1;
 	for (uint i = 0; i < NumSwapChainImages; i++) {
-		CreateImageView(m_device, m_images[i], VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT,	&m_imageViews[i], VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+		CreateImageView(m_device, m_images[i], VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, &m_imageViews[i], VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
 }
 
@@ -341,9 +341,9 @@ uint32_t VulkanCore::AcquireNextImage(VkSemaphore Semaphore)
 
 
 void VulkanCore::Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem)
-{		
+{
 	VkSubmitInfo submitInfo = {};
-	
+
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = pCmbBuf;
@@ -352,7 +352,7 @@ void VulkanCore::Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompl
 		submitInfo.waitSemaphoreCount = 1;
 		VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		submitInfo.pWaitDstStageMask = &waitFlags;
-	}	
+	}
 
 	if (RenderCompleteSem) {
 		submitInfo.pSignalSemaphores = &RenderCompleteSem;
@@ -465,9 +465,9 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 	VkBuffer StagingVB;
 	VkDeviceMemory StagingVBMem;
 	VkDeviceSize AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-											   StagingVB, StagingVBMem);
+		StagingVB, StagingVBMem);
 
-	void* MappedMemAddr = NULL;	
+	void* MappedMemAddr = NULL;
 	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
 	memcpy(MappedMemAddr, &Vertices[0], verticesSize);
 	vkUnmapMemory(m_device, StagingVBMem);
@@ -475,7 +475,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 	VkBuffer vb;
 	VkDeviceMemory vbMem;
 	AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-							      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
 	CopyBuffer(vb, StagingVB, verticesSize);
 
@@ -487,16 +487,16 @@ BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
 {
 	BufferAndMemory Buffer(&m_device);
 
-	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, 
-			   					         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-										 Buffer.m_buffer, Buffer.m_mem);
+	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		Buffer.m_buffer, Buffer.m_mem);
 
 	return Buffer;
 }
 
 
 VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
-							  VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
+	VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
 {
 	VkBufferCreateInfo vbCreateInfo = {};
 	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -549,10 +549,8 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 
 	Submit(&m_copyCmdBuf, NULL, NULL);
 
-	vkQueueWaitIdle(m_queue);	
+	vkQueueWaitIdle(m_queue);
 }
-
-
 
 
 uint32_t VulkanCore::GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
