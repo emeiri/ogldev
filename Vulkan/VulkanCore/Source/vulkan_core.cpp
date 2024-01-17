@@ -724,6 +724,23 @@ void VulkanCore::CreateUniformBuffers()
 }
 
 
+
+
+
+void VulkanCore::UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size)
+{
+	if (ImageIndex >= m_uniformBuffers.size()) {
+		OGLDEV_ERROR("UpdateUniformBuffer: image index %d array size %d\n", ImageIndex, m_uniformBuffers.size());
+	}
+
+	if (UniformBufferIndex >= m_numUniformBuffers) {
+		OGLDEV_ERROR("UpdateUniformBuffer: uniform buffer index %d num uniform buffers %d\n", UniformBufferIndex, m_numUniformBuffers);
+	}
+
+	m_uniformBuffers[ImageIndex][UniformBufferIndex].Update(pData, Size);
+}
+
+
 void BufferAndMemory::Update(const void* pData, size_t Size)
 {
 	if (!m_pDevice) {

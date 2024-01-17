@@ -79,7 +79,7 @@ public:
 
 	BufferAndMemory CreateUniformBuffer(int Size);
 
-	void UpdateUniformBuffer(BufferAndMemory& Buffer, const void* pData, size_t Size);
+	void UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size);
 
 	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
 

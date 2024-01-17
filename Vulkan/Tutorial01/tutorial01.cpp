@@ -68,12 +68,18 @@ public:
 	{
 		uint32_t ImageIndex = m_vkCore.AcquireNextImage(m_presentCompleteSem);
 
+		UpdateUniformBuffers(ImageIndex);
+
 		m_vkCore.Submit(&m_cmdBufs[ImageIndex], m_presentCompleteSem, m_renderCompleteSem);
 
 		m_vkCore.QueuePresent(ImageIndex, m_renderCompleteSem);
 	}
 
 private:
+
+	struct UniformData {
+		Matrix4f WVP;
+	};
 
 	void CreateCommandBuffer()
 	{
@@ -130,6 +136,14 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+	void UpdateUniformBuffers(uint32_t ImageIndex)
+	{
+		static float foo = 0.0f;
+		Matrix4f Rotate;
+		Rotate.InitRotateTransform(0.0f, foo, 0.0f);
+		foo += 0.1f;
+		m_vkCore.UpdateUniformBuffer(ImageIndex, 0, &Rotate.m[0][0], sizeof(Matrix4f));
+	}
 
 	void CreateSemaphores()
 	{
