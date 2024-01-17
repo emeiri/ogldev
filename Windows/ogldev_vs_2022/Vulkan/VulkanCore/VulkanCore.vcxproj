@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp" />

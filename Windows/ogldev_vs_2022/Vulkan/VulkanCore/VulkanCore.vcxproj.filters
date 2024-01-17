@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\CommonOgldev">
+      <UniqueIdentifier>{4939a630-0e07-4638-86e9-269961108740}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vulkan">
+      <UniqueIdentifier>{a62c035f-b479-4bf3-abd5-ee7560353f39}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_core.h">
@@ -29,17 +35,20 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vulkan_core.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vulkan_core.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\math_3d.cpp">
+      <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
