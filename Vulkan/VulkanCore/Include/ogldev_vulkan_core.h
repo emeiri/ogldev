@@ -25,8 +25,8 @@
 
 #include "ogldev_math_3d.h"
 
-#include "vulkan_utils.h"
-#include "vk_device.h"
+#include "ogldev_vulkan_util.h"
+#include "ogldev_vulkan_device.h"
 
 namespace OgldevVK {
 

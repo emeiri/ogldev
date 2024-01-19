@@ -19,17 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\shader.h" />
-    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vk_device.h" />
-    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_core.h" />
-    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\vulkan_utils.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\core.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\device.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vk_device.cpp" />
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\vulkan_core.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_shader.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -128,7 +128,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

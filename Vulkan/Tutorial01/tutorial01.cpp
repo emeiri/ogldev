@@ -23,8 +23,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include "vulkan_core.h"
-#include "shader.h"
+#include "ogldev_vulkan_core.h"
+#include "ogldev_vulkan_shader.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080

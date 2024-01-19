@@ -26,8 +26,8 @@
 
 #include "ogldev_types.h"
 #include "ogldev_util.h"
-#include "vulkan_utils.h"
-#include "shader.h"
+#include "ogldev_vulkan_util.h"
+#include "ogldev_vulkan_shader.h"
 
 namespace OgldevVK {
 

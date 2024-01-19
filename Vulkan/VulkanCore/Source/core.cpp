@@ -18,7 +18,7 @@
 #include <vector>
 #include <assert.h>
 
-#include "vulkan_core.h"
+#include "ogldev_vulkan_core.h"
 
 namespace OgldevVK {
 
@@ -730,7 +730,7 @@ void VulkanCore::CreateDescriptorPool()
 
 	if (m_numUniformBuffers > 0) {
 		PoolSizes.push_back(VkDescriptorPoolSize{ .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-													.descriptorCount = (uint32_t)m_images.size() * m_numUniformBuffers });
+											  	  .descriptorCount = (uint32_t)m_images.size() * m_numUniformBuffers });
 	}
 
 	VkDescriptorPoolCreateInfo PoolInfo = { };
@@ -782,27 +782,24 @@ void VulkanCore::CreateDescriptorSet()
 	res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
 
-/*	for (size_t i = 0; i < m_images.size(); i++) {
+	for (size_t i = 0; i < m_images.size(); i++) {
 		VkDescriptorBufferInfo BufferInfo = {};
-		BufferInfo.buffer = vkState.uniformBuffers[i],
-			.offset = 0,
-			.range = sizeof(UniformBuffer)
-	};
+		BufferInfo.buffer = m_uniformBuffers[i][0].m_buffer;
+		BufferInfo.offset = 0;
+		BufferInfo.range = m_uniformDataSize;
 
-	const std::array<VkWriteDescriptorSet, 4> descriptorWrites = {
-		VkWriteDescriptorSet {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = vkState.descriptorSets[i],
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pBufferInfo = &bufferInfo
-		},
-	};
+		VkWriteDescriptorSet WriteDescriptorSet = {};
 
-	vkUpdateDescriptorSets(vkDev.device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-}*/
+		WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		WriteDescriptorSet.dstSet = m_descriptorSets[i];
+		WriteDescriptorSet.dstBinding = 0;
+		WriteDescriptorSet.dstArrayElement = 0;
+		WriteDescriptorSet.descriptorCount = 1;
+		WriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		WriteDescriptorSet.pBufferInfo = &BufferInfo;
+
+		vkUpdateDescriptorSets(m_device, 1, &WriteDescriptorSet, 0, NULL);
+	}
 }
 
 
