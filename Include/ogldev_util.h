@@ -30,7 +30,9 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
+#ifndef OGLDEV_VULKAN
 #include <GL/glew.h>
+#endif
 #include "ogldev_types.h"
 
 
@@ -76,6 +78,14 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 
 #define SAFE_DELETE(p) if (p) { delete p; p = NULL; }
 
+long long GetCurrentTimeMillis();
+
+
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices )
+
+#define NOT_IMPLEMENTED printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); exit(0);
+
+#ifndef OGLDEV_VULKAN
 #define GLExitIfError                                                          \
 {                                                                               \
     GLenum Error = glGetError();                                                \
@@ -87,14 +97,6 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 }
 
 #define GLCheckError() (glGetError() == GL_NO_ERROR)
-
-long long GetCurrentTimeMillis();
-
-
-#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices )
-
-#define NOT_IMPLEMENTED printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); exit(0);
-
 
 void gl_check_error(const char* function, const char *file, int line);
 
@@ -113,6 +115,7 @@ void glDebugOutput(GLenum source,
                    GLsizei length,
                    const char *message,
                    const void *userParam);
+#endif
 
 string GetDirFromFilename(const string& Filename);
 

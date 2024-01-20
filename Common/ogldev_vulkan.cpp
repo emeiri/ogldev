@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifdef VULKAN
+#ifdef OGLDEV_VULKAN
 
 #include <string>
 #include <stdio.h>
