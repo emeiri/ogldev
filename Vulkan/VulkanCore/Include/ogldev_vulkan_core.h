@@ -53,8 +53,6 @@ public:
 
 	void Init(const char* pAppName, int NumUniformBuffers, size_t UniformDataSize);
 
-	int GetQueue() const { return m_devAndQueue.Queue; }
-
 	VkDevice& GetDevice() { return m_device; }
 
 	int GetNumImages() const { return (int)m_images.size(); }
@@ -84,6 +82,10 @@ public:
 	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
 
 	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs);
+
+	VkPipelineLayout& GetPipelineLayout() { return m_pipelineLayout; }
+
+	VkDescriptorSet& GetDescriptorSet(int i) { return m_descriptorSets[i]; }
 
 private:
 

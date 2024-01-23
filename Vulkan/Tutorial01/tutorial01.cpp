@@ -125,6 +125,8 @@ private:
 
 			vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
+			vkCmdBindDescriptorSets(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_vkCore.GetPipelineLayout(), 0, 1, &m_vkCore.GetDescriptorSet(i), 0, nullptr);
+
 			vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
 
 			vkCmdEndRenderPass(m_cmdBufs[i]);
@@ -140,8 +142,8 @@ private:
 	{
 		static float foo = 0.0f;
 		Matrix4f Rotate;
-		Rotate.InitRotateTransform(0.0f, foo, 0.0f);
-		foo += 0.1f;
+		Rotate.InitRotateTransform(0.0f, 0.0f, foo);
+		foo += 0.01f;
 		m_vkCore.UpdateUniformBuffer(ImageIndex, 0, &Rotate.m[0][0], sizeof(Matrix4f));
 	}
 

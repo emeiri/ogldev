@@ -54,6 +54,7 @@ void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t Unifor
 	CreateDescriptorSet();
 }
 
+
 void VulkanCore::CreateInstance(const char* pAppName)
 {
 	std::vector<const char*> ValidationLayers = {
@@ -113,7 +114,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
 }
 
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL ReportCallback(VkDebugReportFlagsEXT      flags,
+static VKAPI_ATTR VkBool32 VKAPI_CALL ReportCallback(VkDebugReportFlagsEXT flags,
 	VkDebugReportObjectTypeEXT objectType,
 	uint64_t                   object,
 	size_t                     location,
@@ -363,6 +364,7 @@ void VulkanCore::Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompl
 	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
 }
 
+
 void VulkanCore::QueuePresent(uint32_t ImageIndex, VkSemaphore RenderCompleteSem)
 {
 	VkPresentInfoKHR presentInfo = {};
@@ -376,6 +378,7 @@ void VulkanCore::QueuePresent(uint32_t ImageIndex, VkSemaphore RenderCompleteSem
 	VkResult res = vkQueuePresentKHR(m_queue, &presentInfo);
 	CHECK_VK_RESULT(res, "vkQueuePresentKHR\n");
 }
+
 
 VkSemaphore VulkanCore::CreateSemaphore()
 {
@@ -416,14 +419,41 @@ void VulkanCore::CreateRenderPass()
 	attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 	attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
 
-	VkRenderPassCreateInfo renderPassCreateInfo = {};
-	renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassCreateInfo.attachmentCount = 1;
-	renderPassCreateInfo.pAttachments = &attachDesc;
-	renderPassCreateInfo.subpassCount = 1;
-	renderPassCreateInfo.pSubpasses = &subpassDesc;
+#if 0
+	VkAttachmentDescription depthAttachment = {
+		.flags = 0,
+		.format = useDepth ? findDepthFormat(vkDev.physicalDevice) : VK_FORMAT_D32_SFLOAT,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.loadOp = offscreenInt ? VK_ATTACHMENT_LOAD_OP_LOAD : (ci.clearDepth_ ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD),
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+		.initialLayout = ci.clearDepth_ ? VK_IMAGE_LAYOUT_UNDEFINED : (offscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL),
+		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	};
 
-	VkResult res = vkCreateRenderPass(m_device, &renderPassCreateInfo, NULL, &m_renderPass);
+	const VkAttachmentReference depthAttachmentRef = {
+		.attachment = 1,
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	};
+#endif
+
+	VkSubpassDependency Dependency = {};
+	Dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	Dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	Dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	Dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	VkRenderPassCreateInfo RenderPassCreateInfo = {};
+	RenderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	RenderPassCreateInfo.attachmentCount = 1;
+	RenderPassCreateInfo.pAttachments = &attachDesc;
+	RenderPassCreateInfo.subpassCount = 1;
+	RenderPassCreateInfo.pSubpasses = &subpassDesc;
+	RenderPassCreateInfo.dependencyCount = 1;
+	RenderPassCreateInfo.pDependencies = &Dependency;
+
+	VkResult res = vkCreateRenderPass(m_device, &RenderPassCreateInfo, NULL, &m_renderPass);
 	CHECK_VK_RESULT(res, "vkCreateRenderPass\n");
 
 	printf("Created a render pass\n");
@@ -464,8 +494,8 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 
 	VkBuffer StagingVB;
 	VkDeviceMemory StagingVBMem;
-	VkDeviceSize AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		StagingVB, StagingVBMem);
+	VkDeviceSize AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+		                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
 
 	void* MappedMemAddr = NULL;
 	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
@@ -475,7 +505,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
 	VkBuffer vb;
 	VkDeviceMemory vbMem;
 	AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+		                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
 	CopyBuffer(vb, StagingVB, verticesSize);
 
@@ -488,8 +518,7 @@ BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
 	BufferAndMemory Buffer(&m_device);
 
 	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		Buffer.m_buffer, Buffer.m_mem);
+		                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Buffer.m_buffer, Buffer.m_mem);
 
 	return Buffer;
 }
@@ -527,7 +556,6 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 
 	return MemAllocInfo.allocationSize;
 }
-
 
 
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
@@ -606,6 +634,7 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
 	shaderStageCreateInfo[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
 	shaderStageCreateInfo[0].module = vs;
 	shaderStageCreateInfo[0].pName = "main";
+
 	shaderStageCreateInfo[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStageCreateInfo[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 	shaderStageCreateInfo[1].module = fs;
@@ -617,6 +646,7 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
 	VkPipelineInputAssemblyStateCreateInfo pipelineIACreateInfo = {};
 	pipelineIACreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	pipelineIACreateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	pipelineIACreateInfo.primitiveRestartEnable = VK_FALSE;
 
 	int WindowWidth, WindowHeight;
 	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
@@ -645,45 +675,33 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
 	VkPipelineRasterizationStateCreateInfo rastCreateInfo = {};
 	rastCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rastCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
-	rastCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	rastCreateInfo.cullMode = VK_CULL_MODE_NONE;
 	rastCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	rastCreateInfo.lineWidth = 1.0f;
 
 	VkPipelineMultisampleStateCreateInfo pipelineMSCreateInfo = {};
 	pipelineMSCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	pipelineMSCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+	pipelineMSCreateInfo.sampleShadingEnable = VK_FALSE;
+	pipelineMSCreateInfo.minSampleShading = 1.0f;
 
 	VkPipelineColorBlendAttachmentState blendAttachState = {};
-	blendAttachState.colorWriteMask = 0xf;
+	blendAttachState.blendEnable = VK_FALSE;
+	blendAttachState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
 	VkPipelineColorBlendStateCreateInfo blendCreateInfo = {};
 	blendCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	blendCreateInfo.logicOpEnable = VK_FALSE;
 	blendCreateInfo.logicOp = VK_LOGIC_OP_COPY;
 	blendCreateInfo.attachmentCount = 1;
 	blendCreateInfo.pAttachments = &blendAttachState;
 
-	VkDescriptorSetLayoutBinding layoutBinding = {};
-	layoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	layoutBinding.descriptorCount = 1;
-	layoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-	layoutBinding.pImmutableSamplers = NULL;
-
-	VkDescriptorSetLayoutCreateInfo descriptorLayout = {};
-	descriptorLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorLayout.pNext = NULL;
-	descriptorLayout.bindingCount = 1;
-	descriptorLayout.pBindings = &layoutBinding;
-
-	VkDescriptorSetLayout descriptorSetLayout;
-	VkResult res = vkCreateDescriptorSetLayout(m_device, &descriptorLayout, NULL, &descriptorSetLayout);
-	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout\n");
-
 	VkPipelineLayoutCreateInfo layoutInfo = {};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	layoutInfo.setLayoutCount = 1;
-	layoutInfo.pSetLayouts = &descriptorSetLayout;
+	layoutInfo.pSetLayouts = &m_descriptorSetLayout;
 
-	res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &m_pipelineLayout);
+	VkResult res = vkCreatePipelineLayout(m_device, &layoutInfo, NULL, &m_pipelineLayout);
 	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
@@ -698,7 +716,9 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
 	pipelineInfo.pColorBlendState = &blendCreateInfo;
 	pipelineInfo.layout = m_pipelineLayout;
 	pipelineInfo.renderPass = m_renderPass;
+	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineIndex = -1;
+	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 	VkPipeline Pipeline;
 	res = vkCreateGraphicsPipelines(m_device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &Pipeline);
@@ -728,17 +748,16 @@ void VulkanCore::CreateDescriptorPool()
 {
 	std::vector<VkDescriptorPoolSize> PoolSizes;
 
-	if (m_numUniformBuffers > 0) {
-		PoolSizes.push_back(VkDescriptorPoolSize{ .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-											  	  .descriptorCount = (uint32_t)m_images.size() * m_numUniformBuffers });
-	}
+	VkDescriptorPoolSize DescPoolSize = {};
+	DescPoolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	DescPoolSize.descriptorCount = (uint32_t)m_images.size() * m_numUniformBuffers;
 
 	VkDescriptorPoolCreateInfo PoolInfo = { };
 
 	PoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	PoolInfo.maxSets = (uint32_t)m_images.size();
-	PoolInfo.poolSizeCount = (uint32_t)PoolSizes.size();
-	PoolInfo.pPoolSizes = PoolSizes.data();
+	PoolInfo.poolSizeCount = 1;
+	PoolInfo.pPoolSizes = &DescPoolSize;
 
 	VkResult res = vkCreateDescriptorPool(m_device, &PoolInfo, NULL, &m_descriptorPool);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
@@ -748,8 +767,6 @@ void VulkanCore::CreateDescriptorPool()
 
 void VulkanCore::CreateDescriptorSet()
 {
-	std::vector<VkDescriptorSetLayoutBinding> Bindings;
-
 	VkDescriptorSetLayoutBinding LayoutBinding = {};
 
 	LayoutBinding.binding = 0;
@@ -757,14 +774,12 @@ void VulkanCore::CreateDescriptorSet()
 	LayoutBinding.descriptorCount = 1;
 	LayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	Bindings.push_back(LayoutBinding);
-
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {};
 
 	LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	LayoutInfo.flags = 0;
-	LayoutInfo.bindingCount = static_cast<uint32_t>(Bindings.size());
-	LayoutInfo.pBindings = Bindings.data();
+	LayoutInfo.bindingCount = 1;
+	LayoutInfo.pBindings = &LayoutBinding;
 
 	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
