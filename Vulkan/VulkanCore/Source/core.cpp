@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include "ogldev_vulkan_core.h"
+#include "3rdparty/stb_image.h"
 
 namespace OgldevVK {
 
@@ -556,6 +557,105 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 
 	return MemAllocInfo.allocationSize;
 }
+
+
+void VulkanCore::CreateTextureImage(const char* filename, TextureAndMemory& Tex)
+{
+	int ImageWidth = 0;
+	int ImageHeight = 0;
+	int ImageChannels = 0;
+
+	stbi_uc* pPixels = stbi_load(filename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
+
+	if (!pPixels) {
+		printf("Error loading texture from '%s'\n", filename);
+		exit(1);
+	}
+
+	int LayerCount = 1;
+	VkImageCreateFlags Flags = 0;
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, VK_FORMAT_R8G8B8A8_UNORM, LayerCount, Flags);
+
+	stbi_image_free(pPixels);
+}
+
+
+void VulkanCore::CreateTextureImageFromData(TextureAndMemory& Tex, const void* pPixels, uint32_t ImageWidth, uint32_t ImageHeight,
+											VkFormat TexFormat, uint32_t LayerCount, VkImageCreateFlags CreateFlags)
+{
+	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, VK_IMAGE_TILING_OPTIMAL, (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
+		        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, CreateFlags, 1);
+
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, VK_IMAGE_LAYOUT_UNDEFINED);
+}
+
+
+void VulkanCore::CreateImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling,
+	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, uint32_t MipLevels)
+{
+	const VkImageCreateInfo ImageInfo = {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+		.pNext = nullptr,
+		.flags = CreateFlags,
+		.imageType = VK_IMAGE_TYPE_2D,
+		.format = TexFormat,
+		.extent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 },
+		.mipLevels = MipLevels,
+		.arrayLayers = (uint32_t)((CreateFlags == VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) ? 6 : 1),
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.tiling = ImageTiling,
+		.usage = UsageFlags,
+		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 0,
+		.pQueueFamilyIndices = nullptr,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
+	};
+
+	VkResult res = vkCreateImage(m_device, &ImageInfo, nullptr, &Tex.m_image);
+	CHECK_VK_RESULT(res, "vkCreateImage error");
+
+	VkMemoryRequirements MemReqs;
+	vkGetImageMemoryRequirements(m_device, Tex.m_image, &MemReqs);
+
+	uint32_t MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, PropertyFlags);
+
+	const VkMemoryAllocateInfo allocInfo = {
+		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+		.pNext = nullptr,
+		.allocationSize = MemReqs.size,
+		.memoryTypeIndex = MemoryTypeIndex
+	};
+
+	res = vkAllocateMemory(m_device, &allocInfo, NULL, &Tex.m_mem);
+	CHECK_VK_RESULT(res, "vkAllocateMemory error");
+
+	vkBindImageMemory(m_device, Tex.m_image, Tex.m_mem, 0);
+}
+
+
+void VulkanCore::UpdateTextureImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, uint32_t LayerCount, const void* pPixels, VkImageLayout SourceImageLayout)
+{
+	uint32_t BytesPerPixel = GetBytesPerTexFormat(TexFormat);
+
+	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
+	VkDeviceSize ImageSize = LayerSize * LayerCount;
+
+	VkBuffer StagingBuffer;
+	VkDeviceMemory StagingBufferMemory;
+
+	VkDeviceSize AllocationSize = CreateBuffer(ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingBuffer, StagingBufferMemory);
+
+	UploadBufferData(StagingBufferMemory, 0, pPixels, ImageSize);
+
+	TransitionImageLayout(textureImage, texFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layerCount);
+	CopyBufferToImage(StagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), layerCount);
+	TransitionImageLayout(vkDev, textureImage, texFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, layerCount);
+
+	vkDestroyBuffer(m_device, stagingBuffer, nullptr);
+	vkFreeMemory(m_device, StagingBufferMemory, nullptr);
+}
+
 
 
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)

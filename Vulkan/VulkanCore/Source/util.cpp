@@ -1,4 +1,5 @@
 /*
+
 		Copyright 2024 Etay Meiri
 
 	This program is free software: you can redistribute it and/or modify
@@ -15,17 +16,34 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include <vulkan/vulkan.h>
 
-#include <stdio.h>
+#include "ogldev_vulkan_util.h"
 
-typedef unsigned int uint;
-
-#define CHECK_VK_RESULT(res, msg) \
-	if (res != VK_SUCCESS) {      \
-		fprintf(stderr, "Error in %s:%d - %s, code %x\n", __FILE__, __LINE__, msg, res);  \
-		exit(1);	\
+uint32_t GetBytesPerTexFormat(VkFormat Format)
+{
+	switch (Format)
+	{
+	case VK_FORMAT_R8_SINT:
+	case VK_FORMAT_R8_UNORM:
+		return 1;
+	case VK_FORMAT_R16_SFLOAT:
+		return 2;
+	case VK_FORMAT_R16G16_SFLOAT:
+		return 4;
+	case VK_FORMAT_R16G16_SNORM:
+		return 4;
+	case VK_FORMAT_B8G8R8A8_UNORM:
+		return 4;
+	case VK_FORMAT_R8G8B8A8_UNORM:
+		return 4;
+	case VK_FORMAT_R16G16B16A16_SFLOAT:
+		return 4 * sizeof(uint16_t);
+	case VK_FORMAT_R32G32B32A32_SFLOAT:
+		return 4 * sizeof(float);
+	default:
+		break;
 	}
 
-
-uint32_t GetBytesPerTexFormat(VkFormat Format);
+	return 0;
+}

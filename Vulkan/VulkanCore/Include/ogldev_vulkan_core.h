@@ -46,6 +46,12 @@ private:
 	VkDevice* m_pDevice = NULL;
 };
 
+
+struct TextureAndMemory {
+	VkImage m_image = NULL;
+	VkDeviceMemory m_mem = NULL;
+};
+
 class VulkanCore {
 public:
 	VulkanCore(GLFWwindow* pWindow);
@@ -77,6 +83,8 @@ public:
 
 	BufferAndMemory CreateUniformBuffer(int Size);
 
+	void CreateTextureImage(const char* filename, TextureAndMemory& Tex);
+
 	void UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size);
 
 	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
@@ -106,7 +114,15 @@ private:
 	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
 	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
-					  VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+	void CreateTextureImageFromData(TextureAndMemory& Tex, const void* pPixels, uint32_t ImageWidth, uint32_t ImageHeight,
+									VkFormat TexFormat, uint32_t LayerCount, VkImageCreateFlags Flags);
+
+	void CreateImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
+		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, uint32_t MipLevels);
+
+	void UpdateTextureImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, uint32_t LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
 
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_messenger;
