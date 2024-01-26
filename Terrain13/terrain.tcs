@@ -2,11 +2,17 @@
 
 layout (vertices = 4) out;
 
+in vec2 Tex1[];
+
+out vec2 Tex2[];
+
 uniform mat4 gVP;
 
 void main()
 {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    Tex2[gl_InvocationID] = Tex1[gl_InvocationID];
+
     const int MIN_TESS_LEVEL = 4;
     const int MAX_TESS_LEVEL = 64;
     const float MIN_DISTANCE = 20;

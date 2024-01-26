@@ -2,7 +2,7 @@
 
 layout(location = 0) out vec4 FragColor;
 
-in vec2 Tex;
+in vec2 Tex3;
 in vec3 WorldPos;
 in vec3 Normal;
 
@@ -25,27 +25,27 @@ vec4 CalcTexColor()
     float Height = WorldPos.y;
 
     if (Height < gHeight0) {
-       TexColor = texture(gTextureHeight0, Tex);
+       TexColor = texture(gTextureHeight0, Tex3);
     } else if (Height < gHeight1) {
-       vec4 Color0 = texture(gTextureHeight0, Tex);
-       vec4 Color1 = texture(gTextureHeight1, Tex);
+       vec4 Color0 = texture(gTextureHeight0, Tex3);
+       vec4 Color1 = texture(gTextureHeight1, Tex3);
        float Delta = gHeight1 - gHeight0;
        float Factor = (Height - gHeight0) / Delta;
        TexColor = mix(Color0, Color1, Factor);
     } else if (Height < gHeight2) {
-       vec4 Color0 = texture(gTextureHeight1, Tex);
-       vec4 Color1 = texture(gTextureHeight2, Tex);
+       vec4 Color0 = texture(gTextureHeight1, Tex3);
+       vec4 Color1 = texture(gTextureHeight2, Tex3);
        float Delta = gHeight2 - gHeight1;
        float Factor = (Height - gHeight1) / Delta;
        TexColor = mix(Color0, Color1, Factor);
     } else if (Height < gHeight3) {
-       vec4 Color0 = texture(gTextureHeight2, Tex);
-       vec4 Color1 = texture(gTextureHeight3, Tex);
+       vec4 Color0 = texture(gTextureHeight2, Tex3);
+       vec4 Color1 = texture(gTextureHeight3, Tex3);
        float Delta = gHeight3 - gHeight2;
        float Factor = (Height - gHeight2) / Delta;
        TexColor = mix(Color0, Color1, Factor);
     } else {
-       TexColor = texture(gTextureHeight3, Tex);
+       TexColor = texture(gTextureHeight3, Tex3);
     }
 
     return TexColor;
@@ -54,9 +54,9 @@ vec4 CalcTexColor()
 
 void main()
 {
-   /* vec4 TexColor = CalcTexColor();
+    vec4 TexColor = CalcTexColor();
 
-    vec3 Normal_ = normalize(Normal);
+ /*   vec3 Normal_ = normalize(Normal);
 
     float Diffuse = dot(Normal_, gReversedLightDir);
 
@@ -64,5 +64,5 @@ void main()
 
     FragColor = Color * TexColor * Diffuse;*/
 
-    FragColor = vec4(1.0);
+    FragColor = TexColor;
 }
