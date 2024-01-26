@@ -332,7 +332,7 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
-    int m_terrainSize = 32;
+    int m_terrainSize = 60;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 400.0f;
