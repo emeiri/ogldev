@@ -191,7 +191,7 @@ public:
                 m_pGameCamera->Print();
                 break;
 
-            case GLFW_KEY_W:
+            case GLFW_KEY_Z:
                 m_isWireframe = !m_isWireframe;
 
                 if (m_isWireframe) {
