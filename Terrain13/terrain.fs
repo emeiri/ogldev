@@ -2,7 +2,6 @@
 
 layout(location = 0) out vec4 FragColor;
 
-in vec4 Color;
 in vec2 Tex;
 in vec3 WorldPos;
 in vec3 Normal;
@@ -55,7 +54,7 @@ vec4 CalcTexColor()
 
 void main()
 {
-    vec4 TexColor = CalcTexColor();
+   /* vec4 TexColor = CalcTexColor();
 
     vec3 Normal_ = normalize(Normal);
 
@@ -63,5 +62,7 @@ void main()
 
     Diffuse = max(0.3f, Diffuse);
 
-    FragColor = Color * TexColor * Diffuse;
+    FragColor = Color * TexColor * Diffuse;*/
+
+    FragColor = vec4(1.0);
 }

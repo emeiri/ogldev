@@ -39,7 +39,7 @@ BaseTerrain::~BaseTerrain()
 void BaseTerrain::Destroy()
 {
     m_heightMap.Destroy();
-    m_geomipGrid.Destroy();
+    m_quadList.Destroy();
 }
 
 
@@ -72,7 +72,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 
 void BaseTerrain::Finalize()
 {
-    m_geomipGrid.CreateGeomipGrid(m_terrainSize, m_terrainSize, m_patchSize, this);
+    m_quadList.CreateQuadList(m_terrainSize, m_terrainSize, this);
 }
 
 
@@ -108,7 +108,7 @@ void BaseTerrain::LoadFromFile(const char* pFilename)
     // how do we know the patch size at this point?
     assert(0);
 
-    m_geomipGrid.CreateGeomipGrid(m_terrainSize, m_terrainSize, m_patchSize, this);
+    m_quadList.CreateQuadList(m_terrainSize, m_terrainSize, this);
 }
 
 
@@ -170,7 +170,7 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 	
     m_terrainTech.SetLightDir(m_lightDir);
 
-    m_geomipGrid.Render(Camera.GetPos(), VP);
+    m_quadList.Render();
 
     m_pSkydome->Render(Camera);
 }

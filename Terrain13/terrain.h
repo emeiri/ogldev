@@ -24,7 +24,7 @@
 #include "ogldev_array_2d.h"
 #include "ogldev_texture.h"
 
-#include "geomip_grid.h"
+#include "quad_list.h"
 #include "terrain_technique.h"
 #include "ogldev_skydome.h"
 
@@ -85,7 +85,7 @@ class BaseTerrain
     float m_textureScale = 1.0f;
 
 private:
-    GeomipGrid m_geomipGrid;
+    QuadList m_quadList;
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;
     TerrainTechnique m_terrainTech;

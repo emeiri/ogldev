@@ -44,6 +44,7 @@
     <ClCompile Include="..\..\..\Terrain13\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_demo13.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\Terrain13\quad_list.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -80,6 +81,7 @@
     <ClInclude Include="..\..\..\Terrain13\terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain13\texture_config.h" />
+    <ClInclude Include="..\..\..\Terrain13\quad_list.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\skydome.fs">
@@ -92,6 +94,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\Terrain13\terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain13\terrain.tcs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Terrain13\terrain.tes">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

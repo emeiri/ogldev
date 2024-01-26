@@ -39,6 +39,7 @@
     <ClCompile Include="..\..\..\Terrain13\geomip_grid.cpp" />
     <ClCompile Include="..\..\..\Terrain13\lod_manager.cpp" />
     <ClCompile Include="..\..\..\Terrain13\midpoint_disp_terrain.cpp" />
+    <ClCompile Include="..\..\..\Terrain13\quad_list.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_demo13.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_technique.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="..\..\..\Terrain13\geomip_grid.h" />
     <ClInclude Include="..\..\..\Terrain13\lod_manager.h" />
     <ClInclude Include="..\..\..\Terrain13\midpoint_disp_terrain.h" />
+    <ClInclude Include="..\..\..\Terrain13\quad_list.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain_technique.h" />
     <ClInclude Include="..\..\..\Terrain13\texture_config.h" />
@@ -65,6 +67,8 @@
     <None Include="..\..\..\Common\Shaders\skydome.fs" />
     <None Include="..\..\..\Common\Shaders\skydome.vs" />
     <None Include="..\..\..\Terrain13\terrain.fs" />
+    <None Include="..\..\..\Terrain13\terrain.tcs" />
+    <None Include="..\..\..\Terrain13\terrain.tes" />
     <None Include="..\..\..\Terrain13\terrain.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

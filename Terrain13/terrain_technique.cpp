@@ -34,6 +34,14 @@ bool TerrainTechnique::Init()
         return false;
     }
 
+    if (!AddShader(GL_TESS_CONTROL_SHADER, "terrain.tcs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_TESS_EVALUATION_SHADER, "terrain.tes")) {
+        return false;
+    }
+
     if (!AddShader(GL_FRAGMENT_SHADER, "terrain.fs")) {
         return false;
     }
@@ -67,7 +75,7 @@ bool TerrainTechnique::Init()
         m_tex2HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex3HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION) {
-        return false;
+     //   return false;
     }
 
     Enable();
@@ -79,7 +87,7 @@ bool TerrainTechnique::Init()
 
     glUseProgram(0);
 
-    return true;
+ //   return true;
 }
 
 
