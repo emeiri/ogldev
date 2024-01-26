@@ -335,7 +335,7 @@ private:
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 400.0f;
-    int m_patchSize = 16;
+    int m_patchSize = 32;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;
 };

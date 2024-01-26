@@ -78,7 +78,7 @@ class BaseTerrain
     float GetWorldHeight(float x, float z) const;
 
     int m_terrainSize = 0;
-    int m_patchSize = 0;
+    int m_numPatches = 0;
 	float m_worldScale = 1.0f;
     Array2D<float> m_heightMap;
     Texture* m_pTextures[4] = { 0 };

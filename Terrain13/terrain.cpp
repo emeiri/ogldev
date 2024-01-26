@@ -73,7 +73,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, float QuadSi
 
 void BaseTerrain::Finalize()
 {
-    m_quadList.CreateQuadList(m_terrainSize, m_terrainSize, m_quadSize, this);
+    m_quadList.CreateQuadList(m_numPatches, m_numPatches, this);
 }
 
 
@@ -109,7 +109,7 @@ void BaseTerrain::LoadFromFile(const char* pFilename)
     // how do we know the patch size at this point?
     assert(0);
 
-    m_quadList.CreateQuadList(m_terrainSize, m_terrainSize, m_quadSize, this);
+    m_quadList.CreateQuadList(m_numPatches, m_numPatches, this);
 }
 
 

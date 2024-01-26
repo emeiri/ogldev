@@ -52,11 +52,10 @@ void QuadList::Destroy()
 }
 
 
-void QuadList::CreateQuadList(int Width, int Depth, float QuadSize, const BaseTerrain* pTerrain)
+void QuadList::CreateQuadList(int Width, int Depth, const BaseTerrain* pTerrain)
 {
 	m_width = Width;
     m_depth = Depth;
-    m_quadSize = QuadSize;
 
     CreateGLState();
 
@@ -123,7 +122,7 @@ void QuadList::Vertex::InitVertex(const BaseTerrain* pTerrain, int Width, int De
 
     float TextureScale = pTerrain->GetTextureScale();
     Tex = Vector2f(TextureScale * (float)x / (float)Width, TextureScale * (float)z / (float)Depth);	
-    Tex.Print();
+ //   Tex.Print();
 }
 
 

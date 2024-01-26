@@ -18,7 +18,7 @@
 
 #include "midpoint_disp_terrain.h"
 
-void MidpointDispTerrain::CreateMidpointDisplacement(int TerrainSize, int PatchSize, float Roughness, float MinHeight, float MaxHeight)
+void MidpointDispTerrain::CreateMidpointDisplacement(int TerrainSize, int NumPatches, float Roughness, float MinHeight, float MaxHeight)
 {
     if (Roughness < 0.0f) {
         printf("%s: roughness must be positive - %f\n", __FUNCTION__, Roughness);
@@ -26,7 +26,7 @@ void MidpointDispTerrain::CreateMidpointDisplacement(int TerrainSize, int PatchS
     }
 
     m_terrainSize = TerrainSize;
-    m_patchSize = PatchSize;
+    m_numPatches = NumPatches;
 
     SetMinMaxHeight(MinHeight, MaxHeight);
 
