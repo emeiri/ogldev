@@ -271,6 +271,9 @@ private:
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
+        Pos = Vector3f(3840.0f, 151.946808f, 3840.0f);
+        Target = Vector3f(-0.896419f, -0.443071f, 0.010951f);
+
         float FOV = 45.0f;
         float zNear = 0.1f;
         float zFar = Z_FAR;
@@ -283,8 +286,8 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 64.0f;
-        float TextureScale = 16.0f;
+        float WorldScale = 128.0f;
+        float TextureScale = 1.0f;
 
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
@@ -381,7 +384,7 @@ int main(int argc, char** argv)
     app->Init();
 
     glClearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 0.0f);
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);

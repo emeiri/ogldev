@@ -24,15 +24,20 @@ void main()
 
   //Tex3 = vec2(u,v);
 
-    vec4 p0 = gl_in[0].gl_Position;
-    vec4 p1 = gl_in[1].gl_Position;
-    vec4 p2 = gl_in[2].gl_Position;
-    vec4 p3 = gl_in[3].gl_Position;
+    vec4 p00 = gl_in[0].gl_Position;
+    vec4 p01 = gl_in[1].gl_Position;
+    vec4 p10 = gl_in[2].gl_Position;
+    vec4 p11 = gl_in[3].gl_Position;
 
-    vec4 p = p0 * (1.0 - u) * (1.0 - v) + 
-             p1 * u * (1.0 - v) +
-             p3 * v * (1.0 - u) +
-             p2 * u * v;
+    // compute patch surface normal
+    vec4 uVec = p01 - p00;
+    vec4 vVec = p10 - p00;
+    vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
+
+    // bilinearly interpolate position coordinate across patch
+    vec4 p0 = (p01 - p00) * u + p00;
+    vec4 p1 = (p11 - p10) * u + p10;
+    vec4 p = (p1 - p0) * v + p0;
 
     gl_Position = gVP * p;
 }
