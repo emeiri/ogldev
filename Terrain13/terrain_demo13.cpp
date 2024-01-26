@@ -108,7 +108,7 @@ public:
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
                     srand(g_seed);
-                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
+                    m_terrain.CreateMidpointDisplacement(m_terrainSize, m_numPatches, m_roughness, m_minHeight, m_maxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
 
@@ -285,6 +285,7 @@ private:
     {
         float WorldScale = 64.0f;
         float TextureScale = 16.0f;
+
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
         TextureFilenames.push_back("../Content/textures/coast_sand_rocks_02_diff_2k.jpg");        
@@ -293,7 +294,7 @@ private:
 
         m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
-        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
+        m_terrain.CreateMidpointDisplacement(m_terrainSize, m_numPatches, m_roughness, m_minHeight, m_maxHeight);
 
         Vector3f LightDir(0.0f, -1.0f, 0.0f);
 
@@ -335,7 +336,7 @@ private:
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 400.0f;
-    int m_patchSize = 32;
+    int m_numPatches = 32;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;
 };
