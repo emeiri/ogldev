@@ -291,7 +291,7 @@ private:
         TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");
         TextureFilenames.push_back("../Content/textures/water.png");
 
-        m_terrain.InitTerrain(WorldScale, TextureScale, (float)m_patchSize, TextureFilenames);
+        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
 
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
 

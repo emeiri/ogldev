@@ -37,7 +37,7 @@ class BaseTerrain
 
     void Destroy();
 
-	void InitTerrain(float WorldScale, float TextureScale, float QuadSize, const std::vector<string>& TextureFilenames);
+	void InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames);
 
     void Render(const BasicCamera& Camera);
 
@@ -83,7 +83,6 @@ class BaseTerrain
     Array2D<float> m_heightMap;
     Texture* m_pTextures[4] = { 0 };
     float m_textureScale = 1.0f;
-    float m_quadSize = 0.0f;
 
 private:
     QuadList m_quadList;

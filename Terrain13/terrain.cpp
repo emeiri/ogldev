@@ -44,7 +44,7 @@ void BaseTerrain::Destroy()
 
 
 
-void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, float QuadSize, const std::vector<string>& TextureFilenames)
+void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames)
 {
     if (!m_terrainTech.Init()) {
         printf("Error initializing tech\n");
@@ -59,7 +59,6 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, float QuadSi
 
     m_worldScale = WorldScale;
     m_textureScale = TextureScale;
-    m_quadSize = QuadSize;
 
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
