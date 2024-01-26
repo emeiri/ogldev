@@ -45,7 +45,7 @@ class QuadList {
         Vector3f Pos;
         Vector2f Tex;
 
-        void InitVertex(const BaseTerrain* pTerrain, float x, float z);
+        void InitVertex(const BaseTerrain* pTerrain, int Width, int Depth, int x, int z);
     };
 
     void CreateGLState();

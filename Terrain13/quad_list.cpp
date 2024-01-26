@@ -115,14 +115,15 @@ void QuadList::PopulateBuffers(const BaseTerrain* pTerrain)
 }
 
 
-void QuadList::Vertex::InitVertex(const BaseTerrain* pTerrain, float x, float z)
+void QuadList::Vertex::InitVertex(const BaseTerrain* pTerrain, int Width, int Depth, int x, int z)
 {
 	float WorldScale = pTerrain->GetWorldScale();
 	Pos = Vector3f(x * WorldScale, 0.0f, z * WorldScale);
-	
-    float Size = (float)pTerrain->GetSize();
+    //Pos.Print();
+
     float TextureScale = pTerrain->GetTextureScale();
-    Tex = Vector2f(TextureScale * (float)x / Size, TextureScale * (float)z / Size);	
+    Tex = Vector2f(TextureScale * (float)x / (float)Width, TextureScale * (float)z / (float)Depth);	
+    Tex.Print();
 }
 
 
@@ -133,7 +134,7 @@ void QuadList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Ve
     for (int z = 0 ; z < m_depth ; z++) {
         for (int x = 0 ; x < m_width ; x++) {
             assert(Index < Vertices.size());
-			Vertices[Index].InitVertex(pTerrain, (float)x * m_quadSize, (float)z * m_quadSize);
+			Vertices[Index].InitVertex(pTerrain, m_width, m_depth, x, z);
 			Index++;
         }
     }

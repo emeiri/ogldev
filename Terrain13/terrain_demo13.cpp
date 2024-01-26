@@ -283,7 +283,7 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 4.0f;
+        float WorldScale = 64.0f;
         float TextureScale = 16.0f;
         std::vector<string> TextureFilenames;
         TextureFilenames.push_back("../Content/textures/rocky_trail_02_diff_1k.jpg");
