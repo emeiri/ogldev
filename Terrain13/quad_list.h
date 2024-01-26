@@ -33,7 +33,7 @@ class QuadList {
 
     ~QuadList();
 
-    void CreateQuadList(int Width, int Depth, const BaseTerrain* pTerrain);
+    void CreateQuadList(int Width, int Depth, float QuadSize, const BaseTerrain* pTerrain);
 
     void Destroy();
 
@@ -45,7 +45,7 @@ class QuadList {
         Vector3f Pos;
         Vector2f Tex;
 
-        void InitVertex(const BaseTerrain* pTerrain, int x, int z);
+        void InitVertex(const BaseTerrain* pTerrain, float x, float z);
     };
 
     void CreateGLState();
@@ -56,6 +56,7 @@ class QuadList {
 
     int m_width = 0;
     int m_depth = 0;
+    float m_quadSize = 0.0f;
     GLuint m_vao = 0;
     GLuint m_vb = 0;
     GLuint m_ib = 0;

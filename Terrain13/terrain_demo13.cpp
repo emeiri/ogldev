@@ -291,7 +291,7 @@ private:
         TextureFilenames.push_back("../Content/textures/brown_mud_leaves_01_diff_2k.jpg");
         TextureFilenames.push_back("../Content/textures/water.png");
 
-        m_terrain.InitTerrain(WorldScale, TextureScale, TextureFilenames);
+        m_terrain.InitTerrain(WorldScale, TextureScale, (float)m_patchSize, TextureFilenames);
 
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
 
@@ -331,11 +331,11 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
-    int m_terrainSize = 513;
+    int m_terrainSize = 32;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 400.0f;
-    int m_patchSize = 17;
+    int m_patchSize = 16;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;
 };

@@ -52,10 +52,11 @@ void QuadList::Destroy()
 }
 
 
-void QuadList::CreateQuadList(int Width, int Depth, const BaseTerrain* pTerrain)
+void QuadList::CreateQuadList(int Width, int Depth, float QuadSize, const BaseTerrain* pTerrain)
 {
 	m_width = Width;
     m_depth = Depth;
+    m_quadSize = QuadSize;
 
     CreateGLState();
 
@@ -114,12 +115,10 @@ void QuadList::PopulateBuffers(const BaseTerrain* pTerrain)
 }
 
 
-void QuadList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
+void QuadList::Vertex::InitVertex(const BaseTerrain* pTerrain, float x, float z)
 {
-    float y = pTerrain->GetHeight(x, z);
-
 	float WorldScale = pTerrain->GetWorldScale();
-	Pos = Vector3f(x * WorldScale, y, z * WorldScale);
+	Pos = Vector3f(x * WorldScale, 0.0f, z * WorldScale);
 	
     float Size = (float)pTerrain->GetSize();
     float TextureScale = pTerrain->GetTextureScale();
@@ -134,7 +133,7 @@ void QuadList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Ve
     for (int z = 0 ; z < m_depth ; z++) {
         for (int x = 0 ; x < m_width ; x++) {
             assert(Index < Vertices.size());
-			Vertices[Index].InitVertex(pTerrain, x, z);
+			Vertices[Index].InitVertex(pTerrain, (float)x * m_quadSize, (float)z * m_quadSize);
 			Index++;
         }
     }
