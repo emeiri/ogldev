@@ -74,7 +74,7 @@ void Texture::Load(const std::string& Filename)
 }
 
 
-void Texture::LoadRaw(int Width, int Height, int BPP, unsigned char* pImageData)
+void Texture::LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData)
 {
     m_imageWidth = Width;
     m_imageHeight = Height;
@@ -84,7 +84,7 @@ void Texture::LoadRaw(int Width, int Height, int BPP, unsigned char* pImageData)
 }
 
 
-void Texture::LoadInternal(void* pImageData)
+void Texture::LoadInternal(const void* pImageData)
 {
     if (IsGLVersionHigher(4, 5)) {
         LoadInternalDSA(pImageData);
@@ -94,7 +94,7 @@ void Texture::LoadInternal(void* pImageData)
 }
 
 
-void Texture::LoadInternalNonDSA(void* pImageData)
+void Texture::LoadInternalNonDSA(const void* pImageData)
 {
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);
@@ -136,7 +136,7 @@ void Texture::LoadInternalNonDSA(void* pImageData)
     glBindTexture(m_textureTarget, 0);
 }
 
-void Texture::LoadInternalDSA(void* pImageData)
+void Texture::LoadInternalDSA(const void* pImageData)
 {
     glCreateTextures(m_textureTarget, 1, &m_textureObj);
 
@@ -180,6 +180,27 @@ void Texture::LoadInternalDSA(void* pImageData)
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glGenerateTextureMipmap(m_textureObj);
+}
+
+
+void Texture::LoadF32(int Width, int Height, const float* pImageData)
+{
+    if (!IsGLVersionHigher(4, 5)) {
+        OGLDEV_ERROR("Non DSA version is not implemented\n");
+    }
+
+    m_imageWidth = Width;
+    m_imageHeight = Height;
+
+    glCreateTextures(m_textureTarget, 1, &m_textureObj);
+    glTextureStorage2D(m_textureObj, 1, GL_R32F, m_imageWidth, m_imageHeight);
+    glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_FLOAT, pImageData);
+
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameterf(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 
