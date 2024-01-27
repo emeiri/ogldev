@@ -31,6 +31,8 @@ public:
 
     void SetVP(const Matrix4f& VP);
 
+    void SetViewMatrix(const Matrix4f& View);
+
     void SetMinMaxHeight(float Min, float Max);
 
     void SetTextureHeights(float Tex0Height, float Tex1Height, float Tex2Height, float Tex3Height);
@@ -39,6 +41,7 @@ public:
 	
 private:
     GLuint m_VPLoc = -1;
+    GLuint m_ViewLoc = -1;
     GLuint m_minHeightLoc = -1;
     GLuint m_maxHeightLoc = -1;
     GLuint m_tex0HeightLoc = -1;

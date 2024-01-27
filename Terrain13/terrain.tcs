@@ -6,7 +6,7 @@ in vec2 Tex1[];
 
 out vec2 Tex2[];
 
-uniform mat4 gVP;
+uniform mat4 gView;
 
 void main()
 {
@@ -21,17 +21,17 @@ void main()
     if (gl_InvocationID == 0) {
         // ----------------------------------------------------------------------
         // Step 2: transform each vertex into eye space
-        vec4 ViewSpacePos00 = gVP * gl_in[0].gl_Position;
-        vec4 ViewSpacePos01 = gVP * gl_in[1].gl_Position;
-        vec4 ViewSpacePos10 = gVP * gl_in[2].gl_Position;
-        vec4 ViewSpacePos11 = gVP * gl_in[3].gl_Position;
+        vec4 ViewSpacePos00 = gView * gl_in[0].gl_Position;
+        vec4 ViewSpacePos01 = gView * gl_in[1].gl_Position;
+        vec4 ViewSpacePos10 = gView * gl_in[2].gl_Position;
+        vec4 ViewSpacePos11 = gView * gl_in[3].gl_Position;
 
         // ----------------------------------------------------------------------
         // Step 3: "distance" from camera scaled between 0 and 1
-        float distance00 = clamp((abs(ViewSpacePos00.z)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
-        float distance01 = clamp((abs(ViewSpacePos01.z)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
-        float distance10 = clamp((abs(ViewSpacePos10.z)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
-        float distance11 = clamp((abs(ViewSpacePos11.z)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance00 = clamp((length(ViewSpacePos00.xyz)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance01 = clamp((length(ViewSpacePos01.xyz)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance10 = clamp((length(ViewSpacePos10.xyz)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
+        float distance11 = clamp((length(ViewSpacePos11.xyz)-MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0);
 
         // ----------------------------------------------------------------------
         // Step 4: interpolate edge tessellation level based on closer vertex

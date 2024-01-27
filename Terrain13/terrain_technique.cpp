@@ -51,6 +51,7 @@ bool TerrainTechnique::Init()
     }
 
     m_VPLoc = GetUniformLocation("gVP");
+    m_ViewLoc = GetUniformLocation("gView");
     m_minHeightLoc = GetUniformLocation("gMinHeight");
     m_maxHeightLoc = GetUniformLocation("gMaxHeight");
     m_tex0UnitLoc = GetUniformLocation("gTextureHeight0");
@@ -64,7 +65,8 @@ bool TerrainTechnique::Init()
     m_reversedLightDirLoc = GetUniformLocation("gReversedLightDir");
     m_heightMapLoc = GetUniformLocation("gHeightMap");
 
-    if (m_VPLoc == INVALID_UNIFORM_LOCATION||
+    if (m_VPLoc == INVALID_UNIFORM_LOCATION ||
+        m_ViewLoc == INVALID_UNIFORM_LOCATION ||
         m_minHeightLoc == INVALID_UNIFORM_LOCATION ||
         m_maxHeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex0UnitLoc == INVALID_UNIFORM_LOCATION ||
@@ -97,6 +99,12 @@ bool TerrainTechnique::Init()
 void TerrainTechnique::SetVP(const Matrix4f& VP)
 {
     glUniformMatrix4fv(m_VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
+}
+
+
+void TerrainTechnique::SetViewMatrix(const Matrix4f& View)
+{
+    glUniformMatrix4fv(m_ViewLoc, 1, GL_TRUE, (const GLfloat*)View.m);
 }
 
 

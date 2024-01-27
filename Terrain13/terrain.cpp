@@ -163,6 +163,7 @@ void BaseTerrain::Render(const BasicCamera& Camera)
     Matrix4f View = Camera.GetMatrix();
 
     m_terrainTech.Enable();
+    m_terrainTech.SetViewMatrix(View);
     m_terrainTech.SetVP(VP);
 
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
