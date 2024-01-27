@@ -77,12 +77,11 @@ void QuadList::CreateGLState()
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vb);
 
-  //  glGenBuffers(1, &m_ib);
-   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
+    glGenBuffers(1, &m_ib);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
 
     int POS_LOC = 0;
     int TEX_LOC = 1;
-	int NORMAL_LOC = 2;
 
 	size_t NumFloats = 0;
 	
@@ -99,18 +98,18 @@ void QuadList::CreateGLState()
 void QuadList::PopulateBuffers(const BaseTerrain* pTerrain)
 {
     std::vector<Vertex> Vertices;
-    Vertices.resize((m_width )* (m_depth ) * 4);
+    Vertices.resize(m_width * m_depth);
 
     InitVertices(pTerrain, Vertices);
 
 	std::vector<unsigned int> Indices;
     int NumQuads = (m_width - 1) * (m_depth - 1);
     Indices.resize(NumQuads * 4);
-   // InitIndices(Indices);
+    InitIndices(Indices);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices[0]) * Vertices.size(), &Vertices[0], GL_STATIC_DRAW);
 
- //   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices[0]) * Indices.size(), &Indices[0], GL_STATIC_DRAW);
 }
 
 
@@ -122,7 +121,7 @@ void QuadList::Vertex::InitVertex(const BaseTerrain* pTerrain, int Width, int De
 
     float TextureScale = pTerrain->GetTextureScale();
     Tex = Vector2f(TextureScale * (float)x / (float)Width, TextureScale * (float)z / (float)Depth);	
-    Tex.Print();
+    //Tex.Print();
 }
 
 
@@ -130,39 +129,11 @@ void QuadList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Ve
 {
     int Index = 0;
 
-   /* for (int z = 0; z < m_depth; z++) {
+    for (int z = 0 ; z < m_depth ; z++) {
         for (int x = 0 ; x < m_width ; x++) {
             assert(Index < Vertices.size());
 			Vertices[Index].InitVertex(pTerrain, m_width, m_depth, x, z);
 			Index++;
-        }
-    }*/
-
-    for (int i = 0; i <= m_width - 1; i++)
-    {
-        for (int j = 0; j <= m_depth - 1; j++)
-        {
-            Vertices[Index++].InitVertex(pTerrain, m_width, m_depth, i, j);            
-            Vertices[Index++].InitVertex(pTerrain, m_width, m_depth, i + 1, j);
-            Vertices[Index++].InitVertex(pTerrain, m_width, m_depth, i, j + 1);
-            Vertices[Index++].InitVertex(pTerrain, m_width, m_depth, i + 1, j + 1);
-#if 0
-            vertices.push_back(-width / 2.0f + width * i / (float)rez); // v.x
-            vertices.push_back(0.0f); // v.y
-            vertices.push_back(-height / 2.0f + height * j / (float)rez); // v.z
-
-            vertices.push_back(-width / 2.0f + width * (i + 1) / (float)rez); // v.x
-            vertices.push_back(0.0f); // v.y
-            vertices.push_back(-height / 2.0f + height * j / (float)rez); // v.z
-
-            vertices.push_back(-width / 2.0f + width * i / (float)rez); // v.x
-            vertices.push_back(0.0f); // v.y
-            vertices.push_back(-height / 2.0f + height * (j + 1) / (float)rez); // v.z
-
-            vertices.push_back(-width / 2.0f + width * (i + 1) / (float)rez); // v.x
-            vertices.push_back(0.0f); // v.y
-            vertices.push_back(-height / 2.0f + height * (j + 1) / (float)rez); // v.z
-#endif
         }
     }
 
@@ -192,7 +163,6 @@ void QuadList::InitIndices(std::vector<unsigned int>& Indices)
             assert(Index < Indices.size());
             unsigned int IndexTopRight = (z + 1) * m_width + x + 1;
             Indices[Index++] = IndexTopRight;
-
         }
     }
 
@@ -205,9 +175,7 @@ void QuadList::Render()
     glBindVertexArray(m_vao);
 
     glPatchParameteri(GL_PATCH_VERTICES, 4);
-    //glDrawElements(GL_PATCHES, (m_depth - 1) * (m_width - 1) * 4, GL_UNSIGNED_INT, NULL);
-
-    glDrawArrays(GL_PATCHES, 0, 4 * m_depth * m_width);
+    glDrawElements(GL_PATCHES, (m_depth - 1) * (m_width - 1) * 4, GL_UNSIGNED_INT, NULL);
 
     glBindVertexArray(0);
 }
