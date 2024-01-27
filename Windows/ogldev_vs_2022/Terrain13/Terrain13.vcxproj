@@ -36,8 +36,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\lod_manager.cpp" />
     <ClCompile Include="..\..\..\Terrain13\midpoint_disp_terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain13\quad_list.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain.cpp" />
@@ -55,8 +53,6 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\Terrain13\demo_config.h" />
-    <ClInclude Include="..\..\..\Terrain13\geomip_grid.h" />
-    <ClInclude Include="..\..\..\Terrain13\lod_manager.h" />
     <ClInclude Include="..\..\..\Terrain13\midpoint_disp_terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\quad_list.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain.h" />

@@ -38,8 +38,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\Terrain13\lod_manager.cpp" />
     <ClCompile Include="..\..\..\Terrain13\midpoint_disp_terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain.cpp" />
     <ClCompile Include="..\..\..\Terrain13\terrain_demo13.cpp" />
@@ -75,8 +73,6 @@
       <Filter>ImGUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Terrain13\demo_config.h" />
-    <ClInclude Include="..\..\..\Terrain13\geomip_grid.h" />
-    <ClInclude Include="..\..\..\Terrain13\lod_manager.h" />
     <ClInclude Include="..\..\..\Terrain13\midpoint_disp_terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain.h" />
     <ClInclude Include="..\..\..\Terrain13\terrain_technique.h" />
