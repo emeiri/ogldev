@@ -175,8 +175,10 @@ void BaseTerrain::Render(const BasicCamera& Camera)
 	
     m_terrainTech.SetLightDir(m_lightDir);
 
+    glFrontFace(GL_CCW);
     m_quadList.Render();
 
+    glFrontFace(GL_CW); // hack....
     m_pSkydome->Render(Camera);
 }
 
