@@ -65,7 +65,6 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
 
-
     m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/kloofendal_48d_partly_cloudy_puresky_4k.jpg", COLOR_TEXTURE_UNIT_0, COLOR_TEXTURE_UNIT_INDEX_0);
 }
 
@@ -73,6 +72,10 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 void BaseTerrain::Finalize()
 {
     m_quadList.CreateQuadList(m_numPatches, m_numPatches, this);
+
+  //  m_heightMap.PrintFloat();
+
+    m_heightMapTexture.LoadF32(m_terrainSize, m_terrainSize, m_heightMap.GetBaseAddr());
 }
 
 
@@ -167,6 +170,8 @@ void BaseTerrain::Render(const BasicCamera& Camera)
             m_pTextures[i]->Bind(COLOR_TEXTURE_UNIT_0 + i);
         }
     }
+
+    m_heightMapTexture.Bind(HEIGHT_MAP_TEXTURE_UNIT);
 	
     m_terrainTech.SetLightDir(m_lightDir);
 

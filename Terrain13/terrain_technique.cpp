@@ -62,6 +62,7 @@ bool TerrainTechnique::Init()
     m_tex2HeightLoc = GetUniformLocation("gHeight2");
     m_tex3HeightLoc = GetUniformLocation("gHeight3");
     m_reversedLightDirLoc = GetUniformLocation("gReversedLightDir");
+    m_heightMapLoc = GetUniformLocation("gHeightMap");
 
     if (m_VPLoc == INVALID_UNIFORM_LOCATION||
         m_minHeightLoc == INVALID_UNIFORM_LOCATION ||
@@ -74,7 +75,8 @@ bool TerrainTechnique::Init()
         m_tex1HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex2HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex3HeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION) {
+        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION ||
+        m_heightMapLoc == INVALID_UNIFORM_LOCATION) {
      //   return false;
     }
 
@@ -84,6 +86,7 @@ bool TerrainTechnique::Init()
     glUniform1i(m_tex1UnitLoc, COLOR_TEXTURE_UNIT_INDEX_1);
     glUniform1i(m_tex2UnitLoc, COLOR_TEXTURE_UNIT_INDEX_2);
     glUniform1i(m_tex3UnitLoc, COLOR_TEXTURE_UNIT_INDEX_3);
+    glUniform1i(m_heightMapLoc, HEIGHT_MAP_TEXTURE_UNIT_INDEX);
 
     glUseProgram(0);
 

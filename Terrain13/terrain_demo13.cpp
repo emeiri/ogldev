@@ -48,18 +48,16 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 static int g_seed = 0;
 
-extern int gShowPoints;
 
-
-class TerrainDemo12
+class TerrainDemo13
 {
 public:
 
-    TerrainDemo12()
+    TerrainDemo13()
     {
     }
 
-    virtual ~TerrainDemo12()
+    virtual ~TerrainDemo13()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -207,23 +205,7 @@ public:
 
             case GLFW_KEY_SPACE:
                 m_showGui = !m_showGui;
-                break;
-
-            case GLFW_KEY_0:
-                gShowPoints = 0;
-                break;
-
-            case GLFW_KEY_1:
-                gShowPoints = 1;
-                break;
-
-            case GLFW_KEY_2:
-                gShowPoints = 2;
-                break;
-
-            case GLFW_KEY_3:
-                gShowPoints = 3;
-                break;
+                break;            
             }
         }
 
@@ -344,7 +326,7 @@ private:
     bool m_constrainCamera = false;
 };
 
-TerrainDemo12* app = NULL;
+TerrainDemo13* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -379,7 +361,7 @@ int main(int argc, char** argv)
 
     srand(g_seed);
 
-    app = new TerrainDemo12();
+    app = new TerrainDemo13();
 
     app->Init();
 

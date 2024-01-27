@@ -3,7 +3,7 @@
 layout(location = 0) out vec4 FragColor;
 
 in vec2 Tex3;
-in vec3 WorldPos;
+in float Height;
 in vec3 Normal;
 
 uniform sampler2D gTextureHeight0;
@@ -22,7 +22,7 @@ vec4 CalcTexColor()
 {
     vec4 TexColor;
 
-    float Height = WorldPos.y;
+//    float Height = WorldPos.y;
 
     if (Height < gHeight0) {
        TexColor = texture(gTextureHeight0, Tex3);

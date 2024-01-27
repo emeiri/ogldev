@@ -5,7 +5,9 @@ layout (quads, fractional_odd_spacing, ccw) in;
 in vec2 Tex2[];
 
 out vec2 Tex3;
+out float Height;
 
+uniform sampler2D gHeightMap;
 uniform mat4 gVP;
 
 void main()
@@ -22,7 +24,7 @@ void main()
     vec2 t1 = (t11 - t10) * u + t10;
     Tex3 = (t1 - t0) * v + t0;
 
-  //Tex3 = vec2(u,v);
+    Height = texture(gHeightMap, Tex3).x;   
 
     vec4 p00 = gl_in[0].gl_Position;
     vec4 p01 = gl_in[1].gl_Position;
@@ -32,12 +34,14 @@ void main()
     // compute patch surface normal
     vec4 uVec = p01 - p00;
     vec4 vVec = p10 - p00;
-    vec4 normal = normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
+    vec4 normal = vec4(0.0, 1.0, 0.0, 0.0);//normalize( vec4(cross(vVec.xyz, uVec.xyz), 0) );
 
     // bilinearly interpolate position coordinate across patch
     vec4 p0 = (p01 - p00) * u + p00;
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 p = (p1 - p0) * v + p0;
+
+    p.y += Height;
 
     gl_Position = gVP * p;
 }

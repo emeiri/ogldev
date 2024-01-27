@@ -31,7 +31,7 @@
 class BaseTerrain
 {
  public:
-    BaseTerrain() {}
+    BaseTerrain() : m_heightMapTexture(GL_TEXTURE_2D) {}
 
     ~BaseTerrain();
 
@@ -81,10 +81,11 @@ class BaseTerrain
     int m_numPatches = 0;
 	float m_worldScale = 1.0f;
     Array2D<float> m_heightMap;
-    Texture* m_pTextures[4] = { 0 };
-    float m_textureScale = 1.0f;
 
 private:
+    float m_textureScale = 1.0f;
+    Texture* m_pTextures[4] = { 0 };
+    Texture m_heightMapTexture;
     QuadList m_quadList;
     float m_minHeight = 0.0f;
     float m_maxHeight = 0.0f;

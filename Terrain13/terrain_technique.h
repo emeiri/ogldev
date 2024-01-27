@@ -50,6 +50,7 @@ private:
     GLuint m_tex2UnitLoc = -1;
     GLuint m_tex3UnitLoc = -1;
     GLuint m_reversedLightDirLoc = -1;
+    GLuint m_heightMapLoc = -1;
 };
 
 #endif  /* TERRAIN_TECHNIQUE_H */
