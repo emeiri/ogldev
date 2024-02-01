@@ -10,9 +10,15 @@
     <ClCompile Include="..\..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+    <ClCompile Include="..\..\..\tutorial30\lighting_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial30\mesh.cpp" />
+    <ClCompile Include="..\..\..\tutorial30\tutorial30.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
+    <ClInclude Include="..\..\..\tutorial30\lighting_technique.h" />
+    <ClInclude Include="..\..\..\tutorial30\mesh.h" />
+    <ClInclude Include="..\..\..\tutorial30\render_callbacks.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
