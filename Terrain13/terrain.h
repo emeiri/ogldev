@@ -63,7 +63,7 @@ class BaseTerrain
 
     float GetMaxHeight() const { return m_maxHeight; }
 
-    float GetWorldSize() const { return m_terrainSize * m_worldScale; }
+    float GetWorldSize() const { return m_numPatches * m_worldScale; }
 
     Vector3f ConstrainCameraPosToTerrain(const Vector3f& CameraPos);
 
