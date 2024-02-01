@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Vulkan\Tutorial01\tutorial01.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial02\tutorial02.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{2b877476-e6ef-4204-9830-723887ef3163}</ProjectGuid>
+    <ProjectGuid>{1F9B3270-B679-4158-A2D2-0F5D64F29B22}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

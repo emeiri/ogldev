@@ -44,3 +44,6 @@ read.lock
 *.lib
 *.pch
 *.iobj
+Content/*
+data/*
+Vulkan_dev1/*
