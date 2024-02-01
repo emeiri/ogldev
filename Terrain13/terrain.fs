@@ -23,30 +23,31 @@ vec4 CalcTexColor()
 {
     vec4 TexColor;
 
+    vec2 ScaledTexCoord = Tex3 * 16.0;
 //    float Height = WorldPos.y;
 
     if (Height < gHeight0) {
-       TexColor = texture(gTextureHeight0, Tex3);
+       TexColor = texture(gTextureHeight0, ScaledTexCoord);
     } else if (Height < gHeight1) {
-       vec4 Color0 = texture(gTextureHeight0, Tex3);
-       vec4 Color1 = texture(gTextureHeight1, Tex3);
+       vec4 Color0 = texture(gTextureHeight0, ScaledTexCoord);
+       vec4 Color1 = texture(gTextureHeight1, ScaledTexCoord);
        float Delta = gHeight1 - gHeight0;
        float Factor = (Height - gHeight0) / Delta;
        TexColor = mix(Color0, Color1, Factor);
     } else if (Height < gHeight2) {
-       vec4 Color0 = texture(gTextureHeight1, Tex3);
-       vec4 Color1 = texture(gTextureHeight2, Tex3);
+       vec4 Color0 = texture(gTextureHeight1, ScaledTexCoord);
+       vec4 Color1 = texture(gTextureHeight2, ScaledTexCoord);
        float Delta = gHeight2 - gHeight1;
        float Factor = (Height - gHeight1) / Delta;
        TexColor = mix(Color0, Color1, Factor);
     } else if (Height < gHeight3) {
-       vec4 Color0 = texture(gTextureHeight2, Tex3);
-       vec4 Color1 = texture(gTextureHeight3, Tex3);
+       vec4 Color0 = texture(gTextureHeight2, ScaledTexCoord);
+       vec4 Color1 = texture(gTextureHeight3, ScaledTexCoord);
        float Delta = gHeight3 - gHeight2;
        float Factor = (Height - gHeight2) / Delta;
        TexColor = mix(Color0, Color1, Factor);
     } else {
-       TexColor = texture(gTextureHeight3, Tex3);
+       TexColor = texture(gTextureHeight3, ScaledTexCoord);
     }
 
     return TexColor;
@@ -55,9 +56,9 @@ vec4 CalcTexColor()
 
 vec3 CalcNormal()
 {
-float HEIGHT_SCALE = 1.0;
-float uTexelSize = 1.0 / 60.0;
-
+    float HEIGHT_SCALE = 1.0;
+    float uTexelSize = 1.0 / 256.0;
+      
     float left  = texture(gHeightMap, Tex3 + vec2(-uTexelSize, 0.0)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
     float right = texture(gHeightMap, Tex3 + vec2( uTexelSize, 0.0)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
     float up    = texture(gHeightMap, Tex3 + vec2(0.0,  uTexelSize)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
