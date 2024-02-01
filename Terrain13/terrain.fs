@@ -63,7 +63,11 @@ vec3 CalcNormal()
     float right = texture(gHeightMap, Tex3 + vec2( uTexelSize, 0.0)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
     float up    = texture(gHeightMap, Tex3 + vec2(0.0,  uTexelSize)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
     float down  = texture(gHeightMap, Tex3 + vec2(0.0, -uTexelSize)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
-    vec3 normal = normalize(vec3(down - up, 2.0, left - right));
+ //   vec3 normal = normalize(vec3(down - up, 2.0, left - right));
+
+ //vec3 normal = normalize(0.25 * vec3(2*(right - left), 2 * (down - up), -4));
+
+ vec3 normal = normalize(vec3(left - right, down - up, 2.0));
 
     return normal;
 }
