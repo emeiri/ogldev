@@ -138,10 +138,10 @@ public:
 
         m_pGameCamera->OnRender();
 
-     /*   static float foo = 0.0f;
+        static float foo = 0.0f;
         foo += 0.002f;
 
-        float S = (float)m_terrainSize;
+       /* float S = (float)m_terrainSize;
         float R = 2.5f * S;
 
         Vector3f Pos(S + cosf(foo) * R, m_maxHeight + 250.0f, S + sinf(foo) * R);
@@ -150,12 +150,12 @@ public:
         Vector3f Center(S, Pos.y * 0.50f, S);
         Vector3f Target = Center - Pos;
         m_pGameCamera->SetTarget(Target);
-        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);
+        m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
 
-        float y = min(-0.4f, cosf(foo));
-        Vector3f LightDir(sinf(foo * 5.0f), y, cosf(foo * 5.0f));
+        float x = min(-0.4f, cosf(foo));
+        Vector3f LightDir(x, -1.0f, 0.0f);
 
-        m_terrain.SetLightDir(LightDir);*/
+      //  m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -253,8 +253,8 @@ private:
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
-        Pos = Vector3f(3840.0f, 151.946808f, 3840.0f);
-        Target = Vector3f(-0.896419f, -0.443071f, 0.010951f);
+     //   Pos = Vector3f(3840.0f, 151.946808f, 3840.0f);
+      //  Target = Vector3f(-0.896419f, -0.443071f, 0.010951f);
 
         float FOV = 45.0f;
         float zNear = 0.1f;
@@ -281,7 +281,7 @@ private:
 
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_numPatches, m_roughness, m_minHeight, m_maxHeight);
 
-        Vector3f LightDir(0.0f, -1.0f, 0.0f);
+        Vector3f LightDir(-1.0f, -0.2f, 0.0f);
 
         m_terrain.SetLightDir(LightDir);
     }
@@ -317,11 +317,11 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
-    int m_terrainSize = 60;
+    int m_terrainSize = 1024;
     float m_roughness = 1.0f;
     float m_minHeight = 0.0f;
-    float m_maxHeight = 400.0f;
-    int m_numPatches = 32;
+    float m_maxHeight = 500.0f;
+    int m_numPatches = 64;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;
 };
