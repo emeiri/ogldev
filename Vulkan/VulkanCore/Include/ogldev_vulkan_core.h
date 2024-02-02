@@ -35,8 +35,10 @@ public:
 private:
 
 	void CreateInstance(const char* pAppName);
+	void CreateDebugCallback();
 
-	VkInstance m_instance = NULL;
+	VkInstance m_instance = VK_NULL_HANDLE;
+	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
 };
 
 }

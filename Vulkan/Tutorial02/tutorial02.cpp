@@ -14,6 +14,10 @@
 
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+	Vulkan For Beginners - 
+	* Tutorial #2: Create a Vulkan instance
+	* Tutorial #3: Validation layers
 */
 
 

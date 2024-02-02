@@ -16,9 +16,11 @@
 */
 
 #include <vector>
+#include <string>
 #include <assert.h>
 
 #include "ogldev_types.h"
+#include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_util.h"
 
@@ -31,6 +33,18 @@ VulkanCore::VulkanCore()
 
 VulkanCore::~VulkanCore()
 {
+	printf("-------------------------------\n");
+
+	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
+	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
+	if (!vkDestroyDebugUtilsMessenger) {
+		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		exit(1);
+	}
+	vkDestroyDebugUtilsMessenger(m_instance, m_debugMessenger, NULL);
+
+	printf("Debug callback destroyed\n");
+
 	vkDestroyInstance(m_instance, NULL);
 	printf("Vulkan instance destroyed\n");
 }
@@ -39,6 +53,7 @@ VulkanCore::~VulkanCore()
 void VulkanCore::Init(const char* pAppName)
 {
 	CreateInstance(pAppName);
+	CreateDebugCallback();
 }
 
 
@@ -48,7 +63,7 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		"VK_LAYER_KHRONOS_validation"
 	};
 
-	std::vector<const char*> Extensions = {		
+	std::vector<const char*> Extensions = {
 		VK_KHR_SURFACE_EXTENSION_NAME,
 #if defined (_WIN32)
 		"VK_KHR_win32_surface",
@@ -59,8 +74,7 @@ void VulkanCore::CreateInstance(const char* pAppName)
 #if defined (__linux__)
 		"VK_KHR_xcb_surface",
 #endif
-	    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-		VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,		
 	};
 
 	VkApplicationInfo AppInfo = {
@@ -89,6 +103,54 @@ void VulkanCore::CreateInstance(const char* pAppName)
 	printf("Vulkan instance created\n");
 }
 
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
+	VkDebugUtilsMessageTypeFlagsEXT Type,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData)
+{
+	printf("Debug callback: %s\n", pCallbackData->pMessage);
+	printf("  Severity %s\n", GetDebugSeverityStr(Severity));
+	printf("  Type %s\n", GetDebugType(Type));
+	printf("  Objects ");
+
+	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
+		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
+	}
+
+	return VK_FALSE;  // The calling function should not be aborted
+}
+
+
+void VulkanCore::CreateDebugCallback()
+{
+	VkDebugUtilsMessengerCreateInfoEXT MessengerCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		.pNext = NULL,
+		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+					   VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+					   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+		.pfnUserCallback = &DebugCallback,
+		.pUserData = NULL
+	};
+
+	PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessenger = VK_NULL_HANDLE;
+	vkCreateDebugUtilsMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
+	if (!vkCreateDebugUtilsMessenger) {
+		OGLDEV_ERROR("Cannot find address of vkCreateDebugUtilsMessenger\n");
+		exit(1);
+	}
+
+	VkResult res = vkCreateDebugUtilsMessenger(m_instance, &MessengerCreateInfo, NULL, &m_debugMessenger);
+	CHECK_VK_RESULT(res, "debug utils messenger");
+
+	printf("Debug utils messenger created\n");
+}
 
 
 }

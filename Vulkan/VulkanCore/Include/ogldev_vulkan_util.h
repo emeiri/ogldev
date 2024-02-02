@@ -27,3 +27,7 @@ typedef unsigned int uint;
 		exit(1);	\
 	}
 
+const char* GetDebugSeverityStr(VkDebugUtilsMessageSeverityFlagBitsEXT Severity);
+
+const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type);
+
