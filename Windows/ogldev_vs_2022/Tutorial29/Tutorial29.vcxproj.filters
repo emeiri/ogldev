@@ -13,7 +13,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\tutorial29_youtube\tutorial29.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
     <ClCompile Include="..\..\..\tutorial29_youtube\skinned_mesh.cpp" />
     <ClCompile Include="..\..\..\tutorial29_youtube\skinning_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial29_youtube\camera.cpp" />

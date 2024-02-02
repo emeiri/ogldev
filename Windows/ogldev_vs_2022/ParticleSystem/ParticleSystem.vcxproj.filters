@@ -11,6 +11,15 @@
     <ClCompile Include="..\..\..\Common\ogldev_app.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_lighting.cpp" />
     <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
+    <ClCompile Include="..\..\..\Common\camera.cpp" />
+    <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\pipeline.cpp" />
+    <ClCompile Include="..\..\..\tutorial28\billboard_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial28\mesh.cpp" />
+    <ClCompile Include="..\..\..\tutorial28\particle_system.cpp" />
+    <ClCompile Include="..\..\..\tutorial28\ps_update_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial28\random_texture.cpp" />
+    <ClCompile Include="..\..\..\tutorial28\tutorial28.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -36,5 +45,12 @@
     <None Include="..\..\..\tutorial28\ps_update.vs">
       <Filter>Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\tutorial28\billboard_technique.h" />
+    <ClInclude Include="..\..\..\tutorial28\mesh.h" />
+    <ClInclude Include="..\..\..\tutorial28\particle_system.h" />
+    <ClInclude Include="..\..\..\tutorial28\ps_update_technique.h" />
+    <ClInclude Include="..\..\..\tutorial28\random_texture.h" />
   </ItemGroup>
 </Project>

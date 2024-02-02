@@ -109,7 +109,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>LibOgldev.lib;meshoptimizer.lib;assimp-vc142-mt.lib;glew32.lib;glfw3dll.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LibOgldev.lib;meshoptimizer.lib;assimp-vc143-mt.lib;glew32.lib;glfw3dll.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

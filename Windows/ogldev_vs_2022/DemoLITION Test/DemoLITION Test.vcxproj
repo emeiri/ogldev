@@ -120,7 +120,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\DLL</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;glfw3dll.lib;glew32.lib;assimp-vc142-mt.lib;glfw3dll.lib;glew32.lib;DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;glfw3dll.lib;glew32.lib;glfw3dll.lib;glew32.lib;DemoLITION_Framework.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
