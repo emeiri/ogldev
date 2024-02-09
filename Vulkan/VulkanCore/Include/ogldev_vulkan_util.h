@@ -19,6 +19,8 @@
 
 #include <stdio.h>
 
+#include <vulkan/vulkan.h>
+
 typedef unsigned int uint;
 
 #define CHECK_VK_RESULT(res, msg) \
