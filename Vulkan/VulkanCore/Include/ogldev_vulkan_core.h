@@ -98,7 +98,7 @@ public:
 private:
 
 	void CreateInstance(const char* pAppName);
-	void InitDebugCallbacks();
+	void CreateDebugCallback();
 	void CreateSurface();
 	void CreateDevice();
 	void CreateSwapChain();
@@ -124,9 +124,8 @@ private:
 
 	void UpdateTextureImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, uint32_t LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
 
-	VkInstance m_instance;
+	VkInstance m_instance = NULL;
 	VkDebugUtilsMessengerEXT m_messenger;
-	VkDebugReportCallbackEXT m_reportCallback;
 	GLFWwindow* m_pWindow = NULL;
 	VkSurfaceKHR m_surface;
 	VulkanPhysicalDevices m_physDevices;

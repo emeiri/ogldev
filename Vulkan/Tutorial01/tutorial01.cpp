@@ -29,7 +29,6 @@
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
 
-GLFWwindow* window = NULL;
 
 void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -186,6 +185,8 @@ private:
 };
 
 
+#define APP_NAME "Tutorial 02"
+
 int main(int argc, char* argv[])
 {
 	if (!glfwInit()) {
@@ -199,19 +200,19 @@ int main(int argc, char* argv[])
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 01", NULL, NULL);
+	GLFWwindow* pWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, APP_NAME, NULL, NULL);
 	
-	if (!window) {
+	if (!pWindow) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	glfwSetKeyCallback(window, GLFW_KeyCallback);
+	glfwSetKeyCallback(pWindow, GLFW_KeyCallback);
 
-	VulkanApp App(window);
-	App.Init("Tutorial 01");
+	VulkanApp App(pWindow);
+	App.Init(APP_NAME);
 
-	while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(pWindow)) {
 		App.RenderScene();
 		glfwPollEvents();
 	}

@@ -31,7 +31,20 @@ VulkanCore::VulkanCore(GLFWwindow* pWindow)
 
 VulkanCore::~VulkanCore()
 {
+	printf("-------------------------------\n");
 
+	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
+	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
+	vkDestroyDebugUtilsMessenger(m_instance, m_messenger, NULL);
+	if (!vkDestroyDebugUtilsMessenger) {
+		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		exit(1);
+	}
+
+	printf("Debug callback destroyed\n");
+
+	vkDestroyInstance(m_instance, NULL);
+	printf("Vulkan instance destroyed\n");
 }
 
 
@@ -40,7 +53,7 @@ void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t Unifor
 	m_numUniformBuffers = NumUniformBuffers;
 	m_uniformDataSize = UniformDataSize;
 	CreateInstance(pAppName);
-	InitDebugCallbacks();
+	CreateDebugCallback();
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
 	m_devAndQueue = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
@@ -58,12 +71,11 @@ void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t Unifor
 
 void VulkanCore::CreateInstance(const char* pAppName)
 {
-	std::vector<const char*> ValidationLayers = {
+	std::vector<const char*> Layers = {
 		"VK_LAYER_KHRONOS_validation"
 	};
 
 	std::vector<const char*> Extensions = {		
-		"VK_KHR_surface",
 		VK_KHR_SURFACE_EXTENSION_NAME,
 #if defined (_WIN32)
 		"VK_KHR_win32_surface",
@@ -78,14 +90,14 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 	};
 
-	const VkApplicationInfo AppInfo = {
+	VkApplicationInfo AppInfo = {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pNext = NULL,
 		.pApplicationName = pAppName,
-		.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-		.pEngineName = "Ogldev Vulkan Engine",
-		.engineVersion = VK_MAKE_VERSION(1, 0, 0),
-		.apiVersion = VK_API_VERSION_1_1
+		.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
+		.pEngineName = "Ogldev Vulkan Tutorials",
+		.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
+		.apiVersion = VK_API_VERSION_1_0
 	};
 
 	VkInstanceCreateInfo CreateInfo = {
@@ -93,9 +105,9 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		.pNext = NULL,
 		.flags = 0,
 		.pApplicationInfo = &AppInfo,
-		.enabledLayerCount = (uint32_t)(ValidationLayers.size()),
-		.ppEnabledLayerNames = ValidationLayers.data(),
-		.enabledExtensionCount = (uint32_t)(Extensions.size()),
+		.enabledLayerCount = (u32)(Layers.size()),
+		.ppEnabledLayerNames = Layers.data(),
+		.enabledExtensionCount = (u32)(Extensions.size()),
 		.ppEnabledExtensionNames = Extensions.data()
 	};
 
@@ -110,66 +122,46 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityF
 	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 	void* pUserData)
 {
-	printf("Validation layer: %s\n", pCallbackData->pMessage);
-	return VK_FALSE;
-}
+	printf("Debug callback: %s\n", pCallbackData->pMessage);
+	printf("  Severity %s\n", GetDebugSeverityStr(Severity));
+	printf("  Type %s\n", GetDebugType(Type));
+	printf("  Objects ");
 
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL ReportCallback(VkDebugReportFlagsEXT flags,
-	VkDebugReportObjectTypeEXT objectType,
-	uint64_t                   object,
-	size_t                     location,
-	int32_t                    messageCode,
-	const char* pLayerPrefix,
-	const char* pMessage,
-	void* PUserData)
-{
-	if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT) {
-		return VK_FALSE;
+	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
+		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
 	}
 
-	printf("Debug callback (%s): %s\n", pLayerPrefix, pMessage);
-	return VK_FALSE;
+	return VK_FALSE;  // The calling function should not be aborted
 }
 
 
-void VulkanCore::InitDebugCallbacks()
+void VulkanCore::CreateDebugCallback()
 {
 	VkDebugUtilsMessengerCreateInfoEXT MessengerCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+		.pNext = NULL,
+		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
 							VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
 						VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
 						VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
 		.pfnUserCallback = &DebugCallback,
-		.pUserData = nullptr
-	};
-
-	PFN_vkCreateDebugUtilsMessengerEXT CreateDebugUtilsMessenger = VK_NULL_HANDLE;
-	CreateDebugUtilsMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
-
-	VkResult res = CreateDebugUtilsMessenger(m_instance, &MessengerCreateInfo, NULL, &m_messenger);
-	CHECK_VK_RESULT(res, "Create debug utils messenger");
-
-	const VkDebugReportCallbackCreateInfoEXT CallbackCreateInfo = {
-		.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
-		.pNext = NULL,
-		.flags = VK_DEBUG_REPORT_WARNING_BIT_EXT |
-					VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
-					VK_DEBUG_REPORT_ERROR_BIT_EXT |
-					VK_DEBUG_REPORT_DEBUG_BIT_EXT,
-		.pfnCallback = &ReportCallback,
 		.pUserData = NULL
 	};
 
-	PFN_vkCreateDebugReportCallbackEXT CreateDebugReportCallback = VK_NULL_HANDLE;
-	CreateDebugReportCallback = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugReportCallbackEXT");
+	PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessenger = VK_NULL_HANDLE;
+	vkCreateDebugUtilsMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
+	if (!vkCreateDebugUtilsMessenger) {
+		OGLDEV_ERROR("Cannot find address of vkCreateDebugUtilsMessenger\n");
+		exit(1);
+	}
 
-	res = CreateDebugReportCallback(m_instance, &CallbackCreateInfo, NULL, &m_reportCallback);
-	CHECK_VK_RESULT(res, "Create debug report callback");
+	VkResult res = vkCreateDebugUtilsMessenger(m_instance, &MessengerCreateInfo, NULL, &m_messenger);
+	CHECK_VK_RESULT(res, "debug utils messenger");
 
-	printf("Debug callbacks initialized\n");
+	printf("Debug utils messenger created\n");
 }
 
 
