@@ -561,6 +561,7 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 
 void VulkanCore::CreateTextureImage(const char* filename, TextureAndMemory& Tex)
 {
+#if 0
 	int ImageWidth = 0;
 	int ImageHeight = 0;
 	int ImageChannels = 0;
@@ -577,6 +578,7 @@ void VulkanCore::CreateTextureImage(const char* filename, TextureAndMemory& Tex)
 	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, VK_FORMAT_R8G8B8A8_UNORM, LayerCount, Flags);
 
 	stbi_image_free(pPixels);
+#endif
 }
 
 
@@ -646,13 +648,13 @@ void VulkanCore::UpdateTextureImage(TextureAndMemory& Tex, uint32_t ImageWidth, 
 	VkDeviceSize AllocationSize = CreateBuffer(ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
 		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingBuffer, StagingBufferMemory);
 
-	UploadBufferData(StagingBufferMemory, 0, pPixels, ImageSize);
+	//UploadBufferData(StagingBufferMemory, 0, pPixels, ImageSize);
 
-	TransitionImageLayout(textureImage, texFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layerCount);
-	CopyBufferToImage(StagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), layerCount);
-	TransitionImageLayout(vkDev, textureImage, texFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, layerCount);
+	//TransitionImageLayout(textureImage, texFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, layerCount);
+	//CopyBufferToImage(StagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), layerCount);
+	//TransitionImageLayout(vkDev, textureImage, texFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, layerCount);
 
-	vkDestroyBuffer(m_device, stagingBuffer, nullptr);
+	//vkDestroyBuffer(m_device, stagingBuffer, nullptr);
 	vkFreeMemory(m_device, StagingBufferMemory, nullptr);
 }
 
