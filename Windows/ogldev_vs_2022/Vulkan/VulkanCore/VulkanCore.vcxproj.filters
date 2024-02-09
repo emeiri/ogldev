@@ -39,6 +39,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\util.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp">
+      <Filter>Source Files\CommonOgldev</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">

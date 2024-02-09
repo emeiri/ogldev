@@ -65,11 +65,11 @@ public:
 
 	std::vector<VkImage>& GetImages() { return m_images;  }
 
-	uint32_t AcquireNextImage(VkSemaphore Semaphore);
+	u32 AcquireNextImage(VkSemaphore Semaphore);
 
 	void Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem);
 
-	void QueuePresent(uint32_t ImageIndex, VkSemaphore RenderCompleteSem);
+	void QueuePresent(u32 ImageIndex, VkSemaphore RenderCompleteSem);
 
 	VkSemaphore CreateSemaphore();
 
@@ -87,7 +87,7 @@ public:
 
 	void UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size);
 
-	void CreateCommandBuffers(int count, VkCommandBuffer* cmdBufs);
+	void CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs);
 
 	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs);
 
@@ -109,20 +109,30 @@ private:
 	void CreateDescriptorPool();
 	void CreateDescriptorSet();
 
-	uint32_t GetMemoryTypeIndex(uint32_t memTypeBits, VkMemoryPropertyFlags memPropFlags);
+	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
 	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
 	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
 					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
-	void CreateTextureImageFromData(TextureAndMemory& Tex, const void* pPixels, uint32_t ImageWidth, uint32_t ImageHeight,
-									VkFormat TexFormat, uint32_t LayerCount, VkImageCreateFlags Flags);
+	void CreateTextureImageFromData(TextureAndMemory& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
+									VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags Flags);
 
-	void CreateImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
-		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, uint32_t MipLevels);
+	void CreateImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
+		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels);
 
-	void UpdateTextureImage(TextureAndMemory& Tex, uint32_t ImageWidth, uint32_t ImageHeight, VkFormat TexFormat, uint32_t LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
+	void UpdateTextureImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
+
+	void UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize);
+
+	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
+
+	void TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
+
+	VkCommandBuffer BeginSingleUseCommand();
+
+	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
 
 	VkInstance m_instance = NULL;
 	VkDebugUtilsMessengerEXT m_messenger;

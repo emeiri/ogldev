@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\core.cpp" />

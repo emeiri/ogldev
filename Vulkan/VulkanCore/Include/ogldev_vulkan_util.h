@@ -29,8 +29,14 @@ typedef unsigned int uint;
 		exit(1);	\
 	}
 
+namespace OgldevVK {
+
 const char* GetDebugSeverityStr(VkDebugUtilsMessageSeverityFlagBitsEXT Severity);
 
 const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type);
 
-uint32_t GetBytesPerTexFormat(VkFormat Format);
+u32 GetBytesPerTexFormat(VkFormat Format);
+
+bool HasStencilComponent(VkFormat Format);
+
+}
