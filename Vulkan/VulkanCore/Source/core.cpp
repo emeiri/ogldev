@@ -642,7 +642,7 @@ void VulkanCore::UpdateTextureImage(TextureAndMemory& Tex, u32 ImageWidth, u32 I
 	UploadBufferData(StagingBufferMemory, 0, pPixels, ImageSize);
 
 	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, 1);
-	//CopyBufferToImage(StagingBuffer, textureImage, static_cast<u32>(texWidth), static_cast<u32>(texHeight), layerCount);
+	CopyBufferToImage(StagingBuffer, Tex.m_image, ImageWidth, ImageHeight, LayerCount);
 	//TransitionImageLayout(vkDev, textureImage, texFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, layerCount);
 
 	//vkDestroyBuffer(m_device, stagingBuffer, NULL);
@@ -660,6 +660,31 @@ void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSi
 	
 	vkUnmapMemory(m_device, BufferMemory);
 }
+
+
+void VulkanCore::CopyBufferToImage(VkBuffer Buffer, VkImage Image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount)
+{
+	VkCommandBuffer CmdBuf = BeginSingleUseCommand();
+
+	VkBufferImageCopy Region = {
+		.bufferOffset = 0,
+		.bufferRowLength = 0,
+		.bufferImageHeight = 0,
+		.imageSubresource = VkImageSubresourceLayers {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = LayerCount
+		},
+		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
+		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
+	};
+
+	vkCmdCopyBufferToImage(CmdBuf, Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+
+	EndSingleTimeCommands(CmdBuf);
+}
+
 
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
