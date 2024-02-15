@@ -27,6 +27,7 @@
 
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_device.h"
+#include "ogldev_vulkan_texture.h"
 
 namespace OgldevVK {
 
@@ -51,7 +52,9 @@ struct TextureAndMemory {
 	VkImage m_image = VK_NULL_HANDLE;
 	VkDeviceMemory m_mem = VK_NULL_HANDLE;
 	VkImageView m_view = VK_NULL_HANDLE;
+	VkSampler m_sampler = VK_NULL_HANDLE;
 };
+
 
 class VulkanCore {
 public:
