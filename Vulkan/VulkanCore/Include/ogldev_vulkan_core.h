@@ -48,8 +48,9 @@ private:
 
 
 struct TextureAndMemory {
-	VkImage m_image = NULL;
-	VkDeviceMemory m_mem = NULL;
+	VkImage m_image = VK_NULL_HANDLE;
+	VkDeviceMemory m_mem = VK_NULL_HANDLE;
+	VkImageView m_view = VK_NULL_HANDLE;
 };
 
 class VulkanCore {

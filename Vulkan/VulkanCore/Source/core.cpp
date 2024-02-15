@@ -238,34 +238,28 @@ static u32 ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 }
 
 
-void CreateImageView(VkDevice device,
-	VkImage image,
-	VkFormat Format,
-	VkImageAspectFlags aspectFlags,
-	VkImageView* imageView,
-	VkImageViewType viewType,
-	u32 layerCount,
-	u32 mipLevels)
+void CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
+					 VkImageView* ImageView, VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
 		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 		.pNext = NULL,
 		.flags = 0,
-		.image = image,
-		.viewType = viewType,
+		.image = Image,
+		.viewType = ViewType,
 		.format = Format,
 		.subresourceRange =
 		{
-			.aspectMask = aspectFlags,
+			.aspectMask = AspectFlags,
 			.baseMipLevel = 0,
 			.levelCount = mipLevels,
 			.baseArrayLayer = 0,
-			.layerCount = layerCount
+			.layerCount = LayerCount
 		}
 	};
 
-	VkResult res = vkCreateImageView(device, &ViewInfo, NULL, imageView);
+	VkResult res = vkCreateImageView(Device, &ViewInfo, NULL, ImageView);
 	CHECK_VK_RESULT(res, "vkCreateImageView");
 }
 
@@ -564,11 +558,18 @@ void VulkanCore::CreateTextureImage(const char* filename, TextureAndMemory& Tex)
 		exit(1);
 	}
 
-	int LayerCount = 1;
+	u32 LayerCount = 1;
 	VkImageCreateFlags Flags = 0;
-	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, VK_FORMAT_R8G8B8A8_UNORM, LayerCount, Flags);
+	VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, LayerCount, Flags);
 
 	stbi_image_free(pPixels);
+
+	VkImageViewType ViewType = VK_IMAGE_VIEW_TYPE_2D;
+	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	u32 MipLevels = 1;
+
+	CreateImageView(m_device, Tex.m_image, Format, AspectFlags, &Tex.m_view, ViewType, LayerCount, MipLevels);
 }
 
 
@@ -643,9 +644,9 @@ void VulkanCore::UpdateTextureImage(TextureAndMemory& Tex, u32 ImageWidth, u32 I
 
 	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, 1);
 	CopyBufferToImage(StagingBuffer, Tex.m_image, ImageWidth, ImageHeight, LayerCount);
-	//TransitionImageLayout(vkDev, textureImage, texFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, layerCount);
+	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, 1);
 
-	//vkDestroyBuffer(m_device, stagingBuffer, NULL);
+	vkDestroyBuffer(m_device, StagingBuffer, NULL);
 	vkFreeMemory(m_device, StagingBufferMemory, NULL);
 }
 
