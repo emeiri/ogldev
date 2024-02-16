@@ -36,11 +36,11 @@ VulkanCore::~VulkanCore()
 
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
-	vkDestroyDebugUtilsMessenger(m_instance, m_messenger, NULL);
 	if (!vkDestroyDebugUtilsMessenger) {
 		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
 		exit(1);
 	}
+	vkDestroyDebugUtilsMessenger(m_instance, m_debugMessenger, NULL);
 
 	printf("Debug callback destroyed\n");
 
@@ -88,7 +88,6 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		"VK_KHR_xcb_surface",
 #endif
 	    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-		VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
 	};
 
 	VkApplicationInfo AppInfo = {
@@ -118,7 +117,8 @@ void VulkanCore::CreateInstance(const char* pAppName)
 }
 
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
+static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
 	VkDebugUtilsMessageTypeFlagsEXT Type,
 	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 	void* pUserData)
@@ -159,7 +159,7 @@ void VulkanCore::CreateDebugCallback()
 		exit(1);
 	}
 
-	VkResult res = vkCreateDebugUtilsMessenger(m_instance, &MessengerCreateInfo, NULL, &m_messenger);
+	VkResult res = vkCreateDebugUtilsMessenger(m_instance, &MessengerCreateInfo, NULL, &m_debugMessenger);
 	CHECK_VK_RESULT(res, "debug utils messenger");
 
 	printf("Debug utils messenger created\n");

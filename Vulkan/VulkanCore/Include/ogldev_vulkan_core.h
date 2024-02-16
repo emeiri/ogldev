@@ -140,8 +140,8 @@ private:
 
 	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
 
-	VkInstance m_instance = NULL;
-	VkDebugUtilsMessengerEXT m_messenger;
+	VkInstance m_instance = VK_NULL_HANDLE;
+	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
 	GLFWwindow* m_pWindow = NULL;
 	VkSurfaceKHR m_surface;
 	VulkanPhysicalDevices m_physDevices;
