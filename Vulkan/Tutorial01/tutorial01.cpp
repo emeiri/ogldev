@@ -155,11 +155,23 @@ private:
 
 	void CreateVertexBuffer()
 	{
-		std::vector<Vector3f> Vertices = {(-1.0f, -1.0f, 0.0f),
-						 (1.0f, -1.0f, 0.0f),
-						 (0.0f,  1.0f, 0.0f), };
+		struct Vertex {
+			Vertex(const Vector3f& p, const Vector2f& t)
+			{
+				Pos = p;
+				Tex = t;
+			}
 
-		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices);
+			Vector3f Pos;
+			Vector2f Tex;
+		};
+
+		std::vector<Vertex> Vertices = {
+			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
+			Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
+			Vertex(Vector3f(0.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)) };
+
+		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices.data(), sizeof(Vertices[0]) * Vertices.size());
 	}
 
 	void CreateShaders()

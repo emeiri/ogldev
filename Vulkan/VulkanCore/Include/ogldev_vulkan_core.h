@@ -83,7 +83,7 @@ public:
 
 	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
 
-	VkBuffer CreateVertexBuffer(const std::vector<Vector3f>& Vertices);
+	VkBuffer CreateVertexBuffer(const void* pVertices, size_t Size);
 
 	BufferAndMemory CreateUniformBuffer(int Size);
 

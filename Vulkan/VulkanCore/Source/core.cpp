@@ -16,6 +16,7 @@
 */
 
 #include <vector>
+#include <array>
 #include <assert.h>
 
 #include "ogldev_vulkan_core.h"
@@ -449,26 +450,24 @@ void VulkanCore::CreateFramebuffer()
 }
 
 
-VkBuffer VulkanCore::CreateVertexBuffer(const std::vector<Vector3f>& Vertices)
+VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
-	size_t verticesSize = sizeof(Vertices);
-
 	VkBuffer StagingVB;
 	VkDeviceMemory StagingVBMem;
-	VkDeviceSize AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+	VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
 		                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
 
 	void* MappedMemAddr = NULL;
 	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
-	memcpy(MappedMemAddr, &Vertices[0], verticesSize);
+	memcpy(MappedMemAddr, pVertices, Size);
 	vkUnmapMemory(m_device, StagingVBMem);
 
 	VkBuffer vb;
 	VkDeviceMemory vbMem;
-	AllocationSize = CreateBuffer(verticesSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
-	CopyBuffer(vb, StagingVB, verticesSize);
+	CopyBuffer(vb, StagingVB, Size);
 
 	return vb;
 }
@@ -1081,19 +1080,33 @@ void VulkanCore::CreateDescriptorPool()
 
 void VulkanCore::CreateDescriptorSet()
 {
-	VkDescriptorSetLayoutBinding LayoutBinding = {};
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	LayoutBinding.binding = 0;
-	LayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	LayoutBinding.descriptorCount = 1;
-	LayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding{
+		.binding = 0,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		.pImmutableSamplers = VK_NULL_HANDLE
+	};
+
+	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding{
+		.binding = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.pImmutableSamplers = VK_NULL_HANDLE
+	};
+
+	LayoutBindings.push_back(VertexShaderLayoutBinding);
+	LayoutBindings.push_back(FragmentShaderLayoutBinding);
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {};
 
 	LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	LayoutInfo.flags = 0;
-	LayoutInfo.bindingCount = 1;
-	LayoutInfo.pBindings = &LayoutBinding;
+	LayoutInfo.bindingCount = (u32)LayoutBindings.size();
+	LayoutInfo.pBindings = LayoutBindings.data();
 
 	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
@@ -1112,22 +1125,48 @@ void VulkanCore::CreateDescriptorSet()
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
 
 	for (size_t i = 0; i < m_images.size(); i++) {
-		VkDescriptorBufferInfo BufferInfo = {};
-		BufferInfo.buffer = m_uniformBuffers[i][0].m_buffer;
-		BufferInfo.offset = 0;
-		BufferInfo.range = m_uniformDataSize;
+		VkDescriptorBufferInfo BufferInfo = {
+			.buffer = m_uniformBuffers[i][0].m_buffer,
+			.offset = 0,
+			.range = m_uniformDataSize,
+		};
 
-		VkWriteDescriptorSet WriteDescriptorSet = {};
+		VkDescriptorImageInfo ImageInfo = {
+			//.sampler =  TODO_EMEIRI
+			.imageView = 0,
+			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		};
 
-		WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		std::array<VkWriteDescriptorSet, 2> WriteDescriptorSet = {
+			VkWriteDescriptorSet {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 0,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo = &BufferInfo
+			},
+			VkWriteDescriptorSet {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 3,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = &ImageInfo
+			},
+		};
+
+		/*WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		WriteDescriptorSet.dstSet = m_descriptorSets[i];
 		WriteDescriptorSet.dstBinding = 0;
 		WriteDescriptorSet.dstArrayElement = 0;
 		WriteDescriptorSet.descriptorCount = 1;
 		WriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		WriteDescriptorSet.pBufferInfo = &BufferInfo;
+		WriteDescriptorSet.pBufferInfo = &BufferInfo1;*/
 
-		vkUpdateDescriptorSets(m_device, 1, &WriteDescriptorSet, 0, NULL);
+		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 	}
 }
 
