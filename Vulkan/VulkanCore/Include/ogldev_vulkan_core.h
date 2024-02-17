@@ -20,6 +20,9 @@
 
 #include <vulkan/vulkan.h>
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 namespace OgldevVK {
 
 class VulkanCore {
@@ -30,15 +33,17 @@ public:
 
 	~VulkanCore();
 
-	void Init(const char* pAppName);
+	void Init(const char* pAppName, GLFWwindow* pWindow);
 
 private:
 
 	void CreateInstance(const char* pAppName);
 	void CreateDebugCallback();
+	void CreateSurface(GLFWwindow* pWindow);
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
+	VkSurfaceKHR m_surface;
 };
 
 }

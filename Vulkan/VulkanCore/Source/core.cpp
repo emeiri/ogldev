@@ -35,6 +35,17 @@ VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
 
+	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
+	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
+	if (!vkDestroySurface) {
+		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		exit(1);
+	}
+
+	vkDestroySurfaceKHR(m_instance, m_surface, NULL);
+
+	printf("GLFW window surface destroyed\n");
+
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
 	if (!vkDestroyDebugUtilsMessenger) {
@@ -50,10 +61,11 @@ VulkanCore::~VulkanCore()
 }
 
 
-void VulkanCore::Init(const char* pAppName)
+void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 {
 	CreateInstance(pAppName);
 	CreateDebugCallback();
+	CreateSurface(pWindow);
 }
 
 
@@ -74,7 +86,7 @@ void VulkanCore::CreateInstance(const char* pAppName)
 #if defined (__linux__)
 		"VK_KHR_xcb_surface",
 #endif
-		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,		
+		VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
 	};
 
 	VkApplicationInfo AppInfo = {
@@ -129,12 +141,12 @@ void VulkanCore::CreateDebugCallback()
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.pNext = NULL,
 		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-						   VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-					   VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-					   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+						VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+						VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
 		.pfnUserCallback = &DebugCallback,
 		.pUserData = NULL
 	};
@@ -152,5 +164,13 @@ void VulkanCore::CreateDebugCallback()
 	printf("Debug utils messenger created\n");
 }
 
+
+void VulkanCore::CreateSurface(GLFWwindow* pWindow)
+{
+	VkResult res = glfwCreateWindowSurface(m_instance, pWindow, NULL, &m_surface);
+	CHECK_VK_RESULT(res, "glfwCreateWindowSurface");
+
+	printf("GLFW window surface created\n");
+}
 
 }

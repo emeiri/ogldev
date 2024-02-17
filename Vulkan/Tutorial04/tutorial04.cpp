@@ -15,9 +15,7 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-	Vulkan For Beginners - 
-	* Tutorial #2: Create a Vulkan instance
-	* Tutorial #3: Validation layers
+	Vulkan For Beginners - Tutorial #4: Create a surface
 */
 
 
@@ -45,7 +43,7 @@ class VulkanApp
 {
 public:
 
-	VulkanApp() : m_vkCore()  // The NULL is here just for forward compatibility with tutorial #4
+	VulkanApp()
 	{
 	}
 
@@ -53,9 +51,9 @@ public:
 	{
 	}
 
-	void Init(const char* pAppName)
+	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
-		m_vkCore.Init(pAppName, NULL);  // The NULL is for forward compatibility with the following tutorials
+		m_vkCore.Init(pAppName, pWindow);
 	}
 
 	void RenderScene()
@@ -67,7 +65,7 @@ private:
 };
 
 
-#define APP_NAME "Tutorial 02"
+#define APP_NAME "Tutorial 04"
 
 int main(int argc, char* argv[])
 {
@@ -92,7 +90,7 @@ int main(int argc, char* argv[])
 	glfwSetKeyCallback(pWindow, GLFW_KeyCallback);
 
 	VulkanApp App;
-	App.Init(APP_NAME);
+	App.Init(APP_NAME, pWindow);
 
 	while (!glfwWindowShouldClose(pWindow)) {
 		App.RenderScene();
