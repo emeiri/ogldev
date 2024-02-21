@@ -58,6 +58,7 @@ public:
 		CreateSemaphores();
 		CreateVertexBuffer();
 		CreateShaders();
+		CreateTexture();
 		CreatePipeline();
 		RecordCommandBuffers();
 	//	exit(0);
@@ -86,6 +87,56 @@ private:
 		m_vkCore.CreateCommandBuffers(m_vkCore.GetNumImages(), &m_cmdBufs[0]);
 			
 		printf("Created command buffers\n");
+	}
+
+
+	void CreateSemaphores()
+	{
+		m_presentCompleteSem = m_vkCore.CreateSemaphore();
+		m_renderCompleteSem = m_vkCore.CreateSemaphore();
+	}
+
+
+	void CreateVertexBuffer()
+	{
+		struct Vertex {
+			Vertex(const Vector3f& p, const Vector2f& t)
+			{
+				Pos = p;
+				Tex = t;
+			}
+
+			Vector3f Pos;
+			Vector2f Tex;
+		};
+
+		std::vector<Vertex> Vertices = {
+			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
+			Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
+			Vertex(Vector3f(0.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)) };
+
+		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices.data(), sizeof(Vertices[0]) * Vertices.size());
+	}
+
+
+	void CreateShaders()
+	{
+		//m_vs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/vs.spv");
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "Shaders/test.vs");
+
+		m_fs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/fs.spv");
+	}
+
+
+	void CreateTexture()
+	{
+		m_vkCore.CreateTexture("../../Content/bricks.jpg", m_texture);
+	}
+
+
+	void CreatePipeline()
+	{
+		m_pipeline = m_vkCore.CreatePipeline(m_vs, m_fs, m_texture);
 	}
 
 
@@ -137,6 +188,7 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{
 		static float foo = 0.0f;
@@ -146,47 +198,6 @@ private:
 		m_vkCore.UpdateUniformBuffer(ImageIndex, 0, &Rotate.m[0][0], sizeof(Matrix4f));
 	}
 
-	void CreateSemaphores()
-	{
-		m_presentCompleteSem = m_vkCore.CreateSemaphore();
-		m_renderCompleteSem = m_vkCore.CreateSemaphore();
-	}
-
-
-	void CreateVertexBuffer()
-	{
-		struct Vertex {
-			Vertex(const Vector3f& p, const Vector2f& t)
-			{
-				Pos = p;
-				Tex = t;
-			}
-
-			Vector3f Pos;
-			Vector2f Tex;
-		};
-
-		std::vector<Vertex> Vertices = {
-			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
-			Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
-			Vertex(Vector3f(0.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)) };
-
-		VkBuffer vb = m_vkCore.CreateVertexBuffer(Vertices.data(), sizeof(Vertices[0]) * Vertices.size());
-	}
-
-	void CreateShaders()
-	{
-		//m_vs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/vs.spv");
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "Shaders/test.vs");
-
-		m_fs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/fs.spv");
-	}
-
-	void CreatePipeline()
-	{
-		m_pipeline = m_vkCore.CreatePipeline(m_vs, m_fs);
-	}
-
 	OgldevVK::VulkanCore m_vkCore;	
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkSemaphore m_renderCompleteSem;
@@ -194,6 +205,7 @@ private:
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
 	VkPipeline m_pipeline;
+	OgldevVK::VulkanTexture m_texture;
 };
 
 

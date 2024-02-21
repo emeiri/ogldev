@@ -48,7 +48,7 @@ private:
 };
 
 
-struct TextureAndMemory {
+struct VulkanTexture {
 	VkImage m_image = VK_NULL_HANDLE;
 	VkDeviceMemory m_mem = VK_NULL_HANDLE;
 	VkImageView m_view = VK_NULL_HANDLE;
@@ -87,13 +87,13 @@ public:
 
 	BufferAndMemory CreateUniformBuffer(int Size);
 
-	void CreateTextureImage(const char* filename, TextureAndMemory& Tex);
+	void CreateTexture(const char* filename, VulkanTexture& Tex);
 
 	void UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size);
 
 	void CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs);
 
-	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs);
+	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex);
 
 	VkPipelineLayout& GetPipelineLayout() { return m_pipelineLayout; }
 
@@ -111,7 +111,7 @@ private:
 	void CreateCommandBufferPool();
 	void CreateUniformBuffers();
 	void CreateDescriptorPool();
-	void CreateDescriptorSet();
+	void CreateDescriptorSet(const VulkanTexture& Tex);
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
@@ -120,13 +120,13 @@ private:
 	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
 					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
-	void CreateTextureImageFromData(TextureAndMemory& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
+	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
 									VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags Flags);
 
-	void CreateImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
+	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
 		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels);
 
-	void UpdateTextureImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
+	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
 
 	void CopyBufferToImage(VkBuffer buffer, VkImage image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount);
 

@@ -66,7 +66,6 @@ void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t Unifor
 	CreateCommandBuffers(1, &m_copyCmdBuf);
 	CreateUniformBuffers();
 	CreateDescriptorPool();
-	CreateDescriptorSet();
 }
 
 
@@ -518,16 +517,16 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 }
 
 
-void VulkanCore::CreateTextureImage(const char* filename, TextureAndMemory& Tex)
+void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 {
 	int ImageWidth = 0;
 	int ImageHeight = 0;
 	int ImageChannels = 0;
 
-	stbi_uc* pPixels = stbi_load(filename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
+	stbi_uc* pPixels = stbi_load(pFilename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
 
 	if (!pPixels) {
-		printf("Error loading texture from '%s'\n", filename);
+		printf("Error loading texture from '%s'\n", pFilename);
 		exit(1);
 	}
 
@@ -549,10 +548,12 @@ void VulkanCore::CreateTextureImage(const char* filename, TextureAndMemory& Tex)
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	CreateTextureSampler(m_device, &Tex.m_sampler, MinFilter, MaxFilter, AddressMode);
+
+	printf("Texture from '%s' created\n", pFilename);
 }
 
 
-void VulkanCore::CreateTextureImageFromData(TextureAndMemory& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
+void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
 											VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags CreateFlags)
 {
 	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, VK_IMAGE_TILING_OPTIMAL, 
@@ -563,7 +564,7 @@ void VulkanCore::CreateTextureImageFromData(TextureAndMemory& Tex, const void* p
 }
 
 
-void VulkanCore::CreateImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling,
+void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling,
 	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels)
 {
 	VkImageCreateInfo ImageInfo = {
@@ -606,7 +607,7 @@ void VulkanCore::CreateImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHei
 }
 
 
-void VulkanCore::UpdateTextureImage(TextureAndMemory& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout)
+void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout)
 {
 	u32 BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
@@ -939,8 +940,10 @@ void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
 }
 
 
-VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs)
+VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex)
 {
+	CreateDescriptorSet(Tex);
+
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo[2] = {};
 
 	shaderStageCreateInfo[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -1078,11 +1081,11 @@ void VulkanCore::CreateDescriptorPool()
 }
 
 
-void VulkanCore::CreateDescriptorSet()
+void VulkanCore::CreateDescriptorSet(const VulkanTexture& Tex)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding{
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding = {
 		.binding = 0,
 		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 		.descriptorCount = 1,
@@ -1090,9 +1093,9 @@ void VulkanCore::CreateDescriptorSet()
 		.pImmutableSamplers = VK_NULL_HANDLE
 	};
 
-	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding{
+	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
 		.binding = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		.pImmutableSamplers = VK_NULL_HANDLE
@@ -1101,23 +1104,26 @@ void VulkanCore::CreateDescriptorSet()
 	LayoutBindings.push_back(VertexShaderLayoutBinding);
 	LayoutBindings.push_back(FragmentShaderLayoutBinding);
 
-	VkDescriptorSetLayoutCreateInfo LayoutInfo = {};
-
-	LayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	LayoutInfo.flags = 0;
-	LayoutInfo.bindingCount = (u32)LayoutBindings.size();
-	LayoutInfo.pBindings = LayoutBindings.data();
+	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.bindingCount = (u32)LayoutBindings.size(),
+		.pBindings = LayoutBindings.data()
+	};
 
 	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
 
 	std::vector<VkDescriptorSetLayout> Layouts(m_images.size(), m_descriptorSetLayout);
 
-	VkDescriptorSetAllocateInfo AllocInfo = {};
-	AllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	AllocInfo.descriptorPool = m_descriptorPool;
-	AllocInfo.descriptorSetCount = (u32)(m_images.size());
-	AllocInfo.pSetLayouts = Layouts.data();
+	VkDescriptorSetAllocateInfo AllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.pNext = NULL,
+		.descriptorPool = m_descriptorPool,
+		.descriptorSetCount = (u32)(m_images.size()),
+		.pSetLayouts = Layouts.data()
+	};
 
 	m_descriptorSets.resize(m_images.size());
 
@@ -1132,8 +1138,8 @@ void VulkanCore::CreateDescriptorSet()
 		};
 
 		VkDescriptorImageInfo ImageInfo = {
-			//.sampler =  TODO_EMEIRI
-			.imageView = 0,
+			.sampler =  Tex.m_sampler,
+			.imageView = Tex.m_view,
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		};
 
@@ -1150,7 +1156,7 @@ void VulkanCore::CreateDescriptorSet()
 			VkWriteDescriptorSet {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
-				.dstBinding = 3,
+				.dstBinding = 1,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
