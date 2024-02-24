@@ -55,9 +55,9 @@ void PrintImageUsageFlags(const VkImageUsageFlags& flags)
 }
 
 
-uint GetPhysicalDevicesCount(const VkInstance& inst)
+u32 GetPhysicalDevicesCount(const VkInstance& inst)
 {
-    uint NumDevices = 0;
+    u32 NumDevices = 0;
 
     VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, NULL);
     CHECK_VK_RESULT(res, "vkEnumeratePhysicalDevices error\n");
@@ -69,115 +69,113 @@ uint GetPhysicalDevicesCount(const VkInstance& inst)
 void VulkanPhysicalDevices::Allocate(int NumDevices)
 {
     m_devices.resize(NumDevices);
-    m_devProps.resize(NumDevices);
-    m_qFamilyProps.resize(NumDevices);
-    m_qSupportsPresent.resize(NumDevices);
-    m_surfaceFormats.resize(NumDevices);
-    m_surfaceCaps.resize(NumDevices);
-    m_memProps.resize(NumDevices);
-    m_presentModes.resize(NumDevices);
 }
 
 
 void VulkanPhysicalDevices::Init(const VkInstance& inst, const VkSurfaceKHR& Surface)
 {
-    uint NumDevices = GetPhysicalDevicesCount(inst);
+    u32 NumDevices = GetPhysicalDevicesCount(inst);
     printf("Num physical devices %d\n", NumDevices);
 
     Allocate(NumDevices);
 
-    VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, &m_devices[0]);
+    std::vector<VkPhysicalDevice> Devices;
+    Devices.resize(NumDevices);
+
+    VkResult res = vkEnumeratePhysicalDevices(inst, &NumDevices, Devices.data());
     CHECK_VK_RESULT(res, "vkEnumeratePhysicalDevices error\n");
 
-    for (uint i = 0; i < NumDevices; i++) {
-        const VkPhysicalDevice& PhysDev = m_devices[i];
-        vkGetPhysicalDeviceProperties(PhysDev, &m_devProps[i]);
+    for (u32 i = 0; i < NumDevices; i++) {
+        const VkPhysicalDevice& PhysDev = Devices[i];
+        m_devices[i].m_physDevice = PhysDev;
 
-        printf("Device name: %s\n", m_devProps[i].deviceName);
-        uint32_t apiVer = m_devProps[i].apiVersion;
+        vkGetPhysicalDeviceProperties(PhysDev, &m_devices[i].m_devProps);
+
+        printf("Device name: %s\n", m_devices[i].m_devProps.deviceName);
+        u32 apiVer = m_devices[i].m_devProps.apiVersion;
         printf("    API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer), VK_VERSION_MINOR(apiVer), VK_VERSION_PATCH(apiVer));
-        uint NumQFamily = 0;
+        u32 NumQFamily = 0;
 
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, NULL);
 
         printf("    Num of family queues: %d\n", NumQFamily);
 
-        m_qFamilyProps[i].resize(NumQFamily);
-        m_qSupportsPresent[i].resize(NumQFamily);
+        m_devices[i].m_qFamilyProps.resize(NumQFamily);
+        m_devices[i].m_qSupportsPresent.resize(NumQFamily);
 
-        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, &(m_qFamilyProps[i][0]));
+        vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, m_devices[i].m_qFamilyProps.data());
 
-        for (uint q = 0; q < NumQFamily; q++) {
-            res = vkGetPhysicalDeviceSurfaceSupportKHR(PhysDev, q, Surface, &(m_qSupportsPresent[i][q]));
+        for (u32 q = 0; q < NumQFamily; q++) {
+            res = vkGetPhysicalDeviceSurfaceSupportKHR(PhysDev, q, Surface, &(m_devices[i].m_qSupportsPresent[q]));
             CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfaceSupportKHR error\n");
         }
 
-        uint NumFormats = 0;
+        u32 NumFormats = 0;
         vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, NULL);
         assert(NumFormats > 0);
 
-        m_surfaceFormats[i].resize(NumFormats);
+        m_devices[i].m_surfaceFormats.resize(NumFormats);
 
-        res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(m_surfaceFormats[i][0]));
+        res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, m_devices[i].m_surfaceFormats.data());
         CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfaceFormatsKHR\n");
 
-        for (uint j = 0; j < NumFormats; j++) {
-            const VkSurfaceFormatKHR& SurfaceFormat = m_surfaceFormats[i][j];
+        for (u32 j = 0; j < NumFormats; j++) {
+            const VkSurfaceFormatKHR& SurfaceFormat = m_devices[i].m_surfaceFormats[j];
             printf("    Format %d color space %d\n", SurfaceFormat.format, SurfaceFormat.colorSpace);
         }
 
-        res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(m_surfaceCaps[i]));
+        res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(m_devices[i].m_surfaceCaps));
         CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR\n");
 
-        PrintImageUsageFlags(m_surfaceCaps[i].supportedUsageFlags);
+        PrintImageUsageFlags(m_devices[i].m_surfaceCaps.supportedUsageFlags);
 
-        uint NumPresentModes = 0;
+        u32 NumPresentModes = 0;
 
         res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, NULL);
         CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfacePresentModesKHR (1) error\n");
 
         assert(NumPresentModes != 0);
 
-        m_presentModes[i].resize(NumPresentModes);
+        m_devices[i].m_presentModes.resize(NumPresentModes);
 
-        res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, m_presentModes[i].data());
+        res = vkGetPhysicalDeviceSurfacePresentModesKHR(PhysDev, Surface, &NumPresentModes, m_devices[i].m_presentModes.data());
         CHECK_VK_RESULT(res, "vkGetPhysicalDeviceSurfacePresentModesKHR (2) error\n");
 
         printf("Number of presentation modes %d\n", NumPresentModes);
 
-        vkGetPhysicalDeviceMemoryProperties(PhysDev, &m_memProps[i]);
+        vkGetPhysicalDeviceMemoryProperties(PhysDev, &(m_devices[i].m_memProps));
 
-        printf("Num memory types %d\n", m_memProps[i].memoryTypeCount);
-        for (uint j = 0; j < m_memProps[i].memoryTypeCount; j++) {
-            printf("%d: (%x) ", j, m_memProps[i].memoryTypes[j].propertyFlags);
+        printf("Num memory types %d\n", m_devices[i].m_memProps.memoryTypeCount);
+        for (u32 j = 0; j < m_devices[i].m_memProps.memoryTypeCount; j++) {
+            printf("%d: (%x) ", j, m_devices[i].m_memProps.memoryTypes[j].propertyFlags);
 
-            if (m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
+            if (m_devices[i].m_memProps.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) {
                 printf("DEVICE LOCAL ");
             }
 
-            if (m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+            if (m_devices[i].m_memProps.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
                 printf("HOST VISIBLE ");
             }
 
-            if (m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
+            if (m_devices[i].m_memProps.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) {
                 printf("HOST COHERENT ");
             }
 
-            if (m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) {
+            if (m_devices[i].m_memProps.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT) {
                 printf("HOST CACHED ");
             }
 
-            if (m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) {
+            if (m_devices[i].m_memProps.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) {
                 printf("LAZILY ALLOCATED ");
             }
 
-            if (m_memProps[i].memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_PROTECTED_BIT) {
+            if (m_devices[i].m_memProps.memoryTypes[j].propertyFlags & VK_MEMORY_PROPERTY_PROTECTED_BIT) {
                 printf("PROTECTED ");
             }
 
             printf("\n");
         }
-        printf("Num heap types %d\n", m_memProps[i].memoryHeapCount);
+        printf("Num heap types %d\n", m_devices[i].m_memProps.memoryHeapCount);
     }
 }
 
@@ -186,10 +184,10 @@ DeviceAndQueue VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueTyp
 {
     DeviceAndQueue ret;
 
-    for (uint i = 0; i < m_devices.size(); i++) {
+    for (u32 i = 0; i < m_devices.size(); i++) {
 
-        for (uint j = 0; j < m_qFamilyProps[i].size(); j++) {
-            VkQueueFamilyProperties& QFamilyProp = m_qFamilyProps[i][j];
+        for (u32 j = 0; j < m_devices[i].m_qFamilyProps.size(); j++) {
+            VkQueueFamilyProperties& QFamilyProp = m_devices[i].m_qFamilyProps[j];
 
             printf("Family %d Num queues: %d\n", j, QFamilyProp.queueCount);
             VkQueueFlags flags = QFamilyProp.queueFlags;
@@ -199,7 +197,7 @@ DeviceAndQueue VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueTyp
                 (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No",
                 (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
 
-            if ((flags & RequiredQueueType) && ((bool)m_qSupportsPresent[i][j] == SupportsPresent)) {
+            if ((flags & RequiredQueueType) && ((bool)m_devices[i].m_qSupportsPresent[j] == SupportsPresent)) {
                 ret.Device = i;
                 ret.Queue = j;
                 printf("Using GFX device %d and queue family %d\n", i, j);

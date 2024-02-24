@@ -24,8 +24,8 @@
 namespace OgldevVK {
 
 struct DeviceAndQueue {
-	uint32_t Device = UINT_MAX;
-	uint32_t Queue = UINT_MAX;
+	u32 Device = UINT_MAX;
+	u32 Queue = UINT_MAX;
 };
 
 class VulkanPhysicalDevices {
@@ -37,20 +37,21 @@ public:
 
 	DeviceAndQueue SelectDevice(VkQueueFlags RequiredQueueType, bool SupportsPresent);
 
-    std::vector<VkPhysicalDevice> m_devices;
-    std::vector<VkPhysicalDeviceProperties> m_devProps;
-    std::vector< std::vector<VkQueueFamilyProperties> > m_qFamilyProps;
-    std::vector< std::vector<VkBool32> > m_qSupportsPresent;
-    std::vector< std::vector<VkSurfaceFormatKHR> > m_surfaceFormats;
-    std::vector<VkSurfaceCapabilitiesKHR> m_surfaceCaps;
-    std::vector<VkPhysicalDeviceMemoryProperties> m_memProps;
-    std::vector< std::vector<VkPresentModeKHR> > m_presentModes;
+	struct PhysicalDevice {
+		VkPhysicalDevice m_physDevice;
+		VkPhysicalDeviceProperties m_devProps;
+		std::vector<VkQueueFamilyProperties> m_qFamilyProps;
+		std::vector<VkBool32> m_qSupportsPresent;
+		std::vector<VkSurfaceFormatKHR> m_surfaceFormats;
+		VkSurfaceCapabilitiesKHR m_surfaceCaps;
+		VkPhysicalDeviceMemoryProperties m_memProps;
+		std::vector<VkPresentModeKHR> m_presentModes;
+	};
+
+	std::vector<PhysicalDevice> m_devices;
 
 private:
     void Allocate(int NumDevices);
 };
-
-
-void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surface, VulkanPhysicalDevices& PhysDevices);
 
 }

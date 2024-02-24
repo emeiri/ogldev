@@ -205,7 +205,7 @@ void VulkanCore::CreateDevice()
 	devInfo.queueCreateInfoCount = 1;
 	devInfo.pQueueCreateInfos = &qInfo;
 
-	VkResult res = vkCreateDevice(m_physDevices.m_devices[m_devAndQueue.Device], &devInfo, NULL, &m_device);
+	VkResult res = vkCreateDevice(m_physDevices.m_devices[m_devAndQueue.Device].m_physDevice, &devInfo, NULL, &m_device);
 	CHECK_VK_RESULT(res, "Create device\n");
 
 	printf("Device created\n");
@@ -248,13 +248,13 @@ static u32 ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 
 void VulkanCore::CreateSwapChain()
 {
-	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.m_surfaceCaps[m_devAndQueue.Device];
+	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceCaps;
 
 	assert(SurfaceCaps.currentExtent.width != -1);
 
 	uint NumImages = ChooseNumImages(SurfaceCaps);
 
-	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.m_presentModes[m_devAndQueue.Device];
+	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.m_devices[m_devAndQueue.Device].m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
 	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
@@ -262,8 +262,8 @@ void VulkanCore::CreateSwapChain()
 	SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	SwapChainCreateInfo.surface = m_surface;
 	SwapChainCreateInfo.minImageCount = NumImages;
-	SwapChainCreateInfo.imageFormat = m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0].format;
-	SwapChainCreateInfo.imageColorSpace = m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0].colorSpace;
+	SwapChainCreateInfo.imageFormat = m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceFormats[0].format;
+	SwapChainCreateInfo.imageColorSpace = m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceFormats[0].colorSpace;
 	SwapChainCreateInfo.imageExtent = SurfaceCaps.currentExtent;
 	SwapChainCreateInfo.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 	SwapChainCreateInfo.preTransform = SurfaceCaps.currentTransform;
@@ -363,7 +363,7 @@ VkSemaphore VulkanCore::CreateSemaphore()
 
 const VkSurfaceFormatKHR& VulkanCore::GetSurfaceFormat() const
 {
-	return m_physDevices.m_surfaceFormats[m_devAndQueue.Device][0];
+	return m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceFormats[0];
 }
 
 
@@ -868,7 +868,7 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 
 u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
 {
-	VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.m_memProps[m_devAndQueue.Device];
+	VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.m_devices[m_devAndQueue.Device].m_memProps;
 
 	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
 		if ((memTypeBits & (1 << i)) &&
