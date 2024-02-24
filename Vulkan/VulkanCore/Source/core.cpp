@@ -24,15 +24,24 @@
 
 namespace OgldevVK {
 
-VulkanCore::VulkanCore(GLFWwindow* pWindow)
+VulkanCore::VulkanCore()
 {
-	m_pWindow = pWindow;
 }
 
 
 VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
+	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
+	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
+	if (!vkDestroySurface) {
+		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		exit(1);
+	}
+
+	vkDestroySurfaceKHR(m_instance, m_surface, NULL);
+
+	printf("GLFW window surface destroyed\n");
 
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
@@ -49,8 +58,9 @@ VulkanCore::~VulkanCore()
 }
 
 
-void VulkanCore::Init(const char* pAppName, int NumUniformBuffers, size_t UniformDataSize)
+void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformBuffers, size_t UniformDataSize)
 {
+	m_pWindow = pWindow;
 	m_numUniformBuffers = NumUniformBuffers;
 	m_uniformDataSize = UniformDataSize;
 	CreateInstance(pAppName);
@@ -167,10 +177,8 @@ void VulkanCore::CreateDebugCallback()
 
 void VulkanCore::CreateSurface()
 {
-	if (glfwCreateWindowSurface(m_instance, m_pWindow, NULL, &m_surface)) {
-		fprintf(stderr, "Error creating GLFW window surface\n");
-		exit(1);
-	}
+	VkResult res = glfwCreateWindowSurface(m_instance, m_pWindow, NULL, &m_surface);
+	CHECK_VK_RESULT(res, "glfwCreateWindowSurface");
 
 	printf("GLFW window surface created\n");
 }

@@ -42,7 +42,7 @@ class VulkanApp
 {
 public:
 
-	VulkanApp(GLFWwindow* pWindow) : m_vkCore(pWindow)
+	VulkanApp()
 	{
 	}
 
@@ -50,10 +50,10 @@ public:
 	{
 	}
 
-	void Init(const char* pAppName)
+	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
 		int NumUniformBuffers = 1;
-		m_vkCore.Init(pAppName, NumUniformBuffers, sizeof(UniformData));
+		m_vkCore.Init(pAppName, pWindow, NumUniformBuffers, sizeof(UniformData));
 		CreateCommandBuffer();		
 		CreateSemaphores();
 		CreateVertexBuffer();
@@ -233,8 +233,8 @@ int main(int argc, char* argv[])
 
 	glfwSetKeyCallback(pWindow, GLFW_KeyCallback);
 
-	VulkanApp App(pWindow);
-	App.Init(APP_NAME);
+	VulkanApp App;
+	App.Init(APP_NAME, pWindow);
 
 	while (!glfwWindowShouldClose(pWindow)) {
 		App.RenderScene();

@@ -58,10 +58,10 @@ struct VulkanTexture {
 
 class VulkanCore {
 public:
-	VulkanCore(GLFWwindow* pWindow);
+	VulkanCore();
 	~VulkanCore();
 
-	void Init(const char* pAppName, int NumUniformBuffers, size_t UniformDataSize);
+	void Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformBuffers, size_t UniformDataSize);
 
 	VkDevice& GetDevice() { return m_device; }
 
