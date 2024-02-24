@@ -190,7 +190,6 @@ void BaseTerrain::SetMinMaxHeight(float MinHeight, float MaxHeight)
     m_maxHeight = MaxHeight;
 
     m_terrainTech.Enable();
-    m_terrainTech.SetMinMaxHeight(MinHeight, MaxHeight);
 }
 
 

@@ -24,7 +24,6 @@ vec4 CalcTexColor()
     vec4 TexColor;
 
     vec2 ScaledTexCoord = Tex3 * 16.0;
-//    float Height = WorldPos.y;
 
     if (Height < gHeight0) {
        TexColor = texture(gTextureHeight0, ScaledTexCoord);
@@ -59,10 +58,16 @@ vec3 CalcNormal()
     float HEIGHT_SCALE = 1.0;
     float uTexelSize = 1.0 / 256.0;
       
-    float left  = texture(gHeightMap, Tex3 + vec2(-uTexelSize, 0.0)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
-    float right = texture(gHeightMap, Tex3 + vec2( uTexelSize, 0.0)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
-    float up    = texture(gHeightMap, Tex3 + vec2(0.0,  uTexelSize)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
-    float down  = texture(gHeightMap, Tex3 + vec2(0.0, -uTexelSize)).r;// * HEIGHT_SCALE * 2.0 - 1.0;
+    //float left  = texture(gHeightMap, Tex3 + vec2(-uTexelSize, 0.0)).r;
+    //float right = texture(gHeightMap, Tex3 + vec2( uTexelSize, 0.0)).r;
+    //float up    = texture(gHeightMap, Tex3 + vec2(0.0,  uTexelSize)).r;
+    //float down  = texture(gHeightMap, Tex3 + vec2(0.0, -uTexelSize)).r;
+
+    float left  = textureOffset(gHeightMap, Tex3, ivec2(-1, 0)).r;
+    float right = textureOffset(gHeightMap, Tex3, ivec2( 1, 0)).r;
+    float up    = textureOffset(gHeightMap, Tex3, ivec2( 0, 1)).r;
+    float down  = textureOffset(gHeightMap, Tex3, ivec2( 0, -1)).r;
+
  //   vec3 normal = normalize(vec3(down - up, 2.0, left - right));
 
  //vec3 normal = normalize(0.25 * vec3(2*(right - left), 2 * (down - up), -4));

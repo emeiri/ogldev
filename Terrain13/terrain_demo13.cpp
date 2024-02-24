@@ -88,7 +88,7 @@ public:
                 ImGui_ImplGlfw_NewFrame();
                 ImGui::NewFrame();
                                  
-                ImGui::Begin("Terrain Demo 5");                          // Create a window called "Hello, world!" and append into it.
+                ImGui::Begin("Terrain Demo 13");                          // Create a window called "Hello, world!" and append into it.
 
                 ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
                 ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
@@ -139,7 +139,7 @@ public:
         m_pGameCamera->OnRender();
 
         static float foo = 0.0f;
-        foo += 0.002f;
+        foo += 0.01f;
 
        /* float S = (float)m_terrainSize;
         float R = 2.5f * S;
@@ -153,9 +153,9 @@ public:
         m_pGameCamera->SetUp(0.0f, 1.0f, 0.0f);*/
 
         float x = min(-0.4f, cosf(foo));
-        Vector3f LightDir(x, -1.0f, 0.0f);
+        Vector3f LightDir(cosf(foo), -1.0f, sinf(foo));
 
-      //  m_terrain.SetLightDir(LightDir);
+        m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -247,9 +247,9 @@ private:
     {
         float CameraX = m_terrain.GetWorldSize() / 2.0f;
         float CameraZ = CameraX;
-        Vector3f Pos(CameraX, 0.0f, CameraZ);
+        Vector3f Pos(CameraX, 600.0f, CameraZ);
     //    Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Pos = m_terrain.ConstrainCameraPosToTerrain(Pos);
+       // Pos = m_terrain.ConstrainCameraPosToTerrain(Pos);
         Vector3f Target(0.0f, 0.0f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
