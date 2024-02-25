@@ -43,11 +43,18 @@ class VulkanApp
 public:
 
 	VulkanApp()
-	{
+	{	
 	}
 
 	~VulkanApp()
 	{
+		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+		m_vkCore.FreeSemaphore(m_presentCompleteSem);
+		m_vkCore.FreeSemaphore(m_renderCompleteSem);
+		vkDestroyShaderModule(m_vkCore.GetDevice(), m_vs, NULL);
+		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
+		m_vkCore.DestroyTexture(m_texture);
+		m_vkCore.DestroyPipeline(m_pipeline);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -56,12 +63,11 @@ public:
 		m_vkCore.Init(pAppName, pWindow, NumUniformBuffers, sizeof(UniformData));
 		CreateCommandBuffer();		
 		CreateSemaphores();
-		CreateVertexBuffer();
+	//	CreateVertexBuffer();
 		CreateShaders();
 		CreateTexture();
 		CreatePipeline();
 		RecordCommandBuffers();
-	//	exit(0);
 	}
 
 	void RenderScene()

@@ -75,7 +75,10 @@ public:
 
 	void QueuePresent(u32 ImageIndex, VkSemaphore RenderCompleteSem);
 
+	void QueueWaitIdle() { vkQueueWaitIdle(m_queue); }
+
 	VkSemaphore CreateSemaphore();
+	void FreeSemaphore(VkSemaphore Sem);
 
 	const VkRenderPass& GetRenderPass() const { return m_renderPass; }
 
@@ -86,12 +89,15 @@ public:
 	BufferAndMemory CreateUniformBuffer(int Size);
 
 	void CreateTexture(const char* filename, VulkanTexture& Tex);
+	void DestroyTexture(VulkanTexture& Tex);
 
 	void UpdateUniformBuffer(int ImageIndex, int UniformBufferIndex, const void* pData, size_t Size);
 
-	void CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs);
+	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
+	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
 	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex);
+	void DestroyPipeline(VkPipeline Pipeline);
 
 	VkPipelineLayout& GetPipelineLayout() { return m_pipelineLayout; }
 

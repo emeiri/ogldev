@@ -32,6 +32,34 @@ VulkanCore::VulkanCore()
 VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
+
+	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
+
+	for (int i = 0; i < m_uniformBuffers.size(); i++) {
+		for (int j = 0; j < m_uniformBuffers[i].size(); j++) {
+			vkFreeMemory(m_device, m_uniformBuffers[i][j].m_mem, NULL);
+			vkDestroyBuffer(m_device, m_uniformBuffers[i][j].m_buffer, NULL);
+		}
+	}
+
+	for (int i = 0 ; i < m_fbs.size(); i++) {
+		vkDestroyFramebuffer(m_device, m_fbs[i], NULL);
+	}
+
+	vkDestroyRenderPass(m_device, m_renderPass, NULL);
+
+	for (int i = 0; i < m_imageViews.size(); i++) {
+		vkDestroyImageView(m_device, m_imageViews[i], NULL);
+	}
+
+	vkDestroySwapchainKHR(m_device, m_swapChain, NULL);
+
+	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
+
+	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
+
+	vkDestroyDevice(m_device, NULL);
+
 	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
 	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
 	if (!vkDestroySurface) {
@@ -361,6 +389,12 @@ VkSemaphore VulkanCore::CreateSemaphore()
 }
 
 
+void VulkanCore::FreeSemaphore(VkSemaphore Sem)
+{
+	vkDestroySemaphore(m_device, Sem, NULL);
+}
+
+
 void VulkanCore::CreateRenderPass()
 {
 	VkAttachmentReference attachRef = {};
@@ -552,6 +586,15 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	CreateTextureSampler(m_device, &Tex.m_sampler, MinFilter, MaxFilter, AddressMode);
 
 	printf("Texture from '%s' created\n", pFilename);
+}
+
+
+void VulkanCore::DestroyTexture(VulkanTexture& Tex)
+{
+	vkDestroySampler(m_device, Tex.m_sampler, NULL);
+	vkDestroyImageView(m_device, Tex.m_view, NULL);
+	vkDestroyImage(m_device, Tex.m_image, NULL);
+	vkFreeMemory(m_device, Tex.m_mem, NULL);
 }
 
 
@@ -907,6 +950,13 @@ void VulkanCore::CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs)
 }
 
 
+void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
+{
+	QueueWaitIdle();
+	vkFreeCommandBuffers(m_device, m_cmdBufPool, Count, pCmdBufs);
+}
+
+
 VkCommandBuffer VulkanCore::BeginSingleUseCommand()
 {
 	VkCommandBuffer CmdBuf;
@@ -1045,6 +1095,14 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs, cons
 	printf("Graphics pipeline created\n");
 
 	return Pipeline;
+}
+
+
+void VulkanCore::DestroyPipeline(VkPipeline Pipeline)
+{
+	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
+	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
+	vkDestroyPipeline(m_device, Pipeline, NULL);
 }
 
 
