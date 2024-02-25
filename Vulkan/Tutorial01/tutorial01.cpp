@@ -124,7 +124,8 @@ private:
 		//m_vs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/vs.spv");
 		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "Shaders/test.vs");
 
-		m_fs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/fs.spv");
+		//m_fs = OgldevVK::CreateShaderModuleFromBinary(m_vkCore.GetDevice(), "Shaders/fs.spv");
+		m_fs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "Shaders/test.fs");
 	}
 
 
