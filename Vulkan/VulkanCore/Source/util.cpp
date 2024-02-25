@@ -21,6 +21,7 @@
 #include "ogldev_util.h"
 #include "ogldev_vulkan_util.h"
 
+namespace OgldevVK {
 
 const char* GetDebugSeverityStr(VkDebugUtilsMessageSeverityFlagBitsEXT Severity)
 {
@@ -96,4 +97,6 @@ uint32_t GetBytesPerTexFormat(VkFormat Format)
 	}
 
 	return 0;
+}
+
 }

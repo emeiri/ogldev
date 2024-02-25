@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include <stdio.h>
 
 typedef unsigned int uint;
@@ -27,7 +29,10 @@ typedef unsigned int uint;
 		exit(1);	\
 	}
 
+namespace OgldevVK {
+
 const char* GetDebugSeverityStr(VkDebugUtilsMessageSeverityFlagBitsEXT Severity);
 
 const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type);
 
+}

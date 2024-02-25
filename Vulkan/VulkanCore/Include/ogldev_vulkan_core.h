@@ -23,6 +23,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_vulkan_device.h"
+
 namespace OgldevVK {
 
 class VulkanCore {
@@ -39,11 +41,14 @@ private:
 
 	void CreateInstance(const char* pAppName);
 	void CreateDebugCallback();
-	void CreateSurface(GLFWwindow* pWindow);
+	void CreateSurface();
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
-	VkSurfaceKHR m_surface;
+	GLFWwindow* m_pWindow = NULL;
+	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
+	VulkanPhysicalDevices m_physDevices;
+	u32 m_queueFamily = 0;
 };
 
 }
