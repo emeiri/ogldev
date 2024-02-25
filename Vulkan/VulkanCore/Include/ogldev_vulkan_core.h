@@ -77,8 +77,6 @@ public:
 
 	VkSemaphore CreateSemaphore();
 
-	const VkSurfaceFormatKHR& GetSurfaceFormat() const;
-
 	const VkRenderPass& GetRenderPass() const { return m_renderPass; }
 
 	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
@@ -145,7 +143,7 @@ private:
 	GLFWwindow* m_pWindow = NULL;
 	VkSurfaceKHR m_surface;
 	VulkanPhysicalDevices m_physDevices;
-	DeviceAndQueue m_devAndQueue;
+	u32 m_queueFamily = 0;
 	VkDevice m_device;
 	VkQueue m_queue;
 	VkSwapchainKHR m_swapChain;

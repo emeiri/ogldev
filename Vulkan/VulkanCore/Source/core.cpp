@@ -67,7 +67,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformB
 	CreateDebugCallback();
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
-	m_devAndQueue = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
+	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
 	CreateDevice();
 	CreateSwapChain();
 	CreateRenderPass();
@@ -191,7 +191,7 @@ void VulkanCore::CreateDevice()
 	float qPriorities = 1.0f;
 	qInfo.queueCount = 1;
 	qInfo.pQueuePriorities = &qPriorities;
-	qInfo.queueFamilyIndex = m_devAndQueue.Queue;
+	qInfo.queueFamilyIndex = m_queueFamily;
 
 	std::vector<const char*> DevExts = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -205,12 +205,12 @@ void VulkanCore::CreateDevice()
 	devInfo.queueCreateInfoCount = 1;
 	devInfo.pQueueCreateInfos = &qInfo;
 
-	VkResult res = vkCreateDevice(m_physDevices.m_devices[m_devAndQueue.Device].m_physDevice, &devInfo, NULL, &m_device);
+	VkResult res = vkCreateDevice(m_physDevices.Selected().m_physDevice, &devInfo, NULL, &m_device);
 	CHECK_VK_RESULT(res, "Create device\n");
 
 	printf("Device created\n");
 
-	vkGetDeviceQueue(m_device, m_devAndQueue.Queue, 0, &m_queue);
+	vkGetDeviceQueue(m_device, m_queueFamily, 0, &m_queue);
 
 	printf("Queue acquired\n");
 }
@@ -248,13 +248,13 @@ static u32 ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 
 void VulkanCore::CreateSwapChain()
 {
-	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceCaps;
+	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.Selected().m_surfaceCaps;
 
 	assert(SurfaceCaps.currentExtent.width != -1);
 
 	uint NumImages = ChooseNumImages(SurfaceCaps);
 
-	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.m_devices[m_devAndQueue.Device].m_presentModes;
+	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.Selected().m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
 	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
@@ -262,8 +262,8 @@ void VulkanCore::CreateSwapChain()
 	SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	SwapChainCreateInfo.surface = m_surface;
 	SwapChainCreateInfo.minImageCount = NumImages;
-	SwapChainCreateInfo.imageFormat = m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceFormats[0].format;
-	SwapChainCreateInfo.imageColorSpace = m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceFormats[0].colorSpace;
+	SwapChainCreateInfo.imageFormat = m_physDevices.Selected().m_surfaceFormats[0].format;
+	SwapChainCreateInfo.imageColorSpace = m_physDevices.Selected().m_surfaceFormats[0].colorSpace;
 	SwapChainCreateInfo.imageExtent = SurfaceCaps.currentExtent;
 	SwapChainCreateInfo.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
 	SwapChainCreateInfo.preTransform = SurfaceCaps.currentTransform;
@@ -273,7 +273,7 @@ void VulkanCore::CreateSwapChain()
 	SwapChainCreateInfo.clipped = VK_TRUE;
 	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	SwapChainCreateInfo.queueFamilyIndexCount = 1;
-	SwapChainCreateInfo.pQueueFamilyIndices = &m_devAndQueue.Queue;
+	SwapChainCreateInfo.pQueueFamilyIndices = &m_queueFamily;
 
 	VkResult res = vkCreateSwapchainKHR(m_device, &SwapChainCreateInfo, NULL, &m_swapChain);
 	CHECK_VK_RESULT(res, "vkCreateSwapchainKHR\n");
@@ -361,12 +361,6 @@ VkSemaphore VulkanCore::CreateSemaphore()
 }
 
 
-const VkSurfaceFormatKHR& VulkanCore::GetSurfaceFormat() const
-{
-	return m_physDevices.m_devices[m_devAndQueue.Device].m_surfaceFormats[0];
-}
-
-
 void VulkanCore::CreateRenderPass()
 {
 	VkAttachmentReference attachRef = {};
@@ -379,7 +373,7 @@ void VulkanCore::CreateRenderPass()
 	subpassDesc.pColorAttachments = &attachRef;
 
 	VkAttachmentDescription attachDesc = {};
-	attachDesc.format = GetSurfaceFormat().format;
+	attachDesc.format = m_physDevices.Selected().m_surfaceFormats[0].format;
 	attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 	attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -868,7 +862,7 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 
 u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
 {
-	VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.m_devices[m_devAndQueue.Device].m_memProps;
+	const VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.Selected().m_memProps;
 
 	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
 		if ((memTypeBits & (1 << i)) &&
@@ -887,7 +881,7 @@ void VulkanCore::CreateCommandBufferPool()
 {
 	VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
 	cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	cmdPoolCreateInfo.queueFamilyIndex = m_devAndQueue.Queue;
+	cmdPoolCreateInfo.queueFamilyIndex = m_queueFamily;
 
 	VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
 	CHECK_VK_RESULT(res, "vkCreateCommandPool\n");

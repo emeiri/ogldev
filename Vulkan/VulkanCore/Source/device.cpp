@@ -66,18 +66,12 @@ u32 GetPhysicalDevicesCount(const VkInstance& inst)
 }
 
 
-void VulkanPhysicalDevices::Allocate(int NumDevices)
-{
-    m_devices.resize(NumDevices);
-}
-
-
 void VulkanPhysicalDevices::Init(const VkInstance& inst, const VkSurfaceKHR& Surface)
 {
     u32 NumDevices = GetPhysicalDevicesCount(inst);
-    printf("Num physical devices %d\n", NumDevices);
+    printf("Num physical devices %d\n\n", NumDevices);
 
-    Allocate(NumDevices);
+    m_devices.resize(NumDevices);
 
     std::vector<VkPhysicalDevice> Devices;
     Devices.resize(NumDevices);
@@ -94,10 +88,9 @@ void VulkanPhysicalDevices::Init(const VkInstance& inst, const VkSurfaceKHR& Sur
         printf("Device name: %s\n", m_devices[i].m_devProps.deviceName);
         u32 apiVer = m_devices[i].m_devProps.apiVersion;
         printf("    API version: %d.%d.%d\n", VK_VERSION_MAJOR(apiVer), VK_VERSION_MINOR(apiVer), VK_VERSION_PATCH(apiVer));
+
         u32 NumQFamily = 0;
-
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamily, NULL);
-
         printf("    Num of family queues: %d\n", NumQFamily);
 
         m_devices[i].m_qFamilyProps.resize(NumQFamily);
@@ -176,14 +169,13 @@ void VulkanPhysicalDevices::Init(const VkInstance& inst, const VkSurfaceKHR& Sur
             printf("\n");
         }
         printf("Num heap types %d\n", m_devices[i].m_memProps.memoryHeapCount);
+        printf("\n");
     }
 }
 
 
-DeviceAndQueue VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueType, bool SupportsPresent)
+u32 VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueType, bool SupportsPresent)
 {
-    DeviceAndQueue ret;
-
     for (u32 i = 0; i < m_devices.size(); i++) {
 
         for (u32 j = 0; j < m_devices[i].m_qFamilyProps.size(); j++) {
@@ -198,15 +190,26 @@ DeviceAndQueue VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueTyp
                 (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
 
             if ((flags & RequiredQueueType) && ((bool)m_devices[i].m_qSupportsPresent[j] == SupportsPresent)) {
-                ret.Device = i;
-                ret.Queue = j;
-                printf("Using GFX device %d and queue family %d\n", i, j);
-                return ret;
+                m_devIndex = i;
+                int QueueFamily = j;
+                printf("Using GFX device %d and queue family %d\n", m_devIndex, QueueFamily);
+                return QueueFamily;
             }
         }
     }
+    
+    OGLDEV_ERROR("Required queue type %x and supports present %d not found\n", RequiredQueueType, SupportsPresent);
+    
+    return 0;
+}
 
-    fprintf(stderr, "Required queue type %x and supports present %d not found\n", RequiredQueueType, SupportsPresent);
-    exit(1);
+
+const PhysicalDevice& VulkanPhysicalDevices::Selected() const
+{
+    if (m_devIndex < 0) {
+        OGLDEV_ERROR("A physical device has not been selected\n");
+    }
+
+    return m_devices[m_devIndex];
 }
 }
