@@ -187,8 +187,6 @@ void VulkanPhysicalDevices::Init(const VkInstance& Instance, const VkSurfaceKHR&
         printf("Num heap types %d\n", m_devices[i].m_memProps.memoryHeapCount);
         printf("\n");
     }
-
-    exit(0);
 }
 
 
