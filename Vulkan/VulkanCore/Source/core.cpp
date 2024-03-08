@@ -24,6 +24,25 @@
 
 namespace OgldevVK {
 
+static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+	VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
+	VkDebugUtilsMessageTypeFlagsEXT Type,
+	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData)
+{
+	printf("Debug callback: %s\n", pCallbackData->pMessage);
+	printf("  Severity %s\n", GetDebugSeverityStr(Severity));
+	printf("  Type %s\n", GetDebugType(Type));
+	printf("  Objects ");
+
+	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
+		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
+	}
+
+	return VK_FALSE;  // The calling function should not be aborted
+}
+
+
 VulkanCore::VulkanCore()
 {
 }
@@ -127,6 +146,20 @@ void VulkanCore::CreateInstance(const char* pAppName)
 	    VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
 	};
 
+	VkDebugUtilsMessengerCreateInfoEXT MessengerCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+		.pNext = NULL,
+		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT |
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+							VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+						VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+						VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+		.pfnUserCallback = &DebugCallback,
+		.pUserData = NULL
+	};
+
 	VkApplicationInfo AppInfo = {
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pNext = NULL,
@@ -139,7 +172,7 @@ void VulkanCore::CreateInstance(const char* pAppName)
 
 	VkInstanceCreateInfo CreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-		.pNext = NULL,
+		.pNext = &MessengerCreateInfo,
 		.flags = 0,
 		.pApplicationInfo = &AppInfo,
 		.enabledLayerCount = (u32)(Layers.size()),
@@ -151,25 +184,6 @@ void VulkanCore::CreateInstance(const char* pAppName)
 	VkResult res = vkCreateInstance(&CreateInfo, NULL, &m_instance);
 	CHECK_VK_RESULT(res, "Create instance");
 	printf("Vulkan instance created\n");
-}
-
-
-static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-	VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
-	VkDebugUtilsMessageTypeFlagsEXT Type,
-	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-	void* pUserData)
-{
-	printf("Debug callback: %s\n", pCallbackData->pMessage);
-	printf("  Severity %s\n", GetDebugSeverityStr(Severity));
-	printf("  Type %s\n", GetDebugType(Type));
-	printf("  Objects ");
-
-	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
-		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
-	}
-
-	return VK_FALSE;  // The calling function should not be aborted
 }
 
 
@@ -214,26 +228,48 @@ void VulkanCore::CreateSurface()
 
 void VulkanCore::CreateDevice()
 {
-	VkDeviceQueueCreateInfo qInfo = {};
-	qInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	float qPriorities = 1.0f;
-	qInfo.queueCount = 1;
-	qInfo.pQueuePriorities = &qPriorities;
-	qInfo.queueFamilyIndex = m_queueFamily;
+
+	VkDeviceQueueCreateInfo qInfo = {
+		.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0, // must be zero
+		.queueFamilyIndex = m_queueFamily,
+		.queueCount = 1,
+		.pQueuePriorities = &qPriorities,	// optional
+	};
 
 	std::vector<const char*> DevExts = {
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 		VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
 	};
 
-	VkDeviceCreateInfo devInfo = {};
-	devInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	devInfo.enabledExtensionCount = (u32)DevExts.size();
-	devInfo.ppEnabledExtensionNames = DevExts.data();
-	devInfo.queueCreateInfoCount = 1;
-	devInfo.pQueueCreateInfos = &qInfo;
+	if (m_physDevices.Selected().m_features.geometryShader == VK_FALSE) {
+		OGLDEV_ERROR("The Geometry Shader is not supported!\n");
+	}
 
-	VkResult res = vkCreateDevice(m_physDevices.Selected().m_physDevice, &devInfo, NULL, &m_device);
+	if (m_physDevices.Selected().m_features.tessellationShader == VK_FALSE) {
+		OGLDEV_ERROR("The Tessellation Shader is not supported!\n");
+	}
+
+	VkPhysicalDeviceFeatures DeviceFeatures = { 0 };
+	DeviceFeatures.geometryShader = VK_TRUE;
+	DeviceFeatures.tessellationShader = VK_TRUE;
+
+	VkDeviceCreateInfo DeviceCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.queueCreateInfoCount = 1,
+		.pQueueCreateInfos = &qInfo,
+		.enabledLayerCount = 0,
+		.ppEnabledLayerNames = NULL,
+		.enabledExtensionCount = (u32)DevExts.size(),
+		.ppEnabledExtensionNames = DevExts.data(),		
+		.pEnabledFeatures = NULL
+	};
+
+	VkResult res = vkCreateDevice(m_physDevices.Selected().m_physDevice, &DeviceCreateInfo, NULL, &m_device);
 	CHECK_VK_RESULT(res, "Create device\n");
 
 	printf("Device created\n");
