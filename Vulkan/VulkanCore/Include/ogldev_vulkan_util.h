@@ -18,10 +18,11 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <vulkan/vulkan.h>
 
-typedef unsigned int uint;
+#include "ogldev_types.h"
 
 #define CHECK_VK_RESULT(res, msg) \
 	if (res != VK_SUCCESS) {      \

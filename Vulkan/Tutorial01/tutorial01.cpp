@@ -49,8 +49,6 @@ public:
 	~VulkanApp()
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
-		m_vkCore.FreeSemaphore(m_presentCompleteSem);
-		m_vkCore.FreeSemaphore(m_renderCompleteSem);
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_vs, NULL);
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
 		m_vkCore.DestroyTexture(m_texture);
@@ -61,8 +59,7 @@ public:
 	{
 		int NumUniformBuffers = 1;
 		m_vkCore.Init(pAppName, pWindow, NumUniformBuffers, sizeof(UniformData));
-		CreateCommandBuffer();		
-		CreateSemaphores();
+		CreateCommandBuffer();				
 	//	CreateVertexBuffer();
 		CreateShaders();
 		CreateTexture();
@@ -72,13 +69,13 @@ public:
 
 	void RenderScene()
 	{
-		uint32_t ImageIndex = m_vkCore.AcquireNextImage(m_presentCompleteSem);
+		uint32_t ImageIndex = m_vkCore.GetQueue().AcquireNextImage();
 
 		UpdateUniformBuffers(ImageIndex);
 
-		m_vkCore.Submit(&m_cmdBufs[ImageIndex], m_presentCompleteSem, m_renderCompleteSem);
+		m_vkCore.GetQueue().SubmitAsync(&m_cmdBufs[ImageIndex]);
 
-		m_vkCore.QueuePresent(ImageIndex, m_renderCompleteSem);
+		m_vkCore.GetQueue().Present(ImageIndex);
 	}
 
 private:
@@ -93,13 +90,6 @@ private:
 		m_vkCore.CreateCommandBuffers(m_vkCore.GetNumImages(), &m_cmdBufs[0]);
 			
 		printf("Created command buffers\n");
-	}
-
-
-	void CreateSemaphores()
-	{
-		m_presentCompleteSem = m_vkCore.CreateSemaphore();
-		m_renderCompleteSem = m_vkCore.CreateSemaphore();
 	}
 
 
@@ -207,8 +197,6 @@ private:
 
 	OgldevVK::VulkanCore m_vkCore;	
 	std::vector<VkCommandBuffer> m_cmdBufs;
-	VkSemaphore m_renderCompleteSem;
-	VkSemaphore m_presentCompleteSem;
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
 	VkPipeline m_pipeline;

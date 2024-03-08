@@ -67,6 +67,8 @@ VulkanCore::~VulkanCore()
 
 	vkDestroyRenderPass(m_device, m_renderPass, NULL);
 
+	m_queue.Destroy();
+
 	for (int i = 0; i < m_imageViews.size(); i++) {
 		vkDestroyImageView(m_device, m_imageViews[i], NULL);
 	}
@@ -115,8 +117,9 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformB
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
 	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
-	CreateDevice();
+	CreateDevice();	
 	CreateSwapChain();
+	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
 	CreateRenderPass();
 	CreateFramebuffer();
 	CreateCommandBufferPool();
@@ -273,10 +276,6 @@ void VulkanCore::CreateDevice()
 	CHECK_VK_RESULT(res, "Create device\n");
 
 	printf("Device created\n");
-
-	vkGetDeviceQueue(m_device, m_queueFamily, 0, &m_queue);
-
-	printf("Queue acquired\n");
 }
 
 
@@ -362,72 +361,6 @@ void VulkanCore::CreateSwapChain()
 	for (uint i = 0; i < NumSwapChainImages; i++) {
 		CreateImageView(m_device, m_images[i], VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, &m_imageViews[i], VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
-}
-
-
-u32 VulkanCore::AcquireNextImage(VkSemaphore Semaphore)
-{
-	u32 ImageIndex = 0;
-	VkResult res = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, Semaphore, NULL, &ImageIndex);
-	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR\n");
-	return ImageIndex;
-}
-
-
-void VulkanCore::Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem)
-{
-	VkSubmitInfo submitInfo = {};
-
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = pCmbBuf;
-	if (PresentCompleteSem) {
-		submitInfo.pWaitSemaphores = &PresentCompleteSem;
-		submitInfo.waitSemaphoreCount = 1;
-		VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		submitInfo.pWaitDstStageMask = &waitFlags;
-	}
-
-	if (RenderCompleteSem) {
-		submitInfo.pSignalSemaphores = &RenderCompleteSem;
-		submitInfo.signalSemaphoreCount = 1;
-	}
-
-	VkResult res = vkQueueSubmit(m_queue, 1, &submitInfo, NULL);
-	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
-}
-
-
-void VulkanCore::QueuePresent(u32 ImageIndex, VkSemaphore RenderCompleteSem)
-{
-	VkPresentInfoKHR presentInfo = {};
-	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = &m_swapChain;
-	presentInfo.pImageIndices = &ImageIndex;
-	presentInfo.pWaitSemaphores = &RenderCompleteSem;
-	presentInfo.waitSemaphoreCount = 1;
-
-	VkResult res = vkQueuePresentKHR(m_queue, &presentInfo);
-	CHECK_VK_RESULT(res, "vkQueuePresentKHR\n");
-}
-
-
-VkSemaphore VulkanCore::CreateSemaphore()
-{
-	VkSemaphoreCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-	VkSemaphore semaphore;
-	VkResult res = vkCreateSemaphore(m_device, &createInfo, NULL, &semaphore);
-	CHECK_VK_RESULT(res, "vkCreateSemaphore\n");
-	return semaphore;
-}
-
-
-void VulkanCore::FreeSemaphore(VkSemaphore Sem)
-{
-	vkDestroySemaphore(m_device, Sem, NULL);
 }
 
 
@@ -933,9 +866,9 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 
 	vkEndCommandBuffer(m_copyCmdBuf);
 
-	Submit(&m_copyCmdBuf, NULL, NULL);
+	m_queue.Submit(&m_copyCmdBuf);
 
-	vkQueueWaitIdle(m_queue);
+	m_queue.WaitIdle();
 }
 
 
@@ -988,7 +921,7 @@ void VulkanCore::CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs)
 
 void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 {
-	QueueWaitIdle();
+	m_queue.WaitIdle();
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, Count, pCmdBufs);
 }
 
@@ -1009,20 +942,9 @@ void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
 {
 	vkEndCommandBuffer(CmdBuf);
 
-	VkSubmitInfo submitInfo = {
-		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-		.pNext = nullptr,
-		.waitSemaphoreCount = 0,
-		.pWaitSemaphores = nullptr,
-		.pWaitDstStageMask = nullptr,
-		.commandBufferCount = 1,
-		.pCommandBuffers = &CmdBuf,
-		.signalSemaphoreCount = 0,
-		.pSignalSemaphores = nullptr
-	};
+	m_queue.Submit(&CmdBuf);
 
-	vkQueueSubmit(m_queue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(m_queue);
+	m_queue.WaitIdle();
 
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &CmdBuf);
 }

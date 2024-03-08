@@ -28,6 +28,7 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_device.h"
 #include "ogldev_vulkan_texture.h"
+#include "ogldev_vulkan_queue.h"
 
 namespace OgldevVK {
 
@@ -69,16 +70,7 @@ public:
 
 	std::vector<VkImage>& GetImages() { return m_images;  }
 
-	u32 AcquireNextImage(VkSemaphore Semaphore);
-
-	void Submit(const VkCommandBuffer* pCmbBuf, VkSemaphore PresentCompleteSem, VkSemaphore RenderCompleteSem);
-
-	void QueuePresent(u32 ImageIndex, VkSemaphore RenderCompleteSem);
-
-	void QueueWaitIdle() { vkQueueWaitIdle(m_queue); }
-
-	VkSemaphore CreateSemaphore();
-	void FreeSemaphore(VkSemaphore Sem);
+	VulkanQueue& GetQueue() { return m_queue; }
 
 	const VkRenderPass& GetRenderPass() const { return m_renderPass; }
 
@@ -151,7 +143,7 @@ private:
 	VulkanPhysicalDevices m_physDevices;
 	u32 m_queueFamily = 0;
 	VkDevice m_device;
-	VkQueue m_queue;
+	VulkanQueue m_queue;
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
