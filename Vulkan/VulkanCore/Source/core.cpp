@@ -41,6 +41,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
 	}
 
+	printf("\n");
+
 	return VK_FALSE;  // The calling function should not be aborted
 }
 
@@ -53,6 +55,8 @@ VulkanCore::VulkanCore()
 VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
+
+	vkDestroyDevice(m_device, NULL);
 
 	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
 	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
@@ -88,6 +92,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
 	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
+	CreateDevice();
 }
 
 
@@ -188,6 +193,56 @@ void VulkanCore::CreateSurface()
 	CHECK_VK_RESULT(res, "glfwCreateWindowSurface");
 
 	printf("GLFW window surface created\n");
+}
+
+
+void VulkanCore::CreateDevice()
+{
+	float qPriorities[] = { 1.0f };
+
+	VkDeviceQueueCreateInfo qInfo = {
+		.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0, // must be zero
+		.queueFamilyIndex = m_queueFamily,
+		.queueCount = 1,
+		.pQueuePriorities = &qPriorities[0]
+	};
+
+	std::vector<const char*> DevExts = {
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
+	};
+
+	if (m_physDevices.Selected().m_features.geometryShader == VK_FALSE) {
+		OGLDEV_ERROR("The Geometry Shader is not supported!\n");
+	}
+
+	if (m_physDevices.Selected().m_features.tessellationShader == VK_FALSE) {
+		OGLDEV_ERROR("The Tessellation Shader is not supported!\n");
+	}
+
+	VkPhysicalDeviceFeatures DeviceFeatures = { 0 };
+	DeviceFeatures.geometryShader = VK_TRUE;
+	DeviceFeatures.tessellationShader = VK_TRUE;
+
+	VkDeviceCreateInfo DeviceCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.queueCreateInfoCount = 1,
+		.pQueueCreateInfos = &qInfo,
+		.enabledLayerCount = 0,			// DEPRECATED
+		.ppEnabledLayerNames = NULL,    // DEPRECATED
+		.enabledExtensionCount = (u32)DevExts.size(),
+		.ppEnabledExtensionNames = DevExts.data(),
+		.pEnabledFeatures = &DeviceFeatures
+	};
+
+	VkResult res = vkCreateDevice(m_physDevices.Selected().m_physDevice, &DeviceCreateInfo, NULL, &m_device);
+	CHECK_VK_RESULT(res, "Create device\n");
+
+	printf("\nDevice created\n");
 }
 
 }

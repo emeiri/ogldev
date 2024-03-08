@@ -34,7 +34,9 @@ struct PhysicalDevice {
 	VkSurfaceCapabilitiesKHR m_surfaceCaps;
 	VkPhysicalDeviceMemoryProperties m_memProps;
 	std::vector<VkPresentModeKHR> m_presentModes;
+	VkPhysicalDeviceFeatures m_features;
 };
+
 
 class VulkanPhysicalDevices {
 public:

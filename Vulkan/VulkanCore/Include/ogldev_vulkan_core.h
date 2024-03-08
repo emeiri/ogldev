@@ -42,6 +42,7 @@ private:
 	void CreateInstance(const char* pAppName);
 	void CreateDebugCallback();
 	void CreateSurface();
+	void CreateDevice();
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
@@ -49,6 +50,7 @@ private:
 	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
 	VulkanPhysicalDevices m_physDevices;
 	u32 m_queueFamily = 0;
+	VkDevice m_device;
 };
 
 }

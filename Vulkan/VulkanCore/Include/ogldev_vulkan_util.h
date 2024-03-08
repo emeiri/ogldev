@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <vulkan/vulkan.h>
-
 #include <stdio.h>
+
+#include <vulkan/vulkan.h>
 
 typedef unsigned int uint;
 
