@@ -72,10 +72,10 @@
     <ClInclude Include="..\..\..\TerrainWater\triangle_list.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Terrain_water\simple_water.fs" />
-    <None Include="..\..\..\Terrain_water\simple_water.vs" />
-    <None Include="..\..\..\Terrain_water\terrain.fs" />
-    <None Include="..\..\..\Terrain_water\terrain.vs" />
+    <None Include="..\..\..\TerrainWater\simple_water.fs" />
+    <None Include="..\..\..\TerrainWater\simple_water.vs" />
+    <None Include="..\..\..\TerrainWater\terrain.fs" />
+    <None Include="..\..\..\TerrainWater\terrain.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
