@@ -12,10 +12,10 @@ uniform sampler2D gTextureHeight1;
 uniform sampler2D gTextureHeight2;
 uniform sampler2D gTextureHeight3;
 
-uniform float gHeight0 = 200.0;
-uniform float gHeight1 = 300.0;
-uniform float gHeight2 = 400.0;
-uniform float gHeight3 = 500.0;
+uniform float gHeight0 = 80.0;
+uniform float gHeight1 = 110.0;
+uniform float gHeight2 = 150.0;
+uniform float gHeight3 = 180.0;
 
 uniform vec3 gReversedLightDir;
 

@@ -24,7 +24,6 @@ layout (location = 2) in vec3 InNormal;
 uniform mat4 gVP;
 uniform float gMinHeight;
 uniform float gMaxHeight;
-uniform vec4 gClipPlane;
 
 out vec4 Color;
 out vec2 Tex;
@@ -48,6 +47,4 @@ void main()
     WorldPos = Position;
     
     Normal = InNormal;
-
-    gl_ClipDistance[0] = dot(vec4(Position, 1.0), gClipPlane);
 }

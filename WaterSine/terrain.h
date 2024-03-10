@@ -23,7 +23,6 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_array_2d.h"
 #include "ogldev_texture.h"
-#include "ogldev_gui_texture.h"
 
 #include "geomip_grid.h"
 #include "terrain_technique.h"
@@ -71,7 +70,7 @@ class BaseTerrain
 	
     void SetWaterHeight(float Height) { m_water.SetWaterHeight(Height); }
 
-    void ControlGUI(bool Enable) { m_guiEnabled = Enable; }
+    void SetWaveParam(int WaveIndex, const WaveParam& Wave) { m_water.SetWaveParam(WaveIndex, Wave); }
 
  protected:
 
@@ -92,9 +91,6 @@ class BaseTerrain
 
 private:
     void RenderTerrain(const BasicCamera& Camera);
-    void RenderTerrainReflectionPass(const BasicCamera& Camera);
-    void RenderTerrainRefractionPass(const BasicCamera& Camera);
-    void RenderTerrainDefaultPass(const BasicCamera& Camera);
     void RenderWater(const BasicCamera& Camera);
 
     GeomipGrid m_geomipGrid;
@@ -105,9 +101,6 @@ private:
     float m_cameraHeight = 2.0f;
     Skydome* m_pSkydome = NULL;		
     SimpleWater m_water;
-    GUITexture m_guiTexture1;
-    GUITexture m_guiTexture2;
-    bool m_guiEnabled = true;
 };
 
 #endif

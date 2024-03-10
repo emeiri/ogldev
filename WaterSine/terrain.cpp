@@ -24,7 +24,6 @@
 #include <cerrno>
 #include <string.h>
 
-#include "demo_config.h"
 #include "terrain.h"
 #include "texture_config.h"
 #include "3rdparty/stb_image_write.h"
@@ -42,6 +41,7 @@ void BaseTerrain::Destroy()
     m_heightMap.Destroy();
     m_geomipGrid.Destroy();
 }
+
 
 
 void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::vector<string>& TextureFilenames)
@@ -65,15 +65,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
 
-    //m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/kloofendal_48d_partly_cloudy_puresky_4k.jpg", SKYDOME_TEXTURE_UNIT, SKYDOME_TEXTURE_UNIT_INDEX);
-    m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/143_hdrmaps_com_free_10K.jpg", 
-        SKYDOME_TEXTURE_UNIT, SKYDOME_TEXTURE_UNIT_INDEX);
-
-    #define GUI_WIDTH  600
-    #define GUI_HEIGHT 400
-
-    m_guiTexture1.Init(0, WINDOW_HEIGHT - GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
-    m_guiTexture2.Init(WINDOW_WIDTH - GUI_WIDTH, WINDOW_HEIGHT - GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
+    m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/kloofendal_48d_partly_cloudy_puresky_4k.jpg", COLOR_TEXTURE_UNIT_0, COLOR_TEXTURE_UNIT_INDEX_0);
 }
 
 
@@ -167,11 +159,11 @@ void BaseTerrain::SaveToFile(const char* pFilename)
 
 void BaseTerrain::Render(const BasicCamera& Camera)
 {
-    RenderTerrain(Camera);
+    //RenderTerrain(Camera);
  
     RenderWater(Camera);
  
-    m_pSkydome->Render(Camera);	
+    //m_pSkydome->Render(Camera);	
 }
 
 
@@ -181,6 +173,7 @@ void BaseTerrain::RenderTerrain(const BasicCamera& Camera)
     Matrix4f View = Camera.GetMatrix();
 
     m_terrainTech.Enable();
+    m_terrainTech.SetVP(VP);
 
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures); i++) {
         if (m_pTextures[i]) {
@@ -190,75 +183,14 @@ void BaseTerrain::RenderTerrain(const BasicCamera& Camera)
 
     m_terrainTech.SetLightDir(m_lightDir);
 
-    RenderTerrainReflectionPass(Camera);
-
-    RenderTerrainRefractionPass(Camera);
-
-    RenderTerrainDefaultPass(Camera);
-
-    if (m_guiEnabled) {
-        m_guiTexture1.Render(m_water.GetReflectionTexture());
-        m_guiTexture2.Render(m_water.GetRefractionTexture());
-    }
-}
-
-
-void BaseTerrain::RenderTerrainReflectionPass(const BasicCamera& Camera)
-{
-    m_water.StartReflectionPass();
-
-    BasicCamera CameraUnderWater = Camera;
-
-    // Set the position of the camera to be under the water
-    const Vector3f& CameraPos = Camera.GetPos();    
-    float CameraHeightAboveWater = CameraPos.y - m_water.GetWaterHeight();
-    Vector3f CameraPosUnderWater = CameraPos;
-    CameraPosUnderWater.y = m_water.GetWaterHeight() - CameraHeightAboveWater;
-    CameraUnderWater.SetPosition(CameraPosUnderWater);
-
-    // Flip the target vector of the under water camera over the Y axis
-    Vector3f CameraTargetUnderWater = Camera.GetTarget();
-    CameraTargetUnderWater.y *= -1.0f;
-    CameraUnderWater.SetTarget(CameraTargetUnderWater);
-
-    Vector3f PlaneNormal(0, 1.0f, 0.0f);
-    Vector3f PointOnPlane(0.0f, m_water.GetWaterHeight() + 0.5f, 0.0f);
-    m_terrainTech.SetClipPlane(PlaneNormal, PointOnPlane);
-
-    m_terrainTech.SetVP(CameraUnderWater.GetViewProjMatrix());
-    m_geomipGrid.Render(CameraUnderWater.GetPos(), CameraUnderWater.GetViewProjMatrix());
-    m_pSkydome->Render(CameraUnderWater);
-    m_terrainTech.Enable();
-    m_water.EndReflectionPass();
-}
-
-void BaseTerrain::RenderTerrainRefractionPass(const BasicCamera& Camera)
-{
-    m_water.StartRefractionPass();
-
-    Vector3f PlaneNormal(0, -1.0f, 0.0f);
-    Vector3f PointOnPlane(0.0f, m_water.GetWaterHeight() + 0.5f, 0.0f);
-    m_terrainTech.SetClipPlane(PlaneNormal, PointOnPlane);
-    m_terrainTech.SetVP(Camera.GetViewProjMatrix());
-    m_geomipGrid.Render(Camera.GetPos(), Camera.GetViewProjMatrix());
-    m_water.EndRefractionPass();
-}
-
-
-void BaseTerrain::RenderTerrainDefaultPass(const BasicCamera& Camera)
-{
-    Vector3f PlaneNormal(0, 1.0f, 0.0f);
-    Vector3f PointOnPlane(0.0f, 0.0f, 0.0f);
-    m_terrainTech.SetClipPlane(PlaneNormal, PointOnPlane);
-
-    m_terrainTech.SetVP(Camera.GetViewProjMatrix());
-    m_geomipGrid.Render(Camera.GetPos(), Camera.GetViewProjMatrix());
+    m_geomipGrid.Render(Camera.GetPos(), VP);	
 }
 
 
 void BaseTerrain::RenderWater(const BasicCamera & Camera)
-{  
-    m_water.Render(Camera.GetPos(), Camera.GetViewProjMatrix(), m_lightDir);
+{
+    Matrix4f VP = Camera.GetViewProjMatrix();
+    m_water.Render(VP);
 }
 
 

@@ -54,7 +54,6 @@ bool TerrainTechnique::Init()
     m_tex2HeightLoc = GetUniformLocation("gHeight2");
     m_tex3HeightLoc = GetUniformLocation("gHeight3");
     m_reversedLightDirLoc = GetUniformLocation("gReversedLightDir");
-    m_clipPlaneLoc = GetUniformLocation("gClipPlane");
 
     if (m_VPLoc == INVALID_UNIFORM_LOCATION||
         m_minHeightLoc == INVALID_UNIFORM_LOCATION ||
@@ -67,8 +66,7 @@ bool TerrainTechnique::Init()
         m_tex1HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex2HeightLoc == INVALID_UNIFORM_LOCATION ||
         m_tex3HeightLoc == INVALID_UNIFORM_LOCATION ||
-        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION ||
-        m_clipPlaneLoc == INVALID_UNIFORM_LOCATION) {
+        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION) {
         return false;
     }
 
@@ -112,12 +110,5 @@ void TerrainTechnique::SetLightDir(const Vector3f& Dir)
     Vector3f ReversedLightDir = Dir * -1.0f;
     ReversedLightDir = ReversedLightDir.Normalize();
     glUniform3f(m_reversedLightDirLoc, ReversedLightDir.x, ReversedLightDir.y, ReversedLightDir.z);
-}
-
-
-void TerrainTechnique::SetClipPlane(const Vector3f& Normal, const Vector3f& PointOnPlane)
-{
-    float d = -Normal.Dot(PointOnPlane);
-    glUniform4f(m_clipPlaneLoc, Normal.x, Normal.y, Normal.z, d);
 }
 

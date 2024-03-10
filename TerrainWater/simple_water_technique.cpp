@@ -42,50 +42,51 @@ bool SimpleWaterTechnique::Init()
         return false;
     }
 
-    m_WVPLoc = GetUniformLocation("gWVP");
+    m_VPLoc = GetUniformLocation("gVP");
+    m_reflectionTexUnitLoc = GetUniformLocation("gReflectionTexture");
+    m_refractionTexUnitLoc = GetUniformLocation("gRefractionTexture");
+    m_dudvMapTexUnitLoc = GetUniformLocation("gDUDVMapTexture");
+    m_normalMapTexUnitLoc = GetUniformLocation("gNormalMap");
+    m_depthMapTexUnitLoc = GetUniformLocation("gDepthMap");
     m_heightLoc = GetUniformLocation("gHeight");
-    m_timeLoc = GetUniformLocation("gTime");
+    m_dudvOffsetLoc = GetUniformLocation("gDUDVOffset");
+    m_cameraPosLoc = GetUniformLocation("gCameraPos");
+    m_lightColorLoc = GetUniformLocation("gLightColor");
+    m_reversedLightDirLoc = GetUniformLocation("gReversedLightDir");
 
-    if (m_WVPLoc == INVALID_UNIFORM_LOCATION ||
+    if (m_VPLoc == INVALID_UNIFORM_LOCATION ||
         m_heightLoc == INVALID_UNIFORM_LOCATION ||
-        m_timeLoc == INVALID_UNIFORM_LOCATION) {
+        m_reflectionTexUnitLoc == INVALID_UNIFORM_LOCATION ||
+        m_refractionTexUnitLoc == INVALID_UNIFORM_LOCATION ||
+        m_normalMapTexUnitLoc == INVALID_UNIFORM_LOCATION ||
+        m_dudvMapTexUnitLoc == INVALID_UNIFORM_LOCATION ||
+        m_depthMapTexUnitLoc == INVALID_UNIFORM_LOCATION ||
+        m_dudvOffsetLoc == INVALID_UNIFORM_LOCATION ||
+        m_cameraPosLoc == INVALID_UNIFORM_LOCATION ||
+        m_lightColorLoc == INVALID_UNIFORM_LOCATION ||
+        m_reversedLightDirLoc == INVALID_UNIFORM_LOCATION) {
         return false;
-    }
-
-    for (int i = 0; i < MAX_WAVES; i++) {
-        char Name[128];
-        snprintf(Name, sizeof(Name), "gWaveParam[%d].WaveLen", i);
-        m_waveParams[i].WaveLenLoc = GetUniformLocation(Name);
-        if (m_waveParams[i].WaveLenLoc == INVALID_UNIFORM_LOCATION) {
-            return false;
-        }
-
-        snprintf(Name, sizeof(Name), "gWaveParam[%d].Speed", i);
-        m_waveParams[i].SpeedLoc = GetUniformLocation(Name);
-        if (m_waveParams[i].SpeedLoc == INVALID_UNIFORM_LOCATION) {
-            return false;
-        }
-
-        snprintf(Name, sizeof(Name), "gWaveParam[%d].Amp", i);
-        m_waveParams[i].AmpLoc = GetUniformLocation(Name);
-        if (m_waveParams[i].AmpLoc == INVALID_UNIFORM_LOCATION) {
-            return false;
-        }
-
-        snprintf(Name, sizeof(Name), "gWaveParam[%d].Dir", i);
-        m_waveParams[i].DirLoc = GetUniformLocation(Name);
-        if (m_waveParams[i].DirLoc == INVALID_UNIFORM_LOCATION) {
-            return false;
-        }
     }
 
     return true;
 }
 
 
-void SimpleWaterTechnique::SetWVP(const Matrix4f& WVP)
+void SimpleWaterTechnique::SetVP(const Matrix4f& VP)
 {
-    glUniformMatrix4fv(m_WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
+    glUniformMatrix4fv(m_VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
+}
+
+
+void SimpleWaterTechnique::SetReflectionTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_reflectionTexUnitLoc, TextureUnit);
+}
+
+
+void SimpleWaterTechnique::SetRefractionTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_refractionTexUnitLoc, TextureUnit);
 }
 
 
@@ -95,21 +96,46 @@ void SimpleWaterTechnique::SetWaterHeight(float Height)
 }
 
 
-void SimpleWaterTechnique::SetTime(float Time)
+void SimpleWaterTechnique::SetDUDVMapTextureUnit(unsigned int TextureUnit)
 {
-    glUniform1f(m_timeLoc, Time);
+    glUniform1i(m_dudvMapTexUnitLoc, TextureUnit);
 }
 
 
-void SimpleWaterTechnique::SetWaveParam(int WaveIndex, const WaveParam& Wave)
+void SimpleWaterTechnique::SetDUDVOffset(float Offset)
 {
-    if (WaveIndex >= MAX_WAVES) {
-        printf("Invalid wave index %d\n", WaveIndex);
-        exit(0);
-    }
-
-    glUniform1f(m_waveParams[WaveIndex].WaveLenLoc, Wave.WaveLen);
-    glUniform1f(m_waveParams[WaveIndex].SpeedLoc, Wave.Speed);
-    glUniform1f(m_waveParams[WaveIndex].AmpLoc, Wave.Amp);
-    glUniform2f(m_waveParams[WaveIndex].DirLoc, Wave.Dir.x, Wave.Dir.y);
+    glUniform1f(m_dudvOffsetLoc, Offset);
 }
+
+
+void SimpleWaterTechnique::SetCameraPos(const Vector3f& CameraPos)
+{
+    glUniform3f(m_cameraPosLoc, CameraPos.x, CameraPos.y, CameraPos.z);
+}
+
+
+void SimpleWaterTechnique::SetNormalMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_normalMapTexUnitLoc, TextureUnit);
+}
+
+
+void SimpleWaterTechnique::SetDepthMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_depthMapTexUnitLoc, TextureUnit);
+}
+
+
+void SimpleWaterTechnique::SetLightColor(const Vector3f& LightColor)
+{
+    glUniform3f(m_lightColorLoc, LightColor.x, LightColor.y, LightColor.z);
+}
+
+
+void SimpleWaterTechnique::SetLightDir(const Vector3f& LightDir)
+{
+    Vector3f ReversedLightDir = LightDir * -1.0f;
+    ReversedLightDir.Normalize();
+    glUniform3f(m_reversedLightDirLoc, ReversedLightDir.x, ReversedLightDir.y, ReversedLightDir.z);
+}
+

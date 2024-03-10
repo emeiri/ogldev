@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{03d3bf34-434a-42d3-b90c-0168e09b9db4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGUI">
+      <UniqueIdentifier>{932f7616-23b9-47a3-909b-90fed7fc74f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
+    <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
+      <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
+    <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\geomip_grid.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\lod_manager.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\midpoint_disp_terrain.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\simple_water.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\simple_water_technique.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\terrain.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\terrain_water.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\triangle_list.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
+      <Filter>ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TerrainWater\demo_config.h" />
+    <ClInclude Include="..\..\..\TerrainWater\geomip_grid.h" />
+    <ClInclude Include="..\..\..\TerrainWater\lod_manager.h" />
+    <ClInclude Include="..\..\..\TerrainWater\midpoint_disp_terrain.h" />
+    <ClInclude Include="..\..\..\TerrainWater\simple_water.h" />
+    <ClInclude Include="..\..\..\TerrainWater\simple_water_technique.h" />
+    <ClInclude Include="..\..\..\TerrainWater\terrain.h" />
+    <ClInclude Include="..\..\..\TerrainWater\terrain_technique.h" />
+    <ClInclude Include="..\..\..\TerrainWater\texture_config.h" />
+    <ClInclude Include="..\..\..\TerrainWater\triangle_list.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\TerrainWater\simple_water.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\TerrainWater\simple_water.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\TerrainWater\terrain.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\TerrainWater\terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -21,6 +21,16 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
+#define MAX_WAVES 4
+
+struct WaveParam {
+    float WaveLen = 0.0f;
+    float Speed = 0.0f;
+    float Amp = 0.0f;
+    Vector2f Dir = { 0.0f, 0.0f };
+};
+
+
 class SimpleWaterTechnique : public Technique
 {
 public:
@@ -29,30 +39,21 @@ public:
 
     virtual bool Init();
 
-    void SetVP(const Matrix4f& VP);
-    void SetReflectionTextureUnit(unsigned int TextureUnit);
-    void SetRefractionTextureUnit(unsigned int TextureUnit);
-    void SetDUDVMapTextureUnit(unsigned int TextureUnit);
-    void SetNormalMapTextureUnit(unsigned int TextureUnit);
-    void SetDepthMapTextureUnit(unsigned int TextureUnit);
+    void SetWVP(const Matrix4f& WVP);
     void SetWaterHeight(float Height);
-    void SetDUDVOffset(float Offset);
-    void SetCameraPos(const Vector3f& CameraPos);
-    void SetLightColor(const Vector3f& LightColor);
-    void SetLightDir(const Vector3f& LightDir);
+    void SetTime(float Time);
+    void SetWaveParam(int WaveIndex, const WaveParam& Wave);
 
 private:
-    GLuint m_VPLoc = -1;
-    GLuint m_reflectionTexUnitLoc = -1;
-    GLuint m_refractionTexUnitLoc = -1;
+    GLuint m_WVPLoc = -1;
     GLuint m_heightLoc = -1;
-    GLuint m_dudvMapTexUnitLoc = -1;
-    GLuint m_normalMapTexUnitLoc = -1;
-    GLuint m_depthMapTexUnitLoc = -1;
-    GLuint m_dudvOffsetLoc = -1;
-    GLuint m_cameraPosLoc = -1;    
-    GLuint m_lightColorLoc = -1;
-    GLuint m_reversedLightDirLoc = -1;
+    GLuint m_timeLoc = -1;
+    struct {
+        GLuint WaveLenLoc = -1;
+        GLuint SpeedLoc = -1;
+        GLuint AmpLoc = -1;
+        GLuint DirLoc = -1;
+    } m_waveParams[MAX_WAVES];
 };
 
 #endif  /* SIMPLE_WATER_TECHNIQUE_H */

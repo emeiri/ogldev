@@ -19,9 +19,9 @@
 #define SIMPLE_WATER_H
 
 #include "ogldev_texture.h"
-#include "ogldev_framebuffer.h"
 #include "simple_water_technique.h"
 #include "triangle_list.h"
+
 
 class SimpleWater {
  public:
@@ -34,30 +34,32 @@ class SimpleWater {
 
     void SetWaterHeight(float Height) { m_waterHeight = Height; }
 
+    void SetWaveParam(int WaveIndex, const WaveParam& Wave);
+
     float GetWaterHeight() const { return m_waterHeight; }
 
-    void Render(const Vector3f& CameraPos, const Matrix4f& VP, const Vector3f& LightDir);
-
-    GLuint GetDUDVTexture() { return m_dudvMap.GetTexture(); }
-
-    void StartReflectionPass();
-    void EndReflectionPass();
-
-    void StartRefractionPass();
-    void EndRefractionPass();
-
-    GLuint GetReflectionTexture() const { return m_reflectionFBO.GetTexture(); }
-
-    GLuint GetRefractionTexture() const { return m_refractionFBO.GetTexture(); }
+    void Render(const Matrix4f& WVP);
 
  private:
+    void InitWaves();
+    void UpdateWaves(int DeltaTimeMillis);
+
     TriangleList m_water;
     SimpleWaterTechnique m_waterTech;
-    float m_waterHeight = 0.0f;
-    Framebuffer m_reflectionFBO;
-    Framebuffer m_refractionFBO;
-    Texture m_dudvMap;
-    Texture m_normalMap;
+    float m_waterHeight = 64.0f;
+    long long m_prevTime = 0;
+    float m_time = 0.0f;
+    WaveParam m_waveParams[MAX_WAVES];
+    struct {
+
+    };
+    float m_fade[MAX_WAVES] = { 0 };
+    int m_transIndex = 0;
+    int m_fadeTime = 0;
+    float m_transDel = -1.0f / 6.0f;
+    float m_minWaveLen = 15.0f;
+    float m_maxWaveLen = 125.0f;
+    float m_ampOverLen = 1.0f;
 };
 
 #endif
