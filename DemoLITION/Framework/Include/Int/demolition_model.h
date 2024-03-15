@@ -105,11 +105,52 @@ private:
     void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
     virtual void ReserveSpace(uint NumVertices, uint NumIndices);
-
-    virtual void InitSingleMesh(const aiScene* pScene, uint MeshIndex, const aiMesh* paiMesh);
-
+    virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
+    virtual void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
     virtual void PopulateBuffers();
+    virtual void PopulateBuffersNonDSA();
+    virtual void PopulateBuffersDSA();
 
+    struct BasicMeshEntry {
+        BasicMeshEntry()
+        {
+            NumIndices = 0;
+            BaseVertex = 0;
+            BaseIndex = 0;
+            MaterialIndex = INVALID_MATERIAL;
+        }
+
+        uint NumIndices;
+        uint BaseVertex;
+        uint BaseIndex;
+        uint MaterialIndex;
+        Matrix4f Transformation;		
+    };
+
+    std::vector<BasicMeshEntry> m_Meshes;
+
+    const aiScene* m_pScene;
+
+    Matrix4f m_GlobalInverseTransform;
+
+    enum BUFFER_TYPE {
+        INDEX_BUFFER = 0,
+        VERTEX_BUFFER = 1,
+        WVP_MAT_BUFFER = 2,  // required only for instancing
+        WORLD_MAT_BUFFER = 3,  // required only for instancing
+        NUM_BUFFERS = 4
+    };
+
+    GLuint m_VAO = 0;
+
+    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
+
+    struct Vertex {
+        Vector3f Position;
+        Vector2f TexCoords;
+        Vector3f Normal;
+    };
+	
     bool InitFromScene(const aiScene* pScene, const std::string& Filename, int WindowWidth, int WindowHeight);
 
     bool InitGeometry(const aiScene* pScene, const string& Filename);
@@ -127,6 +168,7 @@ private:
     void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
 
     void InitAllMeshes(const aiScene* pScene);
+    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<Vertex>& Vertices);
 
     void CalculateMeshTransformations(const aiScene* pScene);
     void TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode);
@@ -149,49 +191,12 @@ private:
 
     void InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight);
 
-    enum BUFFER_TYPE {
-        INDEX_BUFFER = 0,
-        POS_VB       = 1,
-        TEXCOORD_VB  = 2,
-        NORMAL_VB    = 3,
-        WVP_MAT_VB   = 4,  // required only for instancing
-        WORLD_MAT_VB = 5,  // required only for instancing
-        NUM_BUFFERS  = 6
-    };
-
-    GLuint m_VAO = 0;
-    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
-
-    struct BasicMeshEntry {
-        BasicMeshEntry()
-        {
-            NumIndices = 0;
-            BaseVertex = 0;
-            BaseIndex = 0;
-            MaterialIndex = INVALID_MATERIAL;
-        }
-
-        uint NumIndices;
-        uint BaseVertex;
-        uint BaseIndex;
-        uint MaterialIndex;
-        Matrix4f Transformation;
-    };
-
-    std::vector<BasicMeshEntry> m_Meshes;
-
-    const aiScene* m_pScene;
-
-    Matrix4f m_GlobalInverseTransform;
-
     std::vector<Material> m_Materials;
     Texture* m_pNormalMap = NULL;
 
     // Temporary space for vertex stuff before we load them into the GPU
-    vector<Vector3f> m_Positions;
-    vector<Vector3f> m_Normals;
-    vector<Vector2f> m_TexCoords;
     vector<uint> m_Indices;
+    vector<Vertex> m_Vertices;
 
     Assimp::Importer m_Importer;
 
@@ -270,9 +275,6 @@ private:
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
 
     GLuint m_boneBuffer = 0;
-
-    // Temporary space for vertex stuff before we load them into the GPU
-    vector<VertexBoneData> m_Bones;
 
     map<string,uint> m_BoneNameToIndexMap;
 
