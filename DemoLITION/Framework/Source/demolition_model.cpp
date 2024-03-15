@@ -848,9 +848,19 @@ void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 
     Vector3f Up = VectorFromAssimpVector(light.mUp);
     printf("Original up: "); Up.Print();
-    Vector4f Up4D(Up, 0.0f);
-    Up4D = Transformation * Up4D;
-    l.Up = Up4D;
+    if (Up.Length() == 0) {
+        printf("Overiding a zero up vector\n");
+        if ((Dir4D == Vector4f(0.0f, 1.0f, 0.0f, 0.0f)) || (Dir4D == Vector4f(0.0f, -1.0f, 0.0f, 0.0f))) {
+            l.Up = Vector3f(1.0f, 0.0f, 0.0f);
+        } else {
+            l.Up = Vector3f(0.0f, 1.0f, 0.0f);
+        }
+    } else {
+        Vector4f Up4D(Up, 0.0f);
+        Up4D = Transformation * Up4D;
+        l.Up = Up4D;
+    }
+
     printf("Final up: "); l.Up.Print();
 
     Vector3f Position = VectorFromAssimpVector(light.mPosition);
