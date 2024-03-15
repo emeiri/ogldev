@@ -56,7 +56,11 @@ void CoreScene::LoadScene(const std::string& Filename)
     SceneObject* pSceneObject = CreateSceneObject(ModelHandle);
     AddToRenderList(pSceneObject);
     DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
-    m_defaultCamera = pModel->GetCameras()[0];
+    if (pModel->GetCameras().size() == 0) {
+        printf("Warning! '%s' does not include a camera. Falling back to default.\n", Filename.c_str());
+    } else {
+        m_defaultCamera = pModel->GetCameras()[0];
+    }    
 }
 
 
