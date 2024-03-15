@@ -322,6 +322,12 @@ struct Vector4f
         float ret = x * v.x + y * v.y + z * v.z + w * v.w;
         return ret;
     }
+
+    bool operator==(const Vector4f& r)
+    {
+        return ((x == r.x) && (y == r.y) && (z == r.z) && (w == r.w));
+    }
+
 };
 
 
