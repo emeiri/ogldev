@@ -65,6 +65,8 @@ public:
 
     virtual bool RemoveFromRenderList(SceneObject* pSceneObject) = 0;
 
+    virtual void SetCamera(const Vector3f& Pos, const Vector3f& Target) = 0;
+
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 
     std::vector<SpotLight>& GetSpotLights() { return m_spotLights; }

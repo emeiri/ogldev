@@ -80,6 +80,8 @@ public:
 
     const Vector4f& GetClearColor() { return m_clearColor; }
 
+    void SetCamera(const Vector3f& Pos, const Vector3f& Target);
+
 protected:
     BaseRenderingSystem* m_pBaseRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;

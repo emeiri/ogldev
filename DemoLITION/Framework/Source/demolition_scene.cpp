@@ -89,6 +89,11 @@ void CoreScene::CreateDefaultCamera()
 }
 
 
+void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
+{
+    m_defaultCamera.SetPosition(Pos);
+    m_defaultCamera.SetTarget(Target);
+}
 
 void CoreScene::AddToRenderList(SceneObject* pSceneObject)
 {
