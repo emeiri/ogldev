@@ -29,22 +29,22 @@
 #define WINDOW_HEIGHT 1080
 
 
-void test_blender_scene()
+void test_normal_map()
 {
     bool LoadBasicShapes = false;
     RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
 
     pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    //Scene* pScene = pRenderingSystem->CreateScene("../Content/demolition/spot_light2.glb");
-   //Scene* pScene = pRenderingSystem->CreateScene("../Content/demolition/bs_ears.fbx");
-    //Scene* pScene = pRenderingSystem->CreateScene("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/bs_ears.dae");
     Scene* pScene = pRenderingSystem->CreateEmptyScene();
 
     int ModelHandle = pRenderingSystem->LoadModel("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/bs_ears.obj");    
     SceneObject* pSceneObject = pScene->CreateSceneObject(ModelHandle);
     pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
     pScene->AddToRenderList(pSceneObject);
+
+    int NormalMap = pRenderingSystem->LoadTexture2D("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/texture/ogre_normalmap.png");
+    pRenderingSystem->SetNormalMap(ModelHandle, NormalMap);
     
     DirectionalLight DirLight;
     DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 1.0f);
