@@ -41,6 +41,8 @@ class RenderingSystemGL : public BaseRenderingSystem
 
     virtual DemolitionModel* LoadModelInternal(const std::string& Filename);
 
+    virtual int LoadTexture2D(const std::string& Filename);
+
     virtual void Execute();
 
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -60,7 +62,11 @@ class RenderingSystemGL : public BaseRenderingSystem
 
     void SetDefaultGLState();
 
+    Texture* GetTexture(int TextureHandle);
+
     GLFWwindow* m_pWindow = NULL;
     ForwardRenderer m_forwardRenderer;
+    std::vector<Texture*> m_textures;
+    int m_numTextures = 0;
 };
 

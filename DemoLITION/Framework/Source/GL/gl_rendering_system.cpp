@@ -24,6 +24,8 @@
 #include "ogldev_glfw.h"
 #include "GL/gl_rendering_system.h"
 
+#define NUM_TEXTURES 1024
+
 extern BaseRenderingSystem* g_pRenderingSystem;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -50,6 +52,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 RenderingSystemGL::RenderingSystemGL(GameCallbacks* pGameCallbacks, bool LoadBasicShapes) : BaseRenderingSystem(pGameCallbacks, LoadBasicShapes)
 {
+    m_textures.resize(NUM_TEXTURES, 0);
 }
 
 
@@ -101,6 +104,51 @@ DemolitionModel* RenderingSystemGL::LoadModelInternal(const std::string& Filenam
     }
 
     return pModel;
+}
+
+
+int RenderingSystemGL::LoadTexture2D(const std::string& Filename)
+{
+    if (m_numTextures == m_textures.size()) {
+        printf("%s:%d: out of texture space\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    Texture* pTexture = new Texture(GL_TEXTURE_2D, Filename);
+    pTexture->Load();
+
+    m_textures[m_numTextures] = pTexture;
+    int ret = m_numTextures;
+    m_numTextures++;
+
+    printf("2D texture '%s' loaded, handle %d\n", Filename.c_str(), ret);
+
+    return ret;
+}
+
+
+
+
+Texture* RenderingSystemGL::GetTexture(int TextureHandle)
+{
+    if (TextureHandle < 0) {
+        printf("%s:%d: invalid texture handle %d\n", __FILE__, __LINE__, TextureHandle);
+        exit(0);
+    }
+
+    if (TextureHandle >= m_numTextures) {
+        printf("%s:%d: invalid texture handle %d\n", __FILE__, __LINE__, TextureHandle);
+        exit(0);
+    }
+
+    Texture* pTexture = m_textures[TextureHandle];
+
+    if (!pTexture) {
+        printf("%s:%d: invalid texture handle %d\n", __FILE__, __LINE__, TextureHandle);
+        exit(0);
+    }
+
+    return pTexture;
 }
 
 
