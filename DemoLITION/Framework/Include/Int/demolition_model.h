@@ -96,6 +96,8 @@ public:
     const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
     const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
 
+    void SetNormalMap(Texture* pNormalMap) { m_pNormalMap = pNormalMap; }
+
 private:
 
     void Clear();
@@ -183,6 +185,7 @@ private:
     Matrix4f m_GlobalInverseTransform;
 
     std::vector<Material> m_Materials;
+    Texture* m_pNormalMap = NULL;
 
     // Temporary space for vertex stuff before we load them into the GPU
     vector<Vector3f> m_Positions;
@@ -196,8 +199,10 @@ private:
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
-	
+
+    /////////////////////////////////////
 	// Skeletal animation stuff
+    /////////////////////////////////////
     #define MAX_NUM_BONES_PER_VERTEX 4
 	
     struct VertexBoneData

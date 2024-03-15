@@ -43,6 +43,8 @@ class RenderingSystemGL : public BaseRenderingSystem
 
     virtual int LoadTexture2D(const std::string& Filename);
 
+    virtual void SetNormalMap(int ModelHandle, int TextureHandle);
+
     virtual void Execute();
 
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

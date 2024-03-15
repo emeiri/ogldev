@@ -127,6 +127,16 @@ int RenderingSystemGL::LoadTexture2D(const std::string& Filename)
 }
 
 
+void RenderingSystemGL::SetNormalMap(int ModelHandle, int TextureHandle)
+{
+    DemolitionModel* pModel = GetModel(ModelHandle);
+    if (TextureHandle < 0) {
+        pModel->SetNormalMap(NULL);
+    } else {
+        Texture* pTexture = GetTexture(TextureHandle);
+        pModel->SetNormalMap(pTexture);
+    }
+}
 
 
 Texture* RenderingSystemGL::GetTexture(int TextureHandle)
