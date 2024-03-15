@@ -23,11 +23,13 @@
 
 using namespace std;
 
-#define POSITION_LOCATION  0
-#define TEX_COORD_LOCATION 1
-#define NORMAL_LOCATION    2
-#define BONE_ID_LOCATION     3
-#define BONE_WEIGHT_LOCATION 4
+#define POSITION_LOCATION    0
+#define TEX_COORD_LOCATION   1
+#define NORMAL_LOCATION      2
+#define TANGENT_LOCATION     3
+#define BITANGENT_LOCATION   4
+#define BONE_ID_LOCATION     5
+#define BONE_WEIGHT_LOCATION 6
 
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_CalcTangentSpace |       \
                                       aiProcess_Triangulate |            \
@@ -249,6 +251,12 @@ void DemolitionModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
         const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
         v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+
+        const aiVector3D& pTangent = paiMesh->mTangents[i];
+        v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+
+        const aiVector3D& pBitangent = paiMesh->mBitangents[i];
+        v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
 
         m_Vertices.push_back(v);
     }
@@ -578,16 +586,30 @@ void DemolitionModel::PopulateBuffersNonDSA()
     
     size_t NumFloats = 0;
 
+    int NumElements = 3;
     glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
-    NumFloats += 3;
+    glVertexAttribPointer(POSITION_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
 
+    NumElements = 2;
     glEnableVertexAttribArray(TEX_COORD_LOCATION);
-    glVertexAttribPointer(TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
-    NumFloats += 2;
+    glVertexAttribPointer(TEX_COORD_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
 
+    NumElements = 3;
     glEnableVertexAttribArray(NORMAL_LOCATION);
-    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    glVertexAttribPointer(NORMAL_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
+
+    NumElements = 3;
+    glEnableVertexAttribArray(TANGENT_LOCATION);
+    glVertexAttribPointer(TANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
+
+    NumElements = 3;
+    glEnableVertexAttribArray(BITANGENT_LOCATION);
+    glVertexAttribPointer(BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
 }
 
 
@@ -601,19 +623,35 @@ void DemolitionModel::PopulateBuffersDSA()
 
     size_t NumFloats = 0;
 
+    int NumElements = 3;
     glEnableVertexArrayAttrib(m_VAO, POSITION_LOCATION);
-    glVertexArrayAttribFormat(m_VAO, POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribFormat(m_VAO, POSITION_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
     glVertexArrayAttribBinding(m_VAO, POSITION_LOCATION, 0);
-    NumFloats += 3;
+    NumFloats += NumElements;
 
+    NumElements = 2;
     glEnableVertexArrayAttrib(m_VAO, TEX_COORD_LOCATION);
-    glVertexArrayAttribFormat(m_VAO, TEX_COORD_LOCATION, 2, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribFormat(m_VAO, TEX_COORD_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
     glVertexArrayAttribBinding(m_VAO, TEX_COORD_LOCATION, 0);
-    NumFloats += 2;
+    NumFloats += NumElements;
 
+    NumElements = 3;
     glEnableVertexArrayAttrib(m_VAO, NORMAL_LOCATION);
-    glVertexArrayAttribFormat(m_VAO, NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribFormat(m_VAO, NORMAL_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
     glVertexArrayAttribBinding(m_VAO, NORMAL_LOCATION, 0);
+    NumFloats += NumElements;
+
+    NumElements = 3;
+    glEnableVertexArrayAttrib(m_VAO, TANGENT_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, TANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, TANGENT_LOCATION, 0);
+    NumFloats += NumElements;
+
+    NumElements = 3;
+    glEnableVertexArrayAttrib(m_VAO, BITANGENT_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, BITANGENT_LOCATION, 0);
+    NumFloats += NumElements;
 }
 
 
@@ -651,6 +689,10 @@ void DemolitionModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRend
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent_CB(false);
         }
+    }
+
+    if (m_pNormalMap) {
+        m_pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
     }
 
     if (pRenderCallbacks) {

@@ -59,7 +59,8 @@ bool ForwardLightingTechnique::InitCommon()
     shadowMapWidthLoc = GetUniformLocation("gShadowMapWidth");
     shadowMapHeightLoc = GetUniformLocation("gShadowMapHeight");
     shadowMapFilterSizeLoc = GetUniformLocation("gShadowMapFilterSize");
-    ShadowMapOffsetTextureLoc = GetUniformLocation("gShadowMapOffsetTexture");
+    shadowMapOffsetTextureLoc = GetUniformLocation("gShadowMapOffsetTexture");
+    normalMapLoc = GetUniformLocation("gNormalMap");
     ShadowMapOffsetTextureSizeLoc = GetUniformLocation("gShadowMapOffsetTextureSize");
     ShadowMapOffsetFilterSizeLoc = GetUniformLocation("gShadowMapOffsetFilterSize");
     ShadowMapRandomRadiusLoc = GetUniformLocation("gShadowMapRandomRadius");
@@ -95,10 +96,11 @@ bool ForwardLightingTechnique::InitCommon()
         hasSamplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowCubeMapLoc == INVALID_UNIFORM_LOCATION ||
+        normalMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapWidthLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapHeightLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapFilterSizeLoc == INVALID_UNIFORM_LOCATION ||
-        ShadowMapOffsetTextureLoc == INVALID_UNIFORM_LOCATION ||
+        shadowMapOffsetTextureLoc == INVALID_UNIFORM_LOCATION ||
         ShadowMapOffsetTextureSizeLoc == INVALID_UNIFORM_LOCATION ||
         ShadowMapOffsetFilterSizeLoc == INVALID_UNIFORM_LOCATION ||
         ShadowMapRandomRadiusLoc == INVALID_UNIFORM_LOCATION ||
@@ -248,6 +250,12 @@ void ForwardLightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 }
 
 
+void ForwardLightingTechnique::SetNormalMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(normalMapLoc, TextureUnit);
+}
+
+
 void ForwardLightingTechnique::DisableDiffuseTexture()
 {
     glUniform1i(hasSamplerLoc, 0);
@@ -280,7 +288,7 @@ void ForwardLightingTechnique::SetShadowCubeMapTextureUnit(unsigned int TextureU
 
 void ForwardLightingTechnique::SetShadowMapOffsetTextureUnit(unsigned int TextureUnit)
 {
-    glUniform1i(ShadowMapOffsetTextureLoc, TextureUnit);
+    glUniform1i(shadowMapOffsetTextureLoc, TextureUnit);
 }
 
 

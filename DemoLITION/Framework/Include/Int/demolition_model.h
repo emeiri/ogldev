@@ -33,8 +33,9 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "demolition_lights.h"
 
-
 #define INVALID_MATERIAL 0xFFFFFFFF
+
+// #define USE_MESH_OPTIMIZER
 
 class DemolitionRenderCallbacks
 {
@@ -149,6 +150,8 @@ private:
         Vector3f Position;
         Vector2f TexCoords;
         Vector3f Normal;
+        Vector3f Tangent;
+        Vector3f Bitangent;
     };
 	
     bool InitFromScene(const aiScene* pScene, const std::string& Filename, int WindowWidth, int WindowHeight);

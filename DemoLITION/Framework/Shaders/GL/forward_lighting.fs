@@ -7,6 +7,8 @@ in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 WorldPos0;
 in vec4 LightSpacePos;
+in vec3 Tangent0;
+in vec3 Bitangent0;
 
 out vec4 FragColor;
 
@@ -63,6 +65,7 @@ layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
 layout(binding = 2) uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
+layout(binding = 5) uniform sampler2D gNormalMap;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
@@ -474,9 +477,25 @@ float CalcFogFactor()
 }
 
 
+vec3 CalcBumpedNormal()                                                                     
+{                                                                                           
+    vec3 Normal = normalize(Normal0);                                                       
+    vec3 Tangent = normalize(Tangent0);                                                     
+    Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);                           
+    vec3 Bitangent = cross(Tangent, Normal);                                                
+    vec3 BumpMapNormal = texture(gNormalMap, TexCoord0).xyz;                                
+    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0, 1.0, 1.0);                              
+    vec3 NewNormal;                                                                         
+    mat3 TBN = mat3(Tangent, Bitangent, Normal);                                            
+    NewNormal = TBN * BumpMapNormal;                                                        
+    NewNormal = normalize(NewNormal);                                                       
+    return NewNormal;                                                                       
+}                                                                                           
+
+
 vec4 GetTotalLight()
 {
-    vec3 Normal = normalize(Normal0);
+    vec3 Normal = CalcBumpedNormal();
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {

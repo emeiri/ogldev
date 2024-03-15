@@ -37,7 +37,7 @@ BaseRenderingSystem::BaseRenderingSystem(GameCallbacks* pGameCallbacks, bool Loa
     }
 
     m_loadBasicShapes = LoadBasicShapes;
-    m_models.resize(NUM_MODELS, 0);    
+    m_models.resize(NUM_MODELS, 0);
 }
 
 
