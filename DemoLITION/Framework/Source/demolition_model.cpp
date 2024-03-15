@@ -300,6 +300,8 @@ void DemolitionModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pM
                 LoadDiffuseTextureFromFile(Dir, Path, MaterialIndex);
             }
         }
+    } else {
+        printf("Warning! no diffuse textures\n");
     }
 }
 
