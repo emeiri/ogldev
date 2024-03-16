@@ -79,6 +79,7 @@ uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
+uniform bool gLightingEnabled = true;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -512,7 +513,13 @@ vec4 GetTotalLight()
 
 void main()
 {
-    vec4 TotalLight = GetTotalLight();
+    vec4 TotalLight;
+    
+    if (gLightingEnabled) {
+        TotalLight = GetTotalLight();
+    } else {
+        TotalLight = vec4(1.0);
+    }
 
     vec4 TexColor;
 

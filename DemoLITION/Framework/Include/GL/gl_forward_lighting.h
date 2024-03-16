@@ -73,6 +73,7 @@ public:
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
     void SetFogTime(float Time);
+    void SetLightingEnabled(bool LightingEnabled);
 
 protected:
 
@@ -113,6 +114,7 @@ private:
     GLuint ExpSquaredFogEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
+    GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

@@ -18,8 +18,7 @@
 
 #include "GL/gl_forward_lighting.h"
 
-//#define FAIL_ON_MISSING_LOC
-
+#define FAIL_ON_MISSING_LOC
 
 ForwardLightingTechnique::ForwardLightingTechnique()
 {
@@ -87,6 +86,7 @@ bool ForwardLightingTechnique::InitCommon()
     ExpSquaredFogEnabledLoc = GetUniformLocation("gExpSquaredFogEnabled");
     LayeredFogTopLoc = GetUniformLocation("gLayeredFogTop");
     FogTimeLoc = GetUniformLocation("gFogTime");
+    LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -126,12 +126,12 @@ bool ForwardLightingTechnique::InitCommon()
         LayeredFogTopLoc == INVALID_UNIFORM_LOCATION ||
         FogTimeLoc == INVALID_UNIFORM_LOCATION ||
         ColorModLocation == INVALID_UNIFORM_LOCATION ||
-        ColorAddLocation == INVALID_UNIFORM_LOCATION) {
+        ColorAddLocation == INVALID_UNIFORM_LOCATION ||
+        LightingEnabledLoc == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
     }
-
 
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(PointLightsLocation) ; i++) {
         char Name[128];
@@ -544,4 +544,10 @@ void ForwardLightingTechnique::SetAnimatedFog(float FogEnd, float FogDensity)
 
     glUniform1f(FogEndLoc, FogEnd);
     glUniform1f(ExpFogDensityLoc, FogDensity);
+}
+
+
+void ForwardLightingTechnique::SetLightingEnabled(bool LightingEnabled)
+{
+    glUniform1i(LightingEnabledLoc, LightingEnabled);
 }

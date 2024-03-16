@@ -308,9 +308,11 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
     } 
 
     if (NumLightsTotal == 0) {
-        printf("Warning! trying to render but all lights are zero\n");
-        exit(0);
-    }    
+        //printf("Warning! trying to render but all lights are zero\n");
+        m_lightingTech.SetLightingEnabled(false);
+    } else {
+        m_lightingTech.SetLightingEnabled(true);
+    }
 
     m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
 }
