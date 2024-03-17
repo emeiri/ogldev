@@ -39,6 +39,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
 	}
 
+	printf("\n");
+
 	return VK_FALSE;  // The calling function should not be aborted
 }
 
@@ -231,7 +233,7 @@ void VulkanCore::CreateSurface()
 
 void VulkanCore::CreateDevice()
 {
-	float qPriorities = 1.0f;
+	float qPriorities[] = { 1.0f };
 
 	VkDeviceQueueCreateInfo qInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -239,7 +241,7 @@ void VulkanCore::CreateDevice()
 		.flags = 0, // must be zero
 		.queueFamilyIndex = m_queueFamily,
 		.queueCount = 1,
-		.pQueuePriorities = &qPriorities,	// optional
+		.pQueuePriorities = &qPriorities[0]
 	};
 
 	std::vector<const char*> DevExts = {
@@ -269,13 +271,13 @@ void VulkanCore::CreateDevice()
 		.ppEnabledLayerNames = NULL,
 		.enabledExtensionCount = (u32)DevExts.size(),
 		.ppEnabledExtensionNames = DevExts.data(),		
-		.pEnabledFeatures = NULL
+		.pEnabledFeatures = &DeviceFeatures
 	};
 
 	VkResult res = vkCreateDevice(m_physDevices.Selected().m_physDevice, &DeviceCreateInfo, NULL, &m_device);
 	CHECK_VK_RESULT(res, "Create device\n");
 
-	printf("Device created\n");
+	printf("\nDevice created\n");
 }
 
 
