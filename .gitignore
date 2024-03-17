@@ -38,12 +38,13 @@ read.lock
 *.db-shm
 *.db-wal
 *.opendb
-/Windows/ogldev_vs_2022/Terrain2/x64/Release/*.iobj
-/Windows/ogldev_vs_2022/Terrain2/x64/Release/*.ipdb
 *.dll
 *.lib
 *.pch
 *.iobj
+*.ipdb
 Content/*
 data/*
-Vulkan_dev1/*
+VulkanSync/*
+Include/assimp5/assimp.old/*
+Include/assimp5/assimp.orig/*
