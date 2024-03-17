@@ -19,6 +19,7 @@
 		Tutorial #4: Create a surface
 		Tutorial #5: Enumerate physical devices
 		Tutorial #6: Create a logical device
+		Tutorial #7: The swap chain
 */
 
 
@@ -68,7 +69,7 @@ private:
 };
 
 
-#define APP_NAME "Tutorial 04-06"
+#define APP_NAME "Tutorial 04-07"
 
 int main(int argc, char* argv[])
 {
