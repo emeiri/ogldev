@@ -29,10 +29,43 @@
 #define WINDOW_HEIGHT 1080
 
 
+class Game : public GameCallbacks {
+public:
+    Game() 
+    {
+       // m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
+        m_dirLight.DiffuseIntensity = 1.0f;
+    }
+
+    ~Game() {}
+
+    void Init(Scene* pScene)
+    {
+        m_pScene = pScene;
+        pScene->GetDirLights().push_back(m_dirLight);
+    }
+
+    void OnFrame()
+    {
+      //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        m_count += 0.01f;
+    }
+
+private:
+    float m_count = 0.0f;
+    Scene* m_pScene = NULL;
+    DirectionalLight m_dirLight;
+};
+
+
+
 void test_normal_map()
 {
+    Game g;
+
     bool LoadBasicShapes = false;
-    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
+    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &g, LoadBasicShapes);
 
     pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -44,16 +77,13 @@ void test_normal_map()
     pScene->AddToRenderList(pSceneObject);
 
     int NormalMap = pRenderingSystem->LoadTexture2D("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/texture/ogre_normalmap.png");
-    pRenderingSystem->SetNormalMap(ModelHandle, NormalMap);
-    
-    DirectionalLight DirLight;
-    DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 1.0f);
-    DirLight.DiffuseIntensity = 1.0f;
-    pScene->GetDirLights().push_back(DirLight);
+    pRenderingSystem->SetNormalMap(ModelHandle, NormalMap);            
 
     pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
     pScene->SetCamera(Vector3f(0.0f, 0.0, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
+    
+    g.Init(pScene);
 
     pRenderingSystem->SetScene(pScene);
 
