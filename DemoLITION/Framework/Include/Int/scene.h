@@ -22,14 +22,14 @@
 #include <list>
 
 #include "demolition_scene.h"
-#include "demolition_model.h"
+#include "Int\model.h"
 
 
 class CoreSceneObject : public SceneObject {
 public:
     CoreSceneObject() {}
 
-    void SetModel(DemolitionModel* pModel)
+    void SetModel(CoreModel* pModel)
     {
         if (m_pModel) {
             printf("%s:%d - model already initialized\n", __FILE__, __LINE__);
@@ -39,10 +39,10 @@ public:
         m_pModel = pModel;
     }
 
-    DemolitionModel* GetModel() const { return m_pModel; }
+    CoreModel* GetModel() const { return m_pModel; }
 
 private:
-    DemolitionModel* m_pModel = NULL;
+    CoreModel* m_pModel = NULL;
 };
 
 
@@ -56,7 +56,7 @@ public:
 
     virtual void LoadScene(const std::string& Filename);
 
-    virtual SceneObject* CreateSceneObject(int ModelHandle);
+    virtual SceneObject* CreateSceneObject(Model* pModel);
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape);
 
@@ -88,7 +88,7 @@ protected:
 
 private:
     void CreateDefaultCamera();
-    CoreSceneObject* CreateSceneObjectInternal(DemolitionModel* pModel);
+    CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel);
 
     BasicCamera m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;

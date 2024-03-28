@@ -33,7 +33,7 @@ class Game : public GameCallbacks {
 public:
     Game() 
     {
-       // m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
     }
@@ -48,7 +48,7 @@ public:
 
     void OnFrame()
     {
-      //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
     }
 
@@ -71,15 +71,21 @@ void test_normal_map()
 
     Scene* pScene = pRenderingSystem->CreateEmptyScene();
 
-    int ModelHandle = pRenderingSystem->LoadModel("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/bs_ears.obj");    
-    SceneObject* pSceneObject = pScene->CreateSceneObject(ModelHandle);
+    Model* pModel = pRenderingSystem->LoadModel("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/bs_ears.obj");    
+    SceneObject* pSceneObject = pScene->CreateSceneObject(pModel);
     pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
     pScene->AddToRenderList(pSceneObject);
 
     int NormalMap = pRenderingSystem->LoadTexture2D("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/texture/ogre_normalmap.png");
-    pRenderingSystem->SetNormalMap(ModelHandle, NormalMap);            
+    pModel->SetNormalMap(NormalMap);            
 
     pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
+
+   /* DirectionalLight l;
+    l.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
+    l.DiffuseIntensity = 0.5f;
+    l.AmbientIntensity = 0.1f;
+    pScene->GetDirLights().push_back(l);*/
 
     pScene->SetCamera(Vector3f(0.0f, 0.0, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
     

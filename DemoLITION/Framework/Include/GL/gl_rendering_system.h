@@ -39,11 +39,11 @@ class RenderingSystemGL : public BaseRenderingSystem
 
     virtual Scene* CreateEmptyScene();
 
-    virtual DemolitionModel* LoadModelInternal(const std::string& Filename);
+    virtual CoreModel* LoadModelInternal(const std::string& Filename);
 
     virtual int LoadTexture2D(const std::string& Filename);
 
-    virtual void SetNormalMap(int ModelHandle, int TextureHandle);
+    virtual Texture* GetTexture(int TextureHandle);
 
     virtual void Execute();
 
@@ -62,9 +62,7 @@ class RenderingSystemGL : public BaseRenderingSystem
 
     void InitCallbacks();
 
-    void SetDefaultGLState();
-
-    Texture* GetTexture(int TextureHandle);
+    void SetDefaultGLState();    
 
     GLFWwindow* m_pWindow = NULL;
     ForwardRenderer m_forwardRenderer;

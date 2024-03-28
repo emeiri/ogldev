@@ -83,15 +83,15 @@ private:
 
     void InitObjects()
     {
-        m_terrainModelHandle = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
-        m_pTerrainSceneObject = m_pScene->CreateSceneObject(m_terrainModelHandle);
+        m_pTerrainModel = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
+        m_pTerrainSceneObject = m_pScene->CreateSceneObject(m_pTerrainModel);
         m_pTerrainSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
         m_pScene->AddToRenderList(m_pTerrainSceneObject);
     }
 
     RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
-    int m_terrainModelHandle = -1;
+    Model* m_pTerrainModel = NULL;
     SceneObject* m_pTerrainSceneObject = NULL;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;

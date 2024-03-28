@@ -23,6 +23,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "demolition_lights.h"
+#include "demolition_model.h"
 
 class SceneObject {
 public:
@@ -55,9 +56,7 @@ public:
 
     ~Scene() {}
 
-    virtual void LoadScene(const std::string& Filename) = 0;    
-
-    virtual SceneObject* CreateSceneObject(int ModelHandle) = 0;
+    virtual SceneObject* CreateSceneObject(Model* pModel) = 0;
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape) = 0;
        

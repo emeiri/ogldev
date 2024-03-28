@@ -32,6 +32,7 @@
 #include "ogldev_material.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "demolition_lights.h"
+#include "demolition_model.h"
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -51,13 +52,14 @@ public:
     virtual void SetWorldMatrix_CB(const Matrix4f& World) = 0;
 };
 
+class BaseRenderingSystem;
 
-class DemolitionModel 
+class CoreModel : public Model
 {
 public:
-    DemolitionModel() {};
+    CoreModel(BaseRenderingSystem* pBaseRenderingSystem) { m_pBaseRenderingSystem = pBaseRenderingSystem; }
 
-    ~DemolitionModel();
+    ~CoreModel();
 
     bool LoadAssimpModel(const std::string& Filename, int WindowWidth, int WindowHeight);
 
@@ -97,7 +99,7 @@ public:
     const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
     const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
 
-    void SetNormalMap(Texture* pNormalMap) { m_pNormalMap = pNormalMap; }
+    void SetNormalMap(int TextureHandle);
 
 private:
 
@@ -111,6 +113,8 @@ private:
     virtual void PopulateBuffers();
     virtual void PopulateBuffersNonDSA();
     virtual void PopulateBuffersDSA();
+
+    BaseRenderingSystem* m_pBaseRenderingSystem = NULL;
 
     struct BasicMeshEntry {
         BasicMeshEntry()

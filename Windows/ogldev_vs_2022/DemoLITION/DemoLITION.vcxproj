@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h" />
@@ -164,7 +165,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\base_rendering_system.h" />
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\demolition_model.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\scene.h" />
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
   </ItemGroup>

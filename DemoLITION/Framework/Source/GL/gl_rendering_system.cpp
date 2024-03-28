@@ -94,9 +94,9 @@ Scene* RenderingSystemGL::CreateEmptyScene()
 }
 
 
-DemolitionModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
+CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
 {
-    DemolitionModel* pModel = new DemolitionModel();
+    CoreModel* pModel = new CoreModel(this);
 
     if (!pModel->LoadAssimpModel(Filename, m_windowWidth, m_windowHeight)) {
         delete pModel;
@@ -124,18 +124,6 @@ int RenderingSystemGL::LoadTexture2D(const std::string& Filename)
     printf("2D texture '%s' loaded, handle %d\n", Filename.c_str(), ret);
 
     return ret;
-}
-
-
-void RenderingSystemGL::SetNormalMap(int ModelHandle, int TextureHandle)
-{
-    DemolitionModel* pModel = GetModel(ModelHandle);
-    if (TextureHandle < 0) {
-        pModel->SetNormalMap(NULL);
-    } else {
-        Texture* pTexture = GetTexture(TextureHandle);
-        pModel->SetNormalMap(pTexture);
-    }
 }
 
 

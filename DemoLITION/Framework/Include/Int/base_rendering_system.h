@@ -23,7 +23,7 @@
 #include "ogldev_types.h"
 #include "demolition_scene.h"
 #include "demolition_rendering_system.h"
-#include "Int/demolition_model.h"
+#include "Int/model.h"
 
 class BasicCamera;
 
@@ -37,13 +37,13 @@ class BaseRenderingSystem : public RenderingSystem
 
     virtual void CreateWindow(int Width, int Height);
 
-    virtual int LoadModel(const std::string& Filename);
+    virtual Model* LoadModel(const std::string& Filename);
 
-    virtual DemolitionModel* GetModel(int ModelHandle);
-
-    virtual DemolitionModel* GetModel(const std::string& BasicShape);
+    virtual Model* GetModel(const std::string& BasicShape);
 
     virtual void SetScene(Scene* pScene);
+
+    virtual Texture* GetTexture(int TextureHandle) = NULL;
 
     virtual void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
 
@@ -57,7 +57,7 @@ class BaseRenderingSystem : public RenderingSystem
 
     virtual void CreateWindowInternal() = 0;
 
-    virtual DemolitionModel* LoadModelInternal(const std::string& Filename) = 0;    
+    virtual CoreModel* LoadModelInternal(const std::string& Filename) = 0;    
 
     virtual void SetCamera(BasicCamera* pCamera) = 0;
 
@@ -72,8 +72,8 @@ class BaseRenderingSystem : public RenderingSystem
  private:
     void InitializeBasicShapes();
 
-    std::vector<DemolitionModel*> m_models;
-    std::map<std::string, int> m_shapeToHandle;
+    std::vector<CoreModel*> m_models;
+    std::map<std::string, CoreModel*> m_shapeToModel;
     int m_numModels = 0;
     bool m_loadBasicShapes = false;
 };

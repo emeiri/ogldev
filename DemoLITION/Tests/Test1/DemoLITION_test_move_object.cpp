@@ -82,8 +82,8 @@ private:
 
     void InitMesh()
     {
-        m_modelHandle = m_pRenderingSystem->LoadModel("../Content/test.glb");
-        m_pSceneObject = m_pScene->CreateSceneObject(m_modelHandle);
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/test.glb");
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
         m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
@@ -91,7 +91,7 @@ private:
 
     RenderingSystem* m_pRenderingSystem = NULL;
     Scene* m_pScene = NULL;
-    int m_modelHandle = -1;
+    Model* m_pModel = NULL;
     SceneObject* m_pSceneObject = NULL;
     float m_counter = 0;    
 };

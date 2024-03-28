@@ -99,11 +99,14 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\scene.h">
       <Filter>Include\Int</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\demolition_model.h">
-      <Filter>Include\Int</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
       <Filter>Include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\model.h">
+      <Filter>Include\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

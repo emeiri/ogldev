@@ -17,7 +17,8 @@
 */
 
 #include "ogldev_engine_common.h"
-#include "Int/demolition_model.h"
+#include "Int/base_rendering_system.h"
+#include "Int/model.h"
 
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 
@@ -53,13 +54,13 @@ inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 }
 
 
-DemolitionModel::~DemolitionModel()
+CoreModel::~CoreModel()
 {
     Clear();
 }
 
 
-void DemolitionModel::Clear()
+void CoreModel::Clear()
 {
     if (m_Buffers[0] != 0) {
         glDeleteBuffers(ARRAY_SIZE_IN_ELEMENTS(m_Buffers), m_Buffers);
@@ -72,7 +73,18 @@ void DemolitionModel::Clear()
 }
 
 
-bool DemolitionModel::LoadAssimpModel(const string& Filename, int WindowWidth, int WindowHeight)
+void CoreModel::SetNormalMap(int TextureHandle)
+{
+    if (TextureHandle < 0) {
+        m_pNormalMap = NULL;
+    }
+    else {
+        Texture* pTexture = m_pBaseRenderingSystem->GetTexture(TextureHandle);
+        m_pNormalMap = pTexture;
+    }
+}
+
+bool CoreModel::LoadAssimpModel(const string& Filename, int WindowWidth, int WindowHeight)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -110,7 +122,7 @@ bool DemolitionModel::LoadAssimpModel(const string& Filename, int WindowWidth, i
 }
 
 
-bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filename, int WindowWidth, int WindowHeight)
+bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename, int WindowWidth, int WindowHeight)
 {
     if (!InitGeometry(pScene, Filename)) {
         return false;
@@ -124,7 +136,7 @@ bool DemolitionModel::InitFromScene(const aiScene* pScene, const string& Filenam
 }
 
 
-bool DemolitionModel::InitGeometry(const aiScene* pScene, const string& Filename)
+bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 {
     printf("\n*** Initializing geometry ***\n");
     m_Meshes.resize(pScene->mNumMeshes);
@@ -151,7 +163,7 @@ bool DemolitionModel::InitGeometry(const aiScene* pScene, const string& Filename
 }
 
 
-void DemolitionModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
+void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
@@ -165,7 +177,7 @@ void DemolitionModel::CountVerticesAndIndices(const aiScene* pScene, unsigned in
 }
 
 
-void DemolitionModel::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
+void CoreModel::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
 {
     m_Vertices.reserve(NumVertices);
     m_Indices.reserve(NumIndices);
@@ -174,7 +186,7 @@ void DemolitionModel::ReserveSpace(unsigned int NumVertices, unsigned int NumInd
 }
 
 
-void DemolitionModel::InitAllMeshes(const aiScene* pScene)
+void CoreModel::InitAllMeshes(const aiScene* pScene)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
@@ -187,7 +199,7 @@ void DemolitionModel::InitAllMeshes(const aiScene* pScene)
 }
 
 
-void DemolitionModel::CalculateMeshTransformations(const aiScene* pScene)
+void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
 {
     printf("----------------------------------------\n");
     printf("Calculating mesh transformations\n");
@@ -198,7 +210,7 @@ void DemolitionModel::CalculateMeshTransformations(const aiScene* pScene)
 }
 
 
-void DemolitionModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode)
+void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode)
 {
     printf("Traversing node '%s'\n", pNode->mName.C_Str());
     Matrix4f NodeTransformation(pNode->mTransformation);
@@ -228,7 +240,7 @@ void DemolitionModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNod
 }
 
 
-void DemolitionModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
+void CoreModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -278,7 +290,7 @@ void DemolitionModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
-void DemolitionModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
+void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -328,7 +340,7 @@ void DemolitionModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
-void DemolitionModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<Vertex>&Vertices)
+void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<Vertex>&Vertices)
 {
     size_t NumIndices = Indices.size();
     size_t NumVertices = Vertices.size();
@@ -388,7 +400,7 @@ void DemolitionModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std
 }
 
 
-bool DemolitionModel::InitMaterials(const aiScene* pScene, const string& Filename)
+bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
 {
     string Dir = GetDirFromFilename(Filename);
 
@@ -409,14 +421,14 @@ bool DemolitionModel::InitMaterials(const aiScene* pScene, const string& Filenam
 }
 
 
-void DemolitionModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
+void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
 {
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
 }
 
 
-void DemolitionModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].pDiffuse = NULL;
 
@@ -438,7 +450,7 @@ void DemolitionModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pM
 }
 
 
-void DemolitionModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+void CoreModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D);
@@ -447,7 +459,7 @@ void DemolitionModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, in
 }
 
 
-void DemolitionModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void CoreModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
     string p(Path.data);
 
@@ -475,7 +487,7 @@ void DemolitionModel::LoadDiffuseTextureFromFile(const string& Dir, const aiStri
 }
 
 
-void DemolitionModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     m_Materials[MaterialIndex].pSpecularExponent = NULL;
 
@@ -495,7 +507,7 @@ void DemolitionModel::LoadSpecularTexture(const string& Dir, const aiMaterial* p
 }
 
 
-void DemolitionModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+void CoreModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D);
@@ -504,7 +516,7 @@ void DemolitionModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, i
 }
 
 
-void DemolitionModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void CoreModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
     string p(Path.data);
 
@@ -527,7 +539,7 @@ void DemolitionModel::LoadSpecularTextureFromFile(const string& Dir, const aiStr
     }
 }
 
-void DemolitionModel::LoadColors(const aiMaterial* pMaterial, int index)
+void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 {
     aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
     Vector3f AllOnes(1.0f, 1.0f, 1.0f);
@@ -566,7 +578,7 @@ void DemolitionModel::LoadColors(const aiMaterial* pMaterial, int index)
 }
 
 
-void DemolitionModel::PopulateBuffers()
+void CoreModel::PopulateBuffers()
 {
     if (IsGLVersionHigher(4, 5)) {
         PopulateBuffersDSA();
@@ -576,7 +588,7 @@ void DemolitionModel::PopulateBuffers()
 }
 
 
-void DemolitionModel::PopulateBuffersNonDSA()
+void CoreModel::PopulateBuffersNonDSA()
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
@@ -613,7 +625,7 @@ void DemolitionModel::PopulateBuffersNonDSA()
 }
 
 
-void DemolitionModel::PopulateBuffersDSA()
+void CoreModel::PopulateBuffersDSA()
 {
     glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(m_Vertices[0]) * m_Vertices.size(), m_Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
@@ -655,12 +667,11 @@ void DemolitionModel::PopulateBuffersDSA()
 }
 
 
-void DemolitionModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
+void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
     glBindVertexArray(m_VAO);
 
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-//if (i == 1)
         RenderMesh(i, pRenderCallbacks);
     }
 
@@ -669,7 +680,7 @@ void DemolitionModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 }
 
 
-void DemolitionModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks)
+void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks)
 {
     unsigned int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
     assert(MaterialIndex < m_Materials.size());
@@ -715,7 +726,7 @@ void DemolitionModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRend
 }
 
 
-void DemolitionModel::Render(unsigned int DrawIndex, unsigned int PrimID)
+void CoreModel::Render(unsigned int DrawIndex, unsigned int PrimID)
 {
     glBindVertexArray(m_VAO);
 
@@ -743,7 +754,7 @@ void DemolitionModel::Render(unsigned int DrawIndex, unsigned int PrimID)
 
 
 // Used only by instancing
-void DemolitionModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
+void CoreModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats)
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[WVP_MAT_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WVPMats, GL_DYNAMIC_DRAW);
@@ -779,7 +790,7 @@ void DemolitionModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats,
 }
 
 
-void DemolitionModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex)
+void CoreModel::GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex)
 {
     uint MeshIndex = DrawIndex; // Each mesh is rendered in its own draw call
 
@@ -816,7 +827,7 @@ static void traverse(int depth, aiNode* pNode)
 }
 
 
-void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight)
+void CoreModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight)
 {
     printf("\n*** Initializing cameras ***\n");
     printf("Loading %d cameras\n", pScene->mNumCameras);
@@ -829,7 +840,7 @@ void DemolitionModel::InitCameras(const aiScene* pScene, int WindowWidth, int Wi
 }
 
 
-void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight)
+void CoreModel::InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight)
 {
     const aiCamera* pCamera = pScene->mCameras[Index];
     printf("Camera name: '%s'\n", pCamera->mName.C_Str());
@@ -896,7 +907,7 @@ void DemolitionModel::InitSingleCamera(int Index, const aiScene* pScene, int Win
 }
 
 
-void DemolitionModel::InitLights(const aiScene* pScene)
+void CoreModel::InitLights(const aiScene* pScene)
 {   
     printf("\n*** Initializing lights ***\n");
 
@@ -906,7 +917,7 @@ void DemolitionModel::InitLights(const aiScene* pScene)
 }
 
 
-void DemolitionModel::InitSingleLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitSingleLight(const aiScene* pScene, const aiLight& light)
 {
     printf("Init light '%s'\n", light.mName.C_Str());
 
@@ -961,7 +972,7 @@ static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Ma
 }
 
 
-void DemolitionModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light)
 {
     if (m_dirLights.size() > 0) {
         printf("The lighting shader currently supports only a single directional light!\n");
@@ -994,7 +1005,7 @@ void DemolitionModel::InitDirectionalLight(const aiScene* pScene, const aiLight&
 }
 
 
-void DemolitionModel::InitPointLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
 {
     PointLight l;
     l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
@@ -1022,7 +1033,7 @@ void DemolitionModel::InitPointLight(const aiScene* pScene, const aiLight& light
 }
 
 
-void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 {
     SpotLight l;
     //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
@@ -1082,7 +1093,7 @@ void DemolitionModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 }
 
 
-void DemolitionModel::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
+void CoreModel::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 {
     if (pMesh->mNumBones > MAX_BONES) {
         printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
@@ -1098,7 +1109,7 @@ void DemolitionModel::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
 }
 
 
-void DemolitionModel::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
+void CoreModel::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
 {
     int BoneId = GetBoneId(pBone);
 
@@ -1119,7 +1130,7 @@ void DemolitionModel::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
 }
 
 
-void DemolitionModel::MarkRequiredNodesForBone(const aiBone* pBone)
+void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone)
 {
     string NodeName(pBone->mName.C_Str());
 
@@ -1145,7 +1156,7 @@ void DemolitionModel::MarkRequiredNodesForBone(const aiBone* pBone)
 }
 
 
-void DemolitionModel::InitializeRequiredNodeMap(const aiNode* pNode)
+void CoreModel::InitializeRequiredNodeMap(const aiNode* pNode)
 {
     string NodeName(pNode->mName.C_Str());
 
@@ -1159,7 +1170,7 @@ void DemolitionModel::InitializeRequiredNodeMap(const aiNode* pNode)
 }
 
 
-int DemolitionModel::GetBoneId(const aiBone* pBone)
+int CoreModel::GetBoneId(const aiBone* pBone)
 {
     int BoneIndex = 0;
     string BoneName(pBone->mName.C_Str());
@@ -1177,7 +1188,7 @@ int DemolitionModel::GetBoneId(const aiBone* pBone)
 }
 
 
-uint DemolitionModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint CoreModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     for (uint i = 0 ; i < pNodeAnim->mNumPositionKeys - 1 ; i++) {
         float t = (float)pNodeAnim->mPositionKeys[i + 1].mTime;
@@ -1190,7 +1201,7 @@ uint DemolitionModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* p
 }
 
 
-void DemolitionModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumPositionKeys == 1) {
@@ -1217,7 +1228,7 @@ void DemolitionModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationT
 }
 
 
-uint DemolitionModel::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint CoreModel::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumRotationKeys > 0);
 
@@ -1232,7 +1243,7 @@ uint DemolitionModel::FindRotation(float AnimationTimeTicks, const aiNodeAnim* p
 }
 
 
-void DemolitionModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumRotationKeys == 1) {
@@ -1260,7 +1271,7 @@ void DemolitionModel::CalcInterpolatedRotation(aiQuaternion& Out, float Animatio
 }
 
 
-uint DemolitionModel::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+uint CoreModel::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     assert(pNodeAnim->mNumScalingKeys > 0);
 
@@ -1275,7 +1286,7 @@ uint DemolitionModel::FindScaling(float AnimationTimeTicks, const aiNodeAnim* pN
 }
 
 
-void DemolitionModel::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumScalingKeys == 1) {
@@ -1302,7 +1313,7 @@ void DemolitionModel::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTi
 }
 
 
-void DemolitionModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation)
+void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation)
 {
     string NodeName(pNode->mName.data);
 
@@ -1352,7 +1363,7 @@ void DemolitionModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* 
 }
 
 
-void DemolitionModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
+void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
                                            const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor)
 {
     string NodeName(pNode->mName.data);
@@ -1432,7 +1443,7 @@ void DemolitionModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, fl
 }
 
 
-void DemolitionModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
 {
     CalcInterpolatedScaling(Transform.Scaling, AnimationTimeTicks, pNodeAnim);
     CalcInterpolatedRotation(Transform.Rotation, AnimationTimeTicks, pNodeAnim);
@@ -1440,7 +1451,7 @@ void DemolitionModel::CalcLocalTransform(LocalTransform& Transform, float Animat
 }
 
 
-void DemolitionModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
+void CoreModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transforms, unsigned int AnimationIndex)
 {
     if (AnimationIndex >= m_pScene->mNumAnimations) {
         printf("Invalid animation index %d, max is %d\n", AnimationIndex, m_pScene->mNumAnimations);
@@ -1462,7 +1473,7 @@ void DemolitionModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& T
 }
 
 
-void DemolitionModel::GetBoneTransformsBlended(float TimeInSeconds,
+void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
                                            vector<Matrix4f>& BlendedTransforms,
                                            unsigned int StartAnimIndex,
                                            unsigned int EndAnimIndex,
@@ -1502,7 +1513,7 @@ void DemolitionModel::GetBoneTransformsBlended(float TimeInSeconds,
 }
 
 
-float DemolitionModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex)
+float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex)
 {
     float TicksPerSecond = (float)(m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond != 0 ? m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond : 25.0f);
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
@@ -1514,7 +1525,7 @@ float DemolitionModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int 
 }
 
 
-const aiNodeAnim* DemolitionModel::FindNodeAnim(const aiAnimation&
+const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation&
                                             Animation, const string& NodeName)
 {
     for (uint i = 0 ; i < Animation.mNumChannels ; i++) {

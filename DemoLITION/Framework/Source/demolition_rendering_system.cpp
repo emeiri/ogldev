@@ -83,14 +83,14 @@ void BaseRenderingSystem::CreateWindow(int Width, int Height)
 
 void BaseRenderingSystem::InitializeBasicShapes()
 {
-    int ModelHandle = LoadModel("../Content/sphere.obj");
-    m_shapeToHandle["sphere"] = ModelHandle;
+    CoreModel* pModel = LoadModelInternal("../Content/sphere.obj");
+    m_shapeToModel["sphere"] = pModel;
     
-    ModelHandle = LoadModel("../Content/box.obj");
-    m_shapeToHandle["cube"] = ModelHandle;
+    pModel = LoadModelInternal("../Content/box.obj");
+    m_shapeToModel["cube"] = pModel;
 
-    ModelHandle = LoadModel("../Content/quad.obj");
-    m_shapeToHandle["square"] = ModelHandle;
+    pModel = LoadModelInternal("../Content/quad.obj");
+    m_shapeToModel["square"] = pModel;
 }
 
 
@@ -118,20 +118,17 @@ void BaseRenderingSystem::SetScene(Scene* pScene)
 }
 
 
-int BaseRenderingSystem::LoadModel(const std::string& Filename)
+Model* BaseRenderingSystem::LoadModel(const std::string& Filename)
 {
     if (m_numModels == m_models.size()) {
         printf("%s:%d: out of models space\n", __FILE__, __LINE__);
         exit(0);
     }
 
-    DemolitionModel* pModel = LoadModelInternal(Filename);
-
-    int ret = -1;
+    CoreModel* pModel = LoadModelInternal(Filename);
 
     if (pModel) {
         m_models[m_numModels] = pModel;
-        ret = m_numModels;
         m_numModels++;
     }
     else {
@@ -139,43 +136,19 @@ int BaseRenderingSystem::LoadModel(const std::string& Filename)
         exit(0);
     }
 
-    return ret;
+    return pModel;
 }
  
 
-DemolitionModel* BaseRenderingSystem::GetModel(int ModelHandle)
+
+Model* BaseRenderingSystem::GetModel(const std::string& BasicShape)
 {
-    if (ModelHandle < 0) {
-        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
-        exit(0);
-    }
-
-    if (ModelHandle >= m_numModels) {
-        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
-        exit(0);
-    }
-
-    DemolitionModel* pModel = m_models[ModelHandle];
-
-    if (!pModel) {
-        printf("%s:%d: invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
-        exit(0);
-    }
-
-    return pModel;
-}
-
-
-DemolitionModel* BaseRenderingSystem::GetModel(const std::string& BasicShape)
-{
-    if (m_shapeToHandle.find(BasicShape) == m_shapeToHandle.end()) {
+    if (m_shapeToModel.find(BasicShape) == m_shapeToModel.end()) {
         printf("%s:%d - cannot find basic shape %s\n", __FILE__, __LINE__, BasicShape.c_str());
         exit(0);
     }
 
-    int ModelHandle = m_shapeToHandle[BasicShape];
-
-    DemolitionModel* pModel = m_models[ModelHandle];
+    Model* pModel = m_shapeToModel[BasicShape];
 
     return pModel;
 }

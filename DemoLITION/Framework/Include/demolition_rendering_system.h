@@ -21,6 +21,7 @@
 
 #include "ogldev_types.h"
 #include "demolition_scene.h"
+#include "demolition_model.h"
 
 class GameCallbacks
 {
@@ -62,11 +63,9 @@ public:
 
     virtual void CreateWindow(int Width, int Height) = 0;
 
-    virtual int LoadModel(const std::string& Filename) = 0;
+    virtual Model* LoadModel(const std::string& Filename) = 0;
 
     virtual int LoadTexture2D(const std::string& Filename) = 0;
-
-    virtual void SetNormalMap(int ModelHandle, int TextureHandle) = 0;
 
     virtual void SetScene(Scene* pScene) = 0;
 

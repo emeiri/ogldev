@@ -52,10 +52,10 @@ CoreScene::CoreScene(BaseRenderingSystem* pRenderingSystem)
 
 void CoreScene::LoadScene(const std::string& Filename)
 {
-    int ModelHandle = m_pBaseRenderingSystem->LoadModel(Filename.c_str());
-    SceneObject* pSceneObject = CreateSceneObject(ModelHandle);
+    CoreModel* pModel = (CoreModel*)m_pBaseRenderingSystem->LoadModel(Filename.c_str());
+    SceneObject* pSceneObject = CreateSceneObject(pModel);
     AddToRenderList(pSceneObject);
-    DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
+
     if (pModel->GetCameras().size() == 0) {
         printf("Warning! '%s' does not include a camera. Falling back to default.\n", Filename.c_str());
     } else {
@@ -125,21 +125,14 @@ bool CoreScene::RemoveFromRenderList(SceneObject* pSceneObject)
 }
 
 
-SceneObject* CoreScene::CreateSceneObject(int ModelHandle)
+SceneObject* CoreScene::CreateSceneObject(Model* pModel)
 {
-    if (ModelHandle < 0) {
-        printf("%s:%d - invalid model handle %d\n", __FILE__, __LINE__, ModelHandle);
-        exit(0);
-    }
-
     if (m_numSceneObjects == NUM_SCENE_OBJECTS) {
-        printf("%s:%d - out of scene objects space, model handle %d\n", __FILE__, __LINE__, ModelHandle);
+        printf("%s:%d - out of scene objects space\n", __FILE__, __LINE__);
         exit(0);
     }
     
-    DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(ModelHandle);
-
-    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal((CoreModel*)pModel);
 
     return pCoreSceneObject;
 }
@@ -147,7 +140,7 @@ SceneObject* CoreScene::CreateSceneObject(int ModelHandle)
 
 SceneObject* CoreScene::CreateSceneObject(const std::string& BasicShape)
 {
-    DemolitionModel* pModel = m_pBaseRenderingSystem->GetModel(BasicShape);
+    CoreModel* pModel = (CoreModel*)m_pBaseRenderingSystem->GetModel(BasicShape);
 
     CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
 
@@ -155,7 +148,7 @@ SceneObject* CoreScene::CreateSceneObject(const std::string& BasicShape)
 }
 
 
-CoreSceneObject* CoreScene::CreateSceneObjectInternal(DemolitionModel* pModel)
+CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
 {
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
