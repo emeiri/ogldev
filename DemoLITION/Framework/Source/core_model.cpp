@@ -79,7 +79,7 @@ void CoreModel::SetNormalMap(int TextureHandle)
         m_pNormalMap = NULL;
     }
     else {
-        Texture* pTexture = m_pBaseRenderingSystem->GetTexture(TextureHandle);
+        Texture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
         m_pNormalMap = pTexture;
     }
 }

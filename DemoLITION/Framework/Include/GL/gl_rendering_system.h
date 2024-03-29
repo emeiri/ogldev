@@ -28,7 +28,7 @@
 #include "gl_forward_renderer.h"
 #include "GL/gl_scene.h"
 
-class RenderingSystemGL : public BaseRenderingSystem
+class RenderingSystemGL : public CoreRenderingSystem
 {
  public:
     RenderingSystemGL(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);

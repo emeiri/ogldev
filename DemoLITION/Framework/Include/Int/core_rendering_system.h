@@ -27,7 +27,7 @@
 
 class BasicCamera;
 
-class BaseRenderingSystem : public RenderingSystem
+class CoreRenderingSystem : public RenderingSystem
 {
  public:
 
@@ -51,9 +51,9 @@ class BaseRenderingSystem : public RenderingSystem
 
  protected:
 
-    BaseRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);
+    CoreRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);
 
-    ~BaseRenderingSystem();
+    ~CoreRenderingSystem();
 
     virtual void CreateWindowInternal() = 0;
 

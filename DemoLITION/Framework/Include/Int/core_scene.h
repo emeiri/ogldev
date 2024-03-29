@@ -46,11 +46,11 @@ private:
 };
 
 
-class BaseRenderingSystem;
+class CoreRenderingSystem;
 
 class CoreScene : public Scene {
 public:
-    CoreScene(BaseRenderingSystem* pRenderingSystem);
+    CoreScene(CoreRenderingSystem* pRenderingSystem);
 
     virtual ~CoreScene() {}
 
@@ -83,7 +83,7 @@ public:
     void SetCamera(const Vector3f& Pos, const Vector3f& Target);
 
 protected:
-    BaseRenderingSystem* m_pBaseRenderingSystem = NULL;
+    CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;
 
 private:

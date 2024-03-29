@@ -26,7 +26,7 @@
 
 #define NUM_TEXTURES 1024
 
-extern BaseRenderingSystem* g_pRenderingSystem;
+extern CoreRenderingSystem* g_pRenderingSystem;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -50,7 +50,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 }
 
 
-RenderingSystemGL::RenderingSystemGL(GameCallbacks* pGameCallbacks, bool LoadBasicShapes) : BaseRenderingSystem(pGameCallbacks, LoadBasicShapes)
+RenderingSystemGL::RenderingSystemGL(GameCallbacks* pGameCallbacks, bool LoadBasicShapes) : CoreRenderingSystem(pGameCallbacks, LoadBasicShapes)
 {
     m_textures.resize(NUM_TEXTURES, 0);
 }

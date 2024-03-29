@@ -52,12 +52,12 @@ public:
     virtual void SetWorldMatrix_CB(const Matrix4f& World) = 0;
 };
 
-class BaseRenderingSystem;
+class CoreRenderingSystem;
 
 class CoreModel : public Model
 {
 public:
-    CoreModel(BaseRenderingSystem* pBaseRenderingSystem) { m_pBaseRenderingSystem = pBaseRenderingSystem; }
+    CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { m_pCoreRenderingSystem = pCoreRenderingSystem; }
 
     ~CoreModel();
 
@@ -114,7 +114,7 @@ private:
     virtual void PopulateBuffersNonDSA();
     virtual void PopulateBuffersDSA();
 
-    BaseRenderingSystem* m_pBaseRenderingSystem = NULL;
+    CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
     struct BasicMeshEntry {
         BasicMeshEntry()

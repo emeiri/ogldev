@@ -25,9 +25,9 @@
 
 #define NUM_MODELS 1024
 
-BaseRenderingSystem* g_pRenderingSystem = NULL;
+CoreRenderingSystem* g_pRenderingSystem = NULL;
 
-BaseRenderingSystem::BaseRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes)
+CoreRenderingSystem::CoreRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes)
 {
     if (pGameCallbacks) {
         m_pGameCallbacks = pGameCallbacks;
@@ -41,7 +41,7 @@ BaseRenderingSystem::BaseRenderingSystem(GameCallbacks* pGameCallbacks, bool Loa
 }
 
 
-BaseRenderingSystem::~BaseRenderingSystem()
+CoreRenderingSystem::~CoreRenderingSystem()
 {
 
 }
@@ -68,7 +68,7 @@ RenderingSystem* RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM Renderi
 }
 
 
-void BaseRenderingSystem::CreateWindow(int Width, int Height)
+void CoreRenderingSystem::CreateWindow(int Width, int Height)
 {
     m_windowWidth = Width;
     m_windowHeight = Height;
@@ -81,7 +81,7 @@ void BaseRenderingSystem::CreateWindow(int Width, int Height)
 }
 
 
-void BaseRenderingSystem::InitializeBasicShapes()
+void CoreRenderingSystem::InitializeBasicShapes()
 {
     CoreModel* pModel = LoadModelInternal("../Content/sphere.obj");
     m_shapeToModel["sphere"] = pModel;
@@ -94,7 +94,7 @@ void BaseRenderingSystem::InitializeBasicShapes()
 }
 
 
-Scene* BaseRenderingSystem::CreateScene(const std::string& Filename)
+Scene* CoreRenderingSystem::CreateScene(const std::string& Filename)
 {
     CoreScene* pScene = (CoreScene*)CreateEmptyScene();
     pScene->LoadScene(Filename);
@@ -102,7 +102,7 @@ Scene* BaseRenderingSystem::CreateScene(const std::string& Filename)
 }
 
 
-Scene* BaseRenderingSystem::CreateDefaultScene()
+Scene* CoreRenderingSystem::CreateDefaultScene()
 {
     CoreScene* pScene = (CoreScene*)CreateEmptyScene();
     pScene->InitializeDefault();
@@ -110,7 +110,7 @@ Scene* BaseRenderingSystem::CreateDefaultScene()
 }
 
 
-void BaseRenderingSystem::SetScene(Scene* pScene) 
+void CoreRenderingSystem::SetScene(Scene* pScene) 
 { 
     m_pScene = pScene; 
     m_pCamera = ((CoreScene*)pScene)->GetCurrentCamera();
@@ -118,7 +118,7 @@ void BaseRenderingSystem::SetScene(Scene* pScene)
 }
 
 
-Model* BaseRenderingSystem::LoadModel(const std::string& Filename)
+Model* CoreRenderingSystem::LoadModel(const std::string& Filename)
 {
     if (m_numModels == m_models.size()) {
         printf("%s:%d: out of models space\n", __FILE__, __LINE__);
@@ -141,7 +141,7 @@ Model* BaseRenderingSystem::LoadModel(const std::string& Filename)
  
 
 
-Model* BaseRenderingSystem::GetModel(const std::string& BasicShape)
+Model* CoreRenderingSystem::GetModel(const std::string& BasicShape)
 {
     if (m_shapeToModel.find(BasicShape) == m_shapeToModel.end()) {
         printf("%s:%d - cannot find basic shape %s\n", __FILE__, __LINE__, BasicShape.c_str());

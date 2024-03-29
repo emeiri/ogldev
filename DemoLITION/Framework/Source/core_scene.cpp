@@ -43,16 +43,16 @@ Scene::Scene()
 }
 
 
-CoreScene::CoreScene(BaseRenderingSystem* pRenderingSystem)
+CoreScene::CoreScene(CoreRenderingSystem* pRenderingSystem)
 {
-    m_pBaseRenderingSystem = pRenderingSystem;
+    m_pCoreRenderingSystem = pRenderingSystem;
     CreateDefaultCamera();
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);
 }
 
 void CoreScene::LoadScene(const std::string& Filename)
 {
-    CoreModel* pModel = (CoreModel*)m_pBaseRenderingSystem->LoadModel(Filename.c_str());
+    CoreModel* pModel = (CoreModel*)m_pCoreRenderingSystem->LoadModel(Filename.c_str());
     SceneObject* pSceneObject = CreateSceneObject(pModel);
     AddToRenderList(pSceneObject);
 
@@ -85,7 +85,7 @@ void CoreScene::CreateDefaultCamera()
     float zFar = 1000.0f;
     int WindowWidth = 0;
     int WindowHeight = 0;
-    m_pBaseRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+    m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
 
     PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
 
@@ -140,7 +140,7 @@ SceneObject* CoreScene::CreateSceneObject(Model* pModel)
 
 SceneObject* CoreScene::CreateSceneObject(const std::string& BasicShape)
 {
-    CoreModel* pModel = (CoreModel*)m_pBaseRenderingSystem->GetModel(BasicShape);
+    CoreModel* pModel = (CoreModel*)m_pCoreRenderingSystem->GetModel(BasicShape);
 
     CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
 

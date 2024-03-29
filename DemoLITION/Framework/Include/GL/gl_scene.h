@@ -26,7 +26,7 @@ class RenderingSystemGL;
 class GLScene : public CoreScene
 {
 public:
-    GLScene(RenderingSystemGL* pRenderingSystem) : CoreScene((BaseRenderingSystem*)pRenderingSystem) {}
+    GLScene(RenderingSystemGL* pRenderingSystem) : CoreScene((CoreRenderingSystem*)pRenderingSystem) {}
 
     ~GLScene() {}    
 };
