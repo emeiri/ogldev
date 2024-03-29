@@ -24,7 +24,7 @@
 #include "ogldev_material.h"
 #include "ogldev_world_transform.h"
 #include "demolition_lights.h"
-#include "Int/model.h"
+#include "Int/core_model.h"
 
 class ForwardLightingTechnique : public Technique
 {

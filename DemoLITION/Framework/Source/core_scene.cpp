@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Int/scene.h"
-#include "Int/base_rendering_system.h"
+#include "Int/core_scene.h"
+#include "Int/core_rendering_system.h"
 
 #define NUM_SCENE_OBJECTS 1024
 

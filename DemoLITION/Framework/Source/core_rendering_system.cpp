@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Int/base_rendering_system.h"
-#include "Int/scene.h"
+#include "Int/core_rendering_system.h"
+#include "Int/core_scene.h"
 #include "GL/gl_rendering_system.h"
 
 #define NUM_MODELS 1024

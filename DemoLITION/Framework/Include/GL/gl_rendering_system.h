@@ -24,7 +24,7 @@
 #define GLFW_DLL
 #include <GLFW/glfw3.h>
 
-#include "Int/base_rendering_system.h"
+#include "Int/core_rendering_system.h"
 #include "gl_forward_renderer.h"
 #include "GL/gl_scene.h"
 

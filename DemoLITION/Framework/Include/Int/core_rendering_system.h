@@ -23,7 +23,7 @@
 #include "ogldev_types.h"
 #include "demolition_scene.h"
 #include "demolition_rendering_system.h"
-#include "Int/model.h"
+#include "Int/core_model.h"
 
 class BasicCamera;
 

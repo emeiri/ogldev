@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Int/scene.h"
+#include "Int/core_scene.h"
 
 class RenderingSystemGL;
 

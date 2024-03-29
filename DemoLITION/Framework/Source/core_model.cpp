@@ -17,8 +17,8 @@
 */
 
 #include "ogldev_engine_common.h"
-#include "Int/base_rendering_system.h"
-#include "Int/model.h"
+#include "Int/core_rendering_system.h"
+#include "Int/core_model.h"
 
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 

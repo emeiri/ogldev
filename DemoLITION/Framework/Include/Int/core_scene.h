@@ -22,7 +22,7 @@
 #include <list>
 
 #include "demolition_scene.h"
-#include "Int\model.h"
+#include "Int\core_model.h"
 
 
 class CoreSceneObject : public SceneObject {

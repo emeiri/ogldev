@@ -19,12 +19,6 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_scene.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_model.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
@@ -33,9 +27,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp">
       <Filter>Source\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\demolition_rendering_system.cpp">
-      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp">
       <Filter>Source\GL</Filter>
@@ -60,6 +51,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp">
       <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_model.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_rendering_system.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_scene.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,26 +87,26 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\base_rendering_system.h">
-      <Filter>Include\Int</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_system.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\scene.h">
-      <Filter>Include\Int</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\model.h">
-      <Filter>Include\Int</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h">
+      <Filter>Include\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h">
+      <Filter>Include\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h">
+      <Filter>Include\Int</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
