@@ -53,12 +53,14 @@ public:
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
 		m_vkCore.DestroyTexture(m_texture);
 		m_vkCore.DestroyPipeline(m_pipeline);
+		vkDestroyRenderPass(m_vkCore.GetDevice(), m_renderPass, NULL);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
 		int NumUniformBuffers = 1;
 		m_vkCore.Init(pAppName, pWindow, NumUniformBuffers, sizeof(UniformData));
+		m_renderPass = m_vkCore.CreateSimpleRenderPass();
 		CreateCommandBuffer();				
 	//	CreateVertexBuffer();
 		CreateShaders();
@@ -133,7 +135,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pipeline = m_vkCore.CreatePipeline(m_vs, m_fs, m_texture);
+		m_pipeline = m_vkCore.CreatePipeline(m_renderPass, m_vs, m_fs, m_texture);
 	}
 
 
@@ -154,7 +156,7 @@ private:
 
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = m_vkCore.GetRenderPass();
+		renderPassInfo.renderPass = m_renderPass;
 		renderPassInfo.renderArea.offset.x = 0;
 		renderPassInfo.renderArea.offset.y = 0;
 		renderPassInfo.renderArea.extent.width = WINDOW_WIDTH;
@@ -199,6 +201,7 @@ private:
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
+	VkRenderPass m_renderPass;
 	VkPipeline m_pipeline;
 	OgldevVK::VulkanTexture m_texture;
 };

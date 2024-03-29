@@ -64,6 +64,8 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformBuffers, size_t UniformDataSize);
 
+	VkRenderPass CreateSimpleRenderPass();
+
 	VkDevice& GetDevice() { return m_device; }
 
 	int GetNumImages() const { return (int)m_images.size(); }
@@ -71,8 +73,6 @@ public:
 	std::vector<VkImage>& GetImages() { return m_images;  }
 
 	VulkanQueue& GetQueue() { return m_queue; }
-
-	const VkRenderPass& GetRenderPass() const { return m_renderPass; }
 
 	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
 
@@ -88,7 +88,7 @@ public:
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
-	VkPipeline CreatePipeline(VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex);
+	VkPipeline CreatePipeline(VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex);
 	void DestroyPipeline(VkPipeline Pipeline);
 
 	VkPipelineLayout& GetPipelineLayout() { return m_pipelineLayout; }
@@ -101,9 +101,8 @@ private:
 	void CreateDebugCallback();
 	void CreateSurface();
 	void CreateDevice();
-	void CreateSwapChain();
-	void CreateRenderPass();
-	void CreateFramebuffer();
+	void CreateSwapChain();	
+	void CreateFramebuffer(VkRenderPass RenderPass);
 	void CreateCommandBufferPool();
 	void CreateUniformBuffers();
 	void CreateDescriptorPool();
@@ -147,8 +146,7 @@ private:
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
-	VulkanQueue m_queue;
-	VkRenderPass m_renderPass;
+	VulkanQueue m_queue;	
 	std::vector<VkFramebuffer> m_fbs;
 	VkCommandPool m_cmdBufPool;
 	VkCommandBuffer m_copyCmdBuf;

@@ -67,9 +67,7 @@ VulkanCore::~VulkanCore()
 
 	for (int i = 0 ; i < m_fbs.size(); i++) {
 		vkDestroyFramebuffer(m_device, m_fbs[i], NULL);
-	}
-
-	vkDestroyRenderPass(m_device, m_renderPass, NULL);
+	}	
 
 	m_queue.Destroy();
 
@@ -124,8 +122,6 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformB
 	CreateDevice();	
 	CreateSwapChain();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
-	CreateRenderPass();
-	CreateFramebuffer();
 	CreateCommandBufferPool();
 	CreateCommandBuffers(1, &m_copyCmdBuf);
 	CreateUniformBuffers();
@@ -416,8 +412,20 @@ void VulkanCore::CreateSwapChain()
 }
 
 
-void VulkanCore::CreateRenderPass()
+VkRenderPass VulkanCore::CreateSimpleRenderPass()
 {
+	VkAttachmentDescription AttachDesc = {
+	.flags = 0,
+	.format = m_swapChainSurfaceFormat.format,
+	.samples = VK_SAMPLE_COUNT_1_BIT,
+	.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+	.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+	.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+	.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	};
+
 	VkAttachmentReference AttachRef = {
 		.attachment = 0,
 		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
@@ -436,17 +444,6 @@ void VulkanCore::CreateRenderPass()
 		.pPreserveAttachments = NULL
 	};
 
-	VkAttachmentDescription AttachDesc = {
-		.flags = 0,
-		.format = m_swapChainSurfaceFormat.format,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	};
 
 #if 0
 	VkAttachmentDescription depthAttachment = {
@@ -488,14 +485,18 @@ void VulkanCore::CreateRenderPass()
 		.pDependencies = &Dependency
 	};
 
-	VkResult res = vkCreateRenderPass(m_device, &RenderPassCreateInfo, NULL, &m_renderPass);
+	VkRenderPass RenderPass;
+
+	VkResult res = vkCreateRenderPass(m_device, &RenderPassCreateInfo, NULL, &RenderPass);
 	CHECK_VK_RESULT(res, "vkCreateRenderPass\n");
 
-	printf("Created a render pass\n");
+	printf("Created a simple render pass\n");
+
+	return RenderPass;
 }
 
 
-void VulkanCore::CreateFramebuffer()
+void VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
 {
 	m_fbs.resize(m_images.size());
 
@@ -508,7 +509,7 @@ void VulkanCore::CreateFramebuffer()
 
 		VkFramebufferCreateInfo fbCreateInfo = {};
 		fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		fbCreateInfo.renderPass = m_renderPass;
+		fbCreateInfo.renderPass = RenderPass;
 		fbCreateInfo.attachmentCount = 1;
 		fbCreateInfo.pAttachments = &m_imageViews[i];
 		fbCreateInfo.width = WindowWidth;
@@ -1019,8 +1020,10 @@ void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
 }
 
 
-VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex)
+VkPipeline VulkanCore::CreatePipeline(VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs, const VulkanTexture& Tex)
 {
+	CreateFramebuffer(RenderPass);
+
 	CreateDescriptorSet(Tex);
 
 	VkPipelineShaderStageCreateInfo shaderStageCreateInfo[2] = {};
@@ -1110,7 +1113,7 @@ VkPipeline VulkanCore::CreatePipeline(VkShaderModule vs, VkShaderModule fs, cons
 	pipelineInfo.pMultisampleState = &pipelineMSCreateInfo;
 	pipelineInfo.pColorBlendState = &blendCreateInfo;
 	pipelineInfo.layout = m_pipelineLayout;
-	pipelineInfo.renderPass = m_renderPass;
+	pipelineInfo.renderPass = RenderPass;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineIndex = -1;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
