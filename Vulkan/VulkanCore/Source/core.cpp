@@ -19,6 +19,8 @@
 #include <array>
 #include <assert.h>
 
+#include "ogldev_types.h"
+#include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
 #include "3rdparty/stb_image.h"
 
@@ -311,34 +313,82 @@ static u32 ChooseNumImages(const VkSurfaceCapabilitiesKHR& Capabilities)
 }
 
 
+static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkSurfaceFormatKHR>& SurfaceFormats)
+{
+	for (int i = 0; i < SurfaceFormats.size(); i++) {
+		if ((SurfaceFormats[i].format == VK_FORMAT_B8G8R8A8_SRGB) &&
+			(SurfaceFormats[i].colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)) {
+			return SurfaceFormats[i];
+		}
+	}
+
+	return SurfaceFormats[0];
+}
+
+VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
+	                        VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
+{
+	VkImageViewCreateInfo ViewInfo =
+	{
+		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.image = Image,
+		.viewType = ViewType,
+		.format = Format,
+		.components = {
+			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
+			.a = VK_COMPONENT_SWIZZLE_IDENTITY
+		},
+		.subresourceRange = {
+			.aspectMask = AspectFlags,
+			.baseMipLevel = 0,
+			.levelCount = mipLevels,
+			.baseArrayLayer = 0,
+			.layerCount = LayerCount
+		}
+	};
+
+	VkImageView ImageView;
+	VkResult res = vkCreateImageView(Device, &ViewInfo, NULL, &ImageView);
+	CHECK_VK_RESULT(res, "vkCreateImageView");
+	return ImageView;
+}
+
+
 void VulkanCore::CreateSwapChain()
 {
 	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.Selected().m_surfaceCaps;
 
-	assert(SurfaceCaps.currentExtent.width != -1);
-
-	uint NumImages = ChooseNumImages(SurfaceCaps);
+	u32 NumImages = ChooseNumImages(SurfaceCaps);
 
 	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.Selected().m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
-	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
+	VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormatAndColorSpace(
+		                                                     m_physDevices.Selected().m_surfaceFormats);
 
-	SwapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	SwapChainCreateInfo.surface = m_surface;
-	SwapChainCreateInfo.minImageCount = NumImages;
-	SwapChainCreateInfo.imageFormat = m_physDevices.Selected().m_surfaceFormats[0].format;
-	SwapChainCreateInfo.imageColorSpace = m_physDevices.Selected().m_surfaceFormats[0].colorSpace;
-	SwapChainCreateInfo.imageExtent = SurfaceCaps.currentExtent;
-	SwapChainCreateInfo.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT);
-	SwapChainCreateInfo.preTransform = SurfaceCaps.currentTransform;
-	SwapChainCreateInfo.imageArrayLayers = 1;
-	SwapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	SwapChainCreateInfo.presentMode = PresentMode;
-	SwapChainCreateInfo.clipped = VK_TRUE;
-	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-	SwapChainCreateInfo.queueFamilyIndexCount = 1;
-	SwapChainCreateInfo.pQueueFamilyIndices = &m_queueFamily;
+	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
+		.pNext = NULL,
+		.flags = 0,
+		.surface = m_surface,
+		.minImageCount = NumImages,
+		.imageFormat = SurfaceFormat.format,
+		.imageColorSpace = SurfaceFormat.colorSpace,
+		.imageExtent = SurfaceCaps.currentExtent,
+		.imageArrayLayers = 1,
+		.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT),
+		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 1,
+		.pQueueFamilyIndices = &m_queueFamily,
+		.preTransform = SurfaceCaps.currentTransform,
+		.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+		.presentMode = PresentMode,
+		.clipped = VK_TRUE
+	};
 
 	VkResult res = vkCreateSwapchainKHR(m_device, &SwapChainCreateInfo, NULL, &m_swapChain);
 	CHECK_VK_RESULT(res, "vkCreateSwapchainKHR\n");
@@ -355,13 +405,14 @@ void VulkanCore::CreateSwapChain()
 	m_images.resize(NumSwapChainImages);
 	m_imageViews.resize(NumSwapChainImages);
 
-	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, &(m_images[0]));
+	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, m_images.data());
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 
 	int LayerCount = 1;
 	int MipLevels = 1;
-	for (uint i = 0; i < NumSwapChainImages; i++) {
-		CreateImageView(m_device, m_images[i], VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, &m_imageViews[i], VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+	for (u32 i = 0; i < NumSwapChainImages; i++) {
+		m_imageViews[i] = CreateImageView(m_device, m_images[i], SurfaceFormat.format, 
+						       VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
 }
 
@@ -548,7 +599,7 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 	u32 MipLevels = 1;
 
-	CreateImageView(m_device, Tex.m_image, Format, AspectFlags, &Tex.m_view, ViewType, LayerCount, MipLevels);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, ViewType, LayerCount, MipLevels);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;

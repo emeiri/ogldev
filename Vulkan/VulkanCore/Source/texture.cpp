@@ -21,30 +21,6 @@
 
 namespace OgldevVK {
 
-void CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
-	VkImageView* ImageView, VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
-{
-	VkImageViewCreateInfo ViewInfo =
-	{
-		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.image = Image,
-		.viewType = ViewType,
-		.format = Format,
-		.subresourceRange =
-		{
-			.aspectMask = AspectFlags,
-			.baseMipLevel = 0,
-			.levelCount = mipLevels,
-			.baseArrayLayer = 0,
-			.layerCount = LayerCount
-		}
-	};
-
-	VkResult res = vkCreateImageView(Device, &ViewInfo, NULL, ImageView);
-	CHECK_VK_RESULT(res, "vkCreateImageView");
-}
 
 
 void CreateTextureSampler(VkDevice Device, VkSampler* pSampler, VkFilter MinFilter, VkFilter MaxFilter, VkSamplerAddressMode AddressMode)

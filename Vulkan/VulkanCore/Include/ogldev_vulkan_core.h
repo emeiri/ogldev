@@ -143,10 +143,10 @@ private:
 	VulkanPhysicalDevices m_physDevices;
 	u32 m_queueFamily = 0;
 	VkDevice m_device;
-	VulkanQueue m_queue;
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
+	VulkanQueue m_queue;
 	VkRenderPass m_renderPass;
 	std::vector<VkFramebuffer> m_fbs;
 	VkCommandPool m_cmdBufPool;

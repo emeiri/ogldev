@@ -24,9 +24,6 @@
 
 namespace OgldevVK {
 
-void CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
-	VkImageView* ImageView, VkImageViewType ViewType, u32 LayerCount, u32 mipLevels);
-
 void CreateTextureSampler(VkDevice Device, VkSampler* pSampler, VkFilter MinFilter, VkFilter MaxFilter, VkSamplerAddressMode AddressMode);
 
 }
