@@ -101,6 +101,8 @@ public:
 
     void SetNormalMap(int TextureHandle);
 
+    Texture* GetNormalMap() const { return m_pNormalMap; }
+
 private:
 
     void Clear();

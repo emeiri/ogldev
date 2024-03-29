@@ -66,6 +66,7 @@ layout(binding = 2) uniform sampler2D gShadowMap;        // required only for sh
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gNormalMap;
+uniform bool gHasNormalMap = false;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
@@ -259,12 +260,12 @@ float CalcShadowFactor(vec3 LightDirection, vec3 Normal, bool IsPoint)
     float ShadowFactor = 0.0;
 
     if (gShadowMapRandomRadius > 0.0) {
-        ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);
+        ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);        
     } else if (gShadowMapFilterSize > 0){
-        ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);
+        ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);        
     } else {
         if (IsPoint) {
-            ShadowFactor = CalcShadowFactorPointLight(LightDirection);
+            ShadowFactor = CalcShadowFactorPointLight(LightDirection);            
         } else {
             ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
         }
@@ -496,7 +497,13 @@ vec3 CalcBumpedNormal()
 
 vec4 GetTotalLight()
 {
-    vec3 Normal = CalcBumpedNormal();
+    vec3 Normal;
+    
+    if (gHasNormalMap) {
+        Normal = CalcBumpedNormal();
+    } else {
+        Normal = normalize(Normal0);
+    }
     
     vec4 TotalLight = CalcDirectionalLight(Normal);
 return TotalLight;

@@ -62,10 +62,10 @@ private:
 
 void test_normal_map()
 {
-    Game g;
+    Game game;
 
     bool LoadBasicShapes = false;
-    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &g, LoadBasicShapes);
+    RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &game, LoadBasicShapes);
 
     pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
@@ -89,7 +89,7 @@ void test_normal_map()
 
     pScene->SetCamera(Vector3f(0.0f, 0.0, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
     
-    g.Init(pScene);
+    game.Init(pScene);
 
     pRenderingSystem->SetScene(pScene);
 

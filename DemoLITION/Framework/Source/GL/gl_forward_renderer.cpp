@@ -320,7 +320,10 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
 void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
 {
-    pSceneObject->GetModel()->Render(this);
+    CoreModel* pModel = pSceneObject->GetModel();
+    bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
+    m_lightingTech.ControlNormalMap(NormalMapEnabled);
+    pModel->Render(this);
 }
 
 
