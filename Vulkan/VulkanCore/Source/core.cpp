@@ -367,8 +367,7 @@ void VulkanCore::CreateSwapChain()
 	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.Selected().m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
-	VkSurfaceFormatKHR SurfaceFormat = ChooseSurfaceFormatAndColorSpace(
-		                                                     m_physDevices.Selected().m_surfaceFormats);
+	m_swapChainSurfaceFormat = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
 
 	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -376,8 +375,8 @@ void VulkanCore::CreateSwapChain()
 		.flags = 0,
 		.surface = m_surface,
 		.minImageCount = NumImages,
-		.imageFormat = SurfaceFormat.format,
-		.imageColorSpace = SurfaceFormat.colorSpace,
+		.imageFormat = m_swapChainSurfaceFormat.format,
+		.imageColorSpace = m_swapChainSurfaceFormat.colorSpace,
 		.imageExtent = SurfaceCaps.currentExtent,
 		.imageArrayLayers = 1,
 		.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT),
@@ -411,7 +410,7 @@ void VulkanCore::CreateSwapChain()
 	int LayerCount = 1;
 	int MipLevels = 1;
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
-		m_imageViews[i] = CreateImageView(m_device, m_images[i], SurfaceFormat.format, 
+		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format,
 						       VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
 }
