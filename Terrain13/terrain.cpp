@@ -65,7 +65,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
         m_pTextures[i]->Load(TextureFilenames[i]);
     }
 
-    m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/kloofendal_48d_partly_cloudy_puresky_4k.jpg", COLOR_TEXTURE_UNIT_0, COLOR_TEXTURE_UNIT_INDEX_0);
+    m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/143_hdrmaps_com_free_10K.jpg", COLOR_TEXTURE_UNIT_0, COLOR_TEXTURE_UNIT_INDEX_0);
 }
 
 
