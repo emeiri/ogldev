@@ -92,7 +92,7 @@ public:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Terrain Water Demo");
+        ImGui::Begin("Quad Tessellation");
 
         ImGui::SliderFloat("Outer Left Tessellation Level", &this->m_outerLevelLeft, 0.0f, 50.0f);
         ImGui::SliderFloat ("Outer Bottom Tessellation Level", &this->m_outerLevelBottom, 0.0f, 50.0f);
