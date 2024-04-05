@@ -27,7 +27,7 @@ void main()
     float Len11 = length(ViewSpacePos11.xyz);
 
     const float MIN_DISTANCE = 20;
-    const float MAX_DISTANCE = 5000;
+    const float MAX_DISTANCE = 1000;
 
     // Step 3: map the distance to [0,1]        
     float Distance00 = clamp((Len00 - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);
@@ -36,7 +36,7 @@ void main()
     float Distance11 = clamp((Len11 - MIN_DISTANCE) / (MAX_DISTANCE - MIN_DISTANCE), 0.0, 1.0);
 
     const int MIN_TESS_LEVEL = 1;
-    const int MAX_TESS_LEVEL = 8;
+    const int MAX_TESS_LEVEL = 5;
 
     // Step 4: interpolate edge tessellation level based on the closest vertex
     //         on each edge

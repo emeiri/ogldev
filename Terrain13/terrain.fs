@@ -19,11 +19,13 @@ uniform float gHeight3 = 280.0;
 
 uniform vec3 gReversedLightDir;
 
+uniform float gColorTexcoordScaling = 16.0;
+
 vec4 CalcTexColor()
 {
     vec4 TexColor;
 
-    vec2 ScaledTexCoord = Tex3 * 16.0;
+    vec2 ScaledTexCoord = Tex3 * gColorTexcoordScaling;
 
     if (Height < gHeight0) {
        TexColor = texture(gTextureHeight0, ScaledTexCoord);
@@ -54,25 +56,13 @@ vec4 CalcTexColor()
 
 
 vec3 CalcNormal()
-{
-    float HEIGHT_SCALE = 1.0;
-    float uTexelSize = 1.0 / 256.0;
-      
-    //float left  = texture(gHeightMap, Tex3 + vec2(-uTexelSize, 0.0)).r;
-    //float right = texture(gHeightMap, Tex3 + vec2( uTexelSize, 0.0)).r;
-    //float up    = texture(gHeightMap, Tex3 + vec2(0.0,  uTexelSize)).r;
-    //float down  = texture(gHeightMap, Tex3 + vec2(0.0, -uTexelSize)).r;
-
+{   
     float left  = textureOffset(gHeightMap, Tex3, ivec2(-1, 0)).r;
     float right = textureOffset(gHeightMap, Tex3, ivec2( 1, 0)).r;
     float up    = textureOffset(gHeightMap, Tex3, ivec2( 0, 1)).r;
     float down  = textureOffset(gHeightMap, Tex3, ivec2( 0, -1)).r;
 
- //   vec3 normal = normalize(vec3(down - up, 2.0, left - right));
-
- //vec3 normal = normalize(0.25 * vec3(2*(right - left), 2 * (down - up), -4));
-
- vec3 normal = normalize(vec3(left - right, down - up, 2.0));
+    vec3 normal = normalize(vec3(left - right, down - up, 2.0));
 
     return normal;
 }

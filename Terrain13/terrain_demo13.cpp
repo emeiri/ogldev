@@ -155,7 +155,7 @@ public:
         float x = min(-0.4f, cosf(foo));
         Vector3f LightDir(cosf(foo), -1.0f, sinf(foo));
 
-        m_terrain.SetLightDir(LightDir);
+     //   m_terrain.SetLightDir(LightDir);
 
         m_terrain.Render(*m_pGameCamera);
     }
@@ -262,7 +262,7 @@ private:
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
-        m_pGameCamera->SetSpeed(0.05f);
+        m_pGameCamera->SetSpeed(2.5f);
     }
     
 
