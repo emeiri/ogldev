@@ -37,6 +37,9 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow);
 
+	int GetNumImages() const { return (int)m_images.size(); }
+	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
+	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -44,6 +47,7 @@ private:
 	void CreateSurface();
 	void CreateDevice();
 	void CreateSwapChain();
+	void CreateCommandBufferPool();
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
@@ -52,9 +56,11 @@ private:
 	VulkanPhysicalDevices m_physDevices;
 	u32 m_queueFamily = 0;
 	VkDevice m_device;
+	VkSurfaceFormatKHR m_swapChainSurfaceFormat;
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
+	VkCommandPool m_cmdBufPool;
 };
 
 }
