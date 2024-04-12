@@ -13,9 +13,9 @@ uniform sampler2D gTextureHeight3;
 uniform sampler2D gHeightMap;
 
 uniform float gHeight0 = 80.0;
-uniform float gHeight1 = 210.0;
-uniform float gHeight2 = 250.0;
-uniform float gHeight3 = 280.0;
+uniform float gHeight1 = 250.0;
+uniform float gHeight2 = 350.0;
+uniform float gHeight3 = 450.0;
 
 uniform vec3 gReversedLightDir;
 
@@ -62,8 +62,8 @@ vec3 CalcNormal()
     float up    = textureOffset(gHeightMap, Tex3, ivec2( 0, 1)).r;
     float down  = textureOffset(gHeightMap, Tex3, ivec2( 0, -1)).r;
 
-    vec3 normal = normalize(vec3(left - right, down - up, 2.0));
-
+    vec3 normal = normalize(vec3(left - right, 2.0, up - down));
+    
     return normal;
 }
 
@@ -75,9 +75,7 @@ void main()
 
     float Diffuse = dot(Normal, gReversedLightDir);
 
-    Diffuse = max(0.3f, Diffuse);
+    Diffuse = max(0.2f, Diffuse);
 
     FragColor = TexColor * Diffuse;
-
- //   FragColor = vec4(Normal, 1.0);
-}
+ }

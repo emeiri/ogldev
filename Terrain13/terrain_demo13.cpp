@@ -268,7 +268,7 @@ private:
 
     void InitTerrain()
     {
-        float WorldScale = 128.0f;
+        float WorldScale = 64;
         float TextureScale = 1.0f;
 
         std::vector<string> TextureFilenames;
@@ -281,7 +281,7 @@ private:
 
         m_terrain.CreateMidpointDisplacement(m_terrainSize, m_numPatches, m_roughness, m_minHeight, m_maxHeight);
 
-        Vector3f LightDir(-1.0f, -0.2f, 0.0f);
+        Vector3f LightDir(1.0f, -1.0f, 0.0f);
 
         m_terrain.SetLightDir(LightDir);
     }
@@ -317,11 +317,11 @@ private:
     MidpointDispTerrain m_terrain;
     bool m_showGui = false;
     bool m_isPaused = false;
-    int m_terrainSize = 1024;
-    float m_roughness = 1.0f;
+    int m_terrainSize = 2048;
+    float m_roughness = 1.2f;
     float m_minHeight = 0.0f;
     float m_maxHeight = 500.0f;
-    int m_numPatches = 64;
+    int m_numPatches = 32;
     float m_counter = 0.0f;
     bool m_constrainCamera = false;
 };
