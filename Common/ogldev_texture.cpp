@@ -186,7 +186,7 @@ void Texture::LoadInternalDSA(const void* pImageData)
 void Texture::LoadF32(int Width, int Height, const float* pImageData)
 {
     if (!IsGLVersionHigher(4, 5)) {
-        OGLDEV_ERROR("Non DSA version is not implemented\n");
+        OGLDEV_ERROR0("Non DSA version is not implemented\n");
     }
 
     m_imageWidth = Width;
