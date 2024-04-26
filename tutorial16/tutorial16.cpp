@@ -242,7 +242,9 @@ int main(int argc, char** argv)
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("Tutorial 16");
-    const char* game_mode_string = "1920x12@32";
+    char game_mode_string[64];
+    // Game mode string example: <Width>x<Height>@<BPP>
+    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
     glutGameModeString(game_mode_string);
     if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
         glutEnterGameMode();
