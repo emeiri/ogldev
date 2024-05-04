@@ -69,18 +69,18 @@ VulkanCore::~VulkanCore()
 	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
 	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
 	if (!vkDestroySurface) {
-		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		OGLDEV_ERROR("Cannot find address of vkDestroySurfaceKHR\n");
 		exit(1);
 	}
 
-	vkDestroySurfaceKHR(m_instance, m_surface, NULL);
+	vkDestroySurface(m_instance, m_surface, NULL);
 
 	printf("GLFW window surface destroyed\n");
 
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
 	if (!vkDestroyDebugUtilsMessenger) {
-		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessengerEXT\n");
 		exit(1);
 	}
 	vkDestroyDebugUtilsMessenger(m_instance, m_debugMessenger, NULL);
