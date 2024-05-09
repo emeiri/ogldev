@@ -7,7 +7,7 @@ out vec4 FragColor;
                                                                                     
 void main()                                                                         
 {                                                                                   
-    FragColor = texture2D(gColorMap, TexCoord);                                     
+    FragColor = texture(gColorMap, TexCoord);                                     
                                                                                     
     if (FragColor.r == 1 && FragColor.g == 1 && FragColor.b == 1) {
         discard;                                                                    

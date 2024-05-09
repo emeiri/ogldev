@@ -305,7 +305,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
             float SpecularExponent = 128.0;
 
             if (gEnableSpecularExponent) {
-                SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+                SpecularExponent = texture(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             }
 
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
@@ -532,7 +532,7 @@ void main()
     vec4 TexColor;
 
     if (gHasSampler) {
-        TexColor = texture2D(gSampler, TexCoord0.xy);
+        TexColor = texture(gSampler, TexCoord0.xy);
     } else {
         TexColor = vec4(1.0);
     }
@@ -551,6 +551,6 @@ void main()
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
     FragColor = TempColor * gColorMod + gColorAdd;
-    //FragColor = texture2D(gSampler, TexCoord0.xy);
+    //FragColor = texture(gSampler, TexCoord0.xy);
     //FragColor = TotalLight;
 }

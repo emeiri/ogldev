@@ -50,7 +50,7 @@ void main()
         vec3 LightReflect = normalize(reflect(gDirectionalLight.Direction, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
         if (SpecularFactor > 0) {
-            float SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+            float SpecularExponent = texture(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(gDirectionalLight.Color, 1.0f) *
                             vec4(gMaterial.SpecularColor, 1.0f) *
@@ -58,6 +58,6 @@ void main()
         }
     }
 
-    FragColor = texture2D(gSampler, TexCoord0.xy) *
+    FragColor = texture(gSampler, TexCoord0.xy) *
                 (AmbientColor + DiffuseColor + SpecularColor);
 }

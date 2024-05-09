@@ -84,7 +84,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal)
         vec3 LightReflect = normalize(reflect(LightDirection, Normal));
         float SpecularFactor = dot(PixelToCamera, LightReflect);
         if (SpecularFactor > 0) {
-            float SpecularExponent = texture2D(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+            float SpecularExponent = texture(gSamplerSpecularExponent, TexCoord0).r * 255.0;
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
                             Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular
@@ -162,6 +162,6 @@ void main()
     }
 
     if (!found ) {
-         FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight * vec4(0.0001) + vec4(0.0, 0.0, 1.0, 0.0);
+         FragColor = texture(gSampler, TexCoord0.xy) * TotalLight * vec4(0.0001) + vec4(0.0, 0.0, 1.0, 0.0);
     }
 }

@@ -8,5 +8,5 @@ in vec2 TexCoords0;
 
 void main()
 {
-    FragColor = texture2D(gSampler, TexCoords0.xy);
+    FragColor = texture(gSampler, TexCoords0.xy);
 }

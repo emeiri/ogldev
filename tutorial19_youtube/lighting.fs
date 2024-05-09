@@ -21,7 +21,7 @@ uniform sampler2D gSampler;
 
 void main()
 {
-    FragColor = texture2D(gSampler, TexCoord0.xy) *
+    FragColor = texture(gSampler, TexCoord0.xy) *
                 vec4(gMaterial.AmbientColor, 1.0f) *
                 vec4(gLight.Color, 1.0f) *
                 gLight.AmbientIntensity;

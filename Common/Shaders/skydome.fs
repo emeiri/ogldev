@@ -12,7 +12,7 @@ in float Height;
 
 void main()
 {
-      vec4 TexColor = texture2D(gSampler, TexCoords0.xy);
+      vec4 TexColor = texture(gSampler, TexCoords0.xy);
 
       vec4 SkyColor = mix(gLowColor, gHighColor, Height);
 
