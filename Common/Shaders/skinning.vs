@@ -19,7 +19,7 @@ out vec3 Normal0;
 out vec3 LocalPos0;
 out vec3 WorldPos0;
 out vec4 LightSpacePos0; // required only for shadow mapping (spot/directional light)
-out vec3 EdgeDistance0; // to match lighting_new_to_vs.gs
+noperspective out vec3 EdgeDistance0; // to match lighting_new_to_vs.gs
 
 void main()
 {
