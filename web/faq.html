@@ -13,43 +13,96 @@
 <title>
 </title>
 <header> </header>
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600">
+        <link rel="stylesheet" href="https://ogldev.org/www/style.css">
+        <link rel="stylesheet" href="www/print.css" media="print">
+
 </head>
 <body>
-<p> <strong><a name"top">FREQUENTLY ASKED QUESTIONS</a></strong></p>
-<p>&nbsp;</p
-<p><a href ="#Question1">1. Why doesn't tutorials 2 and 3 work? </p>
-<p><a href ="#Question2">2. Can I translate your tutorials to my native language? </p>
-<p><a href ="#Question3">3. Is there a translation to Russian? </p>
-<p><a href ="#Question4">4. Is there a translation to French? </p>
-<p><a href ="#Question5">5. Is there a port to Java? </p>
-<p><a href ="#Question6">6. I'm unable to load my model file</p>
-<p><a href ="#Question7">7. I'm getting errors on a missing MeshOptimizer library</p>
+<p> <h1><a name"top">FREQUENTLY ASKED QUESTIONS</a></h1></p>
+<p><a href ="#Question1">1. What's the best way to learn from OGLDEV?</a></p>
+<p><a href ="#Question2">2. Why doesn't tutorials 2 and 3 work?</a> </p>
+<p><a href ="#Question3">3. Can I translate your tutorials to my native language?</a> </p>
+<p><a href ="#Question4">4. Is there a translation to Russian?</a> </p>
+<p><a href ="#Question5">5. Is there a translation to French?</a> </p>
+<p><a href ="#Question6">6. Is there a port to Java?</a> </p>
+<p><a href ="#Question7">7. I'm unable to load my model file</a></p>
+<p><a href ="#Question8">8. I'm getting errors on a missing MeshOptimizer library</a></p>
+<p><a href ="#Question9">9. Can you help me with my project or provide any sort of support services?</a></a>
     
 <hr/>
 <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 </p>
 <p><strong> Answers </strong></p>
 
-<p><a name="Question1">1. Tutorials 2 and 3 are somewhat unsafe since they don't use shaders for rendering. 
+<p><a name="Question1">1.</a></p><p>I started OGLDEV as a website on late 2010 and created the youtube channel on Mar-2021.
+The plan was to create a series of video tutorials that roughly corresponds to the articles on the website and continue creating videos for new material.
+As I started working I realized that the order of the material on the website can be improved so I changed it on the channel. For example, I decided to
+pull in the introduction of the Assimp library for loading models before lighting so that lighting can be studies using real models instead of simple
+manual models. This is why the order of the channel doesn't match the order on the website which can be a bit confusing. Unfortunately, I don't have
+time to update the website to match the new order so things will stay like that for now.</a></p>
+<br>
+<p> What's the best way to learn? some people prefer to read while others
+prefer to watch a video. Choose whatever method you prefer and stick to it. You should be able to make good progress with either of them.
+If you go with the website you should complete the first 22 tutorials in order. After that the techniques kind of branch out to different directions and you may
+be able to skip ahead and still understand things. In some cases you may need to backtrack a bit to complete some pre-requisite. The youtube channel is very similar.
+The first 23 videos should be completed in order and after that you can try to skip ahead to any technique that you find interesting.</p>
+<br>
+<p>Please note that at the time of writing this (May-24) there are still about 15 tutorials on the website that don't have a video. OTOH, there are also videos with new material
+which is not covered by the website. On many tutorials on the website you will find a link to the corresponding video, when one's available. Note that the code
+was mostly rewritten for the video so you can use the video as an additional source for the theory but if you compare the code there will be many differences.</p>
+<br>
+<p>The last point
+is the naming conventions. When I started the website I simple created folders by the names 'tutorial01', 'tutorial02', etc directly under the directory checked out from github. 
+On the first few videos these folders were actually shared between the website and the channel so there was no problem. But as soon as the order changed I had to create new folders.
+So I've made the decision to add the '_youtube' suffix to any directory which belongs specifically to the youtube channel. I should probably have created a new directory 
+for youtube but it seems a bit late right now because I want the code structure to continue to match the videos. 
+</p>
+<p><a name="Question2">2.</a></p><p> Tutorials 2 and 3 are somewhat unsafe since they don't use shaders for rendering. 
 This is because I take a step by step approach and only introduce shaders in tutorial 4 but I still
 wanted to demonstrate how to render a dot and a triangle before that. Not having a shader program active
 is undefined behavior in the programmable pipeline but it still works on my NVIDIA card. I guess there is
 a fallback in the driver that makes it work. Some people told me that it only worked for them after updating
 their drivers and for some it didn't work at all. Anyway, if you cannot get it to work don't worry. Simply
-study the theory and continue to tutorial 4. From there on it is all shaders.  </a></p>
-<p><a name="Question2">2. Please do. I will add a link to the translation to the website.</a></p>
-<p><a name="Question3">3. Yes: <a href="http://ogltutor.netau.net/">http://ogltutor.netau.net/</a></a></p>
-<p><a name="Question4">4. Yes: <a href="http://dragonjoker.fr/tutos.php?tutos=1&prj=-1">http://dragonjoker.fr/tutos.php?tutos=1&prj=-1</a></a></p>
-<p><a name="Question5">5. Yes: <a href="https://github.com/elect86/oglDevTutorials">https://github.com/elect86/oglDevTutorials</a></a></p>
-<p><a name="Question6">6. We use Assimp to load models (see tutorial 22). If you are unable to load your model
+study the theory and continue to tutorial 4. From there on it is all shaders.</p>
+<br>
+<p><a name="Question3">3.</a></p><p> Please do. I will add a link to the translation to the website.</p>
+<br>
+<p><a name="Question4">4.</a></p><p> Yes: <a href="http://ogltutor.netau.net/">http://ogltutor.netau.net/</a></p>
+<br>
+<p><a name="Question5">5.</a></p><p> Yes: <a href="http://dragonjoker.fr/tutos.php?tutos=1&prj=-1">http://dragonjoker.fr/tutos.php?tutos=1&prj=-1</a></p>
+<br>
+<p><a name="Question6">6.</a></p><p> Yes: <a href="https://github.com/elect86/oglDevTutorials">https://github.com/elect86/oglDevTutorials</a></p>
+<br>
+<p><a name="Question7">7.</a></p><p> We use Assimp to load models (see tutorial 22). If you are unable to load your model
     try to load it with the <a href="http://assimp.sourceforge.net/main_viewer.html"</a>Assimp Viewer</a>.
 This will tell you whether the problem is with the file or with my code (and let me know...).</p>
-<p><a name="Question7">7. MeshOptimizer is a library I use to (surprise!) optimize meshes. It is described in <a href="https://youtu.be/9HO1dl0zcxg">this video</a>. 
+<br>
+<p><a name="Question8">8.</a></p><p> MeshOptimizer is a library I use to (surprise!) optimize meshes. It is described in <a href="https://youtu.be/9HO1dl0zcxg">this video</a>. 
 To make sure you get it use one of the following options:<br>
 <ul>
 <li>On existing sources: git submodule update --init</li>
 <li>When cloning from github make sure to add the '--recurse-submodules' flags: git clone --recurse-submodules https://github.com/emeiri/ogldev.git</li>
-</ul>
+</ul></p>
+<br>
+<p><a name="Question9">9.</a></p><p> Unfortunately, I have a full time job and between work and family I have very little time left
+to work on my youtube channel. Therefore, I can't provide such services. The most that I can offer is to answer specific questions. If you send me an email, I'll do my
+best to answer.</p>
 <a href="#top">Top</a>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ogldevatspacecouk'; // required: replace example with your forum shortname
+var disqus_url = 'http://ogldev.atspace.co.uk/faq.html';
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function() {
+var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
 </body>
 </html>
