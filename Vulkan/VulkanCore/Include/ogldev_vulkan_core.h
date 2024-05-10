@@ -38,6 +38,9 @@ public:
 	void Init(const char* pAppName, GLFWwindow* pWindow);
 
 	int GetNumImages() const { return (int)m_images.size(); }
+
+	const VkImage& GetImage(int Index) const;
+
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 private:

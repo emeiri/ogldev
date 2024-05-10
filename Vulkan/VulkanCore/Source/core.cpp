@@ -110,6 +110,16 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 }
 
 
+const VkImage& VulkanCore::GetImage(int Index) const
+{ 
+	if (Index >= m_images.size()) {
+		OGLDEV_ERROR("Invalid image index %d\n", Index);		
+		exit(1);
+	}
+
+	return m_images[Index]; 
+}
+
 void VulkanCore::CreateInstance(const char* pAppName)
 {
 	std::vector<const char*> Layers = {
