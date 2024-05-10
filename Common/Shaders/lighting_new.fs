@@ -77,10 +77,10 @@ layout(binding = 0) uniform sampler2D gSampler;
 layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
 layout(binding = 2) uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
+layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
-uniform sampler3D gShadowMapOffsetTexture;
 uniform float gShadowMapOffsetTextureSize;
 uniform float gShadowMapOffsetFilterSize;
 uniform float gShadowMapRandomRadius = 0.0;
