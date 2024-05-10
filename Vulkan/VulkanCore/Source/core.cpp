@@ -423,6 +423,46 @@ void VulkanCore::CreateSwapChain()
 }
 
 
+void VulkanCore::CreateCommandBufferPool()
+{
+	VkCommandPoolCreateInfo cmdPoolCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.queueFamilyIndex = m_queueFamily
+	};
+
+	VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
+	CHECK_VK_RESULT(res, "vkCreateCommandPool\n");
+
+	printf("Command buffer pool created\n");
+}
+
+
+void VulkanCore::CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs)
+{
+	VkCommandBufferAllocateInfo cmdBufAllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+		.pNext = NULL,
+		.commandPool = m_cmdBufPool,
+		.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+		.commandBufferCount = count
+	};
+
+	VkResult res = vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, cmdBufs);
+	CHECK_VK_RESULT(res, "vkAllocateCommandBuffers\n");
+
+	printf("%d command buffers created\n", count);
+}
+
+
+void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
+{
+	m_queue.WaitIdle();
+	vkFreeCommandBuffers(m_device, m_cmdBufPool, Count, pCmdBufs);
+}
+
+
 VkRenderPass VulkanCore::CreateSimpleRenderPass()
 {
 	VkAttachmentDescription AttachDesc = {
@@ -954,42 +994,6 @@ u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMem
 	return -1;
 }
 
-
-void VulkanCore::CreateCommandBufferPool()
-{
-	VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
-	cmdPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	cmdPoolCreateInfo.queueFamilyIndex = m_queueFamily;
-
-	VkResult res = vkCreateCommandPool(m_device, &cmdPoolCreateInfo, NULL, &m_cmdBufPool);
-	CHECK_VK_RESULT(res, "vkCreateCommandPool\n");
-
-	printf("Command buffer pool created\n");
-}
-
-
-void VulkanCore::CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs)
-{
-	VkCommandBufferAllocateInfo cmdBufAllocInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-		.pNext = NULL,
-		.commandPool = m_cmdBufPool,
-		.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-		.commandBufferCount = count
-	};
-
-	VkResult res = vkAllocateCommandBuffers(m_device, &cmdBufAllocInfo, cmdBufs);
-	CHECK_VK_RESULT(res, "vkAllocateCommandBuffers\n");
-
-	printf("Created %d command buffers\n", count);
-}
-
-
-void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
-{
-	m_queue.WaitIdle();
-	vkFreeCommandBuffers(m_device, m_cmdBufPool, Count, pCmdBufs);
-}
 
 
 VkCommandBuffer VulkanCore::CreateAndBeginSingleUseCommand()

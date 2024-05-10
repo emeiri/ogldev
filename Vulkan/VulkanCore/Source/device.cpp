@@ -89,6 +89,7 @@ void VulkanPhysicalDevices::Init(const VkInstance& Instance, const VkSurfaceKHR&
 
     VkResult res = vkEnumeratePhysicalDevices(Instance, &NumDevices, NULL);
     CHECK_VK_RESULT(res, "vkEnumeratePhysicalDevices error (1)\n");
+
     printf("Num physical devices %d\n\n", NumDevices);
 
     m_devices.resize(NumDevices);
