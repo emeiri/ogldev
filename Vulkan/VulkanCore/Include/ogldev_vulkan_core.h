@@ -70,7 +70,7 @@ public:
 
 	int GetNumImages() const { return (int)m_images.size(); }
 
-	std::vector<VkImage>& GetImages() { return m_images;  }
+	const VkImage& GetImage(int Index) const;
 
 	VulkanQueue& GetQueue() { return m_queue; }
 
@@ -102,8 +102,8 @@ private:
 	void CreateSurface();
 	void CreateDevice();
 	void CreateSwapChain();	
-	void CreateFramebuffer(VkRenderPass RenderPass);
 	void CreateCommandBufferPool();
+	void CreateFramebuffer(VkRenderPass RenderPass);
 	void CreateUniformBuffers();
 	void CreateDescriptorPool();
 	void CreateDescriptorSet(const VulkanTexture& Tex);
@@ -131,7 +131,7 @@ private:
 
 	void TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
 
-	VkCommandBuffer BeginSingleUseCommand();
+	VkCommandBuffer CreateAndBeginSingleUseCommand();
 
 	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
 
@@ -146,9 +146,9 @@ private:
 	VkSwapchainKHR m_swapChain;
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
+	VkCommandPool m_cmdBufPool;
 	VulkanQueue m_queue;	
 	std::vector<VkFramebuffer> m_fbs;
-	VkCommandPool m_cmdBufPool;
 	VkCommandBuffer m_copyCmdBuf;
 	VkPipelineLayout m_pipelineLayout;
 	int m_numUniformBuffers = 0;

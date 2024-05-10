@@ -22,6 +22,7 @@
 #include "ogldev_types.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
+#include "ogldev_vulkan_wrapper.h"
 #include "3rdparty/stb_image.h"
 
 namespace OgldevVK {
@@ -56,6 +57,10 @@ VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
 
+	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
+
+	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
+
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
 
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
@@ -77,27 +82,23 @@ VulkanCore::~VulkanCore()
 
 	vkDestroySwapchainKHR(m_device, m_swapChain, NULL);
 
-	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
-
-	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
-
 	vkDestroyDevice(m_device, NULL);
 
 	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
 	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
 	if (!vkDestroySurface) {
-		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		OGLDEV_ERROR("Cannot find address of vkDestroySurfaceKHR\n");
 		exit(1);
 	}
 
-	vkDestroySurfaceKHR(m_instance, m_surface, NULL);
+	vkDestroySurface(m_instance, m_surface, NULL);
 
 	printf("GLFW window surface destroyed\n");
 
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
 	if (!vkDestroyDebugUtilsMessenger) {
-		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessenger\n");
+		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessengerEXT\n");
 		exit(1);
 	}
 	vkDestroyDebugUtilsMessenger(m_instance, m_debugMessenger, NULL);
@@ -128,6 +129,16 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, int NumUniformB
 	CreateDescriptorPool();
 }
 
+
+const VkImage& VulkanCore::GetImage(int Index) const
+{ 
+	if (Index >= m_images.size()) {
+		OGLDEV_ERROR("Invalid image index %d\n", Index);		
+		exit(1);
+	}
+
+	return m_images[Index]; 
+}
 
 void VulkanCore::CreateInstance(const char* pAppName)
 {
@@ -729,7 +740,7 @@ void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSi
 
 void VulkanCore::CopyBufferToImage(VkBuffer Buffer, VkImage Image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount)
 {
-	VkCommandBuffer CmdBuf = BeginSingleUseCommand();
+	VkCommandBuffer CmdBuf = CreateAndBeginSingleUseCommand();
 
 	VkBufferImageCopy Region = {
 		.bufferOffset = 0,
@@ -754,7 +765,7 @@ void VulkanCore::CopyBufferToImage(VkBuffer Buffer, VkImage Image, u32 ImageWidt
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
 {
-	VkCommandBuffer CmdBuf = BeginSingleUseCommand();
+	VkCommandBuffer CmdBuf = CreateAndBeginSingleUseCommand();
 
 	TransitionImageLayoutCmd(CmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
 
@@ -909,24 +920,9 @@ void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image,
 }
 
 
-
-static void BeginOneTimeCommandBuffer(VkCommandBuffer CmdBuf)
-{
-	VkCommandBufferBeginInfo cmdBufBeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.pNext = NULL,
-		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
-		.pInheritanceInfo = NULL
-	};
-
-	VkResult res = vkBeginCommandBuffer(CmdBuf, &cmdBufBeginInfo);
-	CHECK_VK_RESULT(res, "vkBeginCommandBuffer error %d\n");
-}
-
-
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 {
-	BeginOneTimeCommandBuffer(m_copyCmdBuf);
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	VkBufferCopy bufferCopy = {};
 	bufferCopy.srcOffset = 0;
@@ -996,13 +992,13 @@ void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 }
 
 
-VkCommandBuffer VulkanCore::BeginSingleUseCommand()
+VkCommandBuffer VulkanCore::CreateAndBeginSingleUseCommand()
 {
 	VkCommandBuffer CmdBuf;
 
 	CreateCommandBuffers(1, &CmdBuf);
 
-	BeginOneTimeCommandBuffer(CmdBuf);
+	BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	return CmdBuf;
 }

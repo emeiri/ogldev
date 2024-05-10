@@ -25,6 +25,7 @@
 
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_shader.h"
+#include "ogldev_vulkan_wrapper.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -61,7 +62,7 @@ public:
 		int NumUniformBuffers = 1;
 		m_vkCore.Init(pAppName, pWindow, NumUniformBuffers, sizeof(UniformData));
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
-		CreateCommandBuffer();				
+		CreateCommandBuffers();
 	//	CreateVertexBuffer();
 		CreateShaders();
 		CreateTexture();
@@ -86,7 +87,7 @@ private:
 		Matrix4f WVP;
 	};
 
-	void CreateCommandBuffer()
+	void CreateCommandBuffers()
 	{
 		m_cmdBufs.resize(m_vkCore.GetNumImages());
 		m_vkCore.CreateCommandBuffers(m_vkCore.GetNumImages(), &m_cmdBufs[0]);
@@ -141,18 +142,17 @@ private:
 
 	void RecordCommandBuffers()
 	{
-		VkCommandBufferBeginInfo beginInfo = {};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-
 		VkClearColorValue clearColor = { 164.0f / 256.0f, 30.0f / 256.0f, 34.0f / 256.0f, 0.0f };
 		VkClearValue clearValue = {};
 		clearValue.color = clearColor;
 
-		VkImageSubresourceRange imageRange = {};
-		imageRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageRange.levelCount = 1;
-		imageRange.layerCount = 1;
+		VkImageSubresourceRange ImageRange = {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.baseMipLevel = 0,
+			.levelCount = 1,
+			.baseArrayLayer = 0,
+			.layerCount = 1
+		};
 
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -165,8 +165,7 @@ private:
 		renderPassInfo.pClearValues = &clearValue;
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
-			VkResult res = vkBeginCommandBuffer(m_cmdBufs[i], &beginInfo);
-			CHECK_VK_RESULT(res, "vkBeginCommandBuffer\n");
+			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			renderPassInfo.framebuffer = m_vkCore.GetFramebuffers()[i];
 
@@ -180,7 +179,7 @@ private:
 
 			vkCmdEndRenderPass(m_cmdBufs[i]);
 
-			res = vkEndCommandBuffer(m_cmdBufs[i]);
+			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
 		}
 
