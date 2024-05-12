@@ -89,30 +89,28 @@ void BasicCamera::InitInternal()
     Vector3f HTarget(m_target.x, 0.0, m_target.z);
     HTarget.Normalize();
 
+  /* The commented code is the original calculation described in 
+     the "Camera Rotation With Quaternion" video (https://youtu.be/MZuYmG1GBFk).
+     As suggested by the youtube viewer @Brmngm I replaced it with the simpler
+     code using atan2 below which does the same thing with less hassle.
+  
     float Angle = ToDegree(asin(abs(HTarget.z)));
 
-    if (HTarget.z >= 0.0f)
-    {
-        if (HTarget.x >= 0.0f)
-        {
+    if (HTarget.z >= 0.0f) {
+        if (HTarget.x >= 0.0f) {
             m_AngleH = 360.0f - Angle;
-        }
-        else
-        {
+        } else {
             m_AngleH = 180.0f + Angle;
         }
-    }
-    else
-    {
-        if (HTarget.x >= 0.0f)
-        {
+    } else {
+        if (HTarget.x >= 0.0f) {
             m_AngleH = Angle;
-        }
-        else
-        {
+        } else {
             m_AngleH = 180.0f - Angle;
         }
-    }
+    }*/
+
+    m_AngleH = -ToDegree(atan2(m_target.z, m_target.x));
 
     m_AngleV = -ToDegree(asin(m_target.y));
 
