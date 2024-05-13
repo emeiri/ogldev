@@ -143,16 +143,19 @@ void VulkanGetPhysicalDevices(const VkInstance& inst, const VkSurfaceKHR& Surfac
               
         uint NumFormats = 0;
         vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, NULL);
-        assert(NumFormats > 0);
         
-        PhysDevices.m_surfaceFormats[i].resize(NumFormats);
-        
-        res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
-        CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR error %d\n", res);
-    
-        for (uint j = 0 ; j < NumFormats ; j++) {
-            const VkSurfaceFormatKHR& SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
-            printf("    Format %d color space %d\n", SurfaceFormat.format , SurfaceFormat.colorSpace);
+        if (NumFormats > 0) {
+            PhysDevices.m_surfaceFormats[i].resize(NumFormats);
+
+            res = vkGetPhysicalDeviceSurfaceFormatsKHR(PhysDev, Surface, &NumFormats, &(PhysDevices.m_surfaceFormats[i][0]));
+            CHECK_VULKAN_ERROR("vkGetPhysicalDeviceSurfaceFormatsKHR error %d\n", res);
+
+            for (uint j = 0 ; j < NumFormats ; j++) {
+                const VkSurfaceFormatKHR& SurfaceFormat = PhysDevices.m_surfaceFormats[i][j];
+                printf("    Format %d color space %d\n", SurfaceFormat.format , SurfaceFormat.colorSpace);
+            }
+        } else {
+            printf("Warning! no formats are supported\n");
         }
         
         res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysDev, Surface, &(PhysDevices.m_surfaceCaps[i]));
