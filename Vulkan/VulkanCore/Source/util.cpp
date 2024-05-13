@@ -59,8 +59,10 @@ const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type)
 	case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
 		return "Performance";
 
+#ifdef _WIN64 // doesn't work on my Linux for some reason
 	case VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT:
 		return "Device address binding";
+#endif
 
 	default:
 		OGLDEV_ERROR("Invalid type code %d\n", Type);

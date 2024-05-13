@@ -38,7 +38,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	printf("  Objects ");
 
 	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
-		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
+		printf("%lx ", pCallbackData->pObjects[i].objectHandle);
 	}
 
 	printf("\n");
@@ -69,7 +69,7 @@ VulkanCore::~VulkanCore()
 	PFN_vkDestroySurfaceKHR vkDestroySurface = VK_NULL_HANDLE;
 	vkDestroySurface = (PFN_vkDestroySurfaceKHR)vkGetInstanceProcAddr(m_instance, "vkDestroySurfaceKHR");
 	if (!vkDestroySurface) {
-		OGLDEV_ERROR("Cannot find address of vkDestroySurfaceKHR\n");
+		OGLDEV_ERROR0("Cannot find address of vkDestroySurfaceKHR\n");
 		exit(1);
 	}
 
@@ -80,7 +80,7 @@ VulkanCore::~VulkanCore()
 	PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkDestroyDebugUtilsMessenger = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkDestroyDebugUtilsMessengerEXT");
 	if (!vkDestroyDebugUtilsMessenger) {
-		OGLDEV_ERROR("Cannot find address of vkDestroyDebugUtilsMessengerEXT\n");
+		OGLDEV_ERROR0("Cannot find address of vkDestroyDebugUtilsMessengerEXT\n");
 		exit(1);
 	}
 	vkDestroyDebugUtilsMessenger(m_instance, m_debugMessenger, NULL);
@@ -97,6 +97,10 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	m_pWindow = pWindow;
 	CreateInstance(pAppName);
 	CreateDebugCallback();
+    if (!pWindow) {
+        printf("You are probably in one of the initial tutorials so we can end the Init function here.\n");
+        return;
+    }
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
 	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
@@ -186,7 +190,7 @@ void VulkanCore::CreateDebugCallback()
 	PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebugUtilsMessenger = VK_NULL_HANDLE;
 	vkCreateDebugUtilsMessenger = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_instance, "vkCreateDebugUtilsMessengerEXT");
 	if (!vkCreateDebugUtilsMessenger) {
-		OGLDEV_ERROR("Cannot find address of vkCreateDebugUtilsMessenger\n");
+		OGLDEV_ERROR0("Cannot find address of vkCreateDebugUtilsMessenger\n");
 		exit(1);
 	}
 
@@ -225,11 +229,11 @@ void VulkanCore::CreateDevice()
 	};
 
 	if (m_physDevices.Selected().m_features.geometryShader == VK_FALSE) {
-		OGLDEV_ERROR("The Geometry Shader is not supported!\n");
+		OGLDEV_ERROR0("The Geometry Shader is not supported!\n");
 	}
 
 	if (m_physDevices.Selected().m_features.tessellationShader == VK_FALSE) {
-		OGLDEV_ERROR("The Tessellation Shader is not supported!\n");
+		OGLDEV_ERROR0("The Tessellation Shader is not supported!\n");
 	}
 
 	VkPhysicalDeviceFeatures DeviceFeatures = { 0 };
@@ -369,9 +373,9 @@ void VulkanCore::CreateSwapChain()
 	uint NumSwapChainImages = 0;
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, NULL);
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
-	assert(NumImages == NumSwapChainImages);
-
-	printf("Number of images %d\n", NumSwapChainImages);
+	assert(NumImages <= NumSwapChainImages);
+    
+	printf("Requested %d images, created %d images\n", NumImages, NumSwapChainImages);
 
 	m_images.resize(NumSwapChainImages);
 	m_imageViews.resize(NumSwapChainImages);

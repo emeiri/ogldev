@@ -217,7 +217,7 @@ u32 VulkanPhysicalDevices::SelectDevice(VkQueueFlags RequiredQueueType, bool Sup
 const PhysicalDevice& VulkanPhysicalDevices::Selected() const
 {
     if (m_devIndex < 0) {
-        OGLDEV_ERROR("A physical device has not been selected\n");
+        OGLDEV_ERROR0("A physical device has not been selected\n");
     }
 
     return m_devices[m_devIndex];
