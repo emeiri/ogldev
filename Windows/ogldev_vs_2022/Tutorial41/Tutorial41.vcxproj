@@ -38,8 +38,8 @@
     <ClCompile Include="..\..\..\tutorial41_youtube\tutorial41.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs" />
-    <None Include="..\..\..\Common\Shaders\sprite.vs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -47,7 +47,7 @@
     <ProjectGuid>{CC9FC32C-1FCB-4C5C-A049-87E67BC81BD8}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial41</ProjectName>
+    <ProjectName>Tutorial41_PCF</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

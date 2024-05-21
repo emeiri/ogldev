@@ -25,10 +25,10 @@
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_offset_texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs">
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Common\Shaders\sprite.vs">
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
