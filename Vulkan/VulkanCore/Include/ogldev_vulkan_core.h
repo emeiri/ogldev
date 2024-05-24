@@ -24,6 +24,7 @@
 #include <GLFW/glfw3.h>
 
 #include "ogldev_vulkan_device.h"
+#include "ogldev_vulkan_queue.h"
 
 namespace OgldevVK {
 
@@ -41,6 +42,7 @@ public:
 
 	const VkImage& GetImage(int Index) const;
 
+	VulkanQueue& GetQueue() { return m_queue; }
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 private:
@@ -64,6 +66,7 @@ private:
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
 	VkCommandPool m_cmdBufPool;
+	VulkanQueue m_queue;
 };
 
 }

@@ -38,7 +38,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	printf("  Objects ");
 
 	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
-		printf("%lx ", pCallbackData->pObjects[i].objectHandle);
+		printf("%llx ", pCallbackData->pObjects[i].objectHandle);
 	}
 
 	printf("\n");
@@ -57,6 +57,8 @@ VulkanCore::~VulkanCore()
 	printf("-------------------------------\n");
 
 	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
+
+	m_queue.Destroy();
 
 	for (int i = 0; i < m_imageViews.size(); i++) {
 		vkDestroyImageView(m_device, m_imageViews[i], NULL);
@@ -107,6 +109,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	CreateDevice();
 	CreateSwapChain();
 	CreateCommandBufferPool();
+	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
 }
 
 
@@ -437,6 +440,7 @@ void VulkanCore::CreateCommandBuffers(u32 count, VkCommandBuffer* cmdBufs)
 
 void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 {
+	m_queue.WaitIdle();
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, Count, pCmdBufs);
 }
 }

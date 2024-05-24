@@ -190,7 +190,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial39", "Tutorial39\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial40", "Tutorial40\Tutorial40.vcxproj", "{7EA10199-138D-4F8B-AFCF-F5E1B97C466A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial41", "Tutorial41\Tutorial41.vcxproj", "{CC9FC32C-1FCB-4C5C-A049-87E67BC81BD8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial41_PCF", "Tutorial41\Tutorial41.vcxproj", "{CC9FC32C-1FCB-4C5C-A049-87E67BC81BD8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial42", "Tutorial42\Tutorial42.vcxproj", "{4ABDE0AF-E754-472C-B941-A1A3D4FD3E74}"
 EndProject
@@ -380,6 +380,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial08", "Vulkan\Tutori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial09", "Vulkan\Tutorial09\Tutorial09.vcxproj", "{94347A05-719C-46B0-A3B9-21D1C3A82E08}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10", "Vulkan\Tutorial10\Tutorial10.vcxproj", "{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1061,6 +1069,14 @@ Global
 		{94347A05-719C-46B0-A3B9-21D1C3A82E08}.Release|x64.Build.0 = Release|x64
 		{94347A05-719C-46B0-A3B9-21D1C3A82E08}.Release|x86.ActiveCfg = Release|Win32
 		{94347A05-719C-46B0-A3B9-21D1C3A82E08}.Release|x86.Build.0 = Release|Win32
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Debug|x64.ActiveCfg = Debug|x64
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Debug|x64.Build.0 = Debug|x64
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Debug|x86.ActiveCfg = Debug|Win32
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Debug|x86.Build.0 = Debug|Win32
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x64.ActiveCfg = Release|x64
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x64.Build.0 = Release|x64
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x86.ActiveCfg = Release|Win32
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1158,6 +1174,7 @@ Global
 		{9D07DEB5-FA82-4C36-ADF5-D9227489653C} = {ACA68C35-1336-405A-85F8-EA7D433F6478}
 		{CDFA67E5-2BE2-4070-B452-633A02DDDAE5} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{94347A05-719C-46B0-A3B9-21D1C3A82E08} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
