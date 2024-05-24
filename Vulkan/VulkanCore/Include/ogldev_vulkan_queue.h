@@ -49,8 +49,6 @@ private:
 
 	void CreateSemaphores();
 
-	void SubmitInternal(VkCommandBuffer CmbBuf, bool IsAsync);
-
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 	VkQueue m_queue = VK_NULL_HANDLE;

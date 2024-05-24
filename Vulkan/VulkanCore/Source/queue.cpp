@@ -69,33 +69,38 @@ u32 VulkanQueue::AcquireNextImage()
 
 void VulkanQueue::SubmitSync(VkCommandBuffer CmbBuf)
 {
-	SubmitInternal(CmbBuf, false);
+	VkSubmitInfo SubmitInfo = {
+		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+		.pNext = NULL,
+		.waitSemaphoreCount = 0,
+		.pWaitSemaphores = VK_NULL_HANDLE,
+		.pWaitDstStageMask = VK_NULL_HANDLE,
+		.commandBufferCount = 1,
+		.pCommandBuffers = &CmbBuf,
+		.signalSemaphoreCount = 0,
+		.pSignalSemaphores = VK_NULL_HANDLE
+	};
+
+	VkResult res = vkQueueSubmit(m_queue, 1, &SubmitInfo, NULL);
+	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
 }
 
 
 void VulkanQueue::SubmitAsync(VkCommandBuffer CmbBuf)
 {
-	SubmitInternal(CmbBuf, true);
-}
+	VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-
-void VulkanQueue::SubmitInternal(VkCommandBuffer CmbBuf, bool IsAsync)
-{
 	VkSubmitInfo SubmitInfo = {
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+		.pNext = NULL,
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = &m_presentCompleteSem,
+		.pWaitDstStageMask = &waitFlags,
 		.commandBufferCount = 1,
-		.pCommandBuffers = &CmbBuf
+		.pCommandBuffers = &CmbBuf,
+		.signalSemaphoreCount = 1,				
+		.pSignalSemaphores = &m_renderCompleteSem		
 	};
-
-	if (IsAsync) {
-		SubmitInfo.pWaitSemaphores = &m_presentCompleteSem;
-		SubmitInfo.waitSemaphoreCount = 1;
-		VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		SubmitInfo.pWaitDstStageMask = &waitFlags;
-
-		SubmitInfo.pSignalSemaphores = &m_renderCompleteSem;
-		SubmitInfo.signalSemaphoreCount = 1;
-	}
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &SubmitInfo, NULL);
 	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
