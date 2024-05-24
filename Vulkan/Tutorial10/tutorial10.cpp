@@ -95,7 +95,7 @@ private:
 		};
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
-			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], 0);
+			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &ClearColor, 1, &ImageRange);
 
