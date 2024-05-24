@@ -58,6 +58,10 @@ VulkanCore::~VulkanCore()
 
 	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
 
+	for (int i = 0; i < m_fbs.size(); i++) {
+		vkDestroyFramebuffer(m_device, m_fbs[i], NULL);
+	}
+
 	m_queue.Destroy();
 
 	for (int i = 0; i < m_imageViews.size(); i++) {
@@ -99,10 +103,10 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	m_pWindow = pWindow;
 	CreateInstance(pAppName);
 	CreateDebugCallback();
-    if (!pWindow) {
-        printf("You are probably in one of the initial tutorials so we can end the Init function here.\n");
-        return;
-    }
+	if (!pWindow) {
+		printf("You are probably in one of the initial tutorials so we can end the Init function here.\n");
+		return;
+	}
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
 	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
@@ -114,13 +118,13 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 
 
 const VkImage& VulkanCore::GetImage(int Index) const
-{ 
+{
 	if (Index >= m_images.size()) {
-		OGLDEV_ERROR("Invalid image index %d\n", Index);		
+		OGLDEV_ERROR("Invalid image index %d\n", Index);
 		exit(1);
 	}
 
-	return m_images[Index]; 
+	return m_images[Index];
 }
 
 void VulkanCore::CreateInstance(const char* pAppName)
@@ -315,7 +319,7 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 }
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
-	                        VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
+	VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -387,7 +391,7 @@ void VulkanCore::CreateSwapChain()
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, NULL);
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 	assert(NumImages <= NumSwapChainImages);
-    
+
 	printf("Requested %d images, created %d images\n", NumImages, NumSwapChainImages);
 
 	m_images.resize(NumSwapChainImages);
@@ -400,7 +404,7 @@ void VulkanCore::CreateSwapChain()
 	int MipLevels = 1;
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
 		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format,
-						       VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+			VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
 }
 
@@ -443,4 +447,117 @@ void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 	m_queue.WaitIdle();
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, Count, pCmdBufs);
 }
+
+
+VkRenderPass VulkanCore::CreateSimpleRenderPass()
+{
+	VkAttachmentDescription AttachDesc = {
+	.flags = 0,
+	.format = m_swapChainSurfaceFormat.format,
+	.samples = VK_SAMPLE_COUNT_1_BIT,
+	.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+	.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+	.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+	.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	};
+
+	VkAttachmentReference AttachRef = {
+		.attachment = 0,
+		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+	};
+
+	VkSubpassDescription SubpassDesc = {
+		.flags = 0,
+		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+		.inputAttachmentCount = 0,
+		.pInputAttachments = NULL,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &AttachRef,
+		.pResolveAttachments = NULL,
+		.pDepthStencilAttachment = NULL,
+		.preserveAttachmentCount = 0,
+		.pPreserveAttachments = NULL
+	};
+
+
+#if 0
+	VkAttachmentDescription depthAttachment = {
+		.flags = 0,
+		.Format = useDepth ? findDepthFormat(vkDev.physicalDevice) : VK_FORMAT_D32_SFLOAT,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.loadOp = offscreenInt ? VK_ATTACHMENT_LOAD_OP_LOAD : (ci.clearDepth_ ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD),
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+		.initialLayout = ci.clearDepth_ ? VK_IMAGE_LAYOUT_UNDEFINED : (offscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL),
+		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	};
+
+	const VkAttachmentReference depthAttachmentRef = {
+		.attachment = 1,
+		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	};
+#endif
+
+	VkSubpassDependency Dependency = {
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.dstSubpass = 0,
+		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.srcAccessMask = 0,
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
+	};
+
+	VkRenderPassCreateInfo RenderPassCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.attachmentCount = 1,
+		.pAttachments = &AttachDesc,
+		.subpassCount = 1,
+		.pSubpasses = &SubpassDesc,
+		.dependencyCount = 1,
+		.pDependencies = &Dependency
+	};
+
+	VkRenderPass RenderPass;
+
+	VkResult res = vkCreateRenderPass(m_device, &RenderPassCreateInfo, NULL, &RenderPass);
+	CHECK_VK_RESULT(res, "vkCreateRenderPass\n");
+
+	printf("Created a simple render pass\n");
+
+	return RenderPass;
+}
+
+
+void VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
+{
+	m_fbs.resize(m_images.size());
+
+	int WindowWidth, WindowHeight;
+	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
+
+	VkResult res;
+
+	for (uint i = 0; i < m_images.size(); i++) {
+
+		VkFramebufferCreateInfo fbCreateInfo = {};
+		fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		fbCreateInfo.renderPass = RenderPass;
+		fbCreateInfo.attachmentCount = 1;
+		fbCreateInfo.pAttachments = &m_imageViews[i];
+		fbCreateInfo.width = WindowWidth;
+		fbCreateInfo.height = WindowHeight;
+		fbCreateInfo.layers = 1;
+
+		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fbs[i]);
+		CHECK_VK_RESULT(res, "vkCreateFramebuffer\n");
+	}
+
+	printf("Framebuffers created\n");
+}
+
 }

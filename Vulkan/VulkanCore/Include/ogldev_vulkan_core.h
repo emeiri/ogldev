@@ -38,6 +38,12 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow);
 
+	VkRenderPass CreateSimpleRenderPass();
+
+	void CreateFramebuffer(VkRenderPass RenderPass);
+
+	VkDevice& GetDevice() { return m_device; }
+
 	int GetNumImages() const { return (int)m_images.size(); }
 
 	const VkImage& GetImage(int Index) const;
@@ -45,6 +51,8 @@ public:
 	VulkanQueue* GetQueue() { return &m_queue; }
 
 	u32 GetQueueFamily() const { return m_queueFamily; }
+
+	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_fbs; }
 
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
 
@@ -57,7 +65,7 @@ private:
 	void CreateSurface();
 	void CreateDevice();
 	void CreateSwapChain();
-	void CreateCommandBufferPool();
+	void CreateCommandBufferPool();	
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
@@ -72,6 +80,7 @@ private:
 	std::vector<VkImageView> m_imageViews;
 	VkCommandPool m_cmdBufPool;
 	VulkanQueue m_queue;
+	std::vector<VkFramebuffer> m_fbs;
 };
 
 }
