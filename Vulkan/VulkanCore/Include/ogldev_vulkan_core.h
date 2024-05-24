@@ -42,7 +42,7 @@ public:
 
 	const VkImage& GetImage(int Index) const;
 
-	VulkanQueue& GetQueue() { return m_queue; }
+	VulkanQueue* GetQueue() { return &m_queue; }
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 private:

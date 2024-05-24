@@ -59,17 +59,18 @@ public:
 	{
 		m_vkCore.Init(pAppName, pWindow);
 		m_numImages = m_vkCore.GetNumImages();
+		m_pQueue = m_vkCore.GetQueue();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 	}
 
 	void RenderScene()
 	{
-		uint32_t ImageIndex = m_vkCore.GetQueue().AcquireNextImage();
+		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
-		m_vkCore.GetQueue().SubmitAsync(&m_cmdBufs[ImageIndex]);
+		m_pQueue->SubmitAsync(m_cmdBufs[ImageIndex]);
 
-		m_vkCore.GetQueue().Present(ImageIndex);
+		m_pQueue->Present(ImageIndex);
 	}
 
 private:
@@ -94,9 +95,9 @@ private:
 		};
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
-			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); // TODO: flags?
+			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], 0);
 
-			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImage(i), VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, &ClearColor, 1, &ImageRange);
+			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &ClearColor, 1, &ImageRange);
 
 			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
@@ -105,7 +106,8 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
-	OgldevVK::VulkanCore m_vkCore;	
+	OgldevVK::VulkanCore m_vkCore;
+	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
 };

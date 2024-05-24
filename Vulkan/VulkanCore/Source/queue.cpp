@@ -79,24 +79,24 @@ u32 VulkanQueue::AcquireNextImage()
 }
 
 
-void VulkanQueue::Submit(const VkCommandBuffer* pCmbBuf)
+void VulkanQueue::Submit(VkCommandBuffer CmbBuf)
 {
-	SubmitInternal(pCmbBuf, false);
+	SubmitInternal(CmbBuf, false);
 }
 
 
-void VulkanQueue::SubmitAsync(const VkCommandBuffer* pCmbBuf)
+void VulkanQueue::SubmitAsync(VkCommandBuffer CmbBuf)
 {
-	SubmitInternal(pCmbBuf, true);
+	SubmitInternal(CmbBuf, true);
 }
 
 
-void VulkanQueue::SubmitInternal(const VkCommandBuffer* pCmbBuf, bool IsAsync)
+void VulkanQueue::SubmitInternal(VkCommandBuffer CmbBuf, bool IsAsync)
 {
 	VkSubmitInfo SubmitInfo = {
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.commandBufferCount = 1,
-		.pCommandBuffers = pCmbBuf
+		.pCommandBuffers = &CmbBuf
 	};
 
 	if (IsAsync) {

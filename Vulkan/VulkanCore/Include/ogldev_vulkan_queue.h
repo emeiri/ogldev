@@ -37,9 +37,9 @@ public:
 
 	u32 AcquireNextImage();
 
-	void Submit(const VkCommandBuffer* pCmbBuf);
+	void Submit(VkCommandBuffer CmbBuf);
 
-	void SubmitAsync(const VkCommandBuffer* pCmbBuf);
+	void SubmitAsync(VkCommandBuffer CmbBuf);
 
 	void Present(u32 ImageIndex);
 
@@ -49,7 +49,7 @@ private:
 
 	void CreateSemaphores();
 
-	void SubmitInternal(const VkCommandBuffer* pCmbBuf, bool IsAsync);
+	void SubmitInternal(VkCommandBuffer CmbBuf, bool IsAsync);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
