@@ -28,4 +28,6 @@ namespace OgldevVK {
 
 void BeginCommandBuffer(VkCommandBuffer CommandBuffer, VkCommandBufferUsageFlags UsageFlags);
 
+VkSemaphore CreateSemaphore(VkDevice Device);
+
 }

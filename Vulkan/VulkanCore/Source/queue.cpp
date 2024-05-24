@@ -20,28 +20,9 @@
 
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_queue.h"
+#include "ogldev_vulkan_wrapper.h"
 
 namespace OgldevVK {
-
-
-// TODO: move this elsewhere
-VkSemaphore CreateSemaphore(VkDevice Device)
-{
-	VkSemaphoreCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-	VkSemaphore semaphore;
-	VkResult Res = vkCreateSemaphore(Device, &createInfo, NULL, &semaphore);
-	CHECK_VK_RESULT(Res, "vkCreateSemaphore");
-	return semaphore;
-}
-
-
-void VulkanQueue::Destroy()
-{
-	vkDestroySemaphore(m_device, m_presentCompleteSem, NULL);
-	vkDestroySemaphore(m_device, m_renderCompleteSem, NULL);
-}
 
 
 void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamily, u32 QueueIndex)
@@ -54,6 +35,13 @@ void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamil
 	printf("Queue acquired\n");
 
 	CreateSemaphores();
+}
+
+
+void VulkanQueue::Destroy()
+{
+	vkDestroySemaphore(m_device, m_presentCompleteSem, NULL);
+	vkDestroySemaphore(m_device, m_renderCompleteSem, NULL);
 }
 
 
@@ -79,7 +67,7 @@ u32 VulkanQueue::AcquireNextImage()
 }
 
 
-void VulkanQueue::Submit(VkCommandBuffer CmbBuf)
+void VulkanQueue::SubmitSync(VkCommandBuffer CmbBuf)
 {
 	SubmitInternal(CmbBuf, false);
 }

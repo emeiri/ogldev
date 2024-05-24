@@ -34,4 +34,20 @@ void BeginCommandBuffer(VkCommandBuffer CommandBuffer, VkCommandBufferUsageFlags
 	CHECK_VK_RESULT(res, "vkBeginCommandBuffer\n");
 }
 
+
+VkSemaphore CreateSemaphore(VkDevice Device)
+{
+	VkSemaphoreCreateInfo CreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0
+	};
+
+	VkSemaphore Semaphore;
+	VkResult Res = vkCreateSemaphore(Device, &CreateInfo, NULL, &Semaphore);
+	CHECK_VK_RESULT(Res, "vkCreateSemaphore");
+	return Semaphore;
+}
+
+
 }

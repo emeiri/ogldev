@@ -37,7 +37,7 @@ public:
 
 	u32 AcquireNextImage();
 
-	void Submit(VkCommandBuffer CmbBuf);
+	void SubmitSync(VkCommandBuffer CmbBuf);
 
 	void SubmitAsync(VkCommandBuffer CmbBuf);
 
