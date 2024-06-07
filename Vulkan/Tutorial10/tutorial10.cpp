@@ -94,10 +94,41 @@ private:
 			.layerCount = 1
 		};
 
+		u32 PresentQueueFamily = m_vkCore.GetQueueFamily();
+
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
+			VkImageMemoryBarrier presentToClearBarrier = {};
+			presentToClearBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			presentToClearBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			presentToClearBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			presentToClearBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			presentToClearBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			presentToClearBarrier.srcQueueFamilyIndex = PresentQueueFamily;
+			presentToClearBarrier.dstQueueFamilyIndex = PresentQueueFamily;
+			presentToClearBarrier.image = m_vkCore.GetImage(i);
+			presentToClearBarrier.subresourceRange = ImageRange;
+
+			// Change layout of image to be optimal for presenting
+			VkImageMemoryBarrier clearToPresentBarrier = {};
+			clearToPresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			clearToPresentBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			clearToPresentBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			clearToPresentBarrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			clearToPresentBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			clearToPresentBarrier.srcQueueFamilyIndex = PresentQueueFamily;
+			clearToPresentBarrier.dstQueueFamilyIndex = PresentQueueFamily;
+			clearToPresentBarrier.image = m_vkCore.GetImage(i);
+			clearToPresentBarrier.subresourceRange = ImageRange;
+			
 			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &ClearColor, 1, &ImageRange);
+			vkCmdPipelineBarrier(m_cmdBufs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 
+				                 0, 0, NULL, 0, NULL, 1, &presentToClearBarrier);
+
+			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &ClearColor, 1, &ImageRange);
+
+			vkCmdPipelineBarrier(m_cmdBufs[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 
+								 0, 0, NULL, 0, NULL, 1, &clearToPresentBarrier);
 
 			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
