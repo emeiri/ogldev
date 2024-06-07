@@ -43,8 +43,13 @@ public:
 	const VkImage& GetImage(int Index) const;
 
 	VulkanQueue* GetQueue() { return &m_queue; }
+
+	u32 GetQueueFamily() const { return m_queueFamily; }
+
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
+
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
+
 private:
 
 	void CreateInstance(const char* pAppName);
