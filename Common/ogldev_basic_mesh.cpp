@@ -588,8 +588,11 @@ void BasicMesh::SetupRenderMaterialsPBR()
     if (m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo) {
         m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo->Bind(ALBEDO_TEXTURE_UNIT);
     }
-}
 
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness->Bind(ROUGHNESS_TEXTURE_UNIT);
+    }
+}
 
 
 void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)

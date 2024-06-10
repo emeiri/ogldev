@@ -18,7 +18,18 @@
 
 #include "ogldev_new_lighting.h"
 
-#define FAIL_ON_MISSING_LOC
+//#define FAIL_ON_MISSING_LOC
+
+
+#ifdef FAIL_ON_MISSING_LOC                  
+#define GET_UNIFORM_AND_CHECK(loc, name)    \
+    loc = GetUniformLocation(name);         \
+    if (loc == INVALID_UNIFORM_LOCATION)    \
+        return false;                       
+#else
+#define GET_UNIFORM_AND_CHECK(loc, name)    \
+    loc = GetUniformLocation(name);         
+#endif
 
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
@@ -148,6 +159,7 @@ bool LightingTechnique::InitCommon()
     WireframeWidthLoc = GetUniformLocation("gWireframeWidth");
     WireframeColorLoc = GetUniformLocation("gWireframeColor");
     AlbedoLoc = GetUniformLocation("gAlbedo");
+    GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -632,13 +644,13 @@ void LightingTechnique::SetPBR(bool IsPBR)
 
 void LightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
 {
-    glUniform1f(PBRMaterialLoc.Roughness, Material.Roughness);
     glUniform1i(PBRMaterialLoc.IsMetal, Material.IsMetal);
     if (Material.pAlbedo) {
         glUniform1i(PBRMaterialLoc.IsAlbedo, 1);
     } else {
         glUniform1i(PBRMaterialLoc.IsAlbedo, 0);
 	    glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
+        glUniform1f(PBRMaterialLoc.Roughness, Material.Roughness);
 	}
 }
 
@@ -675,4 +687,10 @@ void LightingTechnique::SetWireframeColor(const Vector4f& Color)
 void LightingTechnique::SetAlbedoTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(AlbedoLoc, TextureUnit);
+}
+
+
+void LightingTechnique::SetRoughnessTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(RoughnessLoc, TextureUnit);
 }

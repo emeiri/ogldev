@@ -28,6 +28,7 @@ struct PBRMaterial
     bool IsMetal = false;
     Vector3f Color = Vector3f(0.0f, 0.0f, 0.0f);
     Texture* pAlbedo = NULL;
+    Texture* pRoughness = NULL;
 };
 
 

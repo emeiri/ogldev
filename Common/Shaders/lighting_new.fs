@@ -80,6 +80,7 @@ layout(binding = 2) uniform sampler2D gShadowMap;        // required only for sh
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gAlbedo;
+layout(binding = 6) uniform sampler2D gRoughness;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
@@ -542,17 +543,27 @@ vec3 schlickFresnel(float vDotH)
 }
 
 
-float geomSmith(float dp)
+float GetRoughness()
 {
-    float k = (gPBRmaterial.Roughness + 1.0) * (gPBRmaterial.Roughness + 1.0) / 8.0;
+    if (gPBRmaterial.IsAlbedo) {
+        return texture(gRoughness, TexCoord0.xy).x;
+    } else {
+        return gPBRmaterial.Roughness;
+    }
+}
+
+
+float geomSmith(float dp, float Roughness)
+{
+    float k = (Roughness + 1.0) * (Roughness + 1.0) / 8.0;
     float denom = dp * (1 - k) + k;
     return dp / denom;
 }
 
 
-float ggxDistribution(float nDotH)
+float ggxDistribution(float nDotH, float Roughness)
 {
-    float alpha2 = gPBRmaterial.Roughness * gPBRmaterial.Roughness * gPBRmaterial.Roughness * gPBRmaterial.Roughness;
+    float alpha2 = Roughness * Roughness * Roughness * Roughness;
     float d = nDotH * nDotH * (alpha2 - 1) + 1;
     float ggxdistrib = alpha2 / (PI * d * d);
     return ggxdistrib;
@@ -588,10 +599,12 @@ vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
 
-    vec3 SpecBRDF_nom  = ggxDistribution(nDotH) *
+    float Roughness = GetRoughness();
+
+    vec3 SpecBRDF_nom  = ggxDistribution(nDotH, Roughness) *
                          F *
-                         geomSmith(nDotL) *
-                         geomSmith(nDotV);
+                         geomSmith(nDotL, Roughness) *
+                         geomSmith(nDotV, Roughness);
 
     float SpecBRDF_denom = 4.0 * nDotV * nDotL + 0.0001;
 
@@ -651,12 +664,13 @@ void main()
 {
     if (gIsPBR) {
         FragColor = CalcTotalPBRLighting();
+      //  FragColor = texture(gRoughness, TexCoord0.xy);
     } else {
         FragColor = CalcPhongLighting();
     }
 
     if (EdgeDistance0.x >= 0) {
-	float d = min( EdgeDistance0.x, min(EdgeDistance0.y, EdgeDistance0.z ));
+	    float d = min( EdgeDistance0.x, min(EdgeDistance0.y, EdgeDistance0.z ));
 
         float mixVal = 0.0;
         if (d < gWireframeWidth - 1) {

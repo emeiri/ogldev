@@ -45,10 +45,11 @@ class Tutorial43
 {
 public:
 
-    Tutorial43() : m_albedo(GL_TEXTURE_2D)
+    Tutorial43() : m_albedo(GL_TEXTURE_2D), m_roughness(GL_TEXTURE_2D)
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.15f, 1.0f);
-        m_dirLight.DiffuseIntensity = 4.0f;
+        m_dirLight.DiffuseIntensity = 1.0f;
+        m_dirLight.Color = Vector3f(150.0f/256.0f, 150.0f/256.0f, 150.0f/256.0f);
       //  m_dirLight.AmbientIntensity = 0.15f;
 
         m_pointLights[0].WorldPosition = Vector3f(5.0f, 5.0f, 5.0f);
@@ -106,7 +107,6 @@ public:
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
 
-        m_pMesh->GetPBRMaterial().Roughness = 0.43f;
         m_pMesh->GetPBRMaterial().IsMetal = false;
         m_phongRenderer.Render(m_pMesh);
     }
@@ -196,9 +196,12 @@ private:
        // m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
         m_pMesh->LoadMesh("../Content/box_terrain.obj");
 
-        m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
-
+      //  m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
+        m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png");
+        m_albedo.Load("../Content/textures/rusted_iron/albedo.png");
+     //   m_roughness.Load("../Content/textures/rusted_iron/roughness.png");
         m_pMesh->GetPBRMaterial().pAlbedo = &m_albedo;
+        m_pMesh->GetPBRMaterial().pRoughness = &m_roughness;
 
         m_pMesh->SetPBR(true);
     }
@@ -213,6 +216,7 @@ private:
     long long m_startTime = 0;
     long long m_currentTime = 0;
     Texture m_albedo;
+    Texture m_roughness;
 };
 
 Tutorial43* app = NULL;
