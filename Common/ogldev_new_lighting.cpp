@@ -160,6 +160,7 @@ bool LightingTechnique::InitCommon()
     WireframeColorLoc = GetUniformLocation("gWireframeColor");
     AlbedoLoc = GetUniformLocation("gAlbedo");
     GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
+    GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -693,4 +694,10 @@ void LightingTechnique::SetAlbedoTextureUnit(unsigned int TextureUnit)
 void LightingTechnique::SetRoughnessTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(RoughnessLoc, TextureUnit);
+}
+
+
+void LightingTechnique::SetMetallicTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(MetallicLoc, TextureUnit);
 }

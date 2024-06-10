@@ -81,6 +81,7 @@ layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for sh
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gAlbedo;
 layout(binding = 6) uniform sampler2D gRoughness;
+layout(binding = 7) uniform sampler2D gMetallic;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
@@ -529,12 +530,17 @@ vec4 CalcPhongLighting()
 }
 
 
-vec3 schlickFresnel(float vDotH)
+vec3 schlickFresnel(float vDotH, vec3 Albedo)
 {
-    vec3 F0 = vec3(0.04);
-
-    if (gPBRmaterial.IsMetal) {
-        F0 = gPBRmaterial.Color;
+    vec3 F0 = vec3(0.04);    
+    
+    if (gPBRmaterial.IsAlbedo) {
+        float Metallic = texture(gMetallic, TexCoord0.xy).x;
+        F0 = mix(F0, Albedo, Metallic);
+    } else {
+        if (gPBRmaterial.IsMetal) {
+	        F0 = gPBRmaterial.Color;
+	    }
     }
 
     vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
@@ -594,7 +600,17 @@ vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     float nDotL = max(dot(n, l), 0.0);
     float nDotV = max(dot(n, v), 0.0);
 
-    vec3 F = schlickFresnel(vDotH);
+    vec3 fLambert = vec3(0.0);
+
+    if (!gPBRmaterial.IsMetal) {
+        if (gPBRmaterial.IsAlbedo) {
+            fLambert = pow(texture(gAlbedo, TexCoord0.xy).xyz, vec3(2.2));
+        } else {
+            fLambert = gPBRmaterial.Color;
+        }
+    }
+
+    vec3 F = schlickFresnel(vDotH, fLambert);
 
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
@@ -609,16 +625,6 @@ vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     float SpecBRDF_denom = 4.0 * nDotV * nDotL + 0.0001;
 
     vec3 SpecBRDF = SpecBRDF_nom / SpecBRDF_denom;
-
-    vec3 fLambert = vec3(0.0);
-
-    if (!gPBRmaterial.IsMetal) {
-        if (gPBRmaterial.IsAlbedo) {
-            fLambert = texture(gAlbedo, TexCoord0.xy).xyz;
-        } else {
-            fLambert = gPBRmaterial.Color;
-        }
-    }
 
     vec3 DiffuseBRDF = kD * fLambert / PI;
 

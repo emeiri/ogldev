@@ -592,6 +592,10 @@ void BasicMesh::SetupRenderMaterialsPBR()
     if (m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness) {
         m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness->Bind(ROUGHNESS_TEXTURE_UNIT);
     }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic->Bind(METALLIC_TEXTURE_UNIT);
+    }
 }
 
 

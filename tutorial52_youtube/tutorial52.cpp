@@ -45,7 +45,7 @@ class Tutorial43
 {
 public:
 
-    Tutorial43() : m_albedo(GL_TEXTURE_2D), m_roughness(GL_TEXTURE_2D)
+    Tutorial43() : m_albedo(GL_TEXTURE_2D), m_roughness(GL_TEXTURE_2D), m_metallic(GL_TEXTURE_2D)
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.15f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
@@ -197,11 +197,14 @@ private:
         m_pMesh->LoadMesh("../Content/box_terrain.obj");
 
       //  m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
-        m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png");
+        //m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png");
         m_albedo.Load("../Content/textures/rusted_iron/albedo.png");
-     //   m_roughness.Load("../Content/textures/rusted_iron/roughness.png");
+        m_roughness.Load("../Content/textures/rusted_iron/roughness.png");
+        m_metallic.Load("../Content/textures/rusted_iron/metallic.png");
+
         m_pMesh->GetPBRMaterial().pAlbedo = &m_albedo;
         m_pMesh->GetPBRMaterial().pRoughness = &m_roughness;
+        m_pMesh->GetPBRMaterial().pMetallic = &m_metallic;
 
         m_pMesh->SetPBR(true);
     }
@@ -217,6 +220,7 @@ private:
     long long m_currentTime = 0;
     Texture m_albedo;
     Texture m_roughness;
+    Texture m_metallic;
 };
 
 Tutorial43* app = NULL;

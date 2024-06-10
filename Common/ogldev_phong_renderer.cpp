@@ -45,6 +45,7 @@ void PhongRenderer::InitPhongRenderer(int SubTech)
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
@@ -56,6 +57,7 @@ void PhongRenderer::InitPhongRenderer(int SubTech)
     m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
     //    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {

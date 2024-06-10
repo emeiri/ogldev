@@ -126,6 +126,7 @@ public:
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
     void SetAlbedoTextureUnit(unsigned int TextureUnit);
     void SetRoughnessTextureUnit(unsigned int TextureUnit);
+    void SetMetallicTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
@@ -202,6 +203,7 @@ private:
     GLuint WireframeColorLoc = INVALID_UNIFORM_LOCATION;
     GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
     GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
+    GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

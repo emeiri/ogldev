@@ -49,5 +49,8 @@
 #define SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX 12
 #define DETAIL_MAP_TEXTURE_UNIT                     GL_TEXTURE13
 #define DETAIL_MAP_TEXTURE_UNIT_INDEX               13
+#define METALLIC_TEXTURE_UNIT                       GL_TEXTURE14
+#define METALLIC_TEXTURE_UNIT_INDEX                 14
+
 
 #endif  /* OGLDEV_ENGINE_COMMON_H */
