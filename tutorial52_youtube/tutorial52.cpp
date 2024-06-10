@@ -45,7 +45,7 @@ class Tutorial43
 {
 public:
 
-    Tutorial43()
+    Tutorial43() : m_albedo(GL_TEXTURE_2D)
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.15f, 1.0f);
         m_dirLight.DiffuseIntensity = 4.0f;
@@ -56,19 +56,6 @@ public:
 
         m_pointLights[1].WorldPosition = Vector3f(-7.0f, 3.0f, 7.0f);
         //        m_pointLights[1].DiffuseIntensity = 100.0f;
-
-        float metalRough = 0.43f;
-
-        // Gold
-        m_meshData[0] = { Vector3f(-20.0f, 0.0f, 75.0f), Vector3f(1, 0.71f, 0.29f) };
-        // Copper
-        m_meshData[1] = { Vector3f(-10.0f, 0.0f, 75.0f), Vector3f(0.95f, 0.64f, 0.54f) };
-        // Aluminum
-        m_meshData[2] = { Vector3f(-0.0f, 0.0f, 75.0f), Vector3f(0.91f, 0.92f, 0.92f) };
-        // Titanium
-        m_meshData[3] = { Vector3f(10.0f, 0.0f, 75.0f), Vector3f(0.542f, 0.497f, 0.449f) };
-        // Silver
-        m_meshData[4] = { Vector3f(20.0f, 0.0f, 75.0f), Vector3f(0.95f, 0.93f, 0.88f) };
     }
 
     virtual ~Tutorial43()
@@ -119,23 +106,9 @@ public:
         m_dirLight.WorldDirection = Vector3f(sinf(foo), -0.5f, cosf(foo));
         m_phongRenderer.UpdateDirLightDir(m_dirLight.WorldDirection);
 
-        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
-            m_pMesh->SetPosition(m_meshData[i].Pos);
-            m_pMesh->GetPBRMaterial().Roughness = 0.43f;
-            m_pMesh->GetPBRMaterial().IsMetal = true;
-            m_pMesh->GetPBRMaterial().Color = m_meshData[i].Color;
-            m_phongRenderer.Render(m_pMesh);
-        }
-
-        float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
-
-        for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_meshData) ; i++) {
-            m_pMesh->SetPosition(m_meshData[i].Pos + Vector3f(0.0f, 15.0f, 0.0f));
-            m_pMesh->GetPBRMaterial().Roughness = Roughness[i];
-            m_pMesh->GetPBRMaterial().IsMetal = false;
-            m_pMesh->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
-            m_phongRenderer.Render(m_pMesh);
-        }
+        m_pMesh->GetPBRMaterial().Roughness = 0.43f;
+        m_pMesh->GetPBRMaterial().IsMetal = false;
+        m_phongRenderer.Render(m_pMesh);
     }
 
 
@@ -192,7 +165,7 @@ private:
 
     void InitCamera()
     {
-        Vector3f Pos(0.0f, 35.0f, 0.0f);
+        Vector3f Pos(0.0f, 5.0f, -10.0f);
         Vector3f Target(0.0f, -0.25f, 1.0f);
         Vector3f Up(0.0, 1.0f, 0.0f);
 
@@ -219,8 +192,15 @@ private:
     {
         m_pMesh = new SkinnedMesh();
         //        m_pMesh->LoadMesh("../Content/spot/spot_triangulated.obj");
-        m_pMesh->LoadMesh("../Content/dragon.obj");
-        m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
+       // m_pMesh->LoadMesh("../Content/dragon.obj");
+       // m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
+        m_pMesh->LoadMesh("../Content/box_terrain.obj");
+
+        m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
+
+        m_pMesh->GetPBRMaterial().pAlbedo = &m_albedo;
+
+        m_pMesh->SetPBR(true);
     }
 
     GLFWwindow* window = NULL;
@@ -232,11 +212,7 @@ private:
     PointLight m_pointLights[2];
     long long m_startTime = 0;
     long long m_currentTime = 0;
-
-    struct {
-        Vector3f Pos;
-        Vector3f Color;
-    } m_meshData[5];
+    Texture m_albedo;
 };
 
 Tutorial43* app = NULL;

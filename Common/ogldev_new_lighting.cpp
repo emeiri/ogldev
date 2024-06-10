@@ -143,9 +143,11 @@ bool LightingTechnique::InitCommon()
     PBRMaterialLoc.Roughness = GetUniformLocation("gPBRmaterial.Roughness");
     PBRMaterialLoc.IsMetal = GetUniformLocation("gPBRmaterial.IsMetal");
     PBRMaterialLoc.Color = GetUniformLocation("gPBRmaterial.Color");
+    PBRMaterialLoc.IsAlbedo = GetUniformLocation("gPBRmaterial.IsAlbedo");
     ClipPlaneLoc = GetUniformLocation("gClipPlane");
     WireframeWidthLoc = GetUniformLocation("gWireframeWidth");
     WireframeColorLoc = GetUniformLocation("gWireframeColor");
+    AlbedoLoc = GetUniformLocation("gAlbedo");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -188,7 +190,9 @@ bool LightingTechnique::InitCommon()
         PBRMaterialLoc.Roughness == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.IsMetal == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.Color == INVALID_UNIFORM_LOCATION ||
-        ClipPlaneLoc == INVALID_UNIFORM_LOCATION) {
+        PBRMaterialLoc.IsAlbedo == INVALID_UNIFORM_LOCATION ||
+        ClipPlaneLoc == INVALID_UNIFORM_LOCATION ||
+        AlbedoLoc == INVALID_UNIFORM_LOCATION) {
 
 #ifdef FAIL_ON_MISSING_LOC
         return false;
@@ -630,7 +634,12 @@ void LightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
 {
     glUniform1f(PBRMaterialLoc.Roughness, Material.Roughness);
     glUniform1i(PBRMaterialLoc.IsMetal, Material.IsMetal);
-    glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
+    if (Material.pAlbedo) {
+        glUniform1i(PBRMaterialLoc.IsAlbedo, 1);
+    } else {
+        glUniform1i(PBRMaterialLoc.IsAlbedo, 0);
+	    glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
+	}
 }
 
 
@@ -660,4 +669,10 @@ void LightingTechnique::SetWireframeColor(const Vector4f& Color)
     }
 
     glUniform4f(WireframeColorLoc, Color.x, Color.y, Color.z, Color.w);
+}
+
+
+void LightingTechnique::SetAlbedoTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(AlbedoLoc, TextureUnit);
 }

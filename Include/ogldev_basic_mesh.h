@@ -59,6 +59,8 @@ public:
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
+    void SetPBR(bool IsPBR) { m_isPBR = IsPBR; }
+
 protected:
 
     void Clear();
@@ -128,12 +130,17 @@ private:
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
+    void SetupRenderMaterialsPhong(unsigned int MeshIndex, unsigned int MaterialIndex, IRenderCallbacks* pRenderCallbacks);
+    void SetupRenderMaterialsPBR();
+
     std::vector<Material> m_Materials;
     
     // Temporary space for vertex stuff before we load them into the GPU
     vector<Vertex> m_Vertices;
 
     Assimp::Importer m_Importer;
+
+    bool m_isPBR = false;
 };
 
 

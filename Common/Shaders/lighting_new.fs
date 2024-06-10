@@ -65,6 +65,7 @@ struct PBRMaterial
     float Roughness;
     bool IsMetal;
     vec3 Color;
+    bool IsAlbedo;
 };
 
 uniform DirectionalLight gDirectionalLight;
@@ -78,6 +79,7 @@ layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
 layout(binding = 2) uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
+layout(binding = 5) uniform sampler2D gAlbedo;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
@@ -598,7 +600,11 @@ vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
     vec3 fLambert = vec3(0.0);
 
     if (!gPBRmaterial.IsMetal) {
-        fLambert = gPBRmaterial.Color;
+        if (gPBRmaterial.IsAlbedo) {
+            fLambert = texture(gAlbedo, TexCoord0.xy).xyz;
+        } else {
+            fLambert = gPBRmaterial.Color;
+        }
     }
 
     vec3 DiffuseBRDF = kD * fLambert / PI;

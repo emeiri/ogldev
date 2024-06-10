@@ -43,6 +43,7 @@ void PhongRenderer::InitPhongRenderer(int SubTech)
 
     m_lightingTech.Enable();
     m_lightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
@@ -52,6 +53,7 @@ void PhongRenderer::InitPhongRenderer(int SubTech)
 
     m_skinningTech.Enable();
     m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
     //    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
@@ -304,11 +306,13 @@ void PhongRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
 
     m_skinningTech.SetMaterial(pMesh->GetMaterial());
 
-    PBRMaterial Material;
-    Material.Roughness = 0.43f;
-    Material.IsMetal = false;
-    Material.Color = Vector3f(1.0f, 0.71f, 0.29f); //pMesh->GetMaterial().DiffuseColor;
-    m_skinningTech.SetPBRMaterial(Material);
+    if (m_isPBR) {
+        m_skinningTech.SetPBR(true);
+        m_skinningTech.SetPBRMaterial(pMesh->GetPBRMaterial());
+    }
+    else {
+        m_skinningTech.SetPBR(false);
+    }
 
     Vector3f CameraLocalPos3f = pMesh->GetWorldTransform().WorldPosToLocalPos(m_pCamera->GetPos());
     m_skinningTech.SetCameraLocalPos(CameraLocalPos3f);

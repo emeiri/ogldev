@@ -526,47 +526,70 @@ void BasicMesh::PopulateBuffersDSA()
 // Introduced in youtube tutorial #18
 void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
 {
+    if (m_isPBR) {
+        SetupRenderMaterialsPBR();
+    }
+
     glBindVertexArray(m_VAO);
 
-    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-        unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
+    for (unsigned int MeshIndex = 0 ; MeshIndex < m_Meshes.size() ; MeshIndex++) {
+        unsigned int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
         assert(MaterialIndex < m_Materials.size());
 
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
-        }
-
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
-
-            if (pRenderCallbacks) {
-                pRenderCallbacks->ControlSpecularExponent(true);
-            }
-        } else {
-            if (pRenderCallbacks) {
-                pRenderCallbacks->ControlSpecularExponent(false);
-            }
-        }
-
-        if (pRenderCallbacks) {
-            if (m_Materials[MaterialIndex].pDiffuse) {
-                pRenderCallbacks->DrawStartCB(i);
-                pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
-            } else {
-                pRenderCallbacks->DisableDiffuseTexture();
-            }
+        if (!m_isPBR) {
+            SetupRenderMaterialsPhong(MeshIndex, MaterialIndex, pRenderCallbacks);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
-                                 m_Meshes[i].NumIndices,
+                                 m_Meshes[MeshIndex].NumIndices,
                                  GL_UNSIGNED_INT,
-                                 (void*)(sizeof(unsigned int) * m_Meshes[i].BaseIndex),
-                                 m_Meshes[i].BaseVertex);
+                                 (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
+                                 m_Meshes[MeshIndex].BaseVertex);
     }
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
 }
+
+
+void BasicMesh::SetupRenderMaterialsPhong(unsigned int MeshIndex, unsigned int MaterialIndex, IRenderCallbacks* pRenderCallbacks)
+{
+    if (m_Materials[MaterialIndex].pDiffuse) {
+        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pSpecularExponent) {
+        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+
+        if (pRenderCallbacks) {
+            pRenderCallbacks->ControlSpecularExponent(true);
+        }
+    } else {
+        if (pRenderCallbacks) {
+            pRenderCallbacks->ControlSpecularExponent(false);
+        }
+    }
+
+    if (pRenderCallbacks) {
+        if (m_Materials[MaterialIndex].pDiffuse) {
+            pRenderCallbacks->DrawStartCB(MeshIndex);
+            pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
+        }  else {
+            pRenderCallbacks->DisableDiffuseTexture();
+        }
+    }
+}
+
+
+void BasicMesh::SetupRenderMaterialsPBR()
+{
+    int PBRMaterialIndex = 0;
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo->Bind(ALBEDO_TEXTURE_UNIT);
+    }
+}
+
 
 
 void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)

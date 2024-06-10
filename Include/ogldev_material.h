@@ -27,6 +27,7 @@ struct PBRMaterial
     float Roughness = 0.0f;
     bool IsMetal = false;
     Vector3f Color = Vector3f(0.0f, 0.0f, 0.0f);
+    Texture* pAlbedo = NULL;
 };
 
 
@@ -42,6 +43,17 @@ class Material {
     // TODO: need to deallocate these
     Texture* pDiffuse = NULL; // base color of the material
     Texture* pSpecularExponent = NULL;
+
+    ~Material()
+    {
+        if (pDiffuse) {
+            delete pDiffuse;
+        }
+
+        if (pSpecularExponent) {
+            delete pSpecularExponent;
+        }
+    }
 };
 
 

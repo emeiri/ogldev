@@ -124,6 +124,7 @@ public:
     void SetShadowMapOffsetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapOffsetTextureParams(float TextureSize, float FilterSize, float Radius);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
+    void SetAlbedoTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
@@ -198,6 +199,7 @@ private:
     GLuint ClipPlaneLoc = INVALID_UNIFORM_LOCATION;
     GLuint WireframeWidthLoc = INVALID_UNIFORM_LOCATION;
     GLuint WireframeColorLoc = INVALID_UNIFORM_LOCATION;
+    GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;
@@ -250,6 +252,7 @@ private:
         GLuint Roughness;
         GLuint IsMetal;
         GLuint Color;
+        GLuint IsAlbedo;
     } PBRMaterialLoc;
 };
 
