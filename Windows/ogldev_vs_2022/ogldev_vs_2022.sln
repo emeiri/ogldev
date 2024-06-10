@@ -35,7 +35,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15", "Tutorial15\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial16", "Tutorial16\Tutorial16.vcxproj", "{7223D5B2-3FDE-417B-BF9E-3E467D1D9FA5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial18", "Tutorial18\Tutorial18.vcxproj", "{32A9FC7F-FB44-4984-99FB-E768DD0779D9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial18_LoadingModels", "Tutorial18\Tutorial18.vcxproj", "{32A9FC7F-FB44-4984-99FB-E768DD0779D9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17", "Tutorial17\Tutorial17.vcxproj", "{95DAED2E-A907-4D44-8F0C-5A985491353F}"
 EndProject
@@ -105,7 +105,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F
 		..\..\Include\technique.h = ..\..\Include\technique.h
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial22", "Tutorial22\Tutorial22.vcxproj", "{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial22_PointLight", "Tutorial22\Tutorial22.vcxproj", "{2FA16C92-5F8D-4031-8506-5DC8C1FAEC3B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial23", "Tutorial23\Tutorial23.vcxproj", "{A41C1719-A18F-4507-ABDB-D2A06BB2513B}"
 EndProject
@@ -188,13 +188,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial38", "Tutorial38\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial39", "Tutorial39\Tutorial39.vcxproj", "{F0B17728-0597-4364-9A6C-1F6AF645F9F9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial40", "Tutorial40\Tutorial40.vcxproj", "{7EA10199-138D-4F8B-AFCF-F5E1B97C466A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial40_PracticalSkeletonAnimation", "Tutorial40\Tutorial40.vcxproj", "{7EA10199-138D-4F8B-AFCF-F5E1B97C466A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial41_PCF", "Tutorial41\Tutorial41.vcxproj", "{CC9FC32C-1FCB-4C5C-A049-87E67BC81BD8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial42", "Tutorial42\Tutorial42.vcxproj", "{4ABDE0AF-E754-472C-B941-A1A3D4FD3E74}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial43", "Tutorial43\Tutorial43.vcxproj", "{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial43_PBR", "Tutorial43\Tutorial43.vcxproj", "{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TerrainRendering", "TerrainRendering", "{ACA68C35-1336-405A-85F8-EA7D433F6478}"
 EndProject
@@ -387,6 +387,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10", "Vulkan\Tutorial10\Tutorial10.vcxproj", "{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial52_PBRTextures", "Tutorial52_PBRTextures\Tutorial52.vcxproj", "{A905FE76-7290-48E7-AD86-E918753F516D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
 	EndProjectSection
 EndProject
 Global
@@ -1077,6 +1082,14 @@ Global
 		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x64.Build.0 = Release|x64
 		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x86.ActiveCfg = Release|Win32
 		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6}.Release|x86.Build.0 = Release|Win32
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Debug|x64.ActiveCfg = Debug|x64
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Debug|x64.Build.0 = Debug|x64
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Debug|x86.ActiveCfg = Debug|Win32
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Debug|x86.Build.0 = Debug|Win32
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x64.ActiveCfg = Release|x64
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x64.Build.0 = Release|x64
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x86.ActiveCfg = Release|Win32
+		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1175,6 +1188,7 @@ Global
 		{CDFA67E5-2BE2-4070-B452-633A02DDDAE5} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{94347A05-719C-46B0-A3B9-21D1C3A82E08} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{402FFDB9-4128-4C6F-B7E0-AFFF811197B6} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{A905FE76-7290-48E7-AD86-E918753F516D} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}

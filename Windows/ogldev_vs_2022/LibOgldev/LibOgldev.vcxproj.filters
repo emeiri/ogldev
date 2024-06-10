@@ -392,5 +392,8 @@
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp">
       <Filter>Source Files\Techniques</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

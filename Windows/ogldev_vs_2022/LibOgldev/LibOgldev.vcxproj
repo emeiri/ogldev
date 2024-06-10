@@ -224,6 +224,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\camera.cpp" />
     <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\..\Common\glut_backend.cpp" />
