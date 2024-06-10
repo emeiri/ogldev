@@ -41,11 +41,11 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y);
 static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
 
-class Tutorial43
+class Tutorial52
 {
 public:
 
-    Tutorial43() : m_albedo(GL_TEXTURE_2D), m_roughness(GL_TEXTURE_2D), m_metallic(GL_TEXTURE_2D)
+    Tutorial52() : m_albedo(GL_TEXTURE_2D), m_roughness(GL_TEXTURE_2D), m_metallic(GL_TEXTURE_2D), m_normalMap(GL_TEXTURE_2D)
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.15f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
@@ -59,7 +59,7 @@ public:
         //        m_pointLights[1].DiffuseIntensity = 100.0f;
     }
 
-    virtual ~Tutorial43()
+    virtual ~Tutorial52()
     {
         SAFE_DELETE(m_pGameCamera);
     }
@@ -201,10 +201,12 @@ private:
         m_albedo.Load("../Content/textures/rusted_iron/albedo.png");
         m_roughness.Load("../Content/textures/rusted_iron/roughness.png");
         m_metallic.Load("../Content/textures/rusted_iron/metallic.png");
+        m_normalMap.Load("../Content/textures/rusted_iron/normal.png");
 
         m_pMesh->GetPBRMaterial().pAlbedo = &m_albedo;
         m_pMesh->GetPBRMaterial().pRoughness = &m_roughness;
         m_pMesh->GetPBRMaterial().pMetallic = &m_metallic;
+        m_pMesh->GetPBRMaterial().pNormalMap = &m_normalMap;
 
         m_pMesh->SetPBR(true);
     }
@@ -221,9 +223,10 @@ private:
     Texture m_albedo;
     Texture m_roughness;
     Texture m_metallic;
+    Texture m_normalMap;
 };
 
-Tutorial43* app = NULL;
+Tutorial52* app = NULL;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -249,7 +252,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-    app = new Tutorial43();
+    app = new Tutorial52();
 
     app->Init();
 

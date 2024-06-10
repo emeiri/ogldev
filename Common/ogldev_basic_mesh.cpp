@@ -596,6 +596,11 @@ void BasicMesh::SetupRenderMaterialsPBR()
     if (m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic) {
         m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic->Bind(METALLIC_TEXTURE_UNIT);
     }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
+    }
+
 }
 
 

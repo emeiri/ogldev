@@ -158,9 +158,10 @@ bool LightingTechnique::InitCommon()
     ClipPlaneLoc = GetUniformLocation("gClipPlane");
     WireframeWidthLoc = GetUniformLocation("gWireframeWidth");
     WireframeColorLoc = GetUniformLocation("gWireframeColor");
-    AlbedoLoc = GetUniformLocation("gAlbedo");
+    GET_UNIFORM_AND_CHECK(AlbedoLoc, "gAlbedo");
     GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
     GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
+    GET_UNIFORM_AND_CHECK(NormalMapLoc, "gNormalMap");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -204,8 +205,7 @@ bool LightingTechnique::InitCommon()
         PBRMaterialLoc.IsMetal == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.Color == INVALID_UNIFORM_LOCATION ||
         PBRMaterialLoc.IsAlbedo == INVALID_UNIFORM_LOCATION ||
-        ClipPlaneLoc == INVALID_UNIFORM_LOCATION ||
-        AlbedoLoc == INVALID_UNIFORM_LOCATION) {
+        ClipPlaneLoc == INVALID_UNIFORM_LOCATION) {
 
 #ifdef FAIL_ON_MISSING_LOC
         return false;
@@ -700,4 +700,10 @@ void LightingTechnique::SetRoughnessTextureUnit(unsigned int TextureUnit)
 void LightingTechnique::SetMetallicTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(MetallicLoc, TextureUnit);
+}
+
+
+void LightingTechnique::SetNormalTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(NormalMapLoc, TextureUnit);
 }

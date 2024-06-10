@@ -30,6 +30,7 @@ struct PBRMaterial
     Texture* pAlbedo = NULL;
     Texture* pRoughness = NULL;
     Texture* pMetallic = NULL;
+    Texture* pNormalMap = NULL;
 };
 
 

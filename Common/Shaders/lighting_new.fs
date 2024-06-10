@@ -82,6 +82,7 @@ layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gAlbedo;
 layout(binding = 6) uniform sampler2D gRoughness;
 layout(binding = 7) uniform sampler2D gMetallic;
+layout(binding = 8) uniform sampler2D gNormalMap;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;
@@ -576,6 +577,25 @@ float ggxDistribution(float nDotH, float Roughness)
 }
 
 
+vec3 getNormalFromMap()
+{
+    vec3 tangentNormal = texture(gNormalMap, TexCoord0).xyz * 2.0 - 1.0;
+
+    vec3 Q1  = dFdx(WorldPos0);
+    vec3 Q2  = dFdy(WorldPos0);
+    vec2 st1 = dFdx(TexCoord0);
+    vec2 st2 = dFdy(TexCoord0);
+
+    vec3 N   = normalize(Normal0);
+    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
+    vec3 B  = -normalize(cross(N, T));
+    mat3 TBN = mat3(T, B, N);
+
+    return normalize(TBN * tangentNormal);
+}
+
+
+
 vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 {
     vec3 LightIntensity = Light.Color * Light.DiffuseIntensity;
@@ -648,7 +668,7 @@ vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
 
 vec4 CalcTotalPBRLighting()
 {
-    vec3 Normal = normalize(Normal0);
+    vec3 Normal = getNormalFromMap();
 
     vec3 TotalLight = CalcPBRDirectionalLight(Normal);
 

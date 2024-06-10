@@ -127,6 +127,7 @@ public:
     void SetAlbedoTextureUnit(unsigned int TextureUnit);
     void SetRoughnessTextureUnit(unsigned int TextureUnit);
     void SetMetallicTextureUnit(unsigned int TextureUnit);
+    void SetNormalTextureUnit(unsigned int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
@@ -204,6 +205,7 @@ private:
     GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
     GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
     GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NormalMapLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;
