@@ -49,7 +49,7 @@ public:
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.15f, 1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.Color = Vector3f(150.0f/256.0f, 150.0f/256.0f, 150.0f/256.0f);
+      //  m_dirLight.Color = Vector3f(150.0f/256.0f, 150.0f/256.0f, 150.0f/256.0f);
       //  m_dirLight.AmbientIntensity = 0.15f;
 
         m_pointLights[0].WorldPosition = Vector3f(5.0f, 5.0f, 5.0f);
@@ -196,12 +196,19 @@ private:
        // m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
         m_pMesh->LoadMesh("../Content/box_terrain.obj");
 
-      //  m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
-        //m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png");
-        m_albedo.Load("../Content/textures/rusted_iron/albedo.png");
-        m_roughness.Load("../Content/textures/rusted_iron/roughness.png");
-        m_metallic.Load("../Content/textures/rusted_iron/metallic.png");
-        m_normalMap.Load("../Content/textures/rusted_iron/normal.png");
+      
+        if (1) {
+            m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
+            m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png");
+            m_metallic.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_metallic.png");
+            m_normalMap.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
+        }
+        else {
+            m_albedo.Load("../Content/textures/rusted_iron/albedo.png");
+            m_roughness.Load("../Content/textures/rusted_iron/roughness.png");
+            m_metallic.Load("../Content/textures/rusted_iron/metallic.png");
+            m_normalMap.Load("../Content/textures/rusted_iron/normal.png");
+        }
 
         m_pMesh->GetPBRMaterial().pAlbedo = &m_albedo;
         m_pMesh->GetPBRMaterial().pRoughness = &m_roughness;
