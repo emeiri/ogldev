@@ -514,7 +514,7 @@ vec4 GetTotalLight()
     vec3 Normal = GetNormal();   
     
     vec4 TotalLight = CalcDirectionalLight(Normal);
-return TotalLight;
+
     for (int i = 0 ;i < gNumPointLights ;i++) {
         TotalLight += CalcPointLight(gPointLights[i], Normal, true);
     }

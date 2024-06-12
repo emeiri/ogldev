@@ -81,7 +81,6 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
-
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
@@ -220,7 +219,7 @@ void ForwardRenderer::ShadowMapPassPoint(const std::list<CoreSceneObject*>& Rend
 
 void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList)
 {
-    m_curRenderPass = RENDER_PASS_SHADOW;
+    m_curRenderPass = RENDER_PASS_SHADOW_DIR_SPOT;
     m_shadowMapFBO.BindForWriting();
     glClear(GL_DEPTH_BUFFER_BIT);
     m_shadowMapTech.Enable();
@@ -241,15 +240,14 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    if (m_curRenderPass == RENDER_PASS_SHADOW) {
+    if (m_curRenderPass == RENDER_PASS_SHADOW_DIR_SPOT) {
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
-    }
-    else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
+        m_curRenderPass = RENDER_PASS_LIGHTING_DIR_SPOT;
+    } else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
         m_shadowCubeMapFBO.BindForReading(SHADOW_CUBE_MAP_TEXTURE_UNIT);
+        m_curRenderPass = RENDER_PASS_LIGHTING_POINT;
     }
-
-    m_curRenderPass = RENDER_PASS_LIGHTING;    
-
+   
     int WindowWidth = 0;
     int WindowHeight = 0;
     m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
@@ -492,7 +490,7 @@ void ForwardRenderer::DrawStart_CB(uint DrawIndex)
 
 void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
 {
-    if (m_curRenderPass == RENDER_PASS_LIGHTING) {
+    if ((m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) || (m_curRenderPass == RENDER_PASS_LIGHTING_POINT)) {
         m_lightingTech.ControlSpecularExponent(IsEnabled);
     }
 }
@@ -500,7 +498,7 @@ void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
 
 void ForwardRenderer::SetMaterial_CB(const Material& material)
 {
-    if (m_curRenderPass == RENDER_PASS_LIGHTING) {
+    if ((m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) || (m_curRenderPass == RENDER_PASS_LIGHTING_POINT)) {
         m_lightingTech.SetMaterial(material);
     }
 }
@@ -508,7 +506,7 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
 
 void ForwardRenderer::DisableDiffuseTexture_CB()
 {
-    if (m_curRenderPass == RENDER_PASS_LIGHTING) {
+    if ((m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) || (m_curRenderPass == RENDER_PASS_LIGHTING_POINT)) {
         m_lightingTech.DisableDiffuseTexture();
     }
 }
@@ -518,15 +516,16 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 {
     switch (m_curRenderPass) {
 
-    case RENDER_PASS_SHADOW:
-        SetWorldMatrix_CB_ShadowPass(World);
+    case RENDER_PASS_SHADOW_DIR_SPOT:
+        SetWorldMatrix_CB_ShadowPassDirSpot(World);
         break;
 
     case RENDER_PASS_SHADOW_POINT:
         SetWorldMatrix_CB_ShadowPassPoint(World);
         break;
 
-    case RENDER_PASS_LIGHTING:
+    case RENDER_PASS_LIGHTING_DIR_SPOT:
+    case RENDER_PASS_LIGHTING_POINT:
         SetWorldMatrix_CB_LightingPass(World);
         break;
 
@@ -537,11 +536,10 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 }
 
 
-void ForwardRenderer::SetWorldMatrix_CB_ShadowPass(const Matrix4f& World)
+void ForwardRenderer::SetWorldMatrix_CB_ShadowPassDirSpot(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-   // Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
-    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World;
+    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
     m_shadowMapTech.SetWVP(WVP);
 }
 
@@ -566,8 +564,16 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
     m_lightingTech.SetWVP(WVP);
 
-    //Matrix4f LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
-    Matrix4f LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;    
+    Matrix4f LightWVP;
+    
+    if (m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) {
+        LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
+    } else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
+        LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
+    } else {
+        assert(0);
+    }
+
     m_lightingTech.SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = FinalWorldMatrix.Inverse();

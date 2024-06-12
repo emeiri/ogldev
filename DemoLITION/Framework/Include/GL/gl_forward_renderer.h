@@ -30,9 +30,10 @@
 
 enum RENDER_PASS {
     RENDER_PASS_UNINITIALIZED = 0,
-    RENDER_PASS_LIGHTING = 1,
-    RENDER_PASS_SHADOW = 2,    
-    RENDER_PASS_SHADOW_POINT = 3,
+    RENDER_PASS_LIGHTING_DIR_SPOT = 1,
+    RENDER_PASS_LIGHTING_POINT = 2,
+    RENDER_PASS_SHADOW_DIR_SPOT = 3,    
+    RENDER_PASS_SHADOW_POINT = 4,
 };
 
 
@@ -113,7 +114,7 @@ private:
     void SwitchToLightingTech();
     void InitShadowMapping();
     void InitTechniques();
-    void SetWorldMatrix_CB_ShadowPass(const Matrix4f& World);
+    void SetWorldMatrix_CB_ShadowPassDirSpot(const Matrix4f& World);
     void SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World);
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
