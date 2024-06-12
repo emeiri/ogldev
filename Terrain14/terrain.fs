@@ -62,10 +62,12 @@ uniform float gColorTexcoordScaling = 16.0;
 
 vec3 CalcNormal()
 {   
-    float left  = textureOffset(gHeightMap, TexCoord0, ivec2(-1, 0)).r;
-    float right = textureOffset(gHeightMap, TexCoord0, ivec2( 1, 0)).r;
-    float up    = textureOffset(gHeightMap, TexCoord0, ivec2( 0, 1)).r;
-    float down  = textureOffset(gHeightMap, TexCoord0, ivec2( 0, -1)).r;
+    vec2 ScaledTexCoord = TexCoord0 * gColorTexcoordScaling;
+
+    float left  = textureOffset(gHeightMap, ScaledTexCoord, ivec2(-1, 0)).r;
+    float right = textureOffset(gHeightMap, ScaledTexCoord, ivec2( 1, 0)).r;
+    float up    = textureOffset(gHeightMap, ScaledTexCoord, ivec2( 0, 1)).r;
+    float down  = textureOffset(gHeightMap, ScaledTexCoord, ivec2( 0, -1)).r;
 
     vec3 normal = normalize(vec3(left - right, 2.0, up - down));
     
@@ -76,8 +78,10 @@ vec3 CalcNormal()
 vec3 schlickFresnel(float vDotH, vec3 Albedo)
 {
     vec3 F0 = vec3(0.04);    
+
+    vec2 ScaledTexCoord = TexCoord0 * gColorTexcoordScaling;
     
-    float Metallic = texture(gTextureHeight2, TexCoord0.xy).x;
+    float Metallic = texture(gTextureHeight2, ScaledTexCoord.xy).x;
     F0 = mix(F0, Albedo, Metallic);
 
     vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
@@ -105,12 +109,14 @@ float ggxDistribution(float nDotH, float Roughness)
 
 vec3 getNormalFromMap()
 {
-    vec3 tangentNormal = texture(gTextureHeight3, TexCoord0).xyz * 2.0 - 1.0;
+    vec2 ScaledTexCoord = TexCoord0 * gColorTexcoordScaling;
+
+    vec3 tangentNormal = texture(gTextureHeight3, ScaledTexCoord).xyz * 2.0 - 1.0;
 
     vec3 Q1  = dFdx(WorldPos0);
     vec3 Q2  = dFdy(WorldPos0);
-    vec2 st1 = dFdx(TexCoord0);
-    vec2 st2 = dFdy(TexCoord0);
+    vec2 st1 = dFdx(ScaledTexCoord);
+    vec2 st2 = dFdy(ScaledTexCoord);
 
     vec3 Normal0 = CalcNormal();
     vec3 N   = normalize(Normal0);
@@ -127,6 +133,8 @@ vec3 CalcPBRLighting(vec3 Normal)
 {
     vec3 LightIntensity = vec3(1.0);
 
+    vec2 ScaledTexCoord = TexCoord0 * gColorTexcoordScaling;
+
     vec3 l = gReversedLightDir;
 
     vec3 n = Normal;
@@ -138,14 +146,14 @@ vec3 CalcPBRLighting(vec3 Normal)
     float nDotL = max(dot(n, l), 0.0);
     float nDotV = max(dot(n, v), 0.0);
 
-    vec3 fLambert = pow(texture(gTextureHeight0, TexCoord0.xy).xyz, vec3(2.2));
+    vec3 fLambert = pow(texture(gTextureHeight0, ScaledTexCoord.xy).xyz, vec3(2.2));
 
     vec3 F = schlickFresnel(vDotH, fLambert);
 
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
 
-    float Roughness = texture(gTextureHeight1, TexCoord0.xy).x;
+    float Roughness = texture(gTextureHeight1, ScaledTexCoord.xy).x;
 
     vec3 SpecBRDF_nom  = ggxDistribution(nDotH, Roughness) *
                          F *
