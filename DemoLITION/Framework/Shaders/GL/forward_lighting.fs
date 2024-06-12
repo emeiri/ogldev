@@ -492,18 +492,26 @@ vec3 CalcBumpedNormal()
     NewNormal = TBN * BumpMapNormal;                                                        
     NewNormal = normalize(NewNormal);                                                       
     return NewNormal;                                                                       
-}                                                                                           
+}            
 
 
-vec4 GetTotalLight()
+vec3 GetNormal()
 {
     vec3 Normal;
-    
+
     if (gHasNormalMap) {
         Normal = CalcBumpedNormal();
     } else {
         Normal = normalize(Normal0);
     }
+
+    return Normal;
+}
+
+
+vec4 GetTotalLight()
+{
+    vec3 Normal = GetNormal();   
     
     vec4 TotalLight = CalcDirectionalLight(Normal);
 return TotalLight;
