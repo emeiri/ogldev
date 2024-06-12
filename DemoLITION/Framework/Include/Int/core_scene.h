@@ -82,6 +82,8 @@ public:
 
     void SetCamera(const Vector3f& Pos, const Vector3f& Target);
 
+    void SetCameraSpeed(float Speed);
+
 protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;

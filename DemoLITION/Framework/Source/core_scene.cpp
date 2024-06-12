@@ -99,6 +99,13 @@ void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
     m_defaultCamera.SetTarget(Target);
 }
 
+
+void CoreScene::SetCameraSpeed(float Speed)
+{
+    m_defaultCamera.SetSpeed(Speed);
+}
+
+
 void CoreScene::AddToRenderList(SceneObject* pSceneObject)
 {
     CoreSceneObject* pCoreSceneObject = (CoreSceneObject*)pSceneObject;
