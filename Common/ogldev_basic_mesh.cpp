@@ -28,6 +28,23 @@ using namespace std;
 #define NORMAL_LOCATION    2
 
 
+std::string GetFullPath(const string& Dir, const aiString& Path)
+{
+    string p(Path.data);
+
+    if (p == "C:\\\\") {
+        p = "";
+    }
+    else if (p.substr(0, 2) == ".\\") {
+        p = p.substr(2, p.size() - 2);
+    }
+
+    string FullPath = Dir + "/" + p;
+
+    return FullPath;
+}
+
+
 BasicMesh::~BasicMesh()
 {
     Clear();
@@ -151,7 +168,7 @@ void BasicMesh::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
         const aiVector3D& pPos = paiMesh->mVertices[i];
-        // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
+       // printf("%d: ", i); Vector3f t(pPos.x, pPos.y, pPos.z); t.Print();
         v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
 
         if (paiMesh->mNormals) {
@@ -309,10 +326,15 @@ bool BasicMesh::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
-void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
+void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int Index)
 {
-    LoadDiffuseTexture(Dir, pMaterial, index);
-    LoadSpecularTexture(Dir, pMaterial, index);
+    LoadDiffuseTexture(Dir, pMaterial, Index);
+    LoadSpecularTexture(Dir, pMaterial, Index);
+
+    // PBR
+    LoadAlbedoTexture(Dir, pMaterial, Index);
+    LoadMetalnessTexture(Dir, pMaterial, Index);
+    LoadRoughnessTexture(Dir, pMaterial, Index);
 }
 
 
@@ -347,19 +369,7 @@ void BasicMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int Mate
 
 void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string p(Path.data);
-
-    for (int i = 0 ; i < p.length() ; i++) {
-        if (p[i] == '\\') {
-            p[i] = '/';
-        }
-    }
-
-    if (p.substr(0, 2) == ".\\") {
-        p = p.substr(2, p.size() - 2);
-    }
-
-    string FullPath = Dir + "/" + p;
+    string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -404,15 +414,7 @@ void BasicMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int Mat
 
 void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string p(Path.data);
-
-    if (p == "C:\\\\") {
-        p = "";
-    } else if (p.substr(0, 2) == ".\\") {
-        p = p.substr(2, p.size() - 2);
-    }
-
-    string FullPath = Dir + "/" + p;
+    string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
@@ -424,6 +426,152 @@ void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
         printf("Loaded specular texture '%s'\n", FullPath.c_str());
     }
 }
+
+
+void BasicMesh::LoadAlbedoTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    m_Materials[MaterialIndex].PBRmaterial.pAlbedo = NULL;
+
+    if (pMaterial->GetTextureCount(aiTextureType_BASE_COLOR) > 0) {
+        aiString Path;
+
+        if (pMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
+
+            if (paiTexture) {
+                LoadAlbedoTextureEmbedded(paiTexture, MaterialIndex);
+            } else {
+                LoadAlbedoTextureFromFile(Dir, Path, MaterialIndex);
+            }
+        }
+    }
+}
+
+
+void BasicMesh::LoadAlbedoTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+{
+    printf("Embeddeded albedo texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].PBRmaterial.pAlbedo = new Texture(GL_TEXTURE_2D);
+    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].PBRmaterial.pAlbedo->Load(buffer_size, paiTexture->pcData);
+}
+
+
+void BasicMesh::LoadAlbedoTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    string FullPath = GetFullPath(Dir, Path);
+
+    m_Materials[MaterialIndex].PBRmaterial.pAlbedo = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+    if (!m_Materials[MaterialIndex].PBRmaterial.pAlbedo->Load()) {
+        printf("Error loading albedo texture '%s'\n", FullPath.c_str());
+        exit(0);
+    }
+    else {
+        printf("Loaded albedo texture '%s'\n", FullPath.c_str());
+    }
+}
+
+
+void BasicMesh::LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    m_Materials[MaterialIndex].PBRmaterial.pMetallic = NULL;
+
+    int NumTextures = pMaterial->GetTextureCount(aiTextureType_METALNESS);
+
+    if (NumTextures > 0) {
+        printf("Num metalness textures %d\n", NumTextures);
+
+        aiString Path;
+
+        if (pMaterial->GetTexture(aiTextureType_METALNESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
+
+            if (paiTexture) {
+                LoadMetalnessTextureEmbedded(paiTexture, MaterialIndex);
+            }
+            else {
+                LoadMetalnessTextureFromFile(Dir, Path, MaterialIndex);
+            }
+        }
+    }
+}
+
+
+void BasicMesh::LoadMetalnessTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+{
+    printf("Embeddeded metalness texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].PBRmaterial.pMetallic = new Texture(GL_TEXTURE_2D);
+    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].PBRmaterial.pMetallic->Load(buffer_size, paiTexture->pcData);
+}
+
+
+void BasicMesh::LoadMetalnessTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    string FullPath = GetFullPath(Dir, Path);
+
+    m_Materials[MaterialIndex].PBRmaterial.pMetallic = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+    if (!m_Materials[MaterialIndex].PBRmaterial.pMetallic->Load()) {
+        printf("Error loading metalness texture '%s'\n", FullPath.c_str());
+        exit(0);
+    }
+    else {
+        printf("Loaded metalness texture '%s'\n", FullPath.c_str());
+    }
+}
+
+
+void BasicMesh::LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    m_Materials[MaterialIndex].PBRmaterial.pRoughness = NULL;
+
+    int NumTextures = pMaterial->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS);
+
+    if (NumTextures > 0) {
+        printf("Num roughness textures %d\n", NumTextures);
+
+        aiString Path;
+
+        if (pMaterial->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
+
+            if (paiTexture) {
+                LoadRoughnessTextureEmbedded(paiTexture, MaterialIndex);
+            }
+            else {
+                LoadRoughnessTextureFromFile(Dir, Path, MaterialIndex);
+            }
+        }
+    }
+}
+
+
+void BasicMesh::LoadRoughnessTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+{
+    printf("Embeddeded roughness texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].PBRmaterial.pRoughness = new Texture(GL_TEXTURE_2D);
+    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].PBRmaterial.pRoughness->Load(buffer_size, paiTexture->pcData);
+}
+
+
+void BasicMesh::LoadRoughnessTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    string FullPath = GetFullPath(Dir, Path);
+
+    m_Materials[MaterialIndex].PBRmaterial.pRoughness = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+    if (!m_Materials[MaterialIndex].PBRmaterial.pRoughness->Load()) {
+        printf("Error loading roughness texture '%s'\n", FullPath.c_str());
+        exit(0);
+    }
+    else {
+        printf("Loaded roughness texture '%s'\n", FullPath.c_str());
+    }
+}
+
 
 void BasicMesh::LoadColors(const aiMaterial* pMaterial, int index)
 {

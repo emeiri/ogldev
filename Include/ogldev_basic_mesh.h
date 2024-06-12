@@ -128,6 +128,18 @@ private:
     void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
     void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
 
+    void LoadAlbedoTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadAlbedoTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadAlbedoTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
+    void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadMetalnessTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadMetalnessTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
+    void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadRoughnessTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadRoughnessTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
     void LoadColors(const aiMaterial* pMaterial, int index);
 
     void SetupRenderMaterialsPhong(unsigned int MeshIndex, unsigned int MaterialIndex, IRenderCallbacks* pRenderCallbacks);
