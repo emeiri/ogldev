@@ -676,6 +676,11 @@ const Material& BasicMesh::GetMaterial()
         }
     }
 
+    if (m_Materials.size() == 0) {
+        printf("No materials\n");
+        exit(0);
+    }
+
     return m_Materials[0];
 }
 
