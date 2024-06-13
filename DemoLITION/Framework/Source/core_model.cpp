@@ -84,6 +84,19 @@ void CoreModel::SetNormalMap(int TextureHandle)
     }
 }
 
+
+void CoreModel::SetHeightMap(int TextureHandle)
+{
+    if (TextureHandle < 0) {
+        m_pHeightMap = NULL;
+    }
+    else {
+        Texture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
+        m_pHeightMap = pTexture;
+    }
+}
+
+
 bool CoreModel::LoadAssimpModel(const string& Filename, int WindowWidth, int WindowHeight)
 {
     // Release the previously loaded mesh (if it exists)
@@ -704,6 +717,10 @@ void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCall
 
     if (m_pNormalMap) {
         m_pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
+    }
+
+    if (m_pHeightMap) {
+        m_pHeightMap->Bind(HEIGHT_TEXTURE_UNIT);
     }
 
     if (pRenderCallbacks) {

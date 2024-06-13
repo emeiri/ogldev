@@ -51,6 +51,8 @@
 #define DETAIL_MAP_TEXTURE_UNIT_INDEX               13
 #define METALLIC_TEXTURE_UNIT                       GL_TEXTURE14
 #define METALLIC_TEXTURE_UNIT_INDEX                 14
+#define HEIGHT_TEXTURE_UNIT                         GL_TEXTURE15
+#define HEIGHT_TEXTURE_UNIT_INDEX                   15
 
 
 #endif  /* OGLDEV_ENGINE_COMMON_H */

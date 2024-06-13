@@ -103,6 +103,10 @@ public:
 
     Texture* GetNormalMap() const { return m_pNormalMap; }
 
+    void SetHeightMap(int TextureHandle);
+
+    Texture* GetHeightMap() const { return m_pHeightMap; }
+
 private:
 
     void Clear();
@@ -202,6 +206,7 @@ private:
 
     std::vector<Material> m_Materials;
     Texture* m_pNormalMap = NULL;
+    Texture* m_pHeightMap = NULL;
 
     // Temporary space for vertex stuff before we load them into the GPU
     vector<uint> m_Indices;
