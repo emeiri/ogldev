@@ -534,9 +534,7 @@ vec3 GetNormal()
 vec4 GetTotalLight()
 {
     vec3 Normal = GetNormal(); 
-    
-   // return vec4(Normal, 0.0);
-    
+       
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {
@@ -553,6 +551,8 @@ vec4 GetTotalLight()
 
 void main()
 {
+FragColor = vec4(Bitangent0, 0.0);
+return;
     TexCoord = TexCoord0;
 
     vec4 TotalLight;
