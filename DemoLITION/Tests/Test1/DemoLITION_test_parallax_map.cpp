@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    DemoLITION - Normal mapping demo
+    DemoLITION - Parallax mapping demo
 */
 
 #include <stdio.h>
@@ -29,16 +29,16 @@
 #define WINDOW_HEIGHT 1080
 
 
-class Game : public GameCallbacks {
+class ParallaxDemo : public GameCallbacks {
 public:
-    Game() 
+    ParallaxDemo()
     {
-        m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+      //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
     }
 
-    ~Game() {}
+    ~ParallaxDemo() {}
 
     void Init(Scene* pScene)
     {
@@ -48,8 +48,14 @@ public:
 
     void OnFrame()
     {
-        m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+      //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
+    }
+
+
+    bool OnMouseMove(int x, int y)
+    {
+        return true;
     }
 
 private:
@@ -60,9 +66,9 @@ private:
 
 
 
-void test_normal_map()
+void test_parallax_map()
 {
-    Game game;
+    ParallaxDemo game;
 
     bool LoadBasicShapes = false;
     RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &game, LoadBasicShapes);
@@ -71,15 +77,19 @@ void test_normal_map()
 
     Scene* pScene = pRenderingSystem->CreateEmptyScene();
 
-    Model* pModel = pRenderingSystem->LoadModel("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/bs_ears.obj");    
+    //Model* pModel = pRenderingSystem->LoadModel("../Content/dry-rocky-ground-bl/dry-rocky-ground-bl.obj");    
+    Model* pModel = pRenderingSystem->LoadModel("../Content/mybrick/mybrick.obj");
     SceneObject* pSceneObject = pScene->CreateSceneObject(pModel);
     pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
-    //pSceneObject->SetRotation(Vector3f(30.0f, 60.0f, 90.0f));
-   // pSceneObject->SetScale(Vector3f(2.0f, 2.0f, 2.0f));
+    //pSceneObject->SetRotation(Vector3f(-90.0f, 0.0f, 0.0f));
+    pSceneObject->SetRotation(Vector3f(0.0f, 65.0f, 0.0f));
     pScene->AddToRenderList(pSceneObject);
 
-    int NormalMap = pRenderingSystem->LoadTexture2D("../../OpenGL-4-Shading-Language-Cookbook-Third-Edition/media/texture/ogre_normalmap.png");
+    int NormalMap = pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
     pModel->SetNormalMap(NormalMap);            
+
+    int HeightMap = pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-height.png");
+    pModel->SetHeightMap(HeightMap);
 
     pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
@@ -88,8 +98,8 @@ void test_normal_map()
     l.DiffuseIntensity = 0.5f;
     l.AmbientIntensity = 0.1f;
     pScene->GetDirLights().push_back(l);*/
-
-    pScene->SetCamera(Vector3f(0.0f, 0.0, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
+    
+    pScene->SetCamera(Vector3f(0.0f, 0.6f, 2.0f), Vector3f(0.000823f, -0.331338f, 0.943512f));
     pScene->SetCameraSpeed(0.1f);
     
     game.Init(pScene);

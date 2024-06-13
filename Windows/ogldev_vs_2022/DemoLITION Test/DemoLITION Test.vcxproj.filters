@@ -42,5 +42,8 @@
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_normal_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_parallax_map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -71,8 +71,8 @@ private:
     void InitLights()
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
-        m_dirLight.DiffuseIntensity = 0.5f;
-        m_dirLight.AmbientIntensity = 0.1f;
+        m_dirLight.DiffuseIntensity = 1.0f;
+        m_dirLight.AmbientIntensity = 0.3f;
         m_pScene->GetDirLights().push_back(m_dirLight);
 
         m_pointLight.DiffuseIntensity = 0.3f;
@@ -83,9 +83,11 @@ private:
 
     void InitObjects()
     {
-        m_pTerrainModel = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
+        m_pTerrainModel = m_pRenderingSystem->LoadModel("../Content/iclone-7-raptoid-mascot/scene.gltf");
+       // m_pTerrainModel = m_pRenderingSystem->LoadModel("../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj");
         m_pTerrainSceneObject = m_pScene->CreateSceneObject(m_pTerrainModel);
-        m_pTerrainSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
+        m_pTerrainSceneObject->SetPosition(0.0f, 0.0f, 40.0f);
+        m_pTerrainSceneObject->SetScale(0.1f);
         m_pScene->AddToRenderList(m_pTerrainSceneObject);
     }
 
