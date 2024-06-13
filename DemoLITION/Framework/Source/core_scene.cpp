@@ -21,13 +21,41 @@
 
 #define NUM_SCENE_OBJECTS 1024
 
+void SceneObject::SetRotation(const Vector3f& Rot)
+{
+    m_rotations[0] = Rot;
+    m_numRotations = 1;
+}
+
+
+void SceneObject::SetRotation(float x, float y, float z)
+{
+    m_rotations[0].x = x;
+    m_rotations[0].y = y;
+    m_rotations[0].z = z;
+    m_numRotations = 1;
+}
+
+
+void SceneObject::PushRotation(const Vector3f& Rot)
+{
+    if (m_numRotations >= MAX_NUM_ROTATIONS) {
+        printf("Exceeded max number of rotations - %d\n", m_numRotations);
+        assert(0);
+    }
+
+    m_rotations[m_numRotations] = Rot;
+    m_numRotations++;
+}
+
+
 Matrix4f SceneObject::GetMatrix() const
 {
     Matrix4f Scale;
     Scale.InitScaleTransform(m_scale);
 
     Matrix4f Rotation;
-    Rotation.InitRotateTransform(m_rot);
+    CalcRotationStack(Rotation);    
 
     Matrix4f Translation;
     Translation.InitTranslationTransform(m_pos);
@@ -35,6 +63,26 @@ Matrix4f SceneObject::GetMatrix() const
     Matrix4f WorldTransformation = Translation * Rotation * Scale;
 
     return WorldTransformation;
+}
+
+
+void SceneObject::CalcRotationStack(Matrix4f& Rot) const
+{
+    if (m_numRotations == 0) {
+        Rot.InitIdentity();
+    } else {
+        Rot.InitRotateTransform(m_rotations[0]);
+
+        if (m_numRotations > MAX_NUM_ROTATIONS) {
+            printf("Invalid number of rotations - %d\n", m_numRotations);
+            assert(0);
+        }
+        for (int i = 1; i < m_numRotations; i++) {
+            Matrix4f r;
+            r.InitRotateTransform(m_rotations[i]);
+            Rot = r * Rot;
+        }
+    }    
 }
 
 

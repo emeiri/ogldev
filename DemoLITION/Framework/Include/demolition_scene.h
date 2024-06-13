@@ -25,16 +25,21 @@
 #include "demolition_lights.h"
 #include "demolition_model.h"
 
+// Nobody needs more than 640k
+#define MAX_NUM_ROTATIONS 8
+
 class SceneObject {
 public:
     SceneObject() {}
 
     void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
-    void SetRotation(float x, float y, float z) { m_rot.x = x; m_rot.y = y; m_rot.z = z; }
+    void SetRotation(float x, float y, float z);
     void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }
 
     void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
-    void SetRotation(const Vector3f& Rot) { m_rot = Rot; }
+    void SetRotation(const Vector3f& Rot);
+    void PushRotation(const Vector3f& Rot);
+    void ResetRotations() { m_numRotations = 0; }
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
 
     Matrix4f GetMatrix() const;
@@ -43,8 +48,11 @@ public:
     const Vector4f& GetFlatColor() const { return m_flatColor; }
 
 private:
+    void CalcRotationStack(Matrix4f& Rot) const;
+
     Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);
-    Vector3f m_rot = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f m_rotations[MAX_NUM_ROTATIONS];
+    int m_numRotations = 0;
     Vector3f m_scale = Vector3f(1.0f, 1.0f, 1.0f);
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
 };
