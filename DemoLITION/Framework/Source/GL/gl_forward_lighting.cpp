@@ -89,6 +89,9 @@ bool ForwardLightingTechnique::InitCommon()
     FogTimeLoc = GetUniformLocation("gFogTime");
     LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
 
+    GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
+    GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
+
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
         NormalMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -261,6 +264,18 @@ void ForwardLightingTechnique::SetNormalMapTextureUnit(int TextureUnit)
 void ForwardLightingTechnique::ControlNormalMap(bool Enable)
 {
     glUniform1i(HasNormalMapLoc, Enable);
+}
+
+
+void ForwardLightingTechnique::SetHeightMapTextureUnit(int TextureUnit)
+{
+    glUniform1i(HeightMapLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::ControlParallaxMap(bool Enable)
+{
+    glUniform1i(HasHeightMapLoc, Enable);
 }
 
 

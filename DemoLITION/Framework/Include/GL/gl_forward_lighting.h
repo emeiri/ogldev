@@ -38,6 +38,7 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
+    void SetWV(const Matrix4f& WV);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetNormalMatrix(const Matrix3f& NormalMatrix);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
@@ -51,7 +52,9 @@ public:
     void SetShadowMapOffsetTextureParams(float TextureSize, float FilterSize, float Radius);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
     void SetNormalMapTextureUnit(int TextureUnit);
+    void SetHeightMapTextureUnit(int TextureUnit);
     void ControlNormalMap(bool Enable);
+    void ControlParallaxMap(bool Enable);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
@@ -83,6 +86,7 @@ protected:
 private:
     void SetExpFogCommon(float FogEnd, float FogDensity);
 
+    GLuint WVLoc = INVALID_UNIFORM_LOCATION;
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
@@ -93,6 +97,8 @@ private:
     GLuint shadowCubeMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint NormalMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint HasNormalMapLoc = INVALID_UNIFORM_LOCATION;
+    GLuint HeightMapLoc = INVALID_UNIFORM_LOCATION;
+    GLuint HasHeightMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapWidthLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapHeightLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapFilterSizeLoc = INVALID_UNIFORM_LOCATION;

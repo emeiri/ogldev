@@ -81,6 +81,7 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
@@ -320,7 +321,11 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
 {
     CoreModel* pModel = pSceneObject->GetModel();
     bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
+    bool HeightMapEnabled = pModel->GetHeightMap() != NULL;
+
     m_lightingTech.ControlNormalMap(NormalMapEnabled);
+    m_lightingTech.ControlParallaxMap(HeightMapEnabled);
+   
     pModel->Render(this);
 }
 
