@@ -21,16 +21,6 @@
 //#define FAIL_ON_MISSING_LOC
 
 
-#ifdef FAIL_ON_MISSING_LOC                  
-#define GET_UNIFORM_AND_CHECK(loc, name)    \
-    loc = GetUniformLocation(name);         \
-    if (loc == INVALID_UNIFORM_LOCATION)    \
-        return false;                       
-#else
-#define GET_UNIFORM_AND_CHECK(loc, name)    \
-    loc = GetUniformLocation(name);         
-#endif
-
 void DirectionalLight::CalcLocalDirection(const WorldTrans& worldTransform)
 {
     LocalDirection = worldTransform.WorldDirToLocalDir(WorldDirection);
