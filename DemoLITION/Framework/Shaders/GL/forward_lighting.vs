@@ -10,6 +10,7 @@ uniform mat4 gWVP;
 uniform mat4 gLightWVP;
 uniform mat4 gWorld;
 uniform mat3 gNormalMatrix;
+uniform mat4 gWV;
 
 out vec2 TexCoord0;
 out vec3 Normal0;

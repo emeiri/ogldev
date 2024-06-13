@@ -89,6 +89,7 @@ bool ForwardLightingTechnique::InitCommon()
     FogTimeLoc = GetUniformLocation("gFogTime");
     LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
 
+    GET_UNIFORM_AND_CHECK(WVLoc, "gWV");
     GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
     GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
 
@@ -227,6 +228,12 @@ bool ForwardLightingTechnique::InitCommon()
 void ForwardLightingTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
+}
+
+
+void ForwardLightingTechnique::SetWV(const Matrix4f& WV)
+{
+    glUniformMatrix4fv(WVLoc, 1, GL_TRUE, (const GLfloat*)WV.m);
 }
 
 
