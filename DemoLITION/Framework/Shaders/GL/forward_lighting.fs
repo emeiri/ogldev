@@ -6,7 +6,7 @@ const int MAX_SPOT_LIGHTS = 2;
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 WorldPos0;
-in vec4 LightSpacePos;
+in vec4 LightSpacePos0;
 in vec3 Tangent0;
 in vec3 Bitangent0;
 
@@ -123,7 +123,7 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 
 vec3 CalcShadowCoords()
 {
-    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ProjCoords = LightSpacePos0.xyz / LightSpacePos0.w;
     vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
     return ShadowCoords;
 }
@@ -152,7 +152,7 @@ float CalcShadowFactorPCF(vec3 LightDirection, vec3 Normal)
         return 1.0;
     }
 
-    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ProjCoords = LightSpacePos0.xyz / LightSpacePos0.w;
     vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
 
     float DiffuseFactor = dot(Normal, -LightDirection);

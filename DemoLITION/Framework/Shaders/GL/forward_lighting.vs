@@ -14,7 +14,7 @@ uniform mat3 gNormalMatrix;
 out vec2 TexCoord0;
 out vec3 Normal0;
 out vec3 WorldPos0;
-out vec4 LightSpacePos;
+out vec4 LightSpacePos0;
 out vec3 Tangent0;
 out vec3 Bitangent0;
 
@@ -27,5 +27,5 @@ void main()
     Tangent0 = gNormalMatrix * Tangent;
     Bitangent0 = gNormalMatrix * Bitangent;
     WorldPos0 = (gWorld * Pos4).xyz;
-    LightSpacePos = gLightWVP * Pos4;
+    LightSpacePos0 = gLightWVP * Pos4;
 }
