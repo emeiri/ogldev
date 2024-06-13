@@ -12,6 +12,8 @@ in vec3 Bitangent0;
 
 out vec4 FragColor;
 
+vec2 TexCoord;
+
 struct BaseLight
 {
     vec3 Color;
@@ -307,7 +309,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
             float SpecularExponent = 128.0;
 
             if (gEnableSpecularExponent) {
-                SpecularExponent = texture(gSamplerSpecularExponent, TexCoord0).r * 255.0;
+                SpecularExponent = texture(gSamplerSpecularExponent, TexCoord).r * 255.0;
             }
 
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
@@ -486,14 +488,30 @@ vec3 CalcBumpedNormal()
     vec3 Normal = normalize(Normal0);                                                       
     vec3 Tangent = normalize(Tangent0);                                                     
     Tangent = normalize(Tangent - dot(Tangent, Normal) * Normal);                           
-    vec3 Bitangent = cross(Tangent, Normal);                                                
-    vec3 BumpMapNormal = texture(gNormalMap, TexCoord0).xyz;                                
-    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0, 1.0, 1.0);                              
+    vec3 Bitangent = cross(Tangent, Normal);          
+    
+    mat3 TBN = mat3(Tangent, Bitangent, Normal);
+
+
+   // if (gHasHeightMap) {
+        const float bumpFactor = 0.009;  
+        vec3 CameraToPixel = WorldPos0 - gCameraWorldPos;
+        vec3 v = normalize(TBN * CameraToPixel);
+        vec3 s = normalize(TBN * gDirectionalLight.Direction);
+        float height = 1 - texture(gHeightMap, TexCoord0).r;
+        vec2 delta = vec2(v.x, v.y) * height * bumpFactor / v.z;
+        TexCoord = TexCoord0.xy - delta;
+ //   } else {
+        //TexCoord = TexCoord;
+ //   }
+
+    vec3 BumpMapNormal = texture(gNormalMap, TexCoord).xyz;                                
+    BumpMapNormal.xy = 2.0 * BumpMapNormal.xy - 1.0;
     vec3 NewNormal;                                                                         
-    mat3 TBN = mat3(Tangent, Bitangent, Normal);                                            
+    
     NewNormal = TBN * BumpMapNormal;                                                        
     NewNormal = normalize(NewNormal);                                                       
-    return NewNormal;                                                                       
+    return -NewNormal;                                                                       
 }            
 
 
@@ -511,9 +529,13 @@ vec3 GetNormal()
 }
 
 
+
+
 vec4 GetTotalLight()
 {
-    vec3 Normal = GetNormal();   
+    vec3 Normal = GetNormal(); 
+    
+   // return vec4(Normal, 0.0);
     
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
@@ -531,10 +553,14 @@ vec4 GetTotalLight()
 
 void main()
 {
+    TexCoord = TexCoord0;
+
     vec4 TotalLight;
     
     if (gLightingEnabled) {
         TotalLight = GetTotalLight();
+      //  FragColor = TotalLight;
+      //  return;
     } else {
         TotalLight = vec4(1.0);
     }
@@ -542,7 +568,7 @@ void main()
     vec4 TexColor;
 
     if (gHasSampler) {
-        TexColor = texture(gSampler, TexCoord0.xy);
+        TexColor = texture(gSampler, TexCoord.xy);
     } else {
         TexColor = vec4(1.0);
     }
@@ -561,6 +587,7 @@ void main()
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
     FragColor = TempColor * gColorMod + gColorAdd;
-    //FragColor = texture(gSampler, TexCoord0.xy);
+    //FragColor = texture(gSampler, TexCoord.xy);
+    //FragColor = texture(gHeightMap, TexCoord0);
     //FragColor = TotalLight;
 }
