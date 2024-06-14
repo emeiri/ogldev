@@ -53,6 +53,7 @@ public:
 	~VulkanApp()
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+		vkDestroyRenderPass(m_vkCore.GetDevice(), m_renderPass, NULL);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -60,6 +61,8 @@ public:
 		m_vkCore.Init(pAppName, pWindow);
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
+		m_renderPass = m_vkCore.CreateSimpleRenderPass();
+		m_vkCore.CreateFramebuffer(m_renderPass);
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 	}
@@ -85,6 +88,8 @@ private:
 	void RecordCommandBuffers()
 	{
 		VkClearColorValue ClearColor = { 1.0f, 0.0f, 0.0f, 0.0f };
+		VkClearValue ClearValue;
+		ClearValue.color = ClearColor;
 
 		VkImageSubresourceRange ImageRange = {
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
@@ -94,10 +99,32 @@ private:
 			.layerCount = 1
 		};
 
-		for (uint i = 0; i < m_cmdBufs.size(); i++) {		
-			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+		VkRenderPassBeginInfo RenderPassBeginInfo = {
+			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+			.pNext = NULL,
+			.renderPass = m_renderPass,
+			.renderArea = {
+				.offset = {
+					.x = 0,
+					.y = 0
+				},
+				.extent = {
+					.width = WINDOW_WIDTH,
+					.height = WINDOW_HEIGHT
+				}
+			},
+			.clearValueCount = 1,
+			.pClearValues = &ClearValue
+		};
 
-			vkCmdClearColorImage(m_cmdBufs[i], m_vkCore.GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &ClearColor, 1, &ImageRange);
+		for (uint i = 0; i < m_cmdBufs.size(); i++) {
+			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); 
+
+			RenderPassBeginInfo.framebuffer = m_vkCore.GetFramebuffers()[i];
+	
+			vkCmdBeginRenderPass(m_cmdBufs[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+	
+			vkCmdEndRenderPass(m_cmdBufs[i]);
 
 			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
@@ -110,6 +137,7 @@ private:
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
+	VkRenderPass m_renderPass;
 };
 
 
