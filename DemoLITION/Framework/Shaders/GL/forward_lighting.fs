@@ -496,6 +496,7 @@ vec3 CalcBumpedNormal()
    // if (gHasHeightMap) {
         const float bumpFactor = 0.009;  
         vec3 CameraToPixel = WorldPos0 - gCameraWorldPos;
+        vec3 CameraToPixel =WorldPos0 - gCameraWorldPos;
         vec3 v = normalize(TBN * CameraToPixel);
         vec3 s = normalize(TBN * gDirectionalLight.Direction);
         float height = 1 - texture(gHeightMap, TexCoord0).r;
@@ -506,12 +507,11 @@ vec3 CalcBumpedNormal()
  //   }
 
     vec3 BumpMapNormal = texture(gNormalMap, TexCoord).xyz;                                
-    BumpMapNormal.xy = 2.0 * BumpMapNormal.xy - 1.0;
-    vec3 NewNormal;                                                                         
+    BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
     
-    NewNormal = TBN * BumpMapNormal;                                                        
+    vec3 NewNormal = TBN * BumpMapNormal;                                                        
     NewNormal = normalize(NewNormal);                                                       
-    return -NewNormal;                                                                       
+    return NewNormal;                                                                       
 }            
 
 
