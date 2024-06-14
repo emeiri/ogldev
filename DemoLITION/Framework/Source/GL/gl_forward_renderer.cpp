@@ -573,11 +573,16 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 
     Matrix4f LightWVP;
     
-    if (m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) {
-        LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World;
-    } else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
+    switch (m_curRenderPass) {
+    case RENDER_PASS_LIGHTING_DIR_SPOT:
+        LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
+        break;
+
+    case RENDER_PASS_LIGHTING_POINT:
         LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
-    } else {
+        break;
+
+    default:
         assert(0);
     }
 
