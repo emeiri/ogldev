@@ -23,15 +23,16 @@
 #include <math.h>
 
 #include "demolition.h"
+#include "demolition_base_gl_app.h"
 
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
 
-class ParallaxDemo : public GameCallbacks {
+class ParallaxDemo : public BaseGLApp {
 public:
-    ParallaxDemo()
+    ParallaxDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
@@ -47,15 +48,10 @@ public:
 
     void Start()
     {
-        bool LoadBasicShapes = false;
-        RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
+        m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        m_pScene = pRenderingSystem->CreateEmptyScene();
-
-        Model* pModel = pRenderingSystem->LoadModel("../Content/dry-rocky-ground-bl/dry-rocky-ground-bl.obj");
-      //  Model* pModel = pRenderingSystem->LoadModel("../Content/mybrick/mybrick.obj");
+       // Model* pModel = pRenderingSystem->LoadModel("../Content/dry-rocky-ground-bl/dry-rocky-ground-bl.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/mybrick/mybrick.obj");
        // Model* pModel = pRenderingSystem->LoadModel("../Content/brickwall.obj");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
       //  m_pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
@@ -63,14 +59,14 @@ public:
         //m_pSceneObject->SetRotation(Vector3f(0.0f, 65.0f, 0.0f));
         m_pScene->AddToRenderList(m_pSceneObject);
 
-        int NormalMap = pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
-        //int NormalMap = pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
+       // int NormalMap = pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
+        int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
        // int NormalMap = pRenderingSystem->LoadTexture2D("../Content/brickwall_normal.jpg");
         
         pModel->SetNormalMap(NormalMap);
 
-        int HeightMap = pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_height.png");
-        //int HeightMap = pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-height.png");
+      //  int HeightMap = pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_height.png");
+        int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-height.png");
         pModel->SetHeightMap(HeightMap);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
@@ -87,9 +83,9 @@ public:
         //m_pScene->GetDirLights().push_back(m_dirLight);
         m_pScene->GetPointLights().push_back(m_pointLight);
 
-        pRenderingSystem->SetScene(m_pScene);
+        m_pRenderingSystem->SetScene(m_pScene);
 
-        pRenderingSystem->Execute();
+        m_pRenderingSystem->Execute();
     }
 
 

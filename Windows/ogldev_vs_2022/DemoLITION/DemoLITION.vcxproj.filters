@@ -4,9 +4,6 @@
     <ClCompile Include="..\..\..\Common\math_3d.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -61,6 +58,12 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_scene.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\base_gl_app.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\base_camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -106,6 +109,12 @@
       <Filter>Include\Int</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h">
+      <Filter>Include\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_base_gl_app.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\base_camera.h">
       <Filter>Include\Int</Filter>
     </ClInclude>
   </ItemGroup>
