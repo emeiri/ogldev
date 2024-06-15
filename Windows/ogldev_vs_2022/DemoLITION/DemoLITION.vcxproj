@@ -120,7 +120,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,6 +153,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_base_gl_app.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h" />
@@ -171,6 +180,12 @@
     <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />

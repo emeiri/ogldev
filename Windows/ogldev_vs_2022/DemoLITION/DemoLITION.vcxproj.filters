@@ -64,6 +64,24 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
+      <Filter>Source\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp">
+      <Filter>Source\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp">
+      <Filter>Source\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp">
+      <Filter>Source\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp">
+      <Filter>Source\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
+      <Filter>Source\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -114,6 +132,33 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_base_gl_app.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3_loader.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
+      <Filter>Source\ImGUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -136,6 +181,9 @@
     </Filter>
     <Filter Include="Shaders\GL">
       <UniqueIdentifier>{f0d42b3f-7371-47b6-85c4-845f66bd8646}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ImGUI">
+      <UniqueIdentifier>{114ca478-44a4-44e7-8397-fa1424782f7c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

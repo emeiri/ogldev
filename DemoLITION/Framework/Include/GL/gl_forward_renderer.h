@@ -23,6 +23,7 @@
 #include "ogldev_shadow_mapping_technique_point_light.h"
 #include "ogldev_shadow_map_fbo.h"
 #include "ogldev_shadow_cube_map_fbo.h"
+#include "demolition_rendering_system.h"
 #include "Int/core_model.h"
 #include "gl_forward_lighting.h"
 #include "gl_scene.h"
@@ -77,7 +78,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void ControlCellShading(bool IsEnabled);
 
-    void Render(GLScene* pScene);
+    void Render(GLScene* pScene, GameCallbacks* pGameCallbacks);
 
    // void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 

@@ -35,7 +35,7 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual Scene* CreateDefaultScene();
 
-    virtual void CreateWindow(int Width, int Height);
+    virtual void* CreateWindow(int Width, int Height);
 
     virtual Model* LoadModel(const std::string& Filename);
 
@@ -57,7 +57,7 @@ class CoreRenderingSystem : public RenderingSystem
 
     ~CoreRenderingSystem();
 
-    virtual void CreateWindowInternal() = 0;
+    virtual void* CreateWindowInternal() = 0;
 
     virtual CoreModel* LoadModelInternal(const std::string& Filename) = 0;    
 

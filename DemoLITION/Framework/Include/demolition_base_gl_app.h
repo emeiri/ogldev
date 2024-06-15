@@ -20,6 +20,9 @@
 
 #include "demolition_rendering_system.h"
 
+#define GLFW_DLL
+#include <GLFW/glfw3.h>
+
 
 class BaseGLApp : public GameCallbacks
 {
@@ -29,18 +32,22 @@ public:
 
     ~BaseGLApp() {}
 
-    virtual void OnFrame() {}
+    virtual void OnFrame();
 
     virtual bool OnKeyboard(int key, int action);
 
-    virtual bool OnMouseMove(int x, int y) { return false; }
+  //  virtual bool OnMouseMove(int x, int y) { return false; }
 
-    virtual void OnMouseButton(int Button, int Action, int Mode) {}
+   // virtual void OnMouseButton(int Button, int Action, int Mode) {}
 
 protected:
     RenderingSystem* m_pRenderingSystem = NULL;
 
 private:
-    
+    void InitGUI();
+    void OnFrameGUI();
+
+    GLFWwindow* m_pWindow = NULL;
+    bool m_showGui = false;
     bool m_isWireframe = false;
 };

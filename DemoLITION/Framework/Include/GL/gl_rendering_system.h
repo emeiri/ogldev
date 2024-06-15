@@ -54,7 +54,7 @@ class RenderingSystemGL : public CoreRenderingSystem
     void OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
  protected:
-     virtual void CreateWindowInternal();
+     virtual void* CreateWindowInternal();
 
      virtual void SetCamera(BasicCamera* pCamera) { m_forwardRenderer.SetCamera(pCamera); }
 

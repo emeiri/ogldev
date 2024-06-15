@@ -71,7 +71,7 @@ void RenderingSystemGL::Shutdown()
     delete this;
 }
 
-void RenderingSystemGL::CreateWindowInternal()
+void* RenderingSystemGL::CreateWindowInternal()
 {
     int major_ver = 0;
     int minor_ver = 0;
@@ -85,6 +85,8 @@ void RenderingSystemGL::CreateWindowInternal()
     InitCallbacks();
 
     m_forwardRenderer.InitForwardRenderer(this);
+
+    return m_pWindow;
 }
 
 
@@ -182,9 +184,8 @@ void RenderingSystemGL::Execute()
         long long CurrentTimeMillis = GetCurrentTimeMillis();
         m_elapsedTimeMillis = CurrentTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
-        m_pGameCallbacks->OnFrame();
         if (m_pScene) {
-            m_forwardRenderer.Render((GLScene*)m_pScene);
+            m_forwardRenderer.Render((GLScene*)m_pScene, m_pGameCallbacks);
         } else {
             printf("Warning! no scene is set in the rendering subsystem\n");
         }

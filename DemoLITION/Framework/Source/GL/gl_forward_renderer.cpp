@@ -145,13 +145,15 @@ void ForwardRenderer::SwitchToLightingTech()
 }
 
 
-void ForwardRenderer::Render(GLScene* pScene)
+void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks)
 {
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
         glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
+
+    pGameCallbacks->OnFrame();
 
     if (pScene->GetRenderList().size() == 0) {
         printf("Warning! render list is empty and no main model\n");
