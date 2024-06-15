@@ -101,12 +101,6 @@ public:
         m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
     }
 
-
-    bool OnMouseMove(int x, int y)
-    {
-        return true;
-    }
-
 private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
