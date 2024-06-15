@@ -49,6 +49,8 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual long long GetElapsedTimeMillis() const { return m_elapsedTimeMillis; }
 
+    virtual BasicCamera* GetCurrentCamera() { return m_pCamera; }
+
  protected:
 
     CoreRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);

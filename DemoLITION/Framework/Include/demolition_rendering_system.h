@@ -22,6 +22,7 @@
 #include "ogldev_types.h"
 #include "demolition_scene.h"
 #include "demolition_model.h"
+#include "ogldev_basic_glfw_camera.h"
 
 class GameCallbacks
 {
@@ -72,4 +73,6 @@ public:
     virtual void GetWindowSize(int& Width, int& Height) const = 0;
 
     virtual long long GetElapsedTimeMillis() const = 0;
+
+    virtual BasicCamera* GetCurrentCamera() = 0;
 };
