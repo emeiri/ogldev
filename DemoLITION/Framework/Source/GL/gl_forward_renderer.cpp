@@ -247,7 +247,9 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
     } else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
         m_shadowCubeMapFBO.BindForReading(SHADOW_CUBE_MAP_TEXTURE_UNIT);
         m_curRenderPass = RENDER_PASS_LIGHTING_POINT;
-    }
+    } else {    // if there is no shadow pass
+	    m_curRenderPass = RENDER_PASS_LIGHTING_DIR_SPOT;
+	}
    
     int WindowWidth = 0;
     int WindowHeight = 0;
@@ -259,20 +261,20 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
 
-    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
-        CoreSceneObject* pSceneObject = *it;
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {        
+        m_pcurSceneObject = *it;
 
-        const Vector4f& FlatColor = pSceneObject->GetFlatColor();
+        const Vector4f& FlatColor = m_pcurSceneObject->GetFlatColor();
 
         if (FlatColor.x == -1.0f) {
             if (FirstTimeForwardLighting) {
-                StartRenderWithForwardLighting(pScene, pSceneObject);
+                StartRenderWithForwardLighting(pScene, m_pcurSceneObject);
                 FirstTimeForwardLighting = false;
             }
-            RenderWithForwardLighting(pSceneObject);
+            RenderWithForwardLighting(m_pcurSceneObject);
         }
         else {
-            RenderWithFlatColor(pSceneObject);
+            RenderWithFlatColor(m_pcurSceneObject);
         }
     }
 }
