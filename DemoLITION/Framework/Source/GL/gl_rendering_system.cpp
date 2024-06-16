@@ -225,7 +225,9 @@ void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double
 {
     bool HandledByGame = m_pGameCallbacks->OnMouseMove((int)x, (int)y);
 
-    if (!HandledByGame) {
+    if (HandledByGame) {
+        m_pCamera->UpdateMousePosSilent((int)x, (int)y);
+    } else {
         m_pCamera->OnMouse((int)x, (int)y);
     }
 }

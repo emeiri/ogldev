@@ -36,9 +36,9 @@ public:
 
     virtual bool OnKeyboard(int key, int action);
 
-  //  virtual bool OnMouseMove(int x, int y) { return false; }
+    virtual bool OnMouseMove(int x, int y);
 
-   // virtual void OnMouseButton(int Button, int Action, int Mode) {}
+    virtual void OnMouseButton(int Button, int Action, int Mode);
 
 protected:
     RenderingSystem* m_pRenderingSystem = NULL;
@@ -50,4 +50,5 @@ private:
     GLFWwindow* m_pWindow = NULL;
     bool m_showGui = false;
     bool m_isWireframe = false;
+    bool m_leftMousePressed = false;
 };

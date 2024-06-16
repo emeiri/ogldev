@@ -59,7 +59,7 @@ bool BaseGLApp::OnKeyboard(int key, int action)
         }        
         break;
 
-    case GLFW_KEY_W:
+    case GLFW_KEY_Z:
         if (action == GLFW_PRESS) {
             m_isWireframe = !m_isWireframe;
             if (m_isWireframe) {
@@ -141,7 +141,19 @@ void BaseGLApp::OnFrameGUI()
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-m_showGui = !m_showGui;}
-//bool OnMouseMove(int x, int y) { return false; }
+    m_showGui = !m_showGui;
+}
 
-//void OnMouseButton(int Button, int Action, int Mode) {}
+
+bool BaseGLApp::OnMouseMove(int x, int y) 
+{ 
+    return !m_leftMousePressed;
+}
+
+
+void BaseGLApp::OnMouseButton(int Button, int Action, int Mode)
+{
+    if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+        m_leftMousePressed = (Action == GLFW_PRESS);
+    }
+}
