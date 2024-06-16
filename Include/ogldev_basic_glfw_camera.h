@@ -52,6 +52,9 @@ public:
 
     void OnMouse(int x, int y);
 
+    // Update the mouse position without moving the camera
+    void UpdateMousePosSilent(int x, int y);
+
     void OnRender();
 
     Matrix4f GetMatrix() const;

@@ -284,6 +284,13 @@ void BasicCamera::OnMouse(int x, int y)
 }
 
 
+void BasicCamera::UpdateMousePosSilent(int x, int y)
+{
+    m_mousePos.x = x;
+    m_mousePos.y = y;
+}
+
+
 void BasicCamera::OnRender()
 {
     bool ShouldUpdate = false;
