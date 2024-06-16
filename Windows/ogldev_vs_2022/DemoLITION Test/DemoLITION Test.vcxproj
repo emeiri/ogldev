@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_blender_scene.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_clear.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_default_scene.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_grid.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_main.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_minimal.cpp" />

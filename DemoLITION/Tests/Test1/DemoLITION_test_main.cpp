@@ -26,6 +26,7 @@ void test_default_scene();
 void test_lighting();
 void test_normal_map();
 void test_parallax_map();
+void test_grid();
 
 
 int main(int argc, char* arg[])
@@ -38,5 +39,6 @@ int main(int argc, char* arg[])
     //test_default_scene();
     //test_lighting();
     //test_normal_map();
-    test_parallax_map();
+    //test_parallax_map();
+    test_grid();
 }
