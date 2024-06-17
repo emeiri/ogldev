@@ -160,15 +160,17 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 
     CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
-    ReserveSpace(NumVertices, NumIndices);
+    std::vector<Vertex> Vertices;
 
-    InitAllMeshes(pScene);
+    ReserveSpace<Vertex>(Vertices, NumVertices, NumIndices);
+
+    InitAllMeshes<Vertex>(pScene, Vertices);
 
     if (!InitMaterials(pScene, Filename)) {
         return false;
     }
 
-    PopulateBuffers();   
+    PopulateBuffers<Vertex>(Vertices);   
 
     CalculateMeshTransformations(pScene);
 
@@ -190,23 +192,25 @@ void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& Num
 }
 
 
-void CoreModel::ReserveSpace(unsigned int NumVertices, unsigned int NumIndices)
+template<typename VertexType>
+void CoreModel::ReserveSpace(std::vector<VertexType>& Vertices, unsigned int NumVertices, unsigned int NumIndices)
 {
-    m_Vertices.reserve(NumVertices);
+    Vertices.reserve(NumVertices);
     m_Indices.reserve(NumIndices);
     //m_Bones.resize(NumVertices); // TODO: only if there are any bones
     InitializeRequiredNodeMap(m_pScene->mRootNode);	
 }
 
 
-void CoreModel::InitAllMeshes(const aiScene* pScene)
+template<typename VertexType>
+void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
 #ifdef USE_MESH_OPTIMIZER
         InitSingleMeshOpt(i, paiMesh);
 #else
-        InitSingleMesh(i, paiMesh);
+        InitSingleMesh<VertexType>(Vertices, i, paiMesh);
 #endif
     }
 }
@@ -253,7 +257,8 @@ void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNo
 }
 
 
-void CoreModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
+template<typename VertexType>
+void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -262,8 +267,7 @@ void CoreModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
     Vertex v;
 
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-        const aiVector3D& pPos      = paiMesh->mVertices[i];
-        // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
+        const aiVector3D& pPos      = paiMesh->mVertices[i];       
         v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
 
         if (paiMesh->mNormals) {
@@ -283,7 +287,12 @@ void CoreModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
         const aiVector3D& pBitangent = paiMesh->mBitangents[i];
         v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
 
-        m_Vertices.push_back(v);
+     /*   printf("Pos %d: ", i); v.Position.Print();
+        printf("Normal: "); v.Normal.Print();
+        printf("Tangent: "); v.Tangent.Print();
+        printf("Bitangent: "); v.Bitangent.Print();*/
+
+        Vertices.push_back(v);
     }
 
     // Populate the index buffer
@@ -303,6 +312,7 @@ void CoreModel::InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
+template<typename VertexType>
 void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
@@ -333,7 +343,7 @@ void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
         Vertices[i] = v;
     }
 
-    m_Meshes[MeshIndex].BaseVertex = (uint)m_Vertices.size();
+    m_Meshes[MeshIndex].BaseVertex = (uint)Vertices.size();
     m_Meshes[MeshIndex].BaseIndex = (uint)m_Indices.size();
 
     int NumIndices = paiMesh->mNumFaces * 3;
@@ -353,7 +363,8 @@ void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
 }
 
 
-void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<Vertex>&Vertices)
+template<typename VertexType>
+void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<VertexType>&Vertices, std::vector<VertexType>& AllVertices)
 {
     size_t NumIndices = Indices.size();
     size_t NumVertices = Vertices.size();
@@ -407,7 +418,7 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
     // Concatenate the local arrays into the class attributes arrays
     m_Indices.insert(m_Indices.end(), SimplifiedIndices.begin(), SimplifiedIndices.end());
 
-    m_Vertices.insert(m_Vertices.end(), OptVertices.begin(), OptVertices.end());
+    AllVertices.insert(AllVertices.end(), OptVertices.begin(), OptVertices.end());
 
     m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
 }
@@ -591,22 +602,24 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 }
 
 
-void CoreModel::PopulateBuffers()
+template<typename VertexType>
+void CoreModel::PopulateBuffers(std::vector<VertexType>& Vertices)
 {
     if (IsGLVersionHigher(4, 5)) {
-        PopulateBuffersDSA();
+        PopulateBuffersDSA(Vertices);
     } else {
-        PopulateBuffersNonDSA();
+        PopulateBuffersNonDSA(Vertices);
     }
 }
 
 
-void CoreModel::PopulateBuffersNonDSA()
+template<typename VertexType>
+void CoreModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(m_Vertices[0]) * m_Vertices.size(), &m_Vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexType) * Vertices.size(), Vertices.data(), GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
     
     size_t NumFloats = 0;
@@ -638,9 +651,10 @@ void CoreModel::PopulateBuffersNonDSA()
 }
 
 
-void CoreModel::PopulateBuffersDSA()
+template<typename VertexType>
+void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
 {
-    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(m_Vertices[0]) * m_Vertices.size(), m_Vertices.data(), 0);
+    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
 
     glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(Vertex));

@@ -107,18 +107,31 @@ public:
 
     Texture* GetHeightMap() const { return m_pHeightMap; }
 
+    void SetTextureScale(float Scale) { m_textureScale = Scale; }
+
 private:
 
     void Clear();
 
     void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
-    virtual void ReserveSpace(uint NumVertices, uint NumIndices);
-    virtual void InitSingleMesh(uint MeshIndex, const aiMesh* paiMesh);
-    virtual void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
-    virtual void PopulateBuffers();
-    virtual void PopulateBuffersNonDSA();
-    virtual void PopulateBuffersDSA();
+    template<typename VertexType>
+    void ReserveSpace(std::vector<VertexType>& Vertices, uint NumVertices, uint NumIndices);
+
+    template<typename VertexType>
+    void InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
+
+    template<typename VertexType>
+    void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
+
+    template<typename VertexType>
+    void PopulateBuffers(vector<VertexType>& Vertices);
+
+    template<typename VertexType>
+    void PopulateBuffersNonDSA(vector<VertexType>& Vertices);
+
+    template<typename VertexType>
+    void PopulateBuffersDSA(vector<VertexType>& Vertices);
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
@@ -140,7 +153,7 @@ private:
 
     std::vector<BasicMeshEntry> m_Meshes;
 
-    const aiScene* m_pScene;
+    const aiScene* m_pScene = NULL;
 
     Matrix4f m_GlobalInverseTransform;
 
@@ -164,64 +177,6 @@ private:
         Vector3f Bitangent;
     };
 	
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename, int WindowWidth, int WindowHeight);
-
-    bool InitGeometry(const aiScene* pScene, const string& Filename);
-
-    void InitLights(const aiScene* pScene);
-
-    void InitSingleLight(const aiScene* pScene, const aiLight& light);
-
-    void InitDirectionalLight(const aiScene* pScene, const aiLight& light);
-
-    void InitPointLight(const aiScene* pScene, const aiLight& light);
-
-    void InitSpotLight(const aiScene* pScene, const aiLight& light);
-
-    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
-
-    void InitAllMeshes(const aiScene* pScene);
-    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<Vertex>& Vertices);
-
-    void CalculateMeshTransformations(const aiScene* pScene);
-    void TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode);
-
-    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
-
-    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
-
-    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
-
-    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
-
-    void LoadColors(const aiMaterial* pMaterial, int index);
-
-    void InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight);
-
-    void InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight);
-
-    std::vector<Material> m_Materials;
-    Texture* m_pNormalMap = NULL;
-    Texture* m_pHeightMap = NULL;
-
-    // Temporary space for vertex stuff before we load them into the GPU
-    vector<uint> m_Indices;
-    vector<Vertex> m_Vertices;
-
-    Assimp::Importer m_Importer;
-
-    std::vector<BasicCamera> m_cameras;
-    std::vector<DirectionalLight> m_dirLights;
-    std::vector<PointLight> m_pointLights;
-    std::vector<SpotLight> m_spotLights;
-
-    /////////////////////////////////////
-	// Skeletal animation stuff
-    /////////////////////////////////////
     #define MAX_NUM_BONES_PER_VERTEX 4
 	
     struct VertexBoneData
@@ -262,6 +217,78 @@ private:
             index++;
         }
     };
+
+    struct SkinnedVertex {
+        Vector3f Position;
+        Vector2f TexCoords;
+        Vector3f Normal;
+        Vector3f Tangent;
+        Vector3f Bitangent;
+        VertexBoneData Bones;
+    };
+
+
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename, int WindowWidth, int WindowHeight);
+
+    bool InitGeometry(const aiScene* pScene, const string& Filename);
+
+    void InitLights(const aiScene* pScene);
+
+    void InitSingleLight(const aiScene* pScene, const aiLight& light);
+
+    void InitDirectionalLight(const aiScene* pScene, const aiLight& light);
+
+    void InitPointLight(const aiScene* pScene, const aiLight& light);
+
+    void InitSpotLight(const aiScene* pScene, const aiLight& light);
+
+    void CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices);
+
+    template<typename VertexType>
+    void InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Vertices);
+
+    template<typename VertexType>
+    void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices);
+
+    void CalculateMeshTransformations(const aiScene* pScene);
+    void TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode);
+
+    bool InitMaterials(const aiScene* pScene, const std::string& Filename);
+
+    void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
+
+    void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
+    void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
+    void LoadColors(const aiMaterial* pMaterial, int index);
+
+    void InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight);
+
+    void InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight);
+
+    std::vector<Material> m_Materials;
+    Texture* m_pNormalMap = NULL;
+    Texture* m_pHeightMap = NULL;
+	
+    // Temporary space for vertex stuff before we load them into the GPU
+    vector<uint> m_Indices;
+
+    Assimp::Importer m_Importer;
+
+    std::vector<BasicCamera> m_cameras;
+    std::vector<DirectionalLight> m_dirLights;
+    std::vector<PointLight> m_pointLights;
+    std::vector<SpotLight> m_spotLights;
+    float m_textureScale = 1.0f;
+	
+    /////////////////////////////////////
+	// Skeletal animation stuff
+    /////////////////////////////////////
 
     void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
     void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
