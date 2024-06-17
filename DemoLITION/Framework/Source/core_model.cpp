@@ -208,7 +208,7 @@ void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Ve
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
 #ifdef USE_MESH_OPTIMIZER
-        InitSingleMeshOpt(i, paiMesh);
+        InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
 #else
         InitSingleMesh<VertexType>(Vertices, i, paiMesh);
 #endif
@@ -264,7 +264,7 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
 
     printf("Mesh %d %s\n", MeshIndex, paiMesh->mName.C_Str());
     // Populate the vertex attribute vectors
-    Vertex v;
+    VertexType v;
 
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
         const aiVector3D& pPos      = paiMesh->mVertices[i];       
@@ -313,15 +313,15 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
 
 
 template<typename VertexType>
-void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
+void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshIndex, const aiMesh* paiMesh)
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
     // printf("Mesh %d\n", MeshIndex);
     // Populate the vertex attribute vectors
-    Vertex v;
+    VertexType v;
 
-    std::vector<Vertex> Vertices(paiMesh->mNumVertices);
+    std::vector<VertexType> Vertices(paiMesh->mNumVertices);
 
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
         const aiVector3D& pPos = paiMesh->mVertices[i];
@@ -340,10 +340,22 @@ void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
         const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
         v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
 
+        const aiVector3D& pTangent = paiMesh->mTangents[i];
+        v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+
+        const aiVector3D& pBitangent = paiMesh->mBitangents[i];
+        v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+		
+     /*   printf("Pos %d: ", i); v.Position.Print();
+        printf("Normal: "); v.Normal.Print();
+        printf("Tangent: "); v.Tangent.Print();
+        printf("Bitangent: "); v.Bitangent.Print();*/
+	
+
         Vertices[i] = v;
     }
 
-    m_Meshes[MeshIndex].BaseVertex = (uint)Vertices.size();
+    m_Meshes[MeshIndex].BaseVertex = (uint)AllVertices.size();
     m_Meshes[MeshIndex].BaseIndex = (uint)m_Indices.size();
 
     int NumIndices = paiMesh->mNumFaces * 3;
@@ -359,7 +371,7 @@ void CoreModel::InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh)
         Indices[i * 3 + 2] = Face.mIndices[2];
     }
 
-    OptimizeMesh(MeshIndex, Indices, Vertices);
+    OptimizeMesh(MeshIndex, Indices, Vertices, AllVertices);
 }
 
 
@@ -376,26 +388,26 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
                                                         NumIndices,      // ...and size
                                                         Vertices.data(), // src vertices
                                                         NumVertices,     // ...and size
-                                                        sizeof(Vertex)); // stride
+                                                        sizeof(VertexType)); // stride
     // Allocate a local index/vertex arrays
     std::vector<uint> OptIndices;
-    std::vector<Vertex> OptVertices;
+    std::vector<VertexType> OptVertices;
     OptIndices.resize(NumIndices);
     OptVertices.resize(OptVertexCount);
 
     // Optimization #1: remove duplicate vertices    
     meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), NumIndices, remap.data());
 
-    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), NumVertices, sizeof(Vertex), remap.data());
+    meshopt_remapVertexBuffer(OptVertices.data(), Vertices.data(), NumVertices, sizeof(VertexType), remap.data());
 
     // Optimization #2: improve the locality of the vertices
     meshopt_optimizeVertexCache(OptIndices.data(), OptIndices.data(), NumIndices, OptVertexCount);
 
     // Optimization #3: reduce pixel overdraw
-    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), NumIndices, &(OptVertices[0].Position.x), OptVertexCount, sizeof(Vertex), 1.05f);
+    meshopt_optimizeOverdraw(OptIndices.data(), OptIndices.data(), NumIndices, &(OptVertices[0].Position.x), OptVertexCount, sizeof(VertexType), 1.05f);
 
     // Optimization #4: optimize access to the vertex buffer
-    meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(Vertex));
+    meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(VertexType));
 
     // Optimization #5: create a simplified version of the model
     float Threshold = 1.0f;
@@ -404,7 +416,7 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
     float TargetError = 0.0f;
     std::vector<unsigned int> SimplifiedIndices(OptIndices.size());
     size_t OptIndexCount = meshopt_simplify(SimplifiedIndices.data(), OptIndices.data(), NumIndices,
-                                            &OptVertices[0].Position.x, OptVertexCount, sizeof(Vertex), TargetIndexCount, TargetError);
+                                            &OptVertices[0].Position.x, OptVertexCount, sizeof(VertexType), TargetIndexCount, TargetError);
 
     static int num_indices = 0;
     num_indices += (int)NumIndices;
@@ -626,27 +638,27 @@ void CoreModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
 
     int NumElements = 3;
     glEnableVertexAttribArray(POSITION_LOCATION);
-    glVertexAttribPointer(POSITION_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    glVertexAttribPointer(POSITION_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 
     NumElements = 2;
     glEnableVertexAttribArray(TEX_COORD_LOCATION);
-    glVertexAttribPointer(TEX_COORD_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    glVertexAttribPointer(TEX_COORD_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 
     NumElements = 3;
     glEnableVertexAttribArray(NORMAL_LOCATION);
-    glVertexAttribPointer(NORMAL_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    glVertexAttribPointer(NORMAL_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 
     NumElements = 3;
     glEnableVertexAttribArray(TANGENT_LOCATION);
-    glVertexAttribPointer(TANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    glVertexAttribPointer(TANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 
     NumElements = 3;
     glEnableVertexAttribArray(BITANGENT_LOCATION);
-    glVertexAttribPointer(BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
+    glVertexAttribPointer(BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 }
 
@@ -657,7 +669,7 @@ void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
 
-    glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(Vertex));
+    glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(VertexType));
     glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
 
     size_t NumFloats = 0;

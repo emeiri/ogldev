@@ -122,7 +122,7 @@ private:
     void InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
 
     template<typename VertexType>
-    void InitSingleMeshOpt(uint MeshIndex, const aiMesh* paiMesh);
+    void InitSingleMeshOpt(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
 
     template<typename VertexType>
     void PopulateBuffers(vector<VertexType>& Vertices);
