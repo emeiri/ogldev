@@ -666,6 +666,9 @@ void CoreModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
 template<typename VertexType>
 void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
 {
+   // for (int i = 0; i < Vertices.size(); i++) {
+   //     Vertices[i].Print();
+  //  }
     glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
 

@@ -175,6 +175,15 @@ private:
         Vector3f Normal;
         Vector3f Tangent;
         Vector3f Bitangent;
+
+        void Print()
+        {
+            Position.Print();
+            TexCoords.Print();
+            Normal.Print();
+            Tangent.Print();
+            Bitangent.Print();
+        }
     };
 	
     #define MAX_NUM_BONES_PER_VERTEX 4
