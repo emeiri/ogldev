@@ -160,23 +160,35 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 
     CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
-    std::vector<Vertex> Vertices;
+    printf("Num animations %d\n", pScene->mNumAnimations);
 
-    ReserveSpace<Vertex>(Vertices, NumVertices, NumIndices);
-
-    InitAllMeshes<Vertex>(pScene, Vertices);
+    if (pScene->mNumAnimations > 0) {
+        InitGeometryInternal<SkinnedVertex>(NumVertices, NumIndices);
+    } else {
+        InitGeometryInternal<Vertex>(NumVertices, NumIndices);
+    }
 
     if (!InitMaterials(pScene, Filename)) {
         return false;
-    }
-
-    PopulateBuffers<Vertex>(Vertices);   
+    }    
 
     CalculateMeshTransformations(pScene);
 
     return GLCheckError();
 }
 
+
+template<typename VertexType>
+void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
+{
+    std::vector<VertexType> Vertices;
+
+    ReserveSpace<VertexType>(Vertices, NumVertices, NumIndices);
+
+    InitAllMeshes<VertexType>(m_pScene, Vertices);
+
+    PopulateBuffers<VertexType>(Vertices);
+}
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
 {

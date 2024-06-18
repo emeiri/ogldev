@@ -241,6 +241,9 @@ private:
 
     bool InitGeometry(const aiScene* pScene, const string& Filename);
 
+    template<typename VertexType>
+    void InitGeometryInternal(int NumVertices, int NumIndices);
+
     void InitLights(const aiScene* pScene);
 
     void InitSingleLight(const aiScene* pScene, const aiLight& light);
