@@ -103,7 +103,7 @@ void ForwardRenderer::InitTechniques()
 
 void ForwardRenderer::InitShadowMapping()
 {
-    float FOV = 45.0f; // TODO: get from light
+    float FOV = 90.0f; // TODO: get from light
     float zNear = 1.0f;
     float zFar = 100.0f;
     PersProjInfo shadowPersProjInfo = { FOV, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, zNear, zFar };

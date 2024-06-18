@@ -144,7 +144,7 @@ float CalcShadowFactorBasic(vec3 LightDirection, vec3 Normal)
 
     float DiffuseFactor = dot(Normal, -LightDirection);
 
-    float bias = 0.15;//max(0.05 * (1.0 - DiffuseFactor), 0.005);  
+    float bias = max(0.05 * (1.0 - DiffuseFactor), 0.005);  
 
     if (Depth + bias < ShadowCoords.z)
         return 0.05;
