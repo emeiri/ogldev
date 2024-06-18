@@ -50,8 +50,9 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-       // Model* pModel = pRenderingSystem->LoadModel("../Content/dry-rocky-ground-bl/dry-rocky-ground-bl.obj");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/mybrick/mybrick.obj");
+      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/dry-rocky-ground-bl/dry-rocky-ground-bl.obj");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/mybrick/mybrick.obj");
+         Model* pModel = m_pRenderingSystem->LoadModel("../Content/brickwall2.obj");
        // Model* pModel = pRenderingSystem->LoadModel("../Content/brickwall.obj");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
       //  m_pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
@@ -59,14 +60,16 @@ public:
         //m_pSceneObject->SetRotation(Vector3f(0.0f, 65.0f, 0.0f));
         m_pScene->AddToRenderList(m_pSceneObject);
 
-       // int NormalMap = pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
-        int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
+       // int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
+        //int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
        // int NormalMap = pRenderingSystem->LoadTexture2D("../Content/brickwall_normal.jpg");
+        int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/bricks2_normal.jpg");
         
         pModel->SetNormalMap(NormalMap);
 
-      //  int HeightMap = pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_height.png");
-        int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-height.png");
+       // int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_height.png");
+        //int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-height.png");
+        int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/bricks2_disp.jpg");
         pModel->SetHeightMap(HeightMap);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));

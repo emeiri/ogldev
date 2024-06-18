@@ -55,6 +55,9 @@ struct Material
     vec3 SpecularColor;
 };
 
+
+uniform mat4 gWorld;
+
 uniform DirectionalLight gDirectionalLight;
 uniform int gNumPointLights;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
@@ -492,32 +495,30 @@ vec3 CalcBumpedNormal()
     
     mat3 TBN = mat3(Tangent, Bitangent, Normal);
 
-
-   // if (gHasHeightMap) {
+    if (gHasHeightMap) {
         const float bumpFactor = 0.009;  
-        vec3 CameraToPixel = WorldPos0 - gCameraWorldPos;
-        vec3 CameraToPixel =WorldPos0 - gCameraWorldPos;
-        vec3 v = normalize(TBN * CameraToPixel);
-        vec3 s = normalize(TBN * gDirectionalLight.Direction);
-        float height = 1 - texture(gHeightMap, TexCoord0).r;
-        vec2 delta = vec2(v.x, v.y) * height * bumpFactor / v.z;
-        TexCoord = TexCoord0.xy - delta;
- //   } else {
-        //TexCoord = TexCoord;
- //   }
+        vec3 PixelToCamera = gCameraWorldPos - WorldPos0;
+        PixelToCamera = normalize(PixelToCamera);
+        float height = texture(gHeightMap, TexCoord0).r;
+        height = height * 0.5 + 0.5;
+        vec2 delta = vec2(PixelToCamera.x, PixelToCamera.y) * height * bumpFactor / PixelToCamera.z;
+      //  TexCoord = TexCoord0.xy - delta;
+        TexCoord = TexCoord0 - PixelToCamera.xy * (height * bumpFactor);        
+    } 
 
     vec3 BumpMapNormal = texture(gNormalMap, TexCoord).xyz;                                
     BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
-    
     vec3 NewNormal = TBN * BumpMapNormal;                                                        
     NewNormal = normalize(NewNormal);                                                       
     return NewNormal;                                                                       
+   //return BumpMapNormal;
+  // return vec3(TexCoord, 0.0);
 }            
 
 
 vec3 GetNormal()
 {
-    vec3 Normal;
+    vec3 Normal;    
 
     if (gHasNormalMap) {
         Normal = CalcBumpedNormal();
@@ -551,9 +552,13 @@ vec4 GetTotalLight()
 
 void main()
 {
-FragColor = vec4(Bitangent0, 0.0);
-return;
-    TexCoord = TexCoord0;
+
+TexCoord = TexCoord0;
+//vec3 Normal = GetNormal();
+//FragColor = vec4(GetNormal(), 0.0);
+//FragColor = vec4(TexCoord, 0.0, 0.0);
+//return;
+    
 
     vec4 TotalLight;
     

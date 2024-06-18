@@ -26,5 +26,7 @@ public:
     virtual void SetNormalMap(int TextureHandle) = 0;
 
     virtual void SetHeightMap(int TextureHandle) = 0;
+
+    virtual void SetTextureScale(float Scale) = 0;
 };
 
