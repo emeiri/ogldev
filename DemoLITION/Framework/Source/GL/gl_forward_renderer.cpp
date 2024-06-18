@@ -193,9 +193,14 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 
     int NumPointLights = (int)pScene->GetPointLights().size();
 
-    if (NumPointLights > 0) {
+    if (NumDirLights > 0) {
+        m_curRenderPass = RENDER_PASS_SHADOW_DIR;
+        ShadowMapPassDirAndSpot(pScene->GetRenderList());
+    } else if (NumPointLights > 0) {
+        m_curRenderPass = RENDER_PASS_SHADOW_POINT;
         ShadowMapPassPoint(pScene->GetRenderList(), pScene->GetPointLights());
     } else {  
+        m_curRenderPass = RENDER_PASS_SHADOW_SPOT;
         ShadowMapPassDirAndSpot(pScene->GetRenderList());
     }
 }
@@ -203,8 +208,6 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
 
 void ForwardRenderer::ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights)
 {
-    m_curRenderPass = RENDER_PASS_SHADOW_POINT;
-
     m_shadowMapPointLightTech.Enable();
     m_shadowMapPointLightTech.SetLightWorldPos(PointLights[0].WorldPosition);
 
@@ -222,7 +225,6 @@ void ForwardRenderer::ShadowMapPassPoint(const std::list<CoreSceneObject*>& Rend
 
 void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList)
 {
-    m_curRenderPass = RENDER_PASS_SHADOW_DIR_SPOT;
     m_shadowMapFBO.BindForWriting();
     glClear(GL_DEPTH_BUFFER_BIT);
     m_shadowMapTech.Enable();
@@ -243,15 +245,26 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    if (m_curRenderPass == RENDER_PASS_SHADOW_DIR_SPOT) {
+    switch (m_curRenderPass) {
+    case RENDER_PASS_SHADOW_DIR:
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
-        m_curRenderPass = RENDER_PASS_LIGHTING_DIR_SPOT;
-    } else if (m_curRenderPass == RENDER_PASS_SHADOW_POINT) {
+        m_curRenderPass = RENDER_PASS_LIGHTING_DIR;
+        break;
+
+    case RENDER_PASS_SHADOW_SPOT:
+        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_curRenderPass = RENDER_PASS_LIGHTING_SPOT;
+        break;
+
+    case RENDER_PASS_SHADOW_POINT:
         m_shadowCubeMapFBO.BindForReading(SHADOW_CUBE_MAP_TEXTURE_UNIT);
         m_curRenderPass = RENDER_PASS_LIGHTING_POINT;
-    } else {    // if there is no shadow pass
-	    m_curRenderPass = RENDER_PASS_LIGHTING_DIR_SPOT;
-	}
+        break;
+
+    default:
+        // todo: handle the case when there is no shadow pass
+        assert(0);
+    }
    
     int WindowWidth = 0;
     int WindowHeight = 0;
@@ -499,15 +512,22 @@ void ForwardRenderer::DrawStart_CB(uint DrawIndex)
 
 void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
 {
-    if ((m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) || (m_curRenderPass == RENDER_PASS_LIGHTING_POINT)) {
+    switch (m_curRenderPass) {
+    case RENDER_PASS_LIGHTING_DIR:
+    case RENDER_PASS_LIGHTING_SPOT:
+    case RENDER_PASS_LIGHTING_POINT:
         m_lightingTech.ControlSpecularExponent(IsEnabled);
+        break;
     }
 }
 
 
 void ForwardRenderer::SetMaterial_CB(const Material& material)
 {
-    if ((m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) || (m_curRenderPass == RENDER_PASS_LIGHTING_POINT)) {
+    switch (m_curRenderPass) {
+    case RENDER_PASS_LIGHTING_DIR:
+    case RENDER_PASS_LIGHTING_SPOT:
+    case RENDER_PASS_LIGHTING_POINT:
         m_lightingTech.SetMaterial(material);
     }
 }
@@ -515,7 +535,10 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
 
 void ForwardRenderer::DisableDiffuseTexture_CB()
 {
-    if ((m_curRenderPass == RENDER_PASS_LIGHTING_DIR_SPOT) || (m_curRenderPass == RENDER_PASS_LIGHTING_POINT)) {
+    switch (m_curRenderPass) {
+    case RENDER_PASS_LIGHTING_DIR:
+    case RENDER_PASS_LIGHTING_SPOT:
+    case RENDER_PASS_LIGHTING_POINT:
         m_lightingTech.DisableDiffuseTexture();
     }
 }
@@ -525,15 +548,20 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 {
     switch (m_curRenderPass) {
 
-    case RENDER_PASS_SHADOW_DIR_SPOT:
-        SetWorldMatrix_CB_ShadowPassDirSpot(World);
+    case RENDER_PASS_SHADOW_DIR:
+        SetWorldMatrix_CB_ShadowPassDir(World);
+        break;
+
+    case RENDER_PASS_SHADOW_SPOT:
+        SetWorldMatrix_CB_ShadowPassSpot(World);
         break;
 
     case RENDER_PASS_SHADOW_POINT:
         SetWorldMatrix_CB_ShadowPassPoint(World);
         break;
 
-    case RENDER_PASS_LIGHTING_DIR_SPOT:
+    case RENDER_PASS_LIGHTING_DIR:
+    case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
         SetWorldMatrix_CB_LightingPass(World);
         break;
@@ -545,10 +573,18 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 }
 
 
-void ForwardRenderer::SetWorldMatrix_CB_ShadowPassDirSpot(const Matrix4f& World)
+void ForwardRenderer::SetWorldMatrix_CB_ShadowPassDir(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
+    m_shadowMapTech.SetWVP(WVP);
+}
+
+
+void ForwardRenderer::SetWorldMatrix_CB_ShadowPassSpot(const Matrix4f& World)
+{
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
     m_shadowMapTech.SetWVP(WVP);
 }
 
@@ -578,10 +614,11 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f LightWVP;
     
     switch (m_curRenderPass) {
-    case RENDER_PASS_LIGHTING_DIR_SPOT:
+    case RENDER_PASS_LIGHTING_DIR:
         LightWVP = m_lightOrthoProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
         break;
 
+    case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
         LightWVP = m_lightPersProjMatrix * m_lightViewMatrix * FinalWorldMatrix;
         break;
