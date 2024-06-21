@@ -59,10 +59,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL);
 
-    void ShadowMapPass();
-
-    void LightingPass();
-
     void SetCamera(BasicCamera* pCamera) { 
         m_pCurCamera = pCamera; 
     }
@@ -88,7 +84,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void ControlCellShading(bool IsEnabled);
 
-    void Render(GLScene* pScene, GameCallbacks* pGameCallbacks);
+    void Render(GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis);
 
    // void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 
@@ -116,11 +112,11 @@ private:
     void ShadowMapPass(GLScene* pScene);
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
-    void LightingPass(GLScene* pScene);
+    void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
     void RenderAllSceneObjects(GLScene* pScene);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject);
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
-    void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
+    void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
     void InitShadowMapping();

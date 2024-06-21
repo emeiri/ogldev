@@ -169,7 +169,7 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 }
 
 
-void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks)
+void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
 {
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
@@ -190,7 +190,7 @@ void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks)
     }
 
     ShadowMapPass(pScene);
-    LightingPass(pScene);
+    LightingPass(pScene, TotalRuntimeMillis);
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
@@ -265,7 +265,7 @@ void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& 
 }
 
 
-void ForwardRenderer::LightingPass(GLScene* pScene)
+void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -307,7 +307,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 
         if (FlatColor.x == -1.0f) {
             if (FirstTimeForwardLighting) {
-                StartRenderWithForwardLighting(pScene, m_pcurSceneObject);
+                StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
                 FirstTimeForwardLighting = false;
             }
             RenderWithForwardLighting(m_pcurSceneObject);
@@ -319,12 +319,12 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 }
 
 
-void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject)
+void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
 {
     if (pSceneObject->GetModel()->IsAnimated()) {
         SwitchToLightingTech(FORWARD_SKINNING);
 
-        float AnimationTimeSec = 0.0f;
+        float AnimationTimeSec = (float)TotalRuntimeMillis / 1000.0f;
         int AnimationIndex = 0;
         vector<Matrix4f> Transforms;
         pSceneObject->GetModel()->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);

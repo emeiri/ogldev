@@ -169,23 +169,19 @@ void RenderingSystemGL::Execute()
         return;
     }
 
-    /*const DemolitionModel* pMainModel = NULL;
-    
-    if (m_pScene && (m_pScene->GetRenderList().size() > 0)) {
-        pMainModel = m_pScene->GetRenderList().front()->GetModel();
-        if (pMainModel->GetCameras().size() > 0) {
-            *m_pCamera = pMainModel->GetCameras()[0];
-        }
-    }*/
-
     long long StartTimeMillis = GetCurrentTimeMillis();
+    long long CurTimeMillis = StartTimeMillis;
 
     while (!glfwWindowShouldClose(m_pWindow)) {
-        long long CurrentTimeMillis = GetCurrentTimeMillis();
-        m_elapsedTimeMillis = CurrentTimeMillis - StartTimeMillis;
+        long long PrevTimeMillis = CurTimeMillis;
+        CurTimeMillis = GetCurrentTimeMillis();
+        long long DeltaTimeMillis = CurTimeMillis - PrevTimeMillis;
+        long long TotalRuntimeMillis = CurTimeMillis - StartTimeMillis;
+       // printf("Total runtime %I64d delta %I64d\n", TotalRuntimeMillis, DeltaTimeMillis);
+        m_elapsedTimeMillis = CurTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
         if (m_pScene) {
-            m_forwardRenderer.Render((GLScene*)m_pScene, m_pGameCallbacks);
+            m_forwardRenderer.Render((GLScene*)m_pScene, m_pGameCallbacks, TotalRuntimeMillis, DeltaTimeMillis);
         } else {
             printf("Warning! no scene is set in the rendering subsystem\n");
         }
