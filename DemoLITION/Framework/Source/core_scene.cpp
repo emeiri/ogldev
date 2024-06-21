@@ -208,6 +208,7 @@ CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
     CoreSceneObject* pCoreSceneObject = &(m_sceneObjects[m_numSceneObjects]);
+    pCoreSceneObject->SetId(m_numSceneObjects);
 
     m_numSceneObjects++;
 

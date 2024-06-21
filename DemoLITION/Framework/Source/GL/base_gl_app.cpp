@@ -151,7 +151,7 @@ bool BaseGLApp::OnMouseMove(int x, int y)
 }
 
 
-bool BaseGLApp::OnMouseButton(int Button, int Action, int Mode)
+bool BaseGLApp::OnMouseButton(int Button, int Action, int Mode, int x, int y)
 {
     bool HandledByMe = false;
 

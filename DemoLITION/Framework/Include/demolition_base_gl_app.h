@@ -38,16 +38,16 @@ public:
 
     virtual bool OnMouseMove(int x, int y);
 
-    virtual bool OnMouseButton(int Button, int Action, int Mode);
+    virtual bool OnMouseButton(int Button, int Action, int Mode, int x, int y);
 
 protected:
     RenderingSystem* m_pRenderingSystem = NULL;
+    GLFWwindow* m_pWindow = NULL;
 
 private:
     void InitGUI();
     void OnFrameGUI();
-
-    GLFWwindow* m_pWindow = NULL;
+    
     bool m_showGui = false;
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;

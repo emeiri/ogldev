@@ -41,8 +41,13 @@ public:
 
     CoreModel* GetModel() const { return m_pModel; }
 
+    void SetId(int id) { m_id = id; }
+
+    int GetId() const { return m_id; }
+
 private:
     CoreModel* m_pModel = NULL;
+    int m_id = -1;
 };
 
 
@@ -88,6 +93,10 @@ public:
 
     bool IsPickingEnabled() const { return m_enablePicking; }
 
+    void SetPickedSceneObject(const CoreSceneObject* pSceneObject) { m_pPickedSceneObject = pSceneObject; }
+
+    const SceneObject* GetPickedSceneObject() const { return m_pPickedSceneObject; }
+
 protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;
@@ -100,4 +109,5 @@ private:
     std::vector<CoreSceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
     bool m_enablePicking = false;
+    const CoreSceneObject* m_pPickedSceneObject = NULL;
 };

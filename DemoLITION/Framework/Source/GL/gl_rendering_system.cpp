@@ -181,7 +181,7 @@ void RenderingSystemGL::Execute()
         m_elapsedTimeMillis = CurTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
         if (m_pScene) {
-            m_forwardRenderer.Render((GLScene*)m_pScene, m_pGameCallbacks, TotalRuntimeMillis, DeltaTimeMillis);
+            m_forwardRenderer.Render(m_pWindow, (GLScene*)m_pScene, m_pGameCallbacks, TotalRuntimeMillis, DeltaTimeMillis);
         } else {
             printf("Warning! no scene is set in the rendering subsystem\n");
         }
@@ -199,7 +199,7 @@ void RenderingSystemGL::InitCallbacks()
 }
 
 
-void RenderingSystemGL::OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void RenderingSystemGL::OnKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
 {
     bool HandledByGame = m_pGameCallbacks->OnKeyboard(key, action);
 
@@ -217,7 +217,7 @@ void RenderingSystemGL::OnKeyCallback(GLFWwindow* window, int key, int scancode,
 }
 
 
-void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double y)
+void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* pWindow, double x, double y)
 {
     bool HandledByGame = m_pGameCallbacks->OnMouseMove((int)x, (int)y);
 
@@ -229,9 +229,12 @@ void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double
 }
 
 
-void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
+void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)
 {
-    m_pGameCallbacks->OnMouseButton(Button, Action, Mode);
+    int MousePosX = 0, MousePosY = 0;
+    GetMousePos(pWindow, MousePosX, MousePosY);
+    m_pGameCallbacks->OnMouseButton(Button, Action, Mode, MousePosX, MousePosY);
+}
 
 
 void RenderingSystemGL::GetMousePos(void* pWindow, int& x, int& y)

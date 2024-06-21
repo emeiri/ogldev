@@ -62,15 +62,13 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_pRenderingSystemGL = pRenderingSystemGL;
 
+    m_pRenderingSystemGL->GetWindowSize(m_windowWidth, m_windowHeight);
+
     InitTechniques();
 
     InitShadowMapping();
 
-    int WindowWidth = 0;
-    int WindowHeight = 0;
-    m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
-
-    m_pickingTexture.Init(WindowWidth, WindowHeight);
+    m_pickingTexture.Init(m_windowWidth, m_windowHeight);
 
     glUseProgram(0);
 }
@@ -145,10 +143,6 @@ void ForwardRenderer::InitShadowMapping()
 
     m_lightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
 
-    int WindowWidth = 0;
-    int WindowHeight = 0;
-    m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
-
     if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
         exit(1);
     }
@@ -182,7 +176,7 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 }
 
 
-void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
+void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
 {
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
@@ -203,7 +197,10 @@ void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks, lon
     }
 
     if (pScene->IsPickingEnabled()) {
-        PickingPass(pScene);
+        PickingPass(pWindow, pScene);
+        // The render loop may be called multiple time before picking
+        // is again disabled so we do it explicitly
+        pScene->ControlPicking(false);  
     }
 
     ShadowMapPass(pScene);
@@ -213,28 +210,69 @@ void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks, lon
 }
 
 
-void ForwardRenderer::PickingPass(GLScene* pScene)
+void ForwardRenderer::PickingPass(void* pWindow, GLScene* pScene)
 {
     m_curRenderPass = RENDER_PASS_PICKING;
 
     m_pickingTexture.EnableWriting();
 
+    // TODO: change clear color
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_pickingTech.Enable();
 
-    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
-
-    int i = 1; // Background is zero, the real objects start at 1
-    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
-        m_pickingTech.SetObjectIndex(i);
-        i++;
-
-        m_pcurSceneObject = *it;        
-        m_pcurSceneObject->GetModel()->Render(this);
-    }
+    PickingRenderScene(pScene);
 
     m_pickingTexture.DisableWriting();
+
+    PostPickingPass(pWindow, pScene);
+}
+
+
+void ForwardRenderer::PickingRenderScene(GLScene* pScene)
+{
+    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
+
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
+        int ObjectIndex = (*it)->GetId() + 1;  // Background is zero, the real objects start at 1
+        m_pickingTech.SetObjectIndex(ObjectIndex);
+
+        m_pcurSceneObject = *it;
+        m_pcurSceneObject->GetModel()->Render(this);
+    }
+}
+
+
+void ForwardRenderer::PostPickingPass(void* pWindow, GLScene* pScene)
+{
+    int ObjectIndex = GetPickedObjectIndex(pWindow, pScene);
+
+    if (ObjectIndex > 0) {
+        SavePickedObject(pScene, ObjectIndex);
+    }
+}
+
+
+int ForwardRenderer::GetPickedObjectIndex(void* pWindow, GLScene* pScene)
+{
+    int MousePosX = 0, MousePosY = 0;
+    m_pRenderingSystemGL->GetMousePos(pWindow, MousePosX, MousePosY);
+    PickingTexture::PixelInfo Pixel = m_pickingTexture.ReadPixel(MousePosX, m_windowHeight - MousePosY - 1);
+    return Pixel.ObjectID;
+}
+
+
+void ForwardRenderer::SavePickedObject(GLScene* pScene, int ObjectIndex)
+{
+    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
+
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
+        if (((*it)->GetId() + 1) == ObjectIndex) {
+            pScene->SetPickedSceneObject(*it);
+            break;
+        }
+    }
 }
 
 
@@ -332,11 +370,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         assert(0);
     }
    
-    int WindowWidth = 0;
-    int WindowHeight = 0;
-    m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
-
-    glViewport(0, 0, WindowWidth, WindowHeight);
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
 
     bool FirstTimeForwardLighting = true;
 

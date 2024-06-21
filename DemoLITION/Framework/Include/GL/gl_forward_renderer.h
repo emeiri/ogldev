@@ -88,7 +88,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void ControlCellShading(bool IsEnabled);
 
-    void Render(GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis);
+    void Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis);
 
    // void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
 
@@ -113,7 +113,11 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
  
 private:
 
-    void PickingPass(GLScene* pScene);
+    void PickingPass(void* pWindow, GLScene* pScene);
+    void PickingRenderScene(GLScene* pScene);
+    int GetPickedObjectIndex(void* pWindow, GLScene* pScene);
+    void PostPickingPass(void* pWindow, GLScene* pScene);
+    void SavePickedObject(GLScene* pScene, int ObjectIndex);
     void ShadowMapPass(GLScene* pScene);
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
@@ -132,6 +136,9 @@ private:
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
     void SetWorldMatrix_CB_PickingPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
+
+    int m_windowWidth = -1;
+    int m_windowHeight = -1;
 
     RENDER_PASS m_curRenderPass = RENDER_PASS_UNINITIALIZED;
     CoreSceneObject* m_pcurSceneObject = NULL;

@@ -73,6 +73,10 @@ public:
         BaseGLApp::OnFrame();
         m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
+
+        if (m_pScene->GetPickedSceneObject()) {
+            printf("foo\n");
+        }
     //    m_pSceneObject->ResetRotations();
      //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
         //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
@@ -88,7 +92,7 @@ public:
     }
 
 
-    bool OnMouseButton(int Button, int Action, int Mode)
+    bool OnMouseButton(int Button, int Action, int Mode, int x, int y)
     {
         bool HandledByMe = true;
 
