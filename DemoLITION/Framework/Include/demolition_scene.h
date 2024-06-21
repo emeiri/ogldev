@@ -47,6 +47,9 @@ public:
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
     const Vector4f& GetFlatColor() const { return m_flatColor; }
 
+    void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
+    Vector3f GetColorMod() const { return m_colorMod; }
+
 private:
     void CalcRotationStack(Matrix4f& Rot) const;
 
@@ -55,6 +58,7 @@ private:
     int m_numRotations = 0;
     Vector3f m_scale = Vector3f(1.0f, 1.0f, 1.0f);
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
+    Vector3f m_colorMod = Vector3f(1.0f, 1.0f, 1.0f);
 };
 
 
@@ -78,7 +82,7 @@ public:
 
     virtual void ControlPicking(bool Enable) = 0;
 
-    virtual const SceneObject* GetPickedSceneObject() const = 0;
+    virtual SceneObject* GetPickedSceneObject() const = 0;
 
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 

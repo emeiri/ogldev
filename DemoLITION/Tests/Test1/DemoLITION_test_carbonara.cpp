@@ -75,8 +75,15 @@ public:
         m_count += 0.01f;
 
         if (m_pScene->GetPickedSceneObject()) {
-            printf("foo\n");
+            m_pickedObject = m_pScene->GetPickedSceneObject();
+            m_pickedObject->SetColorMod(2.0f, 1.0f, 1.0f);
+        } else {
+            if (m_pickedObject) {
+                m_pickedObject->SetColorMod(1.0f, 1.0f, 1.0f);
+                m_pickedObject = NULL;
+            }
         }
+        
     //    m_pSceneObject->ResetRotations();
      //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
         //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
@@ -122,6 +129,7 @@ private:
     PointLight m_pointLight;
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
+    SceneObject* m_pickedObject = NULL;
 };
 
 

@@ -93,9 +93,9 @@ public:
 
     bool IsPickingEnabled() const { return m_enablePicking; }
 
-    void SetPickedSceneObject(const CoreSceneObject* pSceneObject) { m_pPickedSceneObject = pSceneObject; }
+    void SetPickedSceneObject(CoreSceneObject* pSceneObject) { m_pPickedSceneObject = pSceneObject; }
 
-    const SceneObject* GetPickedSceneObject() const { return m_pPickedSceneObject; }
+    SceneObject* GetPickedSceneObject() const { return m_pPickedSceneObject; }
 
 protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
@@ -109,5 +109,5 @@ private:
     std::vector<CoreSceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
     bool m_enablePicking = false;
-    const CoreSceneObject* m_pPickedSceneObject = NULL;
+    CoreSceneObject* m_pPickedSceneObject = NULL;
 };

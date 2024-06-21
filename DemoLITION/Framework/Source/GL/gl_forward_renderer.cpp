@@ -248,7 +248,9 @@ void ForwardRenderer::PostPickingPass(void* pWindow, GLScene* pScene)
 {
     int ObjectIndex = GetPickedObjectIndex(pWindow, pScene);
 
-    if (ObjectIndex > 0) {
+    if (ObjectIndex == 0) {
+        pScene->SetPickedSceneObject(NULL);
+    } else {
         SavePickedObject(pScene, ObjectIndex);
     }
 }
@@ -270,9 +272,12 @@ void ForwardRenderer::SavePickedObject(GLScene* pScene, int ObjectIndex)
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         if (((*it)->GetId() + 1) == ObjectIndex) {
             pScene->SetPickedSceneObject(*it);
-            break;
+            return;
         }
     }
+
+    // should never get here
+    assert(0);
 }
 
 
@@ -455,6 +460,7 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
 
     m_pCurLightingTech->ControlNormalMap(NormalMapEnabled);
     m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
+    m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));
    
     pModel->Render(this);
 }
