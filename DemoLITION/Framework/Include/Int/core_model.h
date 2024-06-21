@@ -304,8 +304,8 @@ private:
 	// Skeletal animation stuff
     /////////////////////////////////////
 
-    void LoadMeshBones(uint MeshIndex, const aiMesh* paiMesh);
-    void LoadSingleBone(uint MeshIndex, const aiBone* pBone);
+    void LoadMeshBones(vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* paiMesh);
+    void LoadSingleBone(vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone);
     int GetBoneId(const aiBone* pBone);
     void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);
     void CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim);

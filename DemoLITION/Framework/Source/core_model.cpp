@@ -320,7 +320,9 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
         m_Indices.push_back(Face.mIndices[2]);
     }
 
-    LoadMeshBones(MeshIndex, paiMesh);
+    if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
+        LoadMeshBones(Vertices, MeshIndex, paiMesh);
+    }  
 }
 
 
@@ -382,6 +384,10 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
         Indices[i * 3 + 1] = Face.mIndices[1];
         Indices[i * 3 + 2] = Face.mIndices[2];
     }
+
+    if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
+	    LoadMeshBones(Vertices, MeshIndex, paiMesh);
+	}
 
     OptimizeMesh(MeshIndex, Indices, Vertices, AllVertices);
 }
@@ -672,6 +678,18 @@ void CoreModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
     glEnableVertexAttribArray(BITANGENT_LOCATION);
     glVertexAttribPointer(BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
+
+    if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
+        NumElements = MAX_NUM_BONES_PER_VERTEX;
+	    glEnableVertexAttribArray(BONE_ID_LOCATION);
+	    glVertexAttribIPointer(BONE_ID_LOCATION, NumElements, GL_INT, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
+        NumFloats += NumElements;
+
+        NumElements = MAX_NUM_BONES_PER_VERTEX;
+	    glEnableVertexAttribArray(BONE_WEIGHT_LOCATION);
+	    glVertexAttribPointer(BONE_WEIGHT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
+        NumFloats += NumElements;
+    }
 }
 
 
@@ -718,6 +736,20 @@ void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     glVertexArrayAttribFormat(m_VAO, BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
     glVertexArrayAttribBinding(m_VAO, BITANGENT_LOCATION, 0);
     NumFloats += NumElements;
+
+    if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
+        NumElements = MAX_NUM_BONES_PER_VERTEX;
+        glEnableVertexArrayAttrib(m_VAO, BONE_ID_LOCATION);
+        glVertexArrayAttribIFormat(m_VAO, BONE_ID_LOCATION, NumElements, GL_INT, (GLuint)(NumFloats * sizeof(float)));
+        glVertexArrayAttribBinding(m_VAO, BONE_ID_LOCATION, 0);
+        NumFloats += NumElements;
+
+        NumElements = MAX_NUM_BONES_PER_VERTEX;
+        glEnableVertexArrayAttrib(m_VAO, BONE_WEIGHT_LOCATION);
+        glVertexArrayAttribFormat(m_VAO, BONE_WEIGHT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+        glVertexArrayAttribBinding(m_VAO, BONE_WEIGHT_LOCATION, 0);
+        NumFloats += NumElements;
+    }
 }
 
 
@@ -1151,7 +1183,7 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 }
 
 
-void CoreModel::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
+void CoreModel::LoadMeshBones(vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
 {
     if (pMesh->mNumBones > MAX_BONES) {
         printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
@@ -1162,12 +1194,12 @@ void CoreModel::LoadMeshBones(uint MeshIndex, const aiMesh* pMesh)
     // printf("Loading mesh bones %d\n", MeshIndex);
     for (uint i = 0 ; i < pMesh->mNumBones ; i++) {
         // printf("Bone %d %s\n", i, pMesh->mBones[i]->mName.C_Str());
-        LoadSingleBone(MeshIndex, pMesh->mBones[i]);
+        LoadSingleBone(SkinnedVertices, MeshIndex, pMesh->mBones[i]);
     }
 }
 
 
-void CoreModel::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
+void CoreModel::LoadSingleBone(vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone)
 {
     int BoneId = GetBoneId(pBone);
 
@@ -1181,7 +1213,7 @@ void CoreModel::LoadSingleBone(uint MeshIndex, const aiBone* pBone)
         const aiVertexWeight& vw = pBone->mWeights[i];
         uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + pBone->mWeights[i].mVertexId;
         // printf("%d: %d %f\n",i, pBone->mWeights[i].mVertexId, vw.mWeight);
-        //m_Bones[GlobalVertexID].AddBoneData(BoneId, vw.mWeight);
+        SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
     }
 
     MarkRequiredNodesForBone(pBone);

@@ -134,8 +134,6 @@ private:
     RENDER_PASS m_curRenderPass = RENDER_PASS_UNINITIALIZED;
     CoreSceneObject* m_pcurSceneObject = NULL;
 
-    //void RenderAnimationCommon(SkinnedMesh* pMesh);
-
     RenderingSystemGL* m_pRenderingSystemGL = NULL;    
     BasicCamera* m_pCurCamera = NULL;    
 

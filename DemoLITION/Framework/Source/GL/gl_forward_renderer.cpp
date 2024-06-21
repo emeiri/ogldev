@@ -323,6 +323,15 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 {
     if (pSceneObject->GetModel()->IsAnimated()) {
         SwitchToLightingTech(FORWARD_SKINNING);
+
+        float AnimationTimeSec = 0.0f;
+        int AnimationIndex = 0;
+        vector<Matrix4f> Transforms;
+        pSceneObject->GetModel()->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
+
+        for (uint i = 0; i < Transforms.size(); i++) {
+            m_skinningTech.SetBoneTransform(i, Transforms[i]);
+        }
     } else {
         SwitchToLightingTech(FORWARD_LIGHTING);
     }
@@ -425,32 +434,6 @@ void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
     pMesh->Render(&m_skinningTech);
 }*/
 
-
-/*void ForwardRenderer::RenderAnimationCommon(SkinnedMesh* pMesh)
-{
-    if (!m_pCurCamera) {
-        printf("ForwardRenderer: camera not initialized\n");
-        exit(0);
-    }
-
-    if ((m_numPointLights == 0) && (m_numSpotLights == 0) && m_dirLight.IsZero()) {
-        printf("Warning! trying to render but all lights are zero\n");
-    }
-
-    SwitchToSkinningTech();
-
-    if (m_dirLight.DiffuseIntensity > 0.0) {
-        m_skinningTech.UpdateDirLightDirection(m_dirLight);
-    }
-
-    m_skinningTech.UpdatePointLightsPos(m_numPointLights, m_pointLights);
-
-    m_skinningTech.UpdateSpotLightsPosAndDir(m_numSpotLights, m_spotLights);
-
-    m_skinningTech.SetMaterial(pMesh->GetMaterial());
-
-    UpdateMatrices(&m_skinningTech, pMesh);
-}*/
 
 
 void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
