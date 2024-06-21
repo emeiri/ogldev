@@ -82,7 +82,7 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
-    //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    //    m_pCurLightingTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -151,8 +151,8 @@ void ForwardRenderer::SwitchToLightingTech()
     GLint cur_prog = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
 
-    if (cur_prog != m_lightingTech.GetProgram()) {
-        m_lightingTech.Enable();
+    if (cur_prog != m_pCurLightingTech->GetProgram()) {
+        m_pCurLightingTech->Enable();
     }
 }
 
@@ -316,14 +316,14 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
     int NumPointLights = (int)pScene->GetPointLights().size();
 
     if (NumPointLights > 0) {
-        m_lightingTech.SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
+        m_pCurLightingTech->SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
         NumLightsTotal += NumPointLights;
     } 
 
     int NumSpotLights = (int)pScene->GetSpotLights().size();
 
     if (NumSpotLights > 0) {
-        m_lightingTech.SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
+        m_pCurLightingTech->SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
         NumLightsTotal += NumSpotLights;
     } 
 
@@ -331,18 +331,18 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     if (NumDirLights > 0) {
         const DirectionalLight& DirLight = pScene->GetDirLights()[0];
-        m_lightingTech.SetDirectionalLight(DirLight, true);    
+        m_pCurLightingTech->SetDirectionalLight(DirLight, true);    
         NumLightsTotal += NumDirLights;
     } 
 
     if (NumLightsTotal == 0) {
         //printf("Warning! trying to render but all lights are zero\n");
-        m_lightingTech.SetLightingEnabled(false);
+        m_pCurLightingTech->SetLightingEnabled(false);
     } else {
-        m_lightingTech.SetLightingEnabled(true);
+        m_pCurLightingTech->SetLightingEnabled(true);
     }
 
-    m_lightingTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+    m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
 }
 
 
@@ -352,8 +352,8 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
     bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
     bool HeightMapEnabled = pModel->GetHeightMap() != NULL;
 
-    m_lightingTech.ControlNormalMap(NormalMapEnabled);
-    m_lightingTech.ControlParallaxMap(HeightMapEnabled);
+    m_pCurLightingTech->ControlNormalMap(NormalMapEnabled);
+    m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
    
     pModel->Render(this);
 }
@@ -452,67 +452,67 @@ void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 void ForwardRenderer::ControlRimLight(bool IsEnabled)
 {
     SwitchToLightingTech();
-    m_lightingTech.ControlRimLight(IsEnabled);
+    m_pCurLightingTech->ControlRimLight(IsEnabled);
 }
 
 
 void ForwardRenderer::ControlCellShading(bool IsEnabled)
 {
     SwitchToLightingTech();
-    m_lightingTech.ControlCellShading(IsEnabled);
+    m_pCurLightingTech->ControlCellShading(IsEnabled);
 }
 
 
 void ForwardRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetLinearFog(FogStart, FogEnd);
-    m_lightingTech.SetFogColor(FogColor);
+    m_pCurLightingTech->SetLinearFog(FogStart, FogEnd);
+    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetExpFog(float FogEnd, const Vector3f& FogColor, float FogDensity)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetExpFog(FogEnd, FogDensity);
-    m_lightingTech.SetFogColor(FogColor);
+    m_pCurLightingTech->SetExpFog(FogEnd, FogDensity);
+    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, float FogDensity)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetExpSquaredFog(FogEnd, FogDensity);
-    m_lightingTech.SetFogColor(FogColor);
+    m_pCurLightingTech->SetExpSquaredFog(FogEnd, FogDensity);
+    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& FogColor)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetLayeredFog(FogTop, FogEnd);
-    m_lightingTech.SetFogColor(FogColor);
+    m_pCurLightingTech->SetLayeredFog(FogTop, FogEnd);
+    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetAnimatedFog(float FogEnd, float FogDensity, const Vector3f& FogColor)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetAnimatedFog(FogEnd, FogDensity);
-    m_lightingTech.SetFogColor(FogColor);
+    m_pCurLightingTech->SetAnimatedFog(FogEnd, FogDensity);
+    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::UpdateAnimatedFogTime(float FogTime)
 {
     SwitchToLightingTech();
-    m_lightingTech.SetFogTime(FogTime);
+    m_pCurLightingTech->SetFogTime(FogTime);
 }
 
 void ForwardRenderer::DisableFog()
 {
     SwitchToLightingTech();
-    m_lightingTech.SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
+    m_pCurLightingTech->SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
 }
 
 
@@ -528,7 +528,7 @@ void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
     case RENDER_PASS_LIGHTING_DIR:
     case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
-        m_lightingTech.ControlSpecularExponent(IsEnabled);
+        m_pCurLightingTech->ControlSpecularExponent(IsEnabled);
         break;
     }
 }
@@ -540,7 +540,7 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
     case RENDER_PASS_LIGHTING_DIR:
     case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
-        m_lightingTech.SetMaterial(material);
+        m_pCurLightingTech->SetMaterial(material);
     }
 }
 
@@ -551,7 +551,7 @@ void ForwardRenderer::DisableDiffuseTexture_CB()
     case RENDER_PASS_LIGHTING_DIR:
     case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
-        m_lightingTech.DisableDiffuseTexture();
+        m_pCurLightingTech->DisableDiffuseTexture();
     }
 }
 
@@ -614,14 +614,14 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f FinalWorldMatrix = World * ObjectMatrix;
-    m_lightingTech.SetWorldMatrix(FinalWorldMatrix);
+    m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
     Matrix4f View = m_pCurCamera->GetMatrix();
     Matrix4f Projection = m_pCurCamera->GetProjectionMat();
     Matrix4f WV = View * FinalWorldMatrix;
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
-    m_lightingTech.SetWVP(WVP);
-    m_lightingTech.SetWV(WV);
+    m_pCurLightingTech->SetWVP(WVP);
+    m_pCurLightingTech->SetWV(WV);
 
     Matrix4f LightWVP;
     
@@ -639,11 +639,11 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
         assert(0);
     }
 
-    m_lightingTech.SetLightWVP(LightWVP);
+    m_pCurLightingTech->SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = FinalWorldMatrix.Inverse();
     Matrix3f World3x3(InverseWorld);
     Matrix3f WorldTranspose = World3x3.Transpose();
 
-    m_lightingTech.SetNormalMatrix(WorldTranspose);
+    m_pCurLightingTech->SetNormalMatrix(WorldTranspose);
 }

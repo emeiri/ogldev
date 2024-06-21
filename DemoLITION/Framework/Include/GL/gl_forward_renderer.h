@@ -41,6 +41,12 @@ enum RENDER_PASS {
 };
 
 
+enum LIGHTING_TECHNIQUE {
+    FORWARD_LIGHTING = 0,
+    FORWARD_SKINNING = 1
+};
+
+
 class RenderingSystemGL;
 
 class ForwardRenderer : public DemolitionRenderCallbacks {
@@ -139,6 +145,8 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_lightViewMatrix;
 
+    LIGHTING_TECHNIQUE m_curLightingTech;
+    ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
     ForwardLightingTechnique m_lightingTech;
     ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
