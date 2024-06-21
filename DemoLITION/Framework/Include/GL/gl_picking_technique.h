@@ -1,6 +1,5 @@
 /*
-
-        Copyright 2024 Etay Meiri
+        Copyright 2011 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,39 +15,33 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#ifndef PICKING_TECHNIQUE_H
+#define PICKING_TECHNIQUE_H
 
-#include "demolition_rendering_system.h"
+#include "technique.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_basic_mesh.h"
+#include "ogldev_types.h"
 
-#define GLFW_DLL
-#include <GLFW/glfw3.h>
-
-
-class BaseGLApp : public GameCallbacks
+class PickingTechnique : public Technique, public IRenderCallbacks
 {
 public:
 
-    BaseGLApp(int WindowWidth, int WindowHeight);
+    PickingTechnique();
 
-    ~BaseGLApp() {}
+    virtual bool Init();
 
-    virtual void OnFrame();
+    void SetWVP(const Matrix4f& WVP);
 
-    virtual bool OnKeyboard(int key, int action);
+    void SetObjectIndex(uint ObjectIndex);
 
-    virtual bool OnMouseMove(int x, int y);
-
-    virtual bool OnMouseButton(int Button, int Action, int Mode);
-
-protected:
-    RenderingSystem* m_pRenderingSystem = NULL;
+    void DrawStartCB(uint DrawIndex);
 
 private:
-    void InitGUI();
-    void OnFrameGUI();
 
-    GLFWwindow* m_pWindow = NULL;
-    bool m_showGui = false;
-    bool m_isWireframe = false;
-    bool m_leftMousePressed = false;
+    GLuint m_WVPLocation;
+    GLuint m_drawIndexLocation;
+    GLuint m_objectIndexLocation;
 };
+
+#endif  /* PICKING_TECHNIQUE_H */

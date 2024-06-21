@@ -20,6 +20,7 @@
 #include "GL/gl_forward_renderer.h"
 #include "GL/gl_rendering_system.h"
 
+
 #define SHADOW_MAP_WIDTH 2048
 #define SHADOW_MAP_HEIGHT 2048
 
@@ -64,6 +65,12 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
     InitTechniques();
 
     InitShadowMapping();
+
+    int WindowWidth = 0;
+    int WindowHeight = 0;
+    m_pRenderingSystemGL->GetWindowSize(WindowWidth, WindowHeight);
+
+    m_pickingTexture.Init(WindowWidth, WindowHeight);
 
     glUseProgram(0);
 }
@@ -110,6 +117,12 @@ void ForwardRenderer::InitTechniques()
         printf("Error initializing the flat color technique\n");
         exit(1);
     }
+
+    if (!m_pickingTech.Init()) {
+        printf("Error initializing the picking technique\n");
+        exit(1);
+    }
+
 }
 
 
@@ -189,10 +202,49 @@ void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks, lon
         return;
     }
 
+    //if (pScene->IsPickingEnabled()) {
+        PickingPass(pScene);
+   // }
+
     ShadowMapPass(pScene);
     LightingPass(pScene, TotalRuntimeMillis);
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
+}
+
+
+void ForwardRenderer::PickingPass(GLScene* pScene)
+{
+    m_curRenderPass = RENDER_PASS_PICKING;
+
+    m_pickingTexture.EnableWriting();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_pickingTech.Enable();
+
+    const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
+
+    int i = 1; // Background is zero, the real objects start at 1
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
+        m_pickingTech.SetObjectIndex(i);
+        i++;
+        m_pcurSceneObject = *it;
+        
+        m_pcurSceneObject->GetModel()->Render(this);
+    }
+
+    /*for (uint i = 0; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos); i++) {
+        worldTransform.SetPosition(m_worldPos[i]);
+        // Background is zero, the real objects start at 1
+        m_pickingEffect.SetObjectIndex(i + 1);
+        Matrix4f World = worldTransform.GetMatrix();
+        Matrix4f WVP = Projection * View * World;
+        m_pickingEffect.SetWVP(WVP);
+        pMesh->Render(&m_pickingEffect);
+    }*/
+
+    m_pickingTexture.DisableWriting();
 }
 
 
@@ -587,6 +639,10 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
         SetWorldMatrix_CB_LightingPass(World);
         break;
 
+    case RENDER_PASS_PICKING:
+        SetWorldMatrix_CB_PickingPass(World);
+        break;
+
     default:
         printf("%s:%d - Unknown render pass %d\n", __FILE__, __LINE__, m_curRenderPass);
         exit(1);
@@ -629,6 +685,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f Projection = m_pCurCamera->GetProjectionMat();
     Matrix4f WV = View * FinalWorldMatrix;
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
+
+   // printf("Lighting pass\n"); WVP.Print();
     m_pCurLightingTech->SetWVP(WVP);
     m_pCurLightingTech->SetWV(WV);
 
@@ -656,3 +714,16 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 
     m_pCurLightingTech->SetNormalMatrix(WorldTranspose);
 }
+
+
+void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
+{
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f View = m_pCurCamera->GetMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjectionMat();    
+    Matrix4f WVP = Projection * View * World * ObjectMatrix;
+   // printf("Picking pass\n"); WVP.Print();
+
+    m_pickingTech.SetWVP(WVP);
+}
+

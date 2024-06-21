@@ -29,6 +29,9 @@
 #include "gl_forward_skinning.h"
 #include "gl_scene.h"
 #include "flat_color_technique.h"
+#include "GL/gl_picking_texture.h"
+#include "GL/gl_picking_technique.h"
+
 
 enum RENDER_PASS {
     RENDER_PASS_UNINITIALIZED = 0,
@@ -38,6 +41,7 @@ enum RENDER_PASS {
     RENDER_PASS_SHADOW_DIR = 4,    
     RENDER_PASS_SHADOW_SPOT = 5,
     RENDER_PASS_SHADOW_POINT = 6,
+    RENDER_PASS_PICKING = 7
 };
 
 
@@ -109,6 +113,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
  
 private:
 
+    void PickingPass(GLScene* pScene);
     void ShadowMapPass(GLScene* pScene);
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
@@ -125,6 +130,7 @@ private:
     void SetWorldMatrix_CB_ShadowPassSpot(const Matrix4f& World);
     void SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World);
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
+    void SetWorldMatrix_CB_PickingPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
 
     RENDER_PASS m_curRenderPass = RENDER_PASS_UNINITIALIZED;
@@ -147,5 +153,8 @@ private:
     ShadowMappingTechnique m_shadowMapTech;
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;
+    PickingTechnique m_pickingTech;
+
+    PickingTexture m_pickingTexture;
 };
 

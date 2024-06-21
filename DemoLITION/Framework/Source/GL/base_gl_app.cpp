@@ -151,9 +151,14 @@ bool BaseGLApp::OnMouseMove(int x, int y)
 }
 
 
-void BaseGLApp::OnMouseButton(int Button, int Action, int Mode)
+bool BaseGLApp::OnMouseButton(int Button, int Action, int Mode)
 {
+    bool HandledByMe = false;
+
     if (Button == GLFW_MOUSE_BUTTON_LEFT) {
         m_leftMousePressed = (Action == GLFW_PRESS);
+        HandledByMe = true;
     }
+
+    return HandledByMe;
 }

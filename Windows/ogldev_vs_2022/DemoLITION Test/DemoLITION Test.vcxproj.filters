@@ -48,5 +48,8 @@
     <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Tests\Test1\DemoLITION_test_carbonara.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

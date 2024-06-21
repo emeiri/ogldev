@@ -76,6 +76,8 @@ public:
     
     virtual void SetCameraSpeed(float Speed) = 0;
 
+    virtual void ControlPicking(bool Enable) = 0;
+
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 
     std::vector<SpotLight>& GetSpotLights() { return m_spotLights; }
@@ -84,7 +86,7 @@ public:
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
 
-    void DisableClear() { m_clearFrame = false;  }
+    void DisableClear() { m_clearFrame = false;  }    
 
 protected:
     bool m_clearFrame = false;

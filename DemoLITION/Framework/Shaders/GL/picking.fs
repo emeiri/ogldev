@@ -16,39 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#version 330
 
-#include "demolition_rendering_system.h"
+uniform uint gObjectIndex;
+uniform uint gDrawIndex;
 
-#define GLFW_DLL
-#include <GLFW/glfw3.h>
+out uvec3 FragColor;
 
-
-class BaseGLApp : public GameCallbacks
+void main()
 {
-public:
-
-    BaseGLApp(int WindowWidth, int WindowHeight);
-
-    ~BaseGLApp() {}
-
-    virtual void OnFrame();
-
-    virtual bool OnKeyboard(int key, int action);
-
-    virtual bool OnMouseMove(int x, int y);
-
-    virtual bool OnMouseButton(int Button, int Action, int Mode);
-
-protected:
-    RenderingSystem* m_pRenderingSystem = NULL;
-
-private:
-    void InitGUI();
-    void OnFrameGUI();
-
-    GLFWwindow* m_pWindow = NULL;
-    bool m_showGui = false;
-    bool m_isWireframe = false;
-    bool m_leftMousePressed = false;
-};
+   FragColor = uvec3(gObjectIndex, gDrawIndex, gl_PrimitiveID);
+}

@@ -173,6 +173,8 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h" />
@@ -207,6 +209,8 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
@@ -217,6 +221,8 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

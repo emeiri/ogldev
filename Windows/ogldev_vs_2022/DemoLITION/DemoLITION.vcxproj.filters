@@ -85,6 +85,12 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -165,6 +171,12 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h">
+      <Filter>Include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h">
+      <Filter>Include\GL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -206,6 +218,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.vs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

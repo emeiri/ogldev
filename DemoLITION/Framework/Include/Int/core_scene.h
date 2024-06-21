@@ -84,6 +84,10 @@ public:
 
     void SetCameraSpeed(float Speed);
 
+    virtual void ControlPicking(bool Enable) { m_enablePicking = Enable; };
+
+    bool IsPickingEnabled() const { return m_enablePicking; }
+
 protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;
@@ -95,4 +99,5 @@ private:
     BasicCamera m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
+    bool m_enablePicking = false;
 };
