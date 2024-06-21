@@ -53,6 +53,8 @@ class RenderingSystemGL : public CoreRenderingSystem
     
     void OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
+    void GetMousePos(void* pWindow, int& x, int& y);
+
  protected:
      virtual void* CreateWindowInternal();
 

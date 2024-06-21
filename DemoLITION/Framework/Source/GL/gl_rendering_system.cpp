@@ -232,4 +232,13 @@ void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* window, double x, double
 void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
 {
     m_pGameCallbacks->OnMouseButton(Button, Action, Mode);
+
+
+void RenderingSystemGL::GetMousePos(void* pWindow, int& x, int& y)
+{
+    GLFWwindow* pGLFWWindow = (GLFWwindow*)pWindow;
+    double MousePosX = 0.0, MousePosY = 0.0;
+    glfwGetCursorPos(pGLFWWindow, &MousePosX, &MousePosY);
+    x = (int)MousePosX;
+    y = (int)MousePosY;
 }
