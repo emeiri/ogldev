@@ -173,7 +173,6 @@
     <ClInclude Include="..\..\..\Include\ogldev_cubemap_texture.h" />
     <ClInclude Include="..\..\..\Include\ogldev_engine_common.h" />
     <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_forward_skinning.h" />
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
     <ClInclude Include="..\..\..\Include\ogldev_glfw.h" />
     <ClInclude Include="..\..\..\Include\ogldev_glfw_backend.h" />

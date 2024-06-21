@@ -26,6 +26,7 @@
 #include "demolition_rendering_system.h"
 #include "Int/core_model.h"
 #include "gl_forward_lighting.h"
+#include "gl_forward_skinning.h"
 #include "gl_scene.h"
 #include "flat_color_technique.h"
 
@@ -139,7 +140,7 @@ private:
     Matrix4f m_lightViewMatrix;
 
     ForwardLightingTechnique m_lightingTech;
-    //ForwardSkinningTechnique m_skinningTech;
+    ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;

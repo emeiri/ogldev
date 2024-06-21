@@ -3,22 +3,25 @@
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 TexCoord;
 layout (location = 2) in vec3 Normal;
-layout (location = 3) in ivec4 BoneIDs;
-layout (location = 4) in vec4 Weights;
+layout (location = 3) in vec3 Tangent;
+layout (location = 4) in vec3 Bitangent;
+layout (location = 5) in ivec4 BoneIDs;
+layout (location = 6) in vec4 Weights;
 
 const int MAX_BONES = 200;
 
 uniform mat4 gWVP;
-uniform mat4 gBones[MAX_BONES];
+uniform mat4 gLightWVP;
 uniform mat4 gWorld;
 uniform mat3 gNormalMatrix;
-uniform mat4 gLightWVP;
+uniform mat4 gBones[MAX_BONES];
 
 out vec2 TexCoord0;
 out vec3 Normal0;
 out vec3 WorldPos0;
-out vec4 LightSpacePos;
-
+out vec4 LightSpacePos0;
+out vec3 Tangent0;
+out vec3 Bitangent0;
 
 void main()
 {
@@ -27,10 +30,13 @@ void main()
     BoneTransform     += gBones[BoneIDs[2]] * Weights[2];
     BoneTransform     += gBones[BoneIDs[3]] * Weights[3];
 
-    vec4 PosL = BoneTransform * vec4(Position, 1.0);
+    vec4 Pos4 = vec4(Position, 1.0);
+    vec4 PosL = BoneTransform * Pos4;
     gl_Position = gWVP * PosL;
     TexCoord0 = TexCoord;
     Normal0 = gNormalMatrix * Normal;
+    Tangent0 = gNormalMatrix * Tangent;
+    Bitangent0 = gNormalMatrix * Bitangent;
     WorldPos0 = (gWorld * PosL).xyz;
-    LightSpacePos = gLightWVP * vec4(Position, 1.0);
+    LightSpacePos0 = gLightWVP * PosL;
 }

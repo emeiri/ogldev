@@ -84,6 +84,18 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     //    m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
+    if (!m_skinningTech.Init()) {
+        printf("Error initializing the skinning technique\n");
+        exit(1);
+    }
+
+    m_skinningTech.Enable();
+    m_skinningTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
+
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);

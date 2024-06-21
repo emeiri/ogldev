@@ -78,9 +78,6 @@
     <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_forward_skinning.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>

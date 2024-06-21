@@ -20,7 +20,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-#include "ogldev_forward_lighting.h"
+#include "GL/gl_forward_lighting.h"
 
 
 class ForwardSkinningTechnique : public ForwardLightingTechnique

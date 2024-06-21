@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ogldev_forward_skinning.h"
+#include "GL/gl_forward_skinning.h"
 
 
 
@@ -30,11 +30,11 @@ bool ForwardSkinningTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "../Common/Shaders/forward_skinning.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/forward_skinning.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/forward_lighting.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/forward_lighting.fs")) {
         return false;
     }
 
