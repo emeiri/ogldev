@@ -202,9 +202,9 @@ void ForwardRenderer::Render(GLScene* pScene, GameCallbacks* pGameCallbacks, lon
         return;
     }
 
-    //if (pScene->IsPickingEnabled()) {
+    if (pScene->IsPickingEnabled()) {
         PickingPass(pScene);
-   // }
+    }
 
     ShadowMapPass(pScene);
     LightingPass(pScene, TotalRuntimeMillis);
@@ -229,20 +229,10 @@ void ForwardRenderer::PickingPass(GLScene* pScene)
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         m_pickingTech.SetObjectIndex(i);
         i++;
-        m_pcurSceneObject = *it;
-        
+
+        m_pcurSceneObject = *it;        
         m_pcurSceneObject->GetModel()->Render(this);
     }
-
-    /*for (uint i = 0; i < (int)ARRAY_SIZE_IN_ELEMENTS(m_worldPos); i++) {
-        worldTransform.SetPosition(m_worldPos[i]);
-        // Background is zero, the real objects start at 1
-        m_pickingEffect.SetObjectIndex(i + 1);
-        Matrix4f World = worldTransform.GetMatrix();
-        Matrix4f WVP = Projection * View * World;
-        m_pickingEffect.SetWVP(WVP);
-        pMesh->Render(&m_pickingEffect);
-    }*/
 
     m_pickingTexture.DisableWriting();
 }
