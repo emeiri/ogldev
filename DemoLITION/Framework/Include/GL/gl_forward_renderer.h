@@ -43,7 +43,8 @@ enum RENDER_PASS {
 
 enum LIGHTING_TECHNIQUE {
     FORWARD_LIGHTING = 0,
-    FORWARD_SKINNING = 1
+    FORWARD_SKINNING = 1,
+    UNDEFINED_TECHNIQUE = 2,
 };
 
 
@@ -121,7 +122,7 @@ private:
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
-    void SwitchToLightingTech();
+    void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
     void InitShadowMapping();
     void InitTechniques();
     void SetWorldMatrix_CB_ShadowPassDir(const Matrix4f& World);
@@ -145,7 +146,7 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_lightViewMatrix;
 
-    LIGHTING_TECHNIQUE m_curLightingTech;
+    LIGHTING_TECHNIQUE m_curLightingTech = FORWARD_LIGHTING;
     ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
     ForwardLightingTechnique m_lightingTech;
     ForwardSkinningTechnique m_skinningTech;

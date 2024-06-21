@@ -109,6 +109,8 @@ public:
 
     void SetTextureScale(float Scale) { m_textureScale = Scale; }
 
+    bool IsAnimated() const;
+
 private:
 
     void Clear();

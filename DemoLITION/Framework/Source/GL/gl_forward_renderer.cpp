@@ -146,14 +146,26 @@ void ForwardRenderer::InitShadowMapping()
 }
 
 
-void ForwardRenderer::SwitchToLightingTech()
+void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 {
-    GLint cur_prog = 0;
-    glGetIntegerv(GL_CURRENT_PROGRAM, &cur_prog);
+    if (m_curLightingTech != Tech) {
+        switch (Tech) {
+        case FORWARD_LIGHTING:
+            m_pCurLightingTech = &m_lightingTech;
+            break;
 
-    if (cur_prog != m_pCurLightingTech->GetProgram()) {
-        m_pCurLightingTech->Enable();
+        case FORWARD_SKINNING:
+            m_pCurLightingTech = &m_skinningTech;
+            break;
+
+        default:
+            assert(0);
+        }
+
+        m_curLightingTech = Tech;
     }
+
+    m_pCurLightingTech->Enable();
 }
 
 
@@ -309,7 +321,11 @@ void ForwardRenderer::LightingPass(GLScene* pScene)
 
 void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject)
 {
-    SwitchToLightingTech();
+    if (pSceneObject->GetModel()->IsAnimated()) {
+        SwitchToLightingTech(FORWARD_SKINNING);
+    } else {
+        SwitchToLightingTech(FORWARD_LIGHTING);
+    }
 
     int NumLightsTotal = 0;
 
@@ -361,6 +377,7 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
 
 void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
 {
+    m_curLightingTech = UNDEFINED_TECHNIQUE;    // a bit of a hack
     m_flatColorTech.Enable();
     m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
     Matrix4f WVP;
@@ -451,68 +468,77 @@ void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 
 void ForwardRenderer::ControlRimLight(bool IsEnabled)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->ControlRimLight(IsEnabled);
+    assert(0);
+  //  SwitchToLightingTech();
+ //   m_pCurLightingTech->ControlRimLight(IsEnabled);
 }
 
 
 void ForwardRenderer::ControlCellShading(bool IsEnabled)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->ControlCellShading(IsEnabled);
+    assert(0);
+ //   SwitchToLightingTech();
+ //   m_pCurLightingTech->ControlCellShading(IsEnabled);
 }
 
 
 void ForwardRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetLinearFog(FogStart, FogEnd);
-    m_pCurLightingTech->SetFogColor(FogColor);
+    assert(0);
+//    SwitchToLightingTech();
+//    m_pCurLightingTech->SetLinearFog(FogStart, FogEnd);
+ //   m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetExpFog(float FogEnd, const Vector3f& FogColor, float FogDensity)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetExpFog(FogEnd, FogDensity);
-    m_pCurLightingTech->SetFogColor(FogColor);
+    assert(0);
+ //   SwitchToLightingTech();
+//    m_pCurLightingTech->SetExpFog(FogEnd, FogDensity);
+//    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, float FogDensity)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetExpSquaredFog(FogEnd, FogDensity);
-    m_pCurLightingTech->SetFogColor(FogColor);
+    assert(0);
+ //   SwitchToLightingTech();
+ //   m_pCurLightingTech->SetExpSquaredFog(FogEnd, FogDensity);
+ //   m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& FogColor)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetLayeredFog(FogTop, FogEnd);
-    m_pCurLightingTech->SetFogColor(FogColor);
+    assert(0);
+ //   SwitchToLightingTech();
+ //   m_pCurLightingTech->SetLayeredFog(FogTop, FogEnd);
+ //   m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::SetAnimatedFog(float FogEnd, float FogDensity, const Vector3f& FogColor)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetAnimatedFog(FogEnd, FogDensity);
-    m_pCurLightingTech->SetFogColor(FogColor);
+    assert(0);
+//    SwitchToLightingTech();
+//    m_pCurLightingTech->SetAnimatedFog(FogEnd, FogDensity);
+//    m_pCurLightingTech->SetFogColor(FogColor);
 }
 
 
 void ForwardRenderer::UpdateAnimatedFogTime(float FogTime)
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetFogTime(FogTime);
+    assert(0);
+  //  SwitchToLightingTech();
+ //   m_pCurLightingTech->SetFogTime(FogTime);
 }
 
 void ForwardRenderer::DisableFog()
 {
-    SwitchToLightingTech();
-    m_pCurLightingTech->SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
+    assert(0);
+//    SwitchToLightingTech();
+//    m_pCurLightingTech->SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
 }
 
 

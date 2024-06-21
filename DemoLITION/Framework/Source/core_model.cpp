@@ -1596,3 +1596,16 @@ const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation&
 
     return NULL;
 }
+
+
+bool CoreModel::IsAnimated() const
+{
+    bool ret = m_pScene->mNumAnimations > 0;
+
+    if (ret && (NumBones() == 0)) {
+        printf("Animations without bones? need to check this\n");
+        assert(0);
+    }
+
+    return ret;
+}

@@ -31,7 +31,8 @@ void main()
     BoneTransform     += gBones[BoneIDs[3]] * Weights[3];
 
     vec4 Pos4 = vec4(Position, 1.0);
-    vec4 PosL = BoneTransform * Pos4;
+  //  vec4 PosL = BoneTransform * Pos4;
+   vec4 PosL = Pos4;
     gl_Position = gWVP * PosL;
     TexCoord0 = TexCoord;
     Normal0 = gNormalMatrix * Normal;
