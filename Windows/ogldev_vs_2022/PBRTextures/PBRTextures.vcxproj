@@ -25,7 +25,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\..\tutorial52_youtube\tutorial52.cpp" />
+    <ClCompile Include="..\..\..\pbr_textures\pbr_textures.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
@@ -44,7 +44,7 @@
     <ProjectGuid>{A905FE76-7290-48E7-AD86-E918753F516D}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial52_PBRTextures</ProjectName>
+    <ProjectName>PBRTextures</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
