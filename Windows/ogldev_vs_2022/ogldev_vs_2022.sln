@@ -395,6 +395,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11", "Vulkan\Tutori
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRTextures", "PBRTextures\PBRTextures.vcxproj", "{A905FE76-7290-48E7-AD86-E918753F516D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial52_NormalMapping", "Tutorial52_NormalMapping\Tutorial52.vcxproj", "{7895318F-15FC-4CC3-B941-E669BB2892BA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1107,6 +1112,14 @@ Global
 		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x64.Build.0 = Release|x64
 		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x86.ActiveCfg = Release|Win32
 		{A905FE76-7290-48E7-AD86-E918753F516D}.Release|x86.Build.0 = Release|Win32
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Debug|x64.ActiveCfg = Debug|x64
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Debug|x64.Build.0 = Debug|x64
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Debug|x86.ActiveCfg = Debug|Win32
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Debug|x86.Build.0 = Debug|Win32
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x64.ActiveCfg = Release|x64
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x64.Build.0 = Release|x64
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x86.ActiveCfg = Release|Win32
+		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1208,6 +1221,7 @@ Global
 		{D6C450A9-DD41-4D42-B90E-EC904156AA93} = {ACA68C35-1336-405A-85F8-EA7D433F6478}
 		{0BD8E4FC-3B42-44E1-937E-8406FA889A5C} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{A905FE76-7290-48E7-AD86-E918753F516D} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{7895318F-15FC-4CC3-B941-E669BB2892BA} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
