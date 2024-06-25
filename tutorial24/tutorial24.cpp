@@ -196,7 +196,7 @@ public:
         m_pQuad->Render();
 
         p.Scale(0.1f, 0.1f, 0.1f);
-        p.Rotate(0.0f, m_scale, 0.0f);
+        p.Rotate(90.0f, m_scale, 0.0f);
         p.WorldPos(0.0f, 0.0f, 3.0f);
         p.SetCamera(m_pGameCamera->GetPos(), m_pGameCamera->GetTarget(), m_pGameCamera->GetUp());
         m_pLightingEffect->SetWVP(p.GetWVPTrans());
