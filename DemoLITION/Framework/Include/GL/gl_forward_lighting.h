@@ -38,7 +38,6 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetWV(const Matrix4f& WV);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetNormalMatrix(const Matrix3f& NormalMatrix);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
@@ -77,7 +76,8 @@ public:
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
     void SetFogTime(float Time);
-    void SetLightingEnabled(bool LightingEnabled);
+    void ControlLighting(bool LightingEnabled);
+    void ControlShadows(bool ShadowsEnabled);
 
 protected:
 
@@ -86,7 +86,6 @@ protected:
 private:
     void SetExpFogCommon(float FogEnd, float FogDensity);
 
-    GLuint WVLoc = INVALID_UNIFORM_LOCATION;
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
@@ -123,6 +122,7 @@ private:
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

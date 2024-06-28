@@ -63,6 +63,25 @@ private:
 };
 
 
+class SceneConfig
+{
+public:
+
+    SceneConfig();
+
+    void ControlShadowMapping(bool EnableShadowMapping) { m_shadowMappingEnabled = EnableShadowMapping; }
+    bool IsShadowMappingEnabled() const { return m_shadowMappingEnabled; }
+
+    void ControlPicking(bool EnablePicking) { m_pickingEnabled = EnablePicking; }
+    bool IsPickingEnabled() const { return m_pickingEnabled; }
+
+private:
+
+    bool m_shadowMappingEnabled = true;
+    bool m_pickingEnabled = false;
+};
+
+
 class Scene {
 public:
     Scene();
@@ -83,9 +102,9 @@ public:
     
     virtual void SetCameraSpeed(float Speed) = 0;
 
-    virtual void ControlPicking(bool Enable) = 0;
-
     virtual SceneObject* GetPickedSceneObject() const = 0;
+
+    virtual SceneConfig* GetConfig() = 0;
 
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 
@@ -95,7 +114,7 @@ public:
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
 
-    void DisableClear() { m_clearFrame = false;  }  
+    void DisableClear() { m_clearFrame = false;  }      
 
 protected:
     bool m_clearFrame = false;

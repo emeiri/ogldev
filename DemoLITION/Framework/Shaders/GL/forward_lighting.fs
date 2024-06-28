@@ -75,8 +75,6 @@ struct Material
 };
 
 
-uniform mat4 gWorld;
-
 uniform DirectionalLight gDirectionalLight;
 uniform int gNumPointLights;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
@@ -107,6 +105,8 @@ uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
 uniform bool gLightingEnabled = true;
+uniform bool gShadowsEnabled = true;
+
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -283,17 +283,19 @@ float CalcShadowFactorWithRandomSampling(vec3 LightDirection, vec3 Normal)
 
 float CalcShadowFactor(vec3 LightDirection, vec3 Normal, bool IsPoint)
 {
-    float ShadowFactor = 0.0;
+    float ShadowFactor = 1.0;
 
-    if (gShadowMapRandomRadius > 0.0) {
-        ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);        
-    } else if (gShadowMapFilterSize > 0){
-        ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);        
-    } else {
-        if (IsPoint) {
-            ShadowFactor = CalcShadowFactorPointLight(LightDirection);            
+    if (gShadowsEnabled) {
+        if (gShadowMapRandomRadius > 0.0) {
+            ShadowFactor = CalcShadowFactorWithRandomSampling(LightDirection, Normal);        
+        } else if (gShadowMapFilterSize > 0){
+            ShadowFactor = CalcShadowFactorPCF(LightDirection, Normal);        
         } else {
-            ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
+            if (IsPoint) {
+                ShadowFactor = CalcShadowFactorPointLight(LightDirection);            
+            } else {
+                ShadowFactor = CalcShadowFactorBasic(LightDirection, Normal);
+            }
         }
     }
 

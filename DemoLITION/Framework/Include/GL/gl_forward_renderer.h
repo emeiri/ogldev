@@ -128,6 +128,7 @@ private:
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
+    void ApplySceneConfig(GLScene* pScene);
     void InitShadowMapping();
     void InitTechniques();
     void SetWorldMatrix_CB_ShadowPassDir(const Matrix4f& World);

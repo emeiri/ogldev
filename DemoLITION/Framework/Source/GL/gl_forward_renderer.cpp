@@ -196,17 +196,23 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         return;
     }
 
-    if (pScene->IsPickingEnabled()) {
+    if (pScene->GetConfig()->IsPickingEnabled()) {
         PickingPass(pWindow, pScene);
         // The render loop may be called multiple time before picking
         // is again disabled so we do it explicitly
-        pScene->ControlPicking(false);  
+        pScene->GetConfig()->ControlPicking(false);
     }
 
     ShadowMapPass(pScene);
     LightingPass(pScene, TotalRuntimeMillis);
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
+}
+
+
+void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
+{
+    m_pCurLightingTech->ControlShadows(pScene->GetConfig()->IsShadowMappingEnabled());
 }
 
 
@@ -417,6 +423,8 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
         SwitchToLightingTech(FORWARD_LIGHTING);
     }
 
+    ApplySceneConfig(pScene);
+
     int NumLightsTotal = 0;
 
     int NumPointLights = (int)pScene->GetPointLights().size();
@@ -443,9 +451,9 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     if (NumLightsTotal == 0) {
         //printf("Warning! trying to render but all lights are zero\n");
-        m_pCurLightingTech->SetLightingEnabled(false);
+        m_pCurLightingTech->ControlLighting(false);
     } else {
-        m_pCurLightingTech->SetLightingEnabled(true);
+        m_pCurLightingTech->ControlLighting(true);
     }
 
     m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
@@ -718,7 +726,6 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 
    // printf("Lighting pass\n"); WVP.Print();
     m_pCurLightingTech->SetWVP(WVP);
-    m_pCurLightingTech->SetWV(WV);
 
     Matrix4f LightWVP;
     

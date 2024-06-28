@@ -54,6 +54,12 @@ private:
 
 class CoreRenderingSystem;
 
+/*class CoreSceneConfig : public SceneConfig()
+{
+public:
+    CoreSceneConfig() {}
+}*/
+
 class CoreScene : public Scene, public Object {
 public:
     CoreScene(CoreRenderingSystem* pRenderingSystem);
@@ -92,13 +98,11 @@ public:
 
     void SetCameraSpeed(float Speed);
 
-    virtual void ControlPicking(bool Enable) { m_enablePicking = Enable; };
-
-    bool IsPickingEnabled() const { return m_enablePicking; }
-
     void SetPickedSceneObject(CoreSceneObject* pSceneObject) { m_pPickedSceneObject = pSceneObject; }
 
     SceneObject* GetPickedSceneObject() const { return m_pPickedSceneObject; }
+
+    SceneConfig* GetConfig() { return &m_config; }
 
 protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
@@ -111,6 +115,6 @@ private:
     BasicCamera m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
-    bool m_enablePicking = false;
     CoreSceneObject* m_pPickedSceneObject = NULL;
+    SceneConfig m_config;
 };

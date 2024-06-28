@@ -32,7 +32,7 @@ public:
 
     ~BaseGLApp() {}
 
-    virtual void OnFrame();
+   // virtual void OnFrame();
 
     virtual bool OnKeyboard(int key, int action);
 
@@ -46,9 +46,8 @@ protected:
 
 private:
     void InitGUI();
-    void OnFrameGUI();
+
     
-    bool m_showGui = false;
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;
 };
