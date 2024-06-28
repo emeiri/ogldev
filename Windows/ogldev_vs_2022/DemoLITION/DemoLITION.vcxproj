@@ -167,6 +167,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_base_gl_app.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_object.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h" />

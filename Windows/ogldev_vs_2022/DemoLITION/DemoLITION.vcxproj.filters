@@ -177,6 +177,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_object.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
