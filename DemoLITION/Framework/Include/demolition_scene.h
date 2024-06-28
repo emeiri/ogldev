@@ -76,6 +76,8 @@ public:
 
     virtual bool RemoveFromRenderList(SceneObject* pSceneObject) = 0;
 
+    virtual std::list<SceneObject*> GetSceneObjectsList() = 0;
+
     virtual void SetCamera(const Vector3f& Pos, const Vector3f& Target) = 0;
     
     virtual void SetCameraSpeed(float Speed) = 0;

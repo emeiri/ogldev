@@ -180,6 +180,21 @@ bool CoreScene::RemoveFromRenderList(SceneObject* pSceneObject)
 }
 
 
+
+std::list<SceneObject*> CoreScene::GetSceneObjectsList()
+{
+    // TODO: not very efficient. Currently used only by the GUI. For small lists it should be ok.
+
+    std::list<SceneObject*> ObjectList;
+
+    for (std::list<CoreSceneObject*>::const_iterator it = m_renderList.begin(); it != m_renderList.end(); it++) {
+        ObjectList.push_back(*it);
+    }
+
+    return ObjectList;
+}
+
+
 SceneObject* CoreScene::CreateSceneObject(Model* pModel)
 {
     if (m_numSceneObjects == NUM_SCENE_OBJECTS) {
