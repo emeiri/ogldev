@@ -99,6 +99,10 @@ public:
     const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
     const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
 
+    void SetColorTexture(int TextureHandle);
+
+    Texture* GetColorTexture() const { return m_pColorTexture; }
+
     void SetNormalMap(int TextureHandle);
 
     Texture* GetNormalMap() const { return m_pNormalMap; }
@@ -286,6 +290,7 @@ private:
     void InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight);
 
     std::vector<Material> m_Materials;
+    Texture* m_pColorTexture = NULL;
     Texture* m_pNormalMap = NULL;
     Texture* m_pHeightMap = NULL;
 	

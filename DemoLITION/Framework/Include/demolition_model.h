@@ -23,6 +23,8 @@
 class Model {
 public:
 
+    virtual void SetColorTexture(int TextureHandle) = 0;
+
     virtual void SetNormalMap(int TextureHandle) = 0;
 
     virtual void SetHeightMap(int TextureHandle) = 0;
