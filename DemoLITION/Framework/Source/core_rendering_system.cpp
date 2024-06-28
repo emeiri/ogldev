@@ -138,6 +138,7 @@ Model* CoreRenderingSystem::LoadModel(const std::string& Filename)
     if (pModel) {
         m_models[m_numModels] = pModel;
         m_numModels++;
+        pModel->SetName(Filename);
     }
     else {
         printf("%s:%d: error loading '%s'\n", __FILE__, __LINE__, Filename.c_str());
