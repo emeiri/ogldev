@@ -73,6 +73,18 @@ void CoreModel::Clear()
 }
 
 
+void CoreModel::SetColorTexture(int TextureHandle)
+{
+    if (TextureHandle < 0) {
+        m_pColorTexture = NULL;
+    }
+    else {
+        Texture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
+        m_pColorTexture = pTexture;
+    }
+}
+
+
 void CoreModel::SetNormalMap(int TextureHandle)
 {
     if (TextureHandle < 0) {
@@ -771,8 +783,12 @@ void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCall
     unsigned int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
     assert(MaterialIndex < m_Materials.size());
 
-    if (m_Materials[MaterialIndex].pDiffuse) {
-        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    if (m_pColorTexture) {  // overrides the material
+        m_pColorTexture->Bind(COLOR_TEXTURE_UNIT);
+    } else {
+        if (m_Materials[MaterialIndex].pDiffuse) {
+            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        }
     }
 
     if (m_Materials[MaterialIndex].pSpecularExponent) {
@@ -797,7 +813,7 @@ void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCall
     }
 
     if (pRenderCallbacks) {
-        if (m_Materials[MaterialIndex].pDiffuse) {
+        if (m_pColorTexture || m_Materials[MaterialIndex].pDiffuse) {
             pRenderCallbacks->DrawStart_CB(MeshIndex);
             pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
         }
