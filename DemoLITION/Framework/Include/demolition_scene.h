@@ -28,10 +28,8 @@
 // Nobody needs more than 640k
 #define MAX_NUM_ROTATIONS 8
 
-class SceneObject {
+class SceneObject : public Object {
 public:
-    SceneObject() {}
-
     void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
     void SetRotation(float x, float y, float z);
     void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }
@@ -49,6 +47,9 @@ public:
 
     void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
     Vector3f GetColorMod() const { return m_colorMod; }
+
+protected:
+    SceneObject() {}
 
 private:
     void CalcRotationStack(Matrix4f& Rot) const;
