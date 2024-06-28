@@ -22,6 +22,10 @@
 #include <string.h>
 #include <math.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
 
@@ -70,7 +74,11 @@ public:
 
     void OnFrame()
     {
-        BaseGLApp::OnFrame();
+        if (m_showGui) {
+            OnFrameGUI();
+            ApplyGUIConfig();
+        }
+
         m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
 
@@ -93,6 +101,75 @@ public:
     }
 
 
+    void OnFrameGUI()
+    {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        Scene* pScene = m_pRenderingSystem->GetScene();
+
+        std::list<SceneObject*> SceneObjectsList = pScene->GetSceneObjectsList();
+
+        ImGui::Begin("Test");                          // Create a window called "Hello, world!" and append into it.
+        if (ImGui::TreeNode("Scene")) {
+            ImGui::CheckboxFlags("Enable Shadow Mapping", &m_enableShadowMapping, 1);
+            for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
+                if (ImGui::TreeNode((*it)->GetName().c_str())) {
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
+        }
+        // ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
+        // ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
+
+        // ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
+        //  ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
+        //   ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
+        //  ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+
+        // Rendering
+        ImGui::Render();
+        //   int display_w, display_h;
+    //    glfwGetFramebufferSize(window, &display_w, &display_h);
+    //    glViewport(0, 0, display_w, display_h);
+    //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+
+    void ApplyGUIConfig()
+    {
+        m_pScene->GetConfig()->ControlShadowMapping(m_enableShadowMapping);
+    }
+
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = false;
+
+        switch (key) {
+        case GLFW_KEY_SPACE:
+            if (action == GLFW_PRESS) {
+                m_showGui = !m_showGui;
+            }
+            HandledByMe = true;
+            break;
+
+        default:
+            HandledByMe = BaseGLApp::OnKeyboard(key, action);
+        }
+
+        return HandledByMe;
+    }
+
+
     bool OnMouseMove(int x, int y)
     {
         return !m_leftMousePressed;
@@ -110,7 +187,7 @@ public:
 
         case GLFW_MOUSE_BUTTON_MIDDLE:
             m_midMousePressed = (Action == GLFW_PRESS);
-            m_pScene->ControlPicking(m_midMousePressed);
+            m_pScene->GetConfig()->ControlPicking(m_midMousePressed);
             break;
 
         default:
@@ -130,6 +207,8 @@ private:
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
     SceneObject* m_pickedObject = NULL;
+    bool m_showGui = false;
+    int m_enableShadowMapping = 1;
 };
 
 

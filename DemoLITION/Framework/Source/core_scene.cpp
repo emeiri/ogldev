@@ -86,6 +86,13 @@ void SceneObject::CalcRotationStack(Matrix4f& Rot) const
 }
 
 
+SceneConfig::SceneConfig()
+{
+
+}
+
+
+
 Scene::Scene()
 {     
 }
@@ -223,7 +230,9 @@ CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
     CoreSceneObject* pCoreSceneObject = &(m_sceneObjects[m_numSceneObjects]);
-    pCoreSceneObject->SetId(m_numSceneObjects);
+    int Id = m_numSceneObjects;
+    pCoreSceneObject->SetId(Id);
+    pCoreSceneObject->SetName("SceneObject_" + std::to_string(Id));
 
     m_numSceneObjects++;
 

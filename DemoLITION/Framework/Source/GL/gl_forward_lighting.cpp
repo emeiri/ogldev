@@ -18,7 +18,7 @@
 
 #include "GL/gl_forward_lighting.h"
 
-//#define FAIL_ON_MISSING_LOC
+#define FAIL_ON_MISSING_LOC
 
 ForwardLightingTechnique::ForwardLightingTechnique()
 {
@@ -88,10 +88,10 @@ bool ForwardLightingTechnique::InitCommon()
     LayeredFogTopLoc = GetUniformLocation("gLayeredFogTop");
     FogTimeLoc = GetUniformLocation("gFogTime");
     LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
-
-    GET_UNIFORM_AND_CHECK(WVLoc, "gWV");
+    
     GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
     GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
+    GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -228,12 +228,6 @@ bool ForwardLightingTechnique::InitCommon()
 void ForwardLightingTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
-}
-
-
-void ForwardLightingTechnique::SetWV(const Matrix4f& WV)
-{
-    glUniformMatrix4fv(WVLoc, 1, GL_TRUE, (const GLfloat*)WV.m);
 }
 
 
@@ -577,7 +571,14 @@ void ForwardLightingTechnique::SetAnimatedFog(float FogEnd, float FogDensity)
 }
 
 
-void ForwardLightingTechnique::SetLightingEnabled(bool LightingEnabled)
+void ForwardLightingTechnique::ControlLighting(bool LightingEnabled)
 {
     glUniform1i(LightingEnabledLoc, LightingEnabled);
 }
+
+
+void ForwardLightingTechnique::ControlShadows(bool ShadowsEnabled)
+{
+    glUniform1i(ShadowsEnabledLoc, ShadowsEnabled);
+}
+
