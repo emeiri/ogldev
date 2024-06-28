@@ -17,20 +17,22 @@
 
 */
 
+
 #pragma once
 
-#include "demolition_object.h"
+#include <string>
 
-class Model : public Object 
+
+class Object
 {
 public:
+    void SetName(const std::string& Name) { m_name = Name; }
 
-    virtual void SetColorTexture(int TextureHandle) = 0;
+    const std::string GetName() const { return m_name; }
 
-    virtual void SetNormalMap(int TextureHandle) = 0;
+protected:
+    Object() {}
 
-    virtual void SetHeightMap(int TextureHandle) = 0;
-
-    virtual void SetTextureScale(float Scale) = 0;
+private:
+    std::string m_name = "unnamed_object";
 };
-

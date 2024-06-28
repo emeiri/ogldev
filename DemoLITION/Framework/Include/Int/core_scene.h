@@ -22,6 +22,7 @@
 #include <list>
 
 #include "demolition_scene.h"
+#include "demolition_object.h"
 #include "Int\core_model.h"
 
 
@@ -53,7 +54,7 @@ private:
 
 class CoreRenderingSystem;
 
-class CoreScene : public Scene {
+class CoreScene : public Scene, public Object {
 public:
     CoreScene(CoreRenderingSystem* pRenderingSystem);
 
