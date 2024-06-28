@@ -132,7 +132,29 @@ bool Technique::Finalize()
 
     m_shaderObjList.clear();
 
+//    PrintUniformList();
+
     return GLCheckError();
+}
+
+
+void Technique::PrintUniformList()
+{
+    int Count = 0;
+    glGetProgramiv(m_shaderProg, GL_ACTIVE_UNIFORMS, &Count);
+    printf("Active Uniforms: %d\n", Count);
+
+    GLint Size; 
+    GLenum Type;
+    const GLsizei BufSize = 16; 
+    GLchar Name[BufSize];
+    GLsizei Length; 
+
+    for (int i = 0; i < Count; i++) {
+        glGetActiveUniform(m_shaderProg, (GLuint)i, BufSize, &Length, &Size, &Type, Name);
+
+        printf("Uniform #%d Type: %u Name: %s\n", i, Type, Name);
+    }
 }
 
 

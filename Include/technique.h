@@ -48,6 +48,8 @@ protected:
 
 private:
 
+    void PrintUniformList();
+
     typedef std::list<GLuint> ShaderObjList;
     ShaderObjList m_shaderObjList;
 };
