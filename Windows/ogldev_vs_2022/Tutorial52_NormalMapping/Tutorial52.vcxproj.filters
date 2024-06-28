@@ -8,4 +8,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\tutorial52_youtube\tutorial52.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>

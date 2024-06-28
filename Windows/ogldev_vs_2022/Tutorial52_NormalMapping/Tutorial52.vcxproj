@@ -21,6 +21,10 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\tutorial52_youtube\tutorial52.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
