@@ -34,14 +34,13 @@ class ParallaxDemo : public BaseGLApp {
 public:
     ParallaxDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
     {
-      //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
+        m_dirLight.WorldDirection = Vector3f(-1.0f, 0.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
+        m_dirLight.AmbientIntensity = 0.2f;
 
         m_pointLight.WorldPosition = Vector3f(0.25f, 0.25f, 0.0f);
-     //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
-        m_pointLight.DiffuseIntensity = 2.0f;
-        m_pointLight.AmbientIntensity = 0.1f;
+        m_pointLight.DiffuseIntensity = 1.0f;
+        m_pointLight.AmbientIntensity = 0.3f;
     }
 
     ~ParallaxDemo() {}
@@ -49,42 +48,45 @@ public:
     void Start()
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
+        m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
+        m_pScene->SetCameraSpeed(0.1f);
+        // m_pScene->GetDirLights().push_back(m_dirLight);
+        m_pScene->GetPointLights().push_back(m_pointLight);
+
+        // Demo 1
+        if (false) {
+            Model* pModel = m_pRenderingSystem->LoadModel("../Content/sphere.obj");
+            m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+            int ColorTexture = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
+            pModel->SetColorTexture(ColorTexture);
+            int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
+            pModel->SetNormalMap(NormalMap);
+        } else if (true) {
+            Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+            m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+            int ColorTexture = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-color.png");
+            pModel->SetColorTexture(ColorTexture);
+            int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
+        //int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/brickwall_normal.jpg");
+           // int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
+            pModel->SetNormalMap(NormalMap);
+        }
 
       //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/dry-rocky-ground-bl/dry-rocky-ground-bl.obj");
         //Model* pModel = m_pRenderingSystem->LoadModel("../Content/mybrick/mybrick.obj");
-         Model* pModel = m_pRenderingSystem->LoadModel("../Content/brickwall2.obj");
+         //Model* pModel = m_pRenderingSystem->LoadModel("../Content/brickwall2.obj");
        // Model* pModel = pRenderingSystem->LoadModel("../Content/brickwall.obj");
-        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
       //  m_pSceneObject->SetPosition(0.0f, 0.0f, 4.0f);
         //pSceneObject->SetRotation(Vector3f(-90.0f, 0.0f, 0.0f));
         //m_pSceneObject->SetRotation(Vector3f(0.0f, 65.0f, 0.0f));
         m_pScene->AddToRenderList(m_pSceneObject);
 
-       // int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
-        //int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-normal.png");
-       // int NormalMap = pRenderingSystem->LoadTexture2D("../Content/brickwall_normal.jpg");
-        int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/bricks2_normal.jpg");
         
-        pModel->SetNormalMap(NormalMap);
+       
+       // int NormalMap = m_pRenderingSystem->LoadTexture2D("../Content/bricks2_normal.jpg");
+        
 
-       // int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/dry-rocky-ground-bl/dry-rocky-ground_height.png");
-        //int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/mybrick/mybrick-height.png");
-        int HeightMap = m_pRenderingSystem->LoadTexture2D("../Content/bricks2_disp.jpg");
-        pModel->SetHeightMap(HeightMap);
-
-        m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
-
-        /* DirectionalLight l;
-         l.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
-         l.DiffuseIntensity = 0.5f;
-         l.AmbientIntensity = 0.1f;
-         pScene->GetDirLights().push_back(l);*/
-
-        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
-        m_pScene->SetCameraSpeed(0.1f);
-
-        //m_pScene->GetDirLights().push_back(m_dirLight);
-        m_pScene->GetPointLights().push_back(m_pointLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -98,11 +100,12 @@ public:
       //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
         m_pSceneObject->ResetRotations();
-        m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
+        m_pSceneObject->PushRotation(Vector3f(0.0f, m_count, 0.0f));
         //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
 
-        m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
-        m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
+        m_pScene->GetPointLights()[0].WorldPosition.x = 5.0f * sinf(m_count);
+        m_pScene->GetPointLights()[0].WorldPosition.z = 5.0f * cosf(m_count);
+        m_pScene->GetPointLights()[0].WorldPosition.y = 5.0f * cosf(m_count);
     }
 
 private:
