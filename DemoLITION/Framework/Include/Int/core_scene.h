@@ -65,6 +65,8 @@ public:
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape);
 
+    virtual std::list<SceneObject*> GetSceneObjectsList();
+
     const std::vector<PointLight>& GetPointLights();
 
     const std::vector<SpotLight>& GetSpotLights();
@@ -73,7 +75,7 @@ public:
 
     BasicCamera* GetCurrentCamera() { return &m_defaultCamera; }
 
-    void InitializeDefault();
+    void InitializeDefault();    
 
     const std::list<CoreSceneObject*>& GetRenderList() { return m_renderList; }
     

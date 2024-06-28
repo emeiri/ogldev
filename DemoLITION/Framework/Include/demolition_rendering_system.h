@@ -66,6 +66,8 @@ public:
 
     virtual void SetScene(Scene* pScene) = 0;
 
+    virtual Scene* GetScene() = 0;
+
     virtual Model* LoadModel(const std::string& Filename) = 0;
 
     virtual int LoadTexture2D(const std::string& Filename) = 0;    

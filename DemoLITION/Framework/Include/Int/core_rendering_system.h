@@ -43,6 +43,8 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual void SetScene(Scene* pScene);
 
+    virtual Scene* GetScene();
+
     virtual Texture* GetTexture(int TextureHandle) = NULL;
 
     virtual void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }

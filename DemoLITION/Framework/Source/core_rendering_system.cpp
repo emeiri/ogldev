@@ -120,6 +120,12 @@ void CoreRenderingSystem::SetScene(Scene* pScene)
 }
 
 
+Scene* CoreRenderingSystem::GetScene()
+{
+    return m_pScene;
+}
+
+
 Model* CoreRenderingSystem::LoadModel(const std::string& Filename)
 {
     if (m_numModels == m_models.size()) {
