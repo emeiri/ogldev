@@ -115,12 +115,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_WIN64;_USE_MATH_DEFINES</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;_USE_MATH_DEFINES;IMGUIZMO_IMGUI_FOLDER=GLFW/</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -163,6 +163,11 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgConfig.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmo.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmoMath.h" />
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_base_gl_app.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h" />
@@ -191,6 +196,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />

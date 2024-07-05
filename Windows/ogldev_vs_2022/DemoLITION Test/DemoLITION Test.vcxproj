@@ -116,9 +116,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ASSIMP_USE_HUNTER;_USE_MATH_DEFINES;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ASSIMP_USE_HUNTER;_USE_MATH_DEFINES;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);IMGUIZMO_IMGUI_FOLDER=GLFW/</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\DemoLITION\Framework\Include;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\DemoLITION\Framework\Include;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW;..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

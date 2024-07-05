@@ -25,6 +25,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "imGuIZMOquat.h"
 
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
@@ -110,18 +111,12 @@ public:
 
         Scene* pScene = m_pRenderingSystem->GetScene();
 
-        std::list<SceneObject*> SceneObjectsList = pScene->GetSceneObjectsList();
-
         ImGui::Begin("Test");                          // Create a window called "Hello, world!" and append into it.
-        if (ImGui::TreeNode("Scene")) {
-            ImGui::CheckboxFlags("Enable Shadow Mapping", &m_enableShadowMapping, 1);
-            for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
-                if (ImGui::TreeNode((*it)->GetName().c_str())) {
-                    ImGui::TreePop();
-                }
-            }
-            ImGui::TreePop();
-        }
+
+        GUICamera(pScene);
+
+        GUIScene(pScene);
+
         // ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
         // ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
 
@@ -141,6 +136,44 @@ public:
     //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+
+    void GUICamera(Scene* pScene)
+    {
+        if (ImGui::TreeNode("Camera")) {
+            const BasicCamera* pCamera = pScene->GetCurrentCamera();
+            const Vector3f& Pos = pCamera->GetPos();
+            const Vector3f& Target = pCamera->GetTarget();
+            const Vector3f& Up = pCamera->GetUp();
+            ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
+            ImGui::Text("Target %.3f,%.3f,%.3f", Target.x, Target.y, Target.z);
+            ImGui::Text("Up %.3f,%.3f,%.3f", Up.x, Up.y, Up.z);
+            ImGui::TreePop();
+        }
+    }
+
+    void GUIScene(Scene* pScene)
+    {
+        std::list<SceneObject*> SceneObjectsList = pScene->GetSceneObjectsList();
+
+        if (ImGui::TreeNode("Scene")) {
+            ImGui::CheckboxFlags("Enable Shadow Mapping", &m_enableShadowMapping, 1);
+            for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
+                if (ImGui::TreeNode((*it)->GetName().c_str())) {
+                    ImGui::TreePop();
+                }
+            }
+
+            if (pScene->GetDirLights().size() > 0) {
+                ImGui::Text("Directional Light");
+                DirectionalLight& DirLight = pScene->GetDirLights()[0];
+                vec3 Dir(DirLight.WorldDirection.x, DirLight.WorldDirection.y, -DirLight.WorldDirection.z);
+                ImGui::gizmo3D("##Dir1", Dir /*, size,  mode */);
+                DirLight.WorldDirection = Vector3f(Dir.x, Dir.y, -Dir.z);
+            }
+            ImGui::TreePop();
+        }
     }
 
 

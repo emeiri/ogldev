@@ -91,6 +91,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.cpp">
+      <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -180,6 +183,21 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_object.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.h">
+      <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgConfig.h">
+      <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmo.h">
+      <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmoMath.h">
+      <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h">
+      <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -205,6 +223,9 @@
     </Filter>
     <Filter Include="Source\ImGUI">
       <UniqueIdentifier>{114ca478-44a4-44e7-8397-fa1424782f7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\ImGUI\imGuIZmo.quat">
+      <UniqueIdentifier>{5e81e384-d69e-45a5-b905-309d8a740989}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
