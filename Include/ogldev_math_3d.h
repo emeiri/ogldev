@@ -673,12 +673,19 @@ public:
         return n;
     }
 
+    void InitRotateTransform(float RotateX, float RotateY, float RotateZ);
+
     void Print() const
     {
         for (int i = 0 ; i < 3 ; i++) {
             printf("%f %f %f\n", m[i][0], m[i][1], m[i][2]);
         }
     }
+
+private:
+    void InitRotationX(float RotateX);
+    void InitRotationY(float RotateY);
+    void InitRotationZ(float RotateZ);
 };
 
 

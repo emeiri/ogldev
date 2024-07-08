@@ -370,6 +370,46 @@ void Matrix4f::CalcClipPlanes(Vector4f& l, Vector4f& r, Vector4f& b, Vector4f& t
     f = Row3 - Row4;
 }
 
+
+void Matrix3f::InitRotateTransform(float RotateX, float RotateY, float RotateZ)
+{
+    Matrix3f rx, ry, rz;
+
+    float x = ToRadian(RotateX);
+    float y = ToRadian(RotateY);
+    float z = ToRadian(RotateZ);
+
+    rx.InitRotationX(x);
+    ry.InitRotationY(y);
+    rz.InitRotationZ(z);
+
+    *this = rz * ry * rx;
+}
+
+
+void Matrix3f::InitRotationX(float x)
+{
+    m[0][0] = 1.0f; m[0][1] = 0.0f;     m[0][2] = 0.0f;
+    m[1][0] = 0.0f; m[1][1] = cosf(x);  m[1][2] = sinf(x);
+    m[2][0] = 0.0f; m[2][1] = -sinf(x); m[2][2] = cosf(x);
+}
+
+
+void Matrix3f::InitRotationY(float y)
+{
+    m[0][0] = cosf(y); m[0][1] = 0.0f; m[0][2] = -sinf(y); 
+    m[1][0] = 0.0f;    m[1][1] = 1.0f; m[1][2] = 0.0f;
+    m[2][0] = sinf(y); m[2][1] = 0.0f; m[2][2] = cosf(y);
+}
+
+
+void Matrix3f::InitRotationZ(float z)
+{
+    m[0][0] = cosf(z);  m[0][1] = sinf(z); m[0][2] = 0.0f;
+    m[1][0] = -sinf(z); m[1][1] = cosf(z); m[1][2] = 0.0f;
+    m[2][0] = 0.0f;     m[2][1] = 0.0f;    m[2][2] = 1.0f;
+}
+
 Quaternion::Quaternion(float Angle, const Vector3f& V)
 {
     float HalfAngleInRadians = ToRadian(Angle/2);
