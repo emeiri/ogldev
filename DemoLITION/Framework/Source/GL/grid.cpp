@@ -16,27 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if 0
 #include <stdio.h>
 #include <vector>
 
 #include "ogldev_math_3d.h"
-#include "t.h"
-#include "terrain.h"
+#include "GL/grid.h"
 
 
-TriangleList::TriangleList()
+Grid::Grid()
 {
 }
 
 
-TriangleList::~TriangleList()
+Grid::~Grid()
 {
     Destroy();
 }
 
 
-void TriangleList::Destroy()
+void Grid::Destroy()
 {
     if (m_vao > 0) {
         glDeleteVertexArrays(1, &m_vao);
@@ -52,14 +50,14 @@ void TriangleList::Destroy()
 }
 
 
-void TriangleList::CreateTriangleList(int Width, int Depth, const BaseTerrain* pTerrain)
+void Grid::CreateTriangleList(int Width, int Depth)
 {
 	m_width = Width;
     m_depth = Depth;
 
     CreateGLState();
 
-	PopulateBuffers(pTerrain);
+	PopulateBuffers();
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -67,7 +65,7 @@ void TriangleList::CreateTriangleList(int Width, int Depth, const BaseTerrain* p
 }
 
 
-void TriangleList::CreateGLState()
+void Grid::CreateGLState()
 {
     glGenVertexArrays(1, &m_vao);
 
@@ -82,7 +80,6 @@ void TriangleList::CreateGLState()
 
     int POS_LOC = 0;
     int TEX_LOC = 1;
-	int LIGHT_FACTOR_LOC = 2;
 
 	size_t NumFloats = 0;
 	
@@ -93,19 +90,15 @@ void TriangleList::CreateGLState()
     glEnableVertexAttribArray(TEX_LOC);
     glVertexAttribPointer(TEX_LOC, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
     NumFloats += 2;
-
-    glEnableVertexAttribArray(LIGHT_FACTOR_LOC);
-    glVertexAttribPointer(LIGHT_FACTOR_LOC, 1, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(NumFloats * sizeof(float)));
-    NumFloats++;
 }
 
 
-void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
+void Grid::PopulateBuffers()
 {
     std::vector<Vertex> Vertices;
     Vertices.resize(m_width * m_depth);
 
-    InitVertices(pTerrain, Vertices);
+    InitVertices(Vertices);
 
 	std::vector<unsigned int> Indices;
     int NumQuads = (m_width - 1) * (m_depth - 1);
@@ -118,29 +111,27 @@ void TriangleList::PopulateBuffers(const BaseTerrain* pTerrain)
 }
 
 
-void TriangleList::Vertex::InitVertex(const BaseTerrain* pTerrain, int x, int z)
+void Grid::Vertex::InitVertex(int x, int z)
 {
-    float y = pTerrain->GetHeight(x, z);
+    float y = 0.0f;
 
-	float WorldScale = pTerrain->GetWorldScale();
-	Pos = Vector3f(x * WorldScale, y, z * WorldScale);
-	
-    float Size = (float)pTerrain->GetSize();
-    float TextureScale = pTerrain->GetTextureScale();
-    Tex = Vector2f(TextureScale * (float)x / Size, TextureScale * (float)z / Size);	
-	
-    LightFactor = pTerrain->GetSlopeLighting(x, z);
+    float WorldScale = 1.0f;
+    Pos = Vector3f(x * WorldScale, y, z * WorldScale);
+
+    float Size = 1.0f;// (float)pTerrain->GetSize();
+    float TextureScale = 1.0f;
+    Tex = Vector2f(TextureScale * (float)x / Size, TextureScale * (float)z / Size);
 }
 
 
-void TriangleList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>& Vertices)
+void Grid::InitVertices(std::vector<Vertex>& Vertices)
 {
     int Index = 0;
 
     for (int z = 0 ; z < m_depth ; z++) {
         for (int x = 0 ; x < m_width ; x++) {
             assert(Index < Vertices.size());
-			Vertices[Index].InitVertex(pTerrain, x, z);
+			Vertices[Index].InitVertex(x, z);
 			Index++;
         }
     }
@@ -149,7 +140,7 @@ void TriangleList::InitVertices(const BaseTerrain* pTerrain, std::vector<Vertex>
 }
 
 
-void TriangleList::InitIndices(std::vector<unsigned int>& Indices)
+void Grid::InitIndices(std::vector<unsigned int>& Indices)
 {
     int Index = 0;
 
@@ -182,7 +173,7 @@ void TriangleList::InitIndices(std::vector<unsigned int>& Indices)
 }
 
 
-void TriangleList::Render()
+void Grid::Render()
 {
     glBindVertexArray(m_vao);
 
@@ -190,4 +181,3 @@ void TriangleList::Render()
 
     glBindVertexArray(0);
 }
-#endif
