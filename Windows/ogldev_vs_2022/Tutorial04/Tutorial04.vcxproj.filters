@@ -3,6 +3,5 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\tutorial04\tutorial04.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
   </ItemGroup>
 </Project>
