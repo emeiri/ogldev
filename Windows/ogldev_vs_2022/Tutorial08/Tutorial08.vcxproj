@@ -28,6 +28,7 @@
     <ProjectGuid>{79D9962C-A9F1-4A2F-9C0A-E5C488E214E4}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Tutorial08_Scaling</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

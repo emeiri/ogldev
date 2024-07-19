@@ -6,7 +6,7 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\..\..\..\$(ProjectName)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerWorkingDirectory>$(ProjectDir)\..\..\..\$(ProjectName)_youtube</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)\..\..\..\tutorial09_youtube</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=%PATH%;$(SolutionDir)\..\DLL</LocalDebuggerEnvironment>
   </PropertyGroup>

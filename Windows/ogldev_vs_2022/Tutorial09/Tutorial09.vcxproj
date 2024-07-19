@@ -28,6 +28,7 @@
     <ProjectGuid>{E24C0411-F5EC-4854-B836-71A637B69B17}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Tutorial09_Interpolation</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
