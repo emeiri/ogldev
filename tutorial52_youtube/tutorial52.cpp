@@ -32,9 +32,9 @@
 #define POINT_LIGHT
 
 
-class ParallaxDemo : public BaseGLApp {
+class NormalMapping : public BaseGLApp {
 public:
-    ParallaxDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
+    NormalMapping() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
     {
         m_dirLight.WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
@@ -45,7 +45,7 @@ public:
         m_pointLight.AmbientIntensity = 0.4f;
     }
 
-    ~ParallaxDemo() {}
+    ~NormalMapping() {}
 
     void Start()
     {
@@ -192,7 +192,7 @@ private:
 
 int main(int argc, char* argv[])
 {
-    ParallaxDemo game;
+    NormalMapping game;
 
     game.Start();
 
