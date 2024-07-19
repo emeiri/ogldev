@@ -349,6 +349,11 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
         }
     }
 
+    if (gHasNormalMap) {
+        float OriginalDiffuse = dot(normalize(Normal0), -LightDirection);
+        DiffuseColor *= OriginalDiffuse;
+    }
+
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
 }
 
