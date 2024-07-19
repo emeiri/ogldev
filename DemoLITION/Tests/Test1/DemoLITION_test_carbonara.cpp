@@ -159,11 +159,6 @@ public:
 
         if (ImGui::TreeNode("Scene")) {
             ImGui::CheckboxFlags("Enable Shadow Mapping", &m_enableShadowMapping, 1);
-            for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
-                if (ImGui::TreeNode((*it)->GetName().c_str())) {
-                    ImGui::TreePop();
-                }
-            }
 
             if (pScene->GetDirLights().size() > 0) {
                 ImGui::Text("Directional Light");
@@ -172,6 +167,13 @@ public:
                 ImGui::gizmo3D("##Dir1", Dir /*, size,  mode */);
                 DirLight.WorldDirection = Vector3f(Dir.x, Dir.y, -Dir.z);
             }
+
+            for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
+                if (ImGui::TreeNode((*it)->GetName().c_str())) {
+                    ImGui::TreePop();
+                }
+            }
+
             ImGui::TreePop();
         }
     }
