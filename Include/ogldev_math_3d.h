@@ -264,6 +264,11 @@ struct Vector3f
             printf("\n");
         }
     }
+
+    float* data()
+    {
+        return &x;
+    }
 };
 
 
