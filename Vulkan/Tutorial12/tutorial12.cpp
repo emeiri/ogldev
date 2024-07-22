@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #10: Clear the window
+		Tutorial #12: Render Pass
 */
 
 
@@ -90,14 +90,6 @@ private:
 		VkClearColorValue ClearColor = { 1.0f, 0.0f, 0.0f, 0.0f };
 		VkClearValue ClearValue;
 		ClearValue.color = ClearColor;
-
-		VkImageSubresourceRange ImageRange = {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		};
 
 		VkRenderPassBeginInfo RenderPassBeginInfo = {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,

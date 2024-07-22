@@ -9,17 +9,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial02_Dot", "Tutorial0
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial03_Triangle", "Tutorial03\Tutorial03.vcxproj", "{77021C0F-1760-44F0-BB83-6CF85A0D2251}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial04", "Tutorial04\Tutorial04.vcxproj", "{70044A5A-87F2-484E-BDCD-E2CA572083E7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial04_Shaders", "Tutorial04\Tutorial04.vcxproj", "{70044A5A-87F2-484E-BDCD-E2CA572083E7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial05", "Tutorial05\Tutorial05.vcxproj", "{EB4F0585-57E8-465B-B373-D4FAC0A9F87B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial05_Uniforms", "Tutorial05\Tutorial05.vcxproj", "{EB4F0585-57E8-465B-B373-D4FAC0A9F87B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial06", "Tutorial06\Tutorial06.vcxproj", "{A85A448D-839A-4DAF-9579-FEB93B198345}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial06_Translation", "Tutorial06\Tutorial06.vcxproj", "{A85A448D-839A-4DAF-9579-FEB93B198345}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial07", "Tutorial07\Tutorial07.vcxproj", "{2CE25B39-C3E1-4D7C-8092-EEE554D41935}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial07_Rotation", "Tutorial07\Tutorial07.vcxproj", "{2CE25B39-C3E1-4D7C-8092-EEE554D41935}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial08", "Tutorial08\Tutorial08.vcxproj", "{79D9962C-A9F1-4A2F-9C0A-E5C488E214E4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial08_Scaling", "Tutorial08\Tutorial08.vcxproj", "{79D9962C-A9F1-4A2F-9C0A-E5C488E214E4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial09", "Tutorial09\Tutorial09.vcxproj", "{E24C0411-F5EC-4854-B836-71A637B69B17}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial09_Interpolation", "Tutorial09\Tutorial09.vcxproj", "{E24C0411-F5EC-4854-B836-71A637B69B17}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10", "Tutorial10\Tutorial10.vcxproj", "{8362F672-8200-433D-A4A4-34D6D3F90E74}"
 EndProject
@@ -399,6 +399,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial52_NormalMapping", 
 	ProjectSection(ProjectDependencies) = postProject
 		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12", "Vulkan\Tutorial12\Tutorial12.vcxproj", "{52E39A87-D92C-43F6-944E-5F57EE2105DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1120,6 +1122,14 @@ Global
 		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x64.Build.0 = Release|x64
 		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x86.ActiveCfg = Release|Win32
 		{7895318F-15FC-4CC3-B941-E669BB2892BA}.Release|x86.Build.0 = Release|Win32
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Debug|x64.ActiveCfg = Debug|x64
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Debug|x64.Build.0 = Debug|x64
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Debug|x86.ActiveCfg = Debug|Win32
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Debug|x86.Build.0 = Debug|Win32
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x64.ActiveCfg = Release|x64
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x64.Build.0 = Release|x64
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x86.ActiveCfg = Release|Win32
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1222,6 +1232,7 @@ Global
 		{0BD8E4FC-3B42-44E1-937E-8406FA889A5C} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{A905FE76-7290-48E7-AD86-E918753F516D} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{7895318F-15FC-4CC3-B941-E669BB2892BA} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{52E39A87-D92C-43F6-944E-5F57EE2105DC} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
