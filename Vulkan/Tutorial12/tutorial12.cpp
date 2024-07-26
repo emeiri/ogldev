@@ -62,7 +62,7 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
-		m_vkCore.CreateFramebuffer(m_renderPass);
+		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 	}
@@ -112,7 +112,7 @@ private:
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
 			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); 
 
-			RenderPassBeginInfo.framebuffer = m_vkCore.GetFramebuffers()[i];
+			RenderPassBeginInfo.framebuffer = m_frameBuffers[i];
 	
 			vkCmdBeginRenderPass(m_cmdBufs[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	
@@ -130,10 +130,11 @@ private:
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkRenderPass m_renderPass;
+	std::vector<VkFramebuffer> m_frameBuffers;
 };
 
 
-#define APP_NAME "Tutorial 10"
+#define APP_NAME "Tutorial 12"
 
 int main(int argc, char* argv[])
 {

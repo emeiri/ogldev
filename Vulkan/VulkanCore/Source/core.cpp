@@ -58,8 +58,8 @@ VulkanCore::~VulkanCore()
 
 	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
 
-	for (int i = 0; i < m_fbs.size(); i++) {
-		vkDestroyFramebuffer(m_device, m_fbs[i], NULL);
+	for (int i = 0; i < m_frameBuffers.size(); i++) {
+		vkDestroyFramebuffer(m_device, m_frameBuffers[i], NULL);
 	}
 
 	m_queue.Destroy();
@@ -452,20 +452,20 @@ void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 VkRenderPass VulkanCore::CreateSimpleRenderPass()
 {
 	VkAttachmentDescription AttachDesc = {
-	.flags = 0,
-	.format = m_swapChainSurfaceFormat.format,
-	.samples = VK_SAMPLE_COUNT_1_BIT,
-	.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-	.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-	.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-	.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+		.flags = 0,
+		.format = m_swapChainSurfaceFormat.format,
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 	};
 
 	VkAttachmentReference AttachRef = {
 		.attachment = 0,
-		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+		.layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 	};
 
 	VkSubpassDescription SubpassDesc = {
@@ -481,54 +481,6 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 		.pPreserveAttachments = NULL
 	};
 
-
-#if 0
-	VkAttachmentDescription depthAttachment = {
-		.flags = 0,
-		.Format = useDepth ? findDepthFormat(vkDev.physicalDevice) : VK_FORMAT_D32_SFLOAT,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.loadOp = offscreenInt ? VK_ATTACHMENT_LOAD_OP_LOAD : (ci.clearDepth_ ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD),
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = ci.clearDepth_ ? VK_IMAGE_LAYOUT_UNDEFINED : (offscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL),
-		.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	};
-
-	const VkAttachmentReference depthAttachmentRef = {
-		.attachment = 1,
-		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	};
-#endif
-
-	/*VkSubpassDependency Dependency = {
-		.srcSubpass = VK_SUBPASS_EXTERNAL,
-		.dstSubpass = 0,
-		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-		.srcAccessMask = 0,
-		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
-	};*/
-
-
-	VkSubpassDependency dependencies[2];
-
-	dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[0].dstSubpass = 0;
-	dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-	dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-	dependencies[1].srcSubpass = 0;
-	dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-	dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-	dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
 	VkRenderPassCreateInfo RenderPassCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.pNext = NULL,
@@ -537,8 +489,8 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 		.pAttachments = &AttachDesc,
 		.subpassCount = 1,
 		.pSubpasses = &SubpassDesc,
-		.dependencyCount = 2,
-		.pDependencies = dependencies
+		.dependencyCount = 0,
+		.pDependencies = NULL
 	};
 
 	VkRenderPass RenderPass;
@@ -552,9 +504,9 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 }
 
 
-void VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
+std::vector<VkFramebuffer> VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
 {
-	m_fbs.resize(m_images.size());
+	m_frameBuffers.resize(m_images.size());
 
 	int WindowWidth, WindowHeight;
 	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
@@ -572,11 +524,13 @@ void VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
 		fbCreateInfo.height = WindowHeight;
 		fbCreateInfo.layers = 1;
 
-		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_fbs[i]);
+		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_frameBuffers[i]);
 		CHECK_VK_RESULT(res, "vkCreateFramebuffer\n");
 	}
 
 	printf("Framebuffers created\n");
+
+	return m_frameBuffers;
 }
 
 }
