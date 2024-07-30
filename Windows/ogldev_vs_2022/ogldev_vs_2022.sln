@@ -21,9 +21,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial08_Scaling", "Tutor
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial09_Interpolation", "Tutorial09\Tutorial09.vcxproj", "{E24C0411-F5EC-4854-B836-71A637B69B17}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10", "Tutorial10\Tutorial10.vcxproj", "{8362F672-8200-433D-A4A4-34D6D3F90E74}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10_IndexedDraws", "Tutorial10\Tutorial10.vcxproj", "{8362F672-8200-433D-A4A4-34D6D3F90E74}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11", "Tutorial11\Tutorial11.vcxproj", "{85B9081D-B624-4429-98ED-40F819A89541}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11_PersProj1", "Tutorial11\Tutorial11.vcxproj", "{85B9081D-B624-4429-98ED-40F819A89541}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12", "Tutorial12\Tutorial12.vcxproj", "{361E414D-FE1B-406A-A6E4-F046F4761A90}"
 EndProject
@@ -401,6 +401,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial52_NormalMapping", 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12", "Vulkan\Tutorial12\Tutorial12.vcxproj", "{52E39A87-D92C-43F6-944E-5F57EE2105DC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgldevPhysics", "OgldevPhysics\OgldevPhysics.vcxproj", "{87743A97-581B-4DDD-B1B5-F7F63148D230}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1130,6 +1132,14 @@ Global
 		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x64.Build.0 = Release|x64
 		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x86.ActiveCfg = Release|Win32
 		{52E39A87-D92C-43F6-944E-5F57EE2105DC}.Release|x86.Build.0 = Release|Win32
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Debug|x64.ActiveCfg = Debug|x64
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Debug|x64.Build.0 = Debug|x64
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Debug|x86.ActiveCfg = Debug|Win32
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Debug|x86.Build.0 = Debug|Win32
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x64.ActiveCfg = Release|x64
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x64.Build.0 = Release|x64
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x86.ActiveCfg = Release|Win32
+		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
