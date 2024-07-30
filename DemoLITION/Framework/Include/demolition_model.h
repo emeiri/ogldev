@@ -34,3 +34,8 @@ public:
     virtual void SetTextureScale(float Scale) = 0;
 };
 
+
+class Grid : public Model
+{
+};
+

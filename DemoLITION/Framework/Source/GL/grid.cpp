@@ -20,21 +20,22 @@
 #include <vector>
 
 #include "ogldev_math_3d.h"
-#include "GL/grid.h"
+#include "GL/gl_grid.h"
 
 
-Grid::Grid()
+GLGrid::GLGrid(int Width, int Height)
 {
+    CreateTriangleList(Width, Height);
 }
 
 
-Grid::~Grid()
+GLGrid::~GLGrid()
 {
     Destroy();
 }
 
 
-void Grid::Destroy()
+void GLGrid::Destroy()
 {
     if (m_vao > 0) {
         glDeleteVertexArrays(1, &m_vao);
@@ -50,7 +51,7 @@ void Grid::Destroy()
 }
 
 
-void Grid::CreateTriangleList(int Width, int Depth)
+void GLGrid::CreateTriangleList(int Width, int Depth)
 {
 	m_width = Width;
     m_depth = Depth;
@@ -65,7 +66,7 @@ void Grid::CreateTriangleList(int Width, int Depth)
 }
 
 
-void Grid::CreateGLState()
+void GLGrid::CreateGLState()
 {
     glGenVertexArrays(1, &m_vao);
 
@@ -93,7 +94,7 @@ void Grid::CreateGLState()
 }
 
 
-void Grid::PopulateBuffers()
+void GLGrid::PopulateBuffers()
 {
     std::vector<Vertex> Vertices;
     Vertices.resize(m_width * m_depth);
@@ -111,7 +112,7 @@ void Grid::PopulateBuffers()
 }
 
 
-void Grid::Vertex::InitVertex(int x, int z)
+void GLGrid::Vertex::InitVertex(int x, int z)
 {
     float y = 0.0f;
 
@@ -124,7 +125,7 @@ void Grid::Vertex::InitVertex(int x, int z)
 }
 
 
-void Grid::InitVertices(std::vector<Vertex>& Vertices)
+void GLGrid::InitVertices(std::vector<Vertex>& Vertices)
 {
     int Index = 0;
 
@@ -140,7 +141,7 @@ void Grid::InitVertices(std::vector<Vertex>& Vertices)
 }
 
 
-void Grid::InitIndices(std::vector<unsigned int>& Indices)
+void GLGrid::InitIndices(std::vector<unsigned int>& Indices)
 {
     int Index = 0;
 
@@ -173,7 +174,7 @@ void Grid::InitIndices(std::vector<unsigned int>& Indices)
 }
 
 
-void Grid::Render()
+void GLGrid::Render()
 {
     glBindVertexArray(m_vao);
 

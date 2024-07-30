@@ -39,6 +39,8 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual Model* LoadModel(const std::string& Filename);
 
+    virtual Grid* CreateGrid(int Width, int Depth);
+
     virtual Model* GetModel(const std::string& BasicShape);
 
     virtual void SetScene(Scene* pScene);
@@ -61,7 +63,9 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual void* CreateWindowInternal() = 0;
 
-    virtual CoreModel* LoadModelInternal(const std::string& Filename) = 0;    
+    virtual CoreModel* LoadModelInternal(const std::string& Filename) = 0;
+
+    virtual Grid* CreateGridInternal(int Width, int Depth) = 0;
 
     virtual void SetCamera(BasicCamera* pCamera) = 0;
 

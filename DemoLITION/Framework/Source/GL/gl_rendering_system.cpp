@@ -23,6 +23,7 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "GL/gl_rendering_system.h"
+#include "GL/gl_grid.h"
 
 #define NUM_TEXTURES 1024
 
@@ -106,6 +107,13 @@ CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
     }
 
     return pModel;
+}
+
+
+Grid* RenderingSystemGL::CreateGridInternal(int Width, int Depth)
+{
+    GLGrid* pGrid = new GLGrid(Width, Depth);
+    return pGrid;
 }
 
 

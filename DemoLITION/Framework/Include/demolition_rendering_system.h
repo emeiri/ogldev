@@ -79,6 +79,8 @@ public:
 
     virtual Model* LoadModel(const std::string& Filename) = 0;
 
+    virtual Grid* CreateGrid(int Width, int Depth) = 0;
+
     virtual int LoadTexture2D(const std::string& Filename) = 0;    
 
     virtual void GetWindowSize(int& Width, int& Height) const = 0;

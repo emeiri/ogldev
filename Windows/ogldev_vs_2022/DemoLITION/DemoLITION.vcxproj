@@ -183,7 +183,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\grid.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h" />

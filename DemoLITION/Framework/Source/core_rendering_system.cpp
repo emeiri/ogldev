@@ -149,6 +149,28 @@ Model* CoreRenderingSystem::LoadModel(const std::string& Filename)
 }
  
 
+Grid* CoreRenderingSystem::CreateGrid(int Width, int Depth)
+{
+    if (m_numModels == m_models.size()) {
+        printf("%s:%d: out of models space\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    Grid* pGrid = CreateGridInternal(Width, Depth);
+
+  /*  if (pGrid) {
+        m_models[m_numModels] = pGrid;
+        m_numModels++;
+    }
+    else {
+        printf("%s:%d: error creating grid\n", __FILE__, __LINE__);
+        exit(0);
+    }*/
+
+    return pGrid;
+
+}
+
 
 Model* CoreRenderingSystem::GetModel(const std::string& BasicShape)
 {

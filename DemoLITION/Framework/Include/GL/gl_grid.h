@@ -23,19 +23,26 @@
 #include <GL/glew.h>
 #include <vector>
 
+#include "demolition_model.h"
 #include "ogldev_math_3d.h"
 
-class Grid {
+class GLGrid : public Grid {
  public:
-    Grid();
+    GLGrid(int Width, int Depth);
 
-    ~Grid();
-
-    void CreateTriangleList(int Width, int Depth);
+    ~GLGrid();
 
     void Destroy();
 
     void Render();
+
+    virtual void SetColorTexture(int TextureHandle) {}
+
+    virtual void SetNormalMap(int TextureHandle) {}
+
+    virtual void SetHeightMap(int TextureHandle) {}
+
+    virtual void SetTextureScale(float Scale) {}
 
  private:
 
@@ -46,6 +53,7 @@ class Grid {
         void InitVertex(int x, int z);
     };
 
+    void CreateTriangleList(int Width, int Depth);
     void CreateGLState();
 
 	void PopulateBuffers();
