@@ -30,7 +30,6 @@
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
 
-
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
@@ -55,21 +54,35 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Jump/Jump.dae");
-        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pScene->AddToRenderList(m_pSceneObject);
+        
+        LoadAndAddModel("../Content/Jump/Jump.dae");
+        LoadAndAddModel("../Content/ground.obj");
+
+        //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
+        //pSceneObject = m_pScene->CreateSceneObject(pGrid);
+        //m_pSceneObjects.push_back(pSceneObject);
+        //m_pScene->AddToRenderList(pSceneObject);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
         m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
         m_pScene->SetCameraSpeed(0.1f);
 
-        m_pScene->GetDirLights().push_back(m_dirLight);
-     //   m_pScene->GetPointLights().push_back(m_pointLight);
+      //  m_pScene->GetDirLights().push_back(m_dirLight);
+        m_pScene->GetPointLights().push_back(m_pointLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
         m_pRenderingSystem->Execute();
+    }
+
+
+    void LoadAndAddModel(const char* pFilename)
+    {
+        Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        m_pSceneObjects.push_back(pSceneObject);
+        m_pScene->AddToRenderList(pSceneObject);
     }
 
 
@@ -80,7 +93,10 @@ public:
             ApplyGUIConfig();
         }
 
-        m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        if (m_pScene->GetDirLights().size() > 0) {
+            m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+        }
+
         m_count += 0.01f;
 
         if (m_pScene->GetPickedSceneObject()) {
@@ -111,7 +127,11 @@ public:
 
         Scene* pScene = m_pRenderingSystem->GetScene();
 
-        ImGui::Begin("Test");                          // Create a window called "Hello, world!" and append into it.
+        bool my_tool_active = false;
+
+        ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+
+        GUIMenu();
 
         GUICamera(pScene);
 
@@ -139,6 +159,20 @@ public:
     }
 
 
+    void GUIMenu()
+    {
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
+                if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
+                if (ImGui::MenuItem("Close", "Ctrl+W")) {  }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+    }
+
+
     void GUICamera(Scene* pScene)
     {
         if (ImGui::TreeNode("Camera")) {
@@ -160,13 +194,7 @@ public:
         if (ImGui::TreeNode("Scene")) {
             ImGui::CheckboxFlags("Enable Shadow Mapping", &m_enableShadowMapping, 1);
 
-            if (pScene->GetDirLights().size() > 0) {
-                ImGui::Text("Directional Light");
-                DirectionalLight& DirLight = pScene->GetDirLights()[0];
-                vec3 Dir(DirLight.WorldDirection.x, DirLight.WorldDirection.y, -DirLight.WorldDirection.z);
-                ImGui::gizmo3D("##Dir1", Dir /*, size,  mode */);
-                DirLight.WorldDirection = Vector3f(Dir.x, Dir.y, -Dir.z);
-            }
+            GUILighting(pScene);
 
             for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
                 if (ImGui::TreeNode((*it)->GetName().c_str())) {
@@ -175,6 +203,47 @@ public:
             }
 
             ImGui::TreePop();
+        }
+    }
+
+    void GUILighting(Scene* pScene)
+    {
+        GUIDirLighting(pScene);
+
+        GUIPointLighting(pScene);
+    }
+
+
+    void GUIDirLighting(Scene* pScene)
+    {
+        if (pScene->GetDirLights().size() > 0) {
+            ImGui::Text("Directional Light");
+            DirectionalLight& DirLight = pScene->GetDirLights()[0];
+            vec3 Dir(DirLight.WorldDirection.x, DirLight.WorldDirection.y, -DirLight.WorldDirection.z);
+            ImGui::gizmo3D("##Dir1", Dir /*, size,  mode */);
+            DirLight.WorldDirection = Vector3f(Dir.x, Dir.y, -Dir.z);
+            Vector3f DiffuseColor = DirLight.Color;
+            ImGui::ColorEdit4("Diffuse Color", DiffuseColor.data());
+            DirLight.Color = DiffuseColor;
+            //    Vector3f AmbientColor = DirLight.;
+             //   ImGui::ColorEdit4("Color", Color.data());
+             //   DirLight.Color = Color;
+
+        }
+    }
+
+
+    void GUIPointLighting(Scene* pScene)
+    {
+        if (pScene->GetPointLights().size() > 0) {
+            ImGui::Text("Point Light");
+            PointLight& Light = pScene->GetPointLights()[0];
+            vec3 Pos(Light.WorldPosition.x, Light.WorldPosition.y, Light.WorldPosition.z);
+            ImGui::SliderFloat3("Position", &Pos.x, -1000.0f, 1000.0f);
+            Light.WorldPosition = Vector3f(Pos.x, Pos.y, Pos.z);
+            Vector3f Color = Light.Color;
+            ImGui::ColorEdit4("Color", Color.data());
+            Light.Color = Color;
         }
     }
 
@@ -236,7 +305,7 @@ public:
 private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
-    SceneObject* m_pSceneObject = NULL;
+    std::list<SceneObject*> m_pSceneObjects;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
     bool m_leftMousePressed = false;

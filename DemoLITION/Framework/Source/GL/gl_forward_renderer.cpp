@@ -216,6 +216,43 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 }
 
 
+void ForwardRenderer::ApplyLighting(GLScene* pScene)
+{
+    int NumLightsTotal = 0;
+
+    int NumPointLights = (int)pScene->GetPointLights().size();
+
+    if (NumPointLights > 0) {
+        m_pCurLightingTech->SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
+        NumLightsTotal += NumPointLights;
+    }
+
+    int NumSpotLights = (int)pScene->GetSpotLights().size();
+
+    if (NumSpotLights > 0) {
+        m_pCurLightingTech->SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
+        NumLightsTotal += NumSpotLights;
+    }
+
+    int NumDirLights = (int)pScene->GetDirLights().size();
+
+    if (NumDirLights > 0) {
+        const DirectionalLight& DirLight = pScene->GetDirLights()[0];
+        m_pCurLightingTech->SetDirectionalLight(DirLight, true);
+        NumLightsTotal += NumDirLights;
+    }
+
+    if (NumLightsTotal == 0) {
+        //printf("Warning! trying to render but all lights are zero\n");
+        m_pCurLightingTech->ControlLighting(false);
+    }
+    else {
+        m_pCurLightingTech->ControlLighting(true);
+    }
+
+    m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
+}
+
 void ForwardRenderer::PickingPass(void* pWindow, GLScene* pScene)
 {
     m_curRenderPass = RENDER_PASS_PICKING;
@@ -395,9 +432,9 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         if (FlatColor.x == -1.0f) {
             if (FirstTimeForwardLighting) {
                 StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
-                FirstTimeForwardLighting = false;
+              //  FirstTimeForwardLighting = false; TODO: currently disabled
             }
-            RenderWithForwardLighting(m_pcurSceneObject);
+            RenderWithForwardLighting(m_pcurSceneObject, TotalRuntimeMillis);
         }
         else {
             RenderWithFlatColor(m_pcurSceneObject);
@@ -410,6 +447,22 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 {
     if (pSceneObject->GetModel()->IsAnimated()) {
         SwitchToLightingTech(FORWARD_SKINNING);
+    } else {
+        SwitchToLightingTech(FORWARD_LIGHTING);
+    }
+
+    ApplySceneConfig(pScene);
+
+    ApplyLighting(pScene);
+}
+
+
+void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
+{
+    CoreModel* pModel = pSceneObject->GetModel();
+
+    if (pSceneObject->GetModel()->IsAnimated()) {
+        SwitchToLightingTech(FORWARD_SKINNING);
 
         float AnimationTimeSec = (float)TotalRuntimeMillis / 1000.0f;
         int AnimationIndex = 0;
@@ -419,50 +472,11 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
         for (uint i = 0; i < Transforms.size(); i++) {
             m_skinningTech.SetBoneTransform(i, Transforms[i]);
         }
-    } else {
+    }
+    else {
         SwitchToLightingTech(FORWARD_LIGHTING);
     }
 
-    ApplySceneConfig(pScene);
-
-    int NumLightsTotal = 0;
-
-    int NumPointLights = (int)pScene->GetPointLights().size();
-
-    if (NumPointLights > 0) {
-        m_pCurLightingTech->SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
-        NumLightsTotal += NumPointLights;
-    } 
-
-    int NumSpotLights = (int)pScene->GetSpotLights().size();
-
-    if (NumSpotLights > 0) {
-        m_pCurLightingTech->SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
-        NumLightsTotal += NumSpotLights;
-    } 
-
-    int NumDirLights = (int)pScene->GetDirLights().size();
-
-    if (NumDirLights > 0) {
-        const DirectionalLight& DirLight = pScene->GetDirLights()[0];
-        m_pCurLightingTech->SetDirectionalLight(DirLight, true);    
-        NumLightsTotal += NumDirLights;
-    } 
-
-    if (NumLightsTotal == 0) {
-        //printf("Warning! trying to render but all lights are zero\n");
-        m_pCurLightingTech->ControlLighting(false);
-    } else {
-        m_pCurLightingTech->ControlLighting(true);
-    }
-
-    m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
-}
-
-
-void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject)
-{
-    CoreModel* pModel = pSceneObject->GetModel();
     bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
     bool HeightMapEnabled = pModel->GetHeightMap() != NULL;
 
