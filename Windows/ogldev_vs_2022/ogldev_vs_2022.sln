@@ -25,7 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial10_IndexedDraws", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11_PersProj1", "Tutorial11\Tutorial11.vcxproj", "{85B9081D-B624-4429-98ED-40F819A89541}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12", "Tutorial12\Tutorial12.vcxproj", "{361E414D-FE1B-406A-A6E4-F046F4761A90}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12_PersProj2", "Tutorial12\Tutorial12.vcxproj", "{361E414D-FE1B-406A-A6E4-F046F4761A90}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13", "Tutorial13\Tutorial13.vcxproj", "{1176A7B7-93F5-4B6F-BCB7-7517CC92DFCA}"
 EndProject
@@ -264,6 +264,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain6", "Terrain6\Terrain6.vcxproj", "{6B8A5879-9F19-4821-8A8A-511A0C646081}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoLITION_Framework", "DemoLITION\DemoLITION.vcxproj", "{892BD692-485D-4406-8D87-43EB0F16F290}"
+	ProjectSection(ProjectDependencies) = postProject
+		{87743A97-581B-4DDD-B1B5-F7F63148D230} = {87743A97-581B-4DDD-B1B5-F7F63148D230}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoLITION Test", "DemoLITION Test\DemoLITION Test.vcxproj", "{9E3C687B-0A84-4E46-86DB-521300C251C8}"
 	ProjectSection(ProjectDependencies) = postProject

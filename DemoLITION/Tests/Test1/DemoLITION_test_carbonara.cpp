@@ -53,10 +53,17 @@ public:
     void Start()
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
-
         
-        LoadAndAddModel("../Content/Jump/Jump.dae");
-        LoadAndAddModel("../Content/ground.obj");
+      //  LoadAndAddModel("../Content/Jump/Jump.dae");
+        SceneObject* pGround = LoadAndAddModel("../Content/ground.obj");
+        SceneObject* pBox = LoadAndAddModel("../Content/box.obj", 0.1f);
+
+        pBox->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
+        pBox->SetMass(2.0f);
+        pBox->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
+        pBox->SetAcceleration(Vector3f(0.0f, -1.0f, 0.0f));
+        pBox->SetDamping(0.99f);
+     //   LoadAndAddModel("G:/PBRTextures/Blender/synthetic-bl/studded-plastic-bl/sphere.obj", 0.1f);
 
         //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
         //pSceneObject = m_pScene->CreateSceneObject(pGrid);
@@ -68,8 +75,8 @@ public:
         m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
         m_pScene->SetCameraSpeed(0.1f);
 
-      //  m_pScene->GetDirLights().push_back(m_dirLight);
-        m_pScene->GetPointLights().push_back(m_pointLight);
+        m_pScene->GetDirLights().push_back(m_dirLight);
+      //  m_pScene->GetPointLights().push_back(m_pointLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -77,12 +84,14 @@ public:
     }
 
 
-    void LoadAndAddModel(const char* pFilename)
+    SceneObject* LoadAndAddModel(const char* pFilename, float Scale = 1.0f)
     {
         Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        pSceneObject->SetScale(Scale);
         m_pSceneObjects.push_back(pSceneObject);
         m_pScene->AddToRenderList(pSceneObject);
+        return pSceneObject;
     }
 
 

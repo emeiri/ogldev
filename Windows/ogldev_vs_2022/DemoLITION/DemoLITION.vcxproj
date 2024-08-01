@@ -120,7 +120,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Physics\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -130,6 +130,10 @@
       <AdditionalLibraryDirectories>..\..\Lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>assimp-vc142-mt.lib;glew32.lib;glfw3dll.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalDependencies>OgldevPhysics.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\Lib\</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

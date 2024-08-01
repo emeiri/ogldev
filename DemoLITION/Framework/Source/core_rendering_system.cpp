@@ -114,8 +114,8 @@ Scene* CoreRenderingSystem::CreateDefaultScene()
 
 void CoreRenderingSystem::SetScene(Scene* pScene) 
 { 
-    m_pScene = pScene; 
-    m_pCamera = ((CoreScene*)pScene)->GetCurrentCamera();
+    m_pScene = (CoreScene*)pScene; 
+    m_pCamera = m_pScene->GetCurrentCamera();
     SetCamera(m_pCamera);
 }
 

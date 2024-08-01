@@ -21,9 +21,9 @@
 #pragma once
 
 #include "ogldev_types.h"
-#include "demolition_scene.h"
 #include "demolition_rendering_system.h"
 #include "Int/core_model.h"
+#include "Int/core_scene.h"
 
 class BasicCamera;
 
@@ -75,7 +75,7 @@ class CoreRenderingSystem : public RenderingSystem
     BasicCamera* m_pCamera = NULL;
     GameCallbacks* m_pGameCallbacks = NULL;
     GameCallbacks m_defaultGameCallbacks;
-    Scene* m_pScene = NULL;
+    CoreScene* m_pScene = NULL;
 
  private:
     void InitializeBasicShapes();

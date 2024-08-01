@@ -189,6 +189,9 @@ void RenderingSystemGL::Execute()
         m_elapsedTimeMillis = CurTimeMillis - StartTimeMillis;
         m_pCamera->OnRender();
         if (m_pScene) {
+            if (DeltaTimeMillis > 0) {
+                m_pScene->Update(DeltaTimeMillis);
+            }
             m_forwardRenderer.Render(m_pWindow, (GLScene*)m_pScene, m_pGameCallbacks, TotalRuntimeMillis, DeltaTimeMillis);
         } else {
             printf("Warning! no scene is set in the rendering subsystem\n");
