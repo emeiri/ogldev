@@ -21,12 +21,18 @@
     <ClInclude Include="..\..\..\Physics\Include\ogldev_physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Physics\Include\firework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Physics\Source\particle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Physics\Source\ogldev_physics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Physics\Source\firework.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

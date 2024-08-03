@@ -28,6 +28,8 @@
 namespace OgldevPhysics
 {
 
+const static Vector3f GRAVITY = Vector3f(0.0f, -9.81f, 0.0f);
+
 #define DEFAULT_NUM_PARTICLES 1000
 
 class PhysicsSystem {

@@ -19,10 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Physics\Include\firework.h" />
     <ClInclude Include="..\..\..\Physics\Include\ogldev_physics.h" />
     <ClInclude Include="..\..\..\Physics\Include\particle.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Physics\Source\firework.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\ogldev_physics.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\particle.cpp" />
   </ItemGroup>

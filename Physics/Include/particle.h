@@ -30,10 +30,7 @@ class Particle {
 
 public:
 
-    void SetPosition(const Vector3f& Position)
-    {
-        m_position = Position;
-    }    
+    void SetPosition(const Vector3f& Position) { m_position = Position; }    
 
 
     void SetMass(float Mass)
@@ -44,16 +41,16 @@ public:
     }
 
 
-    void SetReciprocalMass(float ReciprocalMass)
-    {
-        m_reciprocalMass = ReciprocalMass;
+    void SetReciprocalMass(float ReciprocalMass) { m_reciprocalMass = ReciprocalMass; }
+
+
+    void SetVelocity(const Vector3f& Velocity) 
+    { 
+        m_velocity = Velocity; 
     }
 
 
-    void SetVelocity(const Vector3f& Velocity)
-    {
-        m_velocity = Velocity;
-    }
+    const Vector3f& GetVelocity() const { return m_velocity; }
 
 
     void SetAcceleration(const Vector3f& Acceleration)
@@ -85,5 +82,6 @@ protected:
     float m_damping = 0.999f;
     float m_reciprocalMass = 0.0f;
 };
+
 
 }

@@ -29,6 +29,7 @@
 
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
+#include "firework.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -54,16 +55,10 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
-      //  LoadAndAddModel("../Content/Jump/Jump.dae");
-        SceneObject* pGround = LoadAndAddModel("../Content/ground.obj");
-        SceneObject* pBox = LoadAndAddModel("../Content/box.obj", 0.1f);
+        //InitBallisticDemo();
 
-        pBox->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
-        pBox->SetMass(2.0f);
-        pBox->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
-        pBox->SetAcceleration(Vector3f(0.0f, -1.0f, 0.0f));
-        pBox->SetDamping(0.99f);
-     //   LoadAndAddModel("G:/PBRTextures/Blender/synthetic-bl/studded-plastic-bl/sphere.obj", 0.1f);
+        InitFireworksDemo();
+      //  LoadAndAddModel("../Content/Jump/Jump.dae");
 
         //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
         //pSceneObject = m_pScene->CreateSceneObject(pGrid);
@@ -72,7 +67,7 @@ public:
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
 
-        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -50.0f), Vector3f(0.0, 0.1f, 1.0f));
         m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetDirLights().push_back(m_dirLight);
@@ -84,12 +79,136 @@ public:
     }
 
 
+    void InitBallisticDemo()
+    {
+        SceneObject* pGround = LoadAndAddModel("../Content/ground.obj");
+        SceneObject* pBox = LoadAndAddModel("../Content/box.obj", 0.1f);
+
+        pBox->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
+        pBox->SetMass(2.0f);
+        pBox->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
+        pBox->SetAcceleration(Vector3f(0.0f, -1.0f, 0.0f));
+        pBox->SetDamping(0.99f);
+    }
+
+
+    void InitFireworksDemo()
+    {
+        m_fireworks.resize(50);
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        for (int i = 0; i < m_fireworks.size(); i++) {
+            SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel, false);
+            pSceneObject->SetScale(0.1f);
+            m_sceneObjects.push_back(pSceneObject);
+            m_pScene->AddToRenderList(pSceneObject);
+        }
+
+        InitFireworksConfig();
+    }
+
+
+    void InitFireworksConfig()
+    {
+        m_fireworkConfigs.resize(9);
+
+        m_fireworkConfigs[0].Init(2);
+        m_fireworkConfigs[0].SetParams(
+            1, // type
+            0.5f, 1.4f, // age range
+            Vector3f(-5, 25, -5), // min velocity
+            Vector3f(5, 28, 5), // max velocity
+            0.1f // damping
+        );
+        m_fireworkConfigs[0].m_payloads[0].Set(3, 5);
+        m_fireworkConfigs[0].m_payloads[1].Set(5, 5);
+
+        m_fireworkConfigs[1].Init(1);
+        m_fireworkConfigs[1].SetParams(
+            2, // type
+            0.5f, 1.0f, // age range
+            Vector3f(-5, 10, -5), // min velocity
+            Vector3f(5, 20, 5), // max velocity
+            0.8f // damping
+        );
+        m_fireworkConfigs[1].m_payloads[0].Set(4, 2);
+
+        m_fireworkConfigs[2].Init(0);
+        m_fireworkConfigs[2].SetParams(
+            3, // type
+            0.5f, 1.5f, // age range
+            Vector3f(-5, -5, -5), // min velocity
+            Vector3f(5, 5, 5), // max velocity
+            0.1f // damping
+        );
+
+        m_fireworkConfigs[3].Init(0);
+        m_fireworkConfigs[3].SetParams(
+            4, // type
+            0.25f, 0.5f, // age range
+            Vector3f(-20, 5, -5), // min velocity
+            Vector3f(20, 5, 5), // max velocity
+            0.2f // damping
+        );
+
+        m_fireworkConfigs[4].Init(1);
+        m_fireworkConfigs[4].SetParams(
+            5, // type
+            0.5f, 1.0f, // age range
+            Vector3f(-20, 2, -5), // min velocity
+            Vector3f(20, 18, 5), // max velocity
+            0.01f // damping
+        );
+        m_fireworkConfigs[4].m_payloads[0].Set(3, 5);
+
+        m_fireworkConfigs[5].Init(0);
+        m_fireworkConfigs[5].SetParams(
+            6, // type
+            3, 5, // age range
+            Vector3f(-5, 5, -5), // min velocity
+            Vector3f(5, 10, 5), // max velocity
+            0.95f // damping
+        );
+
+        m_fireworkConfigs[6].Init(1);
+        m_fireworkConfigs[6].SetParams(
+            7, // type
+            4, 5, // age range
+            Vector3f(-5, 50, -5), // min velocity
+            Vector3f(5, 60, 5), // max velocity
+            0.01f // damping
+        );
+        m_fireworkConfigs[6].m_payloads[0].Set(8, 10);
+
+        m_fireworkConfigs[7].Init(0);
+        m_fireworkConfigs[7].SetParams(
+            8, // type
+            0.25f, 0.5f, // age range
+            Vector3f(-1, -1, -1), // min velocity
+            Vector3f(1, 1, 1), // max velocity
+            0.01f // damping
+        );
+
+        m_fireworkConfigs[8].Init(0);
+        m_fireworkConfigs[8].SetParams(
+            9, // type
+            3, 5, // age range
+            Vector3f(-15, 10, -5), // min velocity
+            Vector3f(15, 15, 5), // max velocity
+            0.95f // damping
+        );
+
+        Create(1, 1, NULL);
+    }
+
+
     SceneObject* LoadAndAddModel(const char* pFilename, float Scale = 1.0f)
     {
         Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
         pSceneObject->SetScale(Scale);
-        m_pSceneObjects.push_back(pSceneObject);
+        m_sceneObjects.push_back(pSceneObject);
         m_pScene->AddToRenderList(pSceneObject);
         return pSceneObject;
     }
@@ -117,6 +236,8 @@ public:
                 m_pickedObject = NULL;
             }
         }
+
+        FireworkUpdate(DeltaTimeMillis);
         
     //    m_pSceneObject->ResetRotations();
      //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
@@ -125,6 +246,82 @@ public:
      //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
       //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
     }
+
+
+    void FireworkUpdate(long long DeltaTimeMillis)
+    {
+        if (DeltaTimeMillis == 0) {
+            return;
+        }
+
+        float dt = (float)DeltaTimeMillis / 1000.0f;
+
+    //    printf("Update fireworks dt %f\n", dt);
+
+        bool Finished = true;
+        for (int i = 0; i < m_fireworks.size(); i++) {
+            OgldevPhysics::Firework& firework = m_fireworks[i];
+            int Type = firework.GetType();
+        //    printf("%d type %d\n", i, Type);
+            if (Type > 0) {
+                Finished = false;
+                if (firework.Update(dt)) {
+                  //  printf("remove\n");
+                    OgldevPhysics::FireworkConfig& Config = m_fireworkConfigs[Type - 1];
+                    firework.SetType(0);
+
+                    for (int j = 0; j < Config.m_payloads.size(); j++) {
+                   //     printf("payload %d\n", j);
+                        Create(Config.m_payloads[j].m_type, Config.m_payloads[j].m_count, &firework);
+                    }
+                 //   printf("---\n");
+                }
+                else {
+            //        printf("dont remove\n");
+                }
+            }            
+        }
+
+      //  printf("Update position\n");
+
+        int i = 0;
+        for (std::list<SceneObject*>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
+            if (i == m_fireworks.size()) {
+                printf("Exceeded max number of fireworks %d, scene object list size %d\n", i, (int)m_sceneObjects.size());
+                exit(1);
+            }
+
+            const Vector3f& p = m_fireworks[i].GetPosition();
+       /*     printf("%d pos ", i);
+            p.Print();
+            printf("velocity ");
+            m_fireworks[i].GetVelocity().Print();*/
+            (*it)->SetPosition(m_fireworks[i].GetPosition());
+            i++;
+        }
+
+     //   if (Finished) exit(0);
+        static int foo = 0;
+      //  if (foo == 10) exit(0);
+        foo++;
+    }
+
+
+    void Create(int Type, uint Count, OgldevPhysics::Firework* pFirework)
+    {
+        for (uint i = 0; i < Count; i++) {
+            OgldevPhysics::FireworkConfig& Config = m_fireworkConfigs[Type - 1];
+            Config.Create(m_fireworks[m_nextFirework], pFirework);
+            m_nextFirework = (m_nextFirework + 1) % m_fireworks.size();
+        }
+    }
+
+
+
+   // void Create(OgldevPhysics::FireworkPayload& Payload, const OgldevPhysics::Firework& firework)
+  //  {
+
+   // }
 
 
     void OnFrameGUI()
@@ -314,7 +511,7 @@ public:
 private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
-    std::list<SceneObject*> m_pSceneObjects;
+    std::list<SceneObject*> m_sceneObjects;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
     bool m_leftMousePressed = false;
@@ -322,6 +519,9 @@ private:
     SceneObject* m_pickedObject = NULL;
     bool m_showGui = false;
     int m_enableShadowMapping = 1;
+    std::vector<OgldevPhysics::FireworkConfig> m_fireworkConfigs;
+    std::vector<OgldevPhysics::Firework> m_fireworks;
+    uint m_nextFirework = 0;
 };
 
 
