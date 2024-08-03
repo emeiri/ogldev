@@ -28,7 +28,7 @@ class GameCallbacks
 {
  public:
 
-    virtual void OnFrame() {}
+    virtual void OnFrame(long long DeltaTimeMillis) {}
 
     virtual bool OnKeyboard(int key, int action) 
     { 

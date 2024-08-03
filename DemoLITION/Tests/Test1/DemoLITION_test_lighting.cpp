@@ -59,7 +59,7 @@ public:
         m_pRenderingSystem->Execute();
     }
 
-    void OnFrame()
+    void OnFrame(long long DeltaTimeMillis)
     {
         m_counter += 0.03f;
         m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_counter), 0.0f, cosf(m_counter));

@@ -95,7 +95,7 @@ public:
     }
 
 
-    void OnFrame()
+    void OnFrame(long long DeltaTimeMillis)
     {
         if (m_showGui) {
             OnFrameGUI();

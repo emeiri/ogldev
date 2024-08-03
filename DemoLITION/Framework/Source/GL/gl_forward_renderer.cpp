@@ -184,7 +184,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    pGameCallbacks->OnFrame();
+    pGameCallbacks->OnFrame(DeltaTimeMillis);
 
     if (pScene->GetRenderList().size() == 0) {
         printf("Warning! render list is empty and no main model\n");

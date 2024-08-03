@@ -46,7 +46,7 @@ public:
         pScene->GetDirLights().push_back(m_dirLight);
     }
 
-    void OnFrame()
+    void OnFrame(long long DeltaTimeMillis)
     {
         m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
