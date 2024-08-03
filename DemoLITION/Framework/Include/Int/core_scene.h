@@ -85,7 +85,7 @@ public:
 
     virtual void LoadScene(const std::string& Filename);
 
-    virtual SceneObject* CreateSceneObject(Model* pModel);
+    virtual SceneObject* CreateSceneObject(Model* pModel, bool WithPhysics = true);
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape);
 
@@ -130,7 +130,7 @@ protected:
 
 private:
     void CreateDefaultCamera();
-    CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel);
+    CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel, bool WithPhysics);
 
     BasicCamera m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;

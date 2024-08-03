@@ -113,7 +113,7 @@ public:
 
     ~Scene() {}
 
-    virtual SceneObject* CreateSceneObject(Model* pModel) = 0;
+    virtual SceneObject* CreateSceneObject(Model* pModel, bool WithPhysics = true) = 0;
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape) = 0;
        

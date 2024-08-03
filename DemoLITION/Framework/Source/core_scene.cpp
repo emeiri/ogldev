@@ -43,7 +43,7 @@ void SceneObject::PushRotation(const Vector3f& Rot)
         printf("Exceeded max number of rotations - %d\n", m_numRotations);
         assert(0);
     }
-
+        
     m_rotations[m_numRotations] = Rot;
     m_numRotations++;
 }
@@ -71,7 +71,9 @@ void SceneObject::CalcRotationStack(Matrix4f& Rot) const
 
 Matrix4f CoreSceneObject::GetMatrix()
 {
-    m_pos = m_pParticle->GetPosition();
+    if (m_pParticle) {
+        m_pos = m_pParticle->GetPosition();
+    }
 
     Matrix4f Scale;
     Scale.InitScaleTransform(m_scale);
@@ -91,33 +93,39 @@ Matrix4f CoreSceneObject::GetMatrix()
 
 void CoreSceneObject::SetMass(float Mass)
 {
+    assert(m_pParticle);
     m_pParticle->SetMass(Mass);
 }
 
 
 void CoreSceneObject::SetVelocity(const Vector3f& Velocity)
 {
+    assert(m_pParticle);
     m_pParticle->SetVelocity(Velocity);
 }
 
 
 void CoreSceneObject::SetAcceleration(const Vector3f& Acceleration)
 {
+    assert(m_pParticle);
     m_pParticle->SetAcceleration(Acceleration);
 }
 
 
 void CoreSceneObject::SetDamping(float Damping)
 {
+    assert(m_pParticle);
     m_pParticle->SetDamping(Damping);
 }
 
 
 void CoreSceneObject::UpdatePosition()
 {
-    printf("Warning! updating particle position to ");
-    m_pos.Print();
-    m_pParticle->SetPosition(m_pos);
+    if (m_pParticle) {
+        printf("Warning! updating particle position to ");
+        m_pos.Print();
+        m_pParticle->SetPosition(m_pos);
+    }
 }
 
 
@@ -238,14 +246,14 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
 }
 
 
-SceneObject* CoreScene::CreateSceneObject(Model* pModel)
+SceneObject* CoreScene::CreateSceneObject(Model* pModel, bool WithPhysics)
 {
     if (m_numSceneObjects == NUM_SCENE_OBJECTS) {
         printf("%s:%d - out of scene objects space\n", __FILE__, __LINE__);
         exit(0);
     }
     
-    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal((CoreModel*)pModel);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal((CoreModel*)pModel, WithPhysics);
 
     return pCoreSceneObject;
 }
@@ -255,13 +263,13 @@ SceneObject* CoreScene::CreateSceneObject(const std::string& BasicShape)
 {
     CoreModel* pModel = (CoreModel*)m_pCoreRenderingSystem->GetModel(BasicShape);
 
-    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel, true);
 
     return pCoreSceneObject;
 }
 
 
-CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
+CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel, bool WithPhysics)
 {
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
@@ -269,8 +277,10 @@ CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
     int Id = m_numSceneObjects;
     pCoreSceneObject->SetId(Id);
     pCoreSceneObject->SetName("SceneObject_" + std::to_string(Id));
-    OgldevPhysics::Particle* pParticle = m_physicsSystem.AllocParticle();
-    pCoreSceneObject->SetParticle(pParticle);
+    if (WithPhysics) {
+        OgldevPhysics::Particle* pParticle = m_physicsSystem.AllocParticle();
+        pCoreSceneObject->SetParticle(pParticle);
+    }
 
     m_numSceneObjects++;
 
