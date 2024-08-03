@@ -164,6 +164,7 @@ struct Vector3f
         z = pFloat[2];
     }
 
+    void InitRandom(const Vector3f& MinVal, const Vector3f& MaxVal);
 
     void InitBySphericalCoords(float Radius, float Pitch, float Heading)
     {

@@ -45,6 +45,15 @@ Vector4f& Vector4f::Normalize()
     return *this;
 }
 
+
+void Vector3f::InitRandom(const Vector3f& MinVal, const Vector3f& MaxVal)
+{
+    x = RandomFloatRange(MinVal.x, MaxVal.x);
+    y = RandomFloatRange(MinVal.y, MaxVal.y);
+    z = RandomFloatRange(MinVal.z, MaxVal.z);
+}
+
+
 Vector3f Vector3f::Cross(const Vector3f& v) const
 {
     const float _x = y * v.z - z * v.y;
@@ -501,7 +510,12 @@ float RandomFloat()
 
 float RandomFloatRange(float Start, float End)
 {
+   // return Start;
     if (End == Start) {
+        return Start;
+    }
+
+    if (End < Start) {
         printf("Invalid random range: (%f, %f)\n", Start, End);
         exit(0);
     }
