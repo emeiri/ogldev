@@ -30,28 +30,17 @@
 
 class SceneObject : public Object {
 public:
-    void SetPosition(float x, float y, float z) 
-    { 
-        m_pos.x = x;
-        m_pos.y = y;
-        m_pos.z = z; 
-        UpdatePosition();
-    }
-
-    void SetPosition(const Vector3f& Pos) 
-    { 
-        m_pos = Pos; 
-        UpdatePosition();
-    }
-
+    void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
     void SetRotation(float x, float y, float z);
     void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }    
+
+    void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
     void SetRotation(const Vector3f& Rot);
     void PushRotation(const Vector3f& Rot);
     void ResetRotations() { m_numRotations = 0; }
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
 
-    virtual Matrix4f GetMatrix() = 0;
+    Matrix4f GetMatrix() const;
 
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
     const Vector4f& GetFlatColor() const { return m_flatColor; }
@@ -59,17 +48,8 @@ public:
     void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
     Vector3f GetColorMod() const { return m_colorMod; }
 
-    virtual void SetMass(float Mass) = 0;
-
-    virtual void SetVelocity(const Vector3f& Velocity) = 0;
-
-    virtual void SetAcceleration(const Vector3f& Acceleration) = 0;
-
-    virtual void SetDamping(float Damping) = 0;
-
 protected:
     SceneObject() {}
-    virtual void UpdatePosition() = 0;
     void CalcRotationStack(Matrix4f& Rot) const;
 
     Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);
@@ -113,7 +93,7 @@ public:
 
     ~Scene() {}
 
-    virtual SceneObject* CreateSceneObject(Model* pModel, bool WithPhysics = true) = 0;
+    virtual SceneObject* CreateSceneObject(Model* pModel) = 0;
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape) = 0;
        

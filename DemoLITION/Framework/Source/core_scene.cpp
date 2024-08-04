@@ -49,6 +49,23 @@ void SceneObject::PushRotation(const Vector3f& Rot)
 }
 
 
+Matrix4f SceneObject::GetMatrix() const
+{
+    Matrix4f Scale;
+    Scale.InitScaleTransform(m_scale);
+
+    Matrix4f Rotation;
+    CalcRotationStack(Rotation);    
+
+    Matrix4f Translation;
+    Translation.InitTranslationTransform(m_pos);
+
+    Matrix4f WorldTransformation = Translation * Rotation * Scale;
+
+    return WorldTransformation;
+}
+
+
 void SceneObject::CalcRotationStack(Matrix4f& Rot) const
 {
     if (m_numRotations == 0) {
@@ -69,66 +86,6 @@ void SceneObject::CalcRotationStack(Matrix4f& Rot) const
 }
 
 
-Matrix4f CoreSceneObject::GetMatrix()
-{
-    if (m_pParticle) {
-        m_pos = m_pParticle->GetPosition();
-    }
-
-    Matrix4f Scale;
-    Scale.InitScaleTransform(m_scale);
-
-    Matrix4f Rotation;
-    CalcRotationStack(Rotation);
-
-    Matrix4f Translation;
-    Translation.InitTranslationTransform(m_pos);
-
-    Matrix4f WorldTransformation = Translation * Rotation * Scale;
-
-    return WorldTransformation;
-}
-
-
-
-void CoreSceneObject::SetMass(float Mass)
-{
-    assert(m_pParticle);
-    m_pParticle->SetMass(Mass);
-}
-
-
-void CoreSceneObject::SetVelocity(const Vector3f& Velocity)
-{
-    assert(m_pParticle);
-    m_pParticle->SetVelocity(Velocity);
-}
-
-
-void CoreSceneObject::SetAcceleration(const Vector3f& Acceleration)
-{
-    assert(m_pParticle);
-    m_pParticle->SetAcceleration(Acceleration);
-}
-
-
-void CoreSceneObject::SetDamping(float Damping)
-{
-    assert(m_pParticle);
-    m_pParticle->SetDamping(Damping);
-}
-
-
-void CoreSceneObject::UpdatePosition()
-{
-    if (m_pParticle) {
-        printf("Warning! updating particle position to ");
-        m_pos.Print();
-        m_pParticle->SetPosition(m_pos);
-    }
-}
-
-
 SceneConfig::SceneConfig()
 {
 
@@ -146,7 +103,6 @@ CoreScene::CoreScene(CoreRenderingSystem* pRenderingSystem)
     m_pCoreRenderingSystem = pRenderingSystem;
     CreateDefaultCamera();
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);
-    m_physicsSystem.Init();
 }
 
 void CoreScene::LoadScene(const std::string& Filename)
@@ -246,14 +202,14 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
 }
 
 
-SceneObject* CoreScene::CreateSceneObject(Model* pModel, bool WithPhysics)
+SceneObject* CoreScene::CreateSceneObject(Model* pModel)
 {
     if (m_numSceneObjects == NUM_SCENE_OBJECTS) {
         printf("%s:%d - out of scene objects space\n", __FILE__, __LINE__);
         exit(0);
     }
     
-    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal((CoreModel*)pModel, WithPhysics);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal((CoreModel*)pModel);
 
     return pCoreSceneObject;
 }
@@ -263,13 +219,13 @@ SceneObject* CoreScene::CreateSceneObject(const std::string& BasicShape)
 {
     CoreModel* pModel = (CoreModel*)m_pCoreRenderingSystem->GetModel(BasicShape);
 
-    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel, true);
+    CoreSceneObject* pCoreSceneObject = CreateSceneObjectInternal(pModel);
 
     return pCoreSceneObject;
 }
 
 
-CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel, bool WithPhysics)
+CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
 {
     m_sceneObjects[m_numSceneObjects].SetModel(pModel);
 
@@ -277,10 +233,6 @@ CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel, bool Wi
     int Id = m_numSceneObjects;
     pCoreSceneObject->SetId(Id);
     pCoreSceneObject->SetName("SceneObject_" + std::to_string(Id));
-    if (WithPhysics) {
-        OgldevPhysics::Particle* pParticle = m_physicsSystem.AllocParticle();
-        pCoreSceneObject->SetParticle(pParticle);
-    }
 
     m_numSceneObjects++;
 
@@ -348,8 +300,3 @@ const std::vector<DirectionalLight>& CoreScene::GetDirLights()
 
 }
 
-
-void CoreScene::Update(long long dt)
-{
-    m_physicsSystem.Update(dt);
-}

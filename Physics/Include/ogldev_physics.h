@@ -24,13 +24,14 @@
 
 #include "ogldev_types.h"
 #include "particle.h"
+#include "firework.h"
 
 namespace OgldevPhysics
 {
 
 const static Vector3f GRAVITY = Vector3f(0.0f, -9.81f, 0.0f);
 
-#define DEFAULT_NUM_PARTICLES 1000
+#define DEFAULT_NUM_OBJECTS 1000
 
 class PhysicsSystem {
 
@@ -39,16 +40,29 @@ public:
 
     ~PhysicsSystem() {}
 
-    void Init(uint NumParticles = DEFAULT_NUM_PARTICLES);
+    void Init(uint NumParticles = DEFAULT_NUM_OBJECTS);
 
     Particle* AllocParticle();
+
+    Firework* AllocFirework();
 
     void Update(long long DeltaTimeMillis);
 
 private:
 
+    void InitFireworksConfig();
+
+    void Create(int Type, uint Count, Firework* pFirework);
+
+    void ParticleUpdate(float dt);
+    void FireworkUpdate(float dt);
+
     std::vector<Particle> m_particles;
     uint m_numParticles = 0;
+    std::vector<Firework> m_fireworks;
+    uint m_numFirework = 0;
+    std::vector<FireworkConfig> m_fireworkConfigs;
+    uint m_nextFirework = 0;
 };
 
 }

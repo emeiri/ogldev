@@ -24,7 +24,6 @@
 #include "demolition_scene.h"
 #include "demolition_object.h"
 #include "Int\core_model.h"
-#include "ogldev_physics.h"
 
 
 class CoreSceneObject : public SceneObject {
@@ -47,25 +46,9 @@ public:
 
     int GetId() const { return m_id; }
 
-    void SetParticle(OgldevPhysics::Particle* pParticle) { m_pParticle = pParticle; }
-
-    virtual Matrix4f GetMatrix();
-
-    virtual void SetMass(float Mass);
-
-    virtual void SetVelocity(const Vector3f& Velocity);
-   
-    virtual void SetAcceleration(const Vector3f& Acceleration);
-    
-    virtual void SetDamping(float Damping);
-
-protected:
-    virtual void UpdatePosition();
-
 private:
     CoreModel* m_pModel = NULL;
     int m_id = -1;
-    OgldevPhysics::Particle* m_pParticle = NULL;
 };
 
 
@@ -85,7 +68,7 @@ public:
 
     virtual void LoadScene(const std::string& Filename);
 
-    virtual SceneObject* CreateSceneObject(Model* pModel, bool WithPhysics = true);
+    virtual SceneObject* CreateSceneObject(Model* pModel);
 
     virtual SceneObject* CreateSceneObject(const std::string& BasicShape);
 
@@ -121,16 +104,13 @@ public:
 
     SceneConfig* GetConfig() { return &m_config; }
 
-    void Update(long long dt);
-
 protected:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;
-    OgldevPhysics::PhysicsSystem m_physicsSystem;
 
 private:
     void CreateDefaultCamera();
-    CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel, bool WithPhysics);
+    CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel);
 
     BasicCamera m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;

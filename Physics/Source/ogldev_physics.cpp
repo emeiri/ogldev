@@ -23,10 +23,16 @@
 namespace OgldevPhysics
 {
 
-void PhysicsSystem::Init(uint NumParticles)
+void PhysicsSystem::Init(uint NumObjects)
 {
-    m_particles.resize(NumParticles);
+    m_particles.resize(NumObjects);
     m_numParticles = 0;
+
+    m_fireworks.resize(NumObjects);
+    m_numFirework = 0;
+
+    InitFireworksConfig();
+
 }
 
 
@@ -44,14 +50,66 @@ Particle* PhysicsSystem::AllocParticle()
 }
 
 
+Firework* PhysicsSystem::AllocFirework()
+{
+    if (m_numFirework == m_fireworks.size()) {
+        printf("%s:%d - exceeded max number of fireworks\n", __FILE__, __LINE__);
+        exit(1);
+    }
+
+    Firework* ret = &m_fireworks[m_numFirework];
+    m_numFirework++;
+
+    return ret;
+}
+
+
 void PhysicsSystem::Update(long long DeltaTimeMillis)
 {
-    assert(DeltaTimeMillis > 0.0f);
+    assert(DeltaTimeMillis >= 0.0f);
 
     float dt = (float)DeltaTimeMillis / 1000.0f;
 
+    ParticleUpdate(dt);
+
+    FireworkUpdate(dt);
+}
+
+
+void PhysicsSystem::ParticleUpdate(float dt)
+{
     for (uint i = 0; i < m_numParticles; i++) {
         m_particles[i].Integrate(dt);
+    }
+}
+
+
+void PhysicsSystem::FireworkUpdate(float dt)
+{
+    printf("Update fireworks dt %f\n", dt);
+
+    bool Finished = true;
+    for (int i = 0; i < m_fireworks.size(); i++) {
+        OgldevPhysics::Firework& firework = m_fireworks[i];
+        int Type = firework.GetType();
+        //    printf("%d type %d\n", i, Type);
+        if (Type > 0) {
+            Finished = false;
+            if (firework.Update(dt)) {
+                //  printf("remove\n");
+                OgldevPhysics::FireworkConfig& Config = m_fireworkConfigs[Type - 1];
+                firework.SetType(0);
+
+                for (int j = 0; j < Config.m_payloads.size(); j++) {
+                    //     printf("payload %d\n", j);
+                    Create(Config.m_payloads[j].m_type, Config.m_payloads[j].m_count, &firework);
+                }
+                //   printf("---\n");
+            }
+            else {
+                //        printf("dont remove\n");
+            }
+        }
     }
 }
 

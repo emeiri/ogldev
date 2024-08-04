@@ -73,4 +73,110 @@ void FireworkConfig::Create(Firework& firework, const Firework* pParent) const
    // firework.ClearAccumulator();
 }
 
+
+void PhysicsSystem::InitFireworksConfig()
+{
+    m_fireworkConfigs.resize(9);
+
+    m_fireworkConfigs[0].Init(2);
+    m_fireworkConfigs[0].SetParams(
+        1, // type
+        0.5f, 1.4f, // age range
+        Vector3f(-5, 25, -5), // min velocity
+        Vector3f(5, 28, 5), // max velocity
+        0.1f // damping
+    );
+    m_fireworkConfigs[0].m_payloads[0].Set(3, 5);
+    m_fireworkConfigs[0].m_payloads[1].Set(5, 5);
+
+    m_fireworkConfigs[1].Init(1);
+    m_fireworkConfigs[1].SetParams(
+        2, // type
+        0.5f, 1.0f, // age range
+        Vector3f(-5, 10, -5), // min velocity
+        Vector3f(5, 20, 5), // max velocity
+        0.8f // damping
+    );
+    m_fireworkConfigs[1].m_payloads[0].Set(4, 2);
+
+    m_fireworkConfigs[2].Init(0);
+    m_fireworkConfigs[2].SetParams(
+        3, // type
+        0.5f, 1.5f, // age range
+        Vector3f(-5, -5, -5), // min velocity
+        Vector3f(5, 5, 5), // max velocity
+        0.1f // damping
+    );
+
+    m_fireworkConfigs[3].Init(0);
+    m_fireworkConfigs[3].SetParams(
+        4, // type
+        0.25f, 0.5f, // age range
+        Vector3f(-20, 5, -5), // min velocity
+        Vector3f(20, 5, 5), // max velocity
+        0.2f // damping
+    );
+
+    m_fireworkConfigs[4].Init(1);
+    m_fireworkConfigs[4].SetParams(
+        5, // type
+        0.5f, 1.0f, // age range
+        Vector3f(-20, 2, -5), // min velocity
+        Vector3f(20, 18, 5), // max velocity
+        0.01f // damping
+    );
+    m_fireworkConfigs[4].m_payloads[0].Set(3, 5);
+
+    m_fireworkConfigs[5].Init(0);
+    m_fireworkConfigs[5].SetParams(
+        6, // type
+        3, 5, // age range
+        Vector3f(-5, 5, -5), // min velocity
+        Vector3f(5, 10, 5), // max velocity
+        0.95f // damping
+    );
+
+    m_fireworkConfigs[6].Init(1);
+    m_fireworkConfigs[6].SetParams(
+        7, // type
+        4, 5, // age range
+        Vector3f(-5, 50, -5), // min velocity
+        Vector3f(5, 60, 5), // max velocity
+        0.01f // damping
+    );
+    m_fireworkConfigs[6].m_payloads[0].Set(8, 10);
+
+    m_fireworkConfigs[7].Init(0);
+    m_fireworkConfigs[7].SetParams(
+        8, // type
+        0.25f, 0.5f, // age range
+        Vector3f(-1, -1, -1), // min velocity
+        Vector3f(1, 1, 1), // max velocity
+        0.01f // damping
+    );
+
+    m_fireworkConfigs[8].Init(0);
+    m_fireworkConfigs[8].SetParams(
+        9, // type
+        3, 5, // age range
+        Vector3f(-15, 10, -5), // min velocity
+        Vector3f(15, 15, 5), // max velocity
+        0.95f // damping
+    );
+
+    Create(1, 1, NULL);
+}
+
+
+void PhysicsSystem::Create(int Type, uint Count, OgldevPhysics::Firework* pFirework)
+{
+    for (uint i = 0; i < Count; i++) {
+        OgldevPhysics::FireworkConfig& Config = m_fireworkConfigs[Type - 1];
+        Config.Create(m_fireworks[m_nextFirework], pFirework);
+        m_nextFirework = (m_nextFirework + 1) % m_fireworks.size();
+    }
+}
+
+
+
 }
