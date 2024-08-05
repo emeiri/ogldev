@@ -30,8 +30,8 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 
 void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
