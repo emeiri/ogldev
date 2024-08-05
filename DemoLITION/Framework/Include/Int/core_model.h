@@ -134,6 +134,9 @@ private:
     void PopulateBuffers(vector<VertexType>& Vertices);
 
     template<typename VertexType>
+    void PopulateBuffersPVP(vector<VertexType>& Vertices);
+
+    template<typename VertexType>
     void PopulateBuffersNonDSA(vector<VertexType>& Vertices);
 
     template<typename VertexType>

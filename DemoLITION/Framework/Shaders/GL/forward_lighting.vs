@@ -17,13 +17,33 @@
 */
 
 
-#version 330
+#version 460 core
+
+//#define PVP
+
+#ifdef PVP
+
+struct Vertex {
+    float Position[3];
+    float TexCoord[2];
+    float Normal[3];
+    float Tangent[3];
+    float Bitangent[3];
+};
+
+layout(std430, binding = 1) restrict readonly buffer Vertices {
+    Vertex in_Vertices[];
+};
+
+#else // PVP
 
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 TexCoord;
 layout (location = 2) in vec3 Normal;
 layout (location = 3) in vec3 Tangent;
 layout (location = 4) in vec3 Bitangent;
+
+#endif
 
 uniform mat4 gWVP;
 uniform mat4 gLightWVP;
@@ -37,8 +57,58 @@ out vec4 LightSpacePos0;
 out vec3 Tangent0;
 out vec3 Bitangent0;
 
+#ifdef PVP
+vec3 GetPosition(int i)
+{
+    return vec3(in_Vertices[i].Position[0], 
+                in_Vertices[i].Position[1], 
+                in_Vertices[i].Position[2]);
+}
+
+
+vec2 GetTexCoord(int i)
+{
+    return vec2(in_Vertices[i].TexCoord[0], 
+                in_Vertices[i].TexCoord[1]);
+}
+
+
+vec3 GetNormal(int i)
+{
+    return vec3(in_Vertices[i].Normal[0], 
+                in_Vertices[i].Normal[1], 
+                in_Vertices[i].Normal[2]);
+}
+
+
+vec3 GetTangent(int i)
+{
+    return vec3(in_Vertices[i].Tangent[0], 
+                in_Vertices[i].Tangent[1], 
+                in_Vertices[i].Tangent[2]);
+}
+
+
+vec3 GetBitangent(int i)
+{
+    return vec3(in_Vertices[i].Bitangent[0], 
+                in_Vertices[i].Bitangent[1], 
+                in_Vertices[i].Bitangent[2]);
+}
+
+#endif // PVP
+
+
 void main()
 {
+#ifdef PVP
+    vec3 Position = GetPosition(gl_VertexID);
+    vec2 TexCoord = GetTexCoord(gl_VertexID);
+    vec3 Normal = GetNormal(gl_VertexID);
+    vec3 Tangent = GetTangent(gl_VertexID);
+    vec3 Bitangent = GetBitangent(gl_VertexID);
+#endif
+
     vec4 Pos4 = vec4(Position, 1.0);
     gl_Position = gWVP * Pos4;
     TexCoord0 = TexCoord;

@@ -714,6 +714,8 @@ void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
 
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_Buffers[VERTEX_BUFFER]);
+
     glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(VertexType));
     glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
 
