@@ -117,8 +117,6 @@ public:
     }
 
 
-
-
     void OnFrame(long long DeltaTimeMillis)
     {
         if (m_showGui) {
@@ -160,7 +158,7 @@ public:
         for (std::list<CombinedObject>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
             const Vector3f& NewPos = it->pParticle->GetPosition();
         //    printf("%d pos ", i);
-            NewPos.Print();
+           // NewPos.Print();
         //    printf("velocity ");
          //   m_fireworks[i].GetVelocity().Print();
             it->pSceneObject->SetPosition(NewPos);

@@ -86,7 +86,7 @@ void PhysicsSystem::ParticleUpdate(float dt)
 
 void PhysicsSystem::FireworkUpdate(float dt)
 {
-    printf("Update fireworks dt %f\n", dt);
+ //   printf("Update fireworks dt %f\n", dt);
 
     bool Finished = true;
     for (int i = 0; i < m_fireworks.size(); i++) {

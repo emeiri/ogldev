@@ -46,7 +46,6 @@ protected:
 
 private:
     void InitGUI();
-
     
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;

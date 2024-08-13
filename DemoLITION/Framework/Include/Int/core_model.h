@@ -36,8 +36,6 @@
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
-// #define USE_MESH_OPTIMIZER
-
 class DemolitionRenderCallbacks
 {
 public:

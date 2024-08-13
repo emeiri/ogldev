@@ -17,9 +17,9 @@
 */
 
 
-#version 460 core
+#version 430 core
 
-//#define PVP
+#define PVP
 
 #ifdef PVP
 
@@ -31,7 +31,7 @@ struct Vertex {
     float Bitangent[3];
 };
 
-layout(std430, binding = 1) restrict readonly buffer Vertices {
+layout(std430, binding = 0) restrict readonly buffer Vertices {
     Vertex in_Vertices[];
 };
 

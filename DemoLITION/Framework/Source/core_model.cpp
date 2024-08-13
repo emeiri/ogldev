@@ -24,6 +24,10 @@
 
 using namespace std;
 
+// config flags
+static bool UsePVP = true;     // Programmable Vertex Pulling
+static bool UseMeshOptimizer = false;
+
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
 #define NORMAL_LOCATION      2
@@ -231,11 +235,11 @@ void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Ve
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
-#ifdef USE_MESH_OPTIMIZER
-        InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
-#else
-        InitSingleMesh<VertexType>(Vertices, i, paiMesh);
-#endif
+        if (UseMeshOptimizer) {
+            InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
+        } else {
+            InitSingleMesh<VertexType>(Vertices, i, paiMesh);
+        }
     }
 }
 
@@ -647,11 +651,33 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 template<typename VertexType>
 void CoreModel::PopulateBuffers(std::vector<VertexType>& Vertices)
 {
-    if (IsGLVersionHigher(4, 5)) {
-        PopulateBuffersDSA(Vertices);
+    if (UsePVP) {
+        if (IsGLVersionHigher(4, 5)) {
+            PopulateBuffersPVP(Vertices);
+        } else {
+            printf("Programmable vertex pulling but OpenGL version is less than 4.5\n");
+            exit(1);
+        }        
     } else {
-        PopulateBuffersNonDSA(Vertices);
+        if (IsGLVersionHigher(4, 5)) {
+            PopulateBuffersDSA(Vertices);
+        }
+        else {
+            PopulateBuffersNonDSA(Vertices);
+        }
     }
+}
+
+
+template<typename VertexType>
+void CoreModel::PopulateBuffersPVP(std::vector<VertexType>& Vertices)
+{
+    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
+    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+
+    glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
 }
 
 
