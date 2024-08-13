@@ -82,7 +82,7 @@ void MidpointDispTerrain::DiamondStep(int RectSize, float CurHeight)
             int mid_x = (x + HalfRectSize) % m_terrainSize;
             int mid_y = (y + HalfRectSize) % m_terrainSize;
 
-            float RandValue = RandomFloatRange(CurHeight, -CurHeight);
+            float RandValue = RandomFloatRange(-CurHeight, CurHeight);
             float MidPoint = (TopLeft + TopRight + BottomLeft + BottomRight) / 4.0f;
 
             m_heightMap.Set(mid_x, mid_y, MidPoint + RandValue);
