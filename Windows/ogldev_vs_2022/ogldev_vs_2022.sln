@@ -27,9 +27,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11_PersProj1", "Tut
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12_PersProj2", "Tutorial12\Tutorial12.vcxproj", "{361E414D-FE1B-406A-A6E4-F046F4761A90}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13", "Tutorial13\Tutorial13.vcxproj", "{1176A7B7-93F5-4B6F-BCB7-7517CC92DFCA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13_CameraSpace", "Tutorial13\Tutorial13.vcxproj", "{1176A7B7-93F5-4B6F-BCB7-7517CC92DFCA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial14", "Tutorial14\Tutorial14.vcxproj", "{050D33E4-33DF-4635-BB55-9D968259A46A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial14_CameraControl", "Tutorial14\Tutorial14.vcxproj", "{050D33E4-33DF-4635-BB55-9D968259A46A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15", "Tutorial15\Tutorial15.vcxproj", "{557323B9-85F8-45DF-B78F-D89406D59464}"
 EndProject
