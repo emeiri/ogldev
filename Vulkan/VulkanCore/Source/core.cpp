@@ -465,7 +465,7 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 
 	VkAttachmentReference AttachRef = {
 		.attachment = 0,
-		.layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	};
 
 	VkSubpassDescription SubpassDesc = {
