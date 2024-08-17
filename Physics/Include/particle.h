@@ -73,11 +73,21 @@ public:
         return m_position;
     }
 
+
+    void AddForce(const Vector3f& Force)
+    {
+        m_forceAccum += Force;
+    }
+
 protected:
+
+    void ClearAccum();
 
     Vector3f m_position = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_velocity = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_acceleration = Vector3f(0.0f, 0.0f, 0.0f);
+
+    Vector3f m_forceAccum = Vector3f(0.0f, 0.0f, 0.0f);
 
     float m_damping = 0.999f;
     float m_reciprocalMass = 0.0f;

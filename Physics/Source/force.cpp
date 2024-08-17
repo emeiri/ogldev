@@ -18,33 +18,22 @@
  */
 
 
-#include "particle.h"
+#include "force_generator.h"
 
-namespace OgldevPhysics
-{
+namespace OgldevPhysics {
 
-void Particle::Integrate(float dt)
+
+void ForceRegistry::Add(Particle* pParticle, ForceGenerator* pForceGenerator)
 {
-    if (m_reciprocalMass <= 0.0f) {
-        return;
+    ForceEntry Entry(pParticle, pForceGenerator);
+    m_forceRegistry.push_back(Entry);
+}
+
+
+void ForceRegistry::Update(float dt)
+{
+    for (Registry::iterator it = m_forceRegistry.begin(); it != m_forceRegistry.end(); it++) {
+        it->pForceGenerator->UpdateForce(it->pParticle, dt);
     }
-
-    m_position += m_velocity * dt;
-
-    Vector3f AccTemp = m_acceleration;
-    AccTemp += m_forceAccum * m_reciprocalMass;
-
-    m_velocity += AccTemp * dt;
-
-    m_velocity *= powf(m_damping, dt);
-
-    ClearAccum();
 }
-
-
-void Particle::ClearAccum()
-{
-    m_forceAccum = Vector3f(0.0f, 0.0f, 0.0f);
-}
-
 }

@@ -24,6 +24,9 @@
     <ClInclude Include="..\..\..\Physics\Include\firework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Physics\Include\force_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Physics\Source\particle.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Physics\Source\firework.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Physics\Source\force.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
