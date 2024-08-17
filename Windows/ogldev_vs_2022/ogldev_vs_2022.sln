@@ -395,6 +395,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain14", "Terrain14\Terrain14.vcxproj", "{D6C450A9-DD41-4D42-B90E-EC904156AA93}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11", "Vulkan\Tutorial11\Tutorial11.vcxproj", "{0BD8E4FC-3B42-44E1-937E-8406FA889A5C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRTextures", "PBRTextures\PBRTextures.vcxproj", "{A905FE76-7290-48E7-AD86-E918753F516D}"
 EndProject
@@ -404,8 +407,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial52_NormalMapping", 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial12", "Vulkan\Tutorial12\Tutorial12.vcxproj", "{52E39A87-D92C-43F6-944E-5F57EE2105DC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgldevPhysics", "OgldevPhysics\OgldevPhysics.vcxproj", "{87743A97-581B-4DDD-B1B5-F7F63148D230}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13", "Vulkan\Tutorial13\Tutorial13.vcxproj", "{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1143,6 +1154,14 @@ Global
 		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x64.Build.0 = Release|x64
 		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x86.ActiveCfg = Release|Win32
 		{87743A97-581B-4DDD-B1B5-F7F63148D230}.Release|x86.Build.0 = Release|Win32
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Debug|x64.ActiveCfg = Debug|x64
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Debug|x64.Build.0 = Debug|x64
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Debug|x86.ActiveCfg = Debug|Win32
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Debug|x86.Build.0 = Debug|Win32
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x64.ActiveCfg = Release|x64
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x64.Build.0 = Release|x64
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x86.ActiveCfg = Release|Win32
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1246,6 +1265,7 @@ Global
 		{A905FE76-7290-48E7-AD86-E918753F516D} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{7895318F-15FC-4CC3-B941-E669BB2892BA} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{52E39A87-D92C-43F6-944E-5F57EE2105DC} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
