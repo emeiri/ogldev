@@ -193,11 +193,11 @@ public:
                 m_isPaused = !m_isPaused;
                 break;
 
-            case GLFW_KEY_A:
+            case GLFW_KEY_F:
                 m_clipPlaneHeight += 0.1f;
                 break;
 
-            case GLFW_KEY_Z:
+            case GLFW_KEY_V:
                 m_clipPlaneHeight -= 0.1f;
                 break;
 
