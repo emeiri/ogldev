@@ -33,8 +33,15 @@ namespace OgldevVK {
 
 struct Shader
 {
-	std::vector<unsigned int> SPIRV;
+	std::vector<u32> SPIRV;
 	VkShaderModule ShaderModule = NULL;
+
+	void Initialize(glslang_program_t* program)
+	{
+		size_t program_size = glslang_program_SPIRV_get_size(program);
+		SPIRV.resize(program_size);
+		glslang_program_SPIRV_get(program, SPIRV.data());
+	}
 };
 
 
@@ -61,9 +68,9 @@ static void PrintShaderSource(const char* text)
 }
 
 
-static size_t CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
+static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
 {
-	const glslang_input_t input = {
+	glslang_input_t input = {
 		.language = GLSLANG_SOURCE_GLSL,
 		.stage = Stage,
 		.client = GLSLANG_CLIENT_VULKAN,
@@ -109,18 +116,17 @@ static size_t CompileShader(VkDevice& Device, glslang_stage_t Stage, const char*
 
 	glslang_program_SPIRV_generate(program, Stage);
 
-	ShaderModule.SPIRV.resize(glslang_program_SPIRV_get_size(program));
-	glslang_program_SPIRV_get(program, ShaderModule.SPIRV.data());
+	ShaderModule.Initialize(program);
 
 	const char* spirv_messages = glslang_program_SPIRV_get_messages(program);
 
 	if (spirv_messages) {
-		fprintf(stderr, "%s", spirv_messages);
+		fprintf(stderr, "SPIR-V message: '%s'", spirv_messages);
 	}
 
 	VkShaderModuleCreateInfo shaderCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.codeSize = ShaderModule.SPIRV.size() * sizeof(uint),
+		.codeSize = ShaderModule.SPIRV.size() * sizeof(uint32_t),
 		.pCode = (const uint32_t*)ShaderModule.SPIRV.data()
 	};
 
@@ -130,13 +136,15 @@ static size_t CompileShader(VkDevice& Device, glslang_stage_t Stage, const char*
 	glslang_program_delete(program);
 	glslang_shader_delete(shader);
 
-	return ShaderModule.SPIRV.size();
+	bool ret = ShaderModule.SPIRV.size() > 0;
+
+	return ret;
 }
 
 
 static glslang_stage_t ShaderStageFromFilename(const char* pFilename)
 {
-	string s(pFilename);
+	std::string s(pFilename);
 
 	if (s.ends_with(".vs")) {
 		return GLSLANG_STAGE_VERTEX;
@@ -171,32 +179,32 @@ static glslang_stage_t ShaderStageFromFilename(const char* pFilename)
 
 VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilename)
 {
-	string Source;
+	std::string Source;
 
 	if (!ReadFile(pFilename, Source)) {
 		assert(0);
 	}
 
-	glslang_initialize_process();
-
 	Shader ShaderModule;
 
 	glslang_stage_t ShaderStage = ShaderStageFromFilename(pFilename);
 
-	size_t Size = CompileShader(Device, ShaderStage, Source.c_str(), ShaderModule);
+	VkShaderModule ret = NULL;
 
-	VkShaderModule s = NULL;
+	glslang_initialize_process();
 
-	if (Size > 0) {
+	bool Success = CompileShader(Device, ShaderStage, Source.c_str(), ShaderModule);	
+
+	if (Success) {
 		printf("Created shader from text file '%s'\n", pFilename);
-		s = ShaderModule.ShaderModule;
-		string BinaryFilename = string(pFilename) + ".spv";
+		ret = ShaderModule.ShaderModule;
+		std::string BinaryFilename = string(pFilename) + ".spv";
 		WriteBinaryFile(BinaryFilename.c_str(), ShaderModule.SPIRV.data(), (int)ShaderModule.SPIRV.size());
 	}
 
 	glslang_finalize_process();
 
-	return  s;
+	return ret;
 }
 
 
