@@ -29,8 +29,8 @@
 #include "camera.h"
 #include "world_transform.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1280
+#define WINDOW_HEIGHT 720
 
 GLuint VBO;
 GLuint IBO;
