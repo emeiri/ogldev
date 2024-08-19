@@ -54,6 +54,7 @@ public:
 	~VulkanApp()
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+		m_vkCore.DestroyFramebuffers(m_frameBuffers);
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_vs, NULL);
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
 		vkDestroyRenderPass(m_vkCore.GetDevice(), m_renderPass, NULL);

@@ -58,10 +58,6 @@ VulkanCore::~VulkanCore()
 
 	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
 
-	for (int i = 0; i < m_frameBuffers.size(); i++) {
-		vkDestroyFramebuffer(m_device, m_frameBuffers[i], NULL);
-	}
-
 	m_queue.Destroy();
 
 	for (int i = 0; i < m_imageViews.size(); i++) {
@@ -506,7 +502,8 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 
 std::vector<VkFramebuffer> VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
 {
-	m_frameBuffers.resize(m_images.size());
+	std::vector<VkFramebuffer> frameBuffers;
+	frameBuffers.resize(m_images.size());
 
 	int WindowWidth, WindowHeight;
 	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
@@ -524,13 +521,21 @@ std::vector<VkFramebuffer> VulkanCore::CreateFramebuffer(VkRenderPass RenderPass
 		fbCreateInfo.height = WindowHeight;
 		fbCreateInfo.layers = 1;
 
-		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &m_frameBuffers[i]);
+		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &frameBuffers[i]);
 		CHECK_VK_RESULT(res, "vkCreateFramebuffer\n");
 	}
 
 	printf("Framebuffers created\n");
 
-	return m_frameBuffers;
+	return frameBuffers;
+}
+
+
+void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
+{
+	for (int i = 0; i < Framebuffers.size(); i++) {
+		vkDestroyFramebuffer(m_device, Framebuffers[i], NULL);
+	}
 }
 
 }

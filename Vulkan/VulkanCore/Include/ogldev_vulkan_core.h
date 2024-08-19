@@ -42,6 +42,8 @@ public:
 
 	std::vector<VkFramebuffer> CreateFramebuffer(VkRenderPass RenderPass);
 
+	void DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers);
+
 	VkDevice& GetDevice() { return m_device; }
 
 	int GetNumImages() const { return (int)m_images.size(); }
@@ -51,8 +53,6 @@ public:
 	VulkanQueue* GetQueue() { return &m_queue; }
 
 	u32 GetQueueFamily() const { return m_queueFamily; }
-
-	const std::vector<VkFramebuffer>& GetFramebuffers() const { return m_frameBuffers; }
 
 	void CreateCommandBuffers(u32 Count, VkCommandBuffer* pCmdBufs);
 
@@ -80,7 +80,6 @@ private:
 	std::vector<VkImageView> m_imageViews;
 	VkCommandPool m_cmdBufPool;
 	VulkanQueue m_queue;
-	std::vector<VkFramebuffer> m_frameBuffers;
 };
 
 }
