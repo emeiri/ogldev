@@ -212,7 +212,13 @@ private:
     void InitMesh()
     {
         m_pMesh = new SkinnedMesh();
-        m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf");
+        
+        if (!m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.glt")) {
+            printf("Missing mesh file\n");
+            printf("You can download it from %s\n", 
+                "https://sketchfab.com/3d-models/iclone-7-raptoid-mascot-free-download-56a3e10a73924843949ae7a9800c97c7");
+        }
+
         m_pMesh->SetRotation(90.0f, -45.0f, 0.0f);
 
        // m_pMesh->LoadMesh("../Content/boblampclean.md5mesh");
