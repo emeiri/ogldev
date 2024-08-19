@@ -32,52 +32,27 @@ public:
 
     void SetPosition(const Vector3f& Position) { m_position = Position; }    
 
+    void SetMass(float Mass);
 
-    void SetMass(float Mass)
-    {
-        assert(Mass > 0.0f);
-
-        m_reciprocalMass = 1.0f / Mass;
-    }
-
+    float GetMass() const;
 
     void SetReciprocalMass(float ReciprocalMass) { m_reciprocalMass = ReciprocalMass; }
 
-
-    void SetVelocity(const Vector3f& Velocity) 
-    { 
-        m_velocity = Velocity; 
-    }
-
+    void SetVelocity(const Vector3f& Velocity) { m_velocity = Velocity; }
 
     const Vector3f& GetVelocity() const { return m_velocity; }
 
+    void SetAcceleration(const Vector3f& Acceleration) { m_acceleration = Acceleration; }
 
-    void SetAcceleration(const Vector3f& Acceleration)
-    {
-        m_acceleration = Acceleration;
-    }
-
-
-    void SetDamping(float Damping)
-    {
-        m_damping = Damping;
-    }
-
+    void SetDamping(float Damping) { m_damping = Damping; }
 
     void Integrate(float dt);
 
+    const Vector3f& GetPosition() const { return m_position; }
 
-    const Vector3f& GetPosition() const
-    {
-        return m_position;
-    }
+    void AddForce(const Vector3f& Force) { m_forceAccum += Force; }
 
-
-    void AddForce(const Vector3f& Force)
-    {
-        m_forceAccum += Force;
-    }
+    bool HasFiniteMass() const { return (m_reciprocalMass >= 0.0f); }
 
 protected:
 

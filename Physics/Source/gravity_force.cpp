@@ -14,59 +14,26 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
  */
 
-
 #include "particle.h"
+#include "gravity_force_generator.h"
 
-namespace OgldevPhysics
-{
+namespace OgldevPhysics {
 
-void Particle::Integrate(float dt)
+GravityForceGenerator::GravityForceGenerator(const Vector3f& Gravity)
 {
-    if (m_reciprocalMass <= 0.0f) {
+    m_gravity = Gravity;
+}
+
+    
+void GravityForceGenerator::UpdateForce(Particle& Particle, float dt)
+{
+    if (!Particle.HasFiniteMass()) {
         return;
     }
 
-    m_position += m_velocity * dt;
-
-    Vector3f AccTemp = m_acceleration;
-    AccTemp += m_forceAccum * m_reciprocalMass;
-
-    m_velocity += AccTemp * dt;
-
-    m_velocity *= powf(m_damping, dt);
-
-    ClearAccum();
-}
-
-
-void Particle::SetMass(float Mass)
-{
-    assert(Mass > 0.0f);
-
-    m_reciprocalMass = 1.0f / Mass;
-}
-
-
-float Particle::GetMass() const
-{
-    float ret = 0.0f;
-
-    if (m_reciprocalMass == 0.0f) {
-        ret = FLT_MAX;
-    } else {
-        ret = 1.0f / m_reciprocalMass;
-    }
-
-    return ret;
-}
-
-
-void Particle::ClearAccum()
-{
-    m_forceAccum = Vector3f(0.0f, 0.0f, 0.0f);
+    Particle.AddForce(m_gravity * Particle.GetMass());
 }
 
 }
