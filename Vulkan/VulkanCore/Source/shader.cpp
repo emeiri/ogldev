@@ -68,7 +68,8 @@ static void PrintShaderSource(const char* text)
 }
 
 
-static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
+static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, 
+						  Shader& ShaderModule)
 {
 	glslang_input_t input = {
 		.language = GLSLANG_SOURCE_GLSL,
@@ -146,27 +147,27 @@ static glslang_stage_t ShaderStageFromFilename(const char* pFilename)
 {
 	std::string s(pFilename);
 
-	if (s.ends_with(".vs")) {
+	if (s.ends_with(".vert")) {
 		return GLSLANG_STAGE_VERTEX;
 	}
 
-	if (s.ends_with(".fs")) {
+	if (s.ends_with(".frag")) {
 		return GLSLANG_STAGE_FRAGMENT;
 	}
 
-	if (s.ends_with(".gs")) {
+	if (s.ends_with(".geom")) {
 		return GLSLANG_STAGE_GEOMETRY;
 	}
 
-	if (s.ends_with(".cs")) {
+	if (s.ends_with(".comp")) {
 		return GLSLANG_STAGE_COMPUTE;
 	}
 
-	if (s.ends_with(".tcs")) {
+	if (s.ends_with(".tesc")) {
 		return GLSLANG_STAGE_TESSCONTROL;
 	}
 
-	if (s.ends_with(".tes")) {
+	if (s.ends_with(".tese")) {
 		return GLSLANG_STAGE_TESSEVALUATION;
 	}
 
