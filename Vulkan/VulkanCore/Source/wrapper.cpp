@@ -49,5 +49,4 @@ VkSemaphore CreateSemaphore(VkDevice Device)
 	return Semaphore;
 }
 
-
 }
