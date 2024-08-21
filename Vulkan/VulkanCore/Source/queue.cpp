@@ -120,6 +120,8 @@ void VulkanQueue::Present(u32 ImageIndex)
 	};
 
 	VkResult res = vkQueuePresentKHR(m_queue, &PresentInfo);
+
+	WaitIdle();	// TODO: looks like a workaround but we're getting error messages without it
 	CHECK_VK_RESULT(res, "vkQueuePresentKHR\n");
 }
 
