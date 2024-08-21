@@ -58,6 +58,9 @@ public:
 
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
+	VkPipeline CreatePipeline(VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs);
+	
+	void DestroyPipeline(VkPipeline Pipeline);
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -80,6 +83,7 @@ private:
 	std::vector<VkImageView> m_imageViews;
 	VkCommandPool m_cmdBufPool;
 	VulkanQueue m_queue;
+	VkPipelineLayout m_pipelineLayout;
 };
 
 }
