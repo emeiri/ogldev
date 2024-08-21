@@ -23,6 +23,7 @@
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_util.h"
+#include "ogldev_vulkan_wrapper.h"
 
 namespace OgldevVK {
 
@@ -55,6 +56,8 @@ VulkanCore::VulkanCore()
 VulkanCore::~VulkanCore()
 {
 	printf("-------------------------------\n");
+
+	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
 
 	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
 
@@ -110,6 +113,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	CreateSwapChain();
 	CreateCommandBufferPool();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
+	CreateCommandBuffers(1, &m_copyCmdBuf);
 }
 
 
@@ -536,6 +540,97 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 	for (int i = 0; i < Framebuffers.size(); i++) {
 		vkDestroyFramebuffer(m_device, Framebuffers[i], NULL);
 	}
+}
+
+
+VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
+{
+	VkBuffer StagingVB;
+	VkDeviceMemory StagingVBMem;
+	VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
+
+	void* MappedMemAddr = NULL;
+	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
+	memcpy(MappedMemAddr, pVertices, Size);
+	vkUnmapMemory(m_device, StagingVBMem);
+
+	VkBuffer vb;
+	VkDeviceMemory vbMem;
+	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+
+	CopyBuffer(vb, StagingVB, Size);
+
+	return vb;
+}
+
+
+VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
+	VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
+{
+	VkBufferCreateInfo vbCreateInfo = {};
+	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	vbCreateInfo.size = Size;
+	vbCreateInfo.usage = Usage;
+	vbCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &Buffer);
+	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
+	printf("Create vertex buffer\n");
+
+	VkMemoryRequirements MemReqs = {};
+	vkGetBufferMemoryRequirements(m_device, Buffer, &MemReqs);
+	printf("Vertex buffer requires %d bytes\n", (int)MemReqs.size);
+
+	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, Properties);
+	VkMemoryAllocateInfo MemAllocInfo = {};
+	MemAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	MemAllocInfo.allocationSize = MemReqs.size;
+	MemAllocInfo.memoryTypeIndex = MemoryTypeIndex;
+	printf("Memory type index %d\n", MemAllocInfo.memoryTypeIndex);
+
+	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &BufferMemory);
+	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
+
+	res = vkBindBufferMemory(m_device, Buffer, BufferMemory, 0);
+	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
+
+	return MemAllocInfo.allocationSize;
+}
+
+void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
+{
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	VkBufferCopy bufferCopy = {};
+	bufferCopy.srcOffset = 0;
+	bufferCopy.dstOffset = 0;
+	bufferCopy.size = Size;
+	vkCmdCopyBuffer(m_copyCmdBuf, Src, Dst, 1, &bufferCopy);
+
+	vkEndCommandBuffer(m_copyCmdBuf);
+
+	m_queue.SubmitSync(m_copyCmdBuf);
+
+	//m_queue.WaitIdle();
+}
+
+
+u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
+{
+	const VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.Selected().m_memProps;
+
+	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
+		if ((memTypeBits & (1 << i)) &&
+			((MemProps.memoryTypes[i].propertyFlags & reqMemPropFlags) == reqMemPropFlags)) {
+			return i;
+		}
+	}
+
+	printf("Cannot find memory type for type %x requested mem props %x\n", memTypeBits, reqMemPropFlags);
+	exit(1);
+	return -1;
 }
 
 }
