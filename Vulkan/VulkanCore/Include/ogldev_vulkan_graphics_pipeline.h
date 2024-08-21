@@ -27,17 +27,29 @@ class GraphicsPipeline {
 
 public:
 
-	GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass, 
-					 VkShaderModule vs, VkShaderModule fs);
+	GraphicsPipeline(VkDevice Device,
+					 GLFWwindow* pWindow,
+					 VkRenderPass RenderPass,
+					 VkShaderModule vs,
+					 VkShaderModule fs,
+					 VkBuffer VB,
+					 size_t VBSize,
+					 int NumImages);
 
 	~GraphicsPipeline();
 
-	void Bind(VkCommandBuffer CmdBuf);
+	void Bind(VkCommandBuffer CmdBuf, int ImageIndex);
 
 private:
+
+	void CreateDescriptorPool(int NumImages);
+	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;
 	VkPipelineLayout m_pipelineLayout = NULL;
+	VkDescriptorPool m_descriptorPool;
+	VkDescriptorSetLayout m_descriptorSetLayout;
+	std::vector<VkDescriptorSet> m_descriptorSets;
 };
 }

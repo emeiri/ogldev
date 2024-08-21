@@ -58,6 +58,8 @@ public:
 
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
+	VkBuffer CreateVertexBuffer(const void* pVertices, size_t Size);
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -66,6 +68,13 @@ private:
 	void CreateDevice();
 	void CreateSwapChain();
 	void CreateCommandBufferPool();	
+
+	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
+
+	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
+
+	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
+					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
@@ -79,7 +88,8 @@ private:
 	std::vector<VkImage> m_images;	
 	std::vector<VkImageView> m_imageViews;
 	VkCommandPool m_cmdBufPool;
-	VulkanQueue m_queue;	
+	VulkanQueue m_queue;
+	VkCommandBuffer m_copyCmdBuf;
 };
 
 }

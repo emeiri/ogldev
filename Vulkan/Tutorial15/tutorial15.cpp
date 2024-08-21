@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #14: Graphics Pipeline
+		Tutorial #15: Vertex Buffer Part 1
 */
 
 
@@ -26,6 +26,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_math_3d.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
@@ -56,10 +57,11 @@ public:
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
 		m_vkCore.DestroyFramebuffers(m_frameBuffers);
-		vkDestroyShaderModule(m_vkCore.GetDevice(), m_vs, NULL);
-		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
+		vkDestroyShaderModule(m_device, m_vs, NULL);
+		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
-		vkDestroyRenderPass(m_vkCore.GetDevice(), m_renderPass, NULL);
+		vkDestroyRenderPass(m_device, m_renderPass, NULL);
+		vkDestroyBuffer(m_device, m_vb, NULL);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -72,6 +74,7 @@ public:
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
 		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
 		CreateShaders();
+		CreateVertexBuffer();
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -96,6 +99,29 @@ private:
 	}
 
 
+	void CreateVertexBuffer()
+	{
+		struct Vertex {
+			Vertex(const Vector3f& p, const Vector2f& t)
+			{
+				Pos = p;
+				Tex = t;
+			}
+
+			Vector3f Pos;
+			Vector2f Tex;
+		};
+
+		std::vector<Vertex> Vertices = {
+			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
+			Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
+			Vertex(Vector3f(0.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)) };
+
+		m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
+		m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_vertexBufferSize);
+	}
+
+
 	void CreateShaders()
 	{
 		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
@@ -106,7 +132,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, 0, m_numImages);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, m_vertexBufferSize, m_numImages);
 	}
 
 
@@ -141,15 +167,15 @@ private:
 	
 			vkCmdBeginRenderPass(m_cmdBufs[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	
-			m_pPipeline->Bind(m_cmdBufs[i]);
+			m_pPipeline->Bind(m_cmdBufs[i], i);
 
 			u32 VertexCount = 3;
 			u32 InstanceCount = 1;
 			u32 FirstVertex = 0;
 			u32 FirstInstance = 0;
-			
+
 			vkCmdDraw(m_cmdBufs[i], VertexCount, InstanceCount, FirstVertex, FirstInstance);
-			
+
 			vkCmdEndRenderPass(m_cmdBufs[i]);
 
 			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
@@ -170,10 +196,12 @@ private:
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
+	VkBuffer m_vb;
+	size_t m_vertexBufferSize = 0;
 };
 
 
-#define APP_NAME "Tutorial 14"
+#define APP_NAME "Tutorial 15"
 
 int main(int argc, char* argv[])
 {
