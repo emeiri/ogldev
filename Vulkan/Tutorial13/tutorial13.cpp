@@ -93,9 +93,9 @@ private:
 
 	void CreateShaders()
 	{
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.vs");
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.vert");
 
-		m_fs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.fs");
+		m_fs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.frag");
 	}
 
 
