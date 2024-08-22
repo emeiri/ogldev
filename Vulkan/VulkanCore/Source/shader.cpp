@@ -200,7 +200,8 @@ VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilenam
 		printf("Created shader from text file '%s'\n", pFilename);
 		ret = ShaderModule.ShaderModule;
 		std::string BinaryFilename = string(pFilename) + ".spv";
-		WriteBinaryFile(BinaryFilename.c_str(), ShaderModule.SPIRV.data(), (int)ShaderModule.SPIRV.size());
+		WriteBinaryFile(BinaryFilename.c_str(), ShaderModule.SPIRV.data(), 
+						(int)ShaderModule.SPIRV.size() * sizeof(uint32_t));
 	}
 
 	glslang_finalize_process();
