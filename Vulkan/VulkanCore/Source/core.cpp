@@ -112,7 +112,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	CreateSwapChain();
 	CreateCommandBufferPool();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
-	CreateCommandBuffers(1, &m_copyCmdBuf);	
+	CreateCommandBuffers(1, &m_copyCmdBuf);
 }
 
 
@@ -567,6 +567,17 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 }
 
 
+BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
+{
+	BufferAndMemory Buffer(&m_device);
+
+	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Buffer.m_buffer, Buffer.m_mem);
+
+	return Buffer;
+}
+
+
 VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
 	VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
 {
@@ -598,6 +609,18 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
 
 	return MemAllocInfo.allocationSize;
+}
+
+
+void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize)
+{
+	void* pMappedData = NULL;
+
+	vkMapMemory(m_device, BufferMemory, DeviceOffset, DataSize, 0, &pMappedData);
+	
+	memcpy(pMappedData, pData, DataSize);
+	
+	vkUnmapMemory(m_device, BufferMemory);
 }
 
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
@@ -634,4 +657,37 @@ u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMem
 	return -1;
 }
 
+
+std::vector < std::vector<BufferAndMemory> > VulkanCore::CreateUniformBuffers(int NumBuffers, size_t DataSize)
+{
+	std::vector< std::vector<BufferAndMemory> > UniformBuffers;
+
+	UniformBuffers.resize(m_images.size());
+
+	for (int i = 0; i < UniformBuffers.size(); i++) {
+		UniformBuffers[i].resize(NumBuffers);
+
+		for (int j = 0; j < NumBuffers; j++) {
+			UniformBuffers[i][j] = CreateUniformBuffer((int)DataSize);
+		}
+	}
+
+	return UniformBuffers;
 }
+
+
+void BufferAndMemory::Update(const void* pData, size_t Size)
+{
+	if (!m_pDevice) {
+		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
+	}
+
+	void* pMem = NULL;
+	VkResult res = vkMapMemory(*m_pDevice, m_mem, 0, Size, 0, &pMem);
+	CHECK_VK_RESULT(res, "vkMapMemory");
+	memcpy(pMem, pData, Size);
+	vkUnmapMemory(*m_pDevice, m_mem);
+}
+
+}
+

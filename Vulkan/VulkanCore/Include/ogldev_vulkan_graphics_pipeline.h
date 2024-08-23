@@ -20,6 +20,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_vulkan_core.h"
 
 namespace OgldevVK {
 
@@ -28,13 +29,15 @@ class GraphicsPipeline {
 public:
 
 	GraphicsPipeline(VkDevice Device,
-					 GLFWwindow* pWindow,
-					 VkRenderPass RenderPass,
-					 VkShaderModule vs,
-					 VkShaderModule fs,
-					 VkBuffer VB,
-					 size_t VBSize,
-					 int NumImages);
+		GLFWwindow* pWindow,
+		VkRenderPass RenderPass,
+		VkShaderModule vs,
+		VkShaderModule fs,
+		VkBuffer VB,
+		size_t VBSize,
+		int NumImages,
+		std::vector < std::vector<BufferAndMemory> >& UniformBuffers,
+		int UniformDataSize);
 
 	~GraphicsPipeline();
 
@@ -42,8 +45,9 @@ public:
 
 private:
 
-	void CreateDescriptorPool(int NumImages);
-	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize);
+	void CreateDescriptorPool(int NumImages, int NumUniformBuffers);
+	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize, 
+		std::vector < std::vector<BufferAndMemory> >& UniformBuffers, int UniformDataSize);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;

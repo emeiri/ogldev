@@ -28,6 +28,23 @@
 
 namespace OgldevVK {
 
+
+class BufferAndMemory {
+public:
+	BufferAndMemory() {}
+	BufferAndMemory(VkDevice* pDevice) : m_pDevice(pDevice) {}
+
+	VkBuffer m_buffer = NULL;
+	VkDeviceMemory m_mem = NULL;
+	VkDeviceSize m_allocationSize = 0;
+
+	void Update(const void* pData, size_t Size);
+
+private:
+	VkDevice* m_pDevice = NULL;
+};
+
+
 class VulkanCore {
 
 public:
@@ -59,6 +76,8 @@ public:
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
 	VkBuffer CreateVertexBuffer(const void* pVertices, size_t Size);
+	
+	std::vector < std::vector<BufferAndMemory> > CreateUniformBuffers(int NumBuffers, size_t DataSize);
 
 private:
 
@@ -68,6 +87,7 @@ private:
 	void CreateDevice();
 	void CreateSwapChain();
 	void CreateCommandBufferPool();	
+	BufferAndMemory CreateUniformBuffer(int Size);
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
@@ -75,6 +95,8 @@ private:
 
 	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
 					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+	void UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize);
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;

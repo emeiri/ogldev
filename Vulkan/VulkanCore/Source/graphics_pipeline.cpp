@@ -32,14 +32,18 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   VkShaderModule fs,
 								   VkBuffer VB,
 								   size_t VBSize,
-								   int NumImages)
+								   int NumImages,
+								   std::vector < std::vector<BufferAndMemory> >& UniformBuffers,
+								   int UniformDataSize)
 {
 	m_device = Device;
 
-	CreateDescriptorPool(NumImages);
+	int NumUniformBuffers = (int)UniformBuffers[0].size();
+
+	CreateDescriptorPool(NumImages, NumUniformBuffers);
 	
 	if (VB) {
-		CreateDescriptorSet(NumImages, VB, VBSize);
+		CreateDescriptorSet(NumImages, VB, VBSize, UniformBuffers, UniformDataSize);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -181,13 +185,19 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
-void GraphicsPipeline::CreateDescriptorPool(int NumImages)
+void GraphicsPipeline::CreateDescriptorPool(int NumImages, int NumUniformBuffers)
 {
+	std::vector<VkDescriptorPoolSize> PoolSizes;
+	VkDescriptorPoolSize DescPoolSize = {
+		.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = (u32)(NumImages * NumUniformBuffers)
+	};
+
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.maxSets = (u32)NumImages,
-		.poolSizeCount = 0,
-		.pPoolSizes = NULL
+		.poolSizeCount = 1,
+		.pPoolSizes = &DescPoolSize
 	};
 
 	VkResult res = vkCreateDescriptorPool(m_device, &PoolInfo, NULL, &m_descriptorPool);
@@ -196,17 +206,26 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize)
+void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize,
+										   std::vector < std::vector<BufferAndMemory> >& UniformBuffers, int UniformDataSize)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
 		.binding = 0,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
+
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
+		.binding = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
+	LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
@@ -236,6 +255,11 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
 
 	for (size_t i = 0; i < NumImages; i++) {
+		VkDescriptorBufferInfo BufferInfo_Uniform = {
+			.buffer = UniformBuffers[i][0].m_buffer,
+			.offset = 0,
+			.range = (VkDeviceSize)UniformDataSize,
+		};
 
 		VkDescriptorBufferInfo BufferInfo_VB = {
 			.buffer = VertexBuffer,
@@ -243,11 +267,20 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 			.range = VertexBufferSize,
 		};
 
-		std::array<VkWriteDescriptorSet, 1> WriteDescriptorSet = {
+		std::array<VkWriteDescriptorSet, 2> WriteDescriptorSet = {
 			VkWriteDescriptorSet {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
 				.dstBinding = 0,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo = &BufferInfo_Uniform
+			},
+			VkWriteDescriptorSet {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 1,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
