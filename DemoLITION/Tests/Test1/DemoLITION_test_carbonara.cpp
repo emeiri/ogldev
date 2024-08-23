@@ -63,9 +63,9 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
-        //InitBallisticDemo();
+        InitBallisticDemo();
 
-        InitFireworksDemo();
+      //  InitFireworksDemo();
       //  LoadAndAddModel("../Content/Jump/Jump.dae");
 
         //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
@@ -74,8 +74,7 @@ public:
         //m_pScene->AddToRenderList(pSceneObject);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
-
-        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -50.0f), Vector3f(0.0, 0.1f, 1.0f));
+        
         m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetDirLights().push_back(m_dirLight);
@@ -89,6 +88,8 @@ public:
 
     void InitBallisticDemo()
     {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
         CombinedObject Ground = LoadAndAddModel("../Content/ground.obj");
         CombinedObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
 
@@ -102,6 +103,8 @@ public:
 
     void InitFireworksDemo()
     {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -50.0f), Vector3f(0.0, 0.1f, 1.0f));
+
         int NumFireworks = 50;
 
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
@@ -142,7 +145,7 @@ public:
 
         m_physicsSystem.Update(DeltaTimeMillis);
 
-        FireworkUpdate(DeltaTimeMillis);
+        UpdateParticlePositions();
         
     //    m_pSceneObject->ResetRotations();
      //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
@@ -153,21 +156,12 @@ public:
     }
 
 
-    void FireworkUpdate(long long DeltaTimeMillis)
+    void UpdateParticlePositions()
     {
         for (std::list<CombinedObject>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
             const Vector3f& NewPos = it->pParticle->GetPosition();
-        //    printf("%d pos ", i);
-           // NewPos.Print();
-        //    printf("velocity ");
-         //   m_fireworks[i].GetVelocity().Print();
             it->pSceneObject->SetPosition(NewPos);
         }
-
-     //   if (Finished) exit(0);
-        static int foo = 0;
-      //  if (foo == 10) exit(0);
-        foo++;
     }
 
 
