@@ -16,7 +16,6 @@
 */
 
 #include <vector>
-#include <string>
 #include <assert.h>
 
 #include "ogldev_types.h"
@@ -59,7 +58,7 @@ VulkanCore::~VulkanCore()
 
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
 
-	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
+	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);	
 
 	m_queue.Destroy();
 
@@ -113,7 +112,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	CreateSwapChain();
 	CreateCommandBufferPool();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
-	CreateCommandBuffers(1, &m_copyCmdBuf);
+	CreateCommandBuffers(1, &m_copyCmdBuf);	
 }
 
 
@@ -557,7 +556,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 
 	VkBuffer vb;
 	VkDeviceMemory vbMem;
-	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
 	CopyBuffer(vb, StagingVB, Size);

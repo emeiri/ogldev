@@ -16,6 +16,7 @@
 */
 
 #include <stdio.h>
+#include <array>
 
 #include "ogldev_types.h"
 #include "ogldev_util.h"
@@ -24,9 +25,20 @@
 
 namespace OgldevVK {
 
-GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs)
+GraphicsPipeline::GraphicsPipeline(VkDevice Device,
+								   GLFWwindow* pWindow,
+								   VkRenderPass RenderPass,
+								   VkShaderModule vs,
+								   VkShaderModule fs,
+								   VkBuffer VB,
+								   size_t VBSize,
+								   int NumImages)
 {
 	m_device = Device;
+
+	CreateDescriptorPool(NumImages);
+	
+	CreateDescriptorSet(NumImages, VB, VBSize);
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
@@ -147,6 +159,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 GraphicsPipeline::~GraphicsPipeline()
 {
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
+	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
 }
 
@@ -154,6 +167,93 @@ GraphicsPipeline::~GraphicsPipeline()
 void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+}
+
+
+void GraphicsPipeline::CreateDescriptorPool(int NumImages)
+{
+	VkDescriptorPoolCreateInfo PoolInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.maxSets = (u32)NumImages,
+		.poolSizeCount = 0,
+		.pPoolSizes = NULL
+	};
+
+	VkResult res = vkCreateDescriptorPool(m_device, &PoolInfo, NULL, &m_descriptorPool);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
+	printf("Descriptor pool created\n");
+}
+
+
+void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize)
+{
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
+
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
+		.binding = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
+
+	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+
+	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.bindingCount = (u32)LayoutBindings.size(),
+		.pBindings = LayoutBindings.data()
+	};
+
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+
+	std::vector<VkDescriptorSetLayout> Layouts(NumImages, m_descriptorSetLayout);
+
+	VkDescriptorSetAllocateInfo AllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.pNext = NULL,
+		.descriptorPool = m_descriptorPool,
+		.descriptorSetCount = (u32)NumImages,
+		.pSetLayouts = Layouts.data()
+	};
+
+	m_descriptorSets.resize(NumImages);
+
+	res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
+	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+
+	for (size_t i = 0; i < NumImages; i++) {
+
+		VkDescriptorBufferInfo BufferInfo_VB = {
+			.buffer = VertexBuffer,
+			.offset = 0,
+			.range = VertexBufferSize,
+		};
+
+		std::array<VkWriteDescriptorSet, 1> WriteDescriptorSet = {
+			VkWriteDescriptorSet {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 1,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.pBufferInfo = &BufferInfo_VB
+			}
+		};
+
+		/*WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		WriteDescriptorSet.dstSet = m_descriptorSets[i];
+		WriteDescriptorSet.dstBinding = 0;
+		WriteDescriptorSet.dstArrayElement = 0;
+		WriteDescriptorSet.descriptorCount = 1;
+		WriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		WriteDescriptorSet.pBufferInfo = &BufferInfo1;*/
+
+		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	}
 }
 
 }
