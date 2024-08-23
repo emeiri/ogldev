@@ -38,7 +38,9 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 
 	CreateDescriptorPool(NumImages);
 	
-	CreateDescriptorSet(NumImages, VB, VBSize);
+	if (VB) {
+		CreateDescriptorSet(NumImages, VB, VBSize);
+	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
@@ -158,6 +160,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 
 GraphicsPipeline::~GraphicsPipeline()
 {
+	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
