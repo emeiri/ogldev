@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #14: Graphics Pipeline
+		Tutorial #15: Vertex buffer
 */
 
 

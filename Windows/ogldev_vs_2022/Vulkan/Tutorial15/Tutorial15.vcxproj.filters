@@ -18,16 +18,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.vs">
-      <Filter>Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial15\tutorial15.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Vulkan\Tutorial15\test.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\Tutorial15\test.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
