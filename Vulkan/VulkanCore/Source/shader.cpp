@@ -68,8 +68,7 @@ static void PrintShaderSource(const char* text)
 }
 
 
-static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, 
-						  Shader& ShaderModule)
+static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
 {
 	glslang_input_t input = {
 		.language = GLSLANG_SOURCE_GLSL,
