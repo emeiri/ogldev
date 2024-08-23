@@ -49,3 +49,4 @@ VulkanSync/*
 Include/assimp5/assimp.old/*
 Include/assimp5/assimp.orig/*
 VulkanClear/*
+*.spv
