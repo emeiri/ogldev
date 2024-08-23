@@ -26,6 +26,7 @@
 #include "particle.h"
 #include "firework.h"
 #include "gravity_force_generator.h"
+#include "drag_force_generator.h"
 
 namespace OgldevPhysics
 {

@@ -176,6 +176,7 @@ public:
         m_sceneObjects.push_back(CObject);
         m_pScene->AddToRenderList(CObject.pSceneObject);
         m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
+        m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
         return CObject;
     }
 
@@ -379,6 +380,7 @@ private:
     int m_enableShadowMapping = 1;
     OgldevPhysics::PhysicsSystem m_physicsSystem;
     OgldevPhysics::GravityForceGenerator m_gravityForceGenerator;
+    OgldevPhysics::DragForceGenerator m_dragForceGenerator;
 };
 
 
