@@ -28,9 +28,11 @@ class GravityForceGenerator : public ForceGenerator
 {
 public:
 
+    GravityForceGenerator();
+
     GravityForceGenerator(const Vector3f& Gravity);
 
-    virtual void UpdateForce(Particle& Particle, float dt);
+    virtual void UpdateForce(Particle* pParticle, float dt);
 
 private:
     Vector3f m_gravity = Vector3f(0.0f, 0.0f, 0.0f);

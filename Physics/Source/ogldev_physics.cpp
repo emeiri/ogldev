@@ -70,6 +70,8 @@ void PhysicsSystem::Update(long long DeltaTimeMillis)
 
     float dt = (float)DeltaTimeMillis / 1000.0f;
 
+    m_forceRegistry.Update(dt);
+
     ParticleUpdate(dt);
 
     FireworkUpdate(dt);

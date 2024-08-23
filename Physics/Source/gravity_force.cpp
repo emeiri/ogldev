@@ -19,7 +19,16 @@
 #include "particle.h"
 #include "gravity_force_generator.h"
 
+
 namespace OgldevPhysics {
+
+static Vector3f DEFAULT_GRAVITY = Vector3f(0.0f, -1.0f, 0.0f);
+
+GravityForceGenerator::GravityForceGenerator()
+{
+    m_gravity = DEFAULT_GRAVITY;
+}
+
 
 GravityForceGenerator::GravityForceGenerator(const Vector3f& Gravity)
 {
@@ -27,13 +36,15 @@ GravityForceGenerator::GravityForceGenerator(const Vector3f& Gravity)
 }
 
     
-void GravityForceGenerator::UpdateForce(Particle& Particle, float dt)
+void GravityForceGenerator::UpdateForce(Particle* pParticle, float dt)
 {
-    if (!Particle.HasFiniteMass()) {
+    if (!pParticle->HasFiniteMass()) {
         return;
     }
 
-    Particle.AddForce(m_gravity * Particle.GetMass());
+    Vector3f Force = m_gravity * pParticle->GetMass();
+
+    pParticle->AddForce(Force);
 }
 
 }

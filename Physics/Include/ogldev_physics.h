@@ -25,6 +25,7 @@
 #include "ogldev_types.h"
 #include "particle.h"
 #include "firework.h"
+#include "gravity_force_generator.h"
 
 namespace OgldevPhysics
 {
@@ -48,6 +49,8 @@ public:
 
     void Update(long long DeltaTimeMillis);
 
+    ForceRegistry& GetRegistry() { return m_forceRegistry; }
+
 private:
 
     void InitFireworksConfig();
@@ -63,6 +66,7 @@ private:
     uint m_numFirework = 0;
     std::vector<FireworkConfig> m_fireworkConfigs;
     uint m_nextFirework = 0;
+    ForceRegistry m_forceRegistry;
 };
 
 }

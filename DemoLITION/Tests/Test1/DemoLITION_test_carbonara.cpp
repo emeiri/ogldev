@@ -96,7 +96,6 @@ public:
         Box.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
         Box.pParticle->SetMass(2.0f);
         Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
-        Box.pParticle->SetAcceleration(Vector3f(0.0f, -1.0f, 0.0f));
         Box.pParticle->SetDamping(0.99f);
     }
 
@@ -159,8 +158,10 @@ public:
     void UpdateParticlePositions()
     {
         for (std::list<CombinedObject>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
-            const Vector3f& NewPos = it->pParticle->GetPosition();
-            it->pSceneObject->SetPosition(NewPos);
+            if (it->pParticle) {
+                const Vector3f& NewPos = it->pParticle->GetPosition();
+                it->pSceneObject->SetPosition(NewPos);
+            }
         }
     }
 
@@ -174,6 +175,7 @@ public:
         CObject.pParticle = m_physicsSystem.AllocParticle();
         m_sceneObjects.push_back(CObject);
         m_pScene->AddToRenderList(CObject.pSceneObject);
+        m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
         return CObject;
     }
 
@@ -376,6 +378,7 @@ private:
     bool m_showGui = false;
     int m_enableShadowMapping = 1;
     OgldevPhysics::PhysicsSystem m_physicsSystem;
+    OgldevPhysics::GravityForceGenerator m_gravityForceGenerator;
 };
 
 
