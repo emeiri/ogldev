@@ -797,6 +797,10 @@ void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
     glBindVertexArray(m_VAO);
 
+    if (UsePVP) {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+    }
+
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         RenderMesh(i, pRenderCallbacks);
     }
@@ -864,6 +868,10 @@ void CoreModel::Render(unsigned int DrawIndex, unsigned int PrimID)
 {
     glBindVertexArray(m_VAO);
 
+    if (UsePVP) {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+    }
+
     unsigned int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
     assert(MaterialIndex < m_Materials.size());
 
@@ -897,6 +905,10 @@ void CoreModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
     glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4f) * NumInstances, WorldMats, GL_DYNAMIC_DRAW);
 
     glBindVertexArray(m_VAO);
+
+    if (UsePVP) {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+    }
 
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
