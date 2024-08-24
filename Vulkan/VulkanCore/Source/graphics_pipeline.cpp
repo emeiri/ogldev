@@ -127,10 +127,16 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 	};
 
 	VkPipelineLayoutCreateInfo LayoutInfo = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.setLayoutCount = 0,
-		.pSetLayouts = NULL
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
+
+	if (VB) {
+		LayoutInfo.setLayoutCount = 1;
+		LayoutInfo.pSetLayouts = &m_descriptorSetLayout;
+	} else {
+		LayoutInfo.setLayoutCount = 0;
+		LayoutInfo.pSetLayouts = NULL;
+	}
 
 	VkResult res = vkCreatePipelineLayout(m_device, &LayoutInfo, NULL, &m_pipelineLayout);
 	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
@@ -167,9 +173,11 @@ GraphicsPipeline::~GraphicsPipeline()
 }
 
 
-void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf)
+void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[ImageIndex], 0, NULL);
 }
 
 
@@ -193,7 +201,7 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
 	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-		.binding = 1,
+		.binding = 0,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -239,7 +247,7 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 			VkWriteDescriptorSet {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
-				.dstBinding = 1,
+				.dstBinding = 0,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,

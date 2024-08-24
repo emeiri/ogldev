@@ -561,6 +561,8 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 
 	CopyBuffer(vb, StagingVB, Size);
 
+	vkDestroyBuffer(m_device, StagingVB, NULL);
+
 	return vb;
 }
 
