@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\core.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\device.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\queue.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\util.cpp" />
@@ -31,6 +32,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_queue.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_shader.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_util.h" />
