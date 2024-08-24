@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\..\Physics\Include\gravity_force_generator.h" />
     <ClInclude Include="..\..\..\Physics\Include\ogldev_physics.h" />
     <ClInclude Include="..\..\..\Physics\Include\particle.h" />
+    <ClInclude Include="..\..\..\Physics\Include\spring_force_generator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Physics\Source\drag_force.cpp" />
@@ -33,6 +34,7 @@
     <ClCompile Include="..\..\..\Physics\Source\gravity_force.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\ogldev_physics.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\particle.cpp" />
+    <ClCompile Include="..\..\..\Physics\Source\spring_force.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
