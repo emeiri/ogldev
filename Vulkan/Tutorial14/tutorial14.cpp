@@ -30,6 +30,7 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
+#include "ogldev_vulkan_graphics_pipeline.h"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
@@ -57,13 +58,15 @@ public:
 		m_vkCore.DestroyFramebuffers(m_frameBuffers);
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_vs, NULL);
 		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
-		m_vkCore.DestroyPipeline(m_pipeline);
+		delete m_pPipeline;
 		vkDestroyRenderPass(m_vkCore.GetDevice(), m_renderPass, NULL);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
+		m_pWindow = pWindow;
 		m_vkCore.Init(pAppName, pWindow);
+		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
@@ -95,15 +98,15 @@ private:
 
 	void CreateShaders()
 	{
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.vs");
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
 
-		m_fs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.fs");
+		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
 	}
 
 
 	void CreatePipeline()
 	{
-		m_pipeline = m_vkCore.CreatePipeline(m_renderPass, m_vs, m_fs);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs);
 	}
 
 
@@ -138,7 +141,7 @@ private:
 	
 			vkCmdBeginRenderPass(m_cmdBufs[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	
-			vkCmdBindPipeline(m_cmdBufs[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+			m_pPipeline->Bind(m_cmdBufs[i]);
 
 			vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
 			vkCmdEndRenderPass(m_cmdBufs[i]);
@@ -150,15 +153,17 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+	GLFWwindow* m_pWindow = NULL;
 	OgldevVK::VulkanCore m_vkCore;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
+	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkRenderPass m_renderPass;
 	std::vector<VkFramebuffer> m_frameBuffers;
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
-	VkPipeline m_pipeline;
+	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 };
 
 
