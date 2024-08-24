@@ -96,7 +96,7 @@ public:
         Box.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
         Box.pParticle->SetMass(2.0f);
         Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
-        Box.pParticle->SetDamping(0.99f);
+     //   Box.pParticle->SetDamping(0.99f);
     }
 
 
