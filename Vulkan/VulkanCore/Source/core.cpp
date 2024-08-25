@@ -612,17 +612,6 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 }
 
 
-void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize)
-{
-	void* pMappedData = NULL;
-
-	vkMapMemory(m_device, BufferMemory, DeviceOffset, DataSize, 0, &pMappedData);
-	
-	memcpy(pMappedData, pData, DataSize);
-	
-	vkUnmapMemory(m_device, BufferMemory);
-}
-
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
