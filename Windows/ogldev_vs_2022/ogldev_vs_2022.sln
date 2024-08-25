@@ -31,7 +31,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13_CameraSpace", "T
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial14_CameraControl", "Tutorial14\Tutorial14.vcxproj", "{050D33E4-33DF-4635-BB55-9D968259A46A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15", "Tutorial15\Tutorial15.vcxproj", "{557323B9-85F8-45DF-B78F-D89406D59464}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15_CameraRotation", "Tutorial15\Tutorial15.vcxproj", "{557323B9-85F8-45DF-B78F-D89406D59464}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial16", "Tutorial16\Tutorial16.vcxproj", "{7223D5B2-3FDE-417B-BF9E-3E467D1D9FA5}"
 EndProject
@@ -417,6 +417,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial13", "Vulkan\Tutori
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial53_PVP", "Tutorial53_PVP\Tutorial53.vcxproj", "{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1162,6 +1164,14 @@ Global
 		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x64.Build.0 = Release|x64
 		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x86.ActiveCfg = Release|Win32
 		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA}.Release|x86.Build.0 = Release|Win32
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Debug|x64.ActiveCfg = Debug|x64
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Debug|x64.Build.0 = Debug|x64
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Debug|x86.ActiveCfg = Debug|Win32
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Debug|x86.Build.0 = Debug|Win32
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Release|x64.ActiveCfg = Release|x64
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Release|x64.Build.0 = Release|x64
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Release|x86.ActiveCfg = Release|Win32
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1266,6 +1276,7 @@ Global
 		{7895318F-15FC-4CC3-B941-E669BB2892BA} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{52E39A87-D92C-43F6-944E-5F57EE2105DC} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{8F208EF6-FCD4-4A9E-884E-18FFEADAE1FA} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{0F9DF446-2CA5-4760-AFE3-7F0A579353EF} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
