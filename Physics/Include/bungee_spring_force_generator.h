@@ -24,13 +24,13 @@
 namespace OgldevPhysics
 {
 
-class SpringForceGenerator : public ForceGenerator
+class BungeeSpringForceGenerator : public ForceGenerator
 {
 public:
 
-    SpringForceGenerator() {}
+    BungeeSpringForceGenerator() {}
 
-    SpringForceGenerator(Particle* pOtherEnd, float SpringConstant, float RestLength);
+    BungeeSpringForceGenerator(Particle* pOtherEnd, float SpringConstant, float RestLength);
 
     void Init(Particle* pOtherEnd, float SpringConstant, float RestLength);
 
@@ -39,9 +39,9 @@ public:
 private:
 
     Particle* m_pOtherEnd = NULL;
-    
+
     float m_springConstant = 0.0f;
-    
+
     float m_restLength = 0.0f;
 };
 

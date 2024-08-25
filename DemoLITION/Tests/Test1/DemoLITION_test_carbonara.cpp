@@ -35,7 +35,7 @@
 #define WINDOW_HEIGHT 1080
 
 
-struct CombinedObject {
+struct PhysicsSceneObject {
     SceneObject* pSceneObject = NULL;
     OgldevPhysics::Particle* pParticle = NULL;
 };
@@ -63,9 +63,10 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
-        InitBallisticDemo();
+        // InitBallisticDemo();
+        // InitFireworksDemo();
+        InitSpringDemo();
 
-      //  InitFireworksDemo();
       //  LoadAndAddModel("../Content/Jump/Jump.dae");
 
         //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
@@ -90,8 +91,8 @@ public:
     {
         m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
 
-        CombinedObject Ground = LoadAndAddModel("../Content/ground.obj");
-        CombinedObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
+        PhysicsSceneObject Ground = LoadAndAddModel("../Content/ground.obj");
+        PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
 
         Box.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
         Box.pParticle->SetMass(2.0f);
@@ -109,13 +110,48 @@ public:
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
 
         for (int i = 0 ; i < NumFireworks ; i++) {
-            CombinedObject CObject;
+            PhysicsSceneObject CObject;
             CObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
             CObject.pSceneObject->SetScale(0.1f);
             CObject.pParticle = m_physicsSystem.AllocFirework();
             m_sceneObjects.push_back(CObject);
             m_pScene->AddToRenderList(CObject.pSceneObject);
         }
+    }
+
+
+    void InitSpringDemo()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        PhysicsSceneObject Box1;
+        Box1.pSceneObject = m_pScene->CreateSceneObject(pModel);
+        Box1.pSceneObject->SetScale(0.1f);
+        Box1.pParticle = m_physicsSystem.AllocParticle();
+        m_sceneObjects.push_back(Box1);
+        m_pScene->AddToRenderList(Box1.pSceneObject);
+        Box1.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
+        Box1.pParticle->SetMass(2.0f);
+
+        PhysicsSceneObject Box2;
+        Box2.pSceneObject = m_pScene->CreateSceneObject(pModel);
+        Box2.pSceneObject->SetScale(0.1f);
+        Box2.pParticle = m_physicsSystem.AllocParticle();
+        m_sceneObjects.push_back(Box2);
+        m_pScene->AddToRenderList(Box2.pSceneObject);
+        Box2.pParticle->SetPosition(Vector3f(1.0f, 0.0f, 0.0f));
+        Box2.pParticle->SetMass(2.0f);
+
+    //    Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
+        m_springForceGenerator.Init(Box1.pParticle, 1.0f, 2.0f);
+
+        m_physicsSystem.GetRegistry().Add(Box1.pParticle, &m_springForceGenerator);
+
+//        m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
+  //      m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
+
     }
 
 
@@ -157,7 +193,7 @@ public:
 
     void UpdateParticlePositions()
     {
-        for (std::list<CombinedObject>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
+        for (std::list<PhysicsSceneObject>::iterator it = m_sceneObjects.begin(); it != m_sceneObjects.end(); it++) {
             if (it->pParticle) {
                 const Vector3f& NewPos = it->pParticle->GetPosition();
                 it->pSceneObject->SetPosition(NewPos);
@@ -166,10 +202,10 @@ public:
     }
 
 
-    CombinedObject LoadAndAddModel(const char* pFilename, float Scale = 1.0f)
+    PhysicsSceneObject LoadAndAddModel(const char* pFilename, float Scale = 1.0f)
     {
         Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
-        CombinedObject CObject;
+        PhysicsSceneObject CObject;
         CObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
         CObject.pSceneObject->SetScale(Scale);
         CObject.pParticle = m_physicsSystem.AllocParticle();
@@ -370,7 +406,7 @@ public:
 private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
-    std::list<CombinedObject> m_sceneObjects;
+    std::list<PhysicsSceneObject> m_sceneObjects;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
     bool m_leftMousePressed = false;
@@ -381,6 +417,7 @@ private:
     OgldevPhysics::PhysicsSystem m_physicsSystem;
     OgldevPhysics::GravityForceGenerator m_gravityForceGenerator;
     OgldevPhysics::DragForceGenerator m_dragForceGenerator;
+    OgldevPhysics::SpringForceGenerator m_springForceGenerator;
 };
 
 

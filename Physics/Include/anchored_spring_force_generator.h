@@ -24,21 +24,21 @@
 namespace OgldevPhysics
 {
 
-class SpringForceGenerator : public ForceGenerator
+class AnchoredSpringForceGenerator : public ForceGenerator
 {
 public:
 
-    SpringForceGenerator() {}
+    AnchoredSpringForceGenerator() {}
 
-    SpringForceGenerator(Particle* pOtherEnd, float SpringConstant, float RestLength);
+    AnchoredSpringForceGenerator(Vector3f* pAnchor, float SpringConstant, float RestLength);
 
-    void Init(Particle* pOtherEnd, float SpringConstant, float RestLength);
+    void Init(Vector3f* pAnchor, float SpringConstant, float RestLength);
 
     virtual void UpdateForce(Particle* pParticle, float dt);
 
 private:
 
-    Particle* m_pOtherEnd = NULL;
+    Vector3f* m_pAnchor = NULL;
     
     float m_springConstant = 0.0f;
     

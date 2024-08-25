@@ -27,6 +27,9 @@
 #include "firework.h"
 #include "gravity_force_generator.h"
 #include "drag_force_generator.h"
+#include "spring_force_generator.h"
+#include "anchored_spring_force_generator.h"
+#include "bungee_spring_force_generator.h"
 
 namespace OgldevPhysics
 {

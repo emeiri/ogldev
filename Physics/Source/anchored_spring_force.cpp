@@ -17,41 +17,37 @@
  */
 
 #include "particle.h"
-#include "spring_force_generator.h"
+#include "anchored_spring_force_generator.h"
 
 
 namespace OgldevPhysics {
 
-SpringForceGenerator::SpringForceGenerator(Particle* pOtherEnd, float SpringConstant, float RestLength)
+AnchoredSpringForceGenerator::AnchoredSpringForceGenerator(Vector3f* pAnchor, float SpringConstant, float RestLength)
 {
-    m_pOtherEnd = pOtherEnd;
+    m_pAnchor = pAnchor;
     m_springConstant = SpringConstant;
     m_restLength = RestLength;
 }
 
 
-void SpringForceGenerator::Init(Particle* pOtherEnd, float SpringConstant, float RestLength)
+void AnchoredSpringForceGenerator::Init(Vector3f* pAnchor, float SpringConstant, float RestLength)
 {
-    m_pOtherEnd = pOtherEnd;
+    m_pAnchor = pAnchor;
     m_springConstant = SpringConstant;
     m_restLength = RestLength;
 }
 
     
-void SpringForceGenerator::UpdateForce(Particle* pParticle, float dt)
+void AnchoredSpringForceGenerator::UpdateForce(Particle* pParticle, float dt)
 {
-    Vector3f Velocity = pParticle->GetVelocity();
+    Vector3f Force = pParticle->GetPosition();
 
-    Velocity -= m_pOtherEnd->GetPosition();
+    Force -= *m_pAnchor;
 
-    float Magnitude = Velocity.Length();
+    float Magnitude = (m_restLength - Force.Length()) * m_springConstant;
 
     if (Magnitude > 0.0f) {
-        Magnitude = fabsf(Magnitude - m_restLength);
-
-        Magnitude *= m_springConstant;
-
-        Vector3f Force = Velocity.Normalize() * (-Magnitude);
+        Force = Force.Normalize() * Magnitude;
 
         pParticle->AddForce(Force);
     }

@@ -17,12 +17,12 @@
  */
 
 #include "particle.h"
-#include "spring_force_generator.h"
+#include "bungee_spring_force_generator.h"
 
 
 namespace OgldevPhysics {
 
-SpringForceGenerator::SpringForceGenerator(Particle* pOtherEnd, float SpringConstant, float RestLength)
+BungeeSpringForceGenerator::BungeeSpringForceGenerator(Particle* pOtherEnd, float SpringConstant, float RestLength)
 {
     m_pOtherEnd = pOtherEnd;
     m_springConstant = SpringConstant;
@@ -30,28 +30,26 @@ SpringForceGenerator::SpringForceGenerator(Particle* pOtherEnd, float SpringCons
 }
 
 
-void SpringForceGenerator::Init(Particle* pOtherEnd, float SpringConstant, float RestLength)
+void BungeeSpringForceGenerator::Init(Particle* pOtherEnd, float SpringConstant, float RestLength)
 {
     m_pOtherEnd = pOtherEnd;
     m_springConstant = SpringConstant;
     m_restLength = RestLength;
 }
 
-    
-void SpringForceGenerator::UpdateForce(Particle* pParticle, float dt)
+
+void BungeeSpringForceGenerator::UpdateForce(Particle* pParticle, float dt)
 {
-    Vector3f Velocity = pParticle->GetVelocity();
+    Vector3f Force = pParticle->GetPosition();
 
-    Velocity -= m_pOtherEnd->GetPosition();
+    Force -= m_pOtherEnd->GetPosition();
 
-    float Magnitude = Velocity.Length();
+    float Magnitude = Force.Length();
 
-    if (Magnitude > 0.0f) {
-        Magnitude = fabsf(Magnitude - m_restLength);
+    if (Magnitude > m_restLength) {
+        Magnitude = m_springConstant * (m_restLength - Magnitude);
 
-        Magnitude *= m_springConstant;
-
-        Vector3f Force = Velocity.Normalize() * (-Magnitude);
+        Force = Force.Normalize() * (-Magnitude);
 
         pParticle->AddForce(Force);
     }
