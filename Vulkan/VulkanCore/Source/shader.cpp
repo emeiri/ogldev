@@ -17,6 +17,7 @@
 */
 
 #include <stdio.h>
+#include <direct.h>
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -68,7 +69,7 @@ static void PrintShaderSource(const char* text)
 }
 
 
-static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
+static bool CompileShader(VkDevice Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
 {
 	glslang_input_t input = {
 		.language = GLSLANG_SOURCE_GLSL,
@@ -177,11 +178,16 @@ static glslang_stage_t ShaderStageFromFilename(const char* pFilename)
 }
 
 
-VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilename)
+VkShaderModule CreateShaderModuleFromText(VkDevice Device, const char* pFilename)
 {
 	std::string Source;
 
+	char CurWorkDir[256];
+	_getcwd(&CurWorkDir[0], ARRAY_SIZE_IN_ELEMENTS(CurWorkDir));
+
 	if (!ReadFile(pFilename, Source)) {
+		printf("Current work dir: %s\n", CurWorkDir);
+
 		assert(0);
 	}
 
@@ -196,7 +202,7 @@ VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilenam
 	bool Success = CompileShader(Device, ShaderStage, Source.c_str(), ShaderModule);	
 
 	if (Success) {
-		printf("Created shader from text file '%s'\n", pFilename);
+		printf("Created shader from text file '%s\\%s'\n", CurWorkDir, pFilename);
 		ret = ShaderModule.ShaderModule;
 		std::string BinaryFilename = string(pFilename) + ".spv";
 		WriteBinaryFile(BinaryFilename.c_str(), ShaderModule.SPIRV.data(), 
@@ -209,7 +215,7 @@ VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilenam
 }
 
 
-VkShaderModule CreateShaderModuleFromBinary(VkDevice& Device, const char* pFilename)
+VkShaderModule CreateShaderModuleFromBinary(VkDevice Device, const char* pFilename)
 {
 	int codeSize = 0;
 	char* pShaderCode = ReadBinaryFile(pFilename, codeSize);

@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #16: Descriptor Sets
+		Tutorial #17: Uniform Buffers
 */
 
 
@@ -65,6 +65,10 @@ public:
 		delete m_pPipeline;
 		vkDestroyRenderPass(m_device, m_renderPass, NULL);
 		m_mesh.Destroy(m_device);
+
+		for (int i = 0; i < m_uniformBuffers.size(); i++) {
+			m_uniformBuffers[i].Destroy(m_device);
+		}
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -75,9 +79,10 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
-		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
+		m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 		CreateShaders();
 		CreateVertexBuffer();
+		CreateUniformBuffers();
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -87,12 +92,15 @@ public:
 	{
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
+		UpdateUniformBuffers(ImageIndex);
+
 		m_pQueue->SubmitAsync(m_cmdBufs[ImageIndex]);
 
 		m_pQueue->Present(ImageIndex);
 	}
 
 private:
+
 	void CreateCommandBuffers()
 	{
 		m_cmdBufs.resize(m_numImages);
@@ -124,6 +132,16 @@ private:
 		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
 		m_mesh.m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_mesh.m_vertexBufferSize);
 	}
+	
+	
+	struct UniformData {
+		glm::mat4 WVP;
+	};
+
+	void CreateUniformBuffers()
+	{
+		m_uniformBuffers = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
+	}
 
 
 	void CreateShaders()
@@ -136,7 +154,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages, m_uniformBuffers, sizeof(UniformData));
 	}
 
 
@@ -189,6 +207,16 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+
+	void UpdateUniformBuffers(uint32_t ImageIndex)
+	{
+		static float foo = 0.0f;
+		glm::mat4 Rotate = glm::mat4(1.0);
+		Rotate = glm::rotate(Rotate, glm::radians(foo), glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
+		foo += 0.001f;
+		m_uniformBuffers[ImageIndex].Update(m_device, &Rotate, sizeof(Rotate));
+	}
+
 	GLFWwindow* m_pWindow = NULL;
 	OgldevVK::VulkanCore m_vkCore;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
@@ -201,10 +229,11 @@ private:
 	VkShaderModule m_fs;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	OgldevVK::SimpleMesh m_mesh;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 };
 
 
-#define APP_NAME "Tutorial 15"
+#define APP_NAME "Tutorial 17"
 
 int main(int argc, char* argv[])
 {

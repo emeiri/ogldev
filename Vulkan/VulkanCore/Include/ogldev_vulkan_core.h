@@ -20,9 +20,11 @@
 
 #include <vulkan/vulkan.h>
 
+#define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_device.h"
 #include "ogldev_vulkan_queue.h"
 
@@ -36,6 +38,8 @@ public:
 	VkBuffer m_buffer = NULL;
 	VkDeviceMemory m_mem = NULL;
 	VkDeviceSize m_allocationSize = 0;
+
+	void Update(VkDevice Device, const void* pData, size_t Size);
 
 	void Destroy(VkDevice Device);
 };
@@ -52,7 +56,7 @@ public:
 
 	VkRenderPass CreateSimpleRenderPass();
 
-	std::vector<VkFramebuffer> CreateFramebuffer(VkRenderPass RenderPass);
+	std::vector<VkFramebuffer> CreateFramebuffers(VkRenderPass RenderPass) const;
 
 	void DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers);
 
@@ -72,6 +76,10 @@ public:
 
 	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
 
+	std::vector<BufferAndMemory> CreateUniformBuffers(size_t DataSize);
+
+	void GetFramebufferSize(int& Width, int& Height) const;
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -80,6 +88,7 @@ private:
 	void CreateDevice();
 	void CreateSwapChain();
 	void CreateCommandBufferPool();	
+	BufferAndMemory CreateUniformBuffer(int Size);
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 

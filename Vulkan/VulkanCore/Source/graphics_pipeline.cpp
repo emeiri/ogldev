@@ -27,12 +27,14 @@ namespace OgldevVK {
 GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass,
 								   VkShaderModule vs, VkShaderModule fs,
 								   const SimpleMesh* pMesh,
-								   int NumImages)
+								   int NumImages,
+								   std::vector<BufferAndMemory>& UniformBuffers,
+								   int UniformDataSize)
 {
 	m_device = Device;
 
 	if (pMesh) {
-		CreateDescriptorSets(pMesh, NumImages);
+		CreateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -181,7 +183,8 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages)
+void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
+											std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
 {
 	CreateDescriptorPool(NumImages);
 
@@ -191,22 +194,28 @@ void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 		.descriptorCount = (u32)(NumImages)
 	};
 
-	CreateDescriptorSetLayout();
+	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize);
 
 	AllocateDescriptorSets(NumImages);
 
-	UpdateDescriptorSets(pMesh, NumImages);
+	UpdateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
 }
 
 
 void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
+	std::vector<VkDescriptorPoolSize> PoolSizes;
+	VkDescriptorPoolSize DescPoolSize = {
+		.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = (u32)(NumImages)
+	};
+
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.flags = 0,
 		.maxSets = (u32)NumImages,
-		.poolSizeCount = 0,
-		.pPoolSizes = NULL
+		.poolSizeCount = 1,
+		.pPoolSizes = &DescPoolSize
 	};
 
 	VkResult res = vkCreateDescriptorPool(m_device, &PoolInfo, NULL, &m_descriptorPool);
@@ -215,7 +224,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSetLayout()
+void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -225,6 +234,17 @@ void GraphicsPipeline::CreateDescriptorSetLayout()
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
+
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
+		.binding = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
+
+	if (UniformBuffers.size() > 0) {
+		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
+	}
 
 	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
 
@@ -260,7 +280,8 @@ void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
 }
 
 
-void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages)
+void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
+											std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
 {
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = pMesh->m_vb.m_buffer,
@@ -268,20 +289,12 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 		.range = pMesh->m_vertexBufferSize,  // can also be VK_WHOLE_SIZE
 	};
 
-#if 0
-	VkDescriptorBufferInfo BufferInfo_Uniform = {
-		.buffer = UniformBuffers[i].m_buffer,
-		.offset = 0,
-		.range = (VkDeviceSize)UniformDataSize,
-	};
-#endif
-
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 
 	for (size_t i = 0; i < NumImages; i++) {
 
 		WriteDescriptorSet.push_back(
-			VkWriteDescriptorSet {
+			VkWriteDescriptorSet{
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
 				.dstBinding = 0,
@@ -289,6 +302,24 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 				.pBufferInfo = &BufferInfo_VB
+			}
+		);
+
+		VkDescriptorBufferInfo BufferInfo_Uniform = {
+			.buffer = UniformBuffers[i].m_buffer,
+			.offset = 0,
+			.range = (VkDeviceSize)UniformDataSize,
+		};
+			
+		WriteDescriptorSet.push_back(
+			VkWriteDescriptorSet{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 1,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo = &BufferInfo_Uniform
 			}
 		);
 	}

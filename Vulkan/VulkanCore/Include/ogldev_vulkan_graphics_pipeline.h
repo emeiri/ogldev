@@ -15,8 +15,10 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
 #include <vulkan/vulkan.h>
 
+#define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -35,7 +37,10 @@ public:
 					 VkShaderModule vs,
 					 VkShaderModule fs,
 					 const SimpleMesh* pMesh,
-					 int NumImages);
+					 int NumImages,
+					 std::vector<BufferAndMemory>& UniformBuffers,
+					 int UniformDataSize);
+
 
 	~GraphicsPipeline();
 
@@ -44,10 +49,11 @@ public:
 private:
 
 	void CreateDescriptorPool(int NumImages);
-	void CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages);
-	void CreateDescriptorSetLayout();
+	void CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
+						  	  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+	void CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
 	void AllocateDescriptorSets(int NumImages);
-	void UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages);
+	void UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;

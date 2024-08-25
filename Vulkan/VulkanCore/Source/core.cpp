@@ -507,13 +507,13 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 }
 
 
-std::vector<VkFramebuffer> VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
+std::vector<VkFramebuffer> VulkanCore::CreateFramebuffers(VkRenderPass RenderPass) const
 {
 	std::vector<VkFramebuffer> frameBuffers;
 	frameBuffers.resize(m_images.size());
 
 	int WindowWidth, WindowHeight;
-	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
+	GetFramebufferSize(WindowWidth, WindowHeight);
 
 	VkResult res;
 
@@ -580,6 +580,17 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 	StagingVB.Destroy(m_device);
 
 	return VB;
+}
+
+
+BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
+{
+	BufferAndMemory Buffer;
+
+	Buffer = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+		                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+	return Buffer;
 }
 
 
@@ -674,13 +685,18 @@ void BufferAndMemory::Destroy(VkDevice Device)
 	if (m_mem) {
 		vkFreeMemory(Device, m_mem, NULL);
 	}
-
 	if (m_buffer) {
 		vkDestroyBuffer(Device, m_buffer, NULL);
 	}
 }
 
-#if 0
+
+void VulkanCore::GetFramebufferSize(int& Width, int& Height) const
+{
+	glfwGetWindowSize(m_pWindow, &Width, &Height);
+}
+
+
 std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t DataSize)
 {
 	std::vector<BufferAndMemory> UniformBuffers;
@@ -695,18 +711,16 @@ std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t DataSize)
 }
 
 
-void BufferAndMemory::Update(const void* pData, size_t Size)
-{
-	if (!m_device) {
-		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
-	}
 
+
+void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
+{
 	void* pMem = NULL;
-	VkResult res = vkMapMemory(m_device, m_mem, 0, Size, 0, &pMem);
+	VkResult res = vkMapMemory(Device, m_mem, 0, Size, 0, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory");
 	memcpy(pMem, pData, Size);
-	vkUnmapMemory(m_device, m_mem);
+	vkUnmapMemory(Device, m_mem);
 }
-#endif
+
 
 }
