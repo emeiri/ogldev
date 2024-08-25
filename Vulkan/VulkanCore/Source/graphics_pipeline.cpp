@@ -33,14 +33,12 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   VkBuffer VB,
 								   size_t VBSize,
 								   int NumImages,
-								   std::vector < std::vector<BufferAndMemory> >& UniformBuffers,
+								   std::vector<BufferAndMemory>& UniformBuffers,
 								   int UniformDataSize)
 {
 	m_device = Device;
 
-	int NumUniformBuffers = (int)UniformBuffers[0].size();
-
-	CreateDescriptorPool(NumImages, NumUniformBuffers);
+	CreateDescriptorPool(NumImages);
 	
 	if (VB) {
 		CreateDescriptorSet(NumImages, VB, VBSize, UniformBuffers, UniformDataSize);
@@ -185,12 +183,12 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
-void GraphicsPipeline::CreateDescriptorPool(int NumImages, int NumUniformBuffers)
+void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
 	std::vector<VkDescriptorPoolSize> PoolSizes;
 	VkDescriptorPoolSize DescPoolSize = {
 		.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.descriptorCount = (u32)(NumImages * NumUniformBuffers)
+		.descriptorCount = (u32)(NumImages)
 	};
 
 	VkDescriptorPoolCreateInfo PoolInfo = {
@@ -207,7 +205,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages, int NumUniformBuffers
 
 
 void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize,
-										   std::vector < std::vector<BufferAndMemory> >& UniformBuffers, int UniformDataSize)
+										   std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -256,7 +254,7 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 
 	for (size_t i = 0; i < NumImages; i++) {
 		VkDescriptorBufferInfo BufferInfo_Uniform = {
-			.buffer = UniformBuffers[i][0].m_buffer,
+			.buffer = UniformBuffers[i].m_buffer,
 			.offset = 0,
 			.range = (VkDeviceSize)UniformDataSize,
 		};

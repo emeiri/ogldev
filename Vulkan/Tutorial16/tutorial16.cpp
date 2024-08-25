@@ -64,10 +64,7 @@ public:
 		vkDestroyBuffer(m_device, m_vb, NULL);
 
 		for (int i = 0; i < m_uniformBuffers.size(); i++) {
-			for (int j = 0; j < m_uniformBuffers[i].size(); j++) {
-				vkFreeMemory(m_device, m_uniformBuffers[i][j].m_mem, NULL);
-				vkDestroyBuffer(m_device, m_uniformBuffers[i][j].m_buffer, NULL);
-			}
+			m_uniformBuffers[i].Destroy();
 		}
 	}
 
@@ -139,8 +136,7 @@ private:
 
 	void CreateUniformBuffers()
 	{
-		int NumUniformBuffers = 1;
-		m_uniformBuffers = m_vkCore.CreateUniformBuffers(NumUniformBuffers, sizeof(UniformData));
+		m_uniformBuffers = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 	}
 
 
@@ -210,8 +206,7 @@ private:
 		Matrix4f Rotate;
 		Rotate.InitRotateTransform(0.0f, 0.0f, foo);
 		foo += 0.001f;
-		int UniformBufferIndex = 0;
-		m_uniformBuffers[ImageIndex][UniformBufferIndex].Update(&Rotate.m[0][0], sizeof(Matrix4f));
+		m_uniformBuffers[ImageIndex].Update(&Rotate.m[0][0], sizeof(Matrix4f));
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -227,7 +222,7 @@ private:
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	VkBuffer m_vb;
 	size_t m_vertexBufferSize = 0;
-	std::vector< std::vector<OgldevVK::BufferAndMemory> > m_uniformBuffers;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 };
 
 

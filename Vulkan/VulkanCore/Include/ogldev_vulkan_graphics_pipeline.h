@@ -36,7 +36,7 @@ public:
 		VkBuffer VB,
 		size_t VBSize,
 		int NumImages,
-		std::vector < std::vector<BufferAndMemory> >& UniformBuffers,
+		std::vector<BufferAndMemory>& UniformBuffers,
 		int UniformDataSize);
 
 	~GraphicsPipeline();
@@ -45,9 +45,9 @@ public:
 
 private:
 
-	void CreateDescriptorPool(int NumImages, int NumUniformBuffers);
+	void CreateDescriptorPool(int NumImages);
 	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize, 
-		std::vector < std::vector<BufferAndMemory> >& UniformBuffers, int UniformDataSize);
+		std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;

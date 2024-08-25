@@ -569,7 +569,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 
 BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
 {
-	BufferAndMemory Buffer(&m_device);
+	BufferAndMemory Buffer(m_device);
 
 	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Buffer.m_buffer, Buffer.m_mem);
@@ -658,18 +658,14 @@ u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMem
 }
 
 
-std::vector < std::vector<BufferAndMemory> > VulkanCore::CreateUniformBuffers(int NumBuffers, size_t DataSize)
+std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t DataSize)
 {
-	std::vector< std::vector<BufferAndMemory> > UniformBuffers;
+	std::vector<BufferAndMemory> UniformBuffers;
 
 	UniformBuffers.resize(m_images.size());
 
 	for (int i = 0; i < UniformBuffers.size(); i++) {
-		UniformBuffers[i].resize(NumBuffers);
-
-		for (int j = 0; j < NumBuffers; j++) {
-			UniformBuffers[i][j] = CreateUniformBuffer((int)DataSize);
-		}
+		UniformBuffers[i] = CreateUniformBuffer((int)DataSize);
 	}
 
 	return UniformBuffers;
@@ -678,15 +674,31 @@ std::vector < std::vector<BufferAndMemory> > VulkanCore::CreateUniformBuffers(in
 
 void BufferAndMemory::Update(const void* pData, size_t Size)
 {
-	if (!m_pDevice) {
+	if (!m_device) {
 		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
 	}
 
 	void* pMem = NULL;
-	VkResult res = vkMapMemory(*m_pDevice, m_mem, 0, Size, 0, &pMem);
+	VkResult res = vkMapMemory(m_device, m_mem, 0, Size, 0, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory");
 	memcpy(pMem, pData, Size);
-	vkUnmapMemory(*m_pDevice, m_mem);
+	vkUnmapMemory(m_device, m_mem);
+}
+
+
+void BufferAndMemory::Destroy()
+{
+	if (!m_device) {
+		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
+	}
+
+	if (m_mem) {
+		vkFreeMemory(m_device, m_mem, NULL);
+	}
+
+	if (m_buffer) {
+		vkDestroyBuffer(m_device, m_buffer, NULL);
+	}
 }
 
 }

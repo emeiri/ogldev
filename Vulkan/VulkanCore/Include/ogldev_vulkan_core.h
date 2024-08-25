@@ -32,7 +32,7 @@ namespace OgldevVK {
 class BufferAndMemory {
 public:
 	BufferAndMemory() {}
-	BufferAndMemory(VkDevice* pDevice) : m_pDevice(pDevice) {}
+	BufferAndMemory(VkDevice Device) : m_device(Device) {}
 
 	VkBuffer m_buffer = NULL;
 	VkDeviceMemory m_mem = NULL;
@@ -40,8 +40,10 @@ public:
 
 	void Update(const void* pData, size_t Size);
 
+	void Destroy();
+
 private:
-	VkDevice* m_pDevice = NULL;
+	VkDevice m_device = NULL;
 };
 
 
@@ -77,7 +79,7 @@ public:
 
 	VkBuffer CreateVertexBuffer(const void* pVertices, size_t Size);
 	
-	std::vector < std::vector<BufferAndMemory> > CreateUniformBuffers(int NumBuffers, size_t DataSize);
+	std::vector<BufferAndMemory> CreateUniformBuffers(size_t DataSize);
 
 private:
 
