@@ -223,7 +223,10 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
-	LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
+	if (UniformBuffers.size() > 0) {
+		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
+	}
+
 	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
