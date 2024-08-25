@@ -185,6 +185,12 @@ void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 {
 	CreateDescriptorPool(NumImages);
 
+	std::vector<VkDescriptorPoolSize> PoolSizes;
+	VkDescriptorPoolSize DescPoolSize = {
+		.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = (u32)(NumImages)
+	};
+
 	CreateDescriptorSetLayout();
 
 	AllocateDescriptorSets(NumImages);
@@ -261,6 +267,14 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 		.offset = 0,
 		.range = pMesh->m_vertexBufferSize,  // can also be VK_WHOLE_SIZE
 	};
+
+#if 0
+	VkDescriptorBufferInfo BufferInfo_Uniform = {
+		.buffer = UniformBuffers[i].m_buffer,
+		.offset = 0,
+		.range = (VkDeviceSize)UniformDataSize,
+	};
+#endif
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 

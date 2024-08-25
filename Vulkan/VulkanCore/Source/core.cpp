@@ -680,4 +680,33 @@ void BufferAndMemory::Destroy(VkDevice Device)
 	}
 }
 
+#if 0
+std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t DataSize)
+{
+	std::vector<BufferAndMemory> UniformBuffers;
+
+	UniformBuffers.resize(m_images.size());
+
+	for (int i = 0; i < UniformBuffers.size(); i++) {
+		UniformBuffers[i] = CreateUniformBuffer((int)DataSize);
+	}
+
+	return UniformBuffers;
+}
+
+
+void BufferAndMemory::Update(const void* pData, size_t Size)
+{
+	if (!m_device) {
+		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
+	}
+
+	void* pMem = NULL;
+	VkResult res = vkMapMemory(m_device, m_mem, 0, Size, 0, &pMem);
+	CHECK_VK_RESULT(res, "vkMapMemory");
+	memcpy(pMem, pData, Size);
+	vkUnmapMemory(m_device, m_mem);
+}
+#endif
+
 }
