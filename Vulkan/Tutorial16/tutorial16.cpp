@@ -150,8 +150,8 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, 
-			m_vertexBufferSize, m_numImages, m_uniformBuffers, sizeof(UniformData));
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, m_vertexBufferSize, 
+			                                         m_numImages, m_uniformBuffers, sizeof(UniformData), NULL);
 	}
 
 

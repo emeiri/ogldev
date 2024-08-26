@@ -133,8 +133,11 @@ private:
 	void CreatePipeline()
 	{
 		std::vector<OgldevVK::BufferAndMemory> UniformBuffers;
+		int UniformDataSize = 0;
+		OgldevVK::VulkanTexture* pTex = NULL;
+
 		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, m_vertexBufferSize, 
-													 m_numImages, UniformBuffers, 0);
+													 m_numImages, UniformBuffers, UniformDataSize, pTex);
 	}
 
 
