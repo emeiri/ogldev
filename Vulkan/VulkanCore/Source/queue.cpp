@@ -16,6 +16,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include <vulkan/vulkan.h>
 
 #include "ogldev_vulkan_util.h"
@@ -25,16 +27,26 @@
 namespace OgldevVK {
 
 
-void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamily, u32 QueueIndex)
+void VulkanQueue::Init(VkDevice Device, u32 QueueFamily, u32 QueueIndex)
 {
 	m_device = Device;
-	m_swapChain = SwapChain;
 
 	vkGetDeviceQueue(Device, QueueFamily, QueueIndex, &m_queue);
 
 	printf("Queue acquired\n");
 
 	CreateSemaphores();
+}
+
+
+void VulkanQueue::SetSwapChain(VkSwapchainKHR SwapChain)
+{
+	if (m_swapChain) {
+		printf("Swap chain already set\n");
+		assert(0);
+	}
+
+	m_swapChain = SwapChain;
 }
 
 
@@ -60,6 +72,7 @@ void VulkanQueue::WaitIdle()
 
 u32 VulkanQueue::AcquireNextImage()
 {
+	assert(m_swapChain);
 	u32 ImageIndex = 0;
 	VkResult res = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_presentCompleteSem, NULL, &ImageIndex);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR\n");
@@ -109,6 +122,8 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer CmbBuf)
 
 void VulkanQueue::Present(u32 ImageIndex)
 {
+	assert(m_swapChain);
+
 	VkPresentInfoKHR PresentInfo = {
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.pNext = NULL,

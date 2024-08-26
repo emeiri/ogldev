@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <assert.h>
+#include <array>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -54,6 +55,37 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 
 	return VK_FALSE;  // The calling function should not be aborted
 }
+
+
+static VkFormat FindSupportedFormat(const PhysicalDevice& PhyiscalDevice, const std::vector<VkFormat>& Candidates,
+	VkImageTiling Tiling, VkFormatFeatureFlags Features)
+{
+	for (int i = 0; i < Candidates.size(); i++) {
+		VkFormat Format = Candidates[i];
+		VkFormatProperties Props;
+		vkGetPhysicalDeviceFormatProperties(PhyiscalDevice.m_physDevice, Format, &Props);
+
+		if (Tiling == VK_IMAGE_TILING_LINEAR && (Props.linearTilingFeatures & Features) == Features) {
+			return Format;
+		}
+		else if (Tiling == VK_IMAGE_TILING_OPTIMAL && (Props.optimalTilingFeatures & Features) == Features) {
+			return Format;
+		}
+	}
+
+	printf("failed to find supported format!\n");
+	exit(0);
+}
+
+
+static VkFormat FindDepthFormat(const PhysicalDevice& PhyiscalDevice)
+{
+	std::vector<VkFormat> FormatCandidates = { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT };
+
+	return FindSupportedFormat(PhyiscalDevice, FormatCandidates,
+		VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
 
 
 VulkanCore::VulkanCore()
@@ -118,9 +150,10 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	m_physDevices.Init(m_instance, m_surface);
 	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
 	CreateDevice();
-	CreateSwapChain();
+	m_queue.Init(m_device, m_queueFamily, 0);
 	CreateCommandBufferPool();
-	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
+	CreateSwapChain();	
+	m_queue.SetSwapChain(m_swapChain);
 	CreateCommandBuffers(1, &m_copyCmdBuf);
 }
 
@@ -327,7 +360,7 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 }
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
-	VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
+							VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -414,6 +447,17 @@ void VulkanCore::CreateSwapChain()
 		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format,
 			VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
+
+	VkFormat DepthFormat = FindDepthFormat(m_physDevices.Selected());
+
+	CreateImage(m_depthTexture, SurfaceCaps.currentExtent.width, SurfaceCaps.currentExtent.height, DepthFormat,
+		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 0, 1);
+
+	m_depthTexture.m_view = CreateImageView(m_device, m_depthTexture.m_image, DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT,
+											VK_IMAGE_VIEW_TYPE_2D, 1, 1);
+
+	TransitionImageLayout(m_depthTexture.m_image, DepthFormat, VK_IMAGE_LAYOUT_UNDEFINED, 
+						  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, LayerCount, 1);
 }
 
 
@@ -422,7 +466,7 @@ void VulkanCore::CreateCommandBufferPool()
 	VkCommandPoolCreateInfo cmdPoolCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 		.pNext = NULL,
-		.flags = 0,
+		.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
 		.queueFamilyIndex = m_queueFamily
 	};
 
@@ -457,9 +501,9 @@ void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 }
 
 
-VkRenderPass VulkanCore::CreateSimpleRenderPass()
+VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled)
 {
-	VkAttachmentDescription AttachDesc = {
+	VkAttachmentDescription ColorAttachDesc = {
 		.flags = 0,
 		.format = m_swapChainSurfaceFormat.format,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
@@ -471,9 +515,41 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 	};
 
-	VkAttachmentReference AttachRef = {
+	VkAttachmentReference ColorAttachRef = {
 		.attachment = 0,
 		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+	};
+
+	VkAttachmentDescription DepthAttachDesc = { 0 };
+	VkAttachmentReference DepthAttachRef = { 0 };
+
+	if (DepthEnabled) {
+		DepthAttachDesc = {
+			.flags = 0,
+			.format = FindDepthFormat(m_physDevices.Selected()),
+			.samples = VK_SAMPLE_COUNT_1_BIT,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+		};
+
+		DepthAttachRef = {
+			.attachment = 1,
+			.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+		};
+	}	
+
+	VkSubpassDependency Dependencies = {
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.dstSubpass = 0,
+		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.srcAccessMask = 0,
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+		.dependencyFlags = 0
 	};
 
 	VkSubpassDescription SubpassDesc = {
@@ -482,23 +558,25 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 		.inputAttachmentCount = 0,
 		.pInputAttachments = NULL,
 		.colorAttachmentCount = 1,
-		.pColorAttachments = &AttachRef,
+		.pColorAttachments = &ColorAttachRef,
 		.pResolveAttachments = NULL,
-		.pDepthStencilAttachment = NULL,
+		.pDepthStencilAttachment = DepthEnabled ? &DepthAttachRef : NULL,
 		.preserveAttachmentCount = 0,
 		.pPreserveAttachments = NULL
 	};
+
+	std::array<VkAttachmentDescription, 2> Attachments = { ColorAttachDesc, DepthAttachDesc };
 
 	VkRenderPassCreateInfo RenderPassCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.pNext = NULL,
 		.flags = 0,
-		.attachmentCount = 1,
-		.pAttachments = &AttachDesc,
+		.attachmentCount = (u32)Attachments.size(),
+		.pAttachments = Attachments.data(),
 		.subpassCount = 1,
 		.pSubpasses = &SubpassDesc,
-		.dependencyCount = 0,
-		.pDependencies = NULL
+		.dependencyCount = 1,
+		.pDependencies = &Dependencies
 	};
 
 	VkRenderPass RenderPass;
@@ -523,15 +601,17 @@ std::vector<VkFramebuffer> VulkanCore::CreateFramebuffer(VkRenderPass RenderPass
 	VkResult res;
 
 	for (uint i = 0; i < m_images.size(); i++) {
+		std::array<VkImageView, 2> Attachments = { m_imageViews[i], m_depthTexture.m_view };
 
-		VkFramebufferCreateInfo fbCreateInfo = {};
-		fbCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		fbCreateInfo.renderPass = RenderPass;
-		fbCreateInfo.attachmentCount = 1;
-		fbCreateInfo.pAttachments = &m_imageViews[i];
-		fbCreateInfo.width = WindowWidth;
-		fbCreateInfo.height = WindowHeight;
-		fbCreateInfo.layers = 1;
+		VkFramebufferCreateInfo fbCreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+			.renderPass = RenderPass,
+			.attachmentCount = (u32)Attachments.size(),
+			.pAttachments = Attachments.data(),
+			.width = (u32)WindowWidth,
+			.height = (u32)WindowHeight,
+			.layers = 1
+		};
 
 		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &frameBuffers[i]);
 		CHECK_VK_RESULT(res, "vkCreateFramebuffer\n");
@@ -950,7 +1030,7 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 
 	m_queue.SubmitSync(m_copyCmdBuf);
 
-	//m_queue.WaitIdle();
+	m_queue.WaitIdle();
 }
 
 

@@ -40,6 +40,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   const VulkanTexture* pTex)
 {
 	m_device = Device;
+	bool DepthEnabled = true;
 
 	CreateDescriptorPool(NumImages);
 	
@@ -131,6 +132,16 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 		.pAttachments = &BlendAttachState
 	};
 
+	VkPipelineDepthStencilStateCreateInfo DepthStencil = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+		.depthTestEnable = DepthEnabled ? VK_TRUE : VK_FALSE,
+		.depthWriteEnable = DepthEnabled ? VK_TRUE : VK_FALSE,
+		.depthCompareOp = VK_COMPARE_OP_LESS,
+		.depthBoundsTestEnable = VK_FALSE,
+		.minDepthBounds = 0.0f,
+		.maxDepthBounds = 1.0f
+	};
+
 	VkPipelineLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
@@ -155,6 +166,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 		.pViewportState = &VPCreateInfo,
 		.pRasterizationState = &RastCreateInfo,
 		.pMultisampleState = &PipelineMSCreateInfo,
+		.pDepthStencilState = &DepthStencil,
 		.pColorBlendState = &BlendCreateInfo,
 		.layout = m_pipelineLayout,
 		.renderPass = RenderPass,

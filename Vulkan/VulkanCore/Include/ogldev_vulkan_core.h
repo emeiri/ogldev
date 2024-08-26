@@ -80,7 +80,7 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow);
 
-	VkRenderPass CreateSimpleRenderPass();
+	VkRenderPass CreateSimpleRenderPass(bool DepthEnabled);
 
 	std::vector<VkFramebuffer> CreateFramebuffer(VkRenderPass RenderPass);
 
@@ -159,6 +159,7 @@ private:
 	VkCommandPool m_cmdBufPool;
 	VulkanQueue m_queue;
 	VkCommandBuffer m_copyCmdBuf;
+	VulkanTexture m_depthTexture;
 };
 
 }

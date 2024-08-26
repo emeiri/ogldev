@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <array>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -80,7 +81,7 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		m_renderPass = m_vkCore.CreateSimpleRenderPass();
+		m_renderPass = m_vkCore.CreateSimpleRenderPass(true);
 		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
 
 		CreateShaders();
@@ -156,8 +157,19 @@ private:
 	void RecordCommandBuffers()
 	{
 		VkClearColorValue ClearColor = { 1.0f, 0.0f, 0.0f, 0.0f };
-		VkClearValue ClearValue;
-		ClearValue.color = ClearColor;
+		VkClearDepthStencilValue DepthStenciValue = {
+			.depth = 1.0f,
+			.stencil = 0
+		};
+
+		const std::array<VkClearValue, 2> ClearValues =	{
+			VkClearValue {.
+				color = ClearColor 
+			},
+			VkClearValue {
+				.depthStencil = DepthStenciValue 
+			}
+		};
 
 		VkRenderPassBeginInfo RenderPassBeginInfo = {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -173,8 +185,8 @@ private:
 					.height = WINDOW_HEIGHT
 				}
 			},
-			.clearValueCount = 1,
-			.pClearValues = &ClearValue
+			.clearValueCount = (u32)ClearValues.size(),
+			.pClearValues = ClearValues.data()
 		};
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {

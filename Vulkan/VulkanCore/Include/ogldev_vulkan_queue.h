@@ -31,7 +31,9 @@ public:
 	VulkanQueue() {}
 	~VulkanQueue() {}
 
-	void Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamily, u32 QueueIndex);
+	void Init(VkDevice Device, u32 QueueFamily, u32 QueueIndex);
+
+	void SetSwapChain(VkSwapchainKHR SwapChain);
 
 	void Destroy();
 
