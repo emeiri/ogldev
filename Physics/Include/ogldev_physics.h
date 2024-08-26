@@ -30,6 +30,7 @@
 #include "spring_force_generator.h"
 #include "anchored_spring_force_generator.h"
 #include "bungee_spring_force_generator.h"
+#include "buoyancy_force_generator.h"
 
 namespace OgldevPhysics
 {
@@ -67,7 +68,7 @@ private:
     std::vector<Particle> m_particles;
     uint m_numParticles = 0;
     std::vector<Firework> m_fireworks;
-    uint m_numFirework = 0;
+    uint m_numFireworks = 0;
     std::vector<FireworkConfig> m_fireworkConfigs;
     uint m_nextFirework = 0;
     ForceRegistry m_forceRegistry;

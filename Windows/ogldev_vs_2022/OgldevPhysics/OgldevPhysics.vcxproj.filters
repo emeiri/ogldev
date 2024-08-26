@@ -42,6 +42,9 @@
     <ClInclude Include="..\..\..\Physics\Include\bungee_spring_force_generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Physics\Include\buoyancy_force_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Physics\Source\particle.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Physics\Source\bungee_spring_force.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Physics\Source\buoyancy_force.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

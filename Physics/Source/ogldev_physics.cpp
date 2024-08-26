@@ -29,7 +29,7 @@ void PhysicsSystem::Init(uint NumObjects)
     m_numParticles = 0;
 
     m_fireworks.resize(NumObjects);
-    m_numFirework = 0;
+    m_numFireworks = 0;
 
     InitFireworksConfig();
 
@@ -52,13 +52,13 @@ Particle* PhysicsSystem::AllocParticle()
 
 Firework* PhysicsSystem::AllocFirework()
 {
-    if (m_numFirework == m_fireworks.size()) {
+    if (m_numFireworks == m_fireworks.size()) {
         printf("%s:%d - exceeded max number of fireworks\n", __FILE__, __LINE__);
         exit(1);
     }
 
-    Firework* ret = &m_fireworks[m_numFirework];
-    m_numFirework++;
+    Firework* ret = &m_fireworks[m_numFireworks];
+    m_numFireworks++;
 
     return ret;
 }
@@ -91,7 +91,7 @@ void PhysicsSystem::FireworkUpdate(float dt)
  //   printf("Update fireworks dt %f\n", dt);
 
     bool Finished = true;
-    for (int i = 0; i < m_fireworks.size(); i++) {
+    for (uint i = 0; i < m_numFireworks; i++) {
         OgldevPhysics::Firework& firework = m_fireworks[i];
         int Type = firework.GetType();
         //    printf("%d type %d\n", i, Type);

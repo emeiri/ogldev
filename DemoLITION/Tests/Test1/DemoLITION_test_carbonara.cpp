@@ -65,7 +65,8 @@ public:
         
         // InitBallisticDemo();
         // InitFireworksDemo();
-        InitSpringDemo();
+        // InitSpringDemo();
+        InitBuoyancyDemo();
 
       //  LoadAndAddModel("../Content/Jump/Jump.dae");
 
@@ -155,6 +156,22 @@ public:
     }
 
 
+    void InitBuoyancyDemo()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 10.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
+        PhysicsSceneObject Water = LoadAndAddModel("../Content/ground.obj");
+        Water.pParticle->SetPosition(0.0f, 10.0f, 0.0f);
+        PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
+        Box.pParticle->SetMass(2.0f);
+        Box.pParticle->SetPosition(0.0f, 10.0f, 0.0f);
+
+        m_buoyancyForceGenerator.Init(5.0f, 1.0f, 10.0f, 0.1f);
+        m_physicsSystem.GetRegistry().Add(Box.pParticle, &m_buoyancyForceGenerator);
+    }
+
+
+
     void OnFrame(long long DeltaTimeMillis)
     {
         if (m_showGui) {
@@ -211,8 +228,8 @@ public:
         CObject.pParticle = m_physicsSystem.AllocParticle();
         m_sceneObjects.push_back(CObject);
         m_pScene->AddToRenderList(CObject.pSceneObject);
-        m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
-        m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
+  //      m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
+   //     m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
         return CObject;
     }
 
@@ -418,6 +435,7 @@ private:
     OgldevPhysics::GravityForceGenerator m_gravityForceGenerator;
     OgldevPhysics::DragForceGenerator m_dragForceGenerator;
     OgldevPhysics::SpringForceGenerator m_springForceGenerator;
+    OgldevPhysics::BuoyancyForceGenerator m_buoyancyForceGenerator;
 };
 
 
