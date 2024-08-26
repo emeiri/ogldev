@@ -34,14 +34,15 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   size_t VBSize,
 								   int NumImages,
 								   std::vector<BufferAndMemory>& UniformBuffers,
-								   int UniformDataSize)
+								   int UniformDataSize,
+								   const VulkanTexture* pTex)
 {
 	m_device = Device;
 
 	CreateDescriptorPool(NumImages);
 	
 	if (VB) {
-		CreateDescriptorSet(NumImages, VB, VBSize, UniformBuffers, UniformDataSize);
+		CreateDescriptorSet(NumImages, VB, VBSize, UniformBuffers, UniformDataSize, pTex);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -205,7 +206,8 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 
 
 void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize,
-										   std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
+										   std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize,
+										   const VulkanTexture* pTex)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -223,11 +225,22 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
+	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
+		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+
 	if (UniformBuffers.size() > 0) {
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
 
 	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	
+	if (pTex) { 
+		LayoutBindings.push_back(FragmentShaderLayoutBinding);
+	}
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -268,7 +281,13 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 			.range = VertexBufferSize,
 		};
 
-		std::array<VkWriteDescriptorSet, 2> WriteDescriptorSet = {
+		VkDescriptorImageInfo ImageInfo = {
+			.sampler = pTex->m_sampler,
+			.imageView = pTex->m_view,
+			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		};
+
+		std::array<VkWriteDescriptorSet, 3> WriteDescriptorSet = {
 			VkWriteDescriptorSet {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
@@ -286,7 +305,16 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 				.pBufferInfo = &BufferInfo_VB
-			}
+			},
+			VkWriteDescriptorSet {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 2,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = &ImageInfo
+			},
 		};
 
 		/*WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\core.cpp" />
@@ -26,6 +27,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\queue.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\texture.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\util.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\wrapper.cpp" />
   </ItemGroup>
@@ -35,6 +37,7 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_queue.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_shader.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_texture.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_util.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_wrapper.h" />
   </ItemGroup>

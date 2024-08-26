@@ -37,7 +37,8 @@ public:
 		size_t VBSize,
 		int NumImages,
 		std::vector<BufferAndMemory>& UniformBuffers,
-		int UniformDataSize);
+		int UniformDataSize,
+		const VulkanTexture* pTex);
 
 	~GraphicsPipeline();
 
@@ -47,7 +48,7 @@ private:
 
 	void CreateDescriptorPool(int NumImages);
 	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize, 
-		std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+		std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize, const VulkanTexture* pTex);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;

@@ -33,8 +33,8 @@
 #include "ogldev_vulkan_shader.h"
 #include "ogldev_vulkan_graphics_pipeline.h"
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH  1000
+#define WINDOW_HEIGHT 1000
 
 
 void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -59,6 +59,7 @@ public:
 		m_vkCore.DestroyFramebuffers(m_frameBuffers);
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
+		m_vkCore.DestroyTexture(m_texture);
 		delete m_pPipeline;
 		vkDestroyRenderPass(m_device, m_renderPass, NULL);
 		vkDestroyBuffer(m_device, m_vb, NULL);
@@ -81,6 +82,7 @@ public:
 		CreateShaders();
 		CreateVertexBuffer();
 		CreateUniformBuffers();
+		CreateTexture();		
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -98,10 +100,6 @@ public:
 	}
 
 private:
-
-	struct UniformData {
-		Matrix4f WVP;
-	};
 
 	void CreateCommandBuffers()
 	{
@@ -127,12 +125,21 @@ private:
 
 		std::vector<Vertex> Vertices = {
 			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
-			Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
-			Vertex(Vector3f(0.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)) };
+			Vertex(Vector3f(-1.0f, 1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
+			Vertex(Vector3f(1.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)), 
+			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
+			Vertex(Vector3f(1.0f, 1.0f, 0.0f), Vector2f(1.0f, 1.0f)),
+			Vertex(Vector3f(1.0f,  -1.0f, 0.0f), Vector2f(1.0f, 0.0f))
+		};
 
 		m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
 		m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_vertexBufferSize);
 	}
+
+
+	struct UniformData {
+		Matrix4f WVP;
+	};
 
 	void CreateUniformBuffers()
 	{
@@ -147,11 +154,17 @@ private:
 		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
 	}
 
+	
+	void CreateTexture()
+	{
+		m_vkCore.CreateTexture("../../Content/bricks.jpg", m_texture);
+	}
+
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, 
-			m_vertexBufferSize, m_numImages, m_uniformBuffers, sizeof(UniformData));
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, m_vertexBufferSize, 
+			                                         m_numImages, m_uniformBuffers, sizeof(UniformData), &m_texture);
 	}
 
 
@@ -188,7 +201,7 @@ private:
 	
 			m_pPipeline->Bind(m_cmdBufs[i], i);
 
-			vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
+			vkCmdDraw(m_cmdBufs[i], 6, 1, 0, 0);
 
 			vkCmdEndRenderPass(m_cmdBufs[i]);
 
@@ -223,6 +236,7 @@ private:
 	VkBuffer m_vb;
 	size_t m_vertexBufferSize = 0;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
+	OgldevVK::VulkanTexture m_texture;	
 };
 
 

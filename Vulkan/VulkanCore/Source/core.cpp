@@ -23,6 +23,7 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
+#include "3rdparty/stb_image.h"
 
 namespace OgldevVK {
 
@@ -612,6 +613,321 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 }
 
 
+void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
+{
+	int ImageWidth = 0;
+	int ImageHeight = 0;
+	int ImageChannels = 0;
+
+	stbi_uc* pPixels = stbi_load(pFilename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
+
+	if (!pPixels) {
+		printf("Error loading texture from '%s'\n", pFilename);
+		exit(1);
+	}
+
+	u32 LayerCount = 1;
+	VkImageCreateFlags Flags = 0;
+	VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, LayerCount, Flags);
+
+	stbi_image_free(pPixels);
+
+	VkImageViewType ViewType = VK_IMAGE_VIEW_TYPE_2D;
+	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	u32 MipLevels = 1;
+
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, ViewType, LayerCount, MipLevels);
+
+	VkFilter MinFilter = VK_FILTER_LINEAR;
+	VkFilter MaxFilter = VK_FILTER_LINEAR;
+	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	CreateTextureSampler(m_device, &Tex.m_sampler, MinFilter, MaxFilter, AddressMode);
+
+	printf("Texture from '%s' created\n", pFilename);
+}
+
+
+void VulkanCore::DestroyTexture(VulkanTexture& Tex)
+{
+	vkDestroySampler(m_device, Tex.m_sampler, NULL);
+	vkDestroyImageView(m_device, Tex.m_view, NULL);
+	vkDestroyImage(m_device, Tex.m_image, NULL);
+	vkFreeMemory(m_device, Tex.m_mem, NULL);
+}
+
+
+void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
+											VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags CreateFlags)
+{
+	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, VK_IMAGE_TILING_OPTIMAL, 
+			    (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
+		        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, CreateFlags, 1);
+
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, VK_IMAGE_LAYOUT_UNDEFINED);
+}
+
+
+void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling,
+	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels)
+{
+	VkImageCreateInfo ImageInfo = {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+		.pNext = NULL,
+		.flags = CreateFlags,
+		.imageType = VK_IMAGE_TYPE_2D,
+		.format = TexFormat,
+		.extent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 },
+		.mipLevels = MipLevels,
+		.arrayLayers = (u32)((CreateFlags == VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) ? 6 : 1),
+		.samples = VK_SAMPLE_COUNT_1_BIT,
+		.tiling = ImageTiling,
+		.usage = UsageFlags,
+		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+		.queueFamilyIndexCount = 0,
+		.pQueueFamilyIndices = NULL,
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
+	};
+
+	VkResult res = vkCreateImage(m_device, &ImageInfo, NULL, &Tex.m_image);
+	CHECK_VK_RESULT(res, "vkCreateImage error");
+
+	VkMemoryRequirements MemReqs;
+	vkGetImageMemoryRequirements(m_device, Tex.m_image, &MemReqs);
+
+	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, PropertyFlags);
+
+	VkMemoryAllocateInfo allocInfo = {
+		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+		.pNext = NULL,
+		.allocationSize = MemReqs.size,
+		.memoryTypeIndex = MemoryTypeIndex
+	};
+
+	res = vkAllocateMemory(m_device, &allocInfo, NULL, &Tex.m_mem);
+	CHECK_VK_RESULT(res, "vkAllocateMemory error");
+
+	vkBindImageMemory(m_device, Tex.m_image, Tex.m_mem, 0);
+}
+
+
+void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout)
+{
+	u32 BytesPerPixel = GetBytesPerTexFormat(TexFormat);
+
+	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
+	VkDeviceSize ImageSize = LayerSize * LayerCount;
+
+	VkBuffer StagingBuffer;
+	VkDeviceMemory StagingBufferMemory;
+
+	VkDeviceSize AllocationSize = CreateBuffer(ImageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingBuffer, StagingBufferMemory);
+
+	UploadBufferData(StagingBufferMemory, 0, pPixels, ImageSize);
+
+	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, 1);
+	CopyBufferToImage(StagingBuffer, Tex.m_image, ImageWidth, ImageHeight, LayerCount);
+	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, 1);
+
+	vkDestroyBuffer(m_device, StagingBuffer, NULL);
+	vkFreeMemory(m_device, StagingBufferMemory, NULL);
+}
+
+
+void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize)
+{
+	void* pMappedData = NULL;
+
+	vkMapMemory(m_device, BufferMemory, DeviceOffset, DataSize, 0, &pMappedData);
+	
+	memcpy(pMappedData, pData, DataSize);
+	
+	vkUnmapMemory(m_device, BufferMemory);
+}
+
+
+void VulkanCore::CopyBufferToImage(VkBuffer Buffer, VkImage Image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount)
+{
+	VkCommandBuffer CmdBuf = CreateAndBeginSingleUseCommand();
+
+	VkBufferImageCopy Region = {
+		.bufferOffset = 0,
+		.bufferRowLength = 0,
+		.bufferImageHeight = 0,
+		.imageSubresource = VkImageSubresourceLayers {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = LayerCount
+		},
+		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
+		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
+	};
+
+	vkCmdCopyBufferToImage(CmdBuf, Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+
+	EndSingleTimeCommands(CmdBuf);
+}
+
+
+
+void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
+{
+	VkCommandBuffer CmdBuf = CreateAndBeginSingleUseCommand();
+
+	TransitionImageLayoutCmd(CmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
+
+	EndSingleTimeCommands(CmdBuf);
+}
+
+
+void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
+{
+	VkImageMemoryBarrier barrier = {
+		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+		.pNext = NULL,
+		.srcAccessMask = 0,
+		.dstAccessMask = 0,
+		.oldLayout = OldLayout,
+		.newLayout = NewLayout,
+		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.image = Image,
+		.subresourceRange = VkImageSubresourceRange {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.baseMipLevel = 0,
+			.levelCount = MipLevels,
+			.baseArrayLayer = 0,
+			.layerCount = LayerCount
+		}
+	};
+
+	VkPipelineStageFlags sourceStage;
+	VkPipelineStageFlags destinationStage;
+
+	if (NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL ||
+		(Format == VK_FORMAT_D16_UNORM) ||
+		(Format == VK_FORMAT_X8_D24_UNORM_PACK32) ||
+		(Format == VK_FORMAT_D32_SFLOAT) ||
+		(Format == VK_FORMAT_S8_UINT) ||
+		(Format == VK_FORMAT_D16_UNORM_S8_UINT) ||
+		(Format == VK_FORMAT_D24_UNORM_S8_UINT))
+	{
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+		if (HasStencilComponent(Format)) {
+			barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+		}
+	}
+	else {
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	}
+
+	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	else
+		if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		}
+	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	/* Convert back from read-only to updateable */
+	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	/* Convert from updateable texture to shader read-only */
+	else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	/* Convert depth texture from undefined state to depth-stencil buffer */
+	else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	}
+
+	/* Wait for render pass to complete */
+	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = 0; // VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = 0;
+		/*
+				sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		///		destinationStage = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
+				destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		*/
+		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+
+	/* Convert back from read-only to color attachment */
+	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	}
+	/* Convert from updateable texture to shader read-only */
+	else if (OldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+
+	/* Convert back from read-only to depth attachment */
+	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+	}
+	/* Convert from updateable depth texture to shader read-only */
+	else if (OldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+
+	vkCmdPipelineBarrier(
+		CmdBuf,
+		sourceStage, destinationStage,
+		0,
+		0, NULL,
+		0, NULL,
+		1, &barrier
+	);
+}
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
@@ -658,6 +974,30 @@ std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t DataSize)
 	}
 
 	return UniformBuffers;
+}
+
+
+VkCommandBuffer VulkanCore::CreateAndBeginSingleUseCommand()
+{
+	VkCommandBuffer CmdBuf;
+
+	CreateCommandBuffers(1, &CmdBuf);
+
+	BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	return CmdBuf;
+}
+
+
+void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
+{
+	vkEndCommandBuffer(CmdBuf);
+
+	m_queue.SubmitSync(CmdBuf);
+
+	m_queue.WaitIdle();
+
+	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &CmdBuf);
 }
 
 

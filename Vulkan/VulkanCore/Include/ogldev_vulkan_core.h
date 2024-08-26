@@ -23,7 +23,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_device.h"
+#include "ogldev_vulkan_texture.h"
 #include "ogldev_vulkan_queue.h"
 
 namespace OgldevVK {
@@ -44,6 +46,14 @@ public:
 
 private:
 	VkDevice m_device = NULL;
+};
+
+
+struct VulkanTexture {
+	VkImage m_image = VK_NULL_HANDLE;
+	VkDeviceMemory m_mem = VK_NULL_HANDLE;
+	VkImageView m_view = VK_NULL_HANDLE;
+	VkSampler m_sampler = VK_NULL_HANDLE;
 };
 
 
@@ -81,6 +91,10 @@ public:
 	
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t DataSize);
 
+	void CreateTexture(const char* filename, VulkanTexture& Tex);
+	
+	void DestroyTexture(VulkanTexture& Tex);
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -97,6 +111,26 @@ private:
 
 	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
 					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+	void UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize);
+
+	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
+									VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags Flags);
+
+	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
+		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels);
+
+	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
+
+	void CopyBufferToImage(VkBuffer buffer, VkImage image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount);
+
+	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
+
+	void TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
+
+	VkCommandBuffer CreateAndBeginSingleUseCommand();
+
+	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
