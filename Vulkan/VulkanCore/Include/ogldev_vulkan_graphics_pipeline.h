@@ -35,6 +35,8 @@ public:
 		VkShaderModule fs,
 		VkBuffer VB,
 		size_t VBSize,
+		VkBuffer IB,
+		size_t IBSize,
 		int NumImages,
 		std::vector<BufferAndMemory>& UniformBuffers,
 		int UniformDataSize,
@@ -47,7 +49,7 @@ public:
 private:
 
 	void CreateDescriptorPool(int NumImages);
-	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize, 
+	void CreateDescriptorSet(int NumImages, const VkBuffer& VB, size_t VBSize, const VkBuffer& IB, size_t IBSize,
 		std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize, const VulkanTexture* pTex);
 
 	VkDevice m_device = NULL;

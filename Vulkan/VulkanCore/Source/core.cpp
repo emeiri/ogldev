@@ -18,6 +18,14 @@
 #include <vector>
 #include <assert.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+
+#include <assimp/Importer.hpp> 
+#include <assimp/scene.h>      
+#include <assimp/postprocess.h> 
+
 #include "ogldev_types.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
@@ -548,7 +556,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 	VkBuffer StagingVB;
 	VkDeviceMemory StagingVBMem;
 	VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
+		            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
 
 	void* MappedMemAddr = NULL;
 	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
@@ -558,7 +566,7 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 	VkBuffer vb;
 	VkDeviceMemory vbMem;
 	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+		                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
 
 	CopyBuffer(vb, StagingVB, Size);
 
@@ -998,6 +1006,87 @@ void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
 	m_queue.WaitIdle();
 
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &CmdBuf);
+}
+
+
+SimpleMesh VulkanCore::LoadSimpleMesh(const char* pFilename)
+{
+	Assimp::Importer Importer;
+	const aiScene* pScene = Importer.ReadFile(pFilename, aiProcess_Triangulate);
+
+	if (!pScene) {
+		printf("Error parsing '%s': '%s'\n", pFilename, Importer.GetErrorString());
+		exit(1);
+	} 
+	
+	if (!pScene->HasMeshes()) {
+		printf("File '%s' hash no meshes\n", pFilename);
+		exit(255);
+	}
+
+	const aiMesh* pMesh = pScene->mMeshes[0];
+
+	SimpleMesh Mesh(m_device);
+	Mesh.m_numVertices = pMesh->mNumVertices;
+	Mesh.m_numIndices = pMesh->mNumFaces * 3;
+
+	struct VertexData {
+		glm::vec3 pos;
+		glm::vec2 tc;
+	};
+
+	std::vector<VertexData> Vertices;
+
+	Vertices.resize(pMesh->mNumVertices);
+
+	for (int i = 0; i != pMesh->mNumVertices; i++) {
+		aiVector3D v = pMesh->mVertices[i];
+		glm::vec3 Pos(v.x, v.z, v.y);
+
+		glm::vec2 TexCoords(0.0f, 0.0f);
+		if (pMesh->mTextureCoords[0]) {
+			aiVector3D t = pMesh->mTextureCoords[0][i];
+			TexCoords = glm::vec2(t.x, 1.0f - t.y);
+		}		
+		
+		Vertices[i] = {.pos = Pos, .tc = TexCoords};
+	}
+
+	std::vector<unsigned int> Indices;
+	Indices.resize(pMesh->mNumFaces * 3);
+
+	for (int i = 0; i != pMesh->mNumFaces; i++) {
+		for (int j = 0; j != 3; j++) {
+			Indices[i * 3 + j] = pMesh->mFaces[i].mIndices[j];
+		}
+	}
+
+	//aiReleaseImport(scene);
+
+	Mesh.m_vertexBufferSize = sizeof(VertexData) * Vertices.size();
+	Mesh.m_indexBufferSize = sizeof(u32) * Indices.size();
+
+	Mesh.m_vb = CreateVertexBuffer(Vertices.data(), Mesh.m_vertexBufferSize);
+	Mesh.m_ib = CreateVertexBuffer(Indices.data(), Mesh.m_indexBufferSize);
+
+	return Mesh;
+}
+
+
+void SimpleMesh::Destroy()
+{
+	if (m_device) {
+		if (m_vb) {
+			vkDestroyBuffer(m_device, m_vb, NULL);
+		}
+
+		if (m_ib) {
+			vkDestroyBuffer(m_device, m_ib, NULL);
+		}
+	} else {
+		printf("SimpleMesh destroyed but no device\n");
+		return;
+	}
 }
 
 

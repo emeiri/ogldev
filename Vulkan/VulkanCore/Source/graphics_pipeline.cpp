@@ -32,6 +32,8 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   VkShaderModule fs,
 								   VkBuffer VB,
 								   size_t VBSize,
+								   VkBuffer IB,
+								   size_t IBSize,
 								   int NumImages,
 								   std::vector<BufferAndMemory>& UniformBuffers,
 								   int UniformDataSize,
@@ -42,7 +44,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 	CreateDescriptorPool(NumImages);
 	
 	if (VB) {
-		CreateDescriptorSet(NumImages, VB, VBSize, UniformBuffers, UniformDataSize, pTex);
+		CreateDescriptorSet(NumImages, VB, VBSize, IB, IBSize, UniformBuffers, UniformDataSize, pTex);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -205,7 +207,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize,
+void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VB, size_t VBSize, const VkBuffer& IB, size_t IBSize,
 										   std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize,
 										   const VulkanTexture* pTex)
 {
@@ -225,8 +227,15 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
-	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
 		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
+
+	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
+		.binding = 3,
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -237,6 +246,7 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 	}
 
 	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
 	
 	if (pTex) { 
 		LayoutBindings.push_back(FragmentShaderLayoutBinding);
@@ -276,9 +286,15 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 		};
 
 		VkDescriptorBufferInfo BufferInfo_VB = {
-			.buffer = VertexBuffer,
+			.buffer = VB,
 			.offset = 0,
-			.range = VertexBufferSize,
+			.range = VBSize,
+		};
+
+		VkDescriptorBufferInfo BufferInfo_IB = {
+			.buffer = IB,
+			.offset = 0,
+			.range = IBSize,
 		};
 
 		VkDescriptorImageInfo ImageInfo = {
@@ -287,7 +303,7 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		};
 
-		std::array<VkWriteDescriptorSet, 3> WriteDescriptorSet = {
+		std::array<VkWriteDescriptorSet, 4> WriteDescriptorSet = {
 			VkWriteDescriptorSet {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
@@ -312,18 +328,19 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 				.dstBinding = 2,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.pBufferInfo = &BufferInfo_IB
+			},
+			VkWriteDescriptorSet {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 3,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 				.pImageInfo = &ImageInfo
 			},
 		};
-
-		/*WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		WriteDescriptorSet.dstSet = m_descriptorSets[i];
-		WriteDescriptorSet.dstBinding = 0;
-		WriteDescriptorSet.dstArrayElement = 0;
-		WriteDescriptorSet.descriptorCount = 1;
-		WriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		WriteDescriptorSet.pBufferInfo = &BufferInfo1;*/
 
 		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 	}

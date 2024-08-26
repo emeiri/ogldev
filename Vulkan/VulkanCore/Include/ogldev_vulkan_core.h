@@ -57,6 +57,19 @@ struct VulkanTexture {
 };
 
 
+struct SimpleMesh {
+	VkDevice m_device = NULL;
+	VkBuffer m_vb = NULL;
+	VkBuffer m_ib = NULL;
+	int m_numVertices = 0;
+	int m_numIndices = 0;
+	size_t m_vertexBufferSize = 0;
+	size_t m_indexBufferSize = 0;
+
+	void Destroy();
+};
+
+
 class VulkanCore {
 
 public:
@@ -92,6 +105,8 @@ public:
 	void CreateTexture(const char* filename, VulkanTexture& Tex);
 	
 	void DestroyTexture(VulkanTexture& Tex);
+
+	SimpleMesh LoadSimpleMesh(const char* pFilename);
 
 private:
 
