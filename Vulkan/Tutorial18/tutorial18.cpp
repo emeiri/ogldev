@@ -26,6 +26,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 #include "ogldev_math_3d.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
@@ -197,11 +200,18 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{
-		static float foo = 0.0f;
-		Matrix4f Rotate;
-		Rotate.InitRotateTransform(0.0f, 0.0f, foo);
-		foo += 0.001f;
-		m_uniformBuffers[ImageIndex].Update(&Rotate.m[0][0], sizeof(Matrix4f));
+		glm::mat4 Translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.5f, -5.0f));
+		glm::mat4 Rotation = glm::rotate(glm::mat4(1.f), glm::pi<float>(), glm::vec3(1, 0, 0));
+		glm::mat4 World = glm::rotate(Translation * Rotation, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+		
+		int Width, Height;
+		glfwGetFramebufferSize(m_pWindow, &Width, &Height);
+		float ar = (float)Width / (float)Height;
+
+		glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
+		glm::mat4 WVP = Proj * World;
+
+		m_uniformBuffers[ImageIndex].Update(&WVP, sizeof(glm::mat4));
 	}
 
 	GLFWwindow* m_pWindow = NULL;
