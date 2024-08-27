@@ -65,6 +65,13 @@ struct SimpleMesh {
 	void Destroy();
 };
 
+enum RenderPassType {
+	RenderPassTypeFirst = 0x01,
+	RenderPassTypeLast = 0x02,
+	RenderPassTypeOffscreen = 0x04,
+	RenderPassTypeOffscreenInternal = 0x08,
+};
+
 
 class VulkanCore {
 
@@ -76,9 +83,9 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow);
 
-	VkRenderPass CreateSimpleRenderPass(bool DepthEnabled);
+	VkRenderPass CreateSimpleRenderPass(bool DepthEnabled, bool ClearColor, bool ClearDepth, RenderPassType RenderPassType) const;
 
-	std::vector<VkFramebuffer> CreateFramebuffer(VkRenderPass RenderPass);
+	std::vector<VkFramebuffer> CreateFramebuffers(VkRenderPass RenderPass) const;
 
 	void DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers);
 
@@ -103,6 +110,10 @@ public:
 	void DestroyTexture(VulkanTexture& Tex);
 
 	SimpleMesh LoadSimpleMesh(const char* pFilename);
+
+	const VulkanTexture& GetDepthTexture() const { return m_depthTexture; }
+
+	void GetFramebufferSize(int& Width, int& Height) const;
 
 private:
 

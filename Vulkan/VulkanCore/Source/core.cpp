@@ -83,9 +83,8 @@ static VkFormat FindDepthFormat(const PhysicalDevice& PhyiscalDevice)
 	std::vector<VkFormat> FormatCandidates = { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT };
 
 	return FindSupportedFormat(PhyiscalDevice, FormatCandidates,
-		VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		                       VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }
-
 
 
 VulkanCore::VulkanCore()
@@ -503,18 +502,23 @@ void VulkanCore::FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs)
 }
 
 
-VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled)
+VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled, bool ClearColor, bool ClearDepth, RenderPassType RenderPassType) const
 {
+	bool OffscreenInt = RenderPassType & RenderPassTypeOffscreenInternal;
+	bool First = RenderPassType & RenderPassTypeFirst;
+	bool Last = RenderPassType & RenderPassTypeLast;
+
 	VkAttachmentDescription ColorAttachDesc = {
 		.flags = 0,
 		.format = m_swapChainSurfaceFormat.format,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.loadOp = OffscreenInt ? VK_ATTACHMENT_LOAD_OP_LOAD : (ClearColor ?
+								 VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD),
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+		.initialLayout = First ? VK_IMAGE_LAYOUT_UNDEFINED : (OffscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL),
+		.finalLayout = Last ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	};
 
 	VkAttachmentReference ColorAttachRef = {
@@ -528,13 +532,16 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled)
 	if (DepthEnabled) {
 		DepthAttachDesc = {
 			.flags = 0,
-			.format = FindDepthFormat(m_physDevices.Selected()),
+			.format = DepthEnabled ? FindDepthFormat(m_physDevices.Selected()) : VK_FORMAT_D32_SFLOAT,
 			.samples = VK_SAMPLE_COUNT_1_BIT,
-			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.loadOp = OffscreenInt ? VK_ATTACHMENT_LOAD_OP_LOAD : 
+									 (ClearDepth ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD),
 			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 			.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 			.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-			.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.initialLayout = ClearDepth ? VK_IMAGE_LAYOUT_UNDEFINED : 
+							              (OffscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : 
+														  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL),
 			.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 		};
 
@@ -543,6 +550,10 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled)
 			.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 		};
 	}	
+
+	if (RenderPassType & RenderPassTypeOffscreen) {
+		ColorAttachDesc.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	}
 
 	VkSubpassDependency Dependencies = {
 		.srcSubpass = VK_SUBPASS_EXTERNAL,
@@ -573,7 +584,7 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled)
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.pNext = NULL,
 		.flags = 0,
-		.attachmentCount = (u32)Attachments.size(),
+		.attachmentCount = (u32)(DepthEnabled ? 2 : 1),
 		.pAttachments = Attachments.data(),
 		.subpassCount = 1,
 		.pSubpasses = &SubpassDesc,
@@ -592,13 +603,13 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled)
 }
 
 
-std::vector<VkFramebuffer> VulkanCore::CreateFramebuffer(VkRenderPass RenderPass)
+std::vector<VkFramebuffer> VulkanCore::CreateFramebuffers(VkRenderPass RenderPass) const
 {
 	std::vector<VkFramebuffer> frameBuffers;
 	frameBuffers.resize(m_images.size());
 
 	int WindowWidth, WindowHeight;
-	glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
+	GetFramebufferSize(WindowWidth, WindowHeight);
 
 	VkResult res;
 
@@ -1152,6 +1163,12 @@ SimpleMesh VulkanCore::LoadSimpleMesh(const char* pFilename)
 	Mesh.m_ib = CreateVertexBuffer(Indices.data(), Mesh.m_indexBufferSize);
 
 	return Mesh;
+}
+
+
+void VulkanCore::GetFramebufferSize(int& Width, int& Height) const
+{
+	glfwGetWindowSize(m_pWindow, &Width, &Height);
 }
 
 

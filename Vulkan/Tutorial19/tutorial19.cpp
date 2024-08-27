@@ -81,7 +81,7 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		m_renderPass = m_vkCore.CreateSimpleRenderPass(true);
+		
 		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
 
 		CreateShaders();
@@ -232,13 +232,9 @@ private:
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
-	VkRenderPass m_renderPass;
-	std::vector<VkFramebuffer> m_frameBuffers;
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
-	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	OgldevVK::SimpleMesh m_mesh;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 	OgldevVK::VulkanTexture m_texture;	
 };
 
