@@ -31,6 +31,7 @@
 #include "anchored_spring_force_generator.h"
 #include "bungee_spring_force_generator.h"
 #include "buoyancy_force_generator.h"
+#include "fake_spring_force_generator.h"
 
 namespace OgldevPhysics
 {

@@ -146,7 +146,7 @@ public:
         Box2.pParticle->SetMass(2.0f);
 
     //    Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
-        m_springForceGenerator.Init(Box1.pParticle, 1.0f, 2.0f);
+        m_springForceGenerator.Init(Box1.pParticle, 1.0f, 0.99f);
 
         m_physicsSystem.GetRegistry().Add(Box1.pParticle, &m_springForceGenerator);
 
@@ -163,11 +163,12 @@ public:
         PhysicsSceneObject Water = LoadAndAddModel("../Content/ground.obj");
         Water.pParticle->SetPosition(0.0f, 10.0f, 0.0f);
         PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
-        Box.pParticle->SetMass(2.0f);
-        Box.pParticle->SetPosition(0.0f, 10.0f, 0.0f);
+        Box.pParticle->SetMass(0.0001f);
+        Box.pParticle->SetPosition(0.0f, 9.5f, 0.0f);
 
         m_buoyancyForceGenerator.Init(5.0f, 1.0f, 10.0f, 0.1f);
-        m_physicsSystem.GetRegistry().Add(Box.pParticle, &m_buoyancyForceGenerator);
+        m_fakeSpringForceGenerator.Init(&Water.pParticle->GetPosition(), 0.000001f, 0.01f);
+        m_physicsSystem.GetRegistry().Add(Box.pParticle, &m_fakeSpringForceGenerator);
     }
 
 
@@ -436,6 +437,7 @@ private:
     OgldevPhysics::DragForceGenerator m_dragForceGenerator;
     OgldevPhysics::SpringForceGenerator m_springForceGenerator;
     OgldevPhysics::BuoyancyForceGenerator m_buoyancyForceGenerator;
+    OgldevPhysics::FakeSpringForceGenerator m_fakeSpringForceGenerator;
 };
 
 

@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\Physics\Include\bungee_spring_force_generator.h" />
     <ClInclude Include="..\..\..\Physics\Include\buoyancy_force_generator.h" />
     <ClInclude Include="..\..\..\Physics\Include\drag_force_generator.h" />
+    <ClInclude Include="..\..\..\Physics\Include\fake_spring_force_generator.h" />
     <ClInclude Include="..\..\..\Physics\Include\firework.h" />
     <ClInclude Include="..\..\..\Physics\Include\force_generator.h" />
     <ClInclude Include="..\..\..\Physics\Include\gravity_force_generator.h" />
@@ -35,6 +36,7 @@
     <ClCompile Include="..\..\..\Physics\Source\bungee_spring_force.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\buoyancy_force.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\drag_force.cpp" />
+    <ClCompile Include="..\..\..\Physics\Source\fake_spring_force.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\firework.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\force.cpp" />
     <ClCompile Include="..\..\..\Physics\Source\gravity_force.cpp" />
