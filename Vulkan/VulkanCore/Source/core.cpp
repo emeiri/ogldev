@@ -107,6 +107,8 @@ VulkanCore::~VulkanCore()
 		vkDestroyImageView(m_device, m_imageViews[i], NULL);
 	}
 
+	DestroyTexture(m_depthTexture);
+
 	vkDestroySwapchainKHR(m_device, m_swapChain, NULL);
 
 	vkDestroyDevice(m_device, NULL);
@@ -631,7 +633,7 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 }
 
 
-VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
 	VkBuffer StagingVB;
 	VkDeviceMemory StagingVBMem;
@@ -643,22 +645,22 @@ VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 	memcpy(MappedMemAddr, pVertices, Size);
 	vkUnmapMemory(m_device, StagingVBMem);
 
-	VkBuffer vb;
-	VkDeviceMemory vbMem;
+	BufferAndMemory VB;
 	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+		                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VB.m_buffer, VB.m_mem);
 
-	CopyBuffer(vb, StagingVB, Size);
+	CopyBuffer(VB.m_buffer, StagingVB, Size);
 
 	vkDestroyBuffer(m_device, StagingVB, NULL);
+	vkFreeMemory(m_device, StagingVBMem, NULL);
 
-	return vb;
+	return VB;
 }
 
 
 BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
 {
-	BufferAndMemory Buffer(m_device);
+	BufferAndMemory Buffer;
 
 	Buffer.m_allocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 		                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Buffer.m_buffer, Buffer.m_mem);
@@ -1156,13 +1158,8 @@ SimpleMesh VulkanCore::LoadSimpleMesh(const char* pFilename)
 void SimpleMesh::Destroy()
 {
 	if (m_device) {
-		if (m_vb) {
-			vkDestroyBuffer(m_device, m_vb, NULL);
-		}
-
-		if (m_ib) {
-			vkDestroyBuffer(m_device, m_ib, NULL);
-		}
+		m_vb.Destroy(m_device);
+		m_ib.Destroy(m_device);
 	} else {
 		printf("SimpleMesh destroyed but no device\n");
 		return;
@@ -1170,32 +1167,24 @@ void SimpleMesh::Destroy()
 }
 
 
-void BufferAndMemory::Update(const void* pData, size_t Size)
+void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
 {
-	if (!m_device) {
-		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
-	}
-
 	void* pMem = NULL;
-	VkResult res = vkMapMemory(m_device, m_mem, 0, Size, 0, &pMem);
+	VkResult res = vkMapMemory(Device, m_mem, 0, Size, 0, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory");
 	memcpy(pMem, pData, Size);
-	vkUnmapMemory(m_device, m_mem);
+	vkUnmapMemory(Device, m_mem);
 }
 
 
-void BufferAndMemory::Destroy()
+void BufferAndMemory::Destroy(VkDevice Device)
 {
-	if (!m_device) {
-		OGLDEV_ERROR("Buffer has not been initialized with a device pointer");
-	}
-
 	if (m_mem) {
-		vkFreeMemory(m_device, m_mem, NULL);
+		vkFreeMemory(Device, m_mem, NULL);
 	}
 
 	if (m_buffer) {
-		vkDestroyBuffer(m_device, m_buffer, NULL);
+		vkDestroyBuffer(Device, m_buffer, NULL);
 	}
 }
 

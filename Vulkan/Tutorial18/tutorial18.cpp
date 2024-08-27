@@ -68,7 +68,7 @@ public:
 		m_mesh.Destroy();
 
 		for (int i = 0; i < m_uniformBuffers.size(); i++) {
-			m_uniformBuffers[i].Destroy();
+			m_uniformBuffers[i].Destroy(m_device);
 		}
 
 		delete m_pPipeline;
@@ -148,8 +148,8 @@ private:
 	void CreatePipeline()
 	{
 		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, 
-													 m_mesh.m_vb, m_mesh.m_vertexBufferSize, 
-													 m_mesh.m_ib, m_mesh.m_indexBufferSize, 
+													 m_mesh.m_vb.m_buffer, m_mesh.m_vertexBufferSize, 
+													 m_mesh.m_ib.m_buffer, m_mesh.m_indexBufferSize, 
 													 m_numImages, m_uniformBuffers, sizeof(UniformData), &m_texture);
 	}
 
@@ -223,7 +223,7 @@ private:
 		glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
 		glm::mat4 WVP = Proj * World;
 
-		m_uniformBuffers[ImageIndex].Update(&WVP, sizeof(glm::mat4));
+		m_uniformBuffers[ImageIndex].Update(m_device, &WVP, sizeof(glm::mat4));
 	}
 
 	GLFWwindow* m_pWindow = NULL;

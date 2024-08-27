@@ -61,10 +61,10 @@ public:
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
 		vkDestroyRenderPass(m_device, m_renderPass, NULL);
-		vkDestroyBuffer(m_device, m_vb, NULL);
+		m_vb.Destroy(m_device);
 
 		for (int i = 0; i < m_uniformBuffers.size(); i++) {
-			m_uniformBuffers[i].Destroy();
+			m_uniformBuffers[i].Destroy(m_device);
 		}
 	}
 
@@ -75,7 +75,7 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		m_renderPass = m_vkCore.CreateSimpleRenderPass();
+		m_renderPass = m_vkCore.CreateSimpleRenderPass(false);
 		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
 
 		CreateShaders();
@@ -150,8 +150,8 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, m_vertexBufferSize, 
-			                                         m_numImages, m_uniformBuffers, sizeof(UniformData), NULL);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb.m_buffer, m_vertexBufferSize, 
+			                                         NULL, 0, m_numImages, m_uniformBuffers, sizeof(UniformData), NULL);
 	}
 
 
@@ -206,7 +206,7 @@ private:
 		Matrix4f Rotate;
 		Rotate.InitRotateTransform(0.0f, 0.0f, foo);
 		foo += 0.001f;
-		m_uniformBuffers[ImageIndex].Update(&Rotate.m[0][0], sizeof(Matrix4f));
+		m_uniformBuffers[ImageIndex].Update(m_device, &Rotate.m[0][0], sizeof(Matrix4f));
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -220,7 +220,7 @@ private:
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
-	VkBuffer m_vb;
+	OgldevVK::BufferAndMemory m_vb;
 	size_t m_vertexBufferSize = 0;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 };

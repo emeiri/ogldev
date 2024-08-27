@@ -34,18 +34,14 @@ namespace OgldevVK {
 class BufferAndMemory {
 public:
 	BufferAndMemory() {}
-	BufferAndMemory(VkDevice Device) : m_device(Device) {}
 
 	VkBuffer m_buffer = NULL;
 	VkDeviceMemory m_mem = NULL;
 	VkDeviceSize m_allocationSize = 0;
 
-	void Update(const void* pData, size_t Size);
+	void Update(VkDevice Device, const void* pData, size_t Size);
 
-	void Destroy();
-
-private:
-	VkDevice m_device = NULL;
+	void Destroy(VkDevice Device);
 };
 
 
@@ -59,8 +55,8 @@ struct VulkanTexture {
 
 struct SimpleMesh {
 	VkDevice m_device = NULL;
-	VkBuffer m_vb = NULL;
-	VkBuffer m_ib = NULL;
+	BufferAndMemory m_vb;
+	BufferAndMemory m_ib;
 	int m_numVertices = 0;
 	int m_numIndices = 0;
 	size_t m_vertexBufferSize = 0;
@@ -98,7 +94,7 @@ public:
 
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
-	VkBuffer CreateVertexBuffer(const void* pVertices, size_t Size);
+	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
 	
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t DataSize);
 

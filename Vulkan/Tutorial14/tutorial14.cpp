@@ -69,7 +69,7 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		m_renderPass = m_vkCore.CreateSimpleRenderPass();
+		m_renderPass = m_vkCore.CreateSimpleRenderPass(false);
 		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
 		CreateShaders();
 		CreatePipeline();
@@ -110,7 +110,7 @@ private:
 		int UniformDataSize = 0;
 		OgldevVK::VulkanTexture* pTex = NULL;
 
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, 0, m_numImages,
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, 0, NULL, 0, m_numImages,
 													 UniformBuffers, UniformDataSize, pTex);
 	}
 
