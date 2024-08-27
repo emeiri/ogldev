@@ -17,33 +17,24 @@
 */
 
 #include "ogldev_vulkan_core.h"
-#include "ogldev_vulkan_clear.h"
+#include "ogldev_vulkan_finish.h"
 
 #pragma once
 
 namespace OgldevVK {
 
-ClearRenderer::ClearRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)											   
+FinishRenderer::FinishRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)											   
 {
-	m_clearDepth = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
+	bool DepthEnabled = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
 
-	m_renderPass = m_vkCore.CreateSimpleRenderPass(m_clearDepth, true, m_clearDepth, RenderPassTypeFirst);
+	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeFirst);
 
 	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 }
 
 
-void ClearRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
+void FinishRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 {
-	VkClearValue ClearValues[2] = {
-		VkClearValue {.
-			color = { 1.0f, 1.0f, 1.0f, 1.0f } 
-		},
-		VkClearValue {
-			.depthStencil = { 1.0f, 0 } 
-		}
-	};
-
 	VkRect2D RenderArea = {
 		.offset = { 0, 0 },
 		.extent = {
@@ -57,8 +48,8 @@ void ClearRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 		.renderPass = m_renderPass,
 		.framebuffer = m_frameBuffers[Image],
 		.renderArea = RenderArea,
-		.clearValueCount = (u32)(m_clearDepth ? 2 : 1),
-		.pClearValues = &ClearValues[0]
+		.clearValueCount = 0,
+		.pClearValues = NULL
 	};
 
 	vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);

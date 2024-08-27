@@ -29,18 +29,19 @@ class GraphicsPipeline {
 public:
 
 	GraphicsPipeline(VkDevice Device,
-		GLFWwindow* pWindow,
-		VkRenderPass RenderPass,
-		VkShaderModule vs,
-		VkShaderModule fs,
-		VkBuffer VB,
-		size_t VBSize,
-		VkBuffer IB,
-		size_t IBSize,
-		int NumImages,
-		std::vector<BufferAndMemory>& UniformBuffers,
-		int UniformDataSize,
-		const VulkanTexture* pTex);
+					int WindowWidth,
+					int WindowHeight,
+					VkRenderPass RenderPass,
+					VkShaderModule vs,
+					VkShaderModule fs,
+					VkBuffer VB,
+					size_t VBSize,
+					VkBuffer IB,
+					size_t IBSize,
+					int NumImages,
+					std::vector<BufferAndMemory>& UniformBuffers,
+					int UniformDataSize,
+					const VulkanTexture* pTex);
 
 	~GraphicsPipeline();
 

@@ -26,7 +26,8 @@
 namespace OgldevVK {
 
 GraphicsPipeline::GraphicsPipeline(VkDevice Device,
-								   GLFWwindow* pWindow,
+								   int WindowWidth, 
+								   int WindowHeight,
 								   VkRenderPass RenderPass,
 								   VkShaderModule vs,
 								   VkShaderModule fs,
@@ -72,9 +73,6 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
 		.primitiveRestartEnable = VK_FALSE
 	};
-
-	int WindowWidth, WindowHeight;
-	glfwGetWindowSize(pWindow, &WindowWidth, &WindowHeight);
 
 	VkViewport VP = {
 		.x = 0.0f,

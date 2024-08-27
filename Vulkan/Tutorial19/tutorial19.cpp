@@ -131,14 +131,6 @@ private:
 	}
 
 
-	void CreateShaders()
-	{
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
-
-		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
-	}
-
-	
 	void CreateTexture()
 	{
 		m_vkCore.CreateTexture("../../Content/bricks.jpg", m_texture);
@@ -239,7 +231,7 @@ private:
 };
 
 
-#define APP_NAME "Tutorial 18"
+#define APP_NAME "Tutorial 19"
 
 int main(int argc, char* argv[])
 {

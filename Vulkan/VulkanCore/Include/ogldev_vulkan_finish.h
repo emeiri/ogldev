@@ -16,43 +16,18 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 #include "ogldev_vulkan_renderer.h"
 
 namespace OgldevVK {
 
-VulkanRenderer::VulkanRenderer(VulkanCore& vkCore) : m_vkCore(vkCore)
-{
+class FinishRenderer : public VulkanRenderer {
+public:
+	FinishRenderer(VulkanCore& vkCore);
 
-}
-
-VulkanRenderer::~VulkanRenderer()
-{
-
-}
-
-
-void VulkanRenderer::BeginRenderPass(VkCommandBuffer CmdBuf, int Image)
-{
-	VkRect2D RenderArea = {
-		.offset = { 0, 0 },
-		.extent = {
-			.width = m_framebufferWidth, 
-			.height = m_framebufferHeight 
-		}
-	};
-
-	VkRenderPassBeginInfo RenderPassBeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-		.pNext = nullptr,
-		.renderPass = m_renderPass,
-		.framebuffer = m_frameBuffers[Image],
-		.renderArea = RenderArea
-	};
-
-	vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-	m_pPipeline->Bind(CmdBuf, Image);
-}
+	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
+};
 
 
 }

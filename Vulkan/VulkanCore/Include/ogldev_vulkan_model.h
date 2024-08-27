@@ -18,35 +18,32 @@
 
 #pragma once
 
-#include "ogldev_vulkan_core.h"
-#include "ogldev_vulkan_graphics_pipeline.h"
+#include "ogldev_vulkan_renderer.h"
 
 namespace OgldevVK {
 
-class VulkanRenderer
-{
+class ModelRenderer : public VulkanRenderer {
 public:
-	explicit VulkanRenderer(VulkanCore& vkCore);
+	ModelRenderer(VulkanCore& vkCore, const char* pModelFilename, const char* pTextureFilename, size_t UniformDataSize);
 
-	virtual ~VulkanRenderer();
-	virtual void FillCommandBuffer(VkCommandBuffer commandBuffer, int Image) = 0;
+	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
 
-	//inline VulkanImage getDepthTexture() const { return depthTexture_; }
+	void UpdateUniformBuffers(int Image, const void* pData, size_t Size);
 
-protected:
+private:
 
-	void BeginRenderPass(VkCommandBuffer commandBuffer, int Image);
-	//bool CreateUniformBuffers(int UniformDataSize);
+	void CreateShaders();
 
-	VulkanCore& m_vkCore;
-
-	u32 m_framebufferWidth  = 0;
-	u32 m_framebufferHeight = 0;
-
-	VkRenderPass m_renderPass = NULL;
-	std::vector<VkFramebuffer> m_frameBuffers;
-	GraphicsPipeline* m_pPipeline = NULL;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
+	size_t m_vertexBufferSize = 0;
+	size_t m_indexBufferSize = 0;
+	BufferAndMemory m_vb;
+	BufferAndMemory m_ib;
+	int m_numVertices = 0;
+	int m_numIndices = 0;
+	VulkanTexture m_texture;
+	VkShaderModule m_vs = NULL;
+	VkShaderModule m_fs = NULL;
 };
+
 
 }
