@@ -27,7 +27,7 @@ FinishRenderer::FinishRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 {
 	bool DepthEnabled = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
 
-	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeFirst);
+	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeLast);
 
 	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 }
@@ -38,8 +38,8 @@ void FinishRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 	VkRect2D RenderArea = {
 		.offset = { 0, 0 },
 		.extent = {
-			.width = m_framebufferWidth, 
-			.height = m_framebufferHeight 
+			.width = (u32)m_framebufferWidth, 
+			.height = (u32)m_framebufferHeight
 		}
 	};
 

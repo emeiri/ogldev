@@ -37,7 +37,7 @@ void ClearRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 {
 	VkClearValue ClearValues[2] = {
 		VkClearValue {.
-			color = { 1.0f, 1.0f, 1.0f, 1.0f } 
+			color = { 0.0f, 1.0f, 0.0f, 1.0f } 
 		},
 		VkClearValue {
 			.depthStencil = { 1.0f, 0 } 
@@ -47,8 +47,8 @@ void ClearRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 	VkRect2D RenderArea = {
 		.offset = { 0, 0 },
 		.extent = {
-			.width = m_framebufferWidth, 
-			.height = m_framebufferHeight 
+			.width = (u32)m_framebufferWidth, 
+			.height = (u32)m_framebufferHeight
 		}
 	};
 

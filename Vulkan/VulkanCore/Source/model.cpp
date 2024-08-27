@@ -49,17 +49,24 @@ ModelRenderer::ModelRenderer(VulkanCore& vkCore, const char* pModelFilename, con
 
 	int NumImages = vkCore.GetNumImages();
 
-	m_pPipeline = new OgldevVK::GraphicsPipeline(vkCore.GetDevice(), m_framebufferWidth, m_framebufferHeight, m_renderPass, 
+	m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_framebufferWidth, m_framebufferHeight, m_renderPass, 
 												 m_vs, m_fs, m_vb.m_buffer, m_vertexBufferSize, m_ib.m_buffer, m_indexBufferSize,
 												 NumImages, m_uniformBuffers, (int)UniformDataSize, &m_texture);
+}
+
+ModelRenderer::~ModelRenderer()
+{
+	vkDestroyShaderModule(m_device, m_vs, NULL);
+	vkDestroyShaderModule(m_device, m_fs, NULL);
+	m_vkCore.DestroyTexture(m_texture);
 }
 
 
 void ModelRenderer::CreateShaders()
 {
-	m_vs = CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.vert");
+	m_vs = CreateShaderModuleFromText(m_device, "test.vert");
 
-	m_fs = CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.frag");
+	m_fs = CreateShaderModuleFromText(m_device, "test.frag");
 }
 
 
@@ -75,7 +82,7 @@ void ModelRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 
 void ModelRenderer::UpdateUniformBuffers(int Image, const void* pData, size_t Size)
 {
-	m_uniformBuffers[Image].Update(m_vkCore.GetDevice(), pData, Size);
+	m_uniformBuffers[Image].Update(m_device, pData, Size);
 }
 
 }

@@ -39,9 +39,10 @@ protected:
 	//bool CreateUniformBuffers(int UniformDataSize);
 
 	VulkanCore& m_vkCore;
+	VkDevice m_device = NULL;
 
-	u32 m_framebufferWidth  = 0;
-	u32 m_framebufferHeight = 0;
+	int m_framebufferWidth  = 0;
+	int m_framebufferHeight = 0;
 
 	VkRenderPass m_renderPass = NULL;
 	std::vector<VkFramebuffer> m_frameBuffers;

@@ -26,6 +26,8 @@ class ModelRenderer : public VulkanRenderer {
 public:
 	ModelRenderer(VulkanCore& vkCore, const char* pModelFilename, const char* pTextureFilename, size_t UniformDataSize);
 
+	~ModelRenderer();
+
 	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
 
 	void UpdateUniformBuffers(int Image, const void* pData, size_t Size);

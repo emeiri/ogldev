@@ -22,12 +22,22 @@ namespace OgldevVK {
 
 VulkanRenderer::VulkanRenderer(VulkanCore& vkCore) : m_vkCore(vkCore)
 {
+	m_device = vkCore.GetDevice();
 
+	vkCore.GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
 }
 
 VulkanRenderer::~VulkanRenderer()
 {
+	m_vkCore.DestroyFramebuffers(m_frameBuffers);
 
+	vkDestroyRenderPass(m_device, m_renderPass, NULL);
+
+	for (int i = 0; i < m_uniformBuffers.size(); i++) {
+		m_uniformBuffers[i].Destroy(m_device);
+	}
+
+	delete m_pPipeline;
 }
 
 
@@ -36,8 +46,8 @@ void VulkanRenderer::BeginRenderPass(VkCommandBuffer CmdBuf, int Image)
 	VkRect2D RenderArea = {
 		.offset = { 0, 0 },
 		.extent = {
-			.width = m_framebufferWidth, 
-			.height = m_framebufferHeight 
+			.width = (u32)m_framebufferWidth,
+			.height = (u32)m_framebufferHeight
 		}
 	};
 
