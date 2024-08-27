@@ -65,35 +65,17 @@ void ModelRenderer::CreateShaders()
 
 void ModelRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 {
-	VkClearValue ClearValues[2] = {
-		VkClearValue {.
-			color = { 1.0f, 1.0f, 1.0f, 1.0f } 
-		},
-		VkClearValue {
-			.depthStencil = { 1.0f, 0 } 
-		}
-	};
+	BeginRenderPass(CmdBuf, Image);
 
-	VkRect2D RenderArea = {
-		.offset = { 0, 0 },
-		.extent = {
-			.width = m_framebufferWidth, 
-			.height = m_framebufferHeight 
-		}
-	};
+	vkCmdDraw(CmdBuf, m_numIndices, 1, 0, 0);
 
-	VkRenderPassBeginInfo RenderPassBeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-		.renderPass = m_renderPass,
-		.framebuffer = m_frameBuffers[Image],
-		.renderArea = RenderArea,
-		.clearValueCount = 0,
-		.pClearValues = NULL
-	};
-
-	vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	vkCmdEndRenderPass(CmdBuf);
 }
 
+
+void ModelRenderer::UpdateUniformBuffers(int Image, const void* pData, size_t Size)
+{
+	m_uniformBuffers[Image].Update(m_vkCore.GetDevice(), pData, Size);
+}
 
 }
