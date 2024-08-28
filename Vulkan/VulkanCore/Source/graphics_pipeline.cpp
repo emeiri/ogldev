@@ -16,7 +16,7 @@
 */
 
 #include <stdio.h>
-#include <array>
+#include <vector>
 
 #include "ogldev_types.h"
 #include "ogldev_util.h"
@@ -255,9 +255,14 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VB, si
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
 
-	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
-	LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
-	
+	if (VB) {
+		LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	}
+
+	if (IB) {
+		LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
+	}
+		
 	if (pTex) { 
 		LayoutBindings.push_back(FragmentShaderLayoutBinding);
 	}
@@ -313,44 +318,61 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VB, si
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		};
 
-		std::array<VkWriteDescriptorSet, 4> WriteDescriptorSet = {
-			VkWriteDescriptorSet {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = m_descriptorSets[i],
-				.dstBinding = 0,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pBufferInfo = &BufferInfo_Uniform
-			},
-			VkWriteDescriptorSet {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = m_descriptorSets[i],
-				.dstBinding = 1,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_VB
-			},
-			VkWriteDescriptorSet {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = m_descriptorSets[i],
-				.dstBinding = 2,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_IB
-			},
-			VkWriteDescriptorSet {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = m_descriptorSets[i],
-				.dstBinding = 3,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = &ImageInfo
-			},
+		std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
+		
+		VkWriteDescriptorSet UniformDesc = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = m_descriptorSets[i],
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &BufferInfo_Uniform
 		};
+			
+		VkWriteDescriptorSet VBDesc = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = m_descriptorSets[i],
+			.dstBinding = 1,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pBufferInfo = &BufferInfo_VB
+		};
+
+		VkWriteDescriptorSet IBDesc = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = m_descriptorSets[i],
+			.dstBinding = 2,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pBufferInfo = &BufferInfo_IB
+		};
+
+		VkWriteDescriptorSet TexDesc = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = m_descriptorSets[i],
+			.dstBinding = 3,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = &ImageInfo
+		};
+
+		WriteDescriptorSet.push_back(UniformDesc);
+
+		if (VB) {
+			WriteDescriptorSet.push_back(VBDesc);
+		}
+
+		if (IB) {
+			WriteDescriptorSet.push_back(IBDesc);
+		}
+
+		if (pTex) {
+			WriteDescriptorSet.push_back(TexDesc);
+		}
 
 		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 	}

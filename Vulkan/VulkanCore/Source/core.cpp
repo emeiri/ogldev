@@ -653,24 +653,30 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 
 BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
-	VkBuffer StagingVB;
-	VkDeviceMemory StagingVBMem;
-	VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
-
-	void* MappedMemAddr = NULL;
-	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
-	memcpy(MappedMemAddr, pVertices, Size);
-	vkUnmapMemory(m_device, StagingVBMem);
-
 	BufferAndMemory VB;
-	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VB.m_buffer, VB.m_mem);
 
-	CopyBuffer(VB.m_buffer, StagingVB, Size);
+	if (pVertices) {
+		VkBuffer StagingVB;
+		VkDeviceMemory StagingVBMem;
+		VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
 
-	vkDestroyBuffer(m_device, StagingVB, NULL);
-	vkFreeMemory(m_device, StagingVBMem, NULL);
+		void* MappedMemAddr = NULL;
+		VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
+		memcpy(MappedMemAddr, pVertices, Size);
+		vkUnmapMemory(m_device, StagingVBMem);
+
+		AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VB.m_buffer, VB.m_mem);
+
+		CopyBuffer(VB.m_buffer, StagingVB, Size);
+
+		vkDestroyBuffer(m_device, StagingVB, NULL);
+		vkFreeMemory(m_device, StagingVBMem, NULL);
+	} else {
+		VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VB.m_buffer, VB.m_mem);
+	}
 
 	return VB;
 }
@@ -844,7 +850,8 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 }
 
 
-void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize)
+void VulkanCore::UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, 
+	                              const void* pData, const size_t DataSize)
 {
 	void* pMappedData = NULL;
 

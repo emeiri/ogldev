@@ -116,6 +116,8 @@ public:
 
 	void GetFramebufferSize(int& Width, int& Height) const;
 
+	void UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize);
+
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -131,9 +133,7 @@ private:
 	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
 	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
-					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-
-	void UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize);
+					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);	
 
 	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
 									VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags Flags);
