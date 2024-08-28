@@ -73,6 +73,8 @@ public:
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
 		m_pWindow = pWindow;
+		glfwGetFramebufferSize(m_pWindow, &m_windowWidth, &m_windowHeight);
+
 		m_vkCore.Init(pAppName, pWindow);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
@@ -84,7 +86,7 @@ public:
 		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
 
 		CreateCommandBuffers();
-		RecordCommandBuffers();
+		RecordCommandBuffers();		
 	}
 
 	void RenderScene()
@@ -137,9 +139,7 @@ private:
 		glm::mat4 Rotation = glm::rotate(glm::mat4(1.f), glm::pi<float>(), glm::vec3(1, 0, 0));
 		glm::mat4 World = glm::rotate(Translation * Rotation, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 		
-		int Width, Height;
-		glfwGetFramebufferSize(m_pWindow, &Width, &Height);
-		float ar = (float)Width / (float)Height;
+		float ar = (float)m_windowWidth / (float)m_windowHeight;
 
 		glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
 		glm::mat4 WVP = Proj * World;
@@ -156,6 +156,8 @@ private:
 	OgldevVK::ClearRenderer* m_pClearRenderer;
 	OgldevVK::FinishRenderer* m_pFinishRenderer;
 	OgldevVK::ModelRenderer* m_pModelRenderer;
+	int m_windowWidth = 0;
+	int m_windowHeight = 0;
 };
 
 
