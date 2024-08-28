@@ -68,6 +68,10 @@ public:
 	~VulkanApp()
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+
+		delete m_pClearRenderer;
+		delete m_pFinishRenderer;
+		delete m_pModelRenderer;
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -153,9 +157,9 @@ private:
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
-	OgldevVK::ClearRenderer* m_pClearRenderer;
-	OgldevVK::FinishRenderer* m_pFinishRenderer;
-	OgldevVK::ModelRenderer* m_pModelRenderer;
+	OgldevVK::ClearRenderer* m_pClearRenderer = NULL;
+	OgldevVK::FinishRenderer* m_pFinishRenderer = NULL;
+	OgldevVK::ModelRenderer* m_pModelRenderer = NULL;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
 };
