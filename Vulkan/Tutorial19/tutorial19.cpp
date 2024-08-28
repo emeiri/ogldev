@@ -78,19 +78,18 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		
-		CreateCommandBuffers();
-
 		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/box.obj", "../../Content/bricks.jpg",
 													   sizeof(UniformData));
 		m_pClearRenderer = new OgldevVK::ClearRenderer(m_vkCore);
 		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
+
+		CreateCommandBuffers();
+		RecordCommandBuffers();
 	}
 
 	void RenderScene()
 	{
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
-
-		ComposeFrame(ImageIndex);
 
 		UpdateUniformBuffers(ImageIndex);
 
@@ -110,6 +109,28 @@ private:
 	}
 
 
+	void RecordCommandBuffers()
+	{
+		for (int i = 0; i < m_numImages; i++) {
+			RecordCommandBuffer(i);
+		}
+	}
+
+
+	void RecordCommandBuffer(int ImageIndex)
+	{
+		VkCommandBuffer CmdBuf = m_cmdBufs[ImageIndex];
+
+		OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+		m_pClearRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		m_pModelRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		m_pFinishRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+
+		CHECK_VK_RESULT(vkEndCommandBuffer(CmdBuf), "vkEndCommandBuffer");
+	}
+
+
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{
 		glm::mat4 Translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.5f, -5.0f));
@@ -124,20 +145,6 @@ private:
 		glm::mat4 WVP = Proj * World;
 
 		m_pModelRenderer->UpdateUniformBuffers(ImageIndex, &WVP[0][0], sizeof(WVP));
-	}
-
-	void ComposeFrame(int ImageIndex)
-	{
-		VkCommandBuffer CmdBuf = m_cmdBufs[ImageIndex];
-
-		OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-		m_pClearRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
-		m_pModelRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
-		m_pFinishRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
-
-		CHECK_VK_RESULT(vkEndCommandBuffer(CmdBuf), "vkEndCommandBuffer");
-
 	}
 
 	GLFWwindow* m_pWindow = NULL;
