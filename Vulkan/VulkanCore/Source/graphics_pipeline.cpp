@@ -314,8 +314,8 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VB, si
 		};
 
 		VkDescriptorImageInfo ImageInfo = {
-			.sampler = pTex->m_sampler,
-			.imageView = pTex->m_view,
+			.sampler = pTex ? pTex->m_sampler : NULL,
+			.imageView = pTex ? pTex->m_view : NULL,
 			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		};
 
