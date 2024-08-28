@@ -102,7 +102,7 @@ public:
 
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
-	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
+	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size, bool HostVisible = false);
 	
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t DataSize);
 

@@ -651,7 +651,7 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 }
 
 
-BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size, bool HostVisible)
 {
 	BufferAndMemory VB;
 
@@ -674,8 +674,13 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 		vkDestroyBuffer(m_device, StagingVB, NULL);
 		vkFreeMemory(m_device, StagingVBMem, NULL);
 	} else {
+		VkMemoryPropertyFlags MemPropFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+		if (HostVisible) {
+			MemPropFlags |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+				 
+		}
 		VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VB.m_buffer, VB.m_mem);
+			                                       MemPropFlags, VB.m_buffer, VB.m_mem);
 	}
 
 	return VB;
