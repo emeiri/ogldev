@@ -28,7 +28,7 @@ ModelRenderer::ModelRenderer(VulkanCore& vkCore, const char* pModelFilename, con
 {
 	bool DepthEnabled = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
 
-	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeFirst);
+	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeDefault);
 
 	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 

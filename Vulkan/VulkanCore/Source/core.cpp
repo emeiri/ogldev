@@ -508,6 +508,13 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled, bool ClearCol
 	bool First = RenderPassType & RenderPassTypeFirst;
 	bool Last = RenderPassType & RenderPassTypeLast;
 
+	VkImageLayout InitialLayout = First ? VK_IMAGE_LAYOUT_UNDEFINED :
+										  (OffscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL :
+											              VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+	printf("Creating a simple render pass\n");
+	printf("Initial layout %x\n", InitialLayout);
+
 	VkAttachmentDescription ColorAttachDesc = {
 		.flags = 0,
 		.format = m_swapChainSurfaceFormat.format,
@@ -517,7 +524,7 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass(bool DepthEnabled, bool ClearCol
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
 		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = First ? VK_IMAGE_LAYOUT_UNDEFINED : (OffscreenInt ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL),
+		.initialLayout = InitialLayout,
 		.finalLayout = Last ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	};
 

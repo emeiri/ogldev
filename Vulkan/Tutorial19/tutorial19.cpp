@@ -123,7 +123,7 @@ private:
 		glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
 		glm::mat4 WVP = Proj * World;
 
-		//m_uniformBuffers[ImageIndex].Update(m_device, &WVP, sizeof(glm::mat4));
+		m_pModelRenderer->UpdateUniformBuffers(ImageIndex, &WVP[0][0], sizeof(WVP));
 	}
 
 	void ComposeFrame(int ImageIndex)
@@ -133,6 +133,7 @@ private:
 		OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 		m_pClearRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		m_pModelRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
 		m_pFinishRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
 
 		CHECK_VK_RESULT(vkEndCommandBuffer(CmdBuf), "vkEndCommandBuffer");

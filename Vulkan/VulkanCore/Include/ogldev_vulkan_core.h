@@ -66,6 +66,7 @@ struct SimpleMesh {
 };
 
 enum RenderPassType {
+	RenderPassTypeDefault = 0x0,
 	RenderPassTypeFirst = 0x01,
 	RenderPassTypeLast = 0x02,
 	RenderPassTypeOffscreen = 0x04,
