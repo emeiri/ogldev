@@ -80,8 +80,8 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		
-		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/box.obj", "../../Content/bricks.jpg",
-													   sizeof(UniformData));
+		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", 
+													   "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
 		m_pClearRenderer = new OgldevVK::ClearRenderer(m_vkCore);
 		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
 
@@ -135,7 +135,7 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{
-		glm::mat4 Translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.5f, -5.0f));
+		glm::mat4 Translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.5f, -2.0f));
 		glm::mat4 Rotation = glm::rotate(glm::mat4(1.f), glm::pi<float>(), glm::vec3(1, 0, 0));
 		glm::mat4 World = glm::rotate(Translation * Rotation, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 		

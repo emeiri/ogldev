@@ -81,8 +81,8 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		m_renderPass = m_vkCore.CreateSimpleRenderPass(true);
-		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
+		m_renderPass = m_vkCore.CreateSimpleRenderPass(true, true, false, OgldevVK::RenderPassTypeDefault);
+		m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 
 		CreateShaders();
 		LoadMesh();
@@ -147,7 +147,10 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, 
+		int WindowWidth, WindowHeight;
+		m_vkCore.GetFramebufferSize(WindowWidth, WindowHeight);
+
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, WindowWidth, WindowHeight, m_renderPass, m_vs, m_fs,
 													 m_mesh.m_vb.m_buffer, m_mesh.m_vertexBufferSize, 
 													 m_mesh.m_ib.m_buffer, m_mesh.m_indexBufferSize, 
 													 m_numImages, m_uniformBuffers, sizeof(UniformData), &m_texture);
