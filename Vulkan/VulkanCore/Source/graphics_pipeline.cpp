@@ -38,7 +38,8 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   int NumImages,
 								   std::vector<BufferAndMemory>& UniformBuffers,
 								   int UniformDataSize,
-								   const VulkanTexture* pTex)
+								   const VulkanTexture* pTex,
+								   VkPrimitiveTopology Topology)
 {
 	m_device = Device;
 	bool DepthEnabled = true;
@@ -70,7 +71,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 
 	VkPipelineInputAssemblyStateCreateInfo PipelineIACreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+		.topology = Topology,
 		.primitiveRestartEnable = VK_FALSE
 	};
 

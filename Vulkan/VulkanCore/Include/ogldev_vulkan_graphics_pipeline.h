@@ -43,7 +43,8 @@ public:
 					int NumImages,
 					std::vector<BufferAndMemory>& UniformBuffers,
 					int UniformDataSize,
-					const VulkanTexture* pTex);
+					const VulkanTexture* pTex,
+					VkPrimitiveTopology Topology);
 
 	~GraphicsPipeline();
 

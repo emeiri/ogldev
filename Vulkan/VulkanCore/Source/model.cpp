@@ -51,7 +51,7 @@ ModelRenderer::ModelRenderer(VulkanCore& vkCore, const char* pModelFilename, con
 
 	m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_framebufferWidth, m_framebufferHeight, m_renderPass, 
 												 m_vs, m_fs, m_vb.m_buffer, m_vertexBufferSize, m_ib.m_buffer, m_indexBufferSize,
-												 NumImages, m_uniformBuffers, (int)UniformDataSize, &m_texture);
+												 NumImages, m_uniformBuffers, (int)UniformDataSize, &m_texture, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 }
 
 ModelRenderer::~ModelRenderer()

@@ -43,7 +43,7 @@ CanvasRenderer::CanvasRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 
 	m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_framebufferWidth, m_framebufferHeight, m_renderPass, 
 												 m_vs, m_fs, m_VBs[0].m_buffer, MaxLinesDataSize, NULL, 0,
-												 NumImages, m_uniformBuffers, (int)UniformDataSize, NULL);
+												 NumImages, m_uniformBuffers, (int)UniformDataSize, NULL, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
 }
 
 CanvasRenderer::~CanvasRenderer()

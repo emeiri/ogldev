@@ -153,7 +153,7 @@ private:
 		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, WindowWidth, WindowHeight, m_renderPass, m_vs, m_fs,
 													 m_mesh.m_vb.m_buffer, m_mesh.m_vertexBufferSize, 
 													 m_mesh.m_ib.m_buffer, m_mesh.m_indexBufferSize, 
-													 m_numImages, m_uniformBuffers, sizeof(UniformData), &m_texture);
+													 m_numImages, m_uniformBuffers, sizeof(UniformData), &m_texture, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 	}
 
 

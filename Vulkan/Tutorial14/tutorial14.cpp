@@ -113,7 +113,7 @@ private:
 		int WindowWidth, WindowHeight;
 		m_vkCore.GetFramebufferSize(WindowWidth, WindowHeight);
 		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, WindowWidth, WindowHeight, m_renderPass, m_vs, m_fs, NULL, 0, NULL, 0, m_numImages,
-													 UniformBuffers, UniformDataSize, pTex);
+													 UniformBuffers, UniformDataSize, pTex, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 	}
 
 
