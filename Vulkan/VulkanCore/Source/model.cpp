@@ -59,6 +59,8 @@ ModelRenderer::~ModelRenderer()
 	vkDestroyShaderModule(m_device, m_vs, NULL);
 	vkDestroyShaderModule(m_device, m_fs, NULL);
 	m_vkCore.DestroyTexture(m_texture);
+	m_vb.Destroy(m_device);
+	m_ib.Destroy(m_device);
 }
 
 
