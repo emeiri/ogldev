@@ -51,17 +51,17 @@ CanvasRenderer::~CanvasRenderer()
 	vkDestroyShaderModule(m_device, m_vs, NULL);
 	vkDestroyShaderModule(m_device, m_fs, NULL);
 
-	for (int i = 0; i < m_VBs.size() ; i++) {
-		m_VBs[i].Destroy(m_device);
-	}
+	//for (int i = 0; i < m_VBs.size() ; i++) {
+		m_VBs[0].Destroy(m_device);
+	//}
 }
 
 
 void CanvasRenderer::CreateShaders()
 {
-	m_vs = CreateShaderModuleFromText(m_device, "test.vert");
+	m_vs = CreateShaderModuleFromText(m_device, "../VulkanCore/Shaders/lines.vert");
 
-	m_fs = CreateShaderModuleFromText(m_device, "test.frag");
+	m_fs = CreateShaderModuleFromText(m_device, "../VulkanCore/Shaders/lines.frag");
 }
 
 
@@ -72,7 +72,7 @@ void CanvasRenderer::CreateVertexBuffers()
 	m_VBs.resize(NumImages);
 
 	for (int i = 0; i < NumImages; i++) {
-		m_VBs[i] = m_vkCore.CreateVertexBuffer(NULL, MaxLinesDataSize);
+		m_VBs[i] = m_vkCore.CreateVertexBuffer(NULL, MaxLinesDataSize, true);
 	}
 }
 
@@ -89,7 +89,7 @@ void CanvasRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 }
 
 
-void CanvasRenderer::UpdateUniformBuffer(const glm::mat4& WVP, float Time, int Image)
+void CanvasRenderer::UpdateUniformBuffer(int Image, const glm::mat4& WVP, float Time)
 {
 	UniformBuffer UBO = {
 		.WVP = WVP,
@@ -105,9 +105,45 @@ void CanvasRenderer::UpdateBuffer(int Image)
 	if (m_lines.size() > 0) {
 		VkDeviceSize BufferSize = m_lines.size() * sizeof(VertexData);
 
-		m_vkCore.UploadBufferData(m_VBs[Image].m_mem, 0, m_lines.data(), BufferSize);
+		m_vkCore.UploadBufferData(m_VBs[0].m_mem, 0, m_lines.data(), BufferSize);
 	}
 }
+
+
+void CanvasRenderer::Clear()
+{
+	m_lines.clear();
+}
+
+void CanvasRenderer::Line(const glm::vec3& p1, const glm::vec3& p2, const glm::vec4& c)
+{
+	m_lines.push_back({ .Position = p1, .Color = c });
+	m_lines.push_back({ .Position = p2, .Color = c });
+}
+
+void CanvasRenderer::Plane3D(const glm::vec3& o, const glm::vec3& v1, const glm::vec3& v2, int n1, int n2, 
+							 float s1, float s2, const glm::vec4& color, const glm::vec4& outlineColor)
+{
+	Line(o - s1 / 2.0f * v1 - s2 / 2.0f * v2, o - s1 / 2.0f * v1 + s2 / 2.0f * v2, outlineColor);
+	Line(o + s1 / 2.0f * v1 - s2 / 2.0f * v2, o + s1 / 2.0f * v1 + s2 / 2.0f * v2, outlineColor);
+
+	Line(o - s1 / 2.0f * v1 + s2 / 2.0f * v2, o + s1 / 2.0f * v1 + s2 / 2.0f * v2, outlineColor);
+	Line(o - s1 / 2.0f * v1 - s2 / 2.0f * v2, o + s1 / 2.0f * v1 - s2 / 2.0f * v2, outlineColor);
+
+	for (int i = 1; i < n1; i++) {
+		float t = ((float)i - (float)n1 / 2.0f) * s1 / (float)n1;
+		const glm::vec3 o1 = o + t * v1;
+		Line(o1 - s2 / 2.0f * v2, o1 + s2 / 2.0f * v2, color);
+	}
+
+	for (int i = 1; i < n2; i++)
+	{
+		const float t = ((float)i - (float)n2 / 2.0f) * s2 / (float)n2;
+		const glm::vec3 o2 = o + t * v2;
+		Line(o2 - s1 / 2.0f * v1, o2 + s1 / 2.0f * v1, color);
+	}
+}
+
 
 
 }

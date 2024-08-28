@@ -40,7 +40,7 @@ public:
 	void Plane3D(const glm::vec3& Orig, const glm::vec3& v1, const glm::vec3& v2, int n1, int n2, 
 			     float s1, float s2, const glm::vec4& Color, const glm::vec4& OutlineColor);
 	void UpdateBuffer(int Image);
-	void UpdateUniformBuffer(const glm::mat4& WVP, float Time, int Image);
+	void UpdateUniformBuffer(int Image, const glm::mat4& WVP, float Time);
 
 private:
 
