@@ -228,6 +228,9 @@
     <ClInclude Include="..\..\..\Include\Techniques\ogldev_ray_marching_technique.h">
       <Filter>Header Files\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_glm_camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -390,6 +393,9 @@
       <Filter>Source Files\Techniques</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
