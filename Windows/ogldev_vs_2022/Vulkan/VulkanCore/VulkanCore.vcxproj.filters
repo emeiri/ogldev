@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Vulkan">
       <UniqueIdentifier>{a62c035f-b479-4bf3-abd5-ee7560353f39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ImGUI">
+      <UniqueIdentifier>{37a04155-6449-4fb6-98d5-4dc4446a1c2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ImGUI\imGuIZmo.quat">
+      <UniqueIdentifier>{2fcf9adc-7c14-4a3d-90c7-802e8fc5542a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -72,6 +78,30 @@
     <ClCompile Include="..\..\..\..\Common\ogldev_glm_camera.cpp">
       <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.cpp">
+      <Filter>Source Files\ImGUI\imGuIZmo.quat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -111,6 +141,48 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_canvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.h">
+      <Filter>Source Files\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgConfig.h">
+      <Filter>Source Files\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmo.h">
+      <Filter>Source Files\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmoMath.h">
+      <Filter>Source Files\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h">
+      <Filter>Source Files\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.h">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

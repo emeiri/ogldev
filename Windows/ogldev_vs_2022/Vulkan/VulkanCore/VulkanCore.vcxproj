@@ -19,6 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp" />
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.cpp" />
     <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_glm_camera.cpp" />
@@ -29,6 +36,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\device.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\finish.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\model.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\queue.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\renderer.cpp" />
@@ -38,12 +46,26 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgConfig.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmo.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmoMath.h" />
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_canvas.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_clear.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_finish.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_imgui.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_model.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_queue.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_renderer.h" />
@@ -146,11 +168,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_USE_MATH_DEFINES;OGLDEV_VULKAN;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;OGLDEV_VULKAN;_DEBUG;_LIB;IMGUIZMO_IMGUI_FOLDER=GLFW/;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(SolutionDir)\..\..\Common\3rdparty\ImGui\;$(SolutionDir)\..\..\Common\3rdparty\ImGui\imGuIZMO.quat;$(SolutionDir)\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

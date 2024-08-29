@@ -92,6 +92,8 @@ public:
 
 	VkDevice& GetDevice() { return m_device; }
 
+	const PhysicalDevice& GetPhysicalDevice() { return m_physDevices.Selected(); }
+
 	int GetNumImages() const { return (int)m_images.size(); }
 
 	const VkImage& GetImage(int Index) const;
@@ -117,6 +119,12 @@ public:
 	void GetFramebufferSize(int& Width, int& Height) const;
 
 	void UploadBufferData(const VkDeviceMemory& BufferMemory, VkDeviceSize DeviceOffset, const void* pData, const size_t DataSize);
+
+	GLFWwindow* GetWindow() const { return m_pWindow; }
+
+	u32 GetQueueFamily() const { return m_queueFamily; }
+
+	VkInstance GetInstance() const { return m_instance; }
 
 private:
 

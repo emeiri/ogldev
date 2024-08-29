@@ -1,4 +1,5 @@
 /*
+
 		Copyright 2024 Etay Meiri
 
 	This program is free software: you can redistribute it and/or modify
@@ -17,47 +18,28 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
-#include <vulkan/vulkan.h>
+#include <vector>
 
-#include "ogldev_types.h"
+#include "ogldev_vulkan_renderer.h"
 
 namespace OgldevVK {
 
-class VulkanQueue {
-
+class ImGUIRenderer : public VulkanRenderer {
 public:
-	VulkanQueue() {}
-	~VulkanQueue() {}
+	ImGUIRenderer(VulkanCore& vkCore);
 
-	void Init(VkDevice Device, u32 QueueFamily, u32 QueueIndex);
+	~ImGUIRenderer();
 
-	void SetSwapChain(VkSwapchainKHR SwapChain);
+	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
 
-	void Destroy();
-
-	u32 AcquireNextImage();
-
-	void SubmitSync(VkCommandBuffer CmbBuf);
-
-	void SubmitAsync(VkCommandBuffer CmbBuf);
-
-	void Present(u32 ImageIndex);
-
-	void WaitIdle();
-
-	VkQueue GetHandle() const { return m_queue; }
+	//void UpdateUniformBuffer(int Image, const glm::mat4& WVP, float Time);
 
 private:
 
-	void CreateSemaphores();
-
-	VkDevice m_device = VK_NULL_HANDLE;
-	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
-	VkQueue m_queue = VK_NULL_HANDLE;
-	VkSemaphore m_renderCompleteSem;
-	VkSemaphore m_presentCompleteSem;
 };
+
 
 }
