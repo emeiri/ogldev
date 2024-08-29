@@ -31,6 +31,7 @@
 #include <glm/ext.hpp>
 
 #include "ogldev_math_3d.h"
+#include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
@@ -44,18 +45,81 @@
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
+static MouseState g_mouseState;
+CameraPositionerFirstPerson g_cameraPositioner = CameraPositionerFirstPerson(glm::vec3(0.0f), 
+																			 glm::vec3(0.0f, 0.0f, -1.0f), 
+																			 glm::vec3(0.0f, 1.0f, 0.0f));
 
-void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
 {
-	if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	bool Press = Action != GLFW_RELEASE;
+
+	switch (Key) {
+	case GLFW_KEY_ESCAPE:
+		if (Press) {
+			glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
+		}
+		break;
+
+	case GLFW_KEY_W:
+		g_cameraPositioner.m_movement.Forward = Press;
+		//printf("1 %d\n", g_cameraPositioner.m_movement.Forward);
+		break;
+
+	case GLFW_KEY_S:
+		g_cameraPositioner.m_movement.Backward = Press;
+		break;
+
+	case GLFW_KEY_A:
+		g_cameraPositioner.m_movement.Left = Press;
+		break;
+
+	case GLFW_KEY_D:
+		g_cameraPositioner.m_movement.Right = Press;
+		break;
+
+	case GLFW_KEY_PAGE_UP:
+		g_cameraPositioner.m_movement.Up = Press;
+		break;
+
+	case GLFW_KEY_PAGE_DOWN:
+		g_cameraPositioner.m_movement.Down = Press;
+		break;
+
+	case GLFW_KEY_SPACE:
+		g_cameraPositioner.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
+		break;
+
+	}
+
+	if (Mods & GLFW_MOD_SHIFT) {
+		g_cameraPositioner.m_movement.FastSpeed = Press;
 	}
 }
+
+
+void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
+{
+	int Width, Height;
+
+	glfwGetWindowSize(pWindow, &Width, &Height);
+
+	g_mouseState.m_pos.x = (float)xpos / (float)Width;
+	g_mouseState.m_pos.y = (float)ypos / (float)Height;
+}
+
+
+void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
+{
+	if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+		g_mouseState.m_pressedLeft = (Action == GLFW_PRESS);
+	}
+}
+
 
 struct UniformData {
 	Matrix4f WVP;
 };
-
 
 
 class VulkanApp
@@ -87,9 +151,9 @@ public:
 		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
 		m_p2DCanvas = new OgldevVK::CanvasRenderer(m_vkCore);
 
-		//m_p2DCanvas->Plane3D(glm::vec3(0, +1.5, 0), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), 40, 40, 10.0f, 10.0f, glm::vec4(1, 0, 0, 1), glm::vec4(1, 0, 0.1f, 1));
+		m_p2DCanvas->Plane3D(glm::vec3(0, 0.25f, 0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), 40, 40, 10.0f, 10.0f, glm::vec4(1, 0, 0, 1), glm::vec4(1, 0, 0.1f, 1));
 
-		m_p2DCanvas->Line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0, 0.0, 1.0f));
+		//m_p2DCanvas->Line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0, 0.0, 1.0f));
 
 		for (int i = 0; i < m_numImages; i++) {
 			m_p2DCanvas->UpdateBuffer(i);
@@ -137,7 +201,7 @@ private:
 
 		m_pClearRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
 		m_pModelRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
-		m_p2DCanvas->FillCommandBuffer(CmdBuf, ImageIndex);
+	//	m_p2DCanvas->FillCommandBuffer(CmdBuf, ImageIndex);
 		m_pFinishRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
 
 		CHECK_VK_RESULT(vkEndCommandBuffer(CmdBuf), "vkEndCommandBuffer");
@@ -149,11 +213,13 @@ private:
 		glm::mat4 Translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.5f, -2.0f));
 		glm::mat4 Rotation = glm::rotate(glm::mat4(1.f), glm::pi<float>(), glm::vec3(1, 0, 0));
 		glm::mat4 World = glm::rotate(Translation * Rotation, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
-		
+
+		glm::mat4 View = g_cameraPositioner.GetViewMatrix();
+
 		float ar = (float)m_windowWidth / (float)m_windowHeight;
 
 		glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
-		glm::mat4 WVP = Proj * World;
+		glm::mat4 WVP = Proj * View * World;
 
 		m_pModelRenderer->UpdateUniformBuffers(ImageIndex, &WVP[0][0], sizeof(WVP));
 		m_p2DCanvas->UpdateUniformBuffer(ImageIndex, WVP[0][0], (float)glfwGetTime());
@@ -197,13 +263,22 @@ int main(int argc, char* argv[])
 	}
 
 	glfwSetKeyCallback(pWindow, GLFW_KeyCallback);
+	glfwSetCursorPosCallback(pWindow, GLFW_MouseCallback);
+	glfwSetMouseButtonCallback(pWindow, GLFW_MouseButtonCallback);
 
 	VulkanApp App;
 	App.Init(APP_NAME, pWindow);
 
+	float CurTime = (float)glfwGetTime();
+
 	while (!glfwWindowShouldClose(pWindow)) {
+		float Time = (float)glfwGetTime();
+		float dt = Time - CurTime;	
+		g_cameraPositioner.Update(dt, g_mouseState.m_pos, g_mouseState.m_pressedLeft);
 		App.RenderScene();
+		CurTime = Time;
 		glfwPollEvents();
+		
 	}
 
 	glfwTerminate();

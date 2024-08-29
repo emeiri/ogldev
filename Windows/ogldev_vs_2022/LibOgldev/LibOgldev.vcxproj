@@ -176,6 +176,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
     <ClInclude Include="..\..\..\Include\ogldev_glfw.h" />
     <ClInclude Include="..\..\..\Include\ogldev_glfw_backend.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_glm_camera.h" />
     <ClInclude Include="..\..\..\Include\ogldev_glut_backend.h" />
     <ClInclude Include="..\..\..\Include\ogldev_guitex_technique.h" />
     <ClInclude Include="..\..\..\Include\ogldev_gui_texture.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw_backend.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_guitex_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_gui_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />

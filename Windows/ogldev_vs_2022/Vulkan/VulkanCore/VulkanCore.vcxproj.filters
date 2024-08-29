@@ -69,6 +69,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\canvas.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\ogldev_glm_camera.cpp">
+      <Filter>Source Files\CommonOgldev</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
