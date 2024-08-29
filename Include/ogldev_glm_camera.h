@@ -90,6 +90,11 @@ public:
 	void ResetMousePosition(const glm::vec2& Pos) { m_mousePos = Pos; }
 
 private:
+
+	glm::vec3 CalcAcceleration();
+	void CalcMoveSpeed(float dt);
+	void CalcCameraOrientation(const glm::vec2& MousePos);
+
 	glm::vec2 m_mousePos = glm::vec2(0.0f);
 	glm::vec3 m_cameraPos = glm::vec3(0.0f);
 	glm::quat m_cameraOrientation = glm::quat(glm::vec3(0.0f));
