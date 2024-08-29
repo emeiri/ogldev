@@ -37,45 +37,86 @@ CameraPositionerFirstPerson::CameraPositionerFirstPerson(const glm::vec3& Pos, c
 void CameraPositionerFirstPerson::Update(float dt, const glm::vec2& MousePos, bool MousePressed)
 {
 	if (MousePressed) {
-		glm::vec2 DeltaMouse = MousePos - m_mousePos;
-
-		glm::quat DeltaQuat = glm::quat(glm::vec3(m_mouseSpeed * DeltaMouse.y, m_mouseSpeed * DeltaMouse.x, 0.0f));
-
-		m_cameraOrientation = glm::normalize(DeltaQuat * m_cameraOrientation);
+		CalcCameraOrientation(MousePos);
 	}
 
 	m_mousePos = MousePos;
 
+	CalcMoveSpeed(dt);
+
+	m_cameraPos += m_moveSpeed * dt;
+}
+
+
+void CameraPositionerFirstPerson::CalcCameraOrientation(const glm::vec2& MousePos)
+{
+	glm::vec2 DeltaMouse = MousePos - m_mousePos;
+
+	glm::quat DeltaQuat = glm::quat(glm::vec3(m_mouseSpeed * DeltaMouse.y, m_mouseSpeed * DeltaMouse.x, 0.0f));
+
+	m_cameraOrientation = glm::normalize(DeltaQuat * m_cameraOrientation);
+}
+
+
+void CameraPositionerFirstPerson::CalcMoveSpeed(float dt)
+{
+	glm::vec3 Acceleration = CalcAcceleration();
+
+	if (Acceleration == glm::vec3(0.0f)) {
+		m_moveSpeed -= m_moveSpeed * std::min(dt * 1.0f / m_damping, 1.0f);
+	}
+	else {
+		m_moveSpeed = Acceleration * m_acceleration * dt;
+		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
+
+		if (glm::length(m_moveSpeed) > m_maxSpeed) {
+			m_moveSpeed = glm::normalize(m_moveSpeed) * m_maxSpeed;
+		}
+	}
+}
+
+
+glm::vec3 CameraPositionerFirstPerson::CalcAcceleration()
+{
 	glm::mat4 v = glm::mat4_cast(m_cameraOrientation);
 
 	glm::vec3 Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
-	glm::vec3 Right =    glm::vec3(v[0][0], v[1][0], v[2][0]);
+	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
 	glm::vec3 Up = glm::cross(Right, Forward);
 
 	glm::vec3 Acceleration = glm::vec3(0.0f);
 
 	//printf("2 %d\n", m_movement.Forward);
 
-	if (m_movement.Forward) { Acceleration += Forward; }
-	if (m_movement.Backward) { Acceleration -= Forward; }
-	if (m_movement.Left) { Acceleration -= Right; }
-	if (m_movement.Right) { Acceleration += Right; }
-	if (m_movement.Up) { Acceleration += Up; }
-	if (m_movement.Down) { Acceleration -= Up; }
-	if (m_movement.FastSpeed) { Acceleration *= m_fastCoef; }
-
-	if (Acceleration == glm::vec3(0.0f)) {
-		m_moveSpeed -= m_moveSpeed * std::min(dt * 1.0f / m_damping, 1.0f);
-	} else {
-		m_moveSpeed = Acceleration * m_acceleration * dt;
-		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
-
-		if (glm::length(m_moveSpeed) > m_maxSpeed) {
-			m_moveSpeed = glm::normalize(m_moveSpeed) * m_maxSpeed;
-		}		
+	if (m_movement.Forward) { 
+		Acceleration += Forward; 
 	}
 
-	m_cameraPos += m_moveSpeed * dt;
+	if (m_movement.Backward) { 
+		Acceleration -= Forward; 
+	}
+
+	if (m_movement.Left) { 
+		Acceleration -= Right; 
+	}
+
+	if (m_movement.Right) { 
+		Acceleration += Right; 
+	}
+
+	if (m_movement.Up) { 
+		Acceleration += Up; 
+	}
+
+	if (m_movement.Down) { 
+		Acceleration -= Up; 
+	}
+
+	if (m_movement.FastSpeed) { 
+		Acceleration *= m_fastCoef; 
+	}
+
+	return Acceleration;
 }
 
 
