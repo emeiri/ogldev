@@ -42,9 +42,11 @@ VkDescriptorPool g_DescriptorPool = NULL;
 
 ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 {
-	m_renderPass = m_vkCore.CreateSimpleRenderPass(m_depthEnabled, true, false, (OgldevVK::RenderPassType)(RenderPassTypeFirst | RenderPassTypeLast));
+	bool DepthEnabled = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
 
-	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass, m_depthEnabled);
+	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, true, false, (OgldevVK::RenderPassType)(RenderPassTypeFirst | RenderPassTypeLast));
+
+	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 
 	//m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_framebufferWidth, m_framebufferHeight, m_renderPass, 
 	//											 NULL, NULL, NULL, 0, NULL, 0,
@@ -190,20 +192,6 @@ void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 }
 
 
-void ImGUIRenderer::Update()
-{
-
-}
-
-/*void ImGUIRenderer::UpdateUniformBuffer(int Image, const glm::mat4& WVP, float Time)
-{
-	UniformBuffer UBO = {
-		.WVP = WVP,
-		.Time = Time
-	};
-
-	m_uniformBuffers[Image].Update(m_device, &UBO, sizeof(UBO));
-}*/
 
 
 
