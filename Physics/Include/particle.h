@@ -38,6 +38,8 @@ public:
 
     float GetMass() const;
 
+    float GetReciprocalMass() const { return m_reciprocalMass; }
+
     void SetReciprocalMass(float ReciprocalMass) { m_reciprocalMass = ReciprocalMass; }
 
     void SetVelocity(const Vector3f& Velocity) { m_velocity = Velocity; }
