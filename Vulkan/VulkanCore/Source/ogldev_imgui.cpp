@@ -38,8 +38,6 @@ static void check_vk_result(VkResult err)
 
 namespace OgldevVK {
 
-VkDescriptorPool g_DescriptorPool = NULL;
-
 ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 {
 	bool DepthEnabled = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
@@ -47,10 +45,6 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, true, false, (OgldevVK::RenderPassType)(RenderPassTypeFirst | RenderPassTypeLast));
 
 	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
-
-	//m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_framebufferWidth, m_framebufferHeight, m_renderPass, 
-	//											 NULL, NULL, NULL, 0, NULL, 0,
-	//											 m_vkCore.GetNumImages(), m_uniformBuffers, 0, NULL, VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
 
 	// Create Descriptor Pool
 	{
@@ -75,7 +69,7 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 		pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
 		pool_info.pPoolSizes = pool_sizes;
 
-		VkResult res = vkCreateDescriptorPool(m_device, &pool_info, NULL, &g_DescriptorPool);
+		VkResult res = vkCreateDescriptorPool(m_device, &pool_info, NULL, &m_descriptorPool);
 		CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
 	}
 
@@ -101,7 +95,7 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 	init_info.QueueFamily = m_vkCore.GetQueueFamily();
 	init_info.Queue = m_vkCore.GetQueue()->GetHandle();
 	init_info.PipelineCache = NULL;
-	init_info.DescriptorPool = g_DescriptorPool;
+	init_info.DescriptorPool = m_descriptorPool;
 	init_info.Subpass = 0;
 	init_info.MinImageCount = m_vkCore.GetPhysicalDevice().m_surfaceCaps.minImageCount;
 	init_info.ImageCount = m_vkCore.GetNumImages();
@@ -135,21 +129,7 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 
 ImGUIRenderer::~ImGUIRenderer()
 {
-//	vkDestroyShaderModule(m_device, m_vs, NULL);
-	//vkDestroyShaderModule(m_device, m_fs, NULL);
-
-
 }
-
-
-/*void ImGUIRenderer::CreateShaders()
-{
-	m_vs = CreateShaderModuleFromText(m_device, "../VulkanCore/Shaders/lines.vert");
-
-	m_fs = CreateShaderModuleFromText(m_device, "../VulkanCore/Shaders/lines.frag");
-}*/
-
-
 
 
 void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)

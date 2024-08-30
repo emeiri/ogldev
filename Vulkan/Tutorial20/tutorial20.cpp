@@ -42,6 +42,7 @@
 #include "ogldev_vulkan_finish.h"
 #include "ogldev_vulkan_model.h"
 #include "ogldev_vulkan_canvas.h"
+#include "ogldev_vulkan_imgui.h"
 
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
@@ -146,18 +147,20 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		
-		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", 
-													   "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
+		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
 		m_pClearRenderer = new OgldevVK::ClearRenderer(m_vkCore);
 		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
+		m_pImGUIRenderer = new OgldevVK::ImGUIRenderer(m_vkCore);
 		m_p2DCanvas = new OgldevVK::CanvasRenderer(m_vkCore);
 
+		if (m_p2DCanvas) {    // The check is required when the canvas creation is commented out
 		m_p2DCanvas->Plane3D(glm::vec3(0, 0.25f, 0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), 40, 40, 10.0f, 10.0f, glm::vec4(1, 0, 0, 1), glm::vec4(1, 0, 0.1f, 1));
 
 		//m_p2DCanvas->Line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0, 0.0, 1.0f));
 
 		for (int i = 0; i < m_numImages; i++) {
 			m_p2DCanvas->UpdateBuffer(i);
+			}
 		}
 
 		CreateCommandBuffers();
@@ -200,10 +203,11 @@ private:
 
 		OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-		m_pClearRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
-		m_pModelRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
-	//	m_p2DCanvas->FillCommandBuffer(CmdBuf, ImageIndex);
-		m_pFinishRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		if (m_pClearRenderer) m_pClearRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		if (m_pModelRenderer) m_pModelRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		if (m_p2DCanvas) m_p2DCanvas->FillCommandBuffer(CmdBuf, ImageIndex);
+		if (m_pImGUIRenderer) m_pImGUIRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
+		if (m_pFinishRenderer) m_pFinishRenderer->FillCommandBuffer(CmdBuf, ImageIndex);
 
 		CHECK_VK_RESULT(vkEndCommandBuffer(CmdBuf), "vkEndCommandBuffer");
 	}
@@ -222,8 +226,8 @@ private:
 		glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
 		glm::mat4 WVP = Proj * View * World;
 
-		m_pModelRenderer->UpdateUniformBuffers(ImageIndex, &WVP[0][0], sizeof(WVP));
-		m_p2DCanvas->UpdateUniformBuffer(ImageIndex, WVP[0][0], (float)glfwGetTime());
+		if (m_pModelRenderer) m_pModelRenderer->UpdateUniformBuffers(ImageIndex, &WVP[0][0], sizeof(WVP));
+		if (m_p2DCanvas) m_p2DCanvas->UpdateUniformBuffer(ImageIndex, WVP[0][0], (float)glfwGetTime());
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -236,6 +240,7 @@ private:
 	OgldevVK::FinishRenderer* m_pFinishRenderer = NULL;
 	OgldevVK::ModelRenderer* m_pModelRenderer = NULL;
 	OgldevVK::CanvasRenderer* m_p2DCanvas = NULL;
+	OgldevVK::ImGUIRenderer* m_pImGUIRenderer = NULL;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
 };

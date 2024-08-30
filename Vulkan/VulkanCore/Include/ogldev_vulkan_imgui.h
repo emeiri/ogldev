@@ -38,7 +38,7 @@ public:
 	//void UpdateUniformBuffer(int Image, const glm::mat4& WVP, float Time);
 
 private:
-
+	VkDescriptorPool m_descriptorPool = NULL;
 };
 
 
