@@ -34,6 +34,10 @@ public:
 
     Vector3f m_contactNormal;
 
+    float m_penetration = 0.0f;
+
+    Vector3f m_particleMovement[2] = { 0.0f };
+
 protected:
     void Resolve(float dt);
 
