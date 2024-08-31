@@ -47,77 +47,6 @@
 #define WINDOW_WIDTH  1000
 #define WINDOW_HEIGHT 1000
 
-static MouseState g_mouseState;
-CameraPositionerFirstPerson g_cameraPositioner = CameraPositionerFirstPerson(glm::vec3(0.0f), 
-																			 glm::vec3(0.0f, 0.0f, -1.0f), 
-																			 glm::vec3(0.0f, 1.0f, 0.0f));
-
-void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
-{
-	bool Press = Action != GLFW_RELEASE;
-
-	switch (Key) {
-	case GLFW_KEY_ESCAPE:
-		if (Press) {
-			glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
-		}
-		break;
-
-	case GLFW_KEY_W:
-		g_cameraPositioner.m_movement.Forward = Press;
-		//printf("1 %d\n", g_cameraPositioner.m_movement.Forward);
-		break;
-
-	case GLFW_KEY_S:
-		g_cameraPositioner.m_movement.Backward = Press;
-		break;
-
-	case GLFW_KEY_A:
-		g_cameraPositioner.m_movement.Left = Press;
-		break;
-
-	case GLFW_KEY_D:
-		g_cameraPositioner.m_movement.Right = Press;
-		break;
-
-	case GLFW_KEY_PAGE_UP:
-		g_cameraPositioner.m_movement.Up = Press;
-		break;
-
-	case GLFW_KEY_PAGE_DOWN:
-		g_cameraPositioner.m_movement.Down = Press;
-		break;
-
-	case GLFW_KEY_SPACE:
-		g_cameraPositioner.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		break;
-
-	}
-
-	if (Mods & GLFW_MOD_SHIFT) {
-		g_cameraPositioner.m_movement.FastSpeed = Press;
-	}
-}
-
-
-void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
-{
-	int Width, Height;
-
-	glfwGetWindowSize(pWindow, &Width, &Height);
-
-	g_mouseState.m_pos.x = (float)xpos / (float)Width;
-	g_mouseState.m_pos.y = (float)ypos / (float)Height;
-}
-
-
-void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
-{
-	if (Button == GLFW_MOUSE_BUTTON_LEFT) {
-		g_mouseState.m_pressedLeft = (Action == GLFW_PRESS);
-	}
-}
-
 
 struct UniformData {
 	Matrix4f WVP;
@@ -205,6 +134,91 @@ public:
 		m_pQueue->Present(ImageIndex);
 	}
 
+
+	void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
+	{
+		bool Press = Action != GLFW_RELEASE;
+
+		switch (Key) {
+		case GLFW_KEY_ESCAPE:
+			if (Press) {
+				glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
+			}
+			break;
+
+		case GLFW_KEY_W:
+			m_cameraPositioner.m_movement.Forward = Press;
+			//printf("1 %d\n", m_cameraPositioner.m_movement.Forward);
+			break;
+
+		case GLFW_KEY_S:
+			m_cameraPositioner.m_movement.Backward = Press;
+			break;
+
+		case GLFW_KEY_A:
+			m_cameraPositioner.m_movement.Left = Press;
+			break;
+
+		case GLFW_KEY_D:
+			m_cameraPositioner.m_movement.Right = Press;
+			break;
+
+		case GLFW_KEY_PAGE_UP:
+			m_cameraPositioner.m_movement.Up = Press;
+			break;
+
+		case GLFW_KEY_PAGE_DOWN:
+			m_cameraPositioner.m_movement.Down = Press;
+			break;
+
+		case GLFW_KEY_SPACE:
+			m_cameraPositioner.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
+			break;
+		}
+
+		if (Mods & GLFW_MOD_SHIFT) {
+			m_cameraPositioner.m_movement.FastSpeed = Press;
+		}
+	}
+
+
+	void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
+	{
+		int Width, Height;
+
+		glfwGetWindowSize(pWindow, &Width, &Height);
+
+		m_mouseState.m_pos.x = (float)xpos / (float)Width;
+		m_mouseState.m_pos.y = (float)ypos / (float)Height;
+	}
+
+
+	void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
+	{
+		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+			m_mouseState.m_pressedLeft = (Action == GLFW_PRESS);
+		}
+	}
+
+	void Execute()
+	{
+		glfwSetWindowUserPointer(m_pWindow, this);
+
+		float CurTime = (float)glfwGetTime();
+
+		while (!glfwWindowShouldClose(m_pWindow)) {
+			float Time = (float)glfwGetTime();
+			float dt = Time - CurTime;
+			m_cameraPositioner.Update(dt, m_mouseState.m_pos, m_mouseState.m_pressedLeft);
+			RenderScene();
+			CurTime = Time;
+			glfwPollEvents();
+		}
+
+		glfwTerminate();
+	}
+
+
 private:
 
 	void CreateCommandBuffers()
@@ -246,7 +260,7 @@ private:
 		glm::mat4 Rotation = glm::rotate(glm::mat4(1.f), glm::pi<float>(), glm::vec3(1, 0, 0));
 		glm::mat4 World = glm::rotate(Translation * Rotation, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		glm::mat4 View = g_cameraPositioner.GetViewMatrix();
+		glm::mat4 View = m_cameraPositioner.GetViewMatrix();
 
 		float ar = (float)m_windowWidth / (float)m_windowHeight;
 
@@ -270,7 +284,37 @@ private:
 	OgldevVK::ImGUIRenderer* m_pImGUIRenderer = NULL;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
+	MouseState m_mouseState;
+	CameraPositionerFirstPerson m_cameraPositioner = CameraPositionerFirstPerson(glm::vec3(0.0f),
+																				 glm::vec3(0.0f, 0.0f, -1.0f),
+																				 glm::vec3(0.0f, 1.0f, 0.0f));
+
 };
+
+
+void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
+{
+	VulkanApp* pVulkanApp = (VulkanApp*)glfwGetWindowUserPointer(pWindow);
+
+	pVulkanApp->GLFW_KeyCallback(pWindow, Key, Scancode, Action, Mods);
+}
+
+
+void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
+{
+	VulkanApp* pVulkanApp = (VulkanApp*)glfwGetWindowUserPointer(pWindow);
+
+	pVulkanApp->GLFW_MouseCallback(pWindow, xpos, ypos);
+}
+
+
+void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
+{
+	VulkanApp* pVulkanApp = (VulkanApp*)glfwGetWindowUserPointer(pWindow);
+
+	pVulkanApp->GLFW_MouseButtonCallback(pWindow, Button, Action, Mods);
+}
+
 
 
 #define APP_NAME "Tutorial 20"
@@ -300,20 +344,10 @@ int main(int argc, char* argv[])
 	glfwSetMouseButtonCallback(pWindow, GLFW_MouseButtonCallback);
 
 	VulkanApp App;
+
 	App.Init(APP_NAME, pWindow);
 
-	float CurTime = (float)glfwGetTime();
-
-	while (!glfwWindowShouldClose(pWindow)) {
-		float Time = (float)glfwGetTime();
-		float dt = Time - CurTime;	
-		g_cameraPositioner.Update(dt, g_mouseState.m_pos, g_mouseState.m_pressedLeft);
-		App.RenderScene();
-		CurTime = Time;
-		glfwPollEvents();		
-	}
-
-	glfwTerminate();
+	App.Execute();
 
 	return 0;
 }
