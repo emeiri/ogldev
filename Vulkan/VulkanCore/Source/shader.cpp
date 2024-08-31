@@ -69,7 +69,7 @@ static void PrintShaderSource(const char* text)
 }
 
 
-static bool CompileShader(VkDevice& Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
+static bool CompileShader(VkDevice Device, glslang_stage_t Stage, const char* pShaderCode, Shader& ShaderModule)
 {
 	glslang_input_t input = {
 		.language = GLSLANG_SOURCE_GLSL,
@@ -178,7 +178,7 @@ static glslang_stage_t ShaderStageFromFilename(const char* pFilename)
 }
 
 
-VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilename)
+VkShaderModule CreateShaderModuleFromText(VkDevice Device, const char* pFilename)
 {
 	std::string Source;
 
@@ -215,7 +215,7 @@ VkShaderModule CreateShaderModuleFromText(VkDevice& Device, const char* pFilenam
 }
 
 
-VkShaderModule CreateShaderModuleFromBinary(VkDevice& Device, const char* pFilename)
+VkShaderModule CreateShaderModuleFromBinary(VkDevice Device, const char* pFilename)
 {
 	int codeSize = 0;
 	char* pShaderCode = ReadBinaryFile(pFilename, codeSize);
