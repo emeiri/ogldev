@@ -21,9 +21,9 @@
 #include "imgui_impl_vulkan.h"
 #include "imGuIZMOquat.h"
 
-
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_imgui.h"
+#include "ogldev_vulkan_wrapper.h"
 
 #pragma once
 
@@ -42,37 +42,59 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 {
 	bool DepthEnabled = m_vkCore.GetDepthTexture().m_image != VK_NULL_HANDLE;
 
-	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, true, false, (OgldevVK::RenderPassType)(RenderPassTypeFirst | RenderPassTypeLast));
+	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeLast);
 
 	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 
-	// Create Descriptor Pool
-	{
-		VkDescriptorPoolSize pool_sizes[] =
-		{
-			{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-			{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-			{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-			{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-			{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-		};
-		VkDescriptorPoolCreateInfo pool_info = {};
-		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-		pool_info.maxSets = 1000 * IM_ARRAYSIZE(pool_sizes);
-		pool_info.poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes);
-		pool_info.pPoolSizes = pool_sizes;
+	CreateDescriptorPool();
 
-		VkResult res = vkCreateDescriptorPool(m_device, &pool_info, NULL, &m_descriptorPool);
-		CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
-	}
+	InitImGUI();
+}
 
+
+ImGUIRenderer::~ImGUIRenderer()
+{
+	m_vkCore.FreeCommandBuffers(1, &m_cmdBuf);
+
+	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
+
+	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
+
+void ImGUIRenderer::CreateDescriptorPool()
+{
+	VkDescriptorPoolSize PoolSizes[] = {
+		{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+	};
+
+	VkDescriptorPoolCreateInfo PoolCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+		.maxSets = 1000 * IM_ARRAYSIZE(PoolSizes),
+		.poolSizeCount = (uint32_t)IM_ARRAYSIZE(PoolSizes),
+		.pPoolSizes = PoolSizes
+	};
+
+	VkResult res = vkCreateDescriptorPool(m_device, &PoolCreateInfo, NULL, &m_descriptorPool);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
+}
+
+
+void ImGUIRenderer::InitImGUI()
+{
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -88,51 +110,51 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 	 // Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForVulkan(m_vkCore.GetWindow(), true);
 
-	ImGui_ImplVulkan_InitInfo init_info = {};
-	init_info.Instance = m_vkCore.GetInstance();
-	init_info.PhysicalDevice = m_vkCore.GetPhysicalDevice().m_physDevice;
-	init_info.Device = m_vkCore.GetDevice();;
-	init_info.QueueFamily = m_vkCore.GetQueueFamily();
-	init_info.Queue = m_vkCore.GetQueue()->GetHandle();
-	init_info.PipelineCache = NULL;
-	init_info.DescriptorPool = m_descriptorPool;
-	init_info.Subpass = 0;
-	init_info.MinImageCount = m_vkCore.GetPhysicalDevice().m_surfaceCaps.minImageCount;
-	init_info.ImageCount = m_vkCore.GetNumImages();
-	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-	init_info.Allocator = NULL;
-	init_info.CheckVkResultFn = check_vk_result;
-	ImGui_ImplVulkan_Init(&init_info, m_renderPass);
+	ImGui_ImplVulkan_InitInfo InitInfo = {
+		.Instance = m_vkCore.GetInstance(),
+		.PhysicalDevice = m_vkCore.GetPhysicalDevice().m_physDevice,
+		.Device = m_vkCore.GetDevice(),
+		.QueueFamily = m_vkCore.GetQueueFamily(),
+		.Queue = m_vkCore.GetQueue()->GetHandle(),
+		.PipelineCache = NULL,
+		.DescriptorPool = m_descriptorPool,
+		.Subpass = 0,
+		.MinImageCount = m_vkCore.GetPhysicalDevice().m_surfaceCaps.minImageCount,
+		.ImageCount = (u32)m_vkCore.GetNumImages(),
+		.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+		.Allocator = NULL,
+		.CheckVkResultFn = check_vk_result
+	};
 
-	VkCommandBuffer command_buffer = NULL;
-	m_vkCore.CreateCommandBuffers(1, &command_buffer);
-	VkCommandBufferBeginInfo begin_info = {};
-	begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	begin_info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-	VkResult res = vkBeginCommandBuffer(command_buffer, &begin_info);
-	CHECK_VK_RESULT(res, "vkBeginCommandBuffer");
+	ImGui_ImplVulkan_Init(&InitInfo, m_renderPass);
 
-	ImGui_ImplVulkan_CreateFontsTexture(command_buffer);
-
-	VkSubmitInfo end_info = {};
-	end_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	end_info.commandBufferCount = 1;
-	end_info.pCommandBuffers = &command_buffer;
-	res = vkEndCommandBuffer(command_buffer);
-	CHECK_VK_RESULT(res, "vkEndCommandBuffer");
-	m_vkCore.GetQueue()->SubmitSync(command_buffer);
-	m_vkCore.GetQueue()->WaitIdle();
-	ImGui_ImplVulkan_DestroyFontUploadObjects();
-
+	InitImGUIFontsTexture();
 }
 
 
-ImGUIRenderer::~ImGUIRenderer()
+void ImGUIRenderer::InitImGUIFontsTexture()
+{	
+	m_vkCore.CreateCommandBuffers(1, &m_cmdBuf);
+
+	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+	ImGui_ImplVulkan_CreateFontsTexture(m_cmdBuf);
+
+	VkResult res = vkEndCommandBuffer(m_cmdBuf);
+	CHECK_VK_RESULT(res, "vkEndCommandBuffer");
+
+	m_vkCore.GetQueue()->SubmitSync(m_cmdBuf);
+	m_vkCore.GetQueue()->WaitIdle();
+
+	ImGui_ImplVulkan_DestroyFontUploadObjects();
+}
+
+void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 {
 }
 
 
-void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
+void ImGUIRenderer::OnFrame(int Image)
 {
 	static float f = 0.0f;
 	static int counter = 0;
@@ -164,11 +186,19 @@ void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
 	ImGui::Render();
 	ImDrawData* draw_data = ImGui::GetDrawData();
 
-	BeginRenderPass(CmdBuf, Image);
+	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-	ImGui_ImplVulkan_RenderDrawData(draw_data, CmdBuf);
+	BeginRenderPass(m_cmdBuf, Image);
 
-	vkCmdEndRenderPass(CmdBuf);
+	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBuf);
+
+	vkCmdEndRenderPass(m_cmdBuf);
+
+	vkEndCommandBuffer(m_cmdBuf);
+
+	m_vkCore.GetQueue()->SubmitSync(m_cmdBuf);
+	m_vkCore.GetQueue()->WaitIdle();
+
 }
 
 

@@ -35,9 +35,17 @@ public:
 
 	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
 
-	//void UpdateUniformBuffer(int Image, const glm::mat4& WVP, float Time);
+	void OnFrame(int Image);
 
 private:
+
+	void CreateDescriptorPool();
+
+	void InitImGUI();
+
+	void InitImGUIFontsTexture();
+
+	VkCommandBuffer m_cmdBuf = NULL;
 	VkDescriptorPool m_descriptorPool = NULL;
 };
 

@@ -135,6 +135,26 @@ public:
 	~VulkanApp()
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+
+		if (m_pImGUIRenderer) {
+			delete m_pImGUIRenderer;
+		}
+
+		if (m_pFinishRenderer) {
+			delete m_pFinishRenderer;
+		}
+
+		if (m_p2DCanvas) {
+			delete m_p2DCanvas;
+		}
+
+		if (m_pModelRenderer) {
+			delete m_pModelRenderer;
+		}
+		
+		if (m_pClearRenderer) {
+			delete m_pClearRenderer;
+		}
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -147,19 +167,19 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		
-		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
+		//m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
 		m_pClearRenderer = new OgldevVK::ClearRenderer(m_vkCore);
-		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
+	//	m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
 		m_pImGUIRenderer = new OgldevVK::ImGUIRenderer(m_vkCore);
-		m_p2DCanvas = new OgldevVK::CanvasRenderer(m_vkCore);
+		//m_p2DCanvas = new OgldevVK::CanvasRenderer(m_vkCore);
 
 		if (m_p2DCanvas) {    // The check is required when the canvas creation is commented out
-		m_p2DCanvas->Plane3D(glm::vec3(0, 0.25f, 0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), 40, 40, 10.0f, 10.0f, glm::vec4(1, 0, 0, 1), glm::vec4(1, 0, 0.1f, 1));
+			m_p2DCanvas->Plane3D(glm::vec3(0, 0.25f, 0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), 40, 40, 10.0f, 10.0f, glm::vec4(1, 0, 0, 1), glm::vec4(1, 0, 0.1f, 1));
 
-		//m_p2DCanvas->Line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0, 0.0, 1.0f));
+			//m_p2DCanvas->Line(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(1.0f, 0.0, 0.0, 1.0f));
 
-		for (int i = 0; i < m_numImages; i++) {
-			m_p2DCanvas->UpdateBuffer(i);
+			for (int i = 0; i < m_numImages; i++) {
+				m_p2DCanvas->UpdateBuffer(i);
 			}
 		}
 
@@ -174,6 +194,8 @@ public:
 		UpdateUniformBuffers(ImageIndex);
 
 		m_pQueue->SubmitAsync(m_cmdBufs[ImageIndex]);
+
+		m_pImGUIRenderer->OnFrame(ImageIndex);
 
 		m_pQueue->Present(ImageIndex);
 	}
