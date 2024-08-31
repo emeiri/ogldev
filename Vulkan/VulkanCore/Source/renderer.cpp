@@ -61,7 +61,9 @@ void VulkanRenderer::BeginRenderPass(VkCommandBuffer CmdBuf, int Image)
 
 	vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	m_pPipeline->Bind(CmdBuf, Image);
+	if (m_pPipeline) {		// Some renderers don't create a pipeline
+		m_pPipeline->Bind(CmdBuf, Image);
+	}
 }
 
 
