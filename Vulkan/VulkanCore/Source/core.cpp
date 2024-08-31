@@ -699,7 +699,7 @@ BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
 
 
 VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
-	VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
+	                                  VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
 {
 	VkBufferCreateInfo vbCreateInfo = {};
 	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -709,11 +709,11 @@ VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usag
 
 	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &Buffer);
 	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
-	printf("Create vertex buffer\n");
+	printf("Created buffer %p usage %x\n", &Buffer, Usage);
 
 	VkMemoryRequirements MemReqs = {};
 	vkGetBufferMemoryRequirements(m_device, Buffer, &MemReqs);
-	printf("Vertex buffer requires %d bytes\n", (int)MemReqs.size);
+	printf("Buffer requires %d bytes\n", (int)MemReqs.size);
 
 	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, Properties);
 	VkMemoryAllocateInfo MemAllocInfo = {};
