@@ -167,12 +167,15 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		
-		//m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
+		m_pModelRenderer = new OgldevVK::ModelRenderer(m_vkCore, "../../Content/rubber_duck/scene.gltf", "../../Content/rubber_duck/textures/Duck_baseColor.png", sizeof(UniformData));
 		m_pClearRenderer = new OgldevVK::ClearRenderer(m_vkCore);
-	//	m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
-		m_pImGUIRenderer = new OgldevVK::ImGUIRenderer(m_vkCore);
 		//m_p2DCanvas = new OgldevVK::CanvasRenderer(m_vkCore);
 
+#if 1	// Enable either the ImGUI renderer OR the finish renderer
+		m_pImGUIRenderer = new OgldevVK::ImGUIRenderer(m_vkCore);
+#else
+		m_pFinishRenderer = new OgldevVK::FinishRenderer(m_vkCore);
+#endif				
 		if (m_p2DCanvas) {    // The check is required when the canvas creation is commented out
 			m_p2DCanvas->Plane3D(glm::vec3(0, 0.25f, 0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), 40, 40, 10.0f, 10.0f, glm::vec4(1, 0, 0, 1), glm::vec4(1, 0, 0.1f, 1));
 
@@ -195,7 +198,9 @@ public:
 
 		m_pQueue->SubmitAsync(m_cmdBufs[ImageIndex]);
 
-		m_pImGUIRenderer->OnFrame(ImageIndex);
+		if (m_pImGUIRenderer) {
+			m_pImGUIRenderer->OnFrame(ImageIndex);
+		}
 
 		m_pQueue->Present(ImageIndex);
 	}
@@ -305,8 +310,7 @@ int main(int argc, char* argv[])
 		g_cameraPositioner.Update(dt, g_mouseState.m_pos, g_mouseState.m_pressedLeft);
 		App.RenderScene();
 		CurTime = Time;
-		glfwPollEvents();
-		
+		glfwPollEvents();		
 	}
 
 	glfwTerminate();

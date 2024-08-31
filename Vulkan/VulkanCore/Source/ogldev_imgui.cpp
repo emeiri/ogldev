@@ -25,8 +25,6 @@
 #include "ogldev_vulkan_imgui.h"
 #include "ogldev_vulkan_wrapper.h"
 
-#pragma once
-
 static void check_vk_result(VkResult err)
 {
 	if (err == 0)
@@ -168,7 +166,7 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	ImGui::NewFrame();
 
-	ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);                          // Create a window called "Hello, world!" and append into it.
+	ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);   // Create a window called "Hello, world!" and append into it.
 
 	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 
@@ -198,13 +196,6 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	m_vkCore.GetQueue()->SubmitSync(m_cmdBuf);
 	m_vkCore.GetQueue()->WaitIdle();
-
 }
-
-
-
-
-
-
 
 }
