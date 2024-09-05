@@ -24,15 +24,12 @@
 #include <stdlib.h>
 #include <array>
 
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
 #include "ogldev_math_3d.h"
 #include "ogldev_glm_camera.h"
+#include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
@@ -53,12 +50,14 @@ struct UniformData {
 };
 
 
-class VulkanApp
+class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp()
+	VulkanApp(int WindowWidth, int WindowHeight)
 	{
+		m_windowWidth = WindowWidth;
+		m_windowHeight = WindowHeight;
 	}
 
 	~VulkanApp()
@@ -86,12 +85,11 @@ public:
 		}
 	}
 
-	void Init(const char* pAppName, GLFWwindow* pWindow)
+	void Init(const char* pAppName)
 	{
-		m_pWindow = pWindow;
-		glfwGetFramebufferSize(m_pWindow, &m_windowWidth, &m_windowHeight);
+		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
 
-		m_vkCore.Init(pAppName, pWindow);
+		m_vkCore.Init(pAppName, m_pWindow);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -116,8 +114,12 @@ public:
 		}
 
 		CreateCommandBuffers();
-		RecordCommandBuffers();		
+		RecordCommandBuffers();	
+
+		// The object is ready to receive callbacks
+		OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
 	}
+
 
 	void RenderScene()
 	{
@@ -135,7 +137,7 @@ public:
 	}
 
 
-	void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
+	void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
 	{
 		bool Press = Action != GLFW_RELEASE;
 
@@ -182,7 +184,7 @@ public:
 	}
 
 
-	void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
+	void MouseMove(GLFWwindow* pWindow, double xpos, double ypos)
 	{
 		int Width, Height;
 
@@ -193,12 +195,13 @@ public:
 	}
 
 
-	void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
+	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods)
 	{
 		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
 			m_mouseState.m_pressedLeft = (Action == GLFW_PRESS);
 		}
 	}
+
 
 	void Execute()
 	{
@@ -288,64 +291,16 @@ private:
 	CameraPositionerFirstPerson m_cameraPositioner = CameraPositionerFirstPerson(glm::vec3(0.0f),
 																				 glm::vec3(0.0f, 0.0f, -1.0f),
 																				 glm::vec3(0.0f, 1.0f, 0.0f));
-
 };
-
-
-void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
-{
-	VulkanApp* pVulkanApp = (VulkanApp*)glfwGetWindowUserPointer(pWindow);
-
-	pVulkanApp->GLFW_KeyCallback(pWindow, Key, Scancode, Action, Mods);
-}
-
-
-void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
-{
-	VulkanApp* pVulkanApp = (VulkanApp*)glfwGetWindowUserPointer(pWindow);
-
-	pVulkanApp->GLFW_MouseCallback(pWindow, xpos, ypos);
-}
-
-
-void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
-{
-	VulkanApp* pVulkanApp = (VulkanApp*)glfwGetWindowUserPointer(pWindow);
-
-	pVulkanApp->GLFW_MouseButtonCallback(pWindow, Button, Action, Mods);
-}
-
 
 
 #define APP_NAME "Tutorial 20"
 
 int main(int argc, char* argv[])
 {
-	if (!glfwInit()) {
-		return 1;
-	}
+	VulkanApp App(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	if (!glfwVulkanSupported()) {
-		return 1;
-	}
-
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, 0);
-
-	GLFWwindow* pWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, APP_NAME, NULL, NULL);
-	
-	if (!pWindow) {
-		glfwTerminate();
-		exit(EXIT_FAILURE);
-	}
-
-	glfwSetKeyCallback(pWindow, GLFW_KeyCallback);
-	glfwSetCursorPosCallback(pWindow, GLFW_MouseCallback);
-	glfwSetMouseButtonCallback(pWindow, GLFW_MouseButtonCallback);
-
-	VulkanApp App;
-
-	App.Init(APP_NAME, pWindow);
+	App.Init(APP_NAME);
 
 	App.Execute();
 

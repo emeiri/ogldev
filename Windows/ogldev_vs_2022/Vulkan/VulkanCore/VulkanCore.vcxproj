@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\core.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\device.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\finish.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\glfw_vulkan.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\model.cpp" />
@@ -64,6 +65,7 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_finish.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_glfw.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_imgui.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_model.h" />

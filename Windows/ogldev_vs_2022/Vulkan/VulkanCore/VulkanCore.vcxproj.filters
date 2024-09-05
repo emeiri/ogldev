@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.cpp">
       <Filter>Source Files\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\glfw_vulkan.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -183,6 +186,9 @@
       <Filter>Source Files\ImGUI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_imgui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_glfw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
