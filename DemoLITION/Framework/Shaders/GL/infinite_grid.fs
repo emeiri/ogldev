@@ -17,8 +17,12 @@
 */
 
 #version 330
+
+in vec3 WorldPos;
+
 layout(location = 0) out vec4 FragColor;
+
 void main()
 {
-	FragColor = vec4(0.0);
+	FragColor = vec4(WorldPos, 1.0);
 }

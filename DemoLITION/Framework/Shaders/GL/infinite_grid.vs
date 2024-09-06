@@ -18,6 +18,8 @@
 
 #version 330
 
+out vec3 WorldPos;
+
 uniform mat4 gVP = mat4(1.0);
 uniform vec3 gCameraWorldPos;
 
@@ -42,4 +44,6 @@ void main()
     vec4 vPos4 = vec4(vPos3, 1.0);
 
     gl_Position = gVP * vPos4;
+
+    WorldPos = vPos3;
 }
