@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2023 Etay Meiri
+        Copyright 2024 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,31 +16,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#version 330
 
-void test_minimal();
-void test_clear();
-void test_object();
-void test_move_object();
-void test_blender_scene();
-void test_default_scene();
-void test_lighting();
-void test_normal_map();
-void test_parallax_map();
-void test_grid();
-void carbonara();
+uniform mat4 gVP = mat4(1.0);
 
+const vec3 Pos[4] = vec3[4](
+    vec3(-1.0, 0.0, -1.0),      // bottom left
+    vec3( 1.0, 0.0, -1.0),      // bottom right
+    vec3( 1.0, 0.0,  1.0),      // top right
+    vec3(-1.0, 0.0,  1.0)       // top left
+);
 
-int main(int argc, char* arg[])
+const int Indices[6] = int[6](0, 2, 1, 2, 0, 3);
+
+void main()
 {
-    //test_minimal();
-    //test_clear();    
-    //test_object();
-    //test_move_object();
-  //  test_blender_scene();
-   // test_default_scene();
-    //test_lighting();
-    //test_normal_map();
-   // test_parallax_map();
-   test_grid();
-  //  carbonara();
+    int Index = Indices[gl_VertexID];
+    vec4 vPos = vec4(Pos[Index], 1.0);
+    gl_Position = gVP * vPos;
 }

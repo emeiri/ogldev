@@ -64,6 +64,15 @@ private:
 };
 
 
+struct InfiniteGrid {
+    bool Enabled = false;
+    float Size = 100.0f;
+    float CellSize = 0.025f;
+    Vector4f ColorThin = Vector4f(0.5f, 0.5f, 0.5f, 1.0f);
+    Vector4f ColorThick = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
+    float MinPixelsBetweenCells = 2.0f;
+};
+
 class SceneConfig
 {
 public:
@@ -76,10 +85,13 @@ public:
     void ControlPicking(bool EnablePicking) { m_pickingEnabled = EnablePicking; }
     bool IsPickingEnabled() const { return m_pickingEnabled; }
 
+    InfiniteGrid& GetInfiniteGrid() { return m_infiniteGrid;  }
+
 private:
 
     bool m_shadowMappingEnabled = true;
     bool m_pickingEnabled = false;
+    InfiniteGrid m_infiniteGrid;
 };
 
 

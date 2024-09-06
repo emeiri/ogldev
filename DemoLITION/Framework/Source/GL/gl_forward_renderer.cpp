@@ -121,6 +121,11 @@ void ForwardRenderer::InitTechniques()
         exit(1);
     }
 
+    if (!m_infiniteGridTech.Init()) {
+        printf("Error initializing the infinite grid technique\n");
+        exit(1);
+    }
+
 }
 
 
@@ -159,20 +164,23 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
         switch (Tech) {
         case FORWARD_LIGHTING:
             m_pCurLightingTech = &m_lightingTech;
+            m_pCurLightingTech->Enable();
             break;
 
         case FORWARD_SKINNING:
             m_pCurLightingTech = &m_skinningTech;
+            m_pCurLightingTech->Enable();
             break;
 
+        case INFINITE_GRID:
+            m_infiniteGridTech.Enable();
+            break;
         default:
             assert(0);
         }
 
         m_curLightingTech = Tech;
     }
-
-    m_pCurLightingTech->Enable();
 }
 
 
@@ -186,13 +194,17 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
     pGameCallbacks->OnFrame(DeltaTimeMillis);
 
-    if (pScene->GetRenderList().size() == 0) {
-        printf("Warning! render list is empty and no main model\n");
+    if (!m_pCurCamera) {
+        printf("ForwardRenderer: camera not initialized\n");
         return;
     }
 
-    if (!m_pCurCamera) {
-        printf("ForwardRenderer: camera not initialized\n");
+    if (pScene->GetRenderList().size() == 0) {
+        if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+            RenderInfiniteGrid(pScene->GetConfig()->GetInfiniteGrid());
+        } else {
+            printf("Warning! render list is empty and no main model\n");
+        }
         return;
     }
 
@@ -500,6 +512,16 @@ void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
 }
 
 
+void ForwardRenderer::RenderInfiniteGrid(const InfiniteGrid& Grid)
+{
+    SwitchToLightingTech(INFINITE_GRID);
+    Matrix4f VP = GetViewProjectionMatrix();
+    m_infiniteGridTech.SetVP(VP);
+    m_infiniteGridTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+    glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
+}
+
+
 
 /*void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
 {
@@ -770,11 +792,21 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f View = m_pCurCamera->GetMatrix();
-    Matrix4f Projection = m_pCurCamera->GetProjectionMat();    
-    Matrix4f WVP = Projection * View * World * ObjectMatrix;
+    Matrix4f ProjView = GetViewProjectionMatrix();
+    Matrix4f WVP = ProjView * World * ObjectMatrix;
    // printf("Picking pass\n"); WVP.Print();
 
     m_pickingTech.SetWVP(WVP);
+}
+
+
+Matrix4f ForwardRenderer::GetViewProjectionMatrix()
+{
+    Matrix4f View = m_pCurCamera->GetMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+
+    Matrix4f Ret = Projection * View;
+
+    return Ret;
 }
 

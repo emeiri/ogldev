@@ -16,9 +16,6 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
@@ -28,9 +25,6 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
@@ -38,12 +32,6 @@
       <Filter>Source\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp">
@@ -82,17 +70,32 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
       <Filter>Source\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.cpp">
       <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp">
+      <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -105,17 +108,11 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h">
-      <Filter>Include\GL</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_grid.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h">
       <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h">
-      <Filter>Include\GL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h">
       <Filter>Include\GL</Filter>
@@ -124,9 +121,6 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h">
-      <Filter>Include\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h">
@@ -171,12 +165,6 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>Source\ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h">
-      <Filter>Include\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h">
-      <Filter>Include\GL</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
@@ -197,6 +185,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h">
       <Filter>Source\ImGUI\imGuIZmo.quat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +233,12 @@
     <Filter Include="Source\ImGUI\imGuIZmo.quat">
       <UniqueIdentifier>{5e81e384-d69e-45a5-b905-309d8a740989}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\GL\Techniques">
+      <UniqueIdentifier>{534f6848-dcfa-4499-b52e-8362d346c652}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\GL\Techniques">
+      <UniqueIdentifier>{e5d7a365-34f3-45d2-b26d-f1b7d90cf2c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.fs">
@@ -248,6 +260,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

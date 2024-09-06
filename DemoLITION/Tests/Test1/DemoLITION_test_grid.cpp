@@ -50,11 +50,9 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/quad.obj");
-        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pScene->AddToRenderList(m_pSceneObject);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 0.0f));
 
-        m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
 
         /* DirectionalLight l;
          l.WorldDirection = Vector3f(1.0f, -0.5f, 0.0f);
@@ -79,8 +77,6 @@ public:
         BaseGLApp::OnFrame(DeltaTimeMillis);
       //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
-        m_pSceneObject->ResetRotations();
-        m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
         //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
 
         m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
@@ -90,7 +86,6 @@ public:
 private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
-    SceneObject* m_pSceneObject = NULL;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
 };

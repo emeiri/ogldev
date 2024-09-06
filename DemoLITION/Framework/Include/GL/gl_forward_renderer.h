@@ -31,6 +31,7 @@
 #include "flat_color_technique.h"
 #include "GL/gl_picking_texture.h"
 #include "GL/gl_picking_technique.h"
+#include "GL/gl_infinite_grid_technique.h"
 
 
 enum RENDER_PASS {
@@ -46,9 +47,10 @@ enum RENDER_PASS {
 
 
 enum LIGHTING_TECHNIQUE {
-    FORWARD_LIGHTING = 0,
-    FORWARD_SKINNING = 1,
-    UNDEFINED_TECHNIQUE = 2,
+    FORWARD_LIGHTING,
+    FORWARD_SKINNING,
+    INFINITE_GRID,
+    UNDEFINED_TECHNIQUE
 };
 
 
@@ -126,6 +128,7 @@ private:
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
+    void RenderInfiniteGrid(const InfiniteGrid& Grid);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
     void ApplySceneConfig(GLScene* pScene);
@@ -138,6 +141,7 @@ private:
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
     void SetWorldMatrix_CB_PickingPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
+    Matrix4f GetViewProjectionMatrix();
 
     int m_windowWidth = -1;
     int m_windowHeight = -1;
@@ -155,7 +159,7 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_lightViewMatrix;
 
-    LIGHTING_TECHNIQUE m_curLightingTech = FORWARD_LIGHTING;
+    LIGHTING_TECHNIQUE m_curLightingTech = UNDEFINED_TECHNIQUE;
     ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
     ForwardLightingTechnique m_lightingTech;
     ForwardSkinningTechnique m_skinningTech;
@@ -163,6 +167,7 @@ private:
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;
     PickingTechnique m_pickingTech;
+    InfiniteGridTechnique m_infiniteGridTech;
 
     PickingTexture m_pickingTexture;
 };

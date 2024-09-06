@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2023 Etay Meiri
+        Copyright 2024 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,31 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-void test_minimal();
-void test_clear();
-void test_object();
-void test_move_object();
-void test_blender_scene();
-void test_default_scene();
-void test_lighting();
-void test_normal_map();
-void test_parallax_map();
-void test_grid();
-void carbonara();
-
-
-int main(int argc, char* arg[])
+#version 330
+layout(location = 0) out vec4 FragColor;
+void main()
 {
-    //test_minimal();
-    //test_clear();    
-    //test_object();
-    //test_move_object();
-  //  test_blender_scene();
-   // test_default_scene();
-    //test_lighting();
-    //test_normal_map();
-   // test_parallax_map();
-   test_grid();
-  //  carbonara();
+	FragColor = vec4(0.0);
 }
