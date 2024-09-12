@@ -518,7 +518,16 @@ void ForwardRenderer::RenderInfiniteGrid(const InfiniteGrid& Grid)
     Matrix4f VP = GetViewProjectionMatrix();
     m_infiniteGridTech.SetVP(VP);
     m_infiniteGridTech.SetCameraWorldPos(m_pCurCamera->GetPos());
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
+    glDisable(GL_BLEND);
+    return;
+    m_shadowMapFBO.BindForWriting();
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
 }
 
 

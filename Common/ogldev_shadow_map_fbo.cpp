@@ -110,7 +110,7 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
     glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowMap);
 
     int Levels = 1;
-    glTextureStorage2D(m_shadowMap, Levels, GL_DEPTH_COMPONENT32, Width, Height);
+    glTextureStorage2D(m_shadowMap, Levels, GL_RGBA32F, Width, Height);
 
     GLint FilterType = ForPCF ? GL_LINEAR : GL_NEAREST;
 
@@ -122,11 +122,11 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTextureParameterfv(m_shadowMap, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-    glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, m_shadowMap, 0);
+    glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, m_shadowMap, 0);
 
     // Disable read/writes to the color buffer
     glNamedFramebufferReadBuffer(m_fbo, GL_NONE);
-    glNamedFramebufferDrawBuffer(m_fbo, GL_NONE);
+    glNamedFramebufferDrawBuffer(m_fbo, GL_COLOR_ATTACHMENT0);
 
     GLenum Status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER);
 
