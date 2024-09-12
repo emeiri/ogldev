@@ -522,7 +522,7 @@ void ForwardRenderer::RenderInfiniteGrid(const InfiniteGrid& Grid)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
     glDisable(GL_BLEND);
-    return;
+    //return;
     m_shadowMapFBO.BindForWriting();
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);

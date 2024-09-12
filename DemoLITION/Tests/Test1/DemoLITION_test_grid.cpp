@@ -50,7 +50,7 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 0.0f));
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
 
@@ -60,7 +60,12 @@ public:
          l.AmbientIntensity = 0.1f;
          pScene->GetDirLights().push_back(l);*/
 
-        m_pScene->SetCamera(Vector3f(0.0f, 0.2f, -2.5f), Vector3f(0.0f, -0.2f, 1.0f));
+     //   m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
+     //   m_pScene->SetCamera(Vector3f(-2.5f, 2.0f, -2.5f), Vector3f(0.66f, -0.5f, 0.66f));
+     m_pScene->SetCamera(Vector3f(0.0f, 0.05f, -2.5f), Vector3f(0.0f, -0.1f, 1.0f));
+   // 
+   //     m_pScene->SetCamera(Vector3f(0.0f, 5.0f, 0.5f), Vector3f(-0.0f, -1.0f, 0.5f));
+
         m_pScene->SetCameraSpeed(0.1f);
 
         //m_pScene->GetDirLights().push_back(m_dirLight);
