@@ -86,20 +86,20 @@ void main()
     float Lod2a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
 
     float LOD_fade = fract(LOD);
-    
     vec4 Color;
 
     if (Lod2a > 0.0) {
         Color = gGridColorThick;
+        Color.a *= Lod2a;
     } else {
         if (Lod1a > 0.0) {
             Color = mix(gGridColorThick, gGridColorThin, LOD_fade);
+	        Color.a *= Lod1a;
         } else {
             Color = gGridColorThin;
+	        Color.a *= (Lod0a * (1.0 - LOD_fade));
         }
     }
 
-    Color.a *= Lod0a;
-   
     FragColor = Color;
 }
