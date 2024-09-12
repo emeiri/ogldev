@@ -22,11 +22,17 @@ in vec3 WorldPos;
 
 layout(location = 0) out vec4 FragColor;
 
+uniform float gGridMinPixelsBetweenCells = 2.0;
 uniform float gGridCellSize = 0.025;
 uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 1.0);
 uniform vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 1.0);
 
 
+float log10(float x)
+{
+    float f = log(x) / log(10.0);
+    return f;
+}
 
 
 float satf(float x)
@@ -60,28 +66,15 @@ void main()
 
     vec2 dudv = vec2(lx, ly);
 
+    float l = length(dudv);
+
+    float LOD = max(0.0, log10(l * gGridMinPixelsBetweenCells / gGridCellSize) + 1.0);
+
+    float GridCellSizeLod0 = gGridCellSize * pow(10.0, floor(LOD));
+
     dudv *= 4.0;
 
-    // Step 1: use the Y derivative of y
-    //float Lod0a = mod(WorldPos.z, gGridCellSize) / (4.0 * dFdy(WorldPos.z));
-
-    // Step 2: use the X derivative of X
-    //float Lod0a = mod(WorldPos.x, gGridCellSize) / (4.0 * dFdx(WorldPos.x));
-
-    // Step 3: 
-    //float Lod0a = mod(WorldPos.z, gGridCellSize) / (4.0 * ly);
-
-    // Step 4:
-    //float Lod0a = mod(WorldPos.x, gGridCellSize) / (4.0 * lx);
-
-    // Step 5:
-    //float Lod0a = max2(mod(WorldPos.xz, gGridCellSize) / dudv);
-
-    // Step 6:
-    //float Lod0a = max2(vec2(1.0) - mod(WorldPos.xz, gGridCellSize) / dudv);
-
-    // Step 7:
-    vec2 mod_div_dudv = mod(WorldPos.xz, gGridCellSize) / dudv;
+    vec2 mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod0) / dudv;
     float Lod0a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
 
     vec4 Color = gGridColorThick;
