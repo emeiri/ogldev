@@ -22,6 +22,7 @@ in vec3 WorldPos;
 
 layout(location = 0) out vec4 FragColor;
 
+uniform float gGridSize = 100.0;
 uniform float gGridMinPixelsBetweenCells = 2.0;
 uniform float gGridCellSize = 0.025;
 uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 1.0);
@@ -100,6 +101,10 @@ void main()
 	        Color.a *= (Lod0a * (1.0 - LOD_fade));
         }
     }
+    
+    float OpacityFalloff = (1.0 - satf(length(WorldPos.xz) / gGridSize));
+
+    Color.a *= OpacityFalloff;
 
     FragColor = Color;
 }
