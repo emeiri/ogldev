@@ -71,13 +71,34 @@ void main()
     float LOD = max(0.0, log10(l * gGridMinPixelsBetweenCells / gGridCellSize) + 1.0);
 
     float GridCellSizeLod0 = gGridCellSize * pow(10.0, floor(LOD));
+    float GridCellSizeLod1 = GridCellSizeLod0 * 10.0;
+    float GridCellSizeLod2 = GridCellSizeLod1 * 10.0;
 
     dudv *= 4.0;
 
     vec2 mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod0) / dudv;
     float Lod0a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
 
-    vec4 Color = gGridColorThick;
+    mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod1) / dudv;
+    float Lod1a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
+    
+    mod_div_dudv = mod(WorldPos.xz, GridCellSizeLod2) / dudv;
+    float Lod2a = max2(vec2(1.0) - abs(satv(mod_div_dudv) * 2.0 - vec2(1.0)) );
+
+    float LOD_fade = fract(LOD);
+    
+    vec4 Color;
+
+    if (Lod2a > 0.0) {
+        Color = gGridColorThick;
+    } else {
+        if (Lod1a > 0.0) {
+            Color = mix(gGridColorThick, gGridColorThin, LOD_fade);
+        } else {
+            Color = gGridColorThin;
+        }
+    }
+
     Color.a *= Lod0a;
    
     FragColor = Color;
