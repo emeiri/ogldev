@@ -67,7 +67,7 @@ void test_normal_map()
     bool LoadBasicShapes = false;
     RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, &game, LoadBasicShapes);
 
-    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Normal Map Test");
 
     Scene* pScene = pRenderingSystem->CreateEmptyScene();
 

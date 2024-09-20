@@ -61,7 +61,7 @@ public:
 
     static RenderingSystem* CreateRenderingSystem(RENDERING_SYSTEM RenderingSystem, GameCallbacks* pGameCallbacks, bool LoadBasicShapes);
 
-    virtual void* CreateWindow(int Width, int Height) = 0;
+    virtual void* CreateWindow(int Width, int Height, const char* pWindowName) = 0;
 
     virtual void Shutdown() = 0;
 

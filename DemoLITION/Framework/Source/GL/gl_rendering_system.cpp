@@ -72,12 +72,12 @@ void RenderingSystemGL::Shutdown()
     delete this;
 }
 
-void* RenderingSystemGL::CreateWindowInternal()
+void* RenderingSystemGL::CreateWindowInternal(const char* pWindowName)
 {
     int major_ver = 0;
     int minor_ver = 0;
     bool is_full_screen = false;
-    m_pWindow = glfw_init(major_ver, minor_ver, m_windowWidth, m_windowHeight, is_full_screen, "Rendering Subsystem GL demo");
+    m_pWindow = glfw_init(major_ver, minor_ver, m_windowWidth, m_windowHeight, is_full_screen, pWindowName);
 
     glfwSetCursorPos(m_pWindow, m_windowWidth / 2, m_windowHeight / 2);
 

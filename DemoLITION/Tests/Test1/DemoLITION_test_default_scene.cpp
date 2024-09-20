@@ -40,7 +40,7 @@ public:
     {
         bool LoadBasicShapes = true;
         m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
-        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Default Scene Test");
 
         m_pScene = m_pRenderingSystem->CreateDefaultScene();
 

@@ -30,7 +30,7 @@ void test_clear()
 {
     bool LoadBasicShapes = false;
     RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
-    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Clear Test");
     
     Scene* pScene = pRenderingSystem->CreateEmptyScene();
     pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 0.0f));

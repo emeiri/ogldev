@@ -29,6 +29,6 @@ void test_minimal()
 {
     bool LoadBasicShapes = false;
     RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
-    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Minimal Test");
     pRenderingSystem->Execute();
 }

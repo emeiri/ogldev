@@ -32,7 +32,7 @@
 
 class ParallaxDemo : public BaseGLApp {
 public:
-    ParallaxDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
+    ParallaxDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Parallax Demo")
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);

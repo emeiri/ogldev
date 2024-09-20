@@ -68,12 +68,12 @@ RenderingSystem* RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM Renderi
 }
 
 
-void* CoreRenderingSystem::CreateWindow(int Width, int Height)
+void* CoreRenderingSystem::CreateWindow(int Width, int Height, const char* pWindowName)
 {
     m_windowWidth = Width;
     m_windowHeight = Height;
 
-    void* pWindow = CreateWindowInternal();
+    void* pWindow = CreateWindowInternal(pWindowName);
 
     if (m_loadBasicShapes) {
         InitializeBasicShapes();

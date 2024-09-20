@@ -28,7 +28,7 @@ class BaseGLApp : public GameCallbacks
 {
 public:
 
-    BaseGLApp(int WindowWidth, int WindowHeight);
+    BaseGLApp(int WindowWidth, int WindowHeight, const char* pWindowName);
 
     ~BaseGLApp() {}
 

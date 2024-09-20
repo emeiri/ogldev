@@ -36,7 +36,7 @@
 
 class GridDemo : public BaseGLApp {
 public:
-    GridDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
+    GridDemo() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Infinite Grid")
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
@@ -66,7 +66,7 @@ public:
 
      //   m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.000823f, -0.331338f, 0.943512f));
      //   m_pScene->SetCamera(Vector3f(-2.5f, 2.0f, -2.5f), Vector3f(0.66f, -0.5f, 0.66f));
-     m_pScene->SetCamera(Vector3f(0.0f, 0.05f, -2.5f), Vector3f(0.0f, -0.1f, 1.0f));
+     m_pScene->SetCamera(Vector3f(0.0f, 0.75f, -2.5f), Vector3f(0.0f, -0.2f, 1.0f));
    // 
    //     m_pScene->SetCamera(Vector3f(0.0f, 5.0f, 0.5f), Vector3f(-0.0f, -1.0f, 0.5f));
 
@@ -90,6 +90,8 @@ public:
         m_count += 0.01f;
         //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
        // m_pScene->SetCamera(Vector3f(0.0f, 0.05f, -2.5f), Vector3f(0.0f, 0.1f * sinf(m_count) - 0.15f, 1.0f));
+//        m_pScene->SetCamera(Vector3f(0.0f, 0.75f, m_count), Vector3f(0.0f, -0.2f, 1.0f));
+
         m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
         m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
 

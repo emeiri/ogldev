@@ -21,11 +21,11 @@
 #include "imgui_impl_opengl3.h"
 #include "demolition_base_gl_app.h"
 
-BaseGLApp::BaseGLApp(int WindowWidth, int WindowHeight)
+BaseGLApp::BaseGLApp(int WindowWidth, int WindowHeight, const char* pWindowName)
 {
     bool LoadBasicShapes = false;
     m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
-    m_pWindow = (GLFWwindow*)m_pRenderingSystem->CreateWindow(WindowWidth, WindowHeight);
+    m_pWindow = (GLFWwindow*)m_pRenderingSystem->CreateWindow(WindowWidth, WindowHeight, pWindowName);
     InitGUI();
 }
 

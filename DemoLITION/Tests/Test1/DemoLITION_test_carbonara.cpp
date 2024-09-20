@@ -43,7 +43,7 @@ struct PhysicsSceneObject {
 
 class Carbonara : public BaseGLApp {
 public:
-    Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
+    Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Carbonara")
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);

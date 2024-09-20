@@ -43,7 +43,7 @@ public:
         bool LoadBasicShapes = false;
         m_pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, this, LoadBasicShapes);
 
-        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+        m_pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Move Object Test");
 
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         DirectionalLight DirLight;

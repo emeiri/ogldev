@@ -34,7 +34,7 @@ void test_blender_scene()
     bool LoadBasicShapes = false;
     RenderingSystem* pRenderingSystem = RenderingSystem::CreateRenderingSystem(RENDERING_SYSTEM_GL, NULL, LoadBasicShapes);
 
-    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
+    pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "test_blender_scene");
 
     Scene* pScene = pRenderingSystem->CreateScene("../Content/demolition/spot_light2.glb");
 

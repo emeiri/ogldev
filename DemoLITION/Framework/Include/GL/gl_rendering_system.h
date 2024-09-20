@@ -58,7 +58,7 @@ class RenderingSystemGL : public CoreRenderingSystem
     void GetMousePos(void* pWindow, int& x, int& y);
 
  protected:
-     virtual void* CreateWindowInternal();
+     virtual void* CreateWindowInternal(const char* pWindowName);
 
      virtual void SetCamera(BasicCamera* pCamera) { m_forwardRenderer.SetCamera(pCamera); }
 
