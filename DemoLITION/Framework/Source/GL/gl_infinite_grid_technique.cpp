@@ -46,6 +46,7 @@ bool InfiniteGridTechnique::InitCommon()
 {
     GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
     GET_UNIFORM_AND_CHECK(CameraWorldPosLoc, "gCameraWorldPos");
+    GET_UNIFORM_AND_CHECK(GridCellSizeLoc, "gGridCellSize");
 
     return true;
 }
@@ -60,6 +61,12 @@ void InfiniteGridTechnique::SetVP(const Matrix4f& VP)
 void InfiniteGridTechnique::SetCameraWorldPos(const Vector3f& CameraWorldPos)
 {
     glUniform3f(CameraWorldPosLoc, CameraWorldPos.x, CameraWorldPos.y, CameraWorldPos.z);
+}
+
+
+void InfiniteGridTechnique::SetCellSize(float CellSize)
+{
+    glUniform1f(GridCellSizeLoc, CellSize);
 }
 
 

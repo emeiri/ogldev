@@ -22,6 +22,10 @@
 #include <string.h>
 #include <math.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
 
@@ -80,12 +84,83 @@ public:
     void OnFrame(long long DeltaTimeMillis)
     {
         BaseGLApp::OnFrame(DeltaTimeMillis);
-      //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+
+      //  m_pScene->SetCamera(Vector3f(0.0f, 0.05f, -2.5f), Vector3f(0.0f, -0.1f, 1.0f));
+        //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
         //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
-
+       // m_pScene->SetCamera(Vector3f(0.0f, 0.05f, -2.5f), Vector3f(0.0f, 0.1f * sinf(m_count) - 0.15f, 1.0f));
         m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
         m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
+
+        if (m_showGui) {
+            RenderGUI();
+        }
+    }
+
+
+    void RenderGUI()
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        bool my_tool_active = false;
+
+        ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);      
+
+        ImGui::SliderFloat("Grid Cell Size", &this->m_gridCellSize, 0.01f, 0.2f);
+        m_pScene->GetConfig()->GetInfiniteGrid().CellSize = m_gridCellSize;
+        
+        ImGui::End();
+
+        // Rendering
+        ImGui::Render();
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
+
+    bool OnMouseMove(int x, int y)
+    {
+        if (m_showGui) {
+            return true;
+        } else {
+            return BaseGLApp::OnMouseMove(x, y);
+        }
+    }
+
+
+    bool OnMouseButton(int Button, int Action, int Mode, int x, int y)
+    {
+        if (m_showGui) {
+            return true;
+        } else {
+            return BaseGLApp::OnMouseButton(Button, Action, Mode, x, y);
+        }
+    }
+    
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = true;
+
+        switch (key) {
+        case GLFW_KEY_SPACE:
+            if (action == GLFW_PRESS) {
+                m_showGui = !m_showGui;
+            }
+            break;
+
+        default:
+            HandledByMe = false;
+        }
+            
+        if (HandledByMe) {
+            return true;
+        } else {
+            return BaseGLApp::OnKeyboard(key, action);
+        }            
     }
 
 private:
@@ -93,6 +168,8 @@ private:
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
+    float m_gridCellSize = 0.025f;
+    bool m_showGui = false;
 };
 
 
