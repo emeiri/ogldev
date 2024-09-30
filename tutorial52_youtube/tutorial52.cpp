@@ -34,7 +34,7 @@
 
 class NormalMapping : public BaseGLApp {
 public:
-    NormalMapping() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT)
+    NormalMapping() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Normal Mapping")
     {
         m_dirLight.WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
