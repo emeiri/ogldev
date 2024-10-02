@@ -62,7 +62,9 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
+		m_pWindow = pWindow;
 		m_vkCore.Init(pAppName, pWindow);
+		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
@@ -93,9 +95,9 @@ private:
 
 	void CreateShaders()
 	{
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.vert");
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
 
-		m_fs = OgldevVK::CreateShaderModuleFromText(m_vkCore.GetDevice(), "test.frag");
+		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
 	}
 
 
@@ -139,8 +141,10 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+	GLFWwindow* m_pWindow = NULL;
 	OgldevVK::VulkanCore m_vkCore;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
+	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkRenderPass m_renderPass;

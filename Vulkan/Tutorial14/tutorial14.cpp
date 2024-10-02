@@ -143,7 +143,13 @@ private:
 	
 			m_pPipeline->Bind(m_cmdBufs[i]);
 
-			vkCmdDraw(m_cmdBufs[i], 3, 1, 0, 0);
+			u32 VertexCount = 3;
+			u32 InstanceCount = 1;
+			u32 FirstVertex = 0;
+			u32 FirstInstance = 0;
+			
+			vkCmdDraw(m_cmdBufs[i], VertexCount, InstanceCount, FirstVertex, FirstInstance);
+			
 			vkCmdEndRenderPass(m_cmdBufs[i]);
 
 			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
