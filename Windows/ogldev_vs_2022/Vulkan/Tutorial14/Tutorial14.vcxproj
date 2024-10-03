@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.fs" />
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.vs" />
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial14\tutorial14.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Vulkan\Tutorial14\tutorial14.cpp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial14\test.frag" />
+    <None Include="..\..\..\..\Vulkan\Tutorial14\test.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

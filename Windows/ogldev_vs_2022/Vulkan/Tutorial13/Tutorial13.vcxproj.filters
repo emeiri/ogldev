@@ -23,10 +23,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.fs">
+    <None Include="..\..\..\..\Vulkan\Tutorial13\test.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.vs">
+    <None Include="..\..\..\..\Vulkan\Tutorial13\test.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

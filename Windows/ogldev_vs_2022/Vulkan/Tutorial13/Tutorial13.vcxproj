@@ -22,8 +22,8 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial13\tutorial13.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.fs" />
-    <None Include="..\..\..\..\Vulkan\Tutorial13\test.vs" />
+    <None Include="..\..\..\..\Vulkan\Tutorial13\test.frag" />
+    <None Include="..\..\..\..\Vulkan\Tutorial13\test.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
