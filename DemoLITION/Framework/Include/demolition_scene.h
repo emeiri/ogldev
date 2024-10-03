@@ -64,7 +64,7 @@ private:
 };
 
 
-struct InfiniteGrid {
+struct InfiniteGridConfig {
     bool Enabled = false;
     float Size = 100.0f;
     float CellSize = 0.025f;
@@ -85,13 +85,13 @@ public:
     void ControlPicking(bool EnablePicking) { m_pickingEnabled = EnablePicking; }
     bool IsPickingEnabled() const { return m_pickingEnabled; }
 
-    InfiniteGrid& GetInfiniteGrid() { return m_infiniteGrid;  }
+    InfiniteGridConfig& GetInfiniteGrid() { return m_infiniteGridConfig;  }
 
 private:
 
     bool m_shadowMappingEnabled = true;
     bool m_pickingEnabled = false;
-    InfiniteGrid m_infiniteGrid;
+    InfiniteGridConfig m_infiniteGridConfig;
 };
 
 

@@ -70,6 +70,8 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_pickingTexture.Init(m_windowWidth, m_windowHeight);
 
+    m_infiniteGrid.Init();
+
     glUseProgram(0);
 }
 
@@ -120,12 +122,6 @@ void ForwardRenderer::InitTechniques()
         printf("Error initializing the picking technique\n");
         exit(1);
     }
-
-    if (!m_infiniteGridTech.Init()) {
-        printf("Error initializing the infinite grid technique\n");
-        exit(1);
-    }
-
 }
 
 
@@ -172,9 +168,6 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
             m_pCurLightingTech->Enable();
             break;
 
-        case INFINITE_GRID:
-            m_infiniteGridTech.Enable();
-            break;
         default:
             assert(0);
         }
@@ -200,8 +193,8 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     }
 
     if (pScene->GetRenderList().size() == 0) {
-        if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
-            RenderInfiniteGrid(pScene->GetConfig()->GetInfiniteGrid());
+        if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {            
+            RenderInfiniteGrid(pScene);
         } else {
             printf("Warning! render list is empty and no main model\n");
         }
@@ -512,19 +505,12 @@ void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
 }
 
 
-void ForwardRenderer::RenderInfiniteGrid(const InfiniteGrid& Grid)
+void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 {
-    SwitchToLightingTech(INFINITE_GRID);
     Matrix4f VP = GetViewProjectionMatrix();
-    m_infiniteGridTech.SetVP(VP);
-    m_infiniteGridTech.SetCameraWorldPos(m_pCurCamera->GetPos());
-    m_infiniteGridTech.SetCellSize(Grid.CellSize);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);        
-    glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
-    glDisable(GL_BLEND);
-    //return;
+    const InfiniteGridConfig& Config = pScene->GetConfig()->GetInfiniteGrid();
+    m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos());
 
     // Debugging - TODO need to cleanup this mess
   /*  m_shadowMapFBO.BindForWriting();

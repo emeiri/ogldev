@@ -31,7 +31,7 @@
 #include "flat_color_technique.h"
 #include "GL/gl_picking_texture.h"
 #include "GL/gl_picking_technique.h"
-#include "GL/gl_infinite_grid_technique.h"
+#include "GL/gl_infinite_grid.h"
 
 
 enum RENDER_PASS {
@@ -49,7 +49,6 @@ enum RENDER_PASS {
 enum LIGHTING_TECHNIQUE {
     FORWARD_LIGHTING,
     FORWARD_SKINNING,
-    INFINITE_GRID,
     UNDEFINED_TECHNIQUE
 };
 
@@ -128,7 +127,7 @@ private:
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
-    void RenderInfiniteGrid(const InfiniteGrid& Grid);
+    void RenderInfiniteGrid(GLScene* pScene);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
     void ApplySceneConfig(GLScene* pScene);
@@ -167,8 +166,8 @@ private:
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;
     PickingTechnique m_pickingTech;
-    InfiniteGridTechnique m_infiniteGridTech;
-
     PickingTexture m_pickingTexture;
+
+    InfiniteGrid m_infiniteGrid;
 };
 
