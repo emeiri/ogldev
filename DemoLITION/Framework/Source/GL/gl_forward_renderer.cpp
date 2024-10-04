@@ -160,12 +160,10 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
         switch (Tech) {
         case FORWARD_LIGHTING:
             m_pCurLightingTech = &m_lightingTech;
-            m_pCurLightingTech->Enable();
             break;
 
         case FORWARD_SKINNING:
             m_pCurLightingTech = &m_skinningTech;
-            m_pCurLightingTech->Enable();
             break;
 
         default:
@@ -173,7 +171,9 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
         }
 
         m_curLightingTech = Tech;
-    }
+    }    
+
+    m_pCurLightingTech->Enable();
 }
 
 
