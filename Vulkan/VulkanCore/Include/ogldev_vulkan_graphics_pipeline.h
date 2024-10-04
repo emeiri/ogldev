@@ -27,7 +27,8 @@ class GraphicsPipeline {
 
 public:
 
-	GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs);
+	GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass, 
+					 VkShaderModule vs, VkShaderModule fs);
 
 	~GraphicsPipeline();
 

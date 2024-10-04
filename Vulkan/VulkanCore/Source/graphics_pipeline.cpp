@@ -24,7 +24,8 @@
 
 namespace OgldevVK {
 
-GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs)
+GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass, 
+								   VkShaderModule vs, VkShaderModule fs)
 {
 	m_device = Device;
 
