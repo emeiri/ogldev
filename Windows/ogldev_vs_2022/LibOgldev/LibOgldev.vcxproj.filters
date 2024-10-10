@@ -54,13 +54,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_basic_mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_bezier_curve_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_billboard_list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_billboard_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_callbacks.h">
@@ -73,9 +67,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_engine_common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h">
@@ -91,9 +82,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_gui_texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_guitex_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_io_buffer.h">
@@ -117,16 +105,10 @@
     <ClInclude Include="..\..\..\Include\ogldev_new_lighting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_passthru_vec2_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_phong_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_pipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_quad_tess_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_random_texture.h">
@@ -147,37 +129,16 @@
     <ClInclude Include="..\..\..\Include\ogldev_shadow_map_offset_texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique_point_light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_skinned_mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_skinning_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_skybox_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_skydome.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_skydome_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_sprite_technique.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_tex_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h">
@@ -231,6 +192,48 @@
     <ClInclude Include="..\..\..\Include\ogldev_glm_camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_infinite_grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_bezier_curve_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_billboard_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_passthru_vec2_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_quad_tess_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_guitex_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique_point_light.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_skinning_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_skybox_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_tex_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_sprite_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_skydome_technique.h">
+      <Filter>Header Files\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -269,16 +272,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_billboard_list.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_flat_passthru_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp">
@@ -293,19 +287,10 @@
     <ClCompile Include="..\..\..\Common\ogldev_gui_texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_guitex_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_passthru_vec2_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_phong_renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_quad_tess_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_screen_quad.cpp">
@@ -320,31 +305,13 @@
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_offset_texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_skinning_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_sprite_technique.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp">
@@ -396,6 +363,48 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_flat_passthru_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_passthru_vec2_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_guitex_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_quad_tess_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_sprite_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_skinning_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_infinite_grid_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_infinite_grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
