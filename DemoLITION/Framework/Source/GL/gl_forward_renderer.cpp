@@ -526,12 +526,12 @@ void ForwardRenderer::RenderInfiniteGrid(const InfiniteGrid& Grid)
     glDisable(GL_BLEND);
     //return;
 
-    // Debugging
-    m_shadowMapFBO.BindForWriting();
+    // Debugging - TODO need to cleanup this mess
+  /*  m_shadowMapFBO.BindForWriting();
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, m_windowWidth, m_windowHeight);
+    glViewport(0, 0, m_windowWidth, m_windowHeight);*/
 }
 
 
