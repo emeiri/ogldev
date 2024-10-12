@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "ogldev_math_3d.h"
 #include "particle.h"
 
@@ -28,7 +30,28 @@ class ParticleContact
 {
 public:
 
-    Particle* m_pParticles[2] = { NULL, NULL };
+    float CalcSeparatingVelocity() const;
+
+    float GetPenetration() const { return m_penetration; }
+    void SetPenetration(float Penetration) { m_penetration = Penetration; }
+
+    void SetRestitution(float Restitution) { m_restitution = Restitution; }
+
+    void Resolve(float dt);
+
+    void SetContactNormal(Vector3f& Normal) { m_contactNormal = Normal; }
+
+    Particle* m_pParticles[2] = { NULL, NULL };    
+
+private:
+
+    void ResolveVelocity(float dt);
+
+    void ResolveInterpenetration(float dt);
+
+    float CalcSepVelocityCausedByAccel(float dt);
+
+    float CalcTotalReciprocalMass();
 
     float m_restitution = 0.0f;
 
@@ -37,19 +60,60 @@ public:
     float m_penetration = 0.0f;
 
     Vector3f m_particleMovement[2] = { 0.0f };
-
-protected:
-    void Resolve(float dt);
-
-    float CalcSeparatingVelocity() const;
-
-private:
-
-    void ResolveVelocity(float dt);
-
-    void ResolveInterpenetration(float dt);
 };
 
 
+class ParticleContactResolver {
+
+public:
+
+    ParticleContactResolver(int Iterations);
+
+    void SetIterations(int Iterations) { m_iterations = Iterations; }
+
+    void ResolveContacts(std::vector<ParticleContact>& ContactArray, float dt);
+
+    int FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray);
+
+protected:
+
+    int m_iterations = 0;
+    int m_iterationsUsed = 0;
+};
+
+
+class ParticleContactGenerator {
+public:
+
+    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0;
+};
+
+
+class ParticleLink : public ParticleContactGenerator {
+
+public:
+    
+    Particle* m_pParticles[2];
+
+    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0;
+
+protected:
+
+    float GetLength() const;
+};
+
+
+class ParticleCable : public ParticleLink {
+
+public:
+
+    virtual int AddContact(ParticleContact& Contact, int Limit) const;
+
+private:
+
+    float m_maxLength = 0.0f;
+
+    float m_restituion = 0.0f;
+};
 
 }

@@ -17,6 +17,9 @@
 
  */
 
+#include <assert.h>
+#include <algorithm>
+
 #include "contact_resolver.h"
 
 namespace OgldevPhysics
@@ -76,15 +79,19 @@ void ParticleContact::ResolveVelocity(float dt)
     float SeparatingVelocity = CalcSeparatingVelocity();
 
     if (SeparatingVelocity <= 0.0f) {
-        float NewSeparatingVelocity = -SeparatingVelocity * m_restitution;
+        float NewSepVelocity = -SeparatingVelocity * m_restitution;
 
-        float DeltaVelocity = NewSeparatingVelocity - SeparatingVelocity;
+        float SepVelocityCausedByAccel = CalcSepVelocityCausedByAccel(dt);
 
-        float TotalReciprocalMass = m_pParticles[0]->GetReciprocalMass();
-        
-        if (m_pParticles[1]) {
-            TotalReciprocalMass += m_pParticles[1]->GetReciprocalMass();
+        if (SepVelocityCausedByAccel < 0) {
+            NewSepVelocity += SepVelocityCausedByAccel * m_restitution;
+
+            NewSepVelocity = std::max(0.0f, NewSepVelocity);
         }
+
+        float DeltaVelocity = NewSepVelocity - SeparatingVelocity;
+
+        float TotalReciprocalMass = CalcTotalReciprocalMass();
 
         if (TotalReciprocalMass > 0.0f) {
             float Impluse = DeltaVelocity / TotalReciprocalMass;
@@ -104,5 +111,104 @@ void ParticleContact::ResolveVelocity(float dt)
     }
 }
 
+
+float ParticleContact::CalcSepVelocityCausedByAccel(float dt)
+{
+    Vector3f VelocityCausedByAccel = m_pParticles[0]->GetAcceleration();
+
+    if (m_pParticles[1]) {
+        VelocityCausedByAccel -= m_pParticles[1]->GetAcceleration();
+    }
+
+    float SepVelocityCausedByAccel = VelocityCausedByAccel.Dot(m_contactNormal) * dt;
+
+    return SepVelocityCausedByAccel;
+}
+
+
+float ParticleContact::CalcTotalReciprocalMass()
+{
+    float TotalReciprocalMass = m_pParticles[0]->GetReciprocalMass();
+
+    if (m_pParticles[1]) {
+        TotalReciprocalMass += m_pParticles[1]->GetReciprocalMass();
+    }
+
+    return TotalReciprocalMass;
+}
+
+
+void ParticleContactResolver::ResolveContacts(std::vector<ParticleContact>& ContactArray, float dt)
+{
+    int i = 0;
+
+    int IterationsUsed = 0;
+
+    while (IterationsUsed < m_iterations) {
+        int Index = FindContactWithLargestClosingVelocity(ContactArray);
+
+        if (Index == ContactArray.size()) {
+            break;
+        }
+
+        ContactArray[i].Resolve(dt);
+
+        IterationsUsed++;
+    }
+}
+
+
+int ParticleContactResolver::FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray)
+{
+    float MaxSepVelocity = FLT_MAX;
+    int MaxIndex = (int)ContactArray.size();
+
+    for (int i = 0; i < ContactArray.size(); i++) {
+        float SepVelocity = ContactArray[i].CalcSeparatingVelocity();
+
+        if ((SepVelocity < MaxSepVelocity) && ((SepVelocity < 0.0f) || (ContactArray[i].GetPenetration() > 0.0f))) {
+            MaxSepVelocity = SepVelocity;
+            MaxIndex = i;
+        }
+    }
+
+    return MaxIndex;
+}
+
+
+float ParticleLink::GetLength() const
+{
+    assert(m_pParticles[0]);
+    assert(m_pParticles[1]);
+
+    Vector3f RelativePos = m_pParticles[0]->GetPosition() - m_pParticles[1]->GetPosition();
+
+    float Len = RelativePos.Length();
+
+    return Len;
+}
+
+
+int ParticleCable::AddContact(ParticleContact& Contact, int Limit) const
+{
+    float Length = GetLength();
+
+    float Ret = 0.0f;
+
+    if (Length >= m_maxLength) {
+        Contact.m_pParticles[0] = m_pParticles[0];
+        Contact.m_pParticles[1] = m_pParticles[1];
+
+        Vector3f Normal = m_pParticles[1]->GetPosition() - m_pParticles[0]->GetPosition();
+
+        Normal.Normalize();
+
+        Contact.SetContactNormal(Normal);
+        Contact.SetPenetration(Length - m_maxLength);
+        Contact.SetRestitution(m_restituion);
+    }
+
+    return 0;
+}
 
 }
