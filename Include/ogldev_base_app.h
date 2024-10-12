@@ -29,11 +29,11 @@
 class OgldevBaseApp
 {
 public:
-    virtual bool KeyboardCB(uint key, int state);
+    virtual bool KeyboardCB(int Key, int Action, int Mods);
 
-    virtual void MouseCB(int button, int action, int x, int y);
+    virtual void MouseButtonCB(int button, int action, int x, int y);
 
-    virtual void PassiveMouseCB(int x, int y);
+    virtual void MouseMoveCB(int x, int y);
 
     void Run();
 
@@ -50,9 +50,11 @@ protected:
 
     void DefaultInitGUI();
 
-    void DefaultInitCallbacks();   
+    void DefaultInitCallbacks();  
 
-    virtual void RenderSceneCB() = 0;
+    void SetWindowShouldClose();
+
+    virtual void RenderSceneCB(float dt) = 0;
 
     GLFWwindow* m_pWindow = NULL;
     int m_windowWidth = 0;

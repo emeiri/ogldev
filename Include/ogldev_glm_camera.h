@@ -20,10 +20,11 @@
 
 #pragma once
 
+#define GLM_FORCE_LEFT_HANDED
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-static bool constexpr CAMERA_LEFT_HANDED = false;
+static bool constexpr CAMERA_LEFT_HANDED = true;
 
 struct MouseState {
 	glm::vec2 m_pos = glm::vec2(0.0f);

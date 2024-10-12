@@ -38,6 +38,11 @@
 #include <assimp/matrix3x3.h>
 #include <assimp/matrix4x4.h>
 
+#define GLM_FORCE_LEFT_HANDED
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+
 // powf wrapper for integer params to avoid crazy casting
 #define powi(base,exp) (int)powf((float)(base), (float)(exp))
 
@@ -162,6 +167,14 @@ struct Vector3f
         x = pFloat[0];
         y = pFloat[1];
         z = pFloat[2];
+    }
+
+
+    Vector3f(const glm::vec3& v)
+    {
+        x = v[0];
+        y = v[1];
+        z = v[2];
     }
 
     void InitRandom(const Vector3f& MinVal, const Vector3f& MaxVal);
@@ -523,6 +536,16 @@ public:
         m[1][0] = AssimpMatrix.b1; m[1][1] = AssimpMatrix.b2; m[1][2] = AssimpMatrix.b3; m[1][3] = 0.0f;
         m[2][0] = AssimpMatrix.c1; m[2][1] = AssimpMatrix.c2; m[2][2] = AssimpMatrix.c3; m[2][3] = 0.0f;
         m[3][0] = 0.0f           ; m[3][1] = 0.0f           ; m[3][2] = 0.0f           ; m[3][3] = 1.0f;
+    }
+
+
+    Matrix4f(const glm::mat4& a)
+    {
+        m[0][0] = a[0][0]; m[0][1] = a[1][0]; m[0][2] = a[2][0]; m[0][3] = a[3][0];
+        m[1][0] = a[0][1]; m[1][1] = a[1][1]; m[1][2] = a[2][1]; m[1][3] = a[3][1];
+        m[2][0] = a[0][2]; m[2][1] = a[1][2]; m[2][2] = a[2][2]; m[2][3] = a[3][2];
+        m[3][0] = a[0][3]; m[3][1] = a[1][3]; m[3][2] = a[2][3]; m[3][3] = a[3][3];
+
     }
 
     void SetZero()
