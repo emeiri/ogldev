@@ -19,6 +19,8 @@
 */
 
 #include <algorithm>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 #include "ogldev_glm_camera.h"
 
@@ -45,6 +47,8 @@ void CameraPositionerFirstPerson::Update(float dt, const glm::vec2& MousePos, bo
 	CalcMoveSpeed(dt);
 
 	m_cameraPos += m_moveSpeed * dt;
+
+//	printf("Camera pos: "); printf("%s\n", glm::to_string(m_cameraPos).c_str());
 }
 
 
@@ -64,8 +68,7 @@ void CameraPositionerFirstPerson::CalcMoveSpeed(float dt)
 
 	if (Acceleration == glm::vec3(0.0f)) {
 		m_moveSpeed -= m_moveSpeed * std::min(dt * 1.0f / m_damping, 1.0f);
-	}
-	else {
+	} else {
 		m_moveSpeed = Acceleration * m_acceleration * dt;
 		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
 
@@ -80,7 +83,14 @@ glm::vec3 CameraPositionerFirstPerson::CalcAcceleration()
 {
 	glm::mat4 v = glm::mat4_cast(m_cameraOrientation);
 
-	glm::vec3 Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
+	glm::vec3 Forward;
+	
+	if (CAMERA_LEFT_HANDED) {
+		Forward = glm::vec3(v[0][2], v[1][2], v[2][2]);
+	} else {
+		Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
+	}
+	
 	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
 	glm::vec3 Up = glm::cross(Right, Forward);
 

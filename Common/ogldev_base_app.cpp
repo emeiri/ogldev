@@ -98,12 +98,12 @@ void OgldevBaseApp::DefaultCreateCameraPers()
 }
 
 
-bool OgldevBaseApp::KeyboardCB(uint key, int state)
+bool OgldevBaseApp::KeyboardCB(int Key, int Action, int Mods)
 {
     bool Handled = true;
 
-    if (state == GLFW_PRESS) {
-        switch (key) {
+    if (Action == GLFW_PRESS) {
+        switch (Key) {
         case GLFW_KEY_ESCAPE:
         case GLFW_KEY_Q:
             glfwDestroyWindow(m_pWindow);
@@ -131,19 +131,19 @@ bool OgldevBaseApp::KeyboardCB(uint key, int state)
     }
 
     if (!Handled) {
-        m_pGameCamera->OnKeyboard(key);
+        m_pGameCamera->OnKeyboard(Key);
     }
 
     return false;
 }
 
 
-void OgldevBaseApp::MouseCB(int button, int action, int x, int y)
+void OgldevBaseApp::MouseButtonCB(int button, int action, int x, int y)
 {
 }
 
 
-void OgldevBaseApp::PassiveMouseCB(int x, int y)
+void OgldevBaseApp::MouseMoveCB(int x, int y)
 {
     if (!m_isPaused) {
         m_pGameCamera->OnMouse(x, y);
@@ -153,13 +153,13 @@ void OgldevBaseApp::PassiveMouseCB(int x, int y)
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    app->KeyboardCB(key, action);
+    app->KeyboardCB(key, action, mods);
 }
 
 
 static void CursorPosCallback(GLFWwindow* window, double x, double y)
 {
-    app->PassiveMouseCB((int)x, (int)y);
+    app->MouseMoveCB((int)x, (int)y);
 }
 
 
@@ -169,7 +169,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
     glfwGetCursorPos(window, &x, &y);
 
-    app->MouseCB(Button, Action, (int)x, (int)y);
+    app->MouseButtonCB(Button, Action, (int)x, (int)y);
 }
 
 
@@ -180,11 +180,21 @@ void OgldevBaseApp::DefaultInitCallbacks()
     glfwSetMouseButtonCallback(m_pWindow, MouseButtonCallback);
 }
 
+void OgldevBaseApp::SetWindowShouldClose()
+{
+    glfwSetWindowShouldClose(m_pWindow, GLFW_TRUE);
+}
+
 
 void OgldevBaseApp::Run()
 {
+    float CurTime = (float)glfwGetTime();
+
     while (!glfwWindowShouldClose(m_pWindow)) {
-        RenderSceneCB();
+        float Time = (float)glfwGetTime();
+        float dt = Time - CurTime;
+        RenderSceneCB(dt);
+        CurTime = Time;
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
     }

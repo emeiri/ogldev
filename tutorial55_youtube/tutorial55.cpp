@@ -27,6 +27,7 @@
 #include "ogldev_vertex_buffer.h"
 #include "ogldev_base_app.h"
 #include "ogldev_infinite_grid.h"
+#include "ogldev_glm_camera.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -65,13 +66,96 @@ public:
     }
 
 
-    virtual void RenderSceneCB()
+	virtual bool KeyboardCB(int Key, int Action, int Mods)
+	{
+		bool Press = Action != GLFW_RELEASE;
+
+        bool Handled = true;
+
+		switch (Key) {
+		case GLFW_KEY_ESCAPE:
+			if (Press) {
+				SetWindowShouldClose();
+			}
+			break;
+
+		case GLFW_KEY_W:
+			m_cameraPositioner.m_movement.Forward = Press;
+			//printf("1 %d\n", m_cameraPositioner.m_movement.Forward);
+			break;
+
+		case GLFW_KEY_S:
+			m_cameraPositioner.m_movement.Backward = Press;
+			break;
+
+		case GLFW_KEY_A:
+			m_cameraPositioner.m_movement.Left = Press;
+			break;
+
+		case GLFW_KEY_D:
+			m_cameraPositioner.m_movement.Right = Press;
+			break;
+
+		case GLFW_KEY_PAGE_UP:
+			m_cameraPositioner.m_movement.Up = Press;
+			break;
+
+		case GLFW_KEY_PAGE_DOWN:
+			m_cameraPositioner.m_movement.Down = Press;
+			break;
+
+		case GLFW_KEY_SPACE:
+			m_cameraPositioner.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
+			break;
+
+        default:
+            Handled = false;
+		}
+
+		if (Mods & GLFW_MOD_SHIFT) {
+			m_cameraPositioner.m_movement.FastSpeed = Press;
+		}
+
+        if (Handled) {
+            return true;
+        } else {
+            return OgldevBaseApp::KeyboardCB(Key, Action, Mods);
+        }
+	}
+
+
+	void MouseMoveCB(int xpos, int ypos)
+	{
+		m_mouseState.m_pos.x = (float)xpos / (float)WINDOW_WIDTH;
+		m_mouseState.m_pos.y = (float)ypos / (float)WINDOW_HEIGHT;
+	}
+
+
+	virtual void MouseButtonCB(int Button, int Action, int x, int y)
+	{
+		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+			m_mouseState.m_pressedLeft = (Action == GLFW_PRESS);
+		}
+	}
+
+
+    virtual void RenderSceneCB(float dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		m_cameraPositioner.Update(dt, m_mouseState.m_pos, m_mouseState.m_pressedLeft);		
 
         Matrix4f VP = m_pGameCamera->GetViewProjMatrix();
 
-        m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
+        glm::mat4 View = m_cameraPositioner.GetViewMatrix();
+
+        float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
+
+        glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
+
+        glm::mat4 VP1 = Proj * View;
+
+        m_infiniteGrid.Render(m_config, VP1, m_cameraPositioner.GetPosition());
        // RenderGui();
     }
 
@@ -81,19 +165,6 @@ public:
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        /*ImGui::Begin("Quad Tessellation");
-
-        ImGui::SliderFloat("Outer Left Tessellation Level", &this->m_outerLevelLeft, 0.0f, 50.0f);
-        ImGui::SliderFloat ("Outer Bottom Tessellation Level", &this->m_outerLevelBottom, 0.0f, 50.0f);
-        ImGui::SliderFloat ("Outer Right Tessellation Level", &this->m_outerLevelRight, 0.0f, 50.0f);
-        ImGui::SliderFloat("Outer Top Tessellation Level", &this->m_outerLevelTop, 0.0f, 50.0f);
-
-        ImGui::SliderFloat("Inner Left/Right Tessellation Level", &this->m_innerLevelLeftRight, 0.0f, 50.0f);
-        ImGui::SliderFloat("Inner Top/Bottom Tessellation Level", &this->m_innerLevelTopBottom, 0.0f, 50.0f);
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();*/
 
         // Rendering
         ImGui::Render();
@@ -130,6 +201,10 @@ public:
 
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
+	MouseState m_mouseState;
+	CameraPositionerFirstPerson m_cameraPositioner = CameraPositionerFirstPerson(glm::vec3(0.0f, 1.0f, 0.0f),
+																				 glm::vec3(0.0f, -0.1f, 1.0f),
+																				 glm::vec3(0.0f, 1.0f, 0.0f));
 };
 
 

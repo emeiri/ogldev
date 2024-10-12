@@ -69,7 +69,7 @@ public:
     }
 
 
-    virtual void RenderSceneCB()
+    virtual void RenderSceneCB(float dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
