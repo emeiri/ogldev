@@ -16,6 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// 
+// Note: This is the old version which is used in the article on the website.
+// For the youtube video series use the files in ogldev\Vulkan\VulkanCore\Include
+// 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 #ifndef OGLDEV_VULKAN_CORE_H
 #define OGLDEV_VULKAN_CORE_H
 
