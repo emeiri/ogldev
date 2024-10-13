@@ -24,7 +24,7 @@
 
 #include "ogldev_glm_camera.h"
 
-GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up)
+GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up, PersProjInfo& persProjInfo)
 {
 	m_cameraPos = Pos;
 	
@@ -33,6 +33,10 @@ GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3
 	} else {
 		m_cameraOrientation = glm::lookAtRH(Pos, Target, Up);
 	}
+
+	float ar = (float)persProjInfo.Width / (float)persProjInfo.Height;
+
+	m_persProjection = glm::perspective(persProjInfo.FOV, ar, persProjInfo.zNear, persProjInfo.zFar);
 }
 
 
@@ -142,6 +146,15 @@ glm::mat4 GLMCameraFirstPerson::GetViewMatrix() const
 	return res;
 }
 
+
+glm::mat4 GLMCameraFirstPerson::GetVPMatrix() const
+{
+	glm::mat4 View = GetViewMatrix();
+
+	glm::mat4 VP = m_persProjection * View;
+
+	return VP;
+}
 
 void GLMCameraFirstPerson::SetUpVector(const glm::vec3& Up)
 {

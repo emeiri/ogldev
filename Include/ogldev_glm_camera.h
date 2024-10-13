@@ -56,11 +56,15 @@ public:
 	float m_fastCoef = 10.0f;
 
 	GLMCameraFirstPerson() {}
-	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up);
+	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up, PersProjInfo& persProjInfo);
 
 	void Update(float dt, const glm::vec2& MousePos, bool MousePressed);
 
 	glm::mat4 GetViewMatrix() const;
+
+	const glm::mat4& GetProjMatrix() const { return m_persProjection; }
+
+	glm::mat4 GetVPMatrix() const;
 
 	glm::vec3 GetPosition() const { return m_cameraPos; }
 
@@ -76,6 +80,7 @@ private:
 	void CalcMoveSpeed(float dt);
 	void CalcCameraOrientation(const glm::vec2& MousePos);
 
+	glm::mat4 m_persProjection = glm::mat4(0.0);
 	glm::vec2 m_mousePos = glm::vec2(0.0f);
 	glm::vec3 m_cameraPos = glm::vec3(0.0f);
 	glm::quat m_cameraOrientation = glm::quat(glm::vec3(0.0f));

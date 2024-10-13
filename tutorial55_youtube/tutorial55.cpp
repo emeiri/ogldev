@@ -68,7 +68,7 @@ public:
 
 	virtual bool KeyboardCB(int Key, int Action, int Mods)
 	{
-        bool Handled = GLFWCameraHandler(m_camera.m_movement, Key, Action, Mods);
+        bool Handled = GLFWCameraHandler(m_pCamera->m_movement, Key, Action, Mods);
 
         if (Handled) {
             return true;
@@ -97,19 +97,13 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		m_camera.Update(dt, m_mouseState.m_pos, m_mouseState.m_pressedLeft);		
+		m_pCamera->Update(dt, m_mouseState.m_pos, m_mouseState.m_pressedLeft);		
 
-        Matrix4f VP = m_pGameCamera->GetViewProjMatrix();
+       // Matrix4f VP = m_pGameCamera->GetViewProjMatrix();
 
-        glm::mat4 View = m_camera.GetViewMatrix();
+        glm::mat4 VP = m_pCamera->GetVPMatrix();
 
-        float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
-
-        glm::mat4 Proj = glm::perspective(45.0f, ar, 0.1f, 1000.0f);
-
-        glm::mat4 VP1 = Proj * View;
-
-        m_infiniteGrid.Render(m_config, VP1, m_camera.GetPosition());
+        m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
        // RenderGui();
     }
 
@@ -144,7 +138,12 @@ public:
         float zFar = 1000.0f;
         PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+       // m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
+
+        m_pCamera = new GLMCameraFirstPerson(glm::vec3(0.0f, 2.1f, 0.0f),    // pos
+                                             glm::vec3(0.0f, 2.1f, 1.0f),    // target
+                                             glm::vec3(0.0f, 1.0f, 0.0f),    // up
+                                             persProjInfo);   
     }
 
 
@@ -156,9 +155,8 @@ public:
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
 	MouseState m_mouseState;
-	GLMCameraFirstPerson m_camera = GLMCameraFirstPerson(glm::vec3(0.0f, 2.1f, 0.0f),    // pos
-														 glm::vec3(0.0f, 2.1f, 1.0f),    // target
-														 glm::vec3(0.0f, 1.0f, 0.0f));   // up
+
+    GLMCameraFirstPerson* m_pCamera = NULL;
 };
 
 
