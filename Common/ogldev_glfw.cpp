@@ -23,6 +23,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_glfw.h"
+#include "ogldev_glm_camera.h"
 
 static int glMajorVersion = 0;
 static int glMinorVersion = 0;
@@ -133,4 +134,60 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
     glfwSwapInterval(1);
 
     return window;
+}
+
+
+bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
+{
+    bool Press = Action != GLFW_RELEASE;
+
+    bool Handled = true;
+
+    switch (Key) {
+
+    case GLFW_KEY_W:
+        Movement.Forward = Press;
+        break;
+
+    case GLFW_KEY_S:
+        Movement.Backward = Press;
+        break;
+
+    case GLFW_KEY_A:
+        Movement.StrafeLeft = Press;
+        break;
+
+    case GLFW_KEY_D:
+        Movement.StrafeRight = Press;
+        break;
+
+    case GLFW_KEY_PAGE_UP:
+        Movement.Up = Press;
+        break;
+
+    case GLFW_KEY_PAGE_DOWN:
+        Movement.Down = Press;
+        break;
+
+    case GLFW_KEY_LEFT:
+        Movement.Left = Press;
+        break;
+
+    case GLFW_KEY_RIGHT:
+        Movement.Right = Press;
+        break;
+
+  /*  case GLFW_KEY_SPACE:
+        m_camera.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
+        break;*/
+
+    default:
+        Handled = false;
+    }
+
+    if (Mods & GLFW_MOD_SHIFT) {
+        Movement.FastSpeed = Press;
+    }
+
+    return Handled;
 }

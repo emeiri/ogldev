@@ -32,21 +32,23 @@ struct MouseState {
 };
 
 
+struct CameraMovement {
+	bool Forward = false;
+	bool Backward = false;
+	bool StrafeLeft = false;
+	bool StrafeRight = false;
+	bool Left = false;
+	bool Right = false;
+	bool Up = false;
+	bool Down = false;
+	bool FastSpeed = false;
+};
+
+
 class GLMCameraFirstPerson {
 public:
-	struct Movement {
-		bool Forward = false;
-		bool Backward = false;
-		bool StrafeLeft = false;
-		bool StrafeRight = false;
-		bool Left = false;
-		bool Right = false;
-		bool Up = false;
-		bool Down = false;
-		bool FastSpeed = false;
-	};
 
-	Movement m_movement;
+	CameraMovement m_movement;
 	float m_mouseSpeed = 4.0f;
 	float m_acceleration = 150.0f;
 	float m_damping = 0.2f;
