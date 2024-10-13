@@ -68,61 +68,7 @@ public:
 
 	virtual bool KeyboardCB(int Key, int Action, int Mods)
 	{
-		bool Press = Action != GLFW_RELEASE;
-
-        bool Handled = true;
-
-		switch (Key) {
-		case GLFW_KEY_ESCAPE:
-			if (Press) {
-				SetWindowShouldClose();
-			}
-			break;
-
-		case GLFW_KEY_W:
-			m_camera.m_movement.Forward = Press;
-			//printf("1 %d\n", m_camera.m_movement.Forward);
-			break;
-
-		case GLFW_KEY_S:
-			m_camera.m_movement.Backward = Press;
-			break;
-
-		case GLFW_KEY_A:
-			m_camera.m_movement.StrafeLeft = Press;
-			break;
-
-		case GLFW_KEY_D:
-			m_camera.m_movement.StrafeRight = Press;
-			break;
-
-		case GLFW_KEY_PAGE_UP:
-			m_camera.m_movement.Up = Press;
-			break;
-
-		case GLFW_KEY_PAGE_DOWN:
-			m_camera.m_movement.Down = Press;
-			break;
-
-        case GLFW_KEY_LEFT:
-            m_camera.m_movement.Left = Press;
-            break;
-
-        case GLFW_KEY_RIGHT:
-            m_camera.m_movement.Right = Press;
-            break;
-
-		case GLFW_KEY_SPACE:
-			m_camera.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
-			break;
-
-        default:
-            Handled = false;
-		}
-
-		if (Mods & GLFW_MOD_SHIFT) {
-			m_camera.m_movement.FastSpeed = Press;
-		}
+        bool Handled = GLFWCameraHandler(m_camera.m_movement, Key, Action, Mods);
 
         if (Handled) {
             return true;
