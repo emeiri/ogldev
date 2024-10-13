@@ -17,7 +17,7 @@
 
 	This camera implementation is based on the "3D Graphics Rendering Cookbook"
 */
-
+#include <iostream>
 #include <algorithm>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
@@ -28,15 +28,15 @@ GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3
 {
 	m_cameraPos = Pos;
 	
-	if (CAMERA_LEFT_HANDED) {
-		m_cameraOrientation = glm::lookAtLH(Pos, Target, Up);
-	} else {
-		m_cameraOrientation = glm::lookAtRH(Pos, Target, Up);
-	}
-
 	float ar = (float)persProjInfo.Width / (float)persProjInfo.Height;
 
-	m_persProjection = glm::perspective(persProjInfo.FOV, ar, persProjInfo.zNear, persProjInfo.zFar);
+	if (CAMERA_LEFT_HANDED) {
+		m_cameraOrientation = glm::lookAtLH(Pos, Target, Up);
+		m_persProjection = glm::perspectiveLH(persProjInfo.FOV, ar, persProjInfo.zNear, persProjInfo.zFar);
+	} else {
+		m_cameraOrientation = glm::lookAtRH(Pos, Target, Up);
+		m_persProjection = glm::perspectiveRH(persProjInfo.FOV, ar, persProjInfo.zNear, persProjInfo.zFar);
+	}	
 }
 
 
@@ -52,7 +52,7 @@ void GLMCameraFirstPerson::Update(float dt, const glm::vec2& MousePos, bool Mous
 
 	m_cameraPos += m_moveSpeed * dt;
 
-//	printf("Camera pos: "); printf("%s\n", glm::to_string(m_cameraPos).c_str());
+	//printf("Camera pos: "); printf("%s\n", glm::to_string(m_cameraPos).c_str());
 }
 
 
@@ -105,6 +105,7 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 
 	if (m_movement.Forward) { 
 		Acceleration += Forward; 
+		//std::cout << glm::to_string(Acceleration) << std::endl;
 	}
 
 	if (m_movement.Backward) { 

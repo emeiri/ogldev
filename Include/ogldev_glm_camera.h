@@ -20,9 +20,10 @@
 
 #pragma once
 
-#define GLM_FORCE_LEFT_HANDED
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+
+#include "ogldev_math_3d.h"
 
 static bool constexpr CAMERA_LEFT_HANDED = true;
 
