@@ -32,35 +32,13 @@ struct MouseState {
 };
 
 
-class CameraPositioner {
-
-public:
-	
-	virtual glm::mat4 GetViewMatrix() const = 0;
-	
-	virtual glm::vec3 GetPosition() const = 0;
-};
-
-class Camera {
-public:
-
-	Camera(CameraPositioner& Positioner) : m_positioner(Positioner) {}
-
-	glm::mat4 GetViewMatrix() const { return m_positioner.GetViewMatrix(); }
-
-	glm::vec3 GetPosition() const { return m_positioner.GetPosition(); }
-
-private:
-
-	CameraPositioner& m_positioner;
-};
-
-
-class CameraPositionerFirstPerson : public CameraPositioner {
+class GLMCameraFirstPerson {
 public:
 	struct Movement {
 		bool Forward = false;
 		bool Backward = false;
+		bool StrafeLeft = false;
+		bool StrafeRight = false;
 		bool Left = false;
 		bool Right = false;
 		bool Up = false;
@@ -75,14 +53,14 @@ public:
 	float m_maxSpeed = 10.0f;
 	float m_fastCoef = 10.0f;
 
-	CameraPositionerFirstPerson() {}
-	CameraPositionerFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up);
+	GLMCameraFirstPerson() {}
+	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up);
 
 	void Update(float dt, const glm::vec2& MousePos, bool MousePressed);
 
-	virtual glm::mat4 GetViewMatrix() const;
+	glm::mat4 GetViewMatrix() const;
 
-	virtual glm::vec3 GetPosition() const { return m_cameraPos; }
+	glm::vec3 GetPosition() const { return m_cameraPos; }
 
 	void SetPosition(const glm::vec3& Pos) { m_cameraPos = Pos; }
 

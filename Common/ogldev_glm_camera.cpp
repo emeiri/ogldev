@@ -24,7 +24,7 @@
 
 #include "ogldev_glm_camera.h"
 
-CameraPositionerFirstPerson::CameraPositionerFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up)
+GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up)
 {
 	m_cameraPos = Pos;
 	
@@ -36,7 +36,7 @@ CameraPositionerFirstPerson::CameraPositionerFirstPerson(const glm::vec3& Pos, c
 }
 
 
-void CameraPositionerFirstPerson::Update(float dt, const glm::vec2& MousePos, bool MousePressed)
+void GLMCameraFirstPerson::Update(float dt, const glm::vec2& MousePos, bool MousePressed)
 {
 	if (MousePressed) {
 		CalcCameraOrientation(MousePos);
@@ -52,7 +52,7 @@ void CameraPositionerFirstPerson::Update(float dt, const glm::vec2& MousePos, bo
 }
 
 
-void CameraPositionerFirstPerson::CalcCameraOrientation(const glm::vec2& MousePos)
+void GLMCameraFirstPerson::CalcCameraOrientation(const glm::vec2& MousePos)
 {
 	glm::vec2 DeltaMouse = MousePos - m_mousePos;
 
@@ -62,7 +62,7 @@ void CameraPositionerFirstPerson::CalcCameraOrientation(const glm::vec2& MousePo
 }
 
 
-void CameraPositionerFirstPerson::CalcMoveSpeed(float dt)
+void GLMCameraFirstPerson::CalcMoveSpeed(float dt)
 {
 	glm::vec3 Acceleration = CalcAcceleration();
 
@@ -79,21 +79,22 @@ void CameraPositionerFirstPerson::CalcMoveSpeed(float dt)
 }
 
 
-glm::vec3 CameraPositionerFirstPerson::CalcAcceleration()
+glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 {
 	glm::mat4 v = glm::mat4_cast(m_cameraOrientation);
 
-	glm::vec3 Forward;
-	
+	glm::vec3 Forward, Up;
+
+	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
+
 	if (CAMERA_LEFT_HANDED) {
 		Forward = glm::vec3(v[0][2], v[1][2], v[2][2]);
+		Up = glm::cross(Forward, Right);
 	} else {
 		Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
+		Up = glm::cross(Right, Forward);
 	}
 	
-	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
-	glm::vec3 Up = glm::cross(Right, Forward);
-
 	glm::vec3 Acceleration = glm::vec3(0.0f);
 
 	//printf("2 %d\n", m_movement.Forward);
@@ -130,7 +131,7 @@ glm::vec3 CameraPositionerFirstPerson::CalcAcceleration()
 }
 
 
-glm::mat4 CameraPositionerFirstPerson::GetViewMatrix() const
+glm::mat4 GLMCameraFirstPerson::GetViewMatrix() const
 {
 	glm::mat4 t = glm::translate(glm::mat4(1.0), -m_cameraPos);
 
@@ -142,7 +143,7 @@ glm::mat4 CameraPositionerFirstPerson::GetViewMatrix() const
 }
 
 
-void CameraPositionerFirstPerson::SetUpVector(const glm::vec3& Up)
+void GLMCameraFirstPerson::SetUpVector(const glm::vec3& Up)
 {
 	glm::mat4 View = GetViewMatrix();
 	glm::vec3 Dir = -glm::vec3(View[0][2], View[1][2], View[2][2]);

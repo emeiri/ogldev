@@ -80,32 +80,40 @@ public:
 			break;
 
 		case GLFW_KEY_W:
-			m_cameraPositioner.m_movement.Forward = Press;
-			//printf("1 %d\n", m_cameraPositioner.m_movement.Forward);
+			m_camera.m_movement.Forward = Press;
+			//printf("1 %d\n", m_camera.m_movement.Forward);
 			break;
 
 		case GLFW_KEY_S:
-			m_cameraPositioner.m_movement.Backward = Press;
+			m_camera.m_movement.Backward = Press;
 			break;
 
 		case GLFW_KEY_A:
-			m_cameraPositioner.m_movement.Left = Press;
+			m_camera.m_movement.StrafeLeft = Press;
 			break;
 
 		case GLFW_KEY_D:
-			m_cameraPositioner.m_movement.Right = Press;
+			m_camera.m_movement.StrafeRight = Press;
 			break;
 
 		case GLFW_KEY_PAGE_UP:
-			m_cameraPositioner.m_movement.Up = Press;
+			m_camera.m_movement.Up = Press;
 			break;
 
 		case GLFW_KEY_PAGE_DOWN:
-			m_cameraPositioner.m_movement.Down = Press;
+			m_camera.m_movement.Down = Press;
 			break;
 
+        case GLFW_KEY_LEFT:
+            m_camera.m_movement.Left = Press;
+            break;
+
+        case GLFW_KEY_RIGHT:
+            m_camera.m_movement.Right = Press;
+            break;
+
 		case GLFW_KEY_SPACE:
-			m_cameraPositioner.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
+			m_camera.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
 			break;
 
         default:
@@ -113,7 +121,7 @@ public:
 		}
 
 		if (Mods & GLFW_MOD_SHIFT) {
-			m_cameraPositioner.m_movement.FastSpeed = Press;
+			m_camera.m_movement.FastSpeed = Press;
 		}
 
         if (Handled) {
@@ -143,11 +151,11 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		m_cameraPositioner.Update(dt, m_mouseState.m_pos, m_mouseState.m_pressedLeft);		
+		m_camera.Update(dt, m_mouseState.m_pos, m_mouseState.m_pressedLeft);		
 
         Matrix4f VP = m_pGameCamera->GetViewProjMatrix();
 
-        glm::mat4 View = m_cameraPositioner.GetViewMatrix();
+        glm::mat4 View = m_camera.GetViewMatrix();
 
         float ar = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
 
@@ -155,7 +163,7 @@ public:
 
         glm::mat4 VP1 = Proj * View;
 
-        m_infiniteGrid.Render(m_config, VP1, m_cameraPositioner.GetPosition());
+        m_infiniteGrid.Render(m_config, VP1, m_camera.GetPosition());
        // RenderGui();
     }
 
@@ -202,9 +210,9 @@ public:
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
 	MouseState m_mouseState;
-	CameraPositionerFirstPerson m_cameraPositioner = CameraPositionerFirstPerson(glm::vec3(0.0f, 1.0f, 0.0f),
-																				 glm::vec3(0.0f, -0.1f, 1.0f),
-																				 glm::vec3(0.0f, 1.0f, 0.0f));
+	GLMCameraFirstPerson m_camera = GLMCameraFirstPerson(glm::vec3(0.0f, 2.1f, 0.0f),    // pos
+														 glm::vec3(0.0f, 2.1f, 1.0f),    // target
+														 glm::vec3(0.0f, 1.0f, 0.0f));   // up
 };
 
 
