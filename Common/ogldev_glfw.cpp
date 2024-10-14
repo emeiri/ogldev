@@ -137,7 +137,7 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
 }
 
 
-bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
+/*bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
 {
     bool Press = Action != GLFW_RELEASE;
 
@@ -177,10 +177,6 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
         Movement.Right = Press;
         break;
 
-  /*  case GLFW_KEY_SPACE:
-        m_camera.SetUpVector(glm::vec3(0.0f, 1.0f, 0.0f));
-        break;*/
-
     default:
         Handled = false;
     }
@@ -191,3 +187,4 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
 
     return Handled;
 }
+*/
