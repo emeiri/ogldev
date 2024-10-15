@@ -27,12 +27,33 @@
 
 static bool constexpr CAMERA_LEFT_HANDED = true;
 
+struct CameraMovement {
+	bool Forward = false;
+	bool Backward = false;
+	bool StrafeLeft = false;
+	bool StrafeRight = false;
+	bool Left = false;
+	bool Right = false;
+	bool Up = false;
+	bool Down = false;
+	bool FastSpeed = false;
+};
+
+
 class GLMCameraFirstPerson {
 public:
+
+	CameraMovement m_movement;
+	float m_acceleration = 150.0f;
+	float m_damping = 0.2f;
+	float m_maxSpeed = 10.0f;
+	float m_fastCoef = 10.0f;
 
 	GLMCameraFirstPerson() {}
 
 	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up, PersProjInfo& persProjInfo);
+
+	void Update(float dt);
 
 	glm::mat4 GetViewMatrix() const;
 
@@ -44,7 +65,11 @@ public:
 
 private:
 
+	glm::vec3 CalcAcceleration();
+	void CalcVelocity(float dt);
+
 	glm::mat4 m_persProjection = glm::mat4(0.0);
 	glm::vec3 m_cameraPos = glm::vec3(0.0f);
 	glm::quat m_cameraOrientation = glm::quat(glm::vec3(0.0f));
+	glm::vec3 m_velocity = glm::vec3(0.0f);
 };

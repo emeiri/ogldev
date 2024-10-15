@@ -40,6 +40,84 @@ GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3
 }
 
 
+void GLMCameraFirstPerson::Update(float dt)
+{
+	CalcVelocity(dt);
+
+	m_cameraPos += m_velocity * dt;
+}
+
+
+void GLMCameraFirstPerson::CalcVelocity(float dt)
+{
+	glm::vec3 Acceleration = CalcAcceleration();
+
+	if (Acceleration == glm::vec3(0.0f)) {
+		m_velocity -= m_velocity * std::min(dt * 1.0f / m_damping, 1.0f);
+	} else {
+		m_velocity = Acceleration * m_acceleration * dt;
+		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
+
+		if (glm::length(m_velocity) > m_maxSpeed) {
+			m_velocity = glm::normalize(m_velocity) * m_maxSpeed;
+		}
+	}
+}
+
+
+glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
+{
+	glm::mat4 v = glm::mat4_cast(m_cameraOrientation);
+
+	glm::vec3 Forward, Up;
+
+	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
+
+	if (CAMERA_LEFT_HANDED) {
+		Forward = glm::vec3(v[0][2], v[1][2], v[2][2]);
+		Up = glm::cross(Forward, Right);
+	} else {
+		Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
+		Up = glm::cross(Right, Forward);
+	}
+	
+	glm::vec3 Acceleration = glm::vec3(0.0f);
+
+	//printf("2 %d\n", m_movement.Forward);
+
+	if (m_movement.Forward) { 
+		Acceleration += Forward; 
+		//std::cout << glm::to_string(Acceleration) << std::endl;
+	}
+
+	if (m_movement.Backward) { 
+		Acceleration -= Forward; 
+	}
+
+	if (m_movement.Left) { 
+		Acceleration -= Right; 
+	}
+
+	if (m_movement.Right) { 
+		Acceleration += Right; 
+	}
+
+	if (m_movement.Up) { 
+		Acceleration += Up; 
+	}
+
+	if (m_movement.Down) { 
+		Acceleration -= Up; 
+	}
+
+	if (m_movement.FastSpeed) { 
+		Acceleration *= m_fastCoef; 
+	}
+
+	return Acceleration;
+}
+
+
 glm::mat4 GLMCameraFirstPerson::GetViewMatrix() const
 {
 	glm::mat4 t = glm::translate(glm::mat4(1.0), -m_cameraPos);

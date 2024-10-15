@@ -68,7 +68,13 @@ public:
 
 	virtual bool KeyboardCB(int Key, int Action, int Mods)
 	{
-        return false;
+        bool Handled = GLFWCameraHandler(m_pCamera->m_movement, Key, Action, Mods);
+
+        if (Handled) {
+            return true;
+        } else {
+            return OgldevBaseApp::KeyboardCB(Key, Action, Mods);
+        }
 	}
 
 
@@ -86,6 +92,8 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+		m_pCamera->Update(dt);		
+
         glm::mat4 VP = m_pCamera->GetVPMatrix();
 
         m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
