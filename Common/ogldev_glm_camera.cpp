@@ -55,7 +55,7 @@ void GLMCameraFirstPerson::CalcVelocity(float dt)
 	if (Acceleration == glm::vec3(0.0f)) {
 		m_velocity -= m_velocity * std::min(dt * 1.0f / m_damping, 1.0f);
 	} else {
-		m_velocity = Acceleration * m_acceleration * dt;
+		m_velocity += Acceleration * m_acceleration * dt;
 		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
 
 		if (glm::length(m_velocity) > m_maxSpeed) {
@@ -86,28 +86,28 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 	//printf("2 %d\n", m_movement.Forward);
 
 	if (m_movement.Forward) { 
-		Acceleration += Forward; 
+		Acceleration = Forward; 
 		//std::cout << glm::to_string(Acceleration) << std::endl;
 	}
 
 	if (m_movement.Backward) { 
-		Acceleration -= Forward; 
+		Acceleration = -Forward; 
 	}
 
 	if (m_movement.Left) { 
-		Acceleration -= Right; 
+		Acceleration = -Right; 
 	}
 
 	if (m_movement.Right) { 
-		Acceleration += Right; 
+		Acceleration = Right; 
 	}
 
 	if (m_movement.Up) { 
-		Acceleration += Up; 
+		Acceleration = Up; 
 	}
 
 	if (m_movement.Down) { 
-		Acceleration -= Up; 
+		Acceleration = -Up; 
 	}
 
 	if (m_movement.FastSpeed) { 
