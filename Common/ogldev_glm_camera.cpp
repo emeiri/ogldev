@@ -53,7 +53,7 @@ void GLMCameraFirstPerson::CalcVelocity(float dt)
 	glm::vec3 Acceleration = CalcAcceleration();
 
 	if (Acceleration == glm::vec3(0.0f)) {
-		m_velocity -= m_velocity * std::min(dt * 1.0f / m_damping, 1.0f);
+		m_velocity -= m_velocity * std::min(dt * m_damping, 1.0f);
 	} else {
 		m_velocity += Acceleration * m_acceleration * dt;
 		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
