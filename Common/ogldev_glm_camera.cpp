@@ -42,9 +42,26 @@ GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3
 
 void GLMCameraFirstPerson::Update(float dt)
 {
+	if (m_mouseState.m_buttonPressed) {
+		CalcCameraOrientation();
+	}
+
+	m_oldMousePos = m_mouseState.m_pos;
+
 	CalcVelocity(dt);
 
 	m_cameraPos += m_velocity * dt;
+}
+
+
+
+void GLMCameraFirstPerson::CalcCameraOrientation()
+{
+	glm::vec2 DeltaMouse = m_mouseState.m_pos - m_oldMousePos;
+
+	glm::quat DeltaQuat = glm::quat(glm::vec3(m_mouseSpeed * DeltaMouse.y, m_mouseSpeed * DeltaMouse.x, 0.0f));
+
+	m_cameraOrientation = glm::normalize(DeltaQuat * m_cameraOrientation);
 }
 
 

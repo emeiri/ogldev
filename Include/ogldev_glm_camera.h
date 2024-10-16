@@ -27,6 +27,12 @@
 
 static bool constexpr CAMERA_LEFT_HANDED = true;
 
+struct MouseState {
+	glm::vec2 m_pos = glm::vec2(0.0f);
+	bool m_buttonPressed = false;
+};
+
+
 struct CameraMovement {
 	bool Forward = false;
 	bool Backward = false;
@@ -44,10 +50,12 @@ class GLMCameraFirstPerson {
 public:
 
 	CameraMovement m_movement;
+	MouseState m_mouseState;
 	float m_acceleration = 150.0f;
 	float m_damping = 5.0f;
 	float m_maxSpeed = 10.0f;
 	float m_fastCoef = 10.0f;
+	float m_mouseSpeed = 4.0f;	
 
 	GLMCameraFirstPerson() {}
 
@@ -67,9 +75,11 @@ private:
 
 	glm::vec3 CalcAcceleration();
 	void CalcVelocity(float dt);
+	void CalcCameraOrientation();
 
 	glm::mat4 m_persProjection = glm::mat4(0.0);
 	glm::vec3 m_cameraPos = glm::vec3(0.0f);
 	glm::quat m_cameraOrientation = glm::quat(glm::vec3(0.0f));
 	glm::vec3 m_velocity = glm::vec3(0.0f);
+	glm::vec2 m_oldMousePos = glm::vec2(0.0f);
 };

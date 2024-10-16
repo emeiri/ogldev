@@ -80,11 +80,16 @@ public:
 
 	void MouseMoveCB(int xpos, int ypos)
 	{
+		m_pCamera->m_mouseState.m_pos.x = (float)xpos / (float)WINDOW_WIDTH;
+        m_pCamera->m_mouseState.m_pos.y = (float)ypos / (float)WINDOW_HEIGHT;
 	}
 
 
 	virtual void MouseButtonCB(int Button, int Action, int x, int y)
 	{
+		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+            m_pCamera->m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
+		}
 	}
 
 
