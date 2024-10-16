@@ -69,45 +69,45 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 {
 	glm::mat4 v = glm::mat4_cast(m_cameraOrientation);
 
-	glm::vec3 Forward, Up;
+	glm::vec3 Forward;
 
 	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
 
 	if (CAMERA_LEFT_HANDED) {
 		Forward = glm::vec3(v[0][2], v[1][2], v[2][2]);
-		Up = glm::cross(Forward, Right);
 	} else {
 		Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
-		Up = glm::cross(Right, Forward);
 	}
+
+	glm::vec3 Up = glm::cross(Right, Forward);
 	
 	glm::vec3 Acceleration = glm::vec3(0.0f);
 
 	//printf("2 %d\n", m_movement.Forward);
 
 	if (m_movement.Forward) { 
-		Acceleration = Forward; 
+		Acceleration += Forward; 
 		//std::cout << glm::to_string(Acceleration) << std::endl;
 	}
 
 	if (m_movement.Backward) { 
-		Acceleration = -Forward; 
+		Acceleration += -Forward; 
 	}
 
 	if (m_movement.Left) { 
-		Acceleration = -Right; 
+		Acceleration += -Right; 
 	}
 
 	if (m_movement.Right) { 
-		Acceleration = Right; 
+		Acceleration += Right; 
 	}
 
 	if (m_movement.Up) { 
-		Acceleration = Up; 
+		Acceleration += Up; 
 	}
 
 	if (m_movement.Down) { 
-		Acceleration = -Up; 
+		Acceleration += -Up; 
 	}
 
 	if (m_movement.FastSpeed) { 
