@@ -71,6 +71,7 @@ public:
 
 	glm::vec3 GetPosition() const { return m_cameraPos; }
 
+	void SetUpVector();
 private:
 
 	glm::vec3 CalcAcceleration();
@@ -82,4 +83,5 @@ private:
 	glm::quat m_cameraOrientation = glm::quat(glm::vec3(0.0f));
 	glm::vec3 m_velocity = glm::vec3(0.0f);
 	glm::vec2 m_oldMousePos = glm::vec2(0.0f);
+	glm::vec3 m_up = glm::vec3(0.0f);
 };

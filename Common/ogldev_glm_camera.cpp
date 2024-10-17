@@ -27,6 +27,7 @@
 GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up, PersProjInfo& persProjInfo)
 {
 	m_cameraPos = Pos;
+	m_up = Up;
 	
 	float ar = (float)persProjInfo.Width / (float)persProjInfo.Height;
 
@@ -62,6 +63,8 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 	glm::quat DeltaQuat = glm::quat(glm::vec3(m_mouseSpeed * DeltaMouse.y, m_mouseSpeed * DeltaMouse.x, 0.0f));
 
 	m_cameraOrientation = glm::normalize(DeltaQuat * m_cameraOrientation);
+
+	SetUpVector();
 }
 
 
@@ -156,3 +159,15 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrix() const
 	return VP;
 }
 
+void GLMCameraFirstPerson::SetUpVector()
+{
+	glm::mat4 View = GetViewMatrix();
+	glm::vec3 Dir = glm::vec3(View[0][2], View[1][2], View[2][2]);
+
+	if (CAMERA_LEFT_HANDED) {
+		m_cameraOrientation = glm::lookAtLH(m_cameraPos, m_cameraPos + Dir, m_up);
+	}
+	else {
+		m_cameraOrientation = glm::lookAtRH(m_cameraPos, m_cameraPos - Dir, m_up);
+	}
+}
