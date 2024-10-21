@@ -38,7 +38,11 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 	printf("  Objects ");
 
 	for (u32 i = 0; i < pCallbackData->objectCount; i++) {
+#ifdef _WIN32
 		printf("%llux ", pCallbackData->pObjects[i].objectHandle);
+#else
+		printf("%lux ", pCallbackData->pObjects[i].objectHandle);
+#endif
 	}
 
 	printf("\n");

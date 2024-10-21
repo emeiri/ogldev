@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #include "ogldev_util.h"
-#include "gl/gl_picking_texture.h"
+#include "GL/gl_picking_texture.h"
 
 
 PickingTexture::~PickingTexture()

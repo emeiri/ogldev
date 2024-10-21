@@ -6,7 +6,7 @@ CPPFLAGS=`pkg-config --cflags glew glfw3 assimp`
 CPPFLAGS="$CPPFLAGS -I$OGLDEV_DIR/Include -I$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW -ggdb3"
 LDFLAGS=`pkg-config --libs glew glfw3 assimp`
 LDFLAGS="$LDFLAGS -lX11 -ldl -lmeshoptimizer"
-SOURCES="terrain_demo13.cpp \
+SOURCES="terrain_demo14.cpp \
 	terrain_technique.cpp \
 	midpoint_disp_terrain.cpp \
 	terrain.cpp \
@@ -30,4 +30,4 @@ SOURCES="terrain_demo13.cpp \
 	$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW/imgui_impl_glfw.cpp \
 	$OGLDEV_DIR/Common/3rdparty/ImGui/GLFW/imgui_impl_opengl3.cpp "
 
-$CC $SOURCES $CPPFLAGS $LDFLAGS -o terrain_demo13
+$CC $SOURCES $CPPFLAGS $LDFLAGS -o terrain_demo14

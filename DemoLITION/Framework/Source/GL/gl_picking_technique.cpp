@@ -16,7 +16,7 @@
 */
 
 #include "ogldev_util.h"
-#include "gl/gl_picking_technique.h"
+#include "GL/gl_picking_technique.h"
 
 PickingTechnique::PickingTechnique()
 {
