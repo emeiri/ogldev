@@ -27,26 +27,23 @@
 
 static bool constexpr CAMERA_LEFT_HANDED = true;
 
-struct MouseState {
-	glm::vec2 m_pos = glm::vec2(0.0f);
-	bool m_buttonPressed = false;
-};
-
-
 struct CameraMovement {
 	bool Forward = false;
 	bool Backward = false;
 	bool StrafeLeft = false;
 	bool StrafeRight = false;
-	bool Left = false;
-	bool Right = false;
 	bool Up = false;
 	bool Down = false;
 	bool FastSpeed = false;
 };
 
+struct MouseState {
+	glm::vec2 m_pos = glm::vec2(0.0f);
+	bool m_buttonPressed = false;
+};
 
 class GLMCameraFirstPerson {
+
 public:
 
 	CameraMovement m_movement;
@@ -57,26 +54,25 @@ public:
 	float m_fastCoef = 10.0f;
 	float m_mouseSpeed = 4.0f;	
 
-	GLMCameraFirstPerson() {}
-
-	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target, const glm::vec3& Up, PersProjInfo& persProjInfo);
+	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target,
+		                 const glm::vec3& Up, PersProjInfo& persProjInfo);
 
 	void Update(float dt);
 
-	glm::mat4 GetViewMatrix() const;
-
 	const glm::mat4& GetProjMatrix() const { return m_persProjection; }
-
-	glm::mat4 GetVPMatrix() const;
 
 	glm::vec3 GetPosition() const { return m_cameraPos; }
 
-	void SetUpVector();
+	glm::mat4 GetViewMatrix() const;
+
+	glm::mat4 GetVPMatrix() const;
+
 private:
 
 	glm::vec3 CalcAcceleration();
 	void CalcVelocity(float dt);
 	void CalcCameraOrientation();
+	void SetUpVector();	
 
 	glm::mat4 m_persProjection = glm::mat4(0.0);
 	glm::vec3 m_cameraPos = glm::vec3(0.0f);

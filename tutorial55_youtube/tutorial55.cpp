@@ -57,7 +57,7 @@ public:
 
         InitInfiniteGrid();
 
-     //   DefaultInitGUI();
+        DefaultInitGUI();
 
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
       //  glFrontFace(GL_CCW);
@@ -129,7 +129,8 @@ public:
         float FOV = 45.0f;
         float zNear = 1.0f;
         float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 
+                                      zNear, zFar };
 
         glm::vec3 Pos(0.0f, 2.1f, 0.0f);
         glm::vec3 Target(0.0f, 2.1f, 1.0f);

@@ -154,11 +154,11 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
         break;
 
     case GLFW_KEY_A:
-        Movement.Left = Press;
+        Movement.StrafeLeft = Press;
         break;
 
     case GLFW_KEY_D:
-        Movement.Right = Press;
+        Movement.StrafeRight = Press;
         break;
 
     case GLFW_KEY_PAGE_UP:
@@ -167,14 +167,6 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
 
     case GLFW_KEY_PAGE_DOWN:
         Movement.Down = Press;
-        break;
-
-    case GLFW_KEY_LEFT:
-        Movement.Left = Press;
-        break;
-
-    case GLFW_KEY_RIGHT:
-        Movement.Right = Press;
         break;
 
     default:
