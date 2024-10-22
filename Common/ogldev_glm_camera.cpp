@@ -157,6 +157,17 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrix() const
 	return VP;
 }
 
+
+glm::mat4 GLMCameraFirstPerson::GetVPMatrixNoTranslate() const
+{
+	glm::mat4 View = glm::mat4_cast(m_cameraOrientation);
+
+	glm::mat4 VP = m_persProjection * View;
+
+	return VP;
+}
+
+
 void GLMCameraFirstPerson::SetUpVector()
 {
 	glm::mat4 View = GetViewMatrix();

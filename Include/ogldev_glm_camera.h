@@ -67,6 +67,8 @@ public:
 
 	glm::mat4 GetVPMatrix() const;
 
+	glm::mat4 GetVPMatrixNoTranslate() const;
+
 private:
 
 	glm::vec3 CalcAcceleration();
