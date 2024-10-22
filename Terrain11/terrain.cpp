@@ -68,8 +68,8 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
     if (!m_skyBox.Init("../Content/envmap_interstellar",
         "interstellar_lf.tga",
         "interstellar_rt.tga",
-        "interstellar_dn.tga",
         "interstellar_up.tga",
+        "interstellar_dn.tga",
         "interstellar_ft.tga",
         "interstellar_bk.tga")) {
         exit(0);
