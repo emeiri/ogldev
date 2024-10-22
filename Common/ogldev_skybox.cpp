@@ -55,17 +55,17 @@ bool SkyBox::Init(const string& Directory,
     m_pSkyboxTechnique->Enable();
     m_pSkyboxTechnique->SetTextureUnit(0);
 
-    m_pCubemapTex = new CubemapTexture(Directory,
+   /* m_pCubemapTex = new CubemapTexture(Directory,
                                        PosXFilename,
                                        NegXFilename,
                                        PosYFilename,
                                        NegYFilename,
                                        PosZFilename,
-                                       NegZFilename);
+                                       NegZFilename);*/
 
-    if (!m_pCubemapTex->Load()) {
-        return false;
-    }
+    m_pCubemapTex = new CubemapEctTexture("foo");
+
+    m_pCubemapTex->Load();
 
     m_pMesh = new BasicMesh();
 

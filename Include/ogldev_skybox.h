@@ -22,7 +22,6 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_skybox_technique.h"
 #include "ogldev_cubemap_texture.h"
-//#include "ogldev_basic_mesh.h"
 
 class BasicMesh;
 
@@ -47,7 +46,7 @@ public:
 
 private:
     SkyboxTechnique* m_pSkyboxTechnique = NULL;
-    CubemapTexture* m_pCubemapTex = NULL;
+    CubemapEctTexture* m_pCubemapTex = NULL;
     BasicMesh* m_pMesh = NULL;
 };
 

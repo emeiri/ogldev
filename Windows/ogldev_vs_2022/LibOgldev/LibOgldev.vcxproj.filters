@@ -22,6 +22,9 @@
     <Filter Include="Source Files\Techniques">
       <UniqueIdentifier>{1cdbfcc6-0425-4563-9d57-bc2ae8656246}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{5a23f0b2-da9a-4db2-8d88-0945efcc8891}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -407,5 +410,118 @@
     <ClCompile Include="..\..\..\Common\ogldev_infinite_grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Common\Shaders\basic_lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\basic_lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tcs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tes">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\billboard.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\billboard.gs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\billboard.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\color.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\empty.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\flat_passthru.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\guitex.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\guitex.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\infinite_grid.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\infinite_grid.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\lighting_new_to_gs.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\passthru.gs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\passthru_vec2.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\passthru_vec3.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\quad_tess.tcs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\quad_tess.tes">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\ray_marching.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\ray_marching.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\shadow_map.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\shadow_map_point_light.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\shadow_map_point_light.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\skinning.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\skybox.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\skybox.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\skydome.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\skydome.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\sprite.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\sprite.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\tex.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\tex.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\Common\Shaders\wireframe_on_mesh.gs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -22,30 +22,48 @@
 #include <string>
 #include <GL/glew.h>
 
-using namespace std;
-
 class CubemapTexture
 {
 public:
-
-    CubemapTexture(const string& Directory,
-                   const string& PosXFilename,
-                   const string& NegXFilename,
-                   const string& PosYFilename,
-                   const string& NegYFilename,
-                   const string& PosZFilename,
-                   const string& NegZFilename);
+    CubemapTexture(const std::string& Directory,
+                   const std::string& PosXFilename,
+                   const std::string& NegXFilename,
+                   const std::string& PosYFilename,
+                   const std::string& NegYFilename,
+                   const std::string& PosZFilename,
+                   const std::string& NegZFilename);
 
     ~CubemapTexture();
 
-    bool Load();
+    void Load();
 
     void Bind(GLenum TextureUnit);
 
 private:
 
-    string m_fileNames[6];
+    std::string m_fileNames[6];
     GLuint m_textureObj;
 };
+
+
+// Ect - Equirectangular
+class CubemapEctTexture
+{
+public:
+   
+    CubemapEctTexture(const std::string& Filename);
+
+    ~CubemapEctTexture() {};
+
+    void Load();
+
+    void Bind(GLenum TextureUnit);
+
+private:
+
+    std::string m_filename;
+    GLuint m_textureObj;
+};
+
 
 #endif  /* OGLDEV_CUBEMAP_TEXTURE_H */

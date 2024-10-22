@@ -277,6 +277,45 @@
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Common\Shaders\basic_lighting.fs" />
+    <None Include="..\..\..\Common\Shaders\basic_lighting.vs" />
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tcs" />
+    <None Include="..\..\..\Common\Shaders\bezier_curve.tes" />
+    <None Include="..\..\..\Common\Shaders\billboard.fs" />
+    <None Include="..\..\..\Common\Shaders\billboard.gs" />
+    <None Include="..\..\..\Common\Shaders\billboard.vs" />
+    <None Include="..\..\..\Common\Shaders\color.fs" />
+    <None Include="..\..\..\Common\Shaders\empty.fs" />
+    <None Include="..\..\..\Common\Shaders\flat_passthru.vs" />
+    <None Include="..\..\..\Common\Shaders\guitex.fs" />
+    <None Include="..\..\..\Common\Shaders\guitex.vs" />
+    <None Include="..\..\..\Common\Shaders\infinite_grid.fs" />
+    <None Include="..\..\..\Common\Shaders\infinite_grid.vs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new_to_gs.vs" />
+    <None Include="..\..\..\Common\Shaders\passthru.gs" />
+    <None Include="..\..\..\Common\Shaders\passthru_vec2.vs" />
+    <None Include="..\..\..\Common\Shaders\passthru_vec3.vs" />
+    <None Include="..\..\..\Common\Shaders\quad_tess.tcs" />
+    <None Include="..\..\..\Common\Shaders\quad_tess.tes" />
+    <None Include="..\..\..\Common\Shaders\ray_marching.fs" />
+    <None Include="..\..\..\Common\Shaders\ray_marching.vs" />
+    <None Include="..\..\..\Common\Shaders\shadow_map.vs" />
+    <None Include="..\..\..\Common\Shaders\shadow_map_point_light.fs" />
+    <None Include="..\..\..\Common\Shaders\shadow_map_point_light.vs" />
+    <None Include="..\..\..\Common\Shaders\skinning.vs" />
+    <None Include="..\..\..\Common\Shaders\skybox.fs" />
+    <None Include="..\..\..\Common\Shaders\skybox.vs" />
+    <None Include="..\..\..\Common\Shaders\skydome.fs" />
+    <None Include="..\..\..\Common\Shaders\skydome.vs" />
+    <None Include="..\..\..\Common\Shaders\sprite.fs" />
+    <None Include="..\..\..\Common\Shaders\sprite.vs" />
+    <None Include="..\..\..\Common\Shaders\tex.fs" />
+    <None Include="..\..\..\Common\Shaders\tex.vs" />
+    <None Include="..\..\..\Common\Shaders\wireframe_on_mesh.gs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
