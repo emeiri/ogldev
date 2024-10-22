@@ -43,6 +43,8 @@ public:
 
     void Render(const BasicCamera& pCamera);
 
+    void Render(const Matrix4f& VP);
+
 private:
     SkyboxTechnique* m_pSkyboxTechnique = NULL;
     CubemapTexture* m_pCubemapTex = NULL;
