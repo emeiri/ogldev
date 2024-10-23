@@ -134,14 +134,14 @@ float ParticleContact::CalcTotalReciprocalMass()
 }
 
 
-void ParticleContactResolver::ResolveContacts(std::vector<ParticleContact>& ContactArray, float dt)
+void ParticleContactResolver::ResolveContacts(std::vector<ParticleContact>& ContactArray, uint NumContacts, float dt)
 {
     int i = 0;
 
     int IterationsUsed = 0;
 
     while (IterationsUsed < m_iterations) {
-        int Index = FindContactWithLargestClosingVelocity(ContactArray);
+        int Index = FindContactWithLargestClosingVelocity(ContactArray, NumContacts);
 
         if (Index == ContactArray.size()) {
             break;
@@ -154,12 +154,14 @@ void ParticleContactResolver::ResolveContacts(std::vector<ParticleContact>& Cont
 }
 
 
-int ParticleContactResolver::FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray)
+int ParticleContactResolver::FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray, uint NumContacts)
 {
     float MaxSepVelocity = FLT_MAX;
-    int MaxIndex = (int)ContactArray.size();
+    uint MaxIndex = (uint)ContactArray.size();
 
-    for (int i = 0; i < ContactArray.size(); i++) {
+    assert(NumContacts <= MaxIndex);
+
+    for (uint i = 0; i < NumContacts; i++) {
         float SepVelocity = ContactArray[i].CalcSeparatingVelocity();
 
         if ((SepVelocity < MaxSepVelocity) && ((SepVelocity < 0.0f) || (ContactArray[i].GetPenetration() > 0.0f))) {

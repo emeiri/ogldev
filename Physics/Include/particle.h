@@ -54,9 +54,9 @@ public:
 
     bool HasFiniteMass() const { return (m_reciprocalMass >= 0.0f); }
 
-protected:
-
     void ClearAccum();
+
+protected:    
 
     Vector3f m_position = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_velocity = Vector3f(0.0f, 0.0f, 0.0f);

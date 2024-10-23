@@ -67,15 +67,17 @@ class ParticleContactResolver {
 
 public:
 
-    ParticleContactResolver(int Iterations);
+    ParticleContactResolver() {}
+
+    void Init(int Iterations) { SetIterations(Iterations); }
 
     void SetIterations(int Iterations) { m_iterations = Iterations; }
 
-    void ResolveContacts(std::vector<ParticleContact>& ContactArray, float dt);
-
-    int FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray);
+    void ResolveContacts(std::vector<ParticleContact>& ContactArray, uint NumContacts, float dt);
 
 protected:
+
+    int FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray, uint NumContacts);
 
     int m_iterations = 0;
     int m_iterationsUsed = 0;
@@ -85,7 +87,7 @@ protected:
 class ParticleContactGenerator {
 public:
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0;
+    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0; // TODO: Contact should be an array of pointers
 };
 
 

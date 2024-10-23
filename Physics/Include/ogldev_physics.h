@@ -32,13 +32,12 @@
 #include "bungee_spring_force_generator.h"
 #include "buoyancy_force_generator.h"
 #include "fake_spring_force_generator.h"
+#include "contact_resolver.h"
 
 namespace OgldevPhysics
 {
 
 const static Vector3f GRAVITY = Vector3f(0.0f, -9.81f, 0.0f);
-
-#define DEFAULT_NUM_OBJECTS 1000
 
 class PhysicsSystem {
 
@@ -47,7 +46,7 @@ public:
 
     ~PhysicsSystem() {}
 
-    void Init(uint NumParticles = DEFAULT_NUM_OBJECTS);
+    void Init(uint NumParticles, uint MaxContacts, uint Iterations);
 
     Particle* AllocParticle();
 
@@ -55,7 +54,11 @@ public:
 
     void Update(long long DeltaTimeMillis);
 
-    ForceRegistry& GetRegistry() { return m_forceRegistry; }
+    ForceRegistry& GetRegistry() { return m_forceRegistry; }    
+
+    void RunPhysics(float dt);
+
+    void StartFrame();
 
 private:
 
@@ -66,13 +69,21 @@ private:
     void ParticleUpdate(float dt);
     void FireworkUpdate(float dt);
 
+    uint GenerateContacts();
+
     std::vector<Particle> m_particles;
-    uint m_numParticles = 0;
     std::vector<Firework> m_fireworks;
-    uint m_numFireworks = 0;
     std::vector<FireworkConfig> m_fireworkConfigs;
-    uint m_nextFirework = 0;
+    std::vector<ParticleContactGenerator> m_contactGenerators;
+    std::vector<ParticleContact> m_contacts;
+
     ForceRegistry m_forceRegistry;
+    ParticleContactResolver m_resolver;
+
+    uint m_numParticles = 0;
+    uint m_numFireworks = 0;
+    uint m_nextFirework = 0;    
+    bool m_calcIters = false;   
 };
 
 }
