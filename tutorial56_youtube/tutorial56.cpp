@@ -50,7 +50,7 @@ public:
 
     void Init()
     {
-        DefaultCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 55");
+        DefaultCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 56");
 
         DefaultInitCallbacks();
 
@@ -62,15 +62,7 @@ public:
 
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-        if (!m_skybox.Init("../Content/envmap_interstellar",
-            "interstellar_lf.tga",
-            "interstellar_rt.tga",
-            "interstellar_up.tga",
-            "interstellar_dn.tga",
-            "interstellar_ft.tga",
-            "interstellar_bk.tga")) {
-            exit(0);
-        }
+        m_skybox.Init("../Content/textures/piazza_bologni_1k.hdr");
 
       //  glFrontFace(GL_CCW);
       //  glEnable(GL_CULL_FACE);

@@ -22,7 +22,16 @@
 #include <string>
 #include <GL/glew.h>
 
-class CubemapTexture
+class BaseCubmapTexture {
+public:
+
+    virtual void Load() = 0;
+
+    virtual void Bind(GLenum TextureUnit) = 0;
+
+};
+
+class CubemapTexture : public BaseCubmapTexture
 {
 public:
     CubemapTexture(const std::string& Directory,
@@ -35,9 +44,9 @@ public:
 
     ~CubemapTexture();
 
-    void Load();
+    virtual void Load();
 
-    void Bind(GLenum TextureUnit);
+    virtual void Bind(GLenum TextureUnit);
 
 private:
 
@@ -47,7 +56,7 @@ private:
 
 
 // Ect - Equirectangular
-class CubemapEctTexture
+class CubemapEctTexture : public BaseCubmapTexture
 {
 public:
    
@@ -55,9 +64,9 @@ public:
 
     ~CubemapEctTexture() {};
 
-    void Load();
+    virtual void Load();
 
-    void Bind(GLenum TextureUnit);
+    virtual void Bind(GLenum TextureUnit);
 
 private:
 

@@ -37,7 +37,7 @@ SkyBox::~SkyBox()
 }
 
 
-bool SkyBox::Init(const string& Directory,
+void SkyBox::Init(const string& Directory,
                   const string& PosXFilename,
                   const string& NegXFilename,
                   const string& PosYFilename,
@@ -45,31 +45,51 @@ bool SkyBox::Init(const string& Directory,
                   const string& PosZFilename,
                   const string& NegZFilename)
 {
-    m_pSkyboxTechnique = new SkyboxTechnique();
+    InitTechnique();
 
-    if (!m_pSkyboxTechnique->Init()) {
-        printf("Error initializing the skybox technique\n");
-        return false;
-    }
-
-    m_pSkyboxTechnique->Enable();
-    m_pSkyboxTechnique->SetTextureUnit(0);
-
-   /* m_pCubemapTex = new CubemapTexture(Directory,
+    m_pCubemapTex = new CubemapTexture(Directory,
                                        PosXFilename,
                                        NegXFilename,
                                        PosYFilename,
                                        NegYFilename,
                                        PosZFilename,
-                                       NegZFilename);*/
+                                       NegZFilename);
 
-    m_pCubemapTex = new CubemapEctTexture("foo");
+    LoadTextureAndMesh();
+}
 
+
+void SkyBox::Init(const std::string& EctTextureFilename)
+{
+    InitTechnique();
+
+    m_pCubemapTex = new CubemapEctTexture(EctTextureFilename);
+
+    LoadTextureAndMesh();
+}
+
+
+void SkyBox::InitTechnique()
+{
+    m_pSkyboxTechnique = new SkyboxTechnique();
+
+    if (!m_pSkyboxTechnique->Init()) {
+        printf("Error initializing the skybox technique\n");
+        exit(1);
+    }
+
+    m_pSkyboxTechnique->Enable();
+    m_pSkyboxTechnique->SetTextureUnit(0);
+}
+
+
+void SkyBox::LoadTextureAndMesh()
+{
     m_pCubemapTex->Load();
 
     m_pMesh = new BasicMesh();
 
-    return m_pMesh->LoadMesh("../Content/box.obj");
+    m_pMesh->LoadMesh("../Content/box.obj");
 }
 
 

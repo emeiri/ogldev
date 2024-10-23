@@ -427,7 +427,7 @@ void CubemapEctTexture::Load()
 //    stbi_set_flip_vertically_on_load(0);
 
     int w, h, comp;
-    const float* img = stbi_loadf("../Content/textures/piazza_bologni_1k.hdr", &w, &h, &comp, 3);
+    const float* img = stbi_loadf(m_filename.c_str(), & w, & h, & comp, 3);
     Bitmap in(w, h, comp, eBitmapFormat_Float, (void*)img);
     Bitmap out = convertEquirectangularMapToVerticalCross(in);
     stbi_image_free((void*)img);

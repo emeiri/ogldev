@@ -32,21 +32,26 @@ public:
 
     ~SkyBox();
 
-    bool Init(const string& Directory,
-              const string& PosXFilename,
-              const string& NegXFilename,
-              const string& PosYFilename,
-              const string& NegYFilename,
-              const string& PosZFilename,
-              const string& NegZFilename);
+    void Init(const std::string& Directory,
+              const std::string& PosXFilename,
+              const std::string& NegXFilename,
+              const std::string& PosYFilename,
+              const std::string& NegYFilename,
+              const std::string& PosZFilename,
+              const std::string& NegZFilename);
+
+    void Init(const std::string& EctTextureFilename);
 
     void Render(const BasicCamera& pCamera);
 
     void Render(const Matrix4f& VP);
 
 private:
+    void InitTechnique();
+    void LoadTextureAndMesh();
+
     SkyboxTechnique* m_pSkyboxTechnique = NULL;
-    CubemapEctTexture* m_pCubemapTex = NULL;
+    BaseCubmapTexture* m_pCubemapTex = NULL;
     BasicMesh* m_pMesh = NULL;
 };
 
