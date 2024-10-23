@@ -49,25 +49,21 @@ float ParticleContact::CalcSeparatingVelocity() const
 void ParticleContact::ResolveInterpenetration(float dt)
 {
     if (m_penetration > 0.0f) {
-        float TotalReciprocalMass = m_pParticles[0]->GetReciprocalMass();
+        float TotalReciprocalMass = CalcTotalReciprocalMass();
 
-        if (m_pParticles[1]) {
-            TotalReciprocalMass += m_pParticles[1]->GetReciprocalMass();
+        if (TotalReciprocalMass > 0.0f) {
+            Vector3f MovePerReciprocalMass = m_contactNormal * m_penetration / TotalReciprocalMass;
 
-            if (TotalReciprocalMass > 0.0f) {
-                Vector3f MovePerReciprocalMass = m_contactNormal * m_penetration / TotalReciprocalMass;
+            m_particleMovement[0] = MovePerReciprocalMass * m_pParticles[0]->GetReciprocalMass();
 
-                m_particleMovement[0] = MovePerReciprocalMass * m_pParticles[0]->GetReciprocalMass();
+            Vector3f NewPos = m_pParticles[0]->GetPosition() + m_particleMovement[0];
+            m_pParticles[0]->SetPosition(NewPos);
 
-                Vector3f NewPos = m_pParticles[0]->GetPosition() + m_particleMovement[0];
-                m_pParticles[0]->SetPosition(NewPos);
+            if (m_pParticles[1]) {
+                m_particleMovement[1] = MovePerReciprocalMass * m_pParticles[1]->GetReciprocalMass();
 
-                if (m_pParticles[1]) {
-                    m_particleMovement[1] = MovePerReciprocalMass * m_pParticles[1]->GetReciprocalMass();
-
-                    NewPos = m_pParticles[1]->GetPosition() + m_particleMovement[1];
-                    m_pParticles[1]->SetPosition(NewPos);
-                }
+                NewPos = m_pParticles[1]->GetPosition() + m_particleMovement[1];
+                m_pParticles[1]->SetPosition(NewPos);
             }
         }
     }
@@ -206,6 +202,36 @@ int ParticleCable::AddContact(ParticleContact& Contact, int Limit) const
         Contact.SetContactNormal(Normal);
         Contact.SetPenetration(Length - m_maxLength);
         Contact.SetRestitution(m_restituion);
+    }
+
+    return 0;
+}
+
+
+int ParticleRod::AddContact(ParticleContact& Contact, int Limit) const
+{
+    float CurLength = GetLength();
+
+    float Ret = 0.0f;
+
+    if (CurLength >= m_len) {
+        Contact.m_pParticles[0] = m_pParticles[0];
+        Contact.m_pParticles[1] = m_pParticles[1];
+
+        Vector3f Normal = m_pParticles[1]->GetPosition() - m_pParticles[0]->GetPosition();
+
+        Normal.Normalize();
+
+        if (CurLength > m_len) {
+            Contact.SetContactNormal(Normal);
+            Contact.SetPenetration(CurLength - m_len);
+        }
+        else {
+            Contact.SetContactNormal(Normal *= -1.0f);
+            Contact.SetPenetration(m_len - CurLength);
+        }
+
+        Contact.SetRestitution(0.0f);
     }
 
     return 0;

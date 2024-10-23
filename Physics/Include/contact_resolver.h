@@ -116,4 +116,14 @@ private:
     float m_restituion = 0.0f;
 };
 
+
+class ParticleRod : public ParticleLink {
+
+public:
+
+    float m_len = 0.0f;
+
+    virtual int AddContact(ParticleContact& Contact, int Limit) const;
+};
+
 }
