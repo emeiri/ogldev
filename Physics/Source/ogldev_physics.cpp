@@ -37,6 +37,8 @@ void PhysicsSystem::Init(uint NumObjects, uint MaxContacts, uint Iterations)
 
     m_contacts.resize(MaxContacts);
 
+    m_contactGenerators.resize(MaxContacts);
+
     m_calcIters = (Iterations == 0);
 }
 
@@ -81,6 +83,7 @@ void PhysicsSystem::Update(long long DeltaTimeMillis)
 
     FireworkUpdate(dt);
 
+    return;
     uint UsedContacts = GenerateContacts();
 
     if (UsedContacts) {
@@ -139,6 +142,18 @@ void PhysicsSystem::StartFrame()
 }
 
 
+void PhysicsSystem::AddContact(ParticleContactGenerator* pContact)
+{
+    if (m_numContacts == m_contactGenerators.size()) {
+        printf("Out of contact generators\n");
+        exit(1);
+    }
+
+    m_contactGenerators[m_numContacts] = pContact;
+    m_numContacts++;
+}
+
+
 uint PhysicsSystem::GenerateContacts()
 {
     uint Limit = (uint)m_contacts.size();
@@ -147,7 +162,7 @@ uint PhysicsSystem::GenerateContacts()
 
     for (size_t i = 0; i < m_contactGenerators.size(); i++) {
         ParticleContact& NextContact = m_contacts[NextContactIndex];
-        uint UsedContacts = m_contactGenerators[i].AddContact(NextContact, Limit);
+        uint UsedContacts = m_contactGenerators[i]->AddContact(NextContact, Limit);
         Limit -= UsedContacts;
         NextContactIndex += Limit;
 

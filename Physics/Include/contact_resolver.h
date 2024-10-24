@@ -111,8 +111,6 @@ public:
 
     virtual int AddContact(ParticleContact& Contact, int Limit) const;
 
-private:
-
     float m_maxLength = 0.0f;
 
     float m_restituion = 0.0f;
@@ -127,5 +125,34 @@ public:
 
     virtual int AddContact(ParticleContact& Contact, int Limit) const;
 };
+
+
+class ParticleConstraint : public ParticleContactGenerator
+{
+
+public:
+
+    Particle* m_pParticle = NULL;
+    Vector3f m_anchor;
+
+    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0;
+
+protected:
+
+    float GetCurLength() const;
+};
+
+
+class ParticleCableConstraint : public ParticleConstraint
+{
+
+public:
+
+    float m_maxLength = 0.0f;
+    float m_restitution = 0.0f;
+
+    virtual int AddContact(ParticleContact& Contact, int Limit) const;
+};
+
 
 }

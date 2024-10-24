@@ -191,7 +191,7 @@ int ParticleCable::AddContact(ParticleContact& Contact, int Limit) const
 {
     float Length = GetLength();
 
-    float Ret = 0.0f;
+    int Ret = 0;
 
     if (Length >= m_maxLength) {
         Contact.m_pParticles[0] = m_pParticles[0];
@@ -204,9 +204,11 @@ int ParticleCable::AddContact(ParticleContact& Contact, int Limit) const
         Contact.SetContactNormal(Normal);
         Contact.SetPenetration(Length - m_maxLength);
         Contact.SetRestitution(m_restituion);
+
+        Ret = 1;
     }
 
-    return 0;
+    return Ret;
 }
 
 
@@ -214,7 +216,7 @@ int ParticleRod::AddContact(ParticleContact& Contact, int Limit) const
 {
     float CurLength = GetLength();
 
-    float Ret = 0.0f;
+    int Ret = 0;
 
     if (CurLength >= m_len) {
         Contact.m_pParticles[0] = m_pParticles[0];
@@ -234,9 +236,41 @@ int ParticleRod::AddContact(ParticleContact& Contact, int Limit) const
         }
 
         Contact.SetRestitution(0.0f);
+
+        Ret = 1;
     }
 
-    return 0;
+    return Ret;
 }
+
+
+float ParticleConstraint::GetCurLength() const
+{
+    Vector3f RelativePos = m_pParticle->GetPosition() - m_anchor;
+    return RelativePos.Length();
+}
+
+
+int ParticleCableConstraint::AddContact(ParticleContact& Contact, int Limit) const
+{
+    float Len = GetCurLength();
+
+    if (Len < m_maxLength) {
+        return 0;
+    }
+
+    Contact.m_pParticles[0] = m_pParticle;
+    Contact.m_pParticles[1] = NULL;
+
+    Vector3f Normal = m_anchor - m_pParticle->GetPosition();
+    Normal.Normalize();
+    Contact.SetContactNormal(Normal);
+
+    Contact.SetPenetration(Len - m_maxLength);
+    Contact.SetRestitution(m_restitution);
+
+    return 1;
+}
+
 
 }

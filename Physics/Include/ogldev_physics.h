@@ -60,6 +60,8 @@ public:
 
     void StartFrame();
 
+    void AddContact(ParticleContactGenerator* pContact);
+
 private:
 
     void InitFireworksConfig();
@@ -74,7 +76,7 @@ private:
     std::vector<Particle> m_particles;
     std::vector<Firework> m_fireworks;
     std::vector<FireworkConfig> m_fireworkConfigs;
-    std::vector<ParticleContactGenerator> m_contactGenerators;
+    std::vector<ParticleContactGenerator*> m_contactGenerators;
     std::vector<ParticleContact> m_contacts;
 
     ForceRegistry m_forceRegistry;
@@ -82,7 +84,8 @@ private:
 
     uint m_numParticles = 0;
     uint m_numFireworks = 0;
-    uint m_nextFirework = 0;    
+    uint m_nextFirework = 0; 
+    uint m_numContacts = 0;
     bool m_calcIters = false;   
 };
 
