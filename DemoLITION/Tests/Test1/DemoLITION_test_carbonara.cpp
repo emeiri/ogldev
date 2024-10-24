@@ -35,6 +35,8 @@
 #define WINDOW_HEIGHT 1080
 
 
+#define NUM_PARTICLES 1000
+
 struct PhysicsSceneObject {
     SceneObject* pSceneObject = NULL;
     OgldevPhysics::Particle* pParticle = NULL;
@@ -54,21 +56,29 @@ public:
         m_pointLight.DiffuseIntensity = 2.0f;
         m_pointLight.AmbientIntensity = 0.1f;
 
-        m_physicsSystem.Init();
+        m_physicsSystem.Init(NUM_PARTICLES, 1, 1);
     }
 
     ~Carbonara() {}
+
+    virtual void InitChild()
+    {
+        printf("-------------------------------------------\n");
+        printf("Warning! Child didn't implement InitChild()\n");
+        printf("-------------------------------------------\n");
+        exit(0);
+    }
 
     void Start()
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
-        // InitBallisticDemo();
+         InitChild();
         // InitFireworksDemo();
         // InitSpringDemo();
-        InitBuoyancyDemo();
+       // InitBuoyancyDemo();
 
-      //  LoadAndAddModel("../Content/Jump/Jump.dae");
+      
 
         //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
         //pSceneObject = m_pScene->CreateSceneObject(pGrid);
@@ -84,40 +94,9 @@ public:
 
         m_pRenderingSystem->SetScene(m_pScene);
 
+        InitChild();
+
         m_pRenderingSystem->Execute();
-    }
-
-
-    void InitBallisticDemo()
-    {
-        m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
-
-        PhysicsSceneObject Ground = LoadAndAddModel("../Content/ground.obj");
-        PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
-
-        Box.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
-        Box.pParticle->SetMass(2.0f);
-        Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
-     //   Box.pParticle->SetDamping(0.99f);
-    }
-
-
-    void InitFireworksDemo()
-    {
-        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -50.0f), Vector3f(0.0, 0.1f, 1.0f));
-
-        int NumFireworks = 50;
-
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
-
-        for (int i = 0 ; i < NumFireworks ; i++) {
-            PhysicsSceneObject CObject;
-            CObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
-            CObject.pSceneObject->SetScale(0.1f);
-            CObject.pParticle = m_physicsSystem.AllocFirework();
-            m_sceneObjects.push_back(CObject);
-            m_pScene->AddToRenderList(CObject.pSceneObject);
-        }
     }
 
 
@@ -420,11 +399,16 @@ public:
         return HandledByMe;
     }
 
+protected:
 
-private:
-    float m_count = 0.0f;
     Scene* m_pScene = NULL;
     std::list<PhysicsSceneObject> m_sceneObjects;
+    OgldevPhysics::PhysicsSystem m_physicsSystem;
+
+private:
+
+    float m_count = 0.0f;
+
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
     bool m_leftMousePressed = false;
@@ -432,7 +416,7 @@ private:
     SceneObject* m_pickedObject = NULL;
     bool m_showGui = false;
     int m_enableShadowMapping = 1;
-    OgldevPhysics::PhysicsSystem m_physicsSystem;
+
     OgldevPhysics::GravityForceGenerator m_gravityForceGenerator;
     OgldevPhysics::DragForceGenerator m_dragForceGenerator;
     OgldevPhysics::SpringForceGenerator m_springForceGenerator;
@@ -442,9 +426,74 @@ private:
 
 
 
+class BallisticsDemo : public Carbonara {
+
+public:
+
+    BallisticsDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.5f, -5.0f), Vector3f(0.0, -0.1f, 1.0f));
+
+        PhysicsSceneObject Ground = LoadAndAddModel("../Content/ground.obj");
+        PhysicsSceneObject Box = LoadAndAddModel("../Content/box.obj", 0.1f);
+
+        Box.pParticle->SetPosition(Vector3f(-1.0f, 0.0f, 0.0f));
+        Box.pParticle->SetMass(2.0f);
+        Box.pParticle->SetVelocity(Vector3f(1.0f, 1.0f, 0.0f));
+        //   Box.pParticle->SetDamping(0.99f);
+    }
+};
+
+
+class FireworksDemo : public Carbonara {
+
+public:
+
+    FireworksDemo()  {}
+
+    void InitChild()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -50.0f), Vector3f(0.0, 0.1f, 1.0f));
+
+        int NumFireworks = 50;
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        for (int i = 0; i < NumFireworks; i++) {
+            PhysicsSceneObject CObject;
+            CObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
+            CObject.pSceneObject->SetScale(0.1f);
+            CObject.pParticle = m_physicsSystem.AllocFirework();
+            m_sceneObjects.push_back(CObject);
+            m_pScene->AddToRenderList(CObject.pSceneObject);
+        }
+    }
+};
+
+
+class AnimationDemo : public Carbonara {
+
+public:
+
+    AnimationDemo() {}
+
+    void InitChild()
+    {
+        m_pScene->SetCamera(Vector3f(0.0f, 0.33f, -0.65f), Vector3f(0.0, -0.3f, 1.0f));
+        LoadAndAddModel("../Content/Jump/Jump.dae", 0.1f);
+    }
+};
+
 void carbonara()
 {
-    Carbonara game;
+    //BallisticsDemo game;
+   //FireworksDemo game;
+    AnimationDemo game;
 
     game.Start();
 }
