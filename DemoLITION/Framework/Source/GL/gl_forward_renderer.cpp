@@ -192,12 +192,12 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         return;
     }
 
+    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+        RenderInfiniteGrid(pScene);
+    }
+
     if (pScene->GetRenderList().size() == 0) {
-        if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {            
-            RenderInfiniteGrid(pScene);
-        } else {
-            printf("Warning! render list is empty and no main model\n");
-        }
+        printf("Warning! render list is empty and no main model\n");
         return;
     }
 
@@ -210,10 +210,6 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
     ShadowMapPass(pScene);
     LightingPass(pScene, TotalRuntimeMillis);
-
-    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
-        RenderInfiniteGrid(pScene);
-    }
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
