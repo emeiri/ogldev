@@ -168,7 +168,7 @@ public:
 
         m_physicsSystem.Update(DeltaTimeMillis);
 
-        UpdateParticlePositions();
+      //  UpdateParticlePositions();
         
     //    m_pSceneObject->ResetRotations();
      //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
@@ -193,15 +193,22 @@ public:
     PhysicsSceneObject LoadAndAddModel(const char* pFilename, float Scale = 1.0f)
     {
         Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
-        PhysicsSceneObject CObject;
-        CObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
-        CObject.pSceneObject->SetScale(Scale);
-        CObject.pParticle = m_physicsSystem.AllocParticle();
-        m_sceneObjects.push_back(CObject);
-        m_pScene->AddToRenderList(CObject.pSceneObject);
+        PhysicsSceneObject CObject = AddPhysicsSceneObject(pModel, Scale);
   //      m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
    //     m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
         return CObject;
+    }
+
+
+    PhysicsSceneObject AddPhysicsSceneObject(Model* pModel, float Scale = 1.0f)
+    {
+        PhysicsSceneObject PSObject;
+        PSObject.pSceneObject = m_pScene->CreateSceneObject(pModel);
+        PSObject.pSceneObject->SetScale(Scale);
+     //   PSObject.pParticle = m_physicsSystem.AllocParticle();
+        m_sceneObjects.push_back(PSObject);
+        m_pScene->AddToRenderList(PSObject.pSceneObject);
+        return PSObject;
     }
 
 
@@ -525,59 +532,41 @@ public:
 
         // Base spheres
         for (int i = 0; i < NUM_SPHERES; i++) {
-            PhysicsSceneObject CObject;
-            CObject.pSceneObject = m_pScene->CreateSceneObject(pSphere);
-            CObject.pSceneObject->SetScale(0.05f,0.05f,0.05f);
-            CObject.pSceneObject->SetPosition(Vector3f((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f));
-            CObject.pParticle = NULL;
-            m_sceneObjects.push_back(CObject);
-            m_pScene->AddToRenderList(CObject.pSceneObject);
-            Spheres[i] = CObject.pSceneObject;
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(pSphere, 0.05f);
+            PSObject.pSceneObject->SetPosition(Vector3f((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f));
+            Spheres[i] = PSObject.pSceneObject;
         }
 
         // Rods that connect each opposing spheres
         for (int i = 0; i < NUM_SPHERES / 2; i++) {
-            PhysicsSceneObject CObject;
-            CObject.pSceneObject = m_pScene->CreateSceneObject(pRod);
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(pRod);
             Vector3f Dir = (Spheres[i * 2 + 1]->GetPosition() - Spheres[i * 2]->GetPosition());
             float RodLen = Dir.Length();
             Vector3f Pos = Spheres[i * 2]->GetPosition() + Dir / 2.0f;
-            CObject.pSceneObject->SetPosition(Pos);
-            CObject.pSceneObject->SetScale(RodLen / 2.0f);
-         //   CObject.pSceneObject->PushRotation(Vector3f(0.0f, 36.0f, 0.0f));
-            DirToRotation(Dir, *CObject.pSceneObject);
-            CObject.pParticle = NULL;
-            m_sceneObjects.push_back(CObject);            
-            m_pScene->AddToRenderList(CObject.pSceneObject);
+            PSObject.pSceneObject->SetPosition(Pos);
+            PSObject.pSceneObject->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *PSObject.pSceneObject);
         }
         
         // Links from above
         for (int i = 0; i < NUM_SPHERES; i++) {
-            PhysicsSceneObject CObject;
-            CObject.pSceneObject = m_pScene->CreateSceneObject(pRod);
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(pRod);
             Vector3f AnchorPos = Spheres[i]->GetPosition() + Vector3f(0.0f, 2.0f, 0.0f);
             Vector3f Dir = AnchorPos - Spheres[i]->GetPosition();
             Vector3f Pos = Spheres[i]->GetPosition() + Dir / 2.0f;
-            CObject.pSceneObject->SetPosition(Pos);
-            
-            DirToRotation(Dir, *CObject.pSceneObject);
-            m_sceneObjects.push_back(CObject);
-            m_pScene->AddToRenderList(CObject.pSceneObject);
+            PSObject.pSceneObject->SetPosition(Pos);            
+            DirToRotation(Dir, *PSObject.pSceneObject);
         }
         
         // Links between consecutive spheres
         for (int i = 0; i < NUM_SPHERES - 2; i++) {
-            PhysicsSceneObject CObject;
-            CObject.pSceneObject = m_pScene->CreateSceneObject(pRod);
+            PhysicsSceneObject PSObject = AddPhysicsSceneObject(pRod);
             Vector3f Dir = (Spheres[i + 2]->GetPosition() - Spheres[i]->GetPosition());
             float RodLen = Dir.Length();
             Vector3f Pos = Spheres[i]->GetPosition() + Dir / 2.0f;
-            CObject.pSceneObject->SetPosition(Pos);
-            DirToRotation(Dir, *CObject.pSceneObject);
-            m_sceneObjects.push_back(CObject);
-            m_pScene->AddToRenderList(CObject.pSceneObject);
+            PSObject.pSceneObject->SetPosition(Pos);
+            DirToRotation(Dir, *PSObject.pSceneObject);
         }
-
     }
 };
 
