@@ -216,6 +216,13 @@ void Matrix4f::InitRotateTransform(const Quaternion& quat)
 }
 
 
+void Matrix4f::InitRotationFromDir(const Vector3f& Dir)
+{
+    Vector3f Up(0.0f, 1.0f, 0.0f);
+    InitCameraTransform(Dir, Up);
+}
+
+
 void Matrix4f::InitTranslationTransform(float x, float y, float z)
 {
     m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = x;

@@ -626,6 +626,7 @@ public:
     void InitRotateTransformZYX(float RotateX, float RotateY, float RotateZ);
     void InitRotateTransform(const Vector3f& Rotate);
     void InitRotateTransform(const Quaternion& quat);
+    void InitRotationFromDir(const Vector3f& Dir);
 
     void InitTranslationTransform(float x, float y, float z);
     void InitTranslationTransform(const Vector3f& Pos);
