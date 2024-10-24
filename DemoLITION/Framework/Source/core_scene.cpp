@@ -49,13 +49,24 @@ void SceneObject::PushRotation(const Vector3f& Rot)
 }
 
 
+bool QuaternionIsZero(const glm::quat& q)
+{
+    bool r = (q.x == 0 && q.y == 0 && q.z == 0.0f && q.w == 0.0f);
+    return r;
+}
+
 Matrix4f SceneObject::GetMatrix() const
 {
     Matrix4f Scale;
     Scale.InitScaleTransform(m_scale);
 
     Matrix4f Rotation;
-    CalcRotationStack(Rotation);    
+
+    if (QuaternionIsZero(m_quaternion)) {
+        CalcRotationStack(Rotation);
+    } else {
+        Rotation.InitRotateTransform(m_quaternion);
+    }
 
     Matrix4f Translation;
     Translation.InitTranslationTransform(m_pos);

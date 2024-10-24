@@ -49,7 +49,7 @@ public:
     void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
     Vector3f GetColorMod() const { return m_colorMod; }
 
-    void SetDirection(const Vector3f& Dir) { m_direction = Dir; }
+    void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
 
 protected:
     SceneObject() {}
@@ -64,7 +64,7 @@ private:
     int m_numRotations = 0;
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
     Vector3f m_colorMod = Vector3f(1.0f, 1.0f, 1.0f);
-    Vector3f m_direction = Vector3f(0.0f, 0.0f, 0.0f);
+    glm::quat m_quaternion;
 };
 
 
