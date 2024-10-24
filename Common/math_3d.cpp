@@ -199,20 +199,30 @@ void Matrix4f::InitRotateTransform(const Quaternion& quat)
     float wy2 = 2.0f * quat.w * quat.y;
     float wx2 = 2.0f * quat.w * quat.x;
     float xx2 = 2.0f * quat.x * quat.x;
-    m[0][0] = - yy2 - zz2 + 1.0f;
+    m[0][0] = -yy2 - zz2 + 1.0f;
     m[0][1] = xy2 + wz2;
     m[0][2] = xz2 - wy2;
     m[0][3] = 0;
     m[1][0] = xy2 - wz2;
-    m[1][1] = - xx2 - zz2 + 1.0f;
+    m[1][1] = -xx2 - zz2 + 1.0f;
     m[1][2] = yz2 + wx2;
     m[1][3] = 0;
     m[2][0] = xz2 + wy2;
     m[2][1] = yz2 - wx2;
-    m[2][2] = - xx2 - yy2 + 1.0f;
+    m[2][2] = -xx2 - yy2 + 1.0f;
     m[2][3] = 0.0f;
     m[3][0] = m[3][1] = m[3][2] = 0;
     m[3][3] = 1.0f;
+}
+
+
+void Matrix4f::InitRotateTransform(const glm::quat& q)
+{
+    glm::mat4 m = glm::mat4_cast(q);
+
+    Matrix4f o(m);
+
+    *this = o;
 }
 
 
@@ -505,6 +515,14 @@ Vector3f Quaternion::ToDegrees()
     f[2] = ToDegree(f[2]);
 
     return Vector3f(f);
+}
+
+
+bool Quaternion::IsZero() const
+{
+    bool ret = (x == 0.0f) && (y == 0.0f) && (z == 0.0f) && (w == 0.0f);
+
+    return ret;
 }
 
 

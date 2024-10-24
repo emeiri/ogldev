@@ -484,7 +484,9 @@ struct OrthoProjInfo
 
 struct Quaternion
 {
-    float x, y, z, w;
+    float x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+
+    Quaternion() {}
 
     Quaternion(float Angle, const Vector3f& V);
 
@@ -495,6 +497,8 @@ struct Quaternion
     Quaternion Conjugate() const;
 
     Vector3f ToDegrees();
+
+    bool IsZero() const;
 };
 
 Quaternion operator*(const Quaternion& l, const Quaternion& r);
@@ -626,6 +630,7 @@ public:
     void InitRotateTransformZYX(float RotateX, float RotateY, float RotateZ);
     void InitRotateTransform(const Vector3f& Rotate);
     void InitRotateTransform(const Quaternion& quat);
+    void InitRotateTransform(const glm::quat& quat);
     void InitRotationFromDir(const Vector3f& Dir);
 
     void InitTranslationTransform(float x, float y, float z);
