@@ -73,23 +73,14 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
-         InitChild();
-        // InitFireworksDemo();
-        // InitSpringDemo();
-       // InitBuoyancyDemo();
+        InitChild();
 
-      
-
-        //Grid* pGrid = m_pRenderingSystem->CreateGrid(100, 100);
-        //pSceneObject = m_pScene->CreateSceneObject(pGrid);
-        //m_pSceneObjects.push_back(pSceneObject);
-        //m_pScene->AddToRenderList(pSceneObject);
-
-        m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         
         m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetDirLights().push_back(m_dirLight);
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
       //  m_pScene->GetPointLights().push_back(m_pointLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
@@ -489,11 +480,113 @@ public:
     }
 };
 
+
+static void DirToRotation(const Vector3f& Dir, SceneObject& o)
+{
+    Vector3f DirN = Dir;
+    DirN.Normalize();
+
+    float AngleH = ToDegree(atan2(DirN.z, DirN.x));
+    float AngleV = ToDegree(asin(DirN.y));
+
+    if (AngleH != 0.0f) {
+        o.PushRotation(Vector3f(0.0f, AngleH, 0.0f));
+    }
+
+    if (AngleV != 0.0f) {
+        o.PushRotation(Vector3f(0.0f, 0.0f, AngleV));
+    }
+}
+
+
+
+class BridgeDemo : public Carbonara {
+
+public:
+
+    BridgeDemo() {}
+
+    void InitChild()
+    {
+       // glDisable(GL_CULL_FACE);
+        m_pScene->SetCamera(Vector3f(0.0f, 4.5f, -14.0f), Vector3f(0.0, -0.25f, 1.0f));
+
+#define NUM_SPHERES 12
+
+        Model* pRod = m_pRenderingSystem->LoadModel("../Content/demolition/rod.obj");
+        int Texture = m_pRenderingSystem->LoadTexture2D("../Content/textures/brickwall.jpg");
+        pRod->SetColorTexture(Texture);
+
+        Model* pSphere = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
+        pSphere->SetColorTexture(Texture);
+
+        std::vector<SceneObject*> Spheres;
+        Spheres.resize(NUM_SPHERES);
+
+        // Base spheres
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            PhysicsSceneObject CObject;
+            CObject.pSceneObject = m_pScene->CreateSceneObject(pSphere);
+            CObject.pSceneObject->SetScale(0.05f,0.05f,0.05f);
+            CObject.pSceneObject->SetPosition(Vector3f((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f));
+            CObject.pParticle = NULL;
+            m_sceneObjects.push_back(CObject);
+            m_pScene->AddToRenderList(CObject.pSceneObject);
+            Spheres[i] = CObject.pSceneObject;
+        }
+
+        // Rods that connect each opposing spheres
+        for (int i = 0; i < NUM_SPHERES / 2; i++) {
+            PhysicsSceneObject CObject;
+            CObject.pSceneObject = m_pScene->CreateSceneObject(pRod);
+            Vector3f Dir = (Spheres[i * 2 + 1]->GetPosition() - Spheres[i * 2]->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = Spheres[i * 2]->GetPosition() + Dir / 2.0f;
+            CObject.pSceneObject->SetPosition(Pos);
+            CObject.pSceneObject->SetScale(RodLen / 2.0f);
+         //   CObject.pSceneObject->PushRotation(Vector3f(0.0f, 36.0f, 0.0f));
+            DirToRotation(Dir, *CObject.pSceneObject);
+            CObject.pParticle = NULL;
+            m_sceneObjects.push_back(CObject);            
+            m_pScene->AddToRenderList(CObject.pSceneObject);
+        }
+        
+        // Links from above
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            PhysicsSceneObject CObject;
+            CObject.pSceneObject = m_pScene->CreateSceneObject(pRod);
+            Vector3f AnchorPos = Spheres[i]->GetPosition() + Vector3f(0.0f, 2.0f, 0.0f);
+            Vector3f Dir = AnchorPos - Spheres[i]->GetPosition();
+            Vector3f Pos = Spheres[i]->GetPosition() + Dir / 2.0f;
+            CObject.pSceneObject->SetPosition(Pos);
+            
+            DirToRotation(Dir, *CObject.pSceneObject);
+            m_sceneObjects.push_back(CObject);
+            m_pScene->AddToRenderList(CObject.pSceneObject);
+        }
+        
+        // Links between consecutive spheres
+        for (int i = 0; i < NUM_SPHERES - 2; i++) {
+            PhysicsSceneObject CObject;
+            CObject.pSceneObject = m_pScene->CreateSceneObject(pRod);
+            Vector3f Dir = (Spheres[i + 2]->GetPosition() - Spheres[i]->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = Spheres[i]->GetPosition() + Dir / 2.0f;
+            CObject.pSceneObject->SetPosition(Pos);
+            DirToRotation(Dir, *CObject.pSceneObject);
+            m_sceneObjects.push_back(CObject);
+            m_pScene->AddToRenderList(CObject.pSceneObject);
+        }
+
+    }
+};
+
 void carbonara()
 {
-    //BallisticsDemo game;
-   //FireworksDemo game;
-    AnimationDemo game;
+  // BallisticsDemo demo;
+   //FireworksDemo demo;
+   // AnimationDemo demo;
+    BridgeDemo demo;
 
-    game.Start();
+    demo.Start();
 }

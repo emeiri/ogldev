@@ -41,6 +41,6 @@ int main(int argc, char* arg[])
     //test_lighting();
     //test_normal_map();
    // test_parallax_map();
-   test_grid();
-  //  carbonara();
+  // test_grid();
+    carbonara();
 }
