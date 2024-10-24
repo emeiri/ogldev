@@ -211,6 +211,10 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     ShadowMapPass(pScene);
     LightingPass(pScene, TotalRuntimeMillis);
 
+    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+        RenderInfiniteGrid(pScene);
+    }
+
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
 
