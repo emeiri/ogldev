@@ -39,6 +39,20 @@
 struct PhysicsSceneObject {
     SceneObject* pSceneObject = NULL;
     OgldevPhysics::Particle* pParticle = NULL;
+
+    void InitPosition(const Vector3f& Pos)
+    {
+        if (!pSceneObject) {
+            printf("pSceneObject is not initialized\n");
+            exit(1);
+        }
+
+        pSceneObject->SetPosition(Pos);
+
+        if (pParticle) {
+            pParticle->SetPosition(Pos);
+        }
+    }
 };
 
 
@@ -584,7 +598,8 @@ private:
         // Base spheres
         for (int i = 0; i < NUM_SPHERES; i++) {
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pSphere, true, 0.05f);
-            PSObject.pSceneObject->SetPosition(Vector3f((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f));
+            Vector3f Pos((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f);
+            PSObject.InitPosition(Pos);
             PSObject.pParticle->SetDamping(0.9f);
             PSObject.pParticle->SetAcceleration(OgldevPhysics::GRAVITY);
             m_spheres[i] = PSObject.pSceneObject;
