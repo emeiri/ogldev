@@ -560,6 +560,8 @@ static void DirToRotation(const Vector3f& Dir, SceneObject& o)
 class BridgeDemo : public Carbonara {
 
 public:
+#define NUM_SPHERES 12
+#define NUM_CABLES (NUM_SPHERES-2)
 
     BridgeDemo() 
     {
@@ -571,7 +573,6 @@ public:
        // glDisable(GL_CULL_FACE);
         m_pScene->SetCamera(Vector3f(0.0f, 4.5f, -14.0f), Vector3f(0.0, -0.25f, 1.0f));
 
-#define NUM_SPHERES 12
 
         m_pRod = m_pRenderingSystem->LoadModel("../Content/demolition/rod.obj");
         int Texture = m_pRenderingSystem->LoadTexture2D("../Content/textures/brickwall.jpg");
@@ -580,7 +581,9 @@ public:
         m_pSphere = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
         m_pSphere->SetColorTexture(Texture);
 
-        m_spheres.resize(NUM_SPHERES);
+        m_particles.resize(NUM_SPHERES);
+        m_cables.resize(NUM_CABLES);
+        m_supports.resize(NUM_SPHERES);
 
         InitPlankEnds();
 
@@ -602,7 +605,7 @@ private:
             PSObject.InitPosition(Pos);
             PSObject.pParticle->SetDamping(0.9f);
             PSObject.pParticle->SetAcceleration(OgldevPhysics::GRAVITY);
-            m_spheres[i] = PSObject.pSceneObject;
+            m_particles[i] = PSObject;
         }
     }
 
@@ -611,9 +614,9 @@ private:
         // Rods that connect each opposing spheres
         for (int i = 0; i < NUM_SPHERES / 2; i++) {
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
-            Vector3f Dir = (m_spheres[i * 2 + 1]->GetPosition() - m_spheres[i * 2]->GetPosition());
+            Vector3f Dir = (m_particles[i * 2 + 1].pSceneObject->GetPosition() - m_particles[i * 2].pSceneObject->GetPosition());
             float RodLen = Dir.Length();
-            Vector3f Pos = m_spheres[i * 2]->GetPosition() + Dir / 2.0f;
+            Vector3f Pos = m_particles[i * 2].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
             PSObject.pSceneObject->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *PSObject.pSceneObject);
@@ -625,28 +628,40 @@ private:
         // Links from above
         for (int i = 0; i < NUM_SPHERES; i++) {
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
-            Vector3f AnchorPos = m_spheres[i]->GetPosition() + Vector3f(0.0f, 2.0f, 0.0f);
-            Vector3f Dir = AnchorPos - m_spheres[i]->GetPosition();
-            Vector3f Pos = m_spheres[i]->GetPosition() + Dir / 2.0f;
+            Vector3f AnchorPos((i / 2.0f) * 2.2f - 5.5f, 6, (i % 2) * 1.6f - 0.8f);
+            Vector3f Dir = AnchorPos - m_particles[i].pSceneObject->GetPosition();
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_particles[i].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
+            PSObject.pSceneObject->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *PSObject.pSceneObject);
+            m_supports[i].m_pParticle = m_particles[i].pParticle;
+       //     m_supports[i].m_anchor = 
         }
     }
 
     void InitHLinks()
     {
         // Links between consecutive spheres
-        for (int i = 0; i < NUM_SPHERES - 2; i++) {
+        for (int i = 0; i < NUM_CABLES ; i++) {
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
-            Vector3f Dir = (m_spheres[i + 2]->GetPosition() - m_spheres[i]->GetPosition());
+            m_cables[i].m_pParticles[0] = m_particles[i].pParticle;
+            m_cables[i].m_pParticles[1] = m_particles[i+2].pParticle;
+            m_cables[i].m_maxLength = 1.9f;
+            m_cables[i].m_restituion = 0.3f;
+            m_physicsSystem.AddContact(&m_cables[i]);
+            Vector3f Dir = (m_particles[i + 2].pSceneObject->GetPosition() - m_particles[i].pSceneObject->GetPosition());
             float RodLen = Dir.Length();
-            Vector3f Pos = m_spheres[i]->GetPosition() + Dir / 2.0f;
+            Vector3f Pos = m_particles[i].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
             DirToRotation(Dir, *PSObject.pSceneObject);
         }
     }
 
-    std::vector<SceneObject*> m_spheres;
+    std::vector<PhysicsSceneObject> m_particles;
+    //std::vector< OgldevPhysics::Particle*> m_particles;
+    std::vector<OgldevPhysics::ParticleCable> m_cables;
+    std::vector<OgldevPhysics::ParticleCableConstraint> m_supports;
     Model* m_pSphere = NULL;
     Model* m_pRod = NULL;
 };
