@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-#define NUM_PARTICLES 1000
+#define NUm_PSOs 1000
 
 struct PhysicsSceneObject {
     SceneObject* pSceneObject = NULL;
@@ -72,8 +72,6 @@ public:
      //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
         m_pointLight.DiffuseIntensity = 2.0f;
         m_pointLight.AmbientIntensity = 0.1f;
-
-        m_physicsSystem.Init(NUM_PARTICLES, 1, 1);
     }
 
     ~Carbonara() {}
@@ -447,7 +445,7 @@ public:
 
     BallisticsDemo()
     {
-        m_physicsSystem.Init(NUM_PARTICLES, 1, 1);
+        m_physicsSystem.Init(NUm_PSOs, 1, 1);
     }
 
     void InitChild()
@@ -471,7 +469,7 @@ public:
 
     FireworksDemo()  
     {
-        m_physicsSystem.Init(NUM_PARTICLES, 1, 1);
+        m_physicsSystem.Init(NUm_PSOs, 1, 1);
     }
 
     void InitChild()
@@ -524,19 +522,22 @@ static void DirToRotation(const Vector3f& Dir, SceneObject& o)
 class BridgeDemo : public Carbonara {
 
 public:
+
 #define NUM_SPHERES 12
 #define NUM_CABLES (NUM_SPHERES-2)
+#define NUM_PLANKS (NUM_SPHERES / 2)
+
+#define PLANK_LENGTH 2.0f
 
     BridgeDemo() 
     {
-        m_physicsSystem.Init(NUM_PARTICLES, NUM_CABLES, 1);
+        m_physicsSystem.Init(NUm_PSOs, NUM_SPHERES * 10, 0);
     }
 
     void InitChild()
     {
        // glDisable(GL_CULL_FACE);
         m_pScene->SetCamera(Vector3f(0.0f, 4.5f, -14.0f), Vector3f(0.0, -0.25f, 1.0f));
-
 
         m_pRod = m_pRenderingSystem->LoadModel("../Content/demolition/rod.obj");
         int Texture = m_pRenderingSystem->LoadTexture2D("../Content/textures/brickwall.jpg");
@@ -545,17 +546,23 @@ public:
         m_pSphere = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
         m_pSphere->SetColorTexture(Texture);
 
+        m_PSOs.resize(NUM_SPHERES);
         m_particles.resize(NUM_SPHERES);
-        m_cables.resize(NUM_CABLES);
-        m_supports.resize(NUM_SPHERES);
+     //   m_cables.resize(NUM_CABLES);
+     //   m_supports.resize(NUM_SPHERES);
+     //   m_planks.resize(NUM_PLANKS);
 
         InitPlankEnds();
 
-        InitPlanks();
+      //  InitPlanks();
         
-        InitVLinks();
+      //  InitVLinks();
 
-        InitHLinks();
+      //  InitHLinks();
+
+        m_groundContactGenerator.Init(&m_particles);
+
+        m_physicsSystem.AddContactGenerator(&m_groundContactGenerator);
     }
 
 private:
@@ -567,24 +574,30 @@ private:
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pSphere, true, 0.05f);
             Vector3f Pos((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f);
             PSObject.InitPosition(Pos);
-          //  PSObject.pParticle->SetMass(0.0001f);
+            PSObject.pParticle->SetMass(1.0f);
             PSObject.pParticle->SetDamping(0.9f);
             PSObject.pParticle->SetAcceleration(OgldevPhysics::GRAVITY);
-            m_particles[i] = PSObject;
+            m_PSOs[i] = PSObject;
+            m_particles[i] = PSObject.pParticle;
         }
     }
 
     void InitPlanks()
     {
         // Rods that connect each opposing spheres
-        for (int i = 0; i < NUM_SPHERES / 2; i++) {
+        for (int i = 0; i < NUM_PLANKS; i++) {
+            int BaseIndex = i * 2;
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
-            Vector3f Dir = (m_particles[i * 2 + 1].pSceneObject->GetPosition() - m_particles[i * 2].pSceneObject->GetPosition());
+            Vector3f Dir = (m_PSOs[BaseIndex + 1].pSceneObject->GetPosition() - m_PSOs[BaseIndex].pSceneObject->GetPosition());
             float RodLen = Dir.Length();
-            Vector3f Pos = m_particles[i * 2].pSceneObject->GetPosition() + Dir / 2.0f;
+            Vector3f Pos = m_PSOs[BaseIndex].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
             PSObject.pSceneObject->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *PSObject.pSceneObject);
+            m_planks[i].m_pParticles[0] = m_PSOs[BaseIndex].pParticle;
+            m_planks[i].m_pParticles[1] = m_PSOs[BaseIndex + 1].pParticle;
+            m_planks[i].m_len = PLANK_LENGTH;
+        //    m_physicsSystem.AddContactGenerator(&m_planks[i]);
         }
     }
 
@@ -594,14 +607,25 @@ private:
         for (int i = 0; i < NUM_SPHERES; i++) {
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
             Vector3f AnchorPos((i / 2.0f) * 2.2f - 5.5f, 6, (i % 2) * 1.6f - 0.8f);
-            Vector3f Dir = AnchorPos - m_particles[i].pSceneObject->GetPosition();
+            Vector3f Dir = AnchorPos - m_PSOs[i].pSceneObject->GetPosition();
             float RodLen = Dir.Length();
-            Vector3f Pos = m_particles[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
             PSObject.pSceneObject->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *PSObject.pSceneObject);
-            m_supports[i].m_pParticle = m_particles[i].pParticle;
-       //     m_supports[i].m_anchor = 
+            m_supports[i].m_pParticle = m_PSOs[i].pParticle;
+            m_supports[i].m_anchor = AnchorPos;
+            float MaxLength = 0.0f;
+            
+            if (i < 6) {
+                MaxLength = (i / 2.0f) * 0.5f + 3.0f;
+            } else {
+                MaxLength = 5.5f - (i / 2.0f) * 0.5f;
+            }
+
+            m_supports[i].m_maxLength = MaxLength;
+            m_supports[i].m_restitution = 0.5f;
+      //      m_physicsSystem.AddContactGenerator(&m_supports[i]);
         }
     }
 
@@ -610,23 +634,25 @@ private:
         // Links between consecutive spheres
         for (int i = 0; i < NUM_CABLES ; i++) {
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pRod, false);
-            m_cables[i].m_pParticles[0] = m_particles[i].pParticle;
-            m_cables[i].m_pParticles[1] = m_particles[i+2].pParticle;
+            m_cables[i].m_pParticles[0] = m_PSOs[i].pParticle;
+            m_cables[i].m_pParticles[1] = m_PSOs[i+2].pParticle;
             m_cables[i].m_maxLength = 1.9f;
             m_cables[i].m_restituion = 0.3f;
-            m_physicsSystem.AddContact(&m_cables[i]);
-            Vector3f Dir = (m_particles[i + 2].pSceneObject->GetPosition() - m_particles[i].pSceneObject->GetPosition());
+      //      m_physicsSystem.AddContactGenerator(&m_cables[i]);
+            Vector3f Dir = (m_PSOs[i + 2].pSceneObject->GetPosition() - m_PSOs[i].pSceneObject->GetPosition());
             float RodLen = Dir.Length();
-            Vector3f Pos = m_particles[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
-            DirToRotation(Dir, *PSObject.pSceneObject);
+        //    DirToRotation(Dir, *PSObject.pSceneObject);
         }
     }
 
-    std::vector<PhysicsSceneObject> m_particles;
-    //std::vector< OgldevPhysics::Particle*> m_particles;
+    std::vector<PhysicsSceneObject> m_PSOs;
+    std::vector<OgldevPhysics::Particle*> m_particles;
     std::vector<OgldevPhysics::ParticleCable> m_cables;
     std::vector<OgldevPhysics::ParticleCableConstraint> m_supports;
+    std::vector<OgldevPhysics::ParticleRod> m_planks;
+    OgldevPhysics::GroundContacts m_groundContactGenerator;
     Model* m_pSphere = NULL;
     Model* m_pRod = NULL;
 };

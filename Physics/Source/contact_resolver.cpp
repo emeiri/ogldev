@@ -80,7 +80,7 @@ void ParticleContact::ResolveVelocity(float dt)
         float SepVelocityCausedByAccel = CalcSepVelocityCausedByAccel(dt);
 
         if (SepVelocityCausedByAccel < 0) {
-            NewSepVelocity += SepVelocityCausedByAccel * m_restitution;
+            NewSepVelocity += m_restitution * SepVelocityCausedByAccel;
 
             NewSepVelocity = std::max(0.0f, NewSepVelocity);
         }
@@ -136,18 +136,35 @@ float ParticleContact::CalcTotalReciprocalMass()
 
 void ParticleContactResolver::ResolveContacts(std::vector<ParticleContact>& ContactArray, uint NumContacts, float dt)
 {
-    int i = 0;
-
     int IterationsUsed = 0;
 
     while (IterationsUsed < m_iterations) {
         int Index = FindContactWithLargestClosingVelocity(ContactArray, NumContacts);
 
-        if (Index == ContactArray.size()) {
+        if (Index == NumContacts) {
             break;
         }
 
-        ContactArray[i].Resolve(dt);
+        ContactArray[Index].Resolve(dt);
+
+        // Update the interpenetrations for all particles
+        Vector3f* Move = &(ContactArray[Index].m_particleMovement[0]);
+
+        for (uint i = 0; i < NumContacts; i++) {
+            if (ContactArray[i].m_pParticles[0] == ContactArray[Index].m_pParticles[0]) {
+                ContactArray[i].m_penetration -= Move[0].Dot(ContactArray[i].m_contactNormal);
+            } else if (ContactArray[i].m_pParticles[0] == ContactArray[Index].m_pParticles[1]) {
+                ContactArray[i].m_penetration -= Move[1].Dot( ContactArray[i].m_contactNormal);
+            }
+
+            if (ContactArray[i].m_pParticles[1]) {
+                if (ContactArray[i].m_pParticles[1] == ContactArray[Index].m_pParticles[0]) {
+                    ContactArray[i].m_penetration += Move[0].Dot(ContactArray[i].m_contactNormal);
+                } else if (ContactArray[i].m_pParticles[1] == ContactArray[Index].m_pParticles[1]) {
+                    ContactArray[i].m_penetration += Move[1].Dot(ContactArray[i].m_contactNormal);
+                }
+            }
+        }
 
         IterationsUsed++;
     }
@@ -157,7 +174,7 @@ void ParticleContactResolver::ResolveContacts(std::vector<ParticleContact>& Cont
 int ParticleContactResolver::FindContactWithLargestClosingVelocity(std::vector<ParticleContact>& ContactArray, uint NumContacts)
 {
     float MaxSepVelocity = FLT_MAX;
-    uint MaxIndex = (uint)ContactArray.size();
+    uint MaxIndex = NumContacts;
 
     assert(NumContacts <= MaxIndex);
 
@@ -187,23 +204,23 @@ float ParticleLink::GetLength() const
 }
 
 
-int ParticleCable::AddContact(ParticleContact& Contact, int Limit) const
+int ParticleCable::AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const
 {
     float Length = GetLength();
 
     int Ret = 0;
 
     if (Length >= m_maxLength) {
-        Contact.m_pParticles[0] = m_pParticles[0];
-        Contact.m_pParticles[1] = m_pParticles[1];
+        Contacts[StartIndex].m_pParticles[0] = m_pParticles[0];
+        Contacts[StartIndex].m_pParticles[1] = m_pParticles[1];
 
         Vector3f Normal = m_pParticles[1]->GetPosition() - m_pParticles[0]->GetPosition();
 
         Normal.Normalize();
 
-        Contact.SetContactNormal(Normal);
-        Contact.SetPenetration(Length - m_maxLength);
-        Contact.SetRestitution(m_restituion);
+        Contacts[StartIndex].SetContactNormal(Normal);
+        Contacts[StartIndex].SetPenetration(Length - m_maxLength);
+        Contacts[StartIndex].SetRestitution(m_restituion);
 
         Ret = 1;
     }
@@ -212,30 +229,30 @@ int ParticleCable::AddContact(ParticleContact& Contact, int Limit) const
 }
 
 
-int ParticleRod::AddContact(ParticleContact& Contact, int Limit) const
+int ParticleRod::AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const
 {
     float CurLength = GetLength();
 
     int Ret = 0;
 
     if (CurLength >= m_len) {
-        Contact.m_pParticles[0] = m_pParticles[0];
-        Contact.m_pParticles[1] = m_pParticles[1];
+        Contacts[StartIndex].m_pParticles[0] = m_pParticles[0];
+        Contacts[StartIndex].m_pParticles[1] = m_pParticles[1];
 
         Vector3f Normal = m_pParticles[1]->GetPosition() - m_pParticles[0]->GetPosition();
 
         Normal.Normalize();
 
         if (CurLength > m_len) {
-            Contact.SetContactNormal(Normal);
-            Contact.SetPenetration(CurLength - m_len);
+            Contacts[StartIndex].SetContactNormal(Normal);
+            Contacts[StartIndex].SetPenetration(CurLength - m_len);
         }
         else {
-            Contact.SetContactNormal(Normal *= -1.0f);
-            Contact.SetPenetration(m_len - CurLength);
+            Contacts[StartIndex].SetContactNormal(Normal *= -1.0f);
+            Contacts[StartIndex].SetPenetration(m_len - CurLength);
         }
 
-        Contact.SetRestitution(0.0f);
+        Contacts[StartIndex].SetRestitution(0.0f);
 
         Ret = 1;
     }
@@ -251,7 +268,7 @@ float ParticleConstraint::GetCurLength() const
 }
 
 
-int ParticleCableConstraint::AddContact(ParticleContact& Contact, int Limit) const
+int ParticleCableConstraint::AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const
 {
     float Len = GetCurLength();
 
@@ -259,18 +276,53 @@ int ParticleCableConstraint::AddContact(ParticleContact& Contact, int Limit) con
         return 0;
     }
 
-    Contact.m_pParticles[0] = m_pParticle;
-    Contact.m_pParticles[1] = NULL;
+    Contacts[StartIndex].m_pParticles[0] = m_pParticle;
+    Contacts[StartIndex].m_pParticles[1] = NULL;
 
     Vector3f Normal = m_anchor - m_pParticle->GetPosition();
     Normal.Normalize();
-    Contact.SetContactNormal(Normal);
+    Contacts[StartIndex].SetContactNormal(Normal);
 
-    Contact.SetPenetration(Len - m_maxLength);
-    Contact.SetRestitution(m_restitution);
+    Contacts[StartIndex].SetPenetration(Len - m_maxLength);
+    Contacts[StartIndex].SetRestitution(m_restitution);
 
     return 1;
 }
 
+
+void GroundContacts::Init(std::vector<Particle*>* pParticles)
+{
+    m_pParticles = pParticles;
+}
+
+
+int GroundContacts::AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const
+{
+    int Count = 0;
+    int Limit = (int)Contacts.size() - StartIndex;
+
+    Vector3f Up(0.0f, 1.0f, 0.0f);
+
+    for (std::vector<Particle*>::iterator it = m_pParticles->begin(); it != m_pParticles->end(); it++) {
+
+        float y = (*it)->GetPosition().y;
+
+        if (y < 0.0f) {
+            Contacts[StartIndex].SetContactNormal(Up);
+            Contacts[StartIndex].m_pParticles[0] = *it;
+            Contacts[StartIndex].m_pParticles[1] = NULL;
+            Contacts[StartIndex].SetPenetration(-y);
+            Contacts[StartIndex].SetRestitution(0.2f);
+            StartIndex++;
+            Count++;
+        }
+
+        if (Count >= Limit) {
+            break;
+        }
+    }
+
+    return Count;
+}
 
 }

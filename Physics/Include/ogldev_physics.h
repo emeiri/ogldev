@@ -60,7 +60,7 @@ public:
 
     void StartFrame();
 
-    void AddContact(ParticleContactGenerator* pContact);
+    void AddContactGenerator(ParticleContactGenerator* pContact);
 
 private:
 
@@ -85,7 +85,7 @@ private:
     uint m_numParticles = 0;
     uint m_numFireworks = 0;
     uint m_nextFirework = 0; 
-    uint m_numContacts = 0;
+    uint m_numContactGenerators = 0;
     bool m_calcIters = false;   
 };
 

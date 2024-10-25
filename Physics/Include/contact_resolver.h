@@ -42,6 +42,9 @@ public:
     void SetContactNormal(Vector3f& Normal) { m_contactNormal = Normal; }
 
     Particle* m_pParticles[2] = { NULL, NULL };    
+    Vector3f m_particleMovement[2] = { 0.0f };
+    float m_penetration = 0.0f;
+    Vector3f m_contactNormal;
 
 private:
 
@@ -54,12 +57,6 @@ private:
     float CalcTotalReciprocalMass();
 
     float m_restitution = 0.0f;
-
-    Vector3f m_contactNormal;
-
-    float m_penetration = 0.0f;
-
-    Vector3f m_particleMovement[2] = { 0.0f };
 };
 
 
@@ -87,7 +84,7 @@ protected:
 class ParticleContactGenerator {
 public:
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0; // TODO: Contact should be an array of pointers
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const = 0; // TODO: Contact should be an array of pointers
 };
 
 
@@ -97,7 +94,7 @@ public:
     
     Particle* m_pParticles[2];
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0;
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const = 0;
 
 protected:
 
@@ -109,7 +106,7 @@ class ParticleCable : public ParticleLink {
 
 public:
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const;
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const;
 
     float m_maxLength = 0.0f;
 
@@ -123,7 +120,7 @@ public:
 
     float m_len = 0.0f;
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const;
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const;
 };
 
 
@@ -135,7 +132,7 @@ public:
     Particle* m_pParticle = NULL;
     Vector3f m_anchor;
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const = 0;
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const = 0;
 
 protected:
 
@@ -151,7 +148,22 @@ public:
     float m_maxLength = 0.0f;
     float m_restitution = 0.0f;
 
-    virtual int AddContact(ParticleContact& Contact, int Limit) const;
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const;
+};
+
+
+class GroundContacts : public ParticleContactGenerator
+{
+
+public:
+
+    void Init(std::vector<Particle*>* pParticles);
+
+    virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const;
+
+private:
+
+    std::vector<Particle*>* m_pParticles = NULL;
 };
 
 

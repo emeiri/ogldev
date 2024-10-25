@@ -37,7 +37,7 @@ void PhysicsSystem::Init(uint NumObjects, uint MaxContacts, uint Iterations)
 
     m_contacts.resize(MaxContacts);
 
-    m_contactGenerators.resize(MaxContacts);
+   // m_contactGenerators.resize(MaxContacts);
 
     m_calcIters = (Iterations == 0);
 }
@@ -77,15 +77,16 @@ void PhysicsSystem::Update(long long DeltaTimeMillis)
 
     float dt = (float)DeltaTimeMillis / 1000.0f;
 
-    m_forceRegistry.Update(dt);
+    StartFrame();
+
+  //  m_forceRegistry.Update(dt);
 
     ParticleUpdate(dt);
 
-    FireworkUpdate(dt);
-
-    return;
+    //FireworkUpdate(dt);
+    
     uint UsedContacts = GenerateContacts();
-
+   // printf("used contacts %d\n", UsedContacts);
     if (UsedContacts) {
         if (m_calcIters) {
             m_resolver.SetIterations(UsedContacts * 2);
@@ -142,15 +143,19 @@ void PhysicsSystem::StartFrame()
 }
 
 
-void PhysicsSystem::AddContact(ParticleContactGenerator* pContact)
+void PhysicsSystem::AddContactGenerator(ParticleContactGenerator* pContactGenerator)
 {
-    if (m_numContacts == m_contactGenerators.size()) {
+#if 0
+    if (m_numContactGenerators == m_contactGenerators.size()) {
         printf("Out of contact generators\n");
         exit(1);
     }
 
-    m_contactGenerators[m_numContacts] = pContact;
-    m_numContacts++;
+    m_contactGenerators[m_numContactGenerators] = pContact;
+    m_numContactGenerators++;
+#else
+    m_contactGenerators.push_back(pContactGenerator);
+#endif
 }
 
 
@@ -161,15 +166,15 @@ uint PhysicsSystem::GenerateContacts()
     int NextContactIndex = 0;
 
     for (size_t i = 0; i < m_contactGenerators.size(); i++) {
-        ParticleContact& NextContact = m_contacts[NextContactIndex];
-        uint UsedContacts = m_contactGenerators[i]->AddContact(NextContact, Limit);
+        uint UsedContacts = m_contactGenerators[i]->AddContact(m_contacts, NextContactIndex);
+      //  printf("used %d\n", UsedContacts);
         Limit -= UsedContacts;
-        NextContactIndex += Limit;
+        NextContactIndex += UsedContacts;
 
-        if (Limit <= 0) {
+      /*  if (Limit <= 0) {
             printf("Warning! Out of contacts\n");
             break;
-        }
+        }*/
     }
 
     uint NumContactsUsed = (uint)m_contacts.size() - Limit;

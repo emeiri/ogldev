@@ -33,10 +33,12 @@ void Particle::Integrate(float dt)
 
     Vector3f AccTemp = m_acceleration;
     AccTemp += m_forceAccum * m_reciprocalMass;
-
+   // printf("accel y %f\n", AccTemp.y);
     m_velocity += AccTemp * dt;
 
     m_velocity *= powf(m_damping, dt);
+
+  //  printf("pos y %f velocity y %f\n", m_position.y, m_velocity.y);
 
     ClearAccum();
 }

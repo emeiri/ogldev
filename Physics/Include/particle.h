@@ -41,7 +41,11 @@ public:
     void SetReciprocalMass(float ReciprocalMass) { m_reciprocalMass = ReciprocalMass; }
 
     const Vector3f& GetVelocity() const { return m_velocity; }
-    void SetVelocity(const Vector3f& Velocity) { m_velocity = Velocity; }
+    void SetVelocity(const Vector3f& Velocity) 
+    { 
+        m_velocity = Velocity; 
+      //  printf("velocity y %f\n", Velocity.y);
+    }
 
     const Vector3f& GetAcceleration() const { return m_acceleration; }
     void SetAcceleration(const Vector3f& Acceleration) { m_acceleration = Acceleration; }
