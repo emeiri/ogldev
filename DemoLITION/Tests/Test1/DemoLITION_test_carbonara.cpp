@@ -34,7 +34,6 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-
 #define NUM_PARTICLES 1000
 
 struct PhysicsSceneObject {
@@ -73,8 +72,6 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         
-        InitChild();
-
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         
         m_pScene->SetCameraSpeed(0.1f);
