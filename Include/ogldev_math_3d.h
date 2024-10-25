@@ -901,7 +901,8 @@ void CalcTightLightProjection(const Matrix4f& CameraView,        // in
 
 int CalcNextPowerOfTwo(int x);
 
-
 bool IsPointInsideViewFrustum(const Vector3f& p, const Matrix4f& VP);
+
+glm::quat RotationBetweenVectors(glm::vec3& start, glm::vec3& dest);
 
 #endif  /* MATH_3D_H */
