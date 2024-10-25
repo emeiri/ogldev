@@ -64,7 +64,7 @@ private:
     int m_numRotations = 0;
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
     Vector3f m_colorMod = Vector3f(1.0f, 1.0f, 1.0f);
-    glm::quat m_quaternion;
+    glm::quat m_quaternion = glm::quat(0.0f, 0.0f, 0.0f, 0.0f);
 };
 
 
