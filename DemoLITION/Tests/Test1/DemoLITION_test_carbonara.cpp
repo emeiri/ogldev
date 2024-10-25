@@ -155,9 +155,10 @@ public:
     }
 
 
-
     void OnFrame(long long DeltaTimeMillis)
     {
+        OnFrameChild(DeltaTimeMillis);
+
         if (m_showGui) {
             OnFrameGUI();
             ApplyGUIConfig();
@@ -414,6 +415,8 @@ public:
 
 protected:
 
+    virtual void OnFrameChild(long long DeltaTimeMillis) {}
+
     Scene* m_pScene = NULL;
     std::list<PhysicsSceneObject> m_sceneObjects;
     OgldevPhysics::PhysicsSystem m_physicsSystem;
@@ -548,21 +551,47 @@ public:
 
         m_PSOs.resize(NUM_SPHERES);
         m_particles.resize(NUM_SPHERES);
-     //   m_cables.resize(NUM_CABLES);
-     //   m_supports.resize(NUM_SPHERES);
-     //   m_planks.resize(NUM_PLANKS);
+        m_supports.resize(NUM_SPHERES);
+        m_vLinks.resize(NUM_SPHERES);
+        m_hLinks.resize(NUM_CABLES);
+        m_cables.resize(NUM_CABLES);
+        m_planks.resize(NUM_PLANKS);
 
         InitPlankEnds();
 
       //  InitPlanks();
         
-      //  InitVLinks();
+        InitVLinks();
 
-      //  InitHLinks();
+        InitHLinks();
 
         m_groundContactGenerator.Init(&m_particles);
 
         m_physicsSystem.AddContactGenerator(&m_groundContactGenerator);
+    }
+
+protected:
+
+    virtual void OnFrameChild(long long DeltaTimeMillis)
+    {
+        // Links from above
+        for (int i = 0; i < NUM_SPHERES; i++) {
+            Vector3f Dir = m_supports[i].m_anchor - m_PSOs[i].pSceneObject->GetPosition();
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_vLinks[i]->SetPosition(Pos);
+            m_vLinks[i]->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *m_vLinks[i]);
+        }
+
+        for (int i = 0; i < NUM_CABLES; i++) {
+            Vector3f Dir = (m_PSOs[i + 2].pSceneObject->GetPosition() - m_PSOs[i].pSceneObject->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_hLinks[i]->SetPosition(Pos);
+            m_hLinks[i]->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *m_hLinks[i]);
+        }
     }
 
 private:
@@ -612,6 +641,7 @@ private:
             Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
             PSObject.pSceneObject->SetPosition(Pos);
             PSObject.pSceneObject->SetScale(RodLen / 2.0f);
+            m_vLinks[i] = PSObject.pSceneObject;
             DirToRotation(Dir, *PSObject.pSceneObject);
             m_supports[i].m_pParticle = m_PSOs[i].pParticle;
             m_supports[i].m_anchor = AnchorPos;
@@ -625,7 +655,7 @@ private:
 
             m_supports[i].m_maxLength = MaxLength;
             m_supports[i].m_restitution = 0.5f;
-      //      m_physicsSystem.AddContactGenerator(&m_supports[i]);
+            m_physicsSystem.AddContactGenerator(&m_supports[i]);
         }
     }
 
@@ -638,16 +668,20 @@ private:
             m_cables[i].m_pParticles[1] = m_PSOs[i+2].pParticle;
             m_cables[i].m_maxLength = 1.9f;
             m_cables[i].m_restituion = 0.3f;
-      //      m_physicsSystem.AddContactGenerator(&m_cables[i]);
+            m_physicsSystem.AddContactGenerator(&m_cables[i]);
             Vector3f Dir = (m_PSOs[i + 2].pSceneObject->GetPosition() - m_PSOs[i].pSceneObject->GetPosition());
             float RodLen = Dir.Length();
             Vector3f Pos = m_PSOs[i].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_hLinks[i] = PSObject.pSceneObject;
             PSObject.pSceneObject->SetPosition(Pos);
-        //    DirToRotation(Dir, *PSObject.pSceneObject);
+            PSObject.pSceneObject->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *PSObject.pSceneObject);
         }
     }
 
     std::vector<PhysicsSceneObject> m_PSOs;
+    std::vector<SceneObject*> m_vLinks;
+    std::vector<SceneObject*> m_hLinks;
     std::vector<OgldevPhysics::Particle*> m_particles;
     std::vector<OgldevPhysics::ParticleCable> m_cables;
     std::vector<OgldevPhysics::ParticleCableConstraint> m_supports;

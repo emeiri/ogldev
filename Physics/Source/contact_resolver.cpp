@@ -52,16 +52,20 @@ void ParticleContact::ResolveInterpenetration(float dt)
         float TotalReciprocalMass = CalcTotalReciprocalMass();
 
         if (TotalReciprocalMass > 0.0f) {
-            Vector3f MovePerReciprocalMass = m_contactNormal * m_penetration / TotalReciprocalMass;
 
+            Vector3f MovePerReciprocalMass = m_contactNormal * (m_penetration / TotalReciprocalMass);
             m_particleMovement[0] = MovePerReciprocalMass * m_pParticles[0]->GetReciprocalMass();
+
+            if (m_pParticles[1]) {
+                m_particleMovement[1] = MovePerReciprocalMass * -m_pParticles[1]->GetReciprocalMass();
+            } else {
+                m_particleMovement[1].SetAll(0.0f);
+            }
 
             Vector3f NewPos = m_pParticles[0]->GetPosition() + m_particleMovement[0];
             m_pParticles[0]->SetPosition(NewPos);
 
             if (m_pParticles[1]) {
-                m_particleMovement[1] = MovePerReciprocalMass * m_pParticles[1]->GetReciprocalMass();
-
                 NewPos = m_pParticles[1]->GetPosition() + m_particleMovement[1];
                 m_pParticles[1]->SetPosition(NewPos);
             }
