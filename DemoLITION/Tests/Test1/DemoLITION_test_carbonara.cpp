@@ -429,7 +429,7 @@ public:
 
     BallisticsDemo()
     {
-
+        m_physicsSystem.Init(NUM_PARTICLES, 1, 1);
     }
 
     void InitChild()
@@ -451,7 +451,10 @@ class FireworksDemo : public Carbonara {
 
 public:
 
-    FireworksDemo()  {}
+    FireworksDemo()  
+    {
+        m_physicsSystem.Init(NUM_PARTICLES, 1, 1);
+    }
 
     void InitChild()
     {
@@ -510,7 +513,10 @@ class BridgeDemo : public Carbonara {
 
 public:
 
-    BridgeDemo() {}
+    BridgeDemo() 
+    {
+        m_physicsSystem.Init(NUM_PARTICLES, NUM_CABLES, 1);
+    }
 
     void InitChild()
     {
