@@ -233,7 +233,6 @@ struct Vector3f
         return &(x);
     }
 
-
     Vector3f Cross(const Vector3f& v) const;
 
     float Dot(const Vector3f& v) const
@@ -280,6 +279,11 @@ struct Vector3f
     float* data()
     {
         return &x;
+    }
+
+    void SetAll(float f)
+    {
+        x = y = z = 0.0f;
     }
 };
 
