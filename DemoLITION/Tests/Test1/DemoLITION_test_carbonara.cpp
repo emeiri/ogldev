@@ -556,10 +556,11 @@ public:
         m_hLinks.resize(NUM_CABLES);
         m_cables.resize(NUM_CABLES);
         m_planks.resize(NUM_PLANKS);
+        m_rods.resize(NUM_PLANKS);
 
         InitPlankEnds();
 
-      //  InitPlanks();
+        InitPlanks();
         
         InitVLinks();
 
@@ -592,6 +593,16 @@ protected:
             m_hLinks[i]->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *m_hLinks[i]);
         }
+
+        for (int i = 0; i < NUM_PLANKS; i++) {
+            int BaseIndex = i * 2;
+            Vector3f Dir = (m_PSOs[BaseIndex + 1].pSceneObject->GetPosition() - m_PSOs[BaseIndex].pSceneObject->GetPosition());
+            float RodLen = Dir.Length();
+            Vector3f Pos = m_PSOs[BaseIndex].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_planks[i]->SetPosition(Pos);
+            m_planks[i]->SetScale(RodLen / 2.0f);
+            DirToRotation(Dir, *m_planks[i]);
+        }
     }
 
 private:
@@ -620,13 +631,14 @@ private:
             Vector3f Dir = (m_PSOs[BaseIndex + 1].pSceneObject->GetPosition() - m_PSOs[BaseIndex].pSceneObject->GetPosition());
             float RodLen = Dir.Length();
             Vector3f Pos = m_PSOs[BaseIndex].pSceneObject->GetPosition() + Dir / 2.0f;
+            m_planks[i] = PSObject.pSceneObject;
             PSObject.pSceneObject->SetPosition(Pos);
             PSObject.pSceneObject->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *PSObject.pSceneObject);
-            m_planks[i].m_pParticles[0] = m_PSOs[BaseIndex].pParticle;
-            m_planks[i].m_pParticles[1] = m_PSOs[BaseIndex + 1].pParticle;
-            m_planks[i].m_len = PLANK_LENGTH;
-        //    m_physicsSystem.AddContactGenerator(&m_planks[i]);
+            m_rods[i].m_pParticles[0] = m_PSOs[BaseIndex].pParticle;
+            m_rods[i].m_pParticles[1] = m_PSOs[BaseIndex + 1].pParticle;
+            m_rods[i].m_len = PLANK_LENGTH;
+            m_physicsSystem.AddContactGenerator(&m_rods[i]);
         }
     }
 
@@ -682,10 +694,11 @@ private:
     std::vector<PhysicsSceneObject> m_PSOs;
     std::vector<SceneObject*> m_vLinks;
     std::vector<SceneObject*> m_hLinks;
+    std::vector<SceneObject*> m_planks;
     std::vector<OgldevPhysics::Particle*> m_particles;
     std::vector<OgldevPhysics::ParticleCable> m_cables;
     std::vector<OgldevPhysics::ParticleCableConstraint> m_supports;
-    std::vector<OgldevPhysics::ParticleRod> m_planks;
+    std::vector<OgldevPhysics::ParticleRod> m_rods;
     OgldevPhysics::GroundContacts m_groundContactGenerator;
     Model* m_pSphere = NULL;
     Model* m_pRod = NULL;
