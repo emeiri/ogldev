@@ -16,19 +16,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// #define USE_GLM
+// Define this to replace some of my code with GLM
+// #define USE_GLM_INSTEAD  
 
-#ifdef USE_GLM
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_clip_space.hpp>
-#include <glm/gtx/string_cast.hpp>
-#endif
 #include <iostream>
 #include <stdlib.h>
 
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 
 Vector4f& Vector4f::Normalize()
@@ -291,7 +289,7 @@ void Matrix4f::InitPersProjTransform(const PersProjInfo& p)
     m[2][0] = 0.0f;         m[2][1] = 0.0f;                 m[2][2] = (-p.zNear - p.zFar)/zRange ; m[2][3] = 2.0f*p.zFar*p.zNear/zRange;
     m[3][0] = 0.0f;         m[3][1] = 0.0f;                 m[3][2] = 1.0f;                        m[3][3] = 0.0;
 
-#ifdef USE_GLM
+#ifdef USE_GLM_INSTEAD
     glm::mat4 Projection = glm::perspectiveFovLH(glm::radians(p.FOV), p.Width, p.Height, p.zNear, p.zFar);
 
     m[0][0] = Projection[0][0]; m[0][1] = Projection[1][0]; m[0][2] = Projection[2][0]; m[0][3] = Projection[3][0];
@@ -653,11 +651,13 @@ bool IsPointInsideViewFrustum(const Vector3f& p, const Matrix4f& VP)
 // Copied from https://github.com/opengl-tutorials/ogl/blob/master/common/quaternion_utils.cpp
 glm::quat RotationBetweenVectors(glm::vec3& start, glm::vec3& dest)
 {
-    start = normalize(start);
-    dest = normalize(dest);
+    start = glm::normalize(start);
+    dest = glm::normalize(dest);
 
-    float cosTheta = dot(start, dest);
-    glm::vec3 rotationAxis;
+    float cosTheta = glm::dot(start, dest);
+    glm::vec3 RotationAxis;
+
+    glm::quat ret;
 
     if (cosTheta < -1 + 0.001f) {
         // special case when vectors in opposite directions :
@@ -665,19 +665,23 @@ glm::quat RotationBetweenVectors(glm::vec3& start, glm::vec3& dest)
         // So guess one; any will do as long as it's perpendicular to start
         // This implementation favors a rotation around the Up axis,
         // since it's often what you want to do.
-        rotationAxis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), start);
-        //   if (glm::length2(rotationAxis) < 0.01) // bad luck, they were parallel, try again!
-         //      rotationAxis = cross(vec3(1.0f, 0.0f, 0.0f), start);
+        RotationAxis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), start);
 
-        rotationAxis = normalize(rotationAxis);
-        return glm::angleAxis(glm::radians(180.0f), rotationAxis);
+        if (glm::length2(RotationAxis) < 0.01) { // bad luck, they were parallel, try again!
+            RotationAxis = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), start);
+        }
+
+        RotationAxis = glm::normalize(RotationAxis);
+        ret = glm::angleAxis(glm::radians(180.0f), RotationAxis);
+    } else {
+        // Implementation from Stan Melax's Game Programming Gems 1 article
+        RotationAxis = glm::cross(start, dest);
+
+        float s = sqrt((1 + cosTheta) * 2);
+        float invs = 1 / s;
+
+        ret = glm::quat(s * 0.5f, RotationAxis.x * invs, RotationAxis.y * invs, RotationAxis.z * invs);
     }
 
-    // Implementation from Stan Melax's Game Programming Gems 1 article
-    rotationAxis = cross(start, dest);
-
-    float s = sqrt((1 + cosTheta) * 2);
-    float invs = 1 / s;
-
-    return glm::quat(s * 0.5f, rotationAxis.x * invs, rotationAxis.y * invs, rotationAxis.z * invs);
+    return ret;
 }

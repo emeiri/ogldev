@@ -31,6 +31,10 @@
 #include "demolition_base_gl_app.h"
 #include "ogldev_physics.h"
 
+//#define GLM_ENABLE_EXPERIMENTAL
+//#include <glm/glm.hpp>
+//#include <glm/ext.hpp>
+
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
@@ -504,9 +508,6 @@ public:
 };
 
 
-
-
-
 static void DirToRotation(const Vector3f& Dir, SceneObject& o)
 {
     Vector3f DirN = Dir;
@@ -518,7 +519,6 @@ static void DirToRotation(const Vector3f& Dir, SceneObject& o)
     glm::quat q = RotationBetweenVectors(Start, Dest);
     o.SetQuaternion(q);
 }
-
 
 
 class BridgeDemo : public Carbonara {
@@ -567,6 +567,7 @@ private:
             PhysicsSceneObject PSObject = AddPhysicsSceneObject(m_pSphere, true, 0.05f);
             Vector3f Pos((i / 2.0f) * 2.0f - 5.0f, 1.0f, (i % 2) * 2.0f - 1.0f);
             PSObject.InitPosition(Pos);
+          //  PSObject.pParticle->SetMass(0.0001f);
             PSObject.pParticle->SetDamping(0.9f);
             PSObject.pParticle->SetAcceleration(OgldevPhysics::GRAVITY);
             m_particles[i] = PSObject;

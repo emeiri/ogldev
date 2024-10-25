@@ -41,7 +41,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-
 // powf wrapper for integer params to avoid crazy casting
 #define powi(base,exp) (int)powf((float)(base), (float)(exp))
 
