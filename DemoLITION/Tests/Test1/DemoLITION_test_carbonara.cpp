@@ -165,7 +165,7 @@ public:
 
         m_physicsSystem.Update(DeltaTimeMillis);
 
-      //  UpdateParticlePositions();
+        UpdateParticlePositions();
         
     //    m_pSceneObject->ResetRotations();
      //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
