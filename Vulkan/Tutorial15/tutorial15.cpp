@@ -35,6 +35,7 @@
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
 #include "ogldev_vulkan_graphics_pipeline.h"
+#include "ogldev_vulkan_simple_mesh.h"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
@@ -64,7 +65,7 @@ public:
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
 		vkDestroyRenderPass(m_device, m_renderPass, NULL);
-		vkDestroyBuffer(m_device, m_vb, NULL);
+		m_mesh.Destroy(m_device);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -120,8 +121,8 @@ private:
 			Vertex(glm::vec3(1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
 			Vertex(glm::vec3(0.0f,  1.0f, 0.0f), glm::vec2(1.0f, 1.0f)) };
 
-		m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
-		m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_vertexBufferSize);
+		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
+		m_mesh.m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_mesh.m_vertexBufferSize);
 	}
 
 
@@ -135,7 +136,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_vb, m_vertexBufferSize, m_numImages);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages);
 	}
 
 
@@ -199,8 +200,7 @@ private:
 	VkShaderModule m_vs;
 	VkShaderModule m_fs;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
-	VkBuffer m_vb;
-	size_t m_vertexBufferSize = 0;
+	OgldevVK::SimpleMesh m_mesh;
 };
 
 

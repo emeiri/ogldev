@@ -20,6 +20,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "ogldev_vulkan_simple_mesh.h"
+
 
 namespace OgldevVK {
 
@@ -32,8 +34,7 @@ public:
 					 VkRenderPass RenderPass,
 					 VkShaderModule vs,
 					 VkShaderModule fs,
-					 VkBuffer VB,
-					 size_t VBSize,
+					 const SimpleMesh* pMesh,
 					 int NumImages);
 
 	~GraphicsPipeline();
@@ -43,7 +44,7 @@ public:
 private:
 
 	void CreateDescriptorPool(int NumImages);
-	void CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize);
+	void CreateDescriptorSet(int NumImages, const SimpleMesh* pMesh);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;

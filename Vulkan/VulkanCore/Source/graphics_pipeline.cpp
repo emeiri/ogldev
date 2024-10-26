@@ -30,16 +30,15 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 								   VkRenderPass RenderPass,
 								   VkShaderModule vs,
 								   VkShaderModule fs,
-								   VkBuffer VB,
-								   size_t VBSize,
+								   const SimpleMesh* pMesh,
 								   int NumImages)
 {
 	m_device = Device;
 
 	CreateDescriptorPool(NumImages);
 	
-	if (VB) {
-		CreateDescriptorSet(NumImages, VB, VBSize);
+	if (pMesh) {
+		CreateDescriptorSet(NumImages, pMesh);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -130,7 +129,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
 
-	if (VB) {
+	if (pMesh && pMesh->m_vb) {
 		LayoutInfo.setLayoutCount = 1;
 		LayoutInfo.pSetLayouts = &m_descriptorSetLayout;
 	} else {
@@ -198,7 +197,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& VertexBuffer, size_t VertexBufferSize)
+void GraphicsPipeline::CreateDescriptorSet(int NumImages, const SimpleMesh* pMesh)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -240,9 +239,9 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const VkBuffer& Vertex
 	for (size_t i = 0; i < NumImages; i++) {
 
 		VkDescriptorBufferInfo BufferInfo_VB = {
-			.buffer = VertexBuffer,
+			.buffer = pMesh->m_vb,
 			.offset = 0,
-			.range = VertexBufferSize,
+			.range = pMesh->m_vertexBufferSize,
 		};
 
 		std::array<VkWriteDescriptorSet, 1> WriteDescriptorSet = {
