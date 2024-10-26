@@ -28,6 +28,18 @@
 
 namespace OgldevVK {
 
+
+class BufferAndMemory {
+public:
+	BufferAndMemory() {}
+
+	VkBuffer m_buffer = NULL;
+	VkDeviceMemory m_mem = NULL;
+	VkDeviceSize m_allocationSize = 0;
+
+	void Destroy(VkDevice Device);
+};
+
 class VulkanCore {
 
 public:
@@ -58,7 +70,7 @@ public:
 
 	void FreeCommandBuffers(u32 Count, const VkCommandBuffer* pCmdBufs);
 
-	VkBuffer CreateVertexBuffer(const void* pVertices, size_t Size);
+	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
 
 private:
 
@@ -73,8 +85,7 @@ private:
 
 	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
-	VkDeviceSize CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
-					          VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+	BufferAndMemory CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties);
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;

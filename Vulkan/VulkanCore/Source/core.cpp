@@ -546,94 +546,107 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 }
 
 
-VkBuffer VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
-	VkBuffer StagingVB;
-	VkDeviceMemory StagingVBMem;
-	VkDeviceSize AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, StagingVB, StagingVBMem);
+	BufferAndMemory StagingVB = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+										            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);		                                       
 
-	void* MappedMemAddr = NULL;
-	VkResult res = vkMapMemory(m_device, StagingVBMem, 0, AllocationSize, 0, &MappedMemAddr);
-	memcpy(MappedMemAddr, pVertices, Size);
-	vkUnmapMemory(m_device, StagingVBMem);
+	void* pMem = NULL;
+	VkDeviceSize Offset = 0;
+	VkMemoryMapFlags Flags = 0;
+	VkResult res = vkMapMemory(m_device, StagingVB.m_mem, Offset, StagingVB.m_allocationSize, Flags, &pMem);
+	CHECK_VK_RESULT(res, "vkMapMemory\n");
+	memcpy(pMem, pVertices, Size);
+	vkUnmapMemory(m_device, StagingVB.m_mem);
 
-	VkBuffer vb;
-	VkDeviceMemory vbMem;
-	AllocationSize = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vb, vbMem);
+	BufferAndMemory VB = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+								           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	CopyBuffer(vb, StagingVB, Size);
+	CopyBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
 
-	vkDestroyBuffer(m_device, StagingVB, NULL);
+	vkDestroyBuffer(m_device, StagingVB.m_buffer, NULL);
 
-	return vb;
+	return VB;
 }
 
 
-VkDeviceSize VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties,
-	VkBuffer& Buffer, VkDeviceMemory& BufferMemory)
+BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties)
 {
-	VkBufferCreateInfo vbCreateInfo = {};
-	vbCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	vbCreateInfo.size = Size;
-	vbCreateInfo.usage = Usage;
-	vbCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	VkBufferCreateInfo vbCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+		.size = Size,
+		.usage = Usage,
+		.sharingMode = VK_SHARING_MODE_EXCLUSIVE
+	};
 
-	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &Buffer);
+	BufferAndMemory Buf;
+
+	// Step 1: create a buffer
+	VkResult res = vkCreateBuffer(m_device, &vbCreateInfo, NULL, &Buf.m_buffer);
 	CHECK_VK_RESULT(res, "vkCreateBuffer\n");
-	printf("Create vertex buffer\n");
+	printf("Buffer created\n");
 
+	// Step 2: get the buffer memory requirements
 	VkMemoryRequirements MemReqs = {};
-	vkGetBufferMemoryRequirements(m_device, Buffer, &MemReqs);
-	printf("Vertex buffer requires %d bytes\n", (int)MemReqs.size);
+	vkGetBufferMemoryRequirements(m_device, Buf.m_buffer, &MemReqs);
+	printf("Buffer requires %d bytes\n", (int)MemReqs.size);
 
+	Buf.m_allocationSize = MemReqs.size;
+
+	// Step 3: get the memory type index
 	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, Properties);
-	VkMemoryAllocateInfo MemAllocInfo = {};
-	MemAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	MemAllocInfo.allocationSize = MemReqs.size;
-	MemAllocInfo.memoryTypeIndex = MemoryTypeIndex;
-	printf("Memory type index %d\n", MemAllocInfo.memoryTypeIndex);
+	printf("Memory type index %d\n", MemoryTypeIndex);
 
-	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &BufferMemory);
+	// Step 4: allocate memory
+	VkMemoryAllocateInfo MemAllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+		.allocationSize = MemReqs.size,
+		.memoryTypeIndex = MemoryTypeIndex
+	};
+
+	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &Buf.m_mem);
 	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
 
-	res = vkBindBufferMemory(m_device, Buffer, BufferMemory, 0);
-	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
+	// Step 5: bind memory
+	res = vkBindBufferMemory(m_device, Buf.m_buffer, Buf.m_mem, 0);
+	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");	
 
-	return MemAllocInfo.allocationSize;
+	return Buf;
 }
 
 void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	VkBufferCopy bufferCopy = {};
-	bufferCopy.srcOffset = 0;
-	bufferCopy.dstOffset = 0;
-	bufferCopy.size = Size;
-	vkCmdCopyBuffer(m_copyCmdBuf, Src, Dst, 1, &bufferCopy);
+	VkBufferCopy BufferCopy = {
+		.srcOffset = 0,
+		.dstOffset = 0,
+		.size = Size
+	};
+
+	vkCmdCopyBuffer(m_copyCmdBuf, Src, Dst, 1, &BufferCopy);
 
 	vkEndCommandBuffer(m_copyCmdBuf);
 
 	m_queue.SubmitSync(m_copyCmdBuf);
-
-	//m_queue.WaitIdle();
 }
 
 
-u32 VulkanCore::GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags reqMemPropFlags)
+u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags ReqMemPropFlags)
 {
 	const VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.Selected().m_memProps;
 
 	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
-		if ((memTypeBits & (1 << i)) &&
-			((MemProps.memoryTypes[i].propertyFlags & reqMemPropFlags) == reqMemPropFlags)) {
+		const VkMemoryType& MemType = MemProps.memoryTypes[i];
+		uint CurBitmask = (1 << i);
+
+		if ((MemTypeBitsMask & CurBitmask) &&
+			((MemType.propertyFlags & ReqMemPropFlags) == ReqMemPropFlags)) {
 			return i;
 		}
 	}
 
-	printf("Cannot find memory type for type %x requested mem props %x\n", memTypeBits, reqMemPropFlags);
+	printf("Cannot find memory type for type %x requested mem props %x\n", MemTypeBitsMask, ReqMemPropFlags);
 	exit(1);
 	return -1;
 }

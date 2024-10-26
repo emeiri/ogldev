@@ -129,7 +129,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
 
-	if (pMesh && pMesh->m_vb) {
+	if (pMesh && pMesh->m_vb.m_buffer) {
 		LayoutInfo.setLayoutCount = 1;
 		LayoutInfo.pSetLayouts = &m_descriptorSetLayout;
 	} else {
@@ -239,7 +239,7 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const SimpleMesh* pMes
 	for (size_t i = 0; i < NumImages; i++) {
 
 		VkDescriptorBufferInfo BufferInfo_VB = {
-			.buffer = pMesh->m_vb,
+			.buffer = pMesh->m_vb.m_buffer,
 			.offset = 0,
 			.range = pMesh->m_vertexBufferSize,
 		};

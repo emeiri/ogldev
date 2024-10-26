@@ -23,19 +23,17 @@
 #include <vulkan/vulkan.h>
 
 #include "ogldev_types.h"
-
+#include "ogldev_vulkan_core.h"
 
 namespace OgldevVK {
 
 struct SimpleMesh {
-	VkBuffer m_vb = NULL;
+	BufferAndMemory m_vb;
 	size_t m_vertexBufferSize = 0;
 
 	void Destroy(VkDevice Device)
 	{
-		if (m_vb) {
-			vkDestroyBuffer(Device, m_vb, NULL);
-		}
+		m_vb.Destroy(Device);
 	}
 };
 
