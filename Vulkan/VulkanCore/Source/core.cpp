@@ -62,7 +62,7 @@ VulkanCore::~VulkanCore()
 
 	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &m_copyCmdBuf);
 
-	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);	
+	vkDestroyCommandPool(m_device, m_cmdBufPool, NULL);
 
 	m_queue.Destroy();
 
@@ -116,7 +116,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 	CreateSwapChain();
 	CreateCommandBufferPool();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
-	CreateCommandBuffers(1, &m_copyCmdBuf);	
+	CreateCommandBuffers(1, &m_copyCmdBuf);
 }
 
 
@@ -549,7 +549,7 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
 	BufferAndMemory StagingVB = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-										            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);		                                       
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* pMem = NULL;
 	VkDeviceSize Offset = 0;
@@ -560,11 +560,11 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 	vkUnmapMemory(m_device, StagingVB.m_mem);
 
 	BufferAndMemory VB = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-								           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	CopyBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
 
-	vkDestroyBuffer(m_device, StagingVB.m_buffer, NULL);
+	StagingVB.Destroy(m_device);
 
 	return VB;
 }
@@ -609,7 +609,7 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 
 	// Step 5: bind memory
 	res = vkBindBufferMemory(m_device, Buf.m_buffer, Buf.m_mem, 0);
-	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");	
+	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
 
 	return Buf;
 }
@@ -629,6 +629,8 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 	vkEndCommandBuffer(m_copyCmdBuf);
 
 	m_queue.SubmitSync(m_copyCmdBuf);
+
+	m_queue.WaitIdle();
 }
 
 
@@ -649,6 +651,18 @@ u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags Re
 	printf("Cannot find memory type for type %x requested mem props %x\n", MemTypeBitsMask, ReqMemPropFlags);
 	exit(1);
 	return -1;
+}
+
+
+void BufferAndMemory::Destroy(VkDevice Device)
+{
+	if (m_mem) {
+		vkFreeMemory(Device, m_mem, NULL);
+	}
+
+	if (m_buffer) {
+		vkDestroyBuffer(Device, m_buffer, NULL);
+	}
 }
 
 }
