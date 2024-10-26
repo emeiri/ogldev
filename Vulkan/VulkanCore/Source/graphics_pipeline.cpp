@@ -177,7 +177,9 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
-	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[ImageIndex], 0, NULL);
+	if (m_descriptorSets.size() > 0) {
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[ImageIndex], 0, NULL);
+	}	
 }
 
 

@@ -56,10 +56,10 @@ public:
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
 		m_vkCore.DestroyFramebuffers(m_frameBuffers);
-		vkDestroyShaderModule(m_vkCore.GetDevice(), m_vs, NULL);
-		vkDestroyShaderModule(m_vkCore.GetDevice(), m_fs, NULL);
+		vkDestroyShaderModule(m_device, m_vs, NULL);
+		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
-		vkDestroyRenderPass(m_vkCore.GetDevice(), m_renderPass, NULL);
+		vkDestroyRenderPass(m_device, m_renderPass, NULL);
 	}
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
@@ -141,7 +141,7 @@ private:
 	
 			vkCmdBeginRenderPass(m_cmdBufs[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	
-			m_pPipeline->Bind(m_cmdBufs[i]);
+			m_pPipeline->Bind(m_cmdBufs[i], i);
 
 			u32 VertexCount = 3;
 			u32 InstanceCount = 1;
