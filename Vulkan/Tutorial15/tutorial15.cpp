@@ -117,9 +117,10 @@ private:
 		};
 
 		std::vector<Vertex> Vertices = {
-			Vertex(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
-			Vertex(glm::vec3(1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
-			Vertex(glm::vec3(0.0f,  1.0f, 0.0f), glm::vec2(1.0f, 1.0f)) };
+			Vertex({-1.0f, -1.0f, 0.0f},  {0.0f, 0.0f}),
+			Vertex({1.0f, -1.0f, 0.0f},   {0.0f, 1.0f}),
+			Vertex({0.0f,  1.0f, 0.0f},   {1.0f, 1.0f}) 
+		};
 
 		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
 		m_mesh.m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_mesh.m_vertexBufferSize);
