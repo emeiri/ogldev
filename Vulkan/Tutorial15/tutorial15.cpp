@@ -26,7 +26,10 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include "ogldev_math_3d.h"
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
@@ -102,20 +105,20 @@ private:
 	void CreateVertexBuffer()
 	{
 		struct Vertex {
-			Vertex(const Vector3f& p, const Vector2f& t)
+			Vertex(const glm::vec3& p, const glm::vec2& t)
 			{
 				Pos = p;
 				Tex = t;
 			}
 
-			Vector3f Pos;
-			Vector2f Tex;
+			glm::vec3 Pos;
+			glm::vec2 Tex;
 		};
 
 		std::vector<Vertex> Vertices = {
-			Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f)),
-			Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(0.0f, 1.0f)),
-			Vertex(Vector3f(0.0f,  1.0f, 0.0f), Vector2f(1.0f, 1.0f)) };
+			Vertex(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
+			Vertex(glm::vec3(1.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
+			Vertex(glm::vec3(0.0f,  1.0f, 0.0f), glm::vec2(1.0f, 1.0f)) };
 
 		m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
 		m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_vertexBufferSize);
