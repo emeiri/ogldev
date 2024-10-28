@@ -548,22 +548,31 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 
 BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
+	// Step 1: create the staging buffer
 	BufferAndMemory StagingVB = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+											 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
+	// Step 2: map the memory of the stage buffer
 	void* pMem = NULL;
 	VkDeviceSize Offset = 0;
 	VkMemoryMapFlags Flags = 0;
 	VkResult res = vkMapMemory(m_device, StagingVB.m_mem, Offset, StagingVB.m_allocationSize, Flags, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory\n");
+
+	// Step 3: copy the vertices to the stating buffer
 	memcpy(pMem, pVertices, Size);
+
+	// Step 4: unmap/release the mapped memory
 	vkUnmapMemory(m_device, StagingVB.m_mem);
 
+	// Step 5: create the final buffer
 	BufferAndMemory VB = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
+	// Step 6: copy the staging buffer to the final buffer
 	CopyBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
 
+	// Step 7: release the resources of the staging buffer
 	StagingVB.Destroy(m_device);
 
 	return VB;
@@ -641,9 +650,10 @@ u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags Re
 	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
 		const VkMemoryType& MemType = MemProps.memoryTypes[i];
 		uint CurBitmask = (1 << i);
+		bool IsCurMemTypeSupported = (MemTypeBitsMask & CurBitmask);
+		bool HasRequiredMemProps = ((MemType.propertyFlags & ReqMemPropFlags) == ReqMemPropFlags);
 
-		if ((MemTypeBitsMask & CurBitmask) &&
-			((MemType.propertyFlags & ReqMemPropFlags) == ReqMemPropFlags)) {
+		if (IsCurMemTypeSupported && HasRequiredMemProps) {
 			return i;
 		}
 	}
