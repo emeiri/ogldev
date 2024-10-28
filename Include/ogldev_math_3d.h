@@ -90,6 +90,12 @@ struct Vector2f
     {
     }
 
+    Vector2f(float f)
+    {
+        x = f;
+        y = f;
+    }
+
     Vector2f(float _x, float _y)
     {
         x = _x;
