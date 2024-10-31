@@ -117,9 +117,9 @@ private:
 		};
 
 		std::vector<Vertex> Vertices = {
-			Vertex({-1.0f, -1.0f, 0.0f},  {0.0f, 0.0f}),
-			Vertex({1.0f, -1.0f, 0.0f},   {0.0f, 1.0f}),
-			Vertex({0.0f,  1.0f, 0.0f},   {1.0f, 1.0f}) 
+			Vertex({-1.0f, -1.0f, 0.0f},  {0.0f, 0.0f}),	// top left
+			Vertex({1.0f, -1.0f, 0.0f},   {0.0f, 1.0f}),	// top right
+			Vertex({0.0f,  1.0f, 0.0f},   {1.0f, 1.0f}) 	// bottom middle
 		};
 
 		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();

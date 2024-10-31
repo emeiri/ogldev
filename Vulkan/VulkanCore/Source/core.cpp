@@ -567,7 +567,7 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 
 	// Step 5: create the final buffer
 	BufferAndMemory VB = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	// Step 6: copy the staging buffer to the final buffer
 	CopyBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
