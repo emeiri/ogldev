@@ -208,6 +208,7 @@ void PhongRenderer::Render(BasicMesh* pMesh)
 
     Matrix4f WVP;
     GetWVP(pMesh, WVP);
+    //printf("Lighting pass\n"); WVP.Print(); exit(1);
     m_lightingTech.SetWVP(WVP);
 
     RefreshLightingPosAndDirs(pMesh);

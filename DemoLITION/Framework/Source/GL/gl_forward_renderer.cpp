@@ -759,7 +759,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WV = View * FinalWorldMatrix;
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
-   // printf("Lighting pass\n"); WVP.Print();
+  //  printf("Lighting pass\n"); WVP.Print(); exit(1);
     m_pCurLightingTech->SetWVP(WVP);
 
     Matrix4f LightWVP;
