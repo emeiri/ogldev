@@ -313,14 +313,20 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
             v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
         }
 
-        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
-        v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+        if (paiMesh->HasTextureCoords(0)) {
+            const aiVector3D& pTexCoord = paiMesh->mTextureCoords[0][i];
+            v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
 
-        const aiVector3D& pTangent = paiMesh->mTangents[i];
-        v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+            const aiVector3D& pTangent = paiMesh->mTangents[i];
+            v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
 
-        const aiVector3D& pBitangent = paiMesh->mBitangents[i];
-        v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+            const aiVector3D& pBitangent = paiMesh->mBitangents[i];
+            v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+        } else {
+            v.TexCoords = Vector2f(0.0f);
+            v.Tangent   = Vector3f(0.0f);
+            v.Bitangent = Vector3f(0.0f);
+        }
 
      /*   printf("Pos %d: ", i); v.Position.Print();
         printf("Normal: "); v.Normal.Print();
