@@ -36,12 +36,19 @@ static bool UseMeshOptimizer = false;
 #define BONE_ID_LOCATION     5
 #define BONE_WEIGHT_LOCATION 6
 
-#define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_CalcTangentSpace |       \
-                                      aiProcess_Triangulate |            \
-                                      aiProcess_GenSmoothNormals |       \
-                                      aiProcess_JoinIdenticalVertices |  \
-                                      aiProcess_MakeLeftHanded |         \
-                                      aiProcess_FlipWindingOrder)
+
+
+#define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices | \
+                                      aiProcess_Triangulate | \
+                                      aiProcess_GenSmoothNormals | \
+                                      aiProcess_LimitBoneWeights | \
+                                      aiProcess_SplitLargeMeshes | \
+                                      aiProcess_ImproveCacheLocality | \
+                                      aiProcess_RemoveRedundantMaterials | \
+                                      aiProcess_FindDegenerates | \
+                                      aiProcess_FindInvalidData | \
+                                      aiProcess_GenUVCoords | \
+                                      aiProcess_CalcTangentSpace)
 
 static void traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);

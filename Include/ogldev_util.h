@@ -81,7 +81,18 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 long long GetCurrentTimeMillis();
 
 
-#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals |  aiProcess_JoinIdenticalVertices )
+#define ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices |    \
+                           aiProcess_Triangulate |              \
+                           aiProcess_GenSmoothNormals |         \
+                           aiProcess_LimitBoneWeights |         \
+                           aiProcess_SplitLargeMeshes |         \
+                           aiProcess_ImproveCacheLocality |     \
+                           aiProcess_RemoveRedundantMaterials | \
+                           aiProcess_FindDegenerates |          \
+                           aiProcess_FindInvalidData |          \
+                           aiProcess_GenUVCoords |              \
+                           aiProcess_CalcTangentSpace)
+
 
 #define NOT_IMPLEMENTED printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); exit(0);
 
