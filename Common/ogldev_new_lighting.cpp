@@ -656,8 +656,10 @@ void LightingTechnique::SetClipPlane(const Vector3f& Normal, const Vector3f& Poi
 void LightingTechnique::SetWireframeWidth(float Width)
 {
     if (WireframeWidthLoc == INVALID_UNIFORM_LOCATION) {
+#ifdef FAIL_ON_MISSING_LOC
         printf("Invalid call to SetWireframeWidth\n");
         exit(0);
+#endif
     }
 
     glUniform1f(WireframeWidthLoc, Width);
@@ -667,8 +669,10 @@ void LightingTechnique::SetWireframeWidth(float Width)
 void LightingTechnique::SetWireframeColor(const Vector4f& Color)
 {
     if (WireframeColorLoc == INVALID_UNIFORM_LOCATION) {
+#ifdef FAIL_ON_MISSING_LOC
         printf("Invalid call to SetWireframeColor\n");
         exit(0);
+#endif
     }
 
     glUniform4f(WireframeColorLoc, Color.x, Color.y, Color.z, Color.w);
