@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-#define NUm_PSOs 1000
+#define NUM_PSOs 1000
 
 struct PhysicsSceneObject {
     SceneObject* pSceneObject = NULL;
@@ -90,7 +90,7 @@ public:
         
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         
-        m_pScene->SetCameraSpeed(0.1f);
+      //  m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetDirLights().push_back(m_dirLight);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
@@ -207,7 +207,7 @@ public:
     PhysicsSceneObject LoadAndAddModel(const char* pFilename, bool AllocParticle, float Scale = 1.0f)
     {
         Model* pModel = m_pRenderingSystem->LoadModel(pFilename);
-        PhysicsSceneObject CObject = AddPhysicsSceneObject(pModel, Scale);
+        PhysicsSceneObject CObject = AddPhysicsSceneObject(pModel, AllocParticle, Scale);
   //      m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_gravityForceGenerator);
    //     m_physicsSystem.GetRegistry().Add(CObject.pParticle, &m_dragForceGenerator);
         return CObject;
@@ -448,7 +448,7 @@ public:
 
     BallisticsDemo()
     {
-        m_physicsSystem.Init(NUm_PSOs, 1, 1);
+        m_physicsSystem.Init(NUM_PSOs, 1, 1);
     }
 
     void InitChild()
@@ -472,7 +472,7 @@ public:
 
     FireworksDemo()  
     {
-        m_physicsSystem.Init(NUm_PSOs, 1, 1);
+        m_physicsSystem.Init(NUM_PSOs, 1, 1);
     }
 
     void InitChild()
@@ -534,7 +534,7 @@ public:
 
     BridgeDemo() 
     {
-        m_physicsSystem.Init(NUm_PSOs, NUM_SPHERES * 10, 0);
+        m_physicsSystem.Init(NUM_PSOs, NUM_SPHERES * 10, 0);
     }
 
     void InitChild()
@@ -704,12 +704,36 @@ private:
     Model* m_pRod = NULL;
 };
 
+
+class AmazonBistroDemo : public Carbonara {
+
+public:
+
+    AmazonBistroDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
+        m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0, 0.0f, 1.0f));
+        LoadAndAddModel("G:/McGuire/bistro/Exterior/exterior.obj", false, 1.0f);
+    }
+
+private:
+
+};
+
+
 void carbonara()
 {
   // BallisticsDemo demo;
    //FireworksDemo demo;
    // AnimationDemo demo;
-    BridgeDemo demo;
+  //  BridgeDemo demo;
+    AmazonBistroDemo demo;
 
     demo.Start();
 }
