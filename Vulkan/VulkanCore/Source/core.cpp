@@ -549,14 +549,17 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
 {
 	// Step 1: create the staging buffer
-	BufferAndMemory StagingVB = CreateBuffer(Size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-											 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	VkMemoryPropertyFlags MemProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+									 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	BufferAndMemory StagingVB = CreateBuffer(Size, Usage, MemProps);
 
 	// Step 2: map the memory of the stage buffer
 	void* pMem = NULL;
 	VkDeviceSize Offset = 0;
 	VkMemoryMapFlags Flags = 0;
-	VkResult res = vkMapMemory(m_device, StagingVB.m_mem, Offset, StagingVB.m_allocationSize, Flags, &pMem);
+	VkResult res = vkMapMemory(m_device, StagingVB.m_mem, Offset, 
+		                       StagingVB.m_allocationSize, Flags, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory\n");
 
 	// Step 3: copy the vertices to the stating buffer
@@ -566,8 +569,9 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 	vkUnmapMemory(m_device, StagingVB.m_mem);
 
 	// Step 5: create the final buffer
-	BufferAndMemory VB = CreateBuffer(Size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	Usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+	MemProps = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	BufferAndMemory VB = CreateBuffer(Size, Usage, MemProps);
 
 	// Step 6: copy the staging buffer to the final buffer
 	CopyBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
@@ -579,7 +583,8 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 }
 
 
-BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties)
+BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, 
+	                                     VkMemoryPropertyFlags Properties)
 {
 	VkBufferCreateInfo vbCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
