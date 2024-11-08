@@ -94,7 +94,7 @@ private:
     Vector3f m_target;
     Vector3f m_up;
 
-    float m_speed = 5.0f;
+    float m_speed = 0.2f;
     int m_windowWidth;
     int m_windowHeight;
 
