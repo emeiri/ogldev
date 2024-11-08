@@ -45,8 +45,6 @@ public:
 
     virtual void SetMaterial_CB(const Material& material) = 0;
 
-    virtual void DisableDiffuseTexture_CB() = 0;
-
     virtual void SetWorldMatrix_CB(const Matrix4f& World) = 0;
 };
 

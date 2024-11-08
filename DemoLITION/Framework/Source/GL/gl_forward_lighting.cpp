@@ -252,7 +252,6 @@ void ForwardLightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
 void ForwardLightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerLoc, TextureUnit);
-    glUniform1i(hasSamplerLoc, 1);
 }
 
 
@@ -280,9 +279,9 @@ void ForwardLightingTechnique::ControlParallaxMap(bool Enable)
 }
 
 
-void ForwardLightingTechnique::DisableDiffuseTexture()
+void ForwardLightingTechnique::ControlDiffuseTexture(bool Enable)
 {
-    glUniform1i(hasSamplerLoc, 0);
+    glUniform1i(hasSamplerLoc, Enable);
 }
 
 void ForwardLightingTechnique::SetShadowMapSize(unsigned int Width, unsigned int Height)
@@ -363,6 +362,9 @@ void ForwardLightingTechnique::SetMaterial(const Material& material)
     glUniform3f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b);
     glUniform3f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b);
     glUniform3f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b);
+
+    bool HasDiffuseTexture = (material.pDiffuse != NULL);
+    ControlDiffuseTexture(HasDiffuseTexture);
 }
 
 

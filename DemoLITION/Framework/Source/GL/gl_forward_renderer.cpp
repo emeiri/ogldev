@@ -679,17 +679,6 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
 }
 
 
-void ForwardRenderer::DisableDiffuseTexture_CB()
-{
-    switch (m_curRenderPass) {
-    case RENDER_PASS_LIGHTING_DIR:
-    case RENDER_PASS_LIGHTING_SPOT:
-    case RENDER_PASS_LIGHTING_POINT:
-        m_pCurLightingTech->DisableDiffuseTexture();
-    }
-}
-
-
 void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 {
     switch (m_curRenderPass) {

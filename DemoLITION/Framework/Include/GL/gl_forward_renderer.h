@@ -108,8 +108,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     virtual void SetMaterial_CB(const Material& material);
 
-    virtual void DisableDiffuseTexture_CB();
-
     virtual void SetWorldMatrix_CB(const Matrix4f& World);
  
 private:

@@ -85,6 +85,7 @@ protected:
 
 private:
     void SetExpFogCommon(float FogEnd, float FogDensity);
+    void ControlDiffuseTexture(bool Enable);
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;

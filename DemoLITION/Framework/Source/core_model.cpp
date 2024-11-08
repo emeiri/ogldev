@@ -858,14 +858,8 @@ void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCall
     }
 
     if (pRenderCallbacks) {
-        if (m_pColorTexture || m_Materials[MaterialIndex].pDiffuse) {
-            pRenderCallbacks->DrawStart_CB(MeshIndex);
-            pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
-        }
-        else {
-            pRenderCallbacks->DisableDiffuseTexture_CB();
-        }
-
+        pRenderCallbacks->DrawStart_CB(MeshIndex);
+        pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
         pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].Transformation);
     }
 
