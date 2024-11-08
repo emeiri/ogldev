@@ -38,8 +38,10 @@
     <ClInclude Include="..\..\..\Include\technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Common\Shaders\sprite.fs" />
-    <None Include="..\..\..\Common\Shaders\sprite.vs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.fs" />
+    <None Include="..\..\..\Common\Shaders\lighting_new.vs" />
+    <None Include="..\..\..\Common\Shaders\shadow_map_point_light.fs" />
+    <None Include="..\..\..\Common\Shaders\shadow_map_point_light.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
