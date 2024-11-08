@@ -163,6 +163,7 @@ void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
 {
     m_defaultCamera.SetPosition(Pos);
     m_defaultCamera.SetTarget(Target);
+    m_defaultCamera.SetUp(0.0f, 1.0f, 0.0f);
 }
 
 
