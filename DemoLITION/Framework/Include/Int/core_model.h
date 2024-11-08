@@ -138,6 +138,8 @@ private:
     template<typename VertexType>
     void PopulateBuffersDSA(vector<VertexType>& Vertices);
 
+    uint CountValidFaces(const aiMesh& Mesh);
+
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
     struct BasicMeshEntry {
@@ -146,12 +148,14 @@ private:
             NumIndices = 0;
             BaseVertex = 0;
             BaseIndex = 0;
+            ValidFaces = 0;
             MaterialIndex = INVALID_MATERIAL;
         }
 
         uint NumIndices;
         uint BaseVertex;
         uint BaseIndex;
+        uint ValidFaces;
         uint MaterialIndex;
         Matrix4f Transformation;		
     };

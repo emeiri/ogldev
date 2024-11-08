@@ -217,13 +217,28 @@ void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& Num
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-        m_Meshes[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+        m_Meshes[i].ValidFaces = CountValidFaces(*pScene->mMeshes[i]);
+        m_Meshes[i].NumIndices = m_Meshes[i].ValidFaces * 3;
         m_Meshes[i].BaseVertex = NumVertices;
         m_Meshes[i].BaseIndex = NumIndices;
 
         NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices  += m_Meshes[i].NumIndices;
     }
+}
+
+
+uint CoreModel::CountValidFaces(const aiMesh& Mesh)
+{
+    uint NumValidFaces = 0;
+
+    for (uint i = 0; i < Mesh.mNumFaces; i++) {
+        if (Mesh.mFaces[i].mNumIndices == 3) {
+            NumValidFaces++;
+        }
+    }
+
+    return NumValidFaces;
 }
 
 
@@ -340,7 +355,10 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
     for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
         //  printf("num indices %d\n", Face.mNumIndices);
-        //  assert(Face.mNumIndices == 3);
+        if (Face.mNumIndices != 3) {
+            printf("Warning! face %d has %d indices\n", i, Face.mNumIndices);
+            continue;
+        }
      /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
         printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
         printf("%d: %d\n", i * 3 + 2, Face.mIndices[2]);*/
@@ -409,6 +427,12 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
     // Populate the index buffer
     for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
+
+        if (Face.mNumIndices != 3) {
+            printf("Warning! face %d has %d indices\n", i, Face.mNumIndices);
+            continue;
+        }
+
         Indices[i * 3 + 0] = Face.mIndices[0];
         Indices[i * 3 + 1] = Face.mIndices[1];
         Indices[i * 3 + 2] = Face.mIndices[2];
