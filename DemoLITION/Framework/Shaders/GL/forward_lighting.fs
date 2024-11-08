@@ -134,7 +134,7 @@ float CalcShadowFactorPointLight(vec3 LightToPixel)
 {
     float Distance = length(LightToPixel);
 
-    LightToPixel.x = -LightToPixel.x;       // what???
+    LightToPixel.y = -LightToPixel.y;
 
     float SampledDistance = texture(gShadowCubeMap, LightToPixel).r;
 
