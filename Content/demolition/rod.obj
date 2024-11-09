@@ -1,6 +1,7 @@
 # Blender 4.2.1 LTS
 # www.blender.org
 mtllib rod.mtl
+usemtl Material
 o Cylinder
 v 1.000000 0.010000 -0.000000
 v -1.000000 0.010000 0.000000

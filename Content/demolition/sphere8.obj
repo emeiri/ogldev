@@ -1,6 +1,7 @@
 # Blender 4.2.1 LTS
 # www.blender.org
 mtllib sphere8.mtl
+usemtl Material
 o Sphere
 v -0.241845 0.939693 0.241845
 v -0.454519 0.766044 0.454519
