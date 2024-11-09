@@ -65,8 +65,9 @@ public:
     Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Carbonara")
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        m_dirLight.WorldDirection = Vector3f(0.0f, -1.0f, -1.0f);
+        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
+        m_dirLight.AmbientIntensity = 0.5f;
 
         m_pointLight.WorldPosition = Vector3f(0.25f, 0.25f, 0.0f);
      //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
@@ -164,9 +165,9 @@ public:
             ApplyGUIConfig();
         }
 
-        if (m_pScene->GetDirLights().size() > 0) {
-            m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        }
+      //  if (m_pScene->GetDirLights().size() > 0) {
+      //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
+      //  }
 
         m_count += 0.01f;
 
@@ -532,6 +533,9 @@ public:
 
 #define PLANK_LENGTH 2.0f
 
+#define BASE_MASS 1
+#define EXTRA_MASS 10
+
     BridgeDemo() 
     {
         m_physicsSystem.Init(NUM_PSOs, NUM_SPHERES * 10, 0);
@@ -543,11 +547,11 @@ public:
         m_pScene->SetCamera(Vector3f(0.0f, 4.5f, -14.0f), Vector3f(0.0, -0.25f, 1.0f));
 
         m_pRod = m_pRenderingSystem->LoadModel("../Content/demolition/rod.obj");
-        int Texture = m_pRenderingSystem->LoadTexture2D("../Content/textures/brickwall.jpg");
-        m_pRod->SetColorTexture(Texture);
+        int SphereTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/brickwall.jpg");
+        m_pRod->SetColorTexture(SphereTexture);
 
         m_pSphere = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
-        m_pSphere->SetColorTexture(Texture);
+        m_pSphere->SetColorTexture(SphereTexture);
 
         m_PSOs.resize(NUM_SPHERES);
         m_particles.resize(NUM_SPHERES);
@@ -566,10 +570,48 @@ public:
 
         InitHLinks();
 
+        InitBall();
+
         m_groundContactGenerator.Init(&m_particles);
 
         m_physicsSystem.AddContactGenerator(&m_groundContactGenerator);
     }
+
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = false;
+
+        switch (key) {
+        case GLFW_KEY_U:
+            m_ballBasePos.z += 0.1f;
+            HandledByMe = true;
+            break;
+
+        case GLFW_KEY_M:
+            m_ballBasePos.z -= 0.1f;
+            HandledByMe = true;
+            break;
+
+        case GLFW_KEY_H:
+            m_ballBasePos.x -= 0.1f;
+            HandledByMe = true;
+            break;
+
+        case GLFW_KEY_K:
+            m_ballBasePos.x += 0.1f;
+            HandledByMe = true;
+            break;
+
+        default:
+            HandledByMe = Carbonara::OnKeyboard(key, action);
+        }
+
+        CLAMP(m_ballBasePos.x, 0.0f, 5.0f);
+        CLAMP(m_ballBasePos.z, -1.0f, 1.0f);
+        return HandledByMe;
+    }
+
 
 protected:
 
@@ -603,6 +645,67 @@ protected:
             m_planks[i]->SetScale(RodLen / 2.0f);
             DirToRotation(Dir, *m_planks[i]);
         }
+
+        UpdateBallPosition();
+    }
+
+    
+    void UpdateBallPosition()
+    {
+        int x = int(m_ballBasePos.x);
+
+        float xp = fmod(m_ballBasePos.x, 1.0f);
+
+        if (x < 0) {
+            x = 0;
+            xp = 0;
+        } 
+        
+        if (x >= 5) {
+            x = 5;
+            xp = 0;
+        }
+
+        int z = int(m_ballBasePos.z);
+        float zp = fmod(m_ballBasePos.z, 1.0f);
+
+        if (z < 0) {
+            z = 0;
+            zp = 0.0f;
+        }
+
+        if (z >= 1) {
+            z = 1;
+            zp = 0;
+        }
+
+
+        // Calculate where to draw the mass
+        m_ballDisplayPos.SetZero();
+
+        // Add the proportion to the correct masses
+        m_particles[x * 2 + z]->SetMass(BASE_MASS + EXTRA_MASS * (1 - xp) * (1 - zp));
+
+        m_ballDisplayPos += (m_particles[x * 2 + z]->GetPosition() * (1 - xp) * (1 - zp));
+
+        if (xp > 0) {
+            m_particles[x * 2 + z + 2]->SetMass(BASE_MASS + EXTRA_MASS * xp * (1 - zp));
+            m_ballDisplayPos += (m_particles[x * 2 + z + 2]->GetPosition() * xp * (1 - zp));
+
+            if (zp > 0) {
+                m_particles[x * 2 + z + 3]->SetMass(BASE_MASS + EXTRA_MASS * xp * zp);
+                m_ballDisplayPos += (m_particles[x * 2 + z + 3]->GetPosition() * xp * zp);
+            }
+        }
+
+        if (zp > 0) {
+            m_particles[x * 2 + z + 1]->SetMass(BASE_MASS + EXTRA_MASS * (1 - xp) * zp);
+            m_ballDisplayPos += (m_particles[x * 2 + z + 1]->GetPosition() * (1 - xp) * zp);
+        }
+
+        m_ballDisplayPos.y += 0.5f;
+
+        m_ballPSObject.InitPosition(m_ballDisplayPos);
     }
 
 private:
@@ -691,6 +794,14 @@ private:
         }
     }
 
+    void InitBall()
+    {
+        int BallTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/gutsy.png");
+        m_pBall = m_pRenderingSystem->LoadModel("../Content/demolition/sphere8.obj");
+        m_pBall->SetColorTexture(BallTexture);
+        m_ballPSObject = AddPhysicsSceneObject(m_pBall, true, 0.5f);
+    }
+
     std::vector<PhysicsSceneObject> m_PSOs;
     std::vector<SceneObject*> m_vLinks;
     std::vector<SceneObject*> m_hLinks;
@@ -701,7 +812,11 @@ private:
     std::vector<OgldevPhysics::ParticleRod> m_rods;
     OgldevPhysics::GroundContacts m_groundContactGenerator;
     Model* m_pSphere = NULL;
+    Model* m_pBall = NULL;
     Model* m_pRod = NULL;
+    PhysicsSceneObject m_ballPSObject;
+    Vector3f m_ballBasePos;
+    Vector3f m_ballDisplayPos;
 };
 
 
@@ -718,10 +833,11 @@ public:
     {
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
-        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0, 0.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(0.917917f, 0.051464f, 0.39342f));
         LoadAndAddModel("G:/McGuire/bistro/Exterior/exterior.obj", false, 1.0f);
+    //    LoadAndAddModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx", false, 1.0f);
     }
-
+    
 private:
 
 };
@@ -732,8 +848,8 @@ void carbonara()
   // BallisticsDemo demo;
    //FireworksDemo demo;
    // AnimationDemo demo;
-  //  BridgeDemo demo;
-    AmazonBistroDemo demo;
+    BridgeDemo demo;
+  //  AmazonBistroDemo demo;
 
     demo.Start();
 }
