@@ -43,7 +43,6 @@ class Material {
 
     PBRMaterial PBRmaterial;
 
-    // TODO: need to deallocate these
     Texture* pDiffuse = NULL; // base color of the material
     Texture* pSpecularExponent = NULL;
 

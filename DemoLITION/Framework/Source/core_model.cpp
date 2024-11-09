@@ -86,13 +86,22 @@ void CoreModel::Clear()
 
 void CoreModel::SetColorTexture(int TextureHandle)
 {
-    if (TextureHandle < 0) {
-        m_pColorTexture = NULL;
+    Texture* pTexture = NULL;
+    
+    if (TextureHandle >= 0) {
+        pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
     }
-    else {
-        Texture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
-        m_pColorTexture = pTexture;
+
+    if (m_Materials.size() == 0) {
+        printf("SetColorTexture: no materials\n");
+        assert(0);
     }
+
+    if (m_Materials[0].pDiffuse) {
+        delete m_Materials[0].pDiffuse;
+    }
+
+    m_Materials[0].pDiffuse = pTexture;
 }
 
 
@@ -852,12 +861,8 @@ void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCall
     unsigned int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
     assert(MaterialIndex < m_Materials.size());
 
-    if (m_pColorTexture) {  // overrides the material
-        m_pColorTexture->Bind(COLOR_TEXTURE_UNIT);
-    } else {
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
-        }
+    if (m_Materials[MaterialIndex].pDiffuse) {
+        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pSpecularExponent) {
@@ -866,8 +871,7 @@ void CoreModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCall
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent_CB(true);
         }
-    }
-    else {
+    } else {
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent_CB(false);
         }
