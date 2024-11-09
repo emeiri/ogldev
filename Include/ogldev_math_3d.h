@@ -291,6 +291,11 @@ struct Vector3f
     {
         x = y = z = 0.0f;
     }
+
+    void SetZero()
+    {
+        SetAll(0.0f);
+    }
 };
 
 
