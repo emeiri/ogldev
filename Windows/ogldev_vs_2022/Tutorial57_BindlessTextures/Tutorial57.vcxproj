@@ -25,6 +25,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\tutorial57_youtube\bindless_tex_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial57_youtube\tutorial57.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +38,7 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\tutorial57_youtube\bindless_tex_technique.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -28,6 +28,7 @@
 #include "ogldev_base_app.h"
 #include "ogldev_infinite_grid.h"
 #include "ogldev_glm_camera.h"
+#include "bindless_tex_technique.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -59,7 +60,10 @@ public:
 
         DefaultInitGUI();
 
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        m_bindlessTexTech.Init();
+
+      //  glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
 
@@ -98,7 +102,11 @@ public:
 
         glm::mat4 VP = m_pCamera->GetVPMatrix();
 
-        m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
+     //   m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
+
+        m_bindlessTexTech.Enable();
+        //glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
 
@@ -145,6 +153,7 @@ public:
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
     GLMCameraFirstPerson* m_pCamera = NULL;    
+    BindlessTextureTechnique m_bindlessTexTech;
 };
 
 

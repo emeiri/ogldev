@@ -523,5 +523,8 @@
     <None Include="..\..\..\Common\Shaders\wireframe_on_mesh.gs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\..\Common\Shaders\quad.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

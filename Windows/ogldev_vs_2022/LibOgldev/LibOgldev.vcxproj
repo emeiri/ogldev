@@ -298,6 +298,7 @@
     <None Include="..\..\..\Common\Shaders\passthru.gs" />
     <None Include="..\..\..\Common\Shaders\passthru_vec2.vs" />
     <None Include="..\..\..\Common\Shaders\passthru_vec3.vs" />
+    <None Include="..\..\..\Common\Shaders\quad.vs" />
     <None Include="..\..\..\Common\Shaders\quad_tess.tcs" />
     <None Include="..\..\..\Common\Shaders\quad_tess.tes" />
     <None Include="..\..\..\Common\Shaders\ray_marching.fs" />

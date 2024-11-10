@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\..\tutorial57_youtube\tutorial57.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tutorial57_youtube\bindless_tex_technique.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\tutorial57_youtube\bindless_tex_technique.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
