@@ -40,6 +40,9 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\tutorial57_youtube\bindless_tex_technique.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial57_youtube\bindless_texture.fs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

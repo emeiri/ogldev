@@ -62,6 +62,8 @@ public:
 
         m_bindlessTexTech.Init();
 
+        InitTexture();
+
       //  glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
@@ -128,6 +130,45 @@ public:
 #define STEP 0.01f
 
     private:
+
+    void InitTexture()
+    {
+        unsigned char limit = unsigned char(rand() % 231 + 25);
+        const size_t textureSize = 32 * 32 * 3;
+        unsigned char textureData[textureSize];
+
+        // Randomly generate an unsigned char per RGB channel
+        for (int j = 0; j < textureSize; ++j) {
+            textureData[j] = unsigned char(rand() % limit);
+        }
+
+        GLuint texture;
+        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+        glTextureStorage2D(texture, 1, GL_RGB8, 32, 32);
+        glTextureSubImage2D(texture,
+            // level, xoffset, yoffset, width, height
+            0, 0, 0, 32, 32,
+            GL_RGB, GL_UNSIGNED_BYTE,
+            (const void*)&textureData[0]);
+        glGenerateTextureMipmap(texture);
+
+        // Retrieve the texture handle after we finish creating the texture
+        const GLuint64 handle = glGetTextureHandleARB(texture);
+        if (handle == 0) {
+            printf("glGetTextureHandleARB failed\n");
+            exit(-1);
+        }
+
+        GLuint textureBuffer;
+        glCreateBuffers(1, &textureBuffer);
+        glNamedBufferStorage(textureBuffer, sizeof(GLuint64), (const void*)&handle, GL_DYNAMIC_STORAGE_BIT);
+
+        glMakeTextureHandleResidentARB(handle);
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, textureBuffer);
+      //  textures.push_back(texture);
+       // textureHandles.push_back(handle);
+    }
 
     void InitCamera()
     {

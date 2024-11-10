@@ -32,7 +32,7 @@ bool BindlessTextureTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "../Common/Shaders/color.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "bindless_texture.fs")) {
         return false;
     }
 

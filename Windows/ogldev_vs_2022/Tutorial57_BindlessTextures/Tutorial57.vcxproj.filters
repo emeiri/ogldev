@@ -69,4 +69,9 @@
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial57_youtube\bindless_texture.fs">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>
