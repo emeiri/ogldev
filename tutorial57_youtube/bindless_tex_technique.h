@@ -29,7 +29,11 @@ public:
 
     virtual bool Init();
 
+    void SetTextureIndex(int Index);
+
 private:
+
+    GLuint m_texIndexLoc = INVALID_UNIFORM_LOCATION;
 };
 
 #endif  /* TEX_TECHNIQUE_H */

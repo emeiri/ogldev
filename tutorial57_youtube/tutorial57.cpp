@@ -34,6 +34,8 @@
 #define WINDOW_HEIGHT 1080
 
 
+#define NUM_INSTANCES 1000
+
 class Tutorial57 : public OgldevBaseApp
 {
 public:
@@ -107,8 +109,16 @@ public:
      //   m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
 
         m_bindlessTexTech.Enable();
-        //glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
+       // glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, NUM_INSTANCES, 0);
+
+        static int TextureIndex = 0;
+        m_bindlessTexTech.SetTextureIndex(TextureIndex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        TextureIndex++;
+        if (TextureIndex == NUM_INSTANCES) {
+            TextureIndex = 0;
+        }
     }
 
 
@@ -127,47 +137,54 @@ public:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-#define STEP 0.01f
-
     private:
 
     void InitTexture()
     {
+        std::vector<GLuint> textures;
+        std::vector<GLuint64> textureHandles;
+
+        textures.resize(NUM_INSTANCES);
+        textureHandles.resize(NUM_INSTANCES);
+
         unsigned char limit = unsigned char(rand() % 231 + 25);
         const size_t textureSize = 32 * 32 * 3;
         unsigned char textureData[textureSize];
 
-        // Randomly generate an unsigned char per RGB channel
-        for (int j = 0; j < textureSize; ++j) {
-            textureData[j] = unsigned char(rand() % limit);
-        }
+        for (int i = 0; i < NUM_INSTANCES; i++) {
+            // Randomly generate an unsigned char per RGB channel
+            for (int j = 0; j < textureSize; ++j) {
+                textureData[j] = unsigned char(rand() % limit);
+            }
 
-        GLuint texture;
-        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-        glTextureStorage2D(texture, 1, GL_RGB8, 32, 32);
-        glTextureSubImage2D(texture,
-            // level, xoffset, yoffset, width, height
-            0, 0, 0, 32, 32,
-            GL_RGB, GL_UNSIGNED_BYTE,
-            (const void*)&textureData[0]);
-        glGenerateTextureMipmap(texture);
+            GLuint texture;
+            glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+            glTextureStorage2D(texture, 1, GL_RGB8, 32, 32);
+            glTextureSubImage2D(texture,
+                // level, xoffset, yoffset, width, height
+                0, 0, 0, 32, 32,
+                GL_RGB, GL_UNSIGNED_BYTE,
+                (const void*)&textureData[0]);
+            glGenerateTextureMipmap(texture);
 
-        // Retrieve the texture handle after we finish creating the texture
-        const GLuint64 handle = glGetTextureHandleARB(texture);
-        if (handle == 0) {
-            printf("glGetTextureHandleARB failed\n");
-            exit(-1);
+            // Retrieve the texture handle after we finish creating the texture
+            const GLuint64 handle = glGetTextureHandleARB(texture);
+            if (handle == 0) {
+                printf("glGetTextureHandleARB failed\n");
+                exit(-1);
+            }
+
+            textures[i] = texture;
+            textureHandles[i] = handle;
+
+            glMakeTextureHandleResidentARB(handle);
         }
 
         GLuint textureBuffer;
         glCreateBuffers(1, &textureBuffer);
-        glNamedBufferStorage(textureBuffer, sizeof(GLuint64), (const void*)&handle, GL_DYNAMIC_STORAGE_BIT);
-
-        glMakeTextureHandleResidentARB(handle);
+        glNamedBufferStorage(textureBuffer, sizeof(GLuint64) * textureHandles.size(), (const void*)textureHandles.data(), GL_DYNAMIC_STORAGE_BIT);        
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, textureBuffer);
-      //  textures.push_back(texture);
-       // textureHandles.push_back(handle);
     }
 
     void InitCamera()
@@ -175,8 +192,7 @@ public:
         float FOV = 45.0f;
         float zNear = 1.0f;
         float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 
-                                      zNear, zFar };
+        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
         glm::vec3 Pos(0.0f, 2.1f, 0.0f);
         glm::vec3 Target(0.0f, 2.1f, 1.0f);

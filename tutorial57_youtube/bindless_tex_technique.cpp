@@ -40,7 +40,16 @@ bool BindlessTextureTechnique::Init()
         return false;
     }
 
+
+    GET_UNIFORM_AND_CHECK(m_texIndexLoc, "gTextureIndex");
+
     return true;
+}
+
+
+void BindlessTextureTechnique::SetTextureIndex(int Index)
+{
+    glUniform1i(m_texIndexLoc, Index);
 }
 
 
