@@ -183,7 +183,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial35", "Tutorial35\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial36", "Tutorial36\Tutorial36.vcxproj", "{50449426-0E07-4D4A-B7EC-366B8D1A8503}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial37", "Tutorial37\Tutorial37.vcxproj", "{118F84E3-475E-45BB-8F8D-51C1CB03BCEE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial37_PointLightShadows", "Tutorial37\Tutorial37.vcxproj", "{118F84E3-475E-45BB-8F8D-51C1CB03BCEE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial38", "Tutorial38\Tutorial38.vcxproj", "{0D237F28-EA59-4308-9330-50650B015A07}"
 EndProject
