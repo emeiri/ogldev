@@ -29,12 +29,15 @@
 #include "ogldev_infinite_grid.h"
 #include "ogldev_glm_camera.h"
 #include "bindless_tex_technique.h"
+#include "3rdparty/stb_image.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
+#define NUM_DIRS 3
+#define NUM_FILES_IN_DIR 100
+#define NUM_TOTAL_FILES (NUM_DIRS * NUM_FILES_IN_DIR)
 
-#define NUM_INSTANCES 1000
 
 class Tutorial57 : public OgldevBaseApp
 {
@@ -116,7 +119,7 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         TextureIndex++;
-        if (TextureIndex == NUM_INSTANCES) {
+        if (TextureIndex == NUM_TOTAL_FILES) {
             TextureIndex = 0;
         }
     }
@@ -143,29 +146,37 @@ public:
     {
         std::vector<GLuint> textures;
         std::vector<GLuint64> textureHandles;
+        std::vector<std::string> textureFiles;
 
-        textures.resize(NUM_INSTANCES);
-        textureHandles.resize(NUM_INSTANCES);
+        textures.resize(NUM_TOTAL_FILES);
+        textureHandles.resize(NUM_TOTAL_FILES);
+        textureFiles.resize(NUM_TOTAL_FILES);
 
-        unsigned char limit = unsigned char(rand() % 231 + 25);
-        const size_t textureSize = 32 * 32 * 3;
-        unsigned char textureData[textureSize];
+        for (uint32_t j = 0; j < NUM_DIRS; j++) {
+            for (uint32_t i = 0; i != NUM_FILES_IN_DIR; i++) {
+                char fname[1024];
+                snprintf(fname, sizeof(fname), "../../Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
+                textureFiles.push_back(fname);
+            }
+        }
 
-        for (int i = 0; i < NUM_INSTANCES; i++) {
-            // Randomly generate an unsigned char per RGB channel
-            for (int j = 0; j < textureSize; ++j) {
-                textureData[j] = unsigned char(rand() % limit);
+        for (int i = 0; i < NUM_TOTAL_FILES; i++) {
+            int texWidth, texHeight, texChannels;
+            printf("Loading '%s'\n", textureFiles[i].c_str());
+            stbi_uc* pixels = stbi_load(textureFiles[i].c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+
+            if (!pixels) {
+                printf("Failed to load [%s] texture\n", textureFiles[i].c_str()); fflush(stdout);
+                exit(1);
             }
 
             GLuint texture;
             glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-            glTextureStorage2D(texture, 1, GL_RGB8, 32, 32);
-            glTextureSubImage2D(texture,
-                // level, xoffset, yoffset, width, height
-                0, 0, 0, 32, 32,
-                GL_RGB, GL_UNSIGNED_BYTE,
-                (const void*)&textureData[0]);
+            glTextureStorage2D(texture, 1, GL_RGBA8, texWidth, texHeight);
+            glTextureSubImage2D(texture, 0, 0, 0, texWidth, texHeight, GL_RGBA, GL_UNSIGNED_BYTE, (const void*)pixels);
             glGenerateTextureMipmap(texture);
+
+            stbi_image_free(pixels);
 
             // Retrieve the texture handle after we finish creating the texture
             const GLuint64 handle = glGetTextureHandleARB(texture);
