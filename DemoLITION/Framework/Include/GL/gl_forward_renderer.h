@@ -64,7 +64,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL);
 
-    void SetCamera(BasicCamera* pCamera) { 
+    void SetCamera(GLMCameraFirstPerson* pCamera) {
         m_pCurCamera = pCamera; 
     }
 
@@ -147,7 +147,7 @@ private:
     CoreSceneObject* m_pcurSceneObject = NULL;
 
     RenderingSystemGL* m_pRenderingSystemGL = NULL;    
-    BasicCamera* m_pCurCamera = NULL;    
+    GLMCameraFirstPerson* m_pCurCamera = NULL;
 
     // Shadow stuff
     ShadowMapFBO m_shadowMapFBO;

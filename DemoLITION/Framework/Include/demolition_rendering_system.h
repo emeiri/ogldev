@@ -20,9 +20,10 @@
 #pragma once
 
 #include "ogldev_types.h"
+#include "ogldev_glm_camera.h"
 #include "demolition_scene.h"
 #include "demolition_model.h"
-#include "ogldev_basic_glfw_camera.h"
+
 
 class GameCallbacks
 {
@@ -87,5 +88,5 @@ public:
 
     virtual long long GetElapsedTimeMillis() const = 0;
 
-    virtual BasicCamera* GetCurrentCamera() = 0;
+    virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
 };

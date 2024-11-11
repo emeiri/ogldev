@@ -80,7 +80,7 @@ public:
 
     const std::vector<DirectionalLight>& GetDirLights();
 
-    BasicCamera* GetCurrentCamera() { return &m_defaultCamera; }
+    GLMCameraFirstPerson* GetCurrentCamera() { return &m_defaultCamera; }
 
     void InitializeDefault();    
 
@@ -112,7 +112,7 @@ private:
     void CreateDefaultCamera();
     CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel);
 
-    BasicCamera m_defaultCamera;
+    GLMCameraFirstPerson m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;
     int m_numSceneObjects = 0;
     CoreSceneObject* m_pPickedSceneObject = NULL;

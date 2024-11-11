@@ -21,7 +21,7 @@
 
 #include <list>
 
-#include "ogldev_basic_glfw_camera.h"
+#include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
 
@@ -121,7 +121,7 @@ public:
 
     virtual void SetCamera(const Vector3f& Pos, const Vector3f& Target) = 0;
 
-    virtual BasicCamera* GetCurrentCamera() = 0;
+    virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
     
     virtual void SetCameraSpeed(float Speed) = 0;
 

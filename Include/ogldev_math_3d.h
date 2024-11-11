@@ -296,6 +296,13 @@ struct Vector3f
     {
         SetAll(0.0f);
     }
+
+
+    glm::vec3 ToGLM() const
+    {
+        glm::vec3 ret(x, y, z);
+        return ret;
+    }
 };
 
 

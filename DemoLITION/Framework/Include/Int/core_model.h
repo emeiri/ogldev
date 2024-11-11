@@ -30,7 +30,7 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
 #include "ogldev_material.h"
-#include "ogldev_basic_glfw_camera.h"
+#include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
 
@@ -69,7 +69,7 @@ public:
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
-    const std::vector<BasicCamera>& GetCameras() const { return m_cameras; }
+    const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
     uint NumBones() const
     {
@@ -299,7 +299,7 @@ private:
 
     Assimp::Importer m_Importer;
 
-    std::vector<BasicCamera> m_cameras;
+    std::vector<GLMCameraFirstPerson> m_cameras;
     std::vector<DirectionalLight> m_dirLights;
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;

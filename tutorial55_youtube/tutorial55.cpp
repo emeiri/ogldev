@@ -101,7 +101,7 @@ public:
 
         glm::mat4 VP = m_pCamera->GetVPMatrix();
 
-        m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
+        m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPos());
     }
 
 

@@ -54,20 +54,35 @@ public:
 	float m_fastCoef = 10.0f;
 	float m_mouseSpeed = 4.0f;	
 
+	GLMCameraFirstPerson() {}
+
 	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target,
 		                 const glm::vec3& Up, PersProjInfo& persProjInfo);
+
+	void Init(const glm::vec3& Pos, const glm::vec3& Target,
+			  const glm::vec3& Up, PersProjInfo& persProjInfo);
 
 	void Update(float dt);
 
 	const glm::mat4& GetProjMatrix() const { return m_persProjection; }
 
-	glm::vec3 GetPosition() const { return m_cameraPos; }
+	glm::vec3 GetPos() const { return m_cameraPos; }
+
+	glm::vec3 GetTarget() const { return glm::vec3(0.0f, 0.0f, 1.0f); }
+
+	glm::vec3 GetUp() const { return m_up; }
 
 	glm::mat4 GetViewMatrix() const;
 
 	glm::mat4 GetVPMatrix() const;
 
 	glm::mat4 GetVPMatrixNoTranslate() const;
+
+	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
+
+	void SetUp(const glm::vec3& Up) { m_up = Up; }
+
+	void SetTarget(const glm::vec3& Target) { printf("Warning!!! SetTarget is not implemented\n"); }
 
 private:
 

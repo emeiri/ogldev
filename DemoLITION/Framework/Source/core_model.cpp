@@ -1084,7 +1084,8 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene, int WindowWid
         printf("Warning! the aspect ratio of the camera is %f while the aspect ratio of the window is %f\n", pCamera->mAspect, AspectRatio);
     }
 
-    m_cameras[Index] = BasicCamera(persProjInfo, FinalPos, FinalTarget, FinalUp);
+    Vector3f Center = FinalPos + FinalTarget;
+    m_cameras[Index].Init(FinalPos.ToGLM(), Center.ToGLM(), FinalUp.ToGLM(), persProjInfo);
 }
 
 

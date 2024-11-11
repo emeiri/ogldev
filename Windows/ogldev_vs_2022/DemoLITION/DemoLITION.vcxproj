@@ -211,8 +211,8 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp" />

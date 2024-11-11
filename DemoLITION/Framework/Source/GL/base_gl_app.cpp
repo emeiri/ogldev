@@ -66,23 +66,23 @@ bool BaseGLApp::OnKeyboard(int key, int action)
         break;
 
     case GLFW_KEY_KP_4:
-        m_pRenderingSystem->GetCurrentCamera()->SetTarget(Vector3f(-1.0f, 0.0f, 0.0f));
-        m_pRenderingSystem->GetCurrentCamera()->SetUp(0.0f, 1.0f, 0.0f);
+        m_pRenderingSystem->GetCurrentCamera()->SetTarget(glm::vec3(-1.0f, 0.0f, 0.0f));
+        m_pRenderingSystem->GetCurrentCamera()->SetUp(glm::vec3(0.0f, 1.0f, 0.0f));
         break;
 
     case GLFW_KEY_KP_6:
-        m_pRenderingSystem->GetCurrentCamera()->SetTarget(Vector3f(1.0f, 0.0f, 0.0f));
-        m_pRenderingSystem->GetCurrentCamera()->SetUp(0.0f, 1.0f, 0.0f);
+        m_pRenderingSystem->GetCurrentCamera()->SetTarget(glm::vec3(1.0f, 0.0f, 0.0f));
+        m_pRenderingSystem->GetCurrentCamera()->SetUp(glm::vec3(0.0f, 1.0f, 0.0f));
         break;
 
     case GLFW_KEY_KP_8:
-        m_pRenderingSystem->GetCurrentCamera()->SetTarget(Vector3f(.0f, 0.0f, 1.0f));
-        m_pRenderingSystem->GetCurrentCamera()->SetUp(0.0f, 1.0f, 0.0f);
+        m_pRenderingSystem->GetCurrentCamera()->SetTarget(glm::vec3(.0f, 0.0f, 1.0f));
+        m_pRenderingSystem->GetCurrentCamera()->SetUp(glm::vec3(0.0f, 1.0f, 0.0f));
         break;
 
     case GLFW_KEY_KP_2:
-        m_pRenderingSystem->GetCurrentCamera()->SetTarget(Vector3f(.0f, 0.0f, -1.0f));
-        m_pRenderingSystem->GetCurrentCamera()->SetUp(0.0f, 1.0f, 0.0f);
+        m_pRenderingSystem->GetCurrentCamera()->SetTarget(glm::vec3(.0f, 0.0f, -1.0f));
+        m_pRenderingSystem->GetCurrentCamera()->SetUp(glm::vec3(0.0f, 1.0f, 0.0f));
         break;
 
    /* case GLFW_KEY_KP_7:

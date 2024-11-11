@@ -21,11 +21,11 @@
 #pragma once
 
 #include "ogldev_types.h"
+#include "ogldev_glm_camera.h"
 #include "demolition_rendering_system.h"
 #include "Int/core_model.h"
 #include "Int/core_scene.h"
 
-class BasicCamera;
 
 class CoreRenderingSystem : public RenderingSystem
 {
@@ -53,7 +53,7 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual long long GetElapsedTimeMillis() const { return m_elapsedTimeMillis; }
 
-    virtual BasicCamera* GetCurrentCamera() { return m_pCamera; }
+    virtual GLMCameraFirstPerson* GetCurrentCamera() { return m_pCamera; }
 
  protected:
 
@@ -67,12 +67,12 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual Grid* CreateGridInternal(int Width, int Depth) = 0;
 
-    virtual void SetCamera(BasicCamera* pCamera) = 0;
+    virtual void SetCamera(GLMCameraFirstPerson* pCamera) = 0;
 
     long long m_elapsedTimeMillis = 0;
     int m_windowWidth = 0;
     int m_windowHeight = 0;
-    BasicCamera* m_pCamera = NULL;
+    GLMCameraFirstPerson* m_pCamera = NULL;
     GameCallbacks* m_pGameCallbacks = NULL;
     GameCallbacks m_defaultGameCallbacks;
     CoreScene* m_pScene = NULL;

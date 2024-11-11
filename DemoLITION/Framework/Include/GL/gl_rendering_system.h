@@ -60,7 +60,7 @@ class RenderingSystemGL : public CoreRenderingSystem
  protected:
      virtual void* CreateWindowInternal(const char* pWindowName);
 
-     virtual void SetCamera(BasicCamera* pCamera) { m_forwardRenderer.SetCamera(pCamera); }
+     virtual void SetCamera(GLMCameraFirstPerson* pCamera) { m_forwardRenderer.SetCamera(pCamera); }
 
  private:
 

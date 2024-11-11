@@ -21,7 +21,14 @@
 #include "ogldev_glm_camera.h"
 
 GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target,
-	                                       const glm::vec3& Up, PersProjInfo& persProjInfo)
+										   const glm::vec3& Up, PersProjInfo& persProjInfo)
+{
+	Init(Pos, Target, Up, persProjInfo);
+}
+
+
+void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
+								const glm::vec3& Up, PersProjInfo& persProjInfo)
 {
 	m_cameraPos = Pos;
 	m_up = Up;

@@ -187,7 +187,7 @@ void RenderingSystemGL::Execute()
         long long TotalRuntimeMillis = CurTimeMillis - StartTimeMillis;
        // printf("Total runtime %I64d delta %I64d\n", TotalRuntimeMillis, DeltaTimeMillis);
         m_elapsedTimeMillis = CurTimeMillis - StartTimeMillis;
-        m_pCamera->OnRender();
+        m_pCamera->Update((float)DeltaTimeMillis / 1000.0f);
         if (m_pScene) {
             m_forwardRenderer.Render(m_pWindow, (GLScene*)m_pScene, m_pGameCallbacks, TotalRuntimeMillis, DeltaTimeMillis);
         } else {
@@ -210,6 +210,7 @@ void RenderingSystemGL::InitCallbacks()
 void RenderingSystemGL::OnKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
 {
     bool HandledByGame = m_pGameCallbacks->OnKeyboard(key, action);
+    bool HandledByCamera = false;
 
     if (!HandledByGame) {
         switch (key) {
@@ -219,7 +220,7 @@ void RenderingSystemGL::OnKeyCallback(GLFWwindow* pWindow, int key, int scancode
             exit(0);
 
         default:
-            m_pCamera->OnKeyboard(key);
+            HandledByCamera = GLFWCameraHandler(m_pCamera->m_movement, key, action, mods);
         }
     }
 }
@@ -229,11 +230,17 @@ void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* pWindow, double x, doubl
 {
     bool HandledByGame = m_pGameCallbacks->OnMouseMove((int)x, (int)y);
 
-    if (HandledByGame) {
+    int WindowWidth, WindowHeight;
+    glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
+
+    m_pCamera->m_mouseState.m_pos.x = (float)x / (float)WindowWidth;
+    m_pCamera->m_mouseState.m_pos.y = (float)y / (float)WindowHeight;
+
+ /*   if (HandledByGame) {
         m_pCamera->UpdateMousePosSilent((int)x, (int)y);
     } else {
         m_pCamera->OnMouse((int)x, (int)y);
-    }
+    }*/
 }
 
 
@@ -242,6 +249,10 @@ void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* pWindow, int Button, i
     int MousePosX = 0, MousePosY = 0;
     GetMousePos(pWindow, MousePosX, MousePosY);
     m_pGameCallbacks->OnMouseButton(Button, Action, Mode, MousePosX, MousePosY);
+
+    if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+        m_pCamera->m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
+    }
 }
 
 

@@ -155,21 +155,22 @@ void CoreScene::CreateDefaultCamera()
 
     PersProjInfo persProjInfo = { FOV, (float)WindowWidth, (float)WindowHeight, zNear, zFar };
 
-    m_defaultCamera = BasicCamera(persProjInfo, Pos, Target, Up);
+    Vector3f Center = Pos + Target;
+    m_defaultCamera.Init(Pos.ToGLM(), Center.ToGLM(), Up.ToGLM(), persProjInfo);
 }
 
 
 void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
 {
-    m_defaultCamera.SetPosition(Pos);
-    m_defaultCamera.SetTarget(Target);
-    m_defaultCamera.SetUp(0.0f, 1.0f, 0.0f);
+    m_defaultCamera.SetPos(Pos.ToGLM());
+    m_defaultCamera.SetTarget(Target.ToGLM());
+    m_defaultCamera.SetUp(glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 
 void CoreScene::SetCameraSpeed(float Speed)
 {
-    m_defaultCamera.SetSpeed(Speed);
+ //   m_defaultCamera.SetSpeed(Speed);
 }
 
 

@@ -287,7 +287,7 @@ public:
     void GUICamera(Scene* pScene)
     {
         if (ImGui::TreeNode("Camera")) {
-            const BasicCamera* pCamera = pScene->GetCurrentCamera();
+            const GLMCameraFirstPerson* pCamera = pScene->GetCurrentCamera();
             const Vector3f& Pos = pCamera->GetPos();
             const Vector3f& Target = pCamera->GetTarget();
             const Vector3f& Up = pCamera->GetUp();

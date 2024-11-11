@@ -49,9 +49,6 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\base_gl_app.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
       <Filter>Source\ImGUI</Filter>
     </ClCompile>
@@ -99,6 +96,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid.cpp">
       <Filter>Source\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

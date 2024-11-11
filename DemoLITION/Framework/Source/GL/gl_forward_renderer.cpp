@@ -564,8 +564,8 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 {
     Matrix4f World = pSceneObject->GetMatrix();
-    Matrix4f View = m_pCurCamera->GetMatrix();
-    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+    Matrix4f View = m_pCurCamera->GetViewMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjMatrix();
 
    // Projection.Print();
  //   exit(0);
@@ -743,8 +743,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f FinalWorldMatrix = World * ObjectMatrix;
     m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
-    Matrix4f View = m_pCurCamera->GetMatrix();
-    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+    Matrix4f View = m_pCurCamera->GetViewMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjMatrix();
     Matrix4f WV = View * FinalWorldMatrix;
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
@@ -790,8 +790,8 @@ void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 
 Matrix4f ForwardRenderer::GetViewProjectionMatrix()
 {
-    Matrix4f View = m_pCurCamera->GetMatrix();
-    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+    Matrix4f View = m_pCurCamera->GetViewMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjMatrix();
 
     Matrix4f Ret = Projection * View;
 
