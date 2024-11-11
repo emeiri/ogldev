@@ -177,6 +177,7 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrixNoTranslate() const
 
 void GLMCameraFirstPerson::SetUpVector()
 {
+	// TODO: reuse GetTarget here
 	glm::mat4 View = GetViewMatrix();
 
 	glm::vec3 Forward = glm::vec3(View[0][2], View[1][2], View[2][2]);
@@ -187,4 +188,33 @@ void GLMCameraFirstPerson::SetUpVector()
 	else {
 		m_cameraOrientation = glm::lookAtRH(m_cameraPos, m_cameraPos - Forward, m_up);
 	}
+}
+
+
+void GLMCameraFirstPerson::SetTarget(const glm::vec3& Target)
+{
+	if (CAMERA_LEFT_HANDED) {
+		m_cameraOrientation = glm::lookAtLH(m_cameraPos, m_cameraPos + Target, m_up);
+	}
+	else {
+		m_cameraOrientation = glm::lookAtRH(m_cameraPos, m_cameraPos - Target, m_up);
+	}
+}
+
+
+glm::vec3 GLMCameraFirstPerson::GetTarget() const
+{
+	glm::mat4 View = GetViewMatrix();
+
+	glm::vec3 Forward = glm::vec3(View[0][2], View[1][2], View[2][2]);
+
+	return Forward;
+}
+
+
+void GLMCameraFirstPerson::Print() const
+{
+	glm::vec3 Target = GetTarget();
+
+	printf("Camera: pos (%f,%f,%f) target (%f,%f,%f)\n", m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, Target.x, Target.y, Target.z);
 }

@@ -68,7 +68,7 @@ public:
 
 	glm::vec3 GetPos() const { return m_cameraPos; }
 
-	glm::vec3 GetTarget() const { return glm::vec3(0.0f, 0.0f, 1.0f); }
+	glm::vec3 GetTarget() const;
 
 	glm::vec3 GetUp() const { return m_up; }
 
@@ -82,7 +82,9 @@ public:
 
 	void SetUp(const glm::vec3& Up) { m_up = Up; }
 
-	void SetTarget(const glm::vec3& Target) { printf("Warning!!! SetTarget is not implemented\n"); }
+	void SetTarget(const glm::vec3& Target);
+
+	void Print() const;
 
 private:
 
