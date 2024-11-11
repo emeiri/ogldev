@@ -376,7 +376,7 @@ vec4 CalcPointLight(PointLight l, vec3 Normal, bool IsPoint)
     float Attenuation =  l.Atten.Constant +
                          l.Atten.Linear * Distance +
                          l.Atten.Exp * Distance * Distance;
-Attenuation = 1.0;      // TODO: how to import correctly from blender
+
     return Color / Attenuation;
 }
 
