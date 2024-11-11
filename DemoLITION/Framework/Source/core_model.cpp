@@ -129,7 +129,7 @@ void CoreModel::SetHeightMap(int TextureHandle)
 }
 
 
-bool CoreModel::LoadAssimpModel(const string& Filename, int WindowWidth, int WindowHeight)
+bool CoreModel::LoadAssimpModel(const string& Filename)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -154,7 +154,7 @@ bool CoreModel::LoadAssimpModel(const string& Filename, int WindowWidth, int Win
         printf("--- END Node Hierarchy ---\n");
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;
         m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
-        Ret = InitFromScene(m_pScene, Filename, WindowWidth, WindowHeight);
+        Ret = InitFromScene(m_pScene, Filename);
     }
     else {
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
@@ -167,13 +167,13 @@ bool CoreModel::LoadAssimpModel(const string& Filename, int WindowWidth, int Win
 }
 
 
-bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename, int WindowWidth, int WindowHeight)
+bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename)
 {
     if (!InitGeometry(pScene, Filename)) {
         return false;
     }    
 
-    InitCameras(pScene, WindowWidth, WindowHeight);
+    InitCameras(pScene);
 
     InitLights(pScene);
 
@@ -1008,7 +1008,7 @@ static void traverse(int depth, aiNode* pNode)
 }
 
 
-void CoreModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight)
+void CoreModel::InitCameras(const aiScene* pScene)
 {
     printf("\n*** Initializing cameras ***\n");
     printf("Loading %d cameras\n", pScene->mNumCameras);
@@ -1016,12 +1016,12 @@ void CoreModel::InitCameras(const aiScene* pScene, int WindowWidth, int WindowHe
     m_cameras.resize(pScene->mNumCameras);
 
     for (unsigned int i = 0; i < pScene->mNumCameras; i++) {
-        InitSingleCamera(i, pScene, WindowWidth, WindowHeight);
+        InitSingleCamera(i, pScene);
     }
 }
 
 
-void CoreModel::InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight)
+void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
 {
     const aiCamera* pCamera = pScene->mCameras[Index];
     printf("Camera name: '%s'\n", pCamera->mName.C_Str());
@@ -1072,17 +1072,12 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene, int WindowWid
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
     persProjInfo.zFar = pCamera->mClipPlaneFar;
-    persProjInfo.Width = (float)WindowWidth;
-    persProjInfo.Height = (float)WindowHeight;
-    persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV);
+    persProjInfo.Width = pCamera->mAspect;
+
+    persProjInfo.Height = 1.0f;
+    persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV) / 2.0f;
 
     //exit(0);*/
-
-    float AspectRatio = (float)WindowWidth / (float)WindowHeight;
-
-    if (AspectRatio != pCamera->mAspect) {
-        printf("Warning! the aspect ratio of the camera is %f while the aspect ratio of the window is %f\n", pCamera->mAspect, AspectRatio);
-    }
 
     Vector3f Center = FinalPos + FinalTarget;
     m_cameras[Index].Init(FinalPos.ToGLM(), Center.ToGLM(), FinalUp.ToGLM(), persProjInfo);

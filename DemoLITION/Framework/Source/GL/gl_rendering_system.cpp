@@ -101,7 +101,7 @@ CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
 {
     CoreModel* pModel = new CoreModel(this);
 
-    if (!pModel->LoadAssimpModel(Filename, m_windowWidth, m_windowHeight)) {
+    if (!pModel->LoadAssimpModel(Filename)) {
         delete pModel;
         pModel = NULL;
     }

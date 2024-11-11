@@ -57,7 +57,7 @@ public:
 
     ~CoreModel();
 
-    bool LoadAssimpModel(const std::string& Filename, int WindowWidth, int WindowHeight);
+    bool LoadAssimpModel(const std::string& Filename);
 
     void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
@@ -244,7 +244,7 @@ private:
     };
 
 
-    bool InitFromScene(const aiScene* pScene, const std::string& Filename, int WindowWidth, int WindowHeight);
+    bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 
     bool InitGeometry(const aiScene* pScene, const string& Filename);
 
@@ -286,9 +286,9 @@ private:
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
-    void InitCameras(const aiScene* pScene, int WindowWidth, int WindowHeight);
+    void InitCameras(const aiScene* pScene);
 
-    void InitSingleCamera(int Index, const aiScene* pScene, int WindowWidth, int WindowHeight);
+    void InitSingleCamera(int Index, const aiScene* pScene);
 
     std::vector<Material> m_Materials;
     Texture* m_pNormalMap = NULL;
