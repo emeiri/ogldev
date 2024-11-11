@@ -219,6 +219,12 @@ void RenderingSystemGL::OnKeyCallback(GLFWwindow* pWindow, int key, int scancode
             Shutdown();
             exit(0);
 
+        case GLFW_KEY_C:
+            if (action == GLFW_PRESS) {
+                m_pCamera->Print();
+            }
+            break;
+
         default:
             HandledByCamera = GLFWCameraHandler(m_pCamera->m_movement, key, action, mods);
         }
