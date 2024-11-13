@@ -657,39 +657,57 @@ void CoreModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
 
 void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 {
-    aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
-    Vector3f AllOnes(1.0f, 1.0f, 1.0f);
+    Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
 
     int ShadingModel = 0;
     if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) == AI_SUCCESS) {
         printf("Shading model %d\n", ShadingModel);
     }
 
+    aiColor4D AmbientColor(0.0f, 0.0f, 0.0f, 0.0f);
+
     if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
         printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
         m_Materials[index].AmbientColor.r = AmbientColor.r;
         m_Materials[index].AmbientColor.g = AmbientColor.g;
         m_Materials[index].AmbientColor.b = AmbientColor.b;
+        m_Materials[index].AmbientColor.a = std::min(AmbientColor.a, 1.0f);
     } else {
         m_Materials[index].AmbientColor = AllOnes;
     }
 
-    aiColor3D DiffuseColor(0.0f, 0.0f, 0.0f);
+    aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    if (pMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, EmissiveColor) == AI_SUCCESS) {
+        printf("Loaded emissive color [%f %f %f]\n", EmissiveColor.r, EmissiveColor.g, EmissiveColor.b);
+        m_Materials[index].AmbientColor.r += EmissiveColor.r;
+        m_Materials[index].AmbientColor.g += EmissiveColor.g;
+        m_Materials[index].AmbientColor.b += EmissiveColor.b;
+        m_Materials[index].AmbientColor.a += EmissiveColor.a;
+        m_Materials[index].AmbientColor.a = std::min(m_Materials[index].AmbientColor.a, 1.0f);
+    }
+    else {
+        m_Materials[index].AmbientColor = AllOnes;
+    }
+
+    aiColor4D DiffuseColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     if (pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, DiffuseColor) == AI_SUCCESS) {
         printf("Loaded diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
         m_Materials[index].DiffuseColor.r = DiffuseColor.r;
         m_Materials[index].DiffuseColor.g = DiffuseColor.g;
         m_Materials[index].DiffuseColor.b = DiffuseColor.b;
+        m_Materials[index].DiffuseColor.a = std::min(DiffuseColor.a, 1.0f);
     }
 
-    aiColor3D SpecularColor(0.0f, 0.0f, 0.0f);
+    aiColor4D SpecularColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     if (pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, SpecularColor) == AI_SUCCESS) {
         printf("Loaded specular color [%f %f %f]\n", SpecularColor.r, SpecularColor.g, SpecularColor.b);
         m_Materials[index].SpecularColor.r = SpecularColor.r;
         m_Materials[index].SpecularColor.g = SpecularColor.g;
         m_Materials[index].SpecularColor.b = SpecularColor.b;
+        m_Materials[index].SpecularColor.a = std::min(SpecularColor.a, 1.0f);
     }
 }
 

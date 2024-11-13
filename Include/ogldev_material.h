@@ -37,9 +37,9 @@ struct PBRMaterial
 class Material {
 
  public:
-    Vector3f AmbientColor = Vector3f(0.0f, 0.0f, 0.0f);
-    Vector3f DiffuseColor = Vector3f(0.0f, 0.0f, 0.0f);
-    Vector3f SpecularColor = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f SpecularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 
     PBRMaterial PBRmaterial;
 
