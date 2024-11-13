@@ -37,6 +37,9 @@ struct PBRMaterial
 class Material {
 
  public:
+
+     std::string m_name;
+
     Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f SpecularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
@@ -45,6 +48,9 @@ class Material {
 
     Texture* pDiffuse = NULL; // base color of the material
     Texture* pSpecularExponent = NULL;
+
+    float m_transparencyFactor = 1.0f;
+    float m_alphaTest = 0.0f;
 
     ~Material()
     {

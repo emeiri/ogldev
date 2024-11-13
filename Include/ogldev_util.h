@@ -132,7 +132,7 @@ string GetDirFromFilename(const string& Filename);
 
 #define MAX_BONES (200)
 
-#define CLAMP(Val, Start, End) Val = std::min(std::max((Val), (Start)), (End));
+#define CLAMP(Val, Start, End) std::min(std::max((Val), (Start)), (End));
 
 int GetGLMajorVersion();
 int GetGLMinorVersion();
