@@ -308,10 +308,25 @@ struct Vector3f
 
 struct Vector4f
 {
-    float x;
-    float y;
-    float z;
-    float w;
+    union {
+        float x;
+        float r;
+    };
+
+    union {
+        float y;
+        float g;
+    };
+
+    union {
+        float z;
+        float b;
+    };
+
+    union {
+        float w;
+        float a;
+    };
 
     Vector4f()
     {
