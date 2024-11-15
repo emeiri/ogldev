@@ -139,6 +139,16 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 		Acceleration *= m_fastCoef; 
 	}
 
+	if (m_movement.Plus) {
+		m_maxSpeed++;
+		m_acceleration += 10.0f;
+	}
+
+	if (m_movement.Minus) {
+		m_maxSpeed--;
+		m_acceleration -= 10.0f;
+	}
+
 	return Acceleration;
 }
 

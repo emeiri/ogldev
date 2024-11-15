@@ -35,6 +35,8 @@ struct CameraMovement {
 	bool Up = false;
 	bool Down = false;
 	bool FastSpeed = false;
+	bool Plus = false;
+	bool Minus = false;
 };
 
 struct MouseState {

@@ -169,6 +169,14 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
         Movement.Down = Press;
         break;
 
+    case GLFW_KEY_KP_ADD:
+        Movement.Plus = Press;
+        break;
+
+    case GLFW_KEY_KP_SUBTRACT:
+        Movement.Minus = Press;
+        break;
+
     default:
         Handled = false;
     }
