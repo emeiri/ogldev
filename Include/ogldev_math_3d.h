@@ -941,4 +941,6 @@ bool IsPointInsideViewFrustum(const Vector3f& p, const Matrix4f& VP);
 
 glm::quat RotationBetweenVectors(glm::vec3& start, glm::vec3& dest);
 
+#define GLM_PRINT_VEC3(s, v) printf("%s (%f,%f,%f)\n", s, v.x, v.y, v.z)
+
 #endif  /* MATH_3D_H */
