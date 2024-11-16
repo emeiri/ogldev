@@ -101,8 +101,11 @@ void Texture::LoadInternalNonDSA(const void* pImageData)
 
     if (m_textureTarget == GL_TEXTURE_2D) {
         switch (m_imageBPP) {
-        case 1:
+        case 1: {
             glTexImage2D(m_textureTarget, 0, GL_RED, m_imageWidth, m_imageHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pImageData);
+            GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
+            glTexParameteriv(m_textureTarget, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
+        }        
             break;
 
         case 2:
@@ -144,9 +147,12 @@ void Texture::LoadInternalDSA(const void* pImageData)
 
     if (m_textureTarget == GL_TEXTURE_2D) {
         switch (m_imageBPP) {
-        case 1:
+        case 1: {
             glTextureStorage2D(m_textureObj, Levels, GL_R8, m_imageWidth, m_imageHeight);
             glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_UNSIGNED_BYTE, pImageData);
+            GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
+            glTextureParameteriv(m_textureObj, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
+        }  
             break;
 
         case 2:
