@@ -86,8 +86,8 @@ void GLMCameraFirstPerson::CalcVelocity(float dt)
 		m_velocity += Acceleration * m_acceleration * dt;
 		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
 
-		if (glm::length(m_velocity) > m_maxSpeed) {
-			m_velocity = glm::normalize(m_velocity) * m_maxSpeed;
+		if (glm::length(m_velocity) > MaxSpeed) {
+			m_velocity = glm::normalize(m_velocity) * MaxSpeed;
 		}
 	}
 }
