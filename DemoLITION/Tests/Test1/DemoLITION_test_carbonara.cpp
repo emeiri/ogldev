@@ -832,9 +832,13 @@ public:
     void InitChild()
     {
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
-        m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(0.917917f, 0.051464f, 0.39342f));
-        LoadAndAddModel("G:/McGuire/bistro/Exterior/exterior.obj", false, 1.0f);
+        m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+        Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        m_pScene->AddToRenderList(pSceneObject);
+
     //    LoadAndAddModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx", false, 1.0f);
     }
     
@@ -848,8 +852,8 @@ void carbonara()
   // BallisticsDemo demo;
    //FireworksDemo demo;
    // AnimationDemo demo;
-    BridgeDemo demo;
-  //  AmazonBistroDemo demo;
+  //  BridgeDemo demo;
+    AmazonBistroDemo demo;
 
     demo.Start();
 }
