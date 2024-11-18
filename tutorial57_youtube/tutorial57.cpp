@@ -156,7 +156,8 @@ public:
             for (uint32_t i = 0; i != NUM_FILES_IN_DIR; i++) {
                 char fname[1024];
                 snprintf(fname, sizeof(fname), "../../Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
-                textureFiles.push_back(fname);
+                int Index = j * NUM_FILES_IN_DIR + i;
+                textureFiles[Index] = fname;
             }
         }
 
