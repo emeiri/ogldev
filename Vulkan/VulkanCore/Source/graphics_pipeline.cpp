@@ -262,9 +262,11 @@ void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMe
 		.range = pMesh->m_vertexBufferSize,
 	};
 
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
+
 	for (size_t i = 0; i < NumImages; i++) {
 
-		std::array<VkWriteDescriptorSet, 1> WriteDescriptorSet = {
+		WriteDescriptorSet.push_back(
 			VkWriteDescriptorSet {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
@@ -274,10 +276,10 @@ void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMe
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 				.pBufferInfo = &BufferInfo_VB
 			}
-		};
-
-		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+		);
 	}
+
+	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 }
 
 }
