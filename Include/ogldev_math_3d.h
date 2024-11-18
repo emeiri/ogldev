@@ -348,6 +348,11 @@ struct Vector4f
         w = _w;
     }
 
+    Vector4f(float f)
+    {
+        x = y = z = w = f;
+    }
+
     void Print(bool endl = true) const
     {
         printf("(%f, %f, %f, %f)", x, y, z, w);
@@ -380,6 +385,11 @@ struct Vector4f
     bool operator==(const Vector4f& r)
     {
         return ((x == r.x) && (y == r.y) && (z == r.z) && (w == r.w));
+    }
+
+    bool operator!=(const Vector4f& r)
+    {
+        return !(*this == r);
     }
 
 };
