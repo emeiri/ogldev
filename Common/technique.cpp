@@ -111,18 +111,21 @@ bool Technique::Finalize()
     glLinkProgram(m_shaderProg);
 
     glGetProgramiv(m_shaderProg, GL_LINK_STATUS, &Success);
-        if (Success == 0) {
-                glGetProgramInfoLog(m_shaderProg, sizeof(ErrorLog), NULL, ErrorLog);
-                fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
+
+    if (Success == 0) {
+        glGetProgramInfoLog(m_shaderProg, sizeof(ErrorLog), NULL, ErrorLog);
+        fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
         return false;
-        }
+    }
 
     glValidateProgram(m_shaderProg);
+
     glGetProgramiv(m_shaderProg, GL_VALIDATE_STATUS, &Success);
-    if (!Success) {
+
+    if (Success == 0) {
         glGetProgramInfoLog(m_shaderProg, sizeof(ErrorLog), NULL, ErrorLog);
         fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
-     //   return false;
+        return false;
     }
 
     // Delete the intermediate shader objects that have been added to the program
