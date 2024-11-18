@@ -38,7 +38,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 	CreateDescriptorPool(NumImages);
 	
 	if (pMesh) {
-		CreateDescriptorSet(NumImages, pMesh);
+		CreateDescriptorSets(NumImages, pMesh);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -197,7 +197,18 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSet(int NumImages, const SimpleMesh* pMesh)
+void GraphicsPipeline::CreateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
+{
+	CreateDescriptorSetLayout();
+
+	AllocateDescriptorSets(NumImages);
+
+	UpdateDescriptorSets(NumImages, pMesh);
+}
+
+
+
+void GraphicsPipeline::CreateDescriptorSetLayout()
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -213,14 +224,18 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const SimpleMesh* pMes
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.pNext = NULL,
-		.flags = 0,
+		.flags = 0,			// reserved - must be zero
 		.bindingCount = (u32)LayoutBindings.size(),
 		.pBindings = LayoutBindings.data()
 	};
 
 	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+}
 
+
+void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
+{
 	std::vector<VkDescriptorSetLayout> Layouts(NumImages, m_descriptorSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
@@ -233,9 +248,13 @@ void GraphicsPipeline::CreateDescriptorSet(int NumImages, const SimpleMesh* pMes
 
 	m_descriptorSets.resize(NumImages);
 
-	res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
+	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+}
 
+
+void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
+{
 	for (size_t i = 0; i < NumImages; i++) {
 
 		VkDescriptorBufferInfo BufferInfo_VB = {

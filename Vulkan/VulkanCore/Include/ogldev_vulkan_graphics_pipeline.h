@@ -44,7 +44,10 @@ public:
 private:
 
 	void CreateDescriptorPool(int NumImages);
-	void CreateDescriptorSet(int NumImages, const SimpleMesh* pMesh);
+	void CreateDescriptorSets(int NumImages, const SimpleMesh* pMesh);
+	void CreateDescriptorSetLayout();
+	void AllocateDescriptorSets(int NumImages);
+	void UpdateDescriptorSets(int NumImages, const SimpleMesh* pMesh);
 
 	VkDevice m_device = NULL;
 	VkPipeline m_pipeline = NULL;
