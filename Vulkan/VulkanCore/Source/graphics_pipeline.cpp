@@ -186,6 +186,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.flags = 0,
 		.maxSets = (u32)NumImages,
 		.poolSizeCount = 0,
 		.pPoolSizes = NULL
@@ -255,13 +256,13 @@ void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
 
 void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
 {
-	for (size_t i = 0; i < NumImages; i++) {
+	VkDescriptorBufferInfo BufferInfo_VB = {
+		.buffer = pMesh->m_vb.m_buffer,
+		.offset = 0,
+		.range = pMesh->m_vertexBufferSize,
+	};
 
-		VkDescriptorBufferInfo BufferInfo_VB = {
-			.buffer = pMesh->m_vb.m_buffer,
-			.offset = 0,
-			.range = pMesh->m_vertexBufferSize,
-		};
+	for (size_t i = 0; i < NumImages; i++) {
 
 		std::array<VkWriteDescriptorSet, 1> WriteDescriptorSet = {
 			VkWriteDescriptorSet {
@@ -274,14 +275,6 @@ void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMe
 				.pBufferInfo = &BufferInfo_VB
 			}
 		};
-
-		/*WriteDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		WriteDescriptorSet.dstSet = m_descriptorSets[i];
-		WriteDescriptorSet.dstBinding = 0;
-		WriteDescriptorSet.dstArrayElement = 0;
-		WriteDescriptorSet.descriptorCount = 1;
-		WriteDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		WriteDescriptorSet.pBufferInfo = &BufferInfo1;*/
 
 		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 	}
