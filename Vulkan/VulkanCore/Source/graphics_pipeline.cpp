@@ -259,7 +259,7 @@ void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMe
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = pMesh->m_vb.m_buffer,
 		.offset = 0,
-		.range = pMesh->m_vertexBufferSize,
+		.range = pMesh->m_vertexBufferSize,  // can also be VK_WHOLE_SIZE
 	};
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
