@@ -303,8 +303,8 @@ void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMate
 
 void SkinnedMesh::LoadColors(const aiMaterial* pMaterial, int index)
 {
-    aiColor3D AmbientColor(0.0f, 0.0f, 0.0f);
-    Vector3f AllOnes(1.0f, 1.0f, 1.0f);
+    aiColor4D AmbientColor(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0);
 
     int ShadingModel = 0;
     if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) == AI_SUCCESS) {
@@ -403,7 +403,7 @@ void SkinnedMesh::Render()
 const Material& SkinnedMesh::GetMaterial()
 {
     for (unsigned int i = 0 ; i < m_Materials.size() ; i++) {
-        if (m_Materials[i].AmbientColor != Vector3f(0.0f, 0.0f, 0.0f)) {
+        if (m_Materials[i].AmbientColor != Vector4f(0.0f, 0.0f, 0.0f, 0.0f)) {
             return m_Materials[i];
         }
     }
