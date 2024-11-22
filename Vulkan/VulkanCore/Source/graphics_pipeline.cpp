@@ -35,8 +35,6 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 {
 	m_device = Device;
 
-	CreateDescriptorPool(NumImages);
-	
 	if (pMesh) {
 		CreateDescriptorSets(NumImages, pMesh);
 	}
@@ -177,7 +175,12 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 	if (m_descriptorSets.size() > 0) {
-		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descriptorSets[ImageIndex], 0, NULL);
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 
+								0,  // firstSet
+								1,  // descriptorSetCount
+								&m_descriptorSets[ImageIndex], 
+								0,	// dynamicOffsetCount
+								NULL);	// pDynamicOffsets
 	}	
 }
 
@@ -200,6 +203,8 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 
 void GraphicsPipeline::CreateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
 {
+	CreateDescriptorPool(NumImages);
+
 	CreateDescriptorSetLayout();
 
 	AllocateDescriptorSets(NumImages);
