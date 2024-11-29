@@ -170,6 +170,7 @@ void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
 
 void CoreScene::SetCameraSpeed(float Speed)
 {
+    printf("Warning! SetCameraSpeed is not implemented!!!\n");
  //   m_defaultCamera.SetSpeed(Speed);
 }
 
