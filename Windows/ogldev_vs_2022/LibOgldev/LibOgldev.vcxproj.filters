@@ -237,6 +237,9 @@
     <ClInclude Include="..\..\..\Include\ogldev_skydome_technique.h">
       <Filter>Header Files\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_base_app2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -408,6 +411,9 @@
       <Filter>Source Files\Techniques</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_infinite_grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_base_app2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
