@@ -16,7 +16,6 @@
 */
 
 #include <stdio.h>
-#include <array>
 
 #include "ogldev_types.h"
 #include "ogldev_util.h"
@@ -25,11 +24,8 @@
 
 namespace OgldevVK {
 
-GraphicsPipeline::GraphicsPipeline(VkDevice Device,
-								   GLFWwindow* pWindow,
-								   VkRenderPass RenderPass,
-								   VkShaderModule vs,
-								   VkShaderModule fs,
+GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass,
+								   VkShaderModule vs, VkShaderModule fs,
 								   const SimpleMesh* pMesh,
 								   int NumImages)
 {
@@ -185,6 +181,18 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
+void GraphicsPipeline::CreateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
+{
+	CreateDescriptorPool(NumImages);
+
+	CreateDescriptorSetLayout();
+
+	AllocateDescriptorSets(NumImages);
+
+	UpdateDescriptorSets(NumImages, pMesh);
+}
+
+
 void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
 	VkDescriptorPoolCreateInfo PoolInfo = {
@@ -199,19 +207,6 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 	CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
 	printf("Descriptor pool created\n");
 }
-
-
-void GraphicsPipeline::CreateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
-{
-	CreateDescriptorPool(NumImages);
-
-	CreateDescriptorSetLayout();
-
-	AllocateDescriptorSets(NumImages);
-
-	UpdateDescriptorSets(NumImages, pMesh);
-}
-
 
 
 void GraphicsPipeline::CreateDescriptorSetLayout()
@@ -284,7 +279,9 @@ void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMe
 		);
 	}
 
-	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	vkUpdateDescriptorSets(m_device, 
+						   (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 
+						   0, NULL);
 }
 
 }
