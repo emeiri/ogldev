@@ -25,137 +25,99 @@
 
 #include "ogldev_util.h"
 #include "ogldev_vertex_buffer.h"
-#include "ogldev_base_app.h"
+#include "ogldev_base_app2.h"
 #include "ogldev_infinite_grid.h"
-#include "ogldev_glm_camera.h"
 #include "ogldev_skybox.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
 
-class Tutorial56 : public OgldevBaseApp
+class Tutorial56 : public OgldevBaseApp2
 {
 public:
 
-    Tutorial56()
-    {
-    }
+    Tutorial56() {}
 
+    virtual ~Tutorial56() {}
 
-    virtual ~Tutorial56()
-    {
-    }
+    void Init();
 
+    virtual void RenderSceneCB(float dt);
 
-    void Init()
-    {
-        DefaultCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 56");
+    virtual void RenderGui();
 
-        DefaultInitCallbacks();
+private:
 
-        InitCamera();
-
-        InitInfiniteGrid();
-
-        DefaultInitGUI();
-
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
-        m_skybox.Init("../Content/textures/piazza_bologni_1k.hdr");
-
-      //  glFrontFace(GL_CCW);
-      //  glEnable(GL_CULL_FACE);
-        //glEnable(GL_DEPTH_TEST);
-    }
-
-
-	virtual bool KeyboardCB(int Key, int Action, int Mods)
-	{
-        bool Handled = GLFWCameraHandler(m_pCamera->m_movement, Key, Action, Mods);
-
-        if (Handled) {
-            return true;
-        } else {
-            return OgldevBaseApp::KeyboardCB(Key, Action, Mods);
-        }
-	}
-
-
-	void MouseMoveCB(int xpos, int ypos)
-	{
-		m_pCamera->m_mouseState.m_pos.x = (float)xpos / (float)WINDOW_WIDTH;
-        m_pCamera->m_mouseState.m_pos.y = (float)ypos / (float)WINDOW_HEIGHT;
-	}
-
-
-	virtual void MouseButtonCB(int Button, int Action, int x, int y)
-	{
-		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
-            m_pCamera->m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
-		}
-	}
-
-
-    virtual void RenderSceneCB(float dt)
-    {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		m_pCamera->Update(dt);		
-
-        glm::mat4 VP = m_pCamera->GetVPMatrixNoTranslate();
-
-        m_skybox.Render(VP);
-
-        //m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
-    }
-
-
-    void RenderGui()
-    {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // Rendering
-        ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(m_pWindow, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
-
-#define STEP 0.01f
-
-    private:
-
-    void InitCamera()
-    {
-        float FOV = 45.0f;
-        float zNear = 1.0f;
-        float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 
-                                      zNear, zFar };
-
-        glm::vec3 Pos(0.0f, 2.1f, 0.0f);
-        glm::vec3 Target(0.0f, 2.1f, 1.0f);
-        glm::vec3 Up(0.0, 1.0f, 0.0f);
-
-        m_pCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);   
-    }
-
-
-    void InitInfiniteGrid()
-    {
-        m_infiniteGrid.Init(); 
-    }
-
-    InfiniteGrid m_infiniteGrid;
-    InfiniteGridConfig m_config;
-    GLMCameraFirstPerson* m_pCamera = NULL;
     SkyBox m_skybox;
 };
+
+
+void Tutorial56::Init()
+{
+    InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 56");
+
+    m_skybox.Init("../Content/textures/piazza_bologni_1k.hdr");
+}
+
+
+void Tutorial56::RenderSceneCB(float dt)
+{	
+    glm::mat4 VP = m_pGameCamera->GetVPMatrixNoTranslate();
+
+    if (m_isPaused) {
+        RenderGui();
+    } else {
+        m_skybox.Render(VP);
+    }    
+}
+
+
+void Tutorial56::RenderGui()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    // Rendering
+   // ImGui::Render();
+   // int display_w, display_h;
+   // glfwGetFramebufferSize(m_pWindow, &display_w, &display_h);
+   // glViewport(0, 0, display_w, display_h);
+
+   // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    bool my_tool_active = false;
+
+    ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+
+  //  GUIMenu();
+
+  //  GUICamera(pScene);
+
+  //  GUIScene(pScene);
+
+    // ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
+    // ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
+
+    // ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
+    //  ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
+    //   ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
+    //  ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
+
+    // Rendering
+    ImGui::Render();
+    //   int display_w, display_h;
+//    glfwGetFramebufferSize(window, &display_w, &display_h);
+//    glViewport(0, 0, display_w, display_h);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+}
 
 
 int main(int argc, char** argv)
