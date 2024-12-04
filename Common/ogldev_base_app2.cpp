@@ -103,8 +103,8 @@ void OgldevBaseApp2::DefaultCreateCameraPers(float FOV, float zNear, float zFar)
     PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
                                   zNear, zFar };
 
-    glm::vec3 Pos(0.0f, 2.1f, 0.0f);
-    glm::vec3 Target(0.0f, 2.1f, 1.0f);
+    glm::vec3 Pos(0.0f, 0.0f, 0.0f);
+    glm::vec3 Target(0.0f, 0.0f, 1.0f);
     glm::vec3 Up(0.0, 1.0f, 0.0f);
 
     m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
