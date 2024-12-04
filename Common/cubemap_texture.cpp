@@ -338,7 +338,12 @@ void ConvertEquirectangularMapToVerticalCross(Bitmap& b, std::vector<Bitmap>& Cu
                     break;
                 }              
 
-                Cubemap[TargetFace].setPixel(i /*x*/, j /*y*/, color);
+                if (face == 0) {
+                    Cubemap[TargetFace].setPixel(FaceSize - i - 1 /*x*/, FaceSize - j - 1 /*y*/, color);
+                }
+                else {
+                    Cubemap[TargetFace].setPixel(i /*x*/, j /*y*/, color);
+                }                
             }
         };
     }
