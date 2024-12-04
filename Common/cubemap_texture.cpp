@@ -31,6 +31,7 @@ static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                                   GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                                   GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
 
+#define CUBEMAP_NUM_FACES 6
 
 template <typename T>
 T clamp(T v, T a, T b)
@@ -116,6 +117,17 @@ class Bitmap {
 
 public:
     Bitmap() {};
+
+    void Init(int w, int h, int comp, eBitmapFormat fmt)
+    {
+        w_ = w;
+        h_ = h;
+        comp_ = comp;
+        fmt_ = fmt;
+        data_.resize(w * h * comp * GetBytesPerComponent(fmt));
+
+        initGetSetFuncs();
+    }        
 
     Bitmap(int w, int h, int comp, eBitmapFormat fmt)
         :w_(w), h_(h), comp_(comp), fmt_(fmt), data_(w * h * comp * GetBytesPerComponent(fmt))
@@ -218,43 +230,49 @@ private:
 };
 
 
-Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
+void ConvertEquirectangularMapToVerticalCross(Bitmap& b, std::vector<Bitmap>& Cubemap)
 {
-    if (b.type_ != eBitmapType_2D) {
-        return Bitmap();
-    }
+   // if (b.type_ != eBitmapType_2D) {
+  //      return Bitmap();
+  //  }
 
-    int faceSize = b.w_ / 4;
+    int FaceSize = b.w_ / 4;
 
     // Prepare a cross type bitmap for the result -
     // three squares horizontal and four vertical
-    int w = faceSize * 3;
-    int h = faceSize * 4;
+   // int w = faceSize * 3;
+   // int h = faceSize * 4;
 
-    Bitmap result(w, h, b.comp_, b.fmt_);
+  //  Bitmap result(w, h, b.comp_, b.fmt_);
 
-    glm::ivec2 FaceOffsets[] = {
+  /*  glm::ivec2 FaceOffsets[] = {
         glm::ivec2(faceSize, faceSize * 3),     // +Z
         glm::ivec2(0, faceSize),                // -X
         glm::ivec2(faceSize, faceSize),         // -Z
         glm::ivec2(faceSize * 2, faceSize),     // +X
         glm::ivec2(faceSize, 0),                // +Y
         glm::ivec2(faceSize, faceSize * 2)      // -Y
-    };
+    };*/
+
+    Cubemap.resize(CUBEMAP_NUM_FACES);
+
+    for (int i = 0; i < CUBEMAP_NUM_FACES; i++) {
+        Cubemap[i].Init(FaceSize, FaceSize, b.comp_, b.fmt_);
+    }
 
     int clampW = b.w_ - 1;
     int clampH = b.h_ - 1;
 
     for (int face = 0; face != 6; face++) {
-        for (int i = 0; i != faceSize; i++) {
-            for (int j = 0; j != faceSize; j++) {
-                glm::vec3 P = FaceCoordsToXYZ(i, j, face, faceSize);
+        for (int i = 0; i != FaceSize; i++) {
+            for (int j = 0; j != FaceSize; j++) {
+                glm::vec3 P = FaceCoordsToXYZ(i, j, face, FaceSize);
                 float R = sqrtf(P.x * P.x + P.y * P.y);//  //hypot(P.x, P.y);
                 float theta = atan2f(P.y, P.x);
                 float phi = atan2f(P.z, R);
                 //	float point source coordinates
-                float Uf = float(2.0f * faceSize * (theta + M_PI) / M_PI);
-                float Vf = float(2.0f * faceSize * (M_PI / 2.0f - phi) / M_PI);
+                float Uf = float(2.0f * FaceSize * (theta + M_PI) / M_PI);
+                float Vf = float(2.0f * FaceSize * (M_PI / 2.0f - phi) / M_PI);
                 // 4-samples for bilinear interpolation
                 int U1 = clamp(int(floor(Uf)), 0, clampW);
                 int V1 = clamp(int(floor(Vf)), 0, clampH);
@@ -270,28 +288,20 @@ Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
                 glm::vec4 D = b.getPixel(U2, V2);
                 // bilinear interpolation
                 glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
-                result.setPixel(i + FaceOffsets[face].x, j + FaceOffsets[face].y, color);
-            }
-        };
-    }
 
-    return result;
-}
+                int TargetFace;
 
+             /*   
+             TARGET
 
+             glm::ivec2(faceSize, faceSize * 3),     // +Z
+                    glm::ivec2(0, faceSize),                // -X
+                    glm::ivec2(faceSize, faceSize),         // -Z
+                    glm::ivec2(faceSize * 2, faceSize),     // +X
+                    glm::ivec2(faceSize, 0),                // +Y
+                    glm::ivec2(faceSize, faceSize * 2)      // -Y
 
-Bitmap convertVerticalCrossToCubeMapFaces(const Bitmap& b)
-{
-    int faceWidth = b.w_ / 3;
-    int faceHeight = b.h_ / 4;
-
-    Bitmap cubemap(faceWidth, faceHeight, 6, b.comp_, b.fmt_);
-    cubemap.type_ = eBitmapType_Cube;
-
-    const uint8_t* src = b.data_.data();
-    uint8_t* dst = cubemap.data_.data();
-
-    /*
+                    SRC
             ------
             | +Y |
      ----------------
@@ -302,67 +312,37 @@ Bitmap convertVerticalCrossToCubeMapFaces(const Bitmap& b)
             | +Z |
             ------
     */
-
-    int pixelSize = cubemap.comp_ * GetBytesPerComponent(cubemap.fmt_);
-
-    for (int face = 0; face != 6; ++face)
-    {
-        for (int j = 0; j != faceHeight; ++j)
-        {
-            for (int i = 0; i != faceWidth; ++i)
-            {
-                int x = 0;
-                int y = 0;
-
-                switch (face)
-                {
-                    // GL_TEXTURE_CUBE_MAP_POSITIVE_X
-                case 0:
-                    x = i;
-                    y = faceHeight + j;
+                switch (face) {
+                case 0:  // -Z          MAYBE
+                    TargetFace = 5;
                     break;
 
-                    // GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-                case 1:
-                    x = 2 * faceWidth + i;
-                    y = 1 * faceHeight + j;
+                case 1: // -X           DONE
+                    TargetFace = 1;
                     break;
 
-                    // GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-                case 2:
-                    x = 2 * faceWidth - (i + 1);
-                    y = 1 * faceHeight - (j + 1);
+                case 2: // +Z           DONE
+                    TargetFace = 4;
                     break;
 
-                    // GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-                case 3:
-                    x = 2 * faceWidth - (i + 1);
-                    y = 3 * faceHeight - (j + 1);
+                case 3: // +X           DONE
+                    TargetFace = 0;
                     break;
 
-                    // GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-                case 4:
-                    x = 2 * faceWidth - (i + 1);
-                    y = b.h_ - (j + 1);
+                case 4: // +Y           DONE
+                    TargetFace = 2;
                     break;
 
-                    // GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-                case 5:
-                    x = faceWidth + i;
-                    y = faceHeight + j;
+                case 5: // -Y           DONE
+                    TargetFace = 3;
                     break;
-                }
+                }              
 
-                memcpy(dst, src + (y * b.w_ + x) * pixelSize, pixelSize);
-
-                dst += pixelSize;
+                Cubemap[TargetFace].setPixel(i /*x*/, j /*y*/, color);
             }
-        }
+        };
     }
-
-    return cubemap;
 }
-
 
 
 CubemapTexture::CubemapTexture(const string& Directory,
@@ -458,13 +438,14 @@ void CubemapEctTexture::Load()
     }
 
     Bitmap in(Width, Height, Comp, eBitmapFormat_Float, (void*)pImg);
-    Bitmap out = convertEquirectangularMapToVerticalCross(in);
+    std::vector<Bitmap> Cubemap;
+    ConvertEquirectangularMapToVerticalCross(in, Cubemap);
 
     stbi_image_free((void*)pImg);
 
     //stbi_write_hdr("screenshot.hdr", out.w_, out.h_, out.comp_, (const float*)out.data_.data());
 
-    Bitmap cubemap = convertVerticalCrossToCubeMapFaces(out);
+    //Bitmap cubemap = convertVerticalCrossToCubeMapFaces(out);
 
     glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_textureObj);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -475,14 +456,40 @@ void CubemapEctTexture::Load()
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, 0);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTextureStorage2D(m_textureObj, 1, GL_RGB32F, cubemap.w_, cubemap.h_);
+    glTextureStorage2D(m_textureObj, 1, GL_RGB32F, Cubemap[0].w_, Cubemap[0].h_);
 
-    const uint8_t* data = cubemap.data_.data();
+    void* pSrc = NULL; 
 
-    for (unsigned i = 0; i != 6; ++i) {
-        glTextureSubImage3D(m_textureObj, 0, 0, 0, i, cubemap.w_, cubemap.h_, 1, GL_RGB, GL_FLOAT, data);
-        data += cubemap.w_ * cubemap.h_ * cubemap.comp_ * GetBytesPerComponent(cubemap.fmt_);
-    }
+    // +X
+    pSrc = Cubemap[0].data_.data();
+    glTextureSubImage3D(m_textureObj, 0, 0, 0, 0, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+
+    // -X
+    pSrc = Cubemap[1].data_.data();
+    glTextureSubImage3D(m_textureObj, 0, 0, 0, 1, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+
+    // -Y
+    pSrc = Cubemap[3].data_.data();
+    glTextureSubImage3D(m_textureObj, 0, 0, 0, 3, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+
+    // +Y
+    pSrc = Cubemap[2].data_.data();
+    glTextureSubImage3D(m_textureObj, 0, 0, 0, 2, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+
+    // +Z
+    pSrc = Cubemap[4].data_.data();
+    glTextureSubImage3D(m_textureObj, 0, 0, 0, 4, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+
+    // -Z
+    pSrc = Cubemap[5].data_.data();
+    glTextureSubImage3D(m_textureObj, 0, 0, 0, 5, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+
+
+  /*  for (unsigned i = 0; i != 6; ++i) {
+        void* pSrc = Cubemap[i].data_.data();
+        glTextureSubImage3D(m_textureObj, 0, 0, 0, i, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+        break;
+    }*/
 }
 
 
