@@ -156,6 +156,7 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\Include\bitmap.h" />
     <ClInclude Include="..\..\..\Include\ogldev.h" />
     <ClInclude Include="..\..\..\Include\ogldev_app.h" />
     <ClInclude Include="..\..\..\Include\ogldev_array_2d.h" />

@@ -20,7 +20,10 @@
 #define OGLDEV_CUBEMAP_TEXTURE_H
 
 #include <string>
+#include <vector>
 #include <GL/glew.h>
+
+#include "bitmap.h"
 
 class BaseCubmapTexture {
 public:
@@ -69,6 +72,8 @@ public:
     virtual void Bind(GLenum TextureUnit);
 
 private:
+
+    void LoadCubemapData(const std::vector<Bitmap>& Cubemap);
 
     std::string m_filename;
     GLuint m_textureObj;

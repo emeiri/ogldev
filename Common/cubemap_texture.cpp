@@ -82,177 +82,9 @@ glm::vec3 FaceCoordsToXYZ(int i, int j, int FaceID, int FaceSize)
 }
 
 
-enum eBitmapType
+static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& Cubemap)
 {
-    eBitmapType_2D,
-    eBitmapType_Cube
-};
-
-enum eBitmapFormat
-{
-    eBitmapFormat_UnsignedByte,
-    eBitmapFormat_Float,
-};
-
-
-int GetBytesPerComponent(eBitmapFormat Fmt)
-{
-    int BytesPerComponent = 0;
-
-    switch (Fmt) {
-    case eBitmapFormat_UnsignedByte:
-        BytesPerComponent = 1;
-        break;
-
-    case eBitmapFormat_Float:
-        BytesPerComponent = 4;
-        break;
-    };
-
-    return BytesPerComponent;
-}
-
-
-class Bitmap {
-
-public:
-    Bitmap() {};
-
-    void Init(int w, int h, int comp, eBitmapFormat fmt)
-    {
-        w_ = w;
-        h_ = h;
-        comp_ = comp;
-        fmt_ = fmt;
-        data_.resize(w * h * comp * GetBytesPerComponent(fmt));
-
-        initGetSetFuncs();
-    }        
-
-    Bitmap(int w, int h, int comp, eBitmapFormat fmt)
-        :w_(w), h_(h), comp_(comp), fmt_(fmt), data_(w * h * comp * GetBytesPerComponent(fmt))
-    {
-        initGetSetFuncs();
-    }
-
-    Bitmap(int w, int h, int d, int comp, eBitmapFormat fmt)
-        :w_(w), h_(h), d_(d), comp_(comp), fmt_(fmt), data_(w * h * d * comp * GetBytesPerComponent(fmt))
-    {
-        initGetSetFuncs();
-    }
-
-    Bitmap(int w, int h, int comp, eBitmapFormat fmt, void* ptr)
-        :w_(w), h_(h), comp_(comp), fmt_(fmt), data_(w * h * comp * GetBytesPerComponent(fmt))
-    {
-        initGetSetFuncs();
-        memcpy(data_.data(), ptr, data_.size());
-    }
-
-    int w_ = 0;
-    int h_ = 0;
-    int d_ = 1;
-    int comp_ = 3;
-    eBitmapFormat fmt_ = eBitmapFormat_UnsignedByte;
-    eBitmapType type_ = eBitmapType_2D;
-    std::vector<uint8_t> data_;
-
-    void setPixel(int x, int y, glm::vec4& c)
-    {
-        (*this.*setPixelFunc)(x, y, c);
-    }
-
-    glm::vec4 getPixel(int x, int y)
-    {
-        return ((*this.*getPixelFunc)(x, y));
-    }
-
-private:
-
-    using setPixel_t = void(Bitmap::*)(int, int, glm::vec4&);
-    using getPixel_t = glm::vec4(Bitmap::*)(int, int);
-    setPixel_t setPixelFunc = &Bitmap::setPixelUnsignedByte;
-    getPixel_t getPixelFunc = &Bitmap::getPixelUnsignedByte;
-
-    void initGetSetFuncs()
-    {
-        switch (fmt_)
-        {
-        case eBitmapFormat_UnsignedByte:
-            setPixelFunc = &Bitmap::setPixelUnsignedByte;
-            getPixelFunc = &Bitmap::getPixelUnsignedByte;
-            break;
-        case eBitmapFormat_Float:
-            setPixelFunc = &Bitmap::setPixelFloat;
-            getPixelFunc = &Bitmap::getPixelFloat;
-            break;
-        }
-    }
-
-    void setPixelFloat(int x, int y, glm::vec4& c)
-    {
-        int ofs = comp_ * (y * w_ + x);
-        float* data = reinterpret_cast<float*>(data_.data());
-        if (comp_ > 0) data[ofs + 0] = c.x;
-        if (comp_ > 1) data[ofs + 1] = c.y;
-        if (comp_ > 2) data[ofs + 2] = c.z;
-        if (comp_ > 3) data[ofs + 3] = c.w;
-    }
-
-    glm::vec4 getPixelFloat(int x, int y)
-    {
-        int ofs = comp_ * (y * w_ + x);
-        float* data = reinterpret_cast<float*>(data_.data());
-        return glm::vec4(
-            comp_ > 0 ? data[ofs + 0] : 0.0f,
-            comp_ > 1 ? data[ofs + 1] : 0.0f,
-            comp_ > 2 ? data[ofs + 2] : 0.0f,
-            comp_ > 3 ? data[ofs + 3] : 0.0f);
-    }
-
-    void setPixelUnsignedByte(int x, int y, glm::vec4& c)
-    {
-        int ofs = comp_ * (y * w_ + x);
-        if (comp_ > 0) data_[ofs + 0] = uint8_t(c.x * 255.0f);
-        if (comp_ > 1) data_[ofs + 1] = uint8_t(c.y * 255.0f);
-        if (comp_ > 2) data_[ofs + 2] = uint8_t(c.z * 255.0f);
-        if (comp_ > 3) data_[ofs + 3] = uint8_t(c.w * 255.0f);
-    }
-
-    glm::vec4 getPixelUnsignedByte(int x, int y)
-    {
-        int ofs = comp_ * (y * w_ + x);
-        return glm::vec4(
-            comp_ > 0 ? float(data_[ofs + 0]) / 255.0f : 0.0f,
-            comp_ > 1 ? float(data_[ofs + 1]) / 255.0f : 0.0f,
-            comp_ > 2 ? float(data_[ofs + 2]) / 255.0f : 0.0f,
-            comp_ > 3 ? float(data_[ofs + 3]) / 255.0f : 0.0f);
-    }
-};
-
-
-void ConvertEquirectangularMapToVerticalCross(Bitmap& b, std::vector<Bitmap>& Cubemap)
-{
-   // if (b.type_ != eBitmapType_2D) {
-  //      return Bitmap();
-  //  }
-
     int FaceSize = b.w_ / 4;
-
-    // Prepare a cross type bitmap for the result -
-    // three squares horizontal and four vertical
-   // int w = faceSize * 3;
-   // int h = faceSize * 4;
-
-  //  Bitmap result(w, h, b.comp_, b.fmt_);
-
-  /*  glm::ivec2 FaceOffsets[] = {
-        glm::ivec2(faceSize, faceSize * 3),     // +Z
-        glm::ivec2(0, faceSize),                // -X
-        glm::ivec2(faceSize, faceSize),         // -Z
-        glm::ivec2(faceSize * 2, faceSize),     // +X
-        glm::ivec2(faceSize, 0),                // +Y
-        glm::ivec2(faceSize, faceSize * 2)      // -Y
-    };*/
 
     Cubemap.resize(CUBEMAP_NUM_FACES);
 
@@ -291,54 +123,33 @@ void ConvertEquirectangularMapToVerticalCross(Bitmap& b, std::vector<Bitmap>& Cu
 
                 int TargetFace;
 
-             /*   
-             TARGET
-
-             glm::ivec2(faceSize, faceSize * 3),     // +Z
-                    glm::ivec2(0, faceSize),                // -X
-                    glm::ivec2(faceSize, faceSize),         // -Z
-                    glm::ivec2(faceSize * 2, faceSize),     // +X
-                    glm::ivec2(faceSize, 0),                // +Y
-                    glm::ivec2(faceSize, faceSize * 2)      // -Y
-
-                    SRC
-            ------
-            | +Y |
-     ----------------
-     | -X | -Z | +X |
-     ----------------
-            | -Y |
-            ------
-            | +Z |
-            ------
-    */
                 switch (face) {
-                case 0:  // -Z          MAYBE
+                case 0:  // -Z          
                     TargetFace = 5;
                     break;
 
-                case 1: // -X           DONE
+                case 1: // -X           
                     TargetFace = 1;
                     break;
 
-                case 2: // +Z           DONE
+                case 2: // +Z           
                     TargetFace = 4;
                     break;
 
-                case 3: // +X           DONE
+                case 3: // +X           
                     TargetFace = 0;
                     break;
 
-                case 4: // +Y           DONE
+                case 4: // +Y         
                     TargetFace = 2;
                     break;
 
-                case 5: // -Y           DONE
+                case 5: // -Y         
                     TargetFace = 3;
                     break;
                 }              
 
-                if (face == 0) {
+                if (TargetFace == 5) {
                     Cubemap[TargetFace].setPixel(FaceSize - i - 1 /*x*/, FaceSize - j - 1 /*y*/, color);
                 }
                 else {
@@ -431,8 +242,6 @@ CubemapEctTexture::CubemapEctTexture(const std::string& Filename)
 
 void CubemapEctTexture::Load()
 {
-//    stbi_set_flip_vertically_on_load(0);
-
     int Width, Height, Comp;
 
     const float* pImg = stbi_loadf(m_filename.c_str(), &Width, &Height, &Comp, 3);
@@ -444,14 +253,16 @@ void CubemapEctTexture::Load()
 
     Bitmap in(Width, Height, Comp, eBitmapFormat_Float, (void*)pImg);
     std::vector<Bitmap> Cubemap;
-    ConvertEquirectangularMapToVerticalCross(in, Cubemap);
+    ConvertEquirectangularMapToCubemap(in, Cubemap);
 
     stbi_image_free((void*)pImg);
 
-    //stbi_write_hdr("screenshot.hdr", out.w_, out.h_, out.comp_, (const float*)out.data_.data());
+    LoadCubemapData(Cubemap);
+}
 
-    //Bitmap cubemap = convertVerticalCrossToCubeMapFaces(out);
 
+void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
+{
     glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_textureObj);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -463,38 +274,10 @@ void CubemapEctTexture::Load()
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureStorage2D(m_textureObj, 1, GL_RGB32F, Cubemap[0].w_, Cubemap[0].h_);
 
-    void* pSrc = NULL; 
-
-    // +X
-    pSrc = Cubemap[0].data_.data();
-    glTextureSubImage3D(m_textureObj, 0, 0, 0, 0, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-
-    // -X
-    pSrc = Cubemap[1].data_.data();
-    glTextureSubImage3D(m_textureObj, 0, 0, 0, 1, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-
-    // -Y
-    pSrc = Cubemap[3].data_.data();
-    glTextureSubImage3D(m_textureObj, 0, 0, 0, 3, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-
-    // +Y
-    pSrc = Cubemap[2].data_.data();
-    glTextureSubImage3D(m_textureObj, 0, 0, 0, 2, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-
-    // +Z
-    pSrc = Cubemap[4].data_.data();
-    glTextureSubImage3D(m_textureObj, 0, 0, 0, 4, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-
-    // -Z
-    pSrc = Cubemap[5].data_.data();
-    glTextureSubImage3D(m_textureObj, 0, 0, 0, 5, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-
-
-  /*  for (unsigned i = 0; i != 6; ++i) {
-        void* pSrc = Cubemap[i].data_.data();
+    for (unsigned i = 0; i != 6; ++i) {
+        const void* pSrc = Cubemap[i].data_.data();
         glTextureSubImage3D(m_textureObj, 0, 0, 0, i, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
-        break;
-    }*/
+    }
 }
 
 
