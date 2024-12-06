@@ -100,11 +100,11 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
             for (int x = 0; x < FaceSize; x++) {
                 glm::vec3 P = FaceCoordsToXYZ(x, y, face, FaceSize);
                 float R = sqrtf(P.x * P.x + P.y * P.y);
-                float theta = atan2f(P.y, P.x);
-                float phi = atan2f(P.z, R);
+                float phi = atan2f(P.y, P.x);
+                float theta = atan2f(P.z, R);
                 //	float point source coordinates
-                float U = float(2.0f * FaceSize * (theta + M_PI) / M_PI);
-                float V = float(2.0f * FaceSize * (M_PI / 2.0f - phi) / M_PI);
+                float U = float(2.0f * FaceSize * (phi + M_PI) / M_PI);
+                float V = float(2.0f * FaceSize * (M_PI / 2.0f - theta) / M_PI);
                 // 4-samples for bilinear interpolation
                 int U1 = CLAMP(int(floor(U)), 0, MaxW);
                 int V1 = CLAMP(int(floor(V)), 0, MaxH);
