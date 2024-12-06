@@ -20,6 +20,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include "ogldev_math_3d.h"
 #include "ogldev_cubemap_texture.h"
 #include "ogldev_util.h"
 #include "3rdparty/stb_image.h"
@@ -39,15 +40,6 @@ static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 #define CUBE_MAP_INDEX_NEG_Y 3
 #define CUBE_MAP_INDEX_POS_Z 4
 #define CUBE_MAP_INDEX_NEG_Z 5
-
-
-template <typename T>
-T clamp(T v, T a, T b)
-{
-    if (v < a) return a;
-    if (v > b) return b;
-    return v;
-}
 
 
 static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
@@ -100,27 +92,27 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
         Cubemap[i].Init(FaceSize, FaceSize, b.comp_, b.fmt_);
     }
 
-    int clampW = b.w_ - 1;
-    int clampH = b.h_ - 1;
+    int MaxW = b.w_ - 1;
+    int MaxH = b.h_ - 1;
 
     for (int face = 0; face < CUBEMAP_NUM_FACES; face++) {
         for (int y = 0; y < FaceSize; y++) {
             for (int x = 0; x < FaceSize; x++) {
                 glm::vec3 P = FaceCoordsToXYZ(x, y, face, FaceSize);
-                float R = sqrtf(P.x * P.x + P.y * P.y);//  //hypot(P.x, P.y);
+                float R = sqrtf(P.x * P.x + P.y * P.y);
                 float theta = atan2f(P.y, P.x);
                 float phi = atan2f(P.z, R);
                 //	float point source coordinates
-                float Uf = float(2.0f * FaceSize * (theta + M_PI) / M_PI);
-                float Vf = float(2.0f * FaceSize * (M_PI / 2.0f - phi) / M_PI);
+                float U = float(2.0f * FaceSize * (theta + M_PI) / M_PI);
+                float V = float(2.0f * FaceSize * (M_PI / 2.0f - phi) / M_PI);
                 // 4-samples for bilinear interpolation
-                int U1 = clamp(int(floor(Uf)), 0, clampW);
-                int V1 = clamp(int(floor(Vf)), 0, clampH);
-                int U2 = clamp(U1 + 1, 0, clampW);
-                int V2 = clamp(V1 + 1, 0, clampH);
+                int U1 = CLAMP(int(floor(U)), 0, MaxW);
+                int V1 = CLAMP(int(floor(V)), 0, MaxH);
+                int U2 = CLAMP(U1 + 1, 0, MaxW);
+                int V2 = CLAMP(V1 + 1, 0, MaxH);
                 // fractional part
-                float s = Uf - U1;
-                float t = Vf - V1;
+                float s = U - U1;
+                float t = V - V1;
                 // fetch 4-samples
                 glm::vec4 A = b.getPixel(U1, V1);
                 glm::vec4 B = b.getPixel(U2, V1);
