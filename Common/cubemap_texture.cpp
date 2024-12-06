@@ -33,6 +33,14 @@ static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 
 #define CUBEMAP_NUM_FACES 6
 
+#define CUBE_MAP_INDEX_POS_X 0
+#define CUBE_MAP_INDEX_NEG_X 1
+#define CUBE_MAP_INDEX_POS_Y 2
+#define CUBE_MAP_INDEX_NEG_Y 3
+#define CUBE_MAP_INDEX_POS_Z 4
+#define CUBE_MAP_INDEX_NEG_Z 5
+
+
 template <typename T>
 T clamp(T v, T a, T b)
 {
@@ -42,7 +50,7 @@ T clamp(T v, T a, T b)
 }
 
 
-glm::vec3 FaceCoordsToXYZ(int i, int j, int FaceID, int FaceSize)
+static glm::vec3 FaceCoordsToXYZ(int i, int j, int FaceID, int FaceSize)
 {
     float A = 2.0f * float(i) / FaceSize;
     float B = 2.0f * float(j) / FaceSize;
@@ -50,28 +58,28 @@ glm::vec3 FaceCoordsToXYZ(int i, int j, int FaceID, int FaceSize)
     glm::vec3 Ret;
 
     switch (FaceID) {
-    case 5:
-        Ret = glm::vec3(-1.0f, A - 1.0f, B - 1.0f); // +Z
+    case CUBE_MAP_INDEX_POS_X:
+        Ret = glm::vec3(1.0f - A, 1.0f, 1.0f - B);
         break;
 
-    case 1:
-        Ret = glm::vec3(A - 1.0f, -1.0f, 1.0f - B); // -X
+    case CUBE_MAP_INDEX_NEG_X:
+        Ret = glm::vec3(A - 1.0f, -1.0f, 1.0f - B);
         break;
 
-    case 4:
-        Ret = glm::vec3(1.0f, A - 1.0f, 1.0f - B);  // -Z
+    case CUBE_MAP_INDEX_POS_Y:
+        Ret = glm::vec3(B - 1.0f, A - 1.0f, 1.0f);
         break;
 
-    case 0:
-        Ret = glm::vec3(1.0f - A, 1.0f, 1.0f - B);  // +X
+    case CUBE_MAP_INDEX_NEG_Y:
+        Ret = glm::vec3(1.0f - B, A - 1.0f, -1.0f);
         break;
 
-    case 2:
-        Ret = glm::vec3(B - 1.0f, A - 1.0f, 1.0f);  // +Y
+    case CUBE_MAP_INDEX_POS_Z:
+        Ret = glm::vec3(1.0f, A - 1.0f, 1.0f - B);
         break;
 
-    case 3:
-        Ret = glm::vec3(1.0f - B, A - 1.0f, -1.0f); // -Y
+    case CUBE_MAP_INDEX_NEG_Z:
+        Ret = glm::vec3(-1.0f, A - 1.0f, B - 1.0f);
         break;
      
     default:
@@ -121,7 +129,7 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
                 // bilinear interpolation
                 glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
 
-                if (face == 5) {
+                if (face == CUBE_MAP_INDEX_NEG_Z) {
                     Cubemap[face].setPixel(FaceSize - i - 1 /*x*/, FaceSize - j - 1 /*y*/, color);
                 }
                 else {
@@ -246,7 +254,7 @@ void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureStorage2D(m_textureObj, 1, GL_RGB32F, Cubemap[0].w_, Cubemap[0].h_);
 
-    for (unsigned i = 0; i != 6; ++i) {
+    for (int i = 0; i < CUBEMAP_NUM_FACES; i++) {
         const void* pSrc = Cubemap[i].data_.data();
         glTextureSubImage3D(m_textureObj, 0, 0, 0, i, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
     }
