@@ -110,7 +110,7 @@ void SkyBox::Render(const BasicCamera& Camera)
     static float r = 0.0f;
     Matrix4f Rotation;
     Rotation.InitRotateTransform(0.0f, r, 0.0f);
-    r += 0.01f;
+   // r += 0.01f;
 
     Matrix4f View;
     View.InitCameraTransform(Vector3f(0.0f, 0.0f, 0.0f), Camera.GetTarget(), Camera.GetUp());
@@ -144,7 +144,7 @@ void SkyBox::Render(const Matrix4f& VP)
     static float r = 0.0f;
     Matrix4f Rotation;
     Rotation.InitRotateTransform(0.0f, r, 0.0f);
-    r += 0.01f;
+   // r += 0.01f;
 
     Matrix4f WVP = VP * Rotation;
     m_pSkyboxTechnique->SetWVP(WVP);
