@@ -50,30 +50,30 @@ glm::vec3 FaceCoordsToXYZ(int i, int j, int FaceID, int FaceSize)
     glm::vec3 Ret;
 
     switch (FaceID) {
-    case 0:
-        Ret = glm::vec3(-1.0f, A - 1.0f, B - 1.0f);
+    case 5:
+        Ret = glm::vec3(-1.0f, A - 1.0f, B - 1.0f); // +Z
         break;
 
     case 1:
-        Ret = glm::vec3(A - 1.0f, -1.0f, 1.0f - B);
-        break;
-
-    case 2:
-        Ret = glm::vec3(1.0f, A - 1.0f, 1.0f - B);
-        break;
-
-    case 3:
-        Ret = glm::vec3(1.0f - A, 1.0f, 1.0f - B);
+        Ret = glm::vec3(A - 1.0f, -1.0f, 1.0f - B); // -X
         break;
 
     case 4:
-        Ret = glm::vec3(B - 1.0f, A - 1.0f, 1.0f);
+        Ret = glm::vec3(1.0f, A - 1.0f, 1.0f - B);  // -Z
         break;
 
-    case 5:
-        Ret = glm::vec3(1.0f - B, A - 1.0f, -1.0f);
+    case 0:
+        Ret = glm::vec3(1.0f - A, 1.0f, 1.0f - B);  // +X
         break;
 
+    case 2:
+        Ret = glm::vec3(B - 1.0f, A - 1.0f, 1.0f);  // +Y
+        break;
+
+    case 3:
+        Ret = glm::vec3(1.0f - B, A - 1.0f, -1.0f); // -Y
+        break;
+     
     default:
         assert(0);
     }
@@ -121,39 +121,11 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
                 // bilinear interpolation
                 glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
 
-                int TargetFace;
-
-                switch (face) {
-                case 0:  // -Z          
-                    TargetFace = 5;
-                    break;
-
-                case 1: // -X           
-                    TargetFace = 1;
-                    break;
-
-                case 2: // +Z           
-                    TargetFace = 4;
-                    break;
-
-                case 3: // +X           
-                    TargetFace = 0;
-                    break;
-
-                case 4: // +Y         
-                    TargetFace = 2;
-                    break;
-
-                case 5: // -Y         
-                    TargetFace = 3;
-                    break;
-                }              
-
-                if (TargetFace == 5) {
-                    Cubemap[TargetFace].setPixel(FaceSize - i - 1 /*x*/, FaceSize - j - 1 /*y*/, color);
+                if (face == 5) {
+                    Cubemap[face].setPixel(FaceSize - i - 1 /*x*/, FaceSize - j - 1 /*y*/, color);
                 }
                 else {
-                    Cubemap[TargetFace].setPixel(i /*x*/, j /*y*/, color);
+                    Cubemap[face].setPixel(i /*x*/, j /*y*/, color);
                 }                
             }   // j loop
         }   // i loop
