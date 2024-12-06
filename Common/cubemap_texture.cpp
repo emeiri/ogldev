@@ -95,9 +95,9 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
     int clampW = b.w_ - 1;
     int clampH = b.h_ - 1;
 
-    for (int face = 0; face != 6; face++) {
-        for (int i = 0; i != FaceSize; i++) {
-            for (int j = 0; j != FaceSize; j++) {
+    for (int face = 0; face < CUBEMAP_NUM_FACES; face++) {
+        for (int i = 0; i < FaceSize; i++) {
+            for (int j = 0; j < FaceSize; j++) {
                 glm::vec3 P = FaceCoordsToXYZ(i, j, face, FaceSize);
                 float R = sqrtf(P.x * P.x + P.y * P.y);//  //hypot(P.x, P.y);
                 float theta = atan2f(P.y, P.x);
@@ -155,9 +155,9 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
                 else {
                     Cubemap[TargetFace].setPixel(i /*x*/, j /*y*/, color);
                 }                
-            }
-        };
-    }
+            }   // j loop
+        }   // i loop
+    }   // Face loop
 }
 
 
