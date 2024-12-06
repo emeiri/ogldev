@@ -50,10 +50,10 @@ T clamp(T v, T a, T b)
 }
 
 
-static glm::vec3 FaceCoordsToXYZ(int i, int j, int FaceID, int FaceSize)
+static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
 {
-    float A = 2.0f * float(i) / FaceSize;
-    float B = 2.0f * float(j) / FaceSize;
+    float A = 2.0f * float(x) / FaceSize;
+    float B = 2.0f * float(y) / FaceSize;
 
     glm::vec3 Ret;
 
@@ -104,9 +104,9 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
     int clampH = b.h_ - 1;
 
     for (int face = 0; face < CUBEMAP_NUM_FACES; face++) {
-        for (int i = 0; i < FaceSize; i++) {
-            for (int j = 0; j < FaceSize; j++) {
-                glm::vec3 P = FaceCoordsToXYZ(i, j, face, FaceSize);
+        for (int y = 0; y < FaceSize; y++) {
+            for (int x = 0; x < FaceSize; x++) {
+                glm::vec3 P = FaceCoordsToXYZ(x, y, face, FaceSize);
                 float R = sqrtf(P.x * P.x + P.y * P.y);//  //hypot(P.x, P.y);
                 float theta = atan2f(P.y, P.x);
                 float phi = atan2f(P.z, R);
@@ -130,10 +130,10 @@ static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& C
                 glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
 
                 if (face == CUBE_MAP_INDEX_NEG_Z) {
-                    Cubemap[face].setPixel(FaceSize - i - 1 /*x*/, FaceSize - j - 1 /*y*/, color);
+                    Cubemap[face].setPixel(FaceSize - x - 1, FaceSize - y - 1, color);
                 }
                 else {
-                    Cubemap[face].setPixel(i /*x*/, j /*y*/, color);
+                    Cubemap[face].setPixel(x, y, color);
                 }                
             }   // j loop
         }   // i loop
