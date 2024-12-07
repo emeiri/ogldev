@@ -205,6 +205,10 @@ class Array2D {
         }
     }
 
+    int GetWidth() const { return m_cols; }
+
+    int GetHeight() const { return m_rows; }
+
  private:
 
     size_t CalcIndex(int Col, int Row) const
