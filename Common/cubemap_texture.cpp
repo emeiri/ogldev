@@ -51,27 +51,27 @@ static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
 
     switch (FaceID) {
     case CUBE_MAP_INDEX_POS_X:
-        Ret = glm::vec3(1.0f - A, 1.0f, 1.0f - B);
+        Ret = glm::vec3(A - 1.0f, 1.0f, 1.0f - B);
         break;
 
     case CUBE_MAP_INDEX_NEG_X:
-        Ret = glm::vec3(A - 1.0f, -1.0f, 1.0f - B);
+        Ret = glm::vec3(1.0f - A, -1.0f, 1.0f - B);
         break;
 
     case CUBE_MAP_INDEX_POS_Y:
-        Ret = glm::vec3(B - 1.0f, A - 1.0f, 1.0f);
+        Ret = glm::vec3(1.0f - B, A - 1.0f, 1.0f);
         break;
 
     case CUBE_MAP_INDEX_NEG_Y:
-        Ret = glm::vec3(1.0f - B, A - 1.0f, -1.0f);
+        Ret = glm::vec3(B - 1.0f, A - 1.0f, -1.0f);
         break;
 
     case CUBE_MAP_INDEX_POS_Z:
-        Ret = glm::vec3(1.0f, A - 1.0f, 1.0f - B);
+        Ret = glm::vec3(-1.0f, A - 1.0f, 1.0f - B);
         break;
 
     case CUBE_MAP_INDEX_NEG_Z:
-        Ret = glm::vec3(-1.0f, A - 1.0f, B - 1.0f);
+        Ret = glm::vec3(1.0f, A - 1.0f, B - 1.0f);
         break;
      
     default:
@@ -82,7 +82,7 @@ static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
 }
 
 
-static void ConvertEquirectangularMapToCubemap(Bitmap& b, std::vector<Bitmap>& Cubemap)
+static void ConvertEquirectangularMapToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap)
 {
     int FaceSize = b.w_ / 4;
 
