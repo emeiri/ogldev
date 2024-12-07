@@ -97,7 +97,7 @@ public:
         (*this.*setPixelFunc)(x, y, c);
     }
 
-    glm::vec4 getPixel(int x, int y)
+    glm::vec4 getPixel(int x, int y) const 
     {
         return ((*this.*getPixelFunc)(x, y));
     }
@@ -105,7 +105,7 @@ public:
 private:
 
     using setPixel_t = void(Bitmap::*)(int, int, glm::vec4&);
-    using getPixel_t = glm::vec4(Bitmap::*)(int, int);
+    using getPixel_t = glm::vec4(Bitmap::*)(int, int) const;
     setPixel_t setPixelFunc = &Bitmap::setPixelUnsignedByte;
     getPixel_t getPixelFunc = &Bitmap::getPixelUnsignedByte;
 
@@ -127,17 +127,17 @@ private:
     void setPixelFloat(int x, int y, glm::vec4& c)
     {
         int ofs = comp_ * (y * w_ + x);
-        float* data = reinterpret_cast<float*>(data_.data());
+        float* data = (float*)(data_.data());
         if (comp_ > 0) data[ofs + 0] = c.x;
         if (comp_ > 1) data[ofs + 1] = c.y;
         if (comp_ > 2) data[ofs + 2] = c.z;
         if (comp_ > 3) data[ofs + 3] = c.w;
     }
 
-    glm::vec4 getPixelFloat(int x, int y)
+    glm::vec4 getPixelFloat(int x, int y) const
     {
         int ofs = comp_ * (y * w_ + x);
-        float* data = reinterpret_cast<float*>(data_.data());
+        const float* data = (const float*)(data_.data());
         return glm::vec4(
             comp_ > 0 ? data[ofs + 0] : 0.0f,
             comp_ > 1 ? data[ofs + 1] : 0.0f,
@@ -154,7 +154,7 @@ private:
         if (comp_ > 3) data_[ofs + 3] = uint8_t(c.w * 255.0f);
     }
 
-    glm::vec4 getPixelUnsignedByte(int x, int y)
+    glm::vec4 getPixelUnsignedByte(int x, int y) const 
     {
         int ofs = comp_ * (y * w_ + x);
         return glm::vec4(
