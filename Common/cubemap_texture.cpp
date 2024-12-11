@@ -71,7 +71,7 @@ static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
         break;
 
     case CUBE_MAP_INDEX_NEG_Z:
-        Ret = glm::vec3(1.0f, A - 1.0f, B - 1.0f);
+        Ret = glm::vec3(1.0f, 1.0f - A, 1.0f - B);
         break;
      
     default:
@@ -82,7 +82,7 @@ static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
 }
 
 
-static void ConvertEquirectangularMapToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap)
+static void ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap)
 {
     int FaceSize = b.w_ / 4;
 
@@ -121,12 +121,7 @@ static void ConvertEquirectangularMapToCubemap(const Bitmap& b, std::vector<Bitm
                 // bilinear interpolation
                 glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
 
-                if (face == CUBE_MAP_INDEX_NEG_Z) {
-                    Cubemap[face].setPixel(FaceSize - x - 1, FaceSize - y - 1, color);
-                }
-                else {
-                    Cubemap[face].setPixel(x, y, color);
-                }                
+                Cubemap[face].setPixel(x, y, color);
             }   // j loop
         }   // i loop
     }   // Face loop
@@ -223,9 +218,9 @@ void CubemapEctTexture::Load()
         exit(1);
     }
 
-    Bitmap in(Width, Height, Comp, eBitmapFormat_Float, (void*)pImg);
+    Bitmap In(Width, Height, Comp, eBitmapFormat_Float, (void*)pImg);
     std::vector<Bitmap> Cubemap;
-    ConvertEquirectangularMapToCubemap(in, Cubemap);
+    ConvertEquirectangularImageToCubemap(In, Cubemap);
 
     stbi_image_free((void*)pImg);
 
