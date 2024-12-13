@@ -102,24 +102,36 @@ static void ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bi
                 float R = sqrtf(P.x * P.x + P.y * P.y);
                 float phi = atan2f(P.y, P.x);
                 float theta = atan2f(P.z, R);
-                //	float point source coordinates
-                float U = float(2.0f * FaceSize * (phi + M_PI) / M_PI);
-                float V = float(2.0f * FaceSize * (M_PI / 2.0f - theta) / M_PI);
+
+                // Calculate texture coordinates
+                float u = (float)((phi + M_PI) / (2.0f * M_PI));
+                float v = (float((M_PI / 2.0f - theta) / M_PI));
+
+                // Scale texture coordinates by image size
+                float U = u * b.w_;
+                float V = v * b.h_;
+
                 // 4-samples for bilinear interpolation
                 int U1 = CLAMP(int(floor(U)), 0, MaxW);
                 int V1 = CLAMP(int(floor(V)), 0, MaxH);
                 int U2 = CLAMP(U1 + 1, 0, MaxW);
                 int V2 = CLAMP(V1 + 1, 0, MaxH);
-                // fractional part
+
+                // Calculate the fractional part
                 float s = U - U1;
                 float t = V - V1;
-                // fetch 4-samples
-                glm::vec4 A = b.getPixel(U1, V1);
-                glm::vec4 B = b.getPixel(U2, V1);
-                glm::vec4 C = b.getPixel(U1, V2);
-                glm::vec4 D = b.getPixel(U2, V2);
-                // bilinear interpolation
-                glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
+
+                // Fetch 4-samples
+                glm::vec4 BottomLeft  = b.getPixel(U1, V1);
+                glm::vec4 BottomRight = b.getPixel(U2, V1);
+                glm::vec4 TopLeft     = b.getPixel(U1, V2);
+                glm::vec4 TopRight    = b.getPixel(U2, V2);
+
+                // Bilinear interpolation
+                glm::vec4 color = BottomLeft * (1 - s) * (1 - t) + 
+                                  BottomRight * (s) * (1 - t) + 
+                                  TopLeft * (1 - s) * t + 
+                                  TopRight * (s) * (t);
 
                 Cubemap[face].setPixel(x, y, color);
             }   // j loop
@@ -243,7 +255,16 @@ void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
 
     for (int i = 0; i < CUBEMAP_NUM_FACES; i++) {
         const void* pSrc = Cubemap[i].data_.data();
-        glTextureSubImage3D(m_textureObj, 0, 0, 0, i, Cubemap[0].w_, Cubemap[0].h_, 1, GL_RGB, GL_FLOAT, pSrc);
+        glTextureSubImage3D(m_textureObj, 
+                            0,      // mipmap level
+                            0,      // xOffset
+                            0,      // yOffset
+                            i,      // zOffset (layer in the case of a cubemap)
+                            Cubemap[0].w_, Cubemap[0].h_,   // 2D image dimensions
+                            1,          // depth
+                            GL_RGB,     // format
+                            GL_FLOAT,   // data type
+                            pSrc);
     }
 }
 
