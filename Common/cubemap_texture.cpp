@@ -82,7 +82,8 @@ static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
 }
 
 
-static void ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap)
+static void ConvertEquirectangularImageToCubemap(const Bitmap& b, 
+                                                 std::vector<Bitmap>& Cubemap)
 {
     int FaceSize = b.w_ / 4;
 
