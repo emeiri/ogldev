@@ -32,7 +32,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 	m_device = Device;
 
 	if (pMesh) {
-		CreateDescriptorSets(NumImages, pMesh);
+		CreateDescriptorSets(pMesh, NumImages);
 	}
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
@@ -181,7 +181,7 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
+void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages)
 {
 	CreateDescriptorPool(NumImages);
 
@@ -189,7 +189,7 @@ void GraphicsPipeline::CreateDescriptorSets(int NumImages, const SimpleMesh* pMe
 
 	AllocateDescriptorSets(NumImages);
 
-	UpdateDescriptorSets(NumImages, pMesh);
+	UpdateDescriptorSets(pMesh, NumImages);
 }
 
 
@@ -254,7 +254,7 @@ void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
 }
 
 
-void GraphicsPipeline::UpdateDescriptorSets(int NumImages, const SimpleMesh* pMesh)
+void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages)
 {
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = pMesh->m_vb.m_buffer,
