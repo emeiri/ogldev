@@ -114,20 +114,22 @@ void OgldevBaseApp2::DefaultCreateCameraPers(float FOV, float zNear, float zFar)
 bool OgldevBaseApp2::KeyboardCB(int Key, int Action, int Mods)
 {
     bool Handled = true;
+    
+    switch (Key) {
+    case GLFW_KEY_ESCAPE:
+    case GLFW_KEY_Q:
+        glfwDestroyWindow(m_pWindow);
+        glfwTerminate();
+        exit(0);
 
-    if (Action == GLFW_PRESS) {
-        switch (Key) {
-        case GLFW_KEY_ESCAPE:
-        case GLFW_KEY_Q:
-            glfwDestroyWindow(m_pWindow);
-            glfwTerminate();
-            exit(0);
-
-        case GLFW_KEY_P:
+    case GLFW_KEY_P:
+        if (Action == GLFW_PRESS) {
             m_isPaused = !m_isPaused;
-            break;
+        }
+        break;
 
-        case GLFW_KEY_Z:
+    case GLFW_KEY_Z:
+        if (Action == GLFW_PRESS) {
             m_isWireframe = !m_isWireframe;
 
             if (m_isWireframe) {
@@ -136,15 +138,17 @@ bool OgldevBaseApp2::KeyboardCB(int Key, int Action, int Mods)
             else {
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             }
-            break;
-
-        case GLFW_KEY_SPACE:
-            RenderGui();
-            break;
-
-        default:
-            Handled = false;
         }
+        break;
+
+    case GLFW_KEY_SPACE:
+        if (Action == GLFW_PRESS) {
+            RenderGui();
+        }
+        break;
+
+    default:
+        Handled = false;
     }
 
     if (!Handled) {
