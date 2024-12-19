@@ -35,25 +35,74 @@
 #include "ogldev_vulkan_shader.h"
 #include "ogldev_vulkan_graphics_pipeline.h"
 #include "ogldev_vulkan_simple_mesh.h"
+#include "ogldev_vulkan_glfw.h"
+#include "ogldev_glm_camera.h"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
 
-void GLFW_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+
+bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
 {
-	if ((key == GLFW_KEY_ESCAPE) && (action == GLFW_PRESS)) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	bool Press = Action != GLFW_RELEASE;
+
+	bool Handled = true;
+
+	switch (Key) {
+
+	case GLFW_KEY_W:
+		Movement.Forward = Press;
+		break;
+
+	case GLFW_KEY_S:
+		Movement.Backward = Press;
+		break;
+
+	case GLFW_KEY_A:
+		Movement.StrafeLeft = Press;
+		break;
+
+	case GLFW_KEY_D:
+		Movement.StrafeRight = Press;
+		break;
+
+	case GLFW_KEY_PAGE_UP:
+		Movement.Up = Press;
+		break;
+
+	case GLFW_KEY_PAGE_DOWN:
+		Movement.Down = Press;
+		break;
+
+	case GLFW_KEY_KP_ADD:
+		Movement.Plus = Press;
+		break;
+
+	case GLFW_KEY_KP_SUBTRACT:
+		Movement.Minus = Press;
+		break;
+
+	default:
+		Handled = false;
 	}
+
+	if (Mods & GLFW_MOD_SHIFT) {
+		Movement.FastSpeed = Press;
+	}
+
+	return Handled;
 }
 
 
-class VulkanApp
+class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp()
+	VulkanApp(int WindowWidth, int WindowHeight)
 	{
+		m_windowWidth = WindowWidth;
+		m_windowHeight = WindowHeight;
 	}
 
 	~VulkanApp()
@@ -71,10 +120,11 @@ public:
 		}
 	}
 
-	void Init(const char* pAppName, GLFWwindow* pWindow)
+	void Init(const char* pAppName)
 	{
-		m_pWindow = pWindow;
-		m_vkCore.Init(pAppName, pWindow);
+		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
+
+		m_vkCore.Init(pAppName, m_pWindow);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -86,7 +136,11 @@ public:
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
+		DefaultCreateCameraPers();
+		// The object is ready to receive callbacks
+		OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
 	}
+
 
 	void RenderScene()
 	{
@@ -98,8 +152,95 @@ public:
 
 		m_pQueue->Present(ImageIndex);
 	}
+	
+	
+	void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
+	{
+		bool Handled = true;
+
+		switch (Key) {
+		case GLFW_KEY_ESCAPE:
+		case GLFW_KEY_Q:
+			glfwDestroyWindow(m_pWindow);
+			glfwTerminate();
+			exit(0);
+
+		default:
+			Handled = false;
+		}
+
+		if (!Handled) {
+			Handled = GLFWCameraHandler(m_pGameCamera->m_movement, Key, Action, Mods);
+		}
+	}
+	
+	
+	void MouseMove(GLFWwindow* pWindow, double x, double y)
+	{
+		m_pGameCamera->m_mouseState.m_pos.x = (float)x / (float)m_windowWidth;
+		m_pGameCamera->m_mouseState.m_pos.y = (float)y / (float)m_windowHeight;
+	}
+
+
+	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods)
+	{
+		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+			m_pGameCamera->m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
+		}
+	}
+	
+	
+	void Execute()
+	{
+		float CurTime = (float)glfwGetTime();
+
+		while (!glfwWindowShouldClose(m_pWindow)) {
+			float Time = (float)glfwGetTime();
+			float dt = Time - CurTime;
+			m_pGameCamera->Update(dt);
+			RenderScene();
+			CurTime = Time;
+			glfwPollEvents();
+		}
+
+		glfwTerminate();
+	}
+
 
 private:
+
+	void DefaultCreateCameraPers()
+	{
+		float FOV = 45.0f;
+		float zNear = 1.0f;
+		float zFar = 1000.0f;
+
+		DefaultCreateCameraPers(FOV, zNear, zFar);
+	}
+
+
+	void DefaultCreateCameraPers(float FOV, float zNear, float zFar)
+	{
+		if ((m_windowWidth == 0) || (m_windowHeight == 0)) {
+			printf("Invalid window dims: width %d height %d\n", m_windowWidth, m_windowHeight);
+			exit(1);
+		}
+
+		if (m_pGameCamera) {
+			printf("Camera already initialized\n");
+			exit(1);
+		}
+
+		PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
+									  zNear, zFar };
+
+		glm::vec3 Pos(0.0f, 0.0f, 0.0f);
+		glm::vec3 Target(0.0f, 0.0f, 1.0f);
+		glm::vec3 Up(0.0, 1.0f, 0.0f);
+
+		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
+	}
+
 
 	void CreateCommandBuffers()
 	{
@@ -214,6 +355,8 @@ private:
 		glm::mat4 Rotate = glm::mat4(1.0);
 		Rotate = glm::rotate(Rotate, glm::radians(foo), glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 		foo += 0.001f;
+
+		Rotate = m_pGameCamera->GetVPMatrix();
 		m_uniformBuffers[ImageIndex].Update(m_device, &Rotate, sizeof(Rotate));
 	}
 
@@ -230,6 +373,9 @@ private:
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	OgldevVK::SimpleMesh m_mesh;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
+	GLMCameraFirstPerson* m_pGameCamera = NULL;
+	int m_windowWidth = 0;
+	int m_windowHeight = 0;
 };
 
 
@@ -237,35 +383,11 @@ private:
 
 int main(int argc, char* argv[])
 {
-	if (!glfwInit()) {
-		return 1;
-	}
+	VulkanApp App(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	if (!glfwVulkanSupported()) {
-		return 1;
-	}
+	App.Init(APP_NAME);
 
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-	GLFWwindow* pWindow = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, APP_NAME, NULL, NULL);
-	
-	if (!pWindow) {
-		glfwTerminate();
-		exit(EXIT_FAILURE);
-	}
-
-	glfwSetKeyCallback(pWindow, GLFW_KeyCallback);
-
-	VulkanApp App;
-	App.Init(APP_NAME, pWindow);
-
-	while (!glfwWindowShouldClose(pWindow)) {
-		App.RenderScene();
-		glfwPollEvents();
-	}
-
-	glfwTerminate();
+	App.Execute();
 
 	return 0;
 }
