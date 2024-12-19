@@ -18,6 +18,9 @@
 	This camera implementation is based on the "3D Graphics Rendering Cookbook"
 */
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
 #include "ogldev_glm_camera.h"
 
 GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target,
@@ -32,6 +35,7 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 {
 	m_cameraPos = Pos;
 	m_up = Up;
+	m_persProjInfo = persProjInfo;
 	
 	float ar = (float)persProjInfo.Width / (float)persProjInfo.Height;
 
@@ -61,6 +65,20 @@ void GLMCameraFirstPerson::Update(float dt)
 	m_cameraPos += m_velocity * dt;
 }
 
+
+void GLMCameraFirstPerson::SetMousePos(float x, float y)
+{
+	m_mouseState.m_pos.x = x / (float)m_persProjInfo.Width;
+	m_mouseState.m_pos.y = y / (float)m_persProjInfo.Height;
+}
+
+
+void GLMCameraFirstPerson::HandleMouseButton(int Button, int Action, int Mods)
+{
+	if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+		m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
+	}
+}
 
 
 void GLMCameraFirstPerson::CalcCameraOrientation()

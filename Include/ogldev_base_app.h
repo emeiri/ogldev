@@ -31,7 +31,7 @@ class OgldevBaseApp
 public:
     virtual bool KeyboardCB(int Key, int Action, int Mods);
 
-    virtual void MouseButtonCB(int button, int action, int x, int y);
+    virtual void MouseButtonCB(int button, int action, int Mods, int x, int y);
 
     virtual void MouseMoveCB(int x, int y);
 

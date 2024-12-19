@@ -124,16 +124,13 @@ public:
 	
 	void MouseMove(GLFWwindow* pWindow, double x, double y)
 	{
-		m_pGameCamera->m_mouseState.m_pos.x = (float)x / (float)m_windowWidth;
-		m_pGameCamera->m_mouseState.m_pos.y = (float)y / (float)m_windowHeight;
+		m_pGameCamera->SetMousePos((float)x, (float)y);
 	}
 
 
 	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods)
 	{
-		if (Button == GLFW_MOUSE_BUTTON_LEFT) {
-			m_pGameCamera->m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
-		}
+		m_pGameCamera->HandleMouseButton(Button, Action, Mods);
 	}
 	
 	

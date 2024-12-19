@@ -38,7 +38,6 @@ class GLMCameraFirstPerson {
 public:
 
 	CameraMovement m_movement;
-	MouseState m_mouseState;
 	float m_acceleration = 150.0f;
 	float m_damping = 5.0f;
 	float m_maxSpeed = 10.0f;
@@ -54,6 +53,10 @@ public:
 			  const glm::vec3& Up, PersProjInfo& persProjInfo);
 
 	void Update(float dt);
+
+	void SetMousePos(float x, float y);
+
+	void HandleMouseButton(int Button, int Action, int Mods);
 
 	const glm::mat4& GetProjMatrix() const { return m_persProjection; }
 
@@ -90,4 +93,6 @@ private:
 	glm::vec3 m_velocity = glm::vec3(0.0f);
 	glm::vec2 m_oldMousePos = glm::vec2(0.0f);
 	glm::vec3 m_up = glm::vec3(0.0f);
+	MouseState m_mouseState;
+	PersProjInfo m_persProjInfo;
 };

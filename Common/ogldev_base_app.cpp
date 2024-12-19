@@ -138,7 +138,7 @@ bool OgldevBaseApp::KeyboardCB(int Key, int Action, int Mods)
 }
 
 
-void OgldevBaseApp::MouseButtonCB(int button, int action, int x, int y)
+void OgldevBaseApp::MouseButtonCB(int Button, int Action, int Mods, int x, int y)
 {
 }
 
@@ -163,13 +163,13 @@ static void CursorPosCallback(GLFWwindow* window, double x, double y)
 }
 
 
-static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode)
+static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mods)
 {
     double x, y;
 
     glfwGetCursorPos(window, &x, &y);
 
-    app->MouseButtonCB(Button, Action, (int)x, (int)y);
+    app->MouseButtonCB(Button, Action, Mods, (int)x, (int)y);
 }
 
 
