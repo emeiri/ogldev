@@ -63,7 +63,7 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
-		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
+		m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 	}

@@ -220,6 +220,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F65533
 		..\..\Common\ogldev_framebuffer.cpp = ..\..\Common\ogldev_framebuffer.cpp
 		..\..\Common\ogldev_glfw.cpp = ..\..\Common\ogldev_glfw.cpp
 		..\..\Common\ogldev_glfw_backend.cpp = ..\..\Common\ogldev_glfw_backend.cpp
+		..\..\Common\ogldev_glfw_camera_handler.cpp = ..\..\Common\ogldev_glfw_camera_handler.cpp
 		..\..\Common\ogldev_glm_camera.cpp = ..\..\Common\ogldev_glm_camera.cpp
 		..\..\Common\ogldev_guitex_technique.cpp = ..\..\Common\ogldev_guitex_technique.cpp
 		..\..\Common\ogldev_gui_texture.cpp = ..\..\Common\ogldev_gui_texture.cpp

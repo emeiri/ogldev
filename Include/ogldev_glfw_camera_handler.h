@@ -16,15 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_GLFW_H
-#define OGLDEV_GLFW_H
+#pragma once
 
-#include <GL/glew.h>
-#define GLFW_DLL
-#include <GLFW/glfw3.h>
+struct CameraMovement {
+    bool Forward = false;
+    bool Backward = false;
+    bool StrafeLeft = false;
+    bool StrafeRight = false;
+    bool Up = false;
+    bool Down = false;
+    bool FastSpeed = false;
+    bool Plus = false;
+    bool Minus = false;
+};
 
-#include "ogldev_glm_camera.h"
 
-GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool is_full_screen, const char* title);
+bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods);
 
-#endif
+//#endif

@@ -70,7 +70,7 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();
-		m_frameBuffers = m_vkCore.CreateFramebuffer(m_renderPass);
+		m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 		CreateShaders();
 		CreatePipeline();
 		CreateCommandBuffers();
@@ -106,7 +106,12 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, m_numImages);
+		// These are not really used in this tutorial.
+		// They are here for forward compatibility with the GraphicsPipeline interface
+		std::vector<OgldevVK::BufferAndMemory> UniformBuffers;
+		int UniformDataSize = 0;
+
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, m_numImages, UniformBuffers, UniformDataSize);
 	}
 
 

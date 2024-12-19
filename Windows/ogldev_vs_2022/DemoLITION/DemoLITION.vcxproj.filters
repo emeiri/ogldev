@@ -100,6 +100,9 @@
     <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_glfw_camera_handler.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">

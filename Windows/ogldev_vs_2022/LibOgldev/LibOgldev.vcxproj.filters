@@ -243,6 +243,9 @@
     <ClInclude Include="..\..\..\Include\bitmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_glfw_camera_handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -417,6 +420,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_base_app2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_glfw_camera_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -24,20 +24,9 @@
 #include <glm/ext.hpp>
 
 #include "ogldev_math_3d.h"
+#include "ogldev_glfw_camera_handler.h"
 
 static bool constexpr CAMERA_LEFT_HANDED = true;
-
-struct CameraMovement {
-	bool Forward = false;
-	bool Backward = false;
-	bool StrafeLeft = false;
-	bool StrafeRight = false;
-	bool Up = false;
-	bool Down = false;
-	bool FastSpeed = false;
-	bool Plus = false;
-	bool Minus = false;
-};
 
 struct MouseState {
 	glm::vec2 m_pos = glm::vec2(0.0f);

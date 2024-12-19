@@ -137,6 +137,13 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
 }
 
 
+#if 0
+
+/* !!!This code was introduced in OpenGL tutorial 55 (GLM Camera).It has been moved to
+<ogldev>\Common\ogldev_glfw_camera_handler.cpp because it is now shared by both OpenGL and
+Vulkan but this file cannot be compiled in Vulkan because of too much OpenGL incompatibilities.
+I'm keeping it here as a reference to match the video. */
+
 bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
 {
     bool Press = Action != GLFW_RELEASE;
@@ -187,3 +194,5 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
 
     return Handled;
 }
+
+#endif

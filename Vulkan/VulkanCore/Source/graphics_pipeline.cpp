@@ -305,23 +305,25 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 			}
 		);
 
-		VkDescriptorBufferInfo BufferInfo_Uniform = {
-			.buffer = UniformBuffers[i].m_buffer,
-			.offset = 0,
-			.range = (VkDeviceSize)UniformDataSize,
-		};
-			
-		WriteDescriptorSet.push_back(
-			VkWriteDescriptorSet{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = m_descriptorSets[i],
-				.dstBinding = 1,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pBufferInfo = &BufferInfo_Uniform
-			}
-		);
+		if (UniformBuffers.size() > 0) {
+			VkDescriptorBufferInfo BufferInfo_Uniform = {
+				.buffer = UniformBuffers[i].m_buffer,
+				.offset = 0,
+				.range = (VkDeviceSize)UniformDataSize,
+			};
+
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = m_descriptorSets[i],
+					.dstBinding = 1,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+					.pBufferInfo = &BufferInfo_Uniform
+				}
+			);
+		}
 	}
 
 	vkUpdateDescriptorSets(m_device, 
