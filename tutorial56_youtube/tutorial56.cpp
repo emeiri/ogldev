@@ -57,7 +57,7 @@ void Tutorial56::Init()
 {
     InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 56");
 
-    m_skybox.Init("../Content/textures/piazza_bologni_1k.hdr");
+    m_skybox.Init("../Content/textures/ahornsteig_4k.jpg");
 }
 
 
