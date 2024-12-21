@@ -184,15 +184,10 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 
 
 void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
-											std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
+											std::vector<BufferAndMemory>& UniformBuffers, 
+											int UniformDataSize)
 {
 	CreateDescriptorPool(NumImages);
-
-	std::vector<VkDescriptorPoolSize> PoolSizes;
-	VkDescriptorPoolSize DescPoolSize = {
-		.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.descriptorCount = (u32)(NumImages)
-	};
 
 	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize);
 
@@ -204,18 +199,12 @@ void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 
 void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
-	std::vector<VkDescriptorPoolSize> PoolSizes;
-	VkDescriptorPoolSize DescPoolSize = {
-		.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.descriptorCount = (u32)(NumImages)
-	};
-
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.flags = 0,
 		.maxSets = (u32)NumImages,
-		.poolSizeCount = 1,
-		.pPoolSizes = &DescPoolSize
+		.poolSizeCount = 0,
+		.pPoolSizes = NULL
 	};
 
 	VkResult res = vkCreateDescriptorPool(m_device, &PoolInfo, NULL, &m_descriptorPool);
@@ -224,7 +213,8 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
+void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, 
+												 int UniformDataSize)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -235,6 +225,8 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
+	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	
 	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
 		.binding = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -245,8 +237,6 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 	if (UniformBuffers.size() > 0) {
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
-
-	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -281,7 +271,8 @@ void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
 
 
 void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
-											std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
+											std::vector<BufferAndMemory>& UniformBuffers, 
+											int UniformDataSize)
 {
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = pMesh->m_vb.m_buffer,

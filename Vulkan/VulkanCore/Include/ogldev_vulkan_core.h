@@ -20,7 +20,6 @@
 
 #include <vulkan/vulkan.h>
 
-#define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -76,7 +75,7 @@ public:
 
 	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
 
-	std::vector<BufferAndMemory> CreateUniformBuffers(size_t DataSize);
+	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 
 	void GetFramebufferSize(int& Width, int& Height) const;
 
@@ -88,7 +87,7 @@ private:
 	void CreateDevice();
 	void CreateSwapChain();
 	void CreateCommandBufferPool();	
-	BufferAndMemory CreateUniformBuffer(int Size);
+	BufferAndMemory CreateUniformBuffer(size_t Size);
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 

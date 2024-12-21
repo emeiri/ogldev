@@ -583,12 +583,15 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 }
 
 
-BufferAndMemory VulkanCore::CreateUniformBuffer(int Size)
+BufferAndMemory VulkanCore::CreateUniformBuffer(size_t Size)
 {
 	BufferAndMemory Buffer;
 
-	Buffer = CreateBuffer(Size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+	VkMemoryPropertyFlags MemProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
+									 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	
+	Buffer = CreateBuffer(Size, Usage, MemProps);
 
 	return Buffer;
 }
@@ -697,14 +700,14 @@ void VulkanCore::GetFramebufferSize(int& Width, int& Height) const
 }
 
 
-std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t DataSize)
+std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size)
 {
 	std::vector<BufferAndMemory> UniformBuffers;
 
 	UniformBuffers.resize(m_images.size());
 
 	for (int i = 0; i < UniformBuffers.size(); i++) {
-		UniformBuffers[i] = CreateUniformBuffer((int)DataSize);
+		UniformBuffers[i] = CreateUniformBuffer(Size);
 	}
 
 	return UniformBuffers;

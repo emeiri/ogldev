@@ -156,7 +156,7 @@ private:
 	void DefaultCreateCameraPers()
 	{
 		float FOV = 45.0f;
-		float zNear = 1.0f;
+		float zNear = 0.1f;
 		float zFar = 1000.0f;
 
 		DefaultCreateCameraPers(FOV, zNear, zFar);
@@ -209,9 +209,9 @@ private:
 		};
 
 		std::vector<Vertex> Vertices = {
-			Vertex({-1.0f, -1.0f, 0.0f},  {0.0f, 0.0f}),	// top left
-			Vertex({1.0f, -1.0f, 0.0f},   {0.0f, 1.0f}),	// top right
-			Vertex({0.0f,  1.0f, 0.0f},   {1.0f, 1.0f}) 	// bottom middle
+			Vertex({-1.0f, -1.0f, 1.0f},  {0.0f, 0.0f}),	// top left
+			Vertex({1.0f, -1.0f, 1.0f},   {0.0f, 1.0f}),	// top right
+			Vertex({0.0f,  1.0f, 1.0f},   {1.0f, 1.0f}) 	// bottom middle
 		};
 
 		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
@@ -239,7 +239,8 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages, m_uniformBuffers, sizeof(UniformData));
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages, 
+													 m_uniformBuffers, sizeof(UniformData));
 	}
 
 
@@ -294,14 +295,16 @@ private:
 
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
-	{
+	{		
 		static float foo = 0.0f;
 		glm::mat4 Rotate = glm::mat4(1.0);
 		Rotate = glm::rotate(Rotate, glm::radians(foo), glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f)));
 		foo += 0.001f;
 
-		Rotate = m_pGameCamera->GetVPMatrix();
-		m_uniformBuffers[ImageIndex].Update(m_device, &Rotate, sizeof(Rotate));
+		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
+
+		glm::mat4 WVP = VP * Rotate;
+		m_uniformBuffers[ImageIndex].Update(m_device, &WVP, sizeof(WVP));
 	}
 
 	GLFWwindow* m_pWindow = NULL;
