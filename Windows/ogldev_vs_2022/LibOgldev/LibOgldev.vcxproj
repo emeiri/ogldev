@@ -172,6 +172,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_billboard_technique.h" />
     <ClInclude Include="..\..\..\Include\ogldev_callbacks.h" />
     <ClInclude Include="..\..\..\Include\ogldev_camera.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_camera_api.h" />
     <ClInclude Include="..\..\..\Include\ogldev_cubemap_texture.h" />
     <ClInclude Include="..\..\..\Include\ogldev_engine_common.h" />
     <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h" />

@@ -245,4 +245,26 @@ void GLMCameraFirstPerson::Print() const
 	glm::vec3 Target = GetTarget();
 
 	printf("Camera: pos (%f,%f,%f) target (%f,%f,%f)\n", m_cameraPos.x, m_cameraPos.y, m_cameraPos.z, Target.x, Target.y, Target.z);
+const Vector3f GLMCameraFirstPerson::GetPos() const
+{
+	Vector3f Ret = m_cameraPos;
+	return Ret;
+}
+
+Matrix4f GLMCameraFirstPerson::GetViewportMatrix() const
+{
+	Matrix4f Ret(GetViewMatrix());
+	return Ret;
+}
+
+Matrix4f GLMCameraFirstPerson::GetMatrix() const
+{
+	Matrix4f Ret(GetVPMatrix());
+	return Ret;
+}
+
+const Matrix4f GLMCameraFirstPerson::GetProjectionMat() const
+{
+	Matrix4f Ret(GetProjMatrix());
+	return Ret;
 }

@@ -25,6 +25,7 @@
 
 #include "ogldev_math_3d.h"
 #include "ogldev_glfw_camera_handler.h"
+#include "ogldev_camera_api.h"
 
 static bool constexpr CAMERA_LEFT_HANDED = true;
 
@@ -33,7 +34,7 @@ struct MouseState {
 	bool m_buttonPressed = false;
 };
 
-class GLMCameraFirstPerson {
+class GLMCameraFirstPerson : public CameraAPI {
 
 public:
 
@@ -60,7 +61,7 @@ public:
 
 	const glm::mat4& GetProjMatrix() const { return m_persProjection; }
 
-	glm::vec3 GetPos() const { return m_cameraPos; }
+	glm::vec3 GetPosition() const { return m_cameraPos; }
 
 	glm::vec3 GetTarget() const;
 
@@ -79,6 +80,17 @@ public:
 	void SetTarget(const glm::vec3& Target);
 
 	void Print() const;
+
+	// Implementation of CameraAPI
+
+	virtual const Vector3f GetPos() const;
+
+	virtual Matrix4f GetViewportMatrix() const;
+
+	virtual Matrix4f GetMatrix() const;
+
+	virtual const Matrix4f GetProjectionMat() const;
+
 
 private:
 

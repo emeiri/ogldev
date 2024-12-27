@@ -20,9 +20,9 @@
 #define OGLDEV_BASIC_GLFW_CAMERA_H
 
 #include "ogldev_math_3d.h"
+#include "ogldev_camera_api.h"
 
-
-class BasicCamera
+class BasicCamera : public CameraAPI
 {
 public:
 
@@ -59,13 +59,13 @@ public:
 
     Matrix4f GetMatrix() const;
 
-    const Vector3f& GetPos() const { return m_pos; }
+    const Vector3f GetPos() const { return m_pos; }
 
     const Vector3f& GetTarget() const { return m_target; }
 
     const Vector3f& GetUp() const { return m_up; }
 
-    const Matrix4f& GetProjectionMat() const { return m_projection; }
+    const Matrix4f GetProjectionMat() const { return m_projection; }
 
     const PersProjInfo& GetPersProjInfo() const { return m_persProjInfo; }
 

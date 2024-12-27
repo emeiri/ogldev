@@ -246,6 +246,9 @@
     <ClInclude Include="..\..\..\Include\ogldev_glfw_camera_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_camera_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
