@@ -25,7 +25,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_vertex_buffer.h"
-#include "ogldev_base_app.h"
+#include "ogldev_base_app2.h"
 #include "ogldev_infinite_grid.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_basic_mesh.h"
@@ -35,11 +35,11 @@
 #define WINDOW_HEIGHT 1080
 
 
-class Tutorial55 : public OgldevBaseApp
+class Tutorial57 : public OgldevBaseApp2
 {
 public:
 
-    Tutorial55()
+    Tutorial57()
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 2.2f;
@@ -47,71 +47,43 @@ public:
     }
 
 
-    virtual ~Tutorial55()
+    virtual ~Tutorial57()
     {
     }
 
 
     void Init()
     {
-        DefaultCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 55");
+        InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 57");
 
-        DefaultInitCallbacks();
-
-        InitCamera();
-
-   //     InitOldCamera();
+        m_pGameCamera->SetPos(glm::vec3(0.0f, 0.5f, 0.0f));
 
         InitInfiniteGrid();
 
-        DefaultInitGUI();
+       // DefaultInitGUI();
 
-   //     InitRenderer();
-
+        InitRenderer();
+		
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
       //  glFrontFace(GL_CCW);
       //  glEnable(GL_CULL_FACE);
         //glEnable(GL_DEPTH_TEST);
 
-   //     m_mesh.LoadMesh("G:/McGuire/bistro/Exterior/exterior.obj");
+        m_mesh.LoadMesh("G:/McGuire/bistro/Exterior/exterior.obj");
     }
 
 
-	virtual bool KeyboardCB(int Key, int Action, int Mods)
-	{
-        bool Handled = GLFWCameraHandler(m_pCamera->m_movement, Key, Action, Mods);
-
-        if (Handled) {
-            return true;
-        } else {
-            return OgldevBaseApp::KeyboardCB(Key, Action, Mods);
-        }
-	}
-
-
-	void MouseMoveCB(int x, int y)
-	{
-        m_pCamera->SetMousePos((float)x, (float)y);
-	}
-
-
-	virtual void MouseButtonCB(int Button, int Action, int Mods, int x, int y)
-	{
-        m_pCamera->HandleMouseButton(Button, Action, Mods);
-    }
 
 
     virtual void RenderSceneCB(float dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		m_pCamera->Update(dt);		
+        glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-        glm::mat4 VP = m_pCamera->GetVPMatrix();
+        m_phongRenderer.Render(&m_mesh);
 
-     //   m_phongRenderer.Render(&m_mesh);
-
-        m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPos());
+        m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
     }
 
 
@@ -130,40 +102,7 @@ public:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-#define STEP 0.01f
-
     private:
-
-    void InitCamera()
-    {
-        float FOV = 45.0f;
-        float zNear = 1.0f;
-        float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, 
-                                      zNear, zFar };
-
-        glm::vec3 Pos(0.0f, 2.1f, 0.0f);
-        glm::vec3 Target(0.0f, 2.1f, 1.0f);
-        glm::vec3 Up(0.0, 1.0f, 0.0f);
-
-        m_pCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);   
-    }
-
-
-    void InitOldCamera()
-    {
-        Vector3f Pos(0.0f, 0.0f, 0.0f);
-        Vector3f Target(0.0f, 0.0f, 1.0f);
-        Vector3f Up(0.0, 1.0f, 0.0f);
-
-        float FOV = 45.0f;
-        float zNear = 0.1f;
-        float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-
-        m_pGameCamera = new BasicCamera(persProjInfo, Pos, Target, Up);
-    }
-
 
 
     void InitInfiniteGrid()
@@ -182,17 +121,15 @@ public:
 
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
-    GLMCameraFirstPerson* m_pCamera = NULL;
     BasicMesh m_mesh;
     PhongRenderer m_phongRenderer;
     DirectionalLight m_dirLight;
-
 };
 
 
 int main(int argc, char** argv)
 {
-    Tutorial55* app = new Tutorial55();
+    Tutorial57* app = new Tutorial57();
 
     app->Init();
 
