@@ -20,7 +20,7 @@
 #ifndef OGLDEV_PHONG_RENDERER
 #define OGLDEV_PHONG_RENDERER
 
-#include "ogldev_basic_glfw_camera.h"
+#include "ogldev_camera_api.h"
 #include "ogldev_new_lighting.h"
 #include "ogldev_skinning_technique.h"
 #include "ogldev_basic_mesh.h"
@@ -39,7 +39,7 @@ class PhongRenderer {
 
     void StartShadowPass();
 
-    void SetCamera(const BasicCamera* pCamera) { m_pCamera = pCamera; }
+    void SetCamera(const CameraAPI* pCamera) { m_pCamera = pCamera; }
 
     void SetPBR(bool IsPBR);
 
@@ -104,7 +104,7 @@ class PhongRenderer {
 
     void RenderAnimationCommon(SkinnedMesh* pMesh);
 
-    const BasicCamera* m_pCamera = NULL;
+    const CameraAPI* m_pCamera = NULL;
     int m_subTech = LightingTechnique::SUBTECH_DEFAULT;
     LightingTechnique m_lightingTech;
     SkinningTechnique m_skinningTech;
