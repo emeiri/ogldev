@@ -27,7 +27,7 @@ Particles::Particles(): bh1(5,0,0,1), bh2(-5,0,0,1)
 
 void Particles::Init()
 {
-    m_colorTech.Init();
+    m_colorTech.Init();    
     m_particlesTech.Init();
 
     InitBuffers();
@@ -35,55 +35,31 @@ void Particles::Init()
 
 void Particles::InitBuffers()
 {
-    // Initial positions of the particles
     vector<Vector4f> Positions(m_totalParticles);
-    vector<GLfloat> Velocities(m_totalParticles * 4, 0.0f);
+    CalcPositions(Positions);
 
-    Vector4f p(0.0f, 0.0f, 0.0f, 1.0f);
+    GLuint PosBuf = 0;
+    GLuint VelBuf = 0;
 
-    float dx = 2.0f / (m_numParticlesX - 1);
-    float dy = 2.0f / (m_numParticlesY - 1);
-    float dz = 2.0f / (m_numParticlesZ - 1);
-
-    // We want to center the particles at (0,0,0)
-    glm::mat4 transf = glm::translate(glm::mat4(1.0f), glm::vec3(-1,-1,-1));
-
-    int ParticleIndex = 0;
-    for (int x = 0; x < m_numParticlesX; x++ ) {
-        for (int y = 0; y < m_numParticlesY; y++ ) {
-            for (int z = 0; z < m_numParticlesZ; z++ ) {
-                p.x = dx * x;
-                p.y = dy * y;
-                p.z = dz * z;
-                p.w = 1.0f;
-                Positions[ParticleIndex] = p;
-                ParticleIndex++;
-              //  p = transf * p;
-          }
-        }
-    }
-
-    // We need buffers for position , and velocity.
-    GLuint bufs[2];
-    glGenBuffers(2, bufs);
-    GLuint posBuf = bufs[0];
-    GLuint velBuf = bufs[1];
+    glGenBuffers(1, &PosBuf);
+    glGenBuffers(1, &VelBuf);
 
   GLuint BufSize = m_totalParticles * 4 * sizeof(GLfloat);
 
   // The buffers for positions
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuf);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, PosBuf);
   glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Positions.data(), GL_DYNAMIC_DRAW);
 
   // Velocities
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuf);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, &Velocities[0], GL_DYNAMIC_COPY);
+  vector<GLfloat> Velocities(m_totalParticles * 4, 0.0f);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, VelBuf);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Velocities.data(), GL_DYNAMIC_COPY);
 
   // Set up the VAO
-  glGenVertexArrays(1, &particlesVao);
-  glBindVertexArray(particlesVao);
+  glGenVertexArrays(1, &m_vao);
+  glBindVertexArray(m_vao);
 
-  glBindBuffer(GL_ARRAY_BUFFER, posBuf);
+  glBindBuffer(GL_ARRAY_BUFFER, PosBuf);
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
   glEnableVertexAttribArray(0);
 
@@ -105,6 +81,36 @@ void Particles::InitBuffers()
   glBindVertexArray(0);
 }
 
+
+void Particles::CalcPositions(vector<Vector4f>& Positions)
+{
+    Vector4f p(0.0f, 0.0f, 0.0f, 1.0f);
+
+    float dx = 2.0f / (m_numParticlesX - 1);
+    float dy = 2.0f / (m_numParticlesY - 1);
+    float dz = 2.0f / (m_numParticlesZ - 1);
+
+    // We want to center the particles at (0,0,0)
+    glm::mat4 transf = glm::translate(glm::mat4(1.0f), glm::vec3(-1, -1, -1));
+
+    int ParticleIndex = 0;
+    for (int x = 0; x < m_numParticlesX; x++) {
+        for (int y = 0; y < m_numParticlesY; y++) {
+            for (int z = 0; z < m_numParticlesZ; z++) {
+                p.x = dx * x;
+                p.y = dy * y;
+                p.z = dz * z;
+                p.w = 1.0f;
+                Positions[ParticleIndex] = p;
+                ParticleIndex++;
+                //  p = transf * p;
+            }
+        }
+    }
+}
+
+
+
 void Particles::Update(float dt)
 { 
     m_angle += m_speed * dt;
@@ -116,18 +122,18 @@ void Particles::Update(float dt)
 
 void Particles::Render(const Matrix4f& VP)
 {
-  // Rotate the attractors ("black holes")
-  glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(m_angle), glm::vec3(0,0,1));
-  Vector3f BlackHolePos1(glm::vec3(rot * bh1));
-  Vector3f BlackHolePos2(glm::vec3(rot * bh2));
+    // Rotate the attractors ("black holes")
+    glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(m_angle), glm::vec3(0, 0, 1));
+    Vector3f BlackHolePos1(glm::vec3(rot * bh1));
+    Vector3f BlackHolePos2(glm::vec3(rot * bh2));
 
-  // Execute the compute shader
-  m_particlesTech.Enable();
-  m_particlesTech.SetBlackHoles(BlackHolePos1, BlackHolePos2);
-  
-  glDispatchCompute(m_totalParticles / 1000, 1, 1);
-  glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
+    ExecuteComputeShader(BlackHolePos1, BlackHolePos2);
 
+    RenderParticles(BlackHolePos1, BlackHolePos2, VP);
+}
+
+void Particles::RenderParticles(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2, const Matrix4f& VP)
+{
   // Draw the scene
   m_colorTech.Enable();
   m_colorTech.SetWVP(VP);
@@ -137,9 +143,9 @@ void Particles::Render(const Matrix4f& VP)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Draw the particles
-  glPointSize(1.0f);
+  glPointSize(10.0f);
   m_colorTech.SetColor(Vector4f(0.0f, 0.0f, 0.0f, 0.2f));
-  glBindVertexArray(particlesVao);
+  glBindVertexArray(m_vao);
   glDrawArrays(GL_POINTS,0, m_totalParticles);
   glBindVertexArray(0);
 
@@ -155,3 +161,11 @@ void Particles::Render(const Matrix4f& VP)
 }
 
 
+void Particles::ExecuteComputeShader(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2)
+{
+    m_particlesTech.Enable();
+    m_particlesTech.SetBlackHoles(BlackHolePos1, BlackHolePos2);
+
+    glDispatchCompute(m_totalParticles / 1000, 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}

@@ -13,6 +13,12 @@ public:
     void Render(const Matrix4f& VP);
 
 private:
+    
+    void InitBuffers();
+    void CalcPositions(vector<Vector4f>& Positions);
+    void ExecuteComputeShader(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2);
+    void RenderParticles(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2, const Matrix4f& VP);
+
     ColorTechnique m_colorTech;
     ParticlesTechnique m_particlesTech;
 
@@ -23,12 +29,10 @@ private:
     int m_totalParticles = 0;
 
     float m_speed, m_angle;
-    GLuint particlesVao;
+    GLuint m_vao;
     GLuint bhVao, bhBuf;  // black hole VAO and buffer
 
-    glm::vec4 bh1, bh2;
-
-    void InitBuffers();
+    glm::vec4 bh1, bh2;    
 };
 
 
