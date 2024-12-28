@@ -35,47 +35,49 @@ void Particles::Init()
 
 void Particles::InitBuffers()
 {
-  // Initial positions of the particles
-  vector<GLfloat> initPos;
-  vector<GLfloat> initVel(m_totalParticles * 4, 0.0f);
-  glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
-  GLfloat dx = 2.0f / (m_numParticlesX - 1),
-          dy = 2.0f / (m_numParticlesY - 1),
-          dz = 2.0f / (m_numParticlesZ - 1);
-  // We want to center the particles at (0,0,0)
-  glm::mat4 transf = glm::translate(glm::mat4(1.0f), glm::vec3(-1,-1,-1));
+    // Initial positions of the particles
+    vector<Vector4f> Positions(m_totalParticles);
+    vector<GLfloat> Velocities(m_totalParticles * 4, 0.0f);
 
-  for( int i = 0; i < m_numParticlesX; i++ ) {
-    for( int j = 0; j < m_numParticlesY; j++ ) {
-      for( int k = 0; k < m_numParticlesZ; k++ ) {
-        p.x = dx * i;
-        p.y = dy * j;
-        p.z = dz * k;
-        p.w = 1.0f;
-        p = transf * p;
-        initPos.push_back(p.x);
-        initPos.push_back(p.y);
-        initPos.push_back(p.z);
-        initPos.push_back(p.w);
-      }
+    Vector4f p(0.0f, 0.0f, 0.0f, 1.0f);
+
+    float dx = 2.0f / (m_numParticlesX - 1);
+    float dy = 2.0f / (m_numParticlesY - 1);
+    float dz = 2.0f / (m_numParticlesZ - 1);
+
+    // We want to center the particles at (0,0,0)
+    glm::mat4 transf = glm::translate(glm::mat4(1.0f), glm::vec3(-1,-1,-1));
+
+    int ParticleIndex = 0;
+    for (int x = 0; x < m_numParticlesX; x++ ) {
+        for (int y = 0; y < m_numParticlesY; y++ ) {
+            for (int z = 0; z < m_numParticlesZ; z++ ) {
+                p.x = dx * x;
+                p.y = dy * y;
+                p.z = dz * z;
+                p.w = 1.0f;
+                Positions[ParticleIndex] = p;
+                ParticleIndex++;
+              //  p = transf * p;
+          }
+        }
     }
-  }
 
-  // We need buffers for position , and velocity.
-  GLuint bufs[2];
-  glGenBuffers(2, bufs);
-  GLuint posBuf = bufs[0];
-  GLuint velBuf = bufs[1];
+    // We need buffers for position , and velocity.
+    GLuint bufs[2];
+    glGenBuffers(2, bufs);
+    GLuint posBuf = bufs[0];
+    GLuint velBuf = bufs[1];
 
-  GLuint bufSize = m_totalParticles * 4 * sizeof(GLfloat);
+  GLuint BufSize = m_totalParticles * 4 * sizeof(GLfloat);
 
   // The buffers for positions
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuf);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initPos[0], GL_DYNAMIC_DRAW);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Positions.data(), GL_DYNAMIC_DRAW);
 
   // Velocities
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuf);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, bufSize, &initVel[0], GL_DYNAMIC_COPY);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, &Velocities[0], GL_DYNAMIC_COPY);
 
   // Set up the VAO
   glGenVertexArrays(1, &particlesVao);
