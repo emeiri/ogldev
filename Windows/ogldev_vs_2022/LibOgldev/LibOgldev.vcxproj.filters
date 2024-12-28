@@ -249,6 +249,9 @@
     <ClInclude Include="..\..\..\Include\ogldev_camera_api.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_color_technique.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -427,6 +430,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_glfw_camera_handler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\Techniques\ogldev_color_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

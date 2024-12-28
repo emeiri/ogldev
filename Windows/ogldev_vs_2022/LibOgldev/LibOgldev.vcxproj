@@ -173,6 +173,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_callbacks.h" />
     <ClInclude Include="..\..\..\Include\ogldev_camera.h" />
     <ClInclude Include="..\..\..\Include\ogldev_camera_api.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_color_technique.h" />
     <ClInclude Include="..\..\..\Include\ogldev_cubemap_texture.h" />
     <ClInclude Include="..\..\..\Include\ogldev_engine_common.h" />
     <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h" />
@@ -281,6 +282,7 @@
     <ClCompile Include="..\..\..\Common\pipeline.cpp" />
     <ClCompile Include="..\..\..\Common\random_texture.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\Common\Techniques\ogldev_color_technique.cpp" />
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 57 - PBR Textures
+    Tutorial 57 - Particle System Using the Compute Shader
 */
 
 #include <stdio.h>
@@ -30,6 +30,7 @@
 #include "ogldev_glm_camera.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_phong_renderer.h"
+#include "particles.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
@@ -65,14 +66,9 @@ public:
         InitRenderer();
 		
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-      //  glFrontFace(GL_CCW);
-      //  glEnable(GL_CULL_FACE);
-        //glEnable(GL_DEPTH_TEST);
 
-        m_mesh.LoadMesh("G:/McGuire/bistro/Exterior/exterior.obj");
+        m_particles.initScene();
     }
-
-
 
 
     virtual void RenderSceneCB(float dt)
@@ -81,7 +77,9 @@ public:
 		
         glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-        m_phongRenderer.Render(&m_mesh);
+        m_particles.update(dt);
+
+        m_particles.Render(VP);
 
         m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
     }
@@ -121,9 +119,9 @@ public:
 
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
-    BasicMesh m_mesh;
     PhongRenderer m_phongRenderer;
     DirectionalLight m_dirLight;
+    Particles m_particles;
 };
 
 

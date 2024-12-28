@@ -1,6 +1,5 @@
 /*
-
-        Copyright 2024 Etay Meiri
+    Copyright 2024 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,14 +15,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
 
-#version 330
+#include "technique.h"
+#include "ogldev_math_3d.h"
 
-uniform vec4 gColor = vec4(1.0);
-
-layout ( location = 0 ) out vec4 FragColor;
-
-void main()
+class ParticlesTechnique : public Technique
 {
-    FragColor = gColor;
-}
+public:
+
+    ParticlesTechnique();
+
+    virtual bool Init();
+
+    void SetBlackHoles(const Vector3f& Pos1, const Vector3f& Pos2);
+    
+private:
+
+    GLuint m_blackHole1Loc = INVALID_UNIFORM_LOCATION;
+    GLuint m_blackHole2Loc = INVALID_UNIFORM_LOCATION;
+};
+

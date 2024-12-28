@@ -19,11 +19,15 @@
 
 #version 330
 
-uniform vec4 gColor = vec4(1.0);
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec2 TexCoords;
 
-layout ( location = 0 ) out vec4 FragColor;
+uniform mat4 gWVP = mat4(1.0);
+
+out vec2 TexCoords0;
 
 void main()
 {
-    FragColor = gColor;
+    gl_Position = gWVP * vec4(Position, 1.0);
+    TexCoords0 = TexCoords;
 }

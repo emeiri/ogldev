@@ -456,7 +456,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17", "Vulkan\Tutori
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial57_PBRTextures", "Tutorial57_PBRTextures\Tutorial57.vcxproj", "{DB269AC5-FD72-4D70-B842-F5D39E0D0BEF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial57_ComputeShaderParticles", "Tutorial57_ComputeShaderParticles\Tutorial57.vcxproj", "{DB269AC5-FD72-4D70-B842-F5D39E0D0BEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

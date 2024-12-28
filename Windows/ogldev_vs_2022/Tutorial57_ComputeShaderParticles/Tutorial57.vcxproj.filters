@@ -33,6 +33,12 @@
     <ClCompile Include="..\..\..\tutorial57_youtube\tutorial57.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tutorial57_youtube\particles.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\tutorial57_youtube\particles_technique.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -62,5 +68,16 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\tutorial57_youtube\particles.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\tutorial57_youtube\particles_technique.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial57_youtube\particles.cs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
