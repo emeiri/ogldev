@@ -101,4 +101,11 @@ uint32_t GetBytesPerTexFormat(VkFormat Format)
 	return 0;
 }
 
+
+bool HasStencilComponent(VkFormat Format)
+{
+	return ((Format == VK_FORMAT_D32_SFLOAT_S8_UINT) || 
+		    (Format == VK_FORMAT_D24_UNORM_S8_UINT));
+}
+
 }

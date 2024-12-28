@@ -43,6 +43,20 @@ public:
 	void Destroy(VkDevice Device);
 };
 
+
+class VulkanTexture {
+public:
+	VulkanTexture() {}
+
+	VkImage m_image = VK_NULL_HANDLE;
+	VkDeviceMemory m_mem = VK_NULL_HANDLE;
+	VkImageView m_view = VK_NULL_HANDLE;
+	VkSampler m_sampler = VK_NULL_HANDLE;
+
+	void Destroy(VkDevice Device);
+};
+
+
 class VulkanCore {
 
 public:
@@ -76,6 +90,8 @@ public:
 	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
 
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
+	
+	void CreateTexture(const char* filename, VulkanTexture& Tex);
 
 	void GetFramebufferSize(int& Width, int& Height) const;
 
@@ -94,6 +110,17 @@ private:
 	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
 	BufferAndMemory CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties);
+
+	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
+									VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags Flags);
+	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
+		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels);
+	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
+	void CopyBufferToImage(VkBuffer buffer, VkImage image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount);
+	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
+	void TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
+	VkCommandBuffer CreateAndBeginSingleUseCommand();
+	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;

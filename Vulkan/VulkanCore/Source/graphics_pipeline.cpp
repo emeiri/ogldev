@@ -189,7 +189,7 @@ void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 {
 	CreateDescriptorPool(NumImages);
 
-	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize);
+	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pMesh->m_pTex);
 
 	AllocateDescriptorSets(NumImages);
 
@@ -214,7 +214,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 
 
 void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, 
-												 int UniformDataSize)
+												 int UniformDataSize, VulkanTexture* pTex)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -234,8 +234,19 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
+	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
+		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
+
 	if (UniformBuffers.size() > 0) {
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
+	}
+	
+	if (pTex) { 
+		LayoutBindings.push_back(FragmentShaderLayoutBinding);
 	}
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
@@ -279,7 +290,15 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 		.offset = 0,
 		.range = pMesh->m_vertexBufferSize,  // can also be VK_WHOLE_SIZE
 	};
-
+	
+	VkDescriptorImageInfo ImageInfo;
+	
+	if (pMesh->m_pTex) {
+		ImageInfo.sampler = pMesh->m_pTex->m_sampler;
+		ImageInfo.imageView = pMesh->m_pTex->m_view;
+		ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	}
+	
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 
 	for (size_t i = 0; i < NumImages; i++) {
@@ -312,6 +331,20 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 					.descriptorCount = 1,
 					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 					.pBufferInfo = &BufferInfo_Uniform
+				}
+			);
+		}
+		
+		if (pMesh->m_pTex) {
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = m_descriptorSets[i],
+					.dstBinding = 2,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+					.pImageInfo = &ImageInfo
 				}
 			);
 		}
