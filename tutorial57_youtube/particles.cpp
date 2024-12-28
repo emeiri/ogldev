@@ -14,21 +14,22 @@ using glm::vec3;
 #define PRIM_RESTART 0xffffff
 
 Particles::Particles():
-  nParticles(100,100,100),
   time(0.0f), deltaT(0.0f), speed(35.0f), angle(0.0f),
   bh1(5,0,0,1), bh2(-5,0,0,1)
 {
-  totalParticles = nParticles.x * nParticles.y * nParticles.z;
+    m_numParticlesX = 100;
+    m_numParticlesY = 100;
+    m_numParticlesZ = 100;
+
+    totalParticles = m_numParticlesX * m_numParticlesY * m_numParticlesZ;
 }
 
-void Particles::initScene()
+void Particles::Init()
 {
     m_colorTech.Init();
     m_particlesTech.Init();
 
   initBuffers();
-
-  //glClearColor(1,1,1,1);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -40,14 +41,15 @@ void Particles::initBuffers()
   vector<GLfloat> initPos;
   vector<GLfloat> initVel(totalParticles * 4, 0.0f);
   glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
-  GLfloat dx = 2.0f / (nParticles.x - 1),
-          dy = 2.0f / (nParticles.y - 1),
-          dz = 2.0f / (nParticles.z - 1);
+  GLfloat dx = 2.0f / (m_numParticlesX - 1),
+          dy = 2.0f / (m_numParticlesY - 1),
+          dz = 2.0f / (m_numParticlesZ - 1);
   // We want to center the particles at (0,0,0)
   glm::mat4 transf = glm::translate(glm::mat4(1.0f), glm::vec3(-1,-1,-1));
-  for( int i = 0; i < nParticles.x; i++ ) {
-    for( int j = 0; j < nParticles.y; j++ ) {
-      for( int k = 0; k < nParticles.z; k++ ) {
+
+  for( int i = 0; i < m_numParticlesX; i++ ) {
+    for( int j = 0; j < m_numParticlesY; j++ ) {
+      for( int k = 0; k < m_numParticlesZ; k++ ) {
         p.x = dx * i;
         p.y = dy * j;
         p.z = dz * k;
@@ -103,7 +105,7 @@ void Particles::initBuffers()
   glBindVertexArray(0);
 }
 
-void Particles::update( float t )
+void Particles::Update( float t )
 {
   if( time == 0.0f ) {
     deltaT = 0.0f;

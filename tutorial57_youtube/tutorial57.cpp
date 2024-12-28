@@ -67,7 +67,7 @@ public:
 		
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
-        m_particles.initScene();
+        m_particles.Init();
     }
 
 
@@ -77,7 +77,7 @@ public:
 		
         glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-        m_particles.update(dt);
+        m_particles.Update(dt);
 
         m_particles.Render(VP);
 

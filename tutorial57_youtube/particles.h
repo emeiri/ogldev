@@ -1,7 +1,5 @@
 #pragma once
 
-#include <glm/glm.hpp>
-
 #include "ogldev_color_technique.h"
 #include "particles_technique.h"
 
@@ -10,16 +8,18 @@ class Particles
 public:
     Particles();
 
-    void initScene();
-    void update(float t);
+    void Init();
+    void Update(float t);
     void Render(const Matrix4f& VP);
-    void resize(int, int);
 
 private:
     ColorTechnique m_colorTech;
     ParticlesTechnique m_particlesTech;
 
-    glm::ivec3 nParticles;
+    int m_numParticlesX;
+    int m_numParticlesY;
+    int m_numParticlesZ;
+
     GLuint totalParticles;
 
     float time, deltaT, speed, angle;
