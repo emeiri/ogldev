@@ -64,7 +64,7 @@ void BasicMesh::Clear()
 }
 
 
-bool BasicMesh::LoadMesh(const string& Filename)
+bool BasicMesh::LoadMesh(const string& Filename, int AssimpFlags)
 {
     // Release the previously loaded mesh (if it exists)
     Clear();
@@ -81,7 +81,7 @@ bool BasicMesh::LoadMesh(const string& Filename)
 
     bool Ret = false;
 
-    m_pScene = m_Importer.ReadFile(Filename.c_str(), ASSIMP_LOAD_FLAGS);
+    m_pScene = m_Importer.ReadFile(Filename.c_str(), AssimpFlags);
 
     if (m_pScene) {
         m_GlobalInverseTransform = m_pScene->mRootNode->mTransformation;

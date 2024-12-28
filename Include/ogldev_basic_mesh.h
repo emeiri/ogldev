@@ -45,7 +45,7 @@ public:
 
     ~BasicMesh();
 
-    bool LoadMesh(const std::string& Filename);
+    bool LoadMesh(const std::string& Filename, int AssimpFlags = ASSIMP_LOAD_FLAGS);
 
     void Render(IRenderCallbacks* pRenderCallbacks = NULL);
 
