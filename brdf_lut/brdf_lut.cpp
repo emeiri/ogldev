@@ -40,6 +40,8 @@ public:
 private:
 
 	void InitBuffers();
+	void InitInputBuffer();
+	void InitOutputBuffer();
 	void ReadResults();
 
 	BRDF_LUT_Technique m_brdfTech;
@@ -72,23 +74,33 @@ void BRDF_LUT::Render()
 
 void BRDF_LUT::InitBuffers()
 {
-	GLuint InputBuf = 0;
-
-	glGenBuffers(1, &InputBuf);
-
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
+	InitInputBuffer();
+	InitOutputBuffer();
+
+	glBindVertexArray(0);
+}
+
+
+void BRDF_LUT::InitInputBuffer()
+{
+	GLuint InputBuf = 0;
+	glCreateBuffers(1, &InputBuf);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, InputBuf);
 	float f = 0.0f;
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float), &f, GL_DYNAMIC_DRAW);
+	glNamedBufferStorage(InputBuf, sizeof(float), &f, GL_MAP_WRITE_BIT);
+}
 
+
+void BRDF_LUT::InitOutputBuffer()
+{
 	glCreateBuffers(1, &m_outputBuf);
 	glNamedBufferStorage(m_outputBuf, bufferSize, m_outputData.data(), GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
-
 	m_outputData.resize(bufferSize);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_outputBuf);
-	glBindVertexArray(0);
 }
 
 
