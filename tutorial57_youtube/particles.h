@@ -16,18 +16,19 @@ private:
     ColorTechnique m_colorTech;
     ParticlesTechnique m_particlesTech;
 
-    int m_numParticlesX;
-    int m_numParticlesY;
-    int m_numParticlesZ;
+    int m_numParticlesX = 0;
+    int m_numParticlesY = 0;
+    int m_numParticlesZ = 0;
 
-    GLuint totalParticles;
+    int m_totalParticles = 0;
 
-    float time, deltaT, speed, angle;
+    float m_speed, m_angle;
     GLuint particlesVao;
     GLuint bhVao, bhBuf;  // black hole VAO and buffer
+
     glm::vec4 bh1, bh2;
 
-    void initBuffers();
+    void InitBuffers();
 };
 
 

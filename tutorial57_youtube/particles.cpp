@@ -13,15 +13,16 @@ using glm::vec3;
 
 #define PRIM_RESTART 0xffffff
 
-Particles::Particles():
-  time(0.0f), deltaT(0.0f), speed(35.0f), angle(0.0f),
-  bh1(5,0,0,1), bh2(-5,0,0,1)
+Particles::Particles(): bh1(5,0,0,1), bh2(-5,0,0,1)
 {
     m_numParticlesX = 100;
     m_numParticlesY = 100;
     m_numParticlesZ = 100;
 
-    totalParticles = m_numParticlesX * m_numParticlesY * m_numParticlesZ;
+    m_speed = 35.0f;
+    m_angle = 0.0f;
+
+    m_totalParticles = m_numParticlesX * m_numParticlesY * m_numParticlesZ;
 }
 
 void Particles::Init()
@@ -29,17 +30,14 @@ void Particles::Init()
     m_colorTech.Init();
     m_particlesTech.Init();
 
-  initBuffers();
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    InitBuffers();
 }
 
-void Particles::initBuffers()
+void Particles::InitBuffers()
 {
   // Initial positions of the particles
   vector<GLfloat> initPos;
-  vector<GLfloat> initVel(totalParticles * 4, 0.0f);
+  vector<GLfloat> initVel(m_totalParticles * 4, 0.0f);
   glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
   GLfloat dx = 2.0f / (m_numParticlesX - 1),
           dy = 2.0f / (m_numParticlesY - 1),
@@ -69,7 +67,7 @@ void Particles::initBuffers()
   GLuint posBuf = bufs[0];
   GLuint velBuf = bufs[1];
 
-  GLuint bufSize = totalParticles * 4 * sizeof(GLfloat);
+  GLuint bufSize = m_totalParticles * 4 * sizeof(GLfloat);
 
   // The buffers for positions
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuf);
@@ -105,24 +103,19 @@ void Particles::initBuffers()
   glBindVertexArray(0);
 }
 
-void Particles::Update( float t )
-{
-  if( time == 0.0f ) {
-    deltaT = 0.0f;
-  } else {
-    deltaT = t - time;
-  }
-  time = t;
-  //if( animating() ) {
-    angle += speed * deltaT;
-    if( angle > 360.0f ) angle -= 360.0f;
-  //}
+void Particles::Update(float dt)
+{ 
+    m_angle += m_speed * dt;
+   // printf("%f\n", m_angle);
+    if (m_angle > 360.0f) {
+        m_angle -= 360.0f;
+    }
 }
 
 void Particles::Render(const Matrix4f& VP)
 {
   // Rotate the attractors ("black holes")
-  glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0,0,1));
+  glm::mat4 rot = glm::rotate(glm::mat4(1.0f), glm::radians(m_angle), glm::vec3(0,0,1));
   Vector3f BlackHolePos1(glm::vec3(rot * bh1));
   Vector3f BlackHolePos2(glm::vec3(rot * bh2));
 
@@ -130,7 +123,7 @@ void Particles::Render(const Matrix4f& VP)
   m_particlesTech.Enable();
   m_particlesTech.SetBlackHoles(BlackHolePos1, BlackHolePos2);
   
-  glDispatchCompute(totalParticles / 1000, 1, 1);
+  glDispatchCompute(m_totalParticles / 1000, 1, 1);
   glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
 
   // Draw the scene
@@ -138,12 +131,14 @@ void Particles::Render(const Matrix4f& VP)
   m_colorTech.SetWVP(VP);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Draw the particles
   glPointSize(1.0f);
   m_colorTech.SetColor(Vector4f(0.0f, 0.0f, 0.0f, 0.2f));
   glBindVertexArray(particlesVao);
-  glDrawArrays(GL_POINTS,0, totalParticles);
+  glDrawArrays(GL_POINTS,0, m_totalParticles);
   glBindVertexArray(0);
 
   // Draw the attractors
