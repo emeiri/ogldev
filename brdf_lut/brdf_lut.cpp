@@ -4,26 +4,20 @@
 
 #include "ogldev_glfw.h"
 #include "brdf_lut_technique.h"
-#include "data.h"
 
-constexpr int brdfW = 256;
-constexpr int brdfH = 256;
+int brdfW = 256;
+int brdfH = 256;
 
-const uint32_t bufferSize = 2 * sizeof(float) * brdfW * brdfH;
+uint32_t bufferSize = 2 * sizeof(float) * brdfW * brdfH;
 
-
-gli::texture convertLUTtoTexture(const float* data)
+static gli::texture ConvertLUTtoTexture(const float* pData)
 {
 	gli::texture lutTexture = gli::texture2d(gli::FORMAT_RG16_SFLOAT_PACK16, gli::extent2d(brdfW, brdfH), 1);
 
-	for (int y = 0; y < brdfH; y++)
-	{
-		for (int x = 0; x < brdfW; x++)
-		{
+	for (int y = 0; y < brdfH; y++)	{
+		for (int x = 0; x < brdfW; x++) {
 			int ofs = y * brdfW + x;
-			gli::vec2 value(data[ofs * 2 + 0], data[ofs * 2 + 1]);
-			//value.x = 1.0f;
-			//value.y = 1.0f;
+			gli::vec2 value(pData[ofs * 2 + 0], pData[ofs * 2 + 1]);
 
 			gli::texture::extent_type uv = { x, y, 0 };
 			lutTexture.store<glm::uint32>(uv, 0, 0, 0, gli::packHalf2x16(value));
@@ -34,20 +28,19 @@ gli::texture convertLUTtoTexture(const float* data)
 }
 
 
-class Particles
+class BRDF_LUT
 {
 public:
-	Particles();
+	BRDF_LUT();
 
 	void Init();
 	void Render();
-	const std::vector<char>& GetOutput();
+	const std::vector<char>& GetOutput() const { return m_outputData; }
 
 private:
 
 	void InitBuffers();
-	//  void ExecuteComputeShader(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2);
-	 // void RenderParticles(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2, const Matrix4f& VP);
+	void ReadResults();
 
 	BRDF_LUT_Technique m_brdfTech;
 	std::vector<char> m_outputData;
@@ -56,26 +49,28 @@ private:
 };
 
 
-Particles::Particles()
+BRDF_LUT::BRDF_LUT()
 {
 }
 
-void Particles::Init()
+void BRDF_LUT::Init()
 {
 	m_brdfTech.Init();
 	InitBuffers();
 }
 
-void Particles::Render()
+void BRDF_LUT::Render()
 {
 	m_brdfTech.Enable();
 	glBindVertexArray(m_vao);
 	glDispatchCompute(brdfW, brdfH, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	glBindVertexArray(0);
+
+	ReadResults();
 }
 
-void Particles::InitBuffers()
+void BRDF_LUT::InitBuffers()
 {
 	GLuint InputBuf = 0;
 
@@ -97,7 +92,7 @@ void Particles::InitBuffers()
 }
 
 
-const std::vector<char>& Particles::GetOutput()
+void BRDF_LUT::ReadResults()
 {
 	// Map buffer for reading
 	void* p = glMapNamedBufferRange(m_outputBuf, 0, bufferSize, GL_MAP_READ_BIT);
@@ -110,8 +105,6 @@ const std::vector<char>& Particles::GetOutput()
 	memcpy(m_outputData.data(), p, bufferSize);
 
 	bool result = glUnmapNamedBuffer(m_outputBuf);
-
-	return m_outputData;
 }
 
 
@@ -122,14 +115,14 @@ int main()
 	bool is_full_screen = false;
 	GLFWwindow* pWindow = glfw_init(major_ver, minor_ver, 1920, 1080, is_full_screen, "brdf");
 
-	Particles foo;
-	foo.Init();
+	BRDF_LUT brdf_lut;
+	brdf_lut.Init();
 
 	printf("Calculating LUT texture...\n");
-	foo.Render();
+	brdf_lut.Render();
 
 	printf("Saving LUT texture...\n");
-	gli::texture lutTexture = convertLUTtoTexture((float*)foo.GetOutput().data());
+	gli::texture lutTexture = ConvertLUTtoTexture((float*)brdf_lut.GetOutput().data());
 
 	// use Pico Pixel to view https://pixelandpolygon.com/ 
 	gli::save_ktx(lutTexture, "brdfLUT.ktx");
