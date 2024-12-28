@@ -36,9 +36,6 @@
     <ClCompile Include="..\..\..\brdf_lut\brdf_lut_technique.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\brdf_lut\data.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -69,9 +66,6 @@
       <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\brdf_lut\brdf_lut_technique.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\brdf_lut\data.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

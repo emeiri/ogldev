@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\brdf_lut\brdf_lut.cpp" />
     <ClCompile Include="..\..\..\brdf_lut\brdf_lut_technique.cpp" />
-    <ClCompile Include="..\..\..\brdf_lut\data.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.cpp" />
@@ -31,7 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\brdf_lut\brdf_lut_technique.h" />
-    <ClInclude Include="..\..\..\brdf_lut\data.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h" />
