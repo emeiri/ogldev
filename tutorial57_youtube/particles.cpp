@@ -44,41 +44,37 @@ void Particles::InitBuffers()
     glGenBuffers(1, &PosBuf);
     glGenBuffers(1, &VelBuf);
 
-  GLuint BufSize = m_totalParticles * 4 * sizeof(GLfloat);
+    GLuint BufSize = (int)Positions.size() * sizeof(Positions[0]);
 
-  // The buffers for positions
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, PosBuf);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Positions.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, PosBuf);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Positions.data(), GL_DYNAMIC_DRAW);
 
-  // Velocities
-  vector<GLfloat> Velocities(m_totalParticles * 4, 0.0f);
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, VelBuf);
-  glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Velocities.data(), GL_DYNAMIC_COPY);
+    vector<Vector4f> Velocities(Positions.size(), Vector4f(0.0f));
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, VelBuf);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, BufSize, Velocities.data(), GL_DYNAMIC_COPY);
 
-  // Set up the VAO
-  glGenVertexArrays(1, &m_vao);
-  glBindVertexArray(m_vao);
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
 
-  glBindBuffer(GL_ARRAY_BUFFER, PosBuf);
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, PosBuf);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
-  glBindVertexArray(0);
+    glBindVertexArray(0);
 
-  // Set up a buffer and a VAO for drawing the attractors (the "black holes")
-  glGenBuffers(1, &bhBuf);
-  glBindBuffer(GL_ARRAY_BUFFER, bhBuf);
-  GLfloat data[] = { bh1.x, bh1.y, bh1.z, bh1.w, bh2.x, bh2.y, bh2.z, bh2.w };
-  glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data, GL_DYNAMIC_DRAW);
+    glGenBuffers(1, &bhBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, bhBuf);
+    GLfloat data[] = { bh1.x, bh1.y, bh1.z, bh1.w, bh2.x, bh2.y, bh2.z, bh2.w };
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), data, GL_DYNAMIC_DRAW);
 
-  glGenVertexArrays(1, &bhVao);
-  glBindVertexArray(bhVao);
+    glGenVertexArrays(1, &bhVao);
+    glBindVertexArray(bhVao);
 
-  glBindBuffer(GL_ARRAY_BUFFER, bhBuf);
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-  glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, bhBuf);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
 
-  glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 
@@ -134,30 +130,30 @@ void Particles::Render(const Matrix4f& VP)
 
 void Particles::RenderParticles(const Vector3f& BlackHolePos1, const Vector3f& BlackHolePos2, const Matrix4f& VP)
 {
-  // Draw the scene
-  m_colorTech.Enable();
-  m_colorTech.SetWVP(VP);
+    // Draw the scene
+    m_colorTech.Enable();
+    m_colorTech.SetWVP(VP);
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  // Draw the particles
-  glPointSize(10.0f);
-  m_colorTech.SetColor(Vector4f(0.0f, 0.0f, 0.0f, 0.2f));
-  glBindVertexArray(m_vao);
-  glDrawArrays(GL_POINTS,0, m_totalParticles);
-  glBindVertexArray(0);
+    // Draw the particles
+    glPointSize(10.0f);
+    m_colorTech.SetColor(Vector4f(0.0f, 0.0f, 0.0f, 0.2f));
+    glBindVertexArray(m_vao);
+    glDrawArrays(GL_POINTS,0, m_totalParticles);
+    glBindVertexArray(0);
 
-  // Draw the attractors
-  glPointSize(5.0f);
-  GLfloat data[] = { BlackHolePos1.x, BlackHolePos1.y, BlackHolePos1.z, 1.0f, BlackHolePos2.x, BlackHolePos2.y, BlackHolePos2.z, 1.0f };
-  glBindBuffer(GL_ARRAY_BUFFER, bhBuf);
-  glBufferSubData( GL_ARRAY_BUFFER, 0, 8 * sizeof(GLfloat), data );
-  m_colorTech.SetColor(Vector4f(1,1,0,1.0f));
-  glBindVertexArray(bhVao);
-  glDrawArrays(GL_POINTS, 0, 2);
-  glBindVertexArray(0);
+    // Draw the attractors
+    glPointSize(5.0f);
+    GLfloat data[] = { BlackHolePos1.x, BlackHolePos1.y, BlackHolePos1.z, 1.0f, BlackHolePos2.x, BlackHolePos2.y, BlackHolePos2.z, 1.0f };
+    glBindBuffer(GL_ARRAY_BUFFER, bhBuf);
+    glBufferSubData( GL_ARRAY_BUFFER, 0, 8 * sizeof(GLfloat), data );
+    m_colorTech.SetColor(Vector4f(1,1,0,1.0f));
+    glBindVertexArray(bhVao);
+    glDrawArrays(GL_POINTS, 0, 2);
+    glBindVertexArray(0);
 }
 
 
