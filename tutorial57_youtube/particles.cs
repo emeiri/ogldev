@@ -1,6 +1,6 @@
 #version 430
 
-layout( local_size_x = 1000 ) in;
+layout (local_size_x = 1) in;
 
 uniform float Gravity1 = 1000.0;
 uniform vec3 BlackHolePos1 = vec3(5,0,0);

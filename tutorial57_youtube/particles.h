@@ -29,10 +29,15 @@ private:
     int m_totalParticles = 0;
 
     float m_speed, m_angle;
-    GLuint m_vao;
-    GLuint bhVao, bhBuf;  // black hole VAO and buffer
+	
+    GLuint m_vao = 0;
+    GLuint m_posBuf = 0;
+	GLuint m_velBuf = 0;
+    
+	GLuint m_bhVao = 0;
+	GLuint m_bhBuf = 0;
 
-    glm::vec4 bh1, bh2;    
+    glm::vec4 m_bh1, m_bh2;    
 };
 
 
