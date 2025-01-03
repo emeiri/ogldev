@@ -221,6 +221,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_world_transform.h" />
     <ClInclude Include="..\..\..\Include\technique.h" />
     <ClInclude Include="..\..\..\Include\Techniques\ogldev_ray_marching_technique.h" />
+    <ClInclude Include="..\..\..\Include\Techniques\ogldev_square_vs.h" />
     <ClInclude Include="framework.h" />
   </ItemGroup>
   <ItemGroup>
@@ -284,6 +285,7 @@
     <ClCompile Include="..\..\..\Common\technique.cpp" />
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_color_technique.cpp" />
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\Techniques\ogldev_square_vs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\basic_lighting.fs" />

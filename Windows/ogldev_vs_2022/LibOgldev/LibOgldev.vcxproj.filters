@@ -252,6 +252,9 @@
     <ClInclude Include="..\..\..\Include\ogldev_color_technique.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\Techniques\ogldev_square_vs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -432,6 +435,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_color_technique.cpp">
+      <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\Techniques\ogldev_square_vs.cpp">
       <Filter>Source Files\Techniques</Filter>
     </ClCompile>
   </ItemGroup>

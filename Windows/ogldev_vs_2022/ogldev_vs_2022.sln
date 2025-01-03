@@ -172,6 +172,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\skydome.vs = ..\..\Common\Shaders\skydome.vs
 		..\..\Common\Shaders\sprite.fs = ..\..\Common\Shaders\sprite.fs
 		..\..\Common\Shaders\sprite.vs = ..\..\Common\Shaders\sprite.vs
+		..\..\Common\Shaders\square.vs = ..\..\Common\Shaders\square.vs
 		..\..\Common\Shaders\tex.fs = ..\..\Common\Shaders\tex.fs
 		..\..\Common\Shaders\tex.vs = ..\..\Common\Shaders\tex.vs
 		..\..\Common\Shaders\wireframe_on_mesh.gs = ..\..\Common\Shaders\wireframe_on_mesh.gs
@@ -467,6 +468,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BRDF_LUT", "BRDF_LUT\BRDF.v
 	ProjectSection(ProjectDependencies) = postProject
 		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Water", "Water\Water.vcxproj", "{7D13D331-42B1-4563-8552-92E53AD4A605}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1300,6 +1303,14 @@ Global
 		{D987C331-0DEE-4940-87F2-E39469B090D0}.Release|x64.Build.0 = Release|x64
 		{D987C331-0DEE-4940-87F2-E39469B090D0}.Release|x86.ActiveCfg = Release|Win32
 		{D987C331-0DEE-4940-87F2-E39469B090D0}.Release|x86.Build.0 = Release|Win32
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Debug|x64.ActiveCfg = Debug|x64
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Debug|x64.Build.0 = Debug|x64
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Debug|x86.ActiveCfg = Debug|Win32
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Debug|x86.Build.0 = Debug|Win32
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x64.ActiveCfg = Release|x64
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x64.Build.0 = Release|x64
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x86.ActiveCfg = Release|Win32
+		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1415,6 +1426,7 @@ Global
 		{DB269AC5-FD72-4D70-B842-F5D39E0D0BEF} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{7570AA4A-A55A-4302-B797-E53C4E935446} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{D987C331-0DEE-4940-87F2-E39469B090D0} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{7D13D331-42B1-4563-8552-92E53AD4A605} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
