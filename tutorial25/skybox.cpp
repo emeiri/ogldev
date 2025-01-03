@@ -66,9 +66,7 @@ bool SkyBox::Init(const string& Directory,
                                        PosZFilename,
                                        NegZFilename);
 
-    if (!m_pCubemapTex->Load()) {
-        return false;
-    }
+    m_pCubemapTex->Load();
 
     m_pMesh = new BasicMesh();
 

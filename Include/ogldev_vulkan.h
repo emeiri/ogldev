@@ -30,7 +30,6 @@
 #else
 #define VK_USE_PLATFORM_XCB_KHR
 #include <vulkan/vulkan.h>
-#include <vulkan/vk_sdk_platform.h>
 #endif
 
 #include "ogldev_util.h"

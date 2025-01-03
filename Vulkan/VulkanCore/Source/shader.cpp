@@ -17,7 +17,9 @@
 */
 
 #include <stdio.h>
+#ifdef _WIN64
 #include <direct.h>
+#endif
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -183,7 +185,11 @@ VkShaderModule CreateShaderModuleFromText(VkDevice Device, const char* pFilename
 	std::string Source;
 
 	char CurWorkDir[256];
+#ifdef _WIN64
 	_getcwd(&CurWorkDir[0], ARRAY_SIZE_IN_ELEMENTS(CurWorkDir));
+#else
+	getcwd(&CurWorkDir[0], ARRAY_SIZE_IN_ELEMENTS(CurWorkDir));
+#endif
 
 	if (!ReadFile(pFilename, Source)) {
 		printf("Current work dir: %s\n", CurWorkDir);

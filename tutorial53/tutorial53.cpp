@@ -110,8 +110,8 @@ void OgldevVulkanApp::CreateSwapChain()
 
     uint NumImages = 2;
 
-    assert(NumImages >= SurfaceCaps.minImageCount);
-    assert(NumImages <= SurfaceCaps.maxImageCount);
+    //assert(NumImages >= SurfaceCaps.minImageCount);
+    //assert(NumImages <= SurfaceCaps.maxImageCount);
       
     VkSwapchainCreateInfoKHR SwapChainCreateInfo = {};
     
