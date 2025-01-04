@@ -22,7 +22,7 @@
 
 namespace OgldevVK {
 
-void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
+static void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
 {
 	GLFWCallbacks* pGLFWCallbacks = (GLFWCallbacks*)glfwGetWindowUserPointer(pWindow);
 
@@ -30,7 +30,7 @@ void GLFW_KeyCallback(GLFWwindow* pWindow, int Key, int Scancode, int Action, in
 }
 
 
-void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
+static void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
 {
 	GLFWCallbacks* pGLFWCallbacks = (GLFWCallbacks*)glfwGetWindowUserPointer(pWindow);
 
@@ -38,7 +38,7 @@ void GLFW_MouseCallback(GLFWwindow* pWindow, double xpos, double ypos)
 }
 
 
-void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
+static void GLFW_MouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mods)
 {
 	GLFWCallbacks* pGLFWCallbacks = (GLFWCallbacks*)glfwGetWindowUserPointer(pWindow);
 
