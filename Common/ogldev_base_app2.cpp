@@ -116,6 +116,11 @@ bool OgldevBaseApp2::KeyboardCB(int Key, int Action, int Mods)
     bool Handled = true;
     
     switch (Key) {
+    case GLFW_KEY_C:
+        if (Action == GLFW_PRESS) {
+            m_pGameCamera->Print();
+        }
+        break;
     case GLFW_KEY_ESCAPE:
     case GLFW_KEY_Q:
         glfwDestroyWindow(m_pWindow);
