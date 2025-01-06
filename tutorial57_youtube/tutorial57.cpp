@@ -77,7 +77,9 @@ public:
 		
         glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-        m_particles.Update(dt);
+        if (!m_isPaused) {
+            m_particles.Update(dt);
+        }
 
         m_particles.Render(VP);
 
