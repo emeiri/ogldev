@@ -57,7 +57,7 @@ public:
     {
         InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 57");
 
-        m_pGameCamera->SetPos(glm::vec3(0.0f, 0.5f, 0.0f));
+        m_pGameCamera->SetPos(glm::vec3(0.0f, 0.5f, -15.0f));
 
         InitInfiniteGrid();
 
