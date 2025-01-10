@@ -91,9 +91,9 @@ public:
 
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 	
-	void CreateTexture(const char* filename, VulkanTexture& Tex);
+	void CreateTexture(const char* filename, VulkanTexture& Tex);	
 
-	void GetFramebufferSize(int& Width, int& Height) const;
+	VulkanTexture CreateDepthBuffer();
 
 private:
 
@@ -121,6 +121,7 @@ private:
 	void TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
 	VkCommandBuffer CreateAndBeginSingleUseCommand();
 	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
+	void GetFramebufferSize(int& Width, int& Height) const;
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
@@ -136,6 +137,8 @@ private:
 	VkCommandPool m_cmdBufPool;
 	VulkanQueue m_queue;
 	VkCommandBuffer m_copyCmdBuf;
+	int m_windowWidth = 0;
+	int m_windowHeight = 0;
 };
 
 }

@@ -106,6 +106,7 @@ VulkanCore::~VulkanCore()
 void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow)
 {
 	m_pWindow = pWindow;
+	GetFramebufferSize(m_windowWidth, m_windowHeight);
 	CreateInstance(pAppName);
 	CreateDebugCallback();
 	if (!pWindow) {
@@ -325,7 +326,7 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 }
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
-	VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
+							VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -410,7 +411,7 @@ void VulkanCore::CreateSwapChain()
 	int MipLevels = 1;
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
 		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format,
-			VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+			                              VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
 	}
 }
 
@@ -515,9 +516,6 @@ std::vector<VkFramebuffer> VulkanCore::CreateFramebuffers(VkRenderPass RenderPas
 	std::vector<VkFramebuffer> frameBuffers;
 	frameBuffers.resize(m_images.size());
 
-	int WindowWidth, WindowHeight;
-	GetFramebufferSize(WindowWidth, WindowHeight);
-
 	VkResult res;
 
 	for (uint i = 0; i < m_images.size(); i++) {
@@ -527,8 +525,8 @@ std::vector<VkFramebuffer> VulkanCore::CreateFramebuffers(VkRenderPass RenderPas
 		fbCreateInfo.renderPass = RenderPass;
 		fbCreateInfo.attachmentCount = 1;
 		fbCreateInfo.pAttachments = &m_imageViews[i];
-		fbCreateInfo.width = WindowWidth;
-		fbCreateInfo.height = WindowHeight;
+		fbCreateInfo.width = m_windowWidth;
+		fbCreateInfo.height = m_windowHeight;
 		fbCreateInfo.layers = 1;
 
 		res = vkCreateFramebuffer(m_device, &fbCreateInfo, NULL, &frameBuffers[i]);
@@ -1045,6 +1043,28 @@ void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
 }
 
 
+VulkanTexture VulkanCore::CreateDepthBuffer()
+{
+	VulkanTexture DepthTex;
+	VkImageCreateFlags CreateFlags = 0;
+	int MipLevels = 1;
+	VkFormat DepthFormat = m_physDevices.Selected().m_depthFormat;
+
+	CreateImage(DepthTex, m_windowWidth, m_windowHeight, DepthFormat, VK_IMAGE_TILING_OPTIMAL, 
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, CreateFlags, MipLevels);
+
+	int LayerCount = 1;
+	CreateImageView(m_device, DepthTex.m_image, DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 
+		            VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+
+	VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	TransitionImageLayout(DepthTex.m_image, DepthFormat, OldLayout, NewLayout, LayerCount, MipLevels);
+
+	return DepthTex;
+}
+
+
 void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
 {
 	void* pMem = NULL;
@@ -1053,6 +1073,5 @@ void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
 	memcpy(pMem, pData, Size);
 	vkUnmapMemory(Device, m_mem);
 }
-
 
 }

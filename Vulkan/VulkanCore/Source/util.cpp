@@ -108,4 +108,25 @@ bool HasStencilComponent(VkFormat Format)
 		    (Format == VK_FORMAT_D24_UNORM_S8_UINT));
 }
 
+
+VkFormat FindSupportedFormat(VkPhysicalDevice Device, const std::vector<VkFormat>& Candidates, 
+	                         VkImageTiling Tiling, VkFormatFeatureFlags Features) 
+{
+	for (int i = 0 ; i < Candidates.size() ; i++) {
+		VkFormat Format = Candidates[i];
+		VkFormatProperties Props;
+		vkGetPhysicalDeviceFormatProperties(Device, Format, &Props);
+
+		if ((Tiling == VK_IMAGE_TILING_LINEAR) && (Props.linearTilingFeatures & Features) == Features) {
+			return Format;
+		} else if (Tiling == VK_IMAGE_TILING_OPTIMAL && (Props.optimalTilingFeatures & Features) == Features) {
+			return Format;
+		}
+	}
+
+	printf("Failed to find supported format!\n");
+	exit(1);
+}
+
+
 }

@@ -405,6 +405,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial11", "Vulkan\Tutori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PBRTextures", "PBRTextures\PBRTextures.vcxproj", "{A905FE76-7290-48E7-AD86-E918753F516D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial52_NormalMapping", "Tutorial52_NormalMapping\Tutorial52.vcxproj", "{7895318F-15FC-4CC3-B941-E669BB2892BA}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -451,6 +454,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15", "Vulkan\Tutori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial16", "Vulkan\Tutorial16\Tutorial16.vcxproj", "{2445069E-C7A3-44CF-937E-BB01DF9E0F22}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17", "Vulkan\Tutorial17\Tutorial17.vcxproj", "{D0A8FCCA-9DCD-420B-A6A3-401EFE6DDE9B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -463,6 +469,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial57_ComputeShaderPar
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial18", "Vulkan\Tutorial18\Tutorial18.vcxproj", "{7570AA4A-A55A-4302-B797-E53C4E935446}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BRDF_LUT", "BRDF_LUT\BRDF.vcxproj", "{D987C331-0DEE-4940-87F2-E39469B090D0}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -470,6 +479,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BRDF_LUT", "BRDF_LUT\BRDF.v
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Water", "Water\Water.vcxproj", "{7D13D331-42B1-4563-8552-92E53AD4A605}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19", "Vulkan\Tutorial19\Tutorial19.vcxproj", "{19BC8366-11D8-45F4-9991-A6B094B6715E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1311,6 +1328,14 @@ Global
 		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x64.Build.0 = Release|x64
 		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x86.ActiveCfg = Release|Win32
 		{7D13D331-42B1-4563-8552-92E53AD4A605}.Release|x86.Build.0 = Release|Win32
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Debug|x64.ActiveCfg = Debug|x64
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Debug|x64.Build.0 = Debug|x64
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Debug|x86.ActiveCfg = Debug|Win32
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Debug|x86.Build.0 = Debug|Win32
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Release|x64.ActiveCfg = Release|x64
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Release|x64.Build.0 = Release|x64
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Release|x86.ActiveCfg = Release|Win32
+		{19BC8366-11D8-45F4-9991-A6B094B6715E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1427,6 +1452,7 @@ Global
 		{7570AA4A-A55A-4302-B797-E53C4E935446} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{D987C331-0DEE-4940-87F2-E39469B090D0} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{7D13D331-42B1-4563-8552-92E53AD4A605} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{19BC8366-11D8-45F4-9991-A6B094B6715E} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}

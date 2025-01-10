@@ -83,6 +83,19 @@ static void PrintMemoryProperty(VkMemoryPropertyFlags PropertyFlags)
 }
 
 
+static VkFormat FindDepthFormat(VkPhysicalDevice Device)
+{
+    std::vector<VkFormat> Candidates = { VK_FORMAT_D32_SFLOAT, 
+                                         VK_FORMAT_D32_SFLOAT_S8_UINT, 
+                                         VK_FORMAT_D24_UNORM_S8_UINT };
+    
+    VkFormat DepthFormat = FindSupportedFormat(Device, Candidates, VK_IMAGE_TILING_OPTIMAL,
+                                               VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+ 
+    return DepthFormat;
+}
+
+
 void VulkanPhysicalDevices::Init(const VkInstance& Instance, const VkSurfaceKHR& Surface)
 {
     u32 NumDevices = 0;
@@ -187,7 +200,9 @@ void VulkanPhysicalDevices::Init(const VkInstance& Instance, const VkSurfaceKHR&
         printf("Num heap types %d\n", m_devices[i].m_memProps.memoryHeapCount);
         printf("\n");
 
-        vkGetPhysicalDeviceFeatures(m_devices[i].m_physDevice, &m_devices[i].m_features);
+        vkGetPhysicalDeviceFeatures(PhysDev, &m_devices[i].m_features);
+
+        m_devices[i].m_depthFormat = FindDepthFormat(PhysDev);
     }
 }
 

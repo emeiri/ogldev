@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 #include <vulkan/vulkan.h>
 
@@ -40,4 +41,6 @@ u32 GetBytesPerTexFormat(VkFormat Format);
 
 bool HasStencilComponent(VkFormat Format);
 
+VkFormat FindSupportedFormat(VkPhysicalDevice Device, const std::vector<VkFormat>& Candidates,
+							 VkImageTiling Tiling, VkFormatFeatureFlags Features);
 }
