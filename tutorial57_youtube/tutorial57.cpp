@@ -27,7 +27,6 @@
 #include "ogldev_vertex_buffer.h"
 #include "ogldev_base_app2.h"
 #include "ogldev_infinite_grid.h"
-#include "ogldev_glm_camera.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_phong_renderer.h"
 #include "particles.h"
