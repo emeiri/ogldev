@@ -73,7 +73,7 @@ const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type)
 }
 
 
-uint32_t GetBytesPerTexFormat(VkFormat Format)
+int GetBytesPerTexFormat(VkFormat Format)
 {
 	switch (Format)
 	{
@@ -95,7 +95,8 @@ uint32_t GetBytesPerTexFormat(VkFormat Format)
 	case VK_FORMAT_R32G32B32A32_SFLOAT:
 		return 4 * sizeof(float);
 	default:
-		break;
+		printf("Unknown format %d\n", Format);
+		exit(1);
 	}
 
 	return 0;

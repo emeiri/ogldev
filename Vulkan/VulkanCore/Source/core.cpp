@@ -421,7 +421,7 @@ void VulkanCore::CreateCommandBufferPool()
 	VkCommandPoolCreateInfo cmdPoolCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 		.pNext = NULL,
-		.flags = 0,
+		.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
 		.queueFamilyIndex = m_queueFamily
 	};
 
@@ -575,7 +575,7 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 	BufferAndMemory VB = CreateBuffer(Size, Usage, MemProps);
 
 	// Step 6: copy the staging buffer to the final buffer
-	CopyBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
+	CopyBufferToBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
 
 	// Step 7: release the resources of the staging buffer
 	StagingVB.Destroy(m_device);
@@ -650,6 +650,7 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	int ImageHeight = 0;
 	int ImageChannels = 0;
 
+	// Step #1: load the image pixels
 	stbi_uc* pPixels = stbi_load(pFilename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
 
 	if (!pPixels) {
@@ -657,24 +658,28 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 		exit(1);
 	}
 
+	// Step #2: create the image object and populate it with pixels
 	u32 LayerCount = 1;
 	VkImageCreateFlags Flags = 0;
 	VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
 	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, LayerCount, Flags);
 
+	// Step #3: release the image pixels. We don't need them after this point
 	stbi_image_free(pPixels);
 
 	VkImageViewType ViewType = VK_IMAGE_VIEW_TYPE_2D;
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
 	u32 MipLevels = 1;
 
+	// Step #4: create the image view
 	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, ViewType, LayerCount, MipLevels);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-	CreateTextureSampler(m_device, &Tex.m_sampler, MinFilter, MaxFilter, AddressMode);
+	// Step #5: create the texture sampler
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
 
 	printf("Texture from '%s' created\n", pFilename);
 }
@@ -745,7 +750,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 
 void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout)
 {
-	u32 BytesPerPixel = GetBytesPerTexFormat(TexFormat);
+	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
 	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
 	VkDeviceSize ImageSize = LayerSize * LayerCount;
@@ -758,45 +763,21 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
 	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, 1);
-	CopyBufferToImage(StagingTex.m_buffer, Tex.m_image, ImageWidth, ImageHeight, LayerCount);
+	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, LayerCount);
 	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, 1);
 
 	StagingTex.Destroy(m_device);
 }
 
 
-void VulkanCore::CopyBufferToImage(VkBuffer Buffer, VkImage Image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount)
-{
-	VkCommandBuffer CmdBuf = CreateAndBeginSingleUseCommand();
-
-	VkBufferImageCopy Region = {
-		.bufferOffset = 0,
-		.bufferRowLength = 0,
-		.bufferImageHeight = 0,
-		.imageSubresource = VkImageSubresourceLayers {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.mipLevel = 0,
-			.baseArrayLayer = 0,
-			.layerCount = LayerCount
-		},
-		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
-		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
-	};
-
-	vkCmdCopyBufferToImage(CmdBuf, Buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
-
-	EndSingleTimeCommands(CmdBuf);
-}
-
-
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
 {
-	VkCommandBuffer CmdBuf = CreateAndBeginSingleUseCommand();
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	TransitionImageLayoutCmd(CmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
+	TransitionImageLayoutCmd(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
 
-	EndSingleTimeCommands(CmdBuf);
+	SubmitCopyCommand();
 }
 
 
@@ -947,7 +928,7 @@ void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image,
 }
 
 
-void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
+void VulkanCore::CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -959,12 +940,33 @@ void VulkanCore::CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size)
 
 	vkCmdCopyBuffer(m_copyCmdBuf, Src, Dst, 1, &BufferCopy);
 
-	vkEndCommandBuffer(m_copyCmdBuf);
-
-	m_queue.SubmitSync(m_copyCmdBuf);
-
-	m_queue.WaitIdle();
+	SubmitCopyCommand();
 }
+
+
+void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, u32 LayerCount)
+{
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	VkBufferImageCopy Region = {
+		.bufferOffset = 0,
+		.bufferRowLength = 0,
+		.bufferImageHeight = 0,
+		.imageSubresource = VkImageSubresourceLayers {
+			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+			.mipLevel = 0,
+			.baseArrayLayer = 0,
+			.layerCount = LayerCount
+		},
+		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
+		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
+	};
+
+	vkCmdCopyBufferToImage(m_copyCmdBuf, Src, Dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
+
+	SubmitCopyCommand();
+}
+
 
 
 u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags ReqMemPropFlags)
@@ -1019,27 +1021,13 @@ std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size)
 }
 
 
-VkCommandBuffer VulkanCore::CreateAndBeginSingleUseCommand()
+void VulkanCore::SubmitCopyCommand()
 {
-	VkCommandBuffer CmdBuf;
+	vkEndCommandBuffer(m_copyCmdBuf);
 
-	CreateCommandBuffers(1, &CmdBuf);
-
-	BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-	return CmdBuf;
-}
-
-
-void VulkanCore::EndSingleTimeCommands(VkCommandBuffer CmdBuf)
-{
-	vkEndCommandBuffer(CmdBuf);
-
-	m_queue.SubmitSync(CmdBuf);
+	m_queue.SubmitSync(m_copyCmdBuf);
 
 	m_queue.WaitIdle();
-
-	vkFreeCommandBuffers(m_device, m_cmdBufPool, 1, &CmdBuf);
 }
 
 

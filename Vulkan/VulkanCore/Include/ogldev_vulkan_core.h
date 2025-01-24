@@ -107,7 +107,7 @@ private:
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
-	void CopyBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
+	void CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 
 	BufferAndMemory CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties);
 
@@ -116,11 +116,10 @@ private:
 	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling, 
 		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels);
 	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout);
-	void CopyBufferToImage(VkBuffer buffer, VkImage image, u32 ImageWidth, u32 ImageHeight, u32 LayerCount);
+	void CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, u32 LayerCount);
 	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
 	void TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels);
-	VkCommandBuffer CreateAndBeginSingleUseCommand();
-	void EndSingleTimeCommands(VkCommandBuffer CmdBuf);
+	void SubmitCopyCommand();
 	void GetFramebufferSize(int& Width, int& Height) const;
 
 	VkInstance m_instance = VK_NULL_HANDLE;

@@ -24,6 +24,6 @@
 
 namespace OgldevVK {
 
-void CreateTextureSampler(VkDevice Device, VkSampler* pSampler, VkFilter MinFilter, VkFilter MaxFilter, VkSamplerAddressMode AddressMode);
+VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter, VkSamplerAddressMode AddressMode);
 
 }
