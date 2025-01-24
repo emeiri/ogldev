@@ -325,8 +325,7 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 	return SurfaceFormats[0];
 }
 
-VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags,
-							VkImageViewType ViewType, u32 LayerCount, u32 mipLevels)
+VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -334,7 +333,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkI
 		.pNext = NULL,
 		.flags = 0,
 		.image = Image,
-		.viewType = ViewType,
+		.viewType = VK_IMAGE_VIEW_TYPE_2D,
 		.format = Format,
 		.components = {
 			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
@@ -345,9 +344,9 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkI
 		.subresourceRange = {
 			.aspectMask = AspectFlags,
 			.baseMipLevel = 0,
-			.levelCount = mipLevels,
+			.levelCount = 1,
 			.baseArrayLayer = 0,
-			.layerCount = LayerCount
+			.layerCount = 1
 		}
 	};
 
@@ -407,11 +406,8 @@ void VulkanCore::CreateSwapChain()
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, m_images.data());
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 
-	int LayerCount = 1;
-	int MipLevels = 1;
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
-		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format,
-			                              VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
@@ -659,20 +655,15 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	}
 
 	// Step #2: create the image object and populate it with pixels
-	u32 LayerCount = 1;
-	VkImageCreateFlags Flags = 0;
 	VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
-	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, LayerCount, Flags);
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format);
 
 	// Step #3: release the image pixels. We don't need them after this point
 	stbi_image_free(pPixels);
 
-	VkImageViewType ViewType = VK_IMAGE_VIEW_TYPE_2D;
-	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	u32 MipLevels = 1;
-
 	// Step #4: create the image view
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, ViewType, LayerCount, MipLevels);
+	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
@@ -694,29 +685,32 @@ void VulkanTexture::Destroy(VkDevice Device)
 }
 
 
-void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
-											VkFormat TexFormat, u32 LayerCount, VkImageCreateFlags CreateFlags)
+void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, 
+											u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat)
 {
+	u32 LayerCount = 1;
+	VkImageCreateFlags Flags = 0;
+
 	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, VK_IMAGE_TILING_OPTIMAL, 
 			    (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
-		        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, CreateFlags, 1);
+		        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, VK_IMAGE_LAYOUT_UNDEFINED);
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, pPixels, VK_IMAGE_LAYOUT_UNDEFINED);
 }
 
 
 void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling,
-	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, VkImageCreateFlags CreateFlags, u32 MipLevels)
+	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags)
 {
 	VkImageCreateInfo ImageInfo = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 		.pNext = NULL,
-		.flags = CreateFlags,
+		.flags = 0,
 		.imageType = VK_IMAGE_TYPE_2D,
 		.format = TexFormat,
 		.extent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 },
-		.mipLevels = MipLevels,
-		.arrayLayers = (u32)((CreateFlags == VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT) ? 6 : 1),
+		.mipLevels = 1,
+		.arrayLayers = 1,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.tiling = ImageTiling,
 		.usage = UsageFlags,
@@ -748,11 +742,12 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 }
 
 
-void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, u32 LayerCount, const void* pPixels, VkImageLayout SourceImageLayout)
+void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, const void* pPixels, VkImageLayout SourceImageLayout)
 {
 	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
 	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
+	int LayerCount = 1;
 	VkDeviceSize ImageSize = LayerSize * LayerCount;
 
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
@@ -762,26 +757,26 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
-	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, 1);
-	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, LayerCount);
-	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, 1);
+	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight);
+	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	StagingTex.Destroy(m_device);
 }
 
 
 
-void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
+void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	TransitionImageLayoutCmd(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
+	TransitionImageLayoutCmd(m_copyCmdBuf, Image, Format, OldLayout, NewLayout);
 
 	SubmitCopyCommand();
 }
 
 
-void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, u32 LayerCount, u32 MipLevels)
+void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout)
 {
 	VkImageMemoryBarrier barrier = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -796,9 +791,9 @@ void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image,
 		.subresourceRange = VkImageSubresourceRange {
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 			.baseMipLevel = 0,
-			.levelCount = MipLevels,
+			.levelCount = 1,
 			.baseArrayLayer = 0,
-			.layerCount = LayerCount
+			.layerCount = 1
 		}
 	};
 
@@ -944,7 +939,7 @@ void VulkanCore::CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Siz
 }
 
 
-void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, u32 LayerCount)
+void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -956,7 +951,7 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u3
 			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
 			.mipLevel = 0,
 			.baseArrayLayer = 0,
-			.layerCount = LayerCount
+			.layerCount = 1
 		},
 		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
 		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
@@ -1035,19 +1030,16 @@ VulkanTexture VulkanCore::CreateDepthBuffer()
 {
 	VulkanTexture DepthTex;
 	VkImageCreateFlags CreateFlags = 0;
-	int MipLevels = 1;
 	VkFormat DepthFormat = m_physDevices.Selected().m_depthFormat;
 
 	CreateImage(DepthTex, m_windowWidth, m_windowHeight, DepthFormat, VK_IMAGE_TILING_OPTIMAL, 
-				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, CreateFlags, MipLevels);
+				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	int LayerCount = 1;
-	CreateImageView(m_device, DepthTex.m_image, DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, 
-		            VK_IMAGE_VIEW_TYPE_2D, LayerCount, MipLevels);
+	CreateImageView(m_device, DepthTex.m_image, DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 
 	VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-	TransitionImageLayout(DepthTex.m_image, DepthFormat, OldLayout, NewLayout, LayerCount, MipLevels);
+	TransitionImageLayout(DepthTex.m_image, DepthFormat, OldLayout, NewLayout);
 
 	return DepthTex;
 }
