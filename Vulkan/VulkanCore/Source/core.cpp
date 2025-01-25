@@ -612,7 +612,7 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 	printf("Buffer created\n");
 
 	// Step 2: get the buffer memory requirements
-	VkMemoryRequirements MemReqs = {};
+	VkMemoryRequirements MemReqs = { 0 };
 	vkGetBufferMemoryRequirements(m_device, Buf.m_buffer, &MemReqs);
 	printf("Buffer requires %d bytes\n", (int)MemReqs.size);
 
@@ -625,6 +625,7 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 	// Step 4: allocate memory
 	VkMemoryAllocateInfo MemAllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+		.pNext = NULL,
 		.allocationSize = MemReqs.size,
 		.memoryTypeIndex = MemoryTypeIndex
 	};
@@ -688,18 +689,16 @@ void VulkanTexture::Destroy(VkDevice Device)
 void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, 
 											u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat)
 {
-	u32 LayerCount = 1;
-	VkImageCreateFlags Flags = 0;
+	VkImageUsageFlagBits Usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
+														VK_IMAGE_USAGE_SAMPLED_BIT);
+	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags);
 
-	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, VK_IMAGE_TILING_OPTIMAL, 
-			    (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
-		        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, pPixels, VK_IMAGE_LAYOUT_UNDEFINED);
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, pPixels);
 }
 
 
-void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageTiling ImageTiling,
+void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat,
 	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags)
 {
 	VkImageCreateInfo ImageInfo = {
@@ -712,7 +711,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 		.mipLevels = 1,
 		.arrayLayers = 1,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.tiling = ImageTiling,
+		.tiling = VK_IMAGE_TILING_OPTIMAL,
 		.usage = UsageFlags,
 		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 		.queueFamilyIndexCount = 0,
@@ -720,206 +719,74 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
 	};
 
+	// Step #1: create the image object
 	VkResult res = vkCreateImage(m_device, &ImageInfo, NULL, &Tex.m_image);
 	CHECK_VK_RESULT(res, "vkCreateImage error");
 
-	VkMemoryRequirements MemReqs;
+	// Step 2: get the buffer memory requirements
+	VkMemoryRequirements MemReqs = { 0 };
 	vkGetImageMemoryRequirements(m_device, Tex.m_image, &MemReqs);
+	printf("Image requires %d bytes\n", (int)MemReqs.size);
 
+	// Step 3: get the memory type index
 	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, PropertyFlags);
+	printf("Memory type index %d\n", MemoryTypeIndex);
 
-	VkMemoryAllocateInfo allocInfo = {
+	// Step 4: allocate memory
+	VkMemoryAllocateInfo MemAllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 		.pNext = NULL,
 		.allocationSize = MemReqs.size,
 		.memoryTypeIndex = MemoryTypeIndex
 	};
 
-	res = vkAllocateMemory(m_device, &allocInfo, NULL, &Tex.m_mem);
+	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &Tex.m_mem);
 	CHECK_VK_RESULT(res, "vkAllocateMemory error");
 
-	vkBindImageMemory(m_device, Tex.m_image, Tex.m_mem, 0);
+	// Step 5: bind memory
+	res = vkBindImageMemory(m_device, Tex.m_image, Tex.m_mem, 0);
+	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
 }
 
 
-void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, const void* pPixels, VkImageLayout SourceImageLayout)
+void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, 
+								    VkFormat TexFormat, const void* pPixels)
 {
 	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
 	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
 	int LayerCount = 1;
-	VkDeviceSize ImageSize = LayerSize * LayerCount;
+	VkDeviceSize ImageSize = LayerCount * LayerSize;
 
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	VkMemoryPropertyFlags Properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	VkMemoryPropertyFlags Properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
+									   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 	BufferAndMemory StagingTex = CreateBuffer(ImageSize, Usage, Properties);
 
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
-	TransitionImageLayout(Tex.m_image, TexFormat, SourceImageLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	TransitionImageLayout(Tex.m_image, TexFormat, 
+						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	
 	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight);
-	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	
+	TransitionImageLayout(Tex.m_image, TexFormat, 
+						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	StagingTex.Destroy(m_device);
 }
 
 
 
-void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout)
+void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 
+									   VkImageLayout OldLayout, VkImageLayout NewLayout)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	TransitionImageLayoutCmd(m_copyCmdBuf, Image, Format, OldLayout, NewLayout);
+	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout);
 
 	SubmitCopyCommand();
-}
-
-
-void VulkanCore::TransitionImageLayoutCmd(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout)
-{
-	VkImageMemoryBarrier barrier = {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.pNext = NULL,
-		.srcAccessMask = 0,
-		.dstAccessMask = 0,
-		.oldLayout = OldLayout,
-		.newLayout = NewLayout,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = Image,
-		.subresourceRange = VkImageSubresourceRange {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		}
-	};
-
-	VkPipelineStageFlags sourceStage;
-	VkPipelineStageFlags destinationStage;
-
-	if (NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL ||
-		(Format == VK_FORMAT_D16_UNORM) ||
-		(Format == VK_FORMAT_X8_D24_UNORM_PACK32) ||
-		(Format == VK_FORMAT_D32_SFLOAT) ||
-		(Format == VK_FORMAT_S8_UINT) ||
-		(Format == VK_FORMAT_D16_UNORM_S8_UINT) ||
-		(Format == VK_FORMAT_D24_UNORM_S8_UINT))
-	{
-		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-
-		if (HasStencilComponent(Format)) {
-			barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
-		}
-	}
-	else {
-		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	}
-
-	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-	else
-		if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
-			barrier.srcAccessMask = 0;
-			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-			sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		}
-	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-	}
-	/* Convert back from read-only to updateable */
-	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-	}
-	/* Convert from updateable texture to shader read-only */
-	else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-	/* Convert depth texture from undefined state to depth-stencil buffer */
-	else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-		barrier.srcAccessMask = 0;
-		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-		destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	}
-
-	/* Wait for render pass to complete */
-	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-		barrier.srcAccessMask = 0; // VK_ACCESS_SHADER_READ_BIT;
-		barrier.dstAccessMask = 0;
-		/*
-				sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		///		destinationStage = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
-				destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		*/
-		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-
-	/* Convert back from read-only to color attachment */
-	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
-		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	}
-	/* Convert from updateable texture to shader read-only */
-	else if (OldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-		barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-
-	/* Convert back from read-only to depth attachment */
-	else if (OldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		destinationStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-	}
-	/* Convert from updateable depth texture to shader read-only */
-	else if (OldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-		barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		sourceStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-
-	vkCmdPipelineBarrier(
-		CmdBuf,
-		sourceStage, destinationStage,
-		0,
-		0, NULL,
-		0, NULL,
-		1, &barrier
-	);
 }
 
 
@@ -957,8 +824,8 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u3
 		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
 	};
 
-	vkCmdCopyBufferToImage(m_copyCmdBuf, Src, Dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &Region);
-
+	vkCmdCopyBufferToImage(m_copyCmdBuf, Src, Dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+						   1, &Region);
 	SubmitCopyCommand();
 }
 
@@ -1032,7 +899,7 @@ VulkanTexture VulkanCore::CreateDepthBuffer()
 	VkImageCreateFlags CreateFlags = 0;
 	VkFormat DepthFormat = m_physDevices.Selected().m_depthFormat;
 
-	CreateImage(DepthTex, m_windowWidth, m_windowHeight, DepthFormat, VK_IMAGE_TILING_OPTIMAL, 
+	CreateImage(DepthTex, m_windowWidth, m_windowHeight, DepthFormat, 
 				VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	CreateImageView(m_device, DepthTex.m_image, DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);

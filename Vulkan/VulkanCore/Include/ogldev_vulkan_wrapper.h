@@ -30,4 +30,6 @@ void BeginCommandBuffer(VkCommandBuffer CommandBuffer, VkCommandBufferUsageFlags
 
 VkSemaphore CreateSemaphore(VkDevice Device);
 
+void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
+					 VkImageLayout OldLayout, VkImageLayout NewLayout);
 }

@@ -52,8 +52,8 @@ private:
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 	VkQueue m_queue = VK_NULL_HANDLE;
-	VkSemaphore m_renderCompleteSem;
-	VkSemaphore m_presentCompleteSem;
+	VkSemaphore m_renderCompleteSem = VK_NULL_HANDLE;
+	VkSemaphore m_presentCompleteSem = VK_NULL_HANDLE;
 };
 
 }
