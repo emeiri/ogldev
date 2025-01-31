@@ -53,6 +53,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError);
 #define ZERO_MEM(a) memset(a, 0, sizeof(a))
 #define ZERO_MEM_VAR(var) memset(&var, 0, sizeof(var))
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+#define ARRAY_SIZE_IN_BYTES(a) (sizeof(a[0]) * a.size())
 
 #ifndef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
