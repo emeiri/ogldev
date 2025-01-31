@@ -29,7 +29,8 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 								   const SimpleMesh* pMesh,
 								   int NumImages,
 								   std::vector<BufferAndMemory>& UniformBuffers,
-								   int UniformDataSize)
+								   int UniformDataSize,
+								   bool DepthEnabled)
 {
 	m_device = Device;
 
@@ -158,7 +159,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 		.pViewportState = &VPCreateInfo,
 		.pRasterizationState = &RastCreateInfo,
 		.pMultisampleState = &PipelineMSCreateInfo,
-		.pDepthStencilState = &DepthStencilState,
+		.pDepthStencilState = DepthEnabled ? &DepthStencilState : VK_NULL_HANDLE,
 		.pColorBlendState = &BlendCreateInfo,
 		.layout = m_pipelineLayout,
 		.renderPass = RenderPass,

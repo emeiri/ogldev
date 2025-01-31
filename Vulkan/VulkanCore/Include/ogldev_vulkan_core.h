@@ -127,7 +127,7 @@ private:
 	VulkanPhysicalDevices m_physDevices;
 	u32 m_queueFamily = 0;
 	VkDevice m_device = VK_NULL_HANDLE;
-	VkSurfaceFormatKHR m_swapChainSurfaceFormat;
+	VkSurfaceFormatKHR m_swapChainSurfaceFormat = {};
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 	std::vector<VkImage> m_images;
 	std::vector<VkImageView> m_imageViews;

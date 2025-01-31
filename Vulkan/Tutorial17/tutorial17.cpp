@@ -71,7 +71,7 @@ public:
 	{
 		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
 
-		m_vkCore.Init(pAppName, m_pWindow);
+		m_vkCore.Init(pAppName, m_pWindow, false);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -240,7 +240,7 @@ private:
 	void CreatePipeline()
 	{
 		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages, 
-													 m_uniformBuffers, sizeof(UniformData));
+													 m_uniformBuffers, sizeof(UniformData), false);
 	}
 
 

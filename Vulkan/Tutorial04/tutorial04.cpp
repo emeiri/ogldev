@@ -57,7 +57,7 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
-		m_vkCore.Init(pAppName, pWindow);
+		m_vkCore.Init(pAppName, pWindow, false);
 	}
 
 	void RenderScene()

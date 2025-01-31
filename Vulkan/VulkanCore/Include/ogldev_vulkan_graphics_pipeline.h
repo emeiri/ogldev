@@ -38,7 +38,8 @@ public:
 					 const SimpleMesh* pMesh,
 					 int NumImages,
 					 std::vector<BufferAndMemory>& UniformBuffers,
-					 int UniformDataSize);
+					 int UniformDataSize,
+					 bool DepthEnabled);
 
 
 	~GraphicsPipeline();
@@ -54,11 +55,11 @@ private:
 	void AllocateDescriptorSets(int NumImages);
 	void UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
 
-	VkDevice m_device = NULL;
-	VkPipeline m_pipeline = NULL;
-	VkPipelineLayout m_pipelineLayout = NULL;
-	VkDescriptorPool m_descriptorPool;
-	VkDescriptorSetLayout m_descriptorSetLayout;
+	VkDevice m_device = VK_NULL_HANDLE;
+	VkPipeline m_pipeline = VK_NULL_HANDLE;
+	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
+	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descriptorSets;
 };
 }

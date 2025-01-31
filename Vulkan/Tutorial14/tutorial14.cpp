@@ -65,7 +65,7 @@ public:
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
 		m_pWindow = pWindow;
-		m_vkCore.Init(pAppName, pWindow);
+		m_vkCore.Init(pAppName, pWindow, false);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -111,7 +111,7 @@ private:
 		std::vector<OgldevVK::BufferAndMemory> UniformBuffers;
 		int UniformDataSize = 0;
 
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, m_numImages, UniformBuffers, UniformDataSize);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, NULL, m_numImages, UniformBuffers, UniformDataSize, false);
 	}
 
 

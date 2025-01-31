@@ -77,12 +77,12 @@ struct Vector3i
 struct Vector2f
 {
     union {
-        float x;
+        float x = 0.0f;
         float u;
     };
 
     union {
-        float y;
+        float y = 0.0f;
         float v;
     };
 
@@ -143,17 +143,17 @@ struct Vector4f;
 struct Vector3f
 {
     union {
-        float x;
+        float x = 0.0f;
         float r;
     };
 
     union {
-        float y;
+        float y = 0.0f;
         float g;
     };
 
     union {
-        float z;
+        float z = 0.0f;
         float b;
     };
 
@@ -309,22 +309,22 @@ struct Vector3f
 struct Vector4f
 {
     union {
-        float x;
+        float x = 0.0f;
         float r;
     };
 
     union {
-        float y;
+        float y = 0.0f;
         float g;
     };
 
     union {
-        float z;
+        float z = 0.0f;
         float b;
     };
 
     union {
-        float w;
+        float w = 0.0f;
         float a;
     };
 
@@ -499,11 +499,11 @@ inline Vector4f operator*(float f, const Vector4f& l)
 
 struct PersProjInfo
 {
-    float FOV;
-    float Width;
-    float Height;
-    float zNear;
-    float zFar;
+    float FOV = 0.0f;
+    float Width = 0.0f;
+    float Height = 0.0f;
+    float zNear = 0.0f;
+    float zFar = 0.0f;
 };
 
 
@@ -555,7 +555,7 @@ Quaternion operator*(const Quaternion& q, const Vector3f& v);
 class Matrix4f
 {
 public:
-    float m[4][4];
+    float m[4][4] = { 0.0f };
 
     Matrix4f()  {}
 
@@ -701,7 +701,7 @@ private:
 class Matrix3f
 {
 public:
-    float m[3][3];
+    float m[3][3] = { 0.0f };
 
     Matrix3f()  {}
 

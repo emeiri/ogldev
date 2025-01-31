@@ -261,7 +261,7 @@ private:
 	void CreatePipeline()
 	{
 		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages, 
-													 m_uniformBuffers, sizeof(UniformData));
+													 m_uniformBuffers, sizeof(UniformData), true);
 	}
 
 
@@ -334,10 +334,10 @@ private:
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
-	VkRenderPass m_renderPass;
+	VkRenderPass m_renderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> m_frameBuffers;
-	VkShaderModule m_vs;
-	VkShaderModule m_fs;
+	VkShaderModule m_vs = VK_NULL_HANDLE;
+	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	OgldevVK::SimpleMesh m_mesh;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
