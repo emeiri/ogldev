@@ -57,9 +57,6 @@
     <ClCompile Include="..\..\..\..\Common\ogldev_glfw_camera_handler.cpp">
       <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\texture.cpp">
-      <Filter>Source Files\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp">
       <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
@@ -90,9 +87,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_glfw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,7 +25,6 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
-#include "ogldev_vulkan_texture.h"
 
 namespace OgldevVK {
 
@@ -325,36 +324,6 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 	return SurfaceFormats[0];
 }
 
-VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, VkImageAspectFlags AspectFlags)
-{
-	VkImageViewCreateInfo ViewInfo =
-	{
-		.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.image = Image,
-		.viewType = VK_IMAGE_VIEW_TYPE_2D,
-		.format = Format,
-		.components = {
-			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.g = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.b = VK_COMPONENT_SWIZZLE_IDENTITY,
-			.a = VK_COMPONENT_SWIZZLE_IDENTITY
-		},
-		.subresourceRange = {
-			.aspectMask = AspectFlags,
-			.baseMipLevel = 0,
-			.levelCount = 1,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		}
-	};
-
-	VkImageView ImageView;
-	VkResult res = vkCreateImageView(Device, &ViewInfo, NULL, &ImageView);
-	CHECK_VK_RESULT(res, "vkCreateImageView");
-	return ImageView;
-}
 
 
 void VulkanCore::CreateSwapChain()
@@ -397,7 +366,7 @@ void VulkanCore::CreateSwapChain()
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, NULL);
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 	assert(NumImages <= NumSwapChainImages);
-
+	
 	printf("Requested %d images, created %d images\n", NumImages, NumSwapChainImages);
 
 	m_images.resize(NumSwapChainImages);
@@ -656,7 +625,8 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	}
 
 	// Step #2: create the image object and populate it with pixels
-	VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
+	//VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
+	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
 	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format);
 
 	// Step #3: release the image pixels. We don't need them after this point
@@ -716,7 +686,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 		.sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 		.queueFamilyIndexCount = 0,
 		.pQueueFamilyIndices = NULL,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED
+		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 	};
 
 	// Step #1: create the image object
@@ -779,6 +749,7 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 
 
+
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 
 									   VkImageLayout OldLayout, VkImageLayout NewLayout)
 {
@@ -810,7 +781,7 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u3
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	VkBufferImageCopy Region = {
+	VkBufferImageCopy BufferImageCopy = {
 		.bufferOffset = 0,
 		.bufferRowLength = 0,
 		.bufferImageHeight = 0,
@@ -825,7 +796,7 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u3
 	};
 
 	vkCmdCopyBufferToImage(m_copyCmdBuf, Src, Dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-						   1, &Region);
+						   1, &BufferImageCopy);
 	SubmitCopyCommand();
 }
 
