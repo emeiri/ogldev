@@ -65,7 +65,7 @@ public:
 
 	~VulkanCore();
 
-	void Init(const char* pAppName, GLFWwindow* pWindow);
+	void Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled);
 
 	VkRenderPass CreateSimpleRenderPass();
 
@@ -93,8 +93,6 @@ public:
 	
 	void CreateTexture(const char* filename, VulkanTexture& Tex);	
 
-	VulkanTexture CreateDepthBuffer();
-
 private:
 
 	void CreateInstance(const char* pAppName);
@@ -104,6 +102,7 @@ private:
 	void CreateSwapChain();
 	void CreateCommandBufferPool();	
 	BufferAndMemory CreateUniformBuffer(size_t Size);
+	void CreateDepthResources();
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
@@ -127,16 +126,18 @@ private:
 	VkSurfaceKHR m_surface = VK_NULL_HANDLE;
 	VulkanPhysicalDevices m_physDevices;
 	u32 m_queueFamily = 0;
-	VkDevice m_device;
+	VkDevice m_device = VK_NULL_HANDLE;
 	VkSurfaceFormatKHR m_swapChainSurfaceFormat;
-	VkSwapchainKHR m_swapChain;
-	std::vector<VkImage> m_images;	
+	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
+	std::vector<VkImage> m_images;
 	std::vector<VkImageView> m_imageViews;
-	VkCommandPool m_cmdBufPool;
+	std::vector<VulkanTexture> m_depthImages;
+	VkCommandPool m_cmdBufPool = VK_NULL_HANDLE;
 	VulkanQueue m_queue;
-	VkCommandBuffer m_copyCmdBuf;
+	VkCommandBuffer m_copyCmdBuf = VK_NULL_HANDLE;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
+	bool m_depthEnabled = false;
 };
 
 }

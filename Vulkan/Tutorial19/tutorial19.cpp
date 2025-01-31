@@ -19,7 +19,7 @@
 		Tutorial #19: Depth Buffering
 */
 
-
+#include <array>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -71,7 +71,7 @@ public:
 	{
 		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
 
-		m_vkCore.Init(pAppName, m_pWindow);
+		m_vkCore.Init(pAppName, m_pWindow, true);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -223,9 +223,9 @@ private:
 			Vertex({1.0f, 1.0f, 0.0f},   {1.0f, 1.0f}), // Top right
 			Vertex({1.0f,  -1.0f, 0.0f}, {1.0f, 0.0f}), // Bottom right
 
-			Vertex({-1.0f, -1.0f, 0.5f}, {1.0f, 1.0f}), // Bottom left
-			Vertex({1.0f, 1.0f, 0.5f},   {0.0f, 1.0f}), // Top right
-			Vertex({1.0f,  -1.0f, 0.5f}, {1.0f, 0.0f})  // Bottom right
+			Vertex({-1.0f, -1.0f, 15.0f}, {1.0f, 1.0f}), // Bottom left
+			Vertex({1.0f, 1.0f, 15.0f},   {0.0f, 1.0f}), // Top right
+			Vertex({1.0f,  -1.0f, 15.0f}, {1.0f, 0.0f})  // Bottom right
 		};
 
 		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
@@ -267,9 +267,9 @@ private:
 
 	void RecordCommandBuffers()
 	{
-		VkClearColorValue ClearColor = { 1.0f, 0.0f, 0.0f, 0.0f };
-		VkClearValue ClearValue;
-		ClearValue.color = ClearColor;
+		std::array<VkClearValue, 2> ClearValues{};
+		ClearValues[0].color = { {1.0f, 0.0f, 0.0f, 1.0f} };
+		ClearValues[1].depthStencil = { 1.0f, 0 };
 
 		VkRenderPassBeginInfo RenderPassBeginInfo = {
 			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
@@ -285,8 +285,8 @@ private:
 					.height = WINDOW_HEIGHT
 				}
 			},
-			.clearValueCount = 1,
-			.pClearValues = &ClearValue
+			.clearValueCount = (u32)ClearValues.size(),
+			.pClearValues = ClearValues.data()
 		};
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
@@ -324,7 +324,7 @@ private:
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-		glm::mat4 WVP = VP * Rotate;
+		glm::mat4 WVP = VP;// *Rotate;
 		m_uniformBuffers[ImageIndex].Update(m_device, &WVP, sizeof(WVP));
 	}
 
