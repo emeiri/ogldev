@@ -25,6 +25,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{5a23f0b2-da9a-4db2-8d88-0945efcc8891}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Demolition">
+      <UniqueIdentifier>{63e4b337-bc16-4cfa-a22b-20a67f919b97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -439,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_square_vs.cpp">
       <Filter>Source Files\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_model.cpp">
+      <Filter>Source Files\Demolition</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

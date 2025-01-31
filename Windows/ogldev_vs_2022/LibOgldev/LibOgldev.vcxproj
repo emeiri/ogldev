@@ -73,6 +73,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\..\Lib\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)\..\Lib\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -115,7 +118,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Common\3rdparty\ImGui\GLFW;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Common\3rdparty\ImGui\GLFW;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;$(ProjectDir)\..\..\..\DemoLITION\Framework\Include;$(ProjectDir)\..\..\..\Common\</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -133,10 +137,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Common\3rdparty\ImGui\GLFW;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;$(ProjectDir)\..\..\..\DemoLITION\Framework\Include;$(ProjectDir)\..\..\..\Common\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -286,6 +291,7 @@
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_color_technique.cpp" />
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_ray_marching_technique.cpp" />
     <ClCompile Include="..\..\..\Common\Techniques\ogldev_square_vs.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Common\Shaders\basic_lighting.fs" />
