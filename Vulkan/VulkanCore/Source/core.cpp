@@ -677,7 +677,6 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	}
 
 	// Step #2: create the image object and populate it with pixels
-	//VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
 	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
 	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format);
 
