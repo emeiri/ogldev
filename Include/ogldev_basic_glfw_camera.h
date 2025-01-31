@@ -95,16 +95,16 @@ private:
     Vector3f m_up;
 
     float m_speed = 0.2f;
-    int m_windowWidth;
-    int m_windowHeight;
+    int m_windowWidth = 0;
+    int m_windowHeight = 0;
 
-    float m_AngleH;
-    float m_AngleV;
+    float m_AngleH = 0.0f;
+    float m_AngleV = 0.0f;
 
-    bool m_OnUpperEdge;
-    bool m_OnLowerEdge;
-    bool m_OnLeftEdge;
-    bool m_OnRightEdge;
+    bool m_OnUpperEdge = false;
+    bool m_OnLowerEdge = false;
+    bool m_OnLeftEdge = false;
+    bool m_OnRightEdge = false;
 
     Vector2i m_mousePos;
     
