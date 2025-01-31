@@ -89,8 +89,8 @@ bool ForwardLightingTechnique::InitCommon()
     FogTimeLoc = GetUniformLocation("gFogTime");
     LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
     
-    GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
-    GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
+   // GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
+    //GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
     GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
