@@ -73,8 +73,8 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 		}
 	};
 
-	VkPipelineStageFlags sourceStage;
-	VkPipelineStageFlags destinationStage;
+	VkPipelineStageFlags sourceStage = VK_PIPELINE_STAGE_NONE;
+	VkPipelineStageFlags destinationStage = VK_PIPELINE_STAGE_NONE;
 
 	if (NewLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL ||
 		(Format == VK_FORMAT_D16_UNORM) ||
