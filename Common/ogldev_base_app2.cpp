@@ -222,6 +222,8 @@ void OgldevBaseApp2::SetWindowShouldClose()
 void OgldevBaseApp2::Run()
 {
     float CurTime = (float)glfwGetTime();
+    float FpsTime = 0.0f;
+    int fps = 0;
 
     while (!glfwWindowShouldClose(m_pWindow)) {
         float Time = (float)glfwGetTime();
@@ -229,6 +231,13 @@ void OgldevBaseApp2::Run()
         m_pGameCamera->Update(dt);
         RenderSceneCB(dt);
         CurTime = Time;
+        FpsTime += dt;
+        if (FpsTime >= 1.0f) {
+            printf("FPS %d\n", fps);
+            FpsTime = 0.0f;
+            fps = 0;
+        }
+        fps++;
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
     }
