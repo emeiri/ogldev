@@ -130,43 +130,43 @@ private:
     GLuint VPLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
-        GLuint AmbientColor;
-        GLuint DiffuseColor;
-        GLuint SpecularColor;
+        GLuint AmbientColor = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseColor = INVALID_UNIFORM_LOCATION;
+        GLuint SpecularColor = INVALID_UNIFORM_LOCATION;
     } materialLoc;
 
     struct {
-        GLuint Color;
-        GLuint AmbientIntensity;
-        GLuint Direction;
-        GLuint DiffuseIntensity;
+        GLuint Color = INVALID_UNIFORM_LOCATION;
+        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint Direction = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
     } dirLightLoc;
 
     struct {
-        GLuint Color;
-        GLuint AmbientIntensity;
-        GLuint WorldPos;
-        GLuint DiffuseIntensity;
+        GLuint Color = INVALID_UNIFORM_LOCATION;
+        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint WorldPos = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
 
         struct
         {
-            GLuint Constant;
-            GLuint Linear;
-            GLuint Exp;
+            GLuint Constant = INVALID_UNIFORM_LOCATION;
+            GLuint Linear = INVALID_UNIFORM_LOCATION;
+            GLuint Exp = INVALID_UNIFORM_LOCATION;
         } Atten;
     } PointLightsLocation[MAX_POINT_LIGHTS];
 
     struct {
-        GLuint Color;
-        GLuint AmbientIntensity;
-        GLuint DiffuseIntensity;
-        GLuint Position;
-        GLuint Direction;
-        GLuint Cutoff;
+        GLuint Color = INVALID_UNIFORM_LOCATION;
+        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint Position = INVALID_UNIFORM_LOCATION;
+        GLuint Direction = INVALID_UNIFORM_LOCATION;
+        GLuint Cutoff = INVALID_UNIFORM_LOCATION;
         struct {
-            GLuint Constant;
-            GLuint Linear;
-            GLuint Exp;
+            GLuint Constant = INVALID_UNIFORM_LOCATION;
+            GLuint Linear = INVALID_UNIFORM_LOCATION;
+            GLuint Exp = INVALID_UNIFORM_LOCATION;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 };
