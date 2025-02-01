@@ -289,7 +289,7 @@ void ForwardRenderer::PickingRenderScene(GLScene* pScene)
         m_pickingTech.SetObjectIndex(ObjectIndex);
 
         m_pcurSceneObject = *it;
-        m_pcurSceneObject->GetModel()->Render(this);
+        RenderSingleObject(m_pcurSceneObject);
     }
 }
 
@@ -395,7 +395,7 @@ void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& 
 {
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         m_pcurSceneObject = *it;
-        m_pcurSceneObject->GetModel()->Render(this);
+        RenderSingleObject(m_pcurSceneObject);
     }
 }
 
@@ -461,13 +461,18 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
     ApplySceneConfig(pScene);
 
     ApplyLighting(pScene);
+
+    if (UseIndirectRender) {        // TODO: do this once
+        Matrix4f VP = m_pCurCamera->GetVPMatrix();
+        m_pCurLightingTech->SetVP(VP);
+    }
+
+    m_pCurLightingTech->ControlIndirectRender(UseIndirectRender);
 }
 
 
 void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
 {
-    CoreModel* pModel = pSceneObject->GetModel();
-
     if (pSceneObject->GetModel()->IsAnimated()) {
         SwitchToLightingTech(FORWARD_SKINNING);
 
@@ -484,21 +489,29 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
         SwitchToLightingTech(FORWARD_LIGHTING);
     }
 
+    CoreModel* pModel = pSceneObject->GetModel();
     bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
     bool HeightMapEnabled = pModel->GetHeightMap() != NULL;
 
     m_pCurLightingTech->ControlNormalMap(NormalMapEnabled);
     m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
-    m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));
+    m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f)); 
 
-    if (UseIndirectRender) {        // TODO: do this once
-        Matrix4f VP = m_pCurCamera->GetVPMatrix();
-        m_pCurLightingTech->SetVP(VP);
+    RenderSingleObject(pSceneObject);
+}
+
+
+void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
+{
+    CoreModel* pModel = pSceneObject->GetModel();
+
+    if (UseIndirectRender) {
+        Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+        pModel->RenderIndirect(ObjectMatrix);
     }
-
-    m_pCurLightingTech->ControlIndirectRender(UseIndirectRender);
-   
-    pModel->Render(this);
+    else {
+        pModel->Render(this);
+    }
 }
 
 

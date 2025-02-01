@@ -139,6 +139,7 @@ private:
     void SetWorldMatrix_CB_PickingPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
     Matrix4f GetViewProjectionMatrix();
+    void RenderSingleObject(CoreSceneObject* pSceneObject);
 
     int m_windowWidth = -1;
     int m_windowHeight = -1;

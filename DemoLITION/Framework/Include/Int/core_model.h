@@ -65,6 +65,8 @@ public:
 
     void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
+    void RenderIndirect(const Matrix4f& ObjectMatrix);
+
     PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
@@ -114,8 +116,6 @@ private:
     void Clear();
 
     void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
-
-    void RenderIndirect();
 
     template<typename VertexType>
     void ReserveSpace(std::vector<VertexType>& Vertices, uint NumVertices, uint NumIndices);

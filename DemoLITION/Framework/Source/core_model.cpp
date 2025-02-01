@@ -930,18 +930,16 @@ void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
 
 void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
+    assert(!UseIndirectRender);
+
     glBindVertexArray(m_VAO);
 
     if (UsePVP) {
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
     }
 
-    if (UseIndirectRender) {
-        RenderIndirect();
-    } else {
-        for (unsigned int i = 0; i < m_Meshes.size(); i++) {
-            RenderMesh(i, pRenderCallbacks);
-        }
+    for (unsigned int i = 0; i < m_Meshes.size(); i++) {
+        RenderMesh(i, pRenderCallbacks);
     }
 
     // Make sure the VAO is not changed from the outside
@@ -1064,15 +1062,23 @@ void CoreModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
 }
 
 
-void CoreModel::RenderIndirect()
+void CoreModel::RenderIndirect(const Matrix4f& ObjectMatrix)
 {
+    assert(UseIndirectRender);
+
+    glBindVertexArray(m_VAO);
+
+    if (UsePVP) {
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+    }
+
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_drawCmdBuffer);
 
     std::vector<Matrix4f> ModelMatrices;
     ModelMatrices.resize(m_Meshes.size());
 
     for (int i = 0; i < m_Meshes.size(); i++) {
-        ModelMatrices[i] = m_Meshes[i].Transformation;
+        ModelMatrices[i] = ObjectMatrix * m_Meshes[i].Transformation;
     }
 
     glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(ModelMatrices), ModelMatrices.data());
@@ -1080,6 +1086,9 @@ void CoreModel::RenderIndirect()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_perObjectBuffer);
 
     glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, (GLsizei)m_Meshes.size(), 0);
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
 }
 
 
