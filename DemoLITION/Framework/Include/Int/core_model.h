@@ -316,6 +316,9 @@ private:
     void InitSingleCamera(int Index, const aiScene* pScene);
 
     void PrepareIndirectRenderSSBOs();
+    void PrepareIndirectRenderCommands();
+    void AllocIndirectRenderPerObjectBuffer();
+    void PrepareIndirectRenderMaterials();
     void SetupRenderIndirectPerObjectData(const Matrix4f& ObjectMatrix);
 
     std::vector<Material> m_Materials;

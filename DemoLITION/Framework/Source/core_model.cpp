@@ -255,6 +255,16 @@ void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
 
 void CoreModel::PrepareIndirectRenderSSBOs()
 {
+    PrepareIndirectRenderCommands();
+
+    AllocIndirectRenderPerObjectBuffer();
+
+    PrepareIndirectRenderMaterials();
+}
+
+
+void CoreModel::PrepareIndirectRenderCommands()
+{
     std::vector<DrawElementsIndirectCommand> DrawCommands;
     DrawCommands.resize(m_Meshes.size());
 
@@ -271,11 +281,19 @@ void CoreModel::PrepareIndirectRenderSSBOs()
 
     glCreateBuffers(1, &m_drawCmdBuffer);
     glNamedBufferStorage(m_drawCmdBuffer, sizeof(DrawCommands[0]) * DrawCommands.size(),
-                         (const void*)DrawCommands.data(), 0);
+        (const void*)DrawCommands.data(), 0);
+}
 
+
+void CoreModel::AllocIndirectRenderPerObjectBuffer()
+{
     glCreateBuffers(1, &m_perObjectBuffer);
     glNamedBufferStorage(m_perObjectBuffer, sizeof(PerObjectData) * m_Meshes.size(), NULL, GL_DYNAMIC_STORAGE_BIT);
+}
 
+
+void CoreModel::PrepareIndirectRenderMaterials()
+{
     int NumMaterials = (int)m_Materials.size();
 
     m_indirectRenderData.Colors.resize(NumMaterials);
