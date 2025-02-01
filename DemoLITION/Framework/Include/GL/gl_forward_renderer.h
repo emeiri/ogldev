@@ -83,8 +83,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void UpdateAnimatedFogTime(float FogTime);
 
-    void DisableFog();
-
     void ControlRimLight(bool IsEnabled);
 
     void ControlCellShading(bool IsEnabled);

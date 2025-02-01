@@ -664,12 +664,6 @@ void ForwardRenderer::UpdateAnimatedFogTime(float FogTime)
  //   m_pCurLightingTech->SetFogTime(FogTime);
 }
 
-void ForwardRenderer::DisableFog()
-{
-    assert(0);
-//    SwitchToLightingTech();
-//    m_pCurLightingTech->SetFogColor(Vector3f(0.0f, 0.0f, 0.0f));
-}
 
 
 void ForwardRenderer::DrawStart_CB(uint DrawIndex)
