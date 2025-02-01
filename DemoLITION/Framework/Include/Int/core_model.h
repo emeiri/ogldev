@@ -305,6 +305,10 @@ private:
     void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
     void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
 
+    void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int index);
+    void LoadNormalTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
+    void LoadNormalTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+
     void LoadColors(const aiMaterial* pMaterial, int index);
 
     void InitCameras(const aiScene* pScene);

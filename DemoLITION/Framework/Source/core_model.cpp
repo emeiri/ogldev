@@ -286,8 +286,10 @@ void CoreModel::PrepareIndirectRenderSSBOs()
         m_indirectRenderData.Colors[i].AmbientColor = m_Materials[i].AmbientColor;
         m_indirectRenderData.Colors[i].DiffuseColor = m_Materials[i].DiffuseColor;
         m_indirectRenderData.Colors[i].SpecularColor = m_Materials[i].SpecularColor;
-        m_indirectRenderData.DiffuseMaps[i] = m_Materials[i].pDiffuse->GetBindlessHandle();
-        m_indirectRenderData.NormalMaps[i] = 0;//m_Materials[i].p->GetBindlessHandle();
+        GLuint64 DiffuseMapBindlessHandle = m_Materials[i].pDiffuse ? m_Materials[i].pDiffuse->GetBindlessHandle() : -1;
+        m_indirectRenderData.DiffuseMaps[i] = DiffuseMapBindlessHandle;
+        GLuint64 NormalMapBindlessHandle = m_Materials[i].pNormal ? m_Materials[i].pNormal->GetBindlessHandle() : -1;
+        m_indirectRenderData.NormalMaps[i] = NormalMapBindlessHandle;
     }
 
     glCreateBuffers(1, &m_colorsBuffer);
@@ -298,7 +300,6 @@ void CoreModel::PrepareIndirectRenderSSBOs()
 
     glCreateBuffers(1, &m_normalMapBuffer);
     glNamedBufferStorage(m_normalMapBuffer, sizeof(GLuint64) * NumMaterials, m_indirectRenderData.NormalMaps.data(), 0);
-
 }
 
 
@@ -629,6 +630,7 @@ void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 {
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
+    LoadNormalTexture(Dir, pMaterial, index);
 }
 
 
@@ -742,6 +744,62 @@ void CoreModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
         printf("Loaded specular texture '%s'\n", FullPath.c_str());
     }
 }
+
+
+void CoreModel::LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    m_Materials[MaterialIndex].pNormal = NULL;
+
+    if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+        aiString Path;
+
+        if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
+
+            if (paiTexture) {
+                LoadNormalTextureEmbedded(paiTexture, MaterialIndex);
+            }
+            else {
+                LoadNormalTextureFromFile(Dir, Path, MaterialIndex);
+            }
+        }
+    }
+}
+
+
+void CoreModel::LoadNormalTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+{
+    printf("Embeddeded nroaml texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].pNormal = new Texture(GL_TEXTURE_2D);
+    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].pNormal->Load(buffer_size, paiTexture->pcData);
+}
+
+
+void CoreModel::LoadNormalTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    string p(Path.data);
+
+    if (p == "C:\\\\") {
+        p = "";
+    }
+    else if (p.substr(0, 2) == ".\\") {
+        p = p.substr(2, p.size() - 2);
+    }
+
+    string FullPath = Dir + "/" + p;
+
+    m_Materials[MaterialIndex].pNormal = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+
+    if (!m_Materials[MaterialIndex].pNormal->Load()) {
+        printf("Error loading normal texture '%s'\n", FullPath.c_str());
+        exit(0);
+    }
+    else {
+        printf("Loaded normal texture '%s'\n", FullPath.c_str());
+    }
+}
+
 
 void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 {

@@ -47,6 +47,7 @@ class Material {
     PBRMaterial PBRmaterial;
 
     Texture* pDiffuse = NULL; // base color of the material
+    Texture* pNormal = NULL;
     Texture* pSpecularExponent = NULL;
 
     float m_transparencyFactor = 1.0f;

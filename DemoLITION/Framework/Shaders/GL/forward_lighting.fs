@@ -602,8 +602,6 @@ vec3 GetNormal()
 }
 
 
-
-
 vec4 GetTotalLight()
 {
     vec3 Normal = GetNormal(); 
@@ -624,14 +622,12 @@ vec4 GetTotalLight()
 
 void main()
 {
-
-TexCoord = TexCoord0;
-//vec3 Normal = GetNormal();
-//FragColor = vec4(GetNormal(), 0.0);
-//FragColor = vec4(TexCoord, 0.0, 0.0);
-//return;
+    TexCoord = TexCoord0;
+    //vec3 Normal = GetNormal();
+    //FragColor = vec4(GetNormal(), 0.0);
+    //FragColor = vec4(TexCoord, 0.0, 0.0);
+    //return;
     
-
     vec4 TotalLight;
     
     if (gLightingEnabled) {
