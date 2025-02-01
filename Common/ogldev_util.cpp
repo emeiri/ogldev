@@ -234,7 +234,7 @@ void OgldevFileError(const char* pFileName, uint line, const char* pFileError)
 long long GetCurrentTimeMillis()
 {
 #ifdef _WIN32
-    return GetTickCount();
+    return GetTickCount64();
 #else
     timeval t;
     gettimeofday(&t, NULL);
