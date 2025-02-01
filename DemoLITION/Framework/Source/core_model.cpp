@@ -1072,8 +1072,19 @@ void CoreModel::RenderIndirect(const Matrix4f& ObjectMatrix)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
     }
 
+    SetupRenderIndirectPerObjectData(ObjectMatrix);
+
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_drawCmdBuffer);
 
+    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, (GLsizei)m_Meshes.size(), 0);
+
+    // Make sure the VAO is not changed from the outside
+    glBindVertexArray(0);
+}
+
+
+void CoreModel::SetupRenderIndirectPerObjectData(const Matrix4f& ObjectMatrix)
+{
     std::vector<Matrix4f> ModelMatrices;
     ModelMatrices.resize(m_Meshes.size());
 
@@ -1084,11 +1095,6 @@ void CoreModel::RenderIndirect(const Matrix4f& ObjectMatrix)
     glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(ModelMatrices), ModelMatrices.data());
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_perObjectBuffer);
-
-    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, (GLsizei)m_Meshes.size(), 0);
-
-    // Make sure the VAO is not changed from the outside
-    glBindVertexArray(0);
 }
 
 
