@@ -474,7 +474,7 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
 {
     if (pSceneObject->GetModel()->IsAnimated()) {
-        SwitchToLightingTech(FORWARD_SKINNING);
+        SwitchToLightingTech(FORWARD_SKINNING);  // TODO: do we need this?
 
         float AnimationTimeSec = (float)TotalRuntimeMillis / 1000.0f;
         int AnimationIndex = 0;
@@ -486,7 +486,7 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
         }
     }
     else {
-        SwitchToLightingTech(FORWARD_LIGHTING);
+        SwitchToLightingTech(FORWARD_LIGHTING);  // TODO: do we need this?
     }
 
     CoreModel* pModel = pSceneObject->GetModel();
@@ -809,7 +809,7 @@ void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 }
 
 
-Matrix4f ForwardRenderer::GetViewProjectionMatrix()
+Matrix4f ForwardRenderer::GetViewProjectionMatrix()     // TODO: replace with GetVP from camera
 {
     Matrix4f View = m_pCurCamera->GetViewMatrix();
     Matrix4f Projection = m_pCurCamera->GetProjMatrix();
