@@ -27,6 +27,7 @@ using namespace std;
 // config flags
 static bool UsePVP = true;     // Programmable Vertex Pulling
 static bool UseMeshOptimizer = false;
+static bool UseIndirectDraw = true;
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
@@ -49,6 +50,16 @@ static bool UseMeshOptimizer = false;
                                       aiProcess_FindInvalidData | \
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
+
+
+struct DrawElementsIndirectCommand {
+    unsigned int  Count = 0;
+    unsigned int  InstanceCount = 0;
+    unsigned int  FirstIndex = 0;
+    int           BaseVertex = 0;
+    unsigned int  BaseInstance = 0;
+};
+
 
 static void traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
@@ -223,6 +234,30 @@ void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
     printf("Max pos: "); m_maxPos.Print();
 
     PopulateBuffers<VertexType>(Vertices);
+
+    if (UseIndirectDraw) {
+        
+        std::vector<DrawElementsIndirectCommand> DrawCommands;
+        DrawCommands.resize(m_Meshes.size());
+
+        for (int i = 0; i < m_Meshes.size(); i++) {
+            DrawElementsIndirectCommand Cmd;
+            Cmd.Count = m_Meshes[i].NumIndices;
+            Cmd.InstanceCount = 1;
+            Cmd.FirstIndex = m_Meshes[i].BaseIndex;
+            Cmd.BaseVertex = m_Meshes[i].BaseVertex;
+            Cmd.BaseInstance = 0;
+
+            DrawCommands[i] = Cmd;
+        }
+
+        glCreateBuffers(1, &m_drawCmdBuffer);
+        glNamedBufferStorage(m_drawCmdBuffer, sizeof(DrawCommands[0]) * DrawCommands.size(),
+                             (const void*)DrawCommands.data(), 0);
+
+        glCreateBuffers(1, &m_perObjectBuffer);
+        glNamedBufferStorage(m_perObjectBuffer, sizeof(Matrix4f) * m_Meshes.size(), NULL, GL_DYNAMIC_STORAGE_BIT);
+    }
 }
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
@@ -901,8 +936,12 @@ void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
     }
 
-    for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
-        RenderMesh(i, pRenderCallbacks);
+    if (UseIndirectDraw) {
+        RenderIndirect();
+    } else {
+        for (unsigned int i = 0; i < m_Meshes.size(); i++) {
+            RenderMesh(i, pRenderCallbacks);
+        }
     }
 
     // Make sure the VAO is not changed from the outside
@@ -1022,6 +1061,25 @@ void CoreModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
+}
+
+
+void CoreModel::RenderIndirect()
+{
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_drawCmdBuffer);
+
+    std::vector<Matrix4f> ModelMatrices;
+    ModelMatrices.resize(m_Meshes.size());
+
+    for (int i = 0; i < m_Meshes.size(); i++) {
+        ModelMatrices[i] = m_Meshes[i].Transformation;
+    }
+
+    glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(ModelMatrices), ModelMatrices.data());
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_perObjectBuffer);
+
+    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, (GLsizei)m_Meshes.size(), 0);
 }
 
 

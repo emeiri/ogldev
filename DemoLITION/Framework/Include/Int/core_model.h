@@ -115,6 +115,8 @@ private:
 
     void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
+    void RenderIndirect();
+
     template<typename VertexType>
     void ReserveSpace(std::vector<VertexType>& Vertices, uint NumVertices, uint NumIndices);
 
@@ -175,6 +177,9 @@ private:
     GLuint m_VAO = 0;
 
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
+
+    GLuint m_drawCmdBuffer = 0;     // Indirect rendering
+    GLuint m_perObjectBuffer = 0;   // Indirect rendering
 
     struct Vertex {
         Vector3f Position;

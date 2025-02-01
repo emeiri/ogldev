@@ -615,7 +615,7 @@ TexCoord = TexCoord0;
 
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    FragColor = TempColor * gColorMod + gColorAdd;
+    FragColor = TempColor * gColorMod + gColorAdd + vec4(1.0);
     //FragColor = texture(gSampler, TexCoord.xy);
     //FragColor = texture(gHeightMap, TexCoord0);
     //FragColor = TotalLight;

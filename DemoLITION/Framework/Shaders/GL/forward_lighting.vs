@@ -17,9 +17,11 @@
 */
 
 
-#version 430 core
+#version 460 core
 
-#define PVP
+layout(std430, binding = 1) restrict readonly buffer PerObject {
+    mat4 ModelMatrix[];
+};
 
 #ifdef PVP
 
@@ -110,7 +112,7 @@ void main()
 #endif
 
     vec4 Pos4 = vec4(Position, 1.0);
-    gl_Position = gWVP * Pos4;
+    gl_Position = gWVP * ModelMatrix[gl_DrawID] * Pos4;
     TexCoord0 = TexCoord;
     Normal0 = gNormalMatrix * Normal;
     Tangent0 = gNormalMatrix * Tangent;

@@ -488,6 +488,9 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
     m_pCurLightingTech->ControlNormalMap(NormalMapEnabled);
     m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
     m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));
+
+    Matrix4f VP = m_pCurCamera->GetVPMatrix();
+    m_pCurLightingTech->SetWVP(VP);
    
     pModel->Render(this);
 }
@@ -749,7 +752,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
   //  printf("Lighting pass\n"); WVP.Print(); exit(1);
-    m_pCurLightingTech->SetWVP(WVP);
+  //  m_pCurLightingTech->SetWVP(WVP);
 
     Matrix4f LightWVP;
     
