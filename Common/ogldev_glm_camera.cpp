@@ -103,10 +103,12 @@ void GLMCameraFirstPerson::CalcVelocity(float dt)
 	} else {
 		m_velocity += Acceleration * m_acceleration * dt;
 		float MaxSpeed = m_movement.FastSpeed ? m_maxSpeed * m_fastCoef : m_maxSpeed;
-
+		//printf("MaxSpeed %f\n", MaxSpeed);
 		if (glm::length(m_velocity) > MaxSpeed) {
 			m_velocity = glm::normalize(m_velocity) * MaxSpeed;
 		}
+
+	//	GLM_PRINT_VEC3("Velocity: ", m_velocity);
 	}
 }
 
@@ -164,7 +166,16 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 
 	if (m_movement.Minus) {
 		m_maxSpeed--;
+
+		if (m_maxSpeed <= 1.0) {
+			m_maxSpeed = 1.0f;
+		}
+
 		m_acceleration -= 10.0f;
+
+		if (m_acceleration <= 10.0f) {
+			m_acceleration = 10.0f;
+		}
 	}
 
 	return Acceleration;
