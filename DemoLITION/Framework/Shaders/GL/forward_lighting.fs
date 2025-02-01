@@ -146,6 +146,7 @@ vec4 GetMaterialAmbientColor()
     }
 }
 
+
 vec4 GetMaterialDiffuseColor()
 {
     if (gIsIndirectRender) {
@@ -155,6 +156,15 @@ vec4 GetMaterialDiffuseColor()
     }
 }
 
+
+vec4 GetMaterialSpecularColor()
+{
+    if (gIsIndirectRender) {
+        return Colors[MaterialIndex].SpecularColor;
+    } else {
+        return gMaterial.SpecularColor;
+    }
+}
 
 float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
 {
@@ -375,7 +385,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
                             Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular
-                            gMaterial.SpecularColor *
+                            GetMaterialSpecularColor() *
                             SpecularFactor;
         }
 
@@ -391,6 +401,8 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
     }
 
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
+   //return vec4(DiffuseFactor);
+ // return DiffuseColor;
 }
 
 
