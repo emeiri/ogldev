@@ -20,7 +20,7 @@
 #version 460 core
 
 layout(std430, binding = 1) restrict readonly buffer PerObject {
-    mat4 ModelMatrix[];
+    mat4 WorldMatrix[];
 };
 
 #ifdef PVP
@@ -48,9 +48,11 @@ layout (location = 4) in vec3 Bitangent;
 #endif
 
 uniform mat4 gWVP;
+uniform mat4 gVP;
 uniform mat4 gLightWVP;
 uniform mat4 gWorld;
 uniform mat3 gNormalMatrix;
+uniform bool gIsIndirectRender = false;
 
 out vec2 TexCoord0;
 out vec3 Normal0;
@@ -112,7 +114,13 @@ void main()
 #endif
 
     vec4 Pos4 = vec4(Position, 1.0);
-    gl_Position = gWVP * ModelMatrix[gl_DrawID] * Pos4;
+
+    if (gIsIndirectRender) {
+        gl_Position = gVP * WorldMatrix[gl_DrawID] * Pos4;
+    } else {
+        gl_Position = gWVP * Pos4;
+    }
+
     TexCoord0 = TexCoord;
     Normal0 = gNormalMatrix * Normal;
     Tangent0 = gNormalMatrix * Tangent;

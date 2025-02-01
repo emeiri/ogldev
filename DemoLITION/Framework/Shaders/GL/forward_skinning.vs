@@ -30,13 +30,15 @@ layout (location = 6) in vec4 Weights;
 const int MAX_BONES = 200;
 
 uniform mat4 gWVP;
+uniform mat4 gVP;
 uniform mat4 gLightWVP;
 uniform mat4 gWorld;
 uniform mat3 gNormalMatrix;
 uniform mat4 gBones[MAX_BONES];
+uniform bool gIsIndirectRender = false;
 
 layout(std430, binding = 1) restrict readonly buffer PerObject {
-    mat4 ModelMatrix[];
+    mat4 WorldMatrix[];
 };
 
 
@@ -56,7 +58,13 @@ void main()
 
     vec4 Pos4 = vec4(Position, 1.0);
     vec4 PosL = BoneTransform * Pos4;
-    gl_Position = gWVP * ModelMatrix[gl_DrawID] * PosL;
+
+    if (gIsIndirectRender) {
+        gl_Position = gVP * WorldMatrix[gl_DrawID] * PosL;
+    } else {
+        gl_Position = gWVP * PosL;
+    }
+    
     TexCoord0 = TexCoord;
     Normal0 = gNormalMatrix * Normal;
     Tangent0 = gNormalMatrix * Tangent;

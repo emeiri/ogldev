@@ -92,6 +92,8 @@ bool ForwardLightingTechnique::InitCommon()
    // GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
     //GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
     GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
+    GET_UNIFORM_AND_CHECK(IsIndirectRenderLoc, "gIsIndirectRender");
+    GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -582,5 +584,15 @@ void ForwardLightingTechnique::ControlLighting(bool LightingEnabled)
 void ForwardLightingTechnique::ControlShadows(bool ShadowsEnabled)
 {
     glUniform1i(ShadowsEnabledLoc, ShadowsEnabled);
+}
+
+void ForwardLightingTechnique::ControlIndirectRender(bool IsIndirectRender)
+{
+    glUniform1i(IsIndirectRenderLoc, IsIndirectRender);
+}
+
+void ForwardLightingTechnique::SetVP(const Matrix4f& VP)
+{
+    glUniformMatrix4fv(VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
 }
 

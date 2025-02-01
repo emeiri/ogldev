@@ -106,7 +106,7 @@ uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
 uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
-
+uniform bool gIsIndirectRender = false;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -615,7 +615,11 @@ TexCoord = TexCoord0;
 
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    FragColor = TempColor * gColorMod + gColorAdd + vec4(1.0);
+    FragColor = TempColor * gColorMod + gColorAdd;
+
+    if (gIsIndirectRender) {
+        FragColor += vec4(1.0, 0.0, 0.0, 1.0);
+    }
     //FragColor = texture(gSampler, TexCoord.xy);
     //FragColor = texture(gHeightMap, TexCoord0);
     //FragColor = TotalLight;

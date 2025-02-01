@@ -27,7 +27,7 @@ using namespace std;
 // config flags
 static bool UsePVP = true;     // Programmable Vertex Pulling
 static bool UseMeshOptimizer = false;
-static bool UseIndirectDraw = true;
+bool UseIndirectRender = true;
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
@@ -235,7 +235,7 @@ void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
 
     PopulateBuffers<VertexType>(Vertices);
 
-    if (UseIndirectDraw) {
+    if (UseIndirectRender) {
         
         std::vector<DrawElementsIndirectCommand> DrawCommands;
         DrawCommands.resize(m_Meshes.size());
@@ -936,7 +936,7 @@ void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
     }
 
-    if (UseIndirectDraw) {
+    if (UseIndirectRender) {
         RenderIndirect();
     } else {
         for (unsigned int i = 0; i < m_Meshes.size(); i++) {

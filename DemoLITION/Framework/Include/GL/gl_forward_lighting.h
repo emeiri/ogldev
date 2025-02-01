@@ -78,6 +78,8 @@ public:
     void SetFogTime(float Time);
     void ControlLighting(bool LightingEnabled);
     void ControlShadows(bool ShadowsEnabled);
+    void ControlIndirectRender(bool IsRenderIndirect);
+    void SetVP(const Matrix4f& VP);
 
 protected:
 
@@ -124,6 +126,8 @@ private:
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;
+    GLuint IsIndirectRenderLoc = INVALID_UNIFORM_LOCATION;
+    GLuint VPLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor;

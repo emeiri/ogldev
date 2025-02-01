@@ -24,6 +24,8 @@
 #define SHADOW_MAP_WIDTH 2048
 #define SHADOW_MAP_HEIGHT 2048
 
+extern bool UseIndirectRender;
+
 struct CameraDirection
 {
     GLenum CubemapFace;
@@ -489,8 +491,12 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
     m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
     m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));
 
-    Matrix4f VP = m_pCurCamera->GetVPMatrix();
-    m_pCurLightingTech->SetWVP(VP);
+    if (UseIndirectRender) {        // TODO: do this once
+        Matrix4f VP = m_pCurCamera->GetVPMatrix();
+        m_pCurLightingTech->SetVP(VP);
+    }
+
+    m_pCurLightingTech->ControlIndirectRender(UseIndirectRender);
    
     pModel->Render(this);
 }
@@ -752,7 +758,12 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
   //  printf("Lighting pass\n"); WVP.Print(); exit(1);
-  //  m_pCurLightingTech->SetWVP(WVP);
+    if (UseIndirectRender) {
+        printf("Incorrect callback with indirect rendering\n");
+        assert(1);
+    }
+
+    m_pCurLightingTech->SetWVP(WVP);
 
     Matrix4f LightWVP;
     
