@@ -17,7 +17,9 @@
 */
 
 
-#version 420
+#version 460
+
+#extension GL_ARB_bindless_texture : require
 
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
@@ -28,6 +30,7 @@ in vec3 WorldPos0;
 in vec4 LightSpacePos0;
 in vec3 Tangent0;
 in vec3 Bitangent0;
+in flat int MaterialIndex;
 
 out vec4 FragColor;
 
@@ -67,11 +70,24 @@ struct SpotLight
     float Cutoff;
 };
 
-struct Material
+struct MaterialColor
 {
-    vec3 AmbientColor;
-    vec3 DiffuseColor;
-    vec3 SpecularColor;
+    vec4 AmbientColor;
+    vec4 DiffuseColor;
+    vec4 SpecularColor;
+};
+
+
+layout(std430, binding = 2) readonly buffer ColorSSBO {
+    MaterialColor Colors[];
+};
+
+layout(std430, binding = 3) readonly buffer DiffuseSSBO {
+    sampler2D DiffuseMaps[];
+};
+
+layout(std430, binding = 4) readonly buffer NormalSSBO {
+    sampler2D NormalMaps[];
 };
 
 
@@ -80,7 +96,7 @@ uniform int gNumPointLights;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform int gNumSpotLights;
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
-uniform Material gMaterial;
+uniform MaterialColor gMaterial;
 uniform bool gHasSampler = false;
 layout(binding = 0) uniform sampler2D gSampler;
 layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
@@ -119,6 +135,26 @@ uniform vec3 gFogColor = vec3(0.0, 0.0, 0.0);
 
 const int toon_color_levels = 4;
 const float toon_scale_factor = 1.0f / toon_color_levels;
+
+
+vec4 GetMaterialAmbientColor()
+{
+    if (gIsIndirectRender) {
+        return Colors[MaterialIndex].AmbientColor;
+    } else {
+        return gMaterial.AmbientColor;
+    }
+}
+
+vec4 GetMaterialDiffuseColor()
+{
+    if (gIsIndirectRender) {
+        return Colors[MaterialIndex].DiffuseColor;
+    } else {
+        return gMaterial.DiffuseColor;
+    }
+}
+
 
 float CalcRimLightFactor(vec3 PixelToCamera, vec3 Normal)
 {
@@ -307,7 +343,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
 {
     vec4 AmbientColor = vec4(Light.Color, 1.0f) *
                         Light.AmbientIntensity *
-                        vec4(gMaterial.AmbientColor, 1.0f);
+                        GetMaterialAmbientColor();
 
     float DiffuseFactor = dot(Normal, -LightDirection);
 
@@ -322,7 +358,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
 
         DiffuseColor = vec4(Light.Color, 1.0f) *
                        Light.DiffuseIntensity *
-                       vec4(gMaterial.DiffuseColor, 1.0f) *
+                       GetMaterialDiffuseColor() *
                        DiffuseFactor;
 
         vec3 PixelToCamera = normalize(gCameraWorldPos - WorldPos0);
@@ -339,7 +375,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
             SpecularFactor = pow(SpecularFactor, SpecularExponent);
             SpecularColor = vec4(Light.Color, 1.0f) *
                             Light.DiffuseIntensity * // using the diffuse intensity for diffuse/specular
-                            vec4(gMaterial.SpecularColor, 1.0f) *
+                            gMaterial.SpecularColor *
                             SpecularFactor;
         }
 
@@ -596,7 +632,9 @@ TexCoord = TexCoord0;
 
     vec4 TexColor;
 
-    if (gHasSampler) {
+    if (gIsIndirectRender) {
+        TexColor = texture(DiffuseMaps[0], TexCoord.xy); // TODO: matrial index
+    } else if (gHasSampler) {
         TexColor = texture(gSampler, TexCoord.xy);
     } else {
         TexColor = vec4(1.0);
@@ -616,11 +654,9 @@ TexCoord = TexCoord0;
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
     FragColor = TempColor * gColorMod + gColorAdd;
-
-    if (gIsIndirectRender) {
-        FragColor += vec4(1.0, 0.0, 0.0, 1.0);
-    }
+   //FragColor = TexColor;
     //FragColor = texture(gSampler, TexCoord.xy);
     //FragColor = texture(gHeightMap, TexCoord0);
-    //FragColor = TotalLight;
+   // FragColor = TotalLight;
+  //FragColor = vec4(Normal0, 1.0);
 }

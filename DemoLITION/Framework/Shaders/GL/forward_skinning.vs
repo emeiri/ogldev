@@ -37,8 +37,14 @@ uniform mat3 gNormalMatrix;
 uniform mat4 gBones[MAX_BONES];
 uniform bool gIsIndirectRender = false;
 
-layout(std430, binding = 1) restrict readonly buffer PerObject {
-    mat4 WorldMatrix[];
+struct PerObjectData {
+    mat4 WorldMatrix;
+    mat4 NormalMatrix;
+    int MaterialIndex;
+};
+
+layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
+    PerObjectData o[];
 };
 
 
@@ -48,6 +54,7 @@ out vec3 WorldPos0;
 out vec4 LightSpacePos0;
 out vec3 Tangent0;
 out vec3 Bitangent0;
+out flat int MaterialIndex;
 
 void main()
 {
@@ -60,15 +67,22 @@ void main()
     vec4 PosL = BoneTransform * Pos4;
 
     if (gIsIndirectRender) {
-        gl_Position = gVP * WorldMatrix[gl_DrawID] * PosL;
+        gl_Position = gVP * o[gl_DrawID].WorldMatrix * PosL;
+        MaterialIndex = o[gl_DrawID].MaterialIndex;
+        Normal0 = (o[gl_DrawID].NormalMatrix * vec4(Normal, 0.0)).xyz;
+        Tangent0 = (o[gl_DrawID].NormalMatrix * vec4(Tangent, 0.0)).xyz;
+        Bitangent0 = (o[gl_DrawID].NormalMatrix * vec4(Bitangent, 0.0)).xyz;
+        WorldPos0 = (o[gl_DrawID].WorldMatrix * PosL).xyz;
     } else {
         gl_Position = gWVP * PosL;
+
+        Normal0 = gNormalMatrix * Normal;
+        Tangent0 = gNormalMatrix * Tangent;
+        Bitangent0 = gNormalMatrix * Bitangent;
+        WorldPos0 = (gWorld * PosL).xyz;
     }
     
     TexCoord0 = TexCoord;
-    Normal0 = gNormalMatrix * Normal;
-    Tangent0 = gNormalMatrix * Tangent;
-    Bitangent0 = gNormalMatrix * Bitangent;
-    WorldPos0 = (gWorld * PosL).xyz;
+
     LightSpacePos0 = gLightWVP * PosL;
 }

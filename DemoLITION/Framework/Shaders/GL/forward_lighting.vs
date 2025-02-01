@@ -19,9 +19,17 @@
 
 #version 460 core
 
-layout(std430, binding = 1) restrict readonly buffer PerObject {
-    mat4 WorldMatrix[];
+struct PerObjectData {
+    mat4 WorldMatrix;
+    int MaterialIndex;
 };
+
+layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
+    PerObjectData o[];
+};
+
+
+//#define PVP
 
 #ifdef PVP
 
@@ -60,6 +68,7 @@ out vec3 WorldPos0;
 out vec4 LightSpacePos0;
 out vec3 Tangent0;
 out vec3 Bitangent0;
+out flat int MaterialIndex;
 
 #ifdef PVP
 vec3 GetPosition(int i)
@@ -116,7 +125,8 @@ void main()
     vec4 Pos4 = vec4(Position, 1.0);
 
     if (gIsIndirectRender) {
-        gl_Position = gVP * WorldMatrix[gl_DrawID] * Pos4;
+        gl_Position = gVP * o[gl_DrawID].WorldMatrix * Pos4;
+        MaterialIndex = o[gl_DrawID].MaterialIndex;
     } else {
         gl_Position = gWVP * Pos4;
     }

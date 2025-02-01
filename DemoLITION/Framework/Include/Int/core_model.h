@@ -178,8 +178,24 @@ private:
 
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
+    struct MaterialColorIndirect
+    {
+        Vector4f AmbientColor;
+        Vector4f DiffuseColor;
+        Vector4f SpecularColor;
+    };
+
+    struct {
+        std::vector<MaterialColorIndirect> Colors;
+        std::vector<GLuint64> DiffuseMaps;
+        std::vector<GLuint64> NormalMaps;
+    } m_indirectRenderData;
+
     GLuint m_drawCmdBuffer = 0;     // Indirect rendering
     GLuint m_perObjectBuffer = 0;   // Indirect rendering
+    GLuint m_colorsBuffer = 0;      // Indirect rendering
+    GLuint m_diffuseMapBuffer = 0;  // Indirect rendering
+    GLuint m_normalMapBuffer = 0;   // Indirect rendering
 
     struct Vertex {
         Vector3f Position;
@@ -295,6 +311,7 @@ private:
 
     void InitSingleCamera(int Index, const aiScene* pScene);
 
+    void PrepareIndirectRenderSSBOs();
     void SetupRenderIndirectPerObjectData(const Matrix4f& ObjectMatrix);
 
     std::vector<Material> m_Materials;

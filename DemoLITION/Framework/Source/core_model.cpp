@@ -37,7 +37,11 @@ bool UseIndirectRender = true;
 #define BONE_ID_LOCATION     5
 #define BONE_WEIGHT_LOCATION 6
 
-
+#define SSBO_INDEX_VERTICES        0
+#define SSBO_INDEX_PER_OBJ_DATA    1
+#define SSBO_INDEX_MATERIAL_COLORS 2
+#define SSBO_INDEX_DIFFUSE_MAPS    3
+#define SSBO_INDEX_NORMAL_MAPS     4
 
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices | \
                                       aiProcess_Triangulate | \
@@ -51,6 +55,14 @@ bool UseIndirectRender = true;
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
 
+struct PerObjectData {
+    Matrix4f WorldMatrix;
+    Matrix4f NormalMatrix;
+    int MaterialIndex = 0;
+};
+
+//aiProcess_MakeLeftHanded | \
+//aiProcess_FlipWindingOrder | \
 
 struct DrawElementsIndirectCommand {
     unsigned int  Count = 0;
@@ -217,6 +229,10 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 
     CalculateMeshTransformations(pScene);
 
+    if (UseIndirectRender) {
+        PrepareIndirectRenderSSBOs();
+    }
+
     return GLCheckError();
 }
 
@@ -234,31 +250,57 @@ void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
     printf("Max pos: "); m_maxPos.Print();
 
     PopulateBuffers<VertexType>(Vertices);
-
-    if (UseIndirectRender) {
-        
-        std::vector<DrawElementsIndirectCommand> DrawCommands;
-        DrawCommands.resize(m_Meshes.size());
-
-        for (int i = 0; i < m_Meshes.size(); i++) {
-            DrawElementsIndirectCommand Cmd;
-            Cmd.Count = m_Meshes[i].NumIndices;
-            Cmd.InstanceCount = 1;
-            Cmd.FirstIndex = m_Meshes[i].BaseIndex;
-            Cmd.BaseVertex = m_Meshes[i].BaseVertex;
-            Cmd.BaseInstance = 0;
-
-            DrawCommands[i] = Cmd;
-        }
-
-        glCreateBuffers(1, &m_drawCmdBuffer);
-        glNamedBufferStorage(m_drawCmdBuffer, sizeof(DrawCommands[0]) * DrawCommands.size(),
-                             (const void*)DrawCommands.data(), 0);
-
-        glCreateBuffers(1, &m_perObjectBuffer);
-        glNamedBufferStorage(m_perObjectBuffer, sizeof(Matrix4f) * m_Meshes.size(), NULL, GL_DYNAMIC_STORAGE_BIT);
-    }
 }
+
+
+void CoreModel::PrepareIndirectRenderSSBOs()
+{
+    std::vector<DrawElementsIndirectCommand> DrawCommands;
+    DrawCommands.resize(m_Meshes.size());
+
+    for (int i = 0; i < m_Meshes.size(); i++) {
+        DrawElementsIndirectCommand Cmd;
+        Cmd.Count = m_Meshes[i].NumIndices;
+        Cmd.InstanceCount = 1;
+        Cmd.FirstIndex = m_Meshes[i].BaseIndex;
+        Cmd.BaseVertex = m_Meshes[i].BaseVertex;
+        Cmd.BaseInstance = 0;
+
+        DrawCommands[i] = Cmd;
+    }
+
+    glCreateBuffers(1, &m_drawCmdBuffer);
+    glNamedBufferStorage(m_drawCmdBuffer, sizeof(DrawCommands[0]) * DrawCommands.size(),
+                         (const void*)DrawCommands.data(), 0);
+
+    glCreateBuffers(1, &m_perObjectBuffer);
+    glNamedBufferStorage(m_perObjectBuffer, sizeof(PerObjectData) * m_Meshes.size(), NULL, GL_DYNAMIC_STORAGE_BIT);
+
+    int NumMaterials = (int)m_Materials.size();
+
+    m_indirectRenderData.Colors.resize(NumMaterials);
+    m_indirectRenderData.DiffuseMaps.resize(NumMaterials);
+    m_indirectRenderData.NormalMaps.resize(NumMaterials);
+
+    for (int i = 0; i < NumMaterials; i++) {
+        m_indirectRenderData.Colors[i].AmbientColor = m_Materials[i].AmbientColor;
+        m_indirectRenderData.Colors[i].DiffuseColor = m_Materials[i].DiffuseColor;
+        m_indirectRenderData.Colors[i].SpecularColor = m_Materials[i].SpecularColor;
+        m_indirectRenderData.DiffuseMaps[i] = m_Materials[i].pDiffuse->GetBindlessHandle();
+        m_indirectRenderData.NormalMaps[i] = 0;//m_Materials[i].p->GetBindlessHandle();
+    }
+
+    glCreateBuffers(1, &m_colorsBuffer);
+    glNamedBufferStorage(m_colorsBuffer, sizeof(MaterialColorIndirect) * NumMaterials, m_indirectRenderData.Colors.data(), 0);
+
+    glCreateBuffers(1, &m_diffuseMapBuffer);
+    glNamedBufferStorage(m_diffuseMapBuffer, sizeof(GLuint64) * NumMaterials, m_indirectRenderData.DiffuseMaps.data(), 0);
+
+    glCreateBuffers(1, &m_normalMapBuffer);
+    glNamedBufferStorage(m_normalMapBuffer, sizeof(GLuint64) * NumMaterials, m_indirectRenderData.NormalMaps.data(), 0);
+
+}
+
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
 {
@@ -810,7 +852,7 @@ void CoreModel::PopulateBuffersPVP(std::vector<VertexType>& Vertices)
     glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
 
     glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
 }
@@ -875,8 +917,6 @@ void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
     glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_Buffers[VERTEX_BUFFER]);
-
     glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(VertexType));
     glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);
 
@@ -935,7 +975,7 @@ void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
     glBindVertexArray(m_VAO);
 
     if (UsePVP) {
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
     for (unsigned int i = 0; i < m_Meshes.size(); i++) {
@@ -995,7 +1035,7 @@ void CoreModel::Render(unsigned int DrawIndex, unsigned int PrimID)
     glBindVertexArray(m_VAO);
 
     if (UsePVP) {
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
     unsigned int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
@@ -1033,7 +1073,7 @@ void CoreModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
     glBindVertexArray(m_VAO);
 
     if (UsePVP) {
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
@@ -1069,7 +1109,7 @@ void CoreModel::RenderIndirect(const Matrix4f& ObjectMatrix)
     glBindVertexArray(m_VAO);
 
     if (UsePVP) {
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Buffers[VERTEX_BUFFER]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
     SetupRenderIndirectPerObjectData(ObjectMatrix);
@@ -1085,16 +1125,26 @@ void CoreModel::RenderIndirect(const Matrix4f& ObjectMatrix)
 
 void CoreModel::SetupRenderIndirectPerObjectData(const Matrix4f& ObjectMatrix)
 {
-    std::vector<Matrix4f> ModelMatrices;
-    ModelMatrices.resize(m_Meshes.size());
+    std::vector<PerObjectData> PerObjectDataVector;
+    PerObjectDataVector.resize(m_Meshes.size());
 
     for (int i = 0; i < m_Meshes.size(); i++) {
-        ModelMatrices[i] = ObjectMatrix * m_Meshes[i].Transformation;
+        // TODO: move to math3d
+        Matrix4f FinalWorldMatrix = m_Meshes[i].Transformation * ObjectMatrix;
+        Matrix4f WorldInverse = FinalWorldMatrix.Inverse();
+        Matrix4f WorldInverseTranspose = WorldInverse.Transpose();
+
+        PerObjectDataVector[i].WorldMatrix = FinalWorldMatrix;
+        PerObjectDataVector[i].NormalMatrix = WorldInverseTranspose;
+        PerObjectDataVector[i].MaterialIndex = m_Meshes[i].MaterialIndex;
     }
 
-    glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(ModelMatrices), ModelMatrices.data());
+    glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(PerObjectDataVector), PerObjectDataVector.data());
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_perObjectBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_PER_OBJ_DATA, m_perObjectBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_MATERIAL_COLORS, m_colorsBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_DIFFUSE_MAPS, m_diffuseMapBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_NORMAL_MAPS, m_normalMapBuffer);
 }
 
 
