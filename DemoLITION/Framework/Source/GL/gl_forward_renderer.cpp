@@ -529,7 +529,7 @@ void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
 
 void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 {
-    Matrix4f VP = GetViewProjectionMatrix();
+    Matrix4f VP = m_pCurCamera->GetVPMatrix();
 
     const InfiniteGridConfig& Config = pScene->GetConfig()->GetInfiniteGrid();
     m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos());
