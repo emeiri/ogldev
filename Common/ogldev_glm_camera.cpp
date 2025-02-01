@@ -40,12 +40,12 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 	float ar = (float)persProjInfo.Width / (float)persProjInfo.Height;
 
 	if (CAMERA_LEFT_HANDED) {
-		m_cameraOrientation = glm::lookAtLH(Pos, Target, Up);
+		m_cameraOrientation = glm::lookAtLH(Pos, Pos + Target, Up);
 		m_persProjection = glm::perspectiveLH(persProjInfo.FOV, ar,
 			                                  persProjInfo.zNear, persProjInfo.zFar);
 	}
 	else {
-		m_cameraOrientation = glm::lookAtRH(Pos, Target, Up);
+		m_cameraOrientation = glm::lookAtRH(Pos, Pos + Target, Up);
 		m_persProjection = glm::perspectiveRH(persProjInfo.FOV, ar,
 			                                  persProjInfo.zNear, persProjInfo.zFar);
 	}	
