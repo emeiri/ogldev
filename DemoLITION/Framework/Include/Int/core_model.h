@@ -304,6 +304,9 @@ private:
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     float m_textureScale = 1.0f;
+
+    Vector3f m_minPos = Vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
+    Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 	
     /////////////////////////////////////
 	// Skeletal animation stuff

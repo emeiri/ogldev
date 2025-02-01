@@ -219,6 +219,9 @@ void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
 
     InitAllMeshes<VertexType>(m_pScene, Vertices);
 
+    printf("Min pos: "); m_minPos.Print();
+    printf("Max pos: "); m_maxPos.Print();
+
     PopulateBuffers<VertexType>(Vertices);
 }
 
@@ -326,8 +329,16 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
     VertexType v;
 
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-        const aiVector3D& pPos      = paiMesh->mVertices[i];       
-        v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
+        const aiVector3D& Pos = paiMesh->mVertices[i];       
+        v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
+
+        m_minPos.x = std::min(m_minPos.x, v.Position.x);
+        m_minPos.y = std::min(m_minPos.y, v.Position.y);
+        m_minPos.z = std::min(m_minPos.z, v.Position.z);
+
+        m_maxPos.x = std::max(m_maxPos.x, v.Position.x);
+        m_maxPos.y = std::max(m_maxPos.y, v.Position.y);
+        m_maxPos.z = std::max(m_maxPos.z, v.Position.z);
 
         if (paiMesh->mNormals) {
             const aiVector3D& pNormal   = paiMesh->mNormals[i];
@@ -394,9 +405,9 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
     std::vector<VertexType> Vertices(paiMesh->mNumVertices);
 
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
-        const aiVector3D& pPos = paiMesh->mVertices[i];
+        const aiVector3D& Pos = paiMesh->mVertices[i];
         // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
-        v.Position = Vector3f(pPos.x, pPos.y, pPos.z);
+        v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
 
         if (paiMesh->mNormals) {
             const aiVector3D& pNormal = paiMesh->mNormals[i];
