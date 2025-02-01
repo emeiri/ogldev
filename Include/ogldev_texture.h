@@ -52,6 +52,8 @@ public:
 
     GLuint GetTexture() const { return m_textureObj; }
 
+    GLuint64 GetBindlessHandle() const { return m_bindlessHandle; }
+
 private:
     void LoadInternal(const void* pImageData);
     void LoadInternalNonDSA(const void* pImageData);
@@ -61,8 +63,9 @@ private:
     void BindInternalDSA(GLenum TextureUnit);
 
     std::string m_fileName;
-    GLenum m_textureTarget;
-    GLuint m_textureObj;
+    GLenum m_textureTarget = 0;
+    GLuint m_textureObj = 0;
+    GLuint64 m_bindlessHandle = 0;
     int m_imageWidth = 0;
     int m_imageHeight = 0;
     int m_imageBPP = 0;

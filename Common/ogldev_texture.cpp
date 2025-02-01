@@ -184,8 +184,12 @@ void Texture::LoadInternalDSA(const void* pImageData)
     glTextureParameterf(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, 16);
 
     glGenerateTextureMipmap(m_textureObj);
+
+    m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
+    glMakeTextureHandleResidentARB(m_bindlessHandle);
 }
 
 
