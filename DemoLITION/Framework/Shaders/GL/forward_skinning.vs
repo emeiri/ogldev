@@ -75,7 +75,6 @@ void main()
         WorldPos0 = (o[gl_DrawID].WorldMatrix * PosL).xyz;
     } else {
         gl_Position = gWVP * PosL;
-
         Normal0 = gNormalMatrix * Normal;
         Tangent0 = gNormalMatrix * Tangent;
         Bitangent0 = gNormalMatrix * Bitangent;
