@@ -759,7 +759,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f FinalWorldMatrix = World * ObjectMatrix;
     m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
-    Matrix4f View = m_pCurCamera->GetViewMatrix();
+    Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
     Matrix4f Projection = m_pCurCamera->GetProjMatrix();
     Matrix4f WV = View * FinalWorldMatrix;
     Matrix4f WVP = Projection * View * FinalWorldMatrix;

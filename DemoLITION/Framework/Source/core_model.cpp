@@ -281,7 +281,7 @@ void CoreModel::PrepareIndirectRenderCommands()
 
     glCreateBuffers(1, &m_drawCmdBuffer);
     glNamedBufferStorage(m_drawCmdBuffer, sizeof(DrawCommands[0]) * DrawCommands.size(),
-        (const void*)DrawCommands.data(), 0);
+                         (const void*)DrawCommands.data(), 0);
 }
 
 
