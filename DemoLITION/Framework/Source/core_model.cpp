@@ -58,7 +58,7 @@ bool UseIndirectRender = true;
 struct PerObjectData {
     Matrix4f WorldMatrix;
     Matrix4f NormalMatrix;
-    int MaterialIndex = 0;
+    glm::ivec4 MaterialIndex = glm::ivec4(0);
 };
 
 //aiProcess_MakeLeftHanded | \
@@ -1212,7 +1212,7 @@ void CoreModel::SetupRenderIndirectPerObjectData(const Matrix4f& ObjectMatrix)
 
         PerObjectDataVector[i].WorldMatrix = FinalWorldMatrix;
         PerObjectDataVector[i].NormalMatrix = WorldInverseTranspose;
-        PerObjectDataVector[i].MaterialIndex = m_Meshes[i].MaterialIndex;
+        PerObjectDataVector[i].MaterialIndex.x = m_Meshes[i].MaterialIndex;
     }
 
     glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(PerObjectDataVector), PerObjectDataVector.data());

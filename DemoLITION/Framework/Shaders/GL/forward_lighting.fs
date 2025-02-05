@@ -641,7 +641,7 @@ void main()
     vec4 TexColor;
 
     if (gIsIndirectRender) {
-        TexColor = texture(DiffuseMaps[0], TexCoord.xy); // TODO: matrial index
+        TexColor = texture(DiffuseMaps[MaterialIndex], TexCoord.xy);
     } else if (gHasSampler) {
         TexColor = texture(gSampler, TexCoord.xy);
     } else {
