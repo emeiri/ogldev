@@ -36,7 +36,7 @@ void test_blender_scene()
 
     pRenderingSystem->CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "test_blender_scene");
 
-    Scene* pScene = pRenderingSystem->CreateScene("../Content/demolition/spot_light2.glb");
+    Scene* pScene = pRenderingSystem->CreateScene("../Content/demolition/spot_light3.glb");
 
     DirectionalLight DirLight;
     DirLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);

@@ -834,14 +834,19 @@ public:
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
-       // m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
-       //  m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
-     //   Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
-        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pScene->AddToRenderList(pSceneObject);
 
-    //    LoadAndAddModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx", false, 1.0f);
+        //m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+      //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
+      //   Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
+
+      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+        
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+     //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+      //  m_pScene->SetCamera(Vector3f(0.0f, 10.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        m_pScene->AddToRenderList(pSceneObject);
     }
     
 private:
@@ -855,7 +860,7 @@ void carbonara()
    //FireworksDemo demo;
     AnimationDemo demo;
   //  BridgeDemo demo;
-   // AmazonBistroDemo demo;
+  //  AmazonBistroDemo demo;
 
     demo.Start();
 }
