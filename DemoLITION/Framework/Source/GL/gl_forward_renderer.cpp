@@ -387,6 +387,11 @@ void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>&
     m_shadowMapFBO.BindForWriting();
     glClear(GL_DEPTH_BUFFER_BIT);
     m_shadowMapTech.Enable();
+    if (UseIndirectRender) {
+        Matrix4f VP = m_lightPersProjMatrix * m_lightViewMatrix;
+        m_shadowMapTech.SetVP(VP);
+    }
+    m_shadowMapTech.ControlIndirectRender(UseIndirectRender);
     RenderEntireRenderList(RenderList);
 }
 
@@ -465,6 +470,8 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
     if (UseIndirectRender) {        // TODO: do this once
         Matrix4f VP = m_pCurCamera->GetVPMatrix();
         m_pCurLightingTech->SetVP(VP);
+        Matrix4f LightVP = m_lightPersProjMatrix * m_lightViewMatrix;	// TODO: get the correct projection matrix
+        m_pCurLightingTech->SetLightVP(LightVP);
     }
 
     m_pCurLightingTech->ControlIndirectRender(UseIndirectRender);

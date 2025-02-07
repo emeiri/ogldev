@@ -44,6 +44,7 @@ bool ShadowMappingTechnique::Init()
 
     GET_UNIFORM_AND_CHECK(m_WVPLoc, "gWVP");
     GET_UNIFORM_AND_CHECK(m_VPLoc, "gVP");
+    GET_UNIFORM_AND_CHECK(m_isIndirectRenderLoc, "gIsIndirectRender");
 
     return true;
 }

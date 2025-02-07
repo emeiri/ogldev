@@ -18,7 +18,7 @@
 
 #include "GL/gl_forward_lighting.h"
 
-#define FAIL_ON_MISSING_LOC
+//#define FAIL_ON_MISSING_LOC
 
 ForwardLightingTechnique::ForwardLightingTechnique()
 {
@@ -94,6 +94,7 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
     GET_UNIFORM_AND_CHECK(IsIndirectRenderLoc, "gIsIndirectRender");
     GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
+    GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -586,13 +587,20 @@ void ForwardLightingTechnique::ControlShadows(bool ShadowsEnabled)
     glUniform1i(ShadowsEnabledLoc, ShadowsEnabled);
 }
 
+
 void ForwardLightingTechnique::ControlIndirectRender(bool IsIndirectRender)
 {
     glUniform1i(IsIndirectRenderLoc, IsIndirectRender);
 }
+
 
 void ForwardLightingTechnique::SetVP(const Matrix4f& VP)
 {
     glUniformMatrix4fv(VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
 }
 
+
+void ForwardLightingTechnique::SetLightVP(const Matrix4f& LightVP)
+{
+    glUniformMatrix4fv(LightVPLoc, 1, GL_TRUE, (const GLfloat*)LightVP.m);
+}

@@ -80,6 +80,7 @@ public:
     void ControlShadows(bool ShadowsEnabled);
     void ControlIndirectRender(bool IsRenderIndirect);
     void SetVP(const Matrix4f& VP);
+    void SetLightVP(const Matrix4f& LightVP);
 
 protected:
 
@@ -93,6 +94,7 @@ private:
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
+    GLuint LightVPLoc = INVALID_UNIFORM_LOCATION;  // required only for shadow mapping with indirect rendering
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint hasSamplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;

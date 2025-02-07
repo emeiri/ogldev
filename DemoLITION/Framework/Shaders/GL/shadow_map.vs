@@ -41,9 +41,9 @@ void main()
 {
     vec4 Pos4 = vec4(Position, 1.0);
 
- //   if (gIsIndirectRender) {
-  //      gl_Position = gVP * o[gl_DrawID].WorldMatrix * Pos4;
- //   } else {
+    if (gIsIndirectRender) {
+        gl_Position = gVP * o[gl_DrawID].WorldMatrix * Pos4;
+    } else {
         gl_Position = gWVP * Pos4;
-  //  }
+    }
 }
