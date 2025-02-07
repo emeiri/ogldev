@@ -67,7 +67,7 @@ public:
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.AmbientIntensity = 0.5f;
+        m_dirLight.AmbientIntensity = 0.8f;
 
         m_pointLight.WorldPosition = Vector3f(0.25f, 0.25f, 0.0f);
      //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
@@ -504,8 +504,9 @@ public:
 
     void InitChild()
     {
-        m_pScene->SetCamera(Vector3f(0.0f, 0.33f, -0.65f), Vector3f(0.0, -0.3f, 1.0f));
-        LoadAndAddModel("../Content/Jump/Jump.dae", false, 0.1f);
+        m_pScene->SetCamera(Vector3f(0.0f, 0.25f, -0.4f), Vector3f(0.0, -0.4f, 1.0f));
+        PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 0.1f);
+        CObject.pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
     }
 };
 
@@ -831,16 +832,16 @@ public:
 
     void InitChild()
     {
-        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
         m_pScene->GetConfig()->ControlShadowMapping(false);
-        m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 0.0f));
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-        //m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+        m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
       //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
-      //   Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
+         Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
 
       //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+     //   Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
         
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
      //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);

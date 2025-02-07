@@ -56,7 +56,6 @@ uniform bool gIsIndirectRender = false;
 struct PerObjectData {
     mat4 WorldMatrix;
     mat4 NormalMatrix;
-    ivec4 MaterialIndex;
 };
 
 layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
@@ -128,7 +127,6 @@ void main()
 
     if (gIsIndirectRender) {
         gl_Position = gVP * o[gl_DrawID].WorldMatrix * Pos4;
-        MaterialIndex = o[gl_DrawID].MaterialIndex.x;
         Normal0 = (o[gl_DrawID].NormalMatrix * vec4(Normal, 0.0)).xyz;
         Tangent0 = (o[gl_DrawID].NormalMatrix * vec4(Tangent, 0.0)).xyz;
         Bitangent0 = (o[gl_DrawID].NormalMatrix * vec4(Bitangent, 0.0)).xyz;
@@ -144,4 +142,6 @@ void main()
     }
 
     TexCoord0 = TexCoord;
+
+    MaterialIndex = 0;  // Hack until we setup bindless textures
 }

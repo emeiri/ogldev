@@ -36,11 +36,11 @@ int main(int argc, char* arg[])
     //test_clear();    
     //test_object();
     //test_move_object();
-    test_blender_scene();
+  //  test_blender_scene();
   //  test_default_scene();
    // test_lighting();
   //  test_normal_map();
    // test_parallax_map();
   // test_grid();
-   // carbonara();
+    carbonara();
 }
