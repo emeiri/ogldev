@@ -853,9 +853,9 @@ void carbonara()
 {
   // BallisticsDemo demo;
    //FireworksDemo demo;
-   // AnimationDemo demo;
+    AnimationDemo demo;
   //  BridgeDemo demo;
-    AmazonBistroDemo demo;
+   // AmazonBistroDemo demo;
 
     demo.Start();
 }

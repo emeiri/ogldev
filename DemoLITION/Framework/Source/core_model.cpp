@@ -25,7 +25,7 @@
 using namespace std;
 
 // config flags
-static bool UsePVP = true;     // Programmable Vertex Pulling
+static bool UsePVP = false;     // Programmable Vertex Pulling
 static bool UseMeshOptimizer = false;
 bool UseIndirectRender = true;
 
