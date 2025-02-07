@@ -42,9 +42,9 @@ bool ShadowMappingTechnique::Init()
         return false;
     }
 
-    m_WVPLoc = GetUniformLocation("gWVP");
+    GET_UNIFORM_AND_CHECK(m_WVPLoc, "gWVP");
 
-    return (m_WVPLoc != INVALID_UNIFORM_LOCATION);
+    return true;
 }
 
 
