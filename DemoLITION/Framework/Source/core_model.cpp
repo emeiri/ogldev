@@ -19,7 +19,7 @@
 #include "ogldev_engine_common.h"
 #include "Int/core_rendering_system.h"
 #include "Int/core_model.h"
-
+#include "GL/gl_ssbo_db.h"
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 
 using namespace std;
@@ -37,12 +37,6 @@ bool UseIndirectRender = true;
 #define BONE_ID_LOCATION     5
 #define BONE_WEIGHT_LOCATION 6
 
-#define SSBO_INDEX_VERTICES        0
-#define SSBO_INDEX_PER_OBJ_DATA    1
-#define SSBO_INDEX_MATERIAL_COLORS 2
-#define SSBO_INDEX_DIFFUSE_MAPS    3
-#define SSBO_INDEX_NORMAL_MAPS     4
-
 #define DEMOLITION_ASSIMP_LOAD_FLAGS (aiProcess_JoinIdenticalVertices | \
                                       aiProcess_Triangulate | \
                                       aiProcess_GenSmoothNormals | \
@@ -55,22 +49,8 @@ bool UseIndirectRender = true;
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
 
-struct PerObjectData {
-    Matrix4f WorldMatrix;
-    Matrix4f NormalMatrix;
-};
-
 //aiProcess_MakeLeftHanded | \
 //aiProcess_FlipWindingOrder | \
-
-struct DrawElementsIndirectCommand {
-    unsigned int  Count = 0;
-    unsigned int  InstanceCount = 0;
-    unsigned int  FirstIndex = 0;
-    int           BaseVertex = 0;
-    unsigned int  BaseInstance = 0;
-};
-
 
 static void traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
@@ -229,7 +209,7 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
     CalculateMeshTransformations(pScene);
 
     if (UseIndirectRender) {
-        PrepareIndirectRenderSSBOs();
+        m_indirectRender.Init(m_Meshes);
     }
 
     return GLCheckError();
@@ -252,41 +232,6 @@ void CoreModel::InitGeometryInternal(int NumVertices, int NumIndices)
 }
 
 
-void CoreModel::PrepareIndirectRenderSSBOs()
-{
-    PrepareIndirectRenderCommands();
-
-    AllocIndirectRenderPerObjectBuffer();
-}
-
-
-void CoreModel::PrepareIndirectRenderCommands()
-{
-    std::vector<DrawElementsIndirectCommand> DrawCommands;
-    DrawCommands.resize(m_Meshes.size());
-
-    for (int i = 0; i < m_Meshes.size(); i++) {
-        DrawElementsIndirectCommand Cmd;
-        Cmd.Count = m_Meshes[i].NumIndices;
-        Cmd.InstanceCount = 1;
-        Cmd.FirstIndex = m_Meshes[i].BaseIndex;
-        Cmd.BaseVertex = m_Meshes[i].BaseVertex;
-        Cmd.BaseInstance = 0;
-
-        DrawCommands[i] = Cmd;
-    }
-
-    glCreateBuffers(1, &m_drawCmdBuffer);
-    glNamedBufferStorage(m_drawCmdBuffer, sizeof(DrawCommands[0]) * DrawCommands.size(),
-                         (const void*)DrawCommands.data(), 0);
-}
-
-
-void CoreModel::AllocIndirectRenderPerObjectBuffer()
-{
-    glCreateBuffers(1, &m_perObjectBuffer);
-    glNamedBufferStorage(m_perObjectBuffer, sizeof(PerObjectData) * m_Meshes.size(), NULL, GL_DYNAMIC_STORAGE_BIT);
-}
 
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
@@ -1156,35 +1101,10 @@ void CoreModel::RenderIndirect(const Matrix4f& ObjectMatrix)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
-    SetupRenderIndirectPerObjectData(ObjectMatrix);
-
-    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_drawCmdBuffer);
-
-    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, (GLsizei)m_Meshes.size(), 0);
+    m_indirectRender.Render(ObjectMatrix);
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
-}
-
-
-void CoreModel::SetupRenderIndirectPerObjectData(const Matrix4f& ObjectMatrix)
-{
-    std::vector<PerObjectData> PerObjectDataVector;
-    PerObjectDataVector.resize(m_Meshes.size());
-
-    for (int i = 0; i < m_Meshes.size(); i++) {
-        // TODO: move to math3d
-        Matrix4f FinalWorldMatrix = m_Meshes[i].Transformation * ObjectMatrix;
-        Matrix4f WorldInverse = FinalWorldMatrix.Inverse();
-        Matrix4f WorldInverseTranspose = WorldInverse.Transpose();
-
-        PerObjectDataVector[i].WorldMatrix = FinalWorldMatrix;
-        PerObjectDataVector[i].NormalMatrix = WorldInverseTranspose;
-    }
-
-    glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(PerObjectDataVector), PerObjectDataVector.data());
-
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_PER_OBJ_DATA, m_perObjectBuffer);
 }
 
 

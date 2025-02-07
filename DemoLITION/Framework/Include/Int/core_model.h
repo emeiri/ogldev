@@ -33,6 +33,8 @@
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
+#include "GL\gl_basic_mesh_entry.h"
+#include "GL\gl_indirect_render.h"
 
 #define INVALID_MATERIAL 0xFFFFFFFF
 
@@ -142,24 +144,6 @@ private:
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
-    struct BasicMeshEntry {
-        BasicMeshEntry()
-        {
-            NumIndices = 0;
-            BaseVertex = 0;
-            BaseIndex = 0;
-            ValidFaces = 0;
-            MaterialIndex = INVALID_MATERIAL;
-        }
-
-        uint NumIndices;
-        uint BaseVertex;
-        uint BaseIndex;
-        uint ValidFaces;
-        uint MaterialIndex;
-        Matrix4f Transformation;		
-    };
-
     std::vector<BasicMeshEntry> m_Meshes;
 
     const aiScene* m_pScene = NULL;
@@ -177,9 +161,6 @@ private:
     GLuint m_VAO = 0;
 
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
-
-    GLuint m_drawCmdBuffer = 0;     // Indirect rendering
-    GLuint m_perObjectBuffer = 0;   // Indirect rendering
 
     struct Vertex {
         Vector3f Position;
@@ -321,6 +302,8 @@ private:
 
     Vector3f m_minPos = Vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
     Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+    IndirectRender m_indirectRender;
 	
     /////////////////////////////////////
 	// Skeletal animation stuff
