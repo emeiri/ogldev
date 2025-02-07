@@ -337,7 +337,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     int NumSpotLights = (int)SpotLights.size();
 
     if (NumSpotLights > 0) {
-        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection * -1.0f, SpotLights[0].Up);
+        m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, SpotLights[0].Up);
     }
 
     const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
