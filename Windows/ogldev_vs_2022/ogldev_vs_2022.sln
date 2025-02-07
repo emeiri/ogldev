@@ -33,13 +33,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial14_CameraControl", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial15_CameraRotation", "Tutorial15\Tutorial15.vcxproj", "{557323B9-85F8-45DF-B78F-D89406D59464}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial16", "Tutorial16\Tutorial16.vcxproj", "{7223D5B2-3FDE-417B-BF9E-3E467D1D9FA5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial16_TextureMapping", "Tutorial16\Tutorial16.vcxproj", "{7223D5B2-3FDE-417B-BF9E-3E467D1D9FA5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial18_LoadingModels", "Tutorial18\Tutorial18.vcxproj", "{32A9FC7F-FB44-4984-99FB-E768DD0779D9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17", "Tutorial17\Tutorial17.vcxproj", "{95DAED2E-A907-4D44-8F0C-5A985491353F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17_VAO", "Tutorial17\Tutorial17.vcxproj", "{95DAED2E-A907-4D44-8F0C-5A985491353F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19", "Tutorial19\Tutorial19.vcxproj", "{D3CB3C43-18C2-47CD-87D0-72D1D280D408}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19_Materials", "Tutorial19\Tutorial19.vcxproj", "{D3CB3C43-18C2-47CD-87D0-72D1D280D408}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial20", "Tutorial20\Tutorial20.vcxproj", "{34AC24B2-95A6-4F39-B643-6B6026D593D7}"
 EndProject
@@ -489,6 +489,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19", "Vulkan\Tutori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial58_DrawIndirect", "Tutorial58_DrawIndirect\Tutorial58.vcxproj", "{6687D730-280D-4BBE-9F16-89E2D89C5573}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
