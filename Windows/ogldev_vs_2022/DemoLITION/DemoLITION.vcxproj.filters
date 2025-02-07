@@ -88,9 +88,6 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp">
-      <Filter>Source\GL\Techniques</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
@@ -102,6 +99,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_glfw_camera_handler.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_shadow_mapping_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -207,11 +207,11 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h">
-      <Filter>Include\GL\Techniques</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid.h">
       <Filter>Include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_shadow_mapping_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +275,9 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\shadow_map.vs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

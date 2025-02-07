@@ -196,10 +196,10 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_grid.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_shadow_mapping_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h" />
-    <ClInclude Include="..\..\..\Include\ogldev_shadow_mapping_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp" />
@@ -215,7 +215,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_glfw_camera_handler.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glm_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
@@ -235,6 +234,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_scene.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +247,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\shadow_map.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
