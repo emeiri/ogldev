@@ -1459,6 +1459,8 @@ void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
     l.Attenuation.Linear = light.mAttenuationLinear;
     l.Attenuation.Exp = light.mAttenuationQuadratic;
 
+    printf("Attenuation: constant %f linear %f exp %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
+
     m_pointLights.push_back(l);
 }
 
@@ -1507,9 +1509,9 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 
     l.Attenuation.Constant = light.mAttenuationConstant;
     l.Attenuation.Linear = light.mAttenuationLinear;
-    l.Attenuation.Exp = light.mAttenuationQuadratic;
+    l.Attenuation.Exp = light.mAttenuationQuadratic / 100.0f;
 
-    printf("Attenuation: constant %f linear %f exp %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
+    printf("Attenuation: constant %f linear %f exp (adjusted!) %f\n", l.Attenuation.Constant, l.Attenuation.Linear, l.Attenuation.Exp);
 
     if (light.mAngleInnerCone != light.mAngleOuterCone) {
         printf("Warning!!! Different values for spot light inner/outer cone angles is not supported\n");
