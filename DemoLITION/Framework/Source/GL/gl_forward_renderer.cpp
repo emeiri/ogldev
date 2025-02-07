@@ -697,6 +697,11 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
 
 void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 {
+    if (UseIndirectRender) {
+        printf("Incorrect callback with indirect rendering\n");
+        assert(1);
+    }
+
     switch (m_curRenderPass) {
 
     case RENDER_PASS_SHADOW_DIR:
@@ -765,10 +770,6 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
   //  printf("Lighting pass\n"); WVP.Print(); exit(1);
-    if (UseIndirectRender) {
-        printf("Incorrect callback with indirect rendering\n");
-        assert(1);
-    }
 
     m_pCurLightingTech->SetWVP(WVP);
 
@@ -793,7 +794,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f InverseWorld = FinalWorldMatrix.Inverse();
     Matrix3f World3x3(InverseWorld);
     Matrix3f WorldTranspose = World3x3.Transpose();
-
+    //WorldTranspose.Print();
+   // exit(1);
     m_pCurLightingTech->SetNormalMatrix(WorldTranspose);
 }
 
