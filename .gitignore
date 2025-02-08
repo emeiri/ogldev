@@ -51,3 +51,4 @@ Include/assimp5/assimp.orig/*
 VulkanClear/*
 *.spv
 *.cap
+.vs/
