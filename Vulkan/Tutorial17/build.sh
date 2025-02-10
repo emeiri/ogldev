@@ -14,7 +14,6 @@ $CC tutorial17.cpp \
     ../VulkanCore/Source/shader.cpp \
     ../VulkanCore/Source/glfw_vulkan.cpp \
     ../VulkanCore/Source/graphics_pipeline.cpp \
-    ../VulkanCore/Source/texture.cpp \
     ../../Common/ogldev_util.cpp  \
     ../../Common/ogldev_glm_camera.cpp  \
     ../../Common/ogldev_glfw_camera_handler.cpp  \

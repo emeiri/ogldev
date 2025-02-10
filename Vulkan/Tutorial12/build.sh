@@ -11,7 +11,6 @@ $CC tutorial12.cpp \
     ../VulkanCore/Source/device.cpp \
     ../VulkanCore/Source/queue.cpp \
     ../VulkanCore/Source/wrapper.cpp \
-    ../VulkanCore/Source/texture.cpp \
     ../../Common/ogldev_util.cpp  \
     ../../Common/3rdparty/stb_image.cpp \
     $CPPFLAGS $LDFLAGS -o tutorial12

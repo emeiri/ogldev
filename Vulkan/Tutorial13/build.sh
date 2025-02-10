@@ -12,7 +12,6 @@ $CC tutorial13.cpp \
     ../VulkanCore/Source/queue.cpp \
     ../VulkanCore/Source/wrapper.cpp \
     ../VulkanCore/Source/shader.cpp \
-    ../VulkanCore/Source/texture.cpp \
     ../../Common/ogldev_util.cpp  \
     ../../Common/3rdparty/stb_image.cpp \
     $CPPFLAGS $LDFLAGS -o tutorial13
