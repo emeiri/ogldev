@@ -22,19 +22,10 @@
 #include "ogldev_math_3d.h"
 
 struct BasicMeshEntry {
-    BasicMeshEntry()
-    {
-        NumIndices = 0;
-        BaseVertex = 0;
-        BaseIndex = 0;
-        ValidFaces = 0;
-        MaterialIndex = 0xFFFFFFFF;
-    }
-
-    uint NumIndices;
-    uint BaseVertex;
-    uint BaseIndex;
-    uint ValidFaces;
-    uint MaterialIndex;
+    uint NumIndices = 0;
+    uint BaseVertex = 0;
+    uint BaseIndex = 0;
+    uint ValidFaces = 0;
+    uint MaterialIndex = 0xFFFFFFFF;
     Matrix4f Transformation;
 };

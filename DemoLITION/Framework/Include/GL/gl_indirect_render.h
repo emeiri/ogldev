@@ -38,7 +38,7 @@ public:
 
 private:
 
-    void InitTransformations(const std::vector<BasicMeshEntry>& Meshes);
+    void InitMeshes(const std::vector<BasicMeshEntry>& Meshes);
 
     void InitDrawCmdsBuffer(const std::vector<BasicMeshEntry>& Meshes);
 
@@ -46,8 +46,12 @@ private:
 
     void UpdatePerObjectData(const Matrix4f& ObjectMatrix);
 
-    std::vector<Matrix4f> m_meshTransformations;
-
     GLuint m_drawCmdBuffer = 0;
     GLuint m_perObjectBuffer = 0;
+
+    struct Mesh {
+        Matrix4f m_transformation;
+    };
+
+    std::vector<Mesh> m_meshes;
 };

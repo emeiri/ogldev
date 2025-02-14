@@ -19,6 +19,10 @@
 #include "GL\gl_ssbo_db.h"
 #include "GL\gl_indirect_render.h"
 
+struct PerObjectData {
+    Matrix4f WorldMatrix;
+    Matrix4f NormalMatrix;
+};
 
 struct DrawElementsIndirectCommand {
     unsigned int  Count = 0;
@@ -29,18 +33,11 @@ struct DrawElementsIndirectCommand {
 };
 
 
-struct PerObjectData {
-    Matrix4f WorldMatrix;
-    Matrix4f NormalMatrix;
-};
-
-
-
 void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes)
 {
     assert(Meshes.size() > 0);
 
-    InitTransformations(Meshes);
+    InitMeshes(Meshes);
 
     InitDrawCmdsBuffer(Meshes);
 
@@ -48,12 +45,12 @@ void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes)
 }
 
 
-void IndirectRender::InitTransformations(const std::vector<BasicMeshEntry>& Meshes)
+void IndirectRender::InitMeshes(const std::vector<BasicMeshEntry>& Meshes)
 {
-    m_meshTransformations.resize(Meshes.size());
+    m_meshes.resize(Meshes.size());
 
     for (int i = 0; i < Meshes.size(); i++) {
-        m_meshTransformations[i] = Meshes[i].Transformation;
+        m_meshes[i].m_transformation = Meshes[i].Transformation;
     }
 }
 
@@ -83,7 +80,8 @@ void IndirectRender::InitDrawCmdsBuffer(const std::vector<BasicMeshEntry>& Meshe
 void IndirectRender::AllocPerObjectBuffer(const std::vector<BasicMeshEntry>& Meshes)
 {
     glCreateBuffers(1, &m_perObjectBuffer);
-    glNamedBufferStorage(m_perObjectBuffer, sizeof(PerObjectData) * Meshes.size(), NULL, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(m_perObjectBuffer, sizeof(PerObjectData) * Meshes.size(), 
+                         NULL, GL_DYNAMIC_STORAGE_BIT);
 }
 
 
@@ -93,18 +91,21 @@ void IndirectRender::Render(const Matrix4f& ObjectMatrix)
 
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, m_drawCmdBuffer);
 
-    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, (GLsizei)m_meshTransformations.size(), 0);
+    glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, NULL, 
+                                (GLsizei)m_meshes.size(), 0);
+
+    glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 }
 
 
 void IndirectRender::UpdatePerObjectData(const Matrix4f& ObjectMatrix)
 {
     std::vector<PerObjectData> PerObjectDataVector;
-    PerObjectDataVector.resize(m_meshTransformations.size());
+    PerObjectDataVector.resize(m_meshes.size());
 
-    for (int i = 0; i < m_meshTransformations.size(); i++) {
+    for (int i = 0; i < m_meshes.size(); i++) {
         // TODO: move to math3d
-        Matrix4f FinalWorldMatrix = m_meshTransformations[i] * ObjectMatrix;
+        Matrix4f FinalWorldMatrix = ObjectMatrix * m_meshes[i].m_transformation;
         Matrix4f WorldInverse = FinalWorldMatrix.Inverse();
         Matrix4f WorldInverseTranspose = WorldInverse.Transpose();
 
@@ -112,7 +113,9 @@ void IndirectRender::UpdatePerObjectData(const Matrix4f& ObjectMatrix)
         PerObjectDataVector[i].NormalMatrix = WorldInverseTranspose;
     }
 
-    glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(PerObjectDataVector), PerObjectDataVector.data());
+    glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(PerObjectDataVector), 
+                         PerObjectDataVector.data());
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_PER_OBJ_DATA, m_perObjectBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_PER_OBJ_DATA, 
+                     m_perObjectBuffer);
 }
