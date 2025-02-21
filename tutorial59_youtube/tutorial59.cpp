@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Tutorial 57 - Bindless Textures
+    Tutorial 59 - Bindless Textures
 */
 
 #include <stdio.h>
@@ -25,8 +25,7 @@
 
 #include "ogldev_util.h"
 #include "ogldev_vertex_buffer.h"
-#include "ogldev_base_app.h"
-#include "ogldev_infinite_grid.h"
+#include "ogldev_base_app2.h"
 #include "ogldev_glm_camera.h"
 #include "bindless_tex_technique.h"
 #include "3rdparty/stb_image.h"
@@ -39,77 +38,39 @@
 #define NUM_TOTAL_FILES (NUM_DIRS * NUM_FILES_IN_DIR)
 
 
-class Tutorial57 : public OgldevBaseApp
+class Tutorial59 : public OgldevBaseApp2
 {
 public:
 
-    Tutorial57()
+    Tutorial59()
     {
     }
 
 
-    virtual ~Tutorial57()
+    virtual ~Tutorial59()
     {
     }
 
 
     void Init()
     {
-        DefaultCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 57");
-
-        DefaultInitCallbacks();
-
-        InitCamera();
-
-        InitInfiniteGrid();
-
-        DefaultInitGUI();
+        InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 59");
 
         m_bindlessTexTech.Init();
 
-        InitTexture();
+        InitTextures();
 
-      //  glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+//        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
-
-	virtual bool KeyboardCB(int Key, int Action, int Mods)
-	{
-        bool Handled = GLFWCameraHandler(m_pCamera->m_movement, Key, Action, Mods);
-
-        if (Handled) {
-            return true;
-        } else {
-            return OgldevBaseApp::KeyboardCB(Key, Action, Mods);
-        }
-	}
-
-
-	void MouseMoveCB(int x, int y)
-	{
-        m_pCamera->SetMousePos((float)x, (float)y);
-    }
-
-
-	virtual void MouseButtonCB(int Button, int Action, int Mods, int x, int y)
-	{
-        m_pCamera->HandleMouseButton(Button, Action, Mods);
-    }
 
 
     virtual void RenderSceneCB(float dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		m_pCamera->Update(dt);		
-
-        glm::mat4 VP = m_pCamera->GetVPMatrix();
-
-     //   m_infiniteGrid.Render(m_config, VP, m_pCamera->GetPosition());
-
         m_bindlessTexTech.Enable();
-       // glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, NUM_INSTANCES, 0);
 
         static int TextureIndex = 0;
         m_bindlessTexTech.SetTextureIndex(TextureIndex);
@@ -121,25 +82,9 @@ public:
         }
     }
 
-
-    void RenderGui()
-    {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // Rendering
-        ImGui::Render();
-        int display_w, display_h;
-        glfwGetFramebufferSize(m_pWindow, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
-
     private:
 
-    void InitTexture()
+    void InitTextures()
     {
         std::vector<GLuint> textures;
         std::vector<GLuint64> textureHandles;
@@ -152,7 +97,7 @@ public:
         for (uint32_t j = 0; j < NUM_DIRS; j++) {
             for (uint32_t i = 0; i != NUM_FILES_IN_DIR; i++) {
                 char fname[1024];
-                snprintf(fname, sizeof(fname), "../../Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
+                snprintf(fname, sizeof(fname), "G://emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
                 int Index = j * NUM_FILES_IN_DIR + i;
                 textureFiles[Index] = fname;
             }
@@ -196,36 +141,13 @@ public:
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, textureBuffer);
     }
 
-    void InitCamera()
-    {
-        float FOV = 45.0f;
-        float zNear = 1.0f;
-        float zFar = 1000.0f;
-        PersProjInfo persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
-
-        glm::vec3 Pos(0.0f, 2.1f, 0.0f);
-        glm::vec3 Target(0.0f, 2.1f, 1.0f);
-        glm::vec3 Up(0.0, 1.0f, 0.0f);
-
-        m_pCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);   
-    }
-
-
-    void InitInfiniteGrid()
-    {
-        m_infiniteGrid.Init(); 
-    }
-
-    InfiniteGrid m_infiniteGrid;
-    InfiniteGridConfig m_config;
-    GLMCameraFirstPerson* m_pCamera = NULL;    
     BindlessTextureTechnique m_bindlessTexTech;
 };
 
 
 int main(int argc, char** argv)
 {
-    Tutorial57* app = new Tutorial57();
+    Tutorial59* app = new Tutorial59();
 
     app->Init();
 

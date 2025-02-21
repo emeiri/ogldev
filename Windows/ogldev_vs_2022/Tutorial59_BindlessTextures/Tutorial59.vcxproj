@@ -25,8 +25,8 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\..\tutorial57_youtube\bindless_tex_technique.cpp" />
-    <ClCompile Include="..\..\..\tutorial57_youtube\tutorial57.cpp" />
+    <ClCompile Include="..\..\..\tutorial59_youtube\bindless_tex_technique.cpp" />
+    <ClCompile Include="..\..\..\tutorial59_youtube\tutorial59.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
@@ -38,18 +38,18 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
-    <ClInclude Include="..\..\..\tutorial57_youtube\bindless_tex_technique.h" />
+    <ClInclude Include="..\..\..\tutorial59_youtube\bindless_tex_technique.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\tutorial57_youtube\bindless_texture.fs" />
+    <None Include="..\..\..\tutorial59_youtube\bindless_texture.fs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{D987C331-0DEE-4940-87F2-E39469B090D0}</ProjectGuid>
+    <ProjectGuid>{BF5E6AD5-9481-4BA1-8A52-09DDA5B2C444}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial57_BindlessTextures</ProjectName>
+    <ProjectName>Tutorial59_BindlessTextures</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

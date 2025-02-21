@@ -30,10 +30,10 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\tutorial57_youtube\tutorial57.cpp">
+    <ClCompile Include="..\..\..\tutorial59_youtube\tutorial59.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\tutorial57_youtube\bindless_tex_technique.cpp">
+    <ClCompile Include="..\..\..\tutorial59_youtube\bindless_tex_technique.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,12 +65,12 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\tutorial57_youtube\bindless_tex_technique.h">
+    <ClInclude Include="..\..\..\tutorial59_youtube\bindless_tex_technique.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\tutorial57_youtube\bindless_texture.fs">
+    <None Include="..\..\..\tutorial59_youtube\bindless_texture.fs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
