@@ -454,7 +454,7 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 
 	VkAttachmentDescription DepthAttachment = {
 		.flags = 0,
-		.format = m_depthEnabled ? DepthFormat : VK_FORMAT_D32_SFLOAT,
+		.format = DepthFormat,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
 		.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
@@ -467,18 +467,6 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 	VkAttachmentReference DepthAttachmentRef = {
 		.attachment = 1,
 		.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	};
-
-	std::vector<VkSubpassDependency> Dependencies = {
-		/* VkSubpassDependency */ {
-			.srcSubpass = VK_SUBPASS_EXTERNAL,
-			.dstSubpass = 0,
-			.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-			.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-			.srcAccessMask = 0,
-			.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-			.dependencyFlags = 0
-		}
 	};
 
 	VkSubpassDescription SubpassDesc = {
@@ -509,8 +497,8 @@ VkRenderPass VulkanCore::CreateSimpleRenderPass()
 		.pAttachments = Attachments.data(),
 		.subpassCount = 1,
 		.pSubpasses = &SubpassDesc,
-		.dependencyCount = (u32)Dependencies.size(),
-		.pDependencies = Dependencies.data()
+		.dependencyCount = 0,
+		.pDependencies = NULL
 	};
 
 	VkRenderPass RenderPass;
@@ -921,10 +909,11 @@ void VulkanCore::CreateDepthResources()
 
 	m_depthImages.resize(NumSwapChainImages);
 
+    VkFormat DepthFormat = m_physDevices.Selected().m_depthFormat;
+
 	for (int i = 0; i < NumSwapChainImages; i++) {
 		VkImageUsageFlagBits Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 		VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-		VkFormat DepthFormat = m_physDevices.Selected().m_depthFormat;
 		CreateImage(m_depthImages[i], m_windowWidth, m_windowHeight, DepthFormat, Usage, PropertyFlags);
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
