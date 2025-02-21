@@ -490,7 +490,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19", "Vulkan\Tutori
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial58_DrawIndirect", "Tutorial58_DrawIndirect\Tutorial58.vcxproj", "{6687D730-280D-4BBE-9F16-89E2D89C5573}"
 	ProjectSection(ProjectDependencies) = postProject
-		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
+		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
 	EndProjectSection
 EndProject
 Global
