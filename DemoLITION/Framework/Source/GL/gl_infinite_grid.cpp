@@ -26,16 +26,22 @@ InfiniteGrid::InfiniteGrid()
 }
 
 
-void InfiniteGrid::Init()
+void InfiniteGrid::Init(int ShadowMapTextureUnit)
 {
     if (!m_infiniteGridTech.Init()) {
         printf("Error initializing the infinite grid technique\n");
         exit(1);
     }
+
+    m_infiniteGridTech.Enable();
+    m_infiniteGridTech.SetShadowMapTextureUnit(ShadowMapTextureUnit);
 }
 
 
-void InfiniteGrid::Render(const InfiniteGridConfig& Config, const Matrix4f& VP, const Vector3f& CameraPos)
+void InfiniteGrid::Render(const InfiniteGridConfig& Config, 
+                          const Matrix4f& VP, 
+                          const Vector3f& CameraPos,
+                          const Matrix4f& LightVP)
 {
     GLint CurProg = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, &CurProg);
@@ -43,6 +49,7 @@ void InfiniteGrid::Render(const InfiniteGridConfig& Config, const Matrix4f& VP, 
     m_infiniteGridTech.Enable();
 
     m_infiniteGridTech.SetVP(VP);
+    m_infiniteGridTech.SetLightVP(LightVP);
     m_infiniteGridTech.SetCameraWorldPos(CameraPos);
     m_infiniteGridTech.SetCellSize(Config.CellSize);
 

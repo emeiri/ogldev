@@ -27,9 +27,9 @@ class InfiniteGrid
 public:
     InfiniteGrid();
 
-    void Init();
+    void Init(int ShadowMapTextureUnit);
 
-    void Render(const InfiniteGridConfig& Config, const Matrix4f& VP, const Vector3f& CameraPos);
+    void Render(const InfiniteGridConfig& Config, const Matrix4f& VP, const Vector3f& CameraPos, const Matrix4f& LightVP);
 
 private:
 

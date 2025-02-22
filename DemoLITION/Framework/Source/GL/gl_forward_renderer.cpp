@@ -73,7 +73,7 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_pickingTexture.Init(m_windowWidth, m_windowHeight);
 
-    m_infiniteGrid.Init();
+    m_infiniteGrid.Init(SHADOW_TEXTURE_UNIT_INDEX);
 
     glUseProgram(0);
 }
@@ -195,10 +195,6 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         return;
     }
 
-    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
-        RenderInfiniteGrid(pScene);
-    }
-
     if (pScene->GetRenderList().size() == 0) {
         printf("Warning! render list is empty and no main model\n");
         return;
@@ -212,6 +208,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     }
 
     ShadowMapPass(pScene);
+
     LightingPass(pScene, TotalRuntimeMillis);
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
@@ -434,6 +431,11 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
    
     glViewport(0, 0, m_windowWidth, m_windowHeight);
 
+    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+        RenderInfiniteGrid(pScene);
+    }
+
+
     bool FirstTimeForwardLighting = true;
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
@@ -541,8 +543,10 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 {
     Matrix4f VP = m_pCurCamera->GetVPMatrix();
 
+    Matrix4f LightVP = m_lightPersProjMatrix * m_lightViewMatrix;	// TODO: get the correct projection matrix
+
     const InfiniteGridConfig& Config = pScene->GetConfig()->GetInfiniteGrid();
-    m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos());
+    m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos(), LightVP);
 
     // Debugging - TODO need to cleanup this mess
   /*  m_shadowMapFBO.BindForWriting();

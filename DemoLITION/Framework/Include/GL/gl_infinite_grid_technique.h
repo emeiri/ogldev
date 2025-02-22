@@ -31,14 +31,17 @@ public:
     virtual bool Init();
 
     void SetVP(const Matrix4f& VP);
+    void SetLightVP(const Matrix4f& LightVP);
     void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     void SetCellSize(float CellSize);
+    void SetShadowMapTextureUnit(unsigned int TextureUnit);
 
 private:
     bool InitCommon();
 
-    GLuint VPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint VPLoc             = INVALID_UNIFORM_LOCATION;
     GLuint CameraWorldPosLoc = INVALID_UNIFORM_LOCATION;
-    GLuint GridCellSizeLoc = INVALID_UNIFORM_LOCATION;
+    GLuint GridCellSizeLoc   = INVALID_UNIFORM_LOCATION;
+    GLuint LightVPLoc        = INVALID_UNIFORM_LOCATION;
+    GLuint ShadowMapLoc      = INVALID_UNIFORM_LOCATION;
 };
-

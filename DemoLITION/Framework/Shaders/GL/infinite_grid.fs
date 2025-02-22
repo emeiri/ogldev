@@ -16,9 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#version 330
+#version 420
 
 in vec3 WorldPos;
+in vec4 LightSpacePos;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -28,7 +29,7 @@ uniform float gGridMinPixelsBetweenCells = 2.0;
 uniform float gGridCellSize = 0.025;
 uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 1.0);
 uniform vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 1.0);
-
+layout(binding = 2) uniform sampler2D gShadowMap;
 
 float log10(float x)
 {
@@ -55,6 +56,33 @@ float max2(vec2 v)
 {
     float f = max(v.x, v.y);
     return f;
+}
+
+
+vec3 CalcShadowCoords()
+{
+    vec3 ProjCoords = LightSpacePos.xyz / LightSpacePos.w;
+    vec3 ShadowCoords = ProjCoords * 0.5 + vec3(0.5);
+    return ShadowCoords;
+}
+
+
+float CalcShadowFactorBasic(vec3 LightDirection)
+{
+    vec3 ShadowCoords = CalcShadowCoords();
+
+    float Depth = texture(gShadowMap, ShadowCoords.xy).x;
+
+    vec3 Normal = vec3(0.0, 1.0, 0.0);
+
+    float DiffuseFactor = dot(Normal, -LightDirection);
+
+    float bias = 0.0;//max(0.05 * (1.0 - DiffuseFactor), 0.005);  
+
+    if (Depth + bias < ShadowCoords.z)
+        return 0.15;
+    else
+        return 1.0;
 }
 
 
@@ -107,5 +135,15 @@ void main()
 
     Color.a *= OpacityFalloff;
 
-    FragColor = Color;
+    vec3 LightDirection = vec3(0.0, -1.0, 0.0);
+    LightDirection = normalize(LightDirection);
+    float ShadowFactor = CalcShadowFactorBasic(LightDirection);
+
+    if (ShadowFactor < 1.0) {
+        FragColor = vec4(Color.xyz * ShadowFactor, 1.0 - ShadowFactor);
+    } else {
+        FragColor = Color;
+    }
+
+ //  FragColor = vec4(ShadowFactor);
 }

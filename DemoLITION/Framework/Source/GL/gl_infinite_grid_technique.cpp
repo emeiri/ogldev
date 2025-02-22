@@ -47,6 +47,8 @@ bool InfiniteGridTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
     GET_UNIFORM_AND_CHECK(CameraWorldPosLoc, "gCameraWorldPos");
     GET_UNIFORM_AND_CHECK(GridCellSizeLoc, "gGridCellSize");
+    GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
+    GET_UNIFORM_AND_CHECK(ShadowMapLoc, "gShadowMap");
 
     return true;
 }
@@ -55,6 +57,12 @@ bool InfiniteGridTechnique::InitCommon()
 void InfiniteGridTechnique::SetVP(const Matrix4f& VP)
 {
     glUniformMatrix4fv(VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
+}
+
+
+void InfiniteGridTechnique::SetLightVP(const Matrix4f& LightVP)
+{
+    glUniformMatrix4fv(LightVPLoc, 1, GL_TRUE, (const GLfloat*)LightVP.m);
 }
 
 
@@ -67,6 +75,12 @@ void InfiniteGridTechnique::SetCameraWorldPos(const Vector3f& CameraWorldPos)
 void InfiniteGridTechnique::SetCellSize(float CellSize)
 {
     glUniform1f(GridCellSizeLoc, CellSize);
+}
+
+
+void InfiniteGridTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(ShadowMapLoc, TextureUnit);
 }
 
 
