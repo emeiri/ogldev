@@ -43,7 +43,7 @@
     <ProjectGuid>{0D237F28-EA59-4308-9330-50650B015A07}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial38</ProjectName>
+    <ProjectName>Tutorial38_ImprovingShadowMapping</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
