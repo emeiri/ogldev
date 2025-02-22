@@ -29,6 +29,7 @@ uniform float gGridMinPixelsBetweenCells = 2.0;
 uniform float gGridCellSize = 0.025;
 uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 1.0);
 uniform vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 1.0);
+uniform vec3 gLightDirection;
 layout(binding = 2) uniform sampler2D gShadowMap;
 
 float log10(float x)
@@ -135,9 +136,7 @@ void main()
 
     Color.a *= OpacityFalloff;
 
-    vec3 LightDirection = vec3(0.0, -1.0, 0.0);
-    LightDirection = normalize(LightDirection);
-    float ShadowFactor = CalcShadowFactorBasic(LightDirection);
+    float ShadowFactor = CalcShadowFactorBasic(gLightDirection);
 
     if (ShadowFactor < 1.0) {
         FragColor = vec4(Color.xyz * ShadowFactor, 1.0 - ShadowFactor);

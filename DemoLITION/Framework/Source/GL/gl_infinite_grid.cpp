@@ -41,7 +41,8 @@ void InfiniteGrid::Init(int ShadowMapTextureUnit)
 void InfiniteGrid::Render(const InfiniteGridConfig& Config, 
                           const Matrix4f& VP, 
                           const Vector3f& CameraPos,
-                          const Matrix4f& LightVP)
+                          const Matrix4f& LightVP,
+                          const Vector3f& LightDir)
 {
     GLint CurProg = 0;
     glGetIntegerv(GL_CURRENT_PROGRAM, &CurProg);
@@ -52,6 +53,7 @@ void InfiniteGrid::Render(const InfiniteGridConfig& Config,
     m_infiniteGridTech.SetLightVP(LightVP);
     m_infiniteGridTech.SetCameraWorldPos(CameraPos);
     m_infiniteGridTech.SetCellSize(Config.CellSize);
+    m_infiniteGridTech.SetLightDirection(LightDir);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

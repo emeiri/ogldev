@@ -555,8 +555,15 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 
     Matrix4f LightVP = m_lightPersProjMatrix * m_lightViewMatrix;	// TODO: get the correct projection matrix
 
+    int NumSpotLights = (int)pScene->GetSpotLights().size();
+    Vector3f LightDir(0.0f);
+
+    if (NumSpotLights > 0) {
+        LightDir = pScene->GetSpotLights()[0].WorldDirection;
+    }
+
     const InfiniteGridConfig& Config = pScene->GetConfig()->GetInfiniteGrid();
-    m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos(), LightVP);
+    m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos(), LightVP, LightDir);
 
     // Debugging - TODO need to cleanup this mess
   /*  m_shadowMapFBO.BindForWriting();

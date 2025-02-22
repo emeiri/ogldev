@@ -29,7 +29,11 @@ public:
 
     void Init(int ShadowMapTextureUnit);
 
-    void Render(const InfiniteGridConfig& Config, const Matrix4f& VP, const Vector3f& CameraPos, const Matrix4f& LightVP);
+    void Render(const InfiniteGridConfig& Config,
+                const Matrix4f& VP,
+                const Vector3f& CameraPos,
+                const Matrix4f& LightVP,
+                const Vector3f& LightDir);
 
 private:
 

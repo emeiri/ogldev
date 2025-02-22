@@ -84,3 +84,7 @@ void InfiniteGridTechnique::SetShadowMapTextureUnit(unsigned int TextureUnit)
 }
 
 
+void InfiniteGridTechnique::SetLightDirection(const Vector3f& LightDir)
+{
+    glUniform3f(LightDirectionLoc, LightDir.x, LightDir.y, LightDir.z);
+}

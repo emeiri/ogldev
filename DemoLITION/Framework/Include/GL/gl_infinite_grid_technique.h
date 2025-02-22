@@ -35,6 +35,7 @@ public:
     void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     void SetCellSize(float CellSize);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
+    void SetLightDirection(const Vector3f& LightDir);
 
 private:
     bool InitCommon();
@@ -44,4 +45,5 @@ private:
     GLuint GridCellSizeLoc   = INVALID_UNIFORM_LOCATION;
     GLuint LightVPLoc        = INVALID_UNIFORM_LOCATION;
     GLuint ShadowMapLoc      = INVALID_UNIFORM_LOCATION;
+    GLuint LightDirectionLoc = INVALID_UNIFORM_LOCATION;
 };
