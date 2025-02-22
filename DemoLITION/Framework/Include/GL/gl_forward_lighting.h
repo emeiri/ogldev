@@ -76,6 +76,7 @@ public:
     void ControlLighting(bool LightingEnabled);
     void ControlShadows(bool ShadowsEnabled);
     void ControlIndirectRender(bool IsRenderIndirect);
+    void ControlPVP(bool IsPVP);
     void SetVP(const Matrix4f& VP);
     void SetLightVP(const Matrix4f& LightVP);
 
@@ -126,6 +127,7 @@ private:
     GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsIndirectRenderLoc = INVALID_UNIFORM_LOCATION;
+    GLuint IsPVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint VPLoc = INVALID_UNIFORM_LOCATION;
 
     struct {

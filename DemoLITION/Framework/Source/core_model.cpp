@@ -25,9 +25,9 @@
 using namespace std;
 
 // config flags
-static bool UsePVP = false;     // Programmable Vertex Pulling
+bool UsePVP = true;     // Programmable Vertex Pulling
 static bool UseMeshOptimizer = false;
-bool UseIndirectRender = true;
+bool UseIndirectRender = false;
 
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1

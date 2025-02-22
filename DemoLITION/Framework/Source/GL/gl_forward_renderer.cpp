@@ -24,6 +24,7 @@
 #define SHADOW_MAP_WIDTH 2048
 #define SHADOW_MAP_HEIGHT 2048
 
+extern bool UsePVP;
 extern bool UseIndirectRender;
 
 struct CameraDirection
@@ -391,7 +392,7 @@ void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>&
         Matrix4f VP = m_lightPersProjMatrix * m_lightViewMatrix;
         m_shadowMapTech.SetVP(VP);
     }
-    m_shadowMapTech.ControlIndirectRender(UseIndirectRender);
+    m_shadowMapTech.ControlIndirectRender(UseIndirectRender);   // TODO: same for point
     RenderEntireRenderList(RenderList);
 }
 
@@ -467,7 +468,7 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     ApplyLighting(pScene);
 
-    if (UseIndirectRender) {        // TODO: do this once
+    if (UseIndirectRender) {  
         Matrix4f VP = m_pCurCamera->GetVPMatrix();
         m_pCurLightingTech->SetVP(VP);
         Matrix4f LightVP = m_lightPersProjMatrix * m_lightViewMatrix;	// TODO: get the correct projection matrix
@@ -475,6 +476,7 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
     }
 
     m_pCurLightingTech->ControlIndirectRender(UseIndirectRender);
+    m_pCurLightingTech->ControlPVP(UsePVP);
 }
 
 

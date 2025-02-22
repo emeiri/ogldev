@@ -19,10 +19,19 @@
 
 #version 460 core
 
-//#define PVP
+//
+// Non PVP input attributes
+//
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec2 TexCoord;
+layout (location = 2) in vec3 Normal;
+layout (location = 3) in vec3 Tangent;
+layout (location = 4) in vec3 Bitangent;
 
-#ifdef PVP
 
+// 
+// PVP input attributes
+//
 struct Vertex {
     float Position[3];
     float TexCoord[2];
@@ -35,24 +44,6 @@ layout(std430, binding = 0) restrict readonly buffer Vertices {
     Vertex in_Vertices[];
 };
 
-#else // PVP
-
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec2 TexCoord;
-layout (location = 2) in vec3 Normal;
-layout (location = 3) in vec3 Tangent;
-layout (location = 4) in vec3 Bitangent;
-
-#endif
-
-uniform mat4 gWVP;
-uniform mat4 gVP;
-uniform mat4 gLightWVP;
-uniform mat4 gLightVP;
-uniform mat4 gWorld;
-uniform mat3 gNormalMatrix;
-uniform bool gIsIndirectRender = false;
-
 struct PerObjectData {
     mat4 WorldMatrix;
     mat4 NormalMatrix;
@@ -62,7 +53,6 @@ layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
     PerObjectData o[];
 };
 
-
 out vec2 TexCoord0;
 out vec3 Normal0;
 out vec3 WorldPos0;
@@ -71,7 +61,16 @@ out vec3 Tangent0;
 out vec3 Bitangent0;
 out flat int MaterialIndex;
 
-#ifdef PVP
+
+uniform mat4 gWVP;
+uniform mat4 gVP;
+uniform mat4 gLightWVP;
+uniform mat4 gLightVP;
+uniform mat4 gWorld;
+uniform mat3 gNormalMatrix;
+uniform bool gIsPVP = false;
+uniform bool gIsIndirectRender = false;
+
 vec3 GetPosition(int i)
 {
     return vec3(in_Vertices[i].Position[0], 
@@ -110,38 +109,48 @@ vec3 GetBitangent(int i)
                 in_Vertices[i].Bitangent[2]);
 }
 
-#endif // PVP
-
 
 void main()
 {
-#ifdef PVP
-    vec3 Position = GetPosition(gl_VertexID);
-    vec2 TexCoord = GetTexCoord(gl_VertexID);
-    vec3 Normal = GetNormal(gl_VertexID);
-    vec3 Tangent = GetTangent(gl_VertexID);
-    vec3 Bitangent = GetBitangent(gl_VertexID);
-#endif
+    vec3 Position_;
+    vec2 TexCoord_;
+    vec3 Normal_;
+    vec3 Tangent_;
+    vec3 Bitangent_;
 
-    vec4 Pos4 = vec4(Position, 1.0);
+    if (gIsPVP) {
+        Position_ = GetPosition(gl_VertexID);        
+        TexCoord_ = GetTexCoord(gl_VertexID);
+        Normal_ = GetNormal(gl_VertexID);
+        Tangent_ = GetTangent(gl_VertexID);
+        Bitangent_ = GetBitangent(gl_VertexID);
+    } else {
+        Position_ = Position;
+        TexCoord_ = TexCoord;
+        Normal_ = Normal;
+        Tangent_ = Tangent;
+        Bitangent_ = Bitangent;
+    }
+
+    vec4 Pos4 = vec4(Position_, 1.0);
 
     if (gIsIndirectRender) {
         gl_Position = gVP * o[gl_DrawID].WorldMatrix * Pos4;
-        Normal0 = (o[gl_DrawID].NormalMatrix * vec4(Normal, 0.0)).xyz;
-        Tangent0 = (o[gl_DrawID].NormalMatrix * vec4(Tangent, 0.0)).xyz;
-        Bitangent0 = (o[gl_DrawID].NormalMatrix * vec4(Bitangent, 0.0)).xyz;
+        Normal0 = (o[gl_DrawID].NormalMatrix * vec4(Normal_, 0.0)).xyz;
+        Tangent0 = (o[gl_DrawID].NormalMatrix * vec4(Tangent_, 0.0)).xyz;
+        Bitangent0 = (o[gl_DrawID].NormalMatrix * vec4(Bitangent_, 0.0)).xyz;
         WorldPos0 = (o[gl_DrawID].WorldMatrix * Pos4).xyz;
         LightSpacePos0 = (gLightVP * o[gl_DrawID].WorldMatrix * Pos4);
     } else {
         gl_Position = gWVP * Pos4;
-	    Normal0 = gNormalMatrix * Normal;
-	    Tangent0 = gNormalMatrix * Tangent;
-	    Bitangent0 = gNormalMatrix * Bitangent;
+        Normal0 = gNormalMatrix * Normal_;
+        Tangent0 = gNormalMatrix * Tangent_;
+        Bitangent0 = gNormalMatrix * Bitangent_;
         WorldPos0 = (gWorld * Pos4).xyz;
         LightSpacePos0 = gLightWVP * Pos4;
     }
 
-    TexCoord0 = TexCoord;
+    TexCoord0 = TexCoord_;
 
     MaterialIndex = 0;  // Hack until we setup bindless textures
 }
