@@ -42,7 +42,6 @@ public:
     void SetNormalMatrix(const Matrix3f& NormalMatrix);
     void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
-    void DisableDiffuseTexture();
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetShadowCubeMapTextureUnit(unsigned int TextureUnit);
     void SetShadowMapSize(unsigned int Width, unsigned int Height);
@@ -57,10 +56,8 @@ public:
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
-    void UpdatePointLight(unsigned int Index, const PointLight& Light);
     void UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights);
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights, bool WithPosAndDir = true);
-    void UpdateSpotLight(unsigned int Index, const SpotLight& Light);
     void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     virtual void SetMaterial(const Material& material);

@@ -92,7 +92,7 @@ class ParticleLink : public ParticleContactGenerator {
 
 public:
     
-    Particle* m_pParticles[2];
+    Particle* m_pParticles[2] = { NULL, NULL };
 
     virtual int AddContact(std::vector<ParticleContact>& Contacts, int StartIndex) const = 0;
 

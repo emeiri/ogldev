@@ -52,8 +52,16 @@ float RandomFloatRange(float Start, float End);
 
 struct Vector2i
 {
-    int x;
-    int y;
+    Vector2i() {}
+
+    Vector2i(int xi, int yi)
+    {
+        x = xi;
+        y = yi;
+    }
+
+    int x = 0;
+    int y = 0;
 };
 
 struct Vector3i

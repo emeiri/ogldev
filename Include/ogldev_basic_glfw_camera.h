@@ -106,7 +106,7 @@ private:
     bool m_OnLeftEdge = false;
     bool m_OnRightEdge = false;
 
-    Vector2i m_mousePos;
+    Vector2i m_mousePos = Vector2i(0,0);
     
     PersProjInfo m_persProjInfo;
     Matrix4f m_projection;
