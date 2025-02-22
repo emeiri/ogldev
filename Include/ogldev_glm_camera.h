@@ -73,6 +73,8 @@ public:
 
 	glm::mat4 GetVPMatrixNoTranslate() const;
 
+	const PersProjInfo& GetPersProjInfo() const { return m_persProjInfo; }
+
 	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
 
 	void SetUp(const glm::vec3& Up) { m_up = Up; }
@@ -90,7 +92,6 @@ public:
 	virtual Matrix4f GetMatrix() const;
 
 	virtual const Matrix4f GetProjectionMat() const;
-
 
 private:
 
