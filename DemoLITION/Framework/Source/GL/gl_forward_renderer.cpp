@@ -393,6 +393,7 @@ void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>&
         m_shadowMapTech.SetVP(VP);
     }
     m_shadowMapTech.ControlIndirectRender(UseIndirectRender);   // TODO: same for point
+    m_shadowMapTech.ControlPVP(UsePVP);                         // TODO: same for point
     RenderEntireRenderList(RenderList);
 }
 

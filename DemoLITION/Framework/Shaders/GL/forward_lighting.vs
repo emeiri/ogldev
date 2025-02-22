@@ -44,10 +44,12 @@ layout(std430, binding = 0) restrict readonly buffer Vertices {
     Vertex in_Vertices[];
 };
 
+
 struct PerObjectData {
     mat4 WorldMatrix;
     mat4 NormalMatrix;
 };
+
 
 layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
     PerObjectData o[];

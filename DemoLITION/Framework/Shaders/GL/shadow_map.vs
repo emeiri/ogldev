@@ -19,16 +19,30 @@
 
 #version 460 core
 
+//
+// Non PVP input attributes
+//
 layout (location = 0) in vec3 Position;
 
-uniform mat4 gWVP;
-uniform mat4 gVP;
-uniform bool gIsIndirectRender = false;
+// 
+// PVP input attributes
+//
+struct Vertex {
+    float Position[3];
+    float TexCoord[2];
+    float Normal[3];
+    float Tangent[3];
+    float Bitangent[3];
+};
+
+layout(std430, binding = 0) restrict readonly buffer Vertices {
+    Vertex in_Vertices[];
+};
+
 
 struct PerObjectData {
     mat4 WorldMatrix;
     mat4 NormalMatrix;
-    ivec4 MaterialIndex;
 };
 
 
@@ -37,9 +51,28 @@ layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
 };
 
 
+uniform mat4 gWVP;
+uniform mat4 gVP;
+uniform bool gIsPVP = false;
+uniform bool gIsIndirectRender = false;
+
+vec3 GetPosition(int i)
+{
+    return vec3(in_Vertices[i].Position[0], 
+                in_Vertices[i].Position[1], 
+                in_Vertices[i].Position[2]);
+}
 void main()
 {
-    vec4 Pos4 = vec4(Position, 1.0);
+    vec3 Position_;
+    
+    if (gIsPVP) {
+        Position_ = GetPosition(gl_VertexID);        
+    } else {
+        Position_ = Position;
+    }
+
+    vec4 Pos4 = vec4(Position_, 1.0);
 
     if (gIsIndirectRender) {
         gl_Position = gVP * o[gl_DrawID].WorldMatrix * Pos4;

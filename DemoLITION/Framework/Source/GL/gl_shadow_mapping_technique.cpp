@@ -45,6 +45,7 @@ bool ShadowMappingTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_WVPLoc, "gWVP");
     GET_UNIFORM_AND_CHECK(m_VPLoc, "gVP");
     GET_UNIFORM_AND_CHECK(m_isIndirectRenderLoc, "gIsIndirectRender");
+    GET_UNIFORM_AND_CHECK(m_isPVPLoc, "gIsPVP");
 
     return true;
 }
@@ -59,6 +60,12 @@ void ShadowMappingTechnique::SetWVP(const Matrix4f& WVP)
 void ShadowMappingTechnique::ControlIndirectRender(bool IsIndirectRender)
 {
     glUniform1i(m_isIndirectRenderLoc, IsIndirectRender);
+}
+
+
+void ShadowMappingTechnique::ControlPVP(bool IsPVP)
+{
+    glUniform1i(m_isPVPLoc, IsPVP);
 }
 
 

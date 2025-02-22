@@ -33,11 +33,13 @@ class ShadowMappingTechnique : public Technique
     void SetWVP(const Matrix4f& WVP);
     void SetVP(const Matrix4f& WVP);            // Indirect rendering    
     void ControlIndirectRender(bool IsRenderIndirect);
+    void ControlPVP(bool IsPVP);
 
  private:
 
     GLuint m_WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_VPLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_isIndirectRenderLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_isPVPLoc = INVALID_UNIFORM_LOCATION;
 };
 
