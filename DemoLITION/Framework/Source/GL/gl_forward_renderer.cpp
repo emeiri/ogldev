@@ -339,11 +339,21 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     }
 
     const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
-    Vector3f Origin(0.0f, 0.0f, 0.0f);
     int NumDirLights = 0;
     if (DirLights.size() == 1) {
         NumDirLights = 1;
-        m_lightViewMatrix.InitCameraTransform(Origin, DirLights[0].WorldDirection, DirLights[0].Up);
+        OrthoProjInfo LightOrthoProjInfo;
+        Vector3f LightWorldPos;
+
+        CalcTightLightProjection(m_pCurCamera->GetViewMatrix(),   // in
+                                 DirLights[0].WorldDirection,     // in
+                                 m_pCurCamera->GetPersProjInfo(), // in
+                                 LightWorldPos,                   // out
+                                 LightOrthoProjInfo);             // out
+
+        Vector3f Up(0.0f, 1.0f, 0.0f);
+        m_lightViewMatrix.InitCameraTransform(LightWorldPos, DirLights[0].WorldDirection, Up);
+
     } else if (DirLights.size() > 1) {
         printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
     }
