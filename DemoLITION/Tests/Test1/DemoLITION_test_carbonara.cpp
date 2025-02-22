@@ -69,10 +69,17 @@ public:
         m_dirLight.DiffuseIntensity = 1.0f;
         m_dirLight.AmbientIntensity = 0.8f;
 
-        m_pointLight.WorldPosition = Vector3f(0.25f, 0.25f, 0.0f);
+        m_pointLight.WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
      //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
-        m_pointLight.DiffuseIntensity = 2.0f;
+        m_pointLight.DiffuseIntensity = 0.2f;
         m_pointLight.AmbientIntensity = 0.1f;
+
+        m_spotLight.WorldPosition = Vector3f(0.0f, 10.0f, 0.0f);
+        m_spotLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
+        m_spotLight.Up = Vector3f(0.0f, 0.0f, -1.0f);
+        m_spotLight.Cutoff = 30.0f;
+        m_spotLight.DiffuseIntensity = 0.2f;
+        m_spotLight.AmbientIntensity = 0.1f;
     }
 
     ~Carbonara() {}
@@ -93,9 +100,10 @@ public:
         
       //  m_pScene->SetCameraSpeed(0.1f);
 
-        m_pScene->GetDirLights().push_back(m_dirLight);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
-      //  m_pScene->GetPointLights().push_back(m_pointLight);
+       // m_pScene->GetDirLights().push_back(m_dirLight);        
+        //m_pScene->GetPointLights().push_back(m_pointLight);
+        m_pScene->GetSpotLights().push_back(m_spotLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -428,6 +436,7 @@ private:
 
     DirectionalLight m_dirLight;
     PointLight m_pointLight;
+    SpotLight m_spotLight;
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
     SceneObject* m_pickedObject = NULL;
@@ -505,7 +514,7 @@ public:
     void InitChild()
     {
         m_pScene->SetCamera(Vector3f(0.0f, 0.25f, -0.4f), Vector3f(0.0, -0.4f, 1.0f));
-        PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 0.1f);
+        PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 1.0f);
         CObject.pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
     }
 };
@@ -838,10 +847,10 @@ public:
 
         m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
       //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
-         Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
+      //   Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
 
       //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
-     //   Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
         
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
      //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
@@ -861,7 +870,7 @@ void carbonara()
    //FireworksDemo demo;
     AnimationDemo demo;
   //  BridgeDemo demo;
-  //  AmazonBistroDemo demo;
+   // AmazonBistroDemo demo;
 
     demo.Start();
 }
