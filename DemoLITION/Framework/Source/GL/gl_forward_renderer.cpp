@@ -768,6 +768,11 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPassDir(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPassSpot(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    /*ObjectMatrix.Print();
+    World.Print();
+    m_lightViewMatrix.Print();
+    m_lightPersProjMatrix.Print();
+    exit(0);*/
     Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
     m_shadowMapTech.SetWVP(WVP);
 }
