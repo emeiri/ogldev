@@ -32,6 +32,7 @@ const int MAX_BONES = 200;
 uniform mat4 gWVP;
 uniform mat4 gVP;
 uniform mat4 gLightWVP;
+uniform mat4 gLightVP;
 uniform mat4 gWorld;
 uniform mat3 gNormalMatrix;
 uniform mat4 gBones[MAX_BONES];
@@ -71,17 +72,17 @@ void main()
         Tangent0 = (o[gl_DrawID].NormalMatrix * vec4(Tangent, 0.0)).xyz;
         Bitangent0 = (o[gl_DrawID].NormalMatrix * vec4(Bitangent, 0.0)).xyz;
         WorldPos0 = (o[gl_DrawID].WorldMatrix * PosL).xyz;
+        LightSpacePos0 = (gLightVP * o[gl_DrawID].WorldMatrix * Pos4);
     } else {
         gl_Position = gWVP * PosL;
         Normal0 = gNormalMatrix * Normal;
         Tangent0 = gNormalMatrix * Tangent;
         Bitangent0 = gNormalMatrix * Bitangent;
         WorldPos0 = (gWorld * PosL).xyz;
+        LightSpacePos0 = gLightWVP * Pos4;
     }
     
     TexCoord0 = TexCoord;
-
-    LightSpacePos0 = gLightWVP * PosL;
 
     MaterialIndex = 0;  // Hack until we setup bindless textures
 }
