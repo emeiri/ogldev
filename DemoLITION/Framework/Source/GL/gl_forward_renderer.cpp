@@ -247,14 +247,11 @@ void ForwardRenderer::ApplyLighting(GLScene* pScene)
         NumLightsTotal += NumDirLights;
     }
 
-    if (NumLightsTotal == 0) {
-        //printf("Warning! trying to render but all lights are zero\n");
-        m_pCurLightingTech->ControlLighting(false);
-    }
-    else {
-        m_pCurLightingTech->ControlLighting(true);
-    }
-
+    bool LightingEnabled = (NumLightsTotal > 0);
+    
+    //if (!LightingEnabled) printf("Warning! trying to render but all lights are zero\n");
+    
+    m_pCurLightingTech->ControlLighting(LightingEnabled);
     m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
 }
 
