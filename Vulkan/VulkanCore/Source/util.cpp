@@ -117,9 +117,11 @@ VkFormat FindSupportedFormat(VkPhysicalDevice Device, const std::vector<VkFormat
 		VkFormatProperties Props;
 		vkGetPhysicalDeviceFormatProperties(Device, Format, &Props);
 
-		if ((Tiling == VK_IMAGE_TILING_LINEAR) && (Props.linearTilingFeatures & Features) == Features) {
+		if ((Tiling == VK_IMAGE_TILING_LINEAR) && 
+			(Props.linearTilingFeatures & Features) == Features) {
 			return Format;
-		} else if (Tiling == VK_IMAGE_TILING_OPTIMAL && (Props.optimalTilingFeatures & Features) == Features) {
+		} else if (Tiling == VK_IMAGE_TILING_OPTIMAL && 
+			(Props.optimalTilingFeatures & Features) == Features) {
 			return Format;
 		}
 	}

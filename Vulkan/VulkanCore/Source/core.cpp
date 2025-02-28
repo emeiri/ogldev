@@ -914,13 +914,15 @@ void VulkanCore::CreateDepthResources()
 	for (int i = 0; i < NumSwapChainImages; i++) {
 		VkImageUsageFlagBits Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 		VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-		CreateImage(m_depthImages[i], m_windowWidth, m_windowHeight, DepthFormat, Usage, PropertyFlags);
+		CreateImage(m_depthImages[i], m_windowWidth, m_windowHeight, DepthFormat, 
+					Usage, PropertyFlags);
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout);
 
-		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
+												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 	}
 }
 

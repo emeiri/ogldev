@@ -223,9 +223,9 @@ private:
 			Vertex({1.0f, 1.0f, 0.0f},   {1.0f, 1.0f}), // Top right
 			Vertex({1.0f,  -1.0f, 0.0f}, {1.0f, 0.0f}), // Bottom right
 
-			Vertex({-1.0f, -1.0f, 15.0f}, {1.0f, 1.0f}), // Bottom left
-			Vertex({1.0f, 1.0f, 15.0f},   {0.0f, 1.0f}), // Top right
-			Vertex({1.0f,  -1.0f, 15.0f}, {1.0f, 0.0f})  // Bottom right
+			Vertex({-1.0f, -1.0f, 5.0f}, {0.0f, 0.0f}), // Bottom left
+			Vertex({-1.0f, 1.0f, 5.0f},  {0.0f, 1.0f}), // Top left
+			Vertex({1.0f,  1.0f, 5.0f},  {1.0f, 1.0f})  // Top right
 		};
 
 		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
