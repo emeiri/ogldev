@@ -556,7 +556,7 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
     Matrix4f LightVP = m_lightPersProjMatrix * m_lightViewMatrix;	// TODO: get the correct projection matrix
 
     int NumSpotLights = (int)pScene->GetSpotLights().size();
-    Vector3f LightDir(0.0f);
+    Vector3f LightDir(0.0f, -1.0f, 0.0f);
 
     if (NumSpotLights > 0) {
         LightDir = pScene->GetSpotLights()[0].WorldDirection;
