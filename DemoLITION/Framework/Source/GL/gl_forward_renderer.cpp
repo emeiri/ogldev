@@ -338,24 +338,27 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         m_lightViewMatrix.InitCameraTransform(SpotLights[0].WorldPosition, SpotLights[0].WorldDirection, SpotLights[0].Up);
     }
 
-    const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
-    int NumDirLights = 0;
-    if (DirLights.size() == 1) {
-        NumDirLights = 1;
-        OrthoProjInfo LightOrthoProjInfo;
-        Vector3f LightWorldPos;
+    int NumDirLights = (int)pScene->GetDirLights().size();
 
-        CalcTightLightProjection(m_pCurCamera->GetViewMatrix(),   // in
-                                 DirLights[0].WorldDirection,     // in
-                                 m_pCurCamera->GetPersProjInfo(), // in
-                                 LightWorldPos,                   // out
-                                 LightOrthoProjInfo);             // out
+    if (NumDirLights > 0) {
+        const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
 
-        Vector3f Up(0.0f, 1.0f, 0.0f);
-        m_lightViewMatrix.InitCameraTransform(LightWorldPos, DirLights[0].WorldDirection, Up);
+        if (NumDirLights == 1) {
+            OrthoProjInfo LightOrthoProjInfo;
+            Vector3f LightWorldPos;
 
-    } else if (DirLights.size() > 1) {
-        printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
+            CalcTightLightProjection(m_pCurCamera->GetViewMatrix(),   // in
+                DirLights[0].WorldDirection,     // in
+                m_pCurCamera->GetPersProjInfo(), // in
+                LightWorldPos,                   // out
+                LightOrthoProjInfo);             // out
+
+            Vector3f Up(0.0f, 1.0f, 0.0f);
+            m_lightViewMatrix.InitCameraTransform(LightWorldPos, DirLights[0].WorldDirection, Up);
+        }
+        else if (DirLights.size() > 1) {
+            printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
+        }
     }
 
     int NumPointLights = (int)pScene->GetPointLights().size();
