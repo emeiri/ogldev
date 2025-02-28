@@ -54,6 +54,7 @@ void InfiniteGrid::Render(const InfiniteGridConfig& Config,
     m_infiniteGridTech.SetCameraWorldPos(CameraPos);
     m_infiniteGridTech.SetCellSize(Config.CellSize);
     m_infiniteGridTech.SetLightDirection(LightDir);
+    m_infiniteGridTech.ControlShadows(Config.ShadowsEnabled);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -31,6 +31,7 @@ uniform vec4 gGridColorThin = vec4(0.5, 0.5, 0.5, 1.0);
 uniform vec4 gGridColorThick = vec4(0.0, 0.0, 0.0, 1.0);
 uniform vec3 gLightDirection;
 layout(binding = 2) uniform sampler2D gShadowMap;
+uniform bool gShadowsEnabled = true;
 
 float log10(float x)
 {
@@ -87,6 +88,20 @@ float CalcShadowFactorBasic(vec3 LightDirection)
 }
 
 
+float GetShadowFactor(vec3 LightDirection)
+{
+    float ShadowFactor;
+
+    if (gShadowsEnabled) {
+        ShadowFactor = CalcShadowFactorBasic(LightDirection);
+    } else {
+        ShadowFactor = 1.0;
+    }
+
+    return ShadowFactor;
+}
+
+
 void main()
 {
     vec2 dvx = vec2(dFdx(WorldPos.x), dFdy(WorldPos.x));
@@ -136,7 +151,7 @@ void main()
 
     Color.a *= OpacityFalloff;
 
-    float ShadowFactor = CalcShadowFactorBasic(gLightDirection);
+    float ShadowFactor = GetShadowFactor(gLightDirection);
 
     if (ShadowFactor < 1.0) {
         FragColor = vec4(Color.xyz * ShadowFactor, 1.0 - ShadowFactor);

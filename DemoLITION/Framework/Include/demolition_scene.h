@@ -75,6 +75,7 @@ struct InfiniteGridConfig {
     Vector4f ColorThin = Vector4f(0.5f, 0.5f, 0.5f, 1.0f);
     Vector4f ColorThick = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
     float MinPixelsBetweenCells = 2.0f;
+    bool ShadowsEnabled = false;
 };
 
 class SceneConfig

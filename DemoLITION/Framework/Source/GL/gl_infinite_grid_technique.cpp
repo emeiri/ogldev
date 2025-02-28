@@ -49,6 +49,7 @@ bool InfiniteGridTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(GridCellSizeLoc, "gGridCellSize");
     GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
     GET_UNIFORM_AND_CHECK(ShadowMapLoc, "gShadowMap");
+    GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
 
     return true;
 }
@@ -89,4 +90,10 @@ void InfiniteGridTechnique::SetLightDirection(const Vector3f& LightDir)
     Vector3f d = LightDir;
     d.Normalize();
     glUniform3f(LightDirectionLoc, d.x, d.y, d.z);
+}
+
+
+void InfiniteGridTechnique::ControlShadows(bool ShadowsEnabled)
+{
+    glUniform1i(ShadowsEnabledLoc, ShadowsEnabled);
 }

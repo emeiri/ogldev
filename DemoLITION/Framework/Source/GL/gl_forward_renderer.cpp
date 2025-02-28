@@ -562,7 +562,8 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
         LightDir = pScene->GetSpotLights()[0].WorldDirection;
     }
 
-    const InfiniteGridConfig& Config = pScene->GetConfig()->GetInfiniteGrid();
+    InfiniteGridConfig& Config = pScene->GetConfig()->GetInfiniteGrid();
+    Config.ShadowsEnabled = pScene->GetConfig()->IsShadowMappingEnabled();
     m_infiniteGrid.Render(Config, VP, m_pCurCamera->GetPos(), LightVP, LightDir);
 
     // Debugging - TODO need to cleanup this mess

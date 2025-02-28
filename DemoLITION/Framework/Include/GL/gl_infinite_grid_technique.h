@@ -36,6 +36,7 @@ public:
     void SetCellSize(float CellSize);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetLightDirection(const Vector3f& LightDir);
+    void ControlShadows(bool ShadowsEnabled);
 
 private:
     bool InitCommon();
@@ -46,4 +47,5 @@ private:
     GLuint LightVPLoc        = INVALID_UNIFORM_LOCATION;
     GLuint ShadowMapLoc      = INVALID_UNIFORM_LOCATION;
     GLuint LightDirectionLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;
 };
