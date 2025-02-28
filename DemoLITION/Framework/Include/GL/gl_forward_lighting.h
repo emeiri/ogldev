@@ -16,8 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FORWARD_LIGHTING_TECHNIQUE_H
-#define FORWARD_LIGHTING_TECHNIQUE_H
+#pragma once
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -172,5 +171,3 @@ private:
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 };
 
-
-#endif  /* FORWARD_LIGHTING_TECHNIQUE_H */
