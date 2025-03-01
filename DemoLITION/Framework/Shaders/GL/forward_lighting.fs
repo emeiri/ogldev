@@ -91,6 +91,21 @@ layout(std430, binding = 4) readonly buffer NormalSSBO {
 };
 
 
+struct PBRLight {
+    vec4 PosDir;   // if w == 1 position, else direction
+    vec3 Intensity;
+};
+
+
+struct PBRMaterial
+{
+    float Roughness;
+    bool IsMetal;
+    vec3 Color;
+    bool IsAlbedo;
+};
+
+
 uniform DirectionalLight gDirectionalLight;
 uniform int gNumPointLights;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
@@ -105,6 +120,9 @@ layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for sh
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gNormalMap;
 layout(binding = 6) uniform sampler2D gHeightMap;
+layout(binding = 7) uniform sampler2D gAlbedo;
+layout(binding = 8) uniform sampler2D gRoughness;
+layout(binding = 9) uniform sampler2D gMetallic;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
 uniform int gShadowMapWidth = 0;
@@ -120,6 +138,8 @@ uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
+uniform bool gIsPBR = false;
+uniform PBRMaterial gPBRmaterial;
 uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
@@ -603,7 +623,7 @@ vec3 GetNormal()
 
 
 vec4 GetTotalLight()
-{
+{   
     vec3 Normal = GetNormal(); 
        
     vec4 TotalLight = CalcDirectionalLight(Normal);
@@ -620,14 +640,8 @@ vec4 GetTotalLight()
 }
 
 
-void main()
+vec4 CalcPhongLighting()
 {
-    TexCoord = TexCoord0;
-    //vec3 Normal = GetNormal();
-    //FragColor = vec4(GetNormal(), 0.0);
-    //FragColor = vec4(TexCoord, 0.0, 0.0);
-    //return;
-    
     vec4 TotalLight;
     
     if (gLightingEnabled) {
@@ -638,7 +652,7 @@ void main()
         TotalLight = vec4(1.0);
     }
 
-    vec4 TexColor;
+     vec4 TexColor;
 
     if (gIsIndirectRender) {
         TexColor = texture(DiffuseMaps[MaterialIndex], TexCoord.xy);
@@ -648,15 +662,190 @@ void main()
         TexColor = vec4(1.0);
     }
 
-    TexColor *= TotalLight;
+    vec4 FinalColor = TexColor * TotalLight;
+
+    return FinalColor;
+}
+
+
+vec3 schlickFresnel(float vDotH, vec3 Albedo)
+{
+    vec3 F0 = vec3(0.04);    
+    
+    if (gPBRmaterial.IsAlbedo) {
+        float Metallic = texture(gMetallic, TexCoord0.xy).x;
+        F0 = mix(F0, Albedo, Metallic);
+    } else {
+        if (gPBRmaterial.IsMetal) {
+	        F0 = gPBRmaterial.Color;
+	    }
+    }
+
+    vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
+
+    return ret;
+}
+
+
+float GetRoughness()
+{
+    if (gPBRmaterial.IsAlbedo) {
+        return texture(gRoughness, TexCoord0.xy).x;
+    } else {
+        return gPBRmaterial.Roughness;
+    }
+}
+
+
+float geomSmith(float dp, float Roughness)
+{
+    float k = (Roughness + 1.0) * (Roughness + 1.0) / 8.0;
+    float denom = dp * (1 - k) + k;
+    return dp / denom;
+}
+
+
+float ggxDistribution(float nDotH, float Roughness)
+{
+    float alpha2 = Roughness * Roughness * Roughness * Roughness;
+    float d = nDotH * nDotH * (alpha2 - 1) + 1;
+    float ggxdistrib = alpha2 / (PI * d * d);
+    return ggxdistrib;
+}
+
+
+// TODO: currently unused
+vec3 getNormalFromMap()
+{
+    vec3 tangentNormal = texture(gNormalMap, TexCoord0).xyz * 2.0 - 1.0;
+
+    vec3 Q1  = dFdx(WorldPos0);
+    vec3 Q2  = dFdy(WorldPos0);
+    vec2 st1 = dFdx(TexCoord0);
+    vec2 st2 = dFdy(TexCoord0);
+
+    vec3 N   = normalize(Normal0);
+    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
+    vec3 B  = -normalize(cross(N, T));
+    mat3 TBN = mat3(T, B, N);
+
+    return normalize(TBN * tangentNormal);
+}
+
+
+
+vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
+{
+    vec3 LightIntensity = Light.Color * Light.DiffuseIntensity;
+
+    vec3 l = vec3(0.0);
+
+    if (IsDirLight) {
+        l = -PosDir.xyz;
+    } else {
+        l = PosDir - WorldPos0;
+        float LightToPixelDist = length(l);
+        l = normalize(l);
+        LightIntensity /= (LightToPixelDist * LightToPixelDist);
+    }
+
+    vec3 n = Normal;
+    vec3 v = normalize(gCameraWorldPos - WorldPos0);
+    vec3 h = normalize(v + l);
+
+    float nDotH = max(dot(n, h), 0.0);
+    float vDotH = max(dot(v, h), 0.0);
+    float nDotL = max(dot(n, l), 0.0);
+    float nDotV = max(dot(n, v), 0.0);
+
+    vec3 fLambert = vec3(0.0);
+
+    if (!gPBRmaterial.IsMetal) {
+        if (gPBRmaterial.IsAlbedo) {
+            fLambert = pow(texture(gAlbedo, TexCoord0.xy).xyz, vec3(2.2));
+        } else {
+            fLambert = gPBRmaterial.Color;
+        }
+    }
+
+    vec3 F = schlickFresnel(vDotH, fLambert);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+
+    float Roughness = GetRoughness();
+
+    vec3 SpecBRDF_nom  = ggxDistribution(nDotH, Roughness) *
+                         F *
+                         geomSmith(nDotL, Roughness) *
+                         geomSmith(nDotV, Roughness);
+
+    float SpecBRDF_denom = 4.0 * nDotV * nDotL + 0.0001;
+
+    vec3 SpecBRDF = SpecBRDF_nom / SpecBRDF_denom;
+
+    vec3 DiffuseBRDF = kD * fLambert / PI;
+
+    vec3 FinalColor = (DiffuseBRDF + SpecBRDF) * LightIntensity * nDotL;
+
+    return FinalColor;
+}
+
+
+vec3 CalcPBRDirectionalLight(vec3 Normal)
+{
+    return CalcPBRLighting(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal);
+}
+
+
+vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
+{
+    return CalcPBRLighting(l.Base, l.WorldPos, false, Normal);
+}
+
+
+vec4 CalcTotalPBRLighting()
+{
+    vec3 Normal = GetNormal(); 
+
+    vec3 TotalLight = CalcPBRDirectionalLight(Normal);
+
+    for (int i = 0 ;i < gNumPointLights ;i++) {
+        TotalLight += CalcPBRPointLight(gPointLights[i], Normal);
+    }
+
+    // HDR tone mapping
+    TotalLight = TotalLight / (TotalLight + vec3(1.0));
+
+    // Gamma correction
+    vec4 FinalLight = vec4(pow(TotalLight, vec3(1.0/2.2)), 1.0);
+
+    return FinalLight;
+}
+
+
+void main()
+{
+    TexCoord = TexCoord0;
+    //vec3 Normal = GetNormal();
+    //FragColor = vec4(GetNormal(), 0.0);
+    //FragColor = vec4(TexCoord, 0.0, 0.0);
+    //return;
+    
+    if (gIsPBR) {
+        FragColor = CalcTotalPBRLighting();
+      //  FragColor = texture(gRoughness, TexCoord0.xy);
+    } else {
+        FragColor = CalcPhongLighting();
+    }
 
     vec4 TempColor = vec4(0.0);
 
     if (gFogColor == vec3(0)) {
-        TempColor = TexColor;
+        TempColor = FragColor;
     } else {
         float FogFactor = CalcFogFactor();
-        TempColor = mix(vec4(gFogColor, 1.0), TexColor, FogFactor);
+        TempColor = mix(vec4(gFogColor, 1.0), FragColor, FogFactor);
     }
 
     // I'm using gColorMod and gColorAdd to enhance the color in

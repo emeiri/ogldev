@@ -48,6 +48,9 @@ public:
     void SetShadowMapOffsetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapOffsetTextureParams(float TextureSize, float FilterSize, float Radius);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
+    void SetAlbedoTextureUnit(unsigned int TextureUnit);
+    void SetRoughnessTextureUnit(unsigned int TextureUnit);
+    void SetMetallicTextureUnit(unsigned int TextureUnit);
     void SetNormalMapTextureUnit(int TextureUnit);
     void SetHeightMapTextureUnit(int TextureUnit);
     void ControlNormalMap(bool Enable);
@@ -78,6 +81,8 @@ public:
     void ControlPVP(bool IsPVP);
     void SetVP(const Matrix4f& VP);
     void SetLightVP(const Matrix4f& LightVP);
+    void SetPBR(bool IsPBR);
+    void SetPBRMaterial(const PBRMaterial& Material);
 
 protected:
 
@@ -123,11 +128,16 @@ private:
     GLuint ExpSquaredFogEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
+    GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
     GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsIndirectRenderLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsPVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint VPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
+    GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
+    GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;
+	
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;
@@ -169,5 +179,11 @@ private:
             GLuint Exp = INVALID_UNIFORM_LOCATION;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
+    struct {
+        GLuint Roughness;
+        GLuint IsMetal;
+        GLuint Color;
+        GLuint IsAlbedo;
+    } PBRMaterialLoc;
 };
 

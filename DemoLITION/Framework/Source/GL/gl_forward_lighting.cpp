@@ -87,6 +87,11 @@ bool ForwardLightingTechnique::InitCommon()
     ExpSquaredFogEnabledLoc = GetUniformLocation("gExpSquaredFogEnabled");
     LayeredFogTopLoc = GetUniformLocation("gLayeredFogTop");
     FogTimeLoc = GetUniformLocation("gFogTime");
+    GET_UNIFORM_AND_CHECK(IsPBRLoc, "gIsPBR");
+    GET_UNIFORM_AND_CHECK(PBRMaterialLoc.Roughness, "gPBRmaterial.Roughness");
+    GET_UNIFORM_AND_CHECK(PBRMaterialLoc.IsMetal, "gPBRmaterial.IsMetal");
+    GET_UNIFORM_AND_CHECK(PBRMaterialLoc.Color, "gPBRmaterial.Color");
+    GET_UNIFORM_AND_CHECK(PBRMaterialLoc.IsAlbedo, "gPBRmaterial.IsAlbedo");
     LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
     
    // GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
@@ -96,6 +101,9 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(IsPVPLoc, "gIsPVP");
     GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
     GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
+    GET_UNIFORM_AND_CHECK(AlbedoLoc, "gAlbedo");
+    GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
+    GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -189,11 +197,11 @@ bool ForwardLightingTechnique::InitCommon()
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.AmbientIntensity", i);
         SpotLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
 
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Direction", i);
-        SpotLightsLocation[i].Direction = GetUniformLocation(Name);
-
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.WorldPos", i);
         SpotLightsLocation[i].Position = GetUniformLocation(Name);
+
+        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Direction", i);
+        SpotLightsLocation[i].Direction = GetUniformLocation(Name);
 
         SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Cutoff", i);
         SpotLightsLocation[i].Cutoff = GetUniformLocation(Name);
@@ -577,6 +585,25 @@ void ForwardLightingTechnique::SetAnimatedFog(float FogEnd, float FogDensity)
 }
 
 
+void ForwardLightingTechnique::SetPBR(bool IsPBR)
+{
+    glUniform1i(IsPBRLoc, IsPBR);
+}
+
+
+void ForwardLightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
+{
+    glUniform1i(PBRMaterialLoc.IsMetal, Material.IsMetal);
+    if (Material.pAlbedo) {
+        glUniform1i(PBRMaterialLoc.IsAlbedo, 1);
+    } else {
+        glUniform1i(PBRMaterialLoc.IsAlbedo, 0);
+	    glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
+        glUniform1f(PBRMaterialLoc.Roughness, Material.Roughness);
+	}
+}
+
+
 void ForwardLightingTechnique::ControlLighting(bool LightingEnabled)
 {
     glUniform1i(LightingEnabledLoc, LightingEnabled);
@@ -610,4 +637,21 @@ void ForwardLightingTechnique::SetVP(const Matrix4f& VP)
 void ForwardLightingTechnique::SetLightVP(const Matrix4f& LightVP)
 {
     glUniformMatrix4fv(LightVPLoc, 1, GL_TRUE, (const GLfloat*)LightVP.m);
+}
+
+void ForwardLightingTechnique::SetAlbedoTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(AlbedoLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetRoughnessTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(RoughnessLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetMetallicTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(MetallicLoc, TextureUnit);
 }

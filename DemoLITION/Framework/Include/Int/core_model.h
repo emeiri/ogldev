@@ -69,7 +69,7 @@ public:
 
     void RenderIndirect(const Matrix4f& ObjectMatrix);
 
-    PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
+   //PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
 
     void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
 
@@ -299,6 +299,8 @@ private:
     Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
     IndirectRender m_indirectRender;
+	
+    bool m_isPBR = false;
 	
     /////////////////////////////////////
 	// Skeletal animation stuff

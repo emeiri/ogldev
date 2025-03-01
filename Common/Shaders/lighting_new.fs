@@ -357,6 +357,8 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
     }
 
     return (AmbientColor + ShadowFactor * (DiffuseColor + SpecularColor + RimColor));
+   //return vec4(DiffuseFactor);
+ // return DiffuseColor;
 }
 
 

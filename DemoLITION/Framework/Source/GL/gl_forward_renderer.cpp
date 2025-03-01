@@ -45,6 +45,23 @@ CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
 };
 
 
+static bool IsLightingPass(RENDER_PASS RenderPass)
+{
+    bool ret = false;
+
+    switch (RenderPass)
+    {
+    case RENDER_PASS_LIGHTING_DIR:
+    case RENDER_PASS_LIGHTING_SPOT:
+    case RENDER_PASS_LIGHTING_POINT:
+        ret = true;
+        break;
+    }
+
+    return ret;
+}
+
+
 ForwardRenderer::ForwardRenderer()
 {
 
@@ -93,6 +110,9 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    m_lightingTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -105,6 +125,10 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    m_skinningTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
@@ -445,7 +469,6 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         RenderInfiniteGrid(pScene);
     }
 
-
     bool FirstTimeForwardLighting = true;
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
@@ -526,6 +549,16 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
 void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
 {
     CoreModel* pModel = pSceneObject->GetModel();
+
+    if (IsLightingPass(m_curRenderPass)) {
+        if (pModel->IsPBR()) {
+            m_pCurLightingTech->SetPBR(true);
+            m_pCurLightingTech->SetPBRMaterial(pModel->GetPBRMaterial());
+        }
+        else {
+            m_pCurLightingTech->SetPBR(false);
+        }
+    }
 
     if (UseIndirectRender) {
         Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();

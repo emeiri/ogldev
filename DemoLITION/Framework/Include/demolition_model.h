@@ -20,6 +20,7 @@
 #pragma once
 
 #include "demolition_object.h"
+#include "ogldev_material.h"
 
 class Model : public Object 
 {
@@ -32,6 +33,16 @@ public:
     virtual void SetHeightMap(int TextureHandle) = 0;
 
     virtual void SetTextureScale(float Scale) = 0;
+
+    PBRMaterial& GetPBRMaterial() { return m_PBRmaterial; };
+
+    void SetPBR(bool IsPBR) { m_isPBR = IsPBR; }
+
+    bool IsPBR() const { return m_isPBR; }
+
+protected:
+    PBRMaterial m_PBRmaterial;
+    bool m_isPBR = false;
 };
 
 

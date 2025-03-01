@@ -66,8 +66,8 @@ public:
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.AmbientIntensity = 0.8f;
+        m_dirLight.DiffuseIntensity = 0.9f;
+        m_dirLight.AmbientIntensity = 0.1f;
 
         m_pointLight.WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
      //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
@@ -101,9 +101,9 @@ public:
       //  m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
-       // m_pScene->GetDirLights().push_back(m_dirLight);        
+        m_pScene->GetDirLights().push_back(m_dirLight);        
         //m_pScene->GetPointLights().push_back(m_pointLight);
-        m_pScene->GetSpotLights().push_back(m_spotLight);
+      //  m_pScene->GetSpotLights().push_back(m_spotLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -830,11 +830,11 @@ private:
 };
 
 
-class AmazonBistroDemo : public Carbonara {
+class AssetLoadDemo : public Carbonara {
 
 public:
 
-    AmazonBistroDemo()
+    AssetLoadDemo()
     {
 
     }
@@ -845,22 +845,84 @@ public:
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-        m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+     //   m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
       //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
       //   Model* pModel = m_pRenderingSystem->LoadModel("G:/McGuire/bistro/Exterior/exterior.obj");
 
-      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
         
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
      //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
-      //  m_pScene->SetCamera(Vector3f(0.0f, 10.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
 
         m_pScene->AddToRenderList(pSceneObject);
     }
-    
+};
+
+
+class PBRDemo : public Carbonara {
+
+public:
+
+    PBRDemo()
+    {
+        float metalRough = 0.43f;
+
+        // Gold
+        m_color[0] = Vector3f(1, 0.71f, 0.29f);
+        // Copper
+        m_color[1] = Vector3f(0.95f, 0.64f, 0.54f);
+        // Aluminum
+        m_color[2] = Vector3f(0.91f, 0.92f, 0.92f);
+        // Titanium
+        m_color[3] = Vector3f(0.542f, 0.497f, 0.449f);
+        // Silver
+        m_color[4] = Vector3f(0.95f, 0.93f, 0.88f);
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+      //  m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/dragon.obj");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pScene->AddToRenderList(pSceneObject);
+
+        m_pScene->SetCamera(Vector3f(0.0f, 6.0f, -16.0f), Vector3f(0.0f, 0.0f, 1.0f));        
+    }
+
+    void OnFrameChild(long long DeltaTimeMillis)
+    {
+        m_pModel->SetPBR(true);
+        m_pModel->GetPBRMaterial().Roughness = 0.43f;
+        m_pModel->GetPBRMaterial().IsMetal = true;
+        m_pModel->GetPBRMaterial().Color = m_color[0];
+
+        float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
+
+/*        for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_color); i++) {
+            m_pModel->SetPosition(m_color[i].Pos );
+            m_pModel->GetPBRMaterial().Roughness = Roughness[i];
+            m_pModel->GetPBRMaterial().IsMetal = false;
+            m_pModel->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
+            m_phongRenderer.Render(m_pModel);
+        }*/
+
+        m_time += DeltaTimeMillis;
+    }
+
 private:
 
+    Model* m_pModel = NULL;
+
+    Vector3f m_color[5];
+    long long m_time = 0;
 };
 
 
@@ -868,9 +930,10 @@ void carbonara()
 {
   // BallisticsDemo demo;
    //FireworksDemo demo;
-    AnimationDemo demo;
+   // AnimationDemo demo;
   //  BridgeDemo demo;
-   // AmazonBistroDemo demo;
+ //   AssetLoadDemo demo;
+    PBRDemo demo;
 
     demo.Start();
 }

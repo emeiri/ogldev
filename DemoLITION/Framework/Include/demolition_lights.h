@@ -66,3 +66,8 @@ public:
     float Cutoff = 0.0f;
 };
 
+
+struct PBRLight {
+    Vector4f PosDir;   // if w == 1 position, else direction
+    Vector3f Intensity;
+};
