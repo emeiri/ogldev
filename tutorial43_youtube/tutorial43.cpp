@@ -220,6 +220,7 @@ private:
         m_pMesh = new SkinnedMesh();
         //        m_pMesh->LoadMesh("../Content/spot/spot_triangulated.obj");
         m_pMesh->LoadMesh("../Content/dragon.obj");
+        m_pMesh->SetPBR(true);
         m_pMesh->SetRotation(0.0f, 90.0f, 0.0f);
     }
 
