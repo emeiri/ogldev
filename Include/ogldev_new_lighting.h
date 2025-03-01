@@ -16,8 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEW_LIGHTING_TECHNIQUE_H
-#define NEW_LIGHTING_TECHNIQUE_H
+#pragma once
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
@@ -206,16 +205,16 @@ private:
     GLuint NormalMapLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
-        GLuint AmbientColor;
-        GLuint DiffuseColor;
-        GLuint SpecularColor;
+        GLuint AmbientColor = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseColor = INVALID_UNIFORM_LOCATION;
+        GLuint SpecularColor = INVALID_UNIFORM_LOCATION;
     } materialLoc;
 
     struct {
-        GLuint Color;
-        GLuint AmbientIntensity;
-        GLuint Direction;
-        GLuint DiffuseIntensity;
+        GLuint Color = INVALID_UNIFORM_LOCATION;
+        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint Direction = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
     } dirLightLoc;
 
     struct {
@@ -227,23 +226,23 @@ private:
 
         struct
         {
-            GLuint Constant;
-            GLuint Linear;
-            GLuint Exp;
+            GLuint Constant = INVALID_UNIFORM_LOCATION;
+            GLuint Linear = INVALID_UNIFORM_LOCATION;
+            GLuint Exp = INVALID_UNIFORM_LOCATION;
         } Atten;
     } PointLightsLocation[MAX_POINT_LIGHTS];
 
     struct {
-        GLuint Color;
-        GLuint AmbientIntensity;
-        GLuint DiffuseIntensity;
-        GLuint Position;
-        GLuint Direction;
-        GLuint Cutoff;
+        GLuint Color = INVALID_UNIFORM_LOCATION;
+        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint Position = INVALID_UNIFORM_LOCATION;
+        GLuint Direction = INVALID_UNIFORM_LOCATION;
+        GLuint Cutoff = INVALID_UNIFORM_LOCATION;
         struct {
-            GLuint Constant;
-            GLuint Linear;
-            GLuint Exp;
+            GLuint Constant = INVALID_UNIFORM_LOCATION;
+            GLuint Linear = INVALID_UNIFORM_LOCATION;
+            GLuint Exp = INVALID_UNIFORM_LOCATION;
         } Atten;
     } SpotLightsLocation[MAX_SPOT_LIGHTS];
 
@@ -261,4 +260,3 @@ private:
 };
 
 
-#endif  /* NEW_LIGHTING_TECHNIQUE_H */

@@ -19,6 +19,7 @@
 #ifndef OGLDEV_MATERIAL_H
 #define OGLDEV_MATERIAL_H
 
+#include "ogldev_math_3d.h"
 #include "ogldev_texture.h"
 
 

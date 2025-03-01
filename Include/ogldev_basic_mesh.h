@@ -16,8 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_BASIC_MESH_H
-#define OGLDEV_BASIC_MESH_H
+#pragma once
 
 #include <map>
 #include <vector>
@@ -155,5 +154,3 @@ private:
     bool m_isPBR = false;
 };
 
-
-#endif  /* OGLDEV_BASIC_MESH_H */
