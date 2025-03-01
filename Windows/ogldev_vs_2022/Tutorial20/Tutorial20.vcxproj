@@ -46,7 +46,7 @@
     <ProjectGuid>{34AC24B2-95A6-4F39-B643-6B6026D593D7}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial20</ProjectName>
+    <ProjectName>Tutorial20_DiffuseLighting</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
