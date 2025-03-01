@@ -104,6 +104,8 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(AlbedoLoc, "gAlbedo");
     GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
     GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
+    GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
+    GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -654,4 +656,16 @@ void ForwardLightingTechnique::SetRoughnessTextureUnit(unsigned int TextureUnit)
 void ForwardLightingTechnique::SetMetallicTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(MetallicLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetAOTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(AOLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetEmissiveTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(EmissiveLoc, TextureUnit);
 }

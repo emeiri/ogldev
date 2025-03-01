@@ -276,6 +276,8 @@ private:
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
+    void SetupRenderMaterialsPBR();
+	
     void InitCameras(const aiScene* pScene);
 
     void InitSingleCamera(int Index, const aiScene* pScene);
@@ -299,8 +301,6 @@ private:
     Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
     IndirectRender m_indirectRender;
-	
-    bool m_isPBR = false;
 	
     /////////////////////////////////////
 	// Skeletal animation stuff

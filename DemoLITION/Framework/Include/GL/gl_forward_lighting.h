@@ -51,6 +51,8 @@ public:
     void SetAlbedoTextureUnit(unsigned int TextureUnit);
     void SetRoughnessTextureUnit(unsigned int TextureUnit);
     void SetMetallicTextureUnit(unsigned int TextureUnit);
+    void SetAOTextureUnit(unsigned int TextureUnit);
+    void SetEmissiveTextureUnit(unsigned int TextureUnit);
     void SetNormalMapTextureUnit(int TextureUnit);
     void SetHeightMapTextureUnit(int TextureUnit);
     void ControlNormalMap(bool Enable);
@@ -137,7 +139,8 @@ private:
     GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
     GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
     GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;
-	
+    GLuint AOLoc = INVALID_UNIFORM_LOCATION;
+    GLuint EmissiveLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;

@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ogldev_engine_common.h"
+#include "GL/gl_engine_common.h"
 #include "Int/core_rendering_system.h"
 #include "Int/core_model.h"
 #include "GL/gl_ssbo_db.h"
@@ -960,6 +960,10 @@ void CoreModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
 void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
     assert(!UseIndirectRender);
+	
+    if (m_isPBR) {
+        SetupRenderMaterialsPBR();
+    }
 
     glBindVertexArray(m_VAO);
 
@@ -973,6 +977,45 @@ void CoreModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
+}
+
+
+
+void CoreModel::SetupRenderMaterialsPBR()
+{
+    int PBRMaterialIndex = 0;
+
+    // Hack...
+    m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo    = m_PBRmaterial.pAlbedo;
+    m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness = m_PBRmaterial.pRoughness;
+    m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic  = m_PBRmaterial.pMetallic;
+    m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap = m_PBRmaterial.pNormalMap;
+    m_Materials[PBRMaterialIndex].PBRmaterial.pAO        = m_PBRmaterial.pAO;
+    m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive  = m_PBRmaterial.pEmissive;
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo->Bind(ALBEDO_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness->Bind(ROUGHNESS_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic->Bind(METALLIC_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pAO) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pAO->Bind(AO_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive) {
+        m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive->Bind(EMISSIVE_TEXTURE_UNIT);
+    }
 }
 
 

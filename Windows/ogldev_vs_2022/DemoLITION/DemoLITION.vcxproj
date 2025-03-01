@@ -187,6 +187,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\flat_color_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_basic_mesh_entry.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_engine_common.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h" />

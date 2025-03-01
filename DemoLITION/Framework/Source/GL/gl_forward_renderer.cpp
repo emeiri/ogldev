@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ogldev_engine_common.h"
+#include "GL/gl_engine_common.h"
 #include "GL/gl_forward_renderer.h"
 #include "GL/gl_rendering_system.h"
 
@@ -113,6 +113,8 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -129,6 +131,8 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");

@@ -32,6 +32,8 @@ struct PBRMaterial
     Texture* pRoughness = NULL;
     Texture* pMetallic = NULL;
     Texture* pNormalMap = NULL;
+    Texture* pAO = NULL;
+    Texture* pEmissive = NULL;
 };
 
 

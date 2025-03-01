@@ -888,18 +888,35 @@ public:
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-      //  m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
-        m_pModel = m_pRenderingSystem->LoadModel("../Content/dragon.obj");
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      //  m_pModel = m_pRenderingSystem->LoadModel("../Content/dragon.obj");
+
+        m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        m_pTexAO->Load();
+        m_pTexEmissive = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_emissive.jpg");
+        m_pTexEmissive->Load();
+        m_pTexAlbedo = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_albedo.jpg");
+        m_pTexAlbedo->Load();
+        m_pTexMeR = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_metalRoughness.jpg");
+        m_pTexMeR->Load();
+        m_pTexNormal = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_normal.jpg");
+        m_pTexNormal->Load();
+
+        m_pModel->SetPBR(true);
+        m_pModel->GetPBRMaterial().pAO = m_pTexAO;
+        m_pModel->GetPBRMaterial().pEmissive = m_pTexEmissive;
+        m_pModel->GetPBRMaterial().pAlbedo = m_pTexAlbedo;
+        m_pModel->GetPBRMaterial().pMetallic = m_pTexMeR;
+        m_pModel->GetPBRMaterial().pNormalMap = m_pTexNormal;
 
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(m_pModel);
         m_pScene->AddToRenderList(pSceneObject);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 6.0f, -16.0f), Vector3f(0.0f, 0.0f, 1.0f));        
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -4.0f), Vector3f(0.0f, 0.0f, 1.0f));        
     }
 
     void OnFrameChild(long long DeltaTimeMillis)
     {
-        m_pModel->SetPBR(true);
         m_pModel->GetPBRMaterial().Roughness = 0.43f;
         m_pModel->GetPBRMaterial().IsMetal = true;
         m_pModel->GetPBRMaterial().Color = m_color[0];
@@ -923,6 +940,13 @@ private:
 
     Vector3f m_color[5];
     long long m_time = 0;
+
+    Texture* m_pTexAO = NULL;
+    Texture* m_pTexEmissive = NULL;
+    Texture* m_pTexAlbedo = NULL;
+    Texture* m_pTexMeR = NULL;
+    Texture* m_pTexNormal = NULL;
+
 };
 
 
