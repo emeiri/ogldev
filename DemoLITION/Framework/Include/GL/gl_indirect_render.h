@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "ogldev_math_3d.h"
+#include "ogldev_material.h"
 #include "GL/gl_basic_mesh_entry.h"
 
 class IndirectRender {
@@ -32,7 +33,7 @@ public:
 
     ~IndirectRender() {}
 
-    void Init(const std::vector<BasicMeshEntry>& Meshes);
+    void Init(const std::vector<BasicMeshEntry>& Meshes, std::vector<Material>& Materials);
 
     void Render(const Matrix4f& ObjectMatrix);
 
@@ -46,11 +47,27 @@ private:
 
     void UpdatePerObjectData(const Matrix4f& ObjectMatrix);
 
+    void PrepareIndirectRenderMaterials(std::vector<Material>& Materials);
+
+    struct MaterialColorIndirect {
+        Vector4f AmbientColor;
+        Vector4f DiffuseColor;
+        Vector4f SpecularColor;
+    };
+
+    std::vector<MaterialColorIndirect> m_colors;
+    std::vector<GLuint64> m_diffuseMaps;
+    std::vector<GLuint64> m_normalMaps;
+
     GLuint m_drawCmdBuffer = 0;
     GLuint m_perObjectBuffer = 0;
+    GLuint m_colorsBuffer = 0;
+    GLuint m_diffuseMapBuffer = 0;
+    GLuint m_normalMapBuffer = 0;
 
     struct Mesh {
         Matrix4f m_transformation;
+        int m_materialIndex = 0;
     };
 
     std::vector<Mesh> m_meshes;

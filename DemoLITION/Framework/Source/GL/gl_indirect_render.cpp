@@ -22,6 +22,7 @@
 struct PerObjectData {
     Matrix4f WorldMatrix;
     Matrix4f NormalMatrix;
+    glm::ivec4 MaterialIndex = glm::ivec4(0);
 };
 
 struct DrawElementsIndirectCommand {
@@ -33,7 +34,7 @@ struct DrawElementsIndirectCommand {
 };
 
 
-void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes)
+void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, std::vector<Material>& Materials)
 {
     assert(Meshes.size() > 0);
 
@@ -42,6 +43,8 @@ void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes)
     InitDrawCmdsBuffer(Meshes);
 
     AllocPerObjectBuffer(Meshes);
+
+    PrepareIndirectRenderMaterials(Materials);
 }
 
 
@@ -51,6 +54,7 @@ void IndirectRender::InitMeshes(const std::vector<BasicMeshEntry>& Meshes)
 
     for (int i = 0; i < Meshes.size(); i++) {
         m_meshes[i].m_transformation = Meshes[i].Transformation;
+        m_meshes[i].m_materialIndex = Meshes[i].MaterialIndex;
     }
 }
 
@@ -85,6 +89,36 @@ void IndirectRender::AllocPerObjectBuffer(const std::vector<BasicMeshEntry>& Mes
 }
 
 
+void IndirectRender::PrepareIndirectRenderMaterials(std::vector<Material>& Materials)
+{
+    int NumMaterials = (int)Materials.size();
+
+    m_colors.resize(NumMaterials);
+    m_diffuseMaps.resize(NumMaterials);
+    m_normalMaps.resize(NumMaterials);
+
+    for (int i = 0; i < NumMaterials; i++) {
+        m_colors[i].AmbientColor = Materials[i].AmbientColor;
+        m_colors[i].DiffuseColor = Materials[i].DiffuseColor;
+        m_colors[i].SpecularColor = Materials[i].SpecularColor;
+        GLuint64 DiffuseMapBindlessHandle = Materials[i].pDiffuse ? Materials[i].pDiffuse->GetBindlessHandle() : -1;
+        m_diffuseMaps[i] = DiffuseMapBindlessHandle;
+        GLuint64 NormalMapBindlessHandle = Materials[i].pNormal ? Materials[i].pNormal->GetBindlessHandle() : -1;
+        m_normalMaps[i] = NormalMapBindlessHandle;
+    }
+
+    glCreateBuffers(1, &m_colorsBuffer);
+    glNamedBufferStorage(m_colorsBuffer, sizeof(MaterialColorIndirect) * NumMaterials, m_colors.data(), 0);
+
+    glCreateBuffers(1, &m_diffuseMapBuffer);
+    glNamedBufferStorage(m_diffuseMapBuffer, sizeof(GLuint64) * NumMaterials, m_diffuseMaps.data(), 0);
+
+    glCreateBuffers(1, &m_normalMapBuffer);
+    glNamedBufferStorage(m_normalMapBuffer, sizeof(GLuint64) * NumMaterials, m_normalMaps.data(), 0);
+}
+
+
+
 void IndirectRender::Render(const Matrix4f& ObjectMatrix)
 {
     UpdatePerObjectData(ObjectMatrix);
@@ -111,11 +145,15 @@ void IndirectRender::UpdatePerObjectData(const Matrix4f& ObjectMatrix)
 
         PerObjectDataVector[i].WorldMatrix = FinalWorldMatrix;
         PerObjectDataVector[i].NormalMatrix = WorldInverseTranspose;
+        PerObjectDataVector[i].MaterialIndex.x = m_meshes[i].m_materialIndex;
     }
 
     glNamedBufferSubData(m_perObjectBuffer, 0, ARRAY_SIZE_IN_BYTES(PerObjectDataVector), 
                          PerObjectDataVector.data());
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_PER_OBJ_DATA, 
-                     m_perObjectBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_PER_OBJ_DATA, m_perObjectBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_MATERIAL_COLORS, m_colorsBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_DIFFUSE_MAPS, m_diffuseMapBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_NORMAL_MAPS, m_normalMapBuffer);
+
 }

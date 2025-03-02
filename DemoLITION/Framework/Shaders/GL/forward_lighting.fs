@@ -652,7 +652,7 @@ vec4 CalcPhongLighting()
         TotalLight = vec4(1.0);
     }
 
-     vec4 TexColor;
+    vec4 TexColor;
 
     if (gIsIndirectRender) {
         TexColor = texture(DiffuseMaps[MaterialIndex], TexCoord.xy);

@@ -209,7 +209,7 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
     CalculateMeshTransformations(pScene);
 
     if (UseIndirectRender) {
-        m_indirectRender.Init(m_Meshes);
+        m_indirectRender.Init(m_Meshes, m_Materials);
     }
 
     return GLCheckError();

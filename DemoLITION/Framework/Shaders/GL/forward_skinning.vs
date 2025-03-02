@@ -51,6 +51,7 @@ layout(std430, binding = 0) restrict readonly buffer Vertices {
 struct PerObjectData {
     mat4 WorldMatrix;
     mat4 NormalMatrix;
+    ivec4 MaterialIndex;
 };
 
 layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
@@ -177,6 +178,7 @@ void main()
         Bitangent0 = (o[gl_DrawID].NormalMatrix * vec4(Bitangent_, 0.0)).xyz;
         WorldPos0 = (o[gl_DrawID].WorldMatrix * PosL).xyz;
         LightSpacePos0 = (gLightVP * o[gl_DrawID].WorldMatrix * Pos4);
+        MaterialIndex = o[gl_DrawID].MaterialIndex.x;	
     } else {
         gl_Position = gWVP * PosL;
         Normal0 = gNormalMatrix * Normal_;
@@ -187,6 +189,4 @@ void main()
     }
     
     TexCoord0 = TexCoord_;
-
-    MaterialIndex = 0;  // Hack until we setup bindless textures
 }
