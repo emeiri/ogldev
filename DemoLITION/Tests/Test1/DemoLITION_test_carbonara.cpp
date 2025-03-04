@@ -516,6 +516,7 @@ public:
         m_pScene->SetCamera(Vector3f(0.0f, 0.25f, -0.4f), Vector3f(0.0, -0.4f, 1.0f));
         PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 1.0f);
         CObject.pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
+        m_pScene->GetConfig()->ControlShadowMapping(false);
     }
 };
 
@@ -954,10 +955,10 @@ void carbonara()
 {
   // BallisticsDemo demo;
    //FireworksDemo demo;
-   // AnimationDemo demo;
+    AnimationDemo demo;
   //  BridgeDemo demo;
  //   AssetLoadDemo demo;
-    PBRDemo demo;
+  //  PBRDemo demo;
 
     demo.Start();
 }
