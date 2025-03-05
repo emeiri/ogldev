@@ -155,6 +155,4 @@ void main()
     }
 
     TexCoord0 = TexCoord_;
-
-    MaterialIndex = 0;  // Hack until we setup bindless textures
 }
