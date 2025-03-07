@@ -583,7 +583,13 @@ float CalcFogFactor()
 vec3 CalcBumpedNormal()                                                                     
 {             
     // Step #1: Sample a normal from the normal map
-    vec3 BumpMapNormal = texture(gNormalMap, TexCoord).xyz;
+    vec3 BumpMapNormal;
+    
+    if (gIsIndirectRender) {
+        BumpMapNormal = texture(NormalMaps[MaterialIndex], TexCoord.xy).xyz;
+    } else {
+        BumpMapNormal = texture(gNormalMap, TexCoord).xyz;
+    }
     
     // Step #2: transform from [0,1] to [-1,1]
     BumpMapNormal = 2.0 * BumpMapNormal - vec3(1.0);
