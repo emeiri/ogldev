@@ -27,6 +27,7 @@
 #include "ogldev_vertex_buffer.h"
 #include "ogldev_base_app2.h"
 #include "ogldev_glm_camera.h"
+#include "ogldev_texture.h"
 #include "bindless_tex_technique.h"
 #include "3rdparty/stb_image.h"
 
@@ -61,7 +62,6 @@ public:
         InitTextures();
 
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-//        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
 
@@ -71,6 +71,8 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
         m_bindlessTexTech.Enable();
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_textureBuffer);
 
         static int TextureIndex = 0;
         m_bindlessTexTech.SetTextureIndex(TextureIndex);
@@ -86,62 +88,33 @@ public:
 
     void InitTextures()
     {
-        std::vector<GLuint> textures;
-        std::vector<GLuint64> textureHandles;
-        std::vector<std::string> textureFiles;
-
-        textures.resize(NUM_TOTAL_FILES);
-        textureHandles.resize(NUM_TOTAL_FILES);
-        textureFiles.resize(NUM_TOTAL_FILES);
-
+        std::vector<std::string> TextureFilenames(NUM_TOTAL_FILES);
+        std::vector<Texture> Textures(NUM_TOTAL_FILES, GL_TEXTURE_2D);
+        std::vector<GLuint64> TextureHandles(NUM_TOTAL_FILES);
+               
         for (uint32_t j = 0; j < NUM_DIRS; j++) {
             for (uint32_t i = 0; i != NUM_FILES_IN_DIR; i++) {
-                char fname[1024];
-                snprintf(fname, sizeof(fname), "G://emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
+                char Filename[1024];
+                snprintf(Filename, sizeof(Filename), 
+                         "G://emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
                 int Index = j * NUM_FILES_IN_DIR + i;
-                textureFiles[Index] = fname;
+                TextureFilenames[Index] = Filename;
             }
         }
 
         for (int i = 0; i < NUM_TOTAL_FILES; i++) {
-            int texWidth, texHeight, texChannels;
-            printf("Loading '%s'\n", textureFiles[i].c_str());
-            stbi_uc* pixels = stbi_load(textureFiles[i].c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+            Textures[i].Load(TextureFilenames[i].c_str());
 
-            if (!pixels) {
-                printf("Failed to load [%s] texture\n", textureFiles[i].c_str()); fflush(stdout);
-                exit(1);
-            }
-
-            GLuint texture;
-            glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-            glTextureStorage2D(texture, 1, GL_RGBA8, texWidth, texHeight);
-            glTextureSubImage2D(texture, 0, 0, 0, texWidth, texHeight, GL_RGBA, GL_UNSIGNED_BYTE, (const void*)pixels);
-            glGenerateTextureMipmap(texture);
-
-            stbi_image_free(pixels);
-
-            // Retrieve the texture handle after we finish creating the texture
-            const GLuint64 handle = glGetTextureHandleARB(texture);
-            if (handle == 0) {
-                printf("glGetTextureHandleARB failed\n");
-                exit(-1);
-            }
-
-            textures[i] = texture;
-            textureHandles[i] = handle;
-
-            glMakeTextureHandleResidentARB(handle);
+            TextureHandles[i] = Textures[i].GetBindlessHandle();
         }
 
-        GLuint textureBuffer;
-        glCreateBuffers(1, &textureBuffer);
-        glNamedBufferStorage(textureBuffer, sizeof(GLuint64) * textureHandles.size(), (const void*)textureHandles.data(), GL_DYNAMIC_STORAGE_BIT);        
-
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, textureBuffer);
+        glCreateBuffers(1, &m_textureBuffer);
+        glNamedBufferStorage(m_textureBuffer, ARRAY_SIZE_IN_BYTES(TextureHandles), 
+                             TextureHandles.data(), 0);                
     }
 
-    BindlessTextureTechnique m_bindlessTexTech;
+    BindlessTextureTechnique m_bindlessTexTech;    
+    GLuint m_textureBuffer;
 };
 
 
