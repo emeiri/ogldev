@@ -145,6 +145,7 @@ private:
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
     std::vector<BasicMeshEntry> m_Meshes;
+    std::vector<Material> m_Materials;
 
     const aiScene* m_pScene = NULL;
 
@@ -282,7 +283,6 @@ private:
 
     void InitSingleCamera(int Index, const aiScene* pScene);
 
-    std::vector<Material> m_Materials;
     Texture* m_pNormalMap = NULL;
     Texture* m_pHeightMap = NULL;
 	
