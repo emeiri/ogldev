@@ -23,6 +23,17 @@
 #include "3rdparty/stb_image.h"
 #include "3rdparty/stb_image_write.h"
 
+
+static int GetNumMipMapLevels2D(int w, int h)
+{
+    int levels = 1;
+    while ((w | h) >> levels) {
+        levels += 1;
+    }
+    return levels;
+}
+
+
 Texture::Texture(GLenum TextureTarget, const std::string& FileName)
 {
     m_textureTarget = TextureTarget;
@@ -47,9 +58,27 @@ void Texture::Load(u32 BufferSize, void* pData)
 
 bool Texture::Load()
 {
-    stbi_set_flip_vertically_on_load(1);
+    const char* pExt = strrchr(m_fileName.c_str(), '.');
 
-    unsigned char* pImageData = stbi_load(m_fileName.c_str(), &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
+    m_isKTX = pExt && !strcmp(pExt, ".ktx");
+
+    unsigned char* pImageData = NULL;
+
+    gli::texture gliTex;
+    if (m_isKTX) {
+        gliTex = gli::load_ktx(m_fileName.c_str());
+        gli::gl GL(gli::gl::PROFILE_KTX);
+        m_ktxFormat = GL.translate(gliTex.format(), gliTex.swizzles());
+        glm::tvec3<GLsizei> extent(gliTex.extent(0));
+        m_imageWidth = extent.x;
+        m_imageHeight = extent.y;
+        m_imageBPP = extent.z;        
+        pImageData = (unsigned char*)gliTex.data();
+    } else {
+        stbi_set_flip_vertically_on_load(1);
+
+        pImageData = stbi_load(m_fileName.c_str(), &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
+    }
 
     if (!pImageData) {
         printf("Can't load texture from '%s' - %s\n", m_fileName.c_str(), stbi_failure_reason());
@@ -105,8 +134,8 @@ void Texture::LoadInternalNonDSA(const void* pImageData)
             glTexImage2D(m_textureTarget, 0, GL_RED, m_imageWidth, m_imageHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pImageData);
             GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
             glTexParameteriv(m_textureTarget, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
-        }        
-            break;
+        }
+                break;
 
         case 2:
             glTexImage2D(m_textureTarget, 0, GL_RG, m_imageWidth, m_imageHeight, 0, GL_RG, GL_UNSIGNED_BYTE, pImageData);
@@ -146,32 +175,39 @@ void Texture::LoadInternalDSA(const void* pImageData)
     int Levels = std::min(5, (int)log2f((float)std::max(m_imageWidth, m_imageHeight)));
 
     if (m_textureTarget == GL_TEXTURE_2D) {
-        switch (m_imageBPP) {
-        case 1: {
-            glTextureStorage2D(m_textureObj, Levels, GL_R8, m_imageWidth, m_imageHeight);
-            glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_UNSIGNED_BYTE, pImageData);
-            GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
-            glTextureParameteriv(m_textureObj, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
-        }  
-            break;
+        if (m_isKTX) {
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+          //  int NumMipmaps = GetNumMipMapLevels2D(m_imageWidth, m_imageHeight);
+            glTextureStorage2D(m_textureObj, Levels, m_ktxFormat.Internal, m_imageWidth, m_imageHeight);
+            glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, m_ktxFormat.External, m_ktxFormat.Type, pImageData);
+        } else {
+            switch (m_imageBPP) {
+            case 1: {
+                glTextureStorage2D(m_textureObj, Levels, GL_R8, m_imageWidth, m_imageHeight);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_UNSIGNED_BYTE, pImageData);
+                GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
+                glTextureParameteriv(m_textureObj, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
+            }
+                break;
 
-        case 2:
-            glTextureStorage2D(m_textureObj, Levels, GL_RG8, m_imageWidth, m_imageHeight);
-            glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RG, GL_UNSIGNED_BYTE, pImageData);
-            break;
+            case 2:
+                glTextureStorage2D(m_textureObj, Levels, GL_RG8, m_imageWidth, m_imageHeight);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RG, GL_UNSIGNED_BYTE, pImageData);
+                break;
 
-        case 3:
-            glTextureStorage2D(m_textureObj, Levels, GL_RGB8, m_imageWidth, m_imageHeight);
-            glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGB, GL_UNSIGNED_BYTE, pImageData);
-            break;
+            case 3:
+                glTextureStorage2D(m_textureObj, Levels, GL_RGB8, m_imageWidth, m_imageHeight);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGB, GL_UNSIGNED_BYTE, pImageData);
+                break;
 
-        case 4:
-            glTextureStorage2D(m_textureObj, Levels, GL_RGBA8, m_imageWidth, m_imageHeight);
-            glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGBA, GL_UNSIGNED_BYTE, pImageData);
-            break;
+            case 4:
+                glTextureStorage2D(m_textureObj, Levels, GL_RGBA8, m_imageWidth, m_imageHeight);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGBA, GL_UNSIGNED_BYTE, pImageData);
+                break;
 
-        default:
-            NOT_IMPLEMENTED;
+            default:
+                NOT_IMPLEMENTED;
+            }
         }
     }
     else {
@@ -181,15 +217,16 @@ void Texture::LoadInternalDSA(const void* pImageData)
 
     glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTextureParameterf(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, Levels - 1);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, 16);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, 16);
 
     glGenerateTextureMipmap(m_textureObj);
 
-    m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
-    glMakeTextureHandleResidentARB(m_bindlessHandle);
+  //  m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
+  //  glMakeTextureHandleResidentARB(m_bindlessHandle);
 }
 
 

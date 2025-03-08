@@ -22,6 +22,7 @@
 #include <string>
 
 #include <GL/glew.h>
+#include "gli/gli.hpp"
 
 
 class BaseTexture
@@ -71,6 +72,9 @@ private:
 
     void BindInternalNonDSA(GLenum TextureUnit);
     void BindInternalDSA(GLenum TextureUnit);
+
+    bool m_isKTX = false;
+    gli::gl::format m_ktxFormat;
 
     std::string m_fileName;
     GLuint64 m_bindlessHandle = 0;
