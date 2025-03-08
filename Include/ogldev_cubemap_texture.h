@@ -24,15 +24,16 @@
 #include <GL/glew.h>
 
 #include "bitmap.h"
+#include "ogldev_texture.h"
 
-class BaseCubmapTexture {
+class BaseCubmapTexture : public BaseTexture {
 public:
 
     virtual void Load() = 0;
 
     virtual void Bind(GLenum TextureUnit) = 0;
-
 };
+
 
 class CubemapTexture : public BaseCubmapTexture
 {
@@ -53,8 +54,7 @@ public:
 
 private:
 
-    std::string m_fileNames[6];
-    GLuint m_textureObj;
+    std::string m_fileNames[6];    
 };
 
 
@@ -76,7 +76,6 @@ private:
     void LoadCubemapData(const std::vector<Bitmap>& Cubemap);
 
     std::string m_filename;
-    GLuint m_textureObj;
 };
 
 

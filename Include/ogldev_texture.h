@@ -23,7 +23,17 @@
 
 #include <GL/glew.h>
 
-class Texture
+
+class BaseTexture
+{
+protected:
+    BaseTexture() {}
+
+    GLenum m_textureTarget = 0;
+    GLuint m_textureObj = 0;
+};
+
+class Texture : public BaseTexture
 {
 public:
     Texture(GLenum TextureTarget, const std::string& FileName);
@@ -63,8 +73,6 @@ private:
     void BindInternalDSA(GLenum TextureUnit);
 
     std::string m_fileName;
-    GLenum m_textureTarget = 0;
-    GLuint m_textureObj = 0;
     GLuint64 m_bindlessHandle = 0;
     int m_imageWidth = 0;
     int m_imageHeight = 0;
