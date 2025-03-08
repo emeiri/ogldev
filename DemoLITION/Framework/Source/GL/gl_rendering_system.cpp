@@ -22,6 +22,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
+#include "ogldev_cubemap_texture.h"
 #include "GL/gl_rendering_system.h"
 #include "GL/gl_grid.h"
 
@@ -132,6 +133,26 @@ int RenderingSystemGL::LoadTexture2D(const std::string& Filename)
     m_numTextures++;
 
     printf("2D texture '%s' loaded, handle %d\n", Filename.c_str(), ret);
+
+    return ret;
+}
+
+
+int RenderingSystemGL::LoadCubemapTexture(const std::string& Filename)
+{
+    if (m_numTextures == m_textures.size()) {
+        printf("%s:%d: out of texture space\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    CubemapEctTexture* pTexture = new CubemapEctTexture(Filename);
+    pTexture->Load();
+
+    m_textures[m_numTextures] = pTexture;
+    int ret = m_numTextures;
+    m_numTextures++;
+
+    printf("Equirectangular texture '%s' loaded, handle %d\n", Filename.c_str(), ret);
 
     return ret;
 }
