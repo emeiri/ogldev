@@ -41,6 +41,8 @@ public:
     void ResetRotations() { m_numRotations = 0; }
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
 
+    void RotateBy(float x, float y, float z);
+
     Matrix4f GetMatrix() const;
 
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
@@ -52,7 +54,7 @@ public:
     void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
 
 protected:
-    SceneObject() {}
+    SceneObject();
     void CalcRotationStack(Matrix4f& Rot) const;
 
     Vector3f m_pos = Vector3f(0.0f, 0.0f, 0.0f);

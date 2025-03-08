@@ -21,6 +21,11 @@
 
 #define NUM_SCENE_OBJECTS 1024
 
+SceneObject::SceneObject()
+{
+    memset(&m_rotations[0], 0, sizeof(m_rotations));
+}
+
 void SceneObject::SetRotation(const Vector3f& Rot)
 {
     m_rotations[0] = Rot;
@@ -33,6 +38,14 @@ void SceneObject::SetRotation(float x, float y, float z)
     m_rotations[0].x = x;
     m_rotations[0].y = y;
     m_rotations[0].z = z;
+    m_numRotations = 1;
+}
+
+void SceneObject::RotateBy(float x, float y, float z)
+{
+    m_rotations[0].x += x;
+    m_rotations[0].y += y;
+    m_rotations[0].z += z;
     m_numRotations = 1;
 }
 
