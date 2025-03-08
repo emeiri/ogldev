@@ -88,7 +88,7 @@ void CoreModel::Clear()
 
 void CoreModel::SetColorTexture(int TextureHandle)
 {
-    Texture* pTexture = NULL;
+    BaseTexture* pTexture = NULL;
     
     if (TextureHandle >= 0) {
         pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
@@ -103,7 +103,7 @@ void CoreModel::SetColorTexture(int TextureHandle)
         delete m_Materials[0].pDiffuse;
     }
 
-    m_Materials[0].pDiffuse = pTexture;
+    m_Materials[0].pDiffuse = (Texture*)pTexture;
 }
 
 
@@ -113,8 +113,8 @@ void CoreModel::SetNormalMap(int TextureHandle)
         m_pNormalMap = NULL;
     }
     else {
-        Texture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
-        m_pNormalMap = pTexture;
+        BaseTexture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
+        m_pNormalMap = (Texture*)pTexture;
     }
 }
 
@@ -125,8 +125,8 @@ void CoreModel::SetHeightMap(int TextureHandle)
         m_pHeightMap = NULL;
     }
     else {
-        Texture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
-        m_pHeightMap = pTexture;
+        BaseTexture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
+        m_pHeightMap = (Texture*)pTexture;
     }
 }
 

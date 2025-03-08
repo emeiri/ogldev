@@ -137,7 +137,7 @@ int RenderingSystemGL::LoadTexture2D(const std::string& Filename)
 }
 
 
-Texture* RenderingSystemGL::GetTexture(int TextureHandle)
+BaseTexture* RenderingSystemGL::GetTexture(int TextureHandle)
 {
     if (TextureHandle < 0) {
         printf("%s:%d: invalid texture handle %d\n", __FILE__, __LINE__, TextureHandle);
@@ -149,7 +149,7 @@ Texture* RenderingSystemGL::GetTexture(int TextureHandle)
         exit(0);
     }
 
-    Texture* pTexture = m_textures[TextureHandle];
+    BaseTexture* pTexture = m_textures[TextureHandle];
 
     if (!pTexture) {
         printf("%s:%d: invalid texture handle %d\n", __FILE__, __LINE__, TextureHandle);

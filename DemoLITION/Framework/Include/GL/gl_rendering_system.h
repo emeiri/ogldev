@@ -45,7 +45,7 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual int LoadTexture2D(const std::string& Filename);
 
-    virtual Texture* GetTexture(int TextureHandle);
+    virtual BaseTexture* GetTexture(int TextureHandle);
 
     virtual void Execute();
 
@@ -70,7 +70,7 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     GLFWwindow* m_pWindow = NULL;
     ForwardRenderer m_forwardRenderer;
-    std::vector<Texture*> m_textures;
+    std::vector<BaseTexture*> m_textures;
     int m_numTextures = 0;
 };
 
