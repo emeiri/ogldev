@@ -26,8 +26,7 @@ layout(binding = 0, std430) readonly buffer ssbo3 {
     sampler2D textures[];
 };
 
-smooth in vec2 TexCoord;
-flat in int Instance;
+in vec2 TexCoord;
 
 out vec4 FragColor;
 
