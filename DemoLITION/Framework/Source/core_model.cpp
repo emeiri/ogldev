@@ -55,27 +55,6 @@ inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 }
 
 
-void CoreModel::SetColorTexture(int TextureHandle)
-{
-    BaseTexture* pTexture = NULL;
-    
-    if (TextureHandle >= 0) {
-        pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
-    }
-
-    if (m_Materials.size() == 0) {
-        printf("SetColorTexture: no materials\n");
-        assert(0);
-    }
-
-    if (m_Materials[0].pDiffuse) {
-        delete m_Materials[0].pDiffuse;
-    }
-
-    m_Materials[0].pDiffuse = (Texture*)pTexture;
-}
-
-
 bool CoreModel::LoadAssimpModel(const string& Filename)
 {
     AllocBuffers();
@@ -96,8 +75,10 @@ bool CoreModel::LoadAssimpModel(const string& Filename)
         printf("Error parsing '%s': '%s'\n", Filename.c_str(), m_Importer.GetErrorString());
     }
 
+#ifndef OGLDEV_VULKAN // TODO: move to GLModel using virtual function
     // Make sure the VAO is not changed from the outside
     glBindVertexArray(0);
+#endif
 
     return Ret;
 }
@@ -148,7 +129,11 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 
     InitGeometryPost();
 
+#ifdef OGLDEV_VULKAN
+    return true;
+#else
     return GLCheckError();
+#endif
 }
 
 
@@ -522,8 +507,8 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 void CoreModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D);
-    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].pDiffuse = AllocTexture2D();
+    int buffer_size = paiTexture->mWidth;   // TODO: just the width???
     m_Materials[MaterialIndex].pDiffuse->Load(buffer_size, paiTexture->pcData);
 }
 
@@ -544,15 +529,10 @@ void CoreModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 
     string FullPath = Dir + "/" + p;
 
-    m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+    m_Materials[MaterialIndex].pDiffuse = AllocTexture2D();
 
-    if (!m_Materials[MaterialIndex].pDiffuse->Load()) {
-        printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
-        exit(0);
-    }
-    else {
-        printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), MaterialIndex);
-    }
+    m_Materials[MaterialIndex].pDiffuse->Load(FullPath.c_str());
+    printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), MaterialIndex);
 }
 
 
@@ -579,8 +559,8 @@ void CoreModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
 void CoreModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D);
-    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].pSpecularExponent = AllocTexture2D();
+    int buffer_size = paiTexture->mWidth;   // TODO: just the width???
     m_Materials[MaterialIndex].pSpecularExponent->Load(buffer_size, paiTexture->pcData);
 }
 
@@ -597,15 +577,10 @@ void CoreModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
 
     string FullPath = Dir + "/" + p;
 
-    m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+    m_Materials[MaterialIndex].pSpecularExponent = AllocTexture2D();
 
-    if (!m_Materials[MaterialIndex].pSpecularExponent->Load()) {
-        printf("Error loading specular texture '%s'\n", FullPath.c_str());
-        exit(0);
-    }
-    else {
-        printf("Loaded specular texture '%s'\n", FullPath.c_str());
-    }
+    m_Materials[MaterialIndex].pSpecularExponent->Load(FullPath.c_str());
+    printf("Loaded specular texture '%s'\n", FullPath.c_str());
 }
 
 
@@ -633,8 +608,8 @@ void CoreModel::LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial
 void CoreModel::LoadNormalTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded nroaml texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pNormal = new Texture(GL_TEXTURE_2D);
-    int buffer_size = paiTexture->mWidth;
+    m_Materials[MaterialIndex].pNormal = AllocTexture2D();
+    int buffer_size = paiTexture->mWidth;   // TODO: just the width???
     m_Materials[MaterialIndex].pNormal->Load(buffer_size, paiTexture->pcData);
 }
 
@@ -652,15 +627,10 @@ void CoreModel::LoadNormalTextureFromFile(const string& Dir, const aiString& Pat
 
     string FullPath = Dir + "/" + p;
 
-    m_Materials[MaterialIndex].pNormal = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+    m_Materials[MaterialIndex].pNormal = AllocTexture2D();
 
-    if (!m_Materials[MaterialIndex].pNormal->Load()) {
-        printf("Error loading normal texture '%s'\n", FullPath.c_str());
-        exit(0);
-    }
-    else {
-        printf("Loaded normal texture '%s'\n", FullPath.c_str());
-    }
+    m_Materials[MaterialIndex].pNormal->Load(FullPath.c_str());
+    printf("Loaded normal texture '%s'\n", FullPath.c_str());
 }
 
 

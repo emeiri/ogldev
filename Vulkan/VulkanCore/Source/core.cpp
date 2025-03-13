@@ -686,6 +686,29 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 }
 
 
+void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
+{
+	// Step #1: create the image object and populate it with pixels
+	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format);
+
+	// Step #2: create the image view
+	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags);
+
+	VkFilter MinFilter = VK_FILTER_LINEAR;
+	VkFilter MaxFilter = VK_FILTER_LINEAR;
+	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	// Step #3: create the texture sampler
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
+
+	printf("Texture from data created\n");
+}
+
+
+
+
 void VulkanTexture::Destroy(VkDevice Device)
 {
 	vkDestroySampler(Device, m_sampler, NULL);

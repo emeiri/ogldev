@@ -47,7 +47,7 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual int LoadCubemapTexture(const std::string& Filename);
 
-    virtual BaseTexture* GetTexture(int TextureHandle);
+    BaseTexture* GetTexture(int TextureHandle);
 
     virtual void Execute();
 

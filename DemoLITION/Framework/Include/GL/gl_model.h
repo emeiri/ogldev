@@ -36,11 +36,15 @@ public:
 
     virtual void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
-    void RenderIndirect(const Matrix4f& ObjectMatrix);
+    virtual void SetColorTexture(int TextureHandle);
 
     virtual void SetNormalMap(int TextureHandle);
 
     virtual void SetHeightMap(int TextureHandle);
+
+    virtual Texture* AllocTexture2D();
+
+    void RenderIndirect(const Matrix4f& ObjectMatrix);
 
     Texture* GetNormalMap() const { return m_pNormalMap; }
 

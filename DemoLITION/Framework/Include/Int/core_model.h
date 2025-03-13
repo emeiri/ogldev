@@ -25,9 +25,6 @@
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
 
-#include "ogldev_util.h"
-#include "ogldev_math_3d.h"
-#include "ogldev_texture.h"
 #include "ogldev_material.h"
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
@@ -87,8 +84,6 @@ public:
     const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
     const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
 
-    void SetColorTexture(int TextureHandle);
-
     void SetTextureScale(float Scale) { m_textureScale = Scale; }
 
     bool IsAnimated() const;
@@ -96,6 +91,8 @@ public:
 protected:
 
     virtual void AllocBuffers() = 0;
+
+    virtual Texture* AllocTexture2D() = 0;
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,
@@ -291,8 +288,6 @@ private:
     };
 
     void CalcLocalTransform(LocalTransform& Transform, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim);
-
-    GLuint m_boneBuffer = 0;
 
     map<string,uint> m_BoneNameToIndexMap;
 

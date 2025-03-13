@@ -20,8 +20,11 @@
 #define OGLDEV_MATERIAL_H
 
 #include "ogldev_math_3d.h"
+#ifdef OGLDEV_VULKAN
+#include "ogldev_vulkan_texture.h"
+#else
 #include "ogldev_texture.h"
-
+#endif
 
 struct PBRMaterial
 {

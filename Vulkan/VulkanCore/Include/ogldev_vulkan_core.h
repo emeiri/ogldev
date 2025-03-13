@@ -26,6 +26,7 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_device.h"
 #include "ogldev_vulkan_queue.h"
+#include "ogldev_vulkan_texture.h"
 
 namespace OgldevVK {
 
@@ -39,19 +40,6 @@ public:
 	VkDeviceSize m_allocationSize = 0;
 
 	void Update(VkDevice Device, const void* pData, size_t Size);
-
-	void Destroy(VkDevice Device);
-};
-
-
-class VulkanTexture {
-public:
-	VulkanTexture() {}
-
-	VkImage m_image = VK_NULL_HANDLE;
-	VkDeviceMemory m_mem = VK_NULL_HANDLE;
-	VkImageView m_view = VK_NULL_HANDLE;
-	VkSampler m_sampler = VK_NULL_HANDLE;
 
 	void Destroy(VkDevice Device);
 };
@@ -91,7 +79,9 @@ public:
 
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 	
-	void CreateTexture(const char* filename, VulkanTexture& Tex);	
+	void CreateTexture(const char* filename, VulkanTexture& Tex);
+
+	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
 
 private:
 

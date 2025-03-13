@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Vulkan">
       <UniqueIdentifier>{a62c035f-b479-4bf3-abd5-ee7560353f39}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\DemoLITION">
+      <UniqueIdentifier>{acc52068-bd7a-4008-b4be-220490467a19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -60,6 +63,15 @@
     <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp">
       <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\DemoLITION\Framework\Source\core_model.cpp">
+      <Filter>Source Files\DemoLITION</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\model.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\texture.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -87,6 +99,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_glfw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

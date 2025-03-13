@@ -41,9 +41,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial17_VAO", "Tutorial1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial19_Materials", "Tutorial19\Tutorial19.vcxproj", "{D3CB3C43-18C2-47CD-87D0-72D1D280D408}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial20", "Tutorial20\Tutorial20.vcxproj", "{34AC24B2-95A6-4F39-B643-6B6026D593D7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial20_DiffuseLighting", "Tutorial20\Tutorial20.vcxproj", "{34AC24B2-95A6-4F39-B643-6B6026D593D7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial21", "Tutorial21\Tutorial21.vcxproj", "{88B3273E-DB0F-4211-9F31-D0EED48E0085}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial21_SpecularLighting", "Tutorial21\Tutorial21.vcxproj", "{88B3273E-DB0F-4211-9F31-D0EED48E0085}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F3822-5B5B-46A8-B8E6-253BB09CFB10}"
 	ProjectSection(SolutionItems) = preProject
@@ -182,11 +182,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial34", "Tutorial34\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial35", "Tutorial35\Tutorial35.vcxproj", "{3A97ECEA-0AE3-40B5-BB73-0874F5F9516B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial36", "Tutorial36\Tutorial36.vcxproj", "{50449426-0E07-4D4A-B7EC-366B8D1A8503}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial36_DirLightShadows", "Tutorial36\Tutorial36.vcxproj", "{50449426-0E07-4D4A-B7EC-366B8D1A8503}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial37_PointLightShadows", "Tutorial37\Tutorial37.vcxproj", "{118F84E3-475E-45BB-8F8D-51C1CB03BCEE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial38", "Tutorial38\Tutorial38.vcxproj", "{0D237F28-EA59-4308-9330-50650B015A07}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial38_ImprovingShadowMapping", "Tutorial38\Tutorial38.vcxproj", "{0D237F28-EA59-4308-9330-50650B015A07}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial39", "Tutorial39\Tutorial39.vcxproj", "{F0B17728-0597-4364-9A6C-1F6AF645F9F9}"
 EndProject
@@ -496,6 +496,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial59_BindlessTextures", "Tutorial59_BindlessTextures\Tutorial59.vcxproj", "{BF5E6AD5-9481-4BA1-8A52-09DDA5B2C444}"
 	ProjectSection(ProjectDependencies) = postProject
 		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial20", "Vulkan\Tutorial20\Tutorial20.vcxproj", "{BEFB13F3-683C-4127-AEA3-ADB21222FC36}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
 EndProject
 Global
@@ -1362,6 +1367,14 @@ Global
 		{BF5E6AD5-9481-4BA1-8A52-09DDA5B2C444}.Release|x64.Build.0 = Release|x64
 		{BF5E6AD5-9481-4BA1-8A52-09DDA5B2C444}.Release|x86.ActiveCfg = Release|Win32
 		{BF5E6AD5-9481-4BA1-8A52-09DDA5B2C444}.Release|x86.Build.0 = Release|Win32
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Debug|x64.ActiveCfg = Debug|x64
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Debug|x64.Build.0 = Debug|x64
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Debug|x86.ActiveCfg = Debug|Win32
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Debug|x86.Build.0 = Debug|Win32
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Release|x64.ActiveCfg = Release|x64
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Release|x64.Build.0 = Release|x64
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Release|x86.ActiveCfg = Release|Win32
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1481,6 +1494,7 @@ Global
 		{19BC8366-11D8-45F4-9991-A6B094B6715E} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{6687D730-280D-4BBE-9F16-89E2D89C5573} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{BF5E6AD5-9481-4BA1-8A52-09DDA5B2C444} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{BEFB13F3-683C-4127-AEA3-ADB21222FC36} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}

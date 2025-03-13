@@ -426,6 +426,28 @@ void GLModel::SetupRenderMaterialsPBR()
 }
 
 
+void GLModel::SetColorTexture(int TextureHandle)
+{
+    BaseTexture* pTexture = NULL;
+
+    if (TextureHandle >= 0) {
+        pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
+    }
+
+    if (m_Materials.size() == 0) {
+        printf("SetColorTexture: no materials\n");
+        assert(0);
+    }
+
+    if (m_Materials[0].pDiffuse) {
+        delete m_Materials[0].pDiffuse;
+    }
+
+    m_Materials[0].pDiffuse = (Texture*)pTexture;
+}
+
+
+
 void GLModel::SetNormalMap(int TextureHandle)
 {
     if (TextureHandle < 0) {
@@ -447,5 +469,11 @@ void GLModel::SetHeightMap(int TextureHandle)
         BaseTexture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
         m_pHeightMap = (Texture*)pTexture;
     }
+}
+
+
+Texture* GLModel::AllocTexture2D()
+{
+    return new Texture(GL_TEXTURE_2D);
 }
 
