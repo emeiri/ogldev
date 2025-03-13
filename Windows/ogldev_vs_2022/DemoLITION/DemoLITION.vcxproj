@@ -194,6 +194,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_indirect_render.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_rendering_system.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_indirect_render.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_model.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_rendering_system.cpp" />

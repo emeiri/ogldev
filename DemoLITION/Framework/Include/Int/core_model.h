@@ -20,7 +20,6 @@
 
 #include <map>
 #include <vector>
-#include <GL/glew.h>
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>       // Output data structure
@@ -34,9 +33,7 @@
 #include "demolition_lights.h"
 #include "demolition_model.h"
 #include "GL\gl_basic_mesh_entry.h"
-#include "GL\gl_indirect_render.h"
 
-#define INVALID_MATERIAL 0xFFFFFFFF
 
 class DemolitionRenderCallbacks
 {
@@ -55,30 +52,21 @@ class CoreRenderingSystem;
 class CoreModel : public Model
 {
 public:
-    CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { m_pCoreRenderingSystem = pCoreRenderingSystem; }
+    CoreModel() {}
 
-    ~CoreModel();
+    CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { m_pCoreRenderingSystem = pCoreRenderingSystem; }
 
     bool LoadAssimpModel(const std::string& Filename);
 
-    void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL);
+    virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL) = 0;
 
-    void Render(uint DrawIndex, uint PrimID);
+    virtual void Render(uint DrawIndex, uint PrimID) = 0;
 
-    void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
-
-    void RenderIndirect(const Matrix4f& ObjectMatrix);
-
-   //PBRMaterial& GetPBRMaterial() { return m_Materials[0].PBRmaterial; };
-
-    void GetLeadingVertex(uint DrawIndex, uint PrimID, Vector3f& Vertex);
+    virtual void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats) = 0;
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
-    uint NumBones() const
-    {
-        return (uint)m_BoneNameToIndexMap.size();
-    }
+    uint NumBones() const { return (uint)m_BoneNameToIndexMap.size(); }
 
     // This is the main function to drive the animation. It receives the animation time
     // in seconds and a reference to a vector of transformation matrices (one matrix per bone).
@@ -101,55 +89,13 @@ public:
 
     void SetColorTexture(int TextureHandle);
 
-    void SetNormalMap(int TextureHandle);
-
-    Texture* GetNormalMap() const { return m_pNormalMap; }
-
-    void SetHeightMap(int TextureHandle);
-
-    Texture* GetHeightMap() const { return m_pHeightMap; }
-
     void SetTextureScale(float Scale) { m_textureScale = Scale; }
 
     bool IsAnimated() const;
 
-private:
+protected:
 
-    void Clear();
-
-    void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
-
-    template<typename VertexType>
-    void ReserveSpace(std::vector<VertexType>& Vertices, uint NumVertices, uint NumIndices);
-
-    template<typename VertexType>
-    void InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
-
-    template<typename VertexType>
-    void InitSingleMeshOpt(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
-
-    template<typename VertexType>
-    void PopulateBuffers(vector<VertexType>& Vertices);
-
-    template<typename VertexType>
-    void PopulateBuffersPVP(vector<VertexType>& Vertices);
-
-    template<typename VertexType>
-    void PopulateBuffersNonDSA(vector<VertexType>& Vertices);
-
-    template<typename VertexType>
-    void PopulateBuffersDSA(vector<VertexType>& Vertices);
-
-    uint CountValidFaces(const aiMesh& Mesh);
-
-    CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
-
-    std::vector<BasicMeshEntry> m_Meshes;
-    std::vector<Material> m_Materials;
-
-    const aiScene* m_pScene = NULL;
-
-    Matrix4f m_GlobalInverseTransform;
+    virtual void AllocBuffers() = 0;
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,
@@ -159,9 +105,6 @@ private:
         NUM_BUFFERS = 4
     };
 
-    GLuint m_VAO = 0;
-
-    GLuint m_Buffers[NUM_BUFFERS] = { 0 };
 
     struct Vertex {
         Vector3f Position;
@@ -179,22 +122,20 @@ private:
             Bitangent.Print();
         }
     };
-	
-    #define MAX_NUM_BONES_PER_VERTEX 4
-	
+
+#define MAX_NUM_BONES_PER_VERTEX 4
+
     struct VertexBoneData
     {
         uint BoneIDs[MAX_NUM_BONES_PER_VERTEX] = { 0 };
         float Weights[MAX_NUM_BONES_PER_VERTEX] = { 0.0f };
         int index = 0;  // slot for the next update
 
-        VertexBoneData()
-        {
-        }
+        VertexBoneData() { }
 
         void AddBoneData(uint BoneID, float Weight)
         {
-            for (int i = 0 ; i < index ; i++) {
+            for (int i = 0; i < index; i++) {
                 if (BoneIDs[i] == BoneID) {
                     //  printf("bone %d already found at index %d old weight %f new weight %f\n", BoneID, i, Weights[i], Weight);
                     return;
@@ -211,7 +152,7 @@ private:
 
             if (index == MAX_NUM_BONES_PER_VERTEX) {
                 return;
-                                assert(0);
+                assert(0);
             }
 
             BoneIDs[index] = BoneID;
@@ -230,13 +171,39 @@ private:
         VertexBoneData Bones;
     };
 
+    virtual void InitGeometryPost() = 0;
+
+    std::vector<BasicMeshEntry> m_Meshes;
+    std::vector<Material> m_Materials;
+
+    // Temporary space for vertex stuff before we load them into the GPU
+    vector<uint> m_Indices;
+
+    CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
+
+private:
+
+    template<typename VertexType>
+    void ReserveSpace(std::vector<VertexType>& Vertices, uint NumVertices, uint NumIndices);
+
+    template<typename VertexType>
+    void InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
+
+    template<typename VertexType>
+    void InitSingleMeshOpt(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh);
+
+    virtual void PopulateBuffersSkinned(vector<SkinnedVertex>& Vertices) = 0;
+
+    virtual void PopulateBuffers(vector<Vertex>& Vertices) = 0;
+
+    uint CountValidFaces(const aiMesh& Mesh);
 
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 
     bool InitGeometry(const aiScene* pScene, const string& Filename);
 
     template<typename VertexType>
-    void InitGeometryInternal(int NumVertices, int NumIndices);
+    void InitGeometryInternal(std::vector<VertexType>& Vertices, int NumVertices, int NumIndices);
 
     void InitLights(const aiScene* pScene);
 
@@ -277,17 +244,13 @@ private:
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 
-    void SetupRenderMaterialsPBR();
-	
     void InitCameras(const aiScene* pScene);
 
     void InitSingleCamera(int Index, const aiScene* pScene);
 
-    Texture* m_pNormalMap = NULL;
-    Texture* m_pHeightMap = NULL;
-	
-    // Temporary space for vertex stuff before we load them into the GPU
-    vector<uint> m_Indices;
+    const aiScene* m_pScene = NULL;
+
+    Matrix4f m_GlobalInverseTransform;
 
     Assimp::Importer m_Importer;
 
@@ -300,8 +263,6 @@ private:
     Vector3f m_minPos = Vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
     Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-    IndirectRender m_indirectRender;
-	
     /////////////////////////////////////
 	// Skeletal animation stuff
     /////////////////////////////////////

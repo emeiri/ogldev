@@ -109,6 +109,9 @@
     <ClCompile Include="..\..\..\Common\cubemap_texture.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_model.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -229,6 +232,9 @@
       <Filter>Include\GL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_engine_common.h">
+      <Filter>Include\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_model.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
   </ItemGroup>

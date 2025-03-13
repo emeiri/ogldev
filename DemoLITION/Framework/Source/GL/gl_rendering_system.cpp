@@ -25,6 +25,7 @@
 #include "ogldev_cubemap_texture.h"
 #include "GL/gl_rendering_system.h"
 #include "GL/gl_grid.h"
+#include "GL/gl_model.h"
 
 #define NUM_TEXTURES 1024
 
@@ -100,7 +101,7 @@ Scene* RenderingSystemGL::CreateEmptyScene()
 
 CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
 {
-    CoreModel* pModel = new CoreModel(this);
+    GLModel* pModel = new GLModel(this);
 
     if (!pModel->LoadAssimpModel(Filename)) {
         delete pModel;

@@ -19,6 +19,7 @@
 #include "GL/gl_engine_common.h"
 #include "GL/gl_forward_renderer.h"
 #include "GL/gl_rendering_system.h"
+#include "GL/gl_model.h"
 
 
 #define SHADOW_MAP_WIDTH 2048
@@ -538,7 +539,7 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
         SwitchToLightingTech(FORWARD_LIGHTING);  // TODO: do we need this?
     }
 
-    CoreModel* pModel = pSceneObject->GetModel();
+    GLModel* pModel = (GLModel*)pSceneObject->GetModel();
     bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
     bool HeightMapEnabled = pModel->GetHeightMap() != NULL;
 
@@ -552,7 +553,7 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
 
 void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
 {
-    CoreModel* pModel = pSceneObject->GetModel();
+    GLModel* pModel = (GLModel*)pSceneObject->GetModel();
 
     if (IsLightingPass(m_curRenderPass)) {
         if (pModel->IsPBR()) {
