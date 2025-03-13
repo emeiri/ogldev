@@ -101,6 +101,10 @@ void IndirectRender::PrepareIndirectRenderMaterials(std::vector<Material>& Mater
         m_colors[i].AmbientColor = Materials[i].AmbientColor;
         m_colors[i].DiffuseColor = Materials[i].DiffuseColor;
         m_colors[i].SpecularColor = Materials[i].SpecularColor;
+        if (Materials[i].pDiffuse && (Materials[i].pDiffuse->GetBindlessHandle() == -1)) {
+            printf("Diffuse texture exists but bindless handle is missing\n");
+            exit(1);
+        }
         GLuint64 DiffuseMapBindlessHandle = Materials[i].pDiffuse ? Materials[i].pDiffuse->GetBindlessHandle() : -1;
         m_diffuseMaps[i] = DiffuseMapBindlessHandle;
         GLuint64 NormalMapBindlessHandle = Materials[i].pNormal ? Materials[i].pNormal->GetBindlessHandle() : -1;
