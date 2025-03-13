@@ -225,8 +225,8 @@ void Texture::LoadInternalDSA(const void* pImageData)
 
     glGenerateTextureMipmap(m_textureObj);
 
-  //  m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
-  //  glMakeTextureHandleResidentARB(m_bindlessHandle);
+    m_bindlessHandle = glGetTextureHandleARB(m_textureObj);
+    glMakeTextureHandleResidentARB(m_bindlessHandle);
 }
 
 
