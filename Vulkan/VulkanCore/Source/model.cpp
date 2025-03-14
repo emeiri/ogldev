@@ -41,9 +41,22 @@ Texture* VkModel::AllocTexture2D()
 
 void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 {
+	m_indexCount = m_Indices.size();
+
 	m_vb = m_pVulkanCore->CreateVertexBuffer(Vertices.data(), ARRAY_SIZE_IN_BYTES(Vertices));
     //	printf("%d\n", sizeof(Vertices[0]));
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_Indices.data(), ARRAY_SIZE_IN_BYTES(m_Indices));
+}
+
+
+void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf)
+{
+	u32 InstanceCount = 1;
+	u32 FirstVertex = 0;
+	u32 FirstInstance = 0;
+
+	vkCmdDraw(CmdBuf, (u32)m_indexCount, InstanceCount, FirstVertex, FirstInstance);
+
 }
 
 }

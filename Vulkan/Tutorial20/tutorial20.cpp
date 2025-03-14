@@ -199,7 +199,7 @@ private:
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
-		m_model.LoadAssimpModel("../../Content/box.obj");
+		m_model.LoadAssimpModel("../../Content/dragon.obj");
 	}
 
 
@@ -253,24 +253,21 @@ private:
 		};
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
-			OgldevVK::BeginCommandBuffer(m_cmdBufs[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT); 
+			VkCommandBuffer& CmdBuf = m_cmdBufs[i];
+
+			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			RenderPassBeginInfo.framebuffer = m_frameBuffers[i];
 	
-			vkCmdBeginRenderPass(m_cmdBufs[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	
-			m_pPipeline->Bind(m_cmdBufs[i], i);
+			m_pPipeline->Bind(CmdBuf, i);
 
-			u32 VertexCount = 36;
-			u32 InstanceCount = 1;
-			u32 FirstVertex = 0;
-			u32 FirstInstance = 0;
+			m_model.RecordCommandBuffer(CmdBuf);
 
-			vkCmdDraw(m_cmdBufs[i], VertexCount, InstanceCount, FirstVertex, FirstInstance);
+			vkCmdEndRenderPass(CmdBuf);
 
-			vkCmdEndRenderPass(m_cmdBufs[i]);
-
-			VkResult res = vkEndCommandBuffer(m_cmdBufs[i]);
+			VkResult res = vkEndCommandBuffer(CmdBuf);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
 		}
 

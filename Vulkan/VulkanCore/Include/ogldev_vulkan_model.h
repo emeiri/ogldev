@@ -34,6 +34,8 @@ public:
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf);
+
 	virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL) { assert(0); }
 
 	virtual void Render(uint DrawIndex, uint PrimID) { assert(0); }
@@ -69,6 +71,8 @@ private:
 
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
+
+	size_t m_indexCount = 0;
 };
 
 }
