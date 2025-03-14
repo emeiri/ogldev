@@ -88,6 +88,8 @@ public:
 
     bool IsAnimated() const;
 
+    const Material* GetMaterialForMesh(int MeshIndex) const;
+
 protected:
 
     virtual void AllocBuffers() = 0;

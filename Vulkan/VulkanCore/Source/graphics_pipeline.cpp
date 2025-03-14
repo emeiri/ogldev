@@ -254,12 +254,20 @@ void GraphicsPipeline::CreateDescriptorSets(const VkModel& Model, int NumImages,
 {
 	CreateDescriptorPool(NumImages);
 
+	const Material* pMaterial = Model.GetMaterialForMesh(0);
+
+	VulkanTexture* pTexture = NULL;
+
+	if (pMaterial) {
+		pTexture = pMaterial->pDiffuse;
+	}
+
 	bool IsIB = true;
-	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, NULL, IsIB);
+	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pTexture, IsIB);
 
 	AllocateDescriptorSets(NumImages);
 
-	UpdateDescriptorSets(Model.GetVB(), Model.GetIB(), NULL, NumImages, UniformBuffers, UniformDataSize);
+	UpdateDescriptorSets(Model.GetVB(), Model.GetIB(), pTexture, NumImages, UniformBuffers, UniformDataSize);
 }
 
 void GraphicsPipeline::CreateDescriptorPool(int NumImages)

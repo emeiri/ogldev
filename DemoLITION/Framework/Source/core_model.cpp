@@ -474,6 +474,25 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
+const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
+{
+    if (MeshIndex >= m_Meshes.size()) {
+        printf("Invalid mesh index %d, num meshes %d\n", MeshIndex, (int)m_Meshes.size());
+        exit(1);
+    }
+
+    int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
+
+    const Material* pMaterial = NULL;
+
+    if ((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size())) {
+        pMaterial = & m_Materials[MaterialIndex];
+    }
+
+    return pMaterial;
+}
+
+
 void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
 {
     LoadDiffuseTexture(Dir, pMaterial, index);
