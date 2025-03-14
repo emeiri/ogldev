@@ -21,8 +21,11 @@
 
 struct VertexData
 {
-	float x, y, z;
+	float pos_x, pos_y, pos_z;
 	float u, v;
+    float normal_x, normal_y, normal_z;
+    float tangent_x, tangent_y, tangent_z;
+    float bitangent_x, bitangent_y, bitangent_z;
 };
 
 layout (std430, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
@@ -39,7 +42,7 @@ void main()
 
 	VertexData vtx = in_Vertices.v[Index];
 
-    vec3 pos = vec3(vtx.x, vtx.y, vtx.z);
+    vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
 
 	gl_Position = ubo.WVP * vec4(pos, 1.0);
     

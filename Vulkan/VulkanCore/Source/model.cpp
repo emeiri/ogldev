@@ -38,24 +38,10 @@ Texture* VkModel::AllocTexture2D()
 	return new VulkanTexture(m_pVulkanCore);
 }
 
-struct NewVertex {
-	glm::vec3 Pos;
-	glm::vec2 Tex;
-};
-
 
 void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 {
-	std::vector<NewVertex> foo;
-	foo.resize(Vertices.size());
-	for (int i = 0; i < Vertices.size(); i++) {
-		foo[i].Pos.x = Vertices[i].Position.x;
-		foo[i].Pos.y = Vertices[i].Position.y;
-		foo[i].Pos.z = Vertices[i].Position.z;
-		foo[i].Tex.x = Vertices[i].TexCoords.x;
-		foo[i].Tex.y = Vertices[i].TexCoords.y;
-	}
-	m_vb = m_pVulkanCore->CreateVertexBuffer(foo.data(), ARRAY_SIZE_IN_BYTES(foo));
+	m_vb = m_pVulkanCore->CreateVertexBuffer(Vertices.data(), ARRAY_SIZE_IN_BYTES(Vertices));
     //	printf("%d\n", sizeof(Vertices[0]));
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_Indices.data(), ARRAY_SIZE_IN_BYTES(m_Indices));
 }
