@@ -656,6 +656,8 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	int ImageHeight = 0;
 	int ImageChannels = 0;
 
+	stbi_set_flip_vertically_on_load(1);
+
 	// Step #1: load the image pixels
 	stbi_uc* pPixels = stbi_load(pFilename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
 
