@@ -199,7 +199,7 @@ private:
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
-		m_model.LoadAssimpModel("../../Content/dragon.obj");
+		m_model.LoadAssimpModel("../../Content/box.obj");
 	}
 
 
@@ -261,7 +261,7 @@ private:
 	
 			m_pPipeline->Bind(m_cmdBufs[i], i);
 
-			u32 VertexCount = 9;
+			u32 VertexCount = 36;
 			u32 InstanceCount = 1;
 			u32 FirstVertex = 0;
 			u32 FirstInstance = 0;
