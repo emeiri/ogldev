@@ -71,8 +71,6 @@ private:
 
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
-
-	size_t m_indexCount = 0;
 };
 
 }
