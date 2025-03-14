@@ -22,6 +22,7 @@
 #include <GLFW/glfw3.h>
 
 #include "ogldev_vulkan_simple_mesh.h"
+#include "ogldev_vulkan_model.h"
 
 
 namespace OgldevVK {
@@ -41,6 +42,16 @@ public:
 					 int UniformDataSize,
 					 bool DepthEnabled);
 
+	GraphicsPipeline(VkDevice Device,
+					 GLFWwindow* pWindow,
+					 VkRenderPass RenderPass,
+					 VkShaderModule vs,
+					 VkShaderModule fs,
+					 const VkModel& Model,
+					 int NumImages,
+					 std::vector<BufferAndMemory>& UniformBuffers,
+					 int UniformDataSize);
+
 
 	~GraphicsPipeline();
 
@@ -48,12 +59,17 @@ public:
 
 private:
 
+	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, const BufferAndMemory* pVB, VkShaderModule vs, VkShaderModule fs);
+
 	void CreateDescriptorPool(int NumImages);
 	void CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
 						  	  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
-	void CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize, VulkanTexture* pTex);
+	void CreateDescriptorSets(const VkModel& Model, int NumImages,
+							  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+	void CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize, VulkanTexture* pTex, bool IsIB);
 	void AllocateDescriptorSets(int NumImages);
-	void UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+	void UpdateDescriptorSets(const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
+							  int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
@@ -61,5 +77,6 @@ private:
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descriptorSets;
+	bool m_depthEnabled = false;
 };
 }

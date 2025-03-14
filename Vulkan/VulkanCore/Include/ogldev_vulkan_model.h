@@ -30,6 +30,8 @@ public:
 
 	VkModel() {}
 
+	void Destroy();
+
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
 	virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL) { assert(0); }
@@ -46,6 +48,10 @@ public:
 
 	virtual void SetTextureScale(float Scale) { assert(0); }
 
+	const BufferAndMemory* GetVB() const { return &m_vb; }
+
+	const BufferAndMemory* GetIB() const { return &m_ib; }
+
 protected:
 
 	virtual void AllocBuffers() { /* Nothing to do here */ }
@@ -60,6 +66,9 @@ protected:
 
 private:
 	VulkanCore* m_pVulkanCore = NULL;
+
+	BufferAndMemory m_vb;
+	BufferAndMemory m_ib;
 };
 
 }

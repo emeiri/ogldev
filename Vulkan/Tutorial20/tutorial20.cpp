@@ -61,7 +61,7 @@ public:
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
 		vkDestroyRenderPass(m_device, m_renderPass, NULL);
-		m_mesh.Destroy(m_device);
+		m_model.Destroy();
 
 		for (int i = 0; i < m_uniformBuffers.size(); i++) {
 			m_uniformBuffers[i].Destroy(m_device);
@@ -198,52 +198,11 @@ private:
 
 	void CreateMesh()
 	{
-		CreateVertexBuffer();
-		LoadTexture();
-
-		m_vkModel.Init(&m_vkCore);
-		m_vkModel.LoadAssimpModel("../../Content/dragon.obj");
+		m_model.Init(&m_vkCore);
+		m_model.LoadAssimpModel("../../Content/dragon.obj");
 	}
 
 
-	void CreateVertexBuffer()
-	{
-		struct Vertex {
-			Vertex(const glm::vec3& p, const glm::vec2& t)
-			{
-				Pos = p;
-				Tex = t;
-			}
-
-			glm::vec3 Pos;
-			glm::vec2 Tex;
-		};
-
-		std::vector<Vertex> Vertices = {
-			Vertex({-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}),	// Bottom left
-			Vertex({-1.0f, 1.0f, 0.0f},  {0.0f, 1.0f}), // Top left
-			Vertex({1.0f,  1.0f, 0.0f},  {1.0f, 1.0f}), // Top right
-			Vertex({-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}), // Bottom left
-			Vertex({1.0f, 1.0f, 0.0f},   {1.0f, 1.0f}), // Top right
-			Vertex({1.0f,  -1.0f, 0.0f}, {1.0f, 0.0f}), // Bottom right
-
-			Vertex({-1.0f, -1.0f, 5.0f}, {0.0f, 0.0f}), // Bottom left
-			Vertex({-1.0f, 1.0f, 5.0f},  {0.0f, 1.0f}), // Top left
-			Vertex({1.0f,  1.0f, 5.0f},  {1.0f, 1.0f})  // Top right
-		};
-
-		m_mesh.m_vertexBufferSize = sizeof(Vertices[0]) * Vertices.size();
-		m_mesh.m_vb = m_vkCore.CreateVertexBuffer(Vertices.data(), m_mesh.m_vertexBufferSize);
-	}
-
-
-	void LoadTexture()
-	{
-		m_mesh.m_pTex = new OgldevVK::VulkanTexture;
-		m_vkCore.CreateTexture("../../Content/bricks.jpg", *(m_mesh.m_pTex));
-	}
-	
-	
 	struct UniformData {
 		glm::mat4 WVP;
 	};
@@ -264,8 +223,8 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, &m_mesh, m_numImages, 
-													 m_uniformBuffers, sizeof(UniformData), true);
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_model, m_numImages, 
+													 m_uniformBuffers, sizeof(UniformData));
 	}
 
 
@@ -343,8 +302,7 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
-	OgldevVK::SimpleMesh m_mesh;
-	OgldevVK::VkModel m_vkModel;
+	OgldevVK::VkModel m_model;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	int m_windowWidth = 0;

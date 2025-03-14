@@ -23,6 +23,14 @@
 
 namespace OgldevVK {
 
+
+void VkModel::Destroy()
+{
+	m_vb.Destroy(m_pVulkanCore->GetDevice());
+	m_ib.Destroy(m_pVulkanCore->GetDevice());
+}
+
+
 Texture* VkModel::AllocTexture2D()
 {
 	assert(m_pVulkanCore);
@@ -33,7 +41,8 @@ Texture* VkModel::AllocTexture2D()
 
 void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 {
-	m_pVulkanCore->CreateVertexBuffer(Vertices.data(), ARRAY_SIZE_IN_BYTES(Vertices));
+	m_vb = m_pVulkanCore->CreateVertexBuffer(Vertices.data(), ARRAY_SIZE_IN_BYTES(Vertices));
+	m_ib = m_pVulkanCore->CreateVertexBuffer(m_Indices.data(), ARRAY_SIZE_IN_BYTES(m_Indices));
 }
 
 }

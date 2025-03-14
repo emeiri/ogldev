@@ -25,19 +25,28 @@
 namespace OgldevVK {
 
 GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass,
-								   VkShaderModule vs, VkShaderModule fs,
-								   const SimpleMesh* pMesh,
-								   int NumImages,
-								   std::vector<BufferAndMemory>& UniformBuffers,
-								   int UniformDataSize,
-								   bool DepthEnabled)
+	VkShaderModule vs, VkShaderModule fs,
+	const SimpleMesh* pMesh,
+	int NumImages,
+	std::vector<BufferAndMemory>& UniformBuffers,
+	int UniformDataSize,
+	bool DepthEnabled)
 {
 	m_device = Device;
+	m_depthEnabled = DepthEnabled;
 
 	if (pMesh) {
 		CreateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
 	}
 
+	const BufferAndMemory* pVB = pMesh ? &pMesh->m_vb : NULL;
+
+	InitCommon(pWindow, RenderPass, pVB, vs, fs);
+}
+
+
+void GraphicsPipeline::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, const BufferAndMemory* pVB, VkShaderModule vs, VkShaderModule fs)
+{
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -139,7 +148,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
 
-	if (pMesh && pMesh->m_vb.m_buffer) {
+	if (pVB && pVB->m_buffer) {
 		LayoutInfo.setLayoutCount = 1;
 		LayoutInfo.pSetLayouts = &m_descriptorSetLayout;
 	} else {
@@ -159,7 +168,7 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 		.pViewportState = &VPCreateInfo,
 		.pRasterizationState = &RastCreateInfo,
 		.pMultisampleState = &PipelineMSCreateInfo,
-		.pDepthStencilState = DepthEnabled ? &DepthStencilState : VK_NULL_HANDLE,
+		.pDepthStencilState = m_depthEnabled ? &DepthStencilState : VK_NULL_HANDLE,
 		.pColorBlendState = &BlendCreateInfo,
 		.layout = m_pipelineLayout,
 		.renderPass = RenderPass,
@@ -173,6 +182,26 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 
 	printf("Graphics pipeline created\n");
 }
+
+
+GraphicsPipeline::GraphicsPipeline(VkDevice Device,
+	GLFWwindow* pWindow,
+	VkRenderPass RenderPass,
+	VkShaderModule vs,
+	VkShaderModule fs,
+	const VkModel& Model,
+	int NumImages,
+	std::vector<BufferAndMemory>& UniformBuffers,
+	int UniformDataSize)
+{
+	m_device = Device;
+	m_depthEnabled = true;
+
+	CreateDescriptorSets(Model, NumImages, UniformBuffers, UniformDataSize);
+
+	InitCommon(pWindow, RenderPass, Model.GetVB(), vs, fs);
+}
+
 
 GraphicsPipeline::~GraphicsPipeline()
 {
@@ -204,13 +233,28 @@ void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 {
 	CreateDescriptorPool(NumImages);
 
-	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pMesh->m_pTex);
+	bool IsIB = false;
+	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pMesh->m_pTex, IsIB);
 
 	AllocateDescriptorSets(NumImages);
 
-	UpdateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
+	UpdateDescriptorSets(&(pMesh->m_vb), NULL, pMesh->m_pTex, NumImages, UniformBuffers, UniformDataSize);
 }
 
+
+void GraphicsPipeline::CreateDescriptorSets(const VkModel& Model, int NumImages,
+											std::vector<BufferAndMemory>& UniformBuffers,
+											int UniformDataSize)
+{
+	CreateDescriptorPool(NumImages);
+
+	bool IsIB = true;
+	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, NULL, IsIB);
+
+	AllocateDescriptorSets(NumImages);
+
+	UpdateDescriptorSets(Model.GetVB(), Model.GetIB(), NULL, NumImages, UniformBuffers, UniformDataSize);
+}
 
 void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
@@ -229,7 +273,7 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 
 
 void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, 
-												 int UniformDataSize, VulkanTexture* pTex)
+												 int UniformDataSize, VulkanTexture* pTex, bool IsIB)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -296,21 +340,20 @@ void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
 }
 
 
-void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
-											std::vector<BufferAndMemory>& UniformBuffers, 
-											int UniformDataSize)
+void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
+										    int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
 {
 	VkDescriptorBufferInfo BufferInfo_VB = {
-		.buffer = pMesh->m_vb.m_buffer,
+		.buffer = pVB->m_buffer,
 		.offset = 0,
-		.range = pMesh->m_vertexBufferSize,  // can also be VK_WHOLE_SIZE
+		.range = VK_WHOLE_SIZE
 	};
 	
 	VkDescriptorImageInfo ImageInfo;
 	
-	if (pMesh->m_pTex) {
-		ImageInfo.sampler = pMesh->m_pTex->m_sampler;
-		ImageInfo.imageView = pMesh->m_pTex->m_view;
+	if (pTex) {
+		ImageInfo.sampler = pTex->m_sampler;
+		ImageInfo.imageView = pTex->m_view;
 		ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 	
@@ -350,7 +393,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImag
 			);
 		}
 		
-		if (pMesh->m_pTex) {
+		if (pTex) {
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
