@@ -22,6 +22,12 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_graphics_pipeline.h"
 
+#define BINDING_VB      0
+#define BINDING_IB      1
+#define BINDING_UNIFORM 2
+#define BINDING_TEXTURE 3
+
+
 namespace OgldevVK {
 
 GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass,
@@ -278,34 +284,45 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
 	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-		.binding = 0,
+		.binding = BINDING_VB,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 	};
 
 	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
-	
-	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-		.binding = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-	};
 
-	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
-		.binding = 2,
-		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-	};
+	if (IsIB) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
+			.binding = BINDING_IB,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		};
+
+		LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
+	}
 
 	if (UniformBuffers.size() > 0) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
+			.binding = BINDING_UNIFORM,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		};
+
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
-	
+
 	if (pTex) { 
-		LayoutBindings.push_back(FragmentShaderLayoutBinding);
+		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
+			.binding = BINDING_TEXTURE,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		};
+
+		LayoutBindings.push_back(FragmentShaderLayoutBinding_Tex);
 	}
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
@@ -348,7 +365,15 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};
-	
+
+	VkDescriptorBufferInfo BufferInfo_IB;
+
+	if (pIB) {
+		BufferInfo_IB.buffer = pIB->m_buffer;
+		BufferInfo_IB.offset = 0;
+		BufferInfo_IB.range = VK_WHOLE_SIZE;
+	};
+
 	VkDescriptorImageInfo ImageInfo;
 	
 	if (pTex) {
@@ -365,13 +390,27 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 			VkWriteDescriptorSet{
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = m_descriptorSets[i],
-				.dstBinding = 0,
+				.dstBinding = BINDING_VB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 				.pBufferInfo = &BufferInfo_VB
 			}
 		);
+
+		if (pIB) {
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = m_descriptorSets[i],
+					.dstBinding = BINDING_IB,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+					.pBufferInfo = &BufferInfo_IB
+				}
+			);
+		}
 
 		if (UniformBuffers.size() > 0) {
 			VkDescriptorBufferInfo BufferInfo_Uniform = {
@@ -384,7 +423,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 					.dstSet = m_descriptorSets[i],
-					.dstBinding = 1,
+					.dstBinding = BINDING_UNIFORM,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
 					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -398,7 +437,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 					.dstSet = m_descriptorSets[i],
-					.dstBinding = 2,
+					.dstBinding = BINDING_TEXTURE,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
 					.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -408,9 +447,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 		}
 	}
 
-	vkUpdateDescriptorSets(m_device, 
-						   (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 
-						   0, NULL);
+	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 }
 
 }
