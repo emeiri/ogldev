@@ -30,7 +30,8 @@ const int indices[36] = int[36](
 
 void main() {
 	int idx = indices[gl_VertexID];
-	gl_Position = gVP * vec4(pos[idx], 1.0);
+	vec4 WVP_Pos = gVP * vec4(pos[idx], 1.0);
+	gl_Position = WVP_Pos.xyww;
 	dir = pos[idx].xyz;
 	dir.y = -dir.y;		// workaround for cubemap rendered up side down for some reason...
 }
