@@ -227,7 +227,12 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     }
 
     if (pScene->GetRenderList().size() == 0) {
-        printf("Warning! render list is empty and no main model\n");
+        if (pScene->GetConfig()->IsSkyboxEnabled()) {
+            m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
+        } else {
+            printf("Warning! render list is empty and no main model or skybox\n");
+        }
+        
         return;
     }
 
