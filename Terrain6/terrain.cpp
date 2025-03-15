@@ -52,8 +52,8 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
     }
 	
     if (TextureFilenames.size() != ARRAY_SIZE_IN_ELEMENTS(m_pTextures)) {
-        printf("%s:%d - number of provided textures (%lud) is not equal to the size of the texture array (%lud)\n",
-               __FILE__, __LINE__, TextureFilenames.size(), ARRAY_SIZE_IN_ELEMENTS(m_pTextures));
+        printf("%s:%d - number of provided textures (%d) is not equal to the size of the texture array (%d)\n",
+               __FILE__, __LINE__, (int)TextureFilenames.size(), (int)ARRAY_SIZE_IN_ELEMENTS(m_pTextures));
         exit(0);
     }
 
