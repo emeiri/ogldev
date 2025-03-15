@@ -224,6 +224,8 @@ void CubemapEctTexture::Load()
 {
     int Width, Height, Comp;
 
+    stbi_set_flip_vertically_on_load(0);
+
     const float* pImg = stbi_loadf(m_filename.c_str(), &Width, &Height, &Comp, 3);
     
     if (!pImg) {
