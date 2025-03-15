@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <glm/glm.hpp>
+
 enum eBitmapFormat
 {
     eBitmapFormat_UnsignedByte,

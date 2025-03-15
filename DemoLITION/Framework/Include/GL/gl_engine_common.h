@@ -18,27 +18,29 @@
 
 #pragma once
 
-#define COLOR_TEXTURE_UNIT              GL_TEXTURE0
-#define COLOR_TEXTURE_UNIT_INDEX        0
-#define SPECULAR_EXPONENT_UNIT          GL_TEXTURE1
-#define SPECULAR_EXPONENT_UNIT_INDEX    1
-#define SHADOW_TEXTURE_UNIT             GL_TEXTURE2
-#define SHADOW_TEXTURE_UNIT_INDEX       2
-#define SHADOW_CUBE_MAP_TEXTURE_UNIT        GL_TEXTURE3
-#define SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX  3
+#define COLOR_TEXTURE_UNIT                          GL_TEXTURE0
+#define COLOR_TEXTURE_UNIT_INDEX                    0
+#define SPECULAR_EXPONENT_UNIT                      GL_TEXTURE1
+#define SPECULAR_EXPONENT_UNIT_INDEX                1
+#define SHADOW_TEXTURE_UNIT                         GL_TEXTURE2
+#define SHADOW_TEXTURE_UNIT_INDEX                   2
+#define SHADOW_CUBE_MAP_TEXTURE_UNIT                GL_TEXTURE3
+#define SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX          3
 #define SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT       GL_TEXTURE4
 #define SHADOW_MAP_RANDOM_OFFSET_TEXTURE_UNIT_INDEX 4
-#define NORMAL_TEXTURE_UNIT             GL_TEXTURE5
-#define NORMAL_TEXTURE_UNIT_INDEX       5
+#define NORMAL_TEXTURE_UNIT                         GL_TEXTURE5
+#define NORMAL_TEXTURE_UNIT_INDEX                   5
 #define HEIGHT_TEXTURE_UNIT                         GL_TEXTURE6
 #define HEIGHT_TEXTURE_UNIT_INDEX                   6
-#define ALBEDO_TEXTURE_UNIT             GL_TEXTURE7
-#define ALBEDO_TEXTURE_UNIT_INDEX       7
-#define ROUGHNESS_TEXTURE_UNIT          GL_TEXTURE8
-#define ROUGHNESS_TEXTURE_UNIT_INDEX    8
+#define ALBEDO_TEXTURE_UNIT                         GL_TEXTURE7
+#define ALBEDO_TEXTURE_UNIT_INDEX                   7
+#define ROUGHNESS_TEXTURE_UNIT                      GL_TEXTURE8
+#define ROUGHNESS_TEXTURE_UNIT_INDEX                8
 #define METALLIC_TEXTURE_UNIT                       GL_TEXTURE9
 #define METALLIC_TEXTURE_UNIT_INDEX                 9
 #define AO_TEXTURE_UNIT                             GL_TEXTURE10
 #define AO_TEXTURE_UNIT_INDEX                       10
 #define EMISSIVE_TEXTURE_UNIT                       GL_TEXTURE11
 #define EMISSIVE_TEXTURE_UNIT_INDEX                 11
+#define SKYBOX_TEXTURE_UNIT                         GL_TEXTURE12
+#define SKYBOX_TEXTURE_UNIT_INDEX                   12

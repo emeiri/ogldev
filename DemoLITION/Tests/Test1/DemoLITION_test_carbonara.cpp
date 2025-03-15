@@ -951,14 +951,46 @@ private:
 };
 
 
+class SkyboxDemo : public Carbonara {
+
+public:
+
+    SkyboxDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->ControlSkybox(true);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //   m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
+
+        m_pScene->AddToRenderList(pSceneObject);
+    }
+};
+
+
 void carbonara()
 {
   // BallisticsDemo demo;
    //FireworksDemo demo;
-    AnimationDemo demo;
+   // AnimationDemo demo;
   //  BridgeDemo demo;
  //   AssetLoadDemo demo;
   //  PBRDemo demo;
+    SkyboxDemo demo;
 
     demo.Start();
 }

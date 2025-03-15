@@ -32,6 +32,7 @@
 #include "GL/gl_picking_texture.h"
 #include "GL/gl_picking_technique.h"
 #include "GL/gl_infinite_grid.h"
+#include "GL/gl_skybox.h"
 
 
 enum RENDER_PASS {
@@ -119,7 +120,6 @@ private:
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
-    void RenderAllSceneObjects(GLScene* pScene);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
@@ -166,5 +166,7 @@ private:
     PickingTexture m_pickingTexture;
 
     InfiniteGrid m_infiniteGrid;
+
+    SkyBox m_skybox;
 };
 

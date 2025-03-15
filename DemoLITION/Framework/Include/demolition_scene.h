@@ -92,12 +92,16 @@ public:
     void ControlPicking(bool EnablePicking) { m_pickingEnabled = EnablePicking; }
     bool IsPickingEnabled() const { return m_pickingEnabled; }
 
+    void ControlSkybox(bool EnableSkybox) { m_skyboxEnabled = EnableSkybox; }
+    bool IsSkyboxEnabled() const { return m_skyboxEnabled; }
+
     InfiniteGridConfig& GetInfiniteGrid() { return m_infiniteGridConfig;  }
 
 private:
 
     bool m_shadowMappingEnabled = true;
     bool m_pickingEnabled = false;
+    bool m_skyboxEnabled = false;
     InfiniteGridConfig m_infiniteGridConfig;
 };
 
@@ -132,6 +136,8 @@ public:
 
     virtual SceneConfig* GetConfig() = 0;
 
+    virtual void LoadSkybox(const char* pFilename) = 0;
+
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 
     std::vector<SpotLight>& GetSpotLights() { return m_spotLights; }
@@ -140,7 +146,7 @@ public:
 
     void SetClearColor(const Vector4f& Color) { m_clearColor = Color; m_clearFrame = true; }
 
-    void DisableClear() { m_clearFrame = false;  }      
+    void DisableClear() { m_clearFrame = false;  }   
 
 protected:
     bool m_clearFrame = false;

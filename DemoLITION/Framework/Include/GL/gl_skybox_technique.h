@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2022 Etay Meiri
+        Copyright 2025 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -14,27 +14,28 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
-#pragma once
+#pragma once 
 
-#include "ogldev_cubemap_texture.h"
-#include "Int/core_scene.h"
+#include "ogldev_math_3d.h"
+#include "ogldev_util.h"
+#include "technique.h"
 
-class RenderingSystemGL;
 
-class GLScene : public CoreScene
+class SkyboxTechnique : public Technique
 {
 public:
-    GLScene(RenderingSystemGL* pRenderingSystem) : CoreScene((CoreRenderingSystem*)pRenderingSystem) {}
+    SkyboxTechnique() {}
 
-    ~GLScene();
+    virtual bool Init();
 
-    void LoadSkybox(const char* pFilename);
-
-    BaseCubmapTexture* GetSkyboxTex() const { return m_pSkyboxTex; }
+    void SetVP(const Matrix4f& VP);
+    void SetTextureUnitIndex(int TextureUnitIndex);
 
 private:
-    BaseCubmapTexture* m_pSkyboxTex = NULL;
+    bool InitCommon();
+
+    GLuint m_VPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_cubemapSamplerLoc = INVALID_UNIFORM_LOCATION;
 };

@@ -18,4 +18,23 @@
 */
 
 
+#include "ogldev_cubemap_texture.h"
 #include "GL/gl_scene.h"
+
+
+GLScene::~GLScene()
+{
+    delete m_pSkyboxTex;
+}
+
+void GLScene::LoadSkybox(const char* pFilename)
+{
+    if (m_pSkyboxTex) {
+        delete m_pSkyboxTex;
+    }
+
+    m_pSkyboxTex = new CubemapEctTexture(pFilename);
+
+    m_pSkyboxTex->Load();
+}
+

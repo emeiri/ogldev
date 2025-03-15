@@ -93,6 +93,8 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_infiniteGrid.Init(SHADOW_TEXTURE_UNIT_INDEX);
 
+    m_skybox.Init(SKYBOX_TEXTURE_UNIT, SKYBOX_TEXTURE_UNIT_INDEX);
+
     glUseProgram(0);
 }
 
@@ -239,6 +241,10 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     ShadowMapPass(pScene);
 
     LightingPass(pScene, TotalRuntimeMillis);
+
+    if (pScene->GetConfig()->IsSkyboxEnabled()) {
+        m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
+    }
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
