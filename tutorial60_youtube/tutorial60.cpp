@@ -29,7 +29,6 @@
 #define WINDOW_HEIGHT 1080
 
 
-extern bool UseIndirectRender;
 
 class Tutorial60 : public BaseGLApp {
 public:
@@ -37,13 +36,8 @@ public:
     {
         //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.AmbientIntensity = 0.8f;
-
-        m_pointLight.WorldPosition = Vector3f(0.25f, 0.25f, 0.0f);
-        //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
-        m_pointLight.DiffuseIntensity = 2.0f;
-        m_pointLight.AmbientIntensity = 0.1f;
+        m_dirLight.DiffuseIntensity = 0.9f;
+        m_dirLight.AmbientIntensity = 0.1f;
     }
 
     ~Tutorial60() {}
@@ -58,18 +52,21 @@ public:
         //  m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetDirLights().push_back(m_dirLight);
-        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlSkybox(true);
-        //  m_pScene->GetPointLights().push_back(m_pointLight);
+        m_pScene->GetConfig()->ControlShadowMapping(false);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
         m_pScene->SetCamera(Vector3f(0.0f, 2.0f, -4.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Jump/Jump.dae");
-        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
-        pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
-        m_pScene->AddToRenderList(pSceneObject);
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/crystal_ball/scene.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
+        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+      //  m_pSceneObject->SetScale(Vector3f(0.1f));
+     //   m_pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
+        m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
 
@@ -83,7 +80,9 @@ public:
         //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         //  }
 
-        m_count += 0.01f;
+     //   m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
+        
+        m_count += 1.0f;
 
         if (m_pScene->GetPickedSceneObject()) {
             m_pickedObject = m_pScene->GetPickedSceneObject();
@@ -96,9 +95,9 @@ public:
             }
         }
 
-        //    m_pSceneObject->ResetRotations();
-         //   m_pSceneObject->PushRotation(Vector3f(-90.0f, 0.0f, 0.0f));
-            //m_pSceneObject->PushRotation(Vector3f(0.0f, 90.0f, 0.0f));
+        m_pSceneObject->ResetRotations();
+        m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
+        m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
 
          //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
           //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
@@ -157,10 +156,10 @@ private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLight;
-    PointLight m_pointLight;
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
     SceneObject* m_pickedObject = NULL;
+    SceneObject* m_pSceneObject = NULL;
     bool m_showGui = false;
     int m_enableShadowMapping = 1;
 };
@@ -169,8 +168,6 @@ private:
 
 int main(int argc, char* arg[])
 {
-    UseIndirectRender = true;
-
     Tutorial60 demo;
     demo.Start();
 }
