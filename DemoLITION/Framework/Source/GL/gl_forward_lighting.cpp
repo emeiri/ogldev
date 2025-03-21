@@ -18,7 +18,7 @@
 
 #include "GL/gl_forward_lighting.h"
 
-#define FAIL_ON_MISSING_LOC
+//#define FAIL_ON_MISSING_LOC
 
 ForwardLightingTechnique::ForwardLightingTechnique()
 {
@@ -104,8 +104,9 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(AlbedoLoc, "gAlbedo");
     GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
     GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
-    GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
-    GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
+    GET_UNIFORM_AND_CHECK(SkyboxLoc, "gCubemapTexture");
+   // GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
+   // GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -284,6 +285,12 @@ void ForwardLightingTechnique::ControlNormalMap(bool Enable)
 void ForwardLightingTechnique::SetHeightMapTextureUnit(int TextureUnit)
 {
     glUniform1i(HeightMapLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetSkyboxTextureUnit(int TextureUnit)
+{
+    glUniform1i(SkyboxLoc, TextureUnit);
 }
 
 

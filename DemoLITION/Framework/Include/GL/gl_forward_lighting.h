@@ -55,6 +55,7 @@ public:
     void SetEmissiveTextureUnit(unsigned int TextureUnit);
     void SetNormalMapTextureUnit(int TextureUnit);
     void SetHeightMapTextureUnit(int TextureUnit);
+    void SetSkyboxTextureUnit(int TextureUnit);
     void ControlNormalMap(bool Enable);
     void ControlParallaxMap(bool Enable);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
@@ -141,6 +142,7 @@ private:
     GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;
     GLuint AOLoc = INVALID_UNIFORM_LOCATION;
     GLuint EmissiveLoc = INVALID_UNIFORM_LOCATION;
+    GLuint SkyboxLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;

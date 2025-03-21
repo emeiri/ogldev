@@ -966,7 +966,7 @@ public:
 
     void InitChild()
     {
-        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->GetConfig()->ControlSkybox(true);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
@@ -990,7 +990,7 @@ void carbonara()
 {
   // BallisticsDemo demo;
    //FireworksDemo demo;
-   // AnimationDemo demo;
+  //  AnimationDemo demo;
   //  BridgeDemo demo;
  //   AssetLoadDemo demo;
   //  PBRDemo demo;

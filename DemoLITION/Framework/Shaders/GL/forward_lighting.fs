@@ -123,6 +123,7 @@ layout(binding = 6) uniform sampler2D gHeightMap;
 layout(binding = 7) uniform sampler2D gAlbedo;
 layout(binding = 8) uniform sampler2D gRoughness;
 layout(binding = 9) uniform sampler2D gMetallic;
+layout(binding = 12) uniform samplerCube gCubemapTexture;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
 uniform int gShadowMapWidth = 0;
@@ -668,8 +669,32 @@ vec4 CalcPhongLighting()
         TexColor = vec4(1.0);
     }
 
+    vec3 worldNorm = GetNormal();
+    vec3 worldView = normalize(gCameraWorldPos - WorldPos0);
+
+    vec3 reflection = -normalize(reflect(worldView, worldNorm));
+
+    float eta = 1.00; // ice
+	vec3 refraction = -normalize(refract(worldView, worldNorm, eta));
+
+	const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
+	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-worldView, worldNorm)), 5.0);
+
+
     vec4 FinalColor = TexColor * TotalLight;
 
+    vec3 colorRefl = texture(gCubemapTexture, reflection).rgb;
+    vec3 colorRefr = texture(gCubemapTexture, refraction).rgb;
+    // Gamma correct
+    //cubeMapColor = pow(cubeMapColor, vec3(1.0/2.2));
+    float ReflectFactor = 0.1;
+   // FinalColor = vec4( mix( FinalColor.rgb, cubeMapColor, ReflectFactor), FinalColor.a);
+
+   vec4 ColorReflRefr = vec4(mix(colorRefl, colorRefr, Rtheta), 1.0);
+
+   FinalColor = mix(FinalColor, ColorReflRefr, ReflectFactor);
+
+   // return vec4(cubeMapColor, 1.0);
     return FinalColor;
 }
 

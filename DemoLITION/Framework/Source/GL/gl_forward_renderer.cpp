@@ -118,6 +118,7 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -136,6 +137,7 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
+    m_skinningTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
