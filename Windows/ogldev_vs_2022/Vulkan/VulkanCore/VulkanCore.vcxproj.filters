@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\texture.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v2.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\model_desc.h">
       <Filter>Header Files\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline_v2.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

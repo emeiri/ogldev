@@ -33,7 +33,7 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_graphics_pipeline.h"
+#include "ogldev_vulkan_graphics_pipeline_v2.h"
 #include "ogldev_vulkan_simple_mesh.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
@@ -196,7 +196,9 @@ private:
 		m_model.Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 		//m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
-		m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
+	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
+		//m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+		m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
@@ -217,7 +219,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_model, m_numImages);
+		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_model, m_numImages);
 	}
 
 
@@ -256,7 +258,7 @@ private:
 	
 			vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 	
-			m_pPipeline->Bind(CmdBuf, i);
+			m_pPipeline->Bind(CmdBuf);
 
 			m_model.RecordCommandBuffer(CmdBuf, m_pPipeline, i);
 
@@ -297,7 +299,7 @@ private:
 	std::vector<VkFramebuffer> m_frameBuffers;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
+	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	int m_windowWidth = 0;

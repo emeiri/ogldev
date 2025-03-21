@@ -24,7 +24,7 @@
 namespace OgldevVK {
 
 class VulkanCore;
-class GraphicsPipeline;
+class GraphicsPipelineV2;
 
 class VkModel : public CoreModel
 {
@@ -36,9 +36,9 @@ public:
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
-	void CreateDescriptorSets(GraphicsPipeline* pPipeline);
+	void CreateDescriptorSets(GraphicsPipelineV2* pPipeline);
 
-	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPipeline, int ImageIndex);
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2* pPipeline, int ImageIndex);
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 

@@ -20,7 +20,7 @@
 
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_model.h"
-#include "ogldev_vulkan_graphics_pipeline.h"
+#include "ogldev_vulkan_graphics_pipeline_v2.h"
 
 namespace OgldevVK {
 
@@ -59,7 +59,7 @@ void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 }
 
 
-void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
+void VkModel::CreateDescriptorSets(GraphicsPipelineV2* pPipeline)
 {
 	ModelDesc md;
 
@@ -109,11 +109,10 @@ void VkModel::CreateModelDescriptor(ModelDesc& md)
 		range = UNIFORM_BUFFER_SIZE;
 		md.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = offset, .m_range = range };
 	}
-
 }
 
 
-void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPipeline, int ImageIndex)
+void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2* pPipeline, int ImageIndex)
 {
 	u32 InstanceCount = 1;
 	u32 FirstInstance = 0;
