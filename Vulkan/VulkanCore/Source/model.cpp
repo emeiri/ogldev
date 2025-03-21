@@ -107,6 +107,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPip
 {
 	u32 InstanceCount = 1;
 	u32 FirstInstance = 0;
+	u32 BaseVertex = 0;
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
 		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->GetPipelineLayout(),
@@ -116,14 +117,22 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPip
 			0,	// dynamicOffsetCount
 			NULL);	// pDynamicOffsets
 
-		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, InstanceCount, m_Meshes[SubmeshIndex].BaseVertex, FirstInstance);
+		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, InstanceCount, BaseVertex, FirstInstance);
 	}
 }
 
 
 void VkModel::Update(int ImageIndex, const glm::mat4& Transformation)
 {
-	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), &Transformation, UNIFORM_BUFFER_SIZE);
+	std::vector<glm::mat4> Transformations(m_Meshes.size());
+
+	for (u32 SubmeshIndex = 0; SubmeshIndex < Transformations.size(); SubmeshIndex++) {
+		glm::mat4 MeshTransform = glm::make_mat4(m_Meshes[SubmeshIndex].Transformation.data());
+		MeshTransform = glm::transpose(MeshTransform);
+		Transformations[SubmeshIndex] = Transformation * MeshTransform;
+	}
+
+	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), Transformations.data(), ARRAY_SIZE_IN_BYTES(Transformations));
 }
 
 }
