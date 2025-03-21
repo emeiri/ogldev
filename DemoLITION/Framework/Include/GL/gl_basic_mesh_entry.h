@@ -26,6 +26,6 @@ struct BasicMeshEntry {
     uint BaseVertex = 0;
     uint BaseIndex = 0;
     uint ValidFaces = 0;
-    uint MaterialIndex = 0xFFFFFFFF;
+    int MaterialIndex = -1;
     Matrix4f Transformation;
 };

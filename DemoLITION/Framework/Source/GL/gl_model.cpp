@@ -257,8 +257,8 @@ void GLModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 
 void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks)
 {
-    unsigned int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
-    assert(MaterialIndex < m_Materials.size());
+    int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
+    assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
     if (m_Materials[MaterialIndex].pDiffuse) {
         m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
@@ -307,8 +307,8 @@ void GLModel::Render(unsigned int DrawIndex, unsigned int PrimID)
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
     }
 
-    unsigned int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
-    assert(MaterialIndex < m_Materials.size());
+    int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
+    assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
     if (m_Materials[MaterialIndex].pDiffuse) {
         m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
@@ -346,9 +346,9 @@ void GLModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const M
     }
 
     for (unsigned int i = 0; i < m_Meshes.size(); i++) {
-        const unsigned int MaterialIndex = m_Meshes[i].MaterialIndex;
+        int MaterialIndex = m_Meshes[i].MaterialIndex;
 
-        assert(MaterialIndex < m_Materials.size());
+        assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
         if (m_Materials[MaterialIndex].pDiffuse) {
             m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
