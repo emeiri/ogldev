@@ -40,8 +40,6 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 	m_device = Device;
 	m_numImages = NumImages;
 
-	CreateDescriptorPool();
-
 	bool IsVB = true;
 	bool IsIB = true;
 	bool IsUniform = true;
@@ -65,7 +63,6 @@ void GraphicsPipelineV2::Bind(VkCommandBuffer CmdBuf)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 }
-
 
 
 void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs)
@@ -202,14 +199,12 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 }
 
 
-
-
-void GraphicsPipelineV2::CreateDescriptorPool()
+void GraphicsPipelineV2::CreateDescriptorPool(int MaxSets)
 {
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.flags = 0,
-		.maxSets = m_numImages * 2,
+		.maxSets = (u32)MaxSets,
 		.poolSizeCount = 0,
 		.pPoolSizes = NULL
 	};
@@ -281,28 +276,14 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 }
 
 
-std::vector<VkDescriptorSet> GraphicsPipelineV2::AllocateDescriptorSets()
+void GraphicsPipelineV2::AllocateDescriptorSets(int NumSubmeshes, std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
-	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
-
-	VkDescriptorSetAllocateInfo AllocInfo = {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.pNext = NULL,
-		.descriptorPool = m_descriptorPool,
-		.descriptorSetCount = (u32)Layouts.size(),
-		.pSetLayouts = Layouts.data()
-	};
-
-	std::vector<VkDescriptorSet> DescriptorSets(m_numImages);
-
-	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
-	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
-
-	return DescriptorSets;
+	CreateDescriptorPool(NumSubmeshes * m_numImages);
+	AllocateDescriptorSetsInternal(NumSubmeshes, DescriptorSets);
 }
 
 
-void GraphicsPipelineV2::AllocateDescriptorSets(int NumSubmeshes, std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+void GraphicsPipelineV2::AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
 	std::vector<VkDescriptorSetLayout> Layouts(NumSubmeshes, m_descriptorSetLayout);
 
@@ -357,7 +338,7 @@ void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 
 	}
 
-	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
 		
 		BufferInfo_Uniforms[ImageIndex].resize(NumSubmeshes);
 
@@ -368,7 +349,7 @@ void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 		}
 	}
 
-	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
 		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 			VkDescriptorSet DstSet = DescriptorSets[ImageIndex][SubmeshIndex];
 

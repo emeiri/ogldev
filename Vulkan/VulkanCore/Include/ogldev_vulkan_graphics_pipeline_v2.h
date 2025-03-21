@@ -53,16 +53,16 @@ private:
 
 	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs);
 
-	void CreateDescriptorPool();
+	void AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
+	void CreateDescriptorPool(int MaxSets);
 	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform);
-	std::vector<VkDescriptorSet> AllocateDescriptorSets();
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
-	u32 m_numImages = 0;
+	int m_numImages = 0;
 };
 
 }
