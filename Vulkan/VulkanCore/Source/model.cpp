@@ -54,6 +54,8 @@ void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_Indices.data(), ARRAY_SIZE_IN_BYTES(m_Indices));
 
 	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
+
+	m_vertexSize = sizeof(Vertex);
 }
 
 
@@ -82,9 +84,17 @@ void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
 			ModelDesc.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
 		}
 
-		ModelDesc.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
-		ModelDesc.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
-		ModelDesc.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+		size_t offset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
+		size_t range = m_Meshes[SubmeshIndex].NumVertices * m_vertexSize;
+		ModelDesc.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
+
+		offset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
+		range = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
+		ModelDesc.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };
+
+		offset = SubmeshIndex * UNIFORM_BUFFER_SIZE;
+		range = UNIFORM_BUFFER_SIZE;
+		ModelDesc.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = offset, .m_range = range };
 	}
 	
 	pPipeline->AllocateDescriptorSets((int)m_Meshes.size(), m_descriptorSets);
