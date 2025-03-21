@@ -30,11 +30,11 @@ public:
 
     ~GLModel();
 
-    virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks);
+    void Render(DemolitionRenderCallbacks* pRenderCallbacks);
 
-    virtual void Render(uint DrawIndex, uint PrimID);
+    void Render(uint DrawIndex, uint PrimID);
 
-    virtual void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
+    void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats);
 
     virtual void SetColorTexture(int TextureHandle);
 

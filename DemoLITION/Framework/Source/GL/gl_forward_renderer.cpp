@@ -594,7 +594,8 @@ void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
     Matrix4f WVP;
     GetWVP(pSceneObject, WVP);
     m_flatColorTech.SetWVP(WVP);
-    pSceneObject->GetModel()->Render();
+    GLModel* pModel = (GLModel*)pSceneObject->GetModel();
+    pModel->Render(this);
 }
 
 

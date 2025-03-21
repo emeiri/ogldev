@@ -42,12 +42,6 @@ public:
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
-	virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL) { assert(0); }
-
-	virtual void Render(uint DrawIndex, uint PrimID) { assert(0); }
-
-	virtual void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats) { assert(0); }
-
 	virtual void SetColorTexture(int TextureHandle) { assert(0); }
 
 	virtual void SetNormalMap(int TextureHandle) { assert(0); }

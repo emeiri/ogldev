@@ -55,12 +55,6 @@ public:
 
     bool LoadAssimpModel(const std::string& Filename);
 
-    virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL) = 0;
-
-    virtual void Render(uint DrawIndex, uint PrimID) = 0;
-
-    virtual void Render(uint NumInstances, const Matrix4f* WVPMats, const Matrix4f* WorldMats) = 0;
-
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
     uint NumBones() const { return (uint)m_BoneNameToIndexMap.size(); }
