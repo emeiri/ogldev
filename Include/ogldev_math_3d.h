@@ -664,6 +664,13 @@ public:
         return &(m[0][0]);
     }
 
+
+    const float* data() const
+    {
+        return &(m[0][0]);
+    }
+
+
     void Print() const
     {
         for (int i = 0 ; i < 4 ; i++) {
