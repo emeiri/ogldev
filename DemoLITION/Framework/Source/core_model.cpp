@@ -157,6 +157,7 @@ void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& Num
         m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
         m_Meshes[i].ValidFaces = CountValidFaces(*pScene->mMeshes[i]);
         m_Meshes[i].NumIndices = m_Meshes[i].ValidFaces * 3;
+        m_Meshes[i].NumVertices = pScene->mMeshes[i]->mNumVertices;
         m_Meshes[i].BaseVertex = NumVertices;
         m_Meshes[i].BaseIndex = NumIndices;
 

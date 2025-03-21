@@ -23,6 +23,7 @@
 
 struct BasicMeshEntry {
     uint NumIndices = 0;
+    uint NumVertices = 0;
     uint BaseVertex = 0;
     uint BaseIndex = 0;
     uint ValidFaces = 0;
