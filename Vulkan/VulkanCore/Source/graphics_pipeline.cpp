@@ -22,38 +22,22 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_graphics_pipeline.h"
 
-#define BINDING_VB      0
-#define BINDING_IB      1
-#define BINDING_UNIFORM 2
-#define BINDING_TEXTURE 3
-
-
 namespace OgldevVK {
 
 GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRenderPass RenderPass,
-	VkShaderModule vs, VkShaderModule fs,
-	const SimpleMesh* pMesh,
-	int NumImages,
-	std::vector<BufferAndMemory>& UniformBuffers,
-	int UniformDataSize,
-	bool DepthEnabled)
+								   VkShaderModule vs, VkShaderModule fs,
+								   const SimpleMesh* pMesh,
+								   int NumImages,
+								   std::vector<BufferAndMemory>& UniformBuffers,
+								   int UniformDataSize,
+								   bool DepthEnabled)
 {
 	m_device = Device;
-	m_depthEnabled = DepthEnabled;
-	m_numImages = NumImages;
 
 	if (pMesh) {
-		CreateDescriptorSets(pMesh, UniformBuffers, UniformDataSize);
+		CreateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
 	}
 
-	const BufferAndMemory* pVB = pMesh ? &pMesh->m_vb : NULL;
-
-	InitCommon(pWindow, RenderPass, pVB, vs, fs);
-}
-
-
-void GraphicsPipeline::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, const BufferAndMemory* pVB, VkShaderModule vs, VkShaderModule fs)
-{
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -113,7 +97,7 @@ void GraphicsPipeline::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
 	VkPipelineRasterizationStateCreateInfo RastCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 		.polygonMode = VK_POLYGON_MODE_FILL,
-		.cullMode = VK_CULL_MODE_BACK_BIT,
+		.cullMode = VK_CULL_MODE_NONE,
 		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 		.lineWidth = 1.0f
 	};
@@ -155,7 +139,7 @@ void GraphicsPipeline::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
 
-	if (pVB && pVB->m_buffer) {
+	if (pMesh && pMesh->m_vb.m_buffer) {
 		LayoutInfo.setLayoutCount = 1;
 		LayoutInfo.pSetLayouts = &m_descriptorSetLayout;
 	} else {
@@ -175,7 +159,7 @@ void GraphicsPipeline::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
 		.pViewportState = &VPCreateInfo,
 		.pRasterizationState = &RastCreateInfo,
 		.pMultisampleState = &PipelineMSCreateInfo,
-		.pDepthStencilState = m_depthEnabled ? &DepthStencilState : VK_NULL_HANDLE,
+		.pDepthStencilState = DepthEnabled ? &DepthStencilState : VK_NULL_HANDLE,
 		.pColorBlendState = &BlendCreateInfo,
 		.layout = m_pipelineLayout,
 		.renderPass = RenderPass,
@@ -189,31 +173,6 @@ void GraphicsPipeline::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
 
 	printf("Graphics pipeline created\n");
 }
-
-
-GraphicsPipeline::GraphicsPipeline(VkDevice Device,
-	GLFWwindow* pWindow,
-	VkRenderPass RenderPass,
-	VkShaderModule vs,
-	VkShaderModule fs,
-	const VkModel& Model,
-	int NumImages)
-{
-	m_device = Device;
-	m_depthEnabled = true;
-	m_numImages = NumImages;
-
-	CreateDescriptorPool();
-
-	bool IsVB = true;
-	bool IsIB = true;
-	bool IsUniform = true;
-	bool IsTex = true;
-	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex);
-
-	InitCommon(pWindow, RenderPass, Model.GetVB(), vs, fs);
-}
-
 
 GraphicsPipeline::~GraphicsPipeline()
 {
@@ -239,29 +198,26 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, std::vector<BufferAndMemory>& UniformBuffers, 
+void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
+											std::vector<BufferAndMemory>& UniformBuffers, 
 											int UniformDataSize)
 {
-	CreateDescriptorPool();
+	CreateDescriptorPool(NumImages);
 
-	bool IsVB = true;
-	bool IsIB = false;
-	bool IsUniform = UniformBuffers.size() > 0;
-	bool IsTex = pMesh->m_pTex != NULL;
-	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex);
+	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pMesh->m_pTex);
 
-	m_descriptorSets = AllocateDescriptorSets();
+	AllocateDescriptorSets(NumImages);
 
-	UpdateDescriptorSets(m_descriptorSets, &(pMesh->m_vb), NULL, pMesh->m_pTex, UniformBuffers, UniformDataSize);
+	UpdateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
 }
 
 
-void GraphicsPipeline::CreateDescriptorPool()
+void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 {
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.flags = 0,
-		.maxSets = m_numImages * 2,
+		.maxSets = (u32)NumImages,
 		.poolSizeCount = 0,
 		.pPoolSizes = NULL
 	};
@@ -272,52 +228,40 @@ void GraphicsPipeline::CreateDescriptorPool()
 }
 
 
-void GraphicsPipeline::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform)
+void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, 
+												 int UniformDataSize, VulkanTexture* pTex)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	if (IsVB) {
-		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-			.binding = BINDING_VB,
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		};
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
+		.binding = 0,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
 
-		LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
-	}
+	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
+		.binding = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+	};
 
-	if (IsIB) {
-		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
-			.binding = BINDING_IB,
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		};
+	VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding = {
+		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+	};
 
-		LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
-	}
-
-	if (IsUniform) {
-		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-			.binding = BINDING_UNIFORM,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		};
-
+	if (UniformBuffers.size() > 0) {
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
-
-	if (IsTex) { 
-		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
-			.binding = BINDING_TEXTURE,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		};
-
-		LayoutBindings.push_back(FragmentShaderLayoutBinding_Tex);
+	
+	if (pTex) { 
+		LayoutBindings.push_back(FragmentShaderLayoutBinding);
 	}
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
@@ -333,210 +277,58 @@ void GraphicsPipeline::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTe
 }
 
 
-std::vector<VkDescriptorSet> GraphicsPipeline::AllocateDescriptorSets()
+void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
 {
-	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> Layouts(NumImages, m_descriptorSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 		.pNext = NULL,
 		.descriptorPool = m_descriptorPool,
-		.descriptorSetCount = (u32)Layouts.size(),
+		.descriptorSetCount = (u32)NumImages,
 		.pSetLayouts = Layouts.data()
 	};
 
-	std::vector<VkDescriptorSet> DescriptorSets(m_numImages);
+	m_descriptorSets.resize(NumImages);
 
-	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
+	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
-
-	return DescriptorSets;
 }
 
 
-void GraphicsPipeline::AllocateDescriptorSets(int NumSubmeshes, std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
-{
-	std::vector<VkDescriptorSetLayout> Layouts(NumSubmeshes, m_descriptorSetLayout);
-
-	VkDescriptorSetAllocateInfo AllocInfo = {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.pNext = NULL,
-		.descriptorPool = m_descriptorPool,
-		.descriptorSetCount = (u32)Layouts.size(),
-		.pSetLayouts = Layouts.data()
-	};
-
-	DescriptorSets.resize(m_numImages);
-
-	for (int ImageIndex = 0; ImageIndex < DescriptorSets.size(); ImageIndex++) {
-		DescriptorSets[ImageIndex].resize(NumSubmeshes);
-
-		VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets[ImageIndex].data());
-		CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
-	}
-}
-
-
-
-void GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc,
-											 const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
-{
-	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
-
-#define NUM_DESCS 4 // VB, IB, Uniform and Texture
-
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * NUM_DESCS);
-
-	int WdsIndex = 0;
-
-	std::vector<VkDescriptorBufferInfo> BufferInfo_VBs(NumSubmeshes);
-	std::vector<VkDescriptorBufferInfo> BufferInfo_IBs(NumSubmeshes);
-	std::vector<std::vector<VkDescriptorBufferInfo>> BufferInfo_Uniforms(m_numImages);
-	std::vector<VkDescriptorImageInfo> ImageInfo(NumSubmeshes);
-
-	for (u32 SubmeshIndex = 0 ; SubmeshIndex < NumSubmeshes ; SubmeshIndex++) {
-		BufferInfo_VBs[SubmeshIndex].buffer = ModelDesc.m_vb;
-		BufferInfo_VBs[SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_offset;
-		BufferInfo_VBs[SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_range;
-
-		BufferInfo_IBs[SubmeshIndex].buffer = ModelDesc.m_ib;
-		BufferInfo_IBs[SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_offset;
-		BufferInfo_IBs[SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_range;
-
-		ImageInfo[SubmeshIndex].sampler = ModelDesc.m_materials[SubmeshIndex].m_sampler;
-		ImageInfo[SubmeshIndex].imageView = ModelDesc.m_materials[SubmeshIndex].m_imageView;
-		ImageInfo[SubmeshIndex].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-	}
-
-	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		
-		BufferInfo_Uniforms[ImageIndex].resize(NumSubmeshes);
-
-		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].buffer = ModelDesc.m_uniforms[ImageIndex];
-			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_offset;
-			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_range;
-		}
-	}
-
-	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-			VkDescriptorSet DstSet = DescriptorSets[ImageIndex][SubmeshIndex];
-
-			VkWriteDescriptorSet wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = BINDING_VB,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_VBs[SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-
-			wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = BINDING_IB,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_IBs[SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-
-			wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = BINDING_UNIFORM,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pBufferInfo = &BufferInfo_Uniforms[ImageIndex][SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-
-			wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = BINDING_TEXTURE,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = &ImageInfo[SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-		}
-	}
-
-	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
-}
-
-
-void GraphicsPipeline::UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-											const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
-										    std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
+void GraphicsPipeline::UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
+											std::vector<BufferAndMemory>& UniformBuffers, 
+											int UniformDataSize)
 {
 	VkDescriptorBufferInfo BufferInfo_VB = {
-		.buffer = pVB->m_buffer,
+		.buffer = pMesh->m_vb.m_buffer,
 		.offset = 0,
-		.range = VK_WHOLE_SIZE
+		.range = pMesh->m_vertexBufferSize,  // can also be VK_WHOLE_SIZE
 	};
-
-	VkDescriptorBufferInfo BufferInfo_IB;
-
-	if (pIB) {
-		BufferInfo_IB.buffer = pIB->m_buffer;
-		BufferInfo_IB.offset = 0;
-		BufferInfo_IB.range = VK_WHOLE_SIZE;
-	};
-
+	
 	VkDescriptorImageInfo ImageInfo;
 	
-	if (pTex) {
-		ImageInfo.sampler = pTex->m_sampler;
-		ImageInfo.imageView = pTex->m_view;
+	if (pMesh->m_pTex) {
+		ImageInfo.sampler = pMesh->m_pTex->m_sampler;
+		ImageInfo.imageView = pMesh->m_pTex->m_view;
 		ImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 	
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 
-	for (u32 i = 0; i < m_numImages; i++) {
+	for (size_t i = 0; i < NumImages; i++) {
 
 		WriteDescriptorSet.push_back(
 			VkWriteDescriptorSet{
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DescriptorSets[i],
-				.dstBinding = BINDING_VB,
+				.dstSet = m_descriptorSets[i],
+				.dstBinding = 0,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 				.pBufferInfo = &BufferInfo_VB
 			}
 		);
-
-		if (pIB) {
-			WriteDescriptorSet.push_back(
-				VkWriteDescriptorSet{
-					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DescriptorSets[i],
-					.dstBinding = BINDING_IB,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-					.pBufferInfo = &BufferInfo_IB
-				}
-			);
-		}
 
 		if (UniformBuffers.size() > 0) {
 			VkDescriptorBufferInfo BufferInfo_Uniform = {
@@ -548,8 +340,8 @@ void GraphicsPipeline::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Descri
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DescriptorSets[i],
-					.dstBinding = BINDING_UNIFORM,
+					.dstSet = m_descriptorSets[i],
+					.dstBinding = 1,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
 					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -558,12 +350,12 @@ void GraphicsPipeline::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Descri
 			);
 		}
 		
-		if (pTex) {
+		if (pMesh->m_pTex) {
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DescriptorSets[i],
-					.dstBinding = BINDING_TEXTURE,
+					.dstSet = m_descriptorSets[i],
+					.dstBinding = 2,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
 					.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -573,7 +365,9 @@ void GraphicsPipeline::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Descri
 		}
 	}
 
-	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	vkUpdateDescriptorSets(m_device, 
+						   (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 
+						   0, NULL);
 }
 
 }

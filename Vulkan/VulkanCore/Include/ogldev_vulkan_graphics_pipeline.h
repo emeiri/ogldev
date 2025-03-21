@@ -22,8 +22,7 @@
 #include <GLFW/glfw3.h>
 
 #include "ogldev_vulkan_simple_mesh.h"
-#include "ogldev_vulkan_model.h"
-#include "Int/model_desc.h"
+
 
 namespace OgldevVK {
 
@@ -42,37 +41,19 @@ public:
 					 int UniformDataSize,
 					 bool DepthEnabled);
 
-	GraphicsPipeline(VkDevice Device,
-					 GLFWwindow* pWindow,
-					 VkRenderPass RenderPass,
-					 VkShaderModule vs,
-					 VkShaderModule fs,
-					 const VkModel& Model,
-					 int NumImages);
-
 
 	~GraphicsPipeline();
 
-	void Bind(VkCommandBuffer CmdBuf, int ImageIndex);	
-
-	void AllocateDescriptorSets(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
-
-	void PrepareDescriptorSets(const ModelDesc& ModelDesc,
-							   const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets);
-
-	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
+	void Bind(VkCommandBuffer CmdBuf, int ImageIndex);
 
 private:
 
-	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, const BufferAndMemory* pVB, VkShaderModule vs, VkShaderModule fs);
-
-	void CreateDescriptorPool();
-	void CreateDescriptorSets(const SimpleMesh* pMesh, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
-	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform);
-	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-							  const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
-							  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
-	std::vector<VkDescriptorSet> AllocateDescriptorSets();
+	void CreateDescriptorPool(int NumImages);
+	void CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
+						  	  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+	void CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize, VulkanTexture* pTex);
+	void AllocateDescriptorSets(int NumImages);
+	void UpdateDescriptorSets(const SimpleMesh* pMesh, int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
@@ -80,7 +61,5 @@ private:
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descriptorSets;
-	bool m_depthEnabled = false;
-	u32 m_numImages = 0;
 };
 }
