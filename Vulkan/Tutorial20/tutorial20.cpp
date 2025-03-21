@@ -219,7 +219,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_model, m_numImages);
+		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_numImages);
 	}
 
 
@@ -247,7 +247,7 @@ private:
 			.pClearValues = ClearValues.data()
 		};
 
-		m_model.CreateDescriptorSets(m_pPipeline);
+		m_model.CreateDescriptorSets(*m_pPipeline);
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = m_cmdBufs[i];
@@ -260,7 +260,7 @@ private:
 	
 			m_pPipeline->Bind(CmdBuf);
 
-			m_model.RecordCommandBuffer(CmdBuf, m_pPipeline, i);
+			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
 
 			vkCmdEndRenderPass(CmdBuf);
 

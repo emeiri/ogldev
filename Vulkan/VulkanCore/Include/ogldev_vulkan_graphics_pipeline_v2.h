@@ -23,7 +23,6 @@
 
 #include "ogldev_types.h"
 #include "ogldev_vulkan_core.h"
-#include "ogldev_vulkan_model.h"
 #include "Int/model_desc.h"
 
 namespace OgldevVK {
@@ -37,9 +36,7 @@ public:
 					 VkRenderPass RenderPass,
 					 VkShaderModule vs,
 					 VkShaderModule fs,
-					 const VkModel& Model,
 					 int NumImages);
-
 
 	~GraphicsPipelineV2();
 

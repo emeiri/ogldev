@@ -35,7 +35,6 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 									   VkRenderPass RenderPass,
 									   VkShaderModule vs,
 									   VkShaderModule fs,
-									   const VkModel& Model,
 									   int NumImages)
 {
 	m_device = Device;

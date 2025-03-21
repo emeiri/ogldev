@@ -59,16 +59,16 @@ void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 }
 
 
-void VkModel::CreateDescriptorSets(GraphicsPipelineV2* pPipeline)
+void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
 	ModelDesc md;
 
 	CreateModelDescriptor(md);
 
 	int NumSubmeshes = (int)m_Meshes.size();
-	pPipeline->AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
+	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
 
-	pPipeline->PrepareDescriptorSets(md, m_descriptorSets);
+	Pipeline.PrepareDescriptorSets(md, m_descriptorSets);
 }
 
 
@@ -112,14 +112,14 @@ void VkModel::CreateModelDescriptor(ModelDesc& md)
 }
 
 
-void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2* pPipeline, int ImageIndex)
+void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pipeline, int ImageIndex)
 {
 	u32 InstanceCount = 1;
 	u32 FirstInstance = 0;
 	u32 BaseVertex = 0;
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->GetPipelineLayout(),
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline.GetPipelineLayout(),
 			0,  // firstSet
 			1,  // descriptorSetCount
 			&m_descriptorSets[ImageIndex][SubmeshIndex],

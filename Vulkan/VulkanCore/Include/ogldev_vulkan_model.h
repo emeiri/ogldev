@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include "Int/core_model.h"
 #include "ogldev_vulkan_texture.h"
+#include "ogldev_vulkan_graphics_pipeline_v2.h"
+#include "Int/core_model.h"
 #include "Int/model_desc.h"
 
 namespace OgldevVK {
 
 class VulkanCore;
-class GraphicsPipelineV2;
 
 class VkModel : public CoreModel
 {
@@ -36,9 +36,9 @@ public:
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
-	void CreateDescriptorSets(GraphicsPipelineV2* pPipeline);
+	void CreateDescriptorSets(GraphicsPipelineV2& Pipeline);
 
-	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2* pPipeline, int ImageIndex);
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& pPipeline, int ImageIndex);
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
