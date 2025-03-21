@@ -22,10 +22,14 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_graphics_pipeline_v2.h"
 
-#define BINDING_VB      0
-#define BINDING_IB      1
-#define BINDING_UNIFORM 2
-#define BINDING_TEXTURE 3
+enum Binding {
+	BindingVB = 0,
+	BindingIB = 1,
+	BindingUniform = 2,
+	BindingTexture = 3,
+	BindingCount = 4
+};
+
 
 
 namespace OgldevVK {
@@ -221,7 +225,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsVB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-			.binding = BINDING_VB,
+			.binding = BindingVB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -232,7 +236,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsIB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
-			.binding = BINDING_IB,
+			.binding = BindingIB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -243,7 +247,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsUniform) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-			.binding = BINDING_UNIFORM,
+			.binding = BindingUniform,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -254,7 +258,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsTex) { 
 		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
-			.binding = BINDING_TEXTURE,
+			.binding = BindingTexture,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -306,15 +310,12 @@ void GraphicsPipelineV2::AllocateDescriptorSetsInternal(int NumSubmeshes, std::v
 }
 
 
-
 void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 											 const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
-#define NUM_DESCS 4 // VB, IB, Uniform and Texture
-
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * NUM_DESCS);
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * BindingCount);
 
 	int WdsIndex = 0;
 
@@ -356,7 +357,7 @@ void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 			VkWriteDescriptorSet wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BINDING_VB,
+				.dstBinding = BindingVB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -369,7 +370,7 @@ void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BINDING_IB,
+				.dstBinding = BindingIB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -382,7 +383,7 @@ void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BINDING_UNIFORM,
+				.dstBinding = BindingUniform,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -395,7 +396,7 @@ void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BINDING_TEXTURE,
+				.dstBinding = BindingTexture,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
