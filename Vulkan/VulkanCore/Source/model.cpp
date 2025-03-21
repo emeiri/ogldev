@@ -68,7 +68,8 @@ void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
 
 	if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pDiffuse)) {
 		Texture* pDiffuse = m_Materials[MaterialIndex].pDiffuse;
-		ModelDesc.m_tex = { .sampler = pDiffuse->m_sampler, .imageView = pDiffuse->m_view , .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL };
+		ModelDesc.m_sampler = pDiffuse->m_sampler;
+		ModelDesc.m_imageView = pDiffuse->m_view;
 	}
 
 	ModelDesc.m_uniforms.resize(m_pVulkanCore->GetNumImages());
@@ -77,7 +78,14 @@ void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
 		ModelDesc.m_uniforms[i] = m_uniformBuffers[i].m_buffer;
 	}
 
-	m_descriptorSets = pPipeline->PrepareDescriptorSets(ModelDesc);
+	ModelDesc.m_ranges.resize(1);
+	ModelDesc.m_ranges[0].m_ibRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+	ModelDesc.m_ranges[0].m_vbRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+	ModelDesc.m_ranges[0].m_uniformRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+
+	pPipeline->AllocateDescriptorSets((int)m_Meshes.size(), m_descriptorSets);
+
+	pPipeline->PrepareDescriptorSets(ModelDesc, m_descriptorSets);
 }
 
 
@@ -90,7 +98,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPip
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->GetPipelineLayout(),
 		0,  // firstSet
 		1,  // descriptorSetCount
-		&m_descriptorSets[ImageIndex],
+		m_descriptorSets[ImageIndex].data(),
 		0,	// dynamicOffsetCount
 		NULL);	// pDynamicOffsets
 

@@ -77,7 +77,7 @@ private:
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
-	std::vector<VkDescriptorSet> m_descriptorSets;
+	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
 };
 
 }

@@ -42,11 +42,10 @@ struct ModelDesc {
 	VkBuffer m_vb;
 	VkBuffer m_ib;
 	std::vector<VkBuffer> m_uniforms;
-	VkDescriptorImageInfo m_tex;
+	VkSampler m_sampler;
+	VkImageView m_imageView;
 	std::vector<SubmeshRanges> m_ranges;
 };
-
-
 
 
 class GraphicsPipeline {
@@ -77,7 +76,10 @@ public:
 
 	void Bind(VkCommandBuffer CmdBuf, int ImageIndex);	
 
-	std::vector<VkDescriptorSet> PrepareDescriptorSets(const ModelDesc& ModelDesc);
+	void AllocateDescriptorSets(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
+
+	void PrepareDescriptorSets(const ModelDesc& ModelDesc,
+							   const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets);
 
 	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
 

@@ -341,7 +341,7 @@ std::vector<VkDescriptorSet> GraphicsPipeline::AllocateDescriptorSets()
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 		.pNext = NULL,
 		.descriptorPool = m_descriptorPool,
-		.descriptorSetCount = m_numImages,
+		.descriptorSetCount = (u32)Layouts.size(),
 		.pSetLayouts = Layouts.data()
 	};
 
@@ -354,89 +354,116 @@ std::vector<VkDescriptorSet> GraphicsPipeline::AllocateDescriptorSets()
 }
 
 
-std::vector<VkDescriptorSet> GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc)
+void GraphicsPipeline::AllocateDescriptorSets(int NumSubmeshes, std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
-	std::vector<VkDescriptorSet> DescriptorSets = AllocateDescriptorSets();
+	std::vector<VkDescriptorSetLayout> Layouts(NumSubmeshes, m_descriptorSetLayout);
 
+	VkDescriptorSetAllocateInfo AllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.pNext = NULL,
+		.descriptorPool = m_descriptorPool,
+		.descriptorSetCount = (u32)Layouts.size(),
+		.pSetLayouts = Layouts.data()
+	};
+
+	DescriptorSets.resize(m_numImages);
+
+	for (int ImageIndex = 0; ImageIndex < DescriptorSets.size(); ImageIndex++) {
+		DescriptorSets[ImageIndex].resize(NumSubmeshes);
+
+		VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets[ImageIndex].data());
+		CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+	}
+}
+
+
+
+void GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc,
+											 const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+{
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 
-	for (u32 i = 0; i < m_numImages; i++) {
-		VkDescriptorBufferInfo BufferInfo_VB = {
-			.buffer = ModelDesc.m_vb,
-			.offset = 0,
-			.range = VK_WHOLE_SIZE
-		};
+	VkDescriptorImageInfo ImageInfo = {
+		.sampler = ModelDesc.m_sampler,
+		.imageView = ModelDesc.m_imageView,
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+	};
 
-		VkDescriptorBufferInfo BufferInfo_IB = {
-			.buffer = ModelDesc.m_ib,
-			.offset = 0,
-			.range = VK_WHOLE_SIZE
-		};
+	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
-		VkDescriptorImageInfo ImageInfo = {
-			.sampler = ModelDesc.m_tex.sampler,
-			.imageView = ModelDesc.m_tex.imageView,
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-		};
+	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+			VkDescriptorSet DstSet = DescriptorSets[ImageIndex][SubmeshIndex];
 
-		WriteDescriptorSet.push_back(
-			VkWriteDescriptorSet{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DescriptorSets[i],
-				.dstBinding = BINDING_VB,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_VB
-			}
-		);
+			VkDescriptorBufferInfo BufferInfo_VB = {
+				.buffer = ModelDesc.m_vb,
+				.offset = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_offset,
+				.range = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_range
+			};
 
-		WriteDescriptorSet.push_back(
-			VkWriteDescriptorSet{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DescriptorSets[i],
-				.dstBinding = BINDING_IB,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_IB
-			}
-		);
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = DstSet,
+					.dstBinding = BINDING_VB,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+					.pBufferInfo = &BufferInfo_VB
+				}
+			);
 
-		VkDescriptorBufferInfo BufferInfo_Uniform = {
-			.buffer = ModelDesc.m_uniforms[i],
-			.offset = 0,
-			.range = VK_WHOLE_SIZE
-		};
+			VkDescriptorBufferInfo BufferInfo_IB = {
+				.buffer = ModelDesc.m_ib,
+				.offset = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_offset,
+				.range = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_range,
+			};
 
-		WriteDescriptorSet.push_back(
-			VkWriteDescriptorSet{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DescriptorSets[i],
-				.dstBinding = BINDING_UNIFORM,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pBufferInfo = &BufferInfo_Uniform
-			}
-		);
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = DstSet,
+					.dstBinding = BINDING_IB,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+					.pBufferInfo = &BufferInfo_IB
+				}
+			);
 
-		WriteDescriptorSet.push_back(
-			VkWriteDescriptorSet{
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DescriptorSets[i],
-				.dstBinding = BINDING_TEXTURE,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = &ModelDesc.m_tex
-			}
-		);
+			VkDescriptorBufferInfo BufferInfo_Uniform = {
+				.buffer = ModelDesc.m_uniforms[ImageIndex],
+				.offset = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_offset,
+				.range = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_range,
+			};
+
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = DstSet,
+					.dstBinding = BINDING_UNIFORM,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+					.pBufferInfo = &BufferInfo_Uniform
+				}
+			);
+
+			WriteDescriptorSet.push_back(
+				VkWriteDescriptorSet{
+					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+					.dstSet = DstSet,
+					.dstBinding = BINDING_TEXTURE,
+					.dstArrayElement = 0,
+					.descriptorCount = 1,
+					.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+					.pImageInfo = &ImageInfo
+				}
+			);
+		}
 	}
 
 	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
-
-	return DescriptorSets;
 }
 
 
