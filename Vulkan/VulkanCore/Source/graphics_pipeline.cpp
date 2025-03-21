@@ -261,7 +261,7 @@ void GraphicsPipeline::CreateDescriptorPool()
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.flags = 0,
-		.maxSets = m_numImages,
+		.maxSets = m_numImages * 2,
 		.poolSizeCount = 0,
 		.pPoolSizes = NULL
 	};
@@ -381,85 +381,100 @@ void GraphicsPipeline::AllocateDescriptorSets(int NumSubmeshes, std::vector<std:
 void GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 											 const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
-
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
+
+#define NUM_DESCS 4 // VB, IB, Uniform and Texture
+
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * NUM_DESCS);
+
+	int WdsIndex = 0;
+
+	std::vector<VkDescriptorBufferInfo> BufferInfo_VBs(NumSubmeshes);
+	std::vector<VkDescriptorBufferInfo> BufferInfo_IBs(NumSubmeshes);
+	std::vector<std::vector<VkDescriptorBufferInfo>> BufferInfo_Uniforms(m_numImages);
+	std::vector<VkDescriptorImageInfo> ImageInfo(NumSubmeshes);
+
+	for (u32 SubmeshIndex = 0 ; SubmeshIndex < NumSubmeshes ; SubmeshIndex++) {
+		BufferInfo_VBs[SubmeshIndex].buffer = ModelDesc.m_vb;
+		BufferInfo_VBs[SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_offset;
+		BufferInfo_VBs[SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_range;
+
+		BufferInfo_IBs[SubmeshIndex].buffer = ModelDesc.m_ib;
+		BufferInfo_IBs[SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_offset;
+		BufferInfo_IBs[SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_range;
+
+		ImageInfo[SubmeshIndex].sampler = ModelDesc.m_materials[SubmeshIndex].m_sampler;
+		ImageInfo[SubmeshIndex].imageView = ModelDesc.m_materials[SubmeshIndex].m_imageView;
+		ImageInfo[SubmeshIndex].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	}
+
+	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+		
+		BufferInfo_Uniforms[ImageIndex].resize(NumSubmeshes);
+
+		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].buffer = ModelDesc.m_uniforms[ImageIndex];
+			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_offset;
+			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_range;
+		}
+	}
 
 	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
 		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 			VkDescriptorSet DstSet = DescriptorSets[ImageIndex][SubmeshIndex];
 
-			VkDescriptorBufferInfo BufferInfo_VB = {
-				.buffer = ModelDesc.m_vb,
-				.offset = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_offset,
-				.range = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_range
+			VkWriteDescriptorSet wds = {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DstSet,
+				.dstBinding = BINDING_VB,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.pBufferInfo = &BufferInfo_VBs[SubmeshIndex]
 			};
 
-			WriteDescriptorSet.push_back(
-				VkWriteDescriptorSet{
-					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DstSet,
-					.dstBinding = BINDING_VB,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-					.pBufferInfo = &BufferInfo_VB
-				}
-			);
+			assert(WdsIndex < WriteDescriptorSet.size());
+			WriteDescriptorSet[WdsIndex++] = wds;
 
-			VkDescriptorBufferInfo BufferInfo_IB = {
-				.buffer = ModelDesc.m_ib,
-				.offset = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_offset,
-				.range = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_range,
+			wds = {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DstSet,
+				.dstBinding = BINDING_IB,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.pBufferInfo = &BufferInfo_IBs[SubmeshIndex]
 			};
 
-			WriteDescriptorSet.push_back(
-				VkWriteDescriptorSet{
-					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DstSet,
-					.dstBinding = BINDING_IB,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-					.pBufferInfo = &BufferInfo_IB
-				}
-			);
+			assert(WdsIndex < WriteDescriptorSet.size());
+			WriteDescriptorSet[WdsIndex++] = wds;
 
-			VkDescriptorBufferInfo BufferInfo_Uniform = {
-				.buffer = ModelDesc.m_uniforms[ImageIndex],
-				.offset = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_offset,
-				.range = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_range,
+			wds = {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DstSet,
+				.dstBinding = BINDING_UNIFORM,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo = &BufferInfo_Uniforms[ImageIndex][SubmeshIndex]
 			};
 
-			WriteDescriptorSet.push_back(
-				VkWriteDescriptorSet{
-					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DstSet,
-					.dstBinding = BINDING_UNIFORM,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-					.pBufferInfo = &BufferInfo_Uniform
-				}
-			);
+			assert(WdsIndex < WriteDescriptorSet.size());
+			WriteDescriptorSet[WdsIndex++] = wds;
 
-			VkDescriptorImageInfo ImageInfo = {
-				.sampler = ModelDesc.m_materials[SubmeshIndex].m_sampler,
-				.imageView = ModelDesc.m_materials[SubmeshIndex].m_imageView,
-				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+			wds = {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DstSet,
+				.dstBinding = BINDING_TEXTURE,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = &ImageInfo[SubmeshIndex]
 			};
 
-			WriteDescriptorSet.push_back(
-				VkWriteDescriptorSet{
-					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = DstSet,
-					.dstBinding = BINDING_TEXTURE,
-					.dstArrayElement = 0,
-					.descriptorCount = 1,
-					.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-					.pImageInfo = &ImageInfo
-				}
-			);
+			assert(WdsIndex < WriteDescriptorSet.size());
+			WriteDescriptorSet[WdsIndex++] = wds;
 		}
 	}
 
