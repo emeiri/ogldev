@@ -64,25 +64,29 @@ void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
 	ModelDesc.m_vb = m_vb.m_buffer;
 	ModelDesc.m_ib = m_ib.m_buffer;
 
-	int MaterialIndex = m_Meshes[0].MaterialIndex;
-
-	if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pDiffuse)) {
-		Texture* pDiffuse = m_Materials[MaterialIndex].pDiffuse;
-		ModelDesc.m_sampler = pDiffuse->m_sampler;
-		ModelDesc.m_imageView = pDiffuse->m_view;
-	}
-
 	ModelDesc.m_uniforms.resize(m_pVulkanCore->GetNumImages());
 
-	for (int i = 0; i < m_pVulkanCore->GetNumImages(); i++) {
-		ModelDesc.m_uniforms[i] = m_uniformBuffers[i].m_buffer;
+	for (int ImageIndex = 0; ImageIndex < m_pVulkanCore->GetNumImages(); ImageIndex++) {
+		ModelDesc.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
 	}
 
-	ModelDesc.m_ranges.resize(1);
-	ModelDesc.m_ranges[0].m_ibRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
-	ModelDesc.m_ranges[0].m_vbRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
-	ModelDesc.m_ranges[0].m_uniformRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+	ModelDesc.m_materials.resize(m_Meshes.size());
+	ModelDesc.m_ranges.resize(m_Meshes.size());
 
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+		int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
+
+		if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pDiffuse)) {
+			Texture* pDiffuse = m_Materials[MaterialIndex].pDiffuse;
+			ModelDesc.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
+			ModelDesc.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
+		}
+
+		ModelDesc.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+		ModelDesc.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+		ModelDesc.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = 0, .m_range = VK_WHOLE_SIZE };
+	}
+	
 	pPipeline->AllocateDescriptorSets((int)m_Meshes.size(), m_descriptorSets);
 
 	pPipeline->PrepareDescriptorSets(ModelDesc, m_descriptorSets);

@@ -38,12 +38,16 @@ struct SubmeshRanges {
 	RangeDesc m_uniformRange;
 };
 
+struct TextureInfo {
+	VkSampler m_sampler;
+	VkImageView m_imageView;
+};
+
 struct ModelDesc {
 	VkBuffer m_vb;
 	VkBuffer m_ib;
 	std::vector<VkBuffer> m_uniforms;
-	VkSampler m_sampler;
-	VkImageView m_imageView;
+	std::vector<TextureInfo> m_materials;
 	std::vector<SubmeshRanges> m_ranges;
 };
 

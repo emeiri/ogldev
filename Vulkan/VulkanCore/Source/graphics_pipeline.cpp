@@ -383,12 +383,6 @@ void GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 {
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 
-	VkDescriptorImageInfo ImageInfo = {
-		.sampler = ModelDesc.m_sampler,
-		.imageView = ModelDesc.m_imageView,
-		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-	};
-
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
 	for (u32 ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
@@ -448,6 +442,12 @@ void GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc,
 					.pBufferInfo = &BufferInfo_Uniform
 				}
 			);
+
+			VkDescriptorImageInfo ImageInfo = {
+				.sampler = ModelDesc.m_materials[SubmeshIndex].m_sampler,
+				.imageView = ModelDesc.m_materials[SubmeshIndex].m_imageView,
+				.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+			};
 
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
