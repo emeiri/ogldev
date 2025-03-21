@@ -19,6 +19,7 @@
 
 #include "Int/core_model.h"
 #include "ogldev_vulkan_texture.h"
+#include "Int/model_desc.h"
 
 namespace OgldevVK {
 
@@ -72,6 +73,8 @@ protected:
 	virtual void PopulateBuffers(vector<Vertex>& Vertices);
 
 private:
+	void CreateModelDescriptor(ModelDesc& md);
+
 	VulkanCore* m_pVulkanCore = NULL;
 
 	BufferAndMemory m_vb;

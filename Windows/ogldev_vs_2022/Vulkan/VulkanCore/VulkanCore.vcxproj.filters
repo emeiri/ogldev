@@ -22,6 +22,9 @@
     <Filter Include="Source Files\DemoLITION">
       <UniqueIdentifier>{acc52068-bd7a-4008-b4be-220490467a19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Int">
+      <UniqueIdentifier>{79ede9d0-eb99-4211-8d8e-14ba058ff0e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -106,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_texture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\model_desc.h">
+      <Filter>Header Files\Int</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

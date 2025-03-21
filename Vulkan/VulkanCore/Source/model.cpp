@@ -50,7 +50,7 @@ Texture* VkModel::AllocTexture2D()
 void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 {
 	m_vb = m_pVulkanCore->CreateVertexBuffer(Vertices.data(), ARRAY_SIZE_IN_BYTES(Vertices));
-	//	printf("%d\n", sizeof(Vertices[0]));
+
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_Indices.data(), ARRAY_SIZE_IN_BYTES(m_Indices));
 
 	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
@@ -61,45 +61,55 @@ void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 
 void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
 {
-	ModelDesc ModelDesc;
+	ModelDesc md;
 
-	ModelDesc.m_vb = m_vb.m_buffer;
-	ModelDesc.m_ib = m_ib.m_buffer;
+	CreateModelDescriptor(md);
 
-	ModelDesc.m_uniforms.resize(m_pVulkanCore->GetNumImages());
+	int NumSubmeshes = (int)m_Meshes.size();
+	pPipeline->AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
+
+	pPipeline->PrepareDescriptorSets(md, m_descriptorSets);
+}
+
+
+void VkModel::CreateModelDescriptor(ModelDesc& md)
+{
+	md.m_vb = m_vb.m_buffer;
+	md.m_ib = m_ib.m_buffer;
+
+	md.m_uniforms.resize(m_pVulkanCore->GetNumImages());
 
 	for (int ImageIndex = 0; ImageIndex < m_pVulkanCore->GetNumImages(); ImageIndex++) {
-		ModelDesc.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
+		md.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
 	}
 
-	ModelDesc.m_materials.resize(m_Meshes.size());
-	ModelDesc.m_ranges.resize(m_Meshes.size());
+	md.m_materials.resize(m_Meshes.size());
+	md.m_ranges.resize(m_Meshes.size());
 
-	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+	int NumSubmeshes = (int)m_Meshes.size();
+
+	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
 
 		if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pDiffuse)) {
 			Texture* pDiffuse = m_Materials[MaterialIndex].pDiffuse;
-			ModelDesc.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
-			ModelDesc.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
+			md.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
+			md.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
 		}
 
 		size_t offset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
 		size_t range = m_Meshes[SubmeshIndex].NumVertices * m_vertexSize;
-		ModelDesc.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
+		md.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
 
 		offset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
 		range = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
-		ModelDesc.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };
+		md.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };
 
 		offset = SubmeshIndex * UNIFORM_BUFFER_SIZE;
 		range = UNIFORM_BUFFER_SIZE;
-		ModelDesc.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = offset, .m_range = range };
+		md.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = offset, .m_range = range };
 	}
-	
-	pPipeline->AllocateDescriptorSets((int)m_Meshes.size(), m_descriptorSets);
 
-	pPipeline->PrepareDescriptorSets(ModelDesc, m_descriptorSets);
 }
 
 

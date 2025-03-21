@@ -37,6 +37,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\model_desc.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_glfw.h" />
