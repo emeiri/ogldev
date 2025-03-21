@@ -23,6 +23,7 @@
 namespace OgldevVK {
 
 class VulkanCore;
+class GraphicsPipeline;
 
 class VkModel : public CoreModel
 {
@@ -34,7 +35,11 @@ public:
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
-	void RecordCommandBuffer(VkCommandBuffer CmdBuf);
+	void CreateDescriptorSets(GraphicsPipeline* pPipeline);
+
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPipeline, int ImageIndex);
+
+	void Update(int ImageIndex, const glm::mat4& Transformation);
 
 	virtual void Render(DemolitionRenderCallbacks* pRenderCallbacks = NULL) { assert(0); }
 
@@ -71,6 +76,8 @@ private:
 
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
+	std::vector<VkDescriptorSet> m_descriptorSets;
 };
 
 }

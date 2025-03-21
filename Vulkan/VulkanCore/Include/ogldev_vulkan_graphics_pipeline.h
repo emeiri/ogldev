@@ -27,6 +27,28 @@
 
 namespace OgldevVK {
 
+struct RangeDesc {
+	VkDeviceSize m_offset = 0;
+	VkDeviceSize m_range = 0;
+};
+
+struct SubmeshRanges {
+	RangeDesc m_vbRange;
+	RangeDesc m_ibRange;
+	RangeDesc m_uniformRange;
+};
+
+struct ModelDesc {
+	VkBuffer m_vb;
+	VkBuffer m_ib;
+	std::vector<VkBuffer> m_uniforms;
+	VkDescriptorImageInfo m_tex;
+	std::vector<SubmeshRanges> m_ranges;
+};
+
+
+
+
 class GraphicsPipeline {
 
 public:
@@ -48,28 +70,28 @@ public:
 					 VkShaderModule vs,
 					 VkShaderModule fs,
 					 const VkModel& Model,
-					 int NumImages,
-					 std::vector<BufferAndMemory>& UniformBuffers,
-					 int UniformDataSize);
+					 int NumImages);
 
 
 	~GraphicsPipeline();
 
-	void Bind(VkCommandBuffer CmdBuf, int ImageIndex);
+	void Bind(VkCommandBuffer CmdBuf, int ImageIndex);	
+
+	std::vector<VkDescriptorSet> PrepareDescriptorSets(const ModelDesc& ModelDesc);
+
+	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
 
 private:
 
 	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, const BufferAndMemory* pVB, VkShaderModule vs, VkShaderModule fs);
 
-	void CreateDescriptorPool(int NumImages);
-	void CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
-						  	  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
-	void CreateDescriptorSets(const VkModel& Model, int NumImages,
+	void CreateDescriptorPool();
+	void CreateDescriptorSets(const SimpleMesh* pMesh, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform);
+	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
+							  const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
 							  std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
-	void CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize, VulkanTexture* pTex, bool IsIB);
-	void AllocateDescriptorSets(int NumImages);
-	void UpdateDescriptorSets(const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
-							  int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize);
+	std::vector<VkDescriptorSet> AllocateDescriptorSets();
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
@@ -78,5 +100,6 @@ private:
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descriptorSets;
 	bool m_depthEnabled = false;
+	u32 m_numImages = 0;
 };
 }

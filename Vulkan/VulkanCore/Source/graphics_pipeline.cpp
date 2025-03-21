@@ -40,9 +40,10 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device, GLFWwindow* pWindow, VkRende
 {
 	m_device = Device;
 	m_depthEnabled = DepthEnabled;
+	m_numImages = NumImages;
 
 	if (pMesh) {
-		CreateDescriptorSets(pMesh, NumImages, UniformBuffers, UniformDataSize);
+		CreateDescriptorSets(pMesh, UniformBuffers, UniformDataSize);
 	}
 
 	const BufferAndMemory* pVB = pMesh ? &pMesh->m_vb : NULL;
@@ -196,14 +197,19 @@ GraphicsPipeline::GraphicsPipeline(VkDevice Device,
 	VkShaderModule vs,
 	VkShaderModule fs,
 	const VkModel& Model,
-	int NumImages,
-	std::vector<BufferAndMemory>& UniformBuffers,
-	int UniformDataSize)
+	int NumImages)
 {
 	m_device = Device;
 	m_depthEnabled = true;
+	m_numImages = NumImages;
 
-	CreateDescriptorSets(Model, NumImages, UniformBuffers, UniformDataSize);
+	CreateDescriptorPool();
+
+	bool IsVB = true;
+	bool IsIB = true;
+	bool IsUniform = true;
+	bool IsTex = true;
+	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex);
 
 	InitCommon(pWindow, RenderPass, Model.GetVB(), vs, fs);
 }
@@ -233,49 +239,29 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, int ImageIndex)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, int NumImages,
-											std::vector<BufferAndMemory>& UniformBuffers, 
+void GraphicsPipeline::CreateDescriptorSets(const SimpleMesh* pMesh, std::vector<BufferAndMemory>& UniformBuffers, 
 											int UniformDataSize)
 {
-	CreateDescriptorPool(NumImages);
+	CreateDescriptorPool();
 
+	bool IsVB = true;
 	bool IsIB = false;
-	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pMesh->m_pTex, IsIB);
+	bool IsUniform = UniformBuffers.size() > 0;
+	bool IsTex = pMesh->m_pTex != NULL;
+	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex);
 
-	AllocateDescriptorSets(NumImages);
+	m_descriptorSets = AllocateDescriptorSets();
 
-	UpdateDescriptorSets(&(pMesh->m_vb), NULL, pMesh->m_pTex, NumImages, UniformBuffers, UniformDataSize);
+	UpdateDescriptorSets(m_descriptorSets, &(pMesh->m_vb), NULL, pMesh->m_pTex, UniformBuffers, UniformDataSize);
 }
 
 
-void GraphicsPipeline::CreateDescriptorSets(const VkModel& Model, int NumImages,
-											std::vector<BufferAndMemory>& UniformBuffers,
-											int UniformDataSize)
-{
-	CreateDescriptorPool(NumImages);
-
-	const Material* pMaterial = Model.GetMaterialForMesh(0);
-
-	VulkanTexture* pTexture = NULL;
-
-	if (pMaterial) {
-		pTexture = pMaterial->pDiffuse;
-	}
-
-	bool IsIB = true;
-	CreateDescriptorSetLayout(UniformBuffers, UniformDataSize, pTexture, IsIB);
-
-	AllocateDescriptorSets(NumImages);
-
-	UpdateDescriptorSets(Model.GetVB(), Model.GetIB(), pTexture, NumImages, UniformBuffers, UniformDataSize);
-}
-
-void GraphicsPipeline::CreateDescriptorPool(int NumImages)
+void GraphicsPipeline::CreateDescriptorPool()
 {
 	VkDescriptorPoolCreateInfo PoolInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.flags = 0,
-		.maxSets = (u32)NumImages,
+		.maxSets = m_numImages,
 		.poolSizeCount = 0,
 		.pPoolSizes = NULL
 	};
@@ -286,19 +272,20 @@ void GraphicsPipeline::CreateDescriptorPool(int NumImages)
 }
 
 
-void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& UniformBuffers, 
-												 int UniformDataSize, VulkanTexture* pTex, bool IsIB)
+void GraphicsPipeline::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-		.binding = BINDING_VB,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-	};
+	if (IsVB) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
+			.binding = BINDING_VB,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		};
 
-	LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+		LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	}
 
 	if (IsIB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
@@ -311,7 +298,7 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 		LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
 	}
 
-	if (UniformBuffers.size() > 0) {
+	if (IsUniform) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
 			.binding = BINDING_UNIFORM,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -322,7 +309,7 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
 
-	if (pTex) { 
+	if (IsTex) { 
 		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
 			.binding = BINDING_TEXTURE,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -346,27 +333,116 @@ void GraphicsPipeline::CreateDescriptorSetLayout(std::vector<BufferAndMemory>& U
 }
 
 
-void GraphicsPipeline::AllocateDescriptorSets(int NumImages)
+std::vector<VkDescriptorSet> GraphicsPipeline::AllocateDescriptorSets()
 {
-	std::vector<VkDescriptorSetLayout> Layouts(NumImages, m_descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 		.pNext = NULL,
 		.descriptorPool = m_descriptorPool,
-		.descriptorSetCount = (u32)NumImages,
+		.descriptorSetCount = m_numImages,
 		.pSetLayouts = Layouts.data()
 	};
 
-	m_descriptorSets.resize(NumImages);
+	std::vector<VkDescriptorSet> DescriptorSets(m_numImages);
 
-	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
+	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+
+	return DescriptorSets;
 }
 
 
-void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
-										    int NumImages, std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
+std::vector<VkDescriptorSet> GraphicsPipeline::PrepareDescriptorSets(const ModelDesc& ModelDesc)
+{
+	std::vector<VkDescriptorSet> DescriptorSets = AllocateDescriptorSets();
+
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
+
+	for (u32 i = 0; i < m_numImages; i++) {
+		VkDescriptorBufferInfo BufferInfo_VB = {
+			.buffer = ModelDesc.m_vb,
+			.offset = 0,
+			.range = VK_WHOLE_SIZE
+		};
+
+		VkDescriptorBufferInfo BufferInfo_IB = {
+			.buffer = ModelDesc.m_ib,
+			.offset = 0,
+			.range = VK_WHOLE_SIZE
+		};
+
+		VkDescriptorImageInfo ImageInfo = {
+			.sampler = ModelDesc.m_tex.sampler,
+			.imageView = ModelDesc.m_tex.imageView,
+			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		};
+
+		WriteDescriptorSet.push_back(
+			VkWriteDescriptorSet{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DescriptorSets[i],
+				.dstBinding = BINDING_VB,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.pBufferInfo = &BufferInfo_VB
+			}
+		);
+
+		WriteDescriptorSet.push_back(
+			VkWriteDescriptorSet{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DescriptorSets[i],
+				.dstBinding = BINDING_IB,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				.pBufferInfo = &BufferInfo_IB
+			}
+		);
+
+		VkDescriptorBufferInfo BufferInfo_Uniform = {
+			.buffer = ModelDesc.m_uniforms[i],
+			.offset = 0,
+			.range = VK_WHOLE_SIZE
+		};
+
+		WriteDescriptorSet.push_back(
+			VkWriteDescriptorSet{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DescriptorSets[i],
+				.dstBinding = BINDING_UNIFORM,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+				.pBufferInfo = &BufferInfo_Uniform
+			}
+		);
+
+		WriteDescriptorSet.push_back(
+			VkWriteDescriptorSet{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.dstSet = DescriptorSets[i],
+				.dstBinding = BINDING_TEXTURE,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = &ModelDesc.m_tex
+			}
+		);
+	}
+
+	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+
+	return DescriptorSets;
+}
+
+
+void GraphicsPipeline::UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
+											const BufferAndMemory* pVB, const BufferAndMemory* pIB, VulkanTexture* pTex, 
+										    std::vector<BufferAndMemory>& UniformBuffers, int UniformDataSize)
 {
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = pVB->m_buffer,
@@ -392,12 +468,12 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 	
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet;
 
-	for (size_t i = 0; i < NumImages; i++) {
+	for (u32 i = 0; i < m_numImages; i++) {
 
 		WriteDescriptorSet.push_back(
 			VkWriteDescriptorSet{
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = m_descriptorSets[i],
+				.dstSet = DescriptorSets[i],
 				.dstBinding = BINDING_VB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
@@ -410,7 +486,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = m_descriptorSets[i],
+					.dstSet = DescriptorSets[i],
 					.dstBinding = BINDING_IB,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
@@ -430,7 +506,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = m_descriptorSets[i],
+					.dstSet = DescriptorSets[i],
 					.dstBinding = BINDING_UNIFORM,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,
@@ -444,7 +520,7 @@ void GraphicsPipeline::UpdateDescriptorSets(const BufferAndMemory* pVB, const Bu
 			WriteDescriptorSet.push_back(
 				VkWriteDescriptorSet{
 					.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-					.dstSet = m_descriptorSets[i],
+					.dstSet = DescriptorSets[i],
 					.dstBinding = BINDING_TEXTURE,
 					.dstArrayElement = 0,
 					.descriptorCount = 1,

@@ -62,10 +62,6 @@ public:
 		delete m_pPipeline;
 		vkDestroyRenderPass(m_device, m_renderPass, NULL);
 		m_model.Destroy();
-
-		for (int i = 0; i < m_uniformBuffers.size(); i++) {
-			m_uniformBuffers[i].Destroy(m_device);
-		}
 	}
 
 	void Init(const char* pAppName)
@@ -80,7 +76,6 @@ public:
 		m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 		CreateShaders();
 		CreateMesh();
-		CreateUniformBuffers();
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -199,7 +194,9 @@ private:
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
-		m_model.LoadAssimpModel("../../Content/bs_ears.obj");
+	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
+		//m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
+		m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
 
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
@@ -208,11 +205,6 @@ private:
 	struct UniformData {
 		glm::mat4 WVP;
 	};
-
-	void CreateUniformBuffers()
-	{
-		m_uniformBuffers = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
-	}
 
 
 	void CreateShaders()
@@ -225,8 +217,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_model, m_numImages, 
-													 m_uniformBuffers, sizeof(UniformData));
+		m_pPipeline = new OgldevVK::GraphicsPipeline(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_model, m_numImages);
 	}
 
 
@@ -254,6 +245,8 @@ private:
 			.pClearValues = ClearValues.data()
 		};
 
+		m_model.CreateDescriptorSets(m_pPipeline);
+
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = m_cmdBufs[i];
 
@@ -265,7 +258,7 @@ private:
 	
 			m_pPipeline->Bind(CmdBuf, i);
 
-			m_model.RecordCommandBuffer(CmdBuf);
+			m_model.RecordCommandBuffer(CmdBuf, m_pPipeline, i);
 
 			vkCmdEndRenderPass(CmdBuf);
 
@@ -291,7 +284,7 @@ private:
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
 		glm::mat4 WVP = VP * Rotate * Rotate0;
-		m_uniformBuffers[ImageIndex].Update(m_device, &WVP, sizeof(WVP));
+		m_model.Update(ImageIndex, WVP);
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -306,7 +299,6 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	OgldevVK::VkModel m_model;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
