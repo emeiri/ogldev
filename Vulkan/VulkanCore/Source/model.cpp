@@ -106,20 +106,18 @@ void VkModel::CreateDescriptorSets(GraphicsPipeline* pPipeline)
 void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipeline* pPipeline, int ImageIndex)
 {
 	u32 InstanceCount = 1;
-	u32 FirstVertex = 0;
 	u32 FirstInstance = 0;
 
-	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->GetPipelineLayout(),
-		0,  // firstSet
-		1,  // descriptorSetCount
-		m_descriptorSets[ImageIndex].data(),
-		0,	// dynamicOffsetCount
-		NULL);	// pDynamicOffsets
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->GetPipelineLayout(),
+			0,  // firstSet
+			1,  // descriptorSetCount
+			&m_descriptorSets[ImageIndex][SubmeshIndex],
+			0,	// dynamicOffsetCount
+			NULL);	// pDynamicOffsets
 
-	vkCmdDraw(CmdBuf, m_Meshes[0].NumIndices, InstanceCount, m_Meshes[0].BaseVertex, FirstInstance);
-	//for (unsigned int i = 0; i < m_Meshes.size(); i++) {
-	//	vkCmdDraw(CmdBuf, m_Meshes[i].NumIndices, InstanceCount, m_Meshes[i].BaseVertex, FirstInstance);
-	//}
+		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, InstanceCount, m_Meshes[SubmeshIndex].BaseVertex, FirstInstance);
+	}
 }
 
 
