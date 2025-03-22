@@ -41,14 +41,30 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 
 	if (CAMERA_LEFT_HANDED) {
 		m_cameraOrientation = glm::lookAtLH(Pos, Pos + Target, Up);
+#ifdef OGLDEV_VULKAN
+		m_persProjection = glm::perspectiveLH_ZO(glm::radians(persProjInfo.FOV), ar,
+			                                  persProjInfo.zNear, persProjInfo.zFar);
+#else
 		m_persProjection = glm::perspectiveLH(glm::radians(persProjInfo.FOV), ar,
 			                                  persProjInfo.zNear, persProjInfo.zFar);
+#endif
 	}
 	else {
 		m_cameraOrientation = glm::lookAtRH(Pos, Pos + Target, Up);
+#ifdef OGLDEV_VULKAN
+		m_persProjection = glm::perspectiveRH_ZO(glm::radians(persProjInfo.FOV), ar,
+			                                  persProjInfo.zNear, persProjInfo.zFar);
+#else
 		m_persProjection = glm::perspectiveRH(glm::radians(persProjInfo.FOV), ar,
 			                                  persProjInfo.zNear, persProjInfo.zFar);
+#endif
 	}	
+
+
+#ifdef OGLDEV_VULKAN
+	//m_persProjection[1][1] *= -1; // Flip the Y-axis for Vulkan - currently disabled because it flips the entire world
+#endif
+
 }
 
 
