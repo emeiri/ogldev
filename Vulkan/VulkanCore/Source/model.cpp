@@ -96,6 +96,10 @@ void VkModel::CreateModelDescriptor(ModelDesc& md)
 			md.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
 			md.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
 		}
+		else {
+			printf("No diffuse texture in material %d\n", MaterialIndex);
+			exit(0);
+		}
 
 		size_t offset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
 		size_t range = m_Meshes[SubmeshIndex].NumVertices * m_vertexSize;
