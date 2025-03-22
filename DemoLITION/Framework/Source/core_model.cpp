@@ -40,6 +40,8 @@ static bool UseMeshOptimizer = false;
 //aiProcess_MakeLeftHanded | \
 //aiProcess_FlipWindingOrder | \
 
+Texture* s_pMissingTexture = NULL;
+
 static void traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
 
@@ -463,8 +465,10 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
     printf("Num materials: %d\n", pScene->mNumMaterials);
 
     // Initialize the materials
-    for (unsigned int i = 0 ; i < pScene->mNumMaterials ; i++) {
+    for (unsigned int i = 0 ; i < pScene->mNumMaterials; i++) {
         const aiMaterial* pMaterial = pScene->mMaterials[i];
+
+        printf("Loading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
 
         LoadTextures(Dir, pMaterial, i);
 
@@ -494,8 +498,56 @@ const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
 }
 
 
+static std::string TextureTypeToString(aiTextureType type) {
+    static std::map<aiTextureType, std::string> textureTypeNames = {
+        {aiTextureType_DIFFUSE, "Diffuse"},
+        {aiTextureType_SPECULAR, "Specular"},
+        {aiTextureType_AMBIENT, "Ambient"},
+        {aiTextureType_EMISSIVE, "Emissive"},
+        {aiTextureType_HEIGHT, "Height"},
+        {aiTextureType_NORMALS, "Normals"},
+        {aiTextureType_SHININESS, "Shininess"},
+        {aiTextureType_OPACITY, "Opacity"},
+        {aiTextureType_DISPLACEMENT, "Displacement"},
+        {aiTextureType_LIGHTMAP, "Lightmap"},
+        {aiTextureType_REFLECTION, "Reflection"},
+        {aiTextureType_UNKNOWN, "Unknown"}
+    };
+
+    auto it = textureTypeNames.find(type);
+    if (it != textureTypeNames.end()) {
+        return it->second;
+    }
+    else {
+        return "Invalid Type";
+    }
+}
+
+
+static int GetTextureCount(const aiMaterial* pMaterial)
+{
+    int TextureCount = 0;
+
+    for (int i = 0; i <= aiTextureType_UNKNOWN; ++i) { // UNKNOWN is the last texture type in Assimp.
+        aiTextureType ttype = (aiTextureType)(i);
+        int Count = pMaterial->GetTextureCount(ttype);
+        TextureCount += Count;
+
+        if (Count > 0) {
+            printf("Found texture %s\n", TextureTypeToString(ttype).c_str());
+        }
+    }
+
+    return TextureCount;
+}
+
+
 void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
 {
+    int TextureCount = GetTextureCount(pMaterial);
+
+    printf("Number of textures %d\n", TextureCount);
+
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
     LoadNormalTexture(Dir, pMaterial, index);
@@ -519,7 +571,19 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
             }
         }
     } else {
-        printf("Warning! no diffuse textures\n");
+        printf("Warning! no diffuse texture\n");
+
+        if (!s_pMissingTexture) {
+            printf("Loading default texture\n");
+            s_pMissingTexture = AllocTexture2D();
+#ifdef OGLDEV_VULKAN   // hack due to different local dirs
+            s_pMissingTexture->Load("../../Content/Textures/no_texture.png");            
+#else
+            s_pMissingTexture->Load("../Content/Textures/no_texture.png");
+#endif
+        }
+
+        m_Materials[MaterialIndex].pDiffuse = s_pMissingTexture;
     }
 }
 
@@ -659,12 +723,12 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     Material& material = m_Materials[index];
 
     material.m_name = pMaterial->GetName().C_Str();
-    printf("Loading material %d: '%s'\n", index, material.m_name.c_str());
+
     Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
 
     int ShadingModel = 0;
     if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) == AI_SUCCESS) {
-        printf("Shading model %d\n", ShadingModel);
+      //  printf("Shading model %d\n", ShadingModel);
     }
 
     aiColor4D AmbientColor(0.0f, 0.0f, 0.0f, 0.0f);
