@@ -164,11 +164,19 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 	}
 
 	if (m_movement.Up) { 
-		Acceleration += Up; 
+#ifdef OGLDEV_VULKAN	// Hack due to reversed Y in Vulkan
+		Acceleration -= Up;
+#else
+		Acceleration += Up;
+#endif
 	}
 
 	if (m_movement.Down) { 
-		Acceleration += -Up; 
+#ifdef OGLDEV_VULKAN    // Hack due to reversed Y in Vulkan
+		Acceleration += Up;
+#else
+		Acceleration -= Up;
+#endif
 	}
 
 	if (m_movement.FastSpeed) { 
