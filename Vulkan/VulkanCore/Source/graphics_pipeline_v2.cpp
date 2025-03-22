@@ -310,8 +310,8 @@ void GraphicsPipelineV2::AllocateDescriptorSetsInternal(int NumSubmeshes, std::v
 }
 
 
-void GraphicsPipelineV2::PrepareDescriptorSets(const ModelDesc& ModelDesc,
-											 const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
+											  const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 

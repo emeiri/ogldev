@@ -68,7 +68,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 	int NumSubmeshes = (int)m_Meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
 
-	Pipeline.PrepareDescriptorSets(md, m_descriptorSets);
+	Pipeline.UpdateDescriptorSets(md, m_descriptorSets);
 }
 
 

@@ -44,7 +44,7 @@ public:
 
 	void AllocateDescriptorSets(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
 
-	void PrepareDescriptorSets(const ModelDesc& ModelDesc,
+	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
 							   const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets);
 
 	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
