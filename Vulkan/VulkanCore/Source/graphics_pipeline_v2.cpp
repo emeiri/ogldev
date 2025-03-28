@@ -22,6 +22,7 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_graphics_pipeline_v2.h"
 
+
 enum Binding {
 	BindingVB = 0,
 	BindingIB = 1,
@@ -29,7 +30,6 @@ enum Binding {
 	BindingTexture = 3,
 	BindingCount = 4
 };
-
 
 
 namespace OgldevVK {
@@ -311,13 +311,11 @@ void GraphicsPipelineV2::AllocateDescriptorSetsInternal(int NumSubmeshes, std::v
 
 
 void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
-											  const std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+											  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * BindingCount);
-
-	int WdsIndex = 0;
 
 	std::vector<VkDescriptorBufferInfo> BufferInfo_VBs(NumSubmeshes);
 	std::vector<VkDescriptorBufferInfo> BufferInfo_IBs(NumSubmeshes);
@@ -336,8 +334,9 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		ImageInfo[SubmeshIndex].sampler = ModelDesc.m_materials[SubmeshIndex].m_sampler;
 		ImageInfo[SubmeshIndex].imageView = ModelDesc.m_materials[SubmeshIndex].m_imageView;
 		ImageInfo[SubmeshIndex].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
 	}
+
+	int WdsIndex = 0;
 
 	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
 		

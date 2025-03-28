@@ -341,8 +341,7 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
         if (paiMesh->mNormals) {
             const aiVector3D& pNormal = paiMesh->mNormals[i];
             v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
-        }
-        else {
+        } else {
             aiVector3D Normal(0.0f, 1.0f, 0.0f);
             v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
         }

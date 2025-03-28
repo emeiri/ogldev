@@ -47,7 +47,7 @@ Texture* VkModel::AllocTexture2D()
 }
 
 
-void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
+void VkModel::PopulateBuffers(std::vector<Vertex>& Vertices)
 {
 	m_vb = m_pVulkanCore->CreateVertexBuffer(Vertices.data(), ARRAY_SIZE_IN_BYTES(Vertices));
 
@@ -61,18 +61,18 @@ void VkModel::PopulateBuffers(vector<Vertex>& Vertices)
 
 void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
-	ModelDesc md;
-
-	CreateModelDescriptor(md);
-
 	int NumSubmeshes = (int)m_Meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
+
+	ModelDesc md;
+
+	UpdateModelDesc(md);
 
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets);
 }
 
 
-void VkModel::CreateModelDescriptor(ModelDesc& md)
+void VkModel::UpdateModelDesc(ModelDesc& md)
 {
 	md.m_vb = m_vb.m_buffer;
 	md.m_ib = m_ib.m_buffer;
@@ -123,14 +123,16 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pi
 	u32 BaseVertex = 0;
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, Pipeline.GetPipelineLayout(),
-			0,  // firstSet
-			1,  // descriptorSetCount
-			&m_descriptorSets[ImageIndex][SubmeshIndex],
-			0,	// dynamicOffsetCount
-			NULL);	// pDynamicOffsets
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, 
+								Pipeline.GetPipelineLayout(),
+								0,  // firstSet
+								1,  // descriptorSetCount
+								&m_descriptorSets[ImageIndex][SubmeshIndex],
+								0,	// dynamicOffsetCount
+								NULL);	// pDynamicOffsets
 
-		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, InstanceCount, BaseVertex, FirstInstance);
+		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, 
+			      InstanceCount, BaseVertex, FirstInstance);
 	}
 }
 

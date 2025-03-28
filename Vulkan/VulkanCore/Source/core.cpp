@@ -629,7 +629,7 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 
 	// Step 3: get the memory type index
 	u32 MemoryTypeIndex = GetMemoryTypeIndex(MemReqs.memoryTypeBits, Properties);
-	printf("Memory type index %d\n", MemoryTypeIndex);
+	//printf("Memory type index %d\n", MemoryTypeIndex);
 
 	// Step 4: allocate memory
 	VkMemoryAllocateInfo MemAllocInfo = {

@@ -98,8 +98,7 @@ void GLModel::PopulateBuffersInternal(std::vector<VertexType>& Vertices)
             printf("Programmable vertex pulling but OpenGL version is less than 4.5\n");
             exit(1);
         }
-    }
-    else {
+    } else {
         if (IsGLVersionHigher(4, 5)) {
             PopulateBuffersDSA(Vertices);
         }
@@ -292,10 +291,10 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
     }
 
     glDrawElementsBaseVertex(GL_TRIANGLES,
-        m_Meshes[MeshIndex].NumIndices,
-        GL_UNSIGNED_INT,
-        (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
-        m_Meshes[MeshIndex].BaseVertex);
+                        m_Meshes[MeshIndex].NumIndices,
+                        GL_UNSIGNED_INT,
+                        (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
+                        m_Meshes[MeshIndex].BaseVertex);
 }
 
 

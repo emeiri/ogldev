@@ -21,8 +21,8 @@
 
 struct VertexData
 {
-	float pos_x, pos_y, pos_z;
-	float u, v;
+    float pos_x, pos_y, pos_z;
+    float u, v;
     float normal_x, normal_y, normal_z;
     float tangent_x, tangent_y, tangent_z;
     float bitangent_x, bitangent_y, bitangent_z;
@@ -40,11 +40,11 @@ void main()
 {
     int Index = in_Indices.i[gl_VertexIndex];
 
-	VertexData vtx = in_Vertices.v[Index];
+    VertexData vtx = in_Vertices.v[Index];
 
     vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
 
-	gl_Position = ubo.WVP * vec4(pos, 1.0);
+    gl_Position = ubo.WVP * vec4(pos, 1.0);
     
     texCoord = vec2(vtx.u, vtx.v);
 }

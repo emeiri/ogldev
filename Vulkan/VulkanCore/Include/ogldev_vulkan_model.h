@@ -67,15 +67,15 @@ protected:
 	virtual void PopulateBuffers(vector<Vertex>& Vertices);
 
 private:
-	void CreateModelDescriptor(ModelDesc& md);
+	void UpdateModelDesc(ModelDesc& md);
 
 	VulkanCore* m_pVulkanCore = NULL;
 
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
+	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
-	size_t m_vertexSize = 0;
+	size_t m_vertexSize = 0;	// sizeof(Vertex) OR sizeof(SkinnedVertex)
 };
 
 }

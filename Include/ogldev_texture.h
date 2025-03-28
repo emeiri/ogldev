@@ -44,9 +44,9 @@ public:
     // Should be called once to load the texture
     bool Load();
 
-    void Load(unsigned int BufferSize, void* pImageData);
-
     void Load(const std::string& Filename);
+
+    void Load(unsigned int BufferSize, void* pImageData);
 
     void LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData);
 
