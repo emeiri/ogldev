@@ -84,6 +84,12 @@ public:
 
     const Material* GetMaterialForMesh(int MeshIndex) const;
 
+    virtual void SetColorTexture(int TextureHandle) { assert(0); }
+
+    virtual void SetNormalMap(int TextureHandle) { assert(0); }
+
+    virtual void SetHeightMap(int TextureHandle) { assert(0); }
+
 protected:
 
     virtual void AllocBuffers() = 0;

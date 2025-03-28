@@ -42,14 +42,6 @@ public:
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
-	virtual void SetColorTexture(int TextureHandle) { assert(0); }
-
-	virtual void SetNormalMap(int TextureHandle) { assert(0); }
-
-	virtual void SetHeightMap(int TextureHandle) { assert(0); }
-
-	virtual void SetTextureScale(float Scale) { assert(0); }
-
 	const BufferAndMemory* GetVB() const { return &m_vb; }
 
 	const BufferAndMemory* GetIB() const { return &m_ib; }
