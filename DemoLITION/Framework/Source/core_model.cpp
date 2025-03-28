@@ -338,6 +338,13 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
         // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
         v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
 
+        m_minPos.x = std::min(m_minPos.x, v.Position.x);
+        m_minPos.y = std::min(m_minPos.y, v.Position.y);
+        m_minPos.z = std::min(m_minPos.z, v.Position.z);
+        m_maxPos.x = std::max(m_maxPos.x, v.Position.x);
+        m_maxPos.y = std::max(m_maxPos.y, v.Position.y);
+        m_maxPos.z = std::max(m_maxPos.z, v.Position.z);
+
         if (paiMesh->mNormals) {
             const aiVector3D& pNormal = paiMesh->mNormals[i];
             v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
