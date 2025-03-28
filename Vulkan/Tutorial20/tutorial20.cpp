@@ -39,8 +39,8 @@
 #include "ogldev_vulkan_model.h"
 #include "ogldev_glm_camera.h"
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
@@ -108,6 +108,10 @@ public:
 			glfwTerminate();
 			exit(0);
 
+		case GLFW_KEY_C:
+			m_pGameCamera->Print();
+			break;
+
 		default:
 			Handled = false;
 		}
@@ -153,7 +157,7 @@ private:
 	{
 		float FOV = 45.0f;
 		float zNear = 0.1f;
-		float zFar = 1000.0f;
+		float zFar = 2500.0f;
 
 		DefaultCreateCameraPers(FOV, zNear, zFar);
 	}
@@ -197,9 +201,9 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 		//m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-		//m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
-		m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
-
+		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
+	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
 
