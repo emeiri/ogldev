@@ -39,7 +39,7 @@ class GLMCameraFirstPerson : public CameraAPI {
 public:
 
 	CameraMovement m_movement;
-	float m_acceleration = 150.0f;
+	float m_acceleration = 40.0f;
 	float m_damping = 5.0f;
 	float m_maxSpeed = 10.0f;
 	float m_fastCoef = 10.0f;
