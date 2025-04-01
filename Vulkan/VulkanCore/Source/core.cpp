@@ -568,7 +568,7 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 		                       StagingVB.m_allocationSize, Flags, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory\n");
 
-	// Step 3: copy the vertices to the stating buffer
+	// Step 3: copy the vertices to the staging buffer
 	memcpy(pMem, pVertices, Size);
 
 	// Step 4: unmap/release the mapped memory
