@@ -48,11 +48,31 @@ void BaseGLApp::InitGUI()
 
 
 
+void BaseGLApp::OnFrame(long long DeltaTimeMillis)
+{
+    OnFrameChild(DeltaTimeMillis);
+}
+
+
+void BaseGLApp::OnFrameEnd()
+{
+    if (m_showGui) {
+        OnFrameGUI();
+    }
+}
+
+
 bool BaseGLApp::OnKeyboard(int key, int action) 
 { 
     bool HandledByMe = true;
 
     switch (key) {
+    case GLFW_KEY_SPACE:
+        if (action == GLFW_PRESS) {
+            m_showGui = !m_showGui;
+        }
+        break;
+
     case GLFW_KEY_Z:
         if (action == GLFW_PRESS) {
             m_isWireframe = !m_isWireframe;
@@ -116,4 +136,45 @@ bool BaseGLApp::OnMouseButton(int Button, int Action, int Mode, int x, int y)
     }
 
     return HandledByMe;
+}
+
+
+void BaseGLApp::OnFrameGUI()
+{
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    Scene* pScene = m_pRenderingSystem->GetScene();
+
+    bool my_tool_active = false;
+
+    ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);  // Create a window called "Hello, world!" and append into it.
+
+   // GUIMenu();
+
+   // GUICamera(pScene);
+
+   // GUIScene(pScene);
+
+    // ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
+    // ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
+
+    // ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
+    //  ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
+    //   ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
+    //  ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
+
+    // Rendering
+    ImGui::Render();
+    //   int display_w, display_h;
+//    glfwGetFramebufferSize(window, &display_w, &display_h);
+//    glViewport(0, 0, display_w, display_h);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

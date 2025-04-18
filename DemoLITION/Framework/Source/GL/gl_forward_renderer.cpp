@@ -251,6 +251,8 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
 
+    pGameCallbacks->OnFrameEnd();
+
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
 

@@ -32,7 +32,9 @@ public:
 
     ~BaseGLApp() {}
 
-   // virtual void OnFrame();
+    virtual void OnFrame(long long DeltaTimeMillis);
+
+    virtual void OnFrameEnd();
 
     virtual bool OnKeyboard(int key, int action);
 
@@ -41,12 +43,17 @@ public:
     virtual bool OnMouseButton(int Button, int Action, int Mode, int x, int y);
 
 protected:
+
+    virtual void OnFrameChild(long long DeltaTimeMillis) {};
+
     RenderingSystem* m_pRenderingSystem = NULL;
     GLFWwindow* m_pWindow = NULL;
 
 private:
     void InitGUI();
+    void OnFrameGUI();
     
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;
+    bool m_showGui = false;
 };

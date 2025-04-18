@@ -74,7 +74,7 @@ public:
     }
 
 
-    void OnFrame(long long DeltaTimeMillis)
+    void OnFrameChild(long long DeltaTimeMillis)
     {        
         //  if (m_pScene->GetDirLights().size() > 0) {
         //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
@@ -109,12 +109,6 @@ public:
         bool HandledByMe = false;
 
         switch (key) {
-        case GLFW_KEY_SPACE:
-            if (action == GLFW_PRESS) {
-                m_showGui = !m_showGui;
-            }
-            HandledByMe = true;
-            break;
 
         default:
             HandledByMe = BaseGLApp::OnKeyboard(key, action);
@@ -159,8 +153,7 @@ private:
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
     SceneObject* m_pickedObject = NULL;
-    SceneObject* m_pSceneObject = NULL;
-    bool m_showGui = false;
+    SceneObject* m_pSceneObject = NULL;    
     int m_enableShadowMapping = 1;
 };
 

@@ -31,6 +31,8 @@ class GameCallbacks
 
     virtual void OnFrame(long long DeltaTimeMillis) {}
 
+    virtual void OnFrameEnd() {}
+
     virtual bool OnKeyboard(int key, int action) 
     { 
         return false;

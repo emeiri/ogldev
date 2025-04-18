@@ -168,11 +168,6 @@ public:
     {
         OnFrameChild(DeltaTimeMillis);
 
-        if (m_showGui) {
-            OnFrameGUI();
-            ApplyGUIConfig();
-        }
-
       //  if (m_pScene->GetDirLights().size() > 0) {
       //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
       //  }
@@ -199,6 +194,15 @@ public:
 
      //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
       //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
+    }
+
+
+    void OnFrameEnd()
+    {
+        if (m_showGui) {
+            OnFrameGUI();
+            ApplyGUIConfig();
+        }
     }
 
 
