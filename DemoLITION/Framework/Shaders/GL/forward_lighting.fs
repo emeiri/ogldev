@@ -629,10 +629,8 @@ vec3 GetNormal()
 }
 
 
-vec4 GetTotalLight()
-{   
-    vec3 Normal = GetNormal(); 
-       
+vec4 GetTotalLight(vec3 Normal)
+{        
     vec4 TotalLight = CalcDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {
@@ -647,12 +645,12 @@ vec4 GetTotalLight()
 }
 
 
-vec4 CalcPhongLighting()
+vec4 CalcPhongLighting(vec3 Normal)
 {
     vec4 TotalLight;
     
     if (gLightingEnabled) {
-        TotalLight = GetTotalLight();
+        TotalLight = GetTotalLight(Normal);
       //  FragColor = TotalLight;
       //  return;
     } else {
@@ -835,10 +833,8 @@ vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
 }
 
 
-vec4 CalcTotalPBRLighting()
+vec4 CalcTotalPBRLighting(vec3 Normal)
 {
-    vec3 Normal = GetNormal(); 
-
     vec3 TotalLight = CalcPBRDirectionalLight(Normal);
 
     for (int i = 0 ;i < gNumPointLights ;i++) {
@@ -858,16 +854,16 @@ vec4 CalcTotalPBRLighting()
 void main()
 {
     TexCoord = TexCoord0;
-    //vec3 Normal = GetNormal();
+    vec3 Normal = GetNormal();
     //FragColor = vec4(GetNormal(), 0.0);
     //FragColor = vec4(TexCoord, 0.0, 0.0);
     //return;
     
     if (gIsPBR) {
-        FragColor = CalcTotalPBRLighting();
+        FragColor = CalcTotalPBRLighting(Normal);
       //  FragColor = texture(gRoughness, TexCoord0.xy);
     } else {
-        FragColor = CalcPhongLighting();
+        FragColor = CalcPhongLighting(Normal);
     }
 
     vec4 TempColor = vec4(0.0);
