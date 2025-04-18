@@ -60,9 +60,9 @@ public:
 
         m_pScene->SetCamera(Vector3f(0.0f, 2.0f, -4.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/crystal_ball/scene.gltf");
-        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/dragon.obj");
+       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
+       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
       //  m_pSceneObject->SetScale(Vector3f(0.1f));
      //   m_pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
@@ -95,9 +95,10 @@ public:
             }
         }
 
-        m_pSceneObject->ResetRotations();
-        m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
-        m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
+        m_pSceneObject->RotateBy(0.0f, 0.1f, 0.0f);
+        //m_pSceneObject->ResetRotations();
+      //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
+     //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
 
          //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
           //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);

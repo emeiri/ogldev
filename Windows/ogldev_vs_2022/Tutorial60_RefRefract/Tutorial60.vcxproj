@@ -38,6 +38,10 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
