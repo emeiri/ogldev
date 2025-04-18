@@ -158,13 +158,11 @@ void BaseGLApp::OnFrameGUI()
 
    // GUIScene(pScene);
 
-    // ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
-    // ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
+    float ReflectionFactor = pScene->GetConfig()->GetReflectionFactor();
 
-    // ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
-    //  ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
-    //   ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
-    //  ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
+    ImGui::SliderFloat("Reflection Factor", &ReflectionFactor, 0.0f, 1.0f);
+
+    pScene->GetConfig()->SetReflectionFactor(ReflectionFactor);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();

@@ -97,12 +97,19 @@ public:
 
     InfiniteGridConfig& GetInfiniteGrid() { return m_infiniteGridConfig;  }
 
+    void SetReflectionFactor(float f)
+    {
+        m_reflectionFactor = std::min(1.0f, std::max(m_reflectionFactor, 0.0f));
+    }
+
+    float GetReflectionFactor() const { return m_reflectionFactor; }
 private:
 
     bool m_shadowMappingEnabled = true;
     bool m_pickingEnabled = false;
     bool m_skyboxEnabled = false;
     InfiniteGridConfig m_infiniteGridConfig;
+    float m_reflectionFactor = 0.1f;
 };
 
 

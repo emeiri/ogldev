@@ -86,6 +86,9 @@ public:
     void SetLightVP(const Matrix4f& LightVP);
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
+    void ControlRefRefract(bool Enable);
+    void SetReflectionFactor(float f);
+    void SetMaterialToRefRefractFactor(float f);
 
 protected:
 
@@ -143,6 +146,9 @@ private:
     GLuint AOLoc = INVALID_UNIFORM_LOCATION;
     GLuint EmissiveLoc = INVALID_UNIFORM_LOCATION;
     GLuint SkyboxLoc = INVALID_UNIFORM_LOCATION;
+    GLuint RefRefractEnabledLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ReflectionFactorLoc = INVALID_UNIFORM_LOCATION;
+    GLuint MaterialToRefRefractFactorLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;

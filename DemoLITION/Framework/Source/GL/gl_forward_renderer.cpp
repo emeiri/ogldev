@@ -262,6 +262,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 {
     m_pCurLightingTech->ControlShadows(pScene->GetConfig()->IsShadowMappingEnabled());
+    m_pCurLightingTech->SetReflectionFactor(pScene->GetConfig()->GetReflectionFactor());
 }
 
 

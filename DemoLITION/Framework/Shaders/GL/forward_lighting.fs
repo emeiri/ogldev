@@ -144,6 +144,9 @@ uniform PBRMaterial gPBRmaterial;
 uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
+uniform bool gRefRefractEnabled = true;
+uniform float gReflectionFactor = 1.0;
+uniform float gMaterialToRefrefractFactor = 0.5;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -645,6 +648,35 @@ vec4 GetTotalLight(vec3 Normal)
 }
 
 
+vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
+{
+    vec3 CameraToPixel = normalize(WorldPos0 - gCameraWorldPos);
+
+    vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal));
+
+    float eta = 0.94;
+    vec3 RefractionDir = normalize(refract(CameraToPixel, Normal, eta));
+
+    //const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
+    //const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-CameraToPixel, Normal)), 5.0);    
+
+    vec3 ColorReflect = texture(gCubemapTexture, ReflectionDir).rgb;
+    vec3 ColorRefract = texture(gCubemapTexture, RefractionDir).rgb;
+
+    // Gamma correct
+    //cubeMapColor = pow(cubeMapColor, vec3(1.0/2.2));
+
+    vec4 ColorRefractReflect = vec4(mix(ColorRefract, ColorReflect, gReflectionFactor), 1.0);
+  
+  //FinalColor = vec4(ColorReflect, 1.0);
+  //FinalColor = vec4(ColorRefract, 1.0);
+    //  FinalColor = ColorRefractReflect;
+    FinalColor = mix(ColorRefractReflect, FinalColor, gMaterialToRefrefractFactor);
+
+    return FinalColor;
+}
+
+
 vec4 CalcPhongLighting(vec3 Normal)
 {
     vec4 TotalLight;
@@ -667,34 +699,12 @@ vec4 CalcPhongLighting(vec3 Normal)
         TexColor = vec4(1.0);
     }
 
-    vec3 CameraToPixel = normalize(WorldPos0 - gCameraWorldPos);
-    //vec3 CameraToPixel = normalize(gCameraWorldPos - WorldPos0);
-
-    vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal));
-
-    float eta = 0.94;
-    vec3 RefractionDir = normalize(refract(CameraToPixel, Normal, eta));
-
-    //const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
-    //const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-CameraToPixel, Normal)), 5.0);
-
     vec4 FinalColor = TexColor * TotalLight;
 
-    vec3 ColorReflect = texture(gCubemapTexture, ReflectionDir).rgb;
-    vec3 ColorRefract = texture(gCubemapTexture, RefractionDir).rgb;
+    if (gRefRefractEnabled) {
+        FinalColor = ApplyRefRefract(FinalColor, Normal);
+    }  
 
-    // Gamma correct
-    //cubeMapColor = pow(cubeMapColor, vec3(1.0/2.2));
-    float ReflectFactor = 0.1;
-    // FinalColor = vec4( mix( FinalColor.rgb, cubeMapColor, ReflectFactor), FinalColor.a);
-
-    vec4 ColorRefractReflect = vec4(mix(ColorRefract, ColorReflect, ReflectFactor), 1.0);
-  
-  //FinalColor = vec4(ColorReflect, 1.0);
-  //FinalColor = vec4(ColorRefract, 1.0);
-    //  FinalColor = ColorRefractReflect;
-    FinalColor = mix(ColorRefractReflect, FinalColor, 0.5);
-  
     return FinalColor;
 }
 
