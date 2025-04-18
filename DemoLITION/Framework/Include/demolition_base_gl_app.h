@@ -57,4 +57,7 @@ private:
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
     bool m_showGui = false;
+    int m_isRefRefractEnabled = false;
+    float m_reflectionFactor = 0.1f;
+    float m_matRefRefractFactor = 0.5f;
 };

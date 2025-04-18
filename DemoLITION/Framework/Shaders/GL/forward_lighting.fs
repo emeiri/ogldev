@@ -146,7 +146,7 @@ uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
 uniform bool gRefRefractEnabled = true;
 uniform float gReflectionFactor = 1.0;
-uniform float gMaterialToRefrefractFactor = 0.5;
+uniform float gMatToRefRefractFactor = 0.5;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -671,7 +671,7 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
   //FinalColor = vec4(ColorReflect, 1.0);
   //FinalColor = vec4(ColorRefract, 1.0);
     //  FinalColor = ColorRefractReflect;
-    FinalColor = mix(ColorRefractReflect, FinalColor, gMaterialToRefrefractFactor);
+    FinalColor = mix(ColorRefractReflect, FinalColor, gMatToRefRefractFactor);
 
     return FinalColor;
 }

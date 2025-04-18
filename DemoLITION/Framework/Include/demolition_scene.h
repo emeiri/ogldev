@@ -97,19 +97,27 @@ public:
 
     InfiniteGridConfig& GetInfiniteGrid() { return m_infiniteGridConfig;  }
 
-    void SetReflectionFactor(float f)
-    {
-        m_reflectionFactor = std::min(1.0f, std::max(m_reflectionFactor, 0.0f));
-    }
+    void ControlRefRefract(bool Enable) { m_refRefractEnabled = Enable; }
+
+    bool IsRefRefractEnabled() const { return m_refRefractEnabled; }
+
+    void SetReflectionFactor(float f) { m_reflectionFactor = std::min(1.0f, std::max(f, 0.0f)); }
 
     float GetReflectionFactor() const { return m_reflectionFactor; }
+
+    void SetMatRefRefractFactor(float f) { m_matRefRefractFactor = std::min(1.0f, std::max(f, 0.0f)); }
+
+    float GetMatRefRefractFactor() const { return m_matRefRefractFactor; }
+
 private:
 
     bool m_shadowMappingEnabled = true;
     bool m_pickingEnabled = false;
     bool m_skyboxEnabled = false;
     InfiniteGridConfig m_infiniteGridConfig;
+    bool m_refRefractEnabled = false;
     float m_reflectionFactor = 0.1f;
+    float m_matRefRefractFactor = 0.5f;
 };
 
 

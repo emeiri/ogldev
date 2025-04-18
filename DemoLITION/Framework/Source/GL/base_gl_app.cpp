@@ -168,11 +168,14 @@ void BaseGLApp::OnFrameGUI()
 
    // GUIScene(pScene);
 
-    float ReflectionFactor = pScene->GetConfig()->GetReflectionFactor();
+    ImGui::CheckboxFlags("Enable Reflection/Refraction", &m_isRefRefractEnabled, 1);
+    pScene->GetConfig()->ControlRefRefract(m_isRefRefractEnabled);
 
-    ImGui::SliderFloat("Reflection Factor", &ReflectionFactor, 0.0f, 1.0f);
+    ImGui::SliderFloat("Reflection Factor", &m_reflectionFactor, 0.0f, 1.0f);
+    pScene->GetConfig()->SetReflectionFactor(m_reflectionFactor);
 
-    pScene->GetConfig()->SetReflectionFactor(ReflectionFactor);
+    ImGui::SliderFloat("Material/RefRefract Factor", &m_matRefRefractFactor, 0.0f, 1.0f);
+    pScene->GetConfig()->SetMatRefRefractFactor(m_matRefRefractFactor);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();

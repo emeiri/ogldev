@@ -16,9 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "GL/gl_forward_lighting.h"
-
 #define FAIL_ON_MISSING_LOC
+
+
+#include "GL/gl_forward_lighting.h"
 
 ForwardLightingTechnique::ForwardLightingTechnique()
 {
@@ -107,9 +108,9 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(SkyboxLoc, "gCubemapTexture");
    // GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
    // GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
-    GET_UNIFORM_AND_CHECK(RefRefractEnabledLoc, "gRefRefractEnabledLoc");
-    GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactorLoc");
-    GET_UNIFORM_AND_CHECK(MaterialToRefRefractFactorLoc, "gMaterialToRefRefractFactorLoc");
+    GET_UNIFORM_AND_CHECK(RefRefractEnabledLoc, "gRefRefractEnabled");
+    GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
+    GET_UNIFORM_AND_CHECK(MaterialToRefRefractFactorLoc, "gMatToRefRefractFactor");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -618,16 +619,20 @@ void ForwardLightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
 
 void ForwardLightingTechnique::ControlRefRefract(bool Enable)
 {
+    glUniform1i(RefRefractEnabledLoc, Enable);
 }
 
 
 void ForwardLightingTechnique::SetReflectionFactor(float f)
 {
+    glUniform1f(ReflectionFactorLoc, f);
 }
 
 
 void ForwardLightingTechnique::SetMaterialToRefRefractFactor(float f)
 {
+    //printf("%f\n", f);
+    glUniform1f(MaterialToRefRefractFactorLoc, f);
 }
 
 

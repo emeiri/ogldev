@@ -261,8 +261,12 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
 void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 {
-    m_pCurLightingTech->ControlShadows(pScene->GetConfig()->IsShadowMappingEnabled());
-    m_pCurLightingTech->SetReflectionFactor(pScene->GetConfig()->GetReflectionFactor());
+    SceneConfig* pConfig = pScene->GetConfig();
+
+    m_pCurLightingTech->ControlShadows(pConfig->IsShadowMappingEnabled());
+    m_pCurLightingTech->ControlRefRefract(pConfig->IsRefRefractEnabled());
+    m_pCurLightingTech->SetReflectionFactor(pConfig->GetReflectionFactor());
+    m_pCurLightingTech->SetMaterialToRefRefractFactor(pConfig->GetMatRefRefractFactor());
 }
 
 
