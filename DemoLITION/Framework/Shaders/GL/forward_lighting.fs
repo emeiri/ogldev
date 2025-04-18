@@ -667,32 +667,34 @@ vec4 CalcPhongLighting(vec3 Normal)
         TexColor = vec4(1.0);
     }
 
-    vec3 worldNorm = GetNormal();
-    vec3 worldView = normalize(gCameraWorldPos - WorldPos0);
+    vec3 CameraToPixel = normalize(WorldPos0 - gCameraWorldPos);
+    //vec3 CameraToPixel = normalize(gCameraWorldPos - WorldPos0);
 
-    vec3 reflection = -normalize(reflect(worldView, worldNorm));
+    vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal));
 
-    float eta = 1.00; // ice
-	vec3 refraction = -normalize(refract(worldView, worldNorm, eta));
+    float eta = 0.94;
+    vec3 RefractionDir = normalize(refract(CameraToPixel, Normal, eta));
 
-	const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
-	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-worldView, worldNorm)), 5.0);
-
+    //const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
+    //const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-CameraToPixel, Normal)), 5.0);
 
     vec4 FinalColor = TexColor * TotalLight;
 
-    vec3 colorRefl = texture(gCubemapTexture, reflection).rgb;
-    vec3 colorRefr = texture(gCubemapTexture, refraction).rgb;
+    vec3 ColorReflect = texture(gCubemapTexture, ReflectionDir).rgb;
+    vec3 ColorRefract = texture(gCubemapTexture, RefractionDir).rgb;
+
     // Gamma correct
     //cubeMapColor = pow(cubeMapColor, vec3(1.0/2.2));
     float ReflectFactor = 0.1;
-   // FinalColor = vec4( mix( FinalColor.rgb, cubeMapColor, ReflectFactor), FinalColor.a);
+    // FinalColor = vec4( mix( FinalColor.rgb, cubeMapColor, ReflectFactor), FinalColor.a);
 
-   vec4 ColorReflRefr = vec4(mix(colorRefl, colorRefr, Rtheta), 1.0);
-
-   FinalColor = mix(FinalColor, ColorReflRefr, ReflectFactor);
-
-   // return vec4(cubeMapColor, 1.0);
+    vec4 ColorRefractReflect = vec4(mix(ColorRefract, ColorReflect, ReflectFactor), 1.0);
+  
+  //FinalColor = vec4(ColorReflect, 1.0);
+  //FinalColor = vec4(ColorRefract, 1.0);
+    //  FinalColor = ColorRefractReflect;
+    FinalColor = mix(ColorRefractReflect, FinalColor, 0.5);
+  
     return FinalColor;
 }
 
