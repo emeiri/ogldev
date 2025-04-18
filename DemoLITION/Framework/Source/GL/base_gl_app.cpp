@@ -128,11 +128,21 @@ bool BaseGLApp::OnMouseMove(int x, int y)
 
 bool BaseGLApp::OnMouseButton(int Button, int Action, int Mode, int x, int y)
 {
-    bool HandledByMe = false;
+    bool HandledByMe = true;
 
-    if (Button == GLFW_MOUSE_BUTTON_LEFT) {
+    switch (Button) {
+    case GLFW_MOUSE_BUTTON_LEFT:
         m_leftMousePressed = (Action == GLFW_PRESS);
-        HandledByMe = true;
+        HandledByMe = m_leftMousePressed && m_showGui;
+        break;
+
+    case GLFW_MOUSE_BUTTON_MIDDLE:
+        m_midMousePressed = (Action == GLFW_PRESS);
+       // m_pScene->GetConfig()->ControlPicking(m_midMousePressed);
+        break;
+
+    default:
+        HandledByMe = false;
     }
 
     return HandledByMe;

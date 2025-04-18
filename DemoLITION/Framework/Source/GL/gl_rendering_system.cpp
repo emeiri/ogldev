@@ -262,12 +262,6 @@ void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* pWindow, double x, doubl
     glfwGetWindowSize(m_pWindow, &WindowWidth, &WindowHeight);
 
     m_pCamera->SetMousePos((float)x, (float)y);
-
- /*   if (HandledByGame) {
-        m_pCamera->UpdateMousePosSilent((int)x, (int)y);
-    } else {
-        m_pCamera->OnMouse((int)x, (int)y);
-    }*/
 }
 
 
@@ -275,9 +269,11 @@ void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* pWindow, int Button, i
 {
     int MousePosX = 0, MousePosY = 0;
     GetMousePos(pWindow, MousePosX, MousePosY);
-    m_pGameCallbacks->OnMouseButton(Button, Action, Mode, MousePosX, MousePosY);
+    bool HandledByGame = m_pGameCallbacks->OnMouseButton(Button, Action, Mode, MousePosX, MousePosY);
 
-    m_pCamera->HandleMouseButton(Button, Action, Mode);
+    if (!HandledByGame) {
+        m_pCamera->HandleMouseButton(Button, Action, Mode);
+    }    
 }
 
 

@@ -55,5 +55,6 @@ private:
     
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;
+    bool m_midMousePressed = false;
     bool m_showGui = false;
 };

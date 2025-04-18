@@ -104,55 +104,11 @@ public:
           //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
     }
 
-
-    bool OnKeyboard(int key, int action)
-    {
-        bool HandledByMe = false;
-
-        switch (key) {
-
-        default:
-            HandledByMe = BaseGLApp::OnKeyboard(key, action);
-        }
-
-        return HandledByMe;
-    }
-
-
-    bool OnMouseMove(int x, int y)
-    {
-        return !m_leftMousePressed;
-    }
-
-
-    bool OnMouseButton(int Button, int Action, int Mode, int x, int y)
-    {
-        bool HandledByMe = true;
-
-        switch (Button) {
-        case GLFW_MOUSE_BUTTON_LEFT:
-            m_leftMousePressed = (Action == GLFW_PRESS);
-            break;
-
-        case GLFW_MOUSE_BUTTON_MIDDLE:
-            m_midMousePressed = (Action == GLFW_PRESS);
-            m_pScene->GetConfig()->ControlPicking(m_midMousePressed);
-            break;
-
-        default:
-            HandledByMe = false;
-        }
-
-        return HandledByMe;
-    }
-
 private:
 
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLight;
-    bool m_leftMousePressed = false;
-    bool m_midMousePressed = false;
     SceneObject* m_pickedObject = NULL;
     SceneObject* m_pSceneObject = NULL;    
     int m_enableShadowMapping = 1;
