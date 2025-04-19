@@ -60,4 +60,5 @@ private:
     int m_isRefRefractEnabled = false;
     float m_reflectionFactor = 0.1f;
     float m_matRefRefractFactor = 0.5f;
+    float m_indexOfRefraction = 1.0f;
 };

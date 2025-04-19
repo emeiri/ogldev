@@ -60,7 +60,7 @@ public:
 
         m_pScene->SetCamera(Vector3f(0.0f, 2.0f, -4.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/dragon.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
