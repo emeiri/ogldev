@@ -109,9 +109,10 @@ bool ForwardLightingTechnique::InitCommon()
    // GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
    // GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
     GET_UNIFORM_AND_CHECK(RefRefractEnabledLoc, "gRefRefractEnabled");
-    GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
+  //  GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
     GET_UNIFORM_AND_CHECK(MaterialToRefRefractFactorLoc, "gMatToRefRefractFactor");
     GET_UNIFORM_AND_CHECK(ETALoc, "gETA");
+    GET_UNIFORM_AND_CHECK(FresnelPowerLoc, "gFresnelPower");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -636,9 +637,16 @@ void ForwardLightingTechnique::SetMaterialToRefRefractFactor(float f)
     glUniform1f(MaterialToRefRefractFactorLoc, f);
 }
 
+
 void ForwardLightingTechnique::SetRefractETA(float eta)
 {
     glUniform1f(ETALoc, eta);
+}
+
+
+void ForwardLightingTechnique::SetFresnelPower(float f)
+{
+    glUniform1f(FresnelPowerLoc, f);
 }
 
 

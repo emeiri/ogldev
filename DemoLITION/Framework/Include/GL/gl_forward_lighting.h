@@ -90,6 +90,7 @@ public:
     void SetReflectionFactor(float f);
     void SetMaterialToRefRefractFactor(float f);
     void SetRefractETA(float f);
+    void SetFresnelPower(float f);
 
 protected:
 
@@ -151,6 +152,7 @@ private:
     GLuint ReflectionFactorLoc = INVALID_UNIFORM_LOCATION;
     GLuint MaterialToRefRefractFactorLoc = INVALID_UNIFORM_LOCATION;
     GLuint ETALoc = INVALID_UNIFORM_LOCATION;
+    GLuint FresnelPowerLoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;

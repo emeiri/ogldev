@@ -268,6 +268,7 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
     m_pCurLightingTech->SetReflectionFactor(pConfig->GetReflectionFactor());
     m_pCurLightingTech->SetMaterialToRefRefractFactor(pConfig->GetMatRefRefractFactor());
     m_pCurLightingTech->SetRefractETA(1.0f / pConfig->GetIndexOfRefraction());
+    m_pCurLightingTech->SetFresnelPower(pConfig->GetFresnelPower());
 }
 
 

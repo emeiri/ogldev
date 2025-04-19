@@ -112,7 +112,11 @@ public:
     void SetIndexOfRefraction(float f) { m_indexOfRefraction = f; }
 
     float GetIndexOfRefraction() const { return m_indexOfRefraction; }
-         
+
+    void SetFresnelPower(float f) { m_fresnelPower = f; }
+
+    float GetFresnelPower() const { return m_fresnelPower; }
+
 private:
 
     bool m_shadowMappingEnabled = true;
@@ -123,6 +127,7 @@ private:
     float m_reflectionFactor = 0.1f;
     float m_matRefRefractFactor = 0.5f;
     float m_indexOfRefraction = 1.0f;
+    float m_fresnelPower = 1.0f;
 };
 
 

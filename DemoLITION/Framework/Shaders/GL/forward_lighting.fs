@@ -148,6 +148,7 @@ uniform bool gRefRefractEnabled = true;
 uniform float gReflectionFactor = 1.0;
 uniform float gMatToRefRefractFactor = 0.5;
 uniform float gETA = 1.0;
+uniform float gFresnelPower = 1.0;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -657,9 +658,15 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
     vec4 ColorReflect = vec4(texture(gCubemapTexture, ReflectionDir).rgb, 1.0);
 
     vec3 RefractionDir = normalize(refract(CameraToPixel, Normal, gETA));    
+
+    float F = ((1.0 - gETA) * (1.0 - gETA)) / 
+              ((1.0 + gETA) * (1.0 + gETA));
+
+    float ReflectRefractRatio = F + (1.0 - F) * pow((1.0 - dot(-CameraToPixel, Normal)), gFresnelPower);
+
     vec4 ColorRefract = vec4(texture(gCubemapTexture, RefractionDir).rgb, 1.0);
 
-    vec4 ColorRefractReflect = mix(ColorRefract, ColorReflect, gReflectionFactor);
+    vec4 ColorRefractReflect = mix(ColorRefract, ColorReflect, ReflectRefractRatio);
 
     FinalColor = mix(FinalColor, ColorRefractReflect, gMatToRefRefractFactor);
 
