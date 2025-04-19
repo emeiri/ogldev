@@ -655,29 +655,9 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
 
     vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal));
 
-    vec3 RefractionDir = normalize(refract(CameraToPixel, Normal, gIndexOfRefraction));
+    vec4 ColorReflect = vec4(texture(gCubemapTexture, ReflectionDir).rgb, 1.0);
 
-    //const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
-    //const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-CameraToPixel, Normal)), 5.0);  
-
-    float F = ((1.0 - gIndexOfRefraction) * (1.0 - gIndexOfRefraction)) / 
-              ((1.0 + gIndexOfRefraction) * (1.0 + gIndexOfRefraction));
-    
-    float FresnelPower = 1.0;
-    float ReflectRefractRatio = F + (1.0 - F) * pow((1.0 - dot(-CameraToPixel, Normal)), FresnelPower);
-
-    vec3 ColorReflect = texture(gCubemapTexture, ReflectionDir).rgb;
-    vec3 ColorRefract = texture(gCubemapTexture, RefractionDir).rgb;
-
-    // Gamma correct
-    //cubeMapColor = pow(cubeMapColor, vec3(1.0/2.2));
-
-    vec4 ColorRefractReflect = vec4(mix(ColorRefract, ColorReflect, ReflectRefractRatio), 1.0);
-  
-  //FinalColor = vec4(ColorReflect, 1.0);
-  //FinalColor = vec4(ColorRefract, 1.0);
-    //  FinalColor = ColorRefractReflect;
-    FinalColor = mix(ColorRefractReflect, FinalColor, gMatToRefRefractFactor);
+    FinalColor = mix(FinalColor, ColorReflect, gReflectionFactor);
 
     return FinalColor;
 }

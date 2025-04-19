@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//#define FAIL_ON_MISSING_LOC
+#define FAIL_ON_MISSING_LOC
 
 
 #include "GL/gl_forward_lighting.h"
@@ -109,9 +109,9 @@ bool ForwardLightingTechnique::InitCommon()
    // GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
    // GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
     GET_UNIFORM_AND_CHECK(RefRefractEnabledLoc, "gRefRefractEnabled");
-    //GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
-    GET_UNIFORM_AND_CHECK(MaterialToRefRefractFactorLoc, "gMatToRefRefractFactor");
-    GET_UNIFORM_AND_CHECK(IndexOfRefractionLoc, "gIndexOfRefraction");
+    GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
+  //  GET_UNIFORM_AND_CHECK(MaterialToRefRefractFactorLoc, "gMatToRefRefractFactor");
+   // GET_UNIFORM_AND_CHECK(IndexOfRefractionLoc, "gIndexOfRefraction");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
