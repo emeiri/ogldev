@@ -89,7 +89,7 @@ public:
     void ControlRefRefract(bool Enable);
     void SetReflectionFactor(float f);
     void SetMaterialToRefRefractFactor(float f);
-    void SetIndexOfRefraction(float f);
+    void SetRefractETA(float f);
 
 protected:
 
@@ -150,7 +150,7 @@ private:
     GLuint RefRefractEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint ReflectionFactorLoc = INVALID_UNIFORM_LOCATION;
     GLuint MaterialToRefRefractFactorLoc = INVALID_UNIFORM_LOCATION;
-    GLuint IndexOfRefractionLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ETALoc = INVALID_UNIFORM_LOCATION;
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;

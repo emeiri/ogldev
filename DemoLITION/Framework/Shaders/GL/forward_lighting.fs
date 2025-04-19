@@ -147,7 +147,7 @@ uniform bool gIsIndirectRender = false;
 uniform bool gRefRefractEnabled = true;
 uniform float gReflectionFactor = 1.0;
 uniform float gMatToRefRefractFactor = 0.5;
-uniform float gIndexOfRefraction = 1.0;
+uniform float gETA = 1.0;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -654,10 +654,14 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
     vec3 CameraToPixel = normalize(WorldPos0 - gCameraWorldPos);
 
     vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal));
-
     vec4 ColorReflect = vec4(texture(gCubemapTexture, ReflectionDir).rgb, 1.0);
 
-    FinalColor = mix(FinalColor, ColorReflect, gReflectionFactor);
+    vec3 RefractionDir = normalize(refract(CameraToPixel, Normal, gETA));    
+    vec4 ColorRefract = vec4(texture(gCubemapTexture, RefractionDir).rgb, 1.0);
+
+    vec4 ColorRefractReflect = mix(ColorRefract, ColorReflect, gReflectionFactor);
+
+    FinalColor = mix(FinalColor, ColorRefractReflect, gMatToRefRefractFactor);
 
     return FinalColor;
 }
