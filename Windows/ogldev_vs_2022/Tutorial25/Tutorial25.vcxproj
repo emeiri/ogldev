@@ -47,7 +47,7 @@
     <ProjectGuid>{3511BE6E-7791-4CCD-97BA-BF18B9A16C6C}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial25</ProjectName>
+    <ProjectName>Tutorial25_SkeletalAnimation2</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
