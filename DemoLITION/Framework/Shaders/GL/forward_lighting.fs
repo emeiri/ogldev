@@ -662,11 +662,11 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
     float F = ((1.0 - gETA) * (1.0 - gETA)) / 
               ((1.0 + gETA) * (1.0 + gETA));
 
-    float ReflectRefractRatio = F + (1.0 - F) * pow((1.0 - dot(-CameraToPixel, Normal)), gFresnelPower);
+    float Ratio = F + (1.0 - F) * pow((1.0 - dot(-CameraToPixel, Normal)), gFresnelPower);
 
     vec4 ColorRefract = vec4(texture(gCubemapTexture, RefractionDir).rgb, 1.0);
 
-    vec4 ColorRefractReflect = mix(ColorRefract, ColorReflect, ReflectRefractRatio);
+    vec4 ColorRefractReflect = mix(ColorRefract, ColorReflect, Ratio);
 
     FinalColor = mix(FinalColor, ColorRefractReflect, gMatToRefRefractFactor);
 
