@@ -45,6 +45,15 @@ public:
 };
 
 
+enum RenderPassType {
+	RenderPassTypeDefault = 0x0,
+	RenderPassTypeFirst = 0x01,
+	RenderPassTypeLast = 0x02,
+	RenderPassTypeOffscreen = 0x04,
+	RenderPassTypeOffscreenInternal = 0x08,
+};
+
+
 class VulkanCore {
 
 public:
@@ -62,6 +71,8 @@ public:
 	void DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers);
 
 	VkDevice& GetDevice() { return m_device; }
+
+	const PhysicalDevice& GetPhysicalDevice() { return m_physDevices.Selected(); }
 
 	int GetNumImages() const { return (int)m_images.size(); }
 
@@ -93,6 +104,12 @@ public:
 
 	const VkPhysicalDeviceLimits& GetPhysicalDeviceLimits() const;
 
+	GLFWwindow* GetWindow() const { return m_pWindow; }
+
+	VkInstance GetInstance() const { return m_instance; }
+
+	void GetFramebufferSize(int& Width, int& Height) const;
+
 private:
 
 	void GetInstanceVersion();
@@ -119,7 +136,6 @@ private:
 	void CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight);
 	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout);
 	void SubmitCopyCommand();
-	void GetFramebufferSize(int& Width, int& Height) const;
 
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
