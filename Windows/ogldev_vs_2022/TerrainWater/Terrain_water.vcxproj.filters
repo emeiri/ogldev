@@ -35,21 +35,21 @@
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\geomip_grid.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\lod_manager.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\midpoint_disp_terrain.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\terrain.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\terrain_technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\terrain_water.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\simple_water.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\simple_water_technique.cpp" />
-    <ClCompile Include="..\..\..\Terrain_water\triangle_list.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skydome_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_gui_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_guitex_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_screen_quad.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\geomip_grid.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\lod_manager.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\midpoint_disp_terrain.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\simple_water.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\simple_water_technique.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\terrain.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\terrain_technique.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\terrain_water.cpp" />
+    <ClCompile Include="..\..\..\TerrainWater\triangle_list.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -79,29 +79,29 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
       <Filter>ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Terrain_water\demo_config.h" />
-    <ClInclude Include="..\..\..\Terrain_water\geomip_grid.h" />
-    <ClInclude Include="..\..\..\Terrain_water\lod_manager.h" />
-    <ClInclude Include="..\..\..\Terrain_water\midpoint_disp_terrain.h" />
-    <ClInclude Include="..\..\..\Terrain_water\terrain.h" />
-    <ClInclude Include="..\..\..\Terrain_water\terrain_technique.h" />
-    <ClInclude Include="..\..\..\Terrain_water\texture_config.h" />
-    <ClInclude Include="..\..\..\Terrain_water\simple_water.h" />
-    <ClInclude Include="..\..\..\Terrain_water\simple_water_technique.h" />
-    <ClInclude Include="..\..\..\Terrain_water\triangle_list.h" />
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
+    <ClInclude Include="..\..\..\TerrainWater\demo_config.h" />
+    <ClInclude Include="..\..\..\TerrainWater\geomip_grid.h" />
+    <ClInclude Include="..\..\..\TerrainWater\lod_manager.h" />
+    <ClInclude Include="..\..\..\TerrainWater\midpoint_disp_terrain.h" />
+    <ClInclude Include="..\..\..\TerrainWater\simple_water.h" />
+    <ClInclude Include="..\..\..\TerrainWater\simple_water_technique.h" />
+    <ClInclude Include="..\..\..\TerrainWater\terrain.h" />
+    <ClInclude Include="..\..\..\TerrainWater\terrain_technique.h" />
+    <ClInclude Include="..\..\..\TerrainWater\texture_config.h" />
+    <ClInclude Include="..\..\..\TerrainWater\triangle_list.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Terrain_water\terrain.fs">
+    <None Include="..\..\..\TerrainWater\terrain.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Terrain_water\terrain.vs">
+    <None Include="..\..\..\TerrainWater\terrain.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Terrain_water\simple_water.fs">
+    <None Include="..\..\..\TerrainWater\simple_water.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\Terrain_water\simple_water.vs">
+    <None Include="..\..\..\TerrainWater\simple_water.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
