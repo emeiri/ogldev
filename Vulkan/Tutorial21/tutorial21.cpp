@@ -56,11 +56,9 @@ public:
 	~VulkanApp()
 	{
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
-		m_vkCore.DestroyFramebuffers(m_frameBuffers);
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
-		vkDestroyRenderPass(m_device, m_renderPass, NULL);
 		m_model.Destroy();
 	}
 
@@ -72,8 +70,6 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		m_renderPass = m_vkCore.CreateSimpleRenderPass();
-		m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
 		CreateShaders();
 		CreateMesh();
 		CreatePipeline();
@@ -223,7 +219,7 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, m_renderPass, m_vs, m_fs, m_numImages);
+		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, NULL, m_vs, m_fs, m_numImages);
 	}
 
 
@@ -319,8 +315,6 @@ private:
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
-	VkRenderPass m_renderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> m_frameBuffers;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;

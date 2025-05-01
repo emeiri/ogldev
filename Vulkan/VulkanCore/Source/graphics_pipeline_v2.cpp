@@ -193,7 +193,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 
 	VkGraphicsPipelineCreateInfo PipelineInfo = {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-		.pNext = &RenderingInfo,
+		.pNext = RenderPass ? NULL : &RenderingInfo,
 		.stageCount = ARRAY_SIZE_IN_ELEMENTS(ShaderStageCreateInfo),
 		.pStages = &ShaderStageCreateInfo[0],
 		.pVertexInputState = &VertexInputInfo,
@@ -204,7 +204,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.pDepthStencilState =&DepthStencilState,
 		.pColorBlendState = &BlendCreateInfo,
 		.layout = m_pipelineLayout,
-	//	.renderPass = RenderPass,
+		.renderPass = RenderPass,
 		.subpass = 0,
 		.basePipelineHandle = VK_NULL_HANDLE,
 		.basePipelineIndex = -1
