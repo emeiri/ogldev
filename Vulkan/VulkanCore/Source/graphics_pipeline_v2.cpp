@@ -168,6 +168,19 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.pAttachments = &BlendAttachState
 	};
 
+	VkFormat Format = VK_FORMAT_B8G8R8A8_SRGB;
+
+	VkFormat DepthFormat = VK_FORMAT_D32_SFLOAT;
+
+	VkPipelineRenderingCreateInfo RenderingInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+		.pNext = nullptr,
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &Format,
+		.depthAttachmentFormat = DepthFormat,
+		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
+	};
+
 	VkPipelineLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
 	};
@@ -180,6 +193,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 
 	VkGraphicsPipelineCreateInfo PipelineInfo = {
 		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+		.pNext = &RenderingInfo,
 		.stageCount = ARRAY_SIZE_IN_ELEMENTS(ShaderStageCreateInfo),
 		.pStages = &ShaderStageCreateInfo[0],
 		.pVertexInputState = &VertexInputInfo,
@@ -190,7 +204,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.pDepthStencilState =&DepthStencilState,
 		.pColorBlendState = &BlendCreateInfo,
 		.layout = m_pipelineLayout,
-		.renderPass = RenderPass,
+	//	.renderPass = RenderPass,
 		.subpass = 0,
 		.basePipelineHandle = VK_NULL_HANDLE,
 		.basePipelineIndex = -1
