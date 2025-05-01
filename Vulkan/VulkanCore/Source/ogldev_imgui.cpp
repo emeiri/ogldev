@@ -36,13 +36,19 @@ static void check_vk_result(VkResult err)
 
 namespace OgldevVK {
 
-ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
+ImGUIRenderer::ImGUIRenderer()
 {
+}
+
+void ImGUIRenderer::Init(VulkanCore* pvkCore)
+{
+	VulkanRenderer::Init(pvkCore);
+
 	bool DepthEnabled = true;
 
-	m_renderPass = m_vkCore.CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeLast);
+	m_renderPass = m_pvkCore->CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeLast);
 
-	m_frameBuffers = m_vkCore.CreateFramebuffers(m_renderPass);
+	m_frameBuffers = m_pvkCore->CreateFramebuffers(m_renderPass);
 
 	CreateDescriptorPool();
 
@@ -52,7 +58,7 @@ ImGUIRenderer::ImGUIRenderer(VulkanCore& vkCore) : VulkanRenderer(vkCore)
 
 ImGUIRenderer::~ImGUIRenderer()
 {
-	m_vkCore.FreeCommandBuffers(1, &m_cmdBuf);
+	m_pvkCore->FreeCommandBuffers(1, &m_cmdBuf);
 
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
 
@@ -106,19 +112,19 @@ void ImGUIRenderer::InitImGUI()
 	//ImGui::StyleColorsLight();
 
 	 // Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForVulkan(m_vkCore.GetWindow(), true);
+	ImGui_ImplGlfw_InitForVulkan(m_pvkCore->GetWindow(), true);
 
 	ImGui_ImplVulkan_InitInfo InitInfo = {
-		.Instance = m_vkCore.GetInstance(),
-		.PhysicalDevice = m_vkCore.GetPhysicalDevice().m_physDevice,
-		.Device = m_vkCore.GetDevice(),
-		.QueueFamily = m_vkCore.GetQueueFamily(),
-		.Queue = m_vkCore.GetQueue()->GetHandle(),
+		.Instance = m_pvkCore->GetInstance(),
+		.PhysicalDevice = m_pvkCore->GetPhysicalDevice().m_physDevice,
+		.Device = m_pvkCore->GetDevice(),
+		.QueueFamily = m_pvkCore->GetQueueFamily(),
+		.Queue = m_pvkCore->GetQueue()->GetHandle(),
 		.PipelineCache = NULL,
 		.DescriptorPool = m_descriptorPool,
 		.Subpass = 0,
-		.MinImageCount = m_vkCore.GetPhysicalDevice().m_surfaceCaps.minImageCount,
-		.ImageCount = (u32)m_vkCore.GetNumImages(),
+		.MinImageCount = m_pvkCore->GetPhysicalDevice().m_surfaceCaps.minImageCount,
+		.ImageCount = (u32)m_pvkCore->GetNumImages(),
 		.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
 		.Allocator = NULL,
 		.CheckVkResultFn = check_vk_result
@@ -132,7 +138,7 @@ void ImGUIRenderer::InitImGUI()
 
 void ImGUIRenderer::InitImGUIFontsTexture()
 {	
-	m_vkCore.CreateCommandBuffers(1, &m_cmdBuf);
+	m_pvkCore->CreateCommandBuffers(1, &m_cmdBuf);
 
 	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
@@ -141,8 +147,8 @@ void ImGUIRenderer::InitImGUIFontsTexture()
 	VkResult res = vkEndCommandBuffer(m_cmdBuf);
 	CHECK_VK_RESULT(res, "vkEndCommandBuffer");
 
-	m_vkCore.GetQueue()->SubmitSync(m_cmdBuf);
-	m_vkCore.GetQueue()->WaitIdle();
+	m_pvkCore->GetQueue()->SubmitSync(m_cmdBuf);
+	m_pvkCore->GetQueue()->WaitIdle();
 
 	ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
@@ -194,8 +200,8 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	vkEndCommandBuffer(m_cmdBuf);
 
-	m_vkCore.GetQueue()->SubmitSync(m_cmdBuf);
-	m_vkCore.GetQueue()->WaitIdle();
+	m_pvkCore->GetQueue()->SubmitSync(m_cmdBuf);
+	m_pvkCore->GetQueue()->WaitIdle();
 }
 
 }

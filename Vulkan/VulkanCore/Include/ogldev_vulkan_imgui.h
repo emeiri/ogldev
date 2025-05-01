@@ -29,9 +29,11 @@ namespace OgldevVK {
 
 class ImGUIRenderer : public VulkanRenderer {
 public:
-	ImGUIRenderer(VulkanCore& vkCore);
+	ImGUIRenderer();
 
 	~ImGUIRenderer();
+
+	virtual void Init(VulkanCore* pvkCore);
 
 	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
 

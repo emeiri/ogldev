@@ -20,16 +20,18 @@
 
 namespace OgldevVK {
 
-VulkanRenderer::VulkanRenderer(VulkanCore& vkCore) : m_vkCore(vkCore)
+void VulkanRenderer::Init(VulkanCore* pvkCore)
 {
-	m_device = vkCore.GetDevice();
+	m_pvkCore = pvkCore;
 
-	vkCore.GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
+	m_device = m_pvkCore->GetDevice();
+
+	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
 }
 
 VulkanRenderer::~VulkanRenderer()
 {
-	m_vkCore.DestroyFramebuffers(m_frameBuffers);
+	m_pvkCore->DestroyFramebuffers(m_frameBuffers);
 
 	vkDestroyRenderPass(m_device, m_renderPass, NULL);
 

@@ -26,10 +26,12 @@ namespace OgldevVK {
 class VulkanRenderer
 {
 public:
-	explicit VulkanRenderer(VulkanCore& vkCore);
+	VulkanRenderer() {}
 
 	virtual ~VulkanRenderer();
 	virtual void FillCommandBuffer(VkCommandBuffer commandBuffer, int Image) = 0;
+
+	virtual void Init(VulkanCore* pvkCore);
 
 	//inline VulkanImage getDepthTexture() const { return depthTexture_; }
 
@@ -38,7 +40,7 @@ protected:
 	void BeginRenderPass(VkCommandBuffer commandBuffer, int Image);
 	//bool CreateUniformBuffers(int UniformDataSize);
 
-	VulkanCore& m_vkCore;
+	VulkanCore* m_pvkCore = NULL;
 	VkDevice m_device = NULL;
 
 	int m_framebufferWidth  = 0;
