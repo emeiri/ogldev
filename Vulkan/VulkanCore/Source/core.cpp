@@ -305,9 +305,15 @@ void VulkanCore::CreateDevice()
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;
 
+	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingFeature = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR,
+		.pNext = NULL,
+		.dynamicRendering = VK_TRUE
+	};
+
 	VkDeviceCreateInfo DeviceCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = NULL,
+		.pNext = &DynamicRenderingFeature,
 		.flags = 0,
 		.queueCreateInfoCount = 1,
 		.pQueueCreateInfos = &qInfo,
