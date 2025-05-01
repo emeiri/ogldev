@@ -85,6 +85,7 @@ public:
 
 private:
 
+	void GetInstanceVersion();
 	void CreateInstance(const char* pAppName);
 	void CreateDebugCallback();
 	void CreateSurface();
@@ -128,6 +129,11 @@ private:
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
 	bool m_depthEnabled = false;
+	struct {
+		int Major = 0;
+		int Minor = 0;
+		int Patch = 0;
+	} m_instanceVersion;
 };
 
 }

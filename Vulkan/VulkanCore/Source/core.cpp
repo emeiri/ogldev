@@ -143,8 +143,26 @@ const VkImage& VulkanCore::GetImage(int Index) const
 	return m_images[Index];
 }
 
+
+void VulkanCore::GetInstanceVersion()
+{
+	u32 InstanceVersion = 0;
+
+	VkResult res = vkEnumerateInstanceVersion(&InstanceVersion);
+	CHECK_VK_RESULT(res, "vkEnumerateInstanceVersion");
+
+	m_instanceVersion.Major = VK_VERSION_MAJOR(InstanceVersion);
+	m_instanceVersion.Minor = VK_VERSION_MINOR(InstanceVersion);
+	m_instanceVersion.Patch = VK_VERSION_PATCH(InstanceVersion);
+
+	printf("Vulkan loader supports version %d.%d.%d\n", 
+		   m_instanceVersion.Major, m_instanceVersion.Minor, m_instanceVersion.Patch);
+}
+
 void VulkanCore::CreateInstance(const char* pAppName)
 {
+	GetInstanceVersion();
+
 	std::vector<const char*> Layers = {
 		"VK_LAYER_KHRONOS_validation"
 	};
