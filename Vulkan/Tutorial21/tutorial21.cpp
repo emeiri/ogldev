@@ -225,10 +225,6 @@ private:
 
 	void RecordCommandBuffers()
 	{
-		std::array<VkClearValue, 2> ClearValues{};
-		ClearValues[0].color = { {1.0f, 0.0f, 0.0f, 1.0f} };
-		ClearValues[1].depthStencil = { 1.0f, 0 };
-
 		m_model.CreateDescriptorSets(*m_pPipeline);
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
@@ -239,48 +235,11 @@ private:
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
-			VkRenderingAttachmentInfoKHR colorAttachment = {};
-			colorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
-			colorAttachment.imageView = m_vkCore.GetImageView(i);
-			colorAttachment.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-			colorAttachment.clearValue = { 0.0f, 0.0f, 0.0f, 1.0f }; // Clear to black
+			BeginRendering(CmdBuf, i);
 
-			VkRenderingAttachmentInfo DepthAttachment = {
-				.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-				.pNext = NULL, 
-				.imageView = m_vkCore.GetDepthView(i),
-				.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-				.resolveMode = VK_RESOLVE_MODE_NONE,
-				.resolveImageView = VK_NULL_HANDLE,
-				.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-				.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-				.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-				.clearValue = {.depthStencil = {.depth = 1.0f, .stencil = 0 }},
-			};
-
-			VkRenderingInfoKHR RenderingInfo = {
-				.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
-				.renderArea = { {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT} },
-				.layerCount = 1,
-				.viewMask = 0,
-				.colorAttachmentCount = 1,
-				.pColorAttachments = &colorAttachment,
-				.pDepthAttachment = &DepthAttachment
-			};
-
-			vkCmdBeginRendering(CmdBuf, &RenderingInfo);
-
-			//RenderPassBeginInfo.framebuffer = m_frameBuffers[i];
-	
-			//vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-	
 			m_pPipeline->Bind(CmdBuf);
 
 			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
-
-			//vkCmdEndRenderPass(CmdBuf);
 
 			vkCmdEndRendering(CmdBuf);
 
@@ -291,6 +250,51 @@ private:
 		printf("Command buffers recorded\n");
 	}
 
+
+	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
+	{
+		VkClearValue ClearColor = {
+			.color = {1.0f, 0.0f, 0.0f, 1.0f},
+		};
+
+		VkRenderingAttachmentInfoKHR ColorAttachment = {
+			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+			.pNext = NULL,
+			.imageView = m_vkCore.GetImageView(ImageIndex),
+			.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+			.resolveMode = VK_RESOLVE_MODE_NONE,
+			.resolveImageView = VK_NULL_HANDLE,
+			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.clearValue = ClearColor
+		};
+
+		VkRenderingAttachmentInfo DepthAttachment = {
+			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+			.pNext = NULL,
+			.imageView = m_vkCore.GetDepthView(ImageIndex),
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+			.resolveMode = VK_RESOLVE_MODE_NONE,
+			.resolveImageView = VK_NULL_HANDLE,
+			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+			.clearValue = {.depthStencil = {.depth = 1.0f, .stencil = 0 }},
+		};
+
+		VkRenderingInfoKHR RenderingInfo = {
+			.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
+			.renderArea = { {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT} },
+			.layerCount = 1,
+			.viewMask = 0,
+			.colorAttachmentCount = 1,
+			.pColorAttachments = &ColorAttachment,
+			.pDepthAttachment = &DepthAttachment
+		};
+
+		vkCmdBeginRendering(CmdBuf, &RenderingInfo);
+	}
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
