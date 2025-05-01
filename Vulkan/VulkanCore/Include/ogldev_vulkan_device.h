@@ -36,6 +36,15 @@ struct PhysicalDevice {
 	std::vector<VkPresentModeKHR> m_presentModes;
 	VkPhysicalDeviceFeatures m_features;
 	VkFormat m_depthFormat;
+	struct {
+		int Variant = 0;
+		int Major = 0;
+		int Minor = 0;
+		int Patch = 0;
+	} m_apiVersion;
+	std::vector<VkExtensionProperties> m_extensions;
+
+	bool IsExtensionSupported(const char* pExt) const;
 };
 
 
@@ -51,6 +60,11 @@ public:
 	const PhysicalDevice& Selected() const;
 
 private:
+
+	void GetDeviceAPIVersion(int DeviceIndex);
+
+	void GetExtensions(int DeviceIndex);
+
 	std::vector<PhysicalDevice> m_devices;
 
 	int m_devIndex = -1;

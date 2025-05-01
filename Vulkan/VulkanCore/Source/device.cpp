@@ -120,12 +120,10 @@ void VulkanPhysicalDevices::Init(const VkInstance& Instance, const VkSurfaceKHR&
         vkGetPhysicalDeviceProperties(PhysDev, &m_devices[i].m_devProps);
 
         printf("Device name: %s\n", m_devices[i].m_devProps.deviceName);
-        u32 apiVer = m_devices[i].m_devProps.apiVersion;
-        printf("    API version: %d.%d.%d.%d\n", 
-            VK_API_VERSION_VARIANT(apiVer), 
-            VK_API_VERSION_MAJOR(apiVer), 
-            VK_API_VERSION_MINOR(apiVer), 
-            VK_API_VERSION_PATCH(apiVer));
+
+        GetDeviceAPIVersion(i);
+
+        GetExtensions(i);
 
         u32 NumQFamilies = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(PhysDev, &NumQFamilies, NULL);
@@ -237,4 +235,59 @@ const PhysicalDevice& VulkanPhysicalDevices::Selected() const
 
     return m_devices[m_devIndex];
 }
+
+
+void VulkanPhysicalDevices::GetDeviceAPIVersion(int DeviceIndex)
+{
+    PhysicalDevice& Dev = m_devices[DeviceIndex];
+
+    u32 apiVer = Dev.m_devProps.apiVersion;
+
+    Dev.m_apiVersion.Variant = VK_API_VERSION_VARIANT(apiVer);
+    Dev.m_apiVersion.Major = VK_API_VERSION_MAJOR(apiVer);
+    Dev.m_apiVersion.Minor = VK_API_VERSION_MINOR(apiVer);
+    Dev.m_apiVersion.Patch = VK_API_VERSION_PATCH(apiVer);
+
+    printf("    API version: %d.%d.%d.%d\n", Dev.m_apiVersion.Variant, Dev.m_apiVersion.Major, 
+                                             Dev.m_apiVersion.Minor, Dev.m_apiVersion.Patch);
+}
+
+void VulkanPhysicalDevices::GetExtensions(int DeviceIndex)
+{
+    PhysicalDevice& Dev = m_devices[DeviceIndex];
+
+    u32 ExtensionCount;
+    vkEnumerateDeviceExtensionProperties(Dev.m_physDevice, NULL, &ExtensionCount, NULL);
+
+    Dev.m_extensions.resize(ExtensionCount);
+
+    vkEnumerateDeviceExtensionProperties(Dev.m_physDevice, NULL, &ExtensionCount, Dev.m_extensions.data());
+
+    printf("Physical device extensions:\n");
+    for (const VkExtensionProperties& e : Dev.m_extensions) {
+        printf("    %s\n", e.extensionName);
+    }
+}
+
+
+bool PhysicalDevice::IsExtensionSupported(const char* pExt) const
+{
+    bool ret = false;
+
+    for (const VkExtensionProperties& e : m_extensions) {
+        if (strlen(pExt) == strlen(e.extensionName)) {
+            ret = strncmp(pExt, e.extensionName, strlen(pExt));
+
+            if (ret) {
+                break;
+            }
+        }        
+    }
+
+    printf("Extension %s %s supporterd\n", pExt, ret ? "is" : "is not");
+
+    return ret;
+}
+
+
 }
