@@ -178,6 +178,17 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 		sourceStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	}
+	else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = 0;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+	} 
+	else {
+		printf("Unknown barrier case\n");
+		exit(1);
+	}
 
 	vkCmdPipelineBarrier(CmdBuf, sourceStage, destinationStage, 
 		                 0, 0, NULL, 0, NULL, 1, &barrier);
