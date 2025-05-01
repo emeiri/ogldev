@@ -159,6 +159,7 @@ void VulkanCore::GetInstanceVersion()
 		   m_instanceVersion.Major, m_instanceVersion.Minor, m_instanceVersion.Patch);
 }
 
+
 void VulkanCore::CreateInstance(const char* pAppName)
 {
 	GetInstanceVersion();
@@ -278,6 +279,19 @@ void VulkanCore::CreateDevice()
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 		VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
 	};
+
+	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported("VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME");
+
+	if ((m_instanceVersion.Major > 1) || (m_instanceVersion.Minor >= 3)) {
+		printf("The Vulkan instance supports dynamic rendering as a core feature\n");
+	} else if (m_instanceVersion.Minor == 2) {
+		if (DeviceSupportsDynamicRendering) {
+			DevExts.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+		} else {
+			printf("The system doesn't support dynamic rendering\n");
+			exit(1);
+		}
+	}
 
 	if (m_physDevices.Selected().m_features.geometryShader == VK_FALSE) {
 		OGLDEV_ERROR0("The Geometry Shader is not supported!\n");
