@@ -768,6 +768,13 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 }
 
 
+void VulkanCore::TransitionSwapImage(int Index)
+{
+	VkImage Image = GetImage(Index);
+
+	TransitionImageLayout(Image, m_swapChainSurfaceFormat.format,
+						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+}
 
 
 void VulkanTexture::Destroy(VkDevice Device)

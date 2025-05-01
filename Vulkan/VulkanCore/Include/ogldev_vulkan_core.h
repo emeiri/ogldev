@@ -89,6 +89,8 @@ public:
 
 	VkFormat GetSwapChainFormat() const { return m_swapChainSurfaceFormat.format; }
 
+	void TransitionSwapImage(int Index);
+
 private:
 
 	void GetInstanceVersion();
