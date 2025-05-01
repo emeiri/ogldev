@@ -67,6 +67,10 @@ public:
 
 	const VkImage& GetImage(int Index) const;
 
+	const VkImageView& GetImageView(int Index) const;
+
+	const VkImageView& GetDepthView(int Index) const;
+
 	VulkanQueue* GetQueue() { return &m_queue; }
 
 	u32 GetQueueFamily() const { return m_queueFamily; }
@@ -82,6 +86,8 @@ public:
 	void CreateTexture(const char* filename, VulkanTexture& Tex);
 
 	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
+
+	VkFormat GetSwapChainFormat() const { return m_swapChainSurfaceFormat.format; }
 
 private:
 

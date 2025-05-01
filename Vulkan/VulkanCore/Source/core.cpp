@@ -144,6 +144,27 @@ const VkImage& VulkanCore::GetImage(int Index) const
 }
 
 
+const VkImageView& VulkanCore::GetImageView(int Index) const
+{
+	if (Index >= m_imageViews.size()) {
+		OGLDEV_ERROR("Invalid image view index %d\n", Index);
+		exit(1);
+	}
+
+	return m_imageViews[Index];
+}
+
+const VkImageView& VulkanCore::GetDepthView(int Index) const
+{
+	if (Index >= m_depthImages.size()) {
+		OGLDEV_ERROR("Invalid depth view index %d\n", Index);
+		exit(1);
+	}
+
+	return m_depthImages[Index].m_view;
+}
+
+
 void VulkanCore::GetInstanceVersion()
 {
 	u32 InstanceVersion = 0;
