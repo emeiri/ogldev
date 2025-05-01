@@ -233,32 +233,15 @@ private:
 		ClearValues[0].color = { {1.0f, 0.0f, 0.0f, 1.0f} };
 		ClearValues[1].depthStencil = { 1.0f, 0 };
 
-	/*	VkRenderPassBeginInfo RenderPassBeginInfo = {
-			.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-			.pNext = NULL,
-			.renderPass = m_renderPass,
-			.renderArea = {
-				.offset = {
-					.x = 0,
-					.y = 0
-				},
-				.extent = {
-					.width = WINDOW_WIDTH,
-					.height = WINDOW_HEIGHT
-				}
-			},
-			.clearValueCount = (u32)ClearValues.size(),
-			.pClearValues = ClearValues.data()
-		};*/
-
 		m_model.CreateDescriptorSets(*m_pPipeline);
 
 		for (uint i = 0; i < m_cmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = m_cmdBufs[i];
 
-			m_vkCore.TransitionSwapImage(i);
-
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
+				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 			VkRenderingAttachmentInfoKHR colorAttachment = {};
 			colorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR;
@@ -348,7 +331,7 @@ private:
 };
 
 
-#define APP_NAME "Tutorial 20"
+#define APP_NAME "Tutorial 21"
 
 int main(int argc, char* argv[])
 {
