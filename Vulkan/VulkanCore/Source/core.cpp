@@ -301,7 +301,7 @@ void VulkanCore::CreateDevice()
 		VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
 	};
 
-	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported("VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME");
+	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 
 	if ((m_instanceVersion.Major > 1) || (m_instanceVersion.Minor >= 3)) {
 		printf("The Vulkan instance supports dynamic rendering as a core feature\n");
