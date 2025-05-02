@@ -56,8 +56,10 @@ private:
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 	VkQueue m_queue = VK_NULL_HANDLE;
-	VkSemaphore m_renderCompleteSem = VK_NULL_HANDLE;
-	VkSemaphore m_presentCompleteSem = VK_NULL_HANDLE;
+	std::vector<VkSemaphore> m_renderCompleteSem;
+	std::vector<VkSemaphore> m_presentCompleteSem;
+	u32 m_numImages = 0;
+	int m_currentImage = 0;
 };
 
 }

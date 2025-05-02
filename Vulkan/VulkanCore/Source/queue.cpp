@@ -32,6 +32,9 @@ void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamil
 
 	vkGetDeviceQueue(Device, QueueFamily, QueueIndex, &m_queue);
 
+	VkResult res = vkGetSwapchainImagesKHR(Device, SwapChain, &m_numImages, NULL);
+	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR");
+		
 	printf("Queue acquired\n");
 
 	CreateSemaphores();
@@ -40,15 +43,29 @@ void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamil
 
 void VulkanQueue::Destroy()
 {
-	vkDestroySemaphore(m_device, m_presentCompleteSem, NULL);
-	vkDestroySemaphore(m_device, m_renderCompleteSem, NULL);
+	for (VkSemaphore& Sem : m_presentCompleteSem) {
+		vkDestroySemaphore(m_device, Sem, NULL);
+	}
+
+	for (VkSemaphore& Sem : m_renderCompleteSem) {
+		vkDestroySemaphore(m_device, Sem, NULL);
+	}	
 }
 
 
 void VulkanQueue::CreateSemaphores()
 {
-	m_presentCompleteSem = CreateSemaphore(m_device);
-	m_renderCompleteSem = CreateSemaphore(m_device);
+	m_presentCompleteSem.resize(m_numImages);
+	
+	for (VkSemaphore& Sem : m_presentCompleteSem) {
+		Sem = CreateSemaphore(m_device);
+	}
+
+	m_renderCompleteSem.resize(m_numImages);
+
+	for (VkSemaphore& Sem : m_renderCompleteSem) {
+		Sem = CreateSemaphore(m_device);
+	}
 }
 
 
@@ -61,7 +78,7 @@ void VulkanQueue::WaitIdle()
 u32 VulkanQueue::AcquireNextImage()
 {
 	u32 ImageIndex = 0;
-	VkResult res = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_presentCompleteSem, NULL, &ImageIndex);
+	VkResult res = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_presentCompleteSem[m_currentImage], NULL, &ImageIndex);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR\n");
 	return ImageIndex;
 }
@@ -99,12 +116,12 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.pNext = NULL,
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &m_presentCompleteSem,
+		.pWaitSemaphores = &m_presentCompleteSem[m_currentImage],
 		.pWaitDstStageMask = &waitFlags,
 		.commandBufferCount = (u32)NumCmdBufs,
 		.pCommandBuffers = pCmdBufs,
-		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &m_renderCompleteSem
+		.signalSemaphoreCount = 1,				
+		.pSignalSemaphores = &m_renderCompleteSem[m_currentImage]
 	};
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &SubmitInfo, NULL);
@@ -118,7 +135,7 @@ void VulkanQueue::Present(u32 ImageIndex)
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.pNext = NULL,
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &m_renderCompleteSem,
+		.pWaitSemaphores = &m_renderCompleteSem[m_currentImage],
 		.swapchainCount = 1,
 		.pSwapchains = &m_swapChain,
 		.pImageIndices = &ImageIndex
@@ -127,7 +144,13 @@ void VulkanQueue::Present(u32 ImageIndex)
 	VkResult res = vkQueuePresentKHR(m_queue, &PresentInfo);
 	CHECK_VK_RESULT(res, "vkQueuePresentKHR\n");
 
-	WaitIdle();	// TODO: looks like a workaround but we're getting error messages without it
+	m_currentImage++;
+
+	if (m_currentImage == m_numImages) {
+		m_currentImage = 0;
+	}
+
+//	WaitIdle();	// TODO: looks like a workaround but we're getting error messages without it
 }
 
 }
