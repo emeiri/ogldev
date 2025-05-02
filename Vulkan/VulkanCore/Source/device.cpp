@@ -16,6 +16,7 @@
 */
 
 #include <assert.h>
+#include <string>
 
 #include "ogldev_util.h"
 #include "ogldev_vulkan_util.h"
@@ -274,14 +275,15 @@ bool PhysicalDevice::IsExtensionSupported(const char* pExt) const
 {
     bool ret = false;
 
-    for (const VkExtensionProperties& e : m_extensions) {
-        if (strlen(pExt) == strlen(e.extensionName)) {
-            ret = strncmp(pExt, e.extensionName, strlen(pExt));
+    std::string RequestedExt(pExt);
 
-            if (ret) {
-                break;
-            }
-        }        
+    for (const VkExtensionProperties& e : m_extensions) {
+        std::string CurExt(e.extensionName);
+
+        if (CurExt == RequestedExt) {
+            ret = true;
+            break;
+        }
     }
 
     printf("Extension %s %s supporterd\n", pExt, ret ? "is" : "is not");
