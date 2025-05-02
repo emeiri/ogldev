@@ -58,6 +58,7 @@ private:
 	VkQueue m_queue = VK_NULL_HANDLE;
 	std::vector<VkSemaphore> m_renderCompleteSem;
 	std::vector<VkSemaphore> m_presentCompleteSem;
+	std::vector<VkFence> m_inFlightFences;
 	u32 m_numImages = 0;
 	int m_currentImage = 0;
 };

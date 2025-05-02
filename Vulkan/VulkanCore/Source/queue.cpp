@@ -66,6 +66,16 @@ void VulkanQueue::CreateSemaphores()
 	for (VkSemaphore& Sem : m_renderCompleteSem) {
 		Sem = CreateSemaphore(m_device);
 	}
+
+	m_inFlightFences.resize(m_numImages);
+
+	VkFenceCreateInfo fenceInfo{};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // Start signaled to avoid stalls
+
+	for (VkFence& Fence : m_inFlightFences) {
+		vkCreateFence(m_device, &fenceInfo, nullptr, &Fence);
+	}
 }
 
 
@@ -77,6 +87,9 @@ void VulkanQueue::WaitIdle()
 
 u32 VulkanQueue::AcquireNextImage()
 {
+	vkWaitForFences(m_device, 1, &m_inFlightFences[m_currentImage], VK_TRUE, UINT64_MAX);
+	vkResetFences(m_device, 1, &m_inFlightFences[m_currentImage]);
+
 	u32 ImageIndex = 0;
 	VkResult res = vkAcquireNextImageKHR(m_device, m_swapChain, UINT64_MAX, m_presentCompleteSem[m_currentImage], NULL, &ImageIndex);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR\n");
@@ -124,7 +137,7 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 		.pSignalSemaphores = &m_renderCompleteSem[m_currentImage]
 	};
 
-	VkResult res = vkQueueSubmit(m_queue, 1, &SubmitInfo, NULL);
+	VkResult res = vkQueueSubmit(m_queue, 1, &SubmitInfo, m_inFlightFences[m_currentImage]);
 	CHECK_VK_RESULT(res, "vkQueueSubmit\n");
 }
 
