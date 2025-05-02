@@ -261,6 +261,10 @@ private:
 			.color = {1.0f, 0.0f, 0.0f, 1.0f},
 		};
 
+		VkClearValue DepthValue = {
+			.depthStencil = {.depth = 1.0f, .stencil = 0 }
+		};
+
 		VkRenderingAttachmentInfoKHR ColorAttachment = {
 			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
 			.pNext = NULL,
@@ -284,7 +288,7 @@ private:
 			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
 			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.clearValue = {.depthStencil = {.depth = 1.0f, .stencil = 0 }},
+			.clearValue = DepthValue,
 		};
 
 		VkRenderingInfoKHR RenderingInfo = {
