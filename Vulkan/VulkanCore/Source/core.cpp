@@ -302,9 +302,11 @@ void VulkanCore::CreateDevice()
 	};
 
 	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+	
+	bool Instance_is_1_3_or_more = (m_instanceVersion.Major > 1) || (m_instanceVersion.Minor >= 3);
 
-	if ((m_instanceVersion.Major > 1) || (m_instanceVersion.Minor >= 3)) {
-		printf("The Vulkan instance supports dynamic rendering as a core feature\n");
+	if (Instance_is_1_3_or_more && DeviceSupportsDynamicRendering) {
+		printf("The Vulkan instance and device support dynamic rendering as a core feature\n");
 	} else if (m_instanceVersion.Minor == 2) {
 		if (DeviceSupportsDynamicRendering) {
 			DevExts.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
@@ -312,6 +314,9 @@ void VulkanCore::CreateDevice()
 			printf("The system doesn't support dynamic rendering\n");
 			exit(1);
 		}
+	} else {
+		printf("The system doesn't support dynamic rendering\n");
+		exit(1);
 	}
 
 	if (m_physDevices.Selected().m_features.geometryShader == VK_FALSE) {

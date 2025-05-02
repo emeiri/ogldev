@@ -174,7 +174,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 
 	VkPipelineRenderingCreateInfo RenderingInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
-		.pNext = nullptr,
+		.pNext = NULL,
 		.colorAttachmentCount = 1,
 		.pColorAttachmentFormats = &ColorFormat,
 		.depthAttachmentFormat = DepthFormat,
