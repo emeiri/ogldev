@@ -136,6 +136,8 @@ public:
 	{
 		float CurTime = (float)glfwGetTime();
 
+		int Frames = 0;
+		float FPSTime = 0.0f;
 		while (!glfwWindowShouldClose(m_pWindow)) {
 			float Time = (float)glfwGetTime();
 			float dt = Time - CurTime;
@@ -143,6 +145,15 @@ public:
 			RenderScene();
 			CurTime = Time;
 			glfwPollEvents();
+
+			Frames++;
+			FPSTime += dt;
+
+			if (FPSTime >= 1.0f) {
+				printf("%d\n", Frames);
+				FPSTime = 0.0f;
+				Frames = 0;
+			}
 		}
 
 		glfwTerminate();
