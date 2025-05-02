@@ -224,7 +224,7 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
 		.pEngineName = "Ogldev Vulkan Tutorials",
 		.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
-		.apiVersion = VK_API_VERSION_1_3
+		.apiVersion = VK_MAKE_API_VERSION(0, m_instanceVersion.Major, m_instanceVersion.Minor, 0)
 	};
 
 	VkInstanceCreateInfo CreateInfo = {
