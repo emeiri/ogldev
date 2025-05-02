@@ -39,7 +39,9 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 									   VkRenderPass RenderPass,
 									   VkShaderModule vs,
 									   VkShaderModule fs,
-									   int NumImages)
+									   int NumImages,
+									   VkFormat ColorFormat, 
+									   VkFormat DepthFormat)
 {
 	m_device = Device;
 	m_numImages = NumImages;
@@ -50,7 +52,7 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 	bool IsTex = true;
 	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex);
 
-	InitCommon(pWindow, RenderPass, vs, fs);
+	InitCommon(pWindow, RenderPass, vs, fs, ColorFormat, DepthFormat);
 }
 
 
@@ -69,7 +71,9 @@ void GraphicsPipelineV2::Bind(VkCommandBuffer CmdBuf)
 }
 
 
-void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs)
+void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
+									VkShaderModule vs, VkShaderModule fs,
+									VkFormat ColorFormat, VkFormat DepthFormat)
 {
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
@@ -168,15 +172,11 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.pAttachments = &BlendAttachState
 	};
 
-	VkFormat Format = VK_FORMAT_B8G8R8A8_SRGB;
-
-	VkFormat DepthFormat = VK_FORMAT_D32_SFLOAT;
-
 	VkPipelineRenderingCreateInfo RenderingInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
 		.pNext = nullptr,
 		.colorAttachmentCount = 1,
-		.pColorAttachmentFormats = &Format,
+		.pColorAttachmentFormats = &ColorFormat,
 		.depthAttachmentFormat = DepthFormat,
 		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 	};

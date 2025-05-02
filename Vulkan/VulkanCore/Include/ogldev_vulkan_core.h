@@ -89,6 +89,8 @@ public:
 
 	VkFormat GetSwapChainFormat() const { return m_swapChainSurfaceFormat.format; }
 
+	VkFormat GetDepthFormat() const { return m_physDevices.Selected().m_depthFormat; }
+
 private:
 
 	void GetInstanceVersion();

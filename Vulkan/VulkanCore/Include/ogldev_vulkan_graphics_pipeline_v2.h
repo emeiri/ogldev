@@ -36,7 +36,9 @@ public:
 					 VkRenderPass RenderPass,
 					 VkShaderModule vs,
 					 VkShaderModule fs,
-					 int NumImages);
+					 int NumImages,
+					 VkFormat ColorFormat, 
+					 VkFormat DepthFormat);
 
 	~GraphicsPipelineV2();
 
@@ -51,7 +53,9 @@ public:
 
 private:
 
-	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, VkShaderModule vs, VkShaderModule fs);
+	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
+					VkShaderModule vs, VkShaderModule fs,
+					VkFormat ColorFormat, VkFormat DepthFormat);
 
 	void AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
 	void CreateDescriptorPool(int MaxSets);

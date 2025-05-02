@@ -219,7 +219,9 @@ private:
 
 	void CreatePipeline()
 	{
-		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, NULL, m_vs, m_fs, m_numImages);
+		VkFormat ColorFormat = m_vkCore.GetSwapChainFormat();
+		VkFormat DepthFormat = m_vkCore.GetDepthFormat(); 
+		m_pPipeline = new OgldevVK::GraphicsPipelineV2(m_device, m_pWindow, NULL, m_vs, m_fs, m_numImages, ColorFormat, DepthFormat);
 	}
 
 
