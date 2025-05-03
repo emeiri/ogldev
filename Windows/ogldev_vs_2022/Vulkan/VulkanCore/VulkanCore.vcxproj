@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.cpp" />
     <ClCompile Include="..\..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_glfw_camera_handler.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\model_desc.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
@@ -149,7 +151,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(SolutionDir)\..\..\Common;$(SolutionDir)\..\..\DemoLITION\Framework\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(SolutionDir)\..\..\Common;$(SolutionDir)\..\..\Common\3rdparty;$(SolutionDir)\..\..\DemoLITION\Framework\Include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

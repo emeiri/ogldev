@@ -26,6 +26,7 @@
 
 #include "glslang/Include/glslang_c_interface.h"
 #include "glslang/Public/resource_limits_c.h"
+#include "SPIRV-Reflect/spirv_reflect.h"
 
 #include "ogldev_types.h"
 #include "ogldev_util.h"
@@ -44,6 +45,29 @@ struct Shader
 		size_t program_size = glslang_program_SPIRV_get_size(program);
 		SPIRV.resize(program_size);
 		glslang_program_SPIRV_get(program, SPIRV.data());
+	}
+
+	u32 GetPushConstantSize()
+	{
+		SpvReflectShaderModule SpvShaderModule;
+		size_t Size = ARRAY_SIZE_IN_BYTES(SPIRV);
+
+		SpvReflectResult result = spvReflectCreateShaderModule(Size, SPIRV.data(), &SpvShaderModule);
+		if (result != SPV_REFLECT_RESULT_SUCCESS) {
+			OGLDEV_ERROR("spvReflectCreateShaderModule error %d\n", result);
+			exit(1);
+		}
+
+		u32 PushConstantSize = 0;
+
+		for (u32 i = 0; i < SpvShaderModule.push_constant_block_count; ++i) {
+			const SpvReflectBlockVariable& block = SpvShaderModule.push_constant_blocks[i];
+			PushConstantSize = std::max(PushConstantSize, block.offset + block.size);
+		}
+
+		spvReflectDestroyShaderModule(&SpvShaderModule);
+
+		return PushConstantSize;
 	}
 };
 
@@ -129,12 +153,14 @@ static bool CompileShader(VkDevice Device, glslang_stage_t Stage, const char* pS
 
 	VkShaderModuleCreateInfo shaderCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.codeSize = ShaderModule.SPIRV.size() * sizeof(uint32_t),
-		.pCode = (const uint32_t*)ShaderModule.SPIRV.data()
+		.codeSize = ARRAY_SIZE_IN_BYTES(ShaderModule.SPIRV),
+		.pCode = (const u32*)ShaderModule.SPIRV.data()
 	};
 
 	VkResult res = vkCreateShaderModule(Device, &shaderCreateInfo, NULL, &ShaderModule.ShaderModule);
 	CHECK_VK_RESULT(res, "vkCreateShaderModule\n");
+
+	printf("Push constant size %d\n", ShaderModule.GetPushConstantSize());
 
 	glslang_program_delete(program);
 	glslang_shader_delete(shader);
@@ -212,7 +238,7 @@ VkShaderModule CreateShaderModuleFromText(VkDevice Device, const char* pFilename
 		ret = ShaderModule.ShaderModule;
 		std::string BinaryFilename = string(pFilename) + ".spv";
 		WriteBinaryFile(BinaryFilename.c_str(), ShaderModule.SPIRV.data(), 
-						(int)ShaderModule.SPIRV.size() * sizeof(uint32_t));
+						(int)ShaderModule.SPIRV.size() * sizeof(u32));
 	}
 
 	glslang_finalize_process();
@@ -230,7 +256,7 @@ VkShaderModule CreateShaderModuleFromBinary(VkDevice Device, const char* pFilena
 	VkShaderModuleCreateInfo shaderCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 		.codeSize = (size_t)codeSize,
-		.pCode = (const uint32_t*)pShaderCode
+		.pCode = (const u32*)pShaderCode
 	};
 
 	VkShaderModule shaderModule;

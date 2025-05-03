@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Int">
       <UniqueIdentifier>{79ede9d0-eb99-4211-8d8e-14ba058ff0e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\SPIRV-Reflect">
+      <UniqueIdentifier>{4c720016-a84d-4a0e-bcec-1ac21b8fbaa8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -78,6 +81,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v2.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.cpp">
+      <Filter>Source Files\SPIRV-Reflect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -118,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline_v2.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.h">
+      <Filter>Source Files\SPIRV-Reflect</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
