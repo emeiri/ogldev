@@ -58,14 +58,12 @@ public:
 
         m_pRenderingSystem->SetScene(m_pScene);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 2.0f, -4.0f), Vector3f(0.0, -0.2f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
 
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-      //  m_pSceneObject->SetScale(Vector3f(0.1f));
-     //   m_pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
         m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
