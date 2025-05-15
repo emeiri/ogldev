@@ -172,9 +172,9 @@ void VulkanCore::GetInstanceVersion()
 	VkResult res = vkEnumerateInstanceVersion(&InstanceVersion);
 	CHECK_VK_RESULT(res, "vkEnumerateInstanceVersion");
 
-	m_instanceVersion.Major = VK_VERSION_MAJOR(InstanceVersion);
-	m_instanceVersion.Minor = VK_VERSION_MINOR(InstanceVersion);
-	m_instanceVersion.Patch = VK_VERSION_PATCH(InstanceVersion);
+	m_instanceVersion.Major = VK_API_VERSION_MAJOR(InstanceVersion);
+	m_instanceVersion.Minor = VK_API_VERSION_MINOR(InstanceVersion);
+	m_instanceVersion.Patch = VK_API_VERSION_PATCH(InstanceVersion);
 
 	printf("Vulkan loader supports version %d.%d.%d\n", 
 		   m_instanceVersion.Major, m_instanceVersion.Minor, m_instanceVersion.Patch);
@@ -224,7 +224,8 @@ void VulkanCore::CreateInstance(const char* pAppName)
 		.applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
 		.pEngineName = "Ogldev Vulkan Tutorials",
 		.engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
-		.apiVersion = VK_MAKE_API_VERSION(0, m_instanceVersion.Major, m_instanceVersion.Minor, 0)
+		.apiVersion = VK_MAKE_API_VERSION(0, m_instanceVersion.Major, 
+										  m_instanceVersion.Minor, 0)
 	};
 
 	VkInstanceCreateInfo CreateInfo = {

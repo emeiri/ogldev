@@ -175,18 +175,20 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 	VkPipelineRenderingCreateInfo RenderingInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
 		.pNext = NULL,
+		.viewMask = 0,
 		.colorAttachmentCount = 1,
 		.pColorAttachmentFormats = &ColorFormat,
 		.depthAttachmentFormat = DepthFormat,
 		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 	};
 
-	VkPipelineLayoutCreateInfo LayoutInfo = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
-	};
+	VkPipelineLayoutCreateInfo LayoutInfo = {};
 
-	LayoutInfo.setLayoutCount = 1;
-	LayoutInfo.pSetLayouts = &m_descriptorSetLayout;
+	LayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.setLayoutCount = 1,
+		.pSetLayouts = &m_descriptorSetLayout
+	};
 
 	VkResult res = vkCreatePipelineLayout(m_device, &LayoutInfo, NULL, &m_pipelineLayout);
 	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
