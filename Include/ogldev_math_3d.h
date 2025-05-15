@@ -47,7 +47,13 @@
 #define ToRadian(x) (float)(((x) * M_PI / 180.0f))
 #define ToDegree(x) (float)(((x) * 180.0f / M_PI))
 
-float RandomFloat();
+static inline float RandomFloat()
+{
+    float Max = RAND_MAX;
+    return ((float)RANDOM() / Max);
+}
+
+
 float RandomFloatRange(float Start, float End);
 
 struct Vector2i

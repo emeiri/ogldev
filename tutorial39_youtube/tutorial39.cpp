@@ -100,7 +100,7 @@ public:
 #else
             float scale = 0.0000000000035f; // need to slow it down a bit on Linux
 #endif
-            FogTime += scale * ((float)rand()/10.0f) * RunningTime;
+            FogTime += scale * ((float)RANDOM()/10.0f) * RunningTime;
             m_phongRenderer.UpdateAnimatedFogTime(FogTime);
         }
 

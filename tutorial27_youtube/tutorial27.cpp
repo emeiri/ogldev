@@ -317,11 +317,7 @@ void InitializeGlutCallbacks()
 
 int main(int argc, char** argv)
 {
-#ifdef _WIN64
-    srand(GetCurrentProcessId());
-#else
-    srandom(getpid());
-#endif
+    SRANDOM;
 
     glutInit(&argc, argv);
     glutInitContextVersion(3, 3);

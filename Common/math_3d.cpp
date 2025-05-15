@@ -524,13 +524,6 @@ bool Quaternion::IsZero() const
 }
 
 
-float RandomFloat()
-{
-    float Max = RAND_MAX;
-    return ((float)RANDOM() / Max);
-}
-
-
 float RandomFloatRange(float Start, float End)
 {
    // return Start;

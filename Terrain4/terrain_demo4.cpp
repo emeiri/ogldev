@@ -110,7 +110,6 @@ public:
                     m_terrain.Destroy();
                     int Size = 512;
                     float MinHeight = 0.0f;
-                    //srand(4232);
                     m_terrain.CreateMidpointDisplacement(Size, Roughness, MinHeight, MaxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
@@ -369,14 +368,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-#ifdef _WIN64
-    int Seed = GetCurrentProcessId();
-    srand(Seed);
-    printf("random seed %d\n", Seed);
-   // srand(0);
-#else
-    srand(getpid());
-#endif
+    SRANDOM;
 
     app = new TerrainDemo4();
 

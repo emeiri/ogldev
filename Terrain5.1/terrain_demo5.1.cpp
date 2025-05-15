@@ -105,7 +105,7 @@ public:
 
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
-                    srand(g_seed);
+                    SRANDOM;
                     m_terrain.SetLight(m_lightDir, m_lightSoftness);
                     m_terrain.CreateMidpointDisplacement(m_terrainSize, m_roughness, m_minHeight, m_maxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
@@ -198,7 +198,7 @@ public:
 
             case GLFW_KEY_L:
                 m_terrain.Destroy();
-                srand(g_seed);
+                SRANDOM;
                 m_counter += 0.1f;
                 m_lightDir.x = sinf(m_counter);
                 m_lightDir.z = cosf(m_counter);
@@ -335,7 +335,7 @@ int main(int argc, char** argv)
    // g_seed = 13788;
     printf("random seed %d\n", g_seed);
 
-    srand(g_seed);
+    SRANDOM;
 
     app = new TerrainDemo5_1();
 

@@ -81,9 +81,9 @@ struct Vertex {
     {
         pos = Vector3f(x, y, 0.0f);
 
-        float red   = (float)rand() / (float)RAND_MAX;
-        float green = (float)rand() / (float)RAND_MAX;
-        float blue  = (float)rand() / (float)RAND_MAX;
+        float red   = RandomFloat();
+        float green = RandomFloat();
+        float blue  = RandomFloat();
         color = Vector3f(red, green, blue);
     }
 };
@@ -246,11 +246,7 @@ static void CompileShaders()
 
 int main(int argc, char** argv)
 {
-#ifdef _WIN64
-    srand(GetCurrentProcessId());
-#else
-    srandom(getpid());
-#endif
+    SRANDOM;
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);

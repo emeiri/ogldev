@@ -104,7 +104,7 @@ public:
 
                 if (ImGui::Button("Generate")) {
                     m_terrain.Destroy();
-                    srand(g_seed);
+                    SRANDOM;
                     m_terrain.CreateMidpointDisplacement(m_terrainSize, m_patchSize, m_roughness, m_minHeight, m_maxHeight);
                     m_terrain.SetTextureHeights(Height0, Height1, Height2, Height3);
                 }
@@ -331,7 +331,7 @@ int main(int argc, char** argv)
 #endif
     printf("random seed %d\n", g_seed);
 
-    srand(g_seed);
+    SRANDOM;
 
     app = new TerrainDemo6();
 

@@ -285,11 +285,7 @@ static void MouseButtonCallback(GLFWwindow* window, int Button, int Action, int 
 
 int main(int argc, char** argv)
 {
-#ifdef _WIN64
-    srand(GetCurrentProcessId());
-#else
-    srand(getpid());
-#endif
+    SRANDOM;
 
     app = new TerrainDemo2();
 

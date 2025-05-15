@@ -363,7 +363,7 @@ int main(int argc, char** argv)
 #endif
     printf("random seed %d\n", g_seed);
 
-    srand(g_seed);
+    SRANDOM;
 
     app = new TerrainWater();
 

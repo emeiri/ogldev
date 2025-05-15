@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ogldev_math_3d.h"
 #include "ogldev_random_texture.h"
 #include "ogldev_util.h"
 
@@ -42,7 +43,7 @@ bool RandomTexture::Init(uint size)
     uint TextureSize = size * size * 3;
     float* pRandom = new float[TextureSize];
     for (uint i = 0 ; i < TextureSize ; i++) {
-        float r = 2.0f * (float)rand()/RAND_MAX - 1.0f;
+        float r = 2.0f * RandomFloat() - 1.0f;
         pRandom[i] = r;
     }
     

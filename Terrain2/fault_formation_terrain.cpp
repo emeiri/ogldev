@@ -118,14 +118,14 @@ float FaultFormationTerrain::FIRFilterSinglePoint(int x, int z, float PrevVal, f
 
 void FaultFormationTerrain::GenRandomTerrainPoints(TerrainPoint& p1, TerrainPoint& p2)
 {
-    p1.x = rand() % m_terrainSize;
-    p1.z = rand() % m_terrainSize;
+    p1.x = RANDOM() % m_terrainSize;
+    p1.z = RANDOM() % m_terrainSize;
 
     int Counter = 0;
 
     do {
-        p2.x = rand() % m_terrainSize;
-        p2.z = rand() % m_terrainSize;
+        p2.x = RANDOM() % m_terrainSize;
+        p2.z = RANDOM() % m_terrainSize;
 
         if (Counter++ == 1000) {
             printf("Endless loop detected in %s:%d\n", __FILE__, __LINE__);
