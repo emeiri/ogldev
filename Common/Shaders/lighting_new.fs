@@ -559,10 +559,8 @@ vec3 schlickFresnel(float vDotH, vec3 Albedo)
     if (gPBRmaterial.IsAlbedo) {
         float Metallic = texture(gMetallic, TexCoord0.xy).x;
         F0 = mix(F0, Albedo, Metallic);
-    } else {
-        if (gPBRmaterial.IsMetal) {
-	        F0 = gPBRmaterial.Color;
-	    }
+    } else if (gPBRmaterial.IsMetal) {
+	    F0 = gPBRmaterial.Color;	    
     }
 
     vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
