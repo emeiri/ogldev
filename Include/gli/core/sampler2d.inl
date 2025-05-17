@@ -72,8 +72,8 @@ namespace gli
 
 		extent_type const TextureSize = this->Texture.extent(0);
 
-		int const LevelCount = glm::log2<int>(max(TextureSize.x, TextureSize.y));
-		T const d = max(dot(dPdx, dPdx), dot(dPdy, dPdy));
+		int const LevelCount = glm::log2<int>(std::max(TextureSize.x, TextureSize.y));
+		T const d = std::max(dot(dPdx, dPdx), dot(dPdy, dPdy));
 		T const Clamped = clamp(d, static_cast<T>(1), static_cast<T>(pow(2, (LevelCount - 1) * 2)));
 
 		T const Level = static_cast<T>(0.5) * glm::log2<T>(Clamped);

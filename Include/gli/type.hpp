@@ -36,9 +36,9 @@ namespace gli
 	typedef glm::uint8 byte;
 
 	typedef ivec1 extent1d;
-	typedef ivec2 extent2d;
-	typedef ivec3 extent3d;
-	typedef ivec4 extent4d;
+	typedef gli::ivec2 extent2d;
+	typedef gli::ivec3 extent3d;
+	typedef gli::ivec4 extent4d;
 
 	template <typename T, qualifier P>
 	inline vec<4, T, P> make_vec4(vec<1, T, P> const & v)

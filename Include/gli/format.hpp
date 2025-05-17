@@ -299,7 +299,7 @@ namespace gli
 	size_t block_size(format Format);
 
 	/// Return the dimensions in texels of the block for a format
-	ivec3 block_extent(format Format);
+    gli::ivec3 block_extent(format Format);
 
 	/// Return the number of components of a format
 	size_t component_count(format Format);

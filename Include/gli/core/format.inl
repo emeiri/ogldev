@@ -318,7 +318,7 @@ namespace detail
 		return detail::get_format_info(Format).BlockSize;
 	}
 
-	inline ivec3 block_extent(format Format)
+	inline gli::ivec3 block_extent(format Format)
 	{
 		return gli::ivec3(detail::get_format_info(Format).BlockExtent);
 	}
