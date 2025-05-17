@@ -130,7 +130,7 @@ public:
                                       zNear, zFar };
 
         glm::vec3 Pos(0.0f, 2.1f, 0.0f);
-        glm::vec3 Target(0.0f, 2.1f, 1.0f);
+        glm::vec3 Target(0.0f, -0.25f, 1.0f);
         glm::vec3 Up(0.0, 1.0f, 0.0f);
 
         m_pCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);   
