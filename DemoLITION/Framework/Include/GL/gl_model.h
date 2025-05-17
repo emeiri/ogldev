@@ -19,7 +19,7 @@
 #pragma once
 
 #include "Int/core_model.h"
-#include "GL\gl_indirect_render.h"
+#include "GL/gl_indirect_render.h"
 
 class GLModel : public CoreModel
 {

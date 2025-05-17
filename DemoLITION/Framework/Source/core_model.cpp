@@ -504,7 +504,7 @@ const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
 }
 
 
-static std::string TextureTypeToString(aiTextureType type) {
+static std::string OgldevTextureTypeToString(aiTextureType type) {
     static std::map<aiTextureType, std::string> textureTypeNames = {
         {aiTextureType_DIFFUSE, "Diffuse"},
         {aiTextureType_SPECULAR, "Specular"},
@@ -540,7 +540,7 @@ static int GetTextureCount(const aiMaterial* pMaterial)
         TextureCount += Count;
 
         if (Count > 0) {
-            printf("Found texture %s\n", TextureTypeToString(ttype).c_str());
+            printf("Found texture %s\n", OgldevTextureTypeToString(ttype).c_str());
         }
     }
 

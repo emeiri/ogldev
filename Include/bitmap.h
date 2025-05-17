@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <string.h>
 #include <glm/glm.hpp>
 
 enum eBitmapFormat

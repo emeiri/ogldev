@@ -16,8 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "GL\gl_ssbo_db.h"
-#include "GL\gl_indirect_render.h"
+#include "GL/gl_ssbo_db.h"
+#include "GL/gl_indirect_render.h"
 
 struct PerObjectData {
     Matrix4f WorldMatrix;

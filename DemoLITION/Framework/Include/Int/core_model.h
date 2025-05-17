@@ -29,7 +29,7 @@
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
-#include "GL\gl_basic_mesh_entry.h"
+#include "GL/gl_basic_mesh_entry.h"
 
 
 class DemolitionRenderCallbacks
