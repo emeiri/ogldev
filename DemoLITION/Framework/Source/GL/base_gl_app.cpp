@@ -110,6 +110,10 @@ bool BaseGLApp::OnKeyboard(int key, int action)
         m_pRenderingSystem->GetCurrentCamera()->SetUp(0.0f, 0.0f, -1.0f);
         break;*/
 
+    case GLFW_KEY_R:
+        m_pRenderingSystem->ReloadShaders();
+        break;
+
     default:
         HandledByMe = false;
         break;

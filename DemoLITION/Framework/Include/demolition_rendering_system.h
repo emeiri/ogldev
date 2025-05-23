@@ -66,6 +66,8 @@ public:
 
     virtual void* CreateWindow(int Width, int Height, const char* pWindowName) = 0;
 
+    virtual void ReloadShaders() = 0;
+
     virtual void Shutdown() = 0;
 
     virtual void Execute() = 0;

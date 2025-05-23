@@ -98,6 +98,11 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
     glUseProgram(0);
 }
 
+void ForwardRenderer::ReloadShaders()
+{
+    InitTechniques();
+}
+
 
 void ForwardRenderer::InitTechniques()
 {

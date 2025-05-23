@@ -48,6 +48,10 @@ Technique::~Technique()
 
 bool Technique::Init()
 {
+    if (m_shaderProg) {
+        glDeleteProgram(m_shaderProg);
+    }
+
     m_shaderProg = glCreateProgram();
 
     if (m_shaderProg == 0) {

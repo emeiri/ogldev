@@ -74,6 +74,13 @@ void RenderingSystemGL::Shutdown()
     delete this;
 }
 
+
+void RenderingSystemGL::ReloadShaders()
+{
+    m_forwardRenderer.ReloadShaders();
+}
+
+
 void* RenderingSystemGL::CreateWindowInternal(const char* pWindowName)
 {
     int major_ver = 0;

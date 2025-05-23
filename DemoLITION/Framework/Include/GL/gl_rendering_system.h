@@ -37,6 +37,8 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual void Shutdown();
 
+    virtual void ReloadShaders();
+
     virtual Scene* CreateEmptyScene();
 
     virtual CoreModel* LoadModelInternal(const std::string& Filename);

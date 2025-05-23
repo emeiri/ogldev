@@ -65,6 +65,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL);
 
+    void ReloadShaders();
+
     void SetCamera(GLMCameraFirstPerson* pCamera) {
         m_pCurCamera = pCamera; 
     }
