@@ -455,6 +455,19 @@ void GLModel::SetNormalMap(int TextureHandle)
     else {
         BaseTexture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
         m_pNormalMap = (Texture*)pTexture;
+
+        // Hack 
+        if (m_Materials.size() > 0) {
+            if (m_Materials[0].pNormal) {
+                delete m_Materials[0].pNormal;
+            }
+
+            m_Materials[0].pNormal = m_pNormalMap;
+
+            if (UseIndirectRender) {
+                m_indirectRender.RefreshMaterials(m_Materials);
+            }
+        }
     }
 }
 

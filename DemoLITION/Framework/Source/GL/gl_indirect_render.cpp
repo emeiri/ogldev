@@ -34,7 +34,7 @@ struct DrawElementsIndirectCommand {
 };
 
 
-void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, std::vector<Material>& Materials)
+void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<Material>& Materials)
 {
     assert(Meshes.size() > 0);
 
@@ -89,7 +89,7 @@ void IndirectRender::AllocPerObjectBuffer(const std::vector<BasicMeshEntry>& Mes
 }
 
 
-void IndirectRender::PrepareIndirectRenderMaterials(std::vector<Material>& Materials)
+void IndirectRender::PrepareIndirectRenderMaterials(const std::vector<Material>& Materials)
 {
     int NumMaterials = (int)Materials.size();
 
@@ -112,13 +112,13 @@ void IndirectRender::PrepareIndirectRenderMaterials(std::vector<Material>& Mater
     }
 
     glCreateBuffers(1, &m_colorsBuffer);
-    glNamedBufferStorage(m_colorsBuffer, sizeof(MaterialColorIndirect) * NumMaterials, m_colors.data(), 0);
+    glNamedBufferStorage(m_colorsBuffer, sizeof(MaterialColorIndirect) * NumMaterials, m_colors.data(), GL_DYNAMIC_STORAGE_BIT);
 
     glCreateBuffers(1, &m_diffuseMapBuffer);
-    glNamedBufferStorage(m_diffuseMapBuffer, sizeof(GLuint64) * NumMaterials, m_diffuseMaps.data(), 0);
+    glNamedBufferStorage(m_diffuseMapBuffer, sizeof(GLuint64) * NumMaterials, m_diffuseMaps.data(), GL_DYNAMIC_STORAGE_BIT);
 
     glCreateBuffers(1, &m_normalMapBuffer);
-    glNamedBufferStorage(m_normalMapBuffer, sizeof(GLuint64) * NumMaterials, m_normalMaps.data(), 0);
+    glNamedBufferStorage(m_normalMapBuffer, sizeof(GLuint64) * NumMaterials, m_normalMaps.data(), GL_DYNAMIC_STORAGE_BIT);
 }
 
 
@@ -133,6 +133,31 @@ void IndirectRender::Render(const Matrix4f& ObjectMatrix)
                                 (GLsizei)m_meshes.size(), 0);
 
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+}
+
+void IndirectRender::RefreshMaterials(const std::vector<Material>& Materials)
+{
+    int NumMaterials = (int)Materials.size();
+
+    for (int i = 0; i < NumMaterials; i++) {
+        m_colors[i].AmbientColor = Materials[i].AmbientColor;
+        m_colors[i].DiffuseColor = Materials[i].DiffuseColor;
+        m_colors[i].SpecularColor = Materials[i].SpecularColor;
+        if (Materials[i].pDiffuse && (Materials[i].pDiffuse->GetBindlessHandle() == -1)) {
+            printf("Diffuse texture exists but bindless handle is missing\n");
+            exit(1);
+        }
+        GLuint64 DiffuseMapBindlessHandle = Materials[i].pDiffuse ? Materials[i].pDiffuse->GetBindlessHandle() : -1;
+        m_diffuseMaps[i] = DiffuseMapBindlessHandle;
+        GLuint64 NormalMapBindlessHandle = Materials[i].pNormal ? Materials[i].pNormal->GetBindlessHandle() : -1;
+        m_normalMaps[i] = NormalMapBindlessHandle;
+    }
+
+    glNamedBufferSubData(m_colorsBuffer, 0, sizeof(MaterialColorIndirect) * NumMaterials, m_colors.data());
+
+    glNamedBufferSubData(m_diffuseMapBuffer, 0, sizeof(GLuint64) * NumMaterials, m_diffuseMaps.data());
+
+    glNamedBufferSubData(m_normalMapBuffer, 0, sizeof(GLuint64) * NumMaterials, m_normalMaps.data());
 }
 
 

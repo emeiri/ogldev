@@ -33,9 +33,11 @@ public:
 
     ~IndirectRender() {}
 
-    void Init(const std::vector<BasicMeshEntry>& Meshes, std::vector<Material>& Materials);
+    void Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<Material>& Materials);
 
     void Render(const Matrix4f& ObjectMatrix);
+
+    void RefreshMaterials(const std::vector<Material>& Materials);
 
 private:
 
@@ -47,7 +49,7 @@ private:
 
     void UpdatePerObjectData(const Matrix4f& ObjectMatrix);
 
-    void PrepareIndirectRenderMaterials(std::vector<Material>& Materials);
+    void PrepareIndirectRenderMaterials(const std::vector<Material>& Materials);
 
     struct MaterialColorIndirect {
         Vector4f AmbientColor;
