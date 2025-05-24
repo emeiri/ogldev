@@ -132,13 +132,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation1", "Tessellati
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tessellation2", "Tessellation2\Tessellation2.vcxproj", "{8B19DAE8-A479-4205-B185-122794736B3B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial29", "Tutorial29\Tutorial29.vcxproj", "{0B6C8872-20D5-4F6A-BA12-2EB9380A429F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial29_VertexPipelineFinale", "Tutorial29\Tutorial29.vcxproj", "{0B6C8872-20D5-4F6A-BA12-2EB9380A429F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial31", "Tutorial31\Tutorial31.vcxproj", "{7887096A-82A0-485A-A137-B4FD06CC0548}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial31_3DPicking", "Tutorial31\Tutorial31.vcxproj", "{7887096A-82A0-485A-A137-B4FD06CC0548}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial32_RayCasting", "Tutorial32\Tutorial32.vcxproj", "{905B0D85-B00D-42B5-B40E-BEC17188E053}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial33", "Tutorial33\Tutorial33.vcxproj", "{D0095B63-1959-49A8-875C-D3773C463621}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial33_SpriteBatching", "Tutorial33\Tutorial33.vcxproj", "{D0095B63-1959-49A8-875C-D3773C463621}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB346B-6660-46F9-91AB-2CC238300A31}"
 	ProjectSection(SolutionItems) = preProject
@@ -338,7 +338,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial46_FreetypeGLDemo",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial47_2DTess", "Tutorial47_2DTess\Tutorial47.vcxproj", "{A245B570-737B-4F9C-9BF9-C1FC0C3472E1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30", "Tutorial30\Tutorial30.vcxproj", "{369B38BC-3A9B-40E4-A24F-75265E574EE2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30_Debugging", "Tutorial30\Tutorial30.vcxproj", "{369B38BC-3A9B-40E4-A24F-75265E574EE2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial48_MeshOptimizer", "Tutorial48_MeshOptimizer\Tutorial48.vcxproj", "{F7F975F0-C197-4A9A-B4AA-0EF215183B8B}"
 EndProject
@@ -511,6 +511,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial21", "Vulkan\Tutorial21\Tutorial21.vcxproj", "{8116E841-0AAF-4B14-A45C-C8C31E4B1BC1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial61_ClothSim", "Tutorial61_ClothSim\Tutorial61.vcxproj", "{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
 	EndProjectSection
 EndProject
 Global
@@ -1401,6 +1406,14 @@ Global
 		{8116E841-0AAF-4B14-A45C-C8C31E4B1BC1}.Release|x64.Build.0 = Release|x64
 		{8116E841-0AAF-4B14-A45C-C8C31E4B1BC1}.Release|x86.ActiveCfg = Release|Win32
 		{8116E841-0AAF-4B14-A45C-C8C31E4B1BC1}.Release|x86.Build.0 = Release|Win32
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Debug|x64.ActiveCfg = Debug|x64
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Debug|x64.Build.0 = Debug|x64
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Debug|x86.ActiveCfg = Debug|Win32
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Debug|x86.Build.0 = Debug|Win32
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Release|x64.ActiveCfg = Release|x64
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Release|x64.Build.0 = Release|x64
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Release|x86.ActiveCfg = Release|Win32
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1523,6 +1536,7 @@ Global
 		{BEFB13F3-683C-4127-AEA3-ADB21222FC36} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{229961D5-273F-48A6-B47F-DDF3806B2E9E} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{8116E841-0AAF-4B14-A45C-C8C31E4B1BC1} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}

@@ -1,0 +1,41 @@
+#pragma once
+
+#include "render_technique.h"
+#include "cloth_technique.h"
+#include "ogldev_texture.h"
+
+class Cloth
+{
+public:
+    Cloth();
+
+    void Init();
+    void Update(float t);
+    void Render(const Matrix4f& WV, const Matrix4f& WVP);
+
+private:
+    
+    void InitBuffers();
+    void CalcPositions(vector<Vector4f>& Positions);
+    void ExecuteComputeShader();
+    void RenderCloth(const Matrix4f& WV, const Matrix4f& WVP);
+
+    Texture m_tex;
+
+    RenderTechnique m_renderTech;
+    ClothTechnique m_clothTech;
+
+    GLuint numElements = 0;
+    glm::ivec2 nParticles = glm::ivec2(40, 40);
+    float m_speed, m_angle;
+	
+    GLuint m_vao = 0;
+    float time = 0.0f, deltaT = 0.0f, speed = 200.0f;
+    GLuint readBuf;
+    GLuint posBufs[2], velBufs[2];
+    GLuint normBuf, elBuf, tcBuf;
+
+    glm::vec2 clothSize = glm::vec2(4.0f, 3.0f);
+};
+
+
