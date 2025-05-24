@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\..\tutorial61_youtube\render_technique.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\tutorial61_youtube\cloth_normal_technique.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
@@ -80,6 +83,9 @@
     <ClInclude Include="..\..\..\tutorial61_youtube\render_technique.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\tutorial61_youtube\cloth_normal_technique.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\tutorial61_youtube\cloth.cs">
@@ -89,6 +95,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\..\tutorial61_youtube\render.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\tutorial61_youtube\cloth_normal.cs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

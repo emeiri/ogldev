@@ -81,7 +81,7 @@ public:
 
         m_cloth.Render(WV, VP);
 
-        m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
+       // m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
     }
 
 

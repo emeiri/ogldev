@@ -2,6 +2,7 @@
 
 #include "render_technique.h"
 #include "cloth_technique.h"
+#include "cloth_normal_technique.h"
 #include "ogldev_texture.h"
 
 class Cloth
@@ -24,6 +25,7 @@ private:
 
     RenderTechnique m_renderTech;
     ClothTechnique m_clothTech;
+    ClothNormalTechnique m_clothNormTech;
 
     GLuint numElements = 0;
     glm::ivec2 nParticles = glm::ivec2(40, 40);

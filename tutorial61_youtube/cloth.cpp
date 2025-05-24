@@ -31,7 +31,10 @@ Cloth::Cloth() : m_tex(GL_TEXTURE_2D)
 
 void Cloth::Init()
 {
-    m_renderTech.Init();    
+    m_renderTech.Init(); 
+
+    m_clothNormTech.Init();
+
     m_clothTech.Init();
     m_clothTech.Enable();
     float dx = clothSize.x / (nParticles.x - 1);
@@ -186,10 +189,9 @@ void Cloth::ExecuteComputeShader()
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1 - readBuf]);
     }
 
-
-   // glDispatchCompute(m_totalCloth, 1, 1);
-
-  //  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    m_clothNormTech.Enable();
+    glDispatchCompute(nParticles.x / 10, nParticles.y / 10, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 

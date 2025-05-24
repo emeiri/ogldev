@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp" />
     <ClCompile Include="..\..\..\tutorial61_youtube\cloth.cpp" />
+    <ClCompile Include="..\..\..\tutorial61_youtube\cloth_normal_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial61_youtube\cloth_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial61_youtube\render_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial61_youtube\tutorial61.cpp" />
@@ -41,11 +42,13 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\tutorial61_youtube\cloth.h" />
+    <ClInclude Include="..\..\..\tutorial61_youtube\cloth_normal_technique.h" />
     <ClInclude Include="..\..\..\tutorial61_youtube\cloth_technique.h" />
     <ClInclude Include="..\..\..\tutorial61_youtube\render_technique.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\tutorial61_youtube\cloth.cs" />
+    <None Include="..\..\..\tutorial61_youtube\cloth_normal.cs" />
     <None Include="..\..\..\tutorial61_youtube\render.fs" />
     <None Include="..\..\..\tutorial61_youtube\render.vs" />
   </ItemGroup>
