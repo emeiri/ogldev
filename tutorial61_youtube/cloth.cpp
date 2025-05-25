@@ -168,12 +168,14 @@ void Cloth::Update(float dt)
 
 void Cloth::Render(const Matrix4f& WV, const Matrix4f& WVP)
 {
-    ExecuteComputeShader();
+    ExecuteClothSim();
+
+    RecalcNormals();
 
     RenderCloth(WVP, WVP);
 }
 
-void Cloth::ExecuteComputeShader()
+void Cloth::ExecuteClothSim()
 {
     m_clothTech.Enable();
 

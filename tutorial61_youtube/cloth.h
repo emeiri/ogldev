@@ -18,7 +18,8 @@ private:
     
     void InitBuffers();
     void CalcPositions(vector<Vector4f>& Positions);
-    void ExecuteComputeShader();
+    void ExecuteClothSim();
+    void RecalcNormals();
     void RenderCloth(const Matrix4f& WV, const Matrix4f& WVP);
 
     Texture m_tex;
