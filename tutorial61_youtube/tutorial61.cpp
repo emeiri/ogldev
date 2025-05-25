@@ -41,9 +41,6 @@ public:
 
     Tutorial61()
     {
-        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 2.2f;
-        m_dirLight.AmbientIntensity = 1.5f;
     }
 
 
@@ -56,7 +53,7 @@ public:
     {
         InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 61");
 
-        m_pGameCamera->SetPos(glm::vec3(0.0f, 0.5f, -5.0f));
+        m_pGameCamera->SetPos(glm::vec3(1.0f, 0.5f, -5.0f));
 
         InitInfiniteGrid();
 
@@ -110,7 +107,6 @@ public:
 
     InfiniteGrid m_infiniteGrid;
     InfiniteGridConfig m_config;
-    DirectionalLight m_dirLight;
     Cloth m_cloth;
 };
 
