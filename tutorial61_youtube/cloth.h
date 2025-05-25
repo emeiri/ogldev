@@ -17,6 +17,7 @@ public:
 private:
     
     void InitBuffers();
+    void InitIndices(std::vector<GLuint>& Indices);
     void InitVertices(std::vector<glm::vec4>& Positions, 
                       std::vector<glm::vec4>& Velocities, 
                       std::vector<glm::vec2>& TexCoords);
@@ -30,14 +31,14 @@ private:
     RenderTechnique m_renderTech;    
     ClothNormalTechnique m_clothNormTech;
 
-    GLuint numElements = 0;
+    GLuint m_numIndices = 0;
     glm::ivec2 m_numParticles = glm::ivec2(100, 100);
     glm::vec2 m_clothSize = glm::vec2(4.0f, 3.0f);
 	
     GLuint m_vao = 0;
     GLuint m_curBuf = 0;
-    GLuint posBufs[2], velBufs[2];
-    GLuint normBuf, elBuf, tcBuf;
+    GLuint m_posBufs[2], m_velBufs[2];
+    GLuint m_normBuf, m_ib, m_tcBuf;
 };
 
 

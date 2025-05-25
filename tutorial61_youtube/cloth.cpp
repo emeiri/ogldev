@@ -58,70 +58,63 @@ void Cloth::InitBuffers()
 
     InitVertices(Positions, Velocities, TexCoords);
 
-    // Every row is one triangle strip
-    vector<GLuint> el;
-    for (int row = 0; row < m_numParticles.y - 1; row++) {
-        for (int col = 0; col < m_numParticles.x; col++) {
-            el.push_back((row) * m_numParticles.x + (col));
-            el.push_back((row + 1)*m_numParticles.x + (col));
-        }
-        el.push_back(PRIM_RESTART);
-    }
+    std::vector<GLuint> Indices;
+    InitIndices(Indices);
 
     // We need buffers for position (2), element index,
     // velocity (2), normal, and texture coordinates.
     GLuint bufs[7];
     glGenBuffers(7, bufs);
-    posBufs[0] = bufs[0];
-    posBufs[1] = bufs[1];
-    velBufs[0] = bufs[2];
-    velBufs[1] = bufs[3];
-    normBuf = bufs[4];
-    elBuf = bufs[5];
-    tcBuf = bufs[6];
+    m_posBufs[0] = bufs[0];
+    m_posBufs[1] = bufs[1];
+    m_velBufs[0] = bufs[2];
+    m_velBufs[1] = bufs[3];
+    m_normBuf = bufs[4];
+    m_ib = bufs[5];
+    m_tcBuf = bufs[6];
 
     // The buffers for positions
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[0]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBufs[0]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), &Positions[0], GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_posBufs[1]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
     // Velocities
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[0]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_velBufs[0]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), &Velocities[0], GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_velBufs[1]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
 
     // Normal buffer
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, normBuf);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_normBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
 
     // Element indicies
-    glBindBuffer(GL_ARRAY_BUFFER, elBuf);
-    glBufferData(GL_ARRAY_BUFFER, el.size() * sizeof(GLuint), &el[0], GL_DYNAMIC_COPY);
+    glBindBuffer(GL_ARRAY_BUFFER, m_ib);
+    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(Indices), Indices.data(), GL_DYNAMIC_COPY);
 
     // Texture coordinates
-    glBindBuffer(GL_ARRAY_BUFFER, tcBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, m_tcBuf);
     glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(TexCoords), &TexCoords[0], GL_STATIC_DRAW);
 
-    numElements = GLuint(el.size());
+    m_numIndices = GLuint(Indices.size());
 
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, posBufs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, m_posBufs[0]);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, normBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, m_normBuf);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, tcBuf);
+    glBindBuffer(GL_ARRAY_BUFFER, m_tcBuf);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(2);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elBuf);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
     glBindVertexArray(0);
 }
 
@@ -153,6 +146,30 @@ void Cloth::InitVertices(std::vector<glm::vec4>& Positions,
 }
 
 
+void Cloth::InitIndices(std::vector<GLuint>& Indices)
+{
+    int NumResetValues = m_numParticles.y - 1;
+    m_numIndices = (m_numParticles.y - 1) * m_numParticles.x * 2 + NumResetValues;
+    Indices.resize(m_numIndices);
+
+    int Index = 0;
+
+    for (int row = 0; row < m_numParticles.y - 1; row++) {
+        for (int col = 0; col < m_numParticles.x; col++) {
+            assert(Index < Indices.size());
+            Indices[Index] = row * m_numParticles.x + col;
+            Index++; 
+            assert(Index < Indices.size());
+            Indices[Index] = (row + 1) * m_numParticles.x + col;
+            Index++;
+        }
+        assert(Index < Indices.size());
+        Indices[Index] = PRIM_RESTART;
+        Index++;        
+    }
+}
+
+
 void Cloth::Render(float dt, const Matrix4f& WV, const Matrix4f& WVP)
 {
     ExecuteClothSim(dt);
@@ -174,10 +191,10 @@ void Cloth::ExecuteClothSim(float dt)
 
         // Swap buffers
         m_curBuf = 1 - m_curBuf;  // 0 --> 1 --> 0 --> ...
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[m_curBuf]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1 - m_curBuf]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[m_curBuf]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1 - m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBufs[m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_posBufs[1 - m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_velBufs[m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_velBufs[1 - m_curBuf]);
     }
 }
 
@@ -203,7 +220,7 @@ void Cloth::RenderCloth(const Matrix4f& WV, const Matrix4f& WVP)
     m_tex.Bind(GL_TEXTURE0);
 
     glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLE_STRIP, numElements, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLE_STRIP, m_numIndices, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
