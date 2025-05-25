@@ -62,8 +62,8 @@ void Cloth::InitBuffers()
     vector<GLuint> el;
     for (int row = 0; row < m_numParticles.y - 1; row++) {
         for (int col = 0; col < m_numParticles.x; col++) {
-            el.push_back((row + 1) * m_numParticles.x + (col));
-            el.push_back((row)*m_numParticles.x + (col));
+            el.push_back((row) * m_numParticles.x + (col));
+            el.push_back((row + 1)*m_numParticles.x + (col));
         }
         el.push_back(PRIM_RESTART);
     }
