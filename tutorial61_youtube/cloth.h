@@ -19,7 +19,7 @@ private:
     void InitBuffers();
     void InitVertices(std::vector<glm::vec4>& Positions, 
                       std::vector<glm::vec4>& Velocities, 
-                      std::vector<float>& TexCoords);
+                      std::vector<glm::vec2>& TexCoords);
     void ExecuteClothSim();
     void RecalcNormals();
     void RenderCloth(const Matrix4f& WV, const Matrix4f& WVP);

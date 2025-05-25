@@ -54,7 +54,7 @@ void Cloth::InitBuffers()
     int TotalParticles = m_numParticles.x * m_numParticles.y;
     std::vector<glm::vec4> Positions(TotalParticles);
     std::vector<glm::vec4> Velocities(TotalParticles, glm::vec4(0.0f));
-    std::vector<float> TexCoords;//(TotalParticles);
+    std::vector<glm::vec2> TexCoords(TotalParticles);
 
     InitVertices(Positions, Velocities, TexCoords);
 
@@ -80,23 +80,21 @@ void Cloth::InitBuffers()
     elBuf = bufs[5];
     tcBuf = bufs[6];
 
-    GLuint parts = m_numParticles.x * m_numParticles.y;
-
     // The buffers for positions
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), &Positions[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), &Positions[0], GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
     // Velocities
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), &Velocities[0], GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), &Velocities[0], GL_DYNAMIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
 
     // Normal buffer
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, normBuf);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
 
     // Element indicies
     glBindBuffer(GL_ARRAY_BUFFER, elBuf);
@@ -104,7 +102,7 @@ void Cloth::InitBuffers()
 
     // Texture coordinates
     glBindBuffer(GL_ARRAY_BUFFER, tcBuf);
-    glBufferData(GL_ARRAY_BUFFER, TexCoords.size() * sizeof(GLfloat), &TexCoords[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(TexCoords), &TexCoords[0], GL_STATIC_DRAW);
 
     numElements = GLuint(el.size());
 
@@ -130,7 +128,7 @@ void Cloth::InitBuffers()
 
 void Cloth::InitVertices(std::vector<glm::vec4>& Positions, 
                          std::vector<glm::vec4>& Velocities, 
-                         std::vector<float>& TexCoords)
+                         std::vector<glm::vec2>& TexCoords)
 {
     glm::mat4 transf = glm::translate(glm::mat4(1.0), glm::vec3(0, clothSize.y, 0));
     transf = glm::rotate(transf, glm::radians(-80.0f), glm::vec3(1, 0, 0));
@@ -151,8 +149,9 @@ void Cloth::InitVertices(std::vector<glm::vec4>& Positions,
             
             Positions[Index] = p;
 
-            TexCoords.push_back(ds * j);
-            TexCoords.push_back(dt * i);
+            glm::vec2 tc(ds * j, dt * i);
+
+            TexCoords[Index] = tc;
 
             Index++;
         }
