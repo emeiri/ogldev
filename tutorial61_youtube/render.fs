@@ -26,9 +26,7 @@ void main()
     float DiffuseFactor = max(dot(PixelToLight, Normal), 0.0);
     float SpecularFactor = pow(max(dot(r,ViewDir), 0.0), Shininess);
 
-    vec3 LightColor = LightIntensity * (Ambient + 
-                                        Diffuse * DiffuseFactor +                                        
-                                        Specular * SpecularFactor);
+    vec3 LightColor = LightIntensity * (Ambient + Diffuse * DiffuseFactor + Specular * SpecularFactor);
 
     FragColor = vec4(LightColor, 1.0) * TexColor;
 }

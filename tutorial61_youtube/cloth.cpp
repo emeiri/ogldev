@@ -23,7 +23,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#define PRIM_RESTART 0xffffff
+#define PRIM_RESTART 0xffffffff
 
 Cloth::Cloth() : m_tex(GL_TEXTURE_2D)
 {
@@ -153,17 +153,6 @@ void Cloth::InitVertices(std::vector<glm::vec4>& Positions,
 }
 
 
-void Cloth::Update(float dt)
-{ 
-  if( time == 0.0f ) {
-    deltaT = 0.0f;
-  } else {
-    deltaT = dt - time;
-  }
-  time = dt;
-
-}
-
 void Cloth::Render(float dt, const Matrix4f& WV, const Matrix4f& WVP)
 {
     ExecuteClothSim(dt);
@@ -184,11 +173,11 @@ void Cloth::ExecuteClothSim(float dt)
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         // Swap buffers
-        readBuf = 1 - readBuf;  // 0 --> 1 --> 0 --> ...
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[readBuf]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1 - readBuf]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[readBuf]);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1 - readBuf]);
+        m_curBuf = 1 - m_curBuf;  // 0 --> 1 --> 0 --> ...
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1 - m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[m_curBuf]);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1 - m_curBuf]);
     }
 }
 

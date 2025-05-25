@@ -72,10 +72,6 @@ public:
         glm::mat4 VP = m_pGameCamera->GetVPMatrix();
         glm::mat4 WV = m_pGameCamera->GetViewMatrix();
 
-        if (!m_isPaused) {
-            m_cloth.Update(dt);
-        }
-
         m_cloth.Render(dt, WV, VP);
 
        // m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
