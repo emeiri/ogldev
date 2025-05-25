@@ -164,20 +164,22 @@ void Cloth::Update(float dt)
 
 }
 
-void Cloth::Render(const Matrix4f& WV, const Matrix4f& WVP)
+void Cloth::Render(float dt, const Matrix4f& WV, const Matrix4f& WVP)
 {
-    ExecuteClothSim();
+    ExecuteClothSim(dt);
 
     RecalcNormals();
 
     RenderCloth(WVP, WVP);
 }
 
-void Cloth::ExecuteClothSim()
+void Cloth::ExecuteClothSim(float dt)
 {
     m_clothTech.Enable();
 
-    for (int i = 0; i < 1000; i++) {
+    int Iterations = std::min((int)(30.0f / dt), 3000);
+
+    for (int i = 0; i < Iterations; i++) {
         glDispatchCompute(m_numParticles.x / 10, m_numParticles.y / 10, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 

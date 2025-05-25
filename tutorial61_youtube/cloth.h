@@ -12,7 +12,8 @@ public:
 
     void Init();
     void Update(float t);
-    void Render(const Matrix4f& WV, const Matrix4f& WVP);
+
+    void Render(float dt, const Matrix4f& WV, const Matrix4f& WVP);
 
 private:
     
@@ -20,7 +21,7 @@ private:
     void InitVertices(std::vector<glm::vec4>& Positions, 
                       std::vector<glm::vec4>& Velocities, 
                       std::vector<glm::vec2>& TexCoords);
-    void ExecuteClothSim();
+    void ExecuteClothSim(float dt);
     void RecalcNormals();
     void RenderCloth(const Matrix4f& WV, const Matrix4f& WVP);
 

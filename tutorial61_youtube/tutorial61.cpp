@@ -76,7 +76,7 @@ public:
             m_cloth.Update(dt);
         }
 
-        m_cloth.Render(WV, VP);
+        m_cloth.Render(dt, WV, VP);
 
        // m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
     }
