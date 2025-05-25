@@ -40,7 +40,7 @@ private:
     GLuint posBufs[2], velBufs[2];
     GLuint normBuf, elBuf, tcBuf;
 
-    glm::vec2 clothSize = glm::vec2(4.0f, 3.0f);
+    glm::vec2 m_clothSize = glm::vec2(4.0f, 3.0f);
 };
 
 

@@ -37,8 +37,8 @@ void Cloth::Init()
 
     m_clothTech.Init();
     m_clothTech.Enable();
-    float dx = clothSize.x / (m_numParticles.x - 1);
-    float dy = clothSize.y / (m_numParticles.y - 1);
+    float dx = m_clothSize.x / (m_numParticles.x - 1);
+    float dy = m_clothSize.y / (m_numParticles.y - 1);
     m_clothTech.SetRestLengthHoriz(dx);
     m_clothTech.SetRestLengthVert(dy);
     m_clothTech.SetRestLengthDiag(sqrtf(dx * dx + dy * dy));
@@ -130,26 +130,20 @@ void Cloth::InitVertices(std::vector<glm::vec4>& Positions,
                          std::vector<glm::vec4>& Velocities, 
                          std::vector<glm::vec2>& TexCoords)
 {
-    glm::mat4 transf = glm::translate(glm::mat4(1.0), glm::vec3(0, clothSize.y, 0));
-    transf = glm::rotate(transf, glm::radians(-80.0f), glm::vec3(1, 0, 0));
-    transf = glm::translate(transf, glm::vec3(0, -clothSize.y, 0));
-
-    float dx = clothSize.x / (m_numParticles.x - 1);
-    float dy = clothSize.y / (m_numParticles.y - 1);
+    float dx = m_clothSize.x / (m_numParticles.x - 1);
+    float dy = m_clothSize.y / (m_numParticles.y - 1);
     float ds = 1.0f / (m_numParticles.x - 1);
     float dt = 1.0f / (m_numParticles.y - 1);
-    glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
+
     int Index = 0;
-    for (int i = 0; i < m_numParticles.y; i++) {
-        for (int j = 0; j < m_numParticles.x; j++) {
-            p.x = dx * j;
-            p.y = dy * i;
-            p.z = 0.0f;
-            p = transf * p;
+
+    for (int y = 0; y < m_numParticles.y; y++) {
+        for (int x = 0; x < m_numParticles.x; x++) {
+            glm::vec4 p(dx * x, 0.0f, dy * y, 1.0f);
             
             Positions[Index] = p;
 
-            glm::vec2 tc(ds * j, dt * i);
+            glm::vec2 tc(ds * x, dt * y);
 
             TexCoords[Index] = tc;
 
