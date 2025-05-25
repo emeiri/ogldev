@@ -61,43 +61,9 @@ void Cloth::InitBuffers()
     std::vector<GLuint> Indices;
     InitIndices(Indices);
 
-    // We need buffers for position (2), element index,
-    // velocity (2), normal, and texture coordinates.
-    GLuint bufs[7];
-    glGenBuffers(7, bufs);
-    m_posBufs[0] = bufs[0];
-    m_posBufs[1] = bufs[1];
-    m_velBufs[0] = bufs[2];
-    m_velBufs[1] = bufs[3];
-    m_normBuf = bufs[4];
-    m_ib = bufs[5];
-    m_tcBuf = bufs[6];
+    GenBufferHandles();
 
-    // The buffers for positions
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), &Positions[0], GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_posBufs[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
-
-    // Velocities
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_velBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), &Velocities[0], GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_velBufs[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
-
-    // Normal buffer
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_normBuf);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
-
-    // Element indicies
-    glBindBuffer(GL_ARRAY_BUFFER, m_ib);
-    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(Indices), Indices.data(), GL_DYNAMIC_COPY);
-
-    // Texture coordinates
-    glBindBuffer(GL_ARRAY_BUFFER, m_tcBuf);
-    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(TexCoords), &TexCoords[0], GL_STATIC_DRAW);
-
-    m_numIndices = GLuint(Indices.size());
+    BindAndUploadBuffers(TotalParticles, Positions, Velocities, Indices, TexCoords);
 
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
@@ -116,6 +82,50 @@ void Cloth::InitBuffers()
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
     glBindVertexArray(0);
+}
+
+void Cloth::BindAndUploadBuffers(int TotalParticles,
+                                 std::vector<glm::vec4>& Positions, 
+                                 std::vector<glm::vec4>& Velocities, 
+                                 std::vector<GLuint>& Indices, 
+                                 std::vector<glm::vec2>& TexCoords)
+{
+    // Positions
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBufs[0]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Positions), Positions.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_posBufs[1]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Positions), NULL, GL_DYNAMIC_DRAW);
+
+    // Velocities
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_velBufs[0]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Velocities), Velocities.data(), GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_velBufs[1]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Velocities), NULL, GL_DYNAMIC_COPY);
+
+    // Normals
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_normBuf);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
+
+    // Indices
+    glBindBuffer(GL_ARRAY_BUFFER, m_ib);
+    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(Indices), Indices.data(), GL_DYNAMIC_COPY);
+
+    // Texture coordinates
+    glBindBuffer(GL_ARRAY_BUFFER, m_tcBuf);
+    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(TexCoords), TexCoords.data(), GL_STATIC_DRAW);
+}
+
+void Cloth::GenBufferHandles()
+{
+    GLuint bufs[7];
+    glGenBuffers(7, bufs);
+    m_posBufs[0] = bufs[0];
+    m_posBufs[1] = bufs[1];
+    m_velBufs[0] = bufs[2];
+    m_velBufs[1] = bufs[3];
+    m_ib = bufs[4];
+    m_tcBuf = bufs[5];
+    m_normBuf = bufs[6];
 }
 
 
@@ -159,10 +169,13 @@ void Cloth::InitIndices(std::vector<GLuint>& Indices)
             assert(Index < Indices.size());
             Indices[Index] = row * m_numParticles.x + col;
             Index++; 
+         
             assert(Index < Indices.size());
             Indices[Index] = (row + 1) * m_numParticles.x + col;
             Index++;
         }
+
+        // Add a reset at the end of each line
         assert(Index < Indices.size());
         Indices[Index] = PRIM_RESTART;
         Index++;        

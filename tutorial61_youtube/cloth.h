@@ -17,6 +17,12 @@ public:
 private:
     
     void InitBuffers();
+    void BindAndUploadBuffers(int TotalParticles,
+                              std::vector<glm::vec4>& Positions, 
+                              std::vector<glm::vec4>& Velocities, 
+                              std::vector<GLuint>& Indices, 
+                              std::vector<glm::vec2>& TexCoords);
+    void GenBufferHandles();
     void InitIndices(std::vector<GLuint>& Indices);
     void InitVertices(std::vector<glm::vec4>& Positions, 
                       std::vector<glm::vec4>& Velocities, 
