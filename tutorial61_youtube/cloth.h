@@ -17,7 +17,9 @@ public:
 private:
     
     void InitBuffers();
-    void CalcPositions(vector<Vector4f>& Positions);
+    void InitVertices(std::vector<glm::vec4>& Positions, 
+                      std::vector<glm::vec4>& Velocities, 
+                      std::vector<float>& TexCoords);
     void ExecuteClothSim();
     void RecalcNormals();
     void RenderCloth(const Matrix4f& WV, const Matrix4f& WVP);
@@ -29,7 +31,7 @@ private:
     ClothNormalTechnique m_clothNormTech;
 
     GLuint numElements = 0;
-    glm::ivec2 nParticles = glm::ivec2(40, 40);
+    glm::ivec2 m_numParticles = glm::ivec2(40, 40);
     float m_speed, m_angle;
 	
     GLuint m_vao = 0;

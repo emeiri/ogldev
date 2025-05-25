@@ -37,8 +37,8 @@ void Cloth::Init()
 
     m_clothTech.Init();
     m_clothTech.Enable();
-    float dx = clothSize.x / (nParticles.x - 1);
-    float dy = clothSize.y / (nParticles.y - 1);
+    float dx = clothSize.x / (m_numParticles.x - 1);
+    float dy = clothSize.y / (m_numParticles.y - 1);
     m_clothTech.SetRestLengthHoriz(dx);
     m_clothTech.SetRestLengthVert(dy);
     m_clothTech.SetRestLengthDiag(sqrtf(dx * dx + dy * dy));
@@ -50,41 +50,20 @@ void Cloth::Init()
 
 void Cloth::InitBuffers()
 {
-    glm::mat4 transf = glm::translate(glm::mat4(1.0), glm::vec3(0, clothSize.y, 0));
-    transf = glm::rotate(transf, glm::radians(-80.0f), glm::vec3(1, 0, 0));
-    transf = glm::translate(transf, glm::vec3(0, -clothSize.y, 0));
-
     // Initial positions of the particles
-    vector<GLfloat> initPos;
-    vector<GLfloat> initVel(nParticles.x * nParticles.y * 4, 0.0f);
-    vector<float> initTc;
-    float dx = clothSize.x / (nParticles.x - 1);
-    float dy = clothSize.y / (nParticles.y - 1);
-    float ds = 1.0f / (nParticles.x - 1);
-    float dt = 1.0f / (nParticles.y - 1);
-    glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
-    for (int i = 0; i < nParticles.y; i++) {
-        for (int j = 0; j < nParticles.x; j++) {
-            p.x = dx * j;
-            p.y = dy * i;
-            p.z = 0.0f;
-            p = transf * p;
-            initPos.push_back(p.x);
-            initPos.push_back(p.y);
-            initPos.push_back(p.z);
-            initPos.push_back(1.0f);
+    int TotalParticles = m_numParticles.x * m_numParticles.y;
+    std::vector<glm::vec4> Positions(TotalParticles);
+    std::vector<glm::vec4> Velocities(TotalParticles, glm::vec4(0.0f));
+    std::vector<float> TexCoords;//(TotalParticles);
 
-            initTc.push_back(ds * j);
-            initTc.push_back(dt * i);
-        }
-    }
+    InitVertices(Positions, Velocities, TexCoords);
 
     // Every row is one triangle strip
     vector<GLuint> el;
-    for (int row = 0; row < nParticles.y - 1; row++) {
-        for (int col = 0; col < nParticles.x; col++) {
-            el.push_back((row + 1) * nParticles.x + (col));
-            el.push_back((row)*nParticles.x + (col));
+    for (int row = 0; row < m_numParticles.y - 1; row++) {
+        for (int col = 0; col < m_numParticles.x; col++) {
+            el.push_back((row + 1) * m_numParticles.x + (col));
+            el.push_back((row)*m_numParticles.x + (col));
         }
         el.push_back(PRIM_RESTART);
     }
@@ -101,17 +80,17 @@ void Cloth::InitBuffers()
     elBuf = bufs[5];
     tcBuf = bufs[6];
 
-    GLuint parts = nParticles.x * nParticles.y;
+    GLuint parts = m_numParticles.x * m_numParticles.y;
 
     // The buffers for positions
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), &initPos[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), &Positions[0], GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
 
     // Velocities
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), &initVel[0], GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), &Velocities[0], GL_DYNAMIC_COPY);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1]);
     glBufferData(GL_SHADER_STORAGE_BUFFER, parts * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
 
@@ -125,7 +104,7 @@ void Cloth::InitBuffers()
 
     // Texture coordinates
     glBindBuffer(GL_ARRAY_BUFFER, tcBuf);
-    glBufferData(GL_ARRAY_BUFFER, initTc.size() * sizeof(GLfloat), &initTc[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, TexCoords.size() * sizeof(GLfloat), &TexCoords[0], GL_STATIC_DRAW);
 
     numElements = GLuint(el.size());
 
@@ -149,10 +128,36 @@ void Cloth::InitBuffers()
 }
 
 
-void Cloth::CalcPositions(vector<Vector4f>& Positions)
+void Cloth::InitVertices(std::vector<glm::vec4>& Positions, 
+                         std::vector<glm::vec4>& Velocities, 
+                         std::vector<float>& TexCoords)
 {
-}
+    glm::mat4 transf = glm::translate(glm::mat4(1.0), glm::vec3(0, clothSize.y, 0));
+    transf = glm::rotate(transf, glm::radians(-80.0f), glm::vec3(1, 0, 0));
+    transf = glm::translate(transf, glm::vec3(0, -clothSize.y, 0));
 
+    float dx = clothSize.x / (m_numParticles.x - 1);
+    float dy = clothSize.y / (m_numParticles.y - 1);
+    float ds = 1.0f / (m_numParticles.x - 1);
+    float dt = 1.0f / (m_numParticles.y - 1);
+    glm::vec4 p(0.0f, 0.0f, 0.0f, 1.0f);
+    int Index = 0;
+    for (int i = 0; i < m_numParticles.y; i++) {
+        for (int j = 0; j < m_numParticles.x; j++) {
+            p.x = dx * j;
+            p.y = dy * i;
+            p.z = 0.0f;
+            p = transf * p;
+            
+            Positions[Index] = p;
+
+            TexCoords.push_back(ds * j);
+            TexCoords.push_back(dt * i);
+
+            Index++;
+        }
+    }
+}
 
 
 void Cloth::Update(float dt)
@@ -180,27 +185,30 @@ void Cloth::ExecuteClothSim()
     m_clothTech.Enable();
 
     for (int i = 0; i < 1000; i++) {
-        glDispatchCompute(nParticles.x / 10, nParticles.y / 10, 1);
+        glDispatchCompute(m_numParticles.x / 10, m_numParticles.y / 10, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         // Swap buffers
-        readBuf = 1 - readBuf;
+        readBuf = 1 - readBuf;  // 0 --> 1 --> 0 --> ...
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBufs[readBuf]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, posBufs[1 - readBuf]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, velBufs[readBuf]);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, velBufs[1 - readBuf]);
     }
-
-    m_clothNormTech.Enable();
-    glDispatchCompute(nParticles.x / 10, nParticles.y / 10, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 
+void Cloth::RecalcNormals()
+{
+    m_clothNormTech.Enable();
+    glDispatchCompute(m_numParticles.x / 10, m_numParticles.y / 10, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+}
+
 void Cloth::RenderCloth(const Matrix4f& WV, const Matrix4f& WVP)
 {
-  glEnable(GL_PRIMITIVE_RESTART);
-  glPrimitiveRestartIndex(PRIM_RESTART);
+    glEnable(GL_PRIMITIVE_RESTART);
+    glPrimitiveRestartIndex(PRIM_RESTART);
 
     m_renderTech.Enable();
 
@@ -213,7 +221,6 @@ void Cloth::RenderCloth(const Matrix4f& WV, const Matrix4f& WVP)
     glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLE_STRIP, numElements, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
 }
 
 
