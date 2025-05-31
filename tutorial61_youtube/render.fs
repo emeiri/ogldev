@@ -1,6 +1,7 @@
 #version 430
 
-in vec3 Position;
+in vec3 WorldPosition;
+in vec3 ViewPosition;
 in vec3 Normal;
 in vec2 TexCoord;
 
@@ -19,8 +20,8 @@ layout( location = 0 ) out vec4 FragColor;
 void main() 
 {
     vec4 TexColor = texture( Tex, TexCoord );
-    vec3 PixelToLight = normalize(LightPosition - Position);
-    vec3 ViewDir = normalize(-Position);
+    vec3 PixelToLight = normalize(LightPosition - WorldPosition);
+    vec3 ViewDir = normalize(-ViewPosition);
     vec3 r = reflect(-PixelToLight, Normal);
     
     float DiffuseFactor = max(dot(PixelToLight, Normal), 0.0);

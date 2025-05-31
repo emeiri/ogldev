@@ -68,13 +68,14 @@ public:
     virtual void RenderSceneCB(float dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-        glm::mat4 VP = m_pGameCamera->GetVPMatrix();
-        glm::mat4 WV = m_pGameCamera->GetViewMatrix();
 
-        m_cloth.Render(dt, WV, VP);
+        const glm::mat4& Projection = m_pGameCamera->GetProjMatrix();
+        glm::mat4 View = m_pGameCamera->GetViewMatrix();
 
        // m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
+        glm::mat4 World = glm::mat4(1.0);
+        m_cloth.Render(dt, World, View, Projection);
+        //m_infiniteGrid.Render(m_config, View * Projection, m_pGameCamera->GetPos());
     }
 
 

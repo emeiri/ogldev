@@ -65,6 +65,12 @@ void Cloth::InitBuffers()
 
     BindAndUploadBuffers(TotalParticles, Positions, Velocities, Indices, TexCoords);
 
+    SetupVAO();
+}
+
+
+void Cloth::SetupVAO()
+{
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
 
@@ -183,13 +189,13 @@ void Cloth::InitIndices(std::vector<GLuint>& Indices)
 }
 
 
-void Cloth::Render(float dt, const Matrix4f& WV, const Matrix4f& WVP)
+void Cloth::Render(float dt, const Matrix4f& World, const Matrix4f& View, const Matrix4f& Projection)
 {
     ExecuteClothSim(dt);
 
     RecalcNormals();
 
-    RenderCloth(WVP, WVP);
+    RenderCloth(World, View, Projection);
 }
 
 void Cloth::ExecuteClothSim(float dt)
@@ -219,16 +225,17 @@ void Cloth::RecalcNormals()
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-void Cloth::RenderCloth(const Matrix4f& WV, const Matrix4f& WVP)
+void Cloth::RenderCloth(const Matrix4f& World, const Matrix4f& View, const Matrix4f& Projection)
 {
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(PRIM_RESTART);
 
     m_renderTech.Enable();
 
-    m_renderTech.SetWVMatrix(WV);
-    m_renderTech.SetNormalMatrix(WV);
-    m_renderTech.SetWVPMatrix(WVP);
+    m_renderTech.SetWorldMatrix(World);
+    m_renderTech.SetNormalMatrix(World);
+    m_renderTech.SetViewMatrix(View);
+    m_renderTech.SetProjectionMatrix(Projection);
 
     m_tex.Bind(GL_TEXTURE0);
 

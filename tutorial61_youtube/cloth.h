@@ -12,11 +12,12 @@ public:
 
     void Init();
 
-    void Render(float dt, const Matrix4f& WV, const Matrix4f& WVP);
+    void Render(float dt, const Matrix4f& World, const Matrix4f& View, const Matrix4f& Projection);
 
 private:
     
     void InitBuffers();
+    void SetupVAO();
     void BindAndUploadBuffers(int TotalParticles,
                               std::vector<glm::vec4>& Positions, 
                               std::vector<glm::vec4>& Velocities, 
@@ -29,7 +30,7 @@ private:
                       std::vector<glm::vec2>& TexCoords);
     void ExecuteClothSim(float dt);
     void RecalcNormals();
-    void RenderCloth(const Matrix4f& WV, const Matrix4f& WVP);
+    void RenderCloth(const Matrix4f& World, const Matrix4f& View, const Matrix4f& Projection);
 
     Texture m_tex;
 
@@ -38,7 +39,7 @@ private:
     ClothNormalTechnique m_clothNormTech;
 
     GLuint m_numIndices = 0;
-    glm::ivec2 m_numParticles = glm::ivec2(100, 100);
+    glm::ivec2 m_numParticles = glm::ivec2(50, 50);
     glm::vec2 m_clothSize = glm::vec2(4.0f, 3.0f);
 	
     GLuint m_vao = 0;

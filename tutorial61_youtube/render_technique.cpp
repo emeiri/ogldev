@@ -40,16 +40,17 @@ bool RenderTechnique::Init()
         return false;
     }
 
-    GET_UNIFORM_AND_CHECK(ModelViewMatrixLoc, "ModelViewMatrix");
+    GET_UNIFORM_AND_CHECK(WorldMatrixLoc, "WorldMatrix");
     GET_UNIFORM_AND_CHECK(NormalMatrixLoc, "NormalMatrix");
-    GET_UNIFORM_AND_CHECK(WVPLoc, "MVP");    
+    GET_UNIFORM_AND_CHECK(ViewMatrixLoc, "ViewMatrix");    
+    GET_UNIFORM_AND_CHECK(ProjectionMatrixLoc, "ProjectionMatrix");
 
     return true;
 }
 
-void RenderTechnique::SetWVMatrix(const Matrix4f& m)
+void RenderTechnique::SetWorldMatrix(const Matrix4f& m)
 {
-    glUniformMatrix4fv(ModelViewMatrixLoc, 1, GL_TRUE, (const GLfloat*)m.m);
+    glUniformMatrix4fv(WorldMatrixLoc, 1, GL_TRUE, (const GLfloat*)m.m);
 }
 
 void RenderTechnique::SetNormalMatrix(const Matrix4f& m)
@@ -57,9 +58,13 @@ void RenderTechnique::SetNormalMatrix(const Matrix4f& m)
     glUniformMatrix4fv(NormalMatrixLoc, 1, GL_TRUE, (const GLfloat*)m.m);
 }
 
-void RenderTechnique::SetWVPMatrix(const Matrix4f& m)
+void RenderTechnique::SetViewMatrix(const Matrix4f& m)
 {
-    glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)m.m);
+    glUniformMatrix4fv(ViewMatrixLoc, 1, GL_TRUE, (const GLfloat*)m.m);
 }
 
+void RenderTechnique::SetProjectionMatrix(const Matrix4f& m)
+{
+    glUniformMatrix4fv(ProjectionMatrixLoc, 1, GL_TRUE, (const GLfloat*)m.m);
+}
 

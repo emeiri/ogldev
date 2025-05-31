@@ -28,16 +28,19 @@ public:
 
     virtual bool Init();
 
-    void SetWVMatrix(const Matrix4f& m);
+    void SetWorldMatrix(const Matrix4f& m);    
+
+    void SetViewMatrix(const Matrix4f& m);
+
+    void SetProjectionMatrix(const Matrix4f& m);
 
     void SetNormalMatrix(const Matrix4f& m);
-
-    void SetWVPMatrix(const Matrix4f& m);
     
 private:
 
-    GLuint ModelViewMatrixLoc = INVALID_UNIFORM_LOCATION;
+    GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ViewMatrixLoc = INVALID_UNIFORM_LOCATION;
+    GLuint ProjectionMatrixLoc = INVALID_UNIFORM_LOCATION;
     GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
-    GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
 };
 
