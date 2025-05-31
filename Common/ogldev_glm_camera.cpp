@@ -256,11 +256,17 @@ void GLMCameraFirstPerson::SetUpVector()
 
 void GLMCameraFirstPerson::SetTarget(const glm::vec3& Target)
 {
+	SetAbsTarget(m_cameraPos + Target);
+}
+
+
+void GLMCameraFirstPerson::SetAbsTarget(const glm::vec3& Target)
+{
 	if (CAMERA_LEFT_HANDED) {
-		m_cameraOrientation = glm::lookAtLH(m_cameraPos, m_cameraPos + Target, m_up);
+		m_cameraOrientation = glm::lookAtLH(m_cameraPos, Target, m_up);
 	}
 	else {
-		m_cameraOrientation = glm::lookAtRH(m_cameraPos, m_cameraPos - Target, m_up);
+		m_cameraOrientation = glm::lookAtRH(m_cameraPos, Target, m_up);
 	}
 }
 

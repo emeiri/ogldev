@@ -81,6 +81,8 @@ public:
 
 	void SetTarget(const glm::vec3& Target);
 
+	void SetAbsTarget(const glm::vec3& Target);
+
 	void Print() const;
 
 	// Implementation of CameraAPI
