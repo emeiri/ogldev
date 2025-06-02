@@ -24,8 +24,9 @@
 #include "ogldev_world_transform.h"
 #include "demolition_lights.h"
 #include "Int/core_model.h"
+#include "GL/gl_base_lighting_technique.h"
 
-class ForwardLightingTechnique : public Technique
+class ForwardLightingTechnique : public BaseLightingTechnique
 {
 public:
 
@@ -36,10 +37,6 @@ public:
 
     virtual bool Init();
 
-    void SetWVP(const Matrix4f& WVP);
-    void SetWorldMatrix(const Matrix4f& WVP);
-    void SetNormalMatrix(const Matrix3f& NormalMatrix);
-    void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetShadowCubeMapTextureUnit(unsigned int TextureUnit);
@@ -56,15 +53,12 @@ public:
     void SetNormalMapTextureUnit(int TextureUnit);
     void SetHeightMapTextureUnit(int TextureUnit);
     void SetSkyboxTextureUnit(int TextureUnit);
-    void ControlNormalMap(bool Enable);
-    void ControlParallaxMap(bool Enable);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
     void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
     void UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights);
     void SetSpotLights(unsigned int NumLights, const SpotLight* pLights, bool WithPosAndDir = true);
     void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
-    void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     virtual void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
     void SetColorAdd(const Vector4f& ColorAdd);
@@ -78,12 +72,7 @@ public:
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
     void SetFogTime(float Time);
-    void ControlLighting(bool LightingEnabled);
-    void ControlShadows(bool ShadowsEnabled);
-    void ControlIndirectRender(bool IsRenderIndirect);
-    void ControlPVP(bool IsPVP);
-    void SetVP(const Matrix4f& VP);
-    void SetLightVP(const Matrix4f& LightVP);
+    void ControlLighting(bool LightingEnabled);	
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
     void ControlRefRefract(bool Enable);
@@ -100,19 +89,12 @@ private:
     void SetExpFogCommon(float FogEnd, float FogDensity);
     void ControlDiffuseTexture(bool Enable);
 
-    GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
-    GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
-    GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
-    GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
-    GLuint LightVPLoc = INVALID_UNIFORM_LOCATION;  // required only for shadow mapping with indirect rendering
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint hasSamplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowCubeMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint NormalMapLoc = INVALID_UNIFORM_LOCATION;
-    GLuint HasNormalMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint HeightMapLoc = INVALID_UNIFORM_LOCATION;
-    GLuint HasHeightMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapWidthLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapHeightLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapFilterSizeLoc = INVALID_UNIFORM_LOCATION;
@@ -121,7 +103,6 @@ private:
     GLuint ShadowMapOffsetFilterSizeLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowMapRandomRadiusLoc = INVALID_UNIFORM_LOCATION;
     GLuint samplerSpecularExponentLoc = INVALID_UNIFORM_LOCATION;
-    GLuint CameraWorldPosLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumPointLightsLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumSpotLightsLoc = INVALID_UNIFORM_LOCATION;
     GLuint ColorModLocation = INVALID_UNIFORM_LOCATION;
@@ -137,11 +118,7 @@ private:
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
-    GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;
-    GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;
-    GLuint IsIndirectRenderLoc = INVALID_UNIFORM_LOCATION;
-    GLuint IsPVPLoc = INVALID_UNIFORM_LOCATION;
-    GLuint VPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;	
     GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
     GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
     GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;

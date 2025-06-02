@@ -146,7 +146,7 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
-    if (!m_pbrLightingTech.Init()) {
+  /*  if (!m_pbrLightingTech.Init()) {
         printf("Error initializing the lighting technique\n");
         exit(1);
     }
@@ -164,7 +164,7 @@ void ForwardRenderer::InitTechniques()
     m_pbrLightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
-
+*/
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);

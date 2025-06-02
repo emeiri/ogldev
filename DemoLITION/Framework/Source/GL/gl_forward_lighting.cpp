@@ -43,17 +43,16 @@ bool ForwardLightingTechnique::Init()
         return false;
     }
 
+    if (!BaseLightingTechnique::Init()) {
+        return false;
+    }
+
     return InitCommon();
 }
 
 bool ForwardLightingTechnique::InitCommon()
 {
-    WVPLoc = GetUniformLocation("gWVP");
-    WorldMatrixLoc = GetUniformLocation("gWorld");
-    NormalMatrixLoc = GetUniformLocation("gNormalMatrix");
-    LightWVPLoc = GetUniformLocation("gLightWVP");
     samplerLoc = GetUniformLocation("gSampler");
-    hasSamplerLoc = GetUniformLocation("gHasSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
     shadowCubeMapLoc = GetUniformLocation("gShadowCubeMap");
     shadowMapWidthLoc = GetUniformLocation("gShadowMapWidth");
@@ -61,7 +60,6 @@ bool ForwardLightingTechnique::InitCommon()
     shadowMapFilterSizeLoc = GetUniformLocation("gShadowMapFilterSize");
     shadowMapOffsetTextureLoc = GetUniformLocation("gShadowMapOffsetTexture");
     NormalMapLoc = GetUniformLocation("gNormalMap");
-    HasNormalMapLoc = GetUniformLocation("gHasNormalMap");
     ShadowMapOffsetTextureSizeLoc = GetUniformLocation("gShadowMapOffsetTextureSize");
     ShadowMapOffsetFilterSizeLoc = GetUniformLocation("gShadowMapOffsetFilterSize");
     ShadowMapRandomRadiusLoc = GetUniformLocation("gShadowMapRandomRadius");
@@ -73,7 +71,6 @@ bool ForwardLightingTechnique::InitCommon()
     dirLightLoc.AmbientIntensity = GetUniformLocation("gDirectionalLight.Base.AmbientIntensity");
     dirLightLoc.Direction = GetUniformLocation("gDirectionalLight.Direction");
     dirLightLoc.DiffuseIntensity = GetUniformLocation("gDirectionalLight.Base.DiffuseIntensity");
-    CameraWorldPosLoc = GetUniformLocation("gCameraWorldPos");
     NumPointLightsLoc = GetUniformLocation("gNumPointLights");
     NumSpotLightsLoc = GetUniformLocation("gNumSpotLights");
     ColorModLocation = GetUniformLocation("gColorMod");
@@ -97,11 +94,6 @@ bool ForwardLightingTechnique::InitCommon()
     
    // GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
     //GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
-    GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
-    GET_UNIFORM_AND_CHECK(IsIndirectRenderLoc, "gIsIndirectRender");
-    GET_UNIFORM_AND_CHECK(IsPVPLoc, "gIsPVP");
-    GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
-    GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
     GET_UNIFORM_AND_CHECK(AlbedoLoc, "gAlbedo");
     GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
     GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
@@ -114,16 +106,10 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(ETALoc, "gETA");
     GET_UNIFORM_AND_CHECK(FresnelPowerLoc, "gFresnelPower");
 
-    if (WVPLoc == INVALID_UNIFORM_LOCATION ||
-        WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
-        NormalMatrixLoc == INVALID_UNIFORM_LOCATION ||
-        LightWVPLoc == INVALID_UNIFORM_LOCATION ||  // required only for shadow mapping
-        samplerLoc == INVALID_UNIFORM_LOCATION ||
-        hasSamplerLoc == INVALID_UNIFORM_LOCATION ||
+    if (samplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowCubeMapLoc == INVALID_UNIFORM_LOCATION ||
         NormalMapLoc == INVALID_UNIFORM_LOCATION ||
-        HasNormalMapLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapWidthLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapHeightLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapFilterSizeLoc == INVALID_UNIFORM_LOCATION ||
@@ -135,7 +121,6 @@ bool ForwardLightingTechnique::InitCommon()
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.SpecularColor == INVALID_UNIFORM_LOCATION ||
-        CameraWorldPosLoc == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.Color == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
         dirLightLoc.Direction == INVALID_UNIFORM_LOCATION ||
@@ -246,30 +231,6 @@ bool ForwardLightingTechnique::InitCommon()
 }
 
 
-void ForwardLightingTechnique::SetWVP(const Matrix4f& WVP)
-{
-    glUniformMatrix4fv(WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
-}
-
-
-void ForwardLightingTechnique::SetWorldMatrix(const Matrix4f& World)
-{
-    glUniformMatrix4fv(WorldMatrixLoc, 1, GL_TRUE, (const GLfloat*)World.m);
-}
-
-
-void ForwardLightingTechnique::SetNormalMatrix(const Matrix3f& NormalMatrix)
-{
-    glUniformMatrix3fv(NormalMatrixLoc, 1, GL_TRUE, (const GLfloat*)NormalMatrix.m);
-}
-
-
-void ForwardLightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
-{
-    glUniformMatrix4fv(LightWVPLoc, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
-}
-
-
 void ForwardLightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerLoc, TextureUnit);
@@ -282,12 +243,6 @@ void ForwardLightingTechnique::SetNormalMapTextureUnit(int TextureUnit)
 }
 
 
-void ForwardLightingTechnique::ControlNormalMap(bool Enable)
-{
-    glUniform1i(HasNormalMapLoc, Enable);
-}
-
-
 void ForwardLightingTechnique::SetHeightMapTextureUnit(int TextureUnit)
 {
     glUniform1i(HeightMapLoc, TextureUnit);
@@ -297,12 +252,6 @@ void ForwardLightingTechnique::SetHeightMapTextureUnit(int TextureUnit)
 void ForwardLightingTechnique::SetSkyboxTextureUnit(int TextureUnit)
 {
     glUniform1i(SkyboxLoc, TextureUnit);
-}
-
-
-void ForwardLightingTechnique::ControlParallaxMap(bool Enable)
-{
-    glUniform1i(HasHeightMapLoc, Enable);
 }
 
 
@@ -375,12 +324,6 @@ void ForwardLightingTechnique::UpdateDirLightDirection(const DirectionalLight& D
     LocalDirection.Normalize();
 
     glUniform3f(dirLightLoc.Direction, LocalDirection.x, LocalDirection.y, LocalDirection.z);
-}
-
-
-void ForwardLightingTechnique::SetCameraWorldPos(const Vector3f& CameraWorldPos)
-{
-    glUniform3f(CameraWorldPosLoc, CameraWorldPos.x, CameraWorldPos.y, CameraWorldPos.z);
 }
 
 
@@ -655,35 +598,6 @@ void ForwardLightingTechnique::ControlLighting(bool LightingEnabled)
     glUniform1i(LightingEnabledLoc, LightingEnabled);
 }
 
-
-void ForwardLightingTechnique::ControlShadows(bool ShadowsEnabled)
-{
-    glUniform1i(ShadowsEnabledLoc, ShadowsEnabled);
-}
-
-
-void ForwardLightingTechnique::ControlIndirectRender(bool IsIndirectRender)
-{
-    glUniform1i(IsIndirectRenderLoc, IsIndirectRender);
-}
-
-
-void ForwardLightingTechnique::ControlPVP(bool IsPVP)
-{
-    glUniform1i(IsPVPLoc, IsPVP);
-}
-
-
-void ForwardLightingTechnique::SetVP(const Matrix4f& VP)
-{
-    glUniformMatrix4fv(VPLoc, 1, GL_TRUE, (const GLfloat*)VP.m);
-}
-
-
-void ForwardLightingTechnique::SetLightVP(const Matrix4f& LightVP)
-{
-    glUniformMatrix4fv(LightVPLoc, 1, GL_TRUE, (const GLfloat*)LightVP.m);
-}
 
 void ForwardLightingTechnique::SetAlbedoTextureUnit(unsigned int TextureUnit)
 {
