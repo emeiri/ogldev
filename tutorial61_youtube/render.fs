@@ -5,7 +5,7 @@ in vec3 ViewPosition;
 in vec3 Normal;
 in vec2 TexCoord;
 
-uniform vec3 LightPosition = vec3(0.0f,0.0f, -1.0f);
+uniform vec3 LightPosition = vec3(2.0f,-1.5f, -1.0f);
 uniform vec3 LightIntensity = vec3(2.0f);
 uniform vec3 Diffuse = vec3(0.8f);
 uniform vec3 Ambient = vec3(0.2f);
