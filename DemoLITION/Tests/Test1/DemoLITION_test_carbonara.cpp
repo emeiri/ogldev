@@ -423,7 +423,7 @@ public:
             HandledByMe = false;
         }
 
-        return HandledByMe;
+        return false;
     }
 
 protected:
