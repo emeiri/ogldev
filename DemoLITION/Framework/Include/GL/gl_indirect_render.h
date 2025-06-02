@@ -57,15 +57,17 @@ private:
         Vector4f SpecularColor;
     };
 
-    std::vector<MaterialColorIndirect> m_colors;
-    std::vector<GLuint64> m_diffuseMaps;
-    std::vector<GLuint64> m_normalMaps;
+    struct MaterialIndirect {
+        MaterialColorIndirect Color;
+        GLuint64 DiffuseMap;
+        GLuint64 NormalMap;
+    };
+
+    std::vector<MaterialIndirect> m_materials;
 
     GLuint m_drawCmdBuffer = 0;
     GLuint m_perObjectBuffer = 0;
-    GLuint m_colorsBuffer = 0;
-    GLuint m_diffuseMapBuffer = 0;
-    GLuint m_normalMapBuffer = 0;
+    GLuint m_materialsBuffer = 0;
 
     struct Mesh {
         Matrix4f m_transformation;

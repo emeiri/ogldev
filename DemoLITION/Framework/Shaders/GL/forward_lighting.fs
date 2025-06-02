@@ -78,16 +78,15 @@ struct MaterialColor
 };
 
 
-layout(std430, binding = 2) readonly buffer ColorSSBO {
-    MaterialColor Colors[];
+struct Material {
+    MaterialColor Color;
+    sampler2D DiffuseMap;
+    sampler2D NormalMap;
 };
 
-layout(std430, binding = 3) readonly buffer DiffuseSSBO {
-    sampler2D DiffuseMaps[];
-};
 
-layout(std430, binding = 4) readonly buffer NormalSSBO {
-    sampler2D NormalMaps[];
+layout(std430, binding = 2) readonly buffer Materials {
+    Material materials[];
 };
 
 
@@ -166,7 +165,7 @@ const float toon_scale_factor = 1.0f / toon_color_levels;
 vec4 GetMaterialAmbientColor()
 {
     if (gIsIndirectRender) {
-        return Colors[MaterialIndex].AmbientColor;
+        return materials[MaterialIndex].Color.AmbientColor;
     } else {
         return gMaterial.AmbientColor;
     }
@@ -176,7 +175,7 @@ vec4 GetMaterialAmbientColor()
 vec4 GetMaterialDiffuseColor()
 {
     if (gIsIndirectRender) {
-        return Colors[MaterialIndex].DiffuseColor;
+        return materials[MaterialIndex].Color.DiffuseColor;
     } else {
         return gMaterial.DiffuseColor;
     }
@@ -186,7 +185,7 @@ vec4 GetMaterialDiffuseColor()
 vec4 GetMaterialSpecularColor()
 {
     if (gIsIndirectRender) {
-        return Colors[MaterialIndex].SpecularColor;
+        return materials[MaterialIndex].Color.SpecularColor;
     } else {
         return gMaterial.SpecularColor;
     }
@@ -592,7 +591,7 @@ vec3 CalcBumpedNormal()
     vec3 BumpMapNormal;
     
     if (gIsIndirectRender) {
-        BumpMapNormal = texture(NormalMaps[MaterialIndex], TexCoord.xy).xyz;
+        BumpMapNormal = texture(materials[MaterialIndex].NormalMap, TexCoord.xy).xyz;
     } else {
         BumpMapNormal = texture(gNormalMap, TexCoord).xyz;
     }
@@ -689,7 +688,7 @@ vec4 CalcPhongLighting(vec3 Normal)
     vec4 TexColor;
 
     if (gIsIndirectRender) {
-        TexColor = texture(DiffuseMaps[MaterialIndex], TexCoord.xy);
+        TexColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
     } else if (gHasSampler) {
         TexColor = texture(gSampler, TexCoord.xy);
     } else {
