@@ -146,25 +146,13 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
-  /*  if (!m_pbrLightingTech.Init()) {
-        printf("Error initializing the lighting technique\n");
+    if (!m_pbrLightingTech.Init()) {
+        printf("Error initializing the PBR lighting technique\n");
         exit(1);
     }
 
-    m_pbrLightingTech.Enable();
-    m_pbrLightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-    m_pbrLightingTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
-    m_pbrLightingTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
-*/
+//    m_pbrLightingTech.Enable();
+
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);
@@ -222,10 +210,12 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
         switch (Tech) {
         case FORWARD_LIGHTING:
             m_pCurLightingTech = &m_lightingTech;
+            m_pCurBaseLightingTech = &m_lightingTech;
             break;
 
         case FORWARD_SKINNING:
             m_pCurLightingTech = &m_skinningTech;
+            m_pCurBaseLightingTech = &m_skinningTech;
             break;
 
         default:
@@ -233,13 +223,14 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
         }        
 
         if (UseGLTFPBR) {
-            m_pCurLightingTech = &m_pbrLightingTech;
-        } else {
-            m_curLightingTech = Tech;
+            m_pCurBaseLightingTech = &m_pbrLightingTech;
+            m_pCurLightingTech = NULL;
         }
+
+        m_curLightingTech = Tech;
     }    
 
-    m_pCurLightingTech->Enable();
+    m_pCurBaseLightingTech->Enable();
 }
 
 
@@ -291,6 +282,10 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
 void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 {
+    if (!m_pCurLightingTech) {
+        return;
+    }
+
     SceneConfig* pConfig = pScene->GetConfig();
 
     m_pCurLightingTech->ControlShadows(pConfig->IsShadowMappingEnabled());
@@ -304,6 +299,10 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 
 void ForwardRenderer::ApplyLighting(GLScene* pScene)
 {
+    if (!m_pCurLightingTech) {
+        return;
+    }
+
     int NumLightsTotal = 0;
 
     int NumPointLights = (int)pScene->GetPointLights().size();
@@ -563,13 +562,13 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     if (UseIndirectRender) {  
         Matrix4f VP = m_pCurCamera->GetVPMatrix();
-        m_pCurLightingTech->SetVP(VP);
+        m_pCurBaseLightingTech->SetVP(VP);
         Matrix4f LightVP = m_lightPersProjMatrix * m_lightViewMatrix;	// TODO: get the correct projection matrix
-        m_pCurLightingTech->SetLightVP(LightVP);
+        m_pCurBaseLightingTech->SetLightVP(LightVP);
     }
 
-    m_pCurLightingTech->ControlIndirectRender(UseIndirectRender);
-    m_pCurLightingTech->ControlPVP(UsePVP);
+    m_pCurBaseLightingTech->ControlIndirectRender(UseIndirectRender);
+    m_pCurBaseLightingTech->ControlPVP(UsePVP);
 }
 
 
@@ -595,9 +594,12 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
     bool NormalMapEnabled = pModel->GetNormalMap() != NULL;
     bool HeightMapEnabled = pModel->GetHeightMap() != NULL;
 
-    m_pCurLightingTech->ControlNormalMap(NormalMapEnabled);
-    m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
-    m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f)); 
+    m_pCurBaseLightingTech->ControlNormalMap(NormalMapEnabled);
+    m_pCurBaseLightingTech->ControlParallaxMap(HeightMapEnabled);
+
+    if (m_pCurLightingTech) {
+        m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));
+    }
 
     RenderSingleObject(pSceneObject);
 }
@@ -607,7 +609,7 @@ void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
 {
     GLModel* pModel = (GLModel*)pSceneObject->GetModel();
 
-    if (IsLightingPass(m_curRenderPass)) {
+    if (IsLightingPass(m_curRenderPass) && m_pCurLightingTech) {
         if (pModel->IsPBR()) {
             m_pCurLightingTech->SetPBR(true);
             m_pCurLightingTech->SetPBRMaterial(pModel->GetPBRMaterial());
@@ -731,7 +733,9 @@ void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
     case RENDER_PASS_LIGHTING_DIR:
     case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
-        m_pCurLightingTech->ControlSpecularExponent(IsEnabled);
+        if (m_pCurLightingTech) {
+            m_pCurLightingTech->ControlSpecularExponent(IsEnabled);
+        }
         break;
     }
 }
@@ -743,7 +747,9 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
     case RENDER_PASS_LIGHTING_DIR:
     case RENDER_PASS_LIGHTING_SPOT:
     case RENDER_PASS_LIGHTING_POINT:
-        m_pCurLightingTech->SetMaterial(material);
+        if (m_pCurLightingTech) {
+            m_pCurLightingTech->SetMaterial(material);
+        }
     }
 }
 
@@ -820,7 +826,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f FinalWorldMatrix = World * ObjectMatrix;
-    m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
+    m_pCurBaseLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
     Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
     Matrix4f Projection = m_pCurCamera->GetProjMatrix();
@@ -829,7 +835,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 
   //  printf("Lighting pass\n"); WVP.Print(); exit(1);
 
-    m_pCurLightingTech->SetWVP(WVP);
+    m_pCurBaseLightingTech->SetWVP(WVP);
 
     Matrix4f LightWVP;
     
@@ -847,14 +853,14 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
         assert(0);
     }
 
-    m_pCurLightingTech->SetLightWVP(LightWVP);
+    m_pCurBaseLightingTech->SetLightWVP(LightWVP);
 
     Matrix4f InverseWorld = FinalWorldMatrix.Inverse();
     Matrix3f World3x3(InverseWorld);
     Matrix3f WorldTranspose = World3x3.Transpose();
     //WorldTranspose.Print();
    // exit(1);
-    m_pCurLightingTech->SetNormalMatrix(WorldTranspose);
+    m_pCurBaseLightingTech->SetNormalMatrix(WorldTranspose);
 }
 
 

@@ -24,9 +24,9 @@
 #include "ogldev_world_transform.h"
 #include "demolition_lights.h"
 #include "Int/core_model.h"
-#include "GL/gl_forward_lighting.h"
+#include "GL/gl_base_lighting_technique.h"
 
-class PBRForwardLightingTechnique : public ForwardLightingTechnique
+class PBRForwardLightingTechnique : public BaseLightingTechnique
 {
 public:
 

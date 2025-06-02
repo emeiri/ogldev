@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define FAIL_ON_MISSING_LOC
+//#define FAIL_ON_MISSING_LOC
 
 
 #include "GL/gl_pbr_forward_lighting.h"
@@ -43,6 +43,10 @@ bool PBRForwardLightingTechnique::Init()
         return false;
     }
 
-    return InitCommon();
+    if (!BaseLightingTechnique::Init()) {
+        return false;
+    }
+
+    return true;
 }
 

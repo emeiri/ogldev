@@ -140,6 +140,7 @@ private:
     Matrix4f m_lightViewMatrix;
 
     LIGHTING_TECHNIQUE m_curLightingTech = UNDEFINED_TECHNIQUE;
+    BaseLightingTechnique* m_pCurBaseLightingTech = &m_lightingTech;
     ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
     ForwardLightingTechnique m_lightingTech;    
     ForwardSkinningTechnique m_skinningTech;
