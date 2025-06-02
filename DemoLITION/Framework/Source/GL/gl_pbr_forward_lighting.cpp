@@ -31,7 +31,7 @@ bool PBRForwardLightingTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/pbr_forward_lighting.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/forward_lighting.vs")) {
         return false;
     }
 

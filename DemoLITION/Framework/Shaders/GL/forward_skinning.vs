@@ -23,30 +23,36 @@
 // Non PVP input attributes
 //
 layout (location = 0) in vec3 Position;
-layout (location = 1) in vec2 TexCoord;
-layout (location = 2) in vec3 Normal;
-layout (location = 3) in vec3 Tangent;
-layout (location = 4) in vec3 Bitangent;
-layout (location = 5) in ivec4 BoneIDs;
-layout (location = 6) in vec4 Weights;
+layout (location = 1) in vec2 inTexCoord0;
+layout (location = 2) in vec2 inTexCoord1;
+layout (location = 3) in vec3 Normal;
+layout (location = 4) in vec3 Tangent;
+layout (location = 5) in vec3 Bitangent;
+layout (location = 6) in vec4 Color;
+layout (location = 7) in ivec4 BoneIDs;
+layout (location = 8) in vec4 Weights;
+
 
 // 
 // PVP input attributes
 //
-struct SkinnedVertex {
+struct Vertex {
     float Position[3];
-    float TexCoord[2];
+    float inTexCoord0[2];
+    float inTexCoord1[2];
     float Normal[3];
     float Tangent[3];
     float Bitangent[3];
+    float Color[4];    
     int BoneIDs[4];
     float Weights[4];
     int index;  // slot for the next update (see VertexBoneData)
 };
 
 layout(std430, binding = 0) restrict readonly buffer Vertices {
-    SkinnedVertex in_Vertices[];
+    Vertex in_Vertices[];
 };
+
 
 struct PerObjectData {
     mat4 WorldMatrix;
@@ -54,17 +60,20 @@ struct PerObjectData {
     ivec4 MaterialIndex;
 };
 
+
 layout(std430, binding = 1) restrict readonly buffer PerObjectSSBO {
     PerObjectData o[];
 };
 
 out vec2 TexCoord0;
+out vec2 TexCoord1;
 out vec3 Normal0;
 out vec3 WorldPos0;
 out vec4 LightSpacePos0;
 out vec3 Tangent0;
 out vec3 Bitangent0;
 out flat int MaterialIndex;
+out vec4 Color0;
 
 const int MAX_BONES = 200;
 
@@ -86,10 +95,17 @@ vec3 GetPosition(int i)
 }
 
 
-vec2 GetTexCoord(int i)
+vec2 GetTexCoord0(int i)
 {
-    return vec2(in_Vertices[i].TexCoord[0], 
-                in_Vertices[i].TexCoord[1]);
+    return vec2(in_Vertices[i].inTexCoord0[0], 
+                in_Vertices[i].inTexCoord0[1]);
+}
+
+
+vec2 GetTexCoord1(int i)
+{
+    return vec2(in_Vertices[i].inTexCoord1[0], 
+                in_Vertices[i].inTexCoord1[1]);
 }
 
 
@@ -117,6 +133,15 @@ vec3 GetBitangent(int i)
 }
 
 
+vec4 GetColor(int i)
+{
+    return vec4(in_Vertices[i].Color[0], 
+                in_Vertices[i].Color[1], 
+                in_Vertices[i].Color[2],
+                in_Vertices[i].Color[3]);
+}
+
+
 ivec4 GetBoneIDs(int i)
 {
     return ivec4(in_Vertices[i].BoneIDs[0], 
@@ -138,29 +163,35 @@ vec4 GetWeights(int i)
 void main()
 {
     vec3 Position_;
-    vec2 TexCoord_;
+    vec2 TexCoord0_;
+    vec2 TexCoord1_;
     vec3 Normal_;
     vec3 Tangent_;
     vec3 Bitangent_;
+    vec4 Color_;    
     ivec4 BoneIDs_;
     vec4 Weights_;
 
     if (gIsPVP) {
         Position_ = GetPosition(gl_VertexID);        
-        TexCoord_ = GetTexCoord(gl_VertexID);
+        TexCoord0_ = GetTexCoord0(gl_VertexID);
+        TexCoord1_ = GetTexCoord1(gl_VertexID);
         Normal_ = GetNormal(gl_VertexID);
         Tangent_ = GetTangent(gl_VertexID);
         Bitangent_ = GetBitangent(gl_VertexID);
-	    BoneIDs_ = GetBoneIDs(gl_VertexID);
-	    Weights_ = GetWeights(gl_VertexID);
+        Color_ = GetColor(gl_VertexID);	
+	BoneIDs_ = GetBoneIDs(gl_VertexID);
+	Weights_ = GetWeights(gl_VertexID);
     } else {
         Position_ = Position;
-        TexCoord_ = TexCoord;
+        TexCoord0_ = TexCoord0;
+        TexCoord1_ = TexCoord1;
         Normal_ = Normal;
         Tangent_ = Tangent;
         Bitangent_ = Bitangent;
-	    BoneIDs_ = BoneIDs;
-	    Weights_ = Weights;
+        Color_ = Color;	
+	BoneIDs_ = BoneIDs;
+	Weights_ = Weights;
     }
 
     mat4 BoneTransform = gBones[BoneIDs_[0]] * Weights_[0];
@@ -188,5 +219,7 @@ void main()
         LightSpacePos0 = gLightWVP * Pos4;
     }
     
-    TexCoord0 = TexCoord_;
+    TexCoord0 = TexCoord0_;
+    TexCoord1 = TexCoord1_;
+    Color0 = Color_;
 }

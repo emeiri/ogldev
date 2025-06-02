@@ -337,8 +337,5 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.fs">
       <Filter>Shaders\GL</Filter>
     </None>
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.vs">
-      <Filter>Shaders\GL</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #include "Int/core_rendering_system.h"
 #include "Int/core_model.h"
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
@@ -279,17 +280,30 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
 
         if (paiMesh->HasTextureCoords(0)) {
             const aiVector3D& pTexCoord = paiMesh->mTextureCoords[0][i];
-            v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
-
-            const aiVector3D& pTangent = paiMesh->mTangents[i];
-            v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
-
-            const aiVector3D& pBitangent = paiMesh->mBitangents[i];
-            v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+            v.TexCoords0 = Vector2f(pTexCoord.x, pTexCoord.y);
         } else {
-            v.TexCoords = Vector2f(0.0f);
-            v.Tangent   = Vector3f(0.0f);
-            v.Bitangent = Vector3f(0.0f);
+            v.TexCoords0 = Vector2f(0.0f);
+        }
+
+        if (paiMesh->HasTextureCoords(1)) {
+            const aiVector3D& pTexCoord = paiMesh->mTextureCoords[1][i];
+            v.TexCoords1 = Vector2f(pTexCoord.x, pTexCoord.y);
+        }
+        else {
+            v.TexCoords1 = Vector2f(0.0f);
+        }
+
+        const aiVector3D& pTangent = paiMesh->mTangents[i];
+        v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+
+        const aiVector3D& pBitangent = paiMesh->mBitangents[i];
+        v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+
+        if (paiMesh->mColors[0]) {
+            const aiColor4D& Color = *paiMesh->mColors[0];
+            v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
+        } else {
+            v.Color = Vector4f(0.0f);
         }
 
      /*   printf("Pos %d: ", i); v.Position.Print();
@@ -353,8 +367,11 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
             v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
         }
 
-        const aiVector3D& pTexCoord = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
-        v.TexCoords = Vector2f(pTexCoord.x, pTexCoord.y);
+        const aiVector3D& pTexCoord0 = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
+        v.TexCoords0 = Vector2f(pTexCoord0.x, pTexCoord0.y);
+
+        const aiVector3D& pTexCoord1 = paiMesh->HasTextureCoords(1) ? paiMesh->mTextureCoords[1][i] : Zero3D;
+        v.TexCoords1 = Vector2f(pTexCoord1.x, pTexCoord1.y);
 
         const aiVector3D& pTangent = paiMesh->mTangents[i];
         v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
@@ -362,6 +379,13 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
         const aiVector3D& pBitangent = paiMesh->mBitangents[i];
         v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
 		
+        if (paiMesh->mColors[0]) {
+            const aiColor4D& Color = *paiMesh->mColors[0];
+            v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
+        } else {
+            v.Color = Vector4f(0.0f);
+        }
+
      /*   printf("Pos %d: ", i); v.Position.Print();
         printf("Normal: "); v.Normal.Print();
         printf("Tangent: "); v.Tangent.Print();

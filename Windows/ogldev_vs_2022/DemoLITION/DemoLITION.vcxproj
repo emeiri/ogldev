@@ -262,7 +262,6 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.fs" />
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\shadow_map.vs" />

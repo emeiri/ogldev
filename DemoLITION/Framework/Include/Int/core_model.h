@@ -107,18 +107,22 @@ protected:
 
     struct Vertex {
         Vector3f Position;
-        Vector2f TexCoords;
+        Vector2f TexCoords0;
+        Vector2f TexCoords1;
         Vector3f Normal;
         Vector3f Tangent;
         Vector3f Bitangent;
+        Vector4f Color;
 
         void Print()
         {
             Position.Print();
-            TexCoords.Print();
+            TexCoords0.Print();
+            TexCoords1.Print();
             Normal.Print();
             Tangent.Print();
             Bitangent.Print();
+            Color.Print();
         }
     };
 
@@ -163,10 +167,12 @@ protected:
 
     struct SkinnedVertex {
         Vector3f Position;
-        Vector2f TexCoords;
+        Vector2f TexCoords0;
+        Vector2f TexCoords1;
         Vector3f Normal;
         Vector3f Tangent;
         Vector3f Bitangent;
+        Vector4f Color;
         VertexBoneData Bones;
     };
 

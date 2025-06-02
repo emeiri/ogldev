@@ -46,6 +46,11 @@ bool ForwardSkinningTechnique::Init()
         return false;
     }
 
+    // Ugly
+    if (!BaseLightingTechnique::Init()) {
+        return false;
+    }
+
     for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation) ; i++) {
         char Name[128];
         memset(Name, 0, sizeof(Name));

@@ -57,7 +57,7 @@ bool BaseLightingTechnique::Init()
 #endif
     }
 
-    void SetVP(const Matrix4f& VP);    return true;
+    return true;
 }
 
 
@@ -101,9 +101,6 @@ void BaseLightingTechnique::SetCameraWorldPos(const Vector3f& CameraWorldPos)
 {
     glUniform3f(CameraWorldPosLoc, CameraWorldPos.x, CameraWorldPos.y, CameraWorldPos.z);
 }
-
-
-
 
 
 void BaseLightingTechnique::ControlShadows(bool ShadowsEnabled)

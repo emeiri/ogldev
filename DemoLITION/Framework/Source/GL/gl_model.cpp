@@ -26,12 +26,14 @@ bool UsePVP = true;     // Programmable Vertex Pulling
 bool UseIndirectRender = true;
 
 #define POSITION_LOCATION    0
-#define TEX_COORD_LOCATION   1
-#define NORMAL_LOCATION      2
-#define TANGENT_LOCATION     3
-#define BITANGENT_LOCATION   4
-#define BONE_ID_LOCATION     5
-#define BONE_WEIGHT_LOCATION 6
+#define TEX_COORD0_LOCATION  1
+#define TEX_COORD1_LOCATION  2
+#define NORMAL_LOCATION      3
+#define TANGENT_LOCATION     4
+#define BITANGENT_LOCATION   5
+#define COLOR_LOCATION       6
+#define BONE_ID_LOCATION     7
+#define BONE_WEIGHT_LOCATION 8
 
 
 GLModel::GLModel()
@@ -138,8 +140,13 @@ void GLModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
     NumFloats += NumElements;
 
     NumElements = 2;
-    glEnableVertexAttribArray(TEX_COORD_LOCATION);
-    glVertexAttribPointer(TEX_COORD_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
+    glEnableVertexAttribArray(TEX_COORD0_LOCATION);
+    glVertexAttribPointer(TEX_COORD0_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
+
+    NumElements = 2;
+    glEnableVertexAttribArray(TEX_COORD1_LOCATION);
+    glVertexAttribPointer(TEX_COORD1_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 
     NumElements = 3;
@@ -155,6 +162,11 @@ void GLModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
     NumElements = 3;
     glEnableVertexAttribArray(BITANGENT_LOCATION);
     glVertexAttribPointer(BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
+    NumFloats += NumElements;
+
+    NumElements = 4;
+    glEnableVertexAttribArray(COLOR_LOCATION);
+    glVertexAttribPointer(COLOR_LOCATION, NumElements, GL_FLOAT, GL_FALSE, sizeof(VertexType), (const void*)(NumFloats * sizeof(float)));
     NumFloats += NumElements;
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
@@ -192,9 +204,15 @@ void GLModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     NumFloats += NumElements;
 
     NumElements = 2;
-    glEnableVertexArrayAttrib(m_VAO, TEX_COORD_LOCATION);
-    glVertexArrayAttribFormat(m_VAO, TEX_COORD_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
-    glVertexArrayAttribBinding(m_VAO, TEX_COORD_LOCATION, 0);
+    glEnableVertexArrayAttrib(m_VAO, TEX_COORD0_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, TEX_COORD0_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, TEX_COORD0_LOCATION, 0);
+    NumFloats += NumElements;
+
+    NumElements = 2;
+    glEnableVertexArrayAttrib(m_VAO, TEX_COORD1_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, TEX_COORD1_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, TEX_COORD1_LOCATION, 0);
     NumFloats += NumElements;
 
     NumElements = 3;
@@ -213,6 +231,12 @@ void GLModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     glEnableVertexArrayAttrib(m_VAO, BITANGENT_LOCATION);
     glVertexArrayAttribFormat(m_VAO, BITANGENT_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
     glVertexArrayAttribBinding(m_VAO, BITANGENT_LOCATION, 0);
+    NumFloats += NumElements;
+
+    NumElements = 4;
+    glEnableVertexArrayAttrib(m_VAO, COLOR_LOCATION);
+    glVertexArrayAttribFormat(m_VAO, COLOR_LOCATION, NumElements, GL_FLOAT, GL_FALSE, (GLuint)(NumFloats * sizeof(float)));
+    glVertexArrayAttribBinding(m_VAO, COLOR_LOCATION, 0);
     NumFloats += NumElements;
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
