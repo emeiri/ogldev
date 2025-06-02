@@ -645,11 +645,11 @@ void CoreModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int Mate
 }
 
 
-void CoreModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+static std::string GetFullPath(const string& Dir, const aiString& Path)
 {
     string p(Path.data);
 
-    for (int i = 0 ; i < p.length() ; i++) {
+    for (int i = 0; i < p.length(); i++) {
         if (p[i] == '\\') {
             p[i] = '/';
         }
@@ -660,6 +660,14 @@ void CoreModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
     }
 
     string FullPath = Dir + "/" + p;
+
+    return FullPath;
+}
+
+
+void CoreModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+{
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pDiffuse = AllocTexture2D();
 
@@ -699,19 +707,11 @@ void CoreModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int Mat
 
 void CoreModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string p(Path.data);
-
-    if (p == "C:\\\\") {
-        p = "";
-    } else if (p.substr(0, 2) == ".\\") {
-        p = p.substr(2, p.size() - 2);
-    }
-
-    string FullPath = Dir + "/" + p;
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pSpecularExponent = AllocTexture2D();
-
     m_Materials[MaterialIndex].pSpecularExponent->Load(FullPath.c_str());
+
     printf("Loaded specular texture '%s'\n", FullPath.c_str());
 }
 
@@ -748,20 +748,11 @@ void CoreModel::LoadNormalTextureEmbedded(const aiTexture* paiTexture, int Mater
 
 void CoreModel::LoadNormalTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
 {
-    string p(Path.data);
-
-    if (p == "C:\\\\") {
-        p = "";
-    }
-    else if (p.substr(0, 2) == ".\\") {
-        p = p.substr(2, p.size() - 2);
-    }
-
-    string FullPath = Dir + "/" + p;
+    std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pNormal = AllocTexture2D();
-
     m_Materials[MaterialIndex].pNormal->Load(FullPath.c_str());
+
     printf("Loaded normal texture '%s'\n", FullPath.c_str());
 }
 
