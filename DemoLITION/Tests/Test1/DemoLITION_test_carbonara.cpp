@@ -954,6 +954,95 @@ private:
 
 };
 
+class GLTFPBRDemo : public Carbonara {
+
+public:
+
+    GLTFPBRDemo()
+    {
+        float metalRough = 0.43f;
+
+        // Gold
+        m_color[0] = Vector3f(1, 0.71f, 0.29f);
+        // Copper
+        m_color[1] = Vector3f(0.95f, 0.64f, 0.54f);
+        // Aluminum
+        m_color[2] = Vector3f(0.91f, 0.92f, 0.92f);
+        // Titanium
+        m_color[3] = Vector3f(0.542f, 0.497f, 0.449f);
+        // Silver
+        m_color[4] = Vector3f(0.95f, 0.93f, 0.88f);
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        //  m_pModel = m_pRenderingSystem->LoadModel("../Content/dragon.obj");
+
+        m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        m_pTexAO->Load();
+        m_pTexEmissive = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_emissive.jpg");
+        m_pTexEmissive->Load();
+        m_pTexAlbedo = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_albedo.jpg");
+        m_pTexAlbedo->Load();
+        m_pTexMeR = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_metalRoughness.jpg");
+        m_pTexMeR->Load();
+        m_pTexNormal = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_normal.jpg");
+        m_pTexNormal->Load();
+
+        m_pModel->SetPBR(true);
+        m_pModel->GetPBRMaterial().pAO = m_pTexAO;
+        m_pModel->GetPBRMaterial().pEmissive = m_pTexEmissive;
+        m_pModel->GetPBRMaterial().pAlbedo = m_pTexAlbedo;
+        m_pModel->GetPBRMaterial().pMetallic = m_pTexMeR;
+        m_pModel->GetPBRMaterial().pNormalMap = m_pTexNormal;
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pScene->AddToRenderList(pSceneObject);
+
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -4.0f), Vector3f(0.0f, 0.0f, 1.0f));
+    }
+
+    void OnFrameChild(long long DeltaTimeMillis)
+    {
+        m_pModel->GetPBRMaterial().Roughness = 0.43f;
+        m_pModel->GetPBRMaterial().IsMetal = true;
+        m_pModel->GetPBRMaterial().Color = m_color[0];
+
+        float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
+
+        /*        for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_color); i++) {
+                    m_pModel->SetPosition(m_color[i].Pos );
+                    m_pModel->GetPBRMaterial().Roughness = Roughness[i];
+                    m_pModel->GetPBRMaterial().IsMetal = false;
+                    m_pModel->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
+                    m_phongRenderer.Render(m_pModel);
+                }*/
+
+        m_time += DeltaTimeMillis;
+    }
+
+private:
+
+    Model* m_pModel = NULL;
+
+    Vector3f m_color[5];
+    long long m_time = 0;
+
+    Texture* m_pTexAO = NULL;
+    Texture* m_pTexEmissive = NULL;
+    Texture* m_pTexAlbedo = NULL;
+    Texture* m_pTexMeR = NULL;
+    Texture* m_pTexNormal = NULL;
+
+};
+
+
 
 class SkyboxDemo : public Carbonara {
 
@@ -994,7 +1083,8 @@ void carbonara()
   //  BridgeDemo demo;
  //   AssetLoadDemo demo;
   //  PBRDemo demo;
-    SkyboxDemo demo;
+  //  SkyboxDemo demo;
+      GLTFPBRDemo demo;
 
     demo.Start();
 }

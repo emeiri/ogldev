@@ -118,6 +118,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_skybox.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_pbr_forward_lighting.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -249,6 +252,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_skybox.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_pbr_forward_lighting.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -320,6 +326,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\skybox.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.vs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

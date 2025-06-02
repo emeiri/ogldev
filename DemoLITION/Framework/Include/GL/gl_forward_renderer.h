@@ -31,6 +31,7 @@
 #include "flat_color_technique.h"
 #include "GL/gl_picking_texture.h"
 #include "GL/gl_picking_technique.h"
+#include "GL/gl_pbr_forward_lighting.h"
 #include "GL/gl_infinite_grid.h"
 #include "GL/gl_skybox.h"
 
@@ -70,25 +71,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
     void SetCamera(GLMCameraFirstPerson* pCamera) {
         m_pCurCamera = pCamera; 
     }
-
-    //
-    // Fog
-    //
-    void SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor);
-
-    void SetExpFog(float FogEnd, const Vector3f& FogColor, float FogDensity);
-
-    void SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, float FogDensity);
-
-    void SetLayeredFog(float FogTop, float FogEnd, const Vector3f& FogColor);
-
-    void SetAnimatedFog(float FogEnd, float FogDensity, const Vector3f& FogColor);
-
-    void UpdateAnimatedFogTime(float FogTime);
-
-    void ControlRimLight(bool IsEnabled);
-
-    void ControlCellShading(bool IsEnabled);
 
     void Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis);
 
@@ -159,12 +141,13 @@ private:
 
     LIGHTING_TECHNIQUE m_curLightingTech = UNDEFINED_TECHNIQUE;
     ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
-    ForwardLightingTechnique m_lightingTech;
+    ForwardLightingTechnique m_lightingTech;    
     ForwardSkinningTechnique m_skinningTech;
     ShadowMappingTechnique m_shadowMapTech;
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;
     PickingTechnique m_pickingTech;
+    PBRForwardLightingTechnique m_pbrLightingTech;
     PickingTexture m_pickingTexture;
 
     InfiniteGrid m_infiniteGrid;

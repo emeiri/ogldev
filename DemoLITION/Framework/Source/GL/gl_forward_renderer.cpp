@@ -28,6 +28,8 @@
 extern bool UsePVP;
 extern bool UseIndirectRender;
 
+static bool UseGLTFPBR = false;
+
 struct CameraDirection
 {
     GLenum CubemapFace;
@@ -144,6 +146,25 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
+    if (!m_pbrLightingTech.Init()) {
+        printf("Error initializing the lighting technique\n");
+        exit(1);
+    }
+
+    m_pbrLightingTech.Enable();
+    m_pbrLightingTech.SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetShadowMapTextureUnit(SHADOW_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetShadowCubeMapTextureUnit(SHADOW_CUBE_MAP_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    m_pbrLightingTech.SetAlbedoTextureUnit(ALBEDO_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
+
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);
@@ -209,9 +230,13 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 
         default:
             assert(0);
-        }
+        }        
 
-        m_curLightingTech = Tech;
+        if (UseGLTFPBR) {
+            m_pCurLightingTech = &m_pbrLightingTech;
+        } else {
+            m_curLightingTech = Tech;
+        }
     }    
 
     m_pCurLightingTech->Enable();
@@ -494,7 +519,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         // todo: handle the case when there is no shadow pass
         assert(0);
     }
-   
+  
     glViewport(0, 0, m_windowWidth, m_windowHeight);
 
     if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
@@ -692,76 +717,6 @@ void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 
     WVP = Projection * View * World;
 }
-
-
-void ForwardRenderer::ControlRimLight(bool IsEnabled)
-{
-    assert(0);
-  //  SwitchToLightingTech();
- //   m_pCurLightingTech->ControlRimLight(IsEnabled);
-}
-
-
-void ForwardRenderer::ControlCellShading(bool IsEnabled)
-{
-    assert(0);
- //   SwitchToLightingTech();
- //   m_pCurLightingTech->ControlCellShading(IsEnabled);
-}
-
-
-void ForwardRenderer::SetLinearFog(float FogStart, float FogEnd, const Vector3f& FogColor)
-{
-    assert(0);
-//    SwitchToLightingTech();
-//    m_pCurLightingTech->SetLinearFog(FogStart, FogEnd);
- //   m_pCurLightingTech->SetFogColor(FogColor);
-}
-
-
-void ForwardRenderer::SetExpFog(float FogEnd, const Vector3f& FogColor, float FogDensity)
-{
-    assert(0);
- //   SwitchToLightingTech();
-//    m_pCurLightingTech->SetExpFog(FogEnd, FogDensity);
-//    m_pCurLightingTech->SetFogColor(FogColor);
-}
-
-
-void ForwardRenderer::SetExpSquaredFog(float FogEnd, const Vector3f& FogColor, float FogDensity)
-{
-    assert(0);
- //   SwitchToLightingTech();
- //   m_pCurLightingTech->SetExpSquaredFog(FogEnd, FogDensity);
- //   m_pCurLightingTech->SetFogColor(FogColor);
-}
-
-
-void ForwardRenderer::SetLayeredFog(float FogTop, float FogEnd, const Vector3f& FogColor)
-{
-    assert(0);
- //   SwitchToLightingTech();
- //   m_pCurLightingTech->SetLayeredFog(FogTop, FogEnd);
- //   m_pCurLightingTech->SetFogColor(FogColor);
-}
-
-
-void ForwardRenderer::SetAnimatedFog(float FogEnd, float FogDensity, const Vector3f& FogColor)
-{
-    assert(0);
-//    SwitchToLightingTech();
-//    m_pCurLightingTech->SetAnimatedFog(FogEnd, FogDensity);
-//    m_pCurLightingTech->SetFogColor(FogColor);
-}
-
-
-void ForwardRenderer::UpdateAnimatedFogTime(float FogTime)
-{
-    assert(0);
-  //  SwitchToLightingTech();
- //   m_pCurLightingTech->SetFogTime(FogTime);
-}
-
 
 
 void ForwardRenderer::DrawStart_CB(uint DrawIndex)
