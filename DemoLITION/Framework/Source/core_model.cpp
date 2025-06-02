@@ -293,11 +293,19 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
             v.TexCoords1 = Vector2f(0.0f);
         }
 
-        const aiVector3D& pTangent = paiMesh->mTangents[i];
-        v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+        if (paiMesh->mTangents) {
+            const aiVector3D& pTangent = paiMesh->mTangents[i];
+            v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+        } else {
+            v.Tangent = Vector3f(0.0f);
+        }
 
-        const aiVector3D& pBitangent = paiMesh->mBitangents[i];
-        v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+        if (paiMesh->mBitangents) {
+            const aiVector3D& pBitangent = paiMesh->mBitangents[i];
+            v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+        } else {
+            v.Bitangent = Vector3f(0.0f);
+        }
 
         if (paiMesh->mColors[0]) {
             const aiColor4D& Color = *paiMesh->mColors[0];
@@ -373,12 +381,22 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
         const aiVector3D& pTexCoord1 = paiMesh->HasTextureCoords(1) ? paiMesh->mTextureCoords[1][i] : Zero3D;
         v.TexCoords1 = Vector2f(pTexCoord1.x, pTexCoord1.y);
 
-        const aiVector3D& pTangent = paiMesh->mTangents[i];
-        v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+        if (paiMesh->mTangents) {
+            const aiVector3D& pTangent = paiMesh->mTangents[i];
+            v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
+        }
+        else {
+            v.Tangent = Vector3f(0.0f);
+        }
 
-        const aiVector3D& pBitangent = paiMesh->mBitangents[i];
-        v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
-		
+        if (paiMesh->mBitangents) {
+            const aiVector3D& pBitangent = paiMesh->mBitangents[i];
+            v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
+        }
+        else {
+            v.Bitangent = Vector3f(0.0f);
+        }
+
         if (paiMesh->mColors[0]) {
             const aiColor4D& Color = *paiMesh->mColors[0];
             v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
