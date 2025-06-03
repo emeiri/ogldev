@@ -239,6 +239,11 @@ private:
     void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
     void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
 
     void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, TEXTURE_TYPE MyType);
     void LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType);

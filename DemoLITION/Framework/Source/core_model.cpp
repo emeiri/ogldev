@@ -566,43 +566,17 @@ const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
 }
 
 
-static std::string OgldevTextureTypeToString(aiTextureType type) {
-    static std::map<aiTextureType, std::string> textureTypeNames = {
-        {aiTextureType_DIFFUSE, "Diffuse"},
-        {aiTextureType_SPECULAR, "Specular"},
-        {aiTextureType_AMBIENT, "Ambient"},
-        {aiTextureType_EMISSIVE, "Emissive"},
-        {aiTextureType_HEIGHT, "Height"},
-        {aiTextureType_NORMALS, "Normals"},
-        {aiTextureType_SHININESS, "Shininess"},
-        {aiTextureType_OPACITY, "Opacity"},
-        {aiTextureType_DISPLACEMENT, "Displacement"},
-        {aiTextureType_LIGHTMAP, "Lightmap"},
-        {aiTextureType_REFLECTION, "Reflection"},
-        {aiTextureType_UNKNOWN, "Unknown"}
-    };
-
-    auto it = textureTypeNames.find(type);
-    if (it != textureTypeNames.end()) {
-        return it->second;
-    }
-    else {
-        return "Invalid Type";
-    }
-}
-
-
 static int GetTextureCount(const aiMaterial* pMaterial)
 {
     int TextureCount = 0;
 
-    for (int i = 0; i <= aiTextureType_UNKNOWN; ++i) { // UNKNOWN is the last texture type in Assimp.
+    for (int i = 0; i <= AI_TEXTURE_TYPE_MAX; ++i) { // UNKNOWN is the last texture type in Assimp.
         aiTextureType ttype = (aiTextureType)(i);
         int Count = pMaterial->GetTextureCount(ttype);
         TextureCount += Count;
 
         if (Count > 0) {
-            printf("Found texture %s\n", OgldevTextureTypeToString(ttype).c_str());
+            printf("Found texture %s\n", aiTextureTypeToString(ttype));
         }
     }
 
@@ -620,6 +594,11 @@ void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
     LoadSpecularTexture(Dir, pMaterial, index);
     LoadNormalTexture(Dir, pMaterial, index);
     LoadMetalnessTexture(Dir, pMaterial, index);
+    LoadEmissiveTexture(Dir, pMaterial, index);
+    LoadEmissionColorTexture(Dir, pMaterial, index);
+    LoadNormalCameraTexture(Dir, pMaterial, index);
+    LoadRoughnessTexture(Dir, pMaterial, index);
+    LoadAmbientOcclusionTexture(Dir, pMaterial, index);
 }
 
 
@@ -660,6 +639,31 @@ void CoreModel::LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial
 void CoreModel::LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_METALNESS, TEX_TYPE_METALNESS);
+}
+
+void CoreModel::LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSIVE, TEX_TYPE_EMISSIVE);
+}
+
+void CoreModel::LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSION_COLOR, TEX_TYPE_EMISSION_COLOR);
+}
+
+void CoreModel::LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMAL_CAMERA, TEX_TYPE_NORMAL_CAMERA);
+}
+
+void CoreModel::LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE_ROUGHNESS, TEX_TYPE_ROUGHNESS);
+}
+
+void CoreModel::LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_AMBIENT_OCCLUSION, TEX_TYPE_AMBIENT_OCCLUSION);
 }
 
 
