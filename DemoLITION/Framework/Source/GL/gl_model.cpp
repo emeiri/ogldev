@@ -283,12 +283,12 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
     int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
     assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
-    if (m_Materials[MaterialIndex].pDiffuse) {
-        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
     }
 
-    if (m_Materials[MaterialIndex].pSpecularExponent) {
-        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
 
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent_CB(true);
@@ -333,12 +333,12 @@ void GLModel::Render(unsigned int DrawIndex, unsigned int PrimID)
     int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
     assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
-    if (m_Materials[MaterialIndex].pDiffuse) {
-        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
     }
 
-    if (m_Materials[MaterialIndex].pSpecularExponent) {
-        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
     }
 
     glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -373,12 +373,12 @@ void GLModel::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const M
 
         assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+            m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
         }
 
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+            m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,
@@ -462,11 +462,11 @@ void GLModel::SetColorTexture(int TextureHandle)
         assert(0);
     }
 
-    if (m_Materials[0].pDiffuse) {
-        delete m_Materials[0].pDiffuse;
+    if (m_Materials[0].pTextures[TEX_TYPE_BASE]) {
+        delete m_Materials[0].pTextures[TEX_TYPE_BASE];
     }
 
-    m_Materials[0].pDiffuse = (Texture*)pTexture;
+    m_Materials[0].pTextures[TEX_TYPE_BASE] = (Texture*)pTexture;
 }
 
 
@@ -482,11 +482,11 @@ void GLModel::SetNormalMap(int TextureHandle)
 
         // Hack 
         if (m_Materials.size() > 0) {
-            if (m_Materials[0].pNormal) {
-                delete m_Materials[0].pNormal;
+            if (m_Materials[0].pTextures[TEX_TYPE_NORMAL]) {
+                delete m_Materials[0].pTextures[TEX_TYPE_NORMAL];
             }
 
-            m_Materials[0].pNormal = m_pNormalMap;
+            m_Materials[0].pTextures[TEX_TYPE_NORMAL] = m_pNormalMap;
 
             if (UseIndirectRender) {
                 m_indirectRender.RefreshMaterials(m_Materials);

@@ -340,7 +340,7 @@ void BasicMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 
 void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[MaterialIndex].pDiffuse = NULL;
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         aiString Path;
@@ -361,9 +361,9 @@ void BasicMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 void BasicMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D);
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].pDiffuse->Load(buffer_size, paiTexture->pcData);
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load(buffer_size, paiTexture->pcData);
 }
 
 
@@ -371,9 +371,9 @@ void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 {
     string FullPath = GetFullPath(Dir, Path);
 
-    m_Materials[MaterialIndex].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    if (!m_Materials[MaterialIndex].pDiffuse->Load()) {
+    if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load()) {
         printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
         exit(0);
     }
@@ -385,7 +385,7 @@ void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 
 void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[MaterialIndex].pSpecularExponent = NULL;
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
         aiString Path;
@@ -406,9 +406,9 @@ void BasicMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMateri
 void BasicMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
 {
     printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D);
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].pSpecularExponent->Load(buffer_size, paiTexture->pcData);
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Load(buffer_size, paiTexture->pcData);
 }
 
 
@@ -416,9 +416,9 @@ void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
 {
     string FullPath = GetFullPath(Dir, Path);
 
-    m_Materials[MaterialIndex].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    if (!m_Materials[MaterialIndex].pSpecularExponent->Load()) {
+    if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Load()) {
         printf("Error loading specular texture '%s'\n", FullPath.c_str());
         exit(0);
     }
@@ -702,12 +702,12 @@ void BasicMesh::Render(IRenderCallbacks* pRenderCallbacks)
 
 void BasicMesh::SetupRenderMaterialsPhong(unsigned int MeshIndex, unsigned int MaterialIndex, IRenderCallbacks* pRenderCallbacks)
 {
-    if (m_Materials[MaterialIndex].pDiffuse) {
-        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
     }
 
-    if (m_Materials[MaterialIndex].pSpecularExponent) {
-        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
 
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent(true);
@@ -719,7 +719,7 @@ void BasicMesh::SetupRenderMaterialsPhong(unsigned int MeshIndex, unsigned int M
     }
 
     if (pRenderCallbacks) {
-        if (m_Materials[MaterialIndex].pDiffuse) {
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
             pRenderCallbacks->DrawStartCB(MeshIndex);
             pRenderCallbacks->SetMaterial(m_Materials[MaterialIndex]);
         }  else {
@@ -759,12 +759,12 @@ void BasicMesh::Render(unsigned int DrawIndex, unsigned int PrimID)
     unsigned int MaterialIndex = m_Meshes[DrawIndex].MaterialIndex;
     assert(MaterialIndex < m_Materials.size());
 
-    if (m_Materials[MaterialIndex].pDiffuse) {
-        m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
     }
 
-    if (m_Materials[MaterialIndex].pSpecularExponent) {
-        m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
     }
 
     glDrawElementsBaseVertex(GL_TRIANGLES,
@@ -795,12 +795,12 @@ void BasicMesh::Render(unsigned int NumInstances, const Matrix4f* WVPMats, const
 
         assert(MaterialIndex < m_Materials.size());
 
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+            m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
         }
 
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+            m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
         }
 
         glDrawElementsInstancedBaseVertex(GL_TRIANGLES,

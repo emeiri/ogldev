@@ -236,16 +236,13 @@ private:
     void LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index);
 
     void LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadDiffuseTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
-
     void LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadSpecularTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
 
-    void LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int index);
-    void LoadNormalTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex);
-    void LoadNormalTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex);
+    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, TEXTURE_TYPE MyType);
+    void LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType);
+    void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 

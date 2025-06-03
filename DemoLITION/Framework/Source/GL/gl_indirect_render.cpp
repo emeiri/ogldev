@@ -100,13 +100,13 @@ void IndirectRender::PrepareIndirectRenderMaterials(const std::vector<Material>&
         m_materials[i].Color.DiffuseColor = Materials[i].DiffuseColor;
         m_materials[i].Color.SpecularColor = Materials[i].SpecularColor;
 
-        if (Materials[i].pDiffuse && (Materials[i].pDiffuse->GetBindlessHandle() == -1)) {
+        if (Materials[i].pTextures[TEX_TYPE_BASE] && (Materials[i].pTextures[TEX_TYPE_BASE]->GetBindlessHandle() == -1)) {
             printf("Diffuse texture exists but bindless handle is missing\n");
             exit(1);
         }
-        GLuint64 DiffuseMapBindlessHandle = Materials[i].pDiffuse ? Materials[i].pDiffuse->GetBindlessHandle() : -1;
+        GLuint64 DiffuseMapBindlessHandle = Materials[i].pTextures[TEX_TYPE_BASE] ? Materials[i].pTextures[TEX_TYPE_BASE]->GetBindlessHandle() : -1;
         m_materials[i].DiffuseMap = DiffuseMapBindlessHandle;
-        GLuint64 NormalMapBindlessHandle = Materials[i].pNormal ? Materials[i].pNormal->GetBindlessHandle() : -1;
+        GLuint64 NormalMapBindlessHandle = Materials[i].pTextures[TEX_TYPE_NORMAL] ? Materials[i].pTextures[TEX_TYPE_NORMAL]->GetBindlessHandle() : -1;
         m_materials[i].NormalMap = NormalMapBindlessHandle;
     }
 
@@ -136,13 +136,13 @@ void IndirectRender::RefreshMaterials(const std::vector<Material>& Materials)
         m_materials[i].Color.AmbientColor = Materials[i].AmbientColor;
         m_materials[i].Color.DiffuseColor = Materials[i].DiffuseColor;
         m_materials[i].Color.SpecularColor = Materials[i].SpecularColor;
-        if (Materials[i].pDiffuse && (Materials[i].pDiffuse->GetBindlessHandle() == -1)) {
+        if (Materials[i].pTextures[TEX_TYPE_BASE] && (Materials[i].pTextures[TEX_TYPE_BASE]->GetBindlessHandle() == -1)) {
             printf("Diffuse texture exists but bindless handle is missing\n");
             exit(1);
         }
-        GLuint64 DiffuseMapBindlessHandle = Materials[i].pDiffuse ? Materials[i].pDiffuse->GetBindlessHandle() : -1;
+        GLuint64 DiffuseMapBindlessHandle = Materials[i].pTextures[TEX_TYPE_BASE] ? Materials[i].pTextures[TEX_TYPE_BASE]->GetBindlessHandle() : -1;
         m_materials[i].DiffuseMap = DiffuseMapBindlessHandle;
-        GLuint64 NormalMapBindlessHandle = Materials[i].pNormal ? Materials[i].pNormal->GetBindlessHandle() : -1;
+        GLuint64 NormalMapBindlessHandle = Materials[i].pTextures[TEX_TYPE_NORMAL] ? Materials[i].pTextures[TEX_TYPE_NORMAL]->GetBindlessHandle() : -1;
         m_materials[i].NormalMap = NormalMapBindlessHandle;
     }
 

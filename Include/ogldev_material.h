@@ -39,6 +39,13 @@ struct PBRMaterial
     Texture* pEmissive = NULL;
 };
 
+enum TEXTURE_TYPE {
+    TEX_TYPE_BASE = 0,      // Base color / diffuse / albedo
+    TEX_TYPE_SPECULAR = 1,
+    TEX_TYPE_NORMAL = 2,
+    TEX_TYPE_METALNESS = 3,
+    TEX_TYPE_NUM = 4
+};
 
 class Material {
 
@@ -52,21 +59,15 @@ class Material {
 
     PBRMaterial PBRmaterial;
 
-    Texture* pDiffuse = NULL; // base color of the material
-    Texture* pNormal = NULL;
-    Texture* pSpecularExponent = NULL;
+    Texture* pTextures[TEX_TYPE_NUM] = { 0 };
 
     float m_transparencyFactor = 1.0f;
     float m_alphaTest = 0.0f;
 
     ~Material()
     {
-        if (pDiffuse) {
-            delete pDiffuse;
-        }
-
-        if (pSpecularExponent) {
-            delete pSpecularExponent;
+        for (Texture* pTex : pTextures) {
+            delete pTex;
         }
     }
 };

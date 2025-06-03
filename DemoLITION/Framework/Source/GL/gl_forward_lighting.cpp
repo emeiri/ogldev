@@ -333,7 +333,7 @@ void ForwardLightingTechnique::SetMaterial(const Material& material)
     glUniform4f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b, material.DiffuseColor.a);
     glUniform4f(materialLoc.SpecularColor, material.SpecularColor.r, material.SpecularColor.g, material.SpecularColor.b, material.SpecularColor.a);
 
-    bool HasDiffuseTexture = (material.pDiffuse != NULL);
+    bool HasDiffuseTexture = (material.pTextures[TEX_TYPE_BASE] != NULL);
     ControlDiffuseTexture(HasDiffuseTexture);
 }
 

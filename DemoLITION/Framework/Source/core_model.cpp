@@ -58,6 +58,26 @@ inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 }
 
 
+static std::string GetFullPath(const string& Dir, const aiString& Path)
+{
+    string p(Path.data);
+
+    for (int i = 0; i < p.length(); i++) {
+        if (p[i] == '\\') {
+            p[i] = '/';
+        }
+    }
+
+    if (p.substr(0, 2) == ".\\") {
+        p = p.substr(2, p.size() - 2);
+    }
+
+    string FullPath = Dir + "/" + p;
+
+    return FullPath;
+}
+
+
 bool CoreModel::LoadAssimpModel(const string& Filename)
 {
     AllocBuffers();
@@ -599,25 +619,14 @@ void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
     LoadNormalTexture(Dir, pMaterial, index);
+    LoadMetalnessTexture(Dir, pMaterial, index);
 }
 
 
 void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[MaterialIndex].pDiffuse = NULL;
-
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        aiString Path;
-
-        if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
-
-            if (paiTexture) {
-                LoadDiffuseTextureEmbedded(paiTexture, MaterialIndex);
-            } else {
-                LoadDiffuseTextureFromFile(Dir, Path, MaterialIndex);
-            }
-        }
+        LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, TEX_TYPE_BASE);
     } else {
         printf("Warning! no diffuse texture\n");
 
@@ -631,129 +640,67 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 #endif
         }
 
-        m_Materials[MaterialIndex].pDiffuse = s_pMissingTexture;
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = s_pMissingTexture;
     }
-}
-
-
-void CoreModel::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
-{
-    printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pDiffuse = AllocTexture2D();
-    int buffer_size = paiTexture->mWidth;   // TODO: just the width???
-    m_Materials[MaterialIndex].pDiffuse->Load(buffer_size, paiTexture->pcData);
-}
-
-
-static std::string GetFullPath(const string& Dir, const aiString& Path)
-{
-    string p(Path.data);
-
-    for (int i = 0; i < p.length(); i++) {
-        if (p[i] == '\\') {
-            p[i] = '/';
-        }
-    }
-
-    if (p.substr(0, 2) == ".\\") {
-        p = p.substr(2, p.size() - 2);
-    }
-
-    string FullPath = Dir + "/" + p;
-
-    return FullPath;
-}
-
-
-void CoreModel::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
-{
-    std::string FullPath = GetFullPath(Dir, Path);
-
-    m_Materials[MaterialIndex].pDiffuse = AllocTexture2D();
-
-    m_Materials[MaterialIndex].pDiffuse->Load(FullPath.c_str());
-    printf("Loaded diffuse texture '%s' at index %d\n", FullPath.c_str(), MaterialIndex);
 }
 
 
 void CoreModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[MaterialIndex].pSpecularExponent = NULL;
-
-    if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
-        aiString Path;
-
-        if (pMaterial->GetTexture(aiTextureType_SHININESS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
-            const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
-
-            if (paiTexture) {
-                LoadSpecularTextureEmbedded(paiTexture, MaterialIndex);
-            } else {
-                LoadSpecularTextureFromFile(Dir, Path, MaterialIndex);
-            }
-        }
-    }
-}
-
-
-void CoreModel::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
-{
-    printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pSpecularExponent = AllocTexture2D();
-    int buffer_size = paiTexture->mWidth;   // TODO: just the width???
-    m_Materials[MaterialIndex].pSpecularExponent->Load(buffer_size, paiTexture->pcData);
-}
-
-
-void CoreModel::LoadSpecularTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
-{
-    std::string FullPath = GetFullPath(Dir, Path);
-
-    m_Materials[MaterialIndex].pSpecularExponent = AllocTexture2D();
-    m_Materials[MaterialIndex].pSpecularExponent->Load(FullPath.c_str());
-
-    printf("Loaded specular texture '%s'\n", FullPath.c_str());
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_SHININESS, TEX_TYPE_SPECULAR);
 }
 
 
 void CoreModel::LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    m_Materials[MaterialIndex].pNormal = NULL;
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMALS, TEX_TYPE_NORMAL);
+}
 
-    if (pMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+
+void CoreModel::LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_METALNESS, TEX_TYPE_METALNESS);
+}
+
+
+void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, TEXTURE_TYPE MyType)
+{
+    m_Materials[MaterialIndex].pTextures[MyType] = NULL;
+
+    if (pMaterial->GetTextureCount(AssimpType) > 0) {
         aiString Path;
 
-        if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+        if (pMaterial->GetTexture(AssimpType, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
             if (paiTexture) {
-                LoadNormalTextureEmbedded(paiTexture, MaterialIndex);
+                LoadTextureEmbedded(paiTexture, MaterialIndex, MyType);
             }
             else {
-                LoadNormalTextureFromFile(Dir, Path, MaterialIndex);
+                LoadTextureFromFile(Dir, Path, MaterialIndex, MyType);
             }
         }
     }
 }
 
 
-void CoreModel::LoadNormalTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex)
+void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType)
 {
-    printf("Embeddeded nroaml texture type '%s'\n", paiTexture->achFormatHint);
-    m_Materials[MaterialIndex].pNormal = AllocTexture2D();
+    printf("Loaded embeddeded texture type '%s'\n", paiTexture->achFormatHint);
+    m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
     int buffer_size = paiTexture->mWidth;   // TODO: just the width???
-    m_Materials[MaterialIndex].pNormal->Load(buffer_size, paiTexture->pcData);
+    m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData);
 }
 
 
-void CoreModel::LoadNormalTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex)
+void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType)
 {
     std::string FullPath = GetFullPath(Dir, Path);
 
-    m_Materials[MaterialIndex].pNormal = AllocTexture2D();
-    m_Materials[MaterialIndex].pNormal->Load(FullPath.c_str());
+    m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
+    m_Materials[MaterialIndex].pTextures[MyType]->Load(FullPath.c_str());
 
-    printf("Loaded normal texture '%s'\n", FullPath.c_str());
+    printf("Loaded texture type %d from '%s'\n", MyType, FullPath.c_str());
 }
 
 

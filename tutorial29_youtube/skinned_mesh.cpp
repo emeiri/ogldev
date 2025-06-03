@@ -244,7 +244,7 @@ void SkinnedMesh::LoadTextures(const string& Dir, const aiMaterial* pMaterial, i
 
 void SkinnedMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int index)
 {
-    m_Materials[index].pDiffuse = NULL;
+    m_Materials[index].pTextures[TEX_TYPE_BASE] = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         aiString Path;
@@ -258,9 +258,9 @@ void SkinnedMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMater
 
             string FullPath = Dir + "/" + p;
 
-            m_Materials[index].pDiffuse = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+            m_Materials[index].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Materials[index].pDiffuse->Load()) {
+            if (!m_Materials[index].pTextures[TEX_TYPE_BASE]->Load()) {
                 printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
                 exit(0);
             }
@@ -274,7 +274,7 @@ void SkinnedMesh::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMater
 
 void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int index)
 {
-    m_Materials[index].pSpecularExponent = NULL;
+    m_Materials[index].pTextures[TEX_TYPE_SPECULAR] = NULL;
 
     if (pMaterial->GetTextureCount(aiTextureType_SHININESS) > 0) {
         aiString Path;
@@ -290,9 +290,9 @@ void SkinnedMesh::LoadSpecularTexture(const string& Dir, const aiMaterial* pMate
 
             string FullPath = Dir + "/" + p;
 
-            m_Materials[index].pSpecularExponent = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+            m_Materials[index].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-            if (!m_Materials[index].pSpecularExponent->Load()) {
+            if (!m_Materials[index].pTextures[TEX_TYPE_SPECULAR]->Load()) {
                 printf("Error loading specular texture '%s'\n", FullPath.c_str());
                 exit(0);
             }
@@ -382,12 +382,12 @@ void SkinnedMesh::Render()
 
         assert(MaterialIndex < m_Materials.size());
 
-        if (m_Materials[MaterialIndex].pDiffuse) {
-            m_Materials[MaterialIndex].pDiffuse->Bind(COLOR_TEXTURE_UNIT);
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+            m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
         }
 
-        if (m_Materials[MaterialIndex].pSpecularExponent) {
-            m_Materials[MaterialIndex].pSpecularExponent->Bind(SPECULAR_EXPONENT_UNIT);
+        if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
+            m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
         }
 
         glDrawElementsBaseVertex(GL_TRIANGLES,
