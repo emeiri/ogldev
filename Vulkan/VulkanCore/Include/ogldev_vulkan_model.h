@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "ogldev_vulkan_texture.h"
 #include "ogldev_vulkan_graphics_pipeline_v2.h"
 #include "Int/core_model.h"
@@ -68,6 +70,15 @@ private:
 	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
 	size_t m_vertexSize = 0;	// sizeof(Vertex) OR sizeof(SkinnedVertex)
+
+	struct VulkanMeshEntry {
+		size_t VertexBufferOffset = 0;
+		size_t VertexBufferRange = 0;
+		size_t IndexBufferOffset = 0;
+		size_t IndexBufferRange = 0;
+	};
+
+	std::vector<VulkanMeshEntry> m_alignedMeshes;
 };
 
 }
