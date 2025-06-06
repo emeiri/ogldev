@@ -565,6 +565,12 @@ const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
     return pMaterial;
 }
 
+void CoreModel::GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize)
+{
+    VertexSize = sizeof(Vertex);
+    SkinnedVertexSize = sizeof(SkinnedVertex);
+}
+
 
 static int GetTextureCount(const aiMaterial* pMaterial)
 {
@@ -1530,4 +1536,10 @@ bool CoreModel::IsAnimated() const
     }
 
     return ret;
+}
+
+
+void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize)
+{
+    CoreModel::GetVertexSizesInBytes(VertexSize, SkinnedVertexSize);
 }

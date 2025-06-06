@@ -31,6 +31,8 @@
 #include "demolition_model.h"
 #include "GL/gl_basic_mesh_entry.h"
 
+void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
+
 
 class DemolitionRenderCallbacks
 {
@@ -89,6 +91,8 @@ public:
     virtual void SetNormalMap(int TextureHandle) { assert(0); }
 
     virtual void SetHeightMap(int TextureHandle) { assert(0); }
+
+    static void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
 
 protected:
 
