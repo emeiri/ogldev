@@ -91,8 +91,8 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
 
-		if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pDiffuse)) {
-			Texture* pDiffuse = m_Materials[MaterialIndex].pDiffuse;
+		if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE])) {
+			Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
 			md.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
 			md.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
 		}
