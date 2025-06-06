@@ -62,6 +62,7 @@ protected:
 
 private:
 	void UpdateModelDesc(ModelDesc& md);
+	void UpdateAlignedMeshesArray();
 
 	VulkanCore* m_pVulkanCore = NULL;
 

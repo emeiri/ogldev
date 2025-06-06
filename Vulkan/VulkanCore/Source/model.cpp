@@ -49,36 +49,11 @@ Texture* VkModel::AllocTexture2D()
 
 void VkModel::PopulateBuffers(std::vector<Vertex>& Vertices)
 {
-	VkDeviceSize Alignment = m_pVulkanCore->GetPhysicalDeviceLimits().minStorageBufferOffsetAlignment;	
-
 	m_vertexSize = sizeof(Vertex);
 
 	size_t NumSubmeshes = m_Meshes.size();
 
-	m_alignedMeshes.resize(NumSubmeshes);
-
-	size_t BaseVertexOffset = 0;
-	size_t BaseIndexOffset = 0;
-
-	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		m_alignedMeshes[SubmeshIndex].VertexBufferOffset = BaseVertexOffset;
-		m_alignedMeshes[SubmeshIndex].VertexBufferRange = m_Meshes[SubmeshIndex].NumVertices * m_vertexSize;
-
-		BaseVertexOffset += m_alignedMeshes[SubmeshIndex].VertexBufferRange;
-		BaseVertexOffset = AlignUpToMultiple(BaseVertexOffset, Alignment);
-
-		//size_t SrcVertexOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
-		//printf("%lld --> %lld\n", SrcVertexOffset, m_alignedMeshes[SubmeshIndex].VertexBufferOffset);
-
-		m_alignedMeshes[SubmeshIndex].IndexBufferOffset = BaseIndexOffset;
-		m_alignedMeshes[SubmeshIndex].IndexBufferRange = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
-
-		BaseIndexOffset += m_alignedMeshes[SubmeshIndex].IndexBufferRange;
-		BaseIndexOffset = AlignUpToMultiple(BaseIndexOffset, Alignment);
-
-		//size_t SrcIndexOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
-		//printf("%lld --> %lld\n", SrcIndexOffset, m_alignedMeshes[SubmeshIndex].IndexBufferOffset);
-	}
+	UpdateAlignedMeshesArray();
 
 	size_t VertexBufferSize = m_alignedMeshes[NumSubmeshes - 1].VertexBufferOffset + 
 		                      m_alignedMeshes[NumSubmeshes - 1].VertexBufferRange;
@@ -113,6 +88,38 @@ void VkModel::PopulateBuffers(std::vector<Vertex>& Vertices)
 	free(pAlignedVertices);
 	free(pAlignedIndices);
 
+}
+
+void VkModel::UpdateAlignedMeshesArray()
+{
+	VkDeviceSize Alignment = m_pVulkanCore->GetPhysicalDeviceLimits().minStorageBufferOffsetAlignment;
+
+	size_t NumSubmeshes = m_Meshes.size();
+
+	m_alignedMeshes.resize(NumSubmeshes);
+
+	size_t BaseVertexOffset = 0;
+	size_t BaseIndexOffset = 0;
+
+	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+		m_alignedMeshes[SubmeshIndex].VertexBufferOffset = BaseVertexOffset;
+		m_alignedMeshes[SubmeshIndex].VertexBufferRange = m_Meshes[SubmeshIndex].NumVertices * m_vertexSize;
+
+		BaseVertexOffset += m_alignedMeshes[SubmeshIndex].VertexBufferRange;
+		BaseVertexOffset = AlignUpToMultiple(BaseVertexOffset, Alignment);
+
+		//size_t SrcVertexOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
+		//printf("%lld --> %lld\n", SrcVertexOffset, m_alignedMeshes[SubmeshIndex].VertexBufferOffset);
+
+		m_alignedMeshes[SubmeshIndex].IndexBufferOffset = BaseIndexOffset;
+		m_alignedMeshes[SubmeshIndex].IndexBufferRange = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
+
+		BaseIndexOffset += m_alignedMeshes[SubmeshIndex].IndexBufferRange;
+		BaseIndexOffset = AlignUpToMultiple(BaseIndexOffset, Alignment);
+
+		//size_t SrcIndexOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
+		//printf("%lld --> %lld\n", SrcIndexOffset, m_alignedMeshes[SubmeshIndex].IndexBufferOffset);
+	}
 }
 
 
