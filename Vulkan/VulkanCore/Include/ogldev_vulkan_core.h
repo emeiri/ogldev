@@ -91,6 +91,8 @@ public:
 
 	VkFormat GetDepthFormat() const { return m_physDevices.Selected().m_depthFormat; }
 
+	const VkPhysicalDeviceLimits& GetPhysicalDeviceLimits() const;
+
 private:
 
 	void GetInstanceVersion();

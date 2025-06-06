@@ -1016,6 +1016,12 @@ void VulkanCore::CreateDepthResources()
 }
 
 
+const VkPhysicalDeviceLimits& VulkanCore::GetPhysicalDeviceLimits() const
+{
+	return m_physDevices.Selected().m_devProps.limits;
+}
+
+
 void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
 {
 	void* pMem = NULL;
