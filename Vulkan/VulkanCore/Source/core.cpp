@@ -131,25 +131,6 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabl
 	if (DepthEnabled) {
 		CreateDepthResources();
 	}
-
-	size_t VertexSize = 0;
-	size_t SkinnedVertexSize = 0;
-
-	GetVertexSizesInBytes(VertexSize, SkinnedVertexSize);
-
-	VkDeviceSize Alignment = m_physDevices.Selected().m_devProps.limits.minStorageBufferOffsetAlignment;
-
-	if ((VertexSize % Alignment) != 0) {
-		printf("The vertex size %lld is not aligned to the min storage buffer offset alignment %lld\n", 
-				VertexSize, Alignment);
-		exit(1);
-	}
-
-	if ((SkinnedVertexSize % Alignment) != 0) {
-		printf("The skinned vertex size %lld is not aligned to the min storage buffer offset alignment %lld\n", 
-			   SkinnedVertexSize, Alignment);
-	//	exit(1);
-	}
 }
 
 
