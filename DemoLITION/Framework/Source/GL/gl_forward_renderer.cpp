@@ -151,7 +151,11 @@ void ForwardRenderer::InitTechniques()
         exit(1);
     }
 
-//    m_pbrLightingTech.Enable();
+    m_pbrLightingTech.Enable();
+    m_pbrLightingTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetAmbientOcclusionTextureUnit(AO_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");

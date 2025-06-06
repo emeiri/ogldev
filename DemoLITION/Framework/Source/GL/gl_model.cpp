@@ -293,11 +293,18 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent_CB(true);
         }
-    }
-    else {
+    } else {
         if (pRenderCallbacks) {
             pRenderCallbacks->ControlSpecularExponent_CB(false);
         }
+    }
+
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]->Bind(EMISSIVE_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]->Bind(ROUGHNESS_TEXTURE_UNIT);
     }
 
     if (m_pNormalMap) {

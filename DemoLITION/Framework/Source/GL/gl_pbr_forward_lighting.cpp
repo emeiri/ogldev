@@ -25,6 +25,7 @@ PBRForwardLightingTechnique::PBRForwardLightingTechnique()
 {
 }
 
+
 bool PBRForwardLightingTechnique::Init()
 {
     if (!Technique::Init()) {
@@ -47,6 +48,34 @@ bool PBRForwardLightingTechnique::Init()
         return false;
     }
 
+    GET_UNIFORM_AND_CHECK(m_aoUnitLoc, "gAmbientOcclusion");
+    GET_UNIFORM_AND_CHECK(m_emissiveUnitLoc, "gEmissive");
+    GET_UNIFORM_AND_CHECK(m_albedoUnitLoc, "gAlbedo");
+    GET_UNIFORM_AND_CHECK(m_roughnessUnitLoc, "gRoughness");
+
     return true;
 }
 
+
+void PBRForwardLightingTechnique::SetAmbientOcclusionTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_aoUnitLoc, TextureUnit);
+}
+
+
+void PBRForwardLightingTechnique::SetEmissiveTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_emissiveUnitLoc, TextureUnit);
+}
+
+
+void PBRForwardLightingTechnique::SetAlbedoTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_albedoUnitLoc, TextureUnit);
+}
+
+
+void PBRForwardLightingTechnique::SetRoughnessTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_roughnessUnitLoc, TextureUnit);
+}

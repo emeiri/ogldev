@@ -102,16 +102,18 @@ uniform int gNumSpotLights;
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform MaterialColor gMaterial;
 uniform bool gHasSampler = false;
-layout(binding = 0) uniform sampler2D gSampler;
+layout(binding = 0) uniform sampler2D gAlbedo;
 layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
 layout(binding = 2) uniform sampler2D gShadowMap;        // required only for shadow mapping (spot/directional light)
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gNormalMap;
 layout(binding = 6) uniform sampler2D gHeightMap;
-layout(binding = 7) uniform sampler2D gAlbedo;
+// 7
 layout(binding = 8) uniform sampler2D gRoughness;
 layout(binding = 9) uniform sampler2D gMetallic;
+layout(binding = 10) uniform sampler2D gAmbientOcclusion;
+layout(binding = 11) uniform sampler2D gEmissive;
 layout(binding = 12) uniform samplerCube gCubemapTexture;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
@@ -271,8 +273,24 @@ uint getEnvironmentId() {
 }
 
 
-MetallicRoughnessDataGPU getMaterial(uint idx) {
-  return material[idx]; 
+MetallicRoughnessDataGPU getMaterial(uint idx) 
+{
+    if (gIsIndirectRender) {
+        return material[idx]; 
+    } else {
+        MetallicRoughnessDataGPU ret;
+        ret.occlusionTextureUV = 0;
+        ret.occlusionTextureSampler = gAmbientOcclusion;
+        ret.emissiveTextureUV = 0;
+        ret.emissiveFactorAlphaCutoff = vec4(1.0);       // TODO: get from Assimp
+        ret.emissiveTextureSampler = gEmissive;
+        ret.baseColorTextureUV = 0;
+        ret.baseColorTextureSampler = gAlbedo;
+        ret.baseColorFactor = vec4(1.0);                 // TODO: get from Assimp
+        ret.metallicRoughnessTextureSampler = gRoughness;
+        ret.metallicRoughnessTextureUV = 0;
+        return ret;
+    }      
 }
 
 EnvironmentMapDataGPU getEnvironment(uint idx) {
@@ -578,12 +596,14 @@ void main()
 
 // Uncomment to debug:
 //  out_FragColor = vec4((n + vec3(1.0))*0.5, 1.0);
-//  out_FragColor = Kao;
-//  out_FragColor = Ke;
-//  out_FragColor = Kd;
-//  vec2 MeR = mrSample.yz;
+ // out_FragColor = Kao;
+  //out_FragColor = Ke;
+  //out_FragColor = Kd;
+  out_FragColor = mrSample;
+  //vec2 MeR = mrSample.yz;
+  
 //  MeR.x *= getMetallicFactor(mat);
 //  MeR.y *= getRoughnessFactor(mat);
-//  out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);
-//  out_FragColor = mrSample;*/
+  //out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);
+//  out_FragColor = mrSample;
 }

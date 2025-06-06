@@ -331,7 +331,7 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
             const aiColor4D& Color = *paiMesh->mColors[0];
             v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
         } else {
-            v.Color = Vector4f(0.0f);
+            v.Color = Vector4f(1.0f);
         }
 
      /*   printf("Pos %d: ", i); v.Position.Print();
@@ -421,7 +421,7 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
             const aiColor4D& Color = *paiMesh->mColors[0];
             v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
         } else {
-            v.Color = Vector4f(0.0f);
+            v.Color = Vector4f(1.0f);
         }
 
      /*   printf("Pos %d: ", i); v.Position.Print();
