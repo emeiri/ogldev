@@ -51,44 +51,11 @@ void VkModel::PopulateBuffers(std::vector<Vertex>& Vertices)
 {
 	m_vertexSize = sizeof(Vertex);
 
-	size_t NumSubmeshes = m_Meshes.size();
-
 	UpdateAlignedMeshesArray();
 
-	size_t VertexBufferSize = m_alignedMeshes[NumSubmeshes - 1].VertexBufferOffset + 
-		                      m_alignedMeshes[NumSubmeshes - 1].VertexBufferRange;
-
-	size_t IndexBufferSize = m_alignedMeshes[NumSubmeshes - 1].IndexBufferOffset +
-                             m_alignedMeshes[NumSubmeshes - 1].IndexBufferRange;
-
-	char* pAlignedVertices = (char*)malloc(VertexBufferSize);
-	char* pSrcVertices = (char*)Vertices.data();
-
-	char* pAlignedIndices = (char*)malloc(IndexBufferSize);
-	char* pSrcIndices = (char*)m_Indices.data();
-
-	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		size_t SrcVertexOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
-		char* pSrc = pSrcVertices + SrcVertexOffset;
-		char* pDst = pAlignedVertices + m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
-		memcpy(pDst, pSrc, m_alignedMeshes[SubmeshIndex].VertexBufferRange);
-
-		size_t SrcIndexOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
-		pSrc = pSrcIndices + SrcIndexOffset;
-		pDst = pAlignedIndices + m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
-		memcpy(pDst, pSrc, m_alignedMeshes[SubmeshIndex].IndexBufferRange);
-	}
-
-	m_vb = m_pVulkanCore->CreateVertexBuffer(pAlignedVertices, VertexBufferSize);
-
-	m_ib = m_pVulkanCore->CreateVertexBuffer(pAlignedIndices, IndexBufferSize);
-
-	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
-
-	free(pAlignedVertices);
-	free(pAlignedIndices);
-
+	CreateBuffers(Vertices);
 }
+
 
 void VkModel::UpdateAlignedMeshesArray()
 {
@@ -108,18 +75,53 @@ void VkModel::UpdateAlignedMeshesArray()
 		BaseVertexOffset += m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 		BaseVertexOffset = AlignUpToMultiple(BaseVertexOffset, Alignment);
 
-		//size_t SrcVertexOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
-		//printf("%lld --> %lld\n", SrcVertexOffset, m_alignedMeshes[SubmeshIndex].VertexBufferOffset);
-
 		m_alignedMeshes[SubmeshIndex].IndexBufferOffset = BaseIndexOffset;
 		m_alignedMeshes[SubmeshIndex].IndexBufferRange = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
 
 		BaseIndexOffset += m_alignedMeshes[SubmeshIndex].IndexBufferRange;
 		BaseIndexOffset = AlignUpToMultiple(BaseIndexOffset, Alignment);
-
-		//size_t SrcIndexOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
-		//printf("%lld --> %lld\n", SrcIndexOffset, m_alignedMeshes[SubmeshIndex].IndexBufferOffset);
 	}
+}
+
+
+void VkModel::CreateBuffers(std::vector<CoreModel::Vertex>& Vertices)
+{
+	size_t NumSubmeshes = m_Meshes.size();
+
+	size_t VertexBufferSize = m_alignedMeshes[NumSubmeshes - 1].VertexBufferOffset +
+		m_alignedMeshes[NumSubmeshes - 1].VertexBufferRange;
+
+	size_t IndexBufferSize = m_alignedMeshes[NumSubmeshes - 1].IndexBufferOffset +
+		m_alignedMeshes[NumSubmeshes - 1].IndexBufferRange;
+
+	char* pAlignedVertices = (char*)malloc(VertexBufferSize);
+	char* pSrcVertices = (char*)Vertices.data();
+
+	char* pAlignedIndices = (char*)malloc(IndexBufferSize);
+	char* pSrcIndices = (char*)m_Indices.data();
+
+	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+		size_t SrcOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
+		char* pSrc = pSrcVertices + SrcOffset;
+		char* pDst = pAlignedVertices + m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
+		size_t Size = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
+		memcpy(pDst, pSrc, Size);
+
+		SrcOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
+		pSrc = pSrcIndices + SrcOffset;
+		pDst = pAlignedIndices + m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
+		Size = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
+		memcpy(pDst, pSrc, Size);
+	}
+
+	m_vb = m_pVulkanCore->CreateVertexBuffer(pAlignedVertices, VertexBufferSize);
+
+	m_ib = m_pVulkanCore->CreateVertexBuffer(pAlignedIndices, IndexBufferSize);
+
+	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
+
+	free(pAlignedVertices);
+	free(pAlignedIndices);
 }
 
 
@@ -168,9 +170,6 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 		size_t offset = m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 		size_t range  = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 		md.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
-
-		//offset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
-		//range = m_Meshes[SubmeshIndex].NumIndices * sizeof(u32);
 
 		offset = m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
 		range  = m_alignedMeshes[SubmeshIndex].IndexBufferRange;

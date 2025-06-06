@@ -62,7 +62,10 @@ protected:
 
 private:
 	void UpdateModelDesc(ModelDesc& md);
+
 	void UpdateAlignedMeshesArray();
+
+	void CreateBuffers(std::vector<CoreModel::Vertex>& Vertices);
 
 	VulkanCore* m_pVulkanCore = NULL;
 
