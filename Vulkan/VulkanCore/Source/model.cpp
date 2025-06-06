@@ -86,13 +86,13 @@ void VkModel::UpdateAlignedMeshesArray()
 
 void VkModel::CreateBuffers(std::vector<CoreModel::Vertex>& Vertices)
 {
-	size_t NumSubmeshes = m_Meshes.size();
+	size_t NumSubmeshes = m_alignedMeshes.size();
 
 	size_t VertexBufferSize = m_alignedMeshes[NumSubmeshes - 1].VertexBufferOffset +
-		m_alignedMeshes[NumSubmeshes - 1].VertexBufferRange;
+		                      m_alignedMeshes[NumSubmeshes - 1].VertexBufferRange;
 
 	size_t IndexBufferSize = m_alignedMeshes[NumSubmeshes - 1].IndexBufferOffset +
-		m_alignedMeshes[NumSubmeshes - 1].IndexBufferRange;
+		                     m_alignedMeshes[NumSubmeshes - 1].IndexBufferRange;
 
 	char* pAlignedVertices = (char*)malloc(VertexBufferSize);
 	char* pSrcVertices = (char*)Vertices.data();
@@ -169,6 +169,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 
 		size_t offset = m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 		size_t range  = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
+
 		md.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
 
 		offset = m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
@@ -178,6 +179,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 
 		offset = SubmeshIndex * UNIFORM_BUFFER_SIZE;
 		range = UNIFORM_BUFFER_SIZE;
+
 		md.m_ranges[SubmeshIndex].m_uniformRange = { .m_offset = offset, .m_range = range };
 	}
 }
