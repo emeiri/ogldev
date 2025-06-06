@@ -16,9 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_UTIL_H
-#define OGLDEV_UTIL_H
-
+#pragma once
 
 #ifndef _WIN64
 #include <unistd.h>
@@ -140,4 +138,9 @@ int GetGLMinorVersion();
 
 int IsGLVersionHigher(int MajorVer, int MinorVer);
 
-#endif  /* OGLDEV_UTIL_H */
+static inline size_t AlignUpToMultiple(size_t Size, size_t Alignment)
+{
+    size_t ret = ((Size + Alignment - 1) / Alignment) * Alignment;
+
+    return ret;
+}
