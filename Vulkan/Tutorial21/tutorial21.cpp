@@ -195,9 +195,9 @@ private:
 	{
 		m_model.Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
-		m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
+	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
@@ -308,18 +308,12 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
-		static float foo = 0.0f;
-
-		glm::mat4 Rotate0 = glm::mat4(1.0);
-		Rotate0 = glm::rotate(Rotate0, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));
-
 		glm::mat4 Rotate = glm::mat4(1.0);
-		Rotate = glm::rotate(Rotate, glm::radians(foo), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f)));
-		foo += 0.005f;
+		Rotate = glm::rotate(Rotate, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-		glm::mat4 WVP = VP * Rotate * Rotate0;
+		glm::mat4 WVP = VP * Rotate;
 		m_model.Update(ImageIndex, WVP);
 	}
 
