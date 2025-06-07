@@ -433,7 +433,7 @@ void GLModel::SetupRenderMaterialsPBR()
     m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive = m_PBRmaterial.pEmissive;
 
     if (m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo->Bind(ALBEDO_TEXTURE_UNIT);
+        m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo->Bind(COLOR_TEXTURE_UNIT);
     }
 
     if (m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness) {

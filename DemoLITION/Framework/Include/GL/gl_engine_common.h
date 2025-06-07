@@ -32,8 +32,6 @@
 #define NORMAL_TEXTURE_UNIT_INDEX                   5
 #define HEIGHT_TEXTURE_UNIT                         GL_TEXTURE6
 #define HEIGHT_TEXTURE_UNIT_INDEX                   6
-#define ALBEDO_TEXTURE_UNIT                         GL_TEXTURE7
-#define ALBEDO_TEXTURE_UNIT_INDEX                   7
 #define ROUGHNESS_TEXTURE_UNIT                      GL_TEXTURE8
 #define ROUGHNESS_TEXTURE_UNIT_INDEX                8
 #define METALLIC_TEXTURE_UNIT                       GL_TEXTURE9
