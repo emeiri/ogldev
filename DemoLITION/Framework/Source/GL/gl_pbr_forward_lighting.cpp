@@ -53,6 +53,7 @@ bool PBRForwardLightingTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_albedoUnitLoc, "gAlbedo");
     GET_UNIFORM_AND_CHECK(m_roughnessUnitLoc, "gRoughness");
     GET_UNIFORM_AND_CHECK(m_envmapUnitLoc, "gEnvMap");
+    GET_UNIFORM_AND_CHECK(m_brdfLUTUnitLoc, "gBRDF_LUT");
 
     return true;
 }
@@ -91,4 +92,10 @@ void PBRForwardLightingTechnique::SetNormalTextureUnit(int TextureUnit)
 void PBRForwardLightingTechnique::SetEnvmapTextureUnit(int TextureUnit)
 {
     glUniform1i(m_envmapUnitLoc, TextureUnit);
+}
+
+
+void PBRForwardLightingTechnique::SetBRDF_LUTTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_brdfLUTUnitLoc, TextureUnit);
 }

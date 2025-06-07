@@ -115,6 +115,8 @@ public:
     void SetEnvMap(int EnvMap) { m_envMap = EnvMap; }
     int GetEnvMap() const { return m_envMap; }
 
+    Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
+
 private:
 
     bool m_shadowMappingEnabled = true;

@@ -109,7 +109,7 @@ layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for sh
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gNormalMap;
 layout(binding = 6) uniform sampler2D gHeightMap;
-// 7
+layout(binding = 7) uniform sampler2D gBRDF_LUT;
 layout(binding = 8) uniform sampler2D gRoughness;
 layout(binding = 9) uniform sampler2D gMetallic;
 layout(binding = 10) uniform sampler2D gAmbientOcclusion;
@@ -309,7 +309,7 @@ EnvironmentMapDataGPU getEnvironment(uint idx)
         //ret.envMapTextureIrradiance = ;
         //ret.envMapTextureIrradianceSampler =;
         //ret.texBRDF_LUT =;
-        //ret.texBRDF_LUTSampler =;
+        ret.texBRDF_LUTSampler = gBRDF_LUT;
         return ret;
     }  
 }
@@ -354,8 +354,9 @@ vec4 sampleNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) {
   return texture(mat.normalTextureSampler, tc.uv[mat.normalTextureUV]);
 }
 
-vec4 sampleBRDF_LUT(vec2 tc, EnvironmentMapDataGPU map) {
-  return texture(map.texBRDF_LUTSampler, tc);
+vec4 sampleBRDF_LUT(vec2 tc, EnvironmentMapDataGPU map) 
+{
+    return texture(map.texBRDF_LUTSampler, tc);
 }
 
 vec4 sampleEnvMap(vec3 tc, EnvironmentMapDataGPU map) 
@@ -430,7 +431,7 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs, float specularWeight) {
   vec3 n = pbrInputs.n;
   vec3 v =  pbrInputs.v;
   vec3 reflection = -normalize(reflect(v, n));
-  EnvironmentMapDataGPU envMap =  getEnvironment(getEnvironmentId());
+  EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
   float mipCount = float(sampleEnvMapQueryLevels(envMap));
   float lod = pbrInputs.perceptualRoughness * (mipCount - 1);
 

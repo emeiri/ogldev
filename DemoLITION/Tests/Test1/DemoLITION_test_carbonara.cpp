@@ -986,9 +986,13 @@ public:
 
         m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
         m_pTexAO->Load();
+        m_pModel->GetPBRMaterial().pAO = m_pTexAO;
+
+        m_pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
+        m_pBRDF_LUT->Load();
+        m_pScene->GetConfig()->pBRDF_LUT = m_pBRDF_LUT;
 
         m_pModel->SetPBR(true);
-        m_pModel->GetPBRMaterial().pAO = m_pTexAO;
 
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
 
@@ -1026,6 +1030,7 @@ private:
 
     Vector3f m_color[5];
     Texture* m_pTexAO = NULL;
+    Texture* m_pBRDF_LUT = NULL;
 };
 
 
