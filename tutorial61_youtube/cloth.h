@@ -44,8 +44,8 @@ private:
 	
     GLuint m_vao = 0;
     GLuint m_curBuf = 0;
-    GLuint m_posBufs[2], m_velBufs[2];
-    GLuint m_normBuf, m_ib, m_tcBuf;
+    GLuint m_posBufs[2] = { 0 }, m_velBufs[2] = { 0 };
+    GLuint m_normBuf = 0, m_ib = 0, m_tcBuf = 0;
 };
 
 
