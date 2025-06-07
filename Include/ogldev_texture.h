@@ -32,6 +32,9 @@ protected:
 
     GLenum m_textureTarget = 0;
     GLuint m_textureObj = 0;
+
+    bool m_isKTX = false;
+    gli::gl::format m_ktxFormat;
 };
 
 class Texture : public BaseTexture
@@ -72,9 +75,6 @@ private:
 
     void BindInternalNonDSA(GLenum TextureUnit);
     void BindInternalDSA(GLenum TextureUnit);
-
-    bool m_isKTX = false;
-    gli::gl::format m_ktxFormat;
 
     std::string m_fileName;
     GLuint64 m_bindlessHandle = -1;

@@ -46,9 +46,13 @@ public:
                    const std::string& PosZFilename,
                    const std::string& NegZFilename);
 
+    CubemapTexture() {}
+
     ~CubemapTexture();
 
     virtual void Load();
+
+    void LoadKTX(const std::string& Filename);
 
     virtual void Bind(GLenum TextureUnit);
 
