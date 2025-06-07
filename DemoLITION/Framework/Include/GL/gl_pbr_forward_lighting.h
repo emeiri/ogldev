@@ -32,20 +32,26 @@ public:
 
     PBRForwardLightingTechnique();
 
+    virtual bool Init();
+
     void SetAmbientOcclusionTextureUnit(int TextureUnit);
 
     void SetEmissiveTextureUnit(int TextureUnit);
 
     void SetAlbedoTextureUnit(int TextureUnit);
 
-    void SetRoughnessTextureUnit(int TextureUnit);
+    void SetRoughnessTextureUnit(int TextureUnit);    
 
-    virtual bool Init();
+    void SetNormalTextureUnit(int TextureUnit);
+
+    void SetEnvmapTextureUnit(int TextureUnit);
 
 private:
     GLuint m_aoUnitLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_emissiveUnitLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_albedoUnitLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_roughnessUnitLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_normalUnitLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_envmapUnitLoc = INVALID_UNIFORM_LOCATION;
 };
 

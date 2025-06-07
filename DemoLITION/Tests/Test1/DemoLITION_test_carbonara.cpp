@@ -977,7 +977,7 @@ public:
 
     void InitChild()
     {
-        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
@@ -990,8 +990,12 @@ public:
         m_pModel->SetPBR(true);
         m_pModel->GetPBRMaterial().pAO = m_pTexAO;
 
-        SceneObject* pSceneObject = m_pScene->CreateSceneObject(m_pModel);
-        m_pScene->AddToRenderList(pSceneObject);
+        int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
+
+        m_pScene->GetConfig()->SetEnvMap(EnvMap);
+
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -4.0f), Vector3f(0.0f, 0.0f, 1.0f));
     }
@@ -1004,6 +1008,8 @@ public:
 
         float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
 
+        m_pSceneObject->RotateBy(0.0f, 0.0f, 0.5f);
+
         /*        for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_color); i++) {
                     m_pModel->SetPosition(m_color[i].Pos );
                     m_pModel->GetPBRMaterial().Roughness = Roughness[i];
@@ -1011,17 +1017,14 @@ public:
                     m_pModel->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
                     m_phongRenderer.Render(m_pModel);
                 }*/
-
-        m_time += DeltaTimeMillis;
     }
 
 private:
 
     Model* m_pModel = NULL;
+    SceneObject* m_pSceneObject = NULL;
 
     Vector3f m_color[5];
-    long long m_time = 0;
-
     Texture* m_pTexAO = NULL;
 };
 

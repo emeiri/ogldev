@@ -307,7 +307,9 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]->Bind(ROUGHNESS_TEXTURE_UNIT);
     }
 
-    if (m_pNormalMap) {
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]->Bind(NORMAL_TEXTURE_UNIT);
+    } else if (m_pNormalMap) {
         m_pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
     }
 

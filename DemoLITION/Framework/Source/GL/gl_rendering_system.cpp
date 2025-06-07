@@ -153,14 +153,25 @@ int RenderingSystemGL::LoadCubemapTexture(const std::string& Filename)
         exit(0);
     }
 
-    CubemapEctTexture* pTexture = new CubemapEctTexture(Filename);
-    pTexture->Load();
+    const char* pExt = strrchr(Filename.c_str(), '.');
+
+    bool IsKTX = pExt && !strcmp(pExt, ".ktx");
+
+    BaseCubmapTexture* pTexture = NULL;
+    
+    if (IsKTX) {
+        pTexture = new CubemapTexture;
+        ((CubemapTexture*)pTexture)->LoadKTX(Filename);
+    } else {
+        pTexture = new CubemapEctTexture(Filename);
+        pTexture->Load();
+    }
 
     m_textures[m_numTextures] = pTexture;
     int ret = m_numTextures;
     m_numTextures++;
 
-    printf("Equirectangular texture '%s' loaded, handle %d\n", Filename.c_str(), ret);
+    printf("Cubemap texture '%s' loaded, handle %d\n", Filename.c_str(), ret);
 
     return ret;
 }

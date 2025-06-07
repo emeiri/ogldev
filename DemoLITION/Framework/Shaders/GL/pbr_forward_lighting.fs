@@ -115,6 +115,7 @@ layout(binding = 9) uniform sampler2D gMetallic;
 layout(binding = 10) uniform sampler2D gAmbientOcclusion;
 layout(binding = 11) uniform sampler2D gEmissive;
 layout(binding = 12) uniform samplerCube gCubemapTexture;
+layout(binding = 13) uniform samplerCube gEnvMap;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
 uniform int gShadowMapWidth = 0;
@@ -193,10 +194,11 @@ mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv ) {
   return mat3( T * invmax, B * invmax, N );
 }
 
-vec3 perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv) {
-  vec3 map = normalize( 2.0 * normalSample - vec3(1.0) );
-  mat3 TBN = cotangentFrame(n, v, uv);
-  return normalize(TBN * map);
+vec3 perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv) 
+{
+    vec3 map = normalize( 2.0 * normalSample - vec3(1.0) );
+    mat3 TBN = cotangentFrame(n, v, uv);
+    return normalize(TBN * map);
 }
 
 
@@ -204,7 +206,6 @@ struct PerDrawData {
   mat4 model;
   mat4 view;
   mat4 proj;
-  vec4 cameraPos;
   uint matId;
   uint envId;
 };
@@ -268,8 +269,9 @@ uint getMaterialId() {
   return drawable.matId;
 }
 
-uint getEnvironmentId() {
-  return drawable.envId;
+uint getEnvironmentId() 
+{
+    return drawable.envId;
 }
 
 
@@ -289,12 +291,27 @@ MetallicRoughnessDataGPU getMaterial(uint idx)
         ret.baseColorFactor = vec4(1.0);                 // TODO: get from Assimp
         ret.metallicRoughnessTextureSampler = gRoughness;
         ret.metallicRoughnessTextureUV = 0;
+        ret.normalTextureSampler = gNormalMap;
+        ret.normalTextureUV = 0;
+        ret.metallicRoughnessNormalOcclusion = vec4(1.0);// TODO: get from Assimp
         return ret;
     }      
 }
 
-EnvironmentMapDataGPU getEnvironment(uint idx) {
-  return environment[idx]; 
+EnvironmentMapDataGPU getEnvironment(uint idx) 
+{
+    if (gIsIndirectRender) {
+        return environment[idx]; 
+    } else {
+        EnvironmentMapDataGPU ret;
+        //ret.envMapTexture = ;
+        ret.envMapTextureSampler = gEnvMap;
+        //ret.envMapTextureIrradiance = ;
+        //ret.envMapTextureIrradianceSampler =;
+        //ret.texBRDF_LUT =;
+        //ret.texBRDF_LUTSampler =;
+        return ret;
+    }  
 }
 
 float getMetallicFactor(MetallicRoughnessDataGPU mat) {
@@ -341,12 +358,13 @@ vec4 sampleBRDF_LUT(vec2 tc, EnvironmentMapDataGPU map) {
   return texture(map.texBRDF_LUTSampler, tc);
 }
 
-vec4 sampleEnvMap(vec3 tc, EnvironmentMapDataGPU map) {
-  return texture(map.envMapTextureSampler, tc);
+vec4 sampleEnvMap(vec3 tc, EnvironmentMapDataGPU map) 
+{
+    return texture(map.envMapTextureSampler, tc);
 }
 
 vec4 sampleEnvMapLod(vec3 tc, float lod, EnvironmentMapDataGPU map) {
-  return texture(map.envMapTextureSampler, tc, lod);
+  return texture(map.envMapTextureSampler, tc, 0);
 }
 
 vec4 sampleEnvMapIrradiance(vec3 tc, EnvironmentMapDataGPU map) {
@@ -421,6 +439,10 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs, float specularWeight) {
   vec3 brdf = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
   // HDR envmaps are already linear
   vec3 specularLight = sampleEnvMapLod(reflection.xyz, lod, envMap).rgb;
+
+  //specularLight = texture(gEnvMap, n).rgb;
+
+  //return specularLight;
 
   // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
   // Roughness dependent fresnel, from Fdez-Aguera
@@ -578,7 +600,7 @@ void main()
 
     if (!gl_FrontFacing) n *= -1.0f;
 
-    PBRInfo pbrInputs = calculatePBRInputsMetallicRoughness(Kd, n, drawable.cameraPos.xyz, WorldPos0, mrSample);
+    PBRInfo pbrInputs = calculatePBRInputsMetallicRoughness(Kd, n, gCameraWorldPos, WorldPos0, mrSample);
 
     vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs, 1.0);
     vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs.NdotV, n, pbrInputs.perceptualRoughness, pbrInputs.diffuseColor, pbrInputs.reflectance0, 1.0);
@@ -599,9 +621,9 @@ void main()
  // out_FragColor = Kao;
   //out_FragColor = Ke;
   //out_FragColor = Kd;
-  out_FragColor = mrSample;
+ // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
-  
+  out_FragColor = vec4(specular_color, 1.0);
 //  MeR.x *= getMetallicFactor(mat);
 //  MeR.y *= getRoughnessFactor(mat);
   //out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);

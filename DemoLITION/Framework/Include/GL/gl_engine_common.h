@@ -44,3 +44,5 @@
 #define EMISSIVE_TEXTURE_UNIT_INDEX                 11
 #define SKYBOX_TEXTURE_UNIT                         GL_TEXTURE12
 #define SKYBOX_TEXTURE_UNIT_INDEX                   12
+#define ENVMAP_TEXTURE_UNIT                         GL_TEXTURE13
+#define ENVMAP_TEXTURE_UNIT_INDEX                   13

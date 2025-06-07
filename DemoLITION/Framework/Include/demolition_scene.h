@@ -98,24 +98,22 @@ public:
     InfiniteGridConfig& GetInfiniteGrid() { return m_infiniteGridConfig;  }
 
     void ControlRefRefract(bool Enable) { m_refRefractEnabled = Enable; }
-
     bool IsRefRefractEnabled() const { return m_refRefractEnabled; }
 
     void SetReflectionFactor(float f) { m_reflectionFactor = std::min(1.0f, std::max(f, 0.0f)); }
-
     float GetReflectionFactor() const { return m_reflectionFactor; }
 
     void SetMatRefRefractFactor(float f) { m_matRefRefractFactor = std::min(1.0f, std::max(f, 0.0f)); }
-
     float GetMatRefRefractFactor() const { return m_matRefRefractFactor; }
 
     void SetIndexOfRefraction(float f) { m_indexOfRefraction = f; }
-
     float GetIndexOfRefraction() const { return m_indexOfRefraction; }
 
     void SetFresnelPower(float f) { m_fresnelPower = f; }
-
     float GetFresnelPower() const { return m_fresnelPower; }
+
+    void SetEnvMap(int EnvMap) { m_envMap = EnvMap; }
+    int GetEnvMap() const { return m_envMap; }
 
 private:
 
@@ -128,6 +126,7 @@ private:
     float m_matRefRefractFactor = 0.5f;
     float m_indexOfRefraction = 1.0f;
     float m_fresnelPower = 1.0f;
+    int m_envMap = -1;
 };
 
 

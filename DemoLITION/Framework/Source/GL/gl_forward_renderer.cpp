@@ -156,6 +156,8 @@ void ForwardRenderer::InitTechniques()
     m_pbrLightingTech.SetAmbientOcclusionTextureUnit(AO_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetNormalTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetEnvmapTextureUnit(ENVMAP_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
@@ -286,18 +288,27 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
 void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 {
-    if (!m_pCurLightingTech) {
+    if (!m_pCurLightingTech && !m_pCurBaseLightingTech) {
         return;
     }
 
     SceneConfig* pConfig = pScene->GetConfig();
 
-    m_pCurLightingTech->ControlShadows(pConfig->IsShadowMappingEnabled());
-    m_pCurLightingTech->ControlRefRefract(pConfig->IsRefRefractEnabled());
-    m_pCurLightingTech->SetReflectionFactor(pConfig->GetReflectionFactor());
-    m_pCurLightingTech->SetMaterialToRefRefractFactor(pConfig->GetMatRefRefractFactor());
-    m_pCurLightingTech->SetRefractETA(1.0f / pConfig->GetIndexOfRefraction());
-    m_pCurLightingTech->SetFresnelPower(pConfig->GetFresnelPower());
+    if (!UseGLTFPBR) {
+        m_pCurLightingTech->ControlShadows(pConfig->IsShadowMappingEnabled());
+        m_pCurLightingTech->ControlRefRefract(pConfig->IsRefRefractEnabled());
+        m_pCurLightingTech->SetReflectionFactor(pConfig->GetReflectionFactor());
+        m_pCurLightingTech->SetMaterialToRefRefractFactor(pConfig->GetMatRefRefractFactor());
+        m_pCurLightingTech->SetRefractETA(1.0f / pConfig->GetIndexOfRefraction());
+        m_pCurLightingTech->SetFresnelPower(pConfig->GetFresnelPower());
+    }
+
+    int EnvMap = pConfig->GetEnvMap();
+
+    if (EnvMap >= 0) {
+        CubemapTexture* pCubemapTex = (CubemapTexture*)m_pRenderingSystemGL->GetTexture(EnvMap);
+        pCubemapTex->Bind(ENVMAP_TEXTURE_UNIT);
+    }
 }
 
 
