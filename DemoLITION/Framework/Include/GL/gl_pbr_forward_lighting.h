@@ -48,6 +48,8 @@ public:
 
     void SetBRDF_LUTTextureUnit(int TextureUnit);
 
+    void SetIrradianceTextureUnit(int TextureUnit);
+
 private:
     GLuint m_aoUnitLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_emissiveUnitLoc = INVALID_UNIFORM_LOCATION;
@@ -56,5 +58,6 @@ private:
     GLuint m_normalUnitLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_envmapUnitLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_brdfLUTUnitLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_irradianceUnitLoc = INVALID_UNIFORM_LOCATION;
 };
 

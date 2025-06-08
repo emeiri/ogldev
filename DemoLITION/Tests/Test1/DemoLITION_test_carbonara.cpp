@@ -977,8 +977,10 @@ public:
 
     void InitChild()
     {
-        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
-        m_pScene->GetConfig()->ControlShadowMapping(false);
+        SceneConfig* pConfig = m_pScene->GetConfig();
+
+        pConfig->GetInfiniteGrid().Enabled = false;
+        pConfig->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
         m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
@@ -990,13 +992,15 @@ public:
 
         m_pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
         m_pBRDF_LUT->Load();
-        m_pScene->GetConfig()->pBRDF_LUT = m_pBRDF_LUT;
+        pConfig->pBRDF_LUT = m_pBRDF_LUT;
+
+        int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
+        pConfig->SetIrradianceMap(IrrdianceMap);
 
         m_pModel->SetPBR(true);
 
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
-
-        m_pScene->GetConfig()->SetEnvMap(EnvMap);
+        pConfig->SetEnvMap(EnvMap);
 
         m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
         m_pScene->AddToRenderList(m_pSceneObject);

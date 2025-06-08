@@ -116,6 +116,7 @@ layout(binding = 10) uniform sampler2D gAmbientOcclusion;
 layout(binding = 11) uniform sampler2D gEmissive;
 layout(binding = 12) uniform samplerCube gCubemapTexture;
 layout(binding = 13) uniform samplerCube gEnvMap;
+layout(binding = 14) uniform samplerCube gIrradiance;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
 uniform int gShadowMapWidth = 0;
@@ -307,7 +308,7 @@ EnvironmentMapDataGPU getEnvironment(uint idx)
         //ret.envMapTexture = ;
         ret.envMapTextureSampler = gEnvMap;
         //ret.envMapTextureIrradiance = ;
-        //ret.envMapTextureIrradianceSampler =;
+        ret.envMapTextureIrradianceSampler = gIrradiance;
         //ret.texBRDF_LUT =;
         ret.texBRDF_LUTSampler = gBRDF_LUT;
         return ret;
@@ -373,8 +374,9 @@ vec4 sampleEnvMapLod(vec3 tc, float lod, EnvironmentMapDataGPU map)
     return texture(map.envMapTextureSampler, tc_flip, 0);
 }
 
-vec4 sampleEnvMapIrradiance(vec3 tc, EnvironmentMapDataGPU map) {
-  return texture(map.envMapTextureIrradianceSampler, tc);
+vec4 sampleEnvMapIrradiance(vec3 tc, EnvironmentMapDataGPU map) 
+{
+    return texture(map.envMapTextureIrradianceSampler, tc);
 }
 
 int sampleEnvMapQueryLevels(EnvironmentMapDataGPU map) {
@@ -409,11 +411,12 @@ struct PBRInfo {
 // specularWeight is introduced with KHR_materials_specular
 vec3 getIBLRadianceLambertian(float NdotV, vec3 n, float roughness, vec3 diffuseColor, vec3 F0, float specularWeight) {
   vec2 brdfSamplePoint = clamp(vec2(NdotV, roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
-  EnvironmentMapDataGPU envMap =  getEnvironment(getEnvironmentId());
+  EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
   vec2 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rg;
 
   vec3 irradiance = sampleEnvMapIrradiance(n.xyz, envMap).rgb;
 
+  //return irradiance;
   // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
   // Roughness dependent fresnel, from Fdez-Aguera
   vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
@@ -629,7 +632,7 @@ void main()
   //out_FragColor = Kd;
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
-  out_FragColor = vec4(specular_color, 1.0);
+  //out_FragColor = vec4(diffuse_color, 1.0);
 //  MeR.x *= getMetallicFactor(mat);
 //  MeR.y *= getRoughnessFactor(mat);
   //out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);

@@ -157,6 +157,7 @@ void ForwardRenderer::InitTechniques()
     m_pbrLightingTech.SetNormalTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetEnvmapTextureUnit(ENVMAP_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetBRDF_LUTTextureUnit(BRDF_LUT_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetIrradianceTextureUnit(IRRADIANCE_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
@@ -311,6 +312,13 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 
     if (pConfig->pBRDF_LUT) {
         pConfig->pBRDF_LUT->Bind(BRDF_LUT_TEXTURE_UNIT);
+    }
+
+    int IrradianceMap = pConfig->GetIrradianceMap();
+
+    if (IrradianceMap >= 0) {
+        CubemapTexture* pCubemapTex = (CubemapTexture*)m_pRenderingSystemGL->GetTexture(IrradianceMap);
+        pCubemapTex->Bind(IRRADIANCE_TEXTURE_UNIT);
     }
 }
 

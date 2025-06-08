@@ -115,6 +115,9 @@ public:
     void SetEnvMap(int EnvMap) { m_envMap = EnvMap; }
     int GetEnvMap() const { return m_envMap; }
 
+    void SetIrradianceMap(int IrradianceMap) { m_irradianceMap = IrradianceMap; }
+    int GetIrradianceMap() const { return m_irradianceMap; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -129,6 +132,7 @@ private:
     float m_indexOfRefraction = 1.0f;
     float m_fresnelPower = 1.0f;
     int m_envMap = -1;
+    int m_irradianceMap = -1;
 };
 
 
