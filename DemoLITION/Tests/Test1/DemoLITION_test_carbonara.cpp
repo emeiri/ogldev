@@ -960,19 +960,6 @@ public:
 
     GLTFPBRDemo()
     {
-        float metalRough = 0.43f;
-
-        // Gold
-        m_color[0] = Vector3f(1, 0.71f, 0.29f);
-        // Copper
-        m_color[1] = Vector3f(0.95f, 0.64f, 0.54f);
-        // Aluminum
-        m_color[2] = Vector3f(0.91f, 0.92f, 0.92f);
-        // Titanium
-        m_color[3] = Vector3f(0.542f, 0.497f, 0.449f);
-        // Silver
-        m_color[4] = Vector3f(0.95f, 0.93f, 0.88f);
-
     }
 
     void InitChild()
@@ -1005,18 +992,18 @@ public:
         m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
         m_pScene->AddToRenderList(m_pSceneObject);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -4.0f), Vector3f(0.0f, 0.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
     }
 
     void OnFrameChild(long long DeltaTimeMillis)
     {
-        m_pModel->GetPBRMaterial().Roughness = 0.43f;
-        m_pModel->GetPBRMaterial().IsMetal = true;
-        m_pModel->GetPBRMaterial().Color = m_color[0];
+        //m_pModel->GetPBRMaterial().Roughness = 0.43f;
+       // m_pModel->GetPBRMaterial().IsMetal = true;
+       // m_pModel->GetPBRMaterial().Color = m_color[0];
 
         float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
 
-        m_pSceneObject->RotateBy(0.0f, 0.0f, 0.5f);
+        m_pSceneObject->RotateBy(0.0f, 0.0f, 0.25f);
 
         /*        for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_color); i++) {
                     m_pModel->SetPosition(m_color[i].Pos );
@@ -1032,7 +1019,6 @@ private:
     Model* m_pModel = NULL;
     SceneObject* m_pSceneObject = NULL;
 
-    Vector3f m_color[5];
     Texture* m_pTexAO = NULL;
     Texture* m_pBRDF_LUT = NULL;
 };
