@@ -362,16 +362,16 @@ vec4 sampleBRDF_LUT(vec2 tc, EnvironmentMapDataGPU map)
 
 vec4 sampleEnvMap(vec3 tc, EnvironmentMapDataGPU map) 
 {
-    vec3 tc_flip = tc;
-    tc_flip.y = -tc_flip.y;
-    return texture(map.envMapTextureSampler, tc_flip);
+   // vec3 tc_flip = tc;
+   // tc_flip.y = -tc_flip.y;
+    return texture(map.envMapTextureSampler, tc);
 }
 
 vec4 sampleEnvMapLod(vec3 tc, float lod, EnvironmentMapDataGPU map) 
 {
-    vec3 tc_flip = tc;
-    tc_flip.y = -tc_flip.y;
-    return texture(map.envMapTextureSampler, tc_flip, 0);
+   // vec3 tc_flip = tc;
+   // tc_flip.y = -tc_flip.y;
+    return textureLod(map.envMapTextureSampler, tc, lod);
 }
 
 vec4 sampleEnvMapIrradiance(vec3 tc, EnvironmentMapDataGPU map) 
