@@ -363,7 +363,8 @@ void BasicMesh::LoadDiffuseTextureEmbedded(const aiTexture* paiTexture, int Mate
     printf("Embeddeded diffuse texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load(buffer_size, paiTexture->pcData);
+    bool IsSRGB = true;
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
 
@@ -373,7 +374,9 @@ void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load()) {
+    bool IsSRGB = true;
+
+    if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load(IsSRGB)) {
         printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
         exit(0);
     }
@@ -408,7 +411,8 @@ void BasicMesh::LoadSpecularTextureEmbedded(const aiTexture* paiTexture, int Mat
     printf("Embeddeded specular texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Load(buffer_size, paiTexture->pcData);
+    bool IsSRGB = false;
+    m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
 
@@ -418,7 +422,9 @@ void BasicMesh::LoadSpecularTextureFromFile(const string& Dir, const aiString& P
 
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Load()) {
+    bool IsSRGB = false;
+
+    if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Load(IsSRGB)) {
         printf("Error loading specular texture '%s'\n", FullPath.c_str());
         exit(0);
     }
@@ -453,7 +459,8 @@ void BasicMesh::LoadAlbedoTextureEmbedded(const aiTexture* paiTexture, int Mater
     printf("Embeddeded albedo texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].PBRmaterial.pAlbedo = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].PBRmaterial.pAlbedo->Load(buffer_size, paiTexture->pcData);
+    bool IsSRGB = true;
+    m_Materials[MaterialIndex].PBRmaterial.pAlbedo->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
 
@@ -463,7 +470,9 @@ void BasicMesh::LoadAlbedoTextureFromFile(const string& Dir, const aiString& Pat
 
     m_Materials[MaterialIndex].PBRmaterial.pAlbedo = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    if (!m_Materials[MaterialIndex].PBRmaterial.pAlbedo->Load()) {
+    bool IsSRGB = true;
+
+    if (!m_Materials[MaterialIndex].PBRmaterial.pAlbedo->Load(IsSRGB)) {
         printf("Error loading albedo texture '%s'\n", FullPath.c_str());
         exit(0);
     }
@@ -503,7 +512,8 @@ void BasicMesh::LoadMetalnessTextureEmbedded(const aiTexture* paiTexture, int Ma
     printf("Embeddeded metalness texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].PBRmaterial.pMetallic = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].PBRmaterial.pMetallic->Load(buffer_size, paiTexture->pcData);
+    bool IsSRGB = false;
+    m_Materials[MaterialIndex].PBRmaterial.pMetallic->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
 
@@ -513,7 +523,9 @@ void BasicMesh::LoadMetalnessTextureFromFile(const string& Dir, const aiString& 
 
     m_Materials[MaterialIndex].PBRmaterial.pMetallic = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    if (!m_Materials[MaterialIndex].PBRmaterial.pMetallic->Load()) {
+    bool IsSRGB = false;
+
+    if (!m_Materials[MaterialIndex].PBRmaterial.pMetallic->Load(IsSRGB)) {
         printf("Error loading metalness texture '%s'\n", FullPath.c_str());
         exit(0);
     }
@@ -553,7 +565,8 @@ void BasicMesh::LoadRoughnessTextureEmbedded(const aiTexture* paiTexture, int Ma
     printf("Embeddeded roughness texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].PBRmaterial.pRoughness = new Texture(GL_TEXTURE_2D);
     int buffer_size = paiTexture->mWidth;
-    m_Materials[MaterialIndex].PBRmaterial.pRoughness->Load(buffer_size, paiTexture->pcData);
+    bool IsSRGB = false;
+    m_Materials[MaterialIndex].PBRmaterial.pRoughness->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
 
@@ -562,8 +575,9 @@ void BasicMesh::LoadRoughnessTextureFromFile(const string& Dir, const aiString& 
     string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].PBRmaterial.pRoughness = new Texture(GL_TEXTURE_2D, FullPath.c_str());
+    bool IsSRGB = false;
 
-    if (!m_Materials[MaterialIndex].PBRmaterial.pRoughness->Load()) {
+    if (!m_Materials[MaterialIndex].PBRmaterial.pRoughness->Load(IsSRGB)) {
         printf("Error loading roughness texture '%s'\n", FullPath.c_str());
         exit(0);
     }

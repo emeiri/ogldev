@@ -47,16 +47,16 @@ Texture::Texture(GLenum TextureTarget)
 }
 
 
-void Texture::Load(u32 BufferSize, void* pData)
+void Texture::Load(u32 BufferSize, void* pData, bool IsSRGB)
 {
     void* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
 
-    LoadInternal(pImageData);
+    LoadInternal(pImageData, IsSRGB);
 
     stbi_image_free(pImageData);
 }
 
-bool Texture::Load()
+bool Texture::Load(bool IsSRGB)
 {
     const char* pExt = strrchr(m_fileName.c_str(), '.');
 
@@ -87,46 +87,48 @@ bool Texture::Load()
 
     printf("Width %d, height %d, bpp %d\n", m_imageWidth, m_imageHeight, m_imageBPP);
 
-    LoadInternal(pImageData);
+    LoadInternal(pImageData, IsSRGB);
 
     return true;
 }
 
 
-void Texture::Load(const std::string& Filename)
+void Texture::Load(const std::string& Filename, bool IsSRGB)
 {
     m_fileName = Filename;
 
-    if (!Load()) {
+    if (!Load(IsSRGB)) {
         exit(0);
     }
 }
 
 
-void Texture::LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData)
+void Texture::LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData, bool IsSRGB)
 {
     m_imageWidth = Width;
     m_imageHeight = Height;
     m_imageBPP = BPP;
 
-    LoadInternal(pImageData);
+    LoadInternal(pImageData, IsSRGB);
 }
 
 
-void Texture::LoadInternal(const void* pImageData)
+void Texture::LoadInternal(const void* pImageData, bool IsSRGB)
 {
     if (IsGLVersionHigher(4, 5)) {
-        LoadInternalDSA(pImageData);
+        LoadInternalDSA(pImageData, IsSRGB);
     } else {
-        LoadInternalNonDSA(pImageData);
+        LoadInternalNonDSA(pImageData, IsSRGB);
     }
 }
 
 
-void Texture::LoadInternalNonDSA(const void* pImageData)
+void Texture::LoadInternalNonDSA(const void* pImageData, bool IsSRGB)
 {
     glGenTextures(1, &m_textureObj);
     glBindTexture(m_textureTarget, m_textureObj);
+
+    GLenum InternalFormat = GL_NONE;
 
     if (m_textureTarget == GL_TEXTURE_2D) {
         switch (m_imageBPP) {
@@ -142,11 +144,13 @@ void Texture::LoadInternalNonDSA(const void* pImageData)
             break;
 
         case 3:
-            glTexImage2D(m_textureTarget, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pImageData);
+            InternalFormat = IsSRGB ? GL_SRGB8 : GL_RGB8;
+            glTexImage2D(m_textureTarget, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, InternalFormat, GL_UNSIGNED_BYTE, pImageData);
             break;
 
         case 4:
-            glTexImage2D(m_textureTarget, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImageData);
+            InternalFormat = IsSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+            glTexImage2D(m_textureTarget, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, InternalFormat, GL_UNSIGNED_BYTE, pImageData);
             break;
 
         default:
@@ -162,17 +166,20 @@ void Texture::LoadInternalNonDSA(const void* pImageData)
     glTexParameteri(m_textureTarget, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
     glGenerateMipmap(m_textureTarget);
 
     glBindTexture(m_textureTarget, 0);
 }
 
-void Texture::LoadInternalDSA(const void* pImageData)
+void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
 {
     glCreateTextures(m_textureTarget, 1, &m_textureObj);
 
     int Levels = std::min(5, (int)log2f((float)std::max(m_imageWidth, m_imageHeight)));
+
+    GLenum InternalFormat = GL_NONE;
 
     if (m_textureTarget == GL_TEXTURE_2D) {
         if (m_isKTX) {
@@ -196,12 +203,14 @@ void Texture::LoadInternalDSA(const void* pImageData)
                 break;
 
             case 3:
-                glTextureStorage2D(m_textureObj, Levels, GL_RGB8, m_imageWidth, m_imageHeight);
+                InternalFormat = IsSRGB ? GL_SRGB8 : GL_RGB8;
+                glTextureStorage2D(m_textureObj, Levels, InternalFormat, m_imageWidth, m_imageHeight);
                 glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGB, GL_UNSIGNED_BYTE, pImageData);
                 break;
 
             case 4:
-                glTextureStorage2D(m_textureObj, Levels, GL_RGBA8, m_imageWidth, m_imageHeight);
+                InternalFormat = IsSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+                glTextureStorage2D(m_textureObj, Levels, InternalFormat, m_imageWidth, m_imageHeight);
                 glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGBA, GL_UNSIGNED_BYTE, pImageData);
                 break;
 

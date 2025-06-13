@@ -45,13 +45,13 @@ public:
     Texture(GLenum TextureTarget);
 
     // Should be called once to load the texture
-    bool Load();
+    bool Load(bool IsSRGB = false);
 
-    void Load(const std::string& Filename);
+    void Load(const std::string& Filename, bool IsSRGB = false);
 
-    void Load(unsigned int BufferSize, void* pImageData);
+    void Load(unsigned int BufferSize, void* pImageData, bool IsSRGB);
 
-    void LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData);
+    void LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData, bool IsSRGB);
 
     void LoadF32(int Width, int Height, const float* pImageData);
 
@@ -69,9 +69,9 @@ public:
     GLuint64 GetBindlessHandle() const { return m_bindlessHandle; }
 
 private:
-    void LoadInternal(const void* pImageData);
-    void LoadInternalNonDSA(const void* pImageData);
-    void LoadInternalDSA(const void* pImageData);    
+    void LoadInternal(const void* pImageData, bool IsSRGB);
+    void LoadInternalNonDSA(const void* pImageData, bool IsSRGB);
+    void LoadInternalDSA(const void* pImageData, bool IsSRGB);
 
     void BindInternalNonDSA(GLenum TextureUnit);
     void BindInternalDSA(GLenum TextureUnit);

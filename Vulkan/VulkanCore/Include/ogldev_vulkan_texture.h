@@ -39,9 +39,9 @@ public:
 
 	void Destroy(VkDevice Device);
 
-	void Load(const std::string& Filename);
+	void Load(const std::string& Filename, bool IsRGB);
 
-	void Load(unsigned int BufferSize, void* pImageData);
+	void Load(unsigned int BufferSize, void* pImageData, bool IsRGB);
 
 private:
 

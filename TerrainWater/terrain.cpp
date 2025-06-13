@@ -62,7 +62,7 @@ void BaseTerrain::InitTerrain(float WorldScale, float TextureScale, const std::v
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_pTextures) ; i++) {
         m_pTextures[i] = new Texture(GL_TEXTURE_2D);
-        m_pTextures[i]->Load(TextureFilenames[i]);
+        m_pTextures[i]->Load(TextureFilenames[i], false);
     }
 
     //m_pSkydome = new Skydome(8, 32, 1.0f, "../Content/textures/kloofendal_48d_partly_cloudy_puresky_4k.jpg", SKYDOME_TEXTURE_UNIT, SKYDOME_TEXTURE_UNIT_INDEX);

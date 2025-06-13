@@ -97,7 +97,8 @@ Texture* TextureGenerator::GenerateTexture(int TextureSize, BaseTerrain* pTerrai
 
     stbi_write_png("texture.png", TextureSize, TextureSize, BPP, pTextureData, TextureSize * BPP);
 
-    pTexture->LoadRaw(TextureSize, TextureSize, BPP, pTextureData);
+    bool IsSRGB = false;
+    pTexture->LoadRaw(TextureSize, TextureSize, BPP, pTextureData, IsSRGB);
 
     free(pTextureData);
 

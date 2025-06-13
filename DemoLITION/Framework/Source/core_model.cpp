@@ -618,10 +618,11 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
         if (!s_pMissingTexture) {
             printf("Loading default texture\n");
             s_pMissingTexture = AllocTexture2D();
+            bool IsSRGB = true;
 #ifdef OGLDEV_VULKAN   // hack due to different local dirs
-            s_pMissingTexture->Load("../../Content/Textures/no_texture.png");            
+            s_pMissingTexture->Load("../../Content/Textures/no_texture.png", IsSRGB);            
 #else
-            s_pMissingTexture->Load("../Content/Textures/no_texture.png");
+            s_pMissingTexture->Load("../Content/Textures/no_texture.png", IsSRGB);
 #endif
         }
 
@@ -683,32 +684,34 @@ void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int 
         if (pMaterial->GetTexture(AssimpType, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
+            bool IsSRGB = (MyType == TEX_TYPE_BASE);
+
             if (paiTexture) {
-                LoadTextureEmbedded(paiTexture, MaterialIndex, MyType);
+                LoadTextureEmbedded(paiTexture, MaterialIndex, MyType, IsSRGB);
             }
             else {
-                LoadTextureFromFile(Dir, Path, MaterialIndex, MyType);
+                LoadTextureFromFile(Dir, Path, MaterialIndex, MyType, IsSRGB);
             }
         }
     }
 }
 
 
-void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType)
+void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB)
 {
     printf("Loaded embeddeded texture type '%s'\n", paiTexture->achFormatHint);
     m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
     int buffer_size = paiTexture->mWidth;   // TODO: just the width???
-    m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData);
+    m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
 
-void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType)
+void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB)
 {
     std::string FullPath = GetFullPath(Dir, Path);
 
     m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
-    m_Materials[MaterialIndex].pTextures[MyType]->Load(FullPath.c_str());
+    m_Materials[MaterialIndex].pTextures[MyType]->Load(FullPath.c_str(), IsSRGB);
 
     printf("Loaded texture type %d from '%s'\n", MyType, FullPath.c_str());
 }

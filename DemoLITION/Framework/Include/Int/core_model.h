@@ -250,8 +250,8 @@ private:
     void LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
 
     void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, TEXTURE_TYPE MyType);
-    void LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType);
-    void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType);
+    void LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
+    void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
 

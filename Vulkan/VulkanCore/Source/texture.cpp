@@ -29,7 +29,7 @@
 
 namespace OgldevVK {
 
-void VulkanTexture::Load(unsigned int BufferSize, void* pData)
+void VulkanTexture::Load(unsigned int BufferSize, void* pData, bool IsRGB)
 {
 	assert(m_pVulkanCore);
 
@@ -39,7 +39,7 @@ void VulkanTexture::Load(unsigned int BufferSize, void* pData)
 }
 
 
-void VulkanTexture::Load(const std::string& Filename)
+void VulkanTexture::Load(const std::string& Filename, bool IsRGB)
 {
 	m_pVulkanCore->CreateTexture(Filename.c_str(), *this);
 }
