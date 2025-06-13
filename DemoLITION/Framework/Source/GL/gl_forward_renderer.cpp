@@ -325,7 +325,8 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 
 void ForwardRenderer::ApplyLighting(GLScene* pScene)
 {
-    if (!m_pCurLightingTech) {
+    if (UseGLTFPBR) {
+        m_pCurBaseLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
         return;
     }
 
