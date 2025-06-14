@@ -39,6 +39,8 @@ public:
 
 	void OnFrame(int Image);
 
+	VkCommandBuffer GetCommandBuffer() const { return m_cmdBuf; }
+
 private:
 
 	void CreateDescriptorPool();
