@@ -47,6 +47,8 @@ private:
 
 	void InitImGUIFontsTexture();
 
+	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex);
+
 	VkCommandBuffer m_cmdBuf = NULL;
 	VkDescriptorPool m_descriptorPool = NULL;
 };

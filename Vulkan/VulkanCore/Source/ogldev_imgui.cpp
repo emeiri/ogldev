@@ -16,14 +16,19 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
-#include "imGuIZMOquat.h"
+//#include "imGuIZMOquat.h"
 
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_imgui.h"
 #include "ogldev_vulkan_wrapper.h"
+
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
+
 
 static void check_vk_result(VkResult err)
 {
@@ -45,10 +50,6 @@ void ImGUIRenderer::Init(VulkanCore* pvkCore)
 	VulkanRenderer::Init(pvkCore);
 
 	bool DepthEnabled = true;
-
-	m_renderPass = m_pvkCore->CreateSimpleRenderPass(DepthEnabled, false, false, RenderPassTypeLast);
-
-	m_frameBuffers = m_pvkCore->CreateFramebuffers(m_renderPass);
 
 	CreateDescriptorPool();
 
@@ -104,8 +105,8 @@ void ImGUIRenderer::InitImGUI()
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-	io.Fonts->AddFontDefault();
-	io.Fonts->Build();
+	//io.Fonts->AddFontDefault();
+	//io.Fonts->Build();
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -114,25 +115,40 @@ void ImGUIRenderer::InitImGUI()
 	 // Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForVulkan(m_pvkCore->GetWindow(), true);
 
+	VkFormat ColorFormat = m_pvkCore->GetSwapChainFormat();
+
 	ImGui_ImplVulkan_InitInfo InitInfo = {
+		.ApiVersion = VK_API_VERSION_1_3,
 		.Instance = m_pvkCore->GetInstance(),
 		.PhysicalDevice = m_pvkCore->GetPhysicalDevice().m_physDevice,
 		.Device = m_pvkCore->GetDevice(),
 		.QueueFamily = m_pvkCore->GetQueueFamily(),
 		.Queue = m_pvkCore->GetQueue()->GetHandle(),
-		.PipelineCache = NULL,
 		.DescriptorPool = m_descriptorPool,
-		.Subpass = 0,
+		.RenderPass = NULL,
 		.MinImageCount = m_pvkCore->GetPhysicalDevice().m_surfaceCaps.minImageCount,
 		.ImageCount = (u32)m_pvkCore->GetNumImages(),
 		.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+		.PipelineCache = NULL,
+		.Subpass = 0,
+		.UseDynamicRendering = true,		
+		.PipelineRenderingCreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+			.pNext = NULL,
+			.viewMask = 0,
+			.colorAttachmentCount = 1,
+			.pColorAttachmentFormats = &ColorFormat,
+			.depthAttachmentFormat = m_pvkCore->GetDepthFormat(),
+			.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
+		 },
 		.Allocator = NULL,
 		.CheckVkResultFn = check_vk_result
 	};
 
-	ImGui_ImplVulkan_Init(&InitInfo, m_renderPass);
+	ImGui_ImplVulkan_Init(&InitInfo);
 
-	InitImGUIFontsTexture();
+	m_pvkCore->CreateCommandBuffers(1, &m_cmdBuf);
+	//InitImGUIFontsTexture();
 }
 
 
@@ -142,7 +158,7 @@ void ImGUIRenderer::InitImGUIFontsTexture()
 
 	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-	ImGui_ImplVulkan_CreateFontsTexture(m_cmdBuf);
+	//ImGui_ImplVulkan_CreateFontsTexture(m_cmdBuf);
 
 	VkResult res = vkEndCommandBuffer(m_cmdBuf);
 	CHECK_VK_RESULT(res, "vkEndCommandBuffer");
@@ -150,7 +166,7 @@ void ImGUIRenderer::InitImGUIFontsTexture()
 	m_pvkCore->GetQueue()->SubmitSync(m_cmdBuf);
 	m_pvkCore->GetQueue()->WaitIdle();
 
-	ImGui_ImplVulkan_DestroyFontUploadObjects();
+	//ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
 void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
@@ -190,18 +206,78 @@ void ImGUIRenderer::OnFrame(int Image)
 	ImGui::Render();
 	ImDrawData* draw_data = ImGui::GetDrawData();
 
-	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+	VkResult result = vkResetCommandBuffer(m_cmdBuf, 0);
+	CHECK_VK_RESULT(result, "vkResetCommandBuffer");
 
-	BeginRenderPass(m_cmdBuf, Image);
+	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	OgldevVK::ImageMemBarrier(m_cmdBuf, m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
+							  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+	BeginRendering(m_cmdBuf, Image);
 
 	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBuf);
+	
+	vkCmdEndRendering(m_cmdBuf);
 
-	vkCmdEndRenderPass(m_cmdBuf);
+	OgldevVK::ImageMemBarrier(m_cmdBuf, m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
+							  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	vkEndCommandBuffer(m_cmdBuf);
 
-	m_pvkCore->GetQueue()->SubmitSync(m_cmdBuf);
-	m_pvkCore->GetQueue()->WaitIdle();
+	m_pvkCore->GetQueue()->SubmitAsync(m_cmdBuf);
+	//m_pvkCore->GetQueue()->WaitIdle();
 }
+
+
+void ImGUIRenderer::BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
+{
+	VkClearValue ClearColor = {
+		.color = {1.0f, 0.0f, 0.0f, 1.0f},
+	};
+
+	VkClearValue DepthValue = {
+		.depthStencil = {.depth = 1.0f, .stencil = 0 }
+	};
+
+	VkRenderingAttachmentInfoKHR ColorAttachment = {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+		.pNext = NULL,
+		.imageView = m_pvkCore->GetImageView(ImageIndex),
+		.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		.resolveMode = VK_RESOLVE_MODE_NONE,
+		.resolveImageView = VK_NULL_HANDLE,
+		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.clearValue = ClearColor
+	};
+
+	VkRenderingAttachmentInfo DepthAttachment = {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+		.pNext = NULL,
+		.imageView = m_pvkCore->GetDepthView(ImageIndex),
+		.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+		.resolveMode = VK_RESOLVE_MODE_NONE,
+		.resolveImageView = VK_NULL_HANDLE,
+		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		.clearValue = DepthValue,
+	};
+
+	VkRenderingInfoKHR RenderingInfo = {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
+		.renderArea = { {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT} },
+		.layerCount = 1,
+		.viewMask = 0,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &ColorAttachment,
+		.pDepthAttachment = &DepthAttachment
+	};
+
+	vkCmdBeginRendering(CmdBuf, &RenderingInfo);
+}
+
 
 }

@@ -33,11 +33,8 @@ public:
 
 	virtual void Init(VulkanCore* pvkCore);
 
-	//inline VulkanImage getDepthTexture() const { return depthTexture_; }
-
 protected:
 
-	void BeginRenderPass(VkCommandBuffer commandBuffer, int Image);
 	//bool CreateUniformBuffers(int UniformDataSize);
 
 	VulkanCore* m_pvkCore = NULL;
@@ -46,8 +43,6 @@ protected:
 	int m_framebufferWidth  = 0;
 	int m_framebufferHeight = 0;
 
-	VkRenderPass m_renderPass = NULL;
-	std::vector<VkFramebuffer> m_frameBuffers;
 	GraphicsPipeline* m_pPipeline = NULL;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
 };

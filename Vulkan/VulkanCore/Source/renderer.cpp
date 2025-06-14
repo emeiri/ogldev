@@ -29,44 +29,13 @@ void VulkanRenderer::Init(VulkanCore* pvkCore)
 	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
 }
 
+
 VulkanRenderer::~VulkanRenderer()
 {
-	m_pvkCore->DestroyFramebuffers(m_frameBuffers);
-
-	vkDestroyRenderPass(m_device, m_renderPass, NULL);
-
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
 		m_uniformBuffers[i].Destroy(m_device);
 	}
 
 	delete m_pPipeline;
 }
-
-
-void VulkanRenderer::BeginRenderPass(VkCommandBuffer CmdBuf, int Image)
-{
-	VkRect2D RenderArea = {
-		.offset = { 0, 0 },
-		.extent = {
-			.width = (u32)m_framebufferWidth,
-			.height = (u32)m_framebufferHeight
-		}
-	};
-
-	VkRenderPassBeginInfo RenderPassBeginInfo = {
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-		.pNext = nullptr,
-		.renderPass = m_renderPass,
-		.framebuffer = m_frameBuffers[Image],
-		.renderArea = RenderArea
-	};
-
-	vkCmdBeginRenderPass(CmdBuf, &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-	if (m_pPipeline) {		// Some renderers don't create a pipeline
-		m_pPipeline->Bind(CmdBuf, Image);
-	}
-}
-
-
 }
