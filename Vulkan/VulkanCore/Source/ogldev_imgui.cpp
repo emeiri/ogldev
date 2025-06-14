@@ -39,6 +39,15 @@ static void check_vk_result(VkResult err)
 		abort();
 }
 
+bool IsMouseControlledByImGUI()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	bool ret = io.WantCaptureMouse;
+		
+	return ret;
+}
+
 namespace OgldevVK {
 
 ImGUIRenderer::ImGUIRenderer()

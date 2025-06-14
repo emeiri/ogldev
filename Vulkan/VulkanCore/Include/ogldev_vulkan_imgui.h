@@ -53,5 +53,6 @@ private:
 	VkDescriptorPool m_descriptorPool = NULL;
 };
 
-
 }
+
+bool IsMouseControlledByImGUI();
