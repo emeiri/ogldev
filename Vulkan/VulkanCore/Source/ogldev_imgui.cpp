@@ -190,8 +190,8 @@ void ImGUIRenderer::OnFrame(int Image)
 	static int counter = 0;
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.DisplaySize.x = (float)m_framebufferWidth;      
-	io.DisplaySize.y = (float)m_framebufferHeight;             
+	io.DisplaySize.x = (float)m_framebufferWidth;
+	io.DisplaySize.y = (float)m_framebufferHeight;
 
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -235,7 +235,7 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	vkEndCommandBuffer(m_cmdBuf);
 
-	m_pvkCore->GetQueue()->SubmitAsync(m_cmdBuf);
+	//m_pvkCore->GetQueue()->SubmitAsync(m_cmdBuf);
 	//m_pvkCore->GetQueue()->WaitIdle();
 }
 

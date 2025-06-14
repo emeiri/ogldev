@@ -92,11 +92,15 @@ public:
 		//else {
 			UpdateUniformBuffers(ImageIndex);
 
-			m_pQueue->SubmitAsync(m_cmdBufs[ImageIndex]);
+			m_imGUIRenderer.OnFrame(ImageIndex);
+
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs[ImageIndex], m_imGUIRenderer.GetCommandBuffer() };
+
+			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		//}
 
 				//	if (m_showGui) {
-			m_imGUIRenderer.OnFrame(ImageIndex);
+	
 			//	} 
 
 
