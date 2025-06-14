@@ -102,8 +102,9 @@ void ImGUIRenderer::InitImGUI()
 {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos; 
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;     
 
 	//io.Fonts->AddFontDefault();
 	//io.Fonts->Build();
@@ -211,8 +212,8 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	OgldevVK::ImageMemBarrier(m_cmdBuf, m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
-							  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+	//OgldevVK::ImageMemBarrier(m_cmdBuf, m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
+	//						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 	BeginRendering(m_cmdBuf, Image);
 
@@ -248,7 +249,7 @@ void ImGUIRenderer::BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
 		.resolveMode = VK_RESOLVE_MODE_NONE,
 		.resolveImageView = VK_NULL_HANDLE,
 		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.clearValue = ClearColor
 	};
@@ -261,7 +262,7 @@ void ImGUIRenderer::BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
 		.resolveMode = VK_RESOLVE_MODE_NONE,
 		.resolveImageView = VK_NULL_HANDLE,
 		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+		.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
 		.clearValue = DepthValue,
 	};
