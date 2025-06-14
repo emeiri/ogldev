@@ -37,9 +37,11 @@ public:
 
 	u32 AcquireNextImage();
 
-	void SubmitSync(VkCommandBuffer CmbBuf);
+	void SubmitSync(VkCommandBuffer CmdBuf);
 
-	void SubmitAsync(VkCommandBuffer CmbBuf);
+	void SubmitAsync(VkCommandBuffer CmdBuf);
+
+	void SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs);
 
 	void Present(u32 ImageIndex);
 

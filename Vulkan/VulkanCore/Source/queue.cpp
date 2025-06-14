@@ -86,7 +86,12 @@ void VulkanQueue::SubmitSync(VkCommandBuffer CmbBuf)
 }
 
 
-void VulkanQueue::SubmitAsync(VkCommandBuffer CmbBuf)
+void VulkanQueue::SubmitAsync(VkCommandBuffer CmdBuf)
+{
+	SubmitAsync(&CmdBuf, 1);
+}
+
+void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 {
 	VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
@@ -96,10 +101,10 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer CmbBuf)
 		.waitSemaphoreCount = 1,
 		.pWaitSemaphores = &m_presentCompleteSem,
 		.pWaitDstStageMask = &waitFlags,
-		.commandBufferCount = 1,
-		.pCommandBuffers = &CmbBuf,
-		.signalSemaphoreCount = 1,				
-		.pSignalSemaphores = &m_renderCompleteSem		
+		.commandBufferCount = (u32)NumCmdBufs,
+		.pCommandBuffers = pCmdBufs,
+		.signalSemaphoreCount = 1,
+		.pSignalSemaphores = &m_renderCompleteSem
 	};
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &SubmitInfo, NULL);
