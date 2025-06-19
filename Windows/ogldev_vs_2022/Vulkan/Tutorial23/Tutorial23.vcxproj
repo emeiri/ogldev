@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Vulkan\Tutorial22\tutorial22.cpp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial23\test.frag" />
+    <None Include="..\..\..\..\Vulkan\Tutorial23\test.vert" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial22\test.frag" />
-    <None Include="..\..\..\..\Vulkan\Tutorial22\test.vert" />
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial23\tutorial23.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -31,7 +31,7 @@
     <ProjectGuid>{3041FBBB-86DE-4276-B344-6A5276B9260B}</ProjectGuid>
     <RootNamespace>Tutorial01</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Tutorial22</ProjectName>
+    <ProjectName>Tutorial23</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

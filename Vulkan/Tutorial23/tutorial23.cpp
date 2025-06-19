@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #21: Dear ImGui
+		Tutorial #23: Dear ImGui
 */
 
 #include <array>
@@ -363,7 +363,7 @@ private:
 };
 
 
-#define APP_NAME "Tutorial 22"
+#define APP_NAME "Tutorial 23"
 
 int main(int argc, char* argv[])
 {
