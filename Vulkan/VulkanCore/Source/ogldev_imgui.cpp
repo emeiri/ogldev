@@ -56,9 +56,7 @@ ImGUIRenderer::ImGUIRenderer()
 
 void ImGUIRenderer::Init(VulkanCore* pvkCore)
 {
-	VulkanRenderer::Init(pvkCore);
-
-	bool DepthEnabled = true;
+	m_pvkCore = pvkCore;
 
 	CreateDescriptorPool();
 
@@ -70,7 +68,7 @@ ImGUIRenderer::~ImGUIRenderer()
 {
 	m_pvkCore->FreeCommandBuffers(1, &m_cmdBuf);
 
-	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
+	vkDestroyDescriptorPool(m_pvkCore->GetDevice(), m_descriptorPool, NULL);
 
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -102,7 +100,7 @@ void ImGUIRenderer::CreateDescriptorPool()
 		.pPoolSizes = PoolSizes
 	};
 
-	VkResult res = vkCreateDescriptorPool(m_device, &PoolCreateInfo, NULL, &m_descriptorPool);
+	VkResult res = vkCreateDescriptorPool(m_pvkCore->GetDevice(), &PoolCreateInfo, NULL, &m_descriptorPool);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorPool");
 }
 
@@ -179,15 +177,13 @@ void ImGUIRenderer::InitImGUIFontsTexture()
 	//ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
-void ImGUIRenderer::FillCommandBuffer(VkCommandBuffer CmdBuf, int Image)
-{
-}
-
 
 void ImGUIRenderer::OnFrame(int Image)
 {
 	static float f = 0.0f;
 	static int counter = 0;
+
+	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize.x = (float)m_framebufferWidth;
@@ -221,9 +217,6 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	//OgldevVK::ImageMemBarrier(m_cmdBuf, m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
-	//						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-
 	BeginRendering(m_cmdBuf, Image);
 
 	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBuf);
@@ -234,9 +227,6 @@ void ImGUIRenderer::OnFrame(int Image)
 							  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	vkEndCommandBuffer(m_cmdBuf);
-
-	//m_pvkCore->GetQueue()->SubmitAsync(m_cmdBuf);
-	//m_pvkCore->GetQueue()->WaitIdle();
 }
 
 

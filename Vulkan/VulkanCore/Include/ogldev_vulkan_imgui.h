@@ -23,19 +23,17 @@
 
 #include <vector>
 
-#include "ogldev_vulkan_renderer.h"
+#include "ogldev_vulkan_core.h"
 
 namespace OgldevVK {
 
-class ImGUIRenderer : public VulkanRenderer {
+class ImGUIRenderer  {
 public:
 	ImGUIRenderer();
 
 	~ImGUIRenderer();
 
-	virtual void Init(VulkanCore* pvkCore);
-
-	virtual void FillCommandBuffer(VkCommandBuffer CmdBuf, int Image) override;
+	void Init(VulkanCore* pvkCore);
 
 	void OnFrame(int Image);
 
@@ -51,6 +49,10 @@ private:
 
 	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex);
 
+	VulkanCore* m_pvkCore = NULL;
+	VkDevice m_device = NULL;
+	int m_framebufferWidth = 0;
+	int m_framebufferHeight = 0;
 	VkCommandBuffer m_cmdBuf = NULL;
 	VkDescriptorPool m_descriptorPool = NULL;
 };

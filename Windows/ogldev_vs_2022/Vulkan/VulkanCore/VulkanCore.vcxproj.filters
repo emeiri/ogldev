@@ -87,9 +87,6 @@
     <ClCompile Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.cpp">
       <Filter>Source Files\SPIRV-Reflect</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp">
-      <Filter>Source Files\CommonOgldev</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.cpp">
       <Filter>Source Files\ImGUI</Filter>
     </ClCompile>
@@ -108,7 +105,7 @@
     <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_widgets.cpp">
       <Filter>Source Files\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\renderer.cpp">
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
@@ -156,9 +153,6 @@
       <Filter>Source Files\SPIRV-Reflect</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_imgui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
