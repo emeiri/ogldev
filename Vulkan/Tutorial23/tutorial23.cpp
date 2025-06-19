@@ -56,7 +56,8 @@ public:
 
 	~VulkanApp()
 	{
-		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
+		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		delete m_pPipeline;
@@ -88,21 +89,17 @@ public:
 	{
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
-	
-		//else {
-			UpdateUniformBuffers(ImageIndex);
+		UpdateUniformBuffers(ImageIndex);
 
+		if (m_showGui) {		
 			m_imGUIRenderer.OnFrame(ImageIndex);
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs[ImageIndex], m_imGUIRenderer.GetCommandBuffer() };
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], m_imGUIRenderer.GetCommandBuffer() };
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
-		//}
-
-				//	if (m_showGui) {
-	
-			//	} 
-
+		} else {
+			m_pQueue->SubmitAsync(m_cmdBufs.WithoutGUI[ImageIndex]);
+		}
 
 		m_pQueue->Present(ImageIndex);
 	}
@@ -209,8 +206,11 @@ private:
 
 	void CreateCommandBuffers()
 	{
-		m_cmdBufs.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.data());
+		m_cmdBufs.WithGUI.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithGUI.data());
+
+		m_cmdBufs.WithoutGUI.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithoutGUI.data());
 
 		printf("Created command buffers\n");
 	}
@@ -254,8 +254,16 @@ private:
 	{
 		m_model.CreateDescriptorSets(*m_pPipeline);
 
-		for (uint i = 0; i < m_cmdBufs.size(); i++) {
-			VkCommandBuffer& CmdBuf = m_cmdBufs[i];
+		RecordCommandBuffersInternal(true, m_cmdBufs.WithoutGUI);
+
+		RecordCommandBuffersInternal(false, m_cmdBufs.WithGUI);
+	}
+
+
+	void RecordCommandBuffersInternal(bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
+	{
+		for (uint i = 0; i < CmdBufs.size(); i++) {
+			VkCommandBuffer& CmdBuf = CmdBufs[i];
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
@@ -264,16 +272,16 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			//if (m_pImGUIRenderer) m_pImGUIRenderer->FillCommandBuffer(CmdBuf, i);
-	
 			m_pPipeline->Bind(CmdBuf);
 
 			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
 
 			vkCmdEndRendering(CmdBuf);
 
-			//OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
-			//	                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+			if (WithSecondBarrier) {
+				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
+					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+			}
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 
@@ -350,7 +358,11 @@ private:
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
-	std::vector<VkCommandBuffer> m_cmdBufs;
+	struct {
+		std::vector<VkCommandBuffer> WithGUI;
+		std::vector<VkCommandBuffer> WithoutGUI;
+	} m_cmdBufs;
+	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
