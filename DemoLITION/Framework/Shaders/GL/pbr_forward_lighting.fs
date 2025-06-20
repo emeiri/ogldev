@@ -621,7 +621,9 @@ void main()
     // ambient occlusion
     color = color * ( Kao.r < 0.01 ? 1.0 : Kao.r );
     // emissive
-    color = pow( Ke.rgb + color, vec3(1.0/2.2) );
+    color = Ke.rgb + color;
+    // convert to sRGB
+    color = pow(color, vec3(1.0/2.2) );
 
     out_FragColor = vec4(color, 1.0);
 
