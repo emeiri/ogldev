@@ -50,14 +50,17 @@ public:
 
     void SetIrradianceTextureUnit(int TextureUnit);
 
+    virtual void SetMaterial(const Material& material);
+
 private:
-    GLuint m_aoUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_emissiveUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_albedoUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_roughnessUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_normalUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_envmapUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_brdfLUTUnitLoc = INVALID_UNIFORM_LOCATION;
-    GLuint m_irradianceUnitLoc = INVALID_UNIFORM_LOCATION;
+    DEF_LOC(m_aoUnitLoc);
+    DEF_LOC(m_emissiveUnitLoc);
+    DEF_LOC(m_albedoUnitLoc);
+    DEF_LOC(m_roughnessUnitLoc);
+    DEF_LOC(m_normalUnitLoc);
+    DEF_LOC(m_envmapUnitLoc);
+    DEF_LOC(m_brdfLUTUnitLoc);
+    DEF_LOC(m_irradianceUnitLoc);
+    DEF_LOC(m_baseColorLoc);
 };
 

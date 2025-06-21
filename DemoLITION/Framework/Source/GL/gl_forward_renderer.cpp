@@ -918,6 +918,8 @@ void ForwardRenderer::SetMaterial_CB(const Material& material)
     case RENDER_PASS_LIGHTING_POINT:
         if (m_pCurLightingTech) {
             m_pCurLightingTech->SetMaterial(material);
+        } else if (m_pCurBaseLightingTech) {
+            m_pCurBaseLightingTech->SetMaterial(material);
         }
     }
 }

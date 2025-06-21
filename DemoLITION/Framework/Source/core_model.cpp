@@ -728,17 +728,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
       //  printf("Shading model %d\n", ShadingModel);
     }
 
-    aiColor4D AmbientColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    if (pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, AmbientColor) == AI_SUCCESS) {
-        printf("Loaded ambient color [%f %f %f]\n", AmbientColor.r, AmbientColor.g, AmbientColor.b);
-        material.AmbientColor.r = AmbientColor.r;
-        material.AmbientColor.g = AmbientColor.g;
-        material.AmbientColor.b = AmbientColor.b;
-        material.AmbientColor.a = std::min(AmbientColor.a, 1.0f);
-    } else {
-        material.AmbientColor = AllOnes;
-    }
+    LoadColor(pMaterial, material.AmbientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
 
     aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -754,25 +744,11 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
         material.AmbientColor = AllOnes;
     }
 
-    aiColor4D DiffuseColor(0.0f, 0.0f, 0.0f, 0.0f);
+    LoadColor(pMaterial, material.DiffuseColor, AI_MATKEY_COLOR_DIFFUSE, "diffuse color");
 
-    if (pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, DiffuseColor) == AI_SUCCESS) {
-        printf("Loaded diffuse color [%f %f %f]\n", DiffuseColor.r, DiffuseColor.g, DiffuseColor.b);
-        material.DiffuseColor.r = DiffuseColor.r;
-        material.DiffuseColor.g = DiffuseColor.g;
-        material.DiffuseColor.b = DiffuseColor.b;
-        material.DiffuseColor.a = std::min(DiffuseColor.a, 1.0f);
-    }
+    LoadColor(pMaterial, material.SpecularColor, AI_MATKEY_COLOR_SPECULAR, "specular color");
 
-    aiColor4D SpecularColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    if (pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, SpecularColor) == AI_SUCCESS) {
-        printf("Loaded specular color [%f %f %f]\n", SpecularColor.r, SpecularColor.g, SpecularColor.b);
-        material.SpecularColor.r = SpecularColor.r;
-        material.SpecularColor.g = SpecularColor.g;
-        material.SpecularColor.b = SpecularColor.b;
-        material.SpecularColor.a = std::min(SpecularColor.a, 1.0f);
-    }
+    LoadColor(pMaterial, material.BaseColor, AI_MATKEY_BASE_COLOR, "base color");
 
     float OpaquenessThreshold = 0.05f;
     float Opacity = 1.0f;
@@ -793,6 +769,22 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
         }
 
         material.m_alphaTest = 0.5f;
+    }
+}
+
+void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName)
+{
+    aiColor4D AiColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    if (pMaterial->Get(pAiMatKey, AiMatType, AiMatIdx, AiColor) == AI_SUCCESS) {
+        printf("Loaded %s color [%f %f %f]\n", pName, AiColor.r, AiColor.g, AiColor.b);
+        Color.r = AiColor.r;
+        Color.g = AiColor.g;
+        Color.b = AiColor.b;
+        Color.a = std::min(AiColor.a, 1.0f); // TODO: is this correct?
+    }
+    else {
+        Color = Vector4f(1.0f);
     }
 }
 

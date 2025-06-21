@@ -42,10 +42,10 @@ public:
     void SetCameraWorldPos(const Vector3f& CameraWorldPos);
     void ControlNormalMap(bool Enable);
     void ControlParallaxMap(bool Enable);
-
     void ControlShadows(bool ShadowsEnabled);
     void ControlIndirectRender(bool IsRenderIndirect);
     void ControlPVP(bool IsPVP);
+    virtual void SetMaterial(const Material& material) = 0;
 
 protected:
 

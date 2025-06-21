@@ -254,6 +254,7 @@ private:
     void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
+    void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
 
     void InitCameras(const aiScene* pScene);
 

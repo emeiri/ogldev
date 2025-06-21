@@ -16,8 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TECHNIQUE_H
-#define TECHNIQUE_H
+#pragma once 
 
 #include <list>
 #include <GL/glew.h>
@@ -64,5 +63,6 @@ private:
     loc = GetUniformLocation(name);         
 #endif
 
+#define DEF_LOC(name) GLuint name = INVALID_UNIFORM_LOCATION
 
-#endif  /* TECHNIQUE_H */
+

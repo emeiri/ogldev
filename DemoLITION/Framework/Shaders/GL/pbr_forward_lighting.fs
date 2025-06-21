@@ -129,6 +129,7 @@ uniform vec3 gCameraWorldPos;
 uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
+uniform vec4 gBaseColor;
 
 
 vec4 GetMaterialAmbientColor()
@@ -289,7 +290,7 @@ MetallicRoughnessDataGPU getMaterial(uint idx)
         ret.emissiveTextureSampler = gEmissive;
         ret.baseColorTextureUV = 0;
         ret.baseColorTextureSampler = gAlbedo;
-        ret.baseColorFactor = vec4(1.0);                 // TODO: get from Assimp
+        ret.baseColorFactor = gBaseColor;                 // TODO: get from Assimp
         ret.metallicRoughnessTextureSampler = gRoughness;
         ret.metallicRoughnessTextureUV = 0;
         ret.normalTextureSampler = gNormalMap;

@@ -55,6 +55,7 @@ bool PBRForwardLightingTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_envmapUnitLoc, "gEnvMap");
     GET_UNIFORM_AND_CHECK(m_brdfLUTUnitLoc, "gBRDF_LUT");
     GET_UNIFORM_AND_CHECK(m_irradianceUnitLoc, "gIrradiance");
+    GET_UNIFORM_AND_CHECK(m_baseColorLoc, "gBaseColor");
 
     return true;
 }
@@ -105,4 +106,9 @@ void PBRForwardLightingTechnique::SetBRDF_LUTTextureUnit(int TextureUnit)
 void PBRForwardLightingTechnique::SetIrradianceTextureUnit(int TextureUnit)
 {
     glUniform1i(m_irradianceUnitLoc, TextureUnit);
+}
+
+void PBRForwardLightingTechnique::SetMaterial(const Material& mat)
+{
+    glUniform4f(m_baseColorLoc, mat.BaseColor.r, mat.BaseColor.g, mat.BaseColor.b, mat.BaseColor.a);
 }
