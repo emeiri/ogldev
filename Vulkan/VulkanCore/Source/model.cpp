@@ -84,7 +84,7 @@ void VkModel::UpdateAlignedMeshesArray()
 }
 
 
-void VkModel::CreateBuffers(std::vector<CoreModel::Vertex>& Vertices)
+void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 {
 	size_t NumSubmeshes = m_alignedMeshes.size();
 

@@ -56,16 +56,16 @@ protected:
 
 	virtual void InitGeometryPost() { /* Nothing to do here */ }
 
-	virtual void PopulateBuffersSkinned(vector<SkinnedVertex>& Vertices) { assert(0); }
+	virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) { assert(0); }
 
-	virtual void PopulateBuffers(vector<Vertex>& Vertices);
+	virtual void PopulateBuffers(std::vector<Vertex>& Vertices);
 
 private:
 	void UpdateModelDesc(ModelDesc& md);
 
 	void UpdateAlignedMeshesArray();
 
-	void CreateBuffers(std::vector<CoreModel::Vertex>& Vertices);
+	void CreateBuffers(std::vector<Vertex>& Vertices);
 
 	VulkanCore* m_pVulkanCore = NULL;
 
