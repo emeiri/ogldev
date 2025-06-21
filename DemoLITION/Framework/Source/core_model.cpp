@@ -21,8 +21,6 @@
 #include "Int/core_model.h"
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 
-using namespace std;
-
 // config flags
 static bool UseMeshOptimizer = false;
 

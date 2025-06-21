@@ -21,8 +21,6 @@
 
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 
-using namespace std;
-
 #define POSITION_LOCATION    0
 #define TEX_COORD_LOCATION   1
 #define NORMAL_LOCATION      2

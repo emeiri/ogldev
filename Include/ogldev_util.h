@@ -36,7 +36,7 @@
 
 using namespace std;
 
-bool ReadFile(const char* fileName, string& outFile);
+bool ReadFile(const char* fileName, std::string& outFile);
 char* ReadBinaryFile(const char* pFileName, int& size);
 
 void WriteBinaryFile(const char* pFilename, const void* pData, int size);
