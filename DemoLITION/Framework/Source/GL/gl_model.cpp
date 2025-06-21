@@ -23,7 +23,7 @@
 
 
 bool UsePVP = true;     // Programmable Vertex Pulling
-bool UseIndirectRender = true;
+bool UseIndirectRender = false;
 
 #define POSITION_LOCATION    0
 #define TEX_COORD0_LOCATION  1

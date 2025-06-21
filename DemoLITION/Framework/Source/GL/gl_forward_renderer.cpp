@@ -28,7 +28,7 @@
 
 extern bool UsePVP;
 extern bool UseIndirectRender;
-static bool UseGLTFPBR = false;
+static bool UseGLTFPBR = true;
 static bool DisableSSAO = true;
 static bool UseBlitForFinalCopy = true;
 
