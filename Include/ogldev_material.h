@@ -62,6 +62,7 @@ class Material {
     Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f SpecularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f BaseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f EmissiveColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 
     PBRMaterial PBRmaterial;
 

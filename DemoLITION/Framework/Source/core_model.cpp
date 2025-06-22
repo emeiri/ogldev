@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assimp/GltfMaterial.h>
 
 #include "Int/core_rendering_system.h"
 #include "Int/core_model.h"
@@ -750,9 +751,19 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 
     LoadColor(pMaterial, material.BaseColor, AI_MATKEY_BASE_COLOR, "base color");
 
+    LoadColor(pMaterial, material.EmissiveColor, AI_MATKEY_COLOR_EMISSIVE, "emissive color");
+
+    float AlphaCutoff = 0.0f;
+
+    if (pMaterial->Get(AI_MATKEY_GLTF_ALPHACUTOFF, AlphaCutoff) == AI_SUCCESS) {
+        material.EmissiveColor.a = AlphaCutoff;
+    } else {
+        material.EmissiveColor.a = 0.5f;    // TODO: is this the correct default value?
+    }
+
     float OpaquenessThreshold = 0.05f;
     float Opacity = 1.0f;
-
+   
     if (pMaterial->Get(AI_MATKEY_OPACITY, Opacity) == AI_SUCCESS) {
         material.m_transparencyFactor = CLAMP(1.0f - Opacity, 0.0f, 1.0f);
         if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {

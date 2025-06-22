@@ -62,5 +62,6 @@ private:
     DEF_LOC(m_brdfLUTUnitLoc);
     DEF_LOC(m_irradianceUnitLoc);
     DEF_LOC(m_baseColorLoc);
+    DEF_LOC(m_emissiveColorLoc);
 };
 

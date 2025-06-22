@@ -130,7 +130,7 @@ uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
 uniform vec4 gBaseColor;
-
+uniform vec4 gEmissiveColor;
 
 vec4 GetMaterialAmbientColor()
 {
@@ -286,11 +286,11 @@ MetallicRoughnessDataGPU getMaterial(uint idx)
         ret.occlusionTextureUV = 0;
         ret.occlusionTextureSampler = gAmbientOcclusion;
         ret.emissiveTextureUV = 0;
-        ret.emissiveFactorAlphaCutoff = vec4(1.0);       // TODO: get from Assimp
+        ret.emissiveFactorAlphaCutoff = gEmissiveColor;
         ret.emissiveTextureSampler = gEmissive;
         ret.baseColorTextureUV = 0;
         ret.baseColorTextureSampler = gAlbedo;
-        ret.baseColorFactor = gBaseColor;                 // TODO: get from Assimp
+        ret.baseColorFactor = gBaseColor;                
         ret.metallicRoughnessTextureSampler = gRoughness;
         ret.metallicRoughnessTextureUV = 0;
         ret.normalTextureSampler = gNormalMap;
@@ -618,7 +618,11 @@ void main()
 
     // one hardcoded light source
     vec3 lightPos = vec3(0, 0, -5);
-    color += calculatePBRLightContribution( pbrInputs, normalize(lightPos - WorldPos0), vec3(1.0) );
+
+    vec3 LightContribution = calculatePBRLightContribution( pbrInputs, normalize(lightPos - WorldPos0), vec3(1.0) );
+
+    color += LightContribution;
+
     // ambient occlusion
     color = color * ( Kao.r < 0.01 ? 1.0 : Kao.r );
     // emissive
