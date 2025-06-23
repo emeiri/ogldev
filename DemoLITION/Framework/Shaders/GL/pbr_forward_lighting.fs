@@ -415,7 +415,7 @@ vec3 getIBLRadianceLambertian(float NdotV, vec3 n, float roughness, vec3 diffuse
   EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
   vec2 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rg;
 
-  vec3 irradiance = sampleEnvMapIrradiance(n.xyz, envMap).rgb;
+  vec3 irradiance = sampleEnvMapIrradiance(normalize(n.xyz), envMap).rgb;
 
   //return irradiance;
   // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
@@ -613,7 +613,8 @@ void main()
     PBRInfo pbrInputs = calculatePBRInputsMetallicRoughness(Kd, n, gCameraWorldPos, WorldPos0, mrSample);
 
     vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs, 1.0);
-    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs.NdotV, n, pbrInputs.perceptualRoughness, pbrInputs.diffuseColor, pbrInputs.reflectance0, 1.0);
+    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs.NdotV, n, pbrInputs.perceptualRoughness, 
+                                                  pbrInputs.diffuseColor, pbrInputs.reflectance0, 1.0);
     vec3 color = specular_color + diffuse_color;
 
     // one hardcoded light source
@@ -640,6 +641,8 @@ void main()
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
   //out_FragColor = vec4(diffuse_color, 1.0);
+  //out_FragColor = vec4(specular_color, 1.0);
+ // out_FragColor = vec4(LightContribution, 1.0);
 //  MeR.x *= getMetallicFactor(mat);
 //  MeR.y *= getRoughnessFactor(mat);
   //out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);
