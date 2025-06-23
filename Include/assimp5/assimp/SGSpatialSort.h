@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
+
 
 All rights reserved.
 
@@ -62,8 +63,10 @@ namespace Assimp    {
  *  implementation to handle all details of its file format correctly.
  */
 // ----------------------------------------------------------------------------------
-class ASSIMP_API SGSpatialSort {
+class ASSIMP_API SGSpatialSort
+{
 public:
+
     SGSpatialSort();
 
     // -------------------------------------------------------------------
@@ -87,7 +90,7 @@ public:
     void Prepare();
 
     /** Destructor */
-    ~SGSpatialSort() = default;
+    ~SGSpatialSort();
 
     // -------------------------------------------------------------------
     /** Returns an iterator for all positions close to the given position.

@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
 
 
 All rights reserved.
@@ -191,9 +191,13 @@ struct SceneHelper {
  */
 class ASSIMP_API SceneCombiner {
     // class cannot be instanced
-    SceneCombiner() = delete;
+    SceneCombiner() {
+        // empty
+    }
 
-    ~SceneCombiner() = delete;
+    ~SceneCombiner() {
+        // empty
+    }
 
 public:
     // -------------------------------------------------------------------

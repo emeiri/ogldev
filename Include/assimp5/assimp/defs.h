@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
 
 All rights reserved.
 
@@ -184,26 +184,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef __GNUC__
 #   define AI_WONT_RETURN_SUFFIX __attribute__((noreturn))
-#elif _MSC_VER
-#if defined(__clang__)
-#   define AI_WONT_RETURN_SUFFIX __attribute__((noreturn))
-#else
-#   define AI_WONT_RETURN_SUFFIX
-#endif
 #else
 #   define AI_WONT_RETURN_SUFFIX
 #endif // (defined __clang__)
 
 #ifdef __cplusplus
 /* No explicit 'struct' and 'enum' tags for C++, this keeps showing up
- * in doxydocs. */
+ * in doxydocs. 
+ */
 #define C_STRUCT
 #define C_ENUM
 #else
 //////////////////////////////////////////////////////////////////////////
 /* To build the documentation, make sure ASSIMP_DOXYGEN_BUILD
- * is defined by Doxygen's preprocessor. The corresponding
- * entries in the DOXYFILE are: */
+     * is defined by Doxygen's preprocessor. The corresponding
+     * entries in the DOXYFILE are: */
 //////////////////////////////////////////////////////////////////////////
 #if 0
     ENABLE_PREPROCESSING   = YES
@@ -250,7 +245,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //////////////////////////////////////////////////////////////////////////
 /* Define ASSIMP_DOUBLE_PRECISION to compile assimp
- * with double precision support (64-bit). */
+     * with double precision support (64-bit). */
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef ASSIMP_DOUBLE_PRECISION
@@ -288,11 +283,7 @@ typedef unsigned int ai_uint;
 #define AI_RAD_TO_DEG(x) ((x) * (ai_real) 57.2957795)
 
 /* Numerical limits */
-#ifdef __cplusplus
-constexpr ai_real ai_epsilon = (ai_real) 1e-6;
-#else
-#define ai_epsilon ((ai_real)1e-6)
-#endif
+static const ai_real ai_epsilon = (ai_real) 1e-6;
 
 /* Support for big-endian builds */
 #if defined(__BYTE_ORDER__)

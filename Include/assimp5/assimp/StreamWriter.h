@@ -3,7 +3,9 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
+
+
 
 All rights reserved.
 
@@ -65,8 +67,9 @@ namespace Assimp {
  *  stream is to be determined at runtime.
  */
 // --------------------------------------------------------------------------------------------
-template <bool SwapEndianness = false, bool RuntimeSwitch = false>
-class StreamWriter {
+template <bool SwapEndianess = false, bool RuntimeSwitch = false>
+class StreamWriter
+{
     enum {
         INITIAL_CAPACITY = 1024
     };
@@ -82,7 +85,7 @@ public:
           continues at the current position of the stream cursor.
      *  @param le If @c RuntimeSwitch is true: specifies whether the
      *    stream is in little endian byte order. Otherwise the
-     *    endianness information is defined by the @c SwapEndianness
+     *    endianness information is defined by the @c SwapEndianess
      *    template parameter and this parameter is meaningless.  */
     StreamWriter(std::shared_ptr<IOStream> stream, bool le = false)
         : stream(stream)
@@ -260,7 +263,7 @@ public:
     /** Generic write method. ByteSwap::Swap(T*) *must* be defined */
     template <typename T>
     void Put(T f)   {
-        Intern :: Getter<SwapEndianness,T,RuntimeSwitch>() (&f, le);
+        Intern :: Getter<SwapEndianess,T,RuntimeSwitch>() (&f, le);
 
         if (cursor + sizeof(T) >= buffer.size()) {
             buffer.resize(cursor + sizeof(T));

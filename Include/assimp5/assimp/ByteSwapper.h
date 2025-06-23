@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
+
 
 All rights reserved.
 
@@ -65,10 +66,10 @@ namespace Assimp    {
  * and vice versa. Direct use of this class is DEPRECATED. Use #StreamReader instead. */
 // --------------------------------------------------------------------------------------
 class ByteSwap {
-    ByteSwap() AI_NO_EXCEPT = default;
-    ~ByteSwap() = default;
+    ByteSwap() AI_NO_EXCEPT {}
 
 public:
+
     // ----------------------------------------------------------------------
     /** Swap two bytes of data
      *  @param[inout] _szOut A void* to save the reintcasts for the caller. */
@@ -88,7 +89,8 @@ public:
     // ----------------------------------------------------------------------
     /** Swap four bytes of data
      *  @param[inout] _szOut A void* to save the reintcasts for the caller. */
-    static inline void Swap4(void* _szOut) {
+    static inline void Swap4(void* _szOut)
+    {
         ai_assert(_szOut);
 
 #if _MSC_VER >= 1400
@@ -261,7 +263,7 @@ struct ByteSwapper<T,false> {
 };
 
 // --------------------------------------------------------------------------------------------
-template <bool SwapEndianness, typename T, bool RuntimeSwitch>
+template <bool SwapEndianess, typename T, bool RuntimeSwitch>
 struct Getter {
     void operator() (T* inout, bool le) {
 #ifdef AI_BUILD_BIG_ENDIAN
@@ -276,12 +278,12 @@ struct Getter {
     }
 };
 
-template <bool SwapEndianness, typename T>
-struct Getter<SwapEndianness,T,false> {
+template <bool SwapEndianess, typename T>
+struct Getter<SwapEndianess,T,false> {
 
     void operator() (T* inout, bool /*le*/) {
         // static branch
-        ByteSwapper<T,(SwapEndianness && sizeof(T)>1)> () (inout);
+        ByteSwapper<T,(SwapEndianess && sizeof(T)>1)> () (inout);
     }
 };
 } // end Intern

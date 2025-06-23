@@ -3,7 +3,7 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
 
 All rights reserved.
 
@@ -141,28 +141,25 @@ struct ASSIMP_API aiNode {
     /** Destructor */
     ~aiNode();
 
-    /**
-     *  @brief Searches for a node with a specific name, beginning at this
+    /** Searches for a node with a specific name, beginning at this
      *  nodes. Normally you will call this method on the root node
      *  of the scene.
      *
      *  @param name Name to search for
      *  @return nullptr or a valid Node if the search was successful.
      */
-    inline const aiNode* FindNode(const aiString& name) const {
+    inline
+    const aiNode* FindNode(const aiString& name) const {
         return FindNode(name.data);
     }
 
-    inline aiNode* FindNode(const aiString& name) {
+    inline
+    aiNode* FindNode(const aiString& name) {
         return FindNode(name.data);
     }
 
-    /**
-     * @brief Will search for a node described by its name.
-     * @param[in] name  The name for the node to look for.
-     * @return Pointer showing to the node or nullptr if not found.
-     */
     const aiNode* FindNode(const char* name) const;
+
     aiNode* FindNode(const char* name);
 
     /**
@@ -243,7 +240,8 @@ struct ASSIMP_API aiNode {
  *  delete a given scene on your own.
  */
 // -------------------------------------------------------------------------------
-struct ASSIMP_API aiScene {
+struct aiScene
+{
     /** Any combination of the AI_SCENE_FLAGS_XXX flags. By default
     * this value is 0, no flags are set. Most applications will
     * want to reject all scenes with the AI_SCENE_FLAGS_INCOMPLETE
@@ -357,10 +355,10 @@ struct ASSIMP_API aiScene {
 #ifdef __cplusplus
 
     //! Default constructor - set everything to 0/nullptr
-    aiScene();
+    ASSIMP_API aiScene();
 
     //! Destructor
-    ~aiScene();
+    ASSIMP_API ~aiScene();
 
     //! Check whether the scene contains meshes
     //! Unless no special scene flags are set this will always be true.
@@ -401,9 +399,8 @@ struct ASSIMP_API aiScene {
     //! Returns a short filename from a full path
     static const char* GetShortFilename(const char* filename) {
         const char* lastSlash = strrchr(filename, '/');
-        const char* lastBackSlash = strrchr(filename, '\\');
-        if (lastSlash < lastBackSlash) {
-            lastSlash = lastBackSlash;
+        if (lastSlash == nullptr) {
+            lastSlash = strrchr(filename, '\\');
         }
         const char* shortFilename = lastSlash != nullptr ? lastSlash + 1 : filename;
         return shortFilename;
@@ -436,7 +433,7 @@ struct ASSIMP_API aiScene {
         for (unsigned int i = 0; i < mNumTextures; i++) {
             const char* shortTextureFilename = GetShortFilename(mTextures[i]->mFilename.C_Str());
             if (strcmp(shortTextureFilename, shortFilename) == 0) {
-                return std::make_pair(mTextures[i], static_cast<int>(i));
+                return std::make_pair(mTextures[i], i);
             }
         }
         return std::make_pair(nullptr, -1);
@@ -453,7 +450,7 @@ struct ASSIMP_API aiScene {
 };
 
 #ifdef __cplusplus
-}
+} 
 #endif //! extern "C"
 
 #endif // AI_SCENE_H_INC

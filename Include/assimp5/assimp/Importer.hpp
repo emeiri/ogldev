@@ -3,7 +3,9 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
+
+
 
 All rights reserved.
 
@@ -111,7 +113,7 @@ namespace Assimp {
 * If you need the Importer to do custom file handling to access the files,
 * implement IOSystem and IOStream and supply an instance of your custom
 * IOSystem implementation by calling SetIOHandler() before calling ReadFile().
-* If you do not assign a custom IO handler, a default handler using the
+* If you do not assign a custion IO handler, a default handler using the
 * standard C++ IO logic will be used.
 *
 * @note One Importer instance is not thread-safe. If you use multiple

@@ -3,7 +3,9 @@
 Open Asset Import Library (assimp)
 ---------------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
+
+
 
 All rights reserved.
 
@@ -53,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <assimp/IOStream.hpp>
 #include <assimp/IOSystem.hpp>
-#include <zlib.h>
 
 namespace Assimp {
 
@@ -62,7 +63,7 @@ public:
     //! Open a Zip using the proffered IOSystem
     ZipArchiveIOSystem(IOSystem* pIOHandler, const char *pFilename, const char* pMode = "r");
     ZipArchiveIOSystem(IOSystem* pIOHandler, const std::string& rFilename, const char* pMode = "r");
-    virtual ~ZipArchiveIOSystem() override;
+    virtual ~ZipArchiveIOSystem();
     bool Exists(const char* pFilename) const override;
     char getOsSeparator() const override;
     IOStream* Open(const char* pFilename, const char* pMode = "rb") override;

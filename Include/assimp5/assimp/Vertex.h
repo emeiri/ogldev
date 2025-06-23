@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2022, assimp team
+
 
 All rights reserved.
 
@@ -60,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <functional>
 
-namespace Assimp {
+namespace Assimp    {
 
     ///////////////////////////////////////////////////////////////////////////
     // std::plus-family operates on operands with identical types - we need to
@@ -96,21 +97,15 @@ namespace Assimp {
  *  to *all* vertex components equally. This is useful for stuff like interpolation
  *  or subdivision, but won't work if special handling is required for some vertex components. */
 // ------------------------------------------------------------------------------------------------
-struct Vertex {
+class Vertex {
     friend Vertex operator + (const Vertex&,const Vertex&);
     friend Vertex operator - (const Vertex&,const Vertex&);
     friend Vertex operator * (const Vertex&,ai_real);
     friend Vertex operator / (const Vertex&,ai_real);
     friend Vertex operator * (ai_real, const Vertex&);
 
-    aiVector3D position;
-    aiVector3D normal;
-    aiVector3D tangent, bitangent;
-
-    aiVector3D texcoords[AI_MAX_NUMBER_OF_TEXTURECOORDS];
-    aiColor4D colors[AI_MAX_NUMBER_OF_COLOR_SETS];
-
-    Vertex() = default;
+public:
+    Vertex() {}
 
     // ----------------------------------------------------------------------------
     /** Extract a particular vertex from a mesh and interleave all components */
@@ -183,7 +178,7 @@ struct Vertex {
     }
 
     // ----------------------------------------------------------------------------
-    /// Convert back to non-interleaved storage
+    /** Convert back to non-interleaved storage */
     void SortBack(aiMesh* out, unsigned int idx) const {
         ai_assert(idx<out->mNumVertices);
         out->mVertices[idx] = position;
@@ -209,7 +204,7 @@ struct Vertex {
 private:
 
     // ----------------------------------------------------------------------------
-    /// Construct from two operands and a binary operation to combine them
+    /** Construct from two operands and a binary operation to combine them */
     template <template <typename t> class op> static Vertex BinaryOp(const Vertex& v0, const Vertex& v1) {
         // this is a heavy task for the compiler to optimize ... *pray*
 
@@ -229,9 +224,8 @@ private:
     }
 
     // ----------------------------------------------------------------------------
-    /// This time binary arithmetic of v0 with a floating-point number
-    template <template <typename, typename, typename> class op>
-    static Vertex BinaryOp(const Vertex& v0, ai_real f) {
+    /** This time binary arithmetic of v0 with a floating-point number */
+    template <template <typename, typename, typename> class op> static Vertex BinaryOp(const Vertex& v0, ai_real f) {
         // this is a heavy task for the compiler to optimize ... *pray*
 
         Vertex res;
@@ -244,15 +238,14 @@ private:
             res.texcoords[i] = op<aiVector3D,ai_real,aiVector3D>()(v0.texcoords[i],f);
         }
         for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_COLOR_SETS; ++i) {
-            res.colors[i] = op<aiColor4D,float, aiColor4D>()(v0.colors[i],f);
+            res.colors[i] = op<aiColor4D,ai_real,aiColor4D>()(v0.colors[i],f);
         }
         return res;
     }
 
     // ----------------------------------------------------------------------------
     /** This time binary arithmetic of v0 with a floating-point number */
-    template <template <typename, typename, typename> class op>
-    static Vertex BinaryOp(ai_real f, const Vertex& v0) {
+    template <template <typename, typename, typename> class op> static Vertex BinaryOp(ai_real f, const Vertex& v0) {
         // this is a heavy task for the compiler to optimize ... *pray*
 
         Vertex res;
@@ -265,10 +258,19 @@ private:
             res.texcoords[i] = op<ai_real,aiVector3D,aiVector3D>()(f,v0.texcoords[i]);
         }
         for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_COLOR_SETS; ++i) {
-            res.colors[i] = op<float, aiColor4D,aiColor4D>()(f,v0.colors[i]);
+            res.colors[i] = op<ai_real,aiColor4D,aiColor4D>()(f,v0.colors[i]);
         }
         return res;
     }
+
+public:
+
+    aiVector3D position;
+    aiVector3D normal;
+    aiVector3D tangent, bitangent;
+
+    aiVector3D texcoords[AI_MAX_NUMBER_OF_TEXTURECOORDS];
+    aiColor4D colors[AI_MAX_NUMBER_OF_COLOR_SETS];
 };
 
 // ------------------------------------------------------------------------------------------------
