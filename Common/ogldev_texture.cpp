@@ -85,7 +85,7 @@ bool Texture::Load(bool IsSRGB)
         exit(0);
     }
 
-    printf("Width %d, height %d, bpp %d\n", m_imageWidth, m_imageHeight, m_imageBPP);
+    printf("Loaded texture '%s' width %d, height %d, bpp %d\n", m_fileName.c_str(), m_imageWidth, m_imageHeight, m_imageBPP);
 
     LoadInternal(pImageData, IsSRGB);
 
