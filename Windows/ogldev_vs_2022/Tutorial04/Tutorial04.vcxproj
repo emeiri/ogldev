@@ -22,6 +22,10 @@
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\tutorial04\tutorial04.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial04\shader.fs" />
+    <None Include="..\..\..\tutorial04\shader.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

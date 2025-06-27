@@ -4,4 +4,8 @@
     <ClCompile Include="..\..\..\tutorial04\tutorial04.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\tutorial04\shader.fs" />
+    <None Include="..\..\..\tutorial04\shader.vs" />
+  </ItemGroup>
 </Project>
