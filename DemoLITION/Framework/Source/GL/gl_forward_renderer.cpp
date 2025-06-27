@@ -552,11 +552,17 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         RenderInfiniteGrid(pScene);
     }
 
+    RenderObjectList(pScene, TotalRuntimeMillis);
+}
+
+
+void ForwardRenderer::RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis)
+{
     bool FirstTimeForwardLighting = true;
 
     const std::list<CoreSceneObject*>& RenderList = pScene->GetRenderList();
 
-    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {        
+    for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         m_pcurSceneObject = *it;
 
         const Vector4f& FlatColor = m_pcurSceneObject->GetFlatColor();
@@ -564,7 +570,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         if (FlatColor.x == -1.0f) {
             if (FirstTimeForwardLighting) {
                 StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
-              //  FirstTimeForwardLighting = false; TODO: currently disabled
+                //  FirstTimeForwardLighting = false; TODO: currently disabled
             }
             RenderWithForwardLighting(m_pcurSceneObject, TotalRuntimeMillis);
         }
