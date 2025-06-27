@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ogldev_framebuffer.h"
 #include "GL/gl_engine_common.h"
 #include "GL/gl_forward_renderer.h"
 #include "GL/gl_rendering_system.h"
@@ -97,6 +98,8 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_skybox.Init(SKYBOX_TEXTURE_UNIT, SKYBOX_TEXTURE_UNIT_INDEX);
 
+    m_lightingFBO.Init(m_windowWidth, m_windowHeight);
+
     glUseProgram(0);
 }
 
@@ -176,6 +179,11 @@ void ForwardRenderer::InitTechniques()
 
     if (!m_pickingTech.Init()) {
         printf("Error initializing the picking technique\n");
+        exit(1);
+    }
+
+    if (!m_fullScreenQuadTech.Init()) {
+        printf("Error initializing the full screen quad technique\n");
         exit(1);
     }
 }
@@ -279,6 +287,8 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
+
+    FinalPass();
 
     pGameCallbacks->OnFrameEnd();
 
@@ -523,8 +533,27 @@ void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& 
 
 void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    m_lightingFBO.BindForWriting();
 
+    if (pScene->IsClearFrame()) {
+        const Vector4f& ClearColor = pScene->GetClearColor();
+        glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
+
+    BindShadowMap();
+  
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
+
+    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+        RenderInfiniteGrid(pScene);
+    }
+
+    RenderObjectList(pScene, TotalRuntimeMillis);
+}
+
+void ForwardRenderer::BindShadowMap()
+{
     switch (m_curRenderPass) {
     case RENDER_PASS_SHADOW_DIR:
         m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
@@ -545,14 +574,6 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         // todo: handle the case when there is no shadow pass
         assert(0);
     }
-  
-    glViewport(0, 0, m_windowWidth, m_windowHeight);
-
-    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
-        RenderInfiniteGrid(pScene);
-    }
-
-    RenderObjectList(pScene, TotalRuntimeMillis);
 }
 
 
@@ -700,6 +721,21 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
     glViewport(0, 0, m_windowWidth, m_windowHeight);*/
 }
 
+
+void ForwardRenderer::FinalPass()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_lightingFBO.BindForReading(GL_TEXTURE0);
+
+    m_fullScreenQuadTech.Enable();
+
+    m_fullScreenQuadTech.Render();
+}
 
 
 /*void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)

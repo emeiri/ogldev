@@ -22,6 +22,7 @@
 #include "ogldev_shadow_mapping_technique_point_light.h"
 #include "ogldev_framebuffer_object.h"
 #include "ogldev_shadow_cube_map_fbo.h"
+#include "ogldev_framebuffer.h"
 #include "demolition_rendering_system.h"
 #include "Int/core_model.h"
 #include "gl_forward_lighting.h"
@@ -34,6 +35,7 @@
 #include "GL/gl_pbr_forward_lighting.h"
 #include "GL/gl_infinite_grid.h"
 #include "GL/gl_skybox.h"
+#include "GL/gl_full_screen_quad_technique.h"
 
 
 enum RENDER_PASS {
@@ -104,6 +106,8 @@ private:
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
+    void FinalPass();
+    void BindShadowMap();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
@@ -133,6 +137,8 @@ private:
     RenderingSystemGL* m_pRenderingSystemGL = NULL;    
     GLMCameraFirstPerson* m_pCurCamera = NULL;
 
+    Framebuffer m_lightingFBO;
+
     // Shadow stuff
     FramebufferObject m_shadowMapFBO;
     ShadowCubeMapFBO m_shadowCubeMapFBO;
@@ -151,6 +157,7 @@ private:
     PickingTechnique m_pickingTech;
     PBRForwardLightingTechnique m_pbrLightingTech;
     PickingTexture m_pickingTexture;
+    FullScreenQuadTechnique m_fullScreenQuadTech;
 
     InfiniteGrid m_infiniteGrid;
 

@@ -192,6 +192,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_full_screen_quad_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_indirect_render.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid_technique.h" />
@@ -241,6 +242,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_full_screen_quad_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_indirect_render.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid_technique.cpp" />
@@ -261,6 +263,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\full_screen_quad.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.fs" />
@@ -269,6 +272,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\shadow_map.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\skybox.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\skybox.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tex.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
