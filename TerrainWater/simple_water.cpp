@@ -85,6 +85,7 @@ void SimpleWater::Render(const Vector3f& CameraPos, const Matrix4f& VP, const Ve
 void SimpleWater::StartReflectionPass()
 {
     m_reflectionFBO.BindForWriting();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 
@@ -97,6 +98,7 @@ void SimpleWater::EndReflectionPass()
 void SimpleWater::StartRefractionPass()
 {
     m_refractionFBO.BindForWriting();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 

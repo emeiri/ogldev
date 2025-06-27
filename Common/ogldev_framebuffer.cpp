@@ -92,7 +92,6 @@ void Framebuffer::BindForWriting()
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
 	glViewport(0, 0, m_width, m_height);  // set the width/height of the shadow map!
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 
