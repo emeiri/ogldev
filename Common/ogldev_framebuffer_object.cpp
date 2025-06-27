@@ -78,6 +78,8 @@ bool FramebufferObject::InitNonDSA(unsigned int Width, unsigned int Height, bool
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
 
@@ -121,6 +123,8 @@ bool FramebufferObject::InitDSA(unsigned int Width, unsigned int Height, bool Fo
     glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTextureParameterfv(m_depthBuffer, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glTextureParameteri(m_depthBuffer, GL_TEXTURE_BASE_LEVEL, 0);
 
     glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, m_depthBuffer, 0);
 
