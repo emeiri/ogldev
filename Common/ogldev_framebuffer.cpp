@@ -27,14 +27,14 @@ Framebuffer::~Framebuffer()
 }
 
 
-void Framebuffer::Init(int Width, int Height, bool DepthEnabled)
+void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool DepthEnabled)
 {
 	m_width = Width;
 	m_height = Height;
 
 	glGenFramebuffers(1, &m_fbo);
 
-	GenerateColorBuffer(Width, Height);
+	GenerateColorBuffer(Width, Height, NumFormatComponents);
 
 	if (DepthEnabled) {
 		GenerateDepthBuffer(Width, Height);
@@ -73,11 +73,25 @@ void Framebuffer::GenerateDepthBuffer(int Width, int Height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
-void Framebuffer::GenerateColorBuffer(int Width, int Height)
+void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatComponents)
 {
 	glGenTextures(1, &m_colorBuffer);
 	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	switch (NumFormatComponents) {
+	case 3:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		break;
+	
+	case 4:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		break;
+
+	default:
+		printf("Unsupported num components %d\n", NumFormatComponents);
+		exit(1);
+	}
+		
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -91,7 +105,7 @@ void Framebuffer::BindForWriting()
 	m_saveViewport.Save();
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
-	glViewport(0, 0, m_width, m_height);  // set the width/height of the shadow map!
+	glViewport(0, 0, m_width, m_height);  
 }
 
 
