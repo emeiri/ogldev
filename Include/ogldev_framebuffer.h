@@ -40,7 +40,7 @@ public:
 
     void BindDepthForReading(GLenum TextureUnit);
 
-    GLuint GetTexture() const { return m_textureBuffer; }
+    GLuint GetTexture() const { return m_colorBuffer; }
 
     GLuint GetDepthTexture() const { return m_depthBuffer; }
 
@@ -48,7 +48,7 @@ private:
     int m_width = 0;
     int m_height = 0;
     GLuint m_fbo = -1;
-    GLuint m_textureBuffer = -1;
+    GLuint m_colorBuffer = -1;
     GLuint m_depthBuffer = -1;
     SaveViewport m_saveViewport;
 };

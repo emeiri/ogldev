@@ -17,8 +17,8 @@ Framebuffer::~Framebuffer()
 		glDeleteFramebuffers(1, &m_fbo);
 	}
 
-	if (m_textureBuffer != 0) {
-		glDeleteTextures(1, &m_textureBuffer);
+	if (m_colorBuffer != 0) {
+		glDeleteTextures(1, &m_colorBuffer);
 	}
 
 	if (m_depthBuffer != 0) {
@@ -34,8 +34,8 @@ void Framebuffer::Init(int Width, int Height)
 
 	glGenFramebuffers(1, &m_fbo);
 
-	glGenTextures(1, &m_textureBuffer);
-	glBindTexture(GL_TEXTURE_2D, m_textureBuffer);
+	glGenTextures(1, &m_colorBuffer);
+	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -51,7 +51,7 @@ void Framebuffer::Init(int Width, int Height)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureBuffer, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorBuffer, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -88,7 +88,7 @@ void Framebuffer::UnbindWriting()
 void Framebuffer::BindForReading(GLenum TextureUnit)
 {
 	glActiveTexture(TextureUnit);
-	glBindTexture(GL_TEXTURE_2D, m_textureBuffer);
+	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
 }
 
 
