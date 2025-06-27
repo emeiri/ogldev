@@ -31,9 +31,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp">
-      <Filter>Source\GL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
@@ -123,6 +120,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_base_lighting_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp">
+      <Filter>Source\GL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -260,6 +263,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_base_lighting_technique.h">
       <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h">
+      <Filter>Include\GL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

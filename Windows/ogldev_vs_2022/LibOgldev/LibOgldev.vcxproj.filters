@@ -323,9 +323,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_offset_texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -445,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_model.cpp">
       <Filter>Source Files\Demolition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,9 @@
 
 #include "ogldev_save_viewport.h"
 
-class Framebuffer {
+// TODO: try to merge with the Framebuffer class
+class Framebuffer 
+{
 
 public:
     Framebuffer();

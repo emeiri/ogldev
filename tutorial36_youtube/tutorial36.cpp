@@ -31,7 +31,7 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_shadow_map_fbo.h"
+#include "ogldev_framebuffer_object.h"
 #include "ogldev_new_lighting.h"
 #include "ogldev_shadow_mapping_technique.h"
 
@@ -384,7 +384,7 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
     DirectionalLight m_dirLight;
-    ShadowMapFBO m_shadowMapFBO;
+    FramebufferObject m_shadowMapFBO;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;

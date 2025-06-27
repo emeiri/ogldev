@@ -20,7 +20,7 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique_point_light.h"
-#include "ogldev_shadow_map_fbo.h"
+#include "ogldev_framebuffer_object.h"
 #include "ogldev_shadow_cube_map_fbo.h"
 #include "demolition_rendering_system.h"
 #include "Int/core_model.h"
@@ -133,7 +133,7 @@ private:
     GLMCameraFirstPerson* m_pCurCamera = NULL;
 
     // Shadow stuff
-    ShadowMapFBO m_shadowMapFBO;
+    FramebufferObject m_shadowMapFBO;
     ShadowCubeMapFBO m_shadowCubeMapFBO;
     Matrix4f m_lightPersProjMatrix;
     Matrix4f m_lightOrthoProjMatrix;

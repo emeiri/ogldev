@@ -16,12 +16,12 @@
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_phong_renderer.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skinning_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial40_youtube\tutorial40.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />

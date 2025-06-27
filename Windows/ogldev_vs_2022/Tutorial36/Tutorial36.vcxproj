@@ -23,10 +23,10 @@
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />

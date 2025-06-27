@@ -15,17 +15,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_SHADOW_MAP_FBO_H
-#define OGLDEV_SHADOW_MAP_FBO_H
+#pragma once 
 
 #include <GL/glew.h>
 
-class ShadowMapFBO
+// TODO: try to merge with the Framebuffer class
+class FramebufferObject
 {
 public:
-    ShadowMapFBO();
+    FramebufferObject();
 
-    ~ShadowMapFBO();
+    ~FramebufferObject();
 
     bool Init(unsigned int Width, unsigned int Height, bool ForPCF = false);
 
@@ -44,7 +44,7 @@ private:
     uint m_width = 0;
     uint m_height = 0;
     GLuint m_fbo;
-    GLuint m_shadowMap;
+    GLuint m_depthBuffer;
 };
 
 
@@ -66,5 +66,3 @@ private:
     GLuint m_shadowMap[3];
 };
 
-
-#endif  /* OGLDEV_SHADOW_MAP_FBO_H */

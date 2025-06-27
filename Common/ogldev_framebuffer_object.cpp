@@ -18,29 +18,29 @@
 #include <stdio.h>
 
 #include "ogldev_types.h"
-#include "ogldev_shadow_map_fbo.h"
+#include "ogldev_framebuffer_object.h"
 #include "ogldev_util.h"
 #include "ogldev_engine_common.h"
 
-ShadowMapFBO::ShadowMapFBO()
+FramebufferObject::FramebufferObject()
 {
     m_fbo = 0;
-    m_shadowMap = 0;
+    m_depthBuffer = 0;
 }
 
-ShadowMapFBO::~ShadowMapFBO()
+FramebufferObject::~FramebufferObject()
 {
     if (m_fbo != 0) {
         glDeleteFramebuffers(1, &m_fbo);
     }
 
-    if (m_shadowMap != 0) {
-        glDeleteTextures(1, &m_shadowMap);
+    if (m_depthBuffer != 0) {
+        glDeleteTextures(1, &m_depthBuffer);
     }
 }
 
 
-bool ShadowMapFBO::Init(unsigned int Width, unsigned int Height, bool ForPCF)
+bool FramebufferObject::Init(unsigned int Width, unsigned int Height, bool ForPCF)
 {
     bool ret = false;
 
@@ -55,7 +55,7 @@ bool ShadowMapFBO::Init(unsigned int Width, unsigned int Height, bool ForPCF)
 }
 
 
-bool ShadowMapFBO::InitNonDSA(unsigned int Width, unsigned int Height, bool ForPCF)
+bool FramebufferObject::InitNonDSA(unsigned int Width, unsigned int Height, bool ForPCF)
 {
     m_width = Width;
     m_height = Height;
@@ -64,8 +64,8 @@ bool ShadowMapFBO::InitNonDSA(unsigned int Width, unsigned int Height, bool ForP
     glGenFramebuffers(1, &m_fbo);
 
     // Create the depth buffer
-    glGenTextures(1, &m_shadowMap);
-    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
+    glGenTextures(1, &m_depthBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Width, Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
     GLint FilterType = ForPCF ? GL_LINEAR : GL_NEAREST;
@@ -79,7 +79,7 @@ bool ShadowMapFBO::InitNonDSA(unsigned int Width, unsigned int Height, bool ForP
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMap, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
 
     // Disable read/writes to the color buffer
     glDrawBuffer(GL_NONE);
@@ -98,7 +98,7 @@ bool ShadowMapFBO::InitNonDSA(unsigned int Width, unsigned int Height, bool ForP
 }
 
 
-bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
+bool FramebufferObject::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
 {
     m_width = Width;
     m_height = Height;
@@ -107,22 +107,22 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
     glCreateFramebuffers(1, &m_fbo);
 
     // Create the depth buffer
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowMap);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_depthBuffer);
 
     int Levels = 1;
-    glTextureStorage2D(m_shadowMap, Levels, GL_DEPTH_COMPONENT32, Width, Height);
+    glTextureStorage2D(m_depthBuffer, Levels, GL_DEPTH_COMPONENT32, Width, Height);
 
     GLint FilterType = ForPCF ? GL_LINEAR : GL_NEAREST;
 
-    glTextureParameteri(m_shadowMap, GL_TEXTURE_MIN_FILTER, FilterType);
-    glTextureParameteri(m_shadowMap, GL_TEXTURE_MAG_FILTER, FilterType);
+    glTextureParameteri(m_depthBuffer, GL_TEXTURE_MIN_FILTER, FilterType);
+    glTextureParameteri(m_depthBuffer, GL_TEXTURE_MAG_FILTER, FilterType);
 
-    glTextureParameteri(m_shadowMap, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTextureParameteri(m_shadowMap, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTextureParameterfv(m_shadowMap, GL_TEXTURE_BORDER_COLOR, borderColor);
+    glTextureParameterfv(m_depthBuffer, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-    glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, m_shadowMap, 0);
+    glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, m_depthBuffer, 0);
 
     // Disable read/writes to the color buffer
     glNamedFramebufferReadBuffer(m_fbo, GL_NONE);
@@ -139,14 +139,14 @@ bool ShadowMapFBO::InitDSA(unsigned int Width, unsigned int Height, bool ForPCF)
 }
 
 
-void ShadowMapFBO::BindForWriting()
+void FramebufferObject::BindForWriting()
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
     glViewport(0, 0, m_width, m_height);  // set the width/height of the shadow map!
 }
 
 
-void ShadowMapFBO::BindForReading(GLenum TextureUnit)
+void FramebufferObject::BindForReading(GLenum TextureUnit)
 {
     if (IsGLVersionHigher(4, 5)) {
         BindForReadingDSA(TextureUnit);
@@ -157,16 +157,16 @@ void ShadowMapFBO::BindForReading(GLenum TextureUnit)
 }
 
 
-void ShadowMapFBO::BindForReadingNonDSA(GLenum TextureUnit)
+void FramebufferObject::BindForReadingNonDSA(GLenum TextureUnit)
 {
     glActiveTexture(TextureUnit);
-    glBindTexture(GL_TEXTURE_2D, m_shadowMap);
+    glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
 }
 
 
-void ShadowMapFBO::BindForReadingDSA(GLenum TextureUnit)
+void FramebufferObject::BindForReadingDSA(GLenum TextureUnit)
 {
-    glBindTextureUnit(TextureUnit - GL_TEXTURE0, m_shadowMap);
+    glBindTextureUnit(TextureUnit - GL_TEXTURE0, m_depthBuffer);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -63,6 +63,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F
 		..\..\Include\ogldev_engine_common.h = ..\..\Include\ogldev_engine_common.h
 		..\..\Include\ogldev_flat_passthru_technique.h = ..\..\Include\ogldev_flat_passthru_technique.h
 		..\..\Include\ogldev_framebuffer.h = ..\..\Include\ogldev_framebuffer.h
+		..\..\Include\ogldev_framebuffer_object.h = ..\..\Include\ogldev_framebuffer_object.h
 		..\..\Include\ogldev_glfw.h = ..\..\Include\ogldev_glfw.h
 		..\..\Include\ogldev_glfw_backend.h = ..\..\Include\ogldev_glfw_backend.h
 		..\..\Include\ogldev_glm_camera.h = ..\..\Include\ogldev_glm_camera.h
@@ -84,7 +85,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{1F4F
 		..\..\Include\ogldev_shadow_cube_map_fbo.h = ..\..\Include\ogldev_shadow_cube_map_fbo.h
 		..\..\Include\ogldev_shadow_mapping_technique.h = ..\..\Include\ogldev_shadow_mapping_technique.h
 		..\..\Include\ogldev_shadow_mapping_technique_point_light.h = ..\..\Include\ogldev_shadow_mapping_technique_point_light.h
-		..\..\Include\ogldev_shadow_map_fbo.h = ..\..\Include\ogldev_shadow_map_fbo.h
 		..\..\Include\ogldev_shadow_map_offset_texture.h = ..\..\Include\ogldev_shadow_map_offset_texture.h
 		..\..\Include\ogldev_skinned_mesh.h = ..\..\Include\ogldev_skinned_mesh.h
 		..\..\Include\ogldev_skinning_technique.h = ..\..\Include\ogldev_skinning_technique.h
@@ -219,6 +219,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F65533
 		..\..\Common\ogldev_bezier_curve_technique.cpp = ..\..\Common\ogldev_bezier_curve_technique.cpp
 		..\..\Common\ogldev_flat_passthru_technique.cpp = ..\..\Common\ogldev_flat_passthru_technique.cpp
 		..\..\Common\ogldev_framebuffer.cpp = ..\..\Common\ogldev_framebuffer.cpp
+		..\..\Common\ogldev_framebuffer_object.cpp = ..\..\Common\ogldev_framebuffer_object.cpp
 		..\..\Common\ogldev_glfw.cpp = ..\..\Common\ogldev_glfw.cpp
 		..\..\Common\ogldev_glfw_backend.cpp = ..\..\Common\ogldev_glfw_backend.cpp
 		..\..\Common\ogldev_glfw_camera_handler.cpp = ..\..\Common\ogldev_glfw_camera_handler.cpp
@@ -232,7 +233,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F65533
 		..\..\Common\ogldev_shadow_cube_map_fbo.cpp = ..\..\Common\ogldev_shadow_cube_map_fbo.cpp
 		..\..\Common\ogldev_shadow_mapping_technique.cpp = ..\..\Common\ogldev_shadow_mapping_technique.cpp
 		..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp = ..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp
-		..\..\Common\ogldev_shadow_map_fbo.cpp = ..\..\Common\ogldev_shadow_map_fbo.cpp
 		..\..\Common\ogldev_shadow_map_offset_texture.cpp = ..\..\Common\ogldev_shadow_map_offset_texture.cpp
 		..\..\Common\ogldev_skinned_mesh.cpp = ..\..\Common\ogldev_skinned_mesh.cpp
 		..\..\Common\ogldev_skinning_technique.cpp = ..\..\Common\ogldev_skinning_technique.cpp
@@ -521,6 +521,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial23", "Vulkan\Tutorial23\Tutorial23.vcxproj", "{3041FBBB-86DE-4276-B344-6A5276B9260B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial62_SSAO", "Tutorial62_SSAO\Tutorial62.vcxproj", "{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
 	EndProjectSection
 EndProject
 Global
@@ -1427,6 +1432,14 @@ Global
 		{3041FBBB-86DE-4276-B344-6A5276B9260B}.Release|x64.Build.0 = Release|x64
 		{3041FBBB-86DE-4276-B344-6A5276B9260B}.Release|x86.ActiveCfg = Release|Win32
 		{3041FBBB-86DE-4276-B344-6A5276B9260B}.Release|x86.Build.0 = Release|Win32
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Debug|x64.ActiveCfg = Debug|x64
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Debug|x64.Build.0 = Debug|x64
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Debug|x86.ActiveCfg = Debug|Win32
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Debug|x86.Build.0 = Debug|Win32
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x64.ActiveCfg = Release|x64
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x64.Build.0 = Release|x64
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x86.ActiveCfg = Release|Win32
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1551,6 +1564,7 @@ Global
 		{8116E841-0AAF-4B14-A45C-C8C31E4B1BC1} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{3041FBBB-86DE-4276-B344-6A5276B9260B} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}

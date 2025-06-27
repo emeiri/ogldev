@@ -255,6 +255,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_flat_passthru_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw_backend.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw_camera_handler.cpp" />
@@ -271,7 +272,6 @@
     <ClCompile Include="..\..\..\Common\ogldev_shadow_cube_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique_point_light.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_map_offset_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skinned_mesh.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skinning_technique.cpp" />

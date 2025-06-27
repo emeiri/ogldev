@@ -17,8 +17,8 @@
     <ClCompile Include="..\..\..\Common\ogldev_world_transform.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_new_lighting.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_shadow_mapping_technique.cpp" />
-    <ClCompile Include="..\..\..\Common\ogldev_shadow_map_fbo.cpp" />
     <ClCompile Include="..\..\..\tutorial36_youtube\tutorial36.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Include\ogldev_texture.h" />
