@@ -406,6 +406,11 @@ struct Vector4f
         return !(*this == r);
     }
 
+    const float* data() const
+    {
+        const float* p = &x;
+        return p;
+    }
 };
 
 

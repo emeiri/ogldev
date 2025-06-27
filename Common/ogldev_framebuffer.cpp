@@ -133,3 +133,9 @@ void Framebuffer::BindDepthForReading(GLenum TextureUnit)
 	glActiveTexture(TextureUnit);
 	glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
 }
+
+
+void Framebuffer::ClearColorBuffer(const Vector4f& Color)
+{
+	glClearNamedFramebufferfv(m_fbo, GL_COLOR, 0, (GLfloat*)Color.data());
+}

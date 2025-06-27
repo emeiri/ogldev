@@ -20,6 +20,7 @@
 #include <GL/glew.h>
 
 #include "ogldev_save_viewport.h"
+#include "ogldev_math_3d.h"
 
 // TODO: try to merge with the Framebuffer class
 class Framebuffer 
@@ -39,6 +40,8 @@ public:
     void BindForReading(GLenum TextureUnit);
 
     void BindDepthForReading(GLenum TextureUnit);
+
+    void ClearColorBuffer(const Vector4f& Color);
 
     GLuint GetTexture() const { return m_colorBuffer; }
 
