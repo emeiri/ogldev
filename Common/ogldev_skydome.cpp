@@ -150,10 +150,11 @@ void Skydome::PopulateBuffers(int NumRows, int NumCols, float Radius)
 
 void Skydome::LoadTexture(const char* pTextureFilename)
 {
-    m_texture.Load(pTextureFilename);
+    std::string s(pTextureFilename);        // workaround because calling directy with char* reaches the bool function
+    m_texture.Load(s);
 }
 
-
+ 
 void Skydome::Render(const BasicCamera& Camera)
 {
     m_skydomeTech.Enable();
