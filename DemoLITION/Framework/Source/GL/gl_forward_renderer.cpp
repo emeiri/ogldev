@@ -48,6 +48,17 @@ CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, 1.0f, 0.0f) }
 };
 
+struct SSAOParams
+{
+    float scale_ = 1.0f;
+    float bias_ = 0.2f;
+    float zNear = 0.1f;
+    float zFar = 1000.0f;
+    float radius = 0.2f;
+    float attScale = 1.0f;
+    float distScale = 0.5f;
+} g_SSAOParams;
+
 
 static bool IsLightingPass(RENDER_PASS RenderPass)
 {
@@ -66,7 +77,7 @@ static bool IsLightingPass(RENDER_PASS RenderPass)
 }
 
 
-ForwardRenderer::ForwardRenderer()
+ForwardRenderer::ForwardRenderer() : m_ssaoRotTexture(GL_TEXTURE_2D)
 {
 
 }
@@ -98,7 +109,13 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_skybox.Init(SKYBOX_TEXTURE_UNIT, SKYBOX_TEXTURE_UNIT_INDEX);
 
-    m_lightingFBO.Init(m_windowWidth, m_windowHeight, true);
+    m_lightingFBO.Init(m_windowWidth, m_windowHeight, 3, true);
+
+    m_ssaoFBO.Init(1024, 1024, 4, false);
+
+    m_ssaoParams.InitBuffer(sizeof(g_SSAOParams), NULL, GL_DYNAMIC_STORAGE_BIT);
+
+    m_ssaoRotTexture.Load("../Content/textures/rot_texture.bmp", false);
 
     glUseProgram(0);
 }
@@ -184,6 +201,11 @@ void ForwardRenderer::InitTechniques()
 
     if (!m_fullScreenQuadTech.Init()) {
         printf("Error initializing the full screen quad technique\n");
+        exit(1);
+    }
+
+    if (!m_ssaoTech.Init()) {
+        printf("Error initializing the SSAO technique\n");
         exit(1);
     }
 }
@@ -287,6 +309,8 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
+
+    SSAOPass();
 
     FinalPass();
 
@@ -543,8 +567,6 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
 
     BindShadowMap();
   
-    glViewport(0, 0, m_windowWidth, m_windowHeight);
-
     if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
     }
@@ -719,6 +741,29 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, m_windowWidth, m_windowHeight);*/
+}
+
+
+void ForwardRenderer::SSAOPass()
+{
+    glDisable(GL_DEPTH_TEST);
+
+    m_ssaoFBO.BindForWriting();
+
+    m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+
+    m_ssaoParams.BindUBO(0);
+    m_ssaoParams.Update(&g_SSAOParams, sizeof(g_SSAOParams));
+
+    m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
+
+    m_ssaoRotTexture.Bind(GL_TEXTURE1);
+
+    m_ssaoTech.Enable();
+
+    m_ssaoTech.Render();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 

@@ -36,6 +36,8 @@
 #include "GL/gl_infinite_grid.h"
 #include "GL/gl_skybox.h"
 #include "GL/gl_full_screen_quad_technique.h"
+#include "GL/gl_ssao_technique.h"
+#include "GL/gl_buffer.h"
 
 
 enum RENDER_PASS {
@@ -106,6 +108,7 @@ private:
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
+    void SSAOPass();
     void FinalPass();
     void BindShadowMap();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
@@ -138,6 +141,9 @@ private:
     GLMCameraFirstPerson* m_pCurCamera = NULL;
 
     Framebuffer m_lightingFBO;
+    Framebuffer m_ssaoFBO;
+    GLBuffer m_ssaoParams;
+    Texture m_ssaoRotTexture;
 
     // Shadow stuff
     FramebufferObject m_shadowMapFBO;
@@ -158,6 +164,7 @@ private:
     PBRForwardLightingTechnique m_pbrLightingTech;
     PickingTexture m_pickingTexture;
     FullScreenQuadTechnique m_fullScreenQuadTech;
+    SSAOTechnique m_ssaoTech;
 
     InfiniteGrid m_infiniteGrid;
 
