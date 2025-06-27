@@ -27,34 +27,25 @@ Framebuffer::~Framebuffer()
 }
 
 
-void Framebuffer::Init(int Width, int Height)
+void Framebuffer::Init(int Width, int Height, bool DepthEnabled)
 {
 	m_width = Width;
 	m_height = Height;
 
 	glGenFramebuffers(1, &m_fbo);
 
-	glGenTextures(1, &m_colorBuffer);
-	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	GenerateColorBuffer(Width, Height);
 
-	glGenTextures(1, &m_depthBuffer);
-	glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Width, Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL); GLExitIfError;
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (DepthEnabled) {
+		GenerateDepthBuffer(Width, Height);
+	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorBuffer, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
+
+	if (DepthEnabled) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
+	}	
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 	glReadBuffer(GL_NONE);
@@ -67,6 +58,31 @@ void Framebuffer::Init(int Width, int Height)
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void Framebuffer::GenerateDepthBuffer(int Width, int Height)
+{
+	glGenTextures(1, &m_depthBuffer);
+	glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Width, Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL); GLExitIfError;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+void Framebuffer::GenerateColorBuffer(int Width, int Height)
+{
+	glGenTextures(1, &m_colorBuffer);
+	glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 
@@ -96,6 +112,11 @@ void Framebuffer::BindForReading(GLenum TextureUnit)
 
 void Framebuffer::BindDepthForReading(GLenum TextureUnit)
 {
+	if (m_depthBuffer == -1) {
+		printf("Trying to bind depth for reading in a FBO without depth buffer\n");
+		exit(1);
+	}
+
 	glActiveTexture(TextureUnit);
 	glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
 }

@@ -98,7 +98,7 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_skybox.Init(SKYBOX_TEXTURE_UNIT, SKYBOX_TEXTURE_UNIT_INDEX);
 
-    m_lightingFBO.Init(m_windowWidth, m_windowHeight);
+    m_lightingFBO.Init(m_windowWidth, m_windowHeight, true);
 
     glUseProgram(0);
 }

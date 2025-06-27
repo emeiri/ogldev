@@ -30,7 +30,7 @@ public:
 
     ~Framebuffer();
 
-    void Init(int Width, int Height);
+    void Init(int Width, int Height, bool DepthEnabled);
 
     void BindForWriting();
 
@@ -45,6 +45,10 @@ public:
     GLuint GetDepthTexture() const { return m_depthBuffer; }
 
 private:
+    void GenerateColorBuffer(int Width, int Height);
+
+    void GenerateDepthBuffer(int Width, int Height);
+
     int m_width = 0;
     int m_height = 0;
     GLuint m_fbo = -1;
