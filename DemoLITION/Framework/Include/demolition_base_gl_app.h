@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include "demolition_rendering_system.h"
 
 #define GLFW_DLL
@@ -46,12 +50,13 @@ protected:
 
     virtual void OnFrameChild(long long DeltaTimeMillis) {};
 
+    virtual void OnFrameGUI();
+
     RenderingSystem* m_pRenderingSystem = NULL;
     GLFWwindow* m_pWindow = NULL;
 
 private:
     void InitGUI();
-    void OnFrameGUI();
     
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;

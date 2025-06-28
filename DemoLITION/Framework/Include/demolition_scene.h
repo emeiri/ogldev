@@ -80,6 +80,18 @@ struct InfiniteGridConfig {
     bool ShadowsEnabled = false;
 };
 
+struct SSAOParams
+{
+    float scale = 1.0f;
+    float bias = 0.2f;
+    float zNear = 0.1f;
+    float zFar = 1000.0f;
+    float radius = 0.2f;
+    float attScale = 1.0f;
+    float distScale = 0.5f;
+};
+
+
 class SceneConfig
 {
 public:
@@ -118,6 +130,8 @@ public:
     void SetIrradianceMap(int IrradianceMap) { m_irradianceMap = IrradianceMap; }
     int GetIrradianceMap() const { return m_irradianceMap; }
 
+    SSAOParams& GetSSAOParams() { return m_ssaoParams; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -133,6 +147,7 @@ private:
     float m_fresnelPower = 1.0f;
     int m_envMap = -1;
     int m_irradianceMap = -1;
+    SSAOParams m_ssaoParams;
 };
 
 

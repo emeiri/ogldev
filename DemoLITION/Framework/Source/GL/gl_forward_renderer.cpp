@@ -50,17 +50,6 @@ CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, 1.0f, 0.0f) }
 };
 
-struct SSAOParams
-{
-    float scale_ = 1.0f;
-    float bias_ = 0.2f;
-    float zNear = 0.1f;
-    float zFar = 1000.0f;
-    float radius = 0.2f;
-    float attScale = 1.0f;
-    float distScale = 0.5f;
-} g_SSAOParams;
-
 
 static bool IsLightingPass(RENDER_PASS RenderPass)
 {
@@ -115,7 +104,7 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_ssaoFBO.Init(1024, 1024, 4, false);
 
-    m_ssaoParams.InitBuffer(sizeof(g_SSAOParams), NULL, GL_DYNAMIC_STORAGE_BIT);
+    m_ssaoParams.InitBuffer(sizeof(SSAOParams), NULL, GL_DYNAMIC_STORAGE_BIT);
 
     m_ssaoRotTexture.Load("../Content/textures/rot_texture.bmp", false);
 
@@ -318,7 +307,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     }
 
     if (EnableSSAO) {
-        SSAOPass();
+        SSAOPass(pScene);
         SSAOCombinePass();
     } else {
         if (UseBlitForFinalCopy) {
@@ -759,7 +748,7 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 }
 
 
-void ForwardRenderer::SSAOPass()
+void ForwardRenderer::SSAOPass(GLScene* pScene)
 {
     glDisable(GL_DEPTH_TEST);
 
@@ -768,7 +757,7 @@ void ForwardRenderer::SSAOPass()
     m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
     m_ssaoParams.BindUBO(0);
-    m_ssaoParams.Update(&g_SSAOParams, sizeof(g_SSAOParams));
+    m_ssaoParams.Update(&pScene->GetConfig()->GetSSAOParams(), sizeof(SSAOParams));
 
     m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
 

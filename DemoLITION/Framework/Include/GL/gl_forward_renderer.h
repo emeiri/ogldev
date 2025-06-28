@@ -109,7 +109,7 @@ private:
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
-    void SSAOPass();
+    void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
     void FullScreenQuadBlit();
     void BindShadowMap();

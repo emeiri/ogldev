@@ -16,9 +16,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 #include "demolition_base_gl_app.h"
 
 BaseGLApp::BaseGLApp(int WindowWidth, int WindowHeight, const char* pWindowName)
