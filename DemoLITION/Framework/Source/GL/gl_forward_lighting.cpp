@@ -53,6 +53,7 @@ bool ForwardLightingTechnique::Init()
 bool ForwardLightingTechnique::InitCommon()
 {
     samplerLoc = GetUniformLocation("gSampler");
+    hasSamplerLoc = GetUniformLocation("gHasSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
     shadowCubeMapLoc = GetUniformLocation("gShadowCubeMap");
     shadowMapWidthLoc = GetUniformLocation("gShadowMapWidth");
