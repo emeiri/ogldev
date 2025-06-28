@@ -132,7 +132,7 @@ uniform float gShadowMapOffsetTextureSize;
 uniform float gShadowMapOffsetFilterSize;
 uniform float gShadowMapRandomRadius = 0.0;
 uniform vec3 gCameraWorldPos;
-uniform vec4 gColorMod = vec4(1);
+uniform vec4 gColorMod = vec4(1.0);
 uniform vec4 gColorAdd = vec4(0);
 uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
@@ -673,6 +673,22 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
 }
 
 
+vec4 GetTexColor()
+{
+    vec4 TexColor;
+
+    if (gIsIndirectRender) {
+        TexColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
+    } else if (gHasSampler) {
+        TexColor = texture(gSampler, TexCoord.xy);
+    } else {
+        TexColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+
+    return TexColor;
+}
+
+
 vec4 CalcPhongLighting(vec3 Normal)
 {
     vec4 TotalLight;
@@ -685,15 +701,7 @@ vec4 CalcPhongLighting(vec3 Normal)
         TotalLight = vec4(1.0);
     }
 
-    vec4 TexColor;
-
-    if (gIsIndirectRender) {
-        TexColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
-    } else if (gHasSampler) {
-        TexColor = texture(gSampler, TexCoord.xy);
-    } else {
-        TexColor = vec4(1.0);
-    }
+    vec4 TexColor = GetTexColor();
 
     vec4 FinalColor = TexColor * TotalLight;
 
@@ -882,13 +890,17 @@ void main()
         float FogFactor = CalcFogFactor();
         TempColor = mix(vec4(gFogColor, 1.0), FragColor, FogFactor);
     }
-
+    
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    FragColor = TempColor * gColorMod + gColorAdd;
-   //FragColor = TexColor;
-    //FragColor = texture(gSampler, TexCoord.xy);
+    //  FragColor = TempColor * gColorMod + gColorAdd;
+   // FragColor = vec4(1.0);  
+   FragColor = GetTexColor();
+   // FragColor = GetTotalLight(Normal);
+//    FragColor = texture(gSampler, TexCoord.xy);
+   //   FragColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
     //FragColor = texture(gHeightMap, TexCoord0);
-   // FragColor = TotalLight;
+   
+  //  FragColor = GetMaterialAmbientColor();
   //FragColor = vec4(Normal0, 1.0);
 }
