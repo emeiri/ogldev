@@ -48,7 +48,7 @@ void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool Dept
 	}	
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glReadBuffer(GL_NONE);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
 
 	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -138,4 +138,11 @@ void Framebuffer::BindDepthForReading(GLenum TextureUnit)
 void Framebuffer::ClearColorBuffer(const Vector4f& Color)
 {
 	glClearNamedFramebufferfv(m_fbo, GL_COLOR, 0, (GLfloat*)Color.data());
+}
+
+void Framebuffer::BlitToWindow()
+{
+	//glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
+	//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitNamedFramebuffer(m_fbo, 0, 0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }

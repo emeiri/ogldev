@@ -43,6 +43,8 @@ public:
 
     void ClearColorBuffer(const Vector4f& Color);
 
+    void BlitToWindow();
+
     GLuint GetTexture() const { return m_colorBuffer; }
 
     GLuint GetDepthTexture() const { return m_depthBuffer; }
