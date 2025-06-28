@@ -30,6 +30,8 @@ extern bool UsePVP;
 extern bool UseIndirectRender;
 
 static bool UseGLTFPBR = false;
+static bool EnableSSAO = false;
+static bool UseBlitForFinalCopy = true;
 
 struct CameraDirection
 {
@@ -208,6 +210,11 @@ void ForwardRenderer::InitTechniques()
         printf("Error initializing the SSAO technique\n");
         exit(1);
     }
+
+    if (!m_ssaoCombineTech.Init()) {
+        printf("Error initializing the SSAO combine technique\n");
+        exit(1);
+    }
 }
 
 
@@ -310,9 +317,17 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
 
-    SSAOPass();
-
-    FinalPass();
+    if (EnableSSAO) {
+        SSAOPass();
+        SSAOCombinePass();
+    } else {
+        if (UseBlitForFinalCopy) {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            m_lightingFBO.BlitToWindow();
+        } else {
+            FullScreenQuadBlit();
+        }
+    }    
 
     pGameCallbacks->OnFrameEnd();
 
@@ -767,7 +782,25 @@ void ForwardRenderer::SSAOPass()
 }
 
 
-void ForwardRenderer::FinalPass()
+void ForwardRenderer::SSAOCombinePass()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    m_lightingFBO.BindForReading(GL_TEXTURE0);
+
+    m_ssaoFBO.BindForReading(GL_TEXTURE1);
+    
+    m_ssaoCombineTech.Enable();
+
+    m_ssaoCombineTech.Render();
+}
+
+
+void ForwardRenderer::FullScreenQuadBlit()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

@@ -207,6 +207,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_shadow_mapping_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_skybox.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_skybox_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_combine_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssbo_db.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_base_lighting_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_buffer.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_combine_ssao_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp" />
@@ -277,6 +279,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\skybox.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\skybox.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssao.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssao_combine.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tex.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

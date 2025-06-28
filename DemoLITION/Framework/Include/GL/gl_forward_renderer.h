@@ -37,6 +37,7 @@
 #include "GL/gl_skybox.h"
 #include "GL/gl_full_screen_quad_technique.h"
 #include "GL/gl_ssao_technique.h"
+#include "GL/gl_ssao_combine_technique.h"
 #include "GL/gl_buffer.h"
 
 
@@ -109,7 +110,8 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
     void SSAOPass();
-    void FinalPass();
+    void SSAOCombinePass();
+    void FullScreenQuadBlit();
     void BindShadowMap();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
@@ -165,6 +167,7 @@ private:
     PickingTexture m_pickingTexture;
     FullScreenQuadTechnique m_fullScreenQuadTech;
     SSAOTechnique m_ssaoTech;
+    SSAOCombineTechnique m_ssaoCombineTech;
 
     InfiniteGrid m_infiniteGrid;
 
