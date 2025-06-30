@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "imgui.h"
+
 #include "Int/core_scene.h"
 #include "Int/core_rendering_system.h"
 
@@ -226,6 +228,17 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
     }
 
     return ObjectList;
+}
+
+void CoreScene::ShowSSAOGUI()
+{
+    SSAOParams& ssoaParams = m_config.GetSSAOParams();
+
+    ImGui::SliderFloat("SSAO Scale", &ssoaParams.scale, 0.0f, 1.0f);
+    ImGui::SliderFloat("SSAO Bias", &ssoaParams.bias, 0.0f, 1.0f);
+    ImGui::SliderFloat("SSAO Radius", &ssoaParams.radius, 0.0f, 5.0f);
+    ImGui::SliderFloat("SSAO AttScale", &ssoaParams.attScale, 0.0f, 1.0f);
+    ImGui::SliderFloat("SSAO DistScale", &ssoaParams.distScale, 0.0f, 1.0f);
 }
 
 

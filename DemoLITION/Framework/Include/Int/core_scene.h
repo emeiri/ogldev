@@ -74,6 +74,8 @@ public:
 
     virtual std::list<SceneObject*> GetSceneObjectsList();
 
+    virtual void ShowSSAOGUI();
+
     const std::vector<PointLight>& GetPointLights();
 
     const std::vector<SpotLight>& GetSpotLights();

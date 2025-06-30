@@ -183,6 +183,8 @@ public:
 
     virtual void LoadSkybox(const char* pFilename) = 0;
 
+    virtual void ShowSSAOGUI() = 0;
+
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 
     std::vector<SpotLight>& GetSpotLights() { return m_spotLights; }

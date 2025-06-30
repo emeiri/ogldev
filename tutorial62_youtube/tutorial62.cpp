@@ -57,12 +57,15 @@ public:
 
         m_pRenderingSystem->SetScene(m_pScene);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
+        m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+        //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
+      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
+         Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+        m_pSceneObject->SetScale(0.1f);
         m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pRenderingSystem->Execute();
@@ -90,7 +93,7 @@ public:
             }
         }
 
-        m_pSceneObject->RotateBy(0.0f, 0.1f, 0.0f);
+      //  m_pSceneObject->RotateBy(0.0f, 0.1f, 0.0f);
         //m_pSceneObject->ResetRotations();
       //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
      //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
@@ -98,6 +101,44 @@ public:
          //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
           //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
     }
+
+
+protected:
+    void OnFrameGUI()
+    {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        bool my_tool_active = false;
+
+        ImGui::Begin("SSAO", &my_tool_active, ImGuiWindowFlags_MenuBar); 
+
+        m_pScene->ShowSSAOGUI();
+
+      /*  ImGui::CheckboxFlags("Enable Reflection/Refraction", &m_isRefRefractEnabled, 1);
+        pScene->GetConfig()->ControlRefRefract(m_isRefRefractEnabled);
+
+        ImGui::SliderFloat("Index Of Refraction", &m_indexOfRefraction, 1.0f, 3.0f);
+        pScene->GetConfig()->SetIndexOfRefraction(m_indexOfRefraction);
+
+        ImGui::SliderFloat("Fresnel Power", &m_fresnelPower, 1.0f, 7.0f);
+        pScene->GetConfig()->SetFresnelPower(m_fresnelPower);*/
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+
+        // Rendering
+        ImGui::Render();
+        //   int display_w, display_h;
+    //    glfwGetFramebufferSize(window, &display_w, &display_h);
+    //    glViewport(0, 0, display_w, display_h);
+    //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
+
 
 private:
 
