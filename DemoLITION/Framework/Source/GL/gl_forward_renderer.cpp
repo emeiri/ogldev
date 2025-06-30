@@ -757,6 +757,8 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
     m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
     m_ssaoParams.BindUBO(0);
+    pScene->GetConfig()->GetSSAOParams().zNear = m_pCurCamera->GetPersProjInfo().zNear;
+    pScene->GetConfig()->GetSSAOParams().zFar = m_pCurCamera->GetPersProjInfo().zFar;
     m_ssaoParams.Update(&pScene->GetConfig()->GetSSAOParams(), sizeof(SSAOParams));
 
     m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
