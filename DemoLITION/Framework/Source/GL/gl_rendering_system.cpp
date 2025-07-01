@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "imgui.h"
+
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "ogldev_cubemap_texture.h"
@@ -236,6 +238,24 @@ void RenderingSystemGL::Execute()
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
     }
+}
+
+
+void RenderingSystemGL::ImGuiTextureWindow(const char* pTitle)
+{
+    ImGui::Begin(pTitle, nullptr);
+
+    const ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+    const ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+    GLuint TexID = m_forwardRenderer.GetSSAOTextureHandle();
+
+    ImGui::Image((void*)(intptr_t)TexID,
+                 ImVec2(vMax.x - vMin.x, vMax.y - vMin.y),
+                 ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f)
+    );
+
+    ImGui::End();
 }
 
 

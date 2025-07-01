@@ -30,7 +30,7 @@ extern bool UsePVP;
 extern bool UseIndirectRender;
 
 static bool UseGLTFPBR = false;
-static bool EnableSSAO = false;
+static bool DisableSSAO = false;
 static bool UseBlitForFinalCopy = true;
 
 struct CameraDirection
@@ -306,7 +306,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
 
-    if (EnableSSAO) {
+    if (pScene->GetConfig()->IsSSAOEnabled() && !DisableSSAO) {
         SSAOPass(pScene);
         SSAOCombinePass();
     } else {

@@ -55,6 +55,8 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual GLMCameraFirstPerson* GetCurrentCamera() { return m_pCamera; }
 
+    virtual void ImGuiTextureWindow(const char* pTitle) = 0;
+
  protected:
 
     CoreRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);

@@ -132,6 +132,9 @@ public:
 
     SSAOParams& GetSSAOParams() { return m_ssaoParams; }
 
+    void ControlSSAO(bool Enable) { m_ssaoEnabled = Enable; }
+    bool IsSSAOEnabled() const { return m_ssaoEnabled; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -148,6 +151,7 @@ private:
     int m_envMap = -1;
     int m_irradianceMap = -1;
     SSAOParams m_ssaoParams;
+    bool m_ssaoEnabled = true;
 };
 
 

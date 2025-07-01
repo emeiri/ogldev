@@ -230,15 +230,20 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
     return ObjectList;
 }
 
+
 void CoreScene::ShowSSAOGUI()
 {
     SSAOParams& ssoaParams = m_config.GetSSAOParams();
 
-    ImGui::SliderFloat("SSAO Scale", &ssoaParams.scale, 0.0f, 1.0f);
-    ImGui::SliderFloat("SSAO Bias", &ssoaParams.bias, 0.0f, 1.0f);
-    ImGui::SliderFloat("SSAO Radius", &ssoaParams.radius, 0.0f, 5.0f);
-    ImGui::SliderFloat("SSAO AttScale", &ssoaParams.attScale, 0.0f, 1.0f);
-    ImGui::SliderFloat("SSAO DistScale", &ssoaParams.distScale, 0.0f, 1.0f);
+    bool EnableSSAO = m_config.IsSSAOEnabled();
+    ImGui::Checkbox("SSAO Enable", &EnableSSAO);
+    m_config.ControlSSAO(EnableSSAO);
+    ImGui::SliderFloat("SSAO Scale", &ssoaParams.scale, 0.0f, 2.0f);
+    ImGui::SliderFloat("SSAO Bias", &ssoaParams.bias, 0.0f, 0.3f);
+    ImGui::SliderFloat("SSAO Radius", &ssoaParams.radius, 0.05f, 0.5f);
+    ImGui::SliderFloat("SSAO AttScale", &ssoaParams.attScale, 0.5f, 1.5f);
+    ImGui::SliderFloat("SSAO DistScale", &ssoaParams.distScale, 0.0f, 1.0f);    
+    m_pCoreRenderingSystem->ImGuiTextureWindow("SSAO");
 }
 
 

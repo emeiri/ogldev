@@ -97,6 +97,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
     virtual void SetMaterial_CB(const Material& material);
 
     virtual void SetWorldMatrix_CB(const Matrix4f& World);
+
+    GLuint GetSSAOTextureHandle() const { return m_ssaoFBO.GetTexture(); }
  
 private:
 

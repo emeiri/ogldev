@@ -49,9 +49,11 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual int LoadCubemapTexture(const std::string& Filename);
 
-    BaseTexture* GetTexture(int TextureHandle);
-
     virtual void Execute();
+
+    virtual void ImGuiTextureWindow(const char* pTitle);
+
+    BaseTexture* GetTexture(int TextureHandle);
 
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     
@@ -59,7 +61,7 @@ class RenderingSystemGL : public CoreRenderingSystem
     
     void OnMouseButtonCallback(GLFWwindow* window, int Button, int Action, int Mode);
 
-    void GetMousePos(void* pWindow, int& x, int& y);
+    void GetMousePos(void* pWindow, int& x, int& y);    
 
  protected:
      virtual void* CreateWindowInternal(const char* pWindowName);
