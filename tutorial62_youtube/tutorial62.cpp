@@ -22,12 +22,39 @@
 #include <string.h>
 #include <math.h>
 
+#include <random>
+
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
 
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
+static void CreateRandomOffsetArray()
+{
+    std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
+    std::default_random_engine generator;
+
+    printf("const vec3 offsets[64] = vec3[64](\n");
+
+    for (unsigned int i = 0; i < 64; ++i) {
+        glm::vec3 sample(
+            randomFloats(generator) * 2.0 - 1.0,
+            randomFloats(generator) * 2.0 - 1.0,
+            randomFloats(generator)
+        );
+        sample = glm::normalize(sample);
+        sample *= randomFloats(generator); // bias toward center
+        // Scale samples so more are near the origin
+        float scale = float(i) / 64.0f;
+        scale = glm::mix(0.1f, 1.0f, scale * scale); // quadratic distribution
+        sample *= scale;
+
+        printf("    vec3(%f, %f, %f),\n", sample[0], sample[1], sample[2]);
+    }
+
+    printf(");");
+}
 
 
 class SSAODemo : public BaseGLApp {
@@ -60,12 +87,14 @@ public:
         m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
         //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
-       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
+     //   Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
+   //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
+    //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");
          Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+    //    Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pSceneObject->SetScale(0.1f);
+        m_pSceneObject->SetScale(0.05f);
         m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pRenderingSystem->Execute();
