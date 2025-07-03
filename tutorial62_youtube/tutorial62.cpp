@@ -146,15 +146,6 @@ protected:
 
         m_pScene->ShowSSAOGUI();
 
-      /*  ImGui::CheckboxFlags("Enable Reflection/Refraction", &m_isRefRefractEnabled, 1);
-        pScene->GetConfig()->ControlRefRefract(m_isRefRefractEnabled);
-
-        ImGui::SliderFloat("Index Of Refraction", &m_indexOfRefraction, 1.0f, 3.0f);
-        pScene->GetConfig()->SetIndexOfRefraction(m_indexOfRefraction);
-
-        ImGui::SliderFloat("Fresnel Power", &m_fresnelPower, 1.0f, 7.0f);
-        pScene->GetConfig()->SetFresnelPower(m_fresnelPower);*/
-
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
 
