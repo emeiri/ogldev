@@ -59,7 +59,7 @@ public:
 
 	void HandleMouseButton(int Button, int Action, int Mods);
 
-	const glm::mat4& GetProjMatrix() const { return m_persProjection; }
+	const glm::mat4& GetProjMatrixGLM() const { return m_persProjection; }
 
 	glm::vec3 GetPosition() const { return m_cameraPos; }
 
@@ -93,6 +93,7 @@ public:
 
 	virtual Matrix4f GetMatrix() const;
 
+	// TODO: rename to match the GLM version
 	virtual const Matrix4f GetProjectionMat() const;
 
 private:

@@ -309,6 +309,6 @@ Matrix4f GLMCameraFirstPerson::GetMatrix() const
 
 const Matrix4f GLMCameraFirstPerson::GetProjectionMat() const
 {
-	Matrix4f Ret(GetProjMatrix());
+	Matrix4f Ret(GetProjMatrixGLM());
 	return Ret;
 }

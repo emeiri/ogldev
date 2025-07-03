@@ -850,7 +850,7 @@ void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 {
     Matrix4f World = pSceneObject->GetMatrix();
     Matrix4f View = m_pCurCamera->GetViewMatrix();
-    Matrix4f Projection = m_pCurCamera->GetProjMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
 
    // Projection.Print();
  //   exit(0);
@@ -967,7 +967,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     m_pCurBaseLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
     Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
-    Matrix4f Projection = m_pCurCamera->GetProjMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
     Matrix4f WV = View * FinalWorldMatrix;
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
@@ -1016,7 +1016,7 @@ void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 Matrix4f ForwardRenderer::GetViewProjectionMatrix()     // TODO: replace with GetVP from camera
 {
     Matrix4f View = m_pCurCamera->GetViewMatrix();
-    Matrix4f Projection = m_pCurCamera->GetProjMatrix();
+    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
 
     Matrix4f Ret = Projection * View;
 

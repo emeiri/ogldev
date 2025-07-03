@@ -69,7 +69,7 @@ public:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        const glm::mat4& Projection = m_pGameCamera->GetProjMatrix();
+        const glm::mat4& Projection = m_pGameCamera->GetProjMatrixGLM();
         glm::mat4 View = m_pGameCamera->GetViewMatrix();
 
        // m_infiniteGrid.Render(m_config, VP, m_pGameCamera->GetPos());
