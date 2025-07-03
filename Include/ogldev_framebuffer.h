@@ -50,6 +50,10 @@ public:
     GLuint GetDepthTexture() const { return m_depthBuffer; }
 
 private:
+    void InitDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled);
+
+    void InitNonDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled);
+
     void GenerateColorBuffer(int Width, int Height, int NumFormatComponents);
 
     void GenerateDepthBuffer(int Width, int Height);
