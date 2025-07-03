@@ -116,42 +116,35 @@ float LinearizeDepthGeneric(float depth, float A, float B)
 
 void main()
 {
-	float size = float(textureSize(texDepth, 0 ).x);
-    
-	float Z = LinearizeDepthLH(texture(texDepth, TexCoords).r); 
+    float size = float(textureSize(texDepth, 0 ).x);
 
-	vec2 noiseScale = vec2(1024 / 4.0, 1024 / 4.0);
-	// Sample noise texture and build TBN matrix
+    float Z = LinearizeDepthLH(texture(texDepth, TexCoords).r); 
+
+    vec2 noiseScale = vec2(1024 / 4.0, 1024 / 4.0);
+    // Sample noise texture and build TBN matrix
     vec3 randomVec = normalize(texture(texRotation, TexCoords * noiseScale).xyz);
     vec3 normal = vec3(0.0, 0.0, 1.0); // Replace with actual normal if available
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
     mat3 TBN = mat3(tangent, bitangent, normal);
 
-	//vec3 plane = texture(texRotation, TexCoords * size / 4.0).xyz - vec3(1.0);
-	float att = 0.0;
+    float att = 0.0;
 
-	for (int i = 0; i < 64; i++) {
-	    //vec3 rSample = reflect(offsets[i], plane);
-	    //vec2 sampleUV = TexCoords + radius * rSample.xy / Z;
-
-	    vec3 sampleVec = TBN * offsets[i]; // rotate sample
+    for (int i = 0; i < 64; i++) {
+        vec3 sampleVec = TBN * offsets[i]; // rotate sample
         vec2 offsetUV = TexCoords + (sampleVec.xy * radius / Z);
         offsetUV = clamp(offsetUV, vec2(0.0), vec2(1.0));
 
-	    // Clamp to avoid sampling outside the screen
-	    //sampleUV = clamp(offsetUV, vec2(0.0), vec2(1.0));
+        float zSampleRaw = texture(texDepth, offsetUV).r;
+        float zSample = LinearizeDepthLH(zSampleRaw);
 
-	    float zSampleRaw = texture(texDepth, offsetUV).r;
-	    float zSample = LinearizeDepthLH(zSampleRaw);
+        float dist = max(Z - zSample, 0.0) / distScale;
+        float occl = 25.0 * max(dist * (2.0 - dist), 0.0);
 
-	    float dist = max(zSample - Z, 0.0) / distScale;
-	    float occl = 25.0 * max(dist * (2.0 - dist), 0.0);
+        att += 1.0 / (1.0 + occl * occl);
+    }    
 
-	    att += 1.0 / (1.0 + occl * occl);
-	}    
-
-	att = clamp(att / 64.0, 0.0, 1.0) * attScale;
-	outColor = vec4( vec3(att), 1.0 );
-	//outColor = vec4(Z/zFar);
+    att = clamp(att / 64.0, 0.0, 1.0) * attScale;
+    outColor = vec4( vec3(att), 1.0 );
+    //outColor = vec4(Z/zFar);
 }
