@@ -4,9 +4,9 @@
 #include "ogldev_util.h"
 #include "ogldev_framebuffer.h"
 
-bool gUseDSA = false;
 
 Framebuffer::Framebuffer() {}
+
 
 Framebuffer::~Framebuffer()
 {
@@ -23,9 +23,10 @@ Framebuffer::~Framebuffer()
     }
 }
 
+
 void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool DepthEnabled)
 {
-    if (gUseDSA) {
+    if (IsGLVersionHigher(4, 5)) {
         InitDSA(Width, Height, NumFormatComponents, DepthEnabled);
     } else {
         InitNonDSA(Width, Height, NumFormatComponents, DepthEnabled);
@@ -101,7 +102,7 @@ void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, boo
 
 void Framebuffer::GenerateDepthBuffer(int Width, int Height)
 {
-    if (gUseDSA) {
+    if (IsGLVersionHigher(4, 5)) {
         glCreateTextures(GL_TEXTURE_2D, 1, &m_depthBuffer);
         glTextureStorage2D(m_depthBuffer, 1, GL_DEPTH_COMPONENT32F, Width, Height);
         glTextureParameteri(m_depthBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -121,12 +122,13 @@ void Framebuffer::GenerateDepthBuffer(int Width, int Height)
     }
 }
 
+
 void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatComponents)
 {
     GLenum internalFormat = (NumFormatComponents == 4) ? GL_RGBA8 : GL_RGB8;
     GLenum format = (NumFormatComponents == 4) ? GL_RGBA : GL_RGB;
 
-    if (gUseDSA) {
+    if (IsGLVersionHigher(4, 5)) {
         glCreateTextures(GL_TEXTURE_2D, 1, &m_colorBuffer);
         glTextureStorage2D(m_colorBuffer, 1, internalFormat, Width, Height);
         glTextureParameteri(m_colorBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -155,6 +157,7 @@ void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatCompon
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 }
+
 
 void Framebuffer::BindForWriting()
 {
@@ -190,9 +193,10 @@ void Framebuffer::BindDepthForReading(GLenum TextureUnit)
     glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
 }
 
+
 void Framebuffer::ClearColorBuffer(const Vector4f& Color)
 {
-    if (gUseDSA) {
+    if (IsGLVersionHigher(4, 5)) {
         glClearNamedFramebufferfv(m_fbo, GL_COLOR, 0, (GLfloat*)Color.data());
     }
     else {
@@ -200,9 +204,10 @@ void Framebuffer::ClearColorBuffer(const Vector4f& Color)
     }
 }
 
+
 void Framebuffer::BlitToWindow()
 {
-    if (gUseDSA) {
+    if (IsGLVersionHigher(4, 5)) {
         glBlitNamedFramebuffer(m_fbo, 0, 0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
     }
     else {
