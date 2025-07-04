@@ -295,7 +295,7 @@ void glDebugOutput(GLenum source,
                    const char *message,
                    const void *userParam)
 {
-    GLuint ignore_ids[1] = { 131185 }; // "will use video memory..."
+    GLuint ignore_ids[] = { 131185, 131218 }; // "will use video memory..."
 
     for (int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(ignore_ids) ; i++) {
         if (id == ignore_ids[i]) {
