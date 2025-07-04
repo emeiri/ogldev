@@ -50,6 +50,15 @@ CameraDirection gCameraDirections[NUM_CUBE_MAP_FACES] =
     { GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, Vector3f(0.0f, 0.0f, -1.0f), Vector3f(0.0f, 1.0f, 0.0f) }
 };
 
+struct SSAOParamsInternal
+{
+    SSAOParams params;
+    float zNear = 0.f;
+    float zFar = 0.0f;
+    float OutputWidth = 0.0f;
+    float OutputHeight = 0.0f;
+};
+
 
 static bool IsLightingPass(RENDER_PASS RenderPass)
 {
@@ -104,7 +113,7 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_ssaoFBO.Init(1024, 1024, 4, false);
 
-    m_ssaoParams.InitBuffer(sizeof(SSAOParams), NULL, GL_DYNAMIC_STORAGE_BIT);
+    m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
 
     m_ssaoRotTexture.Load("../Content/textures/rot_texture.bmp", false);
 
@@ -757,11 +766,16 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
     m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
     m_ssaoParams.BindUBO(0);
-    pScene->GetConfig()->GetSSAOParams().zNear = m_pCurCamera->GetPersProjInfo().zNear;
-    pScene->GetConfig()->GetSSAOParams().zFar = m_pCurCamera->GetPersProjInfo().zFar;
-    m_ssaoParams.Update(&pScene->GetConfig()->GetSSAOParams(), sizeof(SSAOParams));
 
     m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
+    SSAOParamsInternal Params;
+    Params.params = pScene->GetConfig()->GetSSAOParams();
+    Params.zNear = m_pCurCamera->GetPersProjInfo().zNear;
+    Params.zFar = m_pCurCamera->GetPersProjInfo().zFar;
+    Params.OutputHeight = (float)m_ssaoFBO.GetHeight();
+    Params.OutputWidth = (float)m_ssaoFBO.GetWidth();
+    
+    m_ssaoParams.Update(&Params, sizeof(SSAOParamsInternal));
 
     m_ssaoRotTexture.Bind(GL_TEXTURE1);
 

@@ -79,11 +79,13 @@ layout(std140, binding = 0) uniform SSAOParams
 {
 	float scale;
 	float bias;
-	float zNear;
-	float zFar;
 	float radius;
 	float attScale;
 	float distScale;
+	float zNear;
+	float zFar;
+    float OutputWidth;         
+    float OutputHeight;
 };
 
 

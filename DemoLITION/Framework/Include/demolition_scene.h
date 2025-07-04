@@ -84,8 +84,6 @@ struct SSAOParams
 {
     float scale = 1.0f;
     float bias = 0.2f;
-    float zNear = 0.1f;
-    float zFar = 1000.0f;
     float radius = 0.2f;
     float attScale = 1.0f;
     float distScale = 0.5f;
