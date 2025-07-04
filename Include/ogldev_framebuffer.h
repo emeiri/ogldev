@@ -41,6 +41,8 @@ public:
 
     void BindDepthForReading(GLenum TextureUnit);
 
+    void Clear(bool ColorBuffer, bool DepthBuffer);
+
     void ClearColorBuffer(const Vector4f& Color);
 
     void BlitToWindow();
@@ -48,6 +50,10 @@ public:
     GLuint GetTexture() const { return m_colorBuffer; }
 
     GLuint GetDepthTexture() const { return m_depthBuffer; }
+
+    int GetWidth() const { return m_width; }
+
+    int GetHeight() const { return m_height; }
 
 private:
     void InitDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled);
