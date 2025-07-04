@@ -543,7 +543,7 @@ void ForwardRenderer::ShadowMapPassPoint(const std::list<CoreSceneObject*>& Rend
 
     for (uint i = 0; i < NUM_CUBE_MAP_FACES; i++) {
         m_shadowCubeMapFBO.BindForWriting(gCameraDirections[i].CubemapFace);
-        glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);
+        glViewport(0, 0, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT);  // TODO: should be done in the FBO
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         m_lightViewMatrix.InitCameraTransform(PointLights[0].WorldPosition, gCameraDirections[i].Target, gCameraDirections[i].Up);
         RenderEntireRenderList(RenderList);
@@ -795,7 +795,7 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
 
     m_ssaoFBO.BindForWriting();
 
-    m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
+    m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f));
 
     m_ssaoParams.BindUBO(0);
 

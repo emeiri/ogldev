@@ -90,19 +90,7 @@ layout(std140, binding = 0) uniform SSAOParams
 };
 
 
-/*float LinearizeDepthLH(float depth) 
-{
-    return (zNear * zFar) / (zFar - depth * (zFar - zNear));
-}*/
-
-float LinearizeDepthLH(float depth) 
-{
-    float z = depth * 2.0 - 1.0; // Convert [0,1] to NDC [-1,1]
-    return (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
-}
-
-
-float LinearizeDepthRH(float depth) 
+float LinearizeDepth(float depth) 
 {
     float z = depth * 2.0 - 1.0; // Convert [0,1] to NDC [-1,1]
     return (2.0 * zNear * zFar) / (zFar + zNear - z * (zFar - zNear));
@@ -121,7 +109,7 @@ void main()
 {
     float size = float(textureSize(texDepth, 0 ).x);
 
-    float Z = LinearizeDepthLH(texture(texDepth, TexCoords).r); 
+    float Z = LinearizeDepth(texture(texDepth, TexCoords).r); 
 
     vec2 noiseScale = vec2(1024 / 4.0, 1024 / 4.0);
     // Sample noise texture and build TBN matrix
@@ -139,7 +127,7 @@ void main()
         offsetUV = clamp(offsetUV, vec2(0.0), vec2(1.0));
 
         float zSampleRaw = texture(texDepth, offsetUV).r;
-        float zSample = LinearizeDepthLH(zSampleRaw);
+        float zSample = LinearizeDepth(zSampleRaw);
 
         float dist = max(Z - zSample, 0.0) / distScale;
         float occl = 25.0 * max(dist * (2.0 - dist), 0.0);
