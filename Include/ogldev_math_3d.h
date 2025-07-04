@@ -570,6 +570,7 @@ Quaternion operator*(const Quaternion& l, const Quaternion& r);
 
 Quaternion operator*(const Quaternion& q, const Vector3f& v);
 
+class Matrix3f;
 
 class Matrix4f
 {
@@ -614,6 +615,8 @@ public:
         m[2][0] = a[0][2]; m[2][1] = a[1][2]; m[2][2] = a[2][2]; m[2][3] = a[3][2];
         m[3][0] = a[0][3]; m[3][1] = a[1][3]; m[3][2] = a[2][3]; m[3][3] = a[3][3];
     }
+
+    Matrix4f(const Matrix3f& a);
 
     void SetZero()
     {
