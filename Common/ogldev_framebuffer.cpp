@@ -107,6 +107,7 @@ void Framebuffer::GenerateDepthBuffer(int Width, int Height)
         glTextureStorage2D(m_depthBuffer, 1, GL_DEPTH_COMPONENT32F, Width, Height);
         glTextureParameteri(m_depthBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(m_depthBuffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(m_depthBuffer, GL_TEXTURE_BASE_LEVEL, 0);
         glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(m_depthBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
@@ -133,6 +134,7 @@ void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatCompon
         glTextureStorage2D(m_colorBuffer, 1, internalFormat, Width, Height);
         glTextureParameteri(m_colorBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTextureParameteri(m_colorBuffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(m_colorBuffer, GL_TEXTURE_BASE_LEVEL, 0);
         glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
