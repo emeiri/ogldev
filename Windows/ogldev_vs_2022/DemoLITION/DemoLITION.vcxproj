@@ -198,6 +198,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_model.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_normal_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_pbr_forward_lighting.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_picking_texture.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_model.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_normal_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_pbr_forward_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_picking_texture.cpp" />
@@ -272,6 +274,8 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\full_screen_quad.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\normal.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\normal.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\picking.vs" />

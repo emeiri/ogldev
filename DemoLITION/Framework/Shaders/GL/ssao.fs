@@ -7,6 +7,7 @@ layout(location = 0) out vec4 outColor;
 
 layout(binding = 0) uniform sampler2D texDepth;
 layout(binding = 1) uniform sampler2D texRotation;
+layout(binding = 2) uniform sampler2D NormalMap;
 
 const vec3 offsets[64] = vec3[64](
 vec3(0.049771, -0.044709, 0.049963),
@@ -125,7 +126,7 @@ void main()
     vec2 noiseScale = vec2(1024 / 4.0, 1024 / 4.0);
     // Sample noise texture and build TBN matrix
     vec3 randomVec = normalize(texture(texRotation, TexCoords * noiseScale).xyz);
-    vec3 normal = vec3(0.0, 0.0, 1.0); // Replace with actual normal if available
+    vec3 normal = texture(NormalMap, TexCoords).xyz; 
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
     mat3 TBN = mat3(tangent, bitangent, normal);

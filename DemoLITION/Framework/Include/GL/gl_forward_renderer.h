@@ -38,6 +38,7 @@
 #include "GL/gl_full_screen_quad_technique.h"
 #include "GL/gl_ssao_technique.h"
 #include "GL/gl_ssao_combine_technique.h"
+#include "GL/gl_normal_technique.h"
 #include "GL/gl_buffer.h"
 
 
@@ -49,7 +50,8 @@ enum RENDER_PASS {
     RENDER_PASS_SHADOW_DIR = 4,    
     RENDER_PASS_SHADOW_SPOT = 5,
     RENDER_PASS_SHADOW_POINT = 6,
-    RENDER_PASS_PICKING = 7
+    RENDER_PASS_PICKING = 7,
+    RENDER_PASS_NORMAL = 8
 };
 
 
@@ -110,6 +112,7 @@ private:
     void ShadowMapPass(GLScene* pScene);
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
+    void NormalPass(GLScene* pScene);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
@@ -131,6 +134,7 @@ private:
     void SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World);
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
     void SetWorldMatrix_CB_PickingPass(const Matrix4f& World);
+    void SetWorldMatrix_CB_NormalPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
     Matrix4f GetViewProjectionMatrix();
     void RenderSingleObject(CoreSceneObject* pSceneObject);
@@ -145,6 +149,7 @@ private:
     GLMCameraFirstPerson* m_pCurCamera = NULL;
 
     Framebuffer m_lightingFBO;
+    Framebuffer m_normalFBO;
     Framebuffer m_ssaoFBO;
     GLBuffer m_ssaoParams;
     Texture m_ssaoRotTexture;
@@ -161,6 +166,7 @@ private:
     ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
     ForwardLightingTechnique m_lightingTech;    
     ForwardSkinningTechnique m_skinningTech;
+    NormalTechnique m_normalTech;
     ShadowMappingTechnique m_shadowMapTech;
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     FlatColorTechnique m_flatColorTech;

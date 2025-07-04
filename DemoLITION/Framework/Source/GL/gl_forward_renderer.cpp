@@ -112,6 +112,7 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
     m_lightingFBO.Init(m_windowWidth, m_windowHeight, 3, true);
 
     m_ssaoFBO.Init(1024, 1024, 4, false);
+    m_normalFBO.Init(m_windowWidth, m_windowHeight, 3, true);
 
     m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
 
@@ -211,6 +212,11 @@ void ForwardRenderer::InitTechniques()
 
     if (!m_ssaoCombineTech.Init()) {
         printf("Error initializing the SSAO combine technique\n");
+        exit(1);
+    }
+
+    if (!m_normalTech.Init()) {
+        printf("Error initializing the normal technique\n");
         exit(1);
     }
 }
@@ -316,6 +322,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     }
 
     if (pScene->GetConfig()->IsSSAOEnabled() && !DisableSSAO) {
+        NormalPass(pScene);
         SSAOPass(pScene);
         SSAOCombinePass();
     } else {
@@ -568,6 +575,31 @@ void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& 
 }
 
 
+void ForwardRenderer::NormalPass(GLScene* pScene)
+{
+    m_curRenderPass = RENDER_PASS_NORMAL;
+
+    m_normalFBO.BindForWriting();
+
+    bool ClearColor = true;
+    bool ClearDepth = true;    
+    m_normalFBO.Clear(ClearColor, ClearDepth);
+
+    m_normalTech.Enable();
+
+    if (UseIndirectRender) {
+        Matrix4f VP = m_pCurCamera->GetVPMatrix();
+        m_normalTech.SetVP(VP);
+    }
+
+    m_normalTech.ControlIndirectRender(UseIndirectRender); 
+    m_normalTech.ControlPVP(UsePVP);                         
+
+    RenderEntireRenderList(pScene->GetRenderList());
+}
+
+
+
 void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis)
 {
     m_lightingFBO.BindForWriting();
@@ -767,7 +799,6 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
 
     m_ssaoParams.BindUBO(0);
 
-    m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
     SSAOParamsInternal Params;
     Params.params = pScene->GetConfig()->GetSSAOParams();
     Params.zNear = m_pCurCamera->GetPersProjInfo().zNear;
@@ -777,7 +808,9 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
     
     m_ssaoParams.Update(&Params, sizeof(SSAOParamsInternal));
 
+    m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
     m_ssaoRotTexture.Bind(GL_TEXTURE1);
+    m_normalFBO.BindForReading(GL_TEXTURE2);    
 
     m_ssaoTech.Enable();
 
@@ -937,6 +970,10 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
         SetWorldMatrix_CB_PickingPass(World);
         break;
 
+    case RENDER_PASS_NORMAL:
+        SetWorldMatrix_CB_NormalPass(World);
+        break;
+
     default:
         printf("%s:%d - Unknown render pass %d\n", __FILE__, __LINE__, m_curRenderPass);
         exit(1);
@@ -974,6 +1011,15 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World)
 }
 
 
+static Matrix3f CalcNormalMatrix(const Matrix4f& World)
+{
+    Matrix4f InverseWorld = World.Inverse();
+    Matrix3f World3x3(InverseWorld);
+    Matrix3f WorldTranspose = World3x3.Transpose();
+    return WorldTranspose;
+}
+
+
 void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
@@ -1007,12 +1053,31 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 
     m_pCurBaseLightingTech->SetLightWVP(LightWVP);
 
-    Matrix4f InverseWorld = FinalWorldMatrix.Inverse();
-    Matrix3f World3x3(InverseWorld);
-    Matrix3f WorldTranspose = World3x3.Transpose();
-    //WorldTranspose.Print();
+    Matrix3f NormalMatrix = CalcNormalMatrix(FinalWorldMatrix);
+    //NormalMatrix.Print();
    // exit(1);
-    m_pCurBaseLightingTech->SetNormalMatrix(WorldTranspose);
+
+    m_pCurBaseLightingTech->SetNormalMatrix(NormalMatrix);
+}
+
+
+void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
+{
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f FinalWorldMatrix = World * ObjectMatrix;
+
+    Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
+    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
+    Matrix4f WVP = Projection * View * FinalWorldMatrix;
+
+    //  printf("Lighting pass\n"); WVP.Print(); exit(1);
+
+    m_normalTech.SetWVP(WVP);
+
+    Matrix3f NormalMatrix = CalcNormalMatrix(FinalWorldMatrix);
+    //NormalMatrix.Print();
+   // exit(1);
+    m_normalTech.SetNormalMatrix(NormalMatrix);
 }
 
 
