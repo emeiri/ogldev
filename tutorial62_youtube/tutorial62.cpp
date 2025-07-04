@@ -32,21 +32,23 @@
 
 static void CreateRandomOffsetArray()
 {
-    std::uniform_real_distribution<float> randomFloats(0.0, 1.0);
-    std::default_random_engine generator;
+    int NumOffsets = 64;
 
-    printf("const vec3 offsets[64] = vec3[64](\n");
+    std::uniform_real_distribution<float> RandomFloats(0.0, 1.0);
+    std::default_random_engine Generator;
 
-    for (unsigned int i = 0; i < 64; ++i) {
+    printf("const vec3 offsets[%d] = vec3[%d](\n", NumOffsets, NumOffsets);
+
+    for (int i = 0; i < NumOffsets; ++i) {
         glm::vec3 sample(
-            randomFloats(generator) * 2.0 - 1.0,
-            randomFloats(generator) * 2.0 - 1.0,
-            randomFloats(generator)
+            RandomFloats(Generator) * 2.0 - 1.0,        // -1 <= X <= 1
+            RandomFloats(Generator) * 2.0 - 1.0,        // -1 <= Y <= 1
+            RandomFloats(Generator)                     //  0 <= Z <= 1
         );
         sample = glm::normalize(sample);
-        sample *= randomFloats(generator); // bias toward center
+        sample *= RandomFloats(Generator); // bias toward center
         // Scale samples so more are near the origin
-        float scale = float(i) / 64.0f;
+        float scale = float(i) / (float)NumOffsets;
         scale = glm::mix(0.1f, 1.0f, scale * scale); // quadratic distribution
         sample *= scale;
 
