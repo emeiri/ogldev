@@ -126,38 +126,69 @@ void Framebuffer::GenerateDepthBuffer(int Width, int Height)
 
 void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatComponents)
 {
-    GLenum internalFormat = (NumFormatComponents == 4) ? GL_RGBA8 : GL_RGB8;
-    GLenum format = (NumFormatComponents == 4) ? GL_RGBA : GL_RGB;
-
     if (IsGLVersionHigher(4, 5)) {
-        glCreateTextures(GL_TEXTURE_2D, 1, &m_colorBuffer);
-        glTextureStorage2D(m_colorBuffer, 1, internalFormat, Width, Height);
-        glTextureParameteri(m_colorBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(m_colorBuffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTextureParameteri(m_colorBuffer, GL_TEXTURE_BASE_LEVEL, 0);
-        glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        GenerateColorBufferDSA(NumFormatComponents, Width, Height);
     }
     else {
-        glGenTextures(1, &m_colorBuffer);
-        glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
-	switch (NumFormatComponents) {
-	case 3:
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		break;
-	case 4:
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		break;
-	default:
-		printf("Unsupported num components %d\n", NumFormatComponents);
-		exit(1);
-	}
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        GenerateColorBufferNonDSA(NumFormatComponents, Width, Height);
     }
+}
+
+
+void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, int Width, int Height)
+{
+    GLenum InternalFormat = 0;
+
+    switch (NumFormatComponents) {
+    case 4:
+        InternalFormat = GL_RGBA8;
+        break;
+
+    case 3:
+        InternalFormat = GL_RGB8;
+        break;
+
+    case 1:
+        InternalFormat = GL_R32F;
+        break;
+
+    default:
+        assert(0);
+    }
+
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_colorBuffer);
+    glTextureStorage2D(m_colorBuffer, 1, InternalFormat, Width, Height);
+    glTextureParameteri(m_colorBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(m_colorBuffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(m_colorBuffer, GL_TEXTURE_BASE_LEVEL, 0);
+    glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+
+void Framebuffer::GenerateColorBufferNonDSA(int NumFormatComponents, int Width, int Height)
+{
+    glGenTextures(1, &m_colorBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
+    switch (NumFormatComponents) {
+    case 4:
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        break;
+    case 3:
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        break;
+    case 1:
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, Width, Height, 0, GL_RED, GL_FLOAT, NULL);
+        break;
+    default:
+        printf("Unsupported num components %d\n", NumFormatComponents);
+        exit(1);
+    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 

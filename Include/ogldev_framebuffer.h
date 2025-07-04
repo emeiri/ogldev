@@ -56,6 +56,10 @@ private:
 
     void GenerateColorBuffer(int Width, int Height, int NumFormatComponents);
 
+    void GenerateColorBufferNonDSA(int NumFormatComponents, int Width, int Height);
+
+    void GenerateColorBufferDSA(int NumFormatComponents, int Width, int Height);
+
     void GenerateDepthBuffer(int Width, int Height);
 
     int m_width = 0;
