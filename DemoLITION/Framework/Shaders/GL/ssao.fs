@@ -104,16 +104,17 @@ float LinearizeDepthGeneric(float depth, float A, float B)
     return B / (z - A);
 }
 
+#define ROT_TEXTURE_WIDTH 4.0
+#define ROT_TEXTURE_HEIGHT 4.0
+
 
 void main()
 {
-    float size = float(textureSize(texDepth, 0 ).x);
-
     float Z = LinearizeDepth(texture(texDepth, TexCoords).r); 
 
-    vec2 noiseScale = vec2(1024 / 4.0, 1024 / 4.0);
+    vec2 NoiseScale = vec2(OutputWidth / ROT_TEXTURE_WIDTH, OutputHeight / ROT_TEXTURE_HEIGHT);
     // Sample noise texture and build TBN matrix
-    vec3 randomVec = normalize(texture(texRotation, TexCoords * noiseScale).xyz);
+    vec3 randomVec = normalize(texture(texRotation, TexCoords * NoiseScale).xyz);
     vec3 normal = texture(NormalMap, TexCoords).xyz; 
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);

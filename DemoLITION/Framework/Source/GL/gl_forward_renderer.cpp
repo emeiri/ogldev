@@ -111,8 +111,9 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_lightingFBO.Init(m_windowWidth, m_windowHeight, 4, true);
 
-    m_ssaoFBO.Init(1024, 1024, 4, false);
     m_normalFBO.Init(m_windowWidth, m_windowHeight, 3, true);
+
+    m_ssaoFBO.Init(m_windowWidth, m_windowHeight, 3, false);
 
     m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
 
