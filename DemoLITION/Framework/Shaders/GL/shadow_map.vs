@@ -29,10 +29,12 @@ layout (location = 0) in vec3 Position;
 //
 struct Vertex {
     float Position[3];
-    float TexCoord[2];
+    float inTexCoord0[2];
+    float inTexCoord1[2];
     float Normal[3];
     float Tangent[3];
     float Bitangent[3];
+    float Color[4];
 };
 
 layout(std430, binding = 0) restrict readonly buffer Vertices {
@@ -43,6 +45,7 @@ layout(std430, binding = 0) restrict readonly buffer Vertices {
 struct PerObjectData {
     mat4 WorldMatrix;
     mat4 NormalMatrix;
+    ivec4 MaterialIndex;
 };
 
 
