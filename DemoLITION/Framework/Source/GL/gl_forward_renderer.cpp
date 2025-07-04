@@ -1076,9 +1076,11 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
     m_normalTech.SetWVP(WVP);
 
     Matrix3f NormalMatrix = CalcNormalMatrix(FinalWorldMatrix);
+    Matrix4f ViewNormalMatrix4D = View * Matrix4f(NormalMatrix);
+    Matrix3f ViewNormalMatrix(ViewNormalMatrix4D);
     //NormalMatrix.Print();
    // exit(1);
-    m_normalTech.SetNormalMatrix(NormalMatrix);
+    m_normalTech.SetNormalMatrix(ViewNormalMatrix);
 }
 
 
