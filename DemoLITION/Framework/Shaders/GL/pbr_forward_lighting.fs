@@ -74,33 +74,12 @@ struct SpotLight
     float Cutoff;
 };
 
-struct MaterialColor
-{
-    vec4 AmbientColor;
-    vec4 DiffuseColor;
-    vec4 SpecularColor;
-};
-
-
-layout(std430, binding = 2) readonly buffer ColorSSBO {
-    MaterialColor Colors[];
-};
-
-layout(std430, binding = 3) readonly buffer DiffuseSSBO {
-    sampler2D DiffuseMaps[];
-};
-
-layout(std430, binding = 4) readonly buffer NormalSSBO {
-    sampler2D NormalMaps[];
-};
-
 
 uniform DirectionalLight gDirectionalLight;
 uniform int gNumPointLights;
 uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform int gNumSpotLights;
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
-uniform MaterialColor gMaterial;
 uniform bool gHasSampler = false;
 layout(binding = 0) uniform sampler2D gAlbedo;
 layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
@@ -132,38 +111,10 @@ uniform bool gIsIndirectRender = false;
 uniform vec4 gBaseColor;
 uniform vec4 gEmissiveColor;
 
-vec4 GetMaterialAmbientColor()
-{
-    if (gIsIndirectRender) {
-        return Colors[MaterialIndex].AmbientColor;
-    } else {
-        return gMaterial.AmbientColor;
-    }
-}
-
-
-vec4 GetMaterialDiffuseColor()
-{
-    if (gIsIndirectRender) {
-        return Colors[MaterialIndex].DiffuseColor;
-    } else {
-        return gMaterial.DiffuseColor;
-    }
-}
-
-
-vec4 GetMaterialSpecularColor()
-{
-    if (gIsIndirectRender) {
-        return Colors[MaterialIndex].SpecularColor;
-    } else {
-        return gMaterial.SpecularColor;
-    }
-}
-
 const float M_PI = 3.141592653589793;
 
-vec4 SRGBtoLINEAR(vec4 srgbIn) {
+vec4 SRGBtoLINEAR(vec4 srgbIn) 
+{
   vec3 linOut = pow(srgbIn.xyz,vec3(2.2));
 
   return vec4(linOut, srgbIn.a);
@@ -204,19 +155,8 @@ vec3 perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv)
 }
 
 
-struct PerDrawData {
-  mat4 model;
-  mat4 view;
-  mat4 proj;
-  uint matId;
-  uint envId;
-};
-
-
-const int kMaxAttributes = 2;
-
 struct InputAttributes {
-  vec2 uv[kMaxAttributes];
+  vec2 uv[2];
 };
 
 // corresponds to MetallicRoughnessDataGPU from Chapter06/04_MetallicRoughness/src/main.cpp
@@ -254,33 +194,24 @@ struct EnvironmentMapDataGPU {
   uint unused1;
 };
 
-layout(std430) readonly buffer Materials {
+layout(std430, binding = 2) readonly buffer Materials {
   MetallicRoughnessDataGPU material[];
 };
 
-layout(std430) readonly buffer Environments {
+layout(std430, binding = 3) readonly buffer Environments {
   EnvironmentMapDataGPU environment[];
 };
 
-layout(std140) uniform PerFrameData {
-    PerDrawData drawable;
-};
-
-
-uint getMaterialId() {
-  return drawable.matId;
-}
-
 uint getEnvironmentId() 
 {
-    return drawable.envId;
+    return 0;
 }
 
 
-MetallicRoughnessDataGPU getMaterial(uint idx) 
+MetallicRoughnessDataGPU GetMaterial() 
 {
     if (gIsIndirectRender) {
-        return material[idx]; 
+        return material[MaterialIndex]; 
     } else {
         MetallicRoughnessDataGPU ret;
         ret.occlusionTextureUV = 0;
@@ -503,7 +434,7 @@ float microfacetDistribution(PBRInfo pbrInputs) {
 PBRInfo calculatePBRInputsMetallicRoughness( vec4 albedo, vec3 normal, vec3 cameraPos, vec3 worldPos, vec4 mrSample) {
   PBRInfo pbrInputs;
 
-  MetallicRoughnessDataGPU mat = getMaterial(getMaterialId());
+  MetallicRoughnessDataGPU mat = GetMaterial();
   float perceptualRoughness = getRoughnessFactor(mat);
   float metallic = getMetallicFactor(mat) * mrSample.b;
   metallic = clamp(metallic, 0.0, 1.0);
@@ -593,7 +524,7 @@ void main()
     tc.uv[0] = TexCoord0;
     tc.uv[1] = TexCoord1;
 
-    MetallicRoughnessDataGPU mat = getMaterial(getMaterialId());
+    MetallicRoughnessDataGPU mat = GetMaterial();
 
     vec4 Kao = sampleAO(tc, mat);
     vec4 Ke  = sampleEmissive(tc, mat);
