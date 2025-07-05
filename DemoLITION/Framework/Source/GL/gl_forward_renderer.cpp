@@ -827,8 +827,6 @@ void ForwardRenderer::SSAOCombinePass()
 
     glViewport(0, 0, m_windowWidth, m_windowHeight);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
-
     m_lightingFBO.BindForReading(GL_TEXTURE0);
 
     m_ssaoFBO.BindForReading(GL_TEXTURE1);
