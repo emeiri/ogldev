@@ -153,7 +153,7 @@ private:
 	{
 		float FOV = 45.0f;
 		float zNear = 0.1f;
-		float zFar = 2500.0f;
+		float zFar = 100.0f;
 
 		DefaultCreateCameraPers(FOV, zNear, zFar);
 	}

@@ -44,7 +44,7 @@ void main()
 
     VertexData vtx = in_Vertices.v[Index];
 
-    vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
+    vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z) * 0.05;
 
     gl_Position = ubo.WVP * vec4(pos, 1.0);
     
