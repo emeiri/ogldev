@@ -21,6 +21,10 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
 #include "ogldev_glm_camera.h"
 
 GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target,
@@ -223,6 +227,8 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrix() const
 	glm::mat4 View = GetViewMatrix();
 
 	glm::mat4 VP = m_persProjection * View;
+
+	//std::cout << glm::to_string(m_persProjection) << std::endl;
 
 	return VP;
 }
