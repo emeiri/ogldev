@@ -853,21 +853,6 @@ void ForwardRenderer::FullScreenQuadBlit()
 }
 
 
-/*void ForwardRenderer::RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex)
-{
-    RenderAnimationCommon(pMesh);
-
-    vector<Matrix4f> Transforms;
-    pMesh->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
-
-    for (uint i = 0 ; i < Transforms.size() ; i++) {
-        m_skinningTech.SetBoneTransform(i, Transforms[i]);
-    }
-
-    pMesh->Render(&m_skinningTech);
-}*/
-
-
 /*void ForwardRenderer::RenderAnimationBlended(SkinnedMesh* pMesh,
                                            float AnimationTimeSec,
                                            int StartAnimIndex,
@@ -1021,6 +1006,7 @@ static Matrix3f CalcNormalMatrix(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
+    // TODO: use GetWVP instead
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f FinalWorldMatrix = World * ObjectMatrix;
     m_pCurBaseLightingTech->SetWorldMatrix(FinalWorldMatrix);
@@ -1062,6 +1048,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
 {
+    // TODO: use GetWVP instead
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f FinalWorldMatrix = World * ObjectMatrix;
 
