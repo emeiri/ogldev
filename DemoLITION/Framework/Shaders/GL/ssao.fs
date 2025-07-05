@@ -81,6 +81,7 @@ layout(std140, binding = 0) uniform SSAOParams
 	float scale;
 	float bias;
 	float radius;
+    float occScale;
 	float attScale;
 	float distScale;
 	float zNear;
@@ -123,15 +124,15 @@ void main()
     float att = 0.0;
 
     for (int i = 0; i < 64; i++) {
-        vec3 sampleVec = TBN * offsets[i]; // rotate sample
-        vec2 offsetUV = TexCoords + (sampleVec.xy * radius / Z);
+        vec3 ViewSpaceVec = TBN * offsets[i]; // rotate sample
+        vec2 offsetUV = TexCoords + (ViewSpaceVec.xy * radius / Z);
         offsetUV = clamp(offsetUV, vec2(0.0), vec2(1.0));
 
         float zSampleRaw = texture(texDepth, offsetUV).r;
         float zSample = LinearizeDepth(zSampleRaw);
 
         float dist = max(Z - zSample, 0.0) / distScale;
-        float occl = 25.0 * max(dist * (2.0 - dist), 0.0);
+        float occl = occScale * max(dist * (2.0 - dist), 0.0);
 
         att += 1.0 / (1.0 + occl * occl);
     }    

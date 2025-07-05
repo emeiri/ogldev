@@ -85,6 +85,7 @@ struct SSAOParams
     float scale = 1.0f;
     float bias = 0.2f;
     float radius = 0.2f;
+    float occScale = 25.0f;
     float attScale = 1.0f;
     float distScale = 0.5f;
 };
