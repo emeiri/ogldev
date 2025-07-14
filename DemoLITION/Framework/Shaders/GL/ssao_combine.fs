@@ -17,7 +17,9 @@ layout(std140, binding = 0) uniform SSAOParams
 void main()
 {
 	vec4 Color = texture(texScene, TexCoords);
+
 	float SSAOFactor = texture(texSSAO, TexCoords).x;
+
 	SSAOFactor = clamp(SSAOFactor + Bias, 0.0, 1.0);
 
 	FragColor = vec4(mix(Color, Color * SSAOFactor, Scale).rgb, 1.0);

@@ -268,12 +268,14 @@ void Framebuffer::ClearColorBuffer(const Vector4f& Color)
 void Framebuffer::BlitToWindow()
 {
     if (IsGLVersionHigher(4, 5)) {
-        glBlitNamedFramebuffer(m_fbo, 0, 0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        glBlitNamedFramebuffer(m_fbo, 0, 0, 0, m_width, m_height, 0, 0, m_width, m_height, 
+                               GL_COLOR_BUFFER_BIT, GL_LINEAR);
     }
     else {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, 
+                          GL_COLOR_BUFFER_BIT, GL_LINEAR);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }
