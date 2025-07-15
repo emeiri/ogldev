@@ -346,6 +346,8 @@ struct PBRInfo {
   vec3 specularColor;           // color contribution from specular lighting
 
   vec3 FssEss;
+  float brdf_scale;
+  float brdf_bias;
 };
 
 // specularWeight is introduced with KHR_materials_specular
@@ -427,6 +429,28 @@ float microfacetDistribution(PBRInfo pbrInputs) {
   return roughnessSq / (M_PI * f * f);
 }
 
+
+vec3 CalcSchlickFresnel(PBRInfo pbrInputs)
+{
+    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
+
+    // retrieve a scale and bias to F0. See [1], Figure 3
+    vec2 brdfSamplePoint = vec2(pbrInputs.NdotV, pbrInputs.perceptualRoughness);
+    brdfSamplePoint = clamp(brdfSamplePoint, vec2(0.0, 0.0), vec2(1.0, 1.0));
+    vec2 brdf = sampleBRDF_LUT(brdfSamplePoint, envMap).rg;
+    pbrInputs.brdf_scale = brdf.x;
+    pbrInputs.brdf_bias = brdf.y;
+
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
+    vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
+    vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
+    vec3 FssEss = k_S * pbrInputs.brdf_scale + pbrInputs.brdf_bias;
+
+    return FssEss;
+}
+
+
 PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 albedo, vec3 normal, vec3 cameraPos, vec3 worldPos, vec4 mrSample) 
 {
     PBRInfo pbrInputs;
@@ -471,20 +495,7 @@ PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 a
     pbrInputs.n = normal;
     pbrInputs.v = v;
 
-    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
-
-    // retrieve a scale and bias to F0. See [1], Figure 3
-    vec2 brdfSamplePoint = vec2(pbrInputs.NdotV, pbrInputs.perceptualRoughness);
-    brdfSamplePoint = clamp(brdfSamplePoint, vec2(0.0, 0.0), vec2(1.0, 1.0));
-    vec3 brdf = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
-
-    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
-    // Roughness dependent fresnel, from Fdez-Aguera
-    vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
-    vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
-    vec3 FssEss = k_S * brdf.x + brdf.y;
-
-    pbrInputs.FssEss = FssEss;
+    pbrInputs.FssEss = CalcSchlickFresnel(pbrInputs);
 
     return pbrInputs;
 }
