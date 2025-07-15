@@ -159,47 +159,47 @@ struct InputAttributes {
   vec2 uv[2];
 };
 
-// corresponds to MetallicRoughnessDataGPU from Chapter06/04_MetallicRoughness/src/main.cpp
+
 struct MetallicRoughnessDataGPU {
-  vec4 baseColorFactor;
-  vec4 metallicRoughnessNormalOcclusion; // packed metallicFactor, roughnessFactor, normalScale, occlusionStrength
-  vec4 emissiveFactorAlphaCutoff;        // packed vec3 emissiveFactor + float AlphaCutoff
-  uint occlusionTexture;
-  sampler2D occlusionTextureSampler;
-  uint occlusionTextureUV;
-  uint emissiveTexture;
-  sampler2D emissiveTextureSampler;
-  uint emissiveTextureUV;
-  uint baseColorTexture;
-  sampler2D baseColorTextureSampler;
-  uint baseColorTextureUV;
-  uint metallicRoughnessTexture;
-  sampler2D metallicRoughnessTextureSampler;
-  uint metallicRoughnessTextureUV;
-  uint normalTexture;
-  sampler2D normalTextureSampler;
-  uint normalTextureUV;
-  uint alphaMode;
+    vec4 baseColorFactor;
+    vec4 metallicRoughnessNormalOcclusion; // packed metallicFactor, roughnessFactor, normalScale, occlusionStrength
+    vec4 emissiveFactorAlphaCutoff;        // packed vec3 emissiveFactor + float AlphaCutoff
+    uint occlusionTexture;
+    sampler2D occlusionTextureSampler;
+    uint occlusionTextureUV;
+    uint emissiveTexture;
+    sampler2D emissiveTextureSampler;
+    uint emissiveTextureUV;
+    uint baseColorTexture;
+    sampler2D baseColorTextureSampler;
+    uint baseColorTextureUV;
+    uint metallicRoughnessTexture;
+    sampler2D metallicRoughnessTextureSampler;
+    uint metallicRoughnessTextureUV;
+    uint normalTexture;
+    sampler2D normalTextureSampler;
+    uint normalTextureUV;
+    uint alphaMode;
 };
 
 // corresponds to EnvironmentMapDataGPU from shared/UtilsGLTF.h 
 struct EnvironmentMapDataGPU {
-  uint envMapTexture;
-  samplerCube envMapTextureSampler;
-  uint envMapTextureIrradiance;
-  samplerCube envMapTextureIrradianceSampler;
-  uint texBRDF_LUT;
-  sampler2D texBRDF_LUTSampler;
-  uint unused0;
-  uint unused1;
+    uint envMapTexture;
+    samplerCube envMapTextureSampler;
+    uint envMapTextureIrradiance;
+    samplerCube envMapTextureIrradianceSampler;
+    uint texBRDF_LUT;
+    sampler2D texBRDF_LUTSampler;
+    uint unused0;
+    uint unused1;
 };
 
 layout(std430, binding = 2) readonly buffer Materials {
-  MetallicRoughnessDataGPU material[];
+    MetallicRoughnessDataGPU material[];
 };
 
 layout(std430, binding = 3) readonly buffer Environments {
-  EnvironmentMapDataGPU environment[];
+    EnvironmentMapDataGPU environment[];
 };
 
 uint getEnvironmentId() 
@@ -247,28 +247,33 @@ EnvironmentMapDataGPU getEnvironment(uint idx)
     }  
 }
 
-float getMetallicFactor(MetallicRoughnessDataGPU mat) {
-  return mat.metallicRoughnessNormalOcclusion.x;
+float GetMetallicFactor(MetallicRoughnessDataGPU mat) 
+{
+    return mat.metallicRoughnessNormalOcclusion.x;
 }
 
-float getRoughnessFactor(MetallicRoughnessDataGPU mat) {
-  return mat.metallicRoughnessNormalOcclusion.y;
+float GetRoughnessFactor(MetallicRoughnessDataGPU mat) 
+{
+    return mat.metallicRoughnessNormalOcclusion.y;
 }
 
-float getNormalScale(MetallicRoughnessDataGPU mat) {
-  return mat.metallicRoughnessNormalOcclusion.z;
+float GetNormalScale(MetallicRoughnessDataGPU mat) 
+{
+    return mat.metallicRoughnessNormalOcclusion.z;
 }
 
-float getOcclusionFactor(MetallicRoughnessDataGPU mat) {
-  return mat.metallicRoughnessNormalOcclusion.w;
+float GetOcclusionFactor(MetallicRoughnessDataGPU mat) 
+{
+    return mat.metallicRoughnessNormalOcclusion.w;
 }
 
-vec2 getNormalUV(InputAttributes tc, MetallicRoughnessDataGPU mat) {
-  return tc.uv[mat.normalTextureUV];
+vec2 GetNormalUV(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
+    return tc.uv[mat.normalTextureUV];
 }
 
 vec4 sampleAO(InputAttributes tc, MetallicRoughnessDataGPU mat) {
-  return texture(mat.occlusionTextureSampler, tc.uv[mat.occlusionTextureUV]);
+    return texture(mat.occlusionTextureSampler, tc.uv[mat.occlusionTextureUV]);
 }
 
 vec4 sampleEmissive(InputAttributes tc, MetallicRoughnessDataGPU mat) {
@@ -311,8 +316,9 @@ vec4 sampleEnvMapIrradiance(vec3 tc, EnvironmentMapDataGPU map)
     return texture(map.envMapTextureIrradianceSampler, tc);
 }
 
-int sampleEnvMapQueryLevels(EnvironmentMapDataGPU map) {
-  return textureQueryLevels(map.envMapTextureSampler);
+int sampleEnvMapQueryLevels(EnvironmentMapDataGPU map) 
+{
+    return textureQueryLevels(map.envMapTextureSampler);
 }
 
 
@@ -468,6 +474,7 @@ PBRInfo calculatePBRInputsMetallicRoughness( vec4 albedo, vec3 normal, vec3 came
 
   vec3 n = normalize(normal);          // normal at surface point
   vec3 v = normalize(cameraPos - worldPos);  // Vector from surface point to camera
+    vec3 brdf = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
 
   pbrInputs.NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
   pbrInputs.perceptualRoughness = perceptualRoughness;
@@ -515,7 +522,6 @@ vec3 calculatePBRLightContribution( inout PBRInfo pbrInputs, vec3 lightDirection
   }
   return color;
 }
-
 
 
 void main()
