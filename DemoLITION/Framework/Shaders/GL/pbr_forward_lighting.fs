@@ -344,28 +344,31 @@ struct PBRInfo {
   float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
   vec3 diffuseColor;            // color contribution from diffuse lighting
   vec3 specularColor;           // color contribution from specular lighting
+
+  vec3 FssEss;
 };
 
 // specularWeight is introduced with KHR_materials_specular
-vec3 getIBLRadianceLambertian(float NdotV, vec3 n, float roughness, vec3 diffuseColor, vec3 F0, float specularWeight) {
-  vec2 brdfSamplePoint = clamp(vec2(NdotV, roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
+vec3 getIBLRadianceLambertian(PBRInfo pbrInputs, vec4 AlbedoColor) 
+{
+  vec2 brdfSamplePoint = clamp(vec2(pbrInputs.NdotV, pbrInputs.perceptualRoughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
   EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
   vec2 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rg;
 
-  vec3 irradiance = sampleEnvMapIrradiance(normalize(n.xyz), envMap).rgb;
+  vec3 irradiance = sampleEnvMapIrradiance(normalize(pbrInputs.n.xyz), envMap).rgb;
 
   //return irradiance;
   // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
   // Roughness dependent fresnel, from Fdez-Aguera
-  vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
-  vec3 k_S = F0 + Fr * pow(1.0 - NdotV, 5.0);
-  vec3 FssEss = specularWeight * k_S * f_ab.x + f_ab.y; // <--- GGX / specular light contribution (scale it down if the specularWeight is low)
+  vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
+  vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
+  vec3 FssEss = k_S * f_ab.x + f_ab.y; // <--- GGX / specular light contribution (scale it down if the specularWeight is low)
 
   // Multiple scattering, from Fdez-Aguera
   float Ems = (1.0 - (f_ab.x + f_ab.y));
-  vec3 F_avg = specularWeight * (F0 + (1.0 - F0) / 21.0);
+  vec3 F_avg = (pbrInputs.reflectance0 + (1.0 - pbrInputs.reflectance0) / 21.0);
   vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);
-  vec3 k_D = diffuseColor * (1.0 - FssEss + FmsEms); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
+  vec3 k_D = AlbedoColor.rgb * (1.0 - FssEss + FmsEms); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
 
   return (FmsEms + k_D) * irradiance;
 }
@@ -373,7 +376,8 @@ vec3 getIBLRadianceLambertian(float NdotV, vec3 n, float roughness, vec3 diffuse
 // Calculation of the lighting contribution from an optional Image Based Light source.
 // Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
 // See our README.md on Environment Maps [3] for additional discussion.
-vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs, float specularWeight) {
+vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs) 
+{
   vec3 n = pbrInputs.n;
   vec3 v =  pbrInputs.v;
   vec3 reflection = -normalize(reflect(v, n));
@@ -381,9 +385,6 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs, float specularWeight) {
   float mipCount = float(sampleEnvMapQueryLevels(envMap));
   float lod = pbrInputs.perceptualRoughness * (mipCount - 1);
 
-  // retrieve a scale and bias to F0. See [1], Figure 3
-  vec2 brdfSamplePoint = clamp(vec2(pbrInputs.NdotV, pbrInputs.perceptualRoughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
-  vec3 brdf = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
   // HDR envmaps are already linear
   vec3 specularLight = sampleEnvMapLod(reflection.xyz, lod, envMap).rgb;
 
@@ -391,13 +392,7 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs, float specularWeight) {
 
   //return specularLight;
 
-  // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
-  // Roughness dependent fresnel, from Fdez-Aguera
-  vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
-  vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
-  vec3 FssEss = k_S * brdf.x + brdf.y;
-
-  return specularWeight * specularLight * FssEss;
+  return specularLight * pbrInputs.FssEss;
 }
 
 // Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
@@ -437,56 +432,67 @@ float microfacetDistribution(PBRInfo pbrInputs) {
   return roughnessSq / (M_PI * f * f);
 }
 
-PBRInfo calculatePBRInputsMetallicRoughness( vec4 albedo, vec3 normal, vec3 cameraPos, vec3 worldPos, vec4 mrSample) {
-  PBRInfo pbrInputs;
+PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 albedo, vec3 normal, vec3 cameraPos, vec3 worldPos, vec4 mrSample) 
+{
+    PBRInfo pbrInputs;
 
-  MetallicRoughnessDataGPU mat = GetMaterial();
-  float perceptualRoughness = getRoughnessFactor(mat);
-  float metallic = getMetallicFactor(mat) * mrSample.b;
-  metallic = clamp(metallic, 0.0, 1.0);
+    // Roughness is stored in the 'g' channel, MetallicFactor is stored in the 'b' channel.
+    // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
+    
+    float MetallicFactor = GetMetallicFactor(mat) * mrSample.b;
+    MetallicFactor = clamp(MetallicFactor, 0.0, 1.0);
 
-  // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
-  // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-  perceptualRoughness = mrSample.g * perceptualRoughness;
-  const float c_MinRoughness = 0.04;
+    float PerceptualRoughness = GetRoughnessFactor(mat);
+    PerceptualRoughness = mrSample.g * PerceptualRoughness;
+    const float c_MinRoughness = 0.04;
 
-  perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
+    PerceptualRoughness = clamp(PerceptualRoughness, c_MinRoughness, 1.0);
 
-  // Roughness is authored as perceptual roughness; as is convention,
-  // convert to material roughness by squaring the perceptual roughness [2].
-  float alphaRoughness = perceptualRoughness * perceptualRoughness;
+    // Roughness is authored as perceptual roughness; as is convention,
+    // convert to material roughness by squaring the perceptual roughness [2].
+    float alphaRoughness = PerceptualRoughness * PerceptualRoughness;
 
-  // The albedo may be defined from a base texture or a flat color
-  vec4 baseColor = albedo;
+    vec3 f0 = vec3(0.04);
+    vec3 diffuseColor = mix(albedo.rgb, vec3(0), MetallicFactor); 
+    vec3 specularColor = mix(f0, albedo.rgb, MetallicFactor);
 
-  vec3 f0 = vec3(0.04);
-  vec3 diffuseColor = mix(baseColor.rgb, vec3(0), metallic); 
-  vec3 specularColor = mix(f0, baseColor.rgb, metallic);
+    float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
 
-  // Compute reflectance.
-  float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
+    // For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
+    // For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
+    float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
+    vec3 specularEnvironmentR0 = specularColor.rgb;
+    vec3 specularEnvironmentR90 = vec3(reflectance90);
 
-  // For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
-  // For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
-  float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
-  vec3 specularEnvironmentR0 = specularColor.rgb;
-  vec3 specularEnvironmentR90 = vec3(1.0, 1.0, 1.0) * reflectance90;
+    vec3 v = normalize(cameraPos - worldPos);  // Vector from surface point to camera
 
-  vec3 n = normalize(normal);          // normal at surface point
-  vec3 v = normalize(cameraPos - worldPos);  // Vector from surface point to camera
+    pbrInputs.NdotV = clamp(abs(dot(normal, v)), 0.001, 1.0);
+    pbrInputs.perceptualRoughness = PerceptualRoughness;
+    pbrInputs.reflectance0 = specularEnvironmentR0;
+    pbrInputs.reflectance90 = specularEnvironmentR90;
+    pbrInputs.alphaRoughness = alphaRoughness;
+    pbrInputs.diffuseColor = diffuseColor;
+    pbrInputs.specularColor = specularColor;
+    pbrInputs.n = normal;
+    pbrInputs.v = v;
+
+    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
+
+    // retrieve a scale and bias to F0. See [1], Figure 3
+    vec2 brdfSamplePoint = vec2(pbrInputs.NdotV, pbrInputs.perceptualRoughness);
+    brdfSamplePoint = clamp(brdfSamplePoint, vec2(0.0, 0.0), vec2(1.0, 1.0));
     vec3 brdf = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
 
-  pbrInputs.NdotV = clamp(abs(dot(n, v)), 0.001, 1.0);
-  pbrInputs.perceptualRoughness = perceptualRoughness;
-  pbrInputs.reflectance0 = specularEnvironmentR0;
-  pbrInputs.reflectance90 = specularEnvironmentR90;
-  pbrInputs.alphaRoughness = alphaRoughness;
-  pbrInputs.diffuseColor = diffuseColor;
-  pbrInputs.specularColor = specularColor;
-  pbrInputs.n = n;
-  pbrInputs.v = v;
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
+    vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
+    vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
+    vec3 FssEss = k_S * brdf.x + brdf.y;
 
-  return pbrInputs;
+    pbrInputs.FssEss = FssEss;
+
+
+    return pbrInputs;
 }
 
 vec3 calculatePBRLightContribution( inout PBRInfo pbrInputs, vec3 lightDirection, vec3 lightColor ) {
@@ -532,26 +538,24 @@ void main()
 
     MetallicRoughnessDataGPU mat = GetMaterial();
 
-    vec4 Kao = sampleAO(tc, mat);
-    vec4 Ke  = sampleEmissive(tc, mat);
-    vec4 Kd  = sampleAlbedo(tc, mat) * Color0;
+    vec4 AmbientOcclusion = sampleAO(tc, mat);
+    vec4 EmissiveColor = sampleEmissive(tc, mat);
+    vec4 AlbedoColor = sampleAlbedo(tc, mat) * Color0;
     vec4 mrSample = sampleMetallicRoughness(tc, mat);
+    vec3 normalSample = sampleNormal(tc, mat).xyz;
 
     // world-space normal
     vec3 n = normalize(Normal0);
 
-    vec3 normalSample = sampleNormal(tc, mat).xyz;
-
     // normal mapping
-    n = perturbNormal(n, WorldPos0, normalSample, getNormalUV(tc, mat));
+    n = perturbNormal(n, WorldPos0, normalSample, GetNormalUV(tc, mat));
 
     if (!gl_FrontFacing) n *= -1.0f;
 
-    PBRInfo pbrInputs = calculatePBRInputsMetallicRoughness(Kd, n, gCameraWorldPos, WorldPos0, mrSample);
+    PBRInfo pbrInputs = calculatePBRInputsMetallicRoughness(mat, AlbedoColor, n, gCameraWorldPos, WorldPos0, mrSample);
 
-    vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs, 1.0);
-    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs.NdotV, n, pbrInputs.perceptualRoughness, 
-                                                  pbrInputs.diffuseColor, pbrInputs.reflectance0, 1.0);
+    vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs);
+    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs, AlbedoColor);
     vec3 color = specular_color + diffuse_color;
 
     // one hardcoded light source
@@ -561,10 +565,12 @@ void main()
 
     color += LightContribution;
 
-    // ambient occlusion
-    color = color * ( Kao.r < 0.01 ? 1.0 : Kao.r );
-    // emissive
-    color = Ke.rgb + color;
+    if (AmbientOcclusion.r >= 0.1) {
+        color *= AmbientOcclusion.r;
+    }
+        
+    color += EmissiveColor.rgb;
+
     // convert to sRGB
     color = pow(color, vec3(1.0/2.2) );
 
@@ -572,16 +578,16 @@ void main()
 
 // Uncomment to debug:
 //  out_FragColor = vec4((n + vec3(1.0))*0.5, 1.0);
- // out_FragColor = Kao;
-  //out_FragColor = Ke;
-  //out_FragColor = Kd;
+ // out_FragColor = AmbientOcclusion;
+  //out_FragColor = EmissiveColor;
+  //out_FragColor = AlbedoColor;
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
   //out_FragColor = vec4(diffuse_color, 1.0);
   //out_FragColor = vec4(specular_color, 1.0);
  // out_FragColor = vec4(LightContribution, 1.0);
-//  MeR.x *= getMetallicFactor(mat);
-//  MeR.y *= getRoughnessFactor(mat);
+//  MeR.x *= GetMetallicFactor(mat);
+//  MeR.y *= GetRoughnessFactor(mat);
   //out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);
 //  out_FragColor = mrSample;
 }
