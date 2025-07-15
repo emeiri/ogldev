@@ -358,17 +358,12 @@ vec3 getIBLRadianceLambertian(PBRInfo pbrInputs, vec4 AlbedoColor)
   vec3 irradiance = sampleEnvMapIrradiance(normalize(pbrInputs.n.xyz), envMap).rgb;
 
   //return irradiance;
-  // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
-  // Roughness dependent fresnel, from Fdez-Aguera
-  vec3 Fr = max(vec3(1.0 - pbrInputs.perceptualRoughness), pbrInputs.reflectance0) - pbrInputs.reflectance0;
-  vec3 k_S = pbrInputs.reflectance0 + Fr * pow(1.0 - pbrInputs.NdotV, 5.0);
-  vec3 FssEss = k_S * f_ab.x + f_ab.y; // <--- GGX / specular light contribution (scale it down if the specularWeight is low)
 
   // Multiple scattering, from Fdez-Aguera
   float Ems = (1.0 - (f_ab.x + f_ab.y));
   vec3 F_avg = (pbrInputs.reflectance0 + (1.0 - pbrInputs.reflectance0) / 21.0);
-  vec3 FmsEms = Ems * FssEss * F_avg / (1.0 - F_avg * Ems);
-  vec3 k_D = AlbedoColor.rgb * (1.0 - FssEss + FmsEms); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
+  vec3 FmsEms = Ems * pbrInputs.FssEss * F_avg / (1.0 - F_avg * Ems);
+  vec3 k_D = AlbedoColor.rgb * (1.0 - pbrInputs.FssEss + FmsEms); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
 
   return (FmsEms + k_D) * irradiance;
 }
@@ -490,7 +485,6 @@ PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 a
     vec3 FssEss = k_S * brdf.x + brdf.y;
 
     pbrInputs.FssEss = FssEss;
-
 
     return pbrInputs;
 }
