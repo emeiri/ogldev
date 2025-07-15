@@ -380,6 +380,8 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
                         Light.AmbientIntensity *
                         GetMaterialAmbientColor();
 
+  //  return vec4(Light.AmbientIntensity);
+
     float DiffuseFactor = dot(Normal, -LightDirection);
 
     vec4 DiffuseColor = vec4(0, 0, 0, 0);
@@ -434,6 +436,7 @@ vec4 CalcLightInternal(BaseLight Light, vec3 LightDirection, vec3 Normal,
 vec4 CalcDirectionalLight(vec3 Normal)
 {
     float ShadowFactor = CalcShadowFactor(gDirectionalLight.Direction, Normal, false);
+    //return vec4(ShadowFactor);
     return CalcLightInternal(gDirectionalLight.Base, gDirectionalLight.Direction, Normal, ShadowFactor);
 }
 
@@ -893,14 +896,16 @@ void main()
     
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-    //  FragColor = TempColor * gColorMod + gColorAdd;
+     FragColor = TempColor * gColorMod + gColorAdd;
+
    // FragColor = vec4(1.0);  
-   FragColor = GetTexColor();
-   // FragColor = GetTotalLight(Normal);
+ // FragColor = GetTexColor();
+  //  FragColor = GetTotalLight(Normal);
+  //  FragColor = vec4(gDirectionalLight.Base.AmbientIntensity);
 //    FragColor = texture(gSampler, TexCoord.xy);
    //   FragColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
     //FragColor = texture(gHeightMap, TexCoord0);
-   
+
   //  FragColor = GetMaterialAmbientColor();
   //FragColor = vec4(Normal0, 1.0);
 }

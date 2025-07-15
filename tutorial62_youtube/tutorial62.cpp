@@ -66,7 +66,7 @@ public:
         //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 0.9f;
-        m_dirLight.AmbientIntensity = 0.1f;
+        m_dirLight.AmbientIntensity = 1.0f;
     }
 
     ~SSAODemo() {}
