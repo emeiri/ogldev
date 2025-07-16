@@ -156,7 +156,7 @@ vec3 perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv)
 
 
 struct InputAttributes {
-  vec2 uv[2];
+    vec2 uv[2];
 };
 
 
@@ -353,20 +353,18 @@ struct PBRInfo {
 // specularWeight is introduced with KHR_materials_specular
 vec3 getIBLRadianceLambertian(PBRInfo pbrInputs, vec4 AlbedoColor) 
 {
-  vec2 brdfSamplePoint = clamp(vec2(pbrInputs.NdotV, pbrInputs.perceptualRoughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
   EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
-  vec2 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rg;
 
   vec3 irradiance = sampleEnvMapIrradiance(normalize(pbrInputs.n.xyz), envMap).rgb;
 
-  //return irradiance;
-
   // Multiple scattering, from Fdez-Aguera
-  float Ems = (1.0 - (f_ab.x + f_ab.y));
+  float Ems = (1.0 - (pbrInputs.brdf_scale + pbrInputs.brdf_bias));
   vec3 F_avg = (pbrInputs.reflectance0 + (1.0 - pbrInputs.reflectance0) / 21.0);
-  vec3 FmsEms = Ems * pbrInputs.FssEss * F_avg / (1.0 - F_avg * Ems);
-  vec3 k_D = AlbedoColor.rgb * (1.0 - pbrInputs.FssEss + FmsEms); // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
+  vec3 FmsEms = F_avg * Ems * pbrInputs.FssEss  / (1.0 - F_avg * Ems);
+  // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
+  vec3 k_D = AlbedoColor.rgb * (1.0 - pbrInputs.FssEss + FmsEms); 
 
+  //return irradiance;
   return (FmsEms + k_D) * irradiance;
 }
 
@@ -402,22 +400,25 @@ vec3 diffuseBurley(PBRInfo pbrInputs) {
 
 // The following equation models the Fresnel reflectance term of the spec equation (aka F())
 // Implementation of fresnel from [4], Equation 15
-vec3 specularReflection(PBRInfo pbrInputs) {
-  return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
+vec3 specularReflection(PBRInfo pbrInputs) 
+{
+    return pbrInputs.reflectance0 + (pbrInputs.reflectance90 - pbrInputs.reflectance0) * 
+           pow(clamp(1.0 - pbrInputs.VdotH, 0.0, 1.0), 5.0);
 }
 
 // This calculates the specular geometric attenuation (aka G()),
 // where rougher material will reflect less light back to the viewer.
 // This implementation is based on [1] Equation 4, and we adopt their modifications to
 // alphaRoughness as input as originally proposed in [2].
-float geometricOcclusion(PBRInfo pbrInputs) {
-  float NdotL = pbrInputs.NdotL;
-  float NdotV = pbrInputs.NdotV;
-  float rSqr = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
+float geometricOcclusion(PBRInfo pbrInputs) 
+{
+    float NdotL = pbrInputs.NdotL;
+    float NdotV = pbrInputs.NdotV;
+    float rSqr = pbrInputs.alphaRoughness * pbrInputs.alphaRoughness;
 
-  float attenuationL = 2.0 * NdotL / (NdotL + sqrt(rSqr + (1.0 - rSqr) * (NdotL * NdotL)));
-  float attenuationV = 2.0 * NdotV / (NdotV + sqrt(rSqr + (1.0 - rSqr) * (NdotV * NdotV)));
-  return attenuationL * attenuationV;
+    float attenuationL = 2.0 * NdotL / (NdotL + sqrt(rSqr + (1.0 - rSqr) * (NdotL * NdotL)));
+    float attenuationV = 2.0 * NdotV / (NdotV + sqrt(rSqr + (1.0 - rSqr) * (NdotV * NdotV)));
+    return attenuationL * attenuationV;
 }
 
 // The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
@@ -430,7 +431,7 @@ float microfacetDistribution(PBRInfo pbrInputs) {
 }
 
 
-vec3 CalcSchlickFresnel(PBRInfo pbrInputs)
+vec3 CalcSchlickFresnel(inout PBRInfo pbrInputs)
 {
     EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
 
@@ -451,7 +452,8 @@ vec3 CalcSchlickFresnel(PBRInfo pbrInputs)
 }
 
 
-PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 albedo, vec3 normal, vec3 cameraPos, vec3 worldPos, vec4 mrSample) 
+PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, 
+                                            vec4 albedo, vec3 normal, vec4 mrSample) 
 {
     PBRInfo pbrInputs;
 
@@ -483,7 +485,7 @@ PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 a
     vec3 specularEnvironmentR0 = specularColor.rgb;
     vec3 specularEnvironmentR90 = vec3(reflectance90);
 
-    vec3 v = normalize(cameraPos - worldPos);  // Vector from surface point to camera
+    vec3 v = normalize(gCameraWorldPos - WorldPos0);  // Vector from surface point to camera
 
     pbrInputs.NdotV = clamp(abs(dot(normal, v)), 0.001, 1.0);
     pbrInputs.perceptualRoughness = PerceptualRoughness;
@@ -500,7 +502,8 @@ PBRInfo calculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat, vec4 a
     return pbrInputs;
 }
 
-vec3 calculatePBRLightContribution( inout PBRInfo pbrInputs, vec3 lightDirection, vec3 lightColor ) {
+vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 lightDirection, vec3 lightColor) 
+{
   vec3 n = pbrInputs.n;
   vec3 v = pbrInputs.v;
   vec3 ld = normalize(lightDirection);  // Vector from surface point to light
@@ -557,18 +560,17 @@ void main()
 
     if (!gl_FrontFacing) n *= -1.0f;
 
-    PBRInfo pbrInputs = calculatePBRInputsMetallicRoughness(mat, AlbedoColor, n, gCameraWorldPos, WorldPos0, mrSample);
+    PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(mat, AlbedoColor, n, mrSample);
 
     vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs);
     vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs, AlbedoColor);
-    vec3 color = specular_color + diffuse_color;
 
     // one hardcoded light source
     vec3 lightPos = vec3(0, 0, -5);
 
     vec3 LightContribution = calculatePBRLightContribution( pbrInputs, normalize(lightPos - WorldPos0), vec3(1.0) );
 
-    color += LightContribution;
+    vec3 color = specular_color + diffuse_color + LightContribution;
 
     if (AmbientOcclusion.r >= 0.1) {
         color *= AmbientOcclusion.r;
