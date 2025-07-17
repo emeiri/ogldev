@@ -45,6 +45,7 @@ public:
     void ControlShadows(bool ShadowsEnabled);
     void ControlIndirectRender(bool IsRenderIndirect);
     void ControlPVP(bool IsPVP);
+    void SetNumLights(int NumLights);
     virtual void SetMaterial(const Material& material) = 0;
 
 protected:
@@ -65,5 +66,6 @@ private:
     GLuint IsIndirectRenderLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsPVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint VPLoc = INVALID_UNIFORM_LOCATION;
+    GLuint NumLightsLoc = INVALID_UNIFORM_LOCATION;
 };
 

@@ -28,10 +28,12 @@
 
 extern bool UsePVP;
 extern bool UseIndirectRender;
-
 static bool UseGLTFPBR = false;
-static bool DisableSSAO = false;
+static bool DisableSSAO = true;
 static bool UseBlitForFinalCopy = true;
+
+#define SSAO_UBO_INDEX  0
+#define LIGHT_UBO_INDEX 1
 
 struct CameraDirection
 {
@@ -116,6 +118,10 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
     m_ssaoFBO.Init(m_windowWidth, m_windowHeight, 3, false);
 
     m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
+
+    m_lightSources.resize(MAX_NUM_LIGHTS);
+
+    m_lightParams.InitBuffer(ARRAY_SIZE_IN_BYTES(m_lightSources), NULL, GL_DYNAMIC_STORAGE_BIT);
 
     m_ssaoRotTexture.Load("../Content/textures/rot_texture.bmp", false);
 
@@ -284,6 +290,7 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 
 void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
 {
+    // TODO: can be removed? happens also at the start of the LightingPass
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
         glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
@@ -298,12 +305,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     }
 
     if (pScene->GetRenderList().size() == 0) {
-        if (pScene->GetConfig()->IsSkyboxEnabled()) {
-            m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
-        } else {
-            printf("Warning! render list is empty and no main model or skybox\n");
-        }
-        
+        HandleEmptyRenderList(pScene);        
         return;
     }
 
@@ -314,6 +316,15 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         pScene->GetConfig()->ControlPicking(false);
     }
 
+    ExecuteRenderGraph(pScene, TotalRuntimeMillis);
+
+    pGameCallbacks->OnFrameEnd();
+
+    m_curRenderPass = RENDER_PASS_UNINITIALIZED;
+}
+
+void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
+{
     ShadowMapPass(pScene);
 
     LightingPass(pScene, TotalRuntimeMillis);
@@ -326,18 +337,26 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         NormalPass(pScene);
         SSAOPass(pScene);
         SSAOCombinePass();
-    } else {
+    }
+    else {
         if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             m_lightingFBO.BlitToWindow();
-        } else {
+        }
+        else {
             FullScreenQuadBlit();
         }
-    }    
+    }
+}
 
-    pGameCallbacks->OnFrameEnd();
-
-    m_curRenderPass = RENDER_PASS_UNINITIALIZED;
+void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
+{
+    if (pScene->GetConfig()->IsSkyboxEnabled()) {
+        m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
+    }
+    else {
+        printf("Warning! render list is empty and no main model or skybox\n");
+    }
 }
 
 
@@ -380,25 +399,23 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 
 void ForwardRenderer::ApplyLighting(GLScene* pScene)
 {
+    UpdateLightSources(pScene);
+
     if (UseGLTFPBR) {
         m_pCurBaseLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
         return;
     }
 
-    int NumLightsTotal = 0;
-
     int NumPointLights = (int)pScene->GetPointLights().size();
 
     if (NumPointLights > 0) {
         m_pCurLightingTech->SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
-        NumLightsTotal += NumPointLights;
     }
 
     int NumSpotLights = (int)pScene->GetSpotLights().size();
 
     if (NumSpotLights > 0) {
         m_pCurLightingTech->SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
-        NumLightsTotal += NumSpotLights;
     }
 
     int NumDirLights = (int)pScene->GetDirLights().size();
@@ -406,16 +423,75 @@ void ForwardRenderer::ApplyLighting(GLScene* pScene)
     if (NumDirLights > 0) {
         const DirectionalLight& DirLight = pScene->GetDirLights()[0];
         m_pCurLightingTech->SetDirectionalLight(DirLight, true);
-        NumLightsTotal += NumDirLights;
     }
-
-    bool LightingEnabled = (NumLightsTotal > 0);
-    
+   
     //if (!LightingEnabled) printf("Warning! trying to render but all lights are zero\n");
     
-    m_pCurLightingTech->ControlLighting(LightingEnabled);
     m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
 }
+
+
+void ForwardRenderer::UpdateLightSources(GLScene* pScene)
+{
+    SetupLightSourcesArray(pScene);
+
+    // TODO: can update only the correct number of lights
+    m_lightParams.Update(m_lightSources.data(), ARRAY_SIZE_IN_BYTES(m_lightSources));
+}
+
+
+void ForwardRenderer::SetupLightSourcesArray(GLScene* pScene)
+{
+    int LightIndex = 0;
+
+    for (const SpotLight& l : pScene->GetSpotLights()) {
+        assert(LightIndex < MAX_NUM_LIGHTS);
+        m_lightSources[LightIndex].LightType = LIGHT_TYPE_SPOT;
+        m_lightSources[LightIndex].AmbientIntensity = l.AmbientIntensity;
+        m_lightSources[LightIndex].Atten_Constant = l.Attenuation.Constant;
+        m_lightSources[LightIndex].Atten_Linear = l.Attenuation.Linear;
+        m_lightSources[LightIndex].Atten_Exp = l.Attenuation.Exp;
+        m_lightSources[LightIndex].Color = l.Color.ToGLM();
+        m_lightSources[LightIndex].Cutoff = l.Cutoff;
+        m_lightSources[LightIndex].DiffuseIntensity = l.DiffuseIntensity;
+        m_lightSources[LightIndex].Direction = l.WorldDirection.ToGLM();
+        m_lightSources[LightIndex].WorldPos = l.WorldPosition.ToGLM();
+        LightIndex++;
+    }
+
+    for (const DirectionalLight& l : pScene->GetDirLights()) {
+        assert(LightIndex < MAX_NUM_LIGHTS);
+        m_lightSources[LightIndex].LightType = LIGHT_TYPE_DIR;
+        m_lightSources[LightIndex].AmbientIntensity = l.AmbientIntensity;
+        m_lightSources[LightIndex].Atten_Constant = 0.0f;
+        m_lightSources[LightIndex].Atten_Linear = 0.0f;
+        m_lightSources[LightIndex].Atten_Exp = 0.0f;
+        m_lightSources[LightIndex].Color = l.Color.ToGLM();
+        m_lightSources[LightIndex].Cutoff = 0.0f;
+        m_lightSources[LightIndex].DiffuseIntensity = l.DiffuseIntensity;
+        m_lightSources[LightIndex].Direction = l.WorldDirection.ToGLM();
+        m_lightSources[LightIndex].WorldPos = glm::vec3(0.0f);
+        LightIndex++;
+    }
+
+    for (const PointLight& l : pScene->GetPointLights()) {
+        assert(LightIndex < MAX_NUM_LIGHTS);
+        m_lightSources[LightIndex].LightType = LIGHT_TYPE_POINT;
+        m_lightSources[LightIndex].AmbientIntensity = l.AmbientIntensity;
+        m_lightSources[LightIndex].Atten_Constant = l.Attenuation.Constant;
+        m_lightSources[LightIndex].Atten_Linear = l.Attenuation.Linear;
+        m_lightSources[LightIndex].Atten_Exp = l.Attenuation.Exp;
+        m_lightSources[LightIndex].Color = l.Color.ToGLM();
+        m_lightSources[LightIndex].Cutoff = 0.0f;
+        m_lightSources[LightIndex].DiffuseIntensity = l.DiffuseIntensity;
+        m_lightSources[LightIndex].Direction = glm::vec3(0.0f);
+        m_lightSources[LightIndex].WorldPos = l.WorldPosition.ToGLM();
+        LightIndex++;
+    }
+
+    m_pCurBaseLightingTech->SetNumLights(LightIndex);
+}
+
 
 void ForwardRenderer::PickingPass(void* pWindow, GLScene* pScene)
 {
@@ -502,20 +578,19 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
     if (NumDirLights > 0) {
         const std::vector<DirectionalLight>& DirLights = pScene->GetDirLights();
 
-        if (NumDirLights == 1) {
-            OrthoProjInfo LightOrthoProjInfo;
-            Vector3f LightWorldPos;
+        OrthoProjInfo LightOrthoProjInfo;
+        Vector3f LightWorldPos;
 
-            CalcTightLightProjection(m_pCurCamera->GetViewMatrix(),   // in
-                DirLights[0].WorldDirection,     // in
-                m_pCurCamera->GetPersProjInfo(), // in
-                LightWorldPos,                   // out
-                LightOrthoProjInfo);             // out
+        CalcTightLightProjection(m_pCurCamera->GetViewMatrix(),   // in
+            DirLights[0].WorldDirection,     // in
+            m_pCurCamera->GetPersProjInfo(), // in
+            LightWorldPos,                   // out
+            LightOrthoProjInfo);             // out
 
-            Vector3f Up(0.0f, 1.0f, 0.0f);
-            m_lightViewMatrix.InitCameraTransform(LightWorldPos, DirLights[0].WorldDirection, Up);
-        }
-        else if (DirLights.size() > 1) {
+        Vector3f Up(0.0f, 1.0f, 0.0f);
+        m_lightViewMatrix.InitCameraTransform(LightWorldPos, DirLights[0].WorldDirection, Up);
+
+        if (DirLights.size() > 1) {
             printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
         }
     }
@@ -611,7 +686,9 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    BindShadowMap();
+    BindShadowMaps();
+
+    m_lightParams.BindUBO(LIGHT_UBO_INDEX);
   
     if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
@@ -620,7 +697,8 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
     RenderObjectList(pScene, TotalRuntimeMillis);
 }
 
-void ForwardRenderer::BindShadowMap()
+
+void ForwardRenderer::BindShadowMaps()
 {
     switch (m_curRenderPass) {
     case RENDER_PASS_SHADOW_DIR:
@@ -798,7 +876,7 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
 
     m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f));
 
-    m_ssaoParams.BindUBO(0);
+    m_ssaoParams.BindUBO(SSAO_UBO_INDEX);
 
     SSAOParamsInternal Params;
     Params.params = pScene->GetConfig()->GetSSAOParams();

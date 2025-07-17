@@ -66,9 +66,15 @@ public:
     Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Carbonara")
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 1.0f;
-        m_dirLight.AmbientIntensity = 1.0f;
+        m_dirLight[0].Color = Vector3f(0.0f, 1.0f, 0.0f);
+        m_dirLight[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight[0].DiffuseIntensity = 1.0f;
+        m_dirLight[0].AmbientIntensity = 0.0f;
+
+        m_dirLight[1].Color = Vector3f(1.0f, 0.0f, 0.0f);
+        m_dirLight[1].WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
+        m_dirLight[1].DiffuseIntensity = 1.0f;
+        m_dirLight[1].AmbientIntensity = 0.0f;
 
         m_pointLight.WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
      //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
@@ -102,7 +108,8 @@ public:
       //  m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
-        m_pScene->GetDirLights().push_back(m_dirLight);        
+        m_pScene->GetDirLights().push_back(m_dirLight[0]);
+        m_pScene->GetDirLights().push_back(m_dirLight[1]);
         //m_pScene->GetPointLights().push_back(m_pointLight);
       //  m_pScene->GetSpotLights().push_back(m_spotLight);
 
@@ -439,7 +446,7 @@ private:
 
     float m_count = 0.0f;
 
-    DirectionalLight m_dirLight;
+    DirectionalLight m_dirLight[2];
     PointLight m_pointLight;
     SpotLight m_spotLight;
     bool m_leftMousePressed = false;
@@ -853,9 +860,9 @@ public:
 
      //   m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
       //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
-         Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
+      //   Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
 
-      // Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+       Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
         
         SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
@@ -985,7 +992,7 @@ public:
         int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
         pConfig->SetIrradianceMap(IrrdianceMap);
 
-        m_pModel->SetPBR(true);
+//        m_pModel->SetPBR(true);
 
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);

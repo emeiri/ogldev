@@ -72,7 +72,6 @@ public:
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
     void SetFogTime(float Time);
-    void ControlLighting(bool LightingEnabled);	
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
     void ControlRefRefract(bool Enable);
@@ -118,7 +117,6 @@ private:
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
     GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
-    GLuint LightingEnabledLoc = INVALID_UNIFORM_LOCATION;	
     GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
     GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
     GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;

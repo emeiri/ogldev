@@ -62,6 +62,38 @@ enum LIGHTING_TECHNIQUE {
 };
 
 
+enum LIGHT_TYPE {
+    LIGHT_TYPE_DIR,
+    LIGHT_TYPE_POINT,
+    LIGHT_TYPE_SPOT
+};
+
+
+struct LightSource {
+    // Offset 0
+    glm::vec3 Color;                // ALL                12 bytes
+    LIGHT_TYPE LightType;           // ALL                4 bytes
+
+    // Offset 16
+    glm::vec3 Direction;            // Dir and spot       12 bytes
+    float AmbientIntensity;         // ALL                4 bytes
+
+    // Offset 32
+    glm::vec3 WorldPos;             // spot and point     12 bytes
+    float DiffuseIntensity;         // ALL                4 bytes
+
+    // Offset 48
+    float Atten_Constant;           // Spot and point     4 bytes
+    float Atten_Linear;             // Spot and point     4 bytes
+    float Atten_Exp;             // Spot and point     4 bytes
+    float Cutoff;                   // spot               4 bytes
+};
+
+
+static_assert(sizeof(LightSource) == 64, "LightSource struct must be 64 bytes");
+
+#define MAX_NUM_LIGHTS 4
+
 class RenderingSystemGL;
 
 class ForwardRenderer : public DemolitionRenderCallbacks {
@@ -104,6 +136,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
  
 private:
 
+    void HandleEmptyRenderList(GLScene* pScene);
+    void ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis);
     void PickingPass(void* pWindow, GLScene* pScene);
     void PickingRenderScene(GLScene* pScene);
     int GetPickedObjectIndex(void* pWindow, GLScene* pScene);
@@ -114,10 +148,12 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void NormalPass(GLScene* pScene);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
+    void UpdateLightSources(GLScene* pScene);
+    void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
     void FullScreenQuadBlit();
-    void BindShadowMap();
+    void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderWithFlatColor(CoreSceneObject* pSceneObject);
@@ -153,6 +189,8 @@ private:
     Framebuffer m_ssaoFBO;
     GLBuffer m_ssaoParams;
     Texture m_ssaoRotTexture;
+    GLBuffer m_lightParams;
+    std::vector<LightSource> m_lightSources;
 
     // Shadow stuff
     FramebufferObject m_shadowMapFBO;

@@ -28,34 +28,18 @@ BaseLightingTechnique::BaseLightingTechnique()
 
 bool BaseLightingTechnique::Init()
 {
-    WVPLoc = GetUniformLocation("gWVP");
-    WorldMatrixLoc = GetUniformLocation("gWorld");
-    NormalMatrixLoc = GetUniformLocation("gNormalMatrix");
-    LightWVPLoc = GetUniformLocation("gLightWVP");
-    HasNormalMapLoc = GetUniformLocation("gHasNormalMap");
-    CameraWorldPosLoc = GetUniformLocation("gCameraWorldPos");
-    
-   // GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
-    //GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
+    GET_UNIFORM_AND_CHECK(WVPLoc, "gWVP");
+    GET_UNIFORM_AND_CHECK(WorldMatrixLoc, "gWorld");
+    GET_UNIFORM_AND_CHECK(NormalMatrixLoc, "gNormalMatrix");
+    GET_UNIFORM_AND_CHECK(LightWVPLoc, "gLightWVP");
+    GET_UNIFORM_AND_CHECK(HasNormalMapLoc, "gHasNormalMap");
+    GET_UNIFORM_AND_CHECK(CameraWorldPosLoc, "gCameraWorldPos");
     GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
     GET_UNIFORM_AND_CHECK(IsIndirectRenderLoc, "gIsIndirectRender");
     GET_UNIFORM_AND_CHECK(IsPVPLoc, "gIsPVP");
     GET_UNIFORM_AND_CHECK(VPLoc, "gVP");
     GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
-   // GET_UNIFORM_AND_CHECK(AOLoc, "gAO");
-   // GET_UNIFORM_AND_CHECK(EmissiveLoc, "gEmissive");
-  //  GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
-
-    if (WVPLoc == INVALID_UNIFORM_LOCATION ||
-        WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
-        NormalMatrixLoc == INVALID_UNIFORM_LOCATION ||
-        LightWVPLoc == INVALID_UNIFORM_LOCATION ||  // required only for shadow mapping
-        HasNormalMapLoc == INVALID_UNIFORM_LOCATION ||
-        CameraWorldPosLoc == INVALID_UNIFORM_LOCATION) {
-#ifdef FAIL_ON_MISSING_LOC
-        return false;
-#endif
-    }
+    GET_UNIFORM_AND_CHECK(NumLightsLoc, "gNumLights");
 
     return true;
 }
@@ -118,6 +102,12 @@ void BaseLightingTechnique::ControlIndirectRender(bool IsIndirectRender)
 void BaseLightingTechnique::ControlPVP(bool IsPVP)
 {
     glUniform1i(IsPVPLoc, IsPVP);
+}
+
+
+void BaseLightingTechnique::SetNumLights(int NumLights)
+{
+    glUniform1i(NumLightsLoc, NumLights);
 }
 
 

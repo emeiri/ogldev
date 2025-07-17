@@ -91,7 +91,6 @@ bool ForwardLightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(PBRMaterialLoc.IsMetal, "gPBRmaterial.IsMetal");
     GET_UNIFORM_AND_CHECK(PBRMaterialLoc.Color, "gPBRmaterial.Color");
     GET_UNIFORM_AND_CHECK(PBRMaterialLoc.IsAlbedo, "gPBRmaterial.IsAlbedo");
-    LightingEnabledLoc = GetUniformLocation("gLightingEnabled");
     
    // GET_UNIFORM_AND_CHECK(HeightMapLoc, "gHeightMap");
     //GET_UNIFORM_AND_CHECK(HasHeightMapLoc, "gHasHeightMap");
@@ -139,8 +138,7 @@ bool ForwardLightingTechnique::InitCommon()
         LayeredFogTopLoc == INVALID_UNIFORM_LOCATION ||
         FogTimeLoc == INVALID_UNIFORM_LOCATION ||
         ColorModLocation == INVALID_UNIFORM_LOCATION ||
-        ColorAddLocation == INVALID_UNIFORM_LOCATION ||
-        LightingEnabledLoc == INVALID_UNIFORM_LOCATION) {
+        ColorAddLocation == INVALID_UNIFORM_LOCATION) {
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
@@ -591,12 +589,6 @@ void ForwardLightingTechnique::SetRefractETA(float eta)
 void ForwardLightingTechnique::SetFresnelPower(float f)
 {
     glUniform1f(FresnelPowerLoc, f);
-}
-
-
-void ForwardLightingTechnique::ControlLighting(bool LightingEnabled)
-{
-    glUniform1i(LightingEnabledLoc, LightingEnabled);
 }
 
 
