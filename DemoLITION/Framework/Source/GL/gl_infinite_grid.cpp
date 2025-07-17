@@ -35,6 +35,8 @@ void InfiniteGrid::Init(int ShadowMapTextureUnit)
 
     m_infiniteGridTech.Enable();
     m_infiniteGridTech.SetShadowMapTextureUnit(ShadowMapTextureUnit);
+
+    glGenVertexArrays(1, &m_dummyVAO);
 }
 
 
@@ -56,10 +58,14 @@ void InfiniteGrid::Render(const InfiniteGridConfig& Config,
     m_infiniteGridTech.SetLightDirection(LightDir);
     m_infiniteGridTech.ControlShadows(Config.ShadowsEnabled);
 
+    glBindVertexArray(m_dummyVAO);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
     glDisable(GL_BLEND);
+
+    glBindVertexArray(0);
 
     glUseProgram(CurProg);
 }

@@ -37,5 +37,6 @@ public:
 
 private:
 
+    GLuint m_dummyVAO = -1;
     InfiniteGridTechnique m_infiniteGridTech;
 };
