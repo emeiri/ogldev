@@ -70,11 +70,6 @@ struct BaseLight
     float DiffuseIntensity;
 };
 
-struct DirectionalLight
-{
-    BaseLight Base;
-    vec3 Direction;
-};
 
 struct Attenuation
 {
@@ -133,9 +128,6 @@ struct PBRMaterial
 
 
 uniform int gNumLights = 0;
-uniform DirectionalLight gDirectionalLight;
-uniform int gNumPointLights;
-uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform int gNumSpotLights;
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform MaterialColor gMaterial;
@@ -820,9 +812,9 @@ vec3 getNormalFromMap()
 
 
 
-vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
+vec3 CalcPBRLighting(int Index, vec3 PosDir, bool IsDirLight, vec3 Normal)
 {
-    vec3 LightIntensity = Light.Color * Light.DiffuseIntensity;
+    vec3 LightIntensity = Lights[Index].Color * Lights[Index].DiffuseIntensity;
 
     vec3 l = vec3(0.0);
 
@@ -878,24 +870,31 @@ vec3 CalcPBRLighting(BaseLight Light, vec3 PosDir, bool IsDirLight, vec3 Normal)
 }
 
 
-vec3 CalcPBRDirectionalLight(vec3 Normal)
+vec3 CalcPBRDirectionalLight(int Index, vec3 Normal)
 {
-    return CalcPBRLighting(gDirectionalLight.Base, gDirectionalLight.Direction, true, Normal);
+    return CalcPBRLighting(Index, Lights[Index].Direction, true, Normal);
 }
 
 
-vec3 CalcPBRPointLight(PointLight l, vec3 Normal)
+vec3 CalcPBRPointLight(int Index, vec3 Normal)
 {
-    return CalcPBRLighting(l.Base, l.WorldPos, false, Normal);
+    return CalcPBRLighting(Index, Lights[Index].WorldPos, false, Normal);
 }
 
 
 vec4 CalcTotalPBRLighting(vec3 Normal)
 {
-    vec3 TotalLight = CalcPBRDirectionalLight(Normal);
+    vec3 TotalLight = vec3(0.0);
 
-    for (int i = 0 ;i < gNumPointLights ;i++) {
-        TotalLight += CalcPBRPointLight(gPointLights[i], Normal);
+    for (int i = 0 ; i < gNumLights ; i++) {
+        switch (Lights[i].LightType) {
+            case LIGHT_TYPE_DIR:
+                TotalLight += CalcPBRDirectionalLight(i, Normal);
+                break;
+            case LIGHT_TYPE_POINT:
+                TotalLight += CalcPBRPointLight(i, Normal);
+                break;
+        }
     }
 
     // HDR tone mapping
