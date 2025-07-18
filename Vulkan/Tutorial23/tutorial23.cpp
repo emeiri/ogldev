@@ -302,44 +302,9 @@ private:
 			.depthStencil = {.depth = 1.0f, .stencil = 0 }
 		};
 
-		VkRenderingAttachmentInfoKHR ColorAttachment = {
-			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
-			.pNext = NULL,
-			.imageView = m_vkCore.GetImageView(ImageIndex),
-			.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-			.resolveMode = VK_RESOLVE_MODE_NONE,
-			.resolveImageView = VK_NULL_HANDLE,
-			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.clearValue = ClearColor
-		};
-
-		VkRenderingAttachmentInfo DepthAttachment = {
-			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-			.pNext = NULL,
-			.imageView = m_vkCore.GetDepthView(ImageIndex),
-			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-			.resolveMode = VK_RESOLVE_MODE_NONE,
-			.resolveImageView = VK_NULL_HANDLE,
-			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-			.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-			.clearValue = DepthValue,
-		};
-
-		VkRenderingInfoKHR RenderingInfo = {
-			.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
-			.renderArea = { {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT} },
-			.layerCount = 1,
-			.viewMask = 0,
-			.colorAttachmentCount = 1,
-			.pColorAttachments = &ColorAttachment,
-			.pDepthAttachment = &DepthAttachment
-		};
-
-		vkCmdBeginRendering(CmdBuf, &RenderingInfo);
+		m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, &ClearColor, &DepthValue);
 	}
+
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		

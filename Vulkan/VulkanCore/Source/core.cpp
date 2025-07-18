@@ -1033,6 +1033,55 @@ const VkPhysicalDeviceLimits& VulkanCore::GetPhysicalDeviceLimits() const
 }
 
 
+void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex, VkClearValue* pClearColor, VkClearValue* pDepthValue)
+{
+	VkRenderingAttachmentInfoKHR ColorAttachment = {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
+		.pNext = NULL,
+		.imageView = GetImageView(ImageIndex),
+		.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+		.resolveMode = VK_RESOLVE_MODE_NONE,
+		.resolveImageView = VK_NULL_HANDLE,
+		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.loadOp = pClearColor ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE		
+	};
+
+	if (pClearColor) {
+		ColorAttachment.clearValue = *pClearColor;
+	}
+
+	VkRenderingAttachmentInfo DepthAttachment = {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+		.pNext = NULL,
+		.imageView = GetDepthView(ImageIndex),
+		.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+		.resolveMode = VK_RESOLVE_MODE_NONE,
+		.resolveImageView = VK_NULL_HANDLE,
+		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+		.loadOp = pDepthValue ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,		
+	};
+
+	if (pDepthValue) {
+		DepthAttachment.clearValue = *pDepthValue;
+	}
+
+	VkRenderingInfoKHR RenderingInfo = {
+		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
+		.renderArea = { {0, 0}, {(u32)m_windowWidth, (u32)m_windowHeight} },
+		.layerCount = 1,
+		.viewMask = 0,
+		.colorAttachmentCount = 1,
+		.pColorAttachments = &ColorAttachment,
+		.pDepthAttachment = &DepthAttachment
+	};
+
+	vkCmdBeginRendering(CmdBuf, &RenderingInfo);
+}
+
+
+
 void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
 {
 	void* pMem = NULL;

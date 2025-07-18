@@ -98,6 +98,9 @@ public:
 
 	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
 
+	void BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
+							   VkClearValue* pClearColor, VkClearValue* pDepthValue);
+
 	VkFormat GetSwapChainFormat() const { return m_swapChainSurfaceFormat.format; }
 
 	VkFormat GetDepthFormat() const { return m_physDevices.Selected().m_depthFormat; }
