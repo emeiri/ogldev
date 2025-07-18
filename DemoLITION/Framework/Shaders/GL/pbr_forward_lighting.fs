@@ -488,11 +488,11 @@ PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat,
     return pbrInputs;
 }
 
-vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 lightDirection, vec3 lightColor) 
+vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection, vec3 lightColor) 
 {
   vec3 n = pbrInputs.n;
   vec3 v = pbrInputs.v;
-  vec3 ld = normalize(lightDirection);  // Vector from surface point to light
+  vec3 ld = normalize(LightDirection);  // Vector from surface point to light
   vec3 h = normalize(ld+v);        // Half vector between both l and v
 
   float NdotV = pbrInputs.NdotV;
@@ -551,10 +551,15 @@ void main()
     vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs);
     vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs, AlbedoColor);
 
-    // one hardcoded light source
-    vec3 lightPos = vec3(0, 0, -5);
+    vec3 LightDirection = vec3(1.0, -1.0, 0.0);
+    vec3 LightColor = vec3(1.0);
 
-    vec3 LightContribution = calculatePBRLightContribution( pbrInputs, normalize(lightPos - WorldPos0), vec3(1.0) );
+    if (gNumLights > 0) {
+        LightDirection = normalize(Lights[0].WorldPos - WorldPos0);
+        LightColor = Lights[0].Color;
+    }
+
+    vec3 LightContribution = calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
 
     vec3 color = specular_color + diffuse_color + LightContribution;
 
