@@ -64,9 +64,9 @@ void ImGUIRenderer::Init(VulkanCore* pvkCore)
 }
 
 
-ImGUIRenderer::~ImGUIRenderer()
+void ImGUIRenderer::Destroy()
 {
-	m_pvkCore->FreeCommandBuffers(1, &m_cmdBuf);
+	m_pvkCore->FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
 
 	vkDestroyDescriptorPool(m_pvkCore->GetDevice(), m_descriptorPool, NULL);
 
@@ -155,14 +155,15 @@ void ImGUIRenderer::InitImGUI()
 
 	ImGui_ImplVulkan_Init(&InitInfo);
 
-	m_pvkCore->CreateCommandBuffers(1, &m_cmdBuf);
+	m_cmdBufs.resize(m_pvkCore->GetNumImages());
+	m_pvkCore->CreateCommandBuffers(m_pvkCore->GetNumImages(), m_cmdBufs.data());
 	//InitImGUIFontsTexture();
 }
 
 
 void ImGUIRenderer::InitImGUIFontsTexture()
 {	
-	m_pvkCore->CreateCommandBuffers(1, &m_cmdBuf);
+	/*m_pvkCore->CreateCommandBuffers(1, &m_cmdBuf);
 
 	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
@@ -174,7 +175,7 @@ void ImGUIRenderer::InitImGUIFontsTexture()
 	m_pvkCore->GetQueue()->SubmitSync(m_cmdBuf);
 	m_pvkCore->GetQueue()->WaitIdle();
 
-	//ImGui_ImplVulkan_DestroyFontUploadObjects();
+	//ImGui_ImplVulkan_DestroyFontUploadObjects();*/
 }
 
 
@@ -212,21 +213,21 @@ void ImGUIRenderer::OnFrame(int Image)
 	ImGui::Render();
 	ImDrawData* draw_data = ImGui::GetDrawData();
 
-	VkResult result = vkResetCommandBuffer(m_cmdBuf, 0);
-	CHECK_VK_RESULT(result, "vkResetCommandBuffer");
+	//VkResult result = vkResetCommandBuffer(m_cmdBuf, 0);
+	//CHECK_VK_RESULT(result, "vkResetCommandBuffer");
 
-	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+	BeginCommandBuffer(m_cmdBufs[Image], VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	m_pvkCore->BeginDynamicRendering(m_cmdBuf, Image, NULL, NULL);
+	m_pvkCore->BeginDynamicRendering(m_cmdBufs[Image], Image, NULL, NULL);
 
-	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBuf);
+	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBufs[Image]);
 	
-	vkCmdEndRendering(m_cmdBuf);
+	vkCmdEndRendering(m_cmdBufs[Image]);
 
-	OgldevVK::ImageMemBarrier(m_cmdBuf, m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
+	OgldevVK::ImageMemBarrier(m_cmdBufs[Image], m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
 							  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
-	vkEndCommandBuffer(m_cmdBuf);
+	vkEndCommandBuffer(m_cmdBufs[Image]);
 }
 
 

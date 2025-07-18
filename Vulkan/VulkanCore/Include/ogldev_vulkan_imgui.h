@@ -31,13 +31,15 @@ class ImGUIRenderer  {
 public:
 	ImGUIRenderer();
 
-	~ImGUIRenderer();
+	~ImGUIRenderer() {};
 
 	void Init(VulkanCore* pvkCore);
 
+	void Destroy();
+
 	void OnFrame(int Image);
 
-	VkCommandBuffer GetCommandBuffer() const { return m_cmdBuf; }
+	VkCommandBuffer GetCommandBuffer(int Index) const { return m_cmdBufs[Index]; }
 
 private:
 
@@ -51,7 +53,7 @@ private:
 	VkDevice m_device = NULL;
 	int m_framebufferWidth = 0;
 	int m_framebufferHeight = 0;
-	VkCommandBuffer m_cmdBuf = NULL;
+	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkDescriptorPool m_descriptorPool = NULL;
 };
 

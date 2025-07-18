@@ -63,6 +63,8 @@ public:
 		delete m_pPipeline;
 			
 		m_model.Destroy();
+
+		m_imGUIRenderer.Destroy();
 	}
 
 	void Init(const char* pAppName)
@@ -94,7 +96,8 @@ public:
 		if (m_showGui) {		
 			m_imGUIRenderer.OnFrame(ImageIndex);
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], m_imGUIRenderer.GetCommandBuffer() };
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], 
+				                          m_imGUIRenderer.GetCommandBuffer(ImageIndex) };
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
