@@ -32,11 +32,15 @@
 
 static void check_vk_result(VkResult err)
 {
-	if (err == 0)
+	if (err == 0) {
 		return;
+	}
+		
 	fprintf(stderr, "[vulkan] Error: VkResult = %d\n", err);
-	if (err < 0)
+
+	if (err < 0) {
 		abort();
+	}
 }
 
 bool IsMouseControlledByImGUI()
@@ -113,14 +117,12 @@ void ImGUIRenderer::InitImGUI()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos; 
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;     
 
-	//io.Fonts->AddFontDefault();
-	//io.Fonts->Build();
+	ImGui::GetStyle().FontScaleMain = 1.5f;
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
 
-	 // Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForVulkan(m_pvkCore->GetWindow(), true);
 
 	VkFormat ColorFormat = m_pvkCore->GetSwapChainFormat();
@@ -157,25 +159,6 @@ void ImGUIRenderer::InitImGUI()
 
 	m_cmdBufs.resize(m_pvkCore->GetNumImages());
 	m_pvkCore->CreateCommandBuffers(m_pvkCore->GetNumImages(), m_cmdBufs.data());
-	//InitImGUIFontsTexture();
-}
-
-
-void ImGUIRenderer::InitImGUIFontsTexture()
-{	
-	/*m_pvkCore->CreateCommandBuffers(1, &m_cmdBuf);
-
-	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-	//ImGui_ImplVulkan_CreateFontsTexture(m_cmdBuf);
-
-	VkResult res = vkEndCommandBuffer(m_cmdBuf);
-	CHECK_VK_RESULT(res, "vkEndCommandBuffer");
-
-	m_pvkCore->GetQueue()->SubmitSync(m_cmdBuf);
-	m_pvkCore->GetQueue()->WaitIdle();
-
-	//ImGui_ImplVulkan_DestroyFontUploadObjects();*/
 }
 
 
@@ -211,15 +194,12 @@ void ImGUIRenderer::OnFrame(int Image)
 	ImGui::End();
 
 	ImGui::Render();
-	ImDrawData* draw_data = ImGui::GetDrawData();
-
-	//VkResult result = vkResetCommandBuffer(m_cmdBuf, 0);
-	//CHECK_VK_RESULT(result, "vkResetCommandBuffer");
-
+	
 	BeginCommandBuffer(m_cmdBufs[Image], VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	m_pvkCore->BeginDynamicRendering(m_cmdBufs[Image], Image, NULL, NULL);
 
+	ImDrawData* draw_data = ImGui::GetDrawData();
 	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBufs[Image]);
 	
 	vkCmdEndRendering(m_cmdBufs[Image]);

@@ -47,8 +47,6 @@ private:
 
 	void InitImGUI();
 
-	void InitImGUIFontsTexture();
-
 	VulkanCore* m_pvkCore = NULL;
 	VkDevice m_device = NULL;
 	int m_framebufferWidth = 0;
