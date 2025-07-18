@@ -34,6 +34,9 @@ public:
 
     virtual bool Init();
 
+    virtual void SetMaterial(const Material& material);
+    virtual void ControlSpecularExponent(bool IsEnabled);
+		
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetShadowCubeMapTextureUnit(unsigned int TextureUnit);
@@ -50,15 +53,11 @@ public:
     void SetNormalMapTextureUnit(int TextureUnit);
     void SetHeightMapTextureUnit(int TextureUnit);
     void SetSkyboxTextureUnit(int TextureUnit);
-    void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
-    void UpdateDirLightDirection(const DirectionalLight& DirLight);
-    void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
-    virtual void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
     void SetColorAdd(const Vector4f& ColorAdd);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
-    virtual void ControlSpecularExponent(bool IsEnabled);
+
     void SetLinearFog(float FogStart, float FogEnd);
     void SetExpFog(float FogEnd, float FogDensity);
     void SetExpSquaredFog(float FogEnd, float FogDensity);

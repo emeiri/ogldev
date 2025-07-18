@@ -105,11 +105,6 @@ void BaseLightingTechnique::ControlPVP(bool IsPVP)
 }
 
 
-void BaseLightingTechnique::SetNumLights(int NumLights)
-{
-    glUniform1i(NumLightsLoc, NumLights);
-}
-
 
 void BaseLightingTechnique::SetVP(const Matrix4f& VP)
 {
@@ -121,4 +116,11 @@ void BaseLightingTechnique::SetLightVP(const Matrix4f& LightVP)
 {
     glUniformMatrix4fv(LightVPLoc, 1, GL_TRUE, (const GLfloat*)LightVP.m);
 }
+
+
+void BaseLightingTechnique::SetNumLights(int NumLights)
+{
+    glUniform1i(NumLightsLoc, NumLights);
+}
+
 

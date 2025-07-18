@@ -33,6 +33,8 @@ public:
 
     virtual bool Init();
 
+    virtual void SetMaterial(const Material& material) = 0;
+	
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetNormalMatrix(const Matrix3f& NormalMatrix);
@@ -46,7 +48,6 @@ public:
     void ControlIndirectRender(bool IsRenderIndirect);
     void ControlPVP(bool IsPVP);
     void SetNumLights(int NumLights);
-    virtual void SetMaterial(const Material& material) = 0;
 
 protected:
 
