@@ -178,7 +178,7 @@ private:
 	{
 		float FOV = 45.0f;
 		float zNear = 0.1f;
-		float zFar = 2500.0f;
+		float zFar = 150.0f;
 
 		DefaultCreateCameraPers(FOV, zNear, zFar);
 	}
@@ -311,12 +311,13 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
+		glm::mat4 Scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 		glm::mat4 Rotate = glm::mat4(1.0);
 		Rotate = glm::rotate(Rotate, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-		glm::mat4 WVP = VP * Rotate;
+		glm::mat4 WVP = VP * Rotate * Scale;
 
 		m_model.Update(ImageIndex, WVP);
 	}
