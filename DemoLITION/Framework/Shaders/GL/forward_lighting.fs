@@ -124,7 +124,6 @@ uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
 uniform bool gIsPBR = false;
 uniform PBRMaterial gPBRmaterial;
-uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
 uniform bool gRefRefractEnabled = true;

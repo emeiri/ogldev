@@ -40,46 +40,33 @@ out vec4 out_FragColor;
 
 vec2 TexCoord;
 
-struct BaseLight
-{
-    vec3 Color;
-    float AmbientIntensity;
-    float DiffuseIntensity;
-};
+#define MAX_NUM_LIGHTS 4
 
-struct DirectionalLight
-{
-    BaseLight Base;
-    vec3 Direction;
-};
+#define LIGHT_TYPE_DIR   0
+#define LIGHT_TYPE_POINT 1
+#define LIGHT_TYPE_SPOT  2
 
-struct Attenuation
-{
-    float Constant;
-    float Linear;
-    float Exp;
-};
 
-struct PointLight
-{
-    BaseLight Base;
-    vec3 WorldPos;
-    Attenuation Atten;
-};
-
-struct SpotLight
-{
-    PointLight Base;
-    vec3 Direction;
-    float Cutoff;
+struct LightSource {
+    vec3 Color;                    // offset 0
+    int LightType;                 // offset 12
+    vec3 Direction;                // offset 16
+    float AmbientIntensity;        // offset 28
+    vec3 WorldPos;                 // offset 32
+    float DiffuseIntensity;        // offset 44
+    float Atten_Constant;          // offset 48
+    float Atten_Linear;            // offset 52
+    float Atten_Exp;               // offset 56
+    float Cutoff;                  // offset 60
 };
 
 
-uniform DirectionalLight gDirectionalLight;
-uniform int gNumPointLights;
-uniform PointLight gPointLights[MAX_POINT_LIGHTS];
-uniform int gNumSpotLights;
-uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
+layout(std140, binding = 1) uniform LightUBO {
+    LightSource Lights[MAX_NUM_LIGHTS];
+};
+
+
+uniform int gNumLights = 0;
 uniform bool gHasSampler = false;
 layout(binding = 0) uniform sampler2D gAlbedo;
 layout(binding = 1) uniform sampler2D gSamplerSpecularExponent;
@@ -105,7 +92,6 @@ uniform float gShadowMapOffsetTextureSize;
 uniform float gShadowMapOffsetFilterSize;
 uniform float gShadowMapRandomRadius = 0.0;
 uniform vec3 gCameraWorldPos;
-uniform bool gLightingEnabled = true;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
 uniform vec4 gBaseColor;

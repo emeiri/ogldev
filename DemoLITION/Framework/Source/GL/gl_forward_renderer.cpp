@@ -397,18 +397,6 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
 }
 
 
-void ForwardRenderer::ApplyLighting(GLScene* pScene)
-{
-    UpdateLightSources(pScene);
-
-    if (UseGLTFPBR) {
-        m_pCurBaseLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
-    } else {
-        m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
-    }      
-}
-
-
 void ForwardRenderer::UpdateLightSources(GLScene* pScene)
 {
     SetupLightSourcesArray(pScene);
@@ -738,7 +726,7 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     ApplySceneConfig(pScene);
 
-    ApplyLighting(pScene);
+    UpdateLightSources(pScene);
 
     if (UseIndirectRender) {  
         Matrix4f VP = m_pCurCamera->GetVPMatrix();
@@ -749,6 +737,13 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 
     m_pCurBaseLightingTech->ControlIndirectRender(UseIndirectRender);
     m_pCurBaseLightingTech->ControlPVP(UsePVP);
+
+    if (UseGLTFPBR) {
+        m_pCurBaseLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
+    }
+    else {
+        m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
+    }
 }
 
 
