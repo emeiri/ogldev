@@ -403,31 +403,9 @@ void ForwardRenderer::ApplyLighting(GLScene* pScene)
 
     if (UseGLTFPBR) {
         m_pCurBaseLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
-        return;
-    }
-
-    int NumPointLights = (int)pScene->GetPointLights().size();
-
-    if (NumPointLights > 0) {
-        m_pCurLightingTech->SetPointLights(NumPointLights, &pScene->GetPointLights()[0], true);
-    }
-
-    int NumSpotLights = (int)pScene->GetSpotLights().size();
-
-    if (NumSpotLights > 0) {
-        m_pCurLightingTech->SetSpotLights(NumSpotLights, &pScene->GetSpotLights()[0], true);
-    }
-
-    int NumDirLights = (int)pScene->GetDirLights().size();
-
-    if (NumDirLights > 0) {
-        const DirectionalLight& DirLight = pScene->GetDirLights()[0];
-        m_pCurLightingTech->SetDirectionalLight(DirLight, true);
-    }
-   
-    //if (!LightingEnabled) printf("Warning! trying to render but all lights are zero\n");
-    
-    m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
+    } else {
+        m_pCurLightingTech->SetCameraWorldPos(m_pCurCamera->GetPos());
+    }      
 }
 
 
@@ -454,7 +432,8 @@ void ForwardRenderer::SetupLightSourcesArray(GLScene* pScene)
         m_lightSources[LightIndex].Color = l.Color.ToGLM();
         m_lightSources[LightIndex].Cutoff = l.Cutoff;
         m_lightSources[LightIndex].DiffuseIntensity = l.DiffuseIntensity;
-        m_lightSources[LightIndex].Direction = l.WorldDirection.ToGLM();
+        Vector3f Dir = l.WorldDirection;
+        m_lightSources[LightIndex].Direction = Dir.Normalize().ToGLM();
         m_lightSources[LightIndex].WorldPos = l.WorldPosition.ToGLM();
         LightIndex++;
     }
@@ -469,7 +448,8 @@ void ForwardRenderer::SetupLightSourcesArray(GLScene* pScene)
         m_lightSources[LightIndex].Color = l.Color.ToGLM();
         m_lightSources[LightIndex].Cutoff = 0.0f;
         m_lightSources[LightIndex].DiffuseIntensity = l.DiffuseIntensity;
-        m_lightSources[LightIndex].Direction = l.WorldDirection.ToGLM();
+        Vector3f Dir = l.WorldDirection;
+        m_lightSources[LightIndex].Direction = Dir.Normalize().ToGLM();
         m_lightSources[LightIndex].WorldPos = glm::vec3(0.0f);
         LightIndex++;
     }

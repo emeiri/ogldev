@@ -21,9 +21,6 @@
 
 #extension GL_ARB_bindless_texture : require
 
-const int MAX_POINT_LIGHTS = 2;
-const int MAX_SPOT_LIGHTS = 2;
-
 in vec2 TexCoord0;
 in vec3 Normal0;
 in vec3 WorldPos0;
@@ -43,7 +40,6 @@ vec2 TexCoord;
 #define LIGHT_TYPE_SPOT  2
 
 
-
 struct LightSource {
     vec3 Color;                    // offset 0
     int LightType;                 // offset 12
@@ -58,40 +54,6 @@ struct LightSource {
 };
 
 
-layout(std140, binding = 1) uniform LightUBO {
-    LightSource Lights[MAX_NUM_LIGHTS];
-};
-
-
-struct BaseLight
-{
-    vec3 Color;
-    float AmbientIntensity;
-    float DiffuseIntensity;
-};
-
-
-struct Attenuation
-{
-    float Constant;
-    float Linear;
-    float Exp;
-};
-
-struct PointLight
-{
-    BaseLight Base;
-    vec3 WorldPos;
-    Attenuation Atten;
-};
-
-struct SpotLight
-{
-    PointLight Base;
-    vec3 Direction;
-    float Cutoff;
-};
-
 struct MaterialColor
 {
     vec4 AmbientColor;
@@ -104,6 +66,10 @@ struct Material {
     MaterialColor Color;
     sampler2D DiffuseMap;
     sampler2D NormalMap;
+};
+
+layout(std140, binding = 1) uniform LightUBO {
+    LightSource Lights[MAX_NUM_LIGHTS];
 };
 
 
@@ -128,8 +94,6 @@ struct PBRMaterial
 
 
 uniform int gNumLights = 0;
-uniform int gNumSpotLights;
-uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform MaterialColor gMaterial;
 uniform bool gHasSampler = false;
 layout(binding = 0) uniform sampler2D gSampler;
@@ -661,22 +625,20 @@ vec4 GetTotalLight(vec3 Normal)
 
     for (int i = 0 ; i < gNumLights ; i++) {
         switch (Lights[i].LightType) {
+
             case LIGHT_TYPE_DIR:
                 TotalLight += CalcDirectionalLight(i, Normal);
                 break;
+
+            case LIGHT_TYPE_POINT:
+                TotalLight += CalcPointLight(i, Normal, true);
+                break;
+
+            case LIGHT_TYPE_SPOT:
+                TotalLight += CalcSpotLight(i, Normal);
+                break;
         }
     }
-
-    return TotalLight;
-    /*vec4 TotalLight = CalcDirectionalLight(Normal);
-
-    for (int i = 0 ;i < gNumPointLights ;i++) {
-        TotalLight += CalcPointLight(gPointLights[i], Normal, true);
-    }
-
-    for (int i = 0 ;i < gNumSpotLights ;i++) {
-        TotalLight += CalcSpotLight(gSpotLights[i], Normal);
-    }*/
 
     return TotalLight;
 }

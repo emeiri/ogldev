@@ -68,12 +68,6 @@ bool ForwardLightingTechnique::InitCommon()
     materialLoc.AmbientColor = GetUniformLocation("gMaterial.AmbientColor");
     materialLoc.DiffuseColor = GetUniformLocation("gMaterial.DiffuseColor");
     materialLoc.SpecularColor = GetUniformLocation("gMaterial.SpecularColor");
-    dirLightLoc.Color = GetUniformLocation("gDirectionalLight.Base.Color");
-    dirLightLoc.AmbientIntensity = GetUniformLocation("gDirectionalLight.Base.AmbientIntensity");
-    dirLightLoc.Direction = GetUniformLocation("gDirectionalLight.Direction");
-    dirLightLoc.DiffuseIntensity = GetUniformLocation("gDirectionalLight.Base.DiffuseIntensity");
-    NumPointLightsLoc = GetUniformLocation("gNumPointLights");
-    NumSpotLightsLoc = GetUniformLocation("gNumSpotLights");
     ColorModLocation = GetUniformLocation("gColorMod");
     ColorAddLocation = GetUniformLocation("gColorAdd");
     EnableRimLightLoc = GetUniformLocation("gRimLightEnabled");
@@ -121,12 +115,6 @@ bool ForwardLightingTechnique::InitCommon()
         materialLoc.AmbientColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.DiffuseColor == INVALID_UNIFORM_LOCATION ||
         materialLoc.SpecularColor == INVALID_UNIFORM_LOCATION ||
-        dirLightLoc.Color == INVALID_UNIFORM_LOCATION ||
-        dirLightLoc.DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
-        dirLightLoc.Direction == INVALID_UNIFORM_LOCATION ||
-        dirLightLoc.AmbientIntensity == INVALID_UNIFORM_LOCATION ||
-        NumPointLightsLoc == INVALID_UNIFORM_LOCATION ||
-        NumSpotLightsLoc == INVALID_UNIFORM_LOCATION ||
         EnableRimLightLoc == INVALID_UNIFORM_LOCATION ||
         EnableCellShadingLoc == INVALID_UNIFORM_LOCATION ||
         EnableSpecularExponent == INVALID_UNIFORM_LOCATION ||
@@ -142,88 +130,6 @@ bool ForwardLightingTechnique::InitCommon()
 #ifdef FAIL_ON_MISSING_LOC
         return false;
 #endif
-    }
-
-    for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(PointLightsLocation) ; i++) {
-        char Name[128];
-        memset(Name, 0, sizeof(Name));
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.Color", i);
-        PointLightsLocation[i].Color = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.AmbientIntensity", i);
-        PointLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].WorldPos", i);
-        PointLightsLocation[i].WorldPos = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Base.DiffuseIntensity", i);
-        PointLightsLocation[i].DiffuseIntensity = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Atten.Constant", i);
-        PointLightsLocation[i].Atten.Constant = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Atten.Linear", i);
-        PointLightsLocation[i].Atten.Linear = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gPointLights[%d].Atten.Exp", i);
-        PointLightsLocation[i].Atten.Exp = GetUniformLocation(Name);
-
-        if (PointLightsLocation[i].Color == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].AmbientIntensity == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].WorldPos == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].Atten.Constant == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].Atten.Linear == INVALID_UNIFORM_LOCATION ||
-            PointLightsLocation[i].Atten.Exp == INVALID_UNIFORM_LOCATION) {
-#ifdef FAIL_ON_MISSING_LOC
-            return false;
-#endif
-        }
-    }
-
-    for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(SpotLightsLocation) ; i++) {
-        char Name[128];
-        memset(Name, 0, sizeof(Name));
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.Color", i);
-        SpotLightsLocation[i].Color = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.AmbientIntensity", i);
-        SpotLightsLocation[i].AmbientIntensity = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.WorldPos", i);
-        SpotLightsLocation[i].Position = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Direction", i);
-        SpotLightsLocation[i].Direction = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Cutoff", i);
-        SpotLightsLocation[i].Cutoff = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Base.DiffuseIntensity", i);
-        SpotLightsLocation[i].DiffuseIntensity = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Atten.Constant", i);
-        SpotLightsLocation[i].Atten.Constant = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Atten.Linear", i);
-        SpotLightsLocation[i].Atten.Linear = GetUniformLocation(Name);
-
-        SNPRINTF(Name, sizeof(Name), "gSpotLights[%d].Base.Atten.Exp", i);
-        SpotLightsLocation[i].Atten.Exp = GetUniformLocation(Name);
-
-        if (SpotLightsLocation[i].Color == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].AmbientIntensity == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].Position == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].Direction == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].Cutoff == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].DiffuseIntensity == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].Atten.Constant == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].Atten.Linear == INVALID_UNIFORM_LOCATION ||
-            SpotLightsLocation[i].Atten.Exp == INVALID_UNIFORM_LOCATION) {
-#ifdef FAIL_ON_MISSING_LOC
-            return false;
-#endif
-        }
     }
 
     return true;
@@ -304,28 +210,6 @@ void ForwardLightingTechnique::SetSpecularExponentTextureUnit(unsigned int Textu
 }
 
 
-void ForwardLightingTechnique::SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir)
-{
-    glUniform3f(dirLightLoc.Color, DirLight.Color.x, DirLight.Color.y, DirLight.Color.z);
-    glUniform1f(dirLightLoc.AmbientIntensity, DirLight.AmbientIntensity);
-    glUniform1f(dirLightLoc.DiffuseIntensity, DirLight.DiffuseIntensity);
-
-    if (WithDir) {
-        UpdateDirLightDirection(DirLight);
-    }
-}
-
-
-void ForwardLightingTechnique::UpdateDirLightDirection(const DirectionalLight& DirLight)
-{
-    Vector3f LocalDirection = DirLight.WorldDirection;
-
-    LocalDirection.Normalize();
-
-    glUniform3f(dirLightLoc.Direction, LocalDirection.x, LocalDirection.y, LocalDirection.z);
-}
-
-
 void ForwardLightingTechnique::SetMaterial(const Material& material)
 {
     glUniform4f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b, material.AmbientColor.a);
@@ -337,65 +221,8 @@ void ForwardLightingTechnique::SetMaterial(const Material& material)
 }
 
 
-void ForwardLightingTechnique::SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos)
-{
-    glUniform1i(NumPointLightsLoc, NumLights);
-
-    for (unsigned int i = 0 ; i < NumLights ; i++) {
-        glUniform3f(PointLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
-        glUniform1f(PointLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
-        glUniform1f(PointLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
-        glUniform1f(PointLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
-        glUniform1f(PointLightsLocation[i].Atten.Linear, pLights[i].Attenuation.Linear);
         // TODO: assimp puts a very small fraction here leading to burnout of the image
-        glUniform1f(PointLightsLocation[i].Atten.Exp, pLights[i].Attenuation.Exp * 2000.0f); 
-    }
-
-    if (WithPos) {
-        UpdatePointLightsPos(NumLights, pLights);
-    }
-}
-
-
-void ForwardLightingTechnique::UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights)
-{
-    for (unsigned int i = 0 ; i < NumLights ; i++) {
-        const Vector3f& WorldPos = pLights[i].WorldPosition;
-        glUniform3f(PointLightsLocation[i].WorldPos, WorldPos.x, WorldPos.y, WorldPos.z);
-    }
-}
-
-void ForwardLightingTechnique::SetSpotLights(unsigned int NumLights, const SpotLight* pLights, bool WithPosAndDir)
-{
-    glUniform1i(NumSpotLightsLoc, NumLights);
-
-    for (unsigned int i = 0 ; i < NumLights ; i++) {
-        glUniform3f(SpotLightsLocation[i].Color, pLights[i].Color.x, pLights[i].Color.y, pLights[i].Color.z);
-        glUniform1f(SpotLightsLocation[i].AmbientIntensity, pLights[i].AmbientIntensity);
-        glUniform1f(SpotLightsLocation[i].DiffuseIntensity, pLights[i].DiffuseIntensity);
-        glUniform1f(SpotLightsLocation[i].Cutoff, cosf(ToRadian(pLights[i].Cutoff)));
-        glUniform1f(SpotLightsLocation[i].Atten.Constant, pLights[i].Attenuation.Constant);
-        glUniform1f(SpotLightsLocation[i].Atten.Linear,   pLights[i].Attenuation.Linear);
-        // TODO: assimp puts a very small fraction here leading to burnout of the image
-        glUniform1f(SpotLightsLocation[i].Atten.Exp, pLights[i].Attenuation.Exp);
-    }
-
-    if (WithPosAndDir) {
-        UpdateSpotLightsPosAndDir(NumLights, pLights);
-    }
-}
-
-
-void ForwardLightingTechnique::UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights)
-{
-    for (unsigned int i = 0 ; i < NumLights ; i++) {
-        Vector3f Direction = pLights[i].WorldDirection;
-        Direction.Normalize();
-        glUniform3f(SpotLightsLocation[i].Direction, Direction.x, Direction.y, Direction.z);
-        const Vector3f& WorldPos = pLights[i].WorldPosition;
-        glUniform3f(SpotLightsLocation[i].Position, WorldPos.x, WorldPos.y, WorldPos.z);
-    }
-}
+//        glUniform1f(PointLightsLocation[i].Atten.Exp, pLights[i].Attenuation.Exp * 2000.0f); 
 
 
 void ForwardLightingTechnique::SetColorMod(const Vector4f& Color)

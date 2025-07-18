@@ -30,9 +30,6 @@ class ForwardLightingTechnique : public BaseLightingTechnique
 {
 public:
 
-    static const unsigned int MAX_POINT_LIGHTS = 2;
-    static const unsigned int MAX_SPOT_LIGHTS = 2;
-
     ForwardLightingTechnique();
 
     virtual bool Init();
@@ -55,9 +52,6 @@ public:
     void SetSkyboxTextureUnit(int TextureUnit);
     void SetDirectionalLight(const DirectionalLight& DirLight, bool WithDir = true);
     void UpdateDirLightDirection(const DirectionalLight& DirLight);
-    void SetPointLights(unsigned int NumLights, const PointLight* pLights, bool WithPos = true);
-    void UpdatePointLightsPos(unsigned int NumLights, const PointLight* pLights);
-    void SetSpotLights(unsigned int NumLights, const SpotLight* pLights, bool WithPosAndDir = true);
     void UpdateSpotLightsPosAndDir(unsigned int NumLights, const SpotLight* pLights);
     virtual void SetMaterial(const Material& material);
     void SetColorMod(const Vector4f& ColorMod);
@@ -135,40 +129,6 @@ private:
         GLuint SpecularColor = INVALID_UNIFORM_LOCATION;
     } materialLoc;
 
-    struct {
-        GLuint Color = INVALID_UNIFORM_LOCATION;
-        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
-        GLuint Direction = INVALID_UNIFORM_LOCATION;
-        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
-    } dirLightLoc;
-
-    struct {
-        GLuint Color = INVALID_UNIFORM_LOCATION;
-        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
-        GLuint WorldPos = INVALID_UNIFORM_LOCATION;
-        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
-
-        struct
-        {
-            GLuint Constant = INVALID_UNIFORM_LOCATION;
-            GLuint Linear = INVALID_UNIFORM_LOCATION;
-            GLuint Exp = INVALID_UNIFORM_LOCATION;
-        } Atten;
-    } PointLightsLocation[MAX_POINT_LIGHTS];
-
-    struct {
-        GLuint Color = INVALID_UNIFORM_LOCATION;
-        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
-        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
-        GLuint Position = INVALID_UNIFORM_LOCATION;
-        GLuint Direction = INVALID_UNIFORM_LOCATION;
-        GLuint Cutoff = INVALID_UNIFORM_LOCATION;
-        struct {
-            GLuint Constant = INVALID_UNIFORM_LOCATION;
-            GLuint Linear = INVALID_UNIFORM_LOCATION;
-            GLuint Exp = INVALID_UNIFORM_LOCATION;
-        } Atten;
-    } SpotLightsLocation[MAX_SPOT_LIGHTS];
     struct {
         GLuint Roughness;
         GLuint IsMetal;
