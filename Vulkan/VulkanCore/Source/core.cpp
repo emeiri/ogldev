@@ -166,7 +166,7 @@ const VkImageView& VulkanCore::GetDepthView(int Index) const
 }
 
 
-void VulkanCore::GetInstanceVersion()
+void VulkanCore::UpdateInstanceVersion()
 {
 	u32 InstanceVersion = 0;
 
@@ -184,7 +184,7 @@ void VulkanCore::GetInstanceVersion()
 
 void VulkanCore::CreateInstance(const char* pAppName)
 {
-	GetInstanceVersion();
+	UpdateInstanceVersion();
 
 	std::vector<const char*> Layers = {
 		"VK_LAYER_KHRONOS_validation"
@@ -976,6 +976,17 @@ void BufferAndMemory::Destroy(VkDevice Device)
 void VulkanCore::GetFramebufferSize(int& Width, int& Height) const
 {
 	glfwGetWindowSize(m_pWindow, &Width, &Height);
+}
+
+
+u32 VulkanCore::GetInstanceVersion() const
+{
+	u32 Version = VK_MAKE_API_VERSION(0,
+									  m_instanceVersion.Major,
+									  m_instanceVersion.Minor,
+									  m_instanceVersion.Patch);
+
+	return Version;
 }
 
 

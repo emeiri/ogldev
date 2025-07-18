@@ -126,7 +126,7 @@ void ImGUIRenderer::InitImGUI()
 	VkFormat ColorFormat = m_pvkCore->GetSwapChainFormat();
 
 	ImGui_ImplVulkan_InitInfo InitInfo = {
-		.ApiVersion = VK_API_VERSION_1_3,
+		.ApiVersion = m_pvkCore->GetInstanceVersion(),
 		.Instance = m_pvkCore->GetInstance(),
 		.PhysicalDevice = m_pvkCore->GetPhysicalDevice().m_physDevice,
 		.Device = m_pvkCore->GetDevice(),

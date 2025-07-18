@@ -113,9 +113,11 @@ public:
 
 	void GetFramebufferSize(int& Width, int& Height) const;
 
+	u32 GetInstanceVersion() const;
+
 private:
 
-	void GetInstanceVersion();
+	void UpdateInstanceVersion();
 	void CreateInstance(const char* pAppName);
 	void CreateDebugCallback();
 	void CreateSurface();
