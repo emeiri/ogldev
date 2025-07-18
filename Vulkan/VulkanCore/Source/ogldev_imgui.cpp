@@ -217,7 +217,7 @@ void ImGUIRenderer::OnFrame(int Image)
 
 	BeginCommandBuffer(m_cmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	BeginRendering(m_cmdBuf, Image);
+	m_pvkCore->BeginDynamicRendering(m_cmdBuf, Image, NULL, NULL);
 
 	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBuf);
 	
@@ -227,56 +227,6 @@ void ImGUIRenderer::OnFrame(int Image)
 							  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	vkEndCommandBuffer(m_cmdBuf);
-}
-
-
-void ImGUIRenderer::BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
-{
-	VkClearValue ClearColor = {
-		.color = {1.0f, 0.0f, 0.0f, 1.0f},
-	};
-
-	VkClearValue DepthValue = {
-		.depthStencil = {.depth = 1.0f, .stencil = 0 }
-	};
-
-	VkRenderingAttachmentInfoKHR ColorAttachment = {
-		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
-		.pNext = NULL,
-		.imageView = m_pvkCore->GetImageView(ImageIndex),
-		.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-		.resolveMode = VK_RESOLVE_MODE_NONE,
-		.resolveImageView = VK_NULL_HANDLE,
-		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-		.clearValue = ClearColor
-	};
-
-	VkRenderingAttachmentInfo DepthAttachment = {
-		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-		.pNext = NULL,
-		.imageView = m_pvkCore->GetDepthView(ImageIndex),
-		.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-		.resolveMode = VK_RESOLVE_MODE_NONE,
-		.resolveImageView = VK_NULL_HANDLE,
-		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-		.clearValue = DepthValue,
-	};
-
-	VkRenderingInfoKHR RenderingInfo = {
-		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
-		.renderArea = { {0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT} },
-		.layerCount = 1,
-		.viewMask = 0,
-		.colorAttachmentCount = 1,
-		.pColorAttachments = &ColorAttachment,
-		.pDepthAttachment = &DepthAttachment
-	};
-
-	vkCmdBeginRendering(CmdBuf, &RenderingInfo);
 }
 
 
