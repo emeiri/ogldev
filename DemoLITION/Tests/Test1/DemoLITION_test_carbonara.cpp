@@ -76,10 +76,18 @@ public:
         m_dirLight[1].DiffuseIntensity = 1.0f;
         m_dirLight[1].AmbientIntensity = 0.0f;
 
-        m_pointLight.WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
-     //  m_pointLight.WorldPosition = Vector3f(1.0f, 0.0f, -1.0f);
-        m_pointLight.DiffuseIntensity = 0.2f;
-        m_pointLight.AmbientIntensity = 0.1f;
+        m_pointLight[0].Color = Vector3f(0.5f, 0.5f, 0.0f);
+        m_pointLight[0].WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
+        m_pointLight[0].DiffuseIntensity = 0.2f;
+        m_pointLight[0].AmbientIntensity = 0.0f;
+        m_pointLight[0].Attenuation.Constant = 0.25f;
+
+        m_pointLight[1].Color = Vector3f(0.0f, 0.0f, 1.0f);
+        m_pointLight[1].WorldPosition = Vector3f(10.0f, 10.0f, 0.0f);
+        m_pointLight[1].DiffuseIntensity = 0.2f;
+        m_pointLight[1].AmbientIntensity = 0.0f;
+        m_pointLight[1].Attenuation.Constant = 0.25f;
+
 
         m_spotLight.WorldPosition = Vector3f(0.0f, 10.0f, 0.0f);
         m_spotLight.WorldDirection = Vector3f(0.0f, -1.0f, 0.0f);
@@ -108,10 +116,11 @@ public:
       //  m_pScene->SetCameraSpeed(0.1f);
 
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
-        m_pScene->GetDirLights().push_back(m_dirLight[0]);
-        m_pScene->GetDirLights().push_back(m_dirLight[1]);
-        //m_pScene->GetPointLights().push_back(m_pointLight);
-      //  m_pScene->GetSpotLights().push_back(m_spotLight);
+        //m_pScene->GetDirLights().push_back(m_dirLight[0]);
+        //m_pScene->GetDirLights().push_back(m_dirLight[1]);
+        m_pScene->GetPointLights().push_back(m_pointLight[0]);
+        m_pScene->GetPointLights().push_back(m_pointLight[1]);
+        //m_pScene->GetSpotLights().push_back(m_spotLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -176,9 +185,13 @@ public:
     {
         OnFrameChild(DeltaTimeMillis);
 
-      //  if (m_pScene->GetDirLights().size() > 0) {
-      //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-      //  }
+        if (m_pScene->GetPointLights().size() > 0) {
+            m_pScene->GetPointLights()[0].WorldPosition = Vector3f(sinf(m_count) * 10.0f, 1.0f, cosf(m_count) * 10.0f);
+
+            if (m_pScene->GetPointLights().size() > 1) {
+                m_pScene->GetPointLights()[1].WorldPosition = Vector3f(-sinf(m_count) * 10.0f, 1.0f, -cosf(m_count) * 10.0f);
+            }
+        }
 
         m_count += 0.01f;
 
@@ -447,7 +460,7 @@ private:
     float m_count = 0.0f;
 
     DirectionalLight m_dirLight[2];
-    PointLight m_pointLight;
+    PointLight m_pointLight[2];
     SpotLight m_spotLight;
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
@@ -1073,7 +1086,7 @@ void carbonara()
     AssetLoadDemo demo;
   //  PBRDemo demo;
   //  SkyboxDemo demo;
-  //    GLTFPBRDemo demo;
+    //  GLTFPBRDemo demo;
 
     demo.Start();
 }
