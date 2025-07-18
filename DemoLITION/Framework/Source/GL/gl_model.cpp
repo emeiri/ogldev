@@ -522,3 +522,9 @@ Texture* GLModel::AllocTexture2D()
     return new Texture(GL_TEXTURE_2D);
 }
 
+
+void GLModel::DestroyTexture(Texture* pTexture)
+{
+    delete pTexture;
+}
+

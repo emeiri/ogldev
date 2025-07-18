@@ -36,6 +36,8 @@ void VkModel::Destroy()
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
 		m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
 	}
+
+	DestroyModel();
 }
 
 
@@ -44,6 +46,14 @@ Texture* VkModel::AllocTexture2D()
 	assert(m_pVulkanCore);
 
 	return new VulkanTexture(m_pVulkanCore);
+}
+
+
+void VkModel::DestroyTexture(Texture* pTexture)
+{
+	assert(pTexture);
+
+	pTexture->Destroy(m_pVulkanCore->GetDevice());
 }
 
 

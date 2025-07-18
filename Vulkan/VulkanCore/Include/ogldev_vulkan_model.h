@@ -54,6 +54,8 @@ protected:
 
 	virtual Texture* AllocTexture2D();
 
+	virtual void DestroyTexture(Texture* pTexture);
+
 	virtual void InitGeometryPost() { /* Nothing to do here */ }
 
 	virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) { assert(0); }

@@ -777,10 +777,21 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 
 void VulkanTexture::Destroy(VkDevice Device)
 {
-	vkDestroySampler(Device, m_sampler, NULL);
-	vkDestroyImageView(Device, m_view, NULL);
-	vkDestroyImage(Device, m_image, NULL);
-	vkFreeMemory(Device, m_mem, NULL);
+	if (m_sampler) {
+		vkDestroySampler(Device, m_sampler, NULL);
+	}
+	
+	if (m_view) {
+		vkDestroyImageView(Device, m_view, NULL);
+	}
+	
+	if (m_image) {
+		vkDestroyImage(Device, m_image, NULL);
+	}
+
+	if (m_mem) {
+		vkFreeMemory(Device, m_mem, NULL);
+	}	
 }
 
 

@@ -77,6 +77,17 @@ static std::string GetFullPath(const string& Dir, const aiString& Path)
 }
 
 
+void CoreModel::DestroyModel()
+{
+    for (Material& material : m_Materials) {
+        for (Texture* pTexture : material.pTextures) {
+            if (pTexture) {
+                DestroyTexture(pTexture);
+            }
+        }
+    }
+}
+
 bool CoreModel::LoadAssimpModel(const string& Filename)
 {
     AllocBuffers();

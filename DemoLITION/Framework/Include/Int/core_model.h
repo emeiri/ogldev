@@ -55,6 +55,8 @@ public:
 
     CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { m_pCoreRenderingSystem = pCoreRenderingSystem; }
 
+    void DestroyModel();
+
     bool LoadAssimpModel(const std::string& Filename);
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
@@ -99,6 +101,8 @@ protected:
     virtual void AllocBuffers() = 0;
 
     virtual Texture* AllocTexture2D() = 0;
+
+    virtual void DestroyTexture(Texture* pTexture) = 0;
 
     enum BUFFER_TYPE {
         INDEX_BUFFER = 0,

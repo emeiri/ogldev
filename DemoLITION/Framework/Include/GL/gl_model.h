@@ -44,6 +44,8 @@ public:
 
     virtual Texture* AllocTexture2D();
 
+    virtual void DestroyTexture(Texture* pTexture);
+
     void RenderIndirect(const Matrix4f& ObjectMatrix);
 
     Texture* GetNormalMap() const { return m_pNormalMap; }
