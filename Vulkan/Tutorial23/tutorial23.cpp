@@ -29,6 +29,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
@@ -94,10 +99,11 @@ public:
 		UpdateUniformBuffers(ImageIndex);
 
 		if (m_showGui) {		
-			m_imGUIRenderer.OnFrame(ImageIndex);
+			UpdateGUI();
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], 
-				                          m_imGUIRenderer.GetCommandBuffer(ImageIndex) };
+			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
+
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], ImGUICmdBuf };
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
@@ -106,7 +112,7 @@ public:
 
 		m_pQueue->Present(ImageIndex);
 	}
-	
+
 	
 	void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
 	{
@@ -298,7 +304,7 @@ private:
 	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
 	{
 		VkClearValue ClearColor = {
-			.color = {1.0f, 0.0f, 0.0f, 1.0f},
+			.color = { m_clearColor[0], m_clearColor[1], m_clearColor[2], 1.0f }
 		};
 
 		VkClearValue DepthValue = {
@@ -309,15 +315,80 @@ private:
 	}
 
 
+	void UpdateGUI()
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		ImGui_ImplVulkan_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+
+		ImGui::NewFrame();
+
+		ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);   // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("Clear color", (float*)&m_clearColor); // Edit 3 floats representing a color
+
+		ImGui::Begin("Transform");
+
+		if (ImGui::CollapsingHeader("Position")) {
+			ImGui::DragFloat3("##Position", &m_position.x, 0.1f);
+			ImGui::SameLine();
+			if (ImGui::Button("Reset##Pos")) {
+				m_position = glm::vec3(0.0f);
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Rotation")) {
+			ImGui::DragFloat3("##Rotation", &m_rotation.x, 1.0f); // Degrees
+			ImGui::SameLine();
+			if (ImGui::Button("Reset##Rot")) {
+				m_rotation = glm::vec3(0.0f);
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Scale")) {
+			ImGui::DragFloat("##Scale", &m_scale, 0.001f, 0.001f, 2.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::SameLine();
+			if (ImGui::Button("Reset##Scale")) {
+				m_scale = 1.0f;
+			}
+		}
+
+		ImGui::End();
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::End();
+
+		ImGui::Render();
+	}
+
+
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
-		glm::mat4 Scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-		glm::mat4 Rotate = glm::mat4(1.0);
-		Rotate = glm::rotate(Rotate, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
+		glm::mat4 Scale = glm::scale(glm::mat4(1.0f), glm::vec3(m_scale));
+
+		glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
+		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
+		glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0, 0, 1));
+		glm::mat4 Rotate = rotX * rotY * rotZ;
+		glm::mat4 Rotate2 = glm::rotate(Rotate, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
+
+		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-		glm::mat4 WVP = VP * Rotate * Scale;
+		glm::mat4 WVP = VP * Translate * Rotate2 * Scale;
 
 		m_model.Update(ImageIndex, WVP);
 	}
@@ -341,6 +412,10 @@ private:
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
 	bool m_showGui = false;
+	glm::vec3 m_clearColor = glm::vec3(1.0f);
+	glm::vec3 m_position = glm::vec3(0.0f);
+	glm::vec3 m_rotation = glm::vec3(0.0f);
+	float m_scale = 0.1f;
 };
 
 

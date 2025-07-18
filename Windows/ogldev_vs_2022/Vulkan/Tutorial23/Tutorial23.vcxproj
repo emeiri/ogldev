@@ -112,7 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;OGLDEV_VULKAN;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(SolutionDir)\..\..\DemoLITION\Framework\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(SolutionDir)\..\..\DemoLITION\Framework\Include;$(SolutionDir)\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

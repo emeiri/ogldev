@@ -111,11 +111,15 @@ void ImGUIRenderer::CreateDescriptorPool()
 
 void ImGUIRenderer::InitImGUI()
 {
+	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
+
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos; 
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;     
+	io.DisplaySize.x = (float)m_framebufferWidth;
+	io.DisplaySize.y = (float)m_framebufferHeight;
 
 	ImGui::GetStyle().FontScaleMain = 1.5f;
 
@@ -162,52 +166,23 @@ void ImGUIRenderer::InitImGUI()
 }
 
 
-void ImGUIRenderer::OnFrame(int Image)
+VkCommandBuffer ImGUIRenderer::PrepareCommandBuffer(int Image)
 {
-	static float f = 0.0f;
-	static int counter = 0;
-
-	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.DisplaySize.x = (float)m_framebufferWidth;
-	io.DisplaySize.y = (float)m_framebufferHeight;
-
-	ImGui_ImplVulkan_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-
-	ImGui::NewFrame();
-
-	ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);   // Create a window called "Hello, world!" and append into it.
-
-	ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-
-	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-	//	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-	if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-		counter++;
-	ImGui::SameLine();
-	ImGui::Text("counter = %d", counter);
-
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-	ImGui::End();
-
-	ImGui::Render();
-	
 	BeginCommandBuffer(m_cmdBufs[Image], VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	m_pvkCore->BeginDynamicRendering(m_cmdBufs[Image], Image, NULL, NULL);
 
 	ImDrawData* draw_data = ImGui::GetDrawData();
 	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBufs[Image]);
-	
+
 	vkCmdEndRendering(m_cmdBufs[Image]);
 
 	OgldevVK::ImageMemBarrier(m_cmdBufs[Image], m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
-							  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+		                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	vkEndCommandBuffer(m_cmdBufs[Image]);
+
+	return m_cmdBufs[Image];
 }
 
 

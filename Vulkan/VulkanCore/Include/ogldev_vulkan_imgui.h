@@ -37,15 +37,13 @@ public:
 
 	void Destroy();
 
-	void OnFrame(int Image);
-
-	VkCommandBuffer GetCommandBuffer(int Index) const { return m_cmdBufs[Index]; }
+	VkCommandBuffer PrepareCommandBuffer(int Image);
 
 private:
 
 	void CreateDescriptorPool();
 
-	void InitImGUI();
+	void InitImGUI();	
 
 	VulkanCore* m_pvkCore = NULL;
 	VkDevice m_device = NULL;
