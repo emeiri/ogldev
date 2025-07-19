@@ -33,6 +33,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
+#include "imGuIZMOquat.h"			// optional
 
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
@@ -229,9 +230,9 @@ private:
 	{
 		m_model.Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
-	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
+		m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+	//	m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
@@ -337,7 +338,7 @@ private:
 		ImGui::Begin("Transform");
 
 		if (ImGui::CollapsingHeader("Position")) {
-			ImGui::DragFloat3("##Position", &m_position.x, 0.1f);
+			ImGui::DragFloat3("##Position", &m_position.x, 0.01f);
 			ImGui::SameLine();
 			if (ImGui::Button("Reset##Pos")) {
 				m_position = glm::vec3(0.0f);

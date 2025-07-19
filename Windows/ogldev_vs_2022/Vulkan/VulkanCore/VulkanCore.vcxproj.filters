@@ -158,26 +158,5 @@
     <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

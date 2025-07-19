@@ -47,13 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_glfw.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_impl_vulkan.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imgui_internal.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_rectpack.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_textedit.h" />
-    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
     <ClInclude Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\model_desc.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />

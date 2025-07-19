@@ -16,21 +16,15 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
-//#include "imGuIZMOquat.h"
 
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_imgui.h"
 #include "ogldev_vulkan_wrapper.h"
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
-
-
-static void check_vk_result(VkResult err)
+static void CheckVKResult(VkResult err)
 {
 	if (err == 0) {
 		return;
@@ -43,6 +37,7 @@ static void check_vk_result(VkResult err)
 	}
 }
 
+
 bool IsMouseControlledByImGUI()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -52,31 +47,18 @@ bool IsMouseControlledByImGUI()
 	return ret;
 }
 
-namespace OgldevVK {
 
-ImGUIRenderer::ImGUIRenderer()
-{
-}
+namespace OgldevVK {
 
 void ImGUIRenderer::Init(VulkanCore* pvkCore)
 {
 	m_pvkCore = pvkCore;
 
+	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
+
 	CreateDescriptorPool();
 
 	InitImGUI();
-}
-
-
-void ImGUIRenderer::Destroy()
-{
-	m_pvkCore->FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
-
-	vkDestroyDescriptorPool(m_pvkCore->GetDevice(), m_descriptorPool, NULL);
-
-	ImGui_ImplVulkan_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
 }
 
 
@@ -111,8 +93,6 @@ void ImGUIRenderer::CreateDescriptorPool()
 
 void ImGUIRenderer::InitImGUI()
 {
-	m_pvkCore->GetFramebufferSize(m_framebufferWidth, m_framebufferHeight);
-
 	ImGui::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -127,7 +107,8 @@ void ImGUIRenderer::InitImGUI()
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
 
-	ImGui_ImplGlfw_InitForVulkan(m_pvkCore->GetWindow(), true);
+	bool InstallGLFWCallbacks = true;
+	ImGui_ImplGlfw_InitForVulkan(m_pvkCore->GetWindow(), InstallGLFWCallbacks);
 
 	VkFormat ColorFormat = m_pvkCore->GetSwapChainFormat();
 
@@ -139,7 +120,7 @@ void ImGUIRenderer::InitImGUI()
 		.QueueFamily = m_pvkCore->GetQueueFamily(),
 		.Queue = m_pvkCore->GetQueue()->GetHandle(),
 		.DescriptorPool = m_descriptorPool,
-		.RenderPass = NULL,
+		.RenderPass = NULL,		// assume dynamic rendering
 		.MinImageCount = m_pvkCore->GetPhysicalDevice().m_surfaceCaps.minImageCount,
 		.ImageCount = (u32)m_pvkCore->GetNumImages(),
 		.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
@@ -156,7 +137,7 @@ void ImGUIRenderer::InitImGUI()
 			.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 		 },
 		.Allocator = NULL,
-		.CheckVkResultFn = check_vk_result
+		.CheckVkResultFn = CheckVKResult
 	};
 
 	ImGui_ImplVulkan_Init(&InitInfo);
@@ -166,14 +147,27 @@ void ImGUIRenderer::InitImGUI()
 }
 
 
+void ImGUIRenderer::Destroy()
+{
+	m_pvkCore->FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
+
+	vkDestroyDescriptorPool(m_pvkCore->GetDevice(), m_descriptorPool, NULL);
+
+	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
+
+// Must be called after the ImGUI frame was prepared on the application side!
 VkCommandBuffer ImGUIRenderer::PrepareCommandBuffer(int Image)
 {
 	BeginCommandBuffer(m_cmdBufs[Image], VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
 	m_pvkCore->BeginDynamicRendering(m_cmdBufs[Image], Image, NULL, NULL);
 
-	ImDrawData* draw_data = ImGui::GetDrawData();
-	ImGui_ImplVulkan_RenderDrawData(draw_data, m_cmdBufs[Image]);
+	ImDrawData* pDrawData = ImGui::GetDrawData();
+	ImGui_ImplVulkan_RenderDrawData(pDrawData, m_cmdBufs[Image]);
 
 	vkCmdEndRendering(m_cmdBufs[Image]);
 

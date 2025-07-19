@@ -29,14 +29,16 @@ namespace OgldevVK {
 
 class ImGUIRenderer  {
 public:
-	ImGUIRenderer();
+	ImGUIRenderer() {}
 
-	~ImGUIRenderer() {};
+	~ImGUIRenderer() {}
 
 	void Init(VulkanCore* pvkCore);
 
 	void Destroy();
 
+	// Called once in every frame where the GUI is visible. Returns
+	// a command buffer to be submitted into the queue.
 	VkCommandBuffer PrepareCommandBuffer(int Image);
 
 private:
@@ -46,7 +48,6 @@ private:
 	void InitImGUI();	
 
 	VulkanCore* m_pvkCore = NULL;
-	VkDevice m_device = NULL;
 	int m_framebufferWidth = 0;
 	int m_framebufferHeight = 0;
 	std::vector<VkCommandBuffer> m_cmdBufs;
