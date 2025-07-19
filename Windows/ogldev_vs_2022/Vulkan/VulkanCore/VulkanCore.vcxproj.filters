@@ -31,6 +31,9 @@
     <Filter Include="Source Files\ImGUI">
       <UniqueIdentifier>{db6f8806-4475-4ff8-8002-bed0166a6476}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ImGUIZMOQuat">
+      <UniqueIdentifier>{f893b59f-da2a-4145-b8f1-6f35a162acb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -108,6 +111,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imguizmo_quat.cpp">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -157,6 +163,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmo3D.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vGizmo3D_config.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath_config.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imguizmo_config.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imguizmo_quat.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.h">
+      <Filter>Source Files\ImGUIZMOQuat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

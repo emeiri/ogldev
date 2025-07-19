@@ -305,7 +305,7 @@ private:
 	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
 	{
 		VkClearValue ClearColor = {
-			.color = { m_clearColor[0], m_clearColor[1], m_clearColor[2], 1.0f }
+			.color = {1.0f, 0.0f, 0.0f, 1.0f},
 		};
 
 		VkClearValue DepthValue = {
@@ -361,7 +361,13 @@ private:
 			}
 		}
 
-		ImGui::End();
+		// For imGuIZMO, declare static or global variable or member class quaternion
+		static quat qRot1 = quat(1.f, 0.f, 0.f, 0.f);
+		static quat qRot2 = quat(1.f, 0.f, 0.f, 0.f);
+		ImGui::gizmo3D("##gizmo1", qRot1, 200.0f/*, mode */);
+
+		static vec4 dir(1.0f, 0.0f, 0.0f, 0.0f);
+		ImGui::gizmo3D("##Dir1", dir, 200.0f, imguiGizmo::modeDirection);
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
@@ -369,6 +375,7 @@ private:
 		ImGui::Text("counter = %d", counter);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::End();
 		ImGui::End();
 
 		ImGui::Render();
