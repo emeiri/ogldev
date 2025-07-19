@@ -96,13 +96,15 @@ public:
 	void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
 	{
 		bool Handled = true;
+		bool Press = Action != GLFW_RELEASE;
 
 		switch (Key) {
 		case GLFW_KEY_ESCAPE:
 		case GLFW_KEY_Q:
-			glfwDestroyWindow(m_pWindow);
-			glfwTerminate();
-			exit(0);
+			if (Press) {
+				glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
+			}
+			break;
 
 		case GLFW_KEY_C:
 			m_pGameCamera->Print();
@@ -153,7 +155,7 @@ private:
 	{
 		float FOV = 45.0f;
 		float zNear = 0.1f;
-		float zFar = 100.0f;
+		float zFar = 150.0f;
 
 		DefaultCreateCameraPers(FOV, zNear, zFar);
 	}

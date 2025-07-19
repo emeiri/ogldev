@@ -317,10 +317,7 @@ private:
 
 
 	void UpdateGUI()
-	{
-		static float f = 0.0f;
-		static int counter = 0;
-
+	{		
 		ImGuiIO& io = ImGui::GetIO();
 
 		ImGui_ImplVulkan_NewFrame();
@@ -332,6 +329,7 @@ private:
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 
+		static float f = 0.0f;
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::ColorEdit3("Clear color", (float*)&m_clearColor); // Edit 3 floats representing a color
 
@@ -369,8 +367,12 @@ private:
 		static vec4 dir(1.0f, 0.0f, 0.0f, 0.0f);
 		ImGui::gizmo3D("##Dir1", dir, 200.0f, imguiGizmo::modeDirection);
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+		static int counter = 0;
+
+		if (ImGui::Button("Button")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
+		}
+
 		ImGui::SameLine();
 		ImGui::Text("counter = %d", counter);
 
