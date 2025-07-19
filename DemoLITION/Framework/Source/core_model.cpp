@@ -851,6 +851,12 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
 
+    /*aiNode* cameraNode = pScene->mRootNode->FindNode(pCamera->mName);
+    aiMatrix4x4 nodeTransform = cameraNode->mTransformation;
+    aiVector3D worldPosition = nodeTransform * pCamera->mPosition;
+    aiVector3D worldLookAt = nodeTransform * (pCamera->mPosition + pCamera->mLookAt);
+    aiVector3D worldUp = nodeTransform * pCamera->mUp;*/
+
     aiMatrix4x4 aiCameraMatrix;
     pCamera->GetCameraMatrix(aiCameraMatrix);
     Matrix4f CameraMatrix(aiCameraMatrix);
@@ -894,15 +900,16 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
     persProjInfo.zFar = pCamera->mClipPlaneFar;
-    persProjInfo.Width = pCamera->mAspect;
-
-    persProjInfo.Height = 1.0f;
+    int WindowWidth, WindowHeight;
+    m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
+    persProjInfo.Width = (float)WindowWidth;
+    persProjInfo.Height = (float)WindowHeight;
     persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV) / 2.0f;
 
     //exit(0);*/
 
-    Vector3f Center = FinalPos + FinalTarget;
-    m_cameras[Index].Init(FinalPos.ToGLM(), Center.ToGLM(), FinalUp.ToGLM(), persProjInfo);
+    //Vector3f Center = FinalPos + FinalTarget;
+    m_cameras[Index].Init(Pos.ToGLM(), FinalTarget.ToGLM(), FinalUp.ToGLM(), persProjInfo);
 }
 
 

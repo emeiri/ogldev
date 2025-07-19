@@ -376,7 +376,7 @@ struct Vector4f
         }
     }
 
-    Vector3f to3f() const
+    Vector3f to3D() const
     {
         Vector3f v(x, y, z);
         return v;
