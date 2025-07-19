@@ -197,11 +197,6 @@ void ForwardRenderer::InitTechniques()
         exit(1);
     }
 
-    if (!m_flatColorTech.Init()) {
-        printf("Error initializing the flat color technique\n");
-        exit(1);
-    }
-
     if (!m_pickingTech.Init()) {
         printf("Error initializing the picking technique\n");
         exit(1);
@@ -700,18 +695,11 @@ void ForwardRenderer::RenderObjectList(GLScene* pScene, long long TotalRuntimeMi
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
         m_pcurSceneObject = *it;
 
-        const Vector4f& FlatColor = m_pcurSceneObject->GetFlatColor();
-
-        if (FlatColor.x == -1.0f) {
-            if (FirstTimeForwardLighting) {
-                StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
-                //  FirstTimeForwardLighting = false; TODO: currently disabled
-            }
-            RenderWithForwardLighting(m_pcurSceneObject, TotalRuntimeMillis);
+        if (FirstTimeForwardLighting) {
+            StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
+            //  FirstTimeForwardLighting = false; TODO: currently disabled
         }
-        else {
-            RenderWithFlatColor(m_pcurSceneObject);
-        }
+        RenderWithForwardLighting(m_pcurSceneObject, TotalRuntimeMillis);
     }
 }
 
@@ -773,7 +761,14 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
     m_pCurBaseLightingTech->ControlParallaxMap(HeightMapEnabled);
 
     if (m_pCurLightingTech) {
-        m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));
+        const Vector4f& FlatColor = m_pcurSceneObject->GetFlatColor();
+
+        if (FlatColor.x == -1.0f) {
+            m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));            
+        } else {
+            m_pCurLightingTech->SetColorMod(Vector4f(0.0f));
+            m_pCurLightingTech->SetColorAdd(FlatColor);
+        }        
     }
 
     RenderSingleObject(pSceneObject);
@@ -801,19 +796,6 @@ void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
     else {
         pModel->Render(this);
     }
-}
-
-
-void ForwardRenderer::RenderWithFlatColor(CoreSceneObject* pSceneObject)
-{
-    m_curLightingTech = UNDEFINED_TECHNIQUE;    // a bit of a hack
-    m_flatColorTech.Enable();
-    m_flatColorTech.SetColor(pSceneObject->GetFlatColor());
-    Matrix4f WVP;
-    GetWVP(pSceneObject, WVP);
-    m_flatColorTech.SetWVP(WVP);
-    GLModel* pModel = (GLModel*)pSceneObject->GetModel();
-    pModel->Render(this);
 }
 
 

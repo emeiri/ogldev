@@ -29,7 +29,6 @@
 #include "gl_forward_skinning.h"
 #include "gl_shadow_mapping_technique.h"
 #include "gl_scene.h"
-#include "flat_color_technique.h"
 #include "GL/gl_picking_texture.h"
 #include "GL/gl_picking_technique.h"
 #include "GL/gl_pbr_forward_lighting.h"
@@ -156,7 +155,6 @@ private:
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
-    void RenderWithFlatColor(CoreSceneObject* pSceneObject);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderInfiniteGrid(GLScene* pScene);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
@@ -206,7 +204,6 @@ private:
     NormalTechnique m_normalTech;
     ShadowMappingTechnique m_shadowMapTech;
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
-    FlatColorTechnique m_flatColorTech;
     PickingTechnique m_pickingTech;
     PBRForwardLightingTechnique m_pbrLightingTech;
     PickingTexture m_pickingTexture;
