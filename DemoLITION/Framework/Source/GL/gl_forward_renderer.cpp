@@ -413,7 +413,7 @@ void ForwardRenderer::SetupLightSourcesArray(GLScene* pScene)
         m_lightSources[LightIndex].Atten_Linear = l.Attenuation.Linear;
         m_lightSources[LightIndex].Atten_Exp = l.Attenuation.Exp;
         m_lightSources[LightIndex].Color = l.Color.ToGLM();
-        m_lightSources[LightIndex].Cutoff = l.Cutoff;
+        m_lightSources[LightIndex].Cutoff = cosf(ToRadian(l.Cutoff));
         m_lightSources[LightIndex].DiffuseIntensity = l.DiffuseIntensity;
         Vector3f Dir = l.WorldDirection;
         m_lightSources[LightIndex].Direction = Dir.Normalize().ToGLM();
