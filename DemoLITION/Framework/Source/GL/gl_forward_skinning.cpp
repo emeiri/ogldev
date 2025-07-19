@@ -69,5 +69,5 @@ void ForwardSkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Tran
         return;
     }
     //Transform.Print();
-    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);
+    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, Transform.data());
 }
