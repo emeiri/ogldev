@@ -1044,7 +1044,8 @@ const VkPhysicalDeviceLimits& VulkanCore::GetPhysicalDeviceLimits() const
 }
 
 
-void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex, VkClearValue* pClearColor, VkClearValue* pDepthValue)
+void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex, 
+	                                VkClearValue* pClearColor, VkClearValue* pDepthValue)
 {
 	VkRenderingAttachmentInfoKHR ColorAttachment = {
 		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,

@@ -106,7 +106,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void ReloadShaders();
 
-    void SetCamera(GLMCameraFirstPerson* pCamera) {
+    void SetCamera(GLMCameraFirstPerson* pCamera) 
+    {
         m_pCurCamera = pCamera; 
     }
 

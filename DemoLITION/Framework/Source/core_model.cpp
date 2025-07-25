@@ -969,8 +969,8 @@ static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Ma
     }    
 
     while (pNode) {
-        Matrix4f NodeTransformation(pNode->mTransformation);
-        Transformation = NodeTransformation * Transformation;
+        Matrix4f CurTransformation(pNode->mTransformation);
+        Transformation = Transformation * CurTransformation;
         pNode = pNode->mParent;
     }
 
