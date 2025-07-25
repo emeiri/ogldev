@@ -119,7 +119,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Common\3rdparty\ImGui\GLFW;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;$(ProjectDir)\..\..\..\DemoLITION\Framework\Include;$(ProjectDir)\..\..\..\Common\</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>

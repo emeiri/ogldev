@@ -121,7 +121,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Physics\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -211,6 +211,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_combine_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssbo_db.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_mesh.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\Common\technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_mesh.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_model.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_rendering_system.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_scene.cpp" />
