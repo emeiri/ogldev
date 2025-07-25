@@ -38,6 +38,8 @@ public:
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
+	virtual void ConvertToMesh(MeshData& mesh) { assert(0); }
+
 	void CreateDescriptorSets(GraphicsPipelineV2& Pipeline);
 
 	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& pPipeline, int ImageIndex);
@@ -85,6 +87,9 @@ private:
 	};
 
 	std::vector<VulkanMeshEntry> m_alignedMeshes;
+
+	MemBuf m_alignedVertices;
+	MemBuf m_alignedIndices;
 };
 
 }

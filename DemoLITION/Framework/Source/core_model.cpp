@@ -127,6 +127,8 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename)
 
     InitLights(pScene);
 
+    //ConvertToMesh();
+
     return true;
 }
 
@@ -142,17 +144,7 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 
     CountVerticesAndIndices(pScene, NumVertices, NumIndices);
 
-    printf("Num animations %d\n", pScene->mNumAnimations);
-
-    if (pScene->mNumAnimations > 0) {
-        std::vector<SkinnedVertex> Vertices;
-        InitGeometryInternal<SkinnedVertex>(Vertices, NumVertices, NumIndices);
-        PopulateBuffersSkinned(Vertices);
-    } else {
-        std::vector<Vertex> Vertices;
-        InitGeometryInternal<Vertex>(Vertices, NumVertices, NumIndices);
-        PopulateBuffers(Vertices);
-    }
+    InitBuffers(pScene, NumVertices, NumIndices);
 
     if (!InitMaterials(pScene, Filename)) {
         return false;
@@ -170,6 +162,23 @@ bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 }
 
 
+void CoreModel::InitBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices)
+{
+    printf("Num animations %d\n", pScene->mNumAnimations);
+
+    if (pScene->mNumAnimations > 0) {
+        std::vector<SkinnedVertex> Vertices;
+        InitGeometryInternal<SkinnedVertex>(Vertices, NumVertices, NumIndices);
+        PopulateBuffersSkinned(Vertices);
+    }
+    else {
+        std::vector<Vertex> Vertices;
+        InitGeometryInternal<Vertex>(Vertices, NumVertices, NumIndices);
+        PopulateBuffers(Vertices);
+    }
+}
+
+
 template<typename VertexType>
 void CoreModel::InitGeometryInternal(std::vector<VertexType>& Vertices, int NumVertices, int NumIndices)
 {
@@ -180,8 +189,6 @@ void CoreModel::InitGeometryInternal(std::vector<VertexType>& Vertices, int NumV
     printf("Min pos: "); m_minPos.Print();
     printf("Max pos: "); m_maxPos.Print();
 }
-
-
 
 
 void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
@@ -980,11 +987,6 @@ static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Ma
 
 void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light)
 {
-    if (m_dirLights.size() > 0) {
-        printf("The lighting shader currently supports only a single directional light!\n");
-        exit(0);
-    }
-
     DirectionalLight l;
     //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
     l.Color = Vector3f(1.0f);

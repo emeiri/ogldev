@@ -51,10 +51,10 @@ MeshFileHeader LoadMeshData(const char* pMeshFile, MeshData& out)
         exit(EXIT_FAILURE);
     }
 
-    out.m_indexData.resize(header.m_indexDataSizeBytes / sizeof(u32));
-    out.m_vertexData.resize(header.m_vertexDataSizeBytes);
+    out.m_indexData.pMem = (char*)malloc(header.m_indexDataSizeBytes);
+    out.m_vertexData.pMem = (char*)malloc(header.m_vertexDataSizeBytes);
 
-    Size = fread(out.m_indexData.data(), 1, header.m_indexDataSizeBytes, f);
+    Size = fread(out.m_indexData.pMem, 1, header.m_indexDataSizeBytes, f);
 
     if (Size != header.m_indexDataSizeBytes) {
         printf("Unable to read index data.\n");
@@ -62,7 +62,7 @@ MeshFileHeader LoadMeshData(const char* pMeshFile, MeshData& out)
         exit(EXIT_FAILURE);
     }
 
-    Size = fread(out.m_vertexData.data(), 1, header.m_vertexDataSizeBytes, f);
+    Size = fread(out.m_vertexData.pMem, 1, header.m_vertexDataSizeBytes, f);
 
     if (Size != header.m_vertexDataSizeBytes) {
         printf("Unable to read vertex data.\n");
@@ -90,16 +90,18 @@ void SaveMeshData(const char* pfileName, const MeshData& m)
 
     MeshFileHeader header = {
       .m_meshCount = (u32)m.m_meshes.size(),
-      .m_indexDataSizeBytes = (u32)(m.m_indexData.size() * sizeof(u32)),
-      .m_vertexDataSizeBytes = (u32)(m.m_vertexData.size()),
+      .m_indexDataSizeBytes = (u32)(m.m_indexData.Size),
+      .m_vertexDataSizeBytes = (u32)(m.m_vertexData.Size),
     };
 
     fwrite(&header, 1, sizeof(header), f);
    // fwrite(&m.streams, 1, sizeof(m.streams), f);
     fwrite(m.m_meshes.data(), sizeof(Mesh), header.m_meshCount, f);
     fwrite(m.m_boxes.data(), sizeof(BoundingBox), header.m_meshCount, f);
-    fwrite(m.m_indexData.data(), 1, header.m_indexDataSizeBytes, f);
-    fwrite(m.m_vertexData.data(), 1, header.m_vertexDataSizeBytes, f);
+    fwrite(m.m_indexData.pMem, 1, header.m_indexDataSizeBytes, f);
+    fwrite(m.m_vertexData.pMem, 1, header.m_vertexDataSizeBytes, f);
 
     fclose(f);
+
+    printf("Mesh saved to '%s'\n", pfileName);
 }

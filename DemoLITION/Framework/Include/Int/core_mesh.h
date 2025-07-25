@@ -9,13 +9,14 @@
 #include "ogldev_types.h"
 
 
+
 #define MAX_LOD_COUNT 8
 
 struct Mesh {
     u32 m_lodCount = 1;
-    u32 m_indexOffset = 0;
-    u32 m_vertexOffset = 0;
-    u32 m_vertexCount = 0;
+    u32 m_baseIndex = 0;
+    u32 m_baseVertex = 0;
+    u32 m_numVertices = 0;
     u32 m_lodOffsets[MAX_LOD_COUNT + 1] = { 0 };
     u32 m_materialID = 0;
 
@@ -143,19 +144,30 @@ struct MeshMaterial {
 
 struct MeshData {
     //VertexInput streams = {};
-    std::vector<u32> m_indexData;
-    std::vector<u32> m_vertexData;
+    MemBuf m_indexData;
+    MemBuf m_vertexData;
     std::vector<Mesh> m_meshes;
     std::vector<BoundingBox> m_boxes;
     std::vector<MeshMaterial> m_materials;
     std::vector<std::string> m_textureFiles;
 
+    void Destroy()
+    {
+        if (m_indexData.pMem) {
+            free(m_indexData.pMem);
+        }
+
+        if (m_vertexData.pMem) {
+            free(m_vertexData.pMem);
+        }
+    }
+
     MeshFileHeader GetMeshFileHeader() const
     {
         MeshFileHeader m = {
           .m_meshCount = (u32)m_meshes.size(),
-          .m_indexDataSizeBytes = (u32)(m_indexData.size() * sizeof(u32)),
-          .m_vertexDataSizeBytes = (u32)m_vertexData.size(),
+          .m_indexDataSizeBytes = (u32)(m_indexData.Size),
+          .m_vertexDataSizeBytes = (u32)(m_vertexData.Size)
         };
 
         return m;
@@ -164,3 +176,5 @@ struct MeshData {
 
 
 MeshFileHeader LoadMeshData(const char* meshFile, MeshData& out);
+
+void SaveMeshData(const char* pfileName, const MeshData& m);

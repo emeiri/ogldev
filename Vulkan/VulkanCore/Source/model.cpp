@@ -38,6 +38,14 @@ void VkModel::Destroy()
 	}
 
 	DestroyModel();
+
+	if (m_alignedVertices.pMem) {
+		free(m_alignedVertices.pMem);
+	}
+
+	if (m_alignedIndices.pMem) {
+		free(m_alignedIndices.pMem);
+	}	
 }
 
 
@@ -104,34 +112,35 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	size_t IndexBufferSize = m_alignedMeshes[NumSubmeshes - 1].IndexBufferOffset +
 		                     m_alignedMeshes[NumSubmeshes - 1].IndexBufferRange;
 
-	char* pAlignedVertices = (char*)malloc(VertexBufferSize);
+	assert(m_alignedVertices.pMem == NULL);
+	m_alignedVertices.Size = VertexBufferSize;
+	m_alignedVertices.pMem = (char*)malloc(VertexBufferSize);
 	char* pSrcVertices = (char*)Vertices.data();
 
-	char* pAlignedIndices = (char*)malloc(IndexBufferSize);
+	assert(m_alignedIndices.pMem == NULL);
+	m_alignedIndices.Size = IndexBufferSize;
+	m_alignedIndices.pMem = (char*)malloc(IndexBufferSize);
 	char* pSrcIndices = (char*)m_Indices.data();
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		size_t SrcOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
 		char* pSrc = pSrcVertices + SrcOffset;
-		char* pDst = pAlignedVertices + m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
+		char* pDst = m_alignedVertices.pMem + m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 		size_t Size = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 		memcpy(pDst, pSrc, Size);
 
 		SrcOffset = m_Meshes[SubmeshIndex].BaseIndex * sizeof(u32);
 		pSrc = pSrcIndices + SrcOffset;
-		pDst = pAlignedIndices + m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
+		pDst = m_alignedIndices.pMem + m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
 		Size = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
 		memcpy(pDst, pSrc, Size);
 	}
 
-	m_vb = m_pVulkanCore->CreateVertexBuffer(pAlignedVertices, VertexBufferSize);
+	m_vb = m_pVulkanCore->CreateVertexBuffer(m_alignedVertices.pMem, VertexBufferSize);
 
-	m_ib = m_pVulkanCore->CreateVertexBuffer(pAlignedIndices, IndexBufferSize);
+	m_ib = m_pVulkanCore->CreateVertexBuffer(m_alignedIndices.pMem, IndexBufferSize);
 
 	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
-
-	free(pAlignedVertices);
-	free(pAlignedIndices);
 }
 
 

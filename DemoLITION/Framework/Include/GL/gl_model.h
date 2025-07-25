@@ -30,6 +30,8 @@ public:
 
     ~GLModel();
 
+    virtual void ConvertToMesh();
+
     void Render(DemolitionRenderCallbacks* pRenderCallbacks);
 
     void Render(uint DrawIndex, uint PrimID);
@@ -83,6 +85,9 @@ private:
     GLuint m_VAO = 0;
 
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
+
+    size_t m_vertexBufferSizeBytes = 0;
+    size_t m_indexBufferSizeBytes = 0;
 
     IndirectRender m_indirectRender;
 

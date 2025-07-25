@@ -29,6 +29,7 @@
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
+#include "Int/core_mesh.h"
 #include "GL/gl_basic_mesh_entry.h"
 
 void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
@@ -58,6 +59,8 @@ public:
     void DestroyModel();
 
     bool LoadAssimpModel(const std::string& Filename);
+
+    virtual void ConvertToMesh() = 0;
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
@@ -214,6 +217,8 @@ private:
     bool InitFromScene(const aiScene* pScene, const std::string& Filename);
 
     bool InitGeometry(const aiScene* pScene, const string& Filename);
+
+    void InitBuffers(const aiScene* pScene, unsigned int NumVertices, unsigned int NumIndices);
 
     template<typename VertexType>
     void InitGeometryInternal(std::vector<VertexType>& Vertices, int NumVertices, int NumIndices);

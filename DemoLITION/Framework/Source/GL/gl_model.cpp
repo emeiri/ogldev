@@ -54,6 +54,48 @@ GLModel::~GLModel()
     }
 }
 
+
+void GLModel::ConvertToMesh()
+{
+    MeshData mesh;
+
+    size_t NumMeshes = m_Meshes.size();
+    mesh.m_meshes.resize(NumMeshes);
+    mesh.m_boxes.resize(NumMeshes);
+
+    u32 IndexOffset = 0;
+    u32 VertexOffset = 0;
+
+    assert(m_vertexBufferSizeBytes > 0);
+    assert(m_indexBufferSizeBytes > 0);
+
+    mesh.m_indexData.Size = m_indexBufferSizeBytes;
+    mesh.m_indexData.pMem = (char*)glMapNamedBufferRange(m_Buffers[INDEX_BUFFER], 0, mesh.m_indexData.Size, GL_MAP_READ_BIT);
+
+    mesh.m_vertexData.Size = m_vertexBufferSizeBytes;
+    mesh.m_vertexData.pMem = (char*)glMapNamedBufferRange(m_Buffers[VERTEX_BUFFER], 0, mesh.m_vertexData.Size, GL_MAP_READ_BIT);
+
+    for (size_t i = 0; i != NumMeshes; i++) {
+        printf("\nConverting meshes %d/%d...", (int)i + 1, (int)NumMeshes);
+        fflush(stdout);
+        Mesh m;
+
+        m.m_baseIndex = m_Meshes[i].BaseIndex;
+        m.m_baseVertex = m_Meshes[i].BaseVertex;
+        //  Mesh m = convertAIMesh(scene->mMeshes[i], mesh, IndexOffset, VertexOffset);
+        
+        mesh.m_meshes[i] = m;
+    }
+
+    SaveMeshData("test.meshes", mesh);
+
+    // recalculateBoundingBoxes(meshData);
+
+    glUnmapNamedBuffer(m_Buffers[INDEX_BUFFER]);
+    glUnmapNamedBuffer(m_Buffers[VERTEX_BUFFER]);
+}
+
+
 void GLModel::AllocBuffers()
 {
     if (IsGLVersionHigher(4, 5)) {
@@ -92,6 +134,9 @@ void GLModel::InitGeometryPost()
 template<typename VertexType>
 void GLModel::PopulateBuffersInternal(std::vector<VertexType>& Vertices)
 {
+    m_vertexBufferSizeBytes = sizeof(VertexType) * Vertices.size();
+    m_indexBufferSizeBytes = sizeof(m_Indices[0]) * m_Indices.size();
+
     if (UsePVP) {
         if (IsGLVersionHigher(4, 5)) {
             PopulateBuffersPVP(Vertices);
@@ -114,8 +159,8 @@ void GLModel::PopulateBuffersInternal(std::vector<VertexType>& Vertices)
 template<typename VertexType>
 void GLModel::PopulateBuffersPVP(std::vector<VertexType>& Vertices)
 {
-    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
-    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
+    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], m_vertexBufferSizeBytes, Vertices.data(), GL_MAP_READ_BIT);
+    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], m_indexBufferSizeBytes, m_Indices.data(), GL_MAP_READ_BIT);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_INDEX_VERTICES, m_Buffers[VERTEX_BUFFER]);
 
@@ -129,8 +174,8 @@ void GLModel::PopulateBuffersNonDSA(std::vector<VertexType>& Vertices)
     glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[VERTEX_BUFFER]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[INDEX_BUFFER]);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(VertexType) * Vertices.size(), Vertices.data(), GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_Indices[0]) * m_Indices.size(), &m_Indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_vertexBufferSizeBytes, Vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferSizeBytes, &m_Indices[0], GL_STATIC_DRAW);
 
     size_t NumFloats = 0;
 
@@ -189,8 +234,8 @@ void GLModel::PopulateBuffersDSA(std::vector<VertexType>& Vertices)
     // for (int i = 0; i < Vertices.size(); i++) {
     //     Vertices[i].Print();
    //  }
-    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], sizeof(VertexType) * Vertices.size(), Vertices.data(), 0);
-    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], sizeof(m_Indices[0]) * m_Indices.size(), m_Indices.data(), 0);
+    glNamedBufferStorage(m_Buffers[VERTEX_BUFFER], m_vertexBufferSizeBytes, Vertices.data(), 0);
+    glNamedBufferStorage(m_Buffers[INDEX_BUFFER], m_indexBufferSizeBytes, m_Indices.data(), 0);
 
     glVertexArrayVertexBuffer(m_VAO, 0, m_Buffers[VERTEX_BUFFER], 0, sizeof(VertexType));
     glVertexArrayElementBuffer(m_VAO, m_Buffers[INDEX_BUFFER]);

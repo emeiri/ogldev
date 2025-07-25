@@ -38,4 +38,10 @@ typedef uint32_t u32;
 typedef int64_t i64;
 typedef uint64_t u64;
 
+struct MemBuf {
+    char* pMem = NULL;
+    size_t Size = 0;
+};
+
+
 #endif  /* OGLDEV_TYPES_H */
