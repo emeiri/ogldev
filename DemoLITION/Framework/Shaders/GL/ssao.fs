@@ -118,7 +118,7 @@ void main()
    
     // Sample noise texture and build TBN matrix
     vec3 RandomVec = normalize(texture(texRotation, TexCoords * NoiseScale).xyz);
-    vec3 Normal = texture(NormalMap, TexCoords).xyz; 
+    vec3 Normal = normalize(texture(NormalMap, TexCoords).xyz * 2.0 - vec3(1.0));
     vec3 Tangent = normalize(RandomVec - Normal * dot(RandomVec, Normal));
     vec3 Bitangent = cross(Normal, Tangent);
     mat3 TBN = mat3(Tangent, Bitangent, Normal);
