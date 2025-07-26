@@ -60,8 +60,6 @@ public:
 
     bool LoadAssimpModel(const std::string& Filename);
 
-    virtual void ConvertToMesh() = 0;
-
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 
     uint NumBones() const { return (uint)m_BoneNameToIndexMap.size(); }
@@ -280,6 +278,7 @@ private:
     std::vector<PointLight> m_pointLights;
     std::vector<SpotLight> m_spotLights;
     float m_textureScale = 1.0f;
+    u32 m_numAnimations = 0;
 
     Vector3f m_minPos = Vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
     Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);

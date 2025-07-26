@@ -78,7 +78,7 @@ public:
 
         m_pointLight[0].Color = Vector3f(0.5f, 0.5f, 0.0f);
         m_pointLight[0].WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
-        m_pointLight[0].DiffuseIntensity = 0.2f;
+        m_pointLight[0].DiffuseIntensity = 1.0f;
         m_pointLight[0].AmbientIntensity = 0.0f;
         m_pointLight[0].Attenuation.Constant = 0.25f;
 
@@ -119,7 +119,7 @@ public:
         //m_pScene->GetDirLights().push_back(m_dirLight[0]);
         //m_pScene->GetDirLights().push_back(m_dirLight[1]);
         m_pScene->GetPointLights().push_back(m_pointLight[0]);
-        m_pScene->GetPointLights().push_back(m_pointLight[1]);
+        //m_pScene->GetPointLights().push_back(m_pointLight[1]);
         //m_pScene->GetSpotLights().push_back(m_spotLight);
 
         m_pRenderingSystem->SetScene(m_pScene);
@@ -1005,8 +1005,6 @@ public:
         int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
         pConfig->SetIrradianceMap(IrrdianceMap);
 
-//        m_pModel->SetPBR(true);
-
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);
 
@@ -1077,16 +1075,52 @@ public:
 };
 
 
+class MeshConvertDemo : public Carbonara {
+
+public:
+
+    MeshConvertDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //   m_pScene->SetCamera(Vector3f(-490.0f, 270.0f, 570.0f), Vector3f(1.0f, 0.05f, 0.4f));
+         //  Model* pModel = m_pRenderingSystem->LoadModel("C:/Users/emeir/Downloads/Bistro_v5_2/Bistro_v5_2/BistroExterior.fbx");
+         //   Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        pModel->ConvertToMesh("DamagedHelmet.mesh");
+
+        Model* pMesh = m_pRenderingSystem->LoadMesh("DamagedHelmet.mesh");
+        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pMesh);
+        //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        m_pScene->AddToRenderList(pSceneObject);
+    }
+};
+
+
+
 void carbonara()
 {
-  // BallisticsDemo demo;
-   //FireworksDemo demo;
-  //  AnimationDemo demo;
-  //  BridgeDemo demo;
-    AssetLoadDemo demo;
-  //  PBRDemo demo;
-  //  SkyboxDemo demo;
-    //  GLTFPBRDemo demo;
+    //BallisticsDemo demo;
+    //FireworksDemo demo;
+    //AnimationDemo demo;
+    //BridgeDemo demo;
+    //AssetLoadDemo demo;
+    //PBRDemo demo;
+    //SkyboxDemo demo;
+    //GLTFPBRDemo demo;
+    MeshConvertDemo demo;
 
     demo.Start();
 }

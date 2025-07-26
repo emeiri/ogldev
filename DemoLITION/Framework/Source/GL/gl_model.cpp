@@ -55,19 +55,20 @@ GLModel::~GLModel()
 }
 
 
-void GLModel::ConvertToMesh()
+void GLModel::ConvertToMesh(const char* pFilename)
 {
+    assert(m_vertexBufferSizeBytes > 0);
+    assert(m_indexBufferSizeBytes > 0);
+
     MeshData mesh;
+
+    mesh.m_totalVertices = (int)(m_vertexBufferSizeBytes / sizeof(Vertex));
+    mesh.m_totalIndices = (int)m_Indices.size();
+    mesh.m_vertexSize = (int)sizeof(Vertex);
 
     size_t NumMeshes = m_Meshes.size();
     mesh.m_meshes.resize(NumMeshes);
     mesh.m_boxes.resize(NumMeshes);
-
-    u32 IndexOffset = 0;
-    u32 VertexOffset = 0;
-
-    assert(m_vertexBufferSizeBytes > 0);
-    assert(m_indexBufferSizeBytes > 0);
 
     mesh.m_indexData.Size = m_indexBufferSizeBytes;
     mesh.m_indexData.pMem = (char*)glMapNamedBufferRange(m_Buffers[INDEX_BUFFER], 0, mesh.m_indexData.Size, GL_MAP_READ_BIT);
@@ -76,23 +77,65 @@ void GLModel::ConvertToMesh()
     mesh.m_vertexData.pMem = (char*)glMapNamedBufferRange(m_Buffers[VERTEX_BUFFER], 0, mesh.m_vertexData.Size, GL_MAP_READ_BIT);
 
     for (size_t i = 0; i != NumMeshes; i++) {
-        printf("\nConverting meshes %d/%d...", (int)i + 1, (int)NumMeshes);
-        fflush(stdout);
+        printf("\nConverting meshes %d/%d\n", (int)i + 1, (int)NumMeshes);
         Mesh m;
 
+        // TODO: lod
         m.m_baseIndex = m_Meshes[i].BaseIndex;
         m.m_baseVertex = m_Meshes[i].BaseVertex;
-        //  Mesh m = convertAIMesh(scene->mMeshes[i], mesh, IndexOffset, VertexOffset);
+        m.m_numIndices = m_Meshes[i].NumIndices;
+        m.m_numVertices = m_Meshes[i].NumVertices;
+        m.m_lodOffsets[0] = 0;
+        m.m_lodOffsets[1] = m_Meshes[i].NumIndices;
         
         mesh.m_meshes[i] = m;
     }
 
-    SaveMeshData("test.meshes", mesh);
+    SaveMeshData(pFilename, mesh);
 
     // recalculateBoundingBoxes(meshData);
 
     glUnmapNamedBuffer(m_Buffers[INDEX_BUFFER]);
     glUnmapNamedBuffer(m_Buffers[VERTEX_BUFFER]);
+}
+
+
+bool GLModel::LoadMesh(const std::string& Filename)
+{
+    MeshData mesh;
+
+    LoadMeshData(Filename.c_str(), mesh);
+
+    AllocBuffers();
+
+    m_Meshes.resize(mesh.m_meshes.size());
+
+    for (int i = 0 ; i < m_Meshes.size() ; i++) {
+        m_Meshes[i].NumIndices = mesh.m_meshes[i].m_numIndices;
+        m_Meshes[i].NumVertices = mesh.m_meshes[i].m_numVertices;
+        m_Meshes[i].BaseVertex = mesh.m_meshes[i].m_baseVertex;
+        m_Meshes[i].BaseIndex = mesh.m_meshes[i].m_baseIndex;
+        //m_Meshes[i].ValidFaces =
+        m_Meshes[i].MaterialIndex = 0;
+        m_Meshes[i].Transformation.InitIdentity();
+    }
+
+    m_Indices.resize(mesh.m_totalIndices);
+    memcpy(m_Indices.data(), mesh.m_indexData.pMem, mesh.m_indexData.Size);
+
+    std::vector<Vertex> Vertices(mesh.m_totalVertices);
+    memcpy(Vertices.data(), mesh.m_vertexData.pMem, mesh.m_vertexData.Size);
+
+    PopulateBuffers(Vertices);
+
+    m_Materials.resize(1);
+
+
+    mesh.Destroy();
+
+    glBindVertexArray(0);
+
+    return true;
 }
 
 
@@ -369,10 +412,10 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
     }
 
     glDrawElementsBaseVertex(GL_TRIANGLES,
-                        m_Meshes[MeshIndex].NumIndices,
-                        GL_UNSIGNED_INT,
-                        (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
-                        m_Meshes[MeshIndex].BaseVertex);
+                             m_Meshes[MeshIndex].NumIndices,
+                             GL_UNSIGNED_INT,
+                             (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
+                             m_Meshes[MeshIndex].BaseVertex);
 }
 
 

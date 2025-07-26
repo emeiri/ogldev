@@ -30,7 +30,9 @@ public:
 
     ~GLModel();
 
-    virtual void ConvertToMesh();
+    virtual void ConvertToMesh(const char* pFilename);
+
+    bool LoadMesh(const std::string& Filename);
 
     void Render(DemolitionRenderCallbacks* pRenderCallbacks);
 

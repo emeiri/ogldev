@@ -43,6 +43,8 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual CoreModel* LoadModelInternal(const std::string& Filename);
 
+    virtual CoreModel* LoadMeshInternal(const std::string& Filename);
+
     virtual Grid* CreateGridInternal(int Width, int Depth);
 
     virtual int LoadTexture2D(const std::string& Filename);

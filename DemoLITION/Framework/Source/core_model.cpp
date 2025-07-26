@@ -127,8 +127,6 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename)
 
     InitLights(pScene);
 
-    //ConvertToMesh();
-
     return true;
 }
 
@@ -136,6 +134,7 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename)
 bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
 {
     printf("\n*** Initializing geometry ***\n");
+    m_numAnimations = pScene->mNumAnimations;
     m_Meshes.resize(pScene->mNumMeshes);
     m_Materials.resize(pScene->mNumMaterials);
 
@@ -1552,7 +1551,7 @@ const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation&
 
 bool CoreModel::IsAnimated() const
 {
-    bool ret = m_pScene->mNumAnimations > 0;
+    bool ret = m_numAnimations > 0;
 
     if (ret && (NumBones() == 0)) {
         printf("Animations without bones? need to check this\n");

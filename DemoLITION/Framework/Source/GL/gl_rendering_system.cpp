@@ -121,6 +121,19 @@ CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
 }
 
 
+CoreModel* RenderingSystemGL::LoadMeshInternal(const std::string& Filename)
+{
+    GLModel* pModel = new GLModel(this);
+
+    if (!pModel->LoadMesh(Filename)) {
+        delete pModel;
+        pModel = NULL;
+    }
+
+    return pModel;
+}
+
+
 Grid* RenderingSystemGL::CreateGridInternal(int Width, int Depth)
 {
     GLGrid* pGrid = new GLGrid(Width, Depth);

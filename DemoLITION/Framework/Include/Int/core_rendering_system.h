@@ -39,6 +39,8 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual Model* LoadModel(const std::string& Filename);
 
+    virtual Model* LoadMesh(const std::string& Filename);
+
     virtual Grid* CreateGrid(int Width, int Depth);
 
     virtual Model* GetModel(const std::string& BasicShape);
@@ -66,6 +68,8 @@ class CoreRenderingSystem : public RenderingSystem
     virtual void* CreateWindowInternal(const char* pWindowName) = 0;
 
     virtual CoreModel* LoadModelInternal(const std::string& Filename) = 0;
+
+    virtual CoreModel* LoadMeshInternal(const std::string& Filename) = 0;
 
     virtual Grid* CreateGridInternal(int Width, int Depth) = 0;
 

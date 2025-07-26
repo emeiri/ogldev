@@ -17,6 +17,7 @@ struct Mesh {
     u32 m_baseIndex = 0;
     u32 m_baseVertex = 0;
     u32 m_numVertices = 0;
+    u32 m_numIndices = 0;
     u32 m_lodOffsets[MAX_LOD_COUNT + 1] = { 0 };
     u32 m_materialID = 0;
 
@@ -38,8 +39,12 @@ struct Mesh {
 struct MeshFileHeader {
     u32 m_magicValue = 0x12345678;
     u32 m_meshCount = 0;
+    u32 m_numIndices = 0;
     u32 m_indexDataSizeBytes = 0;
+    u32 m_numVertices = 0;
     u32 m_vertexDataSizeBytes = 0;
+    u32 m_vertexSizeBytes = 0;    
+    
 };
 
 
@@ -142,14 +147,13 @@ struct MeshMaterial {
 };
 
 
-struct MeshData {
-    //VertexInput streams = {};
-    MemBuf m_indexData;
-    MemBuf m_vertexData;
-    std::vector<Mesh> m_meshes;
-    std::vector<BoundingBox> m_boxes;
-    std::vector<MeshMaterial> m_materials;
-    std::vector<std::string> m_textureFiles;
+class MeshData {
+
+public:
+
+    MeshData() {};
+
+    ~MeshData() {}
 
     void Destroy()
     {
@@ -162,7 +166,7 @@ struct MeshData {
         }
     }
 
-    MeshFileHeader GetMeshFileHeader() const
+    /*MeshFileHeader GetMeshFileHeader() const
     {
         MeshFileHeader m = {
           .m_meshCount = (u32)m_meshes.size(),
@@ -171,7 +175,18 @@ struct MeshData {
         };
 
         return m;
-    }
+    }*/
+
+    //VertexInput streams = {};
+    MemBuf m_indexData;
+    MemBuf m_vertexData;
+    u32 m_totalVertices = 0;
+    u32 m_totalIndices = 0;
+    u32 m_vertexSize = 0;
+    std::vector<Mesh> m_meshes;
+    std::vector<BoundingBox> m_boxes;
+    std::vector<MeshMaterial> m_materials;
+    std::vector<std::string> m_textureFiles;
 };
 
 

@@ -34,6 +34,8 @@ public:
 
     virtual void SetTextureScale(float Scale) = 0;
 
+    virtual void ConvertToMesh(const char* pFilename) { assert(0); }
+
     PBRMaterial& GetPBRMaterial() { return m_PBRmaterial; };
 
     void SetPBR(bool IsPBR) { m_isPBR = IsPBR; }
