@@ -178,9 +178,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\wireframe_on_mesh.gs = ..\..\Common\Shaders\wireframe_on_mesh.gs
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial34", "Tutorial34\Tutorial34.vcxproj", "{1262B432-20E9-4732-8131-C12158999402}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial34_TonnShadingRimLighting", "Tutorial34\Tutorial34.vcxproj", "{1262B432-20E9-4732-8131-C12158999402}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial35", "Tutorial35\Tutorial35.vcxproj", "{3A97ECEA-0AE3-40B5-BB73-0874F5F9516B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial35_ShadowMapping", "Tutorial35\Tutorial35.vcxproj", "{3A97ECEA-0AE3-40B5-BB73-0874F5F9516B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial36_DirLightShadows", "Tutorial36\Tutorial36.vcxproj", "{50449426-0E07-4D4A-B7EC-366B8D1A8503}"
 EndProject
@@ -524,6 +524,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial23", "Vulkan\Tutori
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial62_SSAO", "Tutorial62_SSAO\Tutorial62.vcxproj", "{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial63_HDR_ToneMap", "Tutorial63_HDRToneMap\Tutorial63.vcxproj", "{CD7AF310-6821-40E7-A06B-11F65513899D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
 	EndProjectSection
@@ -1440,6 +1445,14 @@ Global
 		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x64.Build.0 = Release|x64
 		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x86.ActiveCfg = Release|Win32
 		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49}.Release|x86.Build.0 = Release|Win32
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Debug|x64.ActiveCfg = Debug|x64
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Debug|x64.Build.0 = Debug|x64
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Debug|x86.ActiveCfg = Debug|Win32
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Debug|x86.Build.0 = Debug|Win32
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x64.ActiveCfg = Release|x64
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x64.Build.0 = Release|x64
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x86.ActiveCfg = Release|Win32
+		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1565,6 +1578,7 @@ Global
 		{D5FF50DB-B727-48E5-9390-92F9DD8EAA01} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{3041FBBB-86DE-4276-B344-6A5276B9260B} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{CD7AF310-6821-40E7-A06B-11F65513899D} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
