@@ -147,7 +147,30 @@ Model* CoreRenderingSystem::LoadModel(const std::string& Filename)
 
     return pModel;
 }
- 
+
+
+Model* CoreRenderingSystem::LoadMesh(const std::string& Filename)
+{
+    if (m_numModels == m_models.size()) {
+        printf("%s:%d: out of models space\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    CoreModel* pModel = LoadMeshInternal(Filename);
+
+    if (pModel) {
+        m_models[m_numModels] = pModel;
+        m_numModels++;
+        pModel->SetName(Filename);
+    }
+    else {
+        printf("%s:%d: error loading '%s'\n", __FILE__, __LINE__, Filename.c_str());
+        exit(0);
+    }
+
+    return pModel;
+}
+
 
 Grid* CoreRenderingSystem::CreateGrid(int Width, int Depth)
 {
