@@ -39,6 +39,8 @@
 #include "GL/gl_ssao_combine_technique.h"
 #include "GL/gl_normal_technique.h"
 #include "GL/gl_buffer.h"
+#include "GL/gl_tone_map_technique.h"
+#include "GL/gl_hdr_technique.h"
 
 
 enum RENDER_PASS {
@@ -148,11 +150,13 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void NormalPass(GLScene* pScene);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
-    float ComputeAverageLuminance();
+    float HDRPassGPU(float& Exposure);
+    float HDRPassCPU(float& Exposure);
     void UpdateLightSources(GLScene* pScene);
     void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
+    void ToneMappingPass(float AverageLuminance, float Exposure);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
@@ -192,6 +196,7 @@ private:
     GLBuffer m_lightParams;
     std::vector<LightSource> m_lightSources;
     std::vector<float> m_hdrData;
+    GLBuffer m_luminanceBuffer;
 
     // Shadow stuff
     FramebufferObject m_shadowMapFBO;           // TODO: switch to Framebuffer class
@@ -214,6 +219,10 @@ private:
     FullScreenQuadTechnique m_fullScreenQuadTech;
     SSAOTechnique m_ssaoTech;
     SSAOCombineTechnique m_ssaoCombineTech;
+    ToneMapTechnique m_toneMapTech;
+    HDRTechnique m_hdrTech;
+    int m_hdrNumGroupsX = 0;
+    int m_hdrNumGroupsY = 0;
 
     InfiniteGrid m_infiniteGrid;
 

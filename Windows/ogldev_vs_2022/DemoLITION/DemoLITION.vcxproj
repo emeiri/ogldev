@@ -194,6 +194,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_full_screen_quad_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_hdr_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_indirect_render.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_infinite_grid_technique.h" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_combine_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssbo_db.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_tone_map_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_mesh.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
@@ -251,6 +253,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_full_screen_quad_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_hdr_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_indirect_render.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_infinite_grid_technique.cpp" />
@@ -265,6 +268,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_skybox.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_skybox_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_ssao_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_tone_map_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +278,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\full_screen_quad.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\hdr.cs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\infinite_grid.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\normal.fs" />
@@ -287,6 +292,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssao.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssao_combine.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tex.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

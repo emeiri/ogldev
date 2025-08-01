@@ -145,6 +145,12 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\core_mesh.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_tone_map_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_hdr_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -303,6 +309,12 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_mesh.h">
       <Filter>Include\Int</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_tone_map_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_hdr_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -395,6 +407,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\normal.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\hdr.cs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

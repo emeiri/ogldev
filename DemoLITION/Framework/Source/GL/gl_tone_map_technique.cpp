@@ -40,6 +40,7 @@ bool ToneMapTechnique::Init()
 
     GET_UNIFORM_AND_CHECK(m_avgLumLoc, "AveLum");
     GET_UNIFORM_AND_CHECK(m_hdrSamplerLoc, "gHDRSampler");
+    GET_UNIFORM_AND_CHECK(m_exposure, "gExposure");
 
     return true;
 }
@@ -61,5 +62,11 @@ void ToneMapTechnique::SetAverageLuminance(float AvgLum)
 void ToneMapTechnique::SetHDRSampler(unsigned int TextureUnit)
 {
     glUniform1i(m_hdrSamplerLoc, TextureUnit);
+}
+
+
+void ToneMapTechnique::SetExposure(float Exposure)
+{
+    glUniform1f(m_exposure, Exposure);
 }
 

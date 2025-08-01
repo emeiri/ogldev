@@ -122,6 +122,13 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
     int Size = m_windowWidth * m_windowHeight;
     m_hdrData.resize(Size * 3);
 
+    int local_size_x = 10;
+    int local_size_y = 10;
+    m_hdrNumGroupsX = (int)AlignUpToMultiple(m_windowWidth, local_size_x) / local_size_x;
+    m_hdrNumGroupsY = (int)AlignUpToMultiple(m_windowHeight, local_size_y) / local_size_y;
+    int NumTiles = m_hdrNumGroupsX * m_hdrNumGroupsY;
+    m_luminanceBuffer.InitBuffer(sizeof(float) * NumTiles, NULL, GL_MAP_READ_BIT | GL_CLIENT_STORAGE_BIT);
+
     m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
 
     m_lightSources.resize(MAX_NUM_LIGHTS);
@@ -224,6 +231,19 @@ void ForwardRenderer::InitTechniques()
 
     if (!m_normalTech.Init()) {
         printf("Error initializing the normal technique\n");
+        exit(1);
+    }
+
+    if (!m_toneMapTech.Init()) {
+        printf("Error initializing the tone mapping technique\n");
+        exit(1);
+    }
+
+    m_toneMapTech.Enable();
+    m_toneMapTech.SetHDRSampler(0);
+
+    if (!m_hdrTech.Init()) {
+        printf("Error initializing the HDR technique\n");
         exit(1);
     }
 }
@@ -335,8 +355,12 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
 
     LightingPass(pScene, TotalRuntimeMillis);
 
+    float AverageLuminance = 0.0f;
+    float Exposure = 0.0f;
+
     if (IsHDR) {
-        float AverageLuminance = ComputeAverageLuminance();
+        //AverageLuminance = HDRPassCPU(Exposure);
+        AverageLuminance = HDRPassGPU(Exposure);
     }
 
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
@@ -348,12 +372,14 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         SSAOPass(pScene);
         SSAOCombinePass();
     } else if (IsHDR) {
-        if (UseBlitForFinalCopy) {
+        ToneMappingPass(AverageLuminance, Exposure);
+
+        /*if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             m_lightingFBO.BlitToWindow();
         } else {
             FullScreenQuadBlit(pScene);
-        }
+        }*/
     } else {
         // Do nothing?
     }
@@ -686,7 +712,38 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
 }
 
 
-float ForwardRenderer::ComputeAverageLuminance()
+float ForwardRenderer::HDRPassGPU(float& Exposure)
+{
+    m_hdrFBO.BindForReading(GL_TEXTURE0);
+    m_luminanceBuffer.BindSSBO(1);
+
+    m_hdrTech.Enable();
+    glDispatchCompute(m_hdrNumGroupsX, m_hdrNumGroupsY, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    float* p = (float*)m_luminanceBuffer.MapForReading();
+
+    float sum = 0.0f;
+
+    int NumTiles = m_hdrNumGroupsX * m_hdrNumGroupsY;
+
+    for (int i = 0; i < NumTiles; ++i) {
+        sum += p[i];
+    }
+
+    m_luminanceBuffer.Unmap();
+
+   // printf("sum 1 %f\n", sum);
+
+    float avgLogLum = sum / (NumTiles * 100.0f);
+   // printf("avgLogLum %f\n", avgLogLum);
+    Exposure = 0.18f / expf(avgLogLum);
+   // printf("%f\n", exposure);
+    return expf(avgLogLum);
+}
+
+
+float ForwardRenderer::HDRPassCPU(float& Exposure)
 {
     m_hdrFBO.BindForReading(GL_TEXTURE0);
 
@@ -695,13 +752,21 @@ float ForwardRenderer::ComputeAverageLuminance()
     float sum = 0.0f;
     int Size = m_windowWidth * m_windowHeight;
     
+    //#pragma omp parallel for
     for (int i = 0; i < Size; i++) {
         float lum = glm::dot(glm::vec3(m_hdrData[i * 3 + 0], m_hdrData[i * 3 + 1], m_hdrData[i * 3 + 2]),
                              glm::vec3(0.2126f, 0.7152f, 0.0722f));
         sum += logf(lum + 0.00001f);
     }
+
+    //printf("sum 2 %f\n", sum);
     
-    float AverageLuminance = expf(sum / Size);
+    float avgLogLum = sum / Size;
+
+    //printf("avgLogLum %f\n", avgLogLum);
+    float AverageLuminance = expf(avgLogLum);
+   
+    Exposure = 0.18f / AverageLuminance;
 
     return AverageLuminance;
 }
@@ -915,6 +980,23 @@ void ForwardRenderer::SSAOCombinePass()
     m_ssaoCombineTech.Enable();
 
     m_ssaoCombineTech.Render();
+}
+
+
+void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
+
+    m_hdrFBO.BindForReading(GL_TEXTURE0);
+
+    m_toneMapTech.Enable();
+
+    m_toneMapTech.SetAverageLuminance(AverageLuminance);
+    m_toneMapTech.SetExposure(Exposure);
+
+    m_toneMapTech.Render();
 }
 
 
