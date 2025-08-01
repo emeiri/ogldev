@@ -24,24 +24,24 @@ Framebuffer::~Framebuffer()
 }
 
 
-void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool DepthEnabled)
+void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled)
 {
     if (IsGLVersionHigher(4, 5)) {
-        InitDSA(Width, Height, NumFormatComponents, DepthEnabled);
+        InitDSA(Width, Height, NumFormatComponents, IsFloat, DepthEnabled);
     } else {
-        InitNonDSA(Width, Height, NumFormatComponents, DepthEnabled);
+        InitNonDSA(Width, Height, NumFormatComponents, IsFloat, DepthEnabled);
     }
 }
 
 
-void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled)
+void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled)
 {
     m_width = Width;
     m_height = Height;
 
     glCreateFramebuffers(1, &m_fbo);
 
-    GenerateColorBuffer(Width, Height, NumFormatComponents);
+    GenerateColorBuffer(Width, Height, NumFormatComponents, IsFloat);
 
     if (DepthEnabled) {
         GenerateDepthBuffer(Width, Height);
@@ -66,14 +66,14 @@ void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool D
 }
 
 
-void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled)
+void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled)
 {
     m_width = Width;
     m_height = Height;
 
     glGenFramebuffers(1, &m_fbo);
 
-    GenerateColorBuffer(Width, Height, NumFormatComponents);
+    GenerateColorBuffer(Width, Height, NumFormatComponents, IsFloat);
 
     if (DepthEnabled) {
         GenerateDepthBuffer(Width, Height);
@@ -124,31 +124,41 @@ void Framebuffer::GenerateDepthBuffer(int Width, int Height)
 }
 
 
-void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatComponents)
+void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatComponents, bool IsFloat)
 {
     if (IsGLVersionHigher(4, 5)) {
-        GenerateColorBufferDSA(NumFormatComponents, Width, Height);
+        GenerateColorBufferDSA(NumFormatComponents, IsFloat, Width, Height);
     }
     else {
-        GenerateColorBufferNonDSA(NumFormatComponents, Width, Height);
+        GenerateColorBufferNonDSA(NumFormatComponents, IsFloat, Width, Height);
     }
 }
 
 
-void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, int Width, int Height)
+void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, bool IsFloat, int Width, int Height)
 {
     GLenum InternalFormat = 0;
 
     switch (NumFormatComponents) {
     case 4:
-        InternalFormat = GL_RGBA8;
+        if (IsFloat) {
+            InternalFormat = GL_RGBA32F;
+        } else {
+            InternalFormat = GL_RGBA8;
+        }        
         break;
 
     case 3:
-        InternalFormat = GL_RGB8;
+        if (IsFloat) {
+            InternalFormat = GL_RGB32F;
+        }
+        else {
+            InternalFormat = GL_RGB8;
+        }        
         break;
 
     case 1:
+        assert(IsFloat);
         InternalFormat = GL_R32F;
         break;
 
@@ -166,18 +176,21 @@ void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, int Width, int
 }
 
 
-void Framebuffer::GenerateColorBufferNonDSA(int NumFormatComponents, int Width, int Height)
+void Framebuffer::GenerateColorBufferNonDSA(int NumFormatComponents, bool IsFloat, int Width, int Height)
 {
     glGenTextures(1, &m_colorBuffer);
     glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
     switch (NumFormatComponents) {
     case 4:
+        assert(!IsFloat);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
         break;
     case 3:
+        assert(!IsFloat);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
         break;
     case 1:
+        assert(IsFloat);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, Width, Height, 0, GL_RED, GL_FLOAT, NULL);
         break;
     default:

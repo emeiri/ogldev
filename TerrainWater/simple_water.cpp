@@ -49,8 +49,8 @@ void SimpleWater::Init(int Size, float WorldScale)
 
     m_water.CreateTriangleList(2, 2, Size * WorldScale);
 
-    m_reflectionFBO.Init(1000, 1000, 3, true);
-    m_refractionFBO.Init(1000, 1000, 3, true);
+    m_reflectionFBO.Init(1000, 1000, 3, false, true);
+    m_refractionFBO.Init(1000, 1000, 3, false, true);
 }
 
 

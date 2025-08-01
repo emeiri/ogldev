@@ -31,7 +31,7 @@ public:
 
     ~Framebuffer();
 
-    void Init(int Width, int Height, int NumFormatComponents, bool DepthEnabled);
+    void Init(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled);
 
     void BindForWriting();
 
@@ -56,15 +56,15 @@ public:
     int GetHeight() const { return m_height; }
 
 private:
-    void InitDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled);
+    void InitDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled);
 
-    void InitNonDSA(int Width, int Height, int NumFormatComponents, bool DepthEnabled);
+    void InitNonDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled);
 
-    void GenerateColorBuffer(int Width, int Height, int NumFormatComponents);
+    void GenerateColorBuffer(int Width, int Height, int NumFormatComponents, bool IsFloat);
 
-    void GenerateColorBufferNonDSA(int NumFormatComponents, int Width, int Height);
+    void GenerateColorBufferNonDSA(int NumFormatComponents, bool IsFloat, int Width, int Height);
 
-    void GenerateColorBufferDSA(int NumFormatComponents, int Width, int Height);
+    void GenerateColorBufferDSA(int NumFormatComponents, bool IsFloat, int Width, int Height);
 
     void GenerateDepthBuffer(int Width, int Height);
 
