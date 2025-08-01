@@ -285,6 +285,10 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 
 void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
 {
+    if (DisableSSAO) {
+        pScene->GetConfig()->ControlSSAO(false);
+    }
+
     // TODO: can be removed? happens also at the start of the LightingPass
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
@@ -328,7 +332,7 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
 
-    if (pScene->GetConfig()->IsSSAOEnabled() && !DisableSSAO) {
+    if (pScene->GetConfig()->IsSSAOEnabled()) {
         NormalPass(pScene);
         SSAOPass(pScene);
         SSAOCombinePass();
