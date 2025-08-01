@@ -17,6 +17,26 @@ void GLBuffer::BindUBO(int BindIndex)
 }
 
 
+void GLBuffer::BindSSBO(int BindIndex)
+{
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, BindIndex, m_buf);
+}
+
+
+void* GLBuffer::MapForReading()
+{
+	void* p = glMapNamedBufferRange(m_buf, 0, m_size, GL_MAP_READ_BIT);
+
+	return p;
+}
+
+
+void GLBuffer::Unmap()
+{
+	glUnmapNamedBuffer(m_buf);
+}
+
+
 void GLBuffer::Update(const void* pData, size_t size)
 {
 	if (size > m_size) {

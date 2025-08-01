@@ -11,6 +11,12 @@ public:
 
 	void BindUBO(int BindIndex);
 
+	void BindSSBO(int BindIndex);
+
+	void* MapForReading();
+
+	void Unmap();
+
 	void Update(const void* pData, size_t size);
 
 	~GLBuffer() {};
