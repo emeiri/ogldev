@@ -142,19 +142,19 @@ void ForwardLightingTechnique::SetTextureUnit(unsigned int TextureUnit)
 }
 
 
-void ForwardLightingTechnique::SetNormalMapTextureUnit(int TextureUnit)
+void ForwardLightingTechnique::SetNormalMapTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(NormalMapLoc, TextureUnit);
 }
 
 
-void ForwardLightingTechnique::SetHeightMapTextureUnit(int TextureUnit)
+void ForwardLightingTechnique::SetHeightMapTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(HeightMapLoc, TextureUnit);
 }
 
 
-void ForwardLightingTechnique::SetSkyboxTextureUnit(int TextureUnit)
+void ForwardLightingTechnique::SetSkyboxTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(SkyboxLoc, TextureUnit);
 }

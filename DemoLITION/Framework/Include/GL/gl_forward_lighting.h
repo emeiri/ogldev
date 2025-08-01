@@ -50,9 +50,9 @@ public:
     void SetMetallicTextureUnit(unsigned int TextureUnit);
     void SetAOTextureUnit(unsigned int TextureUnit);
     void SetEmissiveTextureUnit(unsigned int TextureUnit);
-    void SetNormalMapTextureUnit(int TextureUnit);
-    void SetHeightMapTextureUnit(int TextureUnit);
-    void SetSkyboxTextureUnit(int TextureUnit);
+    void SetNormalMapTextureUnit(unsigned int TextureUnit);
+    void SetHeightMapTextureUnit(unsigned int TextureUnit);
+    void SetSkyboxTextureUnit(unsigned int TextureUnit);
     void SetColorMod(const Vector4f& ColorMod);
     void SetColorAdd(const Vector4f& ColorAdd);
     void ControlRimLight(bool IsEnabled);
