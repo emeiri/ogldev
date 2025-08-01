@@ -148,6 +148,7 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void NormalPass(GLScene* pScene);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
+    float ComputeAverageLuminance();
     void UpdateLightSources(GLScene* pScene);
     void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
@@ -190,6 +191,7 @@ private:
     Texture m_ssaoRotTexture;
     GLBuffer m_lightParams;
     std::vector<LightSource> m_lightSources;
+    std::vector<float> m_hdrData;
 
     // Shadow stuff
     FramebufferObject m_shadowMapFBO;           // TODO: switch to Framebuffer class

@@ -119,6 +119,9 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_hdrFBO.Init(m_windowWidth, m_windowHeight, 3, true, true);
 
+    int Size = m_windowWidth * m_windowHeight;
+    m_hdrData.resize(Size * 3);
+
     m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
 
     m_lightSources.resize(MAX_NUM_LIGHTS);
@@ -326,9 +329,15 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
 void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
 {
+    bool IsHDR = pScene->GetConfig()->IsHDREnabled();
+
     ShadowMapPass(pScene);
 
     LightingPass(pScene, TotalRuntimeMillis);
+
+    if (IsHDR) {
+        float AverageLuminance = ComputeAverageLuminance();
+    }
 
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
@@ -338,7 +347,7 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         NormalPass(pScene);
         SSAOPass(pScene);
         SSAOCombinePass();
-    } else if (pScene->GetConfig()->IsHDREnabled()) {
+    } else if (IsHDR) {
         if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             m_lightingFBO.BlitToWindow();
@@ -674,6 +683,27 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
     }
 
     RenderObjectList(pScene, TotalRuntimeMillis);
+}
+
+
+float ForwardRenderer::ComputeAverageLuminance()
+{
+    m_hdrFBO.BindForReading(GL_TEXTURE0);
+
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, m_hdrData.data());
+    
+    float sum = 0.0f;
+    int Size = m_windowWidth * m_windowHeight;
+    
+    for (int i = 0; i < Size; i++) {
+        float lum = glm::dot(glm::vec3(m_hdrData[i * 3 + 0], m_hdrData[i * 3 + 1], m_hdrData[i * 3 + 2]),
+                             glm::vec3(0.2126f, 0.7152f, 0.0722f));
+        sum += logf(lum + 0.00001f);
+    }
+    
+    float AverageLuminance = expf(sum / Size);
+
+    return AverageLuminance;
 }
 
 
