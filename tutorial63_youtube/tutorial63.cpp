@@ -36,9 +36,15 @@ public:
     HDRToneMapping() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 63 - HDR & Tone Mapping")
     {
         //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 0.9f;
-        m_dirLight.AmbientIntensity = 1.0f;
+        m_dirLights[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLights[0].Color = Vector3f(0.0f, 1.0f, 0.0f);
+        m_dirLights[0].DiffuseIntensity = 1.0f;
+        m_dirLights[0].AmbientIntensity = 0.1f;
+
+        m_dirLights[1].WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
+        m_dirLights[1].Color = Vector3f(1.0f, 0.0f, 0.0f);
+        m_dirLights[1].DiffuseIntensity = 10.0f;
+        m_dirLights[1].AmbientIntensity = 0.0f;
     }
 
     ~HDRToneMapping() {}
@@ -48,27 +54,29 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 1.0f, 1.0f));
+        m_pScene->SetClearColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
 
         //  m_pScene->SetCameraSpeed(0.1f);
 
-        m_pScene->GetDirLights().push_back(m_dirLight);
+        m_pScene->GetDirLights().push_back(m_dirLights[0]);
+        m_pScene->GetDirLights().push_back(m_dirLights[1]);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
-        m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+        m_pScene->SetCamera(Vector3f(20.888552f, 16.027384f, -1.917199f), Vector3f(-0.898551f, -0.423240f, 0.116076f));
+        //m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
         //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-     //   Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
     //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");
-         Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
     //    Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pSceneObject->SetScale(0.05f);
+        m_pSceneObject->SetScale(0.1f);
         m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pRenderingSystem->Execute();
@@ -81,7 +89,7 @@ public:
         //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         //  }
 
-     //   m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
+        m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
         
         m_count += 1.0f;
 
@@ -116,9 +124,12 @@ protected:
 
         bool my_tool_active = false;
 
-        ImGui::Begin("SSAO", &my_tool_active, ImGuiWindowFlags_MenuBar); 
+        ImGui::Begin("HDR & Tone Mapping", &my_tool_active, ImGuiWindowFlags_MenuBar); 
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+        m_pScene->ShowSceneGUI();
+
         ImGui::End();
 
         // Rendering
@@ -136,7 +147,7 @@ private:
 
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
-    DirectionalLight m_dirLight;
+    DirectionalLight m_dirLights[2];
     SceneObject* m_pickedObject = NULL;
     SceneObject* m_pSceneObject = NULL;    
     int m_enableShadowMapping = 1;
