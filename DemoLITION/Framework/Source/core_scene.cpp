@@ -248,6 +248,14 @@ void CoreScene::ShowSSAOGUI()
 }
 
 
+void CoreScene::ShowSceneGUI()
+{
+    bool EnableHDR = m_config.IsHDREnabled();
+    ImGui::Checkbox("HDR Enable", &EnableHDR);
+    m_config.ControlHDR(EnableHDR);
+}
+
+
 SceneObject* CoreScene::CreateSceneObject(Model* pModel)
 {
     if (m_numSceneObjects == NUM_SCENE_OBJECTS) {

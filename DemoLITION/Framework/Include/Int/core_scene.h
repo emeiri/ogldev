@@ -76,6 +76,8 @@ public:
 
     virtual void ShowSSAOGUI();
 
+    virtual void ShowSceneGUI();
+
     const std::vector<PointLight>& GetPointLights();
 
     const std::vector<SpotLight>& GetSpotLights();
