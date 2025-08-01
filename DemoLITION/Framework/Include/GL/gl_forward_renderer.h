@@ -152,7 +152,7 @@ private:
     void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
-    void FullScreenQuadBlit();
+    void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
     void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
@@ -185,13 +185,14 @@ private:
     Framebuffer m_lightingFBO;
     Framebuffer m_normalFBO;
     Framebuffer m_ssaoFBO;
+    Framebuffer m_hdrFBO;
     GLBuffer m_ssaoParams;
     Texture m_ssaoRotTexture;
     GLBuffer m_lightParams;
     std::vector<LightSource> m_lightSources;
 
     // Shadow stuff
-    FramebufferObject m_shadowMapFBO;
+    FramebufferObject m_shadowMapFBO;           // TODO: switch to Framebuffer class
     ShadowCubeMapFBO m_shadowCubeMapFBO;
     Matrix4f m_lightPersProjMatrix;
     Matrix4f m_lightOrthoProjMatrix;

@@ -338,15 +338,15 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         NormalPass(pScene);
         SSAOPass(pScene);
         SSAOCombinePass();
-    }
-    else {
+    } else if (pScene->GetConfig()->IsHDREnabled()) {
         if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             m_lightingFBO.BlitToWindow();
+        } else {
+            FullScreenQuadBlit(pScene);
         }
-        else {
-            FullScreenQuadBlit();
-        }
+    } else {
+        // Do nothing?
     }
 }
 
@@ -647,8 +647,18 @@ void ForwardRenderer::NormalPass(GLScene* pScene)
 
 void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis)
 {
-    m_lightingFBO.BindForWriting();
-
+    if (pScene->GetConfig()->IsSSAOEnabled()) {
+        if (pScene->GetConfig()->IsHDREnabled()) {
+            NOT_IMPLEMENTED;
+        } else {
+            m_lightingFBO.BindForWriting();
+        }
+    } else if (pScene->GetConfig()->IsHDREnabled()) {
+        m_hdrFBO.BindForWriting();
+    } else {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
         glClearColor(ClearColor.x, ClearColor.y, ClearColor.z, ClearColor.w);
@@ -878,7 +888,7 @@ void ForwardRenderer::SSAOCombinePass()
 }
 
 
-void ForwardRenderer::FullScreenQuadBlit()
+void ForwardRenderer::FullScreenQuadBlit(GLScene* pScene)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -886,8 +896,12 @@ void ForwardRenderer::FullScreenQuadBlit()
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    m_lightingFBO.BindForReading(GL_TEXTURE0);
-
+    if (pScene->GetConfig()->IsHDREnabled()) {
+        m_hdrFBO.BindForReading(GL_TEXTURE0);
+    } else {
+        m_lightingFBO.BindForReading(GL_TEXTURE0);
+    }
+    
     m_fullScreenQuadTech.Enable();
 
     m_fullScreenQuadTech.Render();

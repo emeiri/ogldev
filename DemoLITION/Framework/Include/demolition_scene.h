@@ -134,6 +134,9 @@ public:
     void ControlSSAO(bool Enable) { m_ssaoEnabled = Enable; }
     bool IsSSAOEnabled() const { return m_ssaoEnabled; }
 
+    void ControlHDR(bool Enable) { m_hdrEnabled = Enable; }
+    bool IsHDREnabled() const { return m_hdrEnabled; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -151,6 +154,7 @@ private:
     int m_irradianceMap = -1;
     SSAOParams m_ssaoParams;
     bool m_ssaoEnabled = true;
+    bool m_hdrEnabled = true;
 };
 
 
