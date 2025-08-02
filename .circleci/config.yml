@@ -20,14 +20,12 @@ jobs:
       - run:
           name: Run Linux Build Script
           command: |
-            chmod +x ./build_all.sh
+            ls -la
+            chmod +x ./build_all.sh            
             ./build_all.sh
 
   build-windows:
-    executor:
-      name: win/server-2022
-      version: "current"
-      size: medium
+    executor: win/default
     steps:
       - run:
           name: Authenticate with GitHub
@@ -36,8 +34,8 @@ jobs:
             git clone https://github.com/emeiri/ogldev.git
       - run:
           name: Build Solution
-          command: >
-            & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Release
+          command: |
+            MSBuild "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Debug
 
 workflows:
   version: 2
