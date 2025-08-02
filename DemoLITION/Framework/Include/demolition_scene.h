@@ -35,6 +35,7 @@ public:
     void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }    
 
     void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
+    void SetPosition(const SceneObject* pOtherObject) { m_pos = pOtherObject->GetPosition(); }
     const Vector3f& GetPosition() const { return m_pos; }
     void SetRotation(const Vector3f& Rot);
     void PushRotation(const Vector3f& Rot);
