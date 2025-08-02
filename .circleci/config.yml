@@ -1,12 +1,12 @@
 version: 2.1
 
+orbs:
+  win: circleci/windows@5.0
+
 executors:
   linux:
     docker:
       - image: cimg/base:stable
-  windows:
-    machine:
-      image: 'windows-server-2022-gui'
 
 jobs:
   build-linux:
@@ -20,17 +20,16 @@ jobs:
             ./build_all.sh
 
   build-windows:
-    executor: windows
+    executor:
+      name: win/server-2022
+      version: "current"
+      size: medium
     steps:
       - checkout
       - run:
-          name: Setup MSBuild Path
-          command: |
-            echo "export PATH='C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin':$PATH" >> $BASH_ENV
-      - run:
-          name: Build with MSBuild
-          command: |
-            "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin\\MSBuild.exe" "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Debug
+          name: Build Solution
+          command: >
+            & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe" "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Release
 
 workflows:
   version: 2
@@ -38,4 +37,4 @@ workflows:
     jobs:
       - build-linux
       - build-windows
-      
+     
