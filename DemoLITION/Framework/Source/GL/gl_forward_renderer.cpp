@@ -691,7 +691,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
     } else if (pScene->GetConfig()->IsHDREnabled()) {
         m_hdrFBO.BindForWriting();
     } else {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        SetRenderToDefaultFB();
     }
     
     if (pScene->IsClearFrame()) {
@@ -909,6 +909,12 @@ void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
     }
 }
 
+void ForwardRenderer::SetRenderToDefaultFB()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, m_windowWidth, m_windowHeight);
+}
+
 
 void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
 {
@@ -931,8 +937,7 @@ void ForwardRenderer::RenderInfiniteGrid(GLScene* pScene)
   /*  m_shadowMapFBO.BindForWriting();
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, m_windowWidth, m_windowHeight);*/
+    SetRenderToDefaultFB();*/
 }
 
 
@@ -969,9 +974,7 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
 
 void ForwardRenderer::SSAOCombinePass()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glViewport(0, 0, m_windowWidth, m_windowHeight);
+    SetRenderToDefaultFB();
 
     m_lightingFBO.BindForReading(GL_TEXTURE0);
 
@@ -985,9 +988,7 @@ void ForwardRenderer::SSAOCombinePass()
 
 void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glViewport(0, 0, m_windowWidth, m_windowHeight);
+    SetRenderToDefaultFB();
 
     m_hdrFBO.BindForReading(GL_TEXTURE0);
 
@@ -1002,9 +1003,7 @@ void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure)
 
 void ForwardRenderer::FullScreenQuadBlit(GLScene* pScene)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glViewport(0, 0, m_windowWidth, m_windowHeight);
+    SetRenderToDefaultFB();
 
     glClear(GL_DEPTH_BUFFER_BIT);
 

@@ -177,6 +177,7 @@ private:
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
     Matrix4f GetViewProjectionMatrix();
     void RenderSingleObject(CoreSceneObject* pSceneObject);
+    void SetRenderToDefaultFB();
 
     int m_windowWidth = -1;
     int m_windowHeight = -1;
