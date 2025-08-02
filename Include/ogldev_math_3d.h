@@ -31,6 +31,7 @@
 #endif
 #include <stdio.h>
 #include <cfloat>
+#include <numbers>
 
 #include "ogldev_util.h"
 
@@ -44,8 +45,8 @@
 // powf wrapper for integer params to avoid crazy casting
 #define powi(base,exp) (int)powf((float)(base), (float)(exp))
 
-#define ToRadian(x) (float)(((x) * M_PI / 180.0f))
-#define ToDegree(x) (float)(((x) * 180.0f / M_PI))
+#define ToRadian(x) (float)(((x) * std::numbers::pi / 180.0f))
+#define ToDegree(x) (float)(((x) * 180.0f / std::numbers::pi))
 
 static inline float RandomFloat()
 {
