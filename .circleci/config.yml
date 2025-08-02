@@ -54,7 +54,6 @@ jobs:
           name: Build Solution
           command: |
             cd ogldev
-            Write-Host $env:$VULKAN_SDK
             MSBuild "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Debug
 
 workflows:
