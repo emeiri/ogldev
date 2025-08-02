@@ -33,6 +33,19 @@ jobs:
     executor: win/default
     steps:
       - run:
+          name: Download Vulkan SDK Installer
+          command: |
+            curl -L -o VulkanSDK.exe https://sdk.lunarg.com/sdk/download/1.4.304.0/windows/VulkanSDK-1.4.304.0-Installer.exe
+      - run:
+          name: Install Vulkan SDK
+          command: |
+            Start-Process -FilePath .\VulkanSDK.exe -ArgumentList "/S" -Wait
+      - run:
+          name: Set Environment Variables
+          command: |
+            $env:VULKAN_SDK="C:\VulkanSDK\1.4.304.0\"
+            $env:PATH="$env:VULKAN_SDK\Bin;$env:PATH"
+      - run:
           name: Authenticate with GitHub
           command: |
             git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
