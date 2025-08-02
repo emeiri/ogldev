@@ -595,7 +595,7 @@ void ForwardRenderer::ShadowMapPass(GLScene* pScene)
         m_lightViewMatrix.InitCameraTransform(LightWorldPos, DirLights[0].WorldDirection, Up);
 
         if (DirLights.size() > 1) {
-            printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
+            //printf("%s:%d - only a single directional light is supported\n", __FILE__, __LINE__);
         }
     }
 
@@ -738,6 +738,9 @@ float ForwardRenderer::HDRPassGPU(float& Exposure)
     float avgLogLum = sum / (NumTiles * 100.0f);
    // printf("avgLogLum %f\n", avgLogLum);
     Exposure = 0.18f / expf(avgLogLum);
+
+    Exposure = CLAMP(Exposure, 0.001f, 10.0f);
+
    // printf("%f\n", exposure);
     return expf(avgLogLum);
 }
@@ -767,6 +770,8 @@ float ForwardRenderer::HDRPassCPU(float& Exposure)
     float AverageLuminance = expf(avgLogLum);
    
     Exposure = 0.18f / AverageLuminance;
+
+    Exposure = CLAMP(Exposure, 0.001f, 10.0f);
 
     return AverageLuminance;
 }
