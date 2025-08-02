@@ -13,10 +13,10 @@ jobs:
     executor: linux
     steps:
       - run:
-        name: Install OpenGL and GLFW
-        command: |
-          sudo apt-get update
-          sudo apt-get install -y freeglut3 freeglut3-dev libglew-dev libglew2.2 libmagick++-dev libassimp-dev libglfw3 libglfw3-dev libmeshoptimizer-dev libmeshoptimizer1d vulkan-tools vulkan-validationlayers vulkan-validationlayers-dev glslang-dev glslang-tools
+          name: Install OpenGL and GLFW
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y freeglut3 freeglut3-dev libglew-dev libglew2.2 libmagick++-dev libassimp-dev libglfw3 libglfw3-dev libmeshoptimizer-dev libmeshoptimizer1d vulkan-tools vulkan-validationlayers vulkan-validationlayers-dev glslang-dev glslang-tools
       - run:
           name: Authenticate with GitHub
           command: |
