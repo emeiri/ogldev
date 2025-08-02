@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   win: circleci/windows@5.0
-
+  
 executors:
   linux:
     docker:
@@ -12,7 +12,10 @@ jobs:
   build-linux:
     executor: linux
     steps:
-      - checkout
+      - run:
+        name: Authenticate with GitHub
+        command: |
+            git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
       - run:
           name: Run Linux Build Script
           command: |
@@ -25,7 +28,11 @@ jobs:
       version: "current"
       size: medium
     steps:
-      - checkout
+      - run:
+        name: Authenticate with GitHub
+        command: |
+            git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
+
       - run:
           name: Build Solution
           command: >
