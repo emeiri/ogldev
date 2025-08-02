@@ -252,6 +252,11 @@ void CoreScene::ShowSceneGUI()
 {
     bool EnableHDR = m_config.IsHDREnabled();
     ImGui::Checkbox("HDR Enable", &EnableHDR);
+    float AverageLuminance = 0.0f;
+    float Exposure = 0.0f;
+    m_config.GetHDRParams(AverageLuminance, Exposure);
+    ImGui::Text("HDR average luminance %.3f", AverageLuminance);
+    ImGui::Text("HDR exposure %.3f", Exposure);
     m_config.ControlHDR(EnableHDR);
 }
 

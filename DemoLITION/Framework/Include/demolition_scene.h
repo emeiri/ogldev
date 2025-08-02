@@ -138,6 +138,10 @@ public:
     void ControlHDR(bool Enable) { m_hdrEnabled = Enable; }
     bool IsHDREnabled() const { return m_hdrEnabled; }
 
+    void SetHDRParams(float AverageLuminance, float Exposure) { m_hdrAverageLuminance = AverageLuminance; m_hdrExposure = Exposure; }
+
+    void GetHDRParams(float& AverageLuminance, float& Exposure) { AverageLuminance = m_hdrAverageLuminance; Exposure = m_hdrExposure; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -156,6 +160,8 @@ private:
     SSAOParams m_ssaoParams;
     bool m_ssaoEnabled = true;
     bool m_hdrEnabled = true;
+    float m_hdrAverageLuminance = 0.0f;
+    float m_hdrExposure = 0.0f;
 };
 
 

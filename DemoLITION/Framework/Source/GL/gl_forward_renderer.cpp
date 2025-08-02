@@ -359,8 +359,9 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
     float Exposure = 0.0f;
 
     if (IsHDR) {
-        //AverageLuminance = HDRPassCPU(Exposure);
-        AverageLuminance = HDRPassGPU(Exposure);
+        //HDRPassCPU(AverageLuminance, Exposure);
+        HDRPassGPU(AverageLuminance, Exposure);
+        pScene->GetConfig()->SetHDRParams(AverageLuminance, Exposure);
     }
 
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
@@ -712,7 +713,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
 }
 
 
-float ForwardRenderer::HDRPassGPU(float& Exposure)
+void ForwardRenderer::HDRPassGPU(float& AvgLogLum, float& Exposure)
 {
     m_hdrFBO.BindForReading(GL_TEXTURE0);
     m_luminanceBuffer.BindSSBO(1);
@@ -735,18 +736,19 @@ float ForwardRenderer::HDRPassGPU(float& Exposure)
 
    // printf("sum 1 %f\n", sum);
 
-    float avgLogLum = sum / (NumTiles * 100.0f);
-   // printf("avgLogLum %f\n", avgLogLum);
-    Exposure = 0.18f / expf(avgLogLum);
+    AvgLogLum = sum / (NumTiles * 100.0f);
 
-    Exposure = CLAMP(Exposure, 0.001f, 10.0f);
+    AvgLogLum = expf(AvgLogLum);
+   // printf("avgLogLum %f\n", avgLogLum);
+    Exposure = 0.18f / AvgLogLum;
+
+  //  Exposure = CLAMP(Exposure, 0.001f, 10.0f);
 
    // printf("%f\n", exposure);
-    return expf(avgLogLum);
 }
 
 
-float ForwardRenderer::HDRPassCPU(float& Exposure)
+void ForwardRenderer::HDRPassCPU(float& AvgLogLum, float& Exposure)
 {
     m_hdrFBO.BindForReading(GL_TEXTURE0);
 
@@ -764,16 +766,14 @@ float ForwardRenderer::HDRPassCPU(float& Exposure)
 
     //printf("sum 2 %f\n", sum);
     
-    float avgLogLum = sum / Size;
+    AvgLogLum = sum / Size;
 
     //printf("avgLogLum %f\n", avgLogLum);
-    float AverageLuminance = expf(avgLogLum);
+    AvgLogLum = expf(AvgLogLum);
    
-    Exposure = 0.18f / AverageLuminance;
+    Exposure = 0.18f / AvgLogLum;
 
-    Exposure = CLAMP(Exposure, 0.001f, 10.0f);
-
-    return AverageLuminance;
+    //Exposure = CLAMP(Exposure, 0.001f, 10.0f);
 }
 
 

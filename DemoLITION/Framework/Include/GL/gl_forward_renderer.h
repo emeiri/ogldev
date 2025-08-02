@@ -150,8 +150,8 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void NormalPass(GLScene* pScene);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
-    float HDRPassGPU(float& Exposure);
-    float HDRPassCPU(float& Exposure);
+    void HDRPassGPU(float& AvgLogLum, float& Exposure);
+    void HDRPassCPU(float& AvgLogLum, float& Exposure);
     void UpdateLightSources(GLScene* pScene);
     void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
