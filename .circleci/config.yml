@@ -1,0 +1,41 @@
+version: 2.1
+
+executors:
+  linux:
+    docker:
+      - image: cimg/base:stable
+  windows:
+    machine:
+      image: 'windows-server-2022-gui'
+
+jobs:
+  build-linux:
+    executor: linux
+    steps:
+      - checkout
+      - run:
+          name: Run Linux Build Script
+          command: |
+            chmod +x ./build_all.sh
+            ./build_all.sh
+
+  build-windows:
+    executor: windows
+    steps:
+      - checkout
+      - run:
+          name: Setup MSBuild Path
+          command: |
+            echo "export PATH='C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin':$PATH" >> $BASH_ENV
+      - run:
+          name: Build with MSBuild
+          command: |
+            "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin\\MSBuild.exe" "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Debug
+
+workflows:
+  version: 2
+  build_all_platforms:
+    jobs:
+      - build-linux
+      - build-windows
+      
