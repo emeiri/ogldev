@@ -35,7 +35,7 @@ jobs:
       - run:
           name: Download Vulkan SDK Installer
           command: |
-            curl -L -o VulkanSDK.exe https://sdk.lunarg.com/sdk/download/1.4.304.0/windows/VulkanSDK-1.4.304.0-Installer.exe
+            cmd /c curl -L -o VulkanSDK.exe https://sdk.lunarg.com/sdk/download/1.4.304.0/windows/VulkanSDK-1.4.304.0-Installer.exe
       - run:
           name: Install Vulkan SDK
           command: |
