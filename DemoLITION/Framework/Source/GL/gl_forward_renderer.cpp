@@ -996,6 +996,7 @@ void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure)
     SetRenderToDefaultFB();
 
     m_hdrFBO.BindForReading(GL_TEXTURE0);
+    m_luminanceBuffer.BindSSBO(1);
 
     m_toneMapTech.Enable();
 

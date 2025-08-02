@@ -16,13 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#version 420
+#version 460
 
 in vec2 TexCoords;
 
 layout(location = 0) out vec4 FragColor;
 
 layout(binding = 0) uniform sampler2D gHDRSampler;
+
+layout(std430, binding = 1) buffer Result {
+    float Exposure[]; // One per workgroup
+};
+
 
 uniform float gAvgLum;
 uniform float gExposure = 0.4457;
@@ -59,6 +64,7 @@ vec4 reinhard()
     return ret;
 }    
 
+
 vec4 with_exposure()
 {             
     const float gamma = 2.2;
@@ -70,6 +76,28 @@ vec4 with_exposure()
     mapped = pow(mapped, vec3(1.0 / gamma));
   
     vec4 ret = vec4(mapped, 1.0);
+
+    return ret;
+}  
+
+
+vec4 with_exposure_tiled()
+{             
+    const float gamma = 2.2;
+    vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
+
+    int x = int(TexCoords.x * 192.0);
+    int y = int(TexCoords.y * 108.0);
+    float Exposure = Exposure[y * 192 + x];
+  
+    // exposure tone mapping
+    vec3 mapped = vec3(1.0) - exp(-hdrColor * Exposure);
+    // gamma correction 
+    mapped = pow(mapped, vec3(1.0 / gamma));
+  
+    vec4 ret = vec4(mapped, 1.0);
+
+ //  vec4 ret = vec4(Exposure);
 
     return ret;
 }  
@@ -199,7 +227,8 @@ vec4 bruno()
 void main()
 {
    // FragColor = reinhard();
-    //FragColor = new_method();;
-    FragColor = with_exposure();
-    //FragColor = bruno();
+    //FragColor = new_method();
+    //FragColor = with_exposure_tiled();
+    //FragColor = with_exposure();
+    FragColor = bruno();
 }

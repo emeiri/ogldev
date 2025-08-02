@@ -28,6 +28,16 @@ void main() {
         for (int i = 0; i < 100; ++i) {
             sum += localLum[i];
         }
-        tileLuminance[gl_WorkGroupID.x + gl_WorkGroupID.y * numGroupsX] = sum;
+
+        float avgLogLum = sum / 100.0f;
+        // printf("avgLogLum %f\n", avgLogLum);
+        float Exposure = 0.18f / exp(avgLogLum);
+        Exposure = clamp(Exposure, 0.001f, 1.0f);
+
+		// for tiled tone mapping
+        //tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = Exposure;
+		
+		// regular
+        tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = sum;
     }
 }// Compute shader
