@@ -38,7 +38,7 @@ bool ToneMapTechnique::Init()
 
     glGenVertexArrays(1, &m_dummyVAO);
 
-    GET_UNIFORM_AND_CHECK(m_avgLumLoc, "AveLum");
+    GET_UNIFORM_AND_CHECK(m_avgLumLoc, "gAvgLum");
     GET_UNIFORM_AND_CHECK(m_hdrSamplerLoc, "gHDRSampler");
     GET_UNIFORM_AND_CHECK(m_exposure, "gExposure");
 
