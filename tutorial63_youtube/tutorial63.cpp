@@ -37,14 +37,23 @@ public:
     {
         //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLights[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLights[0].Color = Vector3f(0.0f, 1.0f, 0.0f);
-        m_dirLights[0].DiffuseIntensity = 1.0f;
+        m_dirLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_dirLights[0].DiffuseIntensity = 2.0f;
         m_dirLights[0].AmbientIntensity = 0.1f;
 
         m_dirLights[1].WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
-        m_dirLights[1].Color = Vector3f(1.0f, 0.0f, 0.0f);
-        m_dirLights[1].DiffuseIntensity = 10.0f;
+        m_dirLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
+        m_dirLights[1].DiffuseIntensity = 2.0f;
         m_dirLights[1].AmbientIntensity = 0.0f;
+
+        //m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
+        m_pointLight.Color = Vector3f(10.0f);
+        m_pointLight.AmbientIntensity = 0.3f;
+        m_pointLight.DiffuseIntensity = 10.0f;
+        m_pointLight.Attenuation.Constant = 1.0f;
+        m_pointLight.Attenuation.Linear = 0.22f;
+        m_pointLight.Attenuation.Exp = 0.2f;
+        m_pointLight.WorldPosition = Vector3f(63.0f, 2.0f, 0.0f);
     }
 
     ~HDRToneMapping() {}
@@ -58,26 +67,38 @@ public:
 
         //  m_pScene->SetCameraSpeed(0.1f);
 
-        m_pScene->GetDirLights().push_back(m_dirLights[0]);
-        m_pScene->GetDirLights().push_back(m_dirLights[1]);
+       // m_pScene->GetDirLights().push_back(m_dirLights[0]);
+       // m_pScene->GetDirLights().push_back(m_dirLights[1]);
+        m_pScene->GetPointLights().push_back(m_pointLight);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
-        m_pScene->SetCamera(Vector3f(20.888552f, 16.027384f, -1.917199f), Vector3f(-0.898551f, -0.423240f, 0.116076f));
-        //m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
+        m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+
+        Model* pSphere = m_pRenderingSystem->LoadModel("../Content/sphere.obj");
+        //m_pScene->SetCamera(Vector3f(20.888552f, 16.027384f, -1.917199f), Vector3f(-0.898551f, -0.423240f, 0.116076f));
+        
         //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
 
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
+       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
     //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");
-    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+         
     //    Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pSceneObject->SetScale(0.1f);
+        
+        m_pSceneObject->SetScale(0.05f);
+        
         m_pScene->AddToRenderList(m_pSceneObject);
+
+        m_pLightObject = m_pScene->CreateSceneObject(pSphere);
+        m_pLightObject->SetScale(0.1f);
+
+        m_pScene->AddToRenderList(m_pLightObject);
 
         m_pRenderingSystem->Execute();
     }
@@ -89,9 +110,9 @@ public:
         //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         //  }
 
-        m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
+     //   m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
         
-        m_count += 1.0f;
+        m_count += 0.01f;
 
         if (m_pScene->GetPickedSceneObject()) {
             m_pickedObject = m_pScene->GetPickedSceneObject();
@@ -109,8 +130,11 @@ public:
       //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
      //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
 
-         //   m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
-          //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
+         //m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
+         m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f;
+         //m_pScene->GetPointLights()[0].WorldPosition.Print();
+
+         m_pLightObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
     }
 
 
@@ -148,8 +172,10 @@ private:
     float m_count = 0.0f;
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLights[2];
+    PointLight m_pointLight;
     SceneObject* m_pickedObject = NULL;
     SceneObject* m_pSceneObject = NULL;    
+    SceneObject* m_pLightObject = NULL;
     int m_enableShadowMapping = 1;
 };
 
