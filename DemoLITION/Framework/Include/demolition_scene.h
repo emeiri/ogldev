@@ -92,6 +92,14 @@ struct SSAOParams
 };
 
 
+enum TONE_MAP_METHOD {
+    TONE_MAP_METHOD_NONE = 0,
+    TONE_MAP_METHOD_REINHARD = 1,
+    TONE_MAP_METHOD_BRUNO_OPSENICA = 2,    // https://bruop.github.io/tonemapping/
+    TONE_MAP_METHOD_WITH_EXPOSURE = 3
+};
+
+
 class SceneConfig
 {
 public:
@@ -142,6 +150,14 @@ public:
 
     void GetHDRParams(float& AverageLuminance, float& Exposure) { AverageLuminance = m_hdrAverageLuminance; Exposure = m_hdrExposure; }
 
+    TONE_MAP_METHOD GetToneMapMethod() const { return m_toneMapMethod; }
+
+    void SetToneMapMethod(TONE_MAP_METHOD Method) { m_toneMapMethod = Method; }
+
+    void ControlGammaCorrection(bool Enable) { m_enableGamma = Enable; }
+
+    bool IsGammaCorrectionEnabled() const { return m_enableGamma; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -162,6 +178,8 @@ private:
     bool m_hdrEnabled = true;
     float m_hdrAverageLuminance = 0.0f;
     float m_hdrExposure = 0.0f;
+    TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_WITH_EXPOSURE;
+    bool m_enableGamma = true;
 };
 
 

@@ -146,11 +146,10 @@ protected:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        ImGui::GetStyle().FontScaleMain = 1.5f;
+
         bool my_tool_active = false;
-
-        ImGui::Begin("HDR & Tone Mapping", &my_tool_active, ImGuiWindowFlags_MenuBar); 
-
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Begin("HDR & Tone Mapping", &my_tool_active, ImGuiWindowFlags_MenuBar);         
 
         m_pScene->ShowSceneGUI();
 

@@ -156,7 +156,7 @@ private:
     void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
-    void ToneMappingPass(float AverageLuminance, float Exposure);
+    void ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);

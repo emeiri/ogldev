@@ -373,7 +373,9 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         SSAOPass(pScene);
         SSAOCombinePass();
     } else if (IsHDR) {
-        ToneMappingPass(AverageLuminance, Exposure);
+        ToneMappingPass(AverageLuminance, Exposure, 
+                        pScene->GetConfig()->GetToneMapMethod(),
+                        pScene->GetConfig()->IsGammaCorrectionEnabled());
 
         /*if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -736,13 +738,15 @@ void ForwardRenderer::HDRPassGPU(float& AvgLogLum, float& Exposure)
 
    // printf("sum 1 %f\n", sum);
 
-    AvgLogLum = sum / (NumTiles * 100.0f);
+    int NumPixels = NumTiles * 100;
+
+    AvgLogLum = sum / (float)NumPixels;
 
     AvgLogLum = expf(AvgLogLum);
    // printf("avgLogLum %f\n", avgLogLum);
     Exposure = 0.18f / AvgLogLum;
 
-  //  Exposure = CLAMP(Exposure, 0.001f, 10.0f);
+    //Exposure = CLAMP(Exposure, 0.001f, 2.0f);
 
    // printf("%f\n", exposure);
 }
@@ -991,7 +995,7 @@ void ForwardRenderer::SSAOCombinePass()
 }
 
 
-void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure)
+void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma)
 {
     SetRenderToDefaultFB();
 
@@ -1002,6 +1006,8 @@ void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure)
 
     m_toneMapTech.SetAverageLuminance(AverageLuminance);
     m_toneMapTech.SetExposure(Exposure);
+    m_toneMapTech.SetToneMapMethod(ToneMapMethod);
+    m_toneMapTech.ControlGammaCorrection(EnableGamma);
 
     m_toneMapTech.Render();
 }

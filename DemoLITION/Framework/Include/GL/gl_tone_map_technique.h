@@ -19,6 +19,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
+#include "demolition_scene.h"
 
 class ToneMapTechnique : public Technique
 {
@@ -36,6 +37,10 @@ public:
 
     void SetExposure(float Exposure);
 
+    void SetToneMapMethod(TONE_MAP_METHOD Method);
+
+    void ControlGammaCorrection(bool Enable);
+
 private:
 
     GLuint m_dummyVAO;
@@ -43,5 +48,7 @@ private:
     DEF_LOC(m_avgLumLoc);
     DEF_LOC(m_hdrSamplerLoc);
     DEF_LOC(m_exposure);
+    DEF_LOC(m_methodTypeLoc);
+    DEF_LOC(m_enableGammaLoc);
 };
 

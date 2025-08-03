@@ -28,11 +28,18 @@ layout(std430, binding = 1) buffer Result {
     float Exposure[]; // One per workgroup
 };
 
+// Methods of tone mapping
+#define NO_TONE_MAPPING 0
+#define REINHARD        1
+#define BRUNO_OPSENICA  2    // https://bruop.github.io/tonemapping/
+#define WITH_EXPOSURE   3
+
 
 uniform float gAvgLum;
 uniform float gExposure = 0.4457;
 uniform float White = 1.0;
-uniform bool DoToneMap = true;
+uniform int gMethodType = 0;
+uniform bool gEnableGammaCorrection = true;
 
 // XYZ/RGB conversion matrices from:
 // http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
@@ -49,15 +56,20 @@ uniform mat3 xyz2rgb = mat3(
     -0.4985314,  0.0415560,  1.0572252 );
 
 
+vec4 passthru()
+{
+    vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
+
+    vec4 ret = vec4(hdrColor, 1.0);
+
+    return ret;
+}
+
 vec4 reinhard()
 {             
-    const float gamma = 2.2;
     vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
   
-    // reinhard tone mapping
     vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
-    // gamma correction 
-    mapped = pow(mapped, vec3(1.0 / gamma));
   
     vec4 ret = vec4(mapped, 1.0);
 
@@ -67,13 +79,19 @@ vec4 reinhard()
 
 vec4 with_exposure()
 {             
-    const float gamma = 2.2;
     vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
   
-    // exposure tone mapping
-    vec3 mapped = vec3(1.0) - exp(-hdrColor * gExposure);
-    // gamma correction 
-    mapped = pow(mapped, vec3(1.0 / gamma));
+    const float targetGray = 0.05;
+
+    float bias = 0.03;
+    float minLum = 0.01;
+    float maxLum = 1.0;
+
+    //float exposure = targetGray / clamp(gAvgLum + bias, minLum, maxLum);
+    float exposure = targetGray / max(gAvgLum, 0.0001);
+
+    vec3 mapped = hdrColor * exposure;
+    mapped = mapped / (mapped + vec3(1.0));
   
     vec4 ret = vec4(mapped, 1.0);
 
@@ -81,9 +99,26 @@ vec4 with_exposure()
 }  
 
 
+vec3 RRTAndODTFit(vec3 v) {
+    vec3 a = v * (v + 0.0245786) - 0.000090537;
+    vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081;
+    return a / b;
+}
+
+
+vec4 toneMapACES() 
+{
+    vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
+
+    hdrColor = RRTAndODTFit(hdrColor);
+    vec4 ret = vec4(clamp(hdrColor, 0.0, 1.0), 1.0);
+
+    return ret;
+}
+
+
 vec4 with_exposure_tiled()
-{             
-    const float gamma = 2.2;
+{                 
     vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
 
     int x = int(TexCoords.x * 192.0);
@@ -92,12 +127,8 @@ vec4 with_exposure_tiled()
   
     // exposure tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdrColor * Exposure);
-    // gamma correction 
-    mapped = pow(mapped, vec3(1.0 / gamma));
   
     vec4 ret = vec4(mapped, 1.0);
-
- //  vec4 ret = vec4(Exposure);
 
     return ret;
 }  
@@ -105,21 +136,28 @@ vec4 with_exposure_tiled()
 
 vec4 new_method()
 {
-    vec4 hdrColor = texture(gHDRSampler, TexCoords);
-    float lum = dot(hdrColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-    float mappedL = gExposure * lum / max(gAvgLum, 0.1);
-    mappedL = (mappedL * (1.0 + mappedL / (White * White))) / (1.0 + mappedL);
+    // Retrieve high-res color from texture
+    vec4 color = texture(gHDRSampler, TexCoords);
+    
+    // Convert to XYZ
+    vec3 xyzCol = rgb2xyz * vec3(color);
 
-    // Scale RGB to maintain color ratios
-    vec3 color = hdrColor.rgb * mappedL / lum; // preserve chromaticity
-    color = pow(color, vec3(1.0 / 2.2));       // gamma correction
+    // Convert to xyY
+    float xyzSum = xyzCol.x + xyzCol.y + xyzCol.z;
+    vec3 xyYCol = vec3( xyzCol.x / xyzSum, xyzCol.y / xyzSum, xyzCol.y);
 
-    vec4 ret = vec4(clamp(color, 0.0, 1.0), 1.0);
-        // Output
-        //FragColor = vec4(DoToneMap ? xyz2rgb * mappedXYZ : hdrColor.rgb, 1.0);
+    // Apply the tone mapping operation to the luminance (xyYCol.z or xyzCol.y)
+    float L = (gExposure * xyYCol.z) / gAvgLum;
+    L = (L * ( 1 + L / (White * White) )) / ( 1 + L );
 
-     // FragColor = vec4(hdrColor.rgb, 1.0);
-    // FragColor = vec4(hdrColor.rgb / (vec3(1.0) + hdrColor.rgb),1.0);
+    // Using the new luminance, convert back to XYZ
+    xyzCol.x = (L * xyYCol.x) / (xyYCol.y);
+    xyzCol.y = L;
+    xyzCol.z = (L * (1 - xyYCol.x - xyYCol.y))/xyYCol.y;
+
+    // Convert back to RGB and send to output buffer
+    vec4 ret = vec4( xyz2rgb * xyzCol, 1.0);
+
     return ret;
 }
 
@@ -174,12 +212,15 @@ vec3 convertRGB2Yxy(vec3 _rgb)
 	return convertXYZ2Yxy(convertRGB2XYZ(_rgb) );
 }
 
+
 vec3 convertYxy2RGB(vec3 _Yxy)
 {
 	return convertXYZ2RGB(convertYxy2XYZ(_Yxy) );
 }
 
-float Reinhard2(float x, float White) {
+
+float Reinhard2(float x, float White) 
+{
     //const float L_white = 4.0;
     //return (x * (1.0 + x / (L_white * L_white))) / (1.0 + x);
     float ret = (x * (1.0 + x / (White * White))) / (1.0 + x);
@@ -187,22 +228,28 @@ float Reinhard2(float x, float White) {
     return ret;
 }
 
+
 float toGamma(float _r)
 {
-	return pow(abs(_r), 1.0/2.2);
+    const float gamma = 2.2;
+	return pow(abs(_r), 1.0/gamma);
 }
+
 
 vec3 toGamma(vec3 _rgb)
 {
-	return pow(abs(_rgb), vec3(1.0/2.2) );
+    const float gamma = 2.2;
+	return pow(abs(_rgb), vec3(1.0/gamma) );
 }
+
 
 vec4 toGamma(vec4 _rgba)
 {
 	return vec4(toGamma(_rgba.xyz), _rgba.w);
 }
 
-vec4 bruno()
+
+vec4 bruno_opsenica()
 {
     vec3 rgb = texture2D(gHDRSampler, TexCoords).rgb;
    // float avgLum = texture2D(s_texAvgLum, v_texcoord0).r;
@@ -226,9 +273,35 @@ vec4 bruno()
 
 void main()
 {
-   // FragColor = reinhard();
-    //FragColor = new_method();
-    //FragColor = with_exposure_tiled();
-    //FragColor = with_exposure();
-    FragColor = bruno();
+    vec4 Color;
+
+    switch (gMethodType) {
+        case NO_TONE_MAPPING:
+            Color = passthru();
+            break;
+
+        case REINHARD:
+            Color = reinhard();
+            break;
+
+        case BRUNO_OPSENICA:
+            Color = bruno_opsenica();
+            break;
+
+        case WITH_EXPOSURE:
+            Color = with_exposure();
+            //Color = new_method();
+            //Color = toneMapACES();
+            break;
+    }
+
+    if (gEnableGammaCorrection) {
+        FragColor = toGamma(Color);
+    } else {
+        FragColor = Color;
+    }
+    
+    //
+    //
+    //FragColor = with_exposure_tiled();        
 }

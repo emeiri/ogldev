@@ -250,14 +250,33 @@ void CoreScene::ShowSSAOGUI()
 
 void CoreScene::ShowSceneGUI()
 {
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
     bool EnableHDR = m_config.IsHDREnabled();
     ImGui::Checkbox("HDR Enable", &EnableHDR);
+    m_config.ControlHDR(EnableHDR);
+    
     float AverageLuminance = 0.0f;
     float Exposure = 0.0f;
     m_config.GetHDRParams(AverageLuminance, Exposure);
     ImGui::Text("HDR average luminance %.3f", AverageLuminance);
     ImGui::Text("HDR exposure %.3f", Exposure);
-    m_config.ControlHDR(EnableHDR);
+    
+    ImGui::Text("Tone mapping method:");
+    TONE_MAP_METHOD ToneMappingMethod = m_config.GetToneMapMethod();
+    ImGui::RadioButton("None", (int*)&ToneMappingMethod, TONE_MAP_METHOD_NONE);
+    ImGui::SameLine();
+    ImGui::RadioButton("Reinhard", (int*)&ToneMappingMethod, TONE_MAP_METHOD_REINHARD);
+    ImGui::SameLine();
+    ImGui::RadioButton("Bruno Opsenica", (int*)&ToneMappingMethod, TONE_MAP_METHOD_BRUNO_OPSENICA);
+    ImGui::SameLine();
+    ImGui::RadioButton("With exposure", (int*)&ToneMappingMethod, TONE_MAP_METHOD_WITH_EXPOSURE);
+    m_config.SetToneMapMethod(ToneMappingMethod);
+
+    bool EnableGamma = m_config.IsGammaCorrectionEnabled();
+    ImGui::Checkbox("Enable Gamma correction", &EnableGamma);
+    m_config.ControlGammaCorrection(EnableGamma);
+
 }
 
 

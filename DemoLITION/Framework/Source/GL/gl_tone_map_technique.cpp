@@ -41,6 +41,8 @@ bool ToneMapTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_avgLumLoc, "gAvgLum");
     GET_UNIFORM_AND_CHECK(m_hdrSamplerLoc, "gHDRSampler");
     GET_UNIFORM_AND_CHECK(m_exposure, "gExposure");
+    GET_UNIFORM_AND_CHECK(m_methodTypeLoc, "gMethodType");
+    GET_UNIFORM_AND_CHECK(m_enableGammaLoc, "gEnableGammaCorrection");
 
     return true;
 }
@@ -68,5 +70,17 @@ void ToneMapTechnique::SetHDRSampler(unsigned int TextureUnit)
 void ToneMapTechnique::SetExposure(float Exposure)
 {
     glUniform1f(m_exposure, Exposure);
+}
+
+
+void ToneMapTechnique::SetToneMapMethod(TONE_MAP_METHOD Method)
+{
+    glUniform1i(m_methodTypeLoc, Method);
+}
+
+
+void ToneMapTechnique::ControlGammaCorrection(bool Enable)
+{
+    glUniform1i(m_enableGammaLoc, Enable);
 }
 
