@@ -14,11 +14,22 @@ layout(std430, binding = 1) buffer Result {
 
 shared float localLum[100]; // 16x16 threads
 
-void main() {
+void main() 
+{
     ivec2 texCoord = ivec2(gl_GlobalInvocationID.xy);
     vec3 hdr = texelFetch(hdrTex, texCoord, 0).rgb;
     float lum = dot(hdr, vec3(0.2126, 0.7152, 0.0722));
-    localLum[gl_LocalInvocationIndex] = log(lum + 0.00001);
+
+    //float brightThreshold = 2.5;
+  //  if (lum < brightThreshold) {
+        //FragLum = log(luminance + 0.0001);
+        localLum[gl_LocalInvocationIndex] = log(lum + 0.0001);
+   // }
+  //  else
+  //  {
+   //     localLum[gl_LocalInvocationIndex] = 0.0;
+  //  }
+    
 
     barrier();
 
@@ -29,13 +40,11 @@ void main() {
             sum += localLum[i];
         }
 
-        float avgLogLum = sum / 100.0f;
-        // printf("avgLogLum %f\n", avgLogLum);
-        float Exposure = 0.18f / exp(avgLogLum);
-        Exposure = clamp(Exposure, 0.001f, 1.0f);
-
-		// for tiled tone mapping
-        //tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = Exposure;
+        // for tiled tone mapping
+        // float avgLogLum = sum / 100.0f;
+        // float Exposure = 0.18f / exp(avgLogLum);
+        // Exposure = clamp(Exposure, 0.001f, 1.0f);		
+        // tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = Exposure;
 		
 		// regular
         tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = sum;
