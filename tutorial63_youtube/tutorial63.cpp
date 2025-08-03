@@ -47,13 +47,13 @@ public:
         m_dirLights[1].AmbientIntensity = 0.0f;
 
         //m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
-        m_pointLight.Color = Vector3f(10.0f);
-        m_pointLight.AmbientIntensity = 0.3f;
-        m_pointLight.DiffuseIntensity = 10.0f;
-        m_pointLight.Attenuation.Constant = 1.0f;
-        m_pointLight.Attenuation.Linear = 0.22f;
-        m_pointLight.Attenuation.Exp = 0.2f;
-        m_pointLight.WorldPosition = Vector3f(63.0f, 2.0f, 0.0f);
+        m_pointLight.Color = Vector3f(1.0f);
+        m_pointLight.AmbientIntensity = 0.1f;
+        m_pointLight.DiffuseIntensity = 1000.0f;
+        m_pointLight.Attenuation.Constant = 0.1f;
+        m_pointLight.Attenuation.Linear = 0.01f;
+        m_pointLight.Attenuation.Exp = 0.001f;
+        m_pointLight.WorldPosition = Vector3f(0.0f, 2.0f, 0.0f);
     }
 
     ~HDRToneMapping() {}
@@ -76,12 +76,17 @@ public:
         m_pRenderingSystem->SetScene(m_pScene);
 
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
-        m_pScene->SetCamera(Vector3f(63.0f, 19.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+        m_pScene->SetCamera(Vector3f(63.0f, 15.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+        m_pSceneObject->SetScale(0.05f);
+        m_pScene->AddToRenderList(m_pSceneObject);
 
-        Model* pSphere = m_pRenderingSystem->LoadModel("../Content/sphere.obj");
+        Model* pSphere = m_pRenderingSystem->LoadModel("../Content/sphere/scene.glb");
+        //m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.0f), Vector3f(0.0, 0.0f, 1.0f));
+
         //m_pScene->SetCamera(Vector3f(20.888552f, 16.027384f, -1.917199f), Vector3f(-0.898551f, -0.423240f, 0.116076f));
         
-        //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));
+        //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));        
 
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
@@ -89,16 +94,14 @@ public:
     //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");
          
     //    Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
-        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        
-        m_pSceneObject->SetScale(0.05f);
-        
-        m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pLightObject = m_pScene->CreateSceneObject(pSphere);
-        m_pLightObject->SetScale(0.1f);
-
+        m_pLightObject->SetScale(1.0f);
         m_pScene->AddToRenderList(m_pLightObject);
+
+        m_pBallObject = m_pScene->CreateSceneObject(pSphere);
+        m_pBallObject->SetScale(0.1f);
+        m_pScene->AddToRenderList(m_pBallObject);        
 
         m_pRenderingSystem->Execute();
     }
@@ -130,11 +133,14 @@ public:
       //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
      //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
 
-         //m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
-         m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f;
-         //m_pScene->GetPointLights()[0].WorldPosition.Print();
+        m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
+        m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f; // sponza
+        m_pLightObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
+        m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
 
-         m_pLightObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
+        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);
+        //m_pScene->GetPointLights()[0].WorldPosition = LightPos;
+        //m_pBallObject->SetPosition(LightPos.x, LightPos.y, LightPos.z * -1.0f);
     }
 
 
@@ -175,6 +181,7 @@ private:
     SceneObject* m_pickedObject = NULL;
     SceneObject* m_pSceneObject = NULL;    
     SceneObject* m_pLightObject = NULL;
+    SceneObject* m_pBallObject = NULL;
     int m_enableShadowMapping = 1;
 };
 

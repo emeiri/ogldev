@@ -273,11 +273,13 @@ public:
 
         bool my_tool_active = false;
 
-        ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);  // Create a window called "Hello, world!" and append into it.
 
         GUIMenu();
 
         GUICamera(pScene);
+
+        pScene->ShowSceneGUI();
 
         GUIScene(pScene);
 
@@ -289,7 +291,6 @@ public:
         //   ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
         //  ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
 
         // Rendering
