@@ -177,7 +177,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>vulkan-1.lib;SPIRVd.lib;SPIRV-Toolsd.lib;SPIRV-Tools-diffd.lib;SPIRV-Tools-optd.lib;glslangd.lib;OSDependentd.lib;GenericCodeGend.lib;MachineIndependentd.lib;glslang-default-resource-limitsd.lib</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;SPIRV.lib;SPIRV-Tools.lib;SPIRV-Tools-diff.lib;SPIRV-Tools-opt.lib;glslang.lib;OSDependent.lib;GenericCodeGen.lib;MachineIndependent.lib;glslang-default-resource-limits.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
