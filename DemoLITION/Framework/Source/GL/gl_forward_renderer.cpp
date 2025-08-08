@@ -761,7 +761,6 @@ void ForwardRenderer::HDRPassCPU(float& AvgLogLum, float& Exposure)
     float sum = 0.0f;
     int Size = m_windowWidth * m_windowHeight;
     
-    //#pragma omp parallel for
     for (int i = 0; i < Size; i++) {
         float lum = glm::dot(glm::vec3(m_hdrData[i * 3 + 0], m_hdrData[i * 3 + 1], m_hdrData[i * 3 + 2]),
                              glm::vec3(0.2126f, 0.7152f, 0.0722f));
