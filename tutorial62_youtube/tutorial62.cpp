@@ -142,13 +142,7 @@ protected:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        bool my_tool_active = false;
-
-        ImGui::Begin("SSAO", &my_tool_active, ImGuiWindowFlags_MenuBar); 
-
-        m_pScene->ShowSSAOGUI();
-
-        ImGui::End();
+        m_pScene->ShowSceneGUI();
 
         // Rendering
         ImGui::Render();

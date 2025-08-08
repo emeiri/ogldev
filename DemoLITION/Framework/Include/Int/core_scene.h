@@ -74,8 +74,6 @@ public:
 
     virtual std::list<SceneObject*> GetSceneObjectsList();
 
-    virtual void ShowSSAOGUI();
-
     virtual void ShowSceneGUI();
 
     const std::vector<PointLight>& GetPointLights();
@@ -115,6 +113,8 @@ protected:
 private:
     void CreateDefaultCamera();
     CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel);
+    void SSAOGUI();
+    void HDRAndToneMappingGui();
 
     GLMCameraFirstPerson m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;

@@ -231,52 +231,73 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
 }
 
 
-void CoreScene::ShowSSAOGUI()
+void CoreScene::SSAOGUI()
 {
-    SSAOParams& ssoaParams = m_config.GetSSAOParams();
+    bool my_tool_active = false;
 
-    bool EnableSSAO = m_config.IsSSAOEnabled();
-    ImGui::Checkbox("SSAO Enable", &EnableSSAO);
-    m_config.ControlSSAO(EnableSSAO);
-    ImGui::SliderFloat("SSAO Scale", &ssoaParams.scale, 0.0f, 2.0f);
-    ImGui::SliderFloat("SSAO Bias", &ssoaParams.bias, 0.0f, 0.3f);
-    ImGui::SliderFloat("SSAO Radius", &ssoaParams.radius, 0.05f, 0.5f);
-    ImGui::SliderFloat("SSAO OccScale", &ssoaParams.occScale, 0.1f, 50.0f);
-    ImGui::SliderFloat("SSAO AttScale", &ssoaParams.attScale, 0.5f, 1.5f);
-    ImGui::SliderFloat("SSAO DistScale", &ssoaParams.distScale, 0.0f, 1.0f);    
-    m_pCoreRenderingSystem->ImGuiTextureWindow("SSAO");
+    if (ImGui::TreeNode("SSAO")) {
+        SSAOParams& ssoaParams = m_config.GetSSAOParams();
+
+        bool EnableSSAO = m_config.IsSSAOEnabled();
+        ImGui::Checkbox("SSAO Enable", &EnableSSAO);
+        m_config.ControlSSAO(EnableSSAO);
+        ImGui::SliderFloat("SSAO Scale", &ssoaParams.scale, 0.0f, 2.0f);
+        ImGui::SliderFloat("SSAO Bias", &ssoaParams.bias, 0.0f, 0.3f);
+        ImGui::SliderFloat("SSAO Radius", &ssoaParams.radius, 0.05f, 0.5f);
+        ImGui::SliderFloat("SSAO OccScale", &ssoaParams.occScale, 0.1f, 50.0f);
+        ImGui::SliderFloat("SSAO AttScale", &ssoaParams.attScale, 0.5f, 1.5f);
+        ImGui::SliderFloat("SSAO DistScale", &ssoaParams.distScale, 0.0f, 1.0f);
+        m_pCoreRenderingSystem->ImGuiTextureWindow("SSAO");
+
+        ImGui::TreePop();
+    }
 }
 
 
 void CoreScene::ShowSceneGUI()
 {
+    bool my_tool_active = false;
+    ImGui::Begin("Scene Config", &my_tool_active);
+    
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-    bool EnableHDR = m_config.IsHDREnabled();
-    ImGui::Checkbox("HDR Enable", &EnableHDR);
-    m_config.ControlHDR(EnableHDR);
-    
-    float AverageLuminance = 0.0f;
-    float Exposure = 0.0f;
-    m_config.GetHDRParams(AverageLuminance, Exposure);
-    ImGui::Text("HDR average luminance %.3f", AverageLuminance);
-    ImGui::Text("HDR exposure %.3f", Exposure);
-    
-    ImGui::Text("Tone mapping method:");
-    TONE_MAP_METHOD ToneMappingMethod = m_config.GetToneMapMethod();
-    ImGui::RadioButton("None", (int*)&ToneMappingMethod, TONE_MAP_METHOD_NONE);
-    ImGui::SameLine();
-    ImGui::RadioButton("Reinhard", (int*)&ToneMappingMethod, TONE_MAP_METHOD_REINHARD);
-    ImGui::SameLine();
-    ImGui::RadioButton("Bruno Opsenica", (int*)&ToneMappingMethod, TONE_MAP_METHOD_BRUNO_OPSENICA);
-    ImGui::SameLine();
-    ImGui::RadioButton("With exposure", (int*)&ToneMappingMethod, TONE_MAP_METHOD_WITH_EXPOSURE);
-    m_config.SetToneMapMethod(ToneMappingMethod);
+    SSAOGUI();
 
-    bool EnableGamma = m_config.IsGammaCorrectionEnabled();
-    ImGui::Checkbox("Enable Gamma correction", &EnableGamma);
-    m_config.ControlGammaCorrection(EnableGamma);
+    HDRAndToneMappingGui();    
 
+    ImGui::End();    
+}
+
+void CoreScene::HDRAndToneMappingGui()
+{
+    if (ImGui::TreeNode("HDR & Tone Mapping")) {
+        bool EnableHDR = m_config.IsHDREnabled();
+        ImGui::Checkbox("HDR Enable", &EnableHDR);
+        m_config.ControlHDR(EnableHDR);
+
+        float AverageLuminance = 0.0f;
+        float Exposure = 0.0f;
+        m_config.GetHDRParams(AverageLuminance, Exposure);
+        ImGui::Text("HDR average luminance %.3f", AverageLuminance);
+        ImGui::Text("HDR exposure %.3f", Exposure);
+
+        ImGui::Text("Tone mapping method:");
+        TONE_MAP_METHOD ToneMappingMethod = m_config.GetToneMapMethod();
+        ImGui::RadioButton("None", (int*)&ToneMappingMethod, TONE_MAP_METHOD_NONE);
+        ImGui::SameLine();
+        ImGui::RadioButton("Reinhard", (int*)&ToneMappingMethod, TONE_MAP_METHOD_REINHARD);
+        ImGui::SameLine();
+        ImGui::RadioButton("Bruno Opsenica", (int*)&ToneMappingMethod, TONE_MAP_METHOD_BRUNO_OPSENICA);
+        ImGui::SameLine();
+        ImGui::RadioButton("With exposure", (int*)&ToneMappingMethod, TONE_MAP_METHOD_WITH_EXPOSURE);
+        m_config.SetToneMapMethod(ToneMappingMethod);
+
+        bool EnableGamma = m_config.IsGammaCorrectionEnabled();
+        ImGui::Checkbox("Enable Gamma correction", &EnableGamma);
+        m_config.ControlGammaCorrection(EnableGamma);
+
+        ImGui::TreePop();
+    }
 }
 
 

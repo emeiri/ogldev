@@ -49,7 +49,7 @@ public:
         //m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
         m_pointLight.Color = Vector3f(1.0f);
         m_pointLight.AmbientIntensity = 0.1f;
-        m_pointLight.DiffuseIntensity = 1000.0f;
+        m_pointLight.DiffuseIntensity = 2.0f;
         m_pointLight.Attenuation.Constant = 0.1f;
         m_pointLight.Attenuation.Linear = 0.01f;
         m_pointLight.Attenuation.Exp = 0.001f;
@@ -154,12 +154,7 @@ protected:
 
         ImGui::GetStyle().FontScaleMain = 1.5f;
 
-        bool my_tool_active = false;
-        ImGui::Begin("HDR & Tone Mapping", &my_tool_active, ImGuiWindowFlags_MenuBar);         
-
         m_pScene->ShowSceneGUI();
-
-        ImGui::End();
 
         // Rendering
         ImGui::Render();
