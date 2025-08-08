@@ -6,13 +6,11 @@ layout(local_size_x = 10, local_size_y = 10) in;
 
 layout(binding = 0) uniform sampler2D hdrTex;
 
-uniform int numGroupsX = 192;
-
 layout(std430, binding = 1) buffer Result {
     float tileLuminance[]; // One per workgroup
 };
 
-shared float localLum[100]; // 16x16 threads
+shared float localLum[gl_WorkGroupSize.x * gl_WorkGroupSize.y]; 
 
 void main() 
 {
@@ -30,14 +28,17 @@ void main()
    //     localLum[gl_LocalInvocationIndex] = 0.0;
   //  }
     
-
     barrier();
 
     // Thread 0 reduces tile luminance
     if (gl_LocalInvocationIndex == 0) {
-        float sum = 0.0;
-        for (int i = 0; i < 100; ++i) {
-            sum += localLum[i];
+
+        float Sum = 0.0;
+        
+        uint Size = gl_WorkGroupSize.x * gl_WorkGroupSize.y;
+        
+        for (uint i = 0; i < Size; ++i) {
+            Sum += localLum[i];
         }
 
         // for tiled tone mapping
@@ -47,6 +48,6 @@ void main()
         // tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = Exposure;
 		
 		// regular
-        tileLuminance[gl_WorkGroupID.y * numGroupsX + gl_WorkGroupID.x] = sum;
+        tileLuminance[gl_WorkGroupID.y * gl_NumWorkGroups.x + gl_WorkGroupID.x] = Sum;
     }
 }// Compute shader
