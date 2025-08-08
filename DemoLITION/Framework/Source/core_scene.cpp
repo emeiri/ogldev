@@ -162,8 +162,8 @@ void CoreScene::CreateDefaultCamera()
     Vector3f Up(0.0, 1.0f, 0.0f);
 
     float FOV = 45.0f;
-    float zNear = 0.1f;
-    float zFar = 1000.0f;
+    float zNear = 1.0f;
+    float zFar = 150.0f;
     int WindowWidth = 0;
     int WindowHeight = 0;
     m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
