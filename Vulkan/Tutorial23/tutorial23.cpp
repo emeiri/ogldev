@@ -205,9 +205,9 @@ private:
 
 		PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
 									  zNear, zFar };
-
-		glm::vec3 Pos(0.0f, 0.0f, -1.0f);
-		glm::vec3 Target(0.0f, 0.0f, 1.0f);
+		
+		glm::vec3 Pos(2.2f, -23.3f, 3.2f);
+		glm::vec3 Target(-1.0f, 0.04f, 0.05f);
 		glm::vec3 Up(0.0, 1.0f, 0.0f);
 
 		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
@@ -232,9 +232,9 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
-		m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
+	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
 
@@ -386,7 +386,7 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
-		glm::mat4 Scale = glm::scale(glm::mat4(1.0f), glm::vec3(m_scale));
+		glm::mat4 Scale = glm::scale(glm::mat4(0.1f), glm::vec3(m_scale));
 
 		glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
 		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
