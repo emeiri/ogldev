@@ -27,8 +27,8 @@
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
 
-#define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH  2560
+#define WINDOW_HEIGHT 1440
 
 
 class HDRToneMapping : public BaseGLApp {
@@ -48,12 +48,12 @@ public:
 
         //m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
         m_pointLight.Color = Vector3f(1.0f);
-        m_pointLight.AmbientIntensity = 0.1f;
-        m_pointLight.DiffuseIntensity = 2.0f;
+        m_pointLight.AmbientIntensity = 0.2f;
+        m_pointLight.DiffuseIntensity = 5.0f;
         m_pointLight.Attenuation.Constant = 0.1f;
         m_pointLight.Attenuation.Linear = 0.01f;
         m_pointLight.Attenuation.Exp = 0.001f;
-        m_pointLight.WorldPosition = Vector3f(0.0f, 2.0f, 0.0f);
+        m_pointLight.WorldPosition = Vector3f(0.0f, 0.5f, -1.6f);
     }
 
     ~HDRToneMapping() {}
@@ -74,9 +74,8 @@ public:
         m_pScene->GetConfig()->ControlShadowMapping(false);
 
         m_pRenderingSystem->SetScene(m_pScene);
-
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
-        m_pScene->SetCamera(Vector3f(63.0f, 15.0f, 0.0f), Vector3f(-1.0f, 0.0f, 0.1f)); // for Sponze
+        m_pScene->SetCamera(Vector3f(59.0f, 9.0f, -1.6f), Vector3f(-1.0f, 0.05f, 0.07f)); // for Sponze
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
         m_pSceneObject->SetScale(0.05f);
         m_pScene->AddToRenderList(m_pSceneObject);
@@ -99,9 +98,9 @@ public:
         m_pLightObject->SetScale(1.0f);
         m_pScene->AddToRenderList(m_pLightObject);
 
-        m_pBallObject = m_pScene->CreateSceneObject(pSphere);
-        m_pBallObject->SetScale(0.1f);
-        m_pScene->AddToRenderList(m_pBallObject);        
+      //  m_pBallObject = m_pScene->CreateSceneObject(pSphere);
+       // m_pBallObject->SetScale(0.1f);
+      //  m_pScene->AddToRenderList(m_pBallObject);        
 
         m_pRenderingSystem->Execute();
     }
@@ -133,14 +132,17 @@ public:
       //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
      //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
 
-        m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
+        //m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
         m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f; // sponza
-        m_pLightObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
-        m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
 
-        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);
-        //m_pScene->GetPointLights()[0].WorldPosition = LightPos;
-        //m_pBallObject->SetPosition(LightPos.x, LightPos.y, LightPos.z * -1.0f);
+        const Vector3f& LightPos = m_pScene->GetPointLights()[0].WorldPosition;
+        m_pLightObject->SetPosition(LightPos.x, -LightPos.y, -LightPos.z);
+        //m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
+
+        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);        
+            //m_pScene->GetPointLights()[0].WorldPosition = LightPos;
+       // 
+       // m_pBallObject->SetPosition(LightPos.x, LightPos.y, LightPos.z * -1.0f);
     }
 
 
