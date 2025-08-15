@@ -28,8 +28,7 @@
 
 extern bool UsePVP;
 extern bool UseIndirectRender;
-static bool UseGLTFPBR = true;
-static bool DisableSSAO = true;
+static bool UseGLTFPBR = false;
 static bool UseBlitForFinalCopy = true;
 
 #define SSAO_UBO_INDEX  0
@@ -124,10 +123,14 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     int local_size_x = 10;
     int local_size_y = 10;
+    
     m_hdrNumGroupsX = (int)AlignUpToMultiple(m_windowWidth, local_size_x) / local_size_x;
     m_hdrNumGroupsY = (int)AlignUpToMultiple(m_windowHeight, local_size_y) / local_size_y;
+    
     int NumTiles = m_hdrNumGroupsX * m_hdrNumGroupsY;
-    m_luminanceBuffer.InitBuffer(sizeof(float) * NumTiles, NULL, GL_MAP_READ_BIT | GL_CLIENT_STORAGE_BIT);
+
+    m_luminanceBuffer.InitBuffer(NumTiles * sizeof(float), NULL, GL_MAP_READ_BIT |
+                                                                 GL_CLIENT_STORAGE_BIT);
 
     m_ssaoParams.InitBuffer(sizeof(SSAOParamsInternal), NULL, GL_DYNAMIC_STORAGE_BIT);
 
@@ -310,10 +313,6 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE Tech)
 
 void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
 {
-    if (DisableSSAO) {
-        pScene->GetConfig()->ControlSSAO(false);
-    }
-
     // TODO: can be removed? happens also at the start of the LightingPass
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
@@ -736,19 +735,13 @@ void ForwardRenderer::HDRPassGPU(float& AvgLogLum, float& Exposure)
 
     m_luminanceBuffer.Unmap();
 
-   // printf("sum 1 %f\n", sum);
-
     int NumPixels = NumTiles * 100;
 
     AvgLogLum = sum / (float)NumPixels;
 
     AvgLogLum = expf(AvgLogLum);
-   // printf("avgLogLum %f\n", avgLogLum);
+
     Exposure = 0.18f / AvgLogLum;
-
-    //Exposure = CLAMP(Exposure, 0.001f, 2.0f);
-
-   // printf("%f\n", exposure);
 }
 
 
@@ -759,24 +752,25 @@ void ForwardRenderer::HDRPassCPU(float& AvgLogLum, float& Exposure)
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, m_hdrData.data());
     
     float sum = 0.0f;
+
     int Size = m_windowWidth * m_windowHeight;
     
     for (int i = 0; i < Size; i++) {
-        float lum = glm::dot(glm::vec3(m_hdrData[i * 3 + 0], m_hdrData[i * 3 + 1], m_hdrData[i * 3 + 2]),
-                             glm::vec3(0.2126f, 0.7152f, 0.0722f));
-        sum += logf(lum + 0.00001f);
-    }
+        glm::vec3 Pixel(m_hdrData[i * 3 + 0],
+                        m_hdrData[i * 3 + 1],
+                        m_hdrData[i * 3 + 2]);
 
-    //printf("sum 2 %f\n", sum);
-    
+        float lum = glm::dot(Pixel, glm::vec3(0.2126f, 0.7152f, 0.0722f));
+        sum += logf(lum + 0.0001f);
+    }
+  
     AvgLogLum = sum / Size;
 
-    //printf("avgLogLum %f\n", avgLogLum);
+    // Forgot to mention this...we calculated the log-average
+    // so we need to undo it to get back the linear luminance.
     AvgLogLum = expf(AvgLogLum);
    
     Exposure = 0.18f / AvgLogLum;
-
-    //Exposure = CLAMP(Exposure, 0.001f, 10.0f);
 }
 
 
