@@ -39,8 +39,8 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs" />
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\hdr.cs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map.fs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -154,6 +154,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\flat_passthru.vs = ..\..\Common\Shaders\flat_passthru.vs
 		..\..\Common\Shaders\guitex.fs = ..\..\Common\Shaders\guitex.fs
 		..\..\Common\Shaders\guitex.vs = ..\..\Common\Shaders\guitex.vs
+		..\..\DemoLITION\Framework\Shaders\GL\hdr.cs = ..\..\DemoLITION\Framework\Shaders\GL\hdr.cs
 		..\..\Common\Shaders\lighting_new.fs = ..\..\Common\Shaders\lighting_new.fs
 		..\..\Common\Shaders\lighting_new.vs = ..\..\Common\Shaders\lighting_new.vs
 		..\..\Common\Shaders\lighting_new_to_gs.vs = ..\..\Common\Shaders\lighting_new_to_gs.vs
@@ -175,6 +176,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\square.vs = ..\..\Common\Shaders\square.vs
 		..\..\Common\Shaders\tex.fs = ..\..\Common\Shaders\tex.fs
 		..\..\Common\Shaders\tex.vs = ..\..\Common\Shaders\tex.vs
+		..\..\DemoLITION\Framework\Shaders\GL\tone_map.fs = ..\..\DemoLITION\Framework\Shaders\GL\tone_map.fs
 		..\..\Common\Shaders\wireframe_on_mesh.gs = ..\..\Common\Shaders\wireframe_on_mesh.gs
 	EndProjectSection
 EndProject
