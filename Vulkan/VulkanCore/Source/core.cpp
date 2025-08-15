@@ -25,7 +25,6 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
-#include "Int/core_model.h"
 
 namespace OgldevVK {
 
