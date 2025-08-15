@@ -150,7 +150,7 @@ void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, bool IsFloat, 
 
     case 3:
         if (IsFloat) {
-            InternalFormat = GL_RGB32F;
+            InternalFormat = GL_RGB16F;
         }
         else {
             InternalFormat = GL_RGB8;
