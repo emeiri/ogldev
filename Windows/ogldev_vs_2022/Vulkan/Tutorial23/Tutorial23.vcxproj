@@ -129,15 +129,18 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;OGLDEV_VULKAN;_CONSOLE;IMGUIZMO_IMGUI_FOLDER=$(SolutionDir)..\..\Common\3rdparty\ImGui\GLFW\;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$SolutionDir\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)\..\..\Vulkan\VulkanCore\Include;$(SolutionDir)\..\..\Include;$(SolutionDir)\..\..\Include\assimp5;$(SolutionDir)\..\..\DemoLITION\Framework\Include;$(SolutionDir)\..\..\Common\3rdparty\ImGui\GLFW;$(SolutionDir)\..\..\Common\3rdparty\ImGui\imGuIZMO.quat</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\Lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>meshoptimizer.lib;assimp-vc143-mt.lib;glfw3dll.lib;VulkanCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
