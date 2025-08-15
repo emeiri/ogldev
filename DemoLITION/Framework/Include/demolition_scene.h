@@ -174,7 +174,7 @@ private:
     int m_envMap = -1;
     int m_irradianceMap = -1;
     SSAOParams m_ssaoParams;
-    bool m_ssaoEnabled = true;
+    bool m_ssaoEnabled = false;
     bool m_hdrEnabled = true;
     float m_hdrAverageLuminance = 0.0f;
     float m_hdrExposure = 0.0f;
