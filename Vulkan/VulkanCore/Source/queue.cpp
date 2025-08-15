@@ -162,8 +162,6 @@ void VulkanQueue::Present(u32 ImageIndex)
 	if (m_currentImage == m_numImages) {
 		m_currentImage = 0;
 	}
-
-//	WaitIdle();	// TODO: looks like a workaround but we're getting error messages without it
 }
 
 }
