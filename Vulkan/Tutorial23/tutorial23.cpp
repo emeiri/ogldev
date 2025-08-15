@@ -49,6 +49,7 @@
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
 
+#define APP_NAME "Tutorial 23"
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -166,6 +167,8 @@ public:
 	{
 		float CurTime = (float)glfwGetTime();
 
+		int Frames = 0;
+		float FPSTime = 0.0f;
 		while (!glfwWindowShouldClose(m_pWindow)) {
 			float Time = (float)glfwGetTime();
 			float dt = Time - CurTime;
@@ -173,6 +176,18 @@ public:
 			RenderScene();
 			CurTime = Time;
 			glfwPollEvents();
+
+			Frames++;
+			FPSTime += dt;
+
+			if (FPSTime >= 1.0f) {
+				printf("%d\n", Frames);
+				char Title[256];
+				snprintf(Title, sizeof(Title), "%s : FPS %d\n", APP_NAME, Frames);
+				glfwSetWindowTitle(m_pWindow, Title);
+				FPSTime = 0.0f;
+				Frames = 0;
+			}
 		}
 
 		glfwTerminate();
@@ -428,8 +443,6 @@ private:
 	float m_scale = 0.1f;
 };
 
-
-#define APP_NAME "Tutorial 23"
 
 int main(int argc, char* argv[])
 {
