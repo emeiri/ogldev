@@ -81,15 +81,17 @@ vec4 with_exposure()
 {             
     vec3 hdrColor = texture(gHDRSampler, TexCoords).rgb;
   
-    const float targetGray = 0.05;
+    float exposure = gExposure;
+
+    const float targetGray = 0.18;
 
     float bias = 0.03;
     float minLum = 0.01;
     float maxLum = 1.0;
-
+   
     //float exposure = targetGray / clamp(gAvgLum + bias, minLum, maxLum);
-    float exposure = targetGray / max(gAvgLum, 0.0001);
-
+        
+    // Reinhard operator
     vec3 mapped = hdrColor * exposure;
     mapped = mapped / (mapped + vec3(1.0));
   
@@ -249,6 +251,7 @@ vec4 toGamma(vec4 _rgba)
 }
 
 
+// Based on: https://bruop.github.io/tonemapping/
 vec4 bruno_opsenica()
 {
     vec3 rgb = texture2D(gHDRSampler, TexCoords).rgb;
