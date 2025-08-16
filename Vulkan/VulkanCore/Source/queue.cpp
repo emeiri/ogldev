@@ -99,24 +99,23 @@ u32 VulkanQueue::AcquireNextImage()
 {
 	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
 
-	u32 imageIndex = 0;
+	u32 ImageIndex = 0;
 	VkResult res = vkAcquireNextImageKHR(
 		m_device,
 		m_swapChain,
 		UINT64_MAX,
-		m_imageAvailableSemaphores[m_frameIndex], // Safe: one per frame
+		m_imageAvailableSemaphores[m_frameIndex], 
 		VK_NULL_HANDLE,
-		&imageIndex
+		&ImageIndex
 	);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR");
 
-	if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
-		vkWaitForFences(m_device, 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+	if (m_imagesInFlight[ImageIndex] != VK_NULL_HANDLE) {
+		vkWaitForFences(m_device, 1, &m_imagesInFlight[ImageIndex], VK_TRUE, UINT64_MAX);
 	}
 
-	m_imagesInFlight[imageIndex] = m_inFlightFences[m_frameIndex];
-	return imageIndex;
-
+	m_imagesInFlight[ImageIndex] = m_inFlightFences[m_frameIndex];
+	return ImageIndex;
 }
 
 
@@ -146,17 +145,19 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer CmdBuf)
 
 void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 {
-	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	VkPipelineStageFlags WaitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitSemaphores = &m_imageAvailableSemaphores[m_frameIndex];
-	submitInfo.pWaitDstStageMask = waitStages;
-	submitInfo.commandBufferCount = NumCmdBufs;
-	submitInfo.pCommandBuffers = pCmdBufs;
-	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = &m_renderFinishedSemaphores[m_frameIndex];
+	VkSubmitInfo submitInfo = {
+		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+		.pNext = NULL,
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = &m_imageAvailableSemaphores[m_frameIndex],
+		.pWaitDstStageMask = WaitStages,
+		.commandBufferCount = (u32)NumCmdBufs,
+		.pCommandBuffers = pCmdBufs,
+		.signalSemaphoreCount = 1,
+		.pSignalSemaphores = &m_renderFinishedSemaphores[m_frameIndex]
+	};
 
 	vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
 
@@ -168,19 +169,21 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 
 void VulkanQueue::Present(u32 ImageIndex)
 {
-	VkPresentInfoKHR presentInfo{};
-	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-	presentInfo.waitSemaphoreCount = 1;
-	presentInfo.pWaitSemaphores = &m_renderFinishedSemaphores[m_frameIndex];
-	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = &m_swapChain;
-	presentInfo.pImageIndices = &ImageIndex;
+	VkPresentInfoKHR PresentInfo = {
+		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+		.pNext = NULL,
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = &m_renderFinishedSemaphores[m_frameIndex],
+		.swapchainCount = 1,
+		.pSwapchains = &m_swapChain,
+		.pImageIndices = &ImageIndex,
+		.pResults = NULL
+	};
 
-	VkResult res = vkQueuePresentKHR(m_queue, &presentInfo);
+	VkResult res = vkQueuePresentKHR(m_queue, &PresentInfo);
 	CHECK_VK_RESULT(res, "vkQueuePresentKHR");
 
 	m_frameIndex = (m_frameIndex + 1) % m_maxFramesInFlight;
-
 }
 
 }
