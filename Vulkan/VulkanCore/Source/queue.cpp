@@ -35,11 +35,7 @@ void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamil
 	VkResult res = vkGetSwapchainImagesKHR(Device, SwapChain, &m_numImages, NULL);
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR");
 
-	m_maxFramesInFlight = std::min(2u, m_numImages); // Or 3 if you want to be more aggressive
-		
-	printf("Queue acquired\n");
-
-	CreateSemaphores();
+	CreateSyncObjects();
 }
 
 
@@ -59,7 +55,7 @@ void VulkanQueue::Destroy()
 }
 
 
-void VulkanQueue::CreateSemaphores()
+void VulkanQueue::CreateSyncObjects()
 {
 	m_imageAvailableSemaphores.resize(m_numImages);
 	
@@ -67,14 +63,13 @@ void VulkanQueue::CreateSemaphores()
 		Sem = CreateSemaphore(m_device);
 	}
 
-	m_renderFinishedSemaphores.resize(m_maxFramesInFlight);
+	m_renderFinishedSemaphores.resize(m_numImages);
 
 	for (VkSemaphore& Sem : m_renderFinishedSemaphores) {
 		Sem = CreateSemaphore(m_device);
 	}
 
-	m_inFlightFences.resize(m_maxFramesInFlight);
-	m_imagesInFlight.resize(m_numImages, VK_NULL_HANDLE);
+	m_inFlightFences.resize(m_numImages);
 
 	VkFenceCreateInfo fenceInfo = {
 		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
@@ -97,25 +92,20 @@ void VulkanQueue::WaitIdle()
 
 u32 VulkanQueue::AcquireNextImage()
 {
-	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
-
-	u32 ImageIndex = 0;
 	VkResult res = vkAcquireNextImageKHR(
 		m_device,
 		m_swapChain,
 		UINT64_MAX,
 		m_imageAvailableSemaphores[m_frameIndex], 
 		VK_NULL_HANDLE,
-		&ImageIndex
+		&m_imageIndex
 	);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR");
 
-	if (m_imagesInFlight[ImageIndex] != VK_NULL_HANDLE) {
-		vkWaitForFences(m_device, 1, &m_imagesInFlight[ImageIndex], VK_TRUE, UINT64_MAX);
-	}
-
-	m_imagesInFlight[ImageIndex] = m_inFlightFences[m_frameIndex];
-	return ImageIndex;
+	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
+	vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
+	
+	return m_imageIndex;
 }
 
 
@@ -157,13 +147,10 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 		.pCommandBuffers = pCmdBufs,
 		.signalSemaphoreCount = 1,
 		.pSignalSemaphores = &m_renderFinishedSemaphores[m_frameIndex]
-	};
-
-	vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
+	};	
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &submitInfo, m_inFlightFences[m_frameIndex]);
 	CHECK_VK_RESULT(res, "vkQueueSubmit");
-
 }
 
 
@@ -183,7 +170,7 @@ void VulkanQueue::Present(u32 ImageIndex)
 	VkResult res = vkQueuePresentKHR(m_queue, &PresentInfo);
 	CHECK_VK_RESULT(res, "vkQueuePresentKHR");
 
-	m_frameIndex = (m_frameIndex + 1) % m_maxFramesInFlight;
+	m_frameIndex = (m_frameIndex + 1) % m_numImages;
 }
 
 }
