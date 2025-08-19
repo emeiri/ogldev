@@ -263,6 +263,9 @@ public:
     {
         if (m_mobileCamera) {
             m_pGameCamera->OnMouse(x, y);
+        } else {
+            // avoid a camera glitch when it becomes mobile again
+            m_pGameCamera->UpdateMousePosSilent(x, y);
         }
 
         if (m_leftMouseButton.IsPressed) {
