@@ -59,9 +59,9 @@ private:
 	std::vector<VkSemaphore> m_imageAvailableSemaphores;
 	std::vector<VkSemaphore> m_renderFinishedSemaphores;
 	std::vector<VkFence> m_inFlightFences;
+	std::vector<VkFence> m_imagesInFlight;
 	u32 m_numImages = 0;
 	u32 m_frameIndex = 0;
-	u32 m_imageIndex = 0;
 };
 
 }

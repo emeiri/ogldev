@@ -70,6 +70,7 @@ void VulkanQueue::CreateSyncObjects()
 	}
 
 	m_inFlightFences.resize(m_numImages);
+	m_imagesInFlight.resize(m_numImages, VK_NULL_HANDLE);
 
 	VkFenceCreateInfo fenceInfo = {
 		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
@@ -92,20 +93,29 @@ void VulkanQueue::WaitIdle()
 
 u32 VulkanQueue::AcquireNextImage()
 {
+	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
+    vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
+
+	u32 ImageIndex = 0;
+
 	VkResult res = vkAcquireNextImageKHR(
 		m_device,
 		m_swapChain,
 		UINT64_MAX,
-		m_imageAvailableSemaphores[m_frameIndex], 
+		m_imageAvailableSemaphores[m_frameIndex],
 		VK_NULL_HANDLE,
-		&m_imageIndex
+		&ImageIndex
 	);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR");
 
-	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
-	vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
+	if ((m_imagesInFlight[ImageIndex] != VK_NULL_HANDLE) && 
+		(m_imagesInFlight[ImageIndex] != m_inFlightFences[m_frameIndex])) {
+		vkWaitForFences(m_device, 1, &m_imagesInFlight[ImageIndex], VK_TRUE, UINT64_MAX);
+	}
+
+	m_imagesInFlight[ImageIndex] = m_inFlightFences[m_frameIndex];
 	
-	return m_imageIndex;
+	return ImageIndex;
 }
 
 
