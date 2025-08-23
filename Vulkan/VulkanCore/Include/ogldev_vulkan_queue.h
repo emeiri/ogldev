@@ -56,8 +56,8 @@ private:
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkSwapchainKHR m_swapChain = VK_NULL_HANDLE;
 	VkQueue m_queue = VK_NULL_HANDLE;
-	std::vector<VkSemaphore> m_imageAvailableSemaphores;
-	std::vector<VkSemaphore> m_renderFinishedSemaphores;
+	std::vector<VkSemaphore> m_imageAvailableSems;
+	std::vector<VkSemaphore> m_renderFinishedSems;
 	std::vector<VkFence> m_inFlightFences;
 	std::vector<VkFence> m_imagesInFlight;
 	u32 m_numImages = 0;

@@ -41,11 +41,11 @@ void VulkanQueue::Init(VkDevice Device, VkSwapchainKHR SwapChain, u32 QueueFamil
 
 void VulkanQueue::Destroy()
 {
-	for (VkSemaphore& Sem : m_imageAvailableSemaphores) {
+	for (VkSemaphore& Sem : m_imageAvailableSems) {
 		vkDestroySemaphore(m_device, Sem, NULL);
 	}
 
-	for (VkSemaphore& Sem : m_renderFinishedSemaphores) {
+	for (VkSemaphore& Sem : m_renderFinishedSems) {
 		vkDestroySemaphore(m_device, Sem, NULL);
 	}	
 
@@ -57,15 +57,15 @@ void VulkanQueue::Destroy()
 
 void VulkanQueue::CreateSyncObjects()
 {
-	m_imageAvailableSemaphores.resize(m_numImages);
+	m_imageAvailableSems.resize(m_numImages);
 	
-	for (VkSemaphore& Sem : m_imageAvailableSemaphores) {
+	for (VkSemaphore& Sem : m_imageAvailableSems) {
 		Sem = CreateSemaphore(m_device);
 	}
 
-	m_renderFinishedSemaphores.resize(m_numImages);
+	m_renderFinishedSems.resize(m_numImages);
 
-	for (VkSemaphore& Sem : m_renderFinishedSemaphores) {
+	for (VkSemaphore& Sem : m_renderFinishedSems) {
 		Sem = CreateSemaphore(m_device);
 	}
 
@@ -102,7 +102,7 @@ u32 VulkanQueue::AcquireNextImage()
 		m_device,
 		m_swapChain,
 		UINT64_MAX,
-		m_imageAvailableSemaphores[m_frameIndex],
+		m_imageAvailableSems[m_frameIndex],
 		VK_NULL_HANDLE,
 		&ImageIndex
 	);
@@ -151,12 +151,12 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 		.pNext = NULL,
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &m_imageAvailableSemaphores[m_frameIndex],
+		.pWaitSemaphores = &m_imageAvailableSems[m_frameIndex],
 		.pWaitDstStageMask = WaitStages,
 		.commandBufferCount = (u32)NumCmdBufs,
 		.pCommandBuffers = pCmdBufs,
 		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &m_renderFinishedSemaphores[m_frameIndex]
+		.pSignalSemaphores = &m_renderFinishedSems[m_frameIndex]
 	};	
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &submitInfo, m_inFlightFences[m_frameIndex]);
@@ -170,7 +170,7 @@ void VulkanQueue::Present(u32 ImageIndex)
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.pNext = NULL,
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &m_renderFinishedSemaphores[m_frameIndex],
+		.pWaitSemaphores = &m_renderFinishedSems[m_frameIndex],
 		.swapchainCount = 1,
 		.pSwapchains = &m_swapChain,
 		.pImageIndices = &ImageIndex,
