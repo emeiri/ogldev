@@ -261,9 +261,11 @@ public:
 
     void PassiveMouseCB(int x, int y)
     {
-        if (m_mobileCamera) {
-            m_pGameCamera->OnMouse(x, y);
-        }
+        if (m_mobileCamera) {
+            m_pGameCamera->OnMouse(x, y);
+        } else {
+            m_pGameCamera->UpdateMousePosSilent(x, y);
+        }
 
         if (m_leftMouseButton.IsPressed) {
             m_leftMouseButton.x = x;
