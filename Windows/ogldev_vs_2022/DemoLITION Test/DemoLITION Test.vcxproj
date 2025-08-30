@@ -137,7 +137,7 @@
       <PreprocessorDefinitions>ASSIMP_USE_HUNTER;_USE_MATH_DEFINES;IMGUIZMO_IMGUI_FOLDER=GLFW/;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\DemoLITION\Framework\Include;$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW;..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat;..\..\..\Physics\Include</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
