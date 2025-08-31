@@ -302,12 +302,6 @@ vec4 sampleEnvMapIrradiance(vec3 tc, EnvironmentMapDataGPU map)
     return texture(map.envMapTextureIrradianceSampler, tc);
 }
 
-int sampleEnvMapQueryLevels(EnvironmentMapDataGPU map) 
-{
-    return textureQueryLevels(map.envMapTextureSampler);
-}
-
-
 // Based on: https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/main/source/Renderer/shaders/pbr.frag
 
 // Encapsulate the various inputs used by the various functions in the shading equation
@@ -363,7 +357,7 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs)
   vec3 v =  pbrInputs.v;
   vec3 reflection = normalize(reflect(-v, n));
   EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
-  float mipCount = float(sampleEnvMapQueryLevels(envMap));
+  float mipCount = float(textureQueryLevels(envMap.envMapTextureSampler));
   float lod = pbrInputs.perceptualRoughness * (mipCount - 1);
 
   // HDR envmaps are already linear
