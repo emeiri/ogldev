@@ -328,8 +328,8 @@ struct PBRInfo {
   vec3 reflectance0;            // full reflectance color (normal incidence angle)
   vec3 reflectance90;           // reflectance color at grazing angle
   float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
-  vec3 diffuseColor;            // color contribution from diffuse lighting
-  vec3 specularColor;           // color contribution from specular lighting
+  vec3 baseDiffuseColor;            // color contribution from diffuse lighting
+  vec3 baseSpecularColor;           // color contribution from specular lighting
 
   vec3 FssEss;
   float brdf_scale;
@@ -381,7 +381,7 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs)
 vec3 diffuseBurley(PBRInfo pbrInputs) {
   float f90 = 2.0 * pbrInputs.LdotH * pbrInputs.LdotH * pbrInputs.alphaRoughness - 0.5;
 
-  return (pbrInputs.diffuseColor / M_PI) * (1.0 + f90 * pow((1.0 - pbrInputs.NdotL), 5.0)) * (1.0 + f90 * pow((1.0 - pbrInputs.NdotV), 5.0));
+  return (pbrInputs.baseDiffuseColor / M_PI) * (1.0 + f90 * pow((1.0 - pbrInputs.NdotL), 5.0)) * (1.0 + f90 * pow((1.0 - pbrInputs.NdotV), 5.0));
 }
 
 // The following equation models the Fresnel reflectance term of the spec equation (aka F())
@@ -460,15 +460,15 @@ PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat,
     float alphaRoughness = PerceptualRoughness * PerceptualRoughness;
 
     vec3 f0 = vec3(0.04);
-    vec3 diffuseColor = mix(albedo.rgb, vec3(0), MetallicFactor); 
-    vec3 specularColor = mix(f0, albedo.rgb, MetallicFactor);
+    vec3 baseDiffuseColor = mix(albedo.rgb, vec3(0), MetallicFactor); 
+    vec3 baseSpecularColor = mix(f0, albedo.rgb, MetallicFactor);
 
-    float reflectance = max(max(specularColor.r, specularColor.g), specularColor.b);
+    float reflectance = max(max(baseSpecularColor.r, baseSpecularColor.g), baseSpecularColor.b);
 
     // For typical incident reflectance range (between 4% to 100%) set the grazing reflectance to 100% for typical fresnel effect.
     // For very low reflectance range on highly diffuse objects (below 4%), incrementally reduce grazing reflecance to 0%.
     float reflectance90 = clamp(reflectance * 25.0, 0.0, 1.0);
-    vec3 specularEnvironmentR0 = specularColor.rgb;
+    vec3 specularEnvironmentR0 = baseSpecularColor.rgb;
     vec3 specularEnvironmentR90 = vec3(reflectance90);
 
     vec3 v = normalize(gCameraWorldPos - WorldPos0);  // Vector from surface point to camera
@@ -478,8 +478,8 @@ PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat,
     pbrInputs.reflectance0 = specularEnvironmentR0;
     pbrInputs.reflectance90 = specularEnvironmentR90;
     pbrInputs.alphaRoughness = alphaRoughness;
-    pbrInputs.diffuseColor = diffuseColor;
-    pbrInputs.specularColor = specularColor;
+    pbrInputs.baseDiffuseColor = baseDiffuseColor;
+    pbrInputs.baseSpecularColor = baseSpecularColor;
     pbrInputs.n = normal;
     pbrInputs.v = v;
 
