@@ -28,7 +28,7 @@
 
 extern bool UsePVP;
 extern bool UseIndirectRender;
-static bool UseGLTFPBR = false;
+bool UseGLTFPBR = false;
 static bool UseBlitForFinalCopy = true;
 
 #define SSAO_UBO_INDEX  0

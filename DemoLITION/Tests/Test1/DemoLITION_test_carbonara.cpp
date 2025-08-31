@@ -978,12 +978,16 @@ private:
 
 };
 
+
+extern bool UseGLTFPBR;
+
 class GLTFPBRDemo : public Carbonara {
 
 public:
 
     GLTFPBRDemo()
     {
+        UseGLTFPBR = true;
     }
 
     void InitChild()
