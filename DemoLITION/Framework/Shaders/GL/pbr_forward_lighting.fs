@@ -361,7 +361,7 @@ vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs)
 {
   vec3 n = pbrInputs.n;
   vec3 v =  pbrInputs.v;
-  vec3 reflection = -normalize(reflect(v, n));
+  vec3 reflection = normalize(reflect(-v, n));
   EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
   float mipCount = float(sampleEnvMapQueryLevels(envMap));
   float lod = pbrInputs.perceptualRoughness * (mipCount - 1);
