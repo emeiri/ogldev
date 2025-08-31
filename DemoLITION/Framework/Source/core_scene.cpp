@@ -332,6 +332,7 @@ CoreSceneObject* CoreScene::CreateSceneObjectInternal(CoreModel* pModel)
     int Id = m_numSceneObjects;
     pCoreSceneObject->SetId(Id);
     pCoreSceneObject->SetName("SceneObject_" + std::to_string(Id));
+    pCoreSceneObject->InitMeshTransforms();
 
     m_numSceneObjects++;
 

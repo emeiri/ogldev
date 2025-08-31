@@ -40,6 +40,13 @@ public:
         m_pModel = pModel;
     }
 
+    void InitMeshTransforms()
+    {
+        assert(m_pModel);
+        size_t NumMeshes = m_pModel->GetNumMeshes();
+        m_meshTransforms.resize(NumMeshes);
+    }
+
     CoreModel* GetModel() const { return m_pModel; }
 
     void SetId(int id) { m_id = id; }
@@ -48,6 +55,7 @@ public:
 
 private:
     CoreModel* m_pModel = NULL;
+    std::vector<Matrix4f> m_meshTransforms;
     int m_id = -1;
 };
 

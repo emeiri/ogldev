@@ -36,6 +36,10 @@ public:
 
     virtual void ConvertToMesh(const char* pFilename) { assert(0); }
 
+    virtual int GetMeshIndex(const std::string& Name) const { return -1; }
+
+    virtual size_t GetNumMeshes() const { return 0; }
+
     PBRMaterial& GetPBRMaterial() { return m_PBRmaterial; };
 
     void SetPBR(bool IsPBR) { m_isPBR = IsPBR; }

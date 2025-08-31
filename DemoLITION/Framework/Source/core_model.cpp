@@ -235,6 +235,7 @@ void CoreModel::InitAllMeshes(const aiScene* pScene, std::vector<VertexType>& Ve
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         const aiMesh* paiMesh = pScene->mMeshes[i];
+
         if (UseMeshOptimizer) {
             InitSingleMeshOpt<VertexType>(Vertices, i, paiMesh);
         } else {
@@ -271,6 +272,14 @@ void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNo
             int MeshIndex = pNode->mMeshes[i];
             printf("%d ", MeshIndex);
             m_Meshes[MeshIndex].Transformation = CombinedTransformation;
+            std::string NodeName = std::string(pNode->mName.C_Str());
+            if (m_meshNameToMeshIndex.find(NodeName) == m_meshNameToMeshIndex.end()) {
+                m_meshNameToMeshIndex[NodeName] = i;
+                printf("Mesh '%s' mapped to mesh index %d\n", NodeName.c_str(), i);
+            } else {
+                printf("Node name '%s' already found in the meshNameToMeshIndex map\n", NodeName.c_str());
+                assert(0);
+            }                        
         }
         printf("\n");
     }
@@ -579,6 +588,20 @@ const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
     }
 
     return pMaterial;
+}
+
+
+int CoreModel::GetMeshIndex(const std::string& Name)
+{
+    std::map<std::string, int>::const_iterator it = m_meshNameToMeshIndex.find(Name);
+
+    int ret = -1;
+
+    if (it != m_meshNameToMeshIndex.end()) {
+        ret = m_meshNameToMeshIndex[Name];
+    }
+
+    return ret;
 }
 
 void CoreModel::GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize)

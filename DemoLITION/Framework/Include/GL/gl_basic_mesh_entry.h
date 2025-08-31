@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "ogldev_math_3d.h"
 
 struct BasicMeshEntry {
@@ -29,4 +31,5 @@ struct BasicMeshEntry {
     uint ValidFaces = 0;
     int MaterialIndex = -1;
     Matrix4f Transformation;
+    std::string Name;
 };
