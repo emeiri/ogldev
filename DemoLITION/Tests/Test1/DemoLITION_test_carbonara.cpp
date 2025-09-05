@@ -1023,21 +1023,7 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {
-        //m_pModel->GetPBRMaterial().Roughness = 0.43f;
-       // m_pModel->GetPBRMaterial().IsMetal = true;
-       // m_pModel->GetPBRMaterial().Color = m_color[0];
-
-        float Roughness[] = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f };
-
         m_pSceneObject->RotateBy(0.0f, 0.0f, 0.25f);
-
-        /*        for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_color); i++) {
-                    m_pModel->SetPosition(m_color[i].Pos );
-                    m_pModel->GetPBRMaterial().Roughness = Roughness[i];
-                    m_pModel->GetPBRMaterial().IsMetal = false;
-                    m_pModel->GetPBRMaterial().Color = Vector3f(0.1f, 0.33f, 0.17f);
-                    m_phongRenderer.Render(m_pModel);
-                }*/
     }
 
 private:
@@ -1123,10 +1109,10 @@ void carbonara()
     //FireworksDemo demo;
     //AnimationDemo demo;
     //BridgeDemo demo;
-    AmazonBistroDemo demo;
+    //AmazonBistroDemo demo;
     //PBRDemo demo;
     //SkyboxDemo demo;
-    //GLTFPBRDemo demo;
+    GLTFPBRDemo demo;
     //MeshConvertDemo demo;
 
     demo.Start();
