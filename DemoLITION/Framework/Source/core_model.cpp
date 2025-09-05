@@ -277,8 +277,8 @@ void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNo
                 m_meshNameToMeshIndex[NodeName] = i;
                 printf("Mesh '%s' mapped to mesh index %d\n", NodeName.c_str(), i);
             } else {
-                printf("Node name '%s' already found in the meshNameToMeshIndex map\n", NodeName.c_str());
-                assert(0);
+                printf("Warning: node name '%s' already found in the meshNameToMeshIndex map\n", NodeName.c_str());
+               // assert(0);
             }                        
         }
         printf("\n");
