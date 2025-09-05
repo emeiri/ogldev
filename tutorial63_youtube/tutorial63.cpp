@@ -72,6 +72,8 @@ public:
         m_pScene->GetPointLights().push_back(m_pointLight);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->ControlHDR(true);
+        m_pScene->GetConfig()->ControlGammaCorrection(true);
 
         m_pRenderingSystem->SetScene(m_pScene);
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        

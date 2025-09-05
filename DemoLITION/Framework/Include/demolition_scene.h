@@ -175,11 +175,11 @@ private:
     int m_irradianceMap = -1;
     SSAOParams m_ssaoParams;
     bool m_ssaoEnabled = false;
-    bool m_hdrEnabled = true;
+    bool m_hdrEnabled = false;
     float m_hdrAverageLuminance = 0.0f;
     float m_hdrExposure = 0.0f;
     TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_WITH_EXPOSURE;
-    bool m_enableGamma = true;
+    bool m_enableGamma = false;
 };
 
 
