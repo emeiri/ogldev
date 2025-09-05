@@ -39,7 +39,7 @@ jobs:
       - run:
           name: Install Vulkan SDK
           command: |
-            Start-Process -FilePath .\VulkanSDK.exe -ArgumentList "--root C:\VulkanSDK\1.4.304.0 --accept-licenses --default-answer --confirm-command install" -Wait
+            Start-Process -FilePath .\VulkanSDK.exe -ArgumentList "--root C:\VulkanSDK\1.4.304.0 --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.debug" -Wait
       - run:
           name: Set Environment Variables
           command: |
