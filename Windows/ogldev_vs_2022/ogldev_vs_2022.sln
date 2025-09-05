@@ -190,13 +190,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial37_PointLightShadow
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial38_ImprovingShadowMapping", "Tutorial38\Tutorial38.vcxproj", "{0D237F28-EA59-4308-9330-50650B015A07}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial39", "Tutorial39\Tutorial39.vcxproj", "{F0B17728-0597-4364-9A6C-1F6AF645F9F9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial39_Fog", "Tutorial39\Tutorial39.vcxproj", "{F0B17728-0597-4364-9A6C-1F6AF645F9F9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial40_PracticalSkeletonAnimation", "Tutorial40\Tutorial40.vcxproj", "{7EA10199-138D-4F8B-AFCF-F5E1B97C466A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial41_PCF", "Tutorial41\Tutorial41.vcxproj", "{CC9FC32C-1FCB-4C5C-A049-87E67BC81BD8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial42", "Tutorial42\Tutorial42.vcxproj", "{4ABDE0AF-E754-472C-B941-A1A3D4FD3E74}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial42_SkeletalAnimationBlending", "Tutorial42\Tutorial42.vcxproj", "{4ABDE0AF-E754-472C-B941-A1A3D4FD3E74}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial43_PBR", "Tutorial43\Tutorial43.vcxproj", "{E7CFBDC2-43C5-4B0D-B5CF-BA54EA12BA79}"
 EndProject
@@ -300,7 +300,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain11", "Terrain11\Terr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tutorials", "Tutorials", "{AA79194F-A6EF-4133-A624-C4CE94275552}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial44", "Tutorial44\Tutorial44.vcxproj", "{4FEDA199-87DE-42A1-AC25-AB29F499B0BF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial44_UserClipPlanes", "Tutorial44\Tutorial44.vcxproj", "{4FEDA199-87DE-42A1-AC25-AB29F499B0BF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleSystem", "ParticleSystem\ParticleSystem.vcxproj", "{EFB858F2-F3AB-40A7-B061-F33E4E6FB233}"
 EndProject
@@ -308,7 +308,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain12", "Terrain12\Terr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpenGL", "OpenGL", "{598FEE6D-9610-46D8-A821-39733CDAB3DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial45", "Tutorial45\Tutorial45.vcxproj", "{AC04242A-DA38-4364-8F78-FF8ED49C29D0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial45_PointSprites", "Tutorial45\Tutorial45.vcxproj", "{AC04242A-DA38-4364-8F78-FF8ED49C29D0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial45_demo1", "Tutorial45_demo1\Tutorial45_demo1.vcxproj", "{C11B6038-3356-48E0-9BB2-1A755572835F}"
 EndProject
@@ -518,7 +518,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial61_ClothSim", "Tuto
 		{82C3A59C-96DB-4B6A-9D4B-E08723D016F4} = {82C3A59C-96DB-4B6A-9D4B-E08723D016F4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial23", "Vulkan\Tutorial23\Tutorial23.vcxproj", "{3041FBBB-86DE-4276-B344-6A5276B9260B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial23-24", "Vulkan\Tutorial23\Tutorial23.vcxproj", "{3041FBBB-86DE-4276-B344-6A5276B9260B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
@@ -536,6 +536,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8898C290-9838-4323-A00A-8B2672644C46}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\.circleci\config.yml = ..\..\.circleci\config.yml
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial64_PBR_GLTF2", "Tutorial64_PBR_GLTF2\Tutorial64.vcxproj", "{4075FA99-8771-4E1D-83C9-931A69AAA408}"
+	ProjectSection(ProjectDependencies) = postProject
+		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
 	EndProjectSection
 EndProject
 Global
@@ -1458,6 +1463,14 @@ Global
 		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x64.Build.0 = Release|x64
 		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x86.ActiveCfg = Release|Win32
 		{CD7AF310-6821-40E7-A06B-11F65513899D}.Release|x86.Build.0 = Release|Win32
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Debug|x64.ActiveCfg = Debug|x64
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Debug|x64.Build.0 = Debug|x64
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Debug|x86.ActiveCfg = Debug|Win32
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Debug|x86.Build.0 = Debug|Win32
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Release|x64.ActiveCfg = Release|x64
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Release|x64.Build.0 = Release|x64
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Release|x86.ActiveCfg = Release|Win32
+		{4075FA99-8771-4E1D-83C9-931A69AAA408}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1583,6 +1596,7 @@ Global
 		{3041FBBB-86DE-4276-B344-6A5276B9260B} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
 		{1DE45FB7-EE41-4B47-B7C1-2F4C41BCCF49} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{CD7AF310-6821-40E7-A06B-11F65513899D} = {AA79194F-A6EF-4133-A624-C4CE94275552}
+		{4075FA99-8771-4E1D-83C9-931A69AAA408} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
