@@ -6,7 +6,7 @@ orbs:
 executors:
   linux:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/ubuntu:22.04
 
 jobs:
   build-linux:
