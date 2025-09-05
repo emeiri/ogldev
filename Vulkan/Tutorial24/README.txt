@@ -1,0 +1,1 @@
+Tutorial 24 shares the application source with tutorial 23.
