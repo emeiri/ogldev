@@ -798,7 +798,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     if (pMaterial->Get(AI_MATKEY_GLTF_ALPHACUTOFF, AlphaCutoff) == AI_SUCCESS) {
         material.EmissiveColor.a = AlphaCutoff;
     } else {
-        material.EmissiveColor.a = 0.5f;    // TODO: is this the correct default value?
+        material.EmissiveColor.a = 0.5f;    // Based on the "3D Rendering Cookbook"
     }
 
     float OpaquenessThreshold = 0.05f;
@@ -823,7 +823,8 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     }
 }
 
-void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName)
+void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color, 
+                          const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName)
 {
     aiColor4D AiColor(0.0f, 0.0f, 0.0f, 0.0f);
 
