@@ -96,6 +96,7 @@ uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
 uniform vec4 gBaseColor;
 uniform vec4 gEmissiveColor;
+uniform vec4 gMetallicRoughnessNormalOcclusion;
 
 const float M_PI = 3.141592653589793;
 
@@ -212,7 +213,7 @@ MetallicRoughnessDataGPU GetMaterial()
         ret.metallicRoughnessTextureUV = 0;
         ret.normalTextureSampler = gNormalMap;
         ret.normalTextureUV = 0;
-        ret.metallicRoughnessNormalOcclusion = vec4(1.0);// TODO: get from Assimp
+        ret.metallicRoughnessNormalOcclusion = gMetallicRoughnessNormalOcclusion;
         return ret;
     }      
 }
@@ -545,7 +546,7 @@ void main()
     vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs);
     vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs, AlbedoColor);
 
-    vec3 LightDirection = vec3(1.0, -1.0, 0.0);
+    vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
     vec3 LightColor = vec3(1.0);
 
     if (gNumLights > 0) {

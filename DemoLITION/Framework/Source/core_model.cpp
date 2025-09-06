@@ -40,6 +40,13 @@ static bool UseMeshOptimizer = false;
 //aiProcess_MakeLeftHanded | \
 //aiProcess_FlipWindingOrder | \
 
+enum MaterialType {
+    MaterialType_Invalid = 0,
+    MaterialType_Unlit = 0x80,
+    MaterialType_MetallicRoughness = 0x1,
+    MaterialType_SpecularGlossiness = 0x2
+};
+
 Texture* s_pMissingTexture = NULL;
 
 static void traverse(int depth, aiNode* pNode);
@@ -74,6 +81,35 @@ static std::string GetFullPath(const string& Dir, const aiString& Path)
     string FullPath = Dir + "/" + p;
 
     return FullPath;
+}
+
+
+MaterialType GetMaterialType(const aiMaterial* pMaterial)
+{
+    aiShadingMode ShadingMode = aiShadingMode_NoShading;
+
+    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingMode) == AI_SUCCESS) {
+        if (ShadingMode == aiShadingMode_Unlit) {
+            return MaterialType_Unlit;
+        }
+
+        if (ShadingMode == aiShadingMode_PBR_BRDF) {
+            ai_real factor = 0;
+            if (pMaterial->Get(AI_MATKEY_GLOSSINESS_FACTOR, factor) == AI_SUCCESS) {
+                return MaterialType_SpecularGlossiness;
+            } else if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
+                return MaterialType_MetallicRoughness;
+            }
+        }
+    } else {
+        printf("Error getting shading mode\n");
+        assert(0);
+    }
+
+    printf("Warning: unknown shading mode %d\n", ShadingMode);
+    assert(0);
+
+    return MaterialType_Invalid;
 }
 
 
@@ -821,7 +857,34 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 
         material.m_alphaTest = 0.5f;
     }
+
+    MaterialType MaterialType = GetMaterialType(pMaterial);
+
+    if (MaterialType == MaterialType_MetallicRoughness) {
+        ai_real MetallicFactor;
+
+        if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
+            material.MetallicRoughnessNormalOcclusion.x = MetallicFactor;
+        }
+
+        ai_real roughnessFactor;
+
+        if (pMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughnessFactor) == AI_SUCCESS) {
+            material.MetallicRoughnessNormalOcclusion.y = roughnessFactor;
+        }
+    }
+
+    ai_real NormalScale;
+    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), NormalScale) == AI_SUCCESS) {
+        material.MetallicRoughnessNormalOcclusion.z = NormalScale;
+    }
+
+    ai_real OcclusionStrength;
+    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), OcclusionStrength) == AI_SUCCESS) {
+        material.MetallicRoughnessNormalOcclusion.w = OcclusionStrength;
+    }
 }
+
 
 void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color, 
                           const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName)

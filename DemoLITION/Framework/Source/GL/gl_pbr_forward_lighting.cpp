@@ -57,6 +57,7 @@ bool PBRForwardLightingTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_irradianceUnitLoc, "gIrradiance");
     GET_UNIFORM_AND_CHECK(m_baseColorLoc, "gBaseColor");
     GET_UNIFORM_AND_CHECK(m_emissiveColorLoc, "gEmissiveColor");
+    GET_UNIFORM_AND_CHECK(m_metallicRoughnessNormalOcclusionLoc, "gMetallicRoughnessNormalOcclusion");
 
     return true;
 }
@@ -113,4 +114,9 @@ void PBRForwardLightingTechnique::SetMaterial(const Material& mat)
 {
     glUniform4f(m_baseColorLoc, mat.BaseColor.r, mat.BaseColor.g, mat.BaseColor.b, mat.BaseColor.a);
     glUniform4f(m_emissiveColorLoc, mat.EmissiveColor.r, mat.EmissiveColor.g, mat.EmissiveColor.b, mat.EmissiveColor.a);
+    glUniform4f(m_metallicRoughnessNormalOcclusionLoc,
+                mat.MetallicRoughnessNormalOcclusion.r,
+                mat.MetallicRoughnessNormalOcclusion.g,
+                mat.MetallicRoughnessNormalOcclusion.b,
+                mat.MetallicRoughnessNormalOcclusion.a);
 }

@@ -56,13 +56,14 @@ class Material {
 
  public:
 
-     std::string m_name;
+    std::string m_name;
 
     Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f SpecularColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f BaseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f EmissiveColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f MetallicRoughnessNormalOcclusion = Vector4f(1.0f);
 
     PBRMaterial PBRmaterial;
 
