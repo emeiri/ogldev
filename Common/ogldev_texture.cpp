@@ -89,6 +89,11 @@ bool Texture::Load(bool IsSRGB)
 
     LoadInternal(pImageData, IsSRGB);
 
+    // Free the image data after loading it into OpenGL
+    if (!m_isKTX) {
+        stbi_image_free(pImageData);
+    }
+        
     return true;
 }
 
