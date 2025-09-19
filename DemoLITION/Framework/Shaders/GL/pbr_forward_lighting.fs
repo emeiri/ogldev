@@ -331,8 +331,8 @@ struct PBRInfo {
   float brdf_bias;
 };
 
-// specularWeight is introduced with KHR_materials_specular
-vec3 getIBLRadianceLambertian(PBRInfo pbrInputs, vec4 AlbedoColor) 
+
+vec3 getIBLRadianceLambertian(PBRInfo pbrInputs) 
 {
   EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
 
@@ -343,7 +343,7 @@ vec3 getIBLRadianceLambertian(PBRInfo pbrInputs, vec4 AlbedoColor)
   vec3 F_avg = (pbrInputs.reflectance0 + (1.0 - pbrInputs.reflectance0) / 21.0);
   vec3 FmsEms = F_avg * Ems * pbrInputs.FssEss  / (1.0 - F_avg * Ems);
   // we use +FmsEms as indicated by the formula in the blog post (might be a typo in the implementation)
-  vec3 k_D = AlbedoColor.rgb * (1.0 - pbrInputs.FssEss + FmsEms); 
+    vec3 k_D = pbrInputs.baseDiffuseColor * (1.0 - pbrInputs.FssEss + FmsEms); 
 
   //return irradiance;
   return (FmsEms + k_D) * irradiance;
@@ -544,7 +544,7 @@ void main()
     PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(mat, AlbedoColor, n, mrSample);
 
     vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs);
-    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs, AlbedoColor);
+    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs);
 
     vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
     vec3 LightColor = vec3(1.0);
