@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp" />
     <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\GLFW\imconfig.h">

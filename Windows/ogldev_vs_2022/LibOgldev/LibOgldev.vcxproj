@@ -181,6 +181,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_camera_api.h" />
     <ClInclude Include="..\..\..\Include\ogldev_color_technique.h" />
     <ClInclude Include="..\..\..\Include\ogldev_cubemap_texture.h" />
+    <ClInclude Include="..\..\..\Include\ogldev_ect_cubemap.h" />
     <ClInclude Include="..\..\..\Include\ogldev_engine_common.h" />
     <ClInclude Include="..\..\..\Include\ogldev_flat_passthru_technique.h" />
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_bezier_curve_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_billboard_list.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_billboard_technique.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_flat_passthru_technique.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp" />

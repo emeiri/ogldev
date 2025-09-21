@@ -258,6 +258,9 @@
     <ClInclude Include="..\..\..\Include\Techniques\ogldev_square_vs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Include\ogldev_ect_cubemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\camera.cpp">
@@ -444,6 +447,9 @@
       <Filter>Source Files\Demolition</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

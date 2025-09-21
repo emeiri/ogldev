@@ -230,6 +230,7 @@
     <ClCompile Include="..\..\..\Common\3rdparty\stb_image.cpp" />
     <ClCompile Include="..\..\..\Common\cubemap_texture.cpp" />
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer_object.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />

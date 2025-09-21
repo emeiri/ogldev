@@ -20,6 +20,7 @@
     <ClCompile Include="..\..\..\tutorial28\ps_update_technique.cpp" />
     <ClCompile Include="..\..\..\tutorial28\random_texture.cpp" />
     <ClCompile Include="..\..\..\tutorial28\tutorial28.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

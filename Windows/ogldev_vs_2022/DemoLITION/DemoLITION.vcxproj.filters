@@ -151,6 +151,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_hdr_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp">
+      <Filter>Source\GL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">

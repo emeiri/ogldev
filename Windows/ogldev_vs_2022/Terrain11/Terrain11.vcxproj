@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\..\Common\math_3d.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_glfw_camera.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_basic_mesh.cpp" />
+    <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skybox.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_skybox_technique.cpp" />
