@@ -16,6 +16,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include <vulkan/vulkan.h>
 
 #include "ogldev_vulkan_util.h"
@@ -70,7 +72,6 @@ void VulkanQueue::CreateSyncObjects()
 	}
 
 	m_inFlightFences.resize(m_numImages);
-	m_imagesInFlight.resize(m_numImages, VK_NULL_HANDLE);
 
 	VkFenceCreateInfo fenceInfo = {
 		.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
@@ -96,26 +97,17 @@ u32 VulkanQueue::AcquireNextImage()
 	vkWaitForFences(m_device, 1, &m_inFlightFences[m_frameIndex], VK_TRUE, UINT64_MAX);
     vkResetFences(m_device, 1, &m_inFlightFences[m_frameIndex]);
 
-	u32 ImageIndex = 0;
-
 	VkResult res = vkAcquireNextImageKHR(
 		m_device,
 		m_swapChain,
 		UINT64_MAX,
 		m_imageAvailableSems[m_frameIndex],
 		VK_NULL_HANDLE,
-		&ImageIndex
+		&m_acquiredImageIndex
 	);
 	CHECK_VK_RESULT(res, "vkAcquireNextImageKHR");
 
-	if ((m_imagesInFlight[ImageIndex] != VK_NULL_HANDLE) && 
-		(m_imagesInFlight[ImageIndex] != m_inFlightFences[m_frameIndex])) {
-		vkWaitForFences(m_device, 1, &m_imagesInFlight[ImageIndex], VK_TRUE, UINT64_MAX);
-	}
-
-	m_imagesInFlight[ImageIndex] = m_inFlightFences[m_frameIndex];
-	
-	return ImageIndex;
+	return m_acquiredImageIndex;
 }
 
 
@@ -156,7 +148,7 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 		.commandBufferCount = (u32)NumCmdBufs,
 		.pCommandBuffers = pCmdBufs,
 		.signalSemaphoreCount = 1,
-		.pSignalSemaphores = &m_renderFinishedSems[m_frameIndex]
+		.pSignalSemaphores = &m_renderFinishedSems[m_acquiredImageIndex]
 	};	
 
 	VkResult res = vkQueueSubmit(m_queue, 1, &submitInfo, m_inFlightFences[m_frameIndex]);
@@ -166,11 +158,13 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 
 void VulkanQueue::Present(u32 ImageIndex)
 {
+	assert(ImageIndex == m_acquiredImageIndex);
+
 	VkPresentInfoKHR PresentInfo = {
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.pNext = NULL,
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &m_renderFinishedSems[m_frameIndex],
+		.pWaitSemaphores = &m_renderFinishedSems[m_acquiredImageIndex],
 		.swapchainCount = 1,
 		.pSwapchains = &m_swapChain,
 		.pImageIndices = &ImageIndex,
