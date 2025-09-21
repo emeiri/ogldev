@@ -546,6 +546,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial64_PBR_GLTF2", "Tut
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial25", "Vulkan\Tutorial25\Tutorial25.vcxproj", "{ABD77F9E-78C3-4350-8DF0-33F8E18809AE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "bitmap.h"
 
-void ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap);
+int ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap);

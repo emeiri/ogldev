@@ -84,6 +84,10 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
+
+		m_skyboxTex.Init(&m_vkCore);
+		m_skyboxTex.LoadEctCubemap("../../Content/textures/piazza_bologni_1k.hdr", false);
+
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -431,6 +435,7 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
+	OgldevVK::VulkanTexture m_skyboxTex;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;

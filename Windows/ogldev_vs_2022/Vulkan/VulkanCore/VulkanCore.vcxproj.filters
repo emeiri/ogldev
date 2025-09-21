@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imguizmo_quat.cpp">
       <Filter>Source Files\ImGUIZMOQuat</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\ogldev_ect_cubemap.cpp">
+      <Filter>Source Files\CommonOgldev</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">

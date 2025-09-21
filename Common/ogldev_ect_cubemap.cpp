@@ -24,21 +24,22 @@
 #include "ogldev_math_3d.h"
 #include "ogldev_ect_cubemap.h"
 
-static const GLenum types[6] = {  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-                                  GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-                                  GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-                                  GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-                                  GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-                                  GL_TEXTURE_CUBE_MAP_NEGATIVE_Z };
-
-#define CUBEMAP_NUM_FACES 6
-
 #define CUBE_MAP_INDEX_POS_X 0
 #define CUBE_MAP_INDEX_NEG_X 1
 #define CUBE_MAP_INDEX_POS_Y 2
 #define CUBE_MAP_INDEX_NEG_Y 3
 #define CUBE_MAP_INDEX_POS_Z 4
 #define CUBE_MAP_INDEX_NEG_Z 5
+
+
+static int types[6] = { CUBE_MAP_INDEX_POS_X,
+                        CUBE_MAP_INDEX_NEG_X,
+                        CUBE_MAP_INDEX_POS_Y,
+                        CUBE_MAP_INDEX_NEG_Y,
+                        CUBE_MAP_INDEX_POS_Z,
+                        CUBE_MAP_INDEX_NEG_Z };
+
+#define CUBEMAP_NUM_FACES 6
 
 
 static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
@@ -81,7 +82,7 @@ static glm::vec3 FaceCoordsToXYZ(int x, int y, int FaceID, int FaceSize)
 }
 
 
-void ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap)
+int ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& Cubemap)
 {
     int FaceSize = b.w_ / 4;
 
@@ -136,6 +137,8 @@ void ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& 
             }   // j loop
         }   // i loop
     }   // Face loop
+
+    return FaceSize;
 }
 
 

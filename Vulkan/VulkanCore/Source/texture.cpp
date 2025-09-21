@@ -35,13 +35,23 @@ void VulkanTexture::Load(unsigned int BufferSize, void* pData, bool IsRGB)
 
 	void* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
 
-	m_pVulkanCore->CreateTextureFromData(pImageData, m_imageWidth, m_imageHeight, *this);
+	m_pVulkanCore->Create2DTextureFromData(pImageData, m_imageWidth, m_imageHeight, *this);
 }
 
 
 void VulkanTexture::Load(const std::string& Filename, bool IsRGB)
 {
+	assert(m_pVulkanCore);
+
 	m_pVulkanCore->CreateTexture(Filename.c_str(), *this);
 }
+
+
+void VulkanTexture::LoadEctCubemap(const std::string& Filename, bool IsRGB)
+{
+	assert(m_pVulkanCore);
+	m_pVulkanCore->CreateCubemapTexture(Filename.c_str(), *this);
+}
+
 
 }

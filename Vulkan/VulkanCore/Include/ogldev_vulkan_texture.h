@@ -32,6 +32,8 @@ public:
 
 	VulkanTexture(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
 
+	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
+
 	VkImage m_image = VK_NULL_HANDLE;
 	VkDeviceMemory m_mem = VK_NULL_HANDLE;
 	VkImageView m_view = VK_NULL_HANDLE;
@@ -42,6 +44,8 @@ public:
 	void Load(const std::string& Filename, bool IsRGB);
 
 	void Load(unsigned int BufferSize, void* pImageData, bool IsRGB);
+
+	void LoadEctCubemap(const std::string& Filename, bool IsRGB);
 
 private:
 

@@ -20,6 +20,7 @@
 
 #include "3rdparty/stb_image.h"
 
+#include "ogldev_ect_cubemap.h"
 #include "ogldev_types.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_core.h"
@@ -733,7 +734,7 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 
 	// Step #2: create the image object and populate it with pixels
 	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
-	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format);
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, false);
 
 	// Step #3: release the image pixels. We don't need them after this point
 	stbi_image_free(pPixels);
@@ -752,12 +753,18 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	printf("Texture from '%s' created\n", pFilename);
 }
 
+void VulkanCore::Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
+{
+	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
+	CreateTextureFromData(pPixels, ImageWidth, ImageHeight, Format, false, Tex);
+}
 
-void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
+
+void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, 
+									   VkFormat Format, bool IsCubemap, VulkanTexture& Tex)
 {
 	// Step #1: create the image object and populate it with pixels
-	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
-	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format);
+	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, IsCubemap);
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -771,6 +778,38 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
 
 	printf("Texture from data created\n");
+}
+
+
+void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
+{
+	int Width, Height;
+
+	//stbi_set_flip_vertically_on_load(0);
+
+	const float* pImg = stbi_loadf(pFilename, &Width, &Height, NULL, 4);
+
+	if (!pImg) {
+		printf("Error loading '%s'\n", pFilename);
+		exit(1);
+	}
+
+	Bitmap bitmap(Width, Height, 4, eBitmapFormat_Float, (void*)pImg);
+	std::vector<Bitmap> Cubemap;
+	int FaceSize = ConvertEquirectangularImageToCubemap(bitmap, Cubemap);
+	
+	stbi_image_free((void*)pImg);
+
+	// Hack...
+	size_t bytes = FaceSize * FaceSize * 16 * 6;
+	char* p = (char*)malloc(bytes);
+
+	for (int i = 0; i < 6; i++) {
+		memcpy(p + i * FaceSize * FaceSize * 16, Cubemap[i].data_.data(), FaceSize * FaceSize * 16);
+	}
+
+	VkFormat Format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
 }
 
 
@@ -795,29 +834,40 @@ void VulkanTexture::Destroy(VkDevice Device)
 
 
 void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, 
-											u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat)
+											u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, bool IsCubemap)
 {
 	VkImageUsageFlagBits Usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
 														VK_IMAGE_USAGE_SAMPLED_BIT);
 	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags);
+	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap);
 
-	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, pPixels);
+	int LayerCount = IsCubemap ? 6 : 1;
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels);
 }
 
 
 void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat,
-	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags)
+	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap)
 {
+
+	/*VkImageFormatProperties imageFormatProperties;
+	vkGetPhysicalDeviceImageFormatProperties(m_physDevices.Selected().m_physDevice,
+		TexFormat,
+		VK_IMAGE_TYPE_2D,
+		VK_IMAGE_TILING_OPTIMAL,
+		UsageFlags,
+		VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
+		&imageFormatProperties);*/
+
 	VkImageCreateInfo ImageInfo = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 		.pNext = NULL,
-		.flags = 0,
+		.flags = IsCubemap ? VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT : (VkImageCreateFlags)0,
 		.imageType = VK_IMAGE_TYPE_2D,
 		.format = TexFormat,
 		.extent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 },
 		.mipLevels = 1,
-		.arrayLayers = 1,
+		.arrayLayers = IsCubemap ? 6u : 1u,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.tiling = VK_IMAGE_TILING_OPTIMAL,
 		.usage = UsageFlags,
@@ -858,12 +908,11 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 
 
 void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, 
-								    VkFormat TexFormat, const void* pPixels)
+								    VkFormat TexFormat, int LayerCount, const void* pPixels)
 {
 	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
-	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
-	int LayerCount = 1;
+	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;	 
 	VkDeviceSize ImageSize = LayerCount * LayerSize;
 
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
@@ -1025,7 +1074,7 @@ void VulkanCore::CreateDepthResources()
 		VkImageUsageFlagBits Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 		VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 		CreateImage(m_depthImages[i], m_windowWidth, m_windowHeight, DepthFormat, 
-					Usage, PropertyFlags);
+					Usage, PropertyFlags, false);
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;

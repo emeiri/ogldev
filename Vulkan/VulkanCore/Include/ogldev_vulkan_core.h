@@ -94,9 +94,11 @@ public:
 
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 	
-	void CreateTexture(const char* filename, VulkanTexture& Tex);
+	void CreateTexture(const char* pFilename, VulkanTexture& Tex);
 
-	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
+	void Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
+
+	void CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex);
 
 	void BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
 							   VkClearValue* pClearColor, VkClearValue* pDepthValue);
@@ -133,11 +135,15 @@ private:
 
 	BufferAndMemory CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags Usage, VkMemoryPropertyFlags Properties);
 
-	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight,
-									VkFormat TexFormat);
+	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VkFormat Format, 
+							   bool IsCubemap, VulkanTexture& Tex);
+
+	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight, 
+								    VkFormat TexFormat, bool IsCubemap);
 	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
-		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags);
-	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, const void* pPixels);
+		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap);
+	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
+							int LayerCount, const void* pPixels);
 	void CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight);
 	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout);
 	void SubmitCopyCommand();
