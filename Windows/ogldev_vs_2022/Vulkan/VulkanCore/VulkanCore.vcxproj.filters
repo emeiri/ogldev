@@ -117,6 +117,9 @@
     <ClCompile Include="..\..\..\..\Common\ogldev_ect_cubemap.cpp">
       <Filter>Source Files\CommonOgldev</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\skybox.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -187,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\imGuIZMOquat.h">
       <Filter>Source Files\ImGUIZMOQuat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_skybox.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

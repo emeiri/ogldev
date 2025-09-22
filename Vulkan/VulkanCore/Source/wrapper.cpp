@@ -52,7 +52,7 @@ VkSemaphore CreateSemaphore(VkDevice Device)
 
 // Copied from the "3D Graphics Rendering Cookbook"
 void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
-					 VkImageLayout OldLayout, VkImageLayout NewLayout)
+					 VkImageLayout OldLayout, VkImageLayout NewLayout, bool IsCubemap)
 {
 	VkImageMemoryBarrier barrier = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -69,7 +69,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 			.baseMipLevel = 0,
 			.levelCount = 1,
 			.baseArrayLayer = 0,
-			.layerCount = 1
+			.layerCount = IsCubemap ? 6u : 1u
 		}
 	};
 
@@ -203,7 +203,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, 
-							VkImageAspectFlags AspectFlags)
+							VkImageAspectFlags AspectFlags, bool IsCubemap)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -211,7 +211,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 		.pNext = NULL,
 		.flags = 0,
 		.image = Image,
-		.viewType = VK_IMAGE_VIEW_TYPE_2D,
+		.viewType = IsCubemap ? VK_IMAGE_VIEW_TYPE_CUBE : VK_IMAGE_VIEW_TYPE_2D,
 		.format = Format,
 		.components = {
 			.r = VK_COMPONENT_SWIZZLE_IDENTITY,
@@ -224,7 +224,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 			.baseMipLevel = 0,
 			.levelCount = 1,
 			.baseArrayLayer = 0,
-			.layerCount = 1
+			.layerCount = IsCubemap ? 6u : 1u
 		}
 	};
 
@@ -236,7 +236,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 
 
 VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter, 
-							   VkSamplerAddressMode AddressMode)
+							   VkSamplerAddressMode AddressMode, bool IsCubemap)
 {
 	VkSamplerCreateInfo SamplerInfo = {
 		.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,

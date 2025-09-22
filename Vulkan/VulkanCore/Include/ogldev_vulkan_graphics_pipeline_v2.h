@@ -27,6 +27,30 @@
 
 namespace OgldevVK {
 
+enum Binding {
+	BindingVB = 0,
+	BindingIB = 1,
+	BindingUniform = 2,
+	BindingTexture2D = 3,
+	BindingTextureCube = 4
+};
+
+
+struct PipelineDesc {
+	VkDevice Device = NULL;
+	GLFWwindow* pWindow = NULL;
+	VkShaderModule vs = NULL;
+	VkShaderModule fs = NULL;
+	int NumImages = 0;
+	VkFormat ColorFormat = VK_FORMAT_UNDEFINED;
+	VkFormat DepthFormat = VK_FORMAT_UNDEFINED;
+	bool IsVB = false;
+	bool IsIB = false;
+	bool IsUniform = false;
+	bool IsTex2D = false;
+	bool IsTexCube = false;
+};
+
 class GraphicsPipelineV2 {
 
 public:
@@ -39,6 +63,8 @@ public:
 					 int NumImages,
 					 VkFormat ColorFormat, 
 					 VkFormat DepthFormat);
+
+	GraphicsPipelineV2(const PipelineDesc& pd);
 
 	~GraphicsPipelineV2();
 
@@ -59,7 +85,7 @@ private:
 
 	void AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
 	void CreateDescriptorPool(int MaxSets);
-	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform);
+	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex2D, bool IsUniform, bool IsCubemap);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
