@@ -322,8 +322,8 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-		//	m_pPipeline->Bind(CmdBuf);
-			//m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
+			m_pPipeline->Bind(CmdBuf);
+			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
 
 			m_pSkyboxPipeline->Bind(CmdBuf);
 			m_skybox.RecordCommandBuffer(CmdBuf, *m_pSkyboxPipeline, i);
@@ -444,7 +444,8 @@ private:
 
 		m_model.Update(ImageIndex, WVP);
 
-		m_skybox.Update(ImageIndex, VP);
+		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
+		m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
 
 	GLFWwindow* m_pWindow = NULL;
