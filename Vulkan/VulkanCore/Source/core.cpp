@@ -951,7 +951,7 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	TransitionImageLayout(Tex.m_image, TexFormat, 
 						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, IsCubemap);
 	
-	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight);
+	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, BytesPerPixel, LayerCount);
 	
 	TransitionImageLayout(Tex.m_image, TexFormat, 
 						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, IsCubemap);
@@ -989,26 +989,33 @@ void VulkanCore::CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Siz
 }
 
 
-void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight)
+void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, 
+								   u32 PixelSize, int NumLayers)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	VkBufferImageCopy BufferImageCopy = {
-		.bufferOffset = 0,
-		.bufferRowLength = 0,
-		.bufferImageHeight = 0,
-		.imageSubresource = VkImageSubresourceLayers {
-			.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-			.mipLevel = 0,
-			.baseArrayLayer = 0,
-			.layerCount = 1
-		},
-		.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
-		.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
-	};
+	std::vector<VkBufferImageCopy> BufferImageCopy(NumLayers);
+
+	for (int i = 0; i < NumLayers; i++) {
+		VkBufferImageCopy bic = {
+			.bufferOffset = i * ImageWidth * ImageHeight * PixelSize,
+			.bufferRowLength = 0,
+			.bufferImageHeight = 0,
+			.imageSubresource = VkImageSubresourceLayers {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = 0,
+				.baseArrayLayer = (u32)i,
+				.layerCount = 1
+			},
+			.imageOffset = VkOffset3D {.x = 0, .y = 0, .z = 0 },
+			.imageExtent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 }
+		};
+
+		BufferImageCopy[i] = bic;
+	}
 
 	vkCmdCopyBufferToImage(m_copyCmdBuf, Src, Dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-						   1, &BufferImageCopy);
+						   (u32)BufferImageCopy.size(), BufferImageCopy.data());
 	SubmitCopyCommand();
 }
 
