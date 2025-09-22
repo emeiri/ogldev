@@ -788,8 +788,6 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 {
 	int Width, Height;
 
-	//stbi_set_flip_vertically_on_load(0);
-
 	const float* pImg = stbi_loadf(pFilename, &Width, &Height, NULL, 4);
 
 	if (!pImg) {
@@ -814,6 +812,8 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 	VkFormat Format = VK_FORMAT_R32G32B32A32_SFLOAT;
 	//CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
 	CreateTextureImageFromData(Tex, p, FaceSize, FaceSize, Format, true);
+
+	free(p);
 
 	// Step #4: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
