@@ -22,6 +22,8 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial25\tutorial25.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\Vulkan\Tutorial25\skybox.frag" />
+    <None Include="..\..\..\..\Vulkan\Tutorial25\skybox.vert" />
     <None Include="..\..\..\..\Vulkan\Tutorial25\test.frag" />
     <None Include="..\..\..\..\Vulkan\Tutorial25\test.vert" />
   </ItemGroup>

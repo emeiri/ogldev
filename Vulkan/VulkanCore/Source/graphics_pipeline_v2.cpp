@@ -23,15 +23,6 @@
 #include "ogldev_vulkan_graphics_pipeline_v2.h"
 
 
-enum Binding {
-	BindingVB = 0,
-	BindingIB = 1,
-	BindingUniform = 2,
-	BindingTexture = 3,
-	BindingCount = 4
-};
-
-
 namespace OgldevVK {
 
 GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
@@ -50,9 +41,21 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 	bool IsIB = true;
 	bool IsUniform = true;
 	bool IsTex = true;
-	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex);
+	bool IsCubemap = false;
+	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex, IsCubemap);
 
 	InitCommon(pWindow, RenderPass, vs, fs, ColorFormat, DepthFormat);
+}
+
+
+GraphicsPipelineV2::GraphicsPipelineV2(const PipelineDesc& pd)
+{
+	m_device = pd.Device;
+	m_numImages = pd.NumImages;
+
+	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsTex2D, pd.IsUniform, pd.IsTexCube);
+
+	InitCommon(pd.pWindow, NULL, pd.vs, pd.fs, pd.ColorFormat, pd.DepthFormat);
 }
 
 
@@ -235,7 +238,7 @@ void GraphicsPipelineV2::CreateDescriptorPool(int MaxSets)
 }
 
 
-void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform)
+void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex2D, bool IsUniform, bool IsCubemap)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -272,15 +275,26 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
 
-	if (IsTex) { 
+	if (IsTex2D) { 
 		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
-			.binding = BindingTexture,
+			.binding = BindingTexture2D,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		};
 
 		LayoutBindings.push_back(FragmentShaderLayoutBinding_Tex);
+	}
+
+	if (IsCubemap) {
+		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_TexCube = {
+			.binding = BindingTextureCube,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		};
+
+		LayoutBindings.push_back(FragmentShaderLayoutBinding_TexCube);
 	}
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
@@ -331,7 +345,9 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 {
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * BindingCount);
+	int NumBindings = 4; // VB, IB, Uniform, Tex
+
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * NumBindings);
 
 	std::vector<VkDescriptorBufferInfo> BufferInfo_VBs(NumSubmeshes);
 	std::vector<VkDescriptorBufferInfo> BufferInfo_IBs(NumSubmeshes);
@@ -411,7 +427,7 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingTexture,
+				.dstBinding = BindingTexture2D,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,

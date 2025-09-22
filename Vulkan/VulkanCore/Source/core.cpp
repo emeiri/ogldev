@@ -452,7 +452,8 @@ void VulkanCore::CreateSwapChain()
 
 	m_imageViews.resize(NumSwapChainImages);
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
-		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT);
+		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format, 
+										  VK_IMAGE_ASPECT_COLOR_BIT, false);
 	}
 }
 
@@ -747,16 +748,18 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	// Step #3: release the image pixels. We don't need them after this point
 	stbi_image_free(pPixels);
 
+	// TODO: the next two steps are duplicated below and can be extracted to a single func
+
 	// Step #4: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, false);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #5: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, false);
 
 	printf("Texture from '%s' created\n", pFilename);
 }
@@ -776,14 +779,14 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #3: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, IsCubemap);
 
 	printf("Texture from data created\n");
 }
@@ -817,7 +820,21 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 	}
 
 	VkFormat Format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
+	//CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
+	CreateTextureImageFromData(Tex, p, FaceSize, FaceSize, Format, true);
+
+	// Step #4: create the image view
+	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, true);
+
+	VkFilter MinFilter = VK_FILTER_LINEAR;
+	VkFilter MaxFilter = VK_FILTER_LINEAR;
+	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	// Step #5: create the texture sampler
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, true);
+
+	printf("Texture from '%s' created\n", pFilename);
 }
 
 
@@ -850,7 +867,7 @@ void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPix
 	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap);
 
 	int LayerCount = IsCubemap ? 6 : 1;
-	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels);
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, IsCubemap);
 }
 
 
@@ -916,7 +933,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 
 
 void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, 
-								    VkFormat TexFormat, int LayerCount, const void* pPixels)
+								    VkFormat TexFormat, int LayerCount, const void* pPixels, bool IsCubemap)
 {
 	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
@@ -932,12 +949,12 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
 	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, IsCubemap);
 	
 	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight);
 	
 	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, IsCubemap);
 
 	StagingTex.Destroy(m_device);
 }
@@ -946,11 +963,11 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 
-									   VkImageLayout OldLayout, VkImageLayout NewLayout)
+									   VkImageLayout OldLayout, VkImageLayout NewLayout, bool IsCubemap)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout);
+	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, IsCubemap);
 
 	SubmitCopyCommand();
 }
@@ -1086,10 +1103,10 @@ void VulkanCore::CreateDepthResources()
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout);
+		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, false);
 
 		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
-												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false);
 	}
 }
 

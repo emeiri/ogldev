@@ -29,5 +29,11 @@
     <None Include="..\..\..\..\Vulkan\Tutorial25\test.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\..\..\Vulkan\Tutorial25\skybox.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\Tutorial25\skybox.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
