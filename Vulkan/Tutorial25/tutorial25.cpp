@@ -69,13 +69,11 @@ public:
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 
-		vkDestroyShaderModule(m_device, m_skyboxVS, NULL);
-		vkDestroyShaderModule(m_device, m_skyboxFS, NULL);
-
 		delete m_pPipeline;
-		delete m_pSkyboxPipeline;
 			
 		m_model.Destroy();
+
+		m_skybox.Destroy();
 
 		m_imGUIRenderer.Destroy();
 	}
@@ -90,25 +88,7 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
-
-		m_skyboxVS = OgldevVK::CreateShaderModuleFromText(m_device, "skybox.vert");
-		m_skyboxFS = OgldevVK::CreateShaderModuleFromText(m_device, "skybox.frag");
-		VkFormat ColorFormat = m_vkCore.GetSwapChainFormat();
-		VkFormat DepthFormat = m_vkCore.GetDepthFormat();
-		OgldevVK::PipelineDesc pd;
-		pd.Device = m_device;
-		pd.pWindow = m_pWindow;
-		pd.vs = m_skyboxVS;
-		pd.fs = m_skyboxFS;
-		pd.NumImages = m_numImages;
-		pd.ColorFormat = ColorFormat;
-		pd.DepthFormat = DepthFormat;
-		pd.IsTexCube = true;
-		pd.IsUniform = true;
-		m_pSkyboxPipeline = new OgldevVK::GraphicsPipelineV2(pd);
 		m_skybox.Init(&m_vkCore, "../../Content/textures/piazza_bologni_1k.hdr");
-		m_skybox.CreateDescriptorSets(*m_pSkyboxPipeline);
-
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -324,9 +304,8 @@ private:
 		
 			m_pPipeline->Bind(CmdBuf);
 			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
-
-			m_pSkyboxPipeline->Bind(CmdBuf);
-			m_skybox.RecordCommandBuffer(CmdBuf, *m_pSkyboxPipeline, i);
+			
+			m_skybox.RecordCommandBuffer(CmdBuf, i);
 
 			vkCmdEndRendering(CmdBuf);
 
@@ -461,9 +440,6 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;	
-	OgldevVK::GraphicsPipelineV2* m_pSkyboxPipeline = NULL;	
-	VkShaderModule m_skyboxVS = VK_NULL_HANDLE;
-	VkShaderModule m_skyboxFS = VK_NULL_HANDLE;
 	OgldevVK::Skybox m_skybox;
 
 	OgldevVK::VkModel m_model;

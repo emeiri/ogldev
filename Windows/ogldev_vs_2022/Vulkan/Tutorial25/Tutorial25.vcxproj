@@ -22,10 +22,10 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial25\tutorial25.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial25\skybox.frag" />
-    <None Include="..\..\..\..\Vulkan\Tutorial25\skybox.vert" />
     <None Include="..\..\..\..\Vulkan\Tutorial25\test.frag" />
     <None Include="..\..\..\..\Vulkan\Tutorial25\test.vert" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox.frag" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\skybox.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

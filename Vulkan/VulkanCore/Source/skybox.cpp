@@ -20,7 +20,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ogldev_vulkan_skybox.h"
-
+#include "ogldev_vulkan_shader.h"
 
 
 namespace OgldevVK {
@@ -32,9 +32,32 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 {
 	m_pVulkanCore = pVulkanCore; 
 	m_numImages = pVulkanCore->GetNumImages();
+	
 	m_uniformBuffers = pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE);
+	
 	m_cubemapTex.Init(pVulkanCore);
 	m_cubemapTex.LoadEctCubemap(pFilename, false);
+	
+	m_vs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.vert");
+	m_fs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.frag");
+	
+	VkFormat ColorFormat = m_pVulkanCore->GetSwapChainFormat();
+	VkFormat DepthFormat = m_pVulkanCore->GetDepthFormat();
+	
+	OgldevVK::PipelineDesc pd;
+	pd.Device = pVulkanCore->GetDevice();
+	pd.pWindow = pVulkanCore->GetWindow();
+	pd.vs = m_vs;
+	pd.fs = m_fs;
+	pd.NumImages = m_numImages;
+	pd.ColorFormat = ColorFormat;
+	pd.DepthFormat = DepthFormat;
+	pd.IsTexCube = true;
+	pd.IsUniform = true;
+	
+	m_pPipeline = new OgldevVK::GraphicsPipelineV2(pd);
+
+	CreateDescriptorSets();
 }
 
 
@@ -43,13 +66,20 @@ void Skybox::Destroy()
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
 		m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
 	}
+
+	vkDestroyShaderModule(m_pVulkanCore->GetDevice(), m_vs, NULL);
+	vkDestroyShaderModule(m_pVulkanCore->GetDevice(), m_fs, NULL);
+
+	m_cubemapTex.Destroy(m_pVulkanCore->GetDevice());
+
+	delete m_pPipeline;
 }
 	
 
-void Skybox::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
+void Skybox::CreateDescriptorSets()
 {
 	int NumSubmeshes = 1;
-	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
+	m_pPipeline->AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
 
 	int NumBindings = 2; // Uniform, Cubemap
 
@@ -106,10 +136,12 @@ void Skybox::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 }
 
 
-void Skybox::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pipeline, int ImageIndex)
+void Skybox::RecordCommandBuffer(VkCommandBuffer CmdBuf, int ImageIndex)
 {
+	m_pPipeline->Bind(CmdBuf);
+
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-							Pipeline.GetPipelineLayout(),
+							m_pPipeline->GetPipelineLayout(),
 							0,  // firstSet
 							1,  // descriptorSetCount
 							m_descriptorSets[ImageIndex].data(),
@@ -129,7 +161,5 @@ void Skybox::Update(int ImageIndex, const glm::mat4& Transformation)
 {
 	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), glm::value_ptr(Transformation), sizeof(Transformation));
 }
-
-
 
 };
