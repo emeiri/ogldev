@@ -35,9 +35,9 @@ namespace OgldevVK {
 
 		void Destroy();
 
-		void CreateDescriptorSets(GraphicsPipelineV2& Pipeline);
+		void CreateDescriptorSets();
 
-		void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pipeline, int ImageIndex);
+		void RecordCommandBuffer(VkCommandBuffer CmdBuf, int ImageIndex);
 
 		void Update(int ImageIndex, const glm::mat4& Transformation);
 
@@ -48,5 +48,8 @@ namespace OgldevVK {
 		VulkanTexture m_cubemapTex;
 		std::vector<BufferAndMemory> m_uniformBuffers;
 		std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
+		OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
+		VkShaderModule m_vs = VK_NULL_HANDLE;
+		VkShaderModule m_fs = VK_NULL_HANDLE;
 	};
 }
