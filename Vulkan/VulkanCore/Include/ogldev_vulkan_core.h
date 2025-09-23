@@ -138,7 +138,7 @@ private:
 	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VkFormat Format, 
 							   bool IsCubemap, VulkanTexture& Tex);
 
-	void CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight, 
+	void CreateImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight, 
 								    VkFormat TexFormat, bool IsCubemap);
 	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
 		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap);
