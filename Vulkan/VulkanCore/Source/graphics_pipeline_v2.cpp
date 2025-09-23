@@ -115,7 +115,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.maxDepth = 1.0f
 	};
 
-	VkRect2D Scissor{
+	VkRect2D Scissor = {
 		.offset = {
 			.x = 0,
 			.y = 0,
