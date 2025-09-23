@@ -91,6 +91,10 @@ int GetBytesPerTexFormat(VkFormat Format)
 		return 4;
 	case VK_FORMAT_R16G16B16A16_SFLOAT:
 		return 4 * sizeof(uint16_t);
+	case VK_FORMAT_R32G32B32_SFLOAT:
+		return 3 * sizeof(float);
+	case VK_FORMAT_R8G8B8_SRGB:
+		return 3;
 	case VK_FORMAT_R32G32B32A32_SFLOAT:
 		return 4 * sizeof(float);
 	default:
