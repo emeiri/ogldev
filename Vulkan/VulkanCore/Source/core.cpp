@@ -775,14 +775,14 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 {
 	int Width, Height;
 
-	const float* pImg = stbi_loadf(pFilename, &Width, &Height, NULL, 4);
+	const unsigned char* pImg = stbi_load(pFilename, &Width, &Height, NULL, STBI_rgb_alpha);
 
 	if (!pImg) {
 		printf("Error loading '%s'\n", pFilename);
 		exit(1);
 	}
 
-	Bitmap bitmap(Width, Height, 4, eBitmapFormat_Float, (void*)pImg);
+	Bitmap bitmap(Width, Height, 4, eBitmapFormat_UnsignedByte, (void*)pImg);
 	std::vector<Bitmap> Cubemap;
 	int FaceSize = ConvertEquirectangularImageToCubemap(bitmap, Cubemap);
 	
@@ -790,15 +790,16 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 
 	// Hack...
 	int NumFaces = 6;
-	size_t SingleFaceNumBytes = FaceSize * FaceSize * 16;
+	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
+	int BytesPerPixel = GetBytesPerTexFormat(Format);
+	size_t SingleFaceNumBytes = FaceSize * FaceSize * BytesPerPixel;
 	size_t TotalBytes = NumFaces * SingleFaceNumBytes;
 	char* p = (char*)malloc(TotalBytes);
 
 	for (int i = 0; i < NumFaces; i++) {
 		memcpy(p + i * SingleFaceNumBytes, Cubemap[i].data_.data(), SingleFaceNumBytes);
 	}
-
-	VkFormat Format = VK_FORMAT_R32G32B32A32_SFLOAT;
+	
 	CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
 
 	free(p);
