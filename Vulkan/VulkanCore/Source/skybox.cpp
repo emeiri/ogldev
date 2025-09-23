@@ -49,6 +49,7 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 	pd.NumImages = m_numImages;
 	pd.ColorFormat = m_pVulkanCore->GetSwapChainFormat();
 	pd.DepthFormat = m_pVulkanCore->GetDepthFormat();
+	pd.DepthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
 	pd.IsTexCube = true;
 	pd.IsUniform = true;
 	
