@@ -927,12 +927,12 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
 	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, IsCubemap);
+						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount);
 	
 	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, BytesPerPixel, LayerCount);
 	
 	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, IsCubemap);
+						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount);
 
 	StagingTex.Destroy(m_device);
 }
@@ -941,11 +941,11 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 
-									   VkImageLayout OldLayout, VkImageLayout NewLayout, bool IsCubemap)
+									   VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, IsCubemap);
+	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount);
 
 	SubmitCopyCommand();
 }
@@ -968,13 +968,13 @@ void VulkanCore::CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Siz
 
 
 void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, 
-								   u32 PixelSize, int NumLayers)
+								   u32 PixelSize, int LayerCount)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	std::vector<VkBufferImageCopy> BufferImageCopy(NumLayers);
+	std::vector<VkBufferImageCopy> BufferImageCopy(LayerCount);
 
-	for (int i = 0; i < NumLayers; i++) {
+	for (int i = 0; i < LayerCount; i++) {
 		VkBufferImageCopy bic = {
 			.bufferOffset = i * ImageWidth * ImageHeight * PixelSize,
 			.bufferRowLength = 0,

@@ -205,7 +205,7 @@ private:
 	{
 		float FOV = 45.0f;
 		float zNear = 0.1f;
-		float zFar = 150.0f;
+		float zFar = 1500.0f;
 
 		DefaultCreateCameraPers(FOV, zNear, zFar);
 	}
@@ -298,7 +298,7 @@ private:
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
-				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, false);
+				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
 
 			BeginRendering(CmdBuf, i);
 		
@@ -311,7 +311,7 @@ private:
 
 			if (WithSecondBarrier) {
 				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
-					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, false);
+					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1);
 			}
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);

@@ -31,7 +31,7 @@ void BeginCommandBuffer(VkCommandBuffer CommandBuffer, VkCommandBufferUsageFlags
 VkSemaphore CreateSemaphore(VkDevice Device);
 
 void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
-					 VkImageLayout OldLayout, VkImageLayout NewLayout, bool IsCubemap);
+					 VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount);
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 						    VkImageAspectFlags AspectFlags, bool IsCubemap);

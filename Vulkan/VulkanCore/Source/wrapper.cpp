@@ -52,7 +52,7 @@ VkSemaphore CreateSemaphore(VkDevice Device)
 
 // Copied from the "3D Graphics Rendering Cookbook"
 void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
-					 VkImageLayout OldLayout, VkImageLayout NewLayout, bool IsCubemap)
+					 VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount)
 {
 	VkImageMemoryBarrier barrier = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -69,7 +69,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 			.baseMipLevel = 0,
 			.levelCount = 1,
 			.baseArrayLayer = 0,
-			.layerCount = IsCubemap ? 6u : 1u
+			.layerCount = (u32)LayerCount
 		}
 	};
 
