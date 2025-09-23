@@ -921,7 +921,7 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	TransitionImageLayout(Tex.m_image, TexFormat, 
 						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount);
 	
-	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, BytesPerPixel, LayerCount);
+	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, LayerSize, LayerCount);
 	
 	TransitionImageLayout(Tex.m_image, TexFormat, 
 						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount);
@@ -959,8 +959,9 @@ void VulkanCore::CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Siz
 }
 
 
-void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, 
-								   u32 PixelSize, int LayerCount)
+void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, 
+                                   u32 ImageWidth, u32 ImageHeight, 
+								   VkDeviceSize LayerSize, int LayerCount)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -968,7 +969,7 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u3
 
 	for (int i = 0; i < LayerCount; i++) {
 		VkBufferImageCopy bic = {
-			.bufferOffset = i * ImageWidth * ImageHeight * PixelSize,
+			.bufferOffset = i * LayerSize,
 			.bufferRowLength = 0,
 			.bufferImageHeight = 0,
 			.imageSubresource = VkImageSubresourceLayers {
