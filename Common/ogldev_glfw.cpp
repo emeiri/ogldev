@@ -75,6 +75,7 @@ static void init_glew()
     GLenum res = glewInit();
     if (res != GLEW_OK) {
         OGLDEV_ERROR0((const char*)glewGetErrorString(res));
+        assert(0);
         exit(1);
     }
 }
@@ -103,6 +104,7 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
         int error_code = glfwGetError(&pDesc);
 
         OGLDEV_ERROR("Error creating window: %s", pDesc);
+        assert(0);
         exit(1);
     }
 
@@ -115,6 +117,7 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
     if (major_ver > 0) {
         if (major_ver != glMajorVersion) {
             OGLDEV_ERROR("Requested major version %d is not the same as created version %d", major_ver, glMajorVersion);
+            assert(0);
             exit(0);
         }
     }
@@ -122,6 +125,7 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
     if (minor_ver > 0) {
         if (minor_ver != glMinorVersion) {
             OGLDEV_ERROR("Requested minor version %d is not the same as created version %d", minor_ver, glMinorVersion);
+            assert(0);
             exit(0);
         }
     }
