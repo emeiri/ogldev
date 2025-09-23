@@ -789,11 +789,13 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 	stbi_image_free((void*)pImg);
 
 	// Hack...
-	size_t bytes = FaceSize * FaceSize * 16 * 6;
-	char* p = (char*)malloc(bytes);
+	int NumFaces = 6;
+	size_t SingleFaceNumBytes = FaceSize * FaceSize * 16;
+	size_t TotalBytes = NumFaces * SingleFaceNumBytes;
+	char* p = (char*)malloc(TotalBytes);
 
-	for (int i = 0; i < 6; i++) {
-		memcpy(p + i * FaceSize * FaceSize * 16, Cubemap[i].data_.data(), FaceSize * FaceSize * 16);
+	for (int i = 0; i < NumFaces; i++) {
+		memcpy(p + i * SingleFaceNumBytes, Cubemap[i].data_.data(), SingleFaceNumBytes);
 	}
 
 	VkFormat Format = VK_FORMAT_R32G32B32A32_SFLOAT;
