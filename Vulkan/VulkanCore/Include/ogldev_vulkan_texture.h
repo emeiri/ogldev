@@ -50,10 +50,6 @@ public:
 private:
 
 	VulkanCore* m_pVulkanCore = NULL;
-
-	int m_imageWidth = 0;
-	int m_imageHeight = 0;
-	int m_imageBPP = 0;
 };
 
 }

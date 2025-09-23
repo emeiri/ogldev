@@ -33,9 +33,13 @@ void VulkanTexture::Load(unsigned int BufferSize, void* pData, bool IsRGB)
 {
 	assert(m_pVulkanCore);
 
-	void* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
+	int Width = 0;
+	int Height = 0;
+	int BPP = 0;
 
-	m_pVulkanCore->Create2DTextureFromData(pImageData, m_imageWidth, m_imageHeight, *this);
+	void* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &Width, &Height, &BPP, 0);
+
+	m_pVulkanCore->Create2DTextureFromData(pImageData, Width, Height, *this);
 }
 
 
