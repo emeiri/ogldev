@@ -48,6 +48,7 @@ void main()
 {
 	int idx = indices[gl_VertexIndex];
 	vec4 Pos = vec4(pos[idx], 1.0);
-	gl_Position = ubo.VP * Pos;
+	vec4 WVP_Pos = ubo.VP * Pos;
+	gl_Position = WVP_Pos.xyww;
 	Dir = pos[idx].xyz;
 }
