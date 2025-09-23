@@ -188,15 +188,15 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 	}
 
 	if (m_movement.Plus) {
-		m_maxSpeed++;
+		m_maxSpeed += 0.1f;
 		m_acceleration += 10.0f;
 	}
 
 	if (m_movement.Minus) {
-		m_maxSpeed--;
+		m_maxSpeed -= 0.1f;
 
-		if (m_maxSpeed <= 1.0) {
-			m_maxSpeed = 1.0f;
+		if (m_maxSpeed <= 0.1f) {
+			m_maxSpeed = 0.1f;
 		}
 
 		m_acceleration -= 10.0f;
