@@ -773,7 +773,7 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #3: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, IsCubemap);
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
 
 	printf("Texture from data created\n");
 }

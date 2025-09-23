@@ -236,7 +236,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 
 
 VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter, 
-							   VkSamplerAddressMode AddressMode, bool IsCubemap)
+							   VkSamplerAddressMode AddressMode)
 {
 	VkSamplerCreateInfo SamplerInfo = {
 		.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
