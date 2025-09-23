@@ -41,17 +41,14 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 	m_vs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.vert");
 	m_fs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.frag");
 	
-	VkFormat ColorFormat = m_pVulkanCore->GetSwapChainFormat();
-	VkFormat DepthFormat = m_pVulkanCore->GetDepthFormat();
-	
 	OgldevVK::PipelineDesc pd;
 	pd.Device = pVulkanCore->GetDevice();
 	pd.pWindow = pVulkanCore->GetWindow();
 	pd.vs = m_vs;
 	pd.fs = m_fs;
 	pd.NumImages = m_numImages;
-	pd.ColorFormat = ColorFormat;
-	pd.DepthFormat = DepthFormat;
+	pd.ColorFormat = m_pVulkanCore->GetSwapChainFormat();
+	pd.DepthFormat = m_pVulkanCore->GetDepthFormat();
 	pd.IsTexCube = true;
 	pd.IsUniform = true;
 	
