@@ -790,9 +790,9 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 		exit(1);
 	}
 
-	Bitmap bitmap(Width, Height, 4, eBitmapFormat_UnsignedByte, (void*)pImg);
+	Bitmap Source(Width, Height, 4, eBitmapFormat_UnsignedByte, (void*)pImg);
 	std::vector<Bitmap> Cubemap;
-	int FaceSize = ConvertEquirectangularImageToCubemap(bitmap, Cubemap);
+	int FaceSize = ConvertEquirectangularImageToCubemap(Source, Cubemap);
 	
 	stbi_image_free((void*)pImg);
 
