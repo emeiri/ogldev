@@ -44,7 +44,7 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 	bool IsCubemap = false;
 	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsTex, IsCubemap);
 
-	InitCommon(pWindow, RenderPass, vs, fs, ColorFormat, DepthFormat);
+	InitCommon(pWindow, RenderPass, vs, fs, ColorFormat, DepthFormat, VK_COMPARE_OP_LESS);
 }
 
 
@@ -55,7 +55,7 @@ GraphicsPipelineV2::GraphicsPipelineV2(const PipelineDesc& pd)
 
 	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsTex2D, pd.IsUniform, pd.IsTexCube);
 
-	InitCommon(pd.pWindow, NULL, pd.vs, pd.fs, pd.ColorFormat, pd.DepthFormat);
+	InitCommon(pd.pWindow, NULL, pd.vs, pd.fs, pd.ColorFormat, pd.DepthFormat, pd.DepthCompareOp);
 }
 
 
@@ -76,7 +76,7 @@ void GraphicsPipelineV2::Bind(VkCommandBuffer CmdBuf)
 
 void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
 									VkShaderModule vs, VkShaderModule fs,
-									VkFormat ColorFormat, VkFormat DepthFormat)
+									VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp)
 {
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
@@ -153,7 +153,7 @@ void GraphicsPipelineV2::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 		.depthTestEnable = VK_TRUE,
 		.depthWriteEnable = VK_TRUE,
-		.depthCompareOp = VK_COMPARE_OP_LESS,
+		.depthCompareOp = DepthCompareOp,
 		.depthBoundsTestEnable = VK_FALSE,
 		.stencilTestEnable = VK_FALSE,
 		.front = {},

@@ -44,6 +44,7 @@ struct PipelineDesc {
 	int NumImages = 0;
 	VkFormat ColorFormat = VK_FORMAT_UNDEFINED;
 	VkFormat DepthFormat = VK_FORMAT_UNDEFINED;
+	VkCompareOp DepthCompareOp = VK_COMPARE_OP_LESS;
 	bool IsVB = false;
 	bool IsIB = false;
 	bool IsUniform = false;
@@ -81,7 +82,7 @@ private:
 
 	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
 					VkShaderModule vs, VkShaderModule fs,
-					VkFormat ColorFormat, VkFormat DepthFormat);
+					VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp);
 
 	void AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
 	void CreateDescriptorPool(int MaxSets);
