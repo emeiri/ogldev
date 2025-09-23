@@ -35,13 +35,13 @@ namespace OgldevVK {
 
 		void Destroy();
 
-		void CreateDescriptorSets();
-
 		void RecordCommandBuffer(VkCommandBuffer CmdBuf, int ImageIndex);
 
 		void Update(int ImageIndex, const glm::mat4& Transformation);
 
 	private:
+
+		void CreateDescriptorSets();
 
 		VulkanCore* m_pVulkanCore = NULL;
 		int m_numImages = 0;
