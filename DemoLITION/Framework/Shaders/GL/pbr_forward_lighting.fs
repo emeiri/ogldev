@@ -564,11 +564,23 @@ void main()
   //out_FragColor = AlbedoColor;
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
-  //out_FragColor = vec4(diffuse_color, 1.0);
-  //out_FragColor = vec4(specular_color, 1.0);
+ // out_FragColor = vec4(diffuse_color, 1.0);
+ // out_FragColor = vec4(specular_color, 1.0);
  // out_FragColor = vec4(LightContribution, 1.0);
 //  MeR.x *= GetMetallicFactor(mat);
 //  MeR.y *= GetRoughnessFactor(mat);
   //out_FragColor = vec4(MeR.y,MeR.y,MeR.y, 1.0);
 //  out_FragColor = mrSample;
+
+  //  float MetallicFactor = GetMetallicFactor(mat) * mrSample.b;
+  //  MetallicFactor = clamp(MetallicFactor, 0.0, 1.0);
+  //  out_FragColor = vec4(MetallicFactor);
+
+  //    float PerceptualRoughness = GetRoughnessFactor(mat);
+  //  PerceptualRoughness = mrSample.g * PerceptualRoughness;
+  //  const float c_MinRoughness = 0.04;
+  //  PerceptualRoughness = clamp(PerceptualRoughness, c_MinRoughness, 1.0);
+  //  out_FragColor = vec4(PerceptualRoughness);
+
+  //out_FragColor = vec4(pbrInputs.FssEss, 1.0);
 }
