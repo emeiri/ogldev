@@ -60,6 +60,12 @@ public:
 
         m_pScene->GetDirLights().push_back(m_dirLight);
 
+        //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/MetalRoughSpheres/glTF/MetalRoughSpheres.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/SciFiHelmet/glTF/SciFiHelmet.gltf");
+         //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/Sponza/glTF/Sponza.gltf");
+          //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ABeautifulGame/glTF/ABeautifulGame.gltf");
+//          Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
+    //      Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ToyCar/glTF/ToyCar.gltf");
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
         Texture* pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
         pTexAO->Load();
