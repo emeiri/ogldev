@@ -743,23 +743,10 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 
 	// Step #2: create the image object and populate it with pixels
 	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
-	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, false);
+	CreateTextureFromData(pPixels, ImageWidth, ImageHeight, Format, false, Tex);
 
 	// Step #3: release the image pixels. We don't need them after this point
 	stbi_image_free(pPixels);
-
-	// TODO: the next two steps are duplicated below and can be extracted to a single func
-
-	// Step #4: create the image view
-	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, false);
-
-	VkFilter MinFilter = VK_FILTER_LINEAR;
-	VkFilter MaxFilter = VK_FILTER_LINEAR;
-	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-
-	// Step #5: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, false);
 
 	printf("Texture from '%s' created\n", pFilename);
 }
@@ -775,7 +762,7 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 									   VkFormat Format, bool IsCubemap, VulkanTexture& Tex)
 {
 	// Step #1: create the image object and populate it with pixels
-	CreateTextureImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, IsCubemap);
+	CreateImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, IsCubemap);
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -818,21 +805,9 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 	}
 
 	VkFormat Format = VK_FORMAT_R32G32B32A32_SFLOAT;
-	//CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
-	CreateTextureImageFromData(Tex, p, FaceSize, FaceSize, Format, true);
+	CreateTextureFromData(p, FaceSize, FaceSize, Format, true, Tex);
 
 	free(p);
-
-	// Step #4: create the image view
-	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, true);
-
-	VkFilter MinFilter = VK_FILTER_LINEAR;
-	VkFilter MaxFilter = VK_FILTER_LINEAR;
-	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-
-	// Step #5: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, true);
 
 	printf("Texture from '%s' created\n", pFilename);
 }
@@ -858,8 +833,8 @@ void VulkanTexture::Destroy(VkDevice Device)
 }
 
 
-void VulkanCore::CreateTextureImageFromData(VulkanTexture& Tex, const void* pPixels, 
-											u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, bool IsCubemap)
+void VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels, 
+									 u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, bool IsCubemap)
 {
 	VkImageUsageFlagBits Usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
 														VK_IMAGE_USAGE_SAMPLED_BIT);
