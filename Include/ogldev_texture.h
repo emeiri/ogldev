@@ -78,6 +78,9 @@ private:
 
     std::string m_fileName;
     GLuint64 m_bindlessHandle = -1;
+    int m_imageWidth = 0;
+    int m_imageHeight = 0;
+    int m_imageBPP = 0;
 };
 
 
