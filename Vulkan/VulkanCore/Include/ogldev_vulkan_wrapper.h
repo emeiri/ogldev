@@ -37,5 +37,5 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 						    VkImageAspectFlags AspectFlags, bool IsCubemap);
 
 VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter,
-							   VkSamplerAddressMode AddressMode, bool IsCubemap);
+							   VkSamplerAddressMode AddressMode);
 }
