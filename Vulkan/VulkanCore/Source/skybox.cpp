@@ -157,7 +157,9 @@ void Skybox::RecordCommandBuffer(VkCommandBuffer CmdBuf, int ImageIndex)
 
 void Skybox::Update(int ImageIndex, const glm::mat4& Transformation)
 {
-	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), glm::value_ptr(Transformation), sizeof(Transformation));
+	m_uniformBuffers[ImageIndex].Update(m_pVulkanCore->GetDevice(), 
+										glm::value_ptr(Transformation), 
+										sizeof(Transformation));
 }
 
 };

@@ -48,8 +48,8 @@ namespace OgldevVK {
 		VulkanTexture m_cubemapTex;
 		std::vector<BufferAndMemory> m_uniformBuffers;
 		std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
-		OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
 		VkShaderModule m_vs = VK_NULL_HANDLE;
 		VkShaderModule m_fs = VK_NULL_HANDLE;
+		OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
 	};
 }
