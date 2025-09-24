@@ -31,7 +31,8 @@ const int indices[36] = int[36](
 void main() 
 {
 	int idx = indices[gl_VertexID];
-	vec4 WVP_Pos = gVP * vec4(pos[idx], 1.0);
+	vec4 Pos = vec4(pos[idx], 1.0);
+	vec4 WVP_Pos = gVP * Pos;
 	gl_Position = WVP_Pos.xyww;
 	dir = pos[idx].xyz;
 }
