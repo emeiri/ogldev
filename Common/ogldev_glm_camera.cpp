@@ -142,10 +142,10 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 	glm::vec3 Right = glm::vec3(v[0][0], v[1][0], v[2][0]);
 
 	if (CAMERA_LEFT_HANDED) {
-		Forward = glm::vec3(v[0][2], v[1][2], v[2][2]);
+		Forward = glm::vec3(v[0][2], v[1][2], v[2][2]) * 0.1f;
 		Up = glm::cross(Forward, Right);
 	} else {
-		Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]);
+		Forward = -glm::vec3(v[0][2], v[1][2], v[2][2]) * 0.1f;
 		Up = glm::cross(Right, Forward);
 	}
 	
@@ -189,7 +189,7 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 
 	if (m_movement.Plus) {
 		m_maxSpeed += 0.1f;
-		m_acceleration += 10.0f;
+		m_acceleration += 0.01f;
 	}
 
 	if (m_movement.Minus) {
@@ -199,7 +199,7 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 			m_maxSpeed = 0.1f;
 		}
 
-		m_acceleration -= 10.0f;
+		m_acceleration -= 0.01f;
 
 		if (m_acceleration <= 10.0f) {
 			m_acceleration = 10.0f;
