@@ -1,10 +1,10 @@
 #!/bin/bash
 
 CC=g++
-CPPFLAGS="-std=c++20 -I../VulkanCore/Include -I../../Include -DVULKAN -ggdb3 -DOGLDEV_VULKAN"
+CPPFLAGS="-I../VulkanCore/Include -I../../Include  -I$VULKAN_SDK/include -DOGLDEV_VULKAN -ggdb3 -std=c++20"
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
-LDFLAGS="$LDFLAGS /usr/lib/x86_64-linux-gnu/libglslang.a /usr/lib/x86_64-linux-gnu/libglslang-default-resource-limits.a"
-
+LDFLAGS="$LDFLAGS -L$VULKAN_SDK/lib -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper \
+	-lspirv-cross-reflect ../../Lib/libspirv-reflect-static.a"
 $CC tutorial19.cpp \
     ../VulkanCore/Source/core.cpp \
     ../VulkanCore/Source/util.cpp \
@@ -18,4 +18,5 @@ $CC tutorial19.cpp \
     ../../Common/ogldev_glm_camera.cpp  \
     ../../Common/ogldev_glfw_camera_handler.cpp  \
   ../../Common/3rdparty/stb_image.cpp \
+    ../../Common/ogldev_ect_cubemap.cpp \
     $CPPFLAGS $LDFLAGS -o tutorial19

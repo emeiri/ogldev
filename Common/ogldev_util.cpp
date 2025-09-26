@@ -245,7 +245,7 @@ long long GetCurrentTimeMillis()
 }
 
 #ifndef VULKAN
-
+#ifndef OGLDEV_VULKAN
 #define EXIT_ON_GL_ERROR
 void gl_check_error(const char* function, const char *file, int line)
 {
@@ -342,6 +342,7 @@ void glDebugOutput(GLenum source,
 }
 
 
+#endif
 #endif
 
 string GetDirFromFilename(const string& Filename)
