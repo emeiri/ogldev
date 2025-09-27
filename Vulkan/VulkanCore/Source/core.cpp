@@ -728,12 +728,14 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	stbi_uc* pPixels = stbi_load(pFilename, &ImageWidth, &ImageHeight, &ImageChannels, STBI_rgb_alpha);
 
 	if (!pPixels) {
+#ifndef _WIN64
 		char cwd[PATH_MAX];
 		if (getcwd(cwd, sizeof(cwd)) != NULL) {
 			printf("Current working dir: %s\n", cwd);
 		} else {
 			printf("getcwd() error\n");
 		}
+#endif
 		printf("Error loading texture from '%s'\n", pFilename);
 		exit(1);
 	}
