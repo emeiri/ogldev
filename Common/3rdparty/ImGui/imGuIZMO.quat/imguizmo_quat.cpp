@@ -10,4 +10,11 @@
 //
 //  This software is distributed under the terms of the BSD 2-Clause license
 //------------------------------------------------------------------------------
+//
+#ifndef _WIN64
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_internal.h"
+#endif
+
 #include "imGuIZMOquat.cpp"
