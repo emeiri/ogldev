@@ -25,31 +25,34 @@
 
 namespace OgldevVK {
 
-	class Skybox {
-	public:
-		Skybox() {}
+class Skybox {
 
-		~Skybox() {}
+public:
 
-		void Init(VulkanCore* pVulkanCore, const char* pFilename);
+	Skybox() {}
 
-		void Destroy();
+	~Skybox() {}
 
-		void RecordCommandBuffer(VkCommandBuffer CmdBuf, int ImageIndex);
+	void Init(VulkanCore* pVulkanCore, const char* pFilename);
 
-		void Update(int ImageIndex, const glm::mat4& Transformation);
+	void Destroy();
 
-	private:
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf, int ImageIndex);
 
-		void CreateDescriptorSets();
+	void Update(int ImageIndex, const glm::mat4& Transformation);
 
-		VulkanCore* m_pVulkanCore = NULL;
-		int m_numImages = 0;
-		VulkanTexture m_cubemapTex;
-		std::vector<BufferAndMemory> m_uniformBuffers;
-		std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
-		VkShaderModule m_vs = VK_NULL_HANDLE;
-		VkShaderModule m_fs = VK_NULL_HANDLE;
-		OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;
-	};
+private:
+
+	void CreateDescriptorSets();
+
+	VulkanCore* m_pVulkanCore = NULL;
+	int m_numImages = 0;
+	VulkanTexture m_cubemapTex;
+	std::vector<BufferAndMemory> m_uniformBuffers;
+	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
+	VkShaderModule m_vs = VK_NULL_HANDLE;
+	VkShaderModule m_fs = VK_NULL_HANDLE;
+	GraphicsPipelineV2* m_pPipeline = NULL;
+};
+
 }

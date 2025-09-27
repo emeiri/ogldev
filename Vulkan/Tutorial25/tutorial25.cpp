@@ -47,8 +47,8 @@
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH 2560
+#define WINDOW_HEIGHT 1440
 
 #define APP_NAME "Tutorial 25"
 
@@ -423,6 +423,11 @@ private:
 
 		m_model.Update(ImageIndex, WVP);
 
+		/*static float foo = 0.0f;
+		foo += 0.000075f;
+		glm::vec3 r(sinf(foo), sinf(foo) * 0.4f, cosf(foo));
+		m_pGameCamera->SetTarget(r);*/
+
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -441,7 +446,6 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;	
 	OgldevVK::Skybox m_skybox;
-
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;

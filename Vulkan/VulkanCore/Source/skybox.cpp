@@ -41,7 +41,7 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 	m_vs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.vert");
 	m_fs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.frag");
 	
-	OgldevVK::PipelineDesc pd;
+	PipelineDesc pd;
 	pd.Device = pVulkanCore->GetDevice();
 	pd.pWindow = pVulkanCore->GetWindow();
 	pd.vs = m_vs;
@@ -53,7 +53,7 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 	pd.IsTexCube = true;
 	pd.IsUniform = true;
 	
-	m_pPipeline = new OgldevVK::GraphicsPipelineV2(pd);
+	m_pPipeline = new GraphicsPipelineV2(pd);
 
 	CreateDescriptorSets();
 }
