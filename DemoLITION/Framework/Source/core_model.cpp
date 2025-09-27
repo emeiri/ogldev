@@ -698,9 +698,9 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
             s_pMissingTexture = AllocTexture2D();
             bool IsSRGB = true;
 #ifdef OGLDEV_VULKAN   // hack due to different local dirs
-            s_pMissingTexture->Load("../../Content/Textures/no_texture.png", IsSRGB);            
+            s_pMissingTexture->Load("../../Content/textures/no_texture.png", IsSRGB);            
 #else
-            s_pMissingTexture->Load("../Content/Textures/no_texture.png", IsSRGB);
+            s_pMissingTexture->Load("../Content/textures/no_texture.png", IsSRGB);
 #endif
         }
 
