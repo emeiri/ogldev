@@ -102,7 +102,7 @@ namespace detail
 		if(Texture.faces() > 1)
 		{
 			GLI_ASSERT(Texture.faces() == 6);
-			Header.CubemapFlags |= detail::DDSCAPS2_CUBEMAP_ALLFACES | detail::DDSCAPS2_CUBEMAP;
+			Header.CubemapFlags |= (std::uint32_t)detail::DDSCAPS2_CUBEMAP_ALLFACES | (std::uint32_t)detail::DDSCAPS2_CUBEMAP;
 		}
 
 		// Texture3D
