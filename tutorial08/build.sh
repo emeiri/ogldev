@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CC=g++
-CPPFLAGS="-I../Include"
+source ../build_base.sh
+
 LDFLAGS=`pkg-config --libs glew`
 LDFLAGS="$LDFLAGS -lglut"
 
-$CC tutorial08.cpp ../Common/ogldev_util.cpp $CPPFLAGS $LDFLAGS -o tutorial08
+$CC tutorial08.cpp ../Common/ogldev_util.cpp $OGL_CPPFLAGS $LDFLAGS -o tutorial08
