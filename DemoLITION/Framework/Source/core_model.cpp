@@ -103,6 +103,9 @@ MaterialType GetMaterialType(const aiMaterial* pMaterial)
         }
     } else {
         printf("Error getting shading mode\n");
+#ifndef _WIN64
+        return MaterialType_Invalid;
+#endif
         assert(0);
     }
 
