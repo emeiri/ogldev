@@ -660,7 +660,9 @@ static int GetTextureCount(const aiMaterial* pMaterial)
         TextureCount += Count;
 
         if (Count > 0) {
+#ifdef _WIN64
             printf("Found texture %s\n", aiTextureTypeToString(ttype));
+#endif
         }
     }
 
