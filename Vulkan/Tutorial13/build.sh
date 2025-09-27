@@ -5,7 +5,6 @@ CPPFLAGS="-I../VulkanCore/Include -I../../Include  -I$VULKAN_SDK/include -DVULKA
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
 LDFLAGS="$LDFLAGS -L$VULKAN_SDK/lib -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper \
 	-lspirv-cross-reflect ../../Lib/libspirv-reflect-static.a"
-echo $LDFLAGS
 $CC tutorial13.cpp \
     ../VulkanCore/Source/core.cpp \
     ../VulkanCore/Source/util.cpp \
