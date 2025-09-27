@@ -4,13 +4,13 @@ orbs:
   win: circleci/windows@5.0
   
 executors:
-  linux:
+  ubuntu-executor:
     docker:
       - image: cimg/ubuntu:22.04
 
 jobs:
   build-linux:
-    executor: linux
+    executor: ubuntu-executor
     steps:
       - run:
           name: Install OpenGL and GLFW
