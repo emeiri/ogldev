@@ -407,6 +407,8 @@ struct Vector4f
         return !(*this == r);
     }
 
+
+
     const float* data() const
     {
         const float* p = &x;
@@ -515,6 +517,18 @@ inline Vector4f operator*(float f, const Vector4f& l)
 
     return Ret;
 }
+
+
+inline Vector4f operator*(const Vector4f& l, const Vector4f& r)
+{
+    Vector4f Ret(l.x * r.x,
+                 l.y * r.y,
+                 l.z * r.z,
+                 l.w * r.w);
+
+    return Ret;
+}
+
 
 
 struct PersProjInfo
