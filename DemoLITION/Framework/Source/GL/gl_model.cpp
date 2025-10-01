@@ -130,7 +130,6 @@ bool GLModel::LoadMesh(const std::string& Filename)
 
     m_Materials.resize(1);
 
-
     mesh.Destroy();
 
     glBindVertexArray(0);
@@ -401,6 +400,18 @@ void GLModel::BindTextures(int MaterialIndex)
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]->Bind(ROUGHNESS_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT]->Bind(CLEARCOAT_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_ROUGHNESS]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_ROUGHNESS]->Bind(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT);
+    }
+
+    if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_NORMAL]) {
+        m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_NORMAL]->Bind(CLEARCOAT_NORMAL_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]) {
