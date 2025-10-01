@@ -34,7 +34,15 @@ public:
     virtual bool Init();
 
     virtual void SetMaterial(const Material& material) = 0;
-	
+    virtual void ControlRefRefract(bool Enable) {}
+    virtual void ControlSpecularExponent(bool IsEnabled) {}
+    virtual void SetReflectionFactor(float f) {}
+    virtual void SetColorMod(const Vector4f& ColorMod) {}
+    virtual void SetColorAdd(const Vector4f& ColorAdd) {}
+    virtual void SetMaterialToRefRefractFactor(float f) {}
+    virtual void SetRefractETA(float f) {}
+    virtual void SetFresnelPower(float f) {}
+
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
     void SetNormalMatrix(const Matrix3f& NormalMatrix);

@@ -347,10 +347,6 @@ void GLModel::Render(DemolitionRenderCallbacks* pRenderCallbacks)
 {
     assert(!UseIndirectRender);
 
-    if (m_isPBR) {
-        SetupRenderMaterialsPBR();
-    }
-
     glBindVertexArray(m_VAO);
 
     if (UsePVP) {
@@ -508,44 +504,6 @@ void GLModel::RenderIndirect(const Matrix4f& ObjectMatrix)
 }
 
 
-void GLModel::SetupRenderMaterialsPBR()
-{
-    int PBRMaterialIndex = 0;
-
-    // Hack...
-    m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo = m_PBRmaterial.pAlbedo;
-    m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness = m_PBRmaterial.pRoughness;
-    m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic = m_PBRmaterial.pMetallic;
-    m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap = m_PBRmaterial.pNormalMap;
-    m_Materials[PBRMaterialIndex].PBRmaterial.pAO = m_PBRmaterial.pAO;
-    m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive = m_PBRmaterial.pEmissive;
-
-    if (m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pAlbedo->Bind(COLOR_TEXTURE_UNIT);
-    }
-
-    if (m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pRoughness->Bind(ROUGHNESS_TEXTURE_UNIT);
-    }
-
-    if (m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pMetallic->Bind(METALLIC_TEXTURE_UNIT);
-    }
-
-    if (m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pNormalMap->Bind(NORMAL_TEXTURE_UNIT);
-    }
-
-    if (m_Materials[PBRMaterialIndex].PBRmaterial.pAO) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pAO->Bind(AO_TEXTURE_UNIT);
-    }
-
-    if (m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive) {
-        m_Materials[PBRMaterialIndex].PBRmaterial.pEmissive->Bind(EMISSIVE_TEXTURE_UNIT);
-    }
-}
-
-
 void GLModel::SetColorTexture(int TextureHandle)
 {
     BaseTexture* pTexture = NULL;
@@ -601,6 +559,17 @@ void GLModel::SetHeightMap(int TextureHandle)
     else {
         BaseTexture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
         m_pHeightMap = (Texture*)pTexture;
+    }
+}
+
+
+void GLModel::SetAmbientOcclusionMap(int TextureHandle)
+{
+    if (TextureHandle < 0) {
+        m_pAOMap = NULL;
+    } else {
+        BaseTexture* pTexture = m_pCoreRenderingSystem->GetTexture(TextureHandle);
+        m_pAOMap = (Texture*)pTexture;
     }
 }
 

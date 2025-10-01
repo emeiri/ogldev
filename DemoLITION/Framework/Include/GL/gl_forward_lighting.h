@@ -36,7 +36,14 @@ public:
 
     virtual void SetMaterial(const Material& material);
     virtual void ControlSpecularExponent(bool IsEnabled);
-		
+    virtual void ControlRefRefract(bool Enable);
+    virtual void SetReflectionFactor(float f);
+    virtual void SetColorMod(const Vector4f& ColorMod);
+    virtual void SetColorAdd(const Vector4f& ColorAdd);
+    virtual void SetMaterialToRefRefractFactor(float f);
+    virtual void SetRefractETA(float f);
+    virtual void SetFresnelPower(float f);
+
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
     void SetShadowCubeMapTextureUnit(unsigned int TextureUnit);
@@ -53,11 +60,8 @@ public:
     void SetNormalMapTextureUnit(unsigned int TextureUnit);
     void SetHeightMapTextureUnit(unsigned int TextureUnit);
     void SetSkyboxTextureUnit(unsigned int TextureUnit);
-    void SetColorMod(const Vector4f& ColorMod);
-    void SetColorAdd(const Vector4f& ColorAdd);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
-
     void SetLinearFog(float FogStart, float FogEnd);
     void SetExpFog(float FogEnd, float FogDensity);
     void SetExpSquaredFog(float FogEnd, float FogDensity);
@@ -67,11 +71,6 @@ public:
     void SetFogTime(float Time);
     void SetPBR(bool IsPBR);
     void SetPBRMaterial(const PBRMaterial& Material);
-    void ControlRefRefract(bool Enable);
-    void SetReflectionFactor(float f);
-    void SetMaterialToRefRefractFactor(float f);
-    void SetRefractETA(float f);
-    void SetFresnelPower(float f);
 
 protected:
 

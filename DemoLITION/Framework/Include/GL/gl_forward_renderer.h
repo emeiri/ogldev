@@ -59,6 +59,7 @@ enum RENDER_PASS {
 enum LIGHTING_TECHNIQUE {
     FORWARD_LIGHTING,
     FORWARD_SKINNING,
+    PBR_GLTF2_LIGHTING,
     UNDEFINED_TECHNIQUE
 };
 
@@ -115,14 +116,6 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     void Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis);
 
-   // void RenderAnimation(SkinnedMesh* pMesh, float AnimationTimeSec, int AnimationIndex = 0);
-
- /*   void RenderAnimationBlended(SkinnedMesh* pMesh,
-                                float AnimationTimeSec,
-                                int StartAnimIndex,
-                                int EndAnimIndex,
-                                float BlendFactor);*/
-
     //
     // Implementation of DemolitionRenderCallbacks interface
     //
@@ -165,6 +158,7 @@ private:
     void RenderInfiniteGrid(GLScene* pScene);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
+    LIGHTING_TECHNIQUE GetLightingTech(CoreModel* pModel);
     void ApplySceneConfig(GLScene* pScene);
     void InitShadowMapping();
     void InitTechniques();
@@ -206,9 +200,8 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_lightViewMatrix;
 
-    LIGHTING_TECHNIQUE m_curLightingTech = UNDEFINED_TECHNIQUE;
-    BaseLightingTechnique* m_pCurBaseLightingTech = &m_lightingTech;
-    ForwardLightingTechnique* m_pCurLightingTech = &m_lightingTech;
+    LIGHTING_TECHNIQUE m_curLightingTechId = UNDEFINED_TECHNIQUE;
+    BaseLightingTechnique* m_pCurLightingTech = &m_lightingTech;
     ForwardLightingTechnique m_lightingTech;    
     ForwardSkinningTechnique m_skinningTech;
     NormalTechnique m_normalTech;

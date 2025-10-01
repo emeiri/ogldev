@@ -750,7 +750,7 @@ void CoreModel::LoadRoughnessTexture(const string& Dir, const aiMaterial* pMater
 
 void CoreModel::LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_AMBIENT_OCCLUSION, TEX_TYPE_AMBIENT_OCCLUSION);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_UNKNOWN, TEX_TYPE_AMBIENT_OCCLUSION);
 }
 
 
@@ -797,18 +797,33 @@ void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int
 }
 
 
+void CoreModel::DetectShadingModel(const aiMaterial* pMaterial)
+{
+    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, m_shadingModel) == AI_SUCCESS) {
+        switch (m_shadingModel) {
+        case aiShadingMode_PBR_BRDF:
+            printf("Shading model PBR BRDF\n");
+            break;
+
+        default:
+            printf("Shading model %d\n", m_shadingModel);
+        }
+        
+    } else {
+        printf("Cannot get the shading model\n");
+        assert(0);
+    }
+}
+
 void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 {
     Material& material = m_Materials[index];
 
     material.m_name = pMaterial->GetName().C_Str();
 
-    Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
+    DetectShadingModel(pMaterial);
 
-    int ShadingModel = 0;
-    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) == AI_SUCCESS) {
-      //  printf("Shading model %d\n", ShadingModel);
-    }
+    Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
 
     LoadColor(pMaterial, material.AmbientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
 

@@ -36,14 +36,6 @@ class GLGrid : public Grid {
 
     void Render();
 
-    virtual void SetColorTexture(int TextureHandle) {}
-
-    virtual void SetNormalMap(int TextureHandle) {}
-
-    virtual void SetHeightMap(int TextureHandle) {}
-
-    virtual void SetTextureScale(float Scale) {}
-
  private:
 
     struct Vertex {

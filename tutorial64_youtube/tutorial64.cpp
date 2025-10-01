@@ -30,14 +30,11 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-extern bool UseGLTFPBR;
 
 class PBR_GLTF2 : public BaseGLApp {
 public:
     PBR_GLTF2() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 64 - PBR using GLTF2")
     {
-	    UseGLTFPBR = true;
-
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.DiffuseIntensity = 2.0f;
@@ -67,9 +64,8 @@ public:
 //          Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
     //      Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ToyCar/glTF/ToyCar.gltf");
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
-        Texture* pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
-        pTexAO->Load();
-        pModel->GetPBRMaterial().pAO = pTexAO;
+        int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        pModel->SetAmbientOcclusionMap(AOMap);
 
         Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
         pBRDF_LUT->Load();

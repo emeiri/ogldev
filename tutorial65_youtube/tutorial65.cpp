@@ -30,14 +30,11 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-extern bool UseGLTFPBR;
 
 class ClearCoat : public BaseGLApp {
 public:
     ClearCoat() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 65 - Clear Coat")
     {
-	    UseGLTFPBR = true;
-
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight.DiffuseIntensity = 2.0f;
@@ -63,7 +60,7 @@ public:
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ClearcoatWicker/glTF/ClearcoatWicker.gltf");
         Texture* pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
         pTexAO->Load();
-        pModel->GetPBRMaterial().pAO = pTexAO;
+     //   pModel->GetPBRMaterial().pAO = pTexAO;
 
         Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
         pBRDF_LUT->Load();

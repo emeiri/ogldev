@@ -46,6 +46,8 @@ public:
 
     virtual void SetHeightMap(int TextureHandle);
 
+    virtual void SetAmbientOcclusionMap(int TextureHandle);
+
     virtual Texture* AllocTexture2D();
 
     virtual void DestroyTexture(Texture* pTexture);
@@ -55,6 +57,8 @@ public:
     Texture* GetNormalMap() const { return m_pNormalMap; }
 
     Texture* GetHeightMap() const { return m_pHeightMap; }
+
+    Texture* GetAOMap() const { return m_pAOMap; }
 
 protected:
 
@@ -80,8 +84,6 @@ private:
     template<typename VertexType>
     void PopulateBuffersDSA(vector<VertexType>& Vertices);
 
-    void SetupRenderMaterialsPBR();
-
     void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
     GLuint m_VAO = 0;
@@ -95,4 +97,5 @@ private:
 
     Texture* m_pNormalMap = NULL;
     Texture* m_pHeightMap = NULL;
+    Texture* m_pAOMap = NULL;
 };

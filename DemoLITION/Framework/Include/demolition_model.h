@@ -26,29 +26,21 @@ class Model : public Object
 {
 public:
 
-    virtual void SetColorTexture(int TextureHandle) = 0;
+    virtual void SetColorTexture(int TextureHandle) {};
 
-    virtual void SetNormalMap(int TextureHandle) = 0;
+    virtual void SetNormalMap(int TextureHandle) {};
 
-    virtual void SetHeightMap(int TextureHandle) = 0;
+    virtual void SetHeightMap(int TextureHandle) {};
 
-    virtual void SetTextureScale(float Scale) = 0;
+    virtual void SetAmbientOcclusionMap(int TextureHandle) {};
+
+    virtual void SetTextureScale(float Scale) {};
 
     virtual void ConvertToMesh(const char* pFilename) { assert(0); }
 
     virtual int GetMeshIndex(const std::string& Name) const { return -1; }
 
     virtual size_t GetNumMeshes() const { return 0; }
-
-    PBRMaterial& GetPBRMaterial() { return m_PBRmaterial; };
-
-    void SetPBR(bool IsPBR) { m_isPBR = IsPBR; }
-
-    bool IsPBR() const { return m_isPBR; }
-
-protected:
-    PBRMaterial m_PBRmaterial;
-    bool m_isPBR = false;
 };
 
 
