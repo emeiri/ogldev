@@ -218,11 +218,11 @@ private:
     } dirLightLoc;
 
     struct {
-        GLuint Color;
-        GLuint AmbientIntensity;
-        GLuint LocalPos;
-        GLuint WorldPos;
-        GLuint DiffuseIntensity;
+        GLuint Color = INVALID_UNIFORM_LOCATION;
+        GLuint AmbientIntensity = INVALID_UNIFORM_LOCATION;
+        GLuint LocalPos = INVALID_UNIFORM_LOCATION;
+        GLuint WorldPos = INVALID_UNIFORM_LOCATION;
+        GLuint DiffuseIntensity = INVALID_UNIFORM_LOCATION;
 
         struct
         {
