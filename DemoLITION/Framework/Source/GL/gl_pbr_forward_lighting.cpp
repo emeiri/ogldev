@@ -110,6 +110,25 @@ void PBRForwardLightingTechnique::SetIrradianceTextureUnit(int TextureUnit)
     glUniform1i(m_irradianceUnitLoc, TextureUnit);
 }
 
+
+void PBRForwardLightingTechnique::SetClearCoatTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_clearCoatLoc, TextureUnit);
+}
+
+
+void PBRForwardLightingTechnique::SetClearCoatRoughnessTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_clearCoatRoughnessLoc, TextureUnit);
+}
+
+
+void PBRForwardLightingTechnique::SetClearCoatNormalTextureUnit(int TextureUnit)
+{
+    glUniform1i(m_clearCoatNormalLoc, TextureUnit);
+}
+
+
 void PBRForwardLightingTechnique::SetMaterial(const Material& mat)
 {
     glUniform4f(m_baseColorLoc, mat.BaseColor.r, mat.BaseColor.g, mat.BaseColor.b, mat.BaseColor.a);

@@ -34,6 +34,8 @@ public:
 
     virtual bool Init();
 
+    virtual void SetMaterial(const Material& material);
+
     void SetAmbientOcclusionTextureUnit(int TextureUnit);
 
     void SetEmissiveTextureUnit(int TextureUnit);
@@ -50,7 +52,10 @@ public:
 
     void SetIrradianceTextureUnit(int TextureUnit);
 
-    virtual void SetMaterial(const Material& material);
+    void SetClearCoatTextureUnit(int TextureUnit);
+    void SetClearCoatRoughnessTextureUnit(int TextureUnit);
+    void SetClearCoatNormalTextureUnit(int TextureUnit);
+
 
 private:
     DEF_LOC(m_aoUnitLoc);
@@ -64,5 +69,8 @@ private:
     DEF_LOC(m_baseColorLoc);
     DEF_LOC(m_emissiveColorLoc);
     DEF_LOC(m_metallicRoughnessNormalOcclusionLoc);
+    DEF_LOC(m_clearCoatLoc);
+    DEF_LOC(m_clearCoatRoughnessLoc);
+    DEF_LOC(m_clearCoatNormalLoc);
 };
 
