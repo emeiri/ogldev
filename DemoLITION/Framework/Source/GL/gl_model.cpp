@@ -367,20 +367,32 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
     int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
     assert((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size()));
 
+    BindTextures(MaterialIndex);
+
+    if (pRenderCallbacks) {
+        bool HasSpecularTexure = m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR] != NULL;
+        pRenderCallbacks->ControlSpecularExponent_CB(HasSpecularTexure);
+        pRenderCallbacks->DrawStart_CB(MeshIndex);
+        pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
+        pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].Transformation);
+    }
+
+    glDrawElementsBaseVertex(GL_TRIANGLES,
+                             m_Meshes[MeshIndex].NumIndices,
+                             GL_UNSIGNED_INT,
+                             (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
+                             m_Meshes[MeshIndex].BaseVertex);
+}
+
+
+void GLModel::BindTextures(int MaterialIndex)
+{
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]->Bind(SPECULAR_EXPONENT_UNIT);
-
-        if (pRenderCallbacks) {
-            pRenderCallbacks->ControlSpecularExponent_CB(true);
-        }
-    } else {
-        if (pRenderCallbacks) {
-            pRenderCallbacks->ControlSpecularExponent_CB(false);
-        }
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]) {
@@ -400,18 +412,6 @@ void GLModel::RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallba
     if (m_pHeightMap) {
         m_pHeightMap->Bind(HEIGHT_TEXTURE_UNIT);
     }
-
-    if (pRenderCallbacks) {
-        pRenderCallbacks->DrawStart_CB(MeshIndex);
-        pRenderCallbacks->SetMaterial_CB(m_Materials[MaterialIndex]);
-        pRenderCallbacks->SetWorldMatrix_CB(m_Meshes[MeshIndex].Transformation);
-    }
-
-    glDrawElementsBaseVertex(GL_TRIANGLES,
-                             m_Meshes[MeshIndex].NumIndices,
-                             GL_UNSIGNED_INT,
-                             (void*)(sizeof(unsigned int) * m_Meshes[MeshIndex].BaseIndex),
-                             m_Meshes[MeshIndex].BaseVertex);
 }
 
 

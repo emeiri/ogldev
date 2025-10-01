@@ -86,6 +86,8 @@ private:
 
     void RenderMesh(int MeshIndex, DemolitionRenderCallbacks* pRenderCallbacks = NULL);
 
+    void BindTextures(int MaterialIndex);
+
     GLuint m_VAO = 0;
 
     GLuint m_Buffers[NUM_BUFFERS] = { 0 };
