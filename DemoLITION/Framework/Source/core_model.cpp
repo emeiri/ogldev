@@ -44,8 +44,14 @@ enum MaterialType {
     MaterialType_Invalid = 0,
     MaterialType_Unlit = 0x80,
     MaterialType_MetallicRoughness = 0x1,
-    MaterialType_SpecularGlossiness = 0x2
+    MaterialType_SpecularGlossiness = 0x2,
+    MaterialType_Sheen = 0x4,
+    MaterialType_ClearCoat = 0x8,
+    MaterialType_Specular = 0x10,
+    MaterialType_Transmission = 0x20,
+    MaterialType_Volume = 0x40,
 };
+
 
 Texture* s_pMissingTexture = NULL;
 
@@ -84,35 +90,31 @@ static std::string GetFullPath(const string& Dir, const aiString& Path)
 }
 
 
-MaterialType GetMaterialType(const aiMaterial* pMaterial)
+static MaterialType GetMaterialType(const aiMaterial* pMaterial, aiShadingMode ShadingMode)
 {
-    aiShadingMode ShadingMode = aiShadingMode_NoShading;
+    MaterialType mt = MaterialType_Invalid;
 
-    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingMode) == AI_SUCCESS) {
-        if (ShadingMode == aiShadingMode_Unlit) {
-            return MaterialType_Unlit;
-        }
+    switch (ShadingMode) {
+        case aiShadingMode_Unlit:
+            mt = MaterialType_Unlit;
+            break;
 
-        if (ShadingMode == aiShadingMode_PBR_BRDF) {
-            ai_real factor = 0;
+        case aiShadingMode_PBR_BRDF:
+        {
+            float factor = 0;
             if (pMaterial->Get(AI_MATKEY_GLOSSINESS_FACTOR, factor) == AI_SUCCESS) {
-                return MaterialType_SpecularGlossiness;
+                mt = MaterialType_SpecularGlossiness;
             } else if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
-                return MaterialType_MetallicRoughness;
+                mt = MaterialType_MetallicRoughness;
             }
         }
-    } else {
-        printf("Error getting shading mode\n");
-#ifndef _WIN64
-        return MaterialType_Invalid;
-#endif
-        assert(0);
+            break;
+
+        default:
+            assert(0);
     }
 
-    printf("Warning: unknown shading mode %d\n", ShadingMode);
-    assert(0);
-
-    return MaterialType_Invalid;
+    return mt;
 }
 
 
@@ -229,7 +231,7 @@ void CoreModel::InitGeometryInternal(std::vector<VertexType>& Vertices, int NumV
 }
 
 
-void CoreModel::CountVerticesAndIndices(const aiScene* pScene, unsigned int& NumVertices, unsigned int& NumIndices)
+void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices, uint& NumIndices)
 {
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
@@ -602,6 +604,8 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
 
         printf("Loading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
 
+        DetectShadingModel(pMaterial);
+
         LoadTextures(Dir, pMaterial, i);
 
         LoadColors(pMaterial, i);
@@ -685,13 +689,16 @@ void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
     LoadNormalCameraTexture(Dir, pMaterial, index);
     LoadRoughnessTexture(Dir, pMaterial, index);
     LoadAmbientOcclusionTexture(Dir, pMaterial, index);
+    LoadClearCoatTexture(Dir, pMaterial, index);
+    LoadClearCoatRoughnessTexture(Dir, pMaterial, index);
+    LoadClearCoatNormalTexture(Dir, pMaterial, index);
 }
 
 
 void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-        LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, TEX_TYPE_BASE);
+        LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, 0, TEX_TYPE_BASE);
     } else {
         printf("Warning! no diffuse texture\n");
 
@@ -713,55 +720,74 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 
 void CoreModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_SHININESS, TEX_TYPE_SPECULAR);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_SHININESS, 0, TEX_TYPE_SPECULAR);
 }
 
 
 void CoreModel::LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMALS, TEX_TYPE_NORMAL);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMALS, 0, TEX_TYPE_NORMAL);
 }
 
 
 void CoreModel::LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_METALNESS, TEX_TYPE_METALNESS);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_METALNESS, 0, TEX_TYPE_METALNESS);
 }
 
 void CoreModel::LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSIVE, TEX_TYPE_EMISSIVE);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSIVE, 0, TEX_TYPE_EMISSIVE);
 }
 
 void CoreModel::LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSION_COLOR, TEX_TYPE_EMISSION_COLOR);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSION_COLOR, 0, TEX_TYPE_EMISSION_COLOR);
 }
 
 void CoreModel::LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMAL_CAMERA, TEX_TYPE_NORMAL_CAMERA);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMAL_CAMERA, 0, TEX_TYPE_NORMAL_CAMERA);
 }
 
 void CoreModel::LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE_ROUGHNESS, TEX_TYPE_ROUGHNESS);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE_ROUGHNESS, 0, TEX_TYPE_ROUGHNESS);
 }
 
 void CoreModel::LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
-    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_UNKNOWN, TEX_TYPE_AMBIENT_OCCLUSION);
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_UNKNOWN, 0, TEX_TYPE_AMBIENT_OCCLUSION);
 }
 
 
-void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, TEXTURE_TYPE MyType)
+void CoreModel::LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 0, TEX_TYPE_CLEARCOAT);
+}
+
+
+void CoreModel::LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 1, TEX_TYPE_CLEARCOAT_ROUGHNESS);
+}
+
+
+void CoreModel::LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+{
+    LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 2, TEX_TYPE_CLEARCOAT_NORMAL);
+}
+
+
+void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex,
+                            aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType)
 {
     m_Materials[MaterialIndex].pTextures[MyType] = NULL;
 
     if (pMaterial->GetTextureCount(AssimpType) > 0) {
         aiString Path;
 
-        if (pMaterial->GetTexture(AssimpType, 0, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
+        if (pMaterial->GetTexture(AssimpType, AssimpTexIndex, &Path, NULL, NULL, NULL, NULL, NULL) == AI_SUCCESS) {
             const aiTexture* paiTexture = m_pScene->GetEmbeddedTexture(Path.C_Str());
 
             bool IsSRGB = (MyType == TEX_TYPE_BASE);
@@ -821,8 +847,6 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 
     material.m_name = pMaterial->GetName().C_Str();
 
-    DetectShadingModel(pMaterial);
-
     Vector4f AllOnes(1.0f, 1.0f, 1.0f, 1.0f);
 
     LoadColor(pMaterial, material.AmbientColor, AI_MATKEY_COLOR_AMBIENT, "ambient color");
@@ -849,6 +873,37 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 
     LoadColor(pMaterial, material.EmissiveColor, AI_MATKEY_COLOR_EMISSIVE, "emissive color");
 
+    float EmissiveStrength = 1.0f;
+    if (pMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, EmissiveStrength) == AI_SUCCESS) {
+        material.EmissiveColor = material.EmissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
+    }
+
+    material.m_flags = GetMaterialType(pMaterial, m_shadingModel);
+
+    if (material.m_flags && MaterialType_MetallicRoughness) {
+        float MetallicFactor;
+
+        if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
+            material.MetallicRoughnessNormalOcclusion.x = MetallicFactor;
+        }
+
+        float RoughnessFactor;
+
+        if (pMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, RoughnessFactor) == AI_SUCCESS) {
+            material.MetallicRoughnessNormalOcclusion.y = RoughnessFactor;
+        }
+    }
+
+    float NormalScale;
+    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), NormalScale) == AI_SUCCESS) {
+        material.MetallicRoughnessNormalOcclusion.z = NormalScale;
+    }
+
+    float OcclusionStrength;
+    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), OcclusionStrength) == AI_SUCCESS) {
+        material.MetallicRoughnessNormalOcclusion.w = OcclusionStrength;
+    }
+
     float AlphaCutoff = 0.0f;
 
     if (pMaterial->Get(AI_MATKEY_GLTF_ALPHACUTOFF, AlphaCutoff) == AI_SUCCESS) {
@@ -858,8 +913,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     }
 
     float OpaquenessThreshold = 0.05f;
-    float Opacity = 1.0f;
-   
+    float Opacity = 1.0f;   
     if (pMaterial->Get(AI_MATKEY_OPACITY, Opacity) == AI_SUCCESS) {
         material.m_transparencyFactor = CLAMP(1.0f - Opacity, 0.0f, 1.0f);
         if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
@@ -878,30 +932,30 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
         material.m_alphaTest = 0.5f;
     }
 
-    MaterialType MaterialType = GetMaterialType(pMaterial);
+    ProcessClearCoat(index, pMaterial, material);
+}
 
-    if (MaterialType == MaterialType_MetallicRoughness) {
-        ai_real MetallicFactor;
 
-        if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
-            material.MetallicRoughnessNormalOcclusion.x = MetallicFactor;
-        }
+void CoreModel::ProcessClearCoat(int index, const aiMaterial* pMaterial, Material& material)
+{
+    bool UseClearCoat = m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT] ||
+                        m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT_NORMAL] ||
+                        m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT_ROUGHNESS];
 
-        ai_real roughnessFactor;
-
-        if (pMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughnessFactor) == AI_SUCCESS) {
-            material.MetallicRoughnessNormalOcclusion.y = roughnessFactor;
-        }
+    float ClearCoatFactor = 0.0f;
+    if (pMaterial->Get(AI_MATKEY_CLEARCOAT_FACTOR, ClearCoatFactor) == AI_SUCCESS) {
+        material.ClearCoatTransmissionThickness.x = ClearCoatFactor;
+        UseClearCoat = true;
     }
 
-    ai_real NormalScale;
-    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_NORMALS, 0), NormalScale) == AI_SUCCESS) {
-        material.MetallicRoughnessNormalOcclusion.z = NormalScale;
+    float ClearCoatRoughnessFactor = 0.0f;
+    if (pMaterial->Get(AI_MATKEY_CLEARCOAT_ROUGHNESS_FACTOR, ClearCoatRoughnessFactor) == AI_SUCCESS) {
+        material.ClearCoatTransmissionThickness.y = ClearCoatRoughnessFactor;
+        UseClearCoat = true;
     }
 
-    ai_real OcclusionStrength;
-    if (pMaterial->Get(AI_MATKEY_GLTF_TEXTURE_SCALE(aiTextureType_LIGHTMAP, 0), OcclusionStrength) == AI_SUCCESS) {
-        material.MetallicRoughnessNormalOcclusion.w = OcclusionStrength;
+    if (UseClearCoat) {
+        material.m_flags |= MaterialType_ClearCoat;
     }
 }
 

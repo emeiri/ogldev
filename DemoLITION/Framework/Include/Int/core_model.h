@@ -47,6 +47,7 @@ public:
     virtual void SetWorldMatrix_CB(const Matrix4f& World) = 0;
 };
 
+
 class CoreRenderingSystem;
 
 class CoreModel : public Model
@@ -263,12 +264,16 @@ private:
     void LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
     void LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
+    void LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex);
 
-    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, TEXTURE_TYPE MyType);
+    void LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex, aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType);
     void LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
     void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
+    void ProcessClearCoat(int index, const aiMaterial* pMaterial, Material& material);
     void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
     void DetectShadingModel(const aiMaterial* pMaterial);
 

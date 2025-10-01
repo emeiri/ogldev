@@ -49,7 +49,10 @@ enum TEXTURE_TYPE {
     TEX_TYPE_EMISSION_COLOR = 6,
     TEX_TYPE_ROUGHNESS = 7,
     TEX_TYPE_AMBIENT_OCCLUSION = 8,
-    TEX_TYPE_NUM = 9
+    TEX_TYPE_CLEARCOAT = 9,
+    TEX_TYPE_CLEARCOAT_ROUGHNESS = 10,
+    TEX_TYPE_CLEARCOAT_NORMAL = 11,
+    TEX_TYPE_NUM = 12
 };
 
 class Material {
@@ -64,6 +67,7 @@ class Material {
     Vector4f BaseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f EmissiveColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f MetallicRoughnessNormalOcclusion = Vector4f(1.0f);
+    Vector4f ClearCoatTransmissionThickness = Vector4f(1.0f);
 
     PBRMaterial PBRmaterial;
 
@@ -71,6 +75,7 @@ class Material {
 
     float m_transparencyFactor = 1.0f;
     float m_alphaTest = 0.0f;
+    u32 m_flags = 0;
 
     ~Material()
     {

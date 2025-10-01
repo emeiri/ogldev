@@ -58,9 +58,8 @@ public:
         m_pScene->GetDirLights().push_back(m_dirLight);
   
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ClearcoatWicker/glTF/ClearcoatWicker.gltf");
-        Texture* pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
-        pTexAO->Load();
-     //   pModel->GetPBRMaterial().pAO = pTexAO;
+        int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        pModel->SetAmbientOcclusionMap(AOMap);
 
         Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
         pBRDF_LUT->Load();

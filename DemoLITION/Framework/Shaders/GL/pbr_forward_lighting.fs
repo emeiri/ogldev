@@ -147,6 +147,16 @@ struct InputAttributes {
 };
 
 
+struct ClearCoat {
+    sampler2D TextureSampler;
+    uint TextureUV;
+    sampler2D RoughnessSampler;
+    uint RoughnessUV;
+    sampler2D NormalSampler;
+    uint NormalUV;
+};
+
+
 struct MetallicRoughnessDataGPU {
     vec4 baseColorFactor;
     vec4 metallicRoughnessNormalOcclusion; // packed metallicFactor, roughnessFactor, normalScale, occlusionStrength
@@ -167,6 +177,7 @@ struct MetallicRoughnessDataGPU {
     sampler2D normalTextureSampler;
     uint normalTextureUV;
     uint alphaMode;
+    ClearCoat clearCoat;
 };
 
 // corresponds to EnvironmentMapDataGPU from shared/UtilsGLTF.h 
