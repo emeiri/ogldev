@@ -20,8 +20,6 @@
 #version 460 core
 
 #extension GL_ARB_bindless_texture : require
-#extension GL_KHR_vulkan_glsl : require
-#extension GL_NV_uniform_buffer_std430_layout : require
 
 const int MAX_POINT_LIGHTS = 2;
 const int MAX_SPOT_LIGHTS = 2;
