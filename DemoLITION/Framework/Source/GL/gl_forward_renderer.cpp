@@ -200,6 +200,9 @@ void ForwardRenderer::InitTechniques()
     m_pbrLightingTech.SetEnvmapTextureUnit(ENVMAP_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetBRDF_LUTTextureUnit(BRDF_LUT_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetIrradianceTextureUnit(IRRADIANCE_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetClearCoatTextureUnit(CLEARCOAT_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetClearCoatRoughnessTextureUnit(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_pbrLightingTech.SetClearCoatNormalTextureUnit(CLEARCOAT_NORMAL_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");

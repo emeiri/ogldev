@@ -58,6 +58,7 @@ bool PBRForwardLightingTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_baseColorLoc, "gBaseColor");
     GET_UNIFORM_AND_CHECK(m_emissiveColorLoc, "gEmissiveColor");
     GET_UNIFORM_AND_CHECK(m_metallicRoughnessNormalOcclusionLoc, "gMetallicRoughnessNormalOcclusion");
+    GET_UNIFORM_AND_CHECK(m_clearCoatTransmissionThicknessLoc, "gClearCoatTransmissionThickness");
 
     return true;
 }
