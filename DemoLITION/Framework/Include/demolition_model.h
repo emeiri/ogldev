@@ -20,7 +20,7 @@
 #pragma once
 
 #include "demolition_object.h"
-#include "ogldev_material.h"
+#include "Int/core_material.h"
 
 class Model : public Object 
 {

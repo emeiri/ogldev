@@ -120,7 +120,7 @@ static MaterialType GetMaterialType(const aiMaterial* pMaterial, aiShadingMode S
 
 void CoreModel::DestroyModel()
 {
-    for (Material& material : m_Materials) {
+    for (CoreMaterial& material : m_Materials) {
         for (Texture* pTexture : material.pTextures) {
             if (pTexture) {
                 DestroyTexture(pTexture);
@@ -615,7 +615,7 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
 }
 
 
-const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
+const CoreMaterial* CoreModel::GetMaterialForMesh(int MeshIndex) const
 {
     if (MeshIndex >= m_Meshes.size()) {
         printf("Invalid mesh index %d, num meshes %d\n", MeshIndex, (int)m_Meshes.size());
@@ -624,7 +624,7 @@ const Material* CoreModel::GetMaterialForMesh(int MeshIndex) const
 
     int MaterialIndex = m_Meshes[MeshIndex].MaterialIndex;
 
-    const Material* pMaterial = NULL;
+    const CoreMaterial* pMaterial = NULL;
 
     if ((MaterialIndex >= 0) && (MaterialIndex < m_Materials.size())) {
         pMaterial = & m_Materials[MaterialIndex];
@@ -843,7 +843,7 @@ void CoreModel::DetectShadingModel(const aiMaterial* pMaterial)
 
 void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 {
-    Material& material = m_Materials[index];
+    CoreMaterial& material = m_Materials[index];
 
     material.m_name = pMaterial->GetName().C_Str();
 
@@ -936,7 +936,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 }
 
 
-void CoreModel::ProcessClearCoat(int index, const aiMaterial* pMaterial, Material& material)
+void CoreModel::ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMaterial& material)
 {
     bool UseClearCoat = m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT] ||
                         m_Materials[index].pTextures[TEX_TYPE_CLEARCOAT_NORMAL] ||

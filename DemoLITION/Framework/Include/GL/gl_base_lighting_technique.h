@@ -20,7 +20,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-#include "ogldev_material.h"
+#include "Int/core_material.h"
 #include "ogldev_world_transform.h"
 #include "demolition_lights.h"
 #include "Int/core_model.h"
@@ -33,7 +33,7 @@ public:
 
     virtual bool Init();
 
-    virtual void SetMaterial(const Material& material) = 0;
+    virtual void SetMaterial(const CoreMaterial& material) = 0;
     virtual void ControlRefRefract(bool Enable) {}
     virtual void ControlSpecularExponent(bool IsEnabled) {}
     virtual void SetReflectionFactor(float f) {}

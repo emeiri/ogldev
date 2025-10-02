@@ -213,6 +213,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssbo_db.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_tone_map_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_material.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_mesh.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />

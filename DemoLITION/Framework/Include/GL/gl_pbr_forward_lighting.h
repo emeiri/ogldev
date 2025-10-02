@@ -20,7 +20,7 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-#include "ogldev_material.h"
+#include "Int/core_material.h"
 #include "ogldev_world_transform.h"
 #include "demolition_lights.h"
 #include "Int/core_model.h"
@@ -34,7 +34,7 @@ public:
 
     virtual bool Init();
 
-    virtual void SetMaterial(const Material& material);
+    virtual void SetMaterial(const CoreMaterial& material);
 
     void SetAmbientOcclusionTextureUnit(int TextureUnit);
 

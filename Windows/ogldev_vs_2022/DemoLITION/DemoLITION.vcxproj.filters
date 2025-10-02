@@ -318,6 +318,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_hdr_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_material.h">
+      <Filter>Include\Int</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

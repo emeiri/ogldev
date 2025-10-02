@@ -1073,7 +1073,7 @@ void ForwardRenderer::ControlSpecularExponent_CB(bool IsEnabled)
 }
 
 
-void ForwardRenderer::SetMaterial_CB(const Material& material)
+void ForwardRenderer::SetMaterial_CB(const CoreMaterial& material)
 {
     switch (m_curRenderPass) {
     case RENDER_PASS_LIGHTING_DIR:

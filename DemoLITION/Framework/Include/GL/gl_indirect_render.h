@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "ogldev_math_3d.h"
-#include "ogldev_material.h"
+#include "Int/core_material.h"
 #include "GL/gl_basic_mesh_entry.h"
 
 class IndirectRender {
@@ -33,11 +33,11 @@ public:
 
     ~IndirectRender() {}
 
-    void Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<Material>& Materials);
+    void Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<CoreMaterial>& Materials);
 
     void Render(const Matrix4f& ObjectMatrix);
 
-    void RefreshMaterials(const std::vector<Material>& Materials);
+    void RefreshMaterials(const std::vector<CoreMaterial>& Materials);
 
 private:
 
@@ -49,7 +49,7 @@ private:
 
     void UpdatePerObjectData(const Matrix4f& ObjectMatrix);
 
-    void PrepareIndirectRenderMaterials(const std::vector<Material>& Materials);
+    void PrepareIndirectRenderMaterials(const std::vector<CoreMaterial>& Materials);
 
     struct MaterialColorIndirect {
         Vector4f AmbientColor;

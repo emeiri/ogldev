@@ -224,7 +224,7 @@ void ForwardLightingTechnique::SetSpecularExponentTextureUnit(unsigned int Textu
 }
 
 
-void ForwardLightingTechnique::SetMaterial(const Material& material)
+void ForwardLightingTechnique::SetMaterial(const CoreMaterial& material)
 {
     glUniform4f(materialLoc.AmbientColor, material.AmbientColor.r, material.AmbientColor.g, material.AmbientColor.b, material.AmbientColor.a);
     glUniform4f(materialLoc.DiffuseColor, material.DiffuseColor.r, material.DiffuseColor.g, material.DiffuseColor.b, material.DiffuseColor.a);
@@ -386,19 +386,6 @@ void ForwardLightingTechnique::SetAnimatedFog(float FogEnd, float FogDensity)
 void ForwardLightingTechnique::SetPBR(bool IsPBR)
 {
     glUniform1i(IsPBRLoc, IsPBR);
-}
-
-
-void ForwardLightingTechnique::SetPBRMaterial(const PBRMaterial& Material)
-{
-    glUniform1i(PBRMaterialLoc.IsMetal, Material.IsMetal);
-    if (Material.pAlbedo) {
-        glUniform1i(PBRMaterialLoc.IsAlbedo, 1);
-    } else {
-        glUniform1i(PBRMaterialLoc.IsAlbedo, 0);
-	    glUniform3f(PBRMaterialLoc.Color, Material.Color.r, Material.Color.g, Material.Color.b);
-        glUniform1f(PBRMaterialLoc.Roughness, Material.Roughness);
-	}
 }
 
 

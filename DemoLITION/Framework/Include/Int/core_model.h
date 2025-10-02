@@ -25,7 +25,7 @@
 #include <assimp/scene.h>       // Output data structure
 #include <assimp/postprocess.h> // Post processing flags
 
-#include "ogldev_material.h"
+#include "Int/core_material.h"
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
@@ -42,7 +42,7 @@ public:
 
     virtual void ControlSpecularExponent_CB(bool IsEnabled) = 0;
 
-    virtual void SetMaterial_CB(const Material& material) = 0;
+    virtual void SetMaterial_CB(const CoreMaterial& material) = 0;
 
     virtual void SetWorldMatrix_CB(const Matrix4f& World) = 0;
 };
@@ -90,7 +90,7 @@ public:
 
     bool IsAnimated() const;
 
-    const Material* GetMaterialForMesh(int MeshIndex) const;
+    const CoreMaterial* GetMaterialForMesh(int MeshIndex) const;
 
     virtual void SetColorTexture(int TextureHandle) { assert(0); }
 
@@ -197,7 +197,7 @@ protected:
     virtual void InitGeometryPost() = 0;
 
     std::vector<BasicMeshEntry> m_Meshes;
-    std::vector<Material> m_Materials;
+    std::vector<CoreMaterial> m_Materials;
 
     // Temporary space for vertex stuff before we load them into the GPU
     vector<uint> m_Indices;
@@ -273,7 +273,7 @@ private:
     void LoadTextureFromFile(const string& dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB);
 
     void LoadColors(const aiMaterial* pMaterial, int index);
-    void ProcessClearCoat(int index, const aiMaterial* pMaterial, Material& material);
+    void ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMaterial& material);
     void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
     void DetectShadingModel(const aiMaterial* pMaterial);
 

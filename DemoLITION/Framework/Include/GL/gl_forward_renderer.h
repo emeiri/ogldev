@@ -123,7 +123,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 
     virtual void ControlSpecularExponent_CB(bool IsEnabled);
 
-    virtual void SetMaterial_CB(const Material& material);
+    virtual void SetMaterial_CB(const CoreMaterial& material);
 
     virtual void SetWorldMatrix_CB(const Matrix4f& World);
 

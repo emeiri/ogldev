@@ -130,7 +130,7 @@ void PBRForwardLightingTechnique::SetClearCoatNormalTextureUnit(int TextureUnit)
 }
 
 
-void PBRForwardLightingTechnique::SetMaterial(const Material& mat)
+void PBRForwardLightingTechnique::SetMaterial(const CoreMaterial& mat)
 {
     glUniform4f(m_baseColorLoc, mat.BaseColor.r, mat.BaseColor.g, mat.BaseColor.b, mat.BaseColor.a);
     glUniform4f(m_emissiveColorLoc, mat.EmissiveColor.r, mat.EmissiveColor.g, mat.EmissiveColor.b, mat.EmissiveColor.a);

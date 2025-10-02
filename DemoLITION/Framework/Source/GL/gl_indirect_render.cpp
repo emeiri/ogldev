@@ -34,7 +34,7 @@ struct DrawElementsIndirectCommand {
 };
 
 
-void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<Material>& Materials)
+void IndirectRender::Init(const std::vector<BasicMeshEntry>& Meshes, const std::vector<CoreMaterial>& Materials)
 {
     assert(Meshes.size() > 0);
 
@@ -89,7 +89,7 @@ void IndirectRender::AllocPerObjectBuffer(const std::vector<BasicMeshEntry>& Mes
 }
 
 
-void IndirectRender::PrepareIndirectRenderMaterials(const std::vector<Material>& Materials)
+void IndirectRender::PrepareIndirectRenderMaterials(const std::vector<CoreMaterial>& Materials)
 {
     int NumMaterials = (int)Materials.size();
 
@@ -128,7 +128,7 @@ void IndirectRender::Render(const Matrix4f& ObjectMatrix)
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 }
 
-void IndirectRender::RefreshMaterials(const std::vector<Material>& Materials)
+void IndirectRender::RefreshMaterials(const std::vector<CoreMaterial>& Materials)
 {
     int NumMaterials = (int)Materials.size();
 

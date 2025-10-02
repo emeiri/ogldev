@@ -20,10 +20,9 @@
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
-#include "ogldev_basic_mesh.h"
 #include "ogldev_types.h"
 
-class PickingTechnique : public Technique, public IRenderCallbacks
+class PickingTechnique : public Technique
 {
 public:
 

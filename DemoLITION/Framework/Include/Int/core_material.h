@@ -16,24 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_MATERIAL_H
-#define OGLDEV_MATERIAL_H
+#pragma once 
 
 #include "ogldev_math_3d.h"
+#ifdef OGLDEV_VULKAN
+#include "ogldev_vulkan_texture.h"
+#else
 #include "ogldev_texture.h"
+#endif
 
-struct PBRMaterial
-{
-    float Roughness = 0.0f;
-    bool IsMetal = false;
-    Vector3f Color = Vector3f(0.0f, 0.0f, 0.0f);
-    Texture* pAlbedo = NULL;
-    Texture* pRoughness = NULL;
-    Texture* pMetallic = NULL;
-    Texture* pNormalMap = NULL;
-    Texture* pAO = NULL;
-    Texture* pEmissive = NULL;
-};
 
 enum TEXTURE_TYPE {
     TEX_TYPE_BASE = 0,      // Base color / diffuse / albedo
@@ -51,7 +42,7 @@ enum TEXTURE_TYPE {
     TEX_TYPE_NUM = 12
 };
 
-class Material {
+class CoreMaterial {
 
  public:
 
@@ -65,21 +56,17 @@ class Material {
     Vector4f MetallicRoughnessNormalOcclusion = Vector4f(1.0f);
     Vector4f ClearCoatTransmissionThickness = Vector4f(1.0f);
 
-    PBRMaterial PBRmaterial;
-
     Texture* pTextures[TEX_TYPE_NUM] = { 0 };
 
     float m_transparencyFactor = 1.0f;
     float m_alphaTest = 0.0f;
     u32 m_flags = 0;
+    float m_ior = 1.5f;
 
-    ~Material()
+    ~CoreMaterial()
     {
         for (Texture* pTex : pTextures) {
             delete pTex;
         }
     }
 };
-
-
-#endif
