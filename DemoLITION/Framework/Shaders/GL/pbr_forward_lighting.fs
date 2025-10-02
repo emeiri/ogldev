@@ -61,6 +61,47 @@ struct LightSource {
 };
 
 
+// Encapsulate the various inputs used by the various functions in the shading equation
+// We store values in this struct to simplify the integration of alternative implementations
+// of the shading terms, outlined in the Readme.MD Appendix.
+struct PBRInfo {
+    // geometry properties
+    float NdotL;                  // cos angle between normal and light direction
+    float NdotV;                  // cos angle between normal and view direction
+    float NdotH;                  // cos angle between normal and half vector
+    float LdotH;                  // cos angle between light direction and half vector
+    float VdotH;                  // cos angle between view direction and half vector
+
+    // Normal
+    vec3 n;              // Sahding normal
+    vec3 ng;            // Geometry normal
+    vec3 t;              // Geometry tangent
+    vec3 b;              // Geometry bitangent
+
+    vec3 v;                       // vector from surface point to camera
+
+    // material properties
+    float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)
+    vec3 reflectance0;            // full reflectance color (normal incidence angle)
+    vec3 reflectance90;           // reflectance color at grazing angle
+    float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
+    vec3 baseDiffuseColor;            // color contribution from diffuse lighting
+    vec3 baseSpecularColor;           // color contribution from specular lighting
+
+    vec3 clearCoatF0;
+    vec3 clearCoatF90;
+    float clearCoatFactor;
+    vec3 clearCoatNormal;
+    float clearCoatRoughness;
+
+    float ior;  // TODO
+
+    vec3 FssEss;
+    float brdf_scale;
+    float brdf_bias;
+};
+
+
 layout(std140, binding = 1) uniform LightUBO {
     LightSource Lights[MAX_NUM_LIGHTS];
 };
@@ -83,6 +124,9 @@ layout(binding = 11) uniform sampler2D gEmissive;
 layout(binding = 12) uniform samplerCube gCubemapTexture;
 layout(binding = 13) uniform samplerCube gEnvMap;
 layout(binding = 14) uniform samplerCube gIrradiance;
+layout(binding = 15) uniform sampler2D gClearCoat;
+layout(binding = 16) uniform sampler2D gClearCoatRoughness;
+layout(binding = 17) uniform sampler2D gClearCoatNormal;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
 uniform int gShadowMapWidth = 0;
@@ -97,24 +141,51 @@ uniform bool gIsIndirectRender = false;
 uniform vec4 gBaseColor;
 uniform vec4 gEmissiveColor;
 uniform vec4 gMetallicRoughnessNormalOcclusion;
+uniform vec4 gClearCoatTransmissionThickness;
+uniform int gMaterialType;
 
 const float M_PI = 3.141592653589793;
 
 vec4 SRGBtoLINEAR(vec4 srgbIn) 
 {
-  vec3 linOut = pow(srgbIn.xyz,vec3(2.2));
+    vec3 linOut = pow(srgbIn.xyz,vec3(2.2));
 
-  return vec4(linOut, srgbIn.a);
+    return vec4(linOut, srgbIn.a);
 }
+
+
+float ClampedDot(vec3 x, vec3 y) 
+{
+    return clamp(dot(x, y), 0.0, 1.0);
+}
+
+
+vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH) 
+{
+    return f0 + (f90 - f0) * pow(clamp(1.0 - VdotH, 0.0, 1.0), 5.0);
+}
+
+
 
 // http://www.thetenthplanet.de/archives/1180
 // modified to fix handedness of the resulting cotangent frame
-mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv ) {
+// http://www.thetenthplanet.de/archives/1180
+// modified to fix handedness of the resulting cotangent frame
+mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv, inout PBRInfo pbrInputs ) 
+{
   // get edge vectors of the pixel triangle
   vec3 dp1 = dFdx( p );
   vec3 dp2 = dFdy( p );
   vec2 duv1 = dFdx( uv );
   vec2 duv2 = dFdy( uv );
+
+  if (length(duv1) <= 1e-2) {
+    duv1 = vec2(1.0, 0.0);
+  }
+
+  if (length(duv2) <= 1e-2) {
+    duv2 = vec2(0.0, 1.0);
+  }
 
   // solve the linear system
   vec3 dp2perp = cross( dp2, N );
@@ -131,14 +202,25 @@ mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv ) {
   // adjust tangent if needed
   T = T * w;
 
-  return mat3( T * invmax, B * invmax, N );
+  if (gl_FrontFacing == false) {
+    N *= -1.0f;
+    T *= -1.0f;
+    B *= -1.0f;
+  }
+
+  pbrInputs.t = T * invmax;
+  pbrInputs.b = B * invmax;
+  pbrInputs.ng = N;
+
+  return mat3( pbrInputs.t, pbrInputs.b, N );
 }
 
-vec3 perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv) 
+
+void perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv, inout PBRInfo pbrInputs) 
 {
     vec3 map = normalize( 2.0 * normalSample - vec3(1.0) );
-    mat3 TBN = cotangentFrame(n, v, uv);
-    return normalize(TBN * map);
+    mat3 TBN = cotangentFrame(n, v, uv, pbrInputs);
+    pbrInputs.n = normalize(TBN * map);
 }
 
 
@@ -154,6 +236,7 @@ struct ClearCoat {
     uint RoughnessUV;
     sampler2D NormalSampler;
     uint NormalUV;
+    vec4 TransmissionThickness;
 };
 
 
@@ -178,6 +261,8 @@ struct MetallicRoughnessDataGPU {
     uint normalTextureUV;
     uint alphaMode;
     ClearCoat clearCoat;
+    uint materialType;  // TODO
+    float ior; // TODO
 };
 
 // corresponds to EnvironmentMapDataGPU from shared/UtilsGLTF.h 
@@ -212,6 +297,7 @@ MetallicRoughnessDataGPU GetMaterial()
         return material[MaterialIndex]; 
     } else {
         MetallicRoughnessDataGPU ret;
+        ret.materialType = gMaterialType;
         ret.occlusionTextureUV = 0;
         ret.occlusionTextureSampler = gAmbientOcclusion;
         ret.emissiveTextureUV = 0;
@@ -225,6 +311,13 @@ MetallicRoughnessDataGPU GetMaterial()
         ret.normalTextureSampler = gNormalMap;
         ret.normalTextureUV = 0;
         ret.metallicRoughnessNormalOcclusion = gMetallicRoughnessNormalOcclusion;
+        ret.clearCoat.TextureSampler = gClearCoat;
+        ret.clearCoat.TextureUV = 0;
+        ret.clearCoat.RoughnessSampler = gClearCoatRoughness;
+        ret.clearCoat.RoughnessUV = 0;
+        ret.clearCoat.NormalSampler = gClearCoatNormal;
+        ret.clearCoat.NormalUV = 0;
+        ret.clearCoat.TransmissionThickness = gClearCoatTransmissionThickness;
         return ret;
     }      
 }
@@ -235,11 +328,8 @@ EnvironmentMapDataGPU getEnvironment(uint idx)
         return environment[idx]; 
     } else {
         EnvironmentMapDataGPU ret;
-        //ret.envMapTexture = ;
         ret.envMapTextureSampler = gEnvMap;
-        //ret.envMapTextureIrradiance = ;
         ret.envMapTextureIrradianceSampler = gIrradiance;
-        //ret.texBRDF_LUT =;
         ret.texBRDF_LUTSampler = gBRDF_LUT;
         return ret;
     }  
@@ -270,11 +360,27 @@ vec2 GetNormalUV(InputAttributes tc, MetallicRoughnessDataGPU mat)
     return tc.uv[mat.normalTextureUV];
 }
 
+
+float GetClearcoatFactor(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
+    return texture(mat.clearCoat.TextureSampler, 
+                   tc.uv[mat.clearCoat.TextureUV]).r * mat.clearCoat.TransmissionThickness.x;
+}
+
+
+float GetClearcoatRoughnessFactor(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
+    return texture(mat.clearCoat.RoughnessSampler, 
+                   tc.uv[mat.clearCoat.RoughnessUV]).g * mat.clearCoat.TransmissionThickness.y;
+}
+
+
 vec4 sampleAO(InputAttributes tc, MetallicRoughnessDataGPU mat) {
     return texture(mat.occlusionTextureSampler, tc.uv[mat.occlusionTextureUV]);
 }
 
-vec4 sampleEmissive(InputAttributes tc, MetallicRoughnessDataGPU mat) {
+vec4 SampleEmissive(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
   return texture(mat.emissiveTextureSampler, tc.uv[mat.emissiveTextureUV]) * vec4(mat.emissiveFactorAlphaCutoff.xyz, 1.0f);
 }
 
@@ -289,6 +395,13 @@ vec4 sampleMetallicRoughness(InputAttributes tc, MetallicRoughnessDataGPU mat) {
 vec4 sampleNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) {
   return texture(mat.normalTextureSampler, tc.uv[mat.normalTextureUV]);
 }
+
+
+vec4 SampleClearcoatNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
+    return texture(mat.clearCoat.NormalSampler, tc.uv[mat.clearCoat.NormalUV]);
+}
+
 
 vec4 sampleBRDF_LUT(vec2 tc, EnvironmentMapDataGPU map) 
 {
@@ -308,33 +421,13 @@ vec4 sampleEnvMapLod(vec3 tc, float lod, EnvironmentMapDataGPU map)
 }
 
 
+bool isMaterialTypeClearCoat(MetallicRoughnessDataGPU mat) 
+{
+    return (mat.materialType & 0x8) != 0;
+}
+
+
 // Based on: https://github.com/KhronosGroup/glTF-Sample-Viewer/blob/main/source/Renderer/shaders/pbr.frag
-
-// Encapsulate the various inputs used by the various functions in the shading equation
-// We store values in this struct to simplify the integration of alternative implementations
-// of the shading terms, outlined in the Readme.MD Appendix.
-struct PBRInfo {
-  // geometry properties
-  float NdotL;                  // cos angle between normal and light direction
-  float NdotV;                  // cos angle between normal and view direction
-  float NdotH;                  // cos angle between normal and half vector
-  float LdotH;                  // cos angle between light direction and half vector
-  float VdotH;                  // cos angle between view direction and half vector
-  vec3 n;                       // normal at surface point
-  vec3 v;                       // vector from surface point to camera
-
-  // material properties
-  float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)
-  vec3 reflectance0;            // full reflectance color (normal incidence angle)
-  vec3 reflectance90;           // reflectance color at grazing angle
-  float alphaRoughness;         // roughness mapped to a more linear change in the roughness (proposed by [2])
-  vec3 baseDiffuseColor;            // color contribution from diffuse lighting
-  vec3 baseSpecularColor;           // color contribution from specular lighting
-
-  vec3 FssEss;
-  float brdf_scale;
-  float brdf_bias;
-};
 
 
 vec3 getIBLRadianceLambertian(PBRInfo pbrInputs) 
@@ -357,19 +450,27 @@ vec3 getIBLRadianceLambertian(PBRInfo pbrInputs)
 // Calculation of the lighting contribution from an optional Image Based Light source.
 // Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
 // See our README.md on Environment Maps [3] for additional discussion.
-vec3 getIBLRadianceContributionGGX(PBRInfo pbrInputs) 
+vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0) 
 {
-    vec3 n = pbrInputs.n;
-    vec3 v =  pbrInputs.v;
-    vec3 reflection = normalize(reflect(-v, n));
-    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
+    float NdotV = ClampedDot(n, v);
+    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());       
     float mipCount = float(textureQueryLevels(envMap.envMapTextureSampler));
-    float lod = pbrInputs.perceptualRoughness * (mipCount - 1);
-
+    float lod = roughness * (mipCount - 1);
+    vec3 reflection = normalize(reflect(-v, n));
+    
     // HDR envmaps are already linear
     vec3 specularLight = sampleEnvMapLod(reflection.xyz, lod, envMap).rgb;
 
-    return specularLight * pbrInputs.FssEss;
+    vec2 brdfSamplePoint = clamp(vec2(NdotV, roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
+    vec3 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
+
+    // see https://bruop.github.io/ibl/#single_scattering_results at Single Scattering Results
+    // Roughness dependent fresnel, from Fdez-Aguera
+    vec3 Fr = max(vec3(1.0 - roughness), F0) - F0;
+    vec3 k_S = F0 + Fr * pow(1.0 - NdotV, 5.0);
+    vec3 FssEss = k_S * f_ab.x + f_ab.y;
+
+    return specularLight * FssEss;
 }
 
 // Disney Implementation of diffuse from Physically-Based Shading at Disney by Brent Burley. See Section 5.3.
@@ -440,7 +541,8 @@ PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat,
                                             vec4 albedo, vec3 normal, vec4 mrSample) 
 {
     PBRInfo pbrInputs;
-
+    pbrInputs.ior = mat.ior;
+  
     // Roughness is stored in the 'g' channel, MetallicFactor is stored in the 'b' channel.
     // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
     
@@ -483,17 +585,18 @@ PBRInfo CalculatePBRInputsMetallicRoughness(MetallicRoughnessDataGPU mat,
     return pbrInputs;
 }
 
+
 vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection, vec3 lightColor) 
 {
     vec3 n = pbrInputs.n;
     vec3 v = pbrInputs.v;
-    vec3 ld = normalize(LightDirection);  // Vector from surface point to light
-    vec3 h = normalize(ld+v);             // Half vector between both l and v
+    vec3 l = normalize(LightDirection);  // Vector from surface point to light
+    vec3 h = normalize(l+v);             // Half vector between both l and v
 
     float NdotV = pbrInputs.NdotV;
-    float NdotL = clamp(dot(n, ld), 0.001, 1.0);
+    float NdotL = clamp(dot(n, l), 0.001, 1.0);
     float NdotH = clamp(dot(n, h), 0.0, 1.0);
-    float LdotH = clamp(dot(ld, h), 0.0, 1.0);
+    float LdotH = clamp(dot(l, h), 0.0, 1.0);
     float VdotH = clamp(dot(v, h), 0.0, 1.0);
 
     vec3 color = vec3(0);
@@ -527,23 +630,55 @@ void main()
     tc.uv[1] = TexCoord1;
 
     MetallicRoughnessDataGPU mat = GetMaterial();
+    EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());
           
     vec4 AmbientOcclusion = sampleAO(tc, mat);
-    vec4 EmissiveColor = sampleEmissive(tc, mat);
+    vec4 EmissiveColor = SampleEmissive(tc, mat);
     vec4 AlbedoColor = sampleAlbedo(tc, mat) * Color0;
     vec4 mrSample = sampleMetallicRoughness(tc, mat);
     vec3 normalSample = sampleNormal(tc, mat).xyz;
 
+    bool isClearCoat = isMaterialTypeClearCoat(mat);
+
     vec3 n = normalize(Normal0);
-
-    n = perturbNormal(n, WorldPos0, normalSample, GetNormalUV(tc, mat));
-
-    if (!gl_FrontFacing) n *= -1.0f;
 
     PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(mat, AlbedoColor, n, mrSample);
 
-    vec3 specular_color = getIBLRadianceContributionGGX(pbrInputs);
-    vec3 diffuse_color = getIBLRadianceLambertian(pbrInputs);
+    perturbNormal(n, WorldPos0, normalSample, GetNormalUV(tc, mat), pbrInputs);
+
+   // if (!gl_FrontFacing) n *= -1.0f;    
+    
+    vec3 ClearCoatContrib = vec3(0);
+
+    if (isClearCoat) {
+      pbrInputs.clearCoatFactor = GetClearcoatFactor(tc, mat);
+      pbrInputs.clearCoatRoughness = clamp(GetClearcoatRoughnessFactor(tc, mat), 0.0, 1.0);
+      pbrInputs.clearCoatF0 = vec3(pow((pbrInputs.ior - 1.0) / (pbrInputs.ior + 1.0), 2.0));
+      pbrInputs.clearCoatF90 = vec3(1.0);
+
+      if (mat.clearCoat.NormalUV >- 1) {
+          pbrInputs.clearCoatNormal = mat3(pbrInputs.t, pbrInputs.b, pbrInputs.ng) * SampleClearcoatNormal(tc, mat).rgb;
+      } else {
+          pbrInputs.clearCoatNormal = pbrInputs.ng;
+      }
+
+      ClearCoatContrib = getIBLRadianceGGX(pbrInputs.clearCoatNormal, pbrInputs.v, 
+                                           pbrInputs.clearCoatRoughness, pbrInputs.clearCoatF0);
+    }
+
+    vec3 ClearCoatFresnel = vec3(0);
+    if (isClearCoat) {
+        ClearCoatFresnel = F_Schlick(pbrInputs.clearCoatF0, pbrInputs.clearCoatF90, 
+                                     ClampedDot(pbrInputs.clearCoatNormal, pbrInputs.v));
+    }
+
+    float Occlusion = AmbientOcclusion.r < 0.01 ? 1.0 : AmbientOcclusion.r;
+    float OcclusionStrength = GetOcclusionFactor(mat);
+    vec3 SpecularColor = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, 
+                                           pbrInputs.perceptualRoughness, pbrInputs.reflectance0);
+    vec3 DiffuseColor = getIBLRadianceLambertian(pbrInputs);
+    DiffuseColor = /*lights_diffuse + */ mix(DiffuseColor, DiffuseColor * Occlusion, OcclusionStrength);
+    SpecularColor = /*lights_specular +*/ mix(SpecularColor, SpecularColor * Occlusion, OcclusionStrength);
 
     vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
     vec3 LightColor = vec3(1.0);
@@ -555,18 +690,13 @@ void main()
 
     vec3 LightContribution = calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
 
-    vec3 color = specular_color + diffuse_color + LightContribution;
-
-    if (AmbientOcclusion.r >= 0.1) {
-        color *= AmbientOcclusion.r;
-    }
-        
-    color += EmissiveColor.rgb;
+    vec3 Color = SpecularColor + DiffuseColor + LightContribution + EmissiveColor.rgb;
+    Color = Color * (1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel) + ClearCoatContrib;
 
     // convert to sRGB
-    color = pow(color, vec3(1.0/2.2) );
+    Color = pow(Color, vec3(1.0/2.2) );
 
-    out_FragColor = vec4(color, 1.0);
+    out_FragColor = vec4(Color, 1.0);
 
 // Uncomment to debug:
 //  out_FragColor = vec4((n + vec3(1.0))*0.5, 1.0);
@@ -575,8 +705,8 @@ void main()
   //out_FragColor = AlbedoColor;
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
- // out_FragColor = vec4(diffuse_color, 1.0);
- // out_FragColor = vec4(specular_color, 1.0);
+ // out_FragColor = vec4(DiffuseColor, 1.0);
+ // out_FragColor = vec4(SpecularColor, 1.0);
  // out_FragColor = vec4(LightContribution, 1.0);
 //  MeR.x *= GetMetallicFactor(mat);
 //  MeR.y *= GetRoughnessFactor(mat);
