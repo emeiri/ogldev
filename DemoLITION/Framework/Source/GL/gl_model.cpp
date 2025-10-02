@@ -35,10 +35,47 @@ bool UseIndirectRender = false;
 #define BONE_ID_LOCATION     7
 #define BONE_WEIGHT_LOCATION 8
 
+static GLuint sWhiteTexture = -1;
+
+
+static void CreateWhiteTexture()
+{
+    if (sWhiteTexture == -1) {
+        glGenTextures(1, &sWhiteTexture);
+        glBindTexture(GL_TEXTURE_2D, sWhiteTexture);
+
+        unsigned char WhitePixel[3] = { 255, 255, 255 };
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, WhitePixel);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+}
+
+
+static void BindWhiteTexture(GLenum TextureUnit)
+{
+    assert(sWhiteTexture != -1);
+
+    if (IsGLVersionHigher(4, 5)) {
+        glBindTextureUnit(TextureUnit - GL_TEXTURE0, sWhiteTexture);
+    } else {
+        glActiveTexture(TextureUnit);
+        glBindTexture(GL_TEXTURE_2D, sWhiteTexture);
+    }
+}
+
 
 GLModel::GLModel()
 {
+    CreateWhiteTexture();
+}
 
+
+GLModel::GLModel(CoreRenderingSystem* pCoreRenderingSystem) : CoreModel(pCoreRenderingSystem) 
+{
+    CreateWhiteTexture();
 }
 
 
@@ -101,7 +138,7 @@ void GLModel::ConvertToMesh(const char* pFilename)
 
 
 bool GLModel::LoadMesh(const std::string& Filename)
-{
+{    
     MeshData mesh;
 
     LoadMeshData(Filename.c_str(), mesh);
@@ -396,6 +433,8 @@ void GLModel::BindTextures(int MaterialIndex)
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_EMISSIVE]->Bind(EMISSIVE_TEXTURE_UNIT);
+    } else {
+        BindWhiteTexture(EMISSIVE_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_ROUGHNESS]) {
@@ -404,14 +443,20 @@ void GLModel::BindTextures(int MaterialIndex)
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT]->Bind(CLEARCOAT_TEXTURE_UNIT);
+    } else {
+        BindWhiteTexture(CLEARCOAT_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_ROUGHNESS]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_ROUGHNESS]->Bind(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT);
+    } else {
+        BindWhiteTexture(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_NORMAL]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_NORMAL]->Bind(CLEARCOAT_NORMAL_TEXTURE_UNIT);
+    } else {
+        BindWhiteTexture(CLEARCOAT_NORMAL_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]) {
