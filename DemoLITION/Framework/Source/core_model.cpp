@@ -878,9 +878,9 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
         material.EmissiveColor = material.EmissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
     }
 
-    material.m_flags = GetMaterialType(pMaterial, m_shadingModel);
+    material.m_materialType = GetMaterialType(pMaterial, m_shadingModel);
 
-    if (material.m_flags && MaterialType_MetallicRoughness) {
+    if (material.m_materialType && MaterialType_MetallicRoughness) {
         float MetallicFactor;
 
         if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
@@ -955,7 +955,7 @@ void CoreModel::ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMat
     }
 
     if (UseClearCoat) {
-        material.m_flags |= MaterialType_ClearCoat;
+        material.m_materialType |= MaterialType_ClearCoat;
     }
 }
 

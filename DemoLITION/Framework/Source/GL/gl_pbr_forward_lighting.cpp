@@ -60,6 +60,7 @@ bool PBRForwardLightingTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_metallicRoughnessNormalOcclusionLoc, "gMetallicRoughnessNormalOcclusion");
     GET_UNIFORM_AND_CHECK(m_clearCoatTransmissionThicknessLoc, "gClearCoatTransmissionThickness");
     GET_UNIFORM_AND_CHECK(m_iorLoc, "gIOR");
+    GET_UNIFORM_AND_CHECK(m_materialTypeLoc, "gMaterialType");
 
     return true;
 }
@@ -146,4 +147,5 @@ void PBRForwardLightingTechnique::SetMaterial(const CoreMaterial& mat)
                 mat.ClearCoatTransmissionThickness.b,
                 mat.ClearCoatTransmissionThickness.a);
     glUniform1f(m_iorLoc, mat.m_ior);
+    glUniform1i(m_materialTypeLoc, mat.m_materialType);
 }

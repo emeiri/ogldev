@@ -47,6 +47,7 @@ class CoreMaterial {
  public:
 
     std::string m_name;
+    int m_materialType = 0;
 
     Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
@@ -59,8 +60,7 @@ class CoreMaterial {
     Texture* pTextures[TEX_TYPE_NUM] = { 0 };
 
     float m_transparencyFactor = 1.0f;
-    float m_alphaTest = 0.0f;
-    u32 m_flags = 0;
+    float m_alphaTest = 0.0f;    
     float m_ior = 1.5f;
 
     ~CoreMaterial()
