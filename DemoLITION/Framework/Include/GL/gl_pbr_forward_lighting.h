@@ -73,5 +73,6 @@ private:
     DEF_LOC(m_clearCoatRoughnessLoc);
     DEF_LOC(m_clearCoatNormalLoc);
     DEF_LOC(m_clearCoatTransmissionThicknessLoc);
+    DEF_LOC(m_iorLoc);
 };
 

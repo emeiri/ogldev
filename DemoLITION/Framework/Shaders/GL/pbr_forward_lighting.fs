@@ -141,6 +141,7 @@ uniform vec4 gEmissiveColor;
 uniform vec4 gMetallicRoughnessNormalOcclusion;
 uniform vec4 gClearCoatTransmissionThickness;
 uniform int gMaterialType;
+uniform float gIOR;
 
 const float M_PI = 3.141592653589793;
 
@@ -316,6 +317,7 @@ MetallicRoughnessDataGPU GetMaterial()
         ret.clearCoat.NormalSampler = gClearCoatNormal;
         ret.clearCoat.NormalUV = 0;
         ret.clearCoat.TransmissionThickness = gClearCoatTransmissionThickness;
+        ret.ior = gIOR;
         return ret;
     }      
 }
