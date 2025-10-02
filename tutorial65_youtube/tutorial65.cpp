@@ -82,7 +82,7 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {        
-        m_pSceneObject->RotateBy(0.0f, 0.0f, 0.5f);
+        m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
     }
 
 protected:
