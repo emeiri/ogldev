@@ -138,4 +138,9 @@ void PBRForwardLightingTechnique::SetMaterial(const Material& mat)
                 mat.MetallicRoughnessNormalOcclusion.g,
                 mat.MetallicRoughnessNormalOcclusion.b,
                 mat.MetallicRoughnessNormalOcclusion.a);
+    glUniform4f(m_clearCoatTransmissionThicknessLoc,
+                mat.ClearCoatTransmissionThickness.r,
+                mat.ClearCoatTransmissionThickness.g,
+                mat.ClearCoatTransmissionThickness.b,
+                mat.ClearCoatTransmissionThickness.a);
 }
