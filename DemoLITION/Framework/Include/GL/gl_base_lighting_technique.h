@@ -42,15 +42,15 @@ public:
     virtual void SetMaterialToRefRefractFactor(float f) {}
     virtual void SetRefractETA(float f) {}
     virtual void SetFresnelPower(float f) {}
+    virtual void SetLightWVP(const Matrix4f& LightWVP) {} // required only for shadow mapping
+    virtual void ControlNormalMap(bool Enable) {};
 
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);
-    void SetNormalMatrix(const Matrix3f& NormalMatrix);
-    void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
+    void SetNormalMatrix(const Matrix3f& NormalMatrix);    
     void SetLightVP(const Matrix4f& LightVP);
     void SetVP(const Matrix4f& VP);
-    void SetCameraWorldPos(const Vector3f& CameraWorldPos);
-    void ControlNormalMap(bool Enable);
+    void SetCameraWorldPos(const Vector3f& CameraWorldPos);    
     void ControlParallaxMap(bool Enable);
     void ControlShadows(bool ShadowsEnabled);
     void ControlIndirectRender(bool IsRenderIndirect);
@@ -65,10 +65,8 @@ private:
 
     GLuint WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint WorldMatrixLoc = INVALID_UNIFORM_LOCATION;
-    GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;
-    GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
+    GLuint NormalMatrixLoc = INVALID_UNIFORM_LOCATION;    
     GLuint LightVPLoc = INVALID_UNIFORM_LOCATION;  // required only for shadow mapping with indirect rendering
-    GLuint HasNormalMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint HasHeightMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint CameraWorldPosLoc = INVALID_UNIFORM_LOCATION;
     GLuint ShadowsEnabledLoc = INVALID_UNIFORM_LOCATION;

@@ -30,9 +30,7 @@ bool BaseLightingTechnique::Init()
 {
     GET_UNIFORM_AND_CHECK(WVPLoc, "gWVP");
     GET_UNIFORM_AND_CHECK(WorldMatrixLoc, "gWorld");
-    GET_UNIFORM_AND_CHECK(NormalMatrixLoc, "gNormalMatrix");
-    GET_UNIFORM_AND_CHECK(LightWVPLoc, "gLightWVP");
-    GET_UNIFORM_AND_CHECK(HasNormalMapLoc, "gHasNormalMap");
+    GET_UNIFORM_AND_CHECK(NormalMatrixLoc, "gNormalMatrix");    
     GET_UNIFORM_AND_CHECK(CameraWorldPosLoc, "gCameraWorldPos");
     GET_UNIFORM_AND_CHECK(ShadowsEnabledLoc, "gShadowsEnabled");
     GET_UNIFORM_AND_CHECK(IsIndirectRenderLoc, "gIsIndirectRender");
@@ -60,18 +58,6 @@ void BaseLightingTechnique::SetWorldMatrix(const Matrix4f& World)
 void BaseLightingTechnique::SetNormalMatrix(const Matrix3f& NormalMatrix)
 {
     glUniformMatrix3fv(NormalMatrixLoc, 1, GL_TRUE, (const GLfloat*)NormalMatrix.m);
-}
-
-
-void BaseLightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
-{
-    glUniformMatrix4fv(LightWVPLoc, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
-}
-
-
-void BaseLightingTechnique::ControlNormalMap(bool Enable)
-{
-    glUniform1i(HasNormalMapLoc, Enable);
 }
 
 

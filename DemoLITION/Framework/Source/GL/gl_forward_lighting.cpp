@@ -52,6 +52,8 @@ bool ForwardLightingTechnique::Init()
 
 bool ForwardLightingTechnique::InitCommon()
 {
+    GET_UNIFORM_AND_CHECK(LightWVPLoc, "gLightWVP");
+    GET_UNIFORM_AND_CHECK(HasNormalMapLoc, "gHasNormalMap");
     samplerLoc = GetUniformLocation("gSampler");
     hasSamplerLoc = GetUniformLocation("gHasSampler");
     shadowMapLoc = GetUniformLocation("gShadowMap");
@@ -133,6 +135,18 @@ bool ForwardLightingTechnique::InitCommon()
     }
 
     return true;
+}
+
+
+void ForwardLightingTechnique::SetLightWVP(const Matrix4f& LightWVP)
+{
+    glUniformMatrix4fv(LightWVPLoc, 1, GL_TRUE, (const GLfloat*)LightWVP.m);
+}
+
+
+void ForwardLightingTechnique::ControlNormalMap(bool Enable)
+{
+    glUniform1i(HasNormalMapLoc, Enable);
 }
 
 

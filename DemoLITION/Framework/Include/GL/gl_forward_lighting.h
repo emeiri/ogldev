@@ -43,6 +43,8 @@ public:
     virtual void SetMaterialToRefRefractFactor(float f);
     virtual void SetRefractETA(float f);
     virtual void SetFresnelPower(float f);
+    virtual void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
+    virtual void ControlNormalMap(bool Enable);
 
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -80,6 +82,8 @@ private:
     void SetExpFogCommon(float FogEnd, float FogDensity);
     void ControlDiffuseTexture(bool Enable);
 
+    GLuint LightWVPLoc = INVALID_UNIFORM_LOCATION; // required only for shadow mapping
+    GLuint HasNormalMapLoc = INVALID_UNIFORM_LOCATION;
     GLuint samplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint hasSamplerLoc = INVALID_UNIFORM_LOCATION;
     GLuint shadowMapLoc = INVALID_UNIFORM_LOCATION;
