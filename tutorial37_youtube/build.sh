@@ -1,11 +1,6 @@
 #!/bin/bash
 
-CC=g++
-CPPFLAGS=`pkg-config --cflags glew assimp glfw3`
-CPPFLAGS="$CPPFLAGS -I../Include -ggdb3"
-LDFLAGS=`pkg-config --libs glew assimp glfw3`
-LDFLAGS="$LDFLAGS -lglut -lX11 -lmeshoptimizer"
-ROOTDIR=".."
+source ../build_base.sh
 
 $CC tutorial37.cpp \
     $ROOTDIR/Common/ogldev_util.cpp \
@@ -20,4 +15,4 @@ $CC tutorial37.cpp \
     $ROOTDIR/Common/ogldev_shadow_mapping_technique_point_light.cpp \
     $ROOTDIR/Common/ogldev_shadow_cube_map_fbo.cpp \
     $ROOTDIR/Common/technique.cpp \
-    $CPPFLAGS $LDFLAGS -o tutorial37
+    $OGL_CPPFLAGS $OGL_LDFLAGS -o tutorial37

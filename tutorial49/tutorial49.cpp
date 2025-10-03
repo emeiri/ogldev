@@ -39,6 +39,7 @@
 #include "mesh.h"
 #include "ogldev_lights_common.h"
 #include "ogldev_shadow_map_fbo.h"
+#include "ogldev_framebuffer_object.h"
 #include "lighting_technique.h"
 #include "csm_technique.h"
 #include "ogldev_atb.h"

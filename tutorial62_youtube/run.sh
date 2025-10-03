@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd ../DemoLITION
-../tutorial60_youtube/tutorial60
+../tutorial62_youtube/tutorial62
 cd -

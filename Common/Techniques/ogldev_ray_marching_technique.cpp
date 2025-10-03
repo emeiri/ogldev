@@ -16,7 +16,7 @@
 */
 
 #include "ogldev_util.h"
-#include "Techniques\ogldev_ray_marching_technique.h"
+#include "Techniques/ogldev_ray_marching_technique.h"
 
 
 RayMarchingTechnique::RayMarchingTechnique()

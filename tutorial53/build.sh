@@ -2,7 +2,7 @@
 
 CC=g++
 CPPFLAGS=`pkg-config --cflags glew ImageMagick++ freetype2 glfw3 fontconfig assimp`
-CPPFLAGS="$CPPFLAGS -I../Include -I../Common/FreetypeGL -ggdb3 -DOGLDEV_VULKAN"
+CPPFLAGS="$CPPFLAGS -I../Include -I../Common/FreetypeGL -ggdb3 -DOGLDEV_VULKAN -std=c++20"
 LDFLAGS=`pkg-config --libs glew ImageMagick++ freetype2 glfw3 fontconfig assimp vulkan xcb`
 LDFLAGS="$LDFLAGS -lglut -lX11"
 
