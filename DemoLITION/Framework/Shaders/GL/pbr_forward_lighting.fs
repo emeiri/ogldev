@@ -92,7 +92,7 @@ struct PBRInfo {
     vec3 clearCoatNormal;
     float clearCoatRoughness;
 
-    float ior;  // TODO
+    float ior;
 
     vec3 FssEss;
     float brdf_scale;
@@ -142,6 +142,7 @@ uniform vec4 gMetallicRoughnessNormalOcclusion;
 uniform vec4 gClearCoatTransmissionThickness;
 uniform int gMaterialType;
 uniform float gIOR;
+
 
 const float M_PI = 3.141592653589793;
 
@@ -260,8 +261,8 @@ struct MetallicRoughnessDataGPU {
     uint normalTextureUV;
     uint alphaMode;
     ClearCoat clearCoat;
-    uint materialType;  // TODO
-    float ior; // TODO
+    uint materialType;
+    float ior;
 };
 
 // corresponds to EnvironmentMapDataGPU from shared/UtilsGLTF.h 
@@ -363,8 +364,8 @@ vec2 GetNormalUV(InputAttributes tc, MetallicRoughnessDataGPU mat)
 
 float GetClearcoatFactor(InputAttributes tc, MetallicRoughnessDataGPU mat) 
 {
-    return texture(mat.clearCoat.TextureSampler, 
-                   tc.uv[mat.clearCoat.TextureUV]).r * mat.clearCoat.TransmissionThickness.x;
+    return texture(mat.clearCoat.TextureSampler, tc.uv[mat.clearCoat.TextureUV]).r * 
+                   mat.clearCoat.TransmissionThickness.x;
 }
 
 
@@ -724,4 +725,6 @@ void main()
   //  out_FragColor = vec4(PerceptualRoughness);
 
   //out_FragColor = vec4(pbrInputs.FssEss, 1.0);
+ // out_FragColor = vec4(pbrInputs.clearCoatNormal, 1.0);
+ // out_FragColor = vec4(ClearCoatContrib, 1.0);
 }
