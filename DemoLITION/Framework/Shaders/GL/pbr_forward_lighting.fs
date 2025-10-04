@@ -624,6 +624,28 @@ vec3 calculatePBRLightContribution(inout PBRInfo pbrInputs, vec3 LightDirection,
 }
 
 
+vec3 CalcClearCoat(inout PBRInfo pbrInputs, MetallicRoughnessDataGPU mat, InputAttributes tc)
+{
+    vec3 ClearCoatContrib = vec3(0);
+
+    pbrInputs.clearCoatFactor = GetClearcoatFactor(tc, mat);
+    pbrInputs.clearCoatRoughness = clamp(GetClearcoatRoughnessFactor(tc, mat), 0.0, 1.0);
+    pbrInputs.clearCoatF0 = vec3(pow((pbrInputs.ior - 1.0) / (pbrInputs.ior + 1.0), 2.0));
+    pbrInputs.clearCoatF90 = vec3(1.0);
+
+    if (mat.clearCoat.NormalUV > -1) {
+        pbrInputs.clearCoatNormal = mat3(pbrInputs.t, pbrInputs.b, pbrInputs.ng) * SampleClearcoatNormal(tc, mat).rgb;
+    } else {
+        pbrInputs.clearCoatNormal = pbrInputs.ng;
+    }
+
+    ClearCoatContrib = getIBLRadianceGGX(pbrInputs.clearCoatNormal, pbrInputs.v, 
+                                         pbrInputs.clearCoatRoughness, pbrInputs.clearCoatF0);
+
+    return ClearCoatContrib;
+}
+
+
 void main()
 {
     InputAttributes tc;
@@ -639,8 +661,6 @@ void main()
     vec4 mrSample = sampleMetallicRoughness(tc, mat);
     vec3 normalSample = sampleNormal(tc, mat).xyz;
 
-    bool isClearCoat = isMaterialTypeClearCoat(mat);
-
     vec3 n = normalize(Normal0);
 
     PBRInfo pbrInputs = CalculatePBRInputsMetallicRoughness(mat, AlbedoColor, n, mrSample);
@@ -649,30 +669,18 @@ void main()
 
    // if (!gl_FrontFacing) n *= -1.0f;    
     
+    bool isClearCoat = isMaterialTypeClearCoat(mat);
+
     vec3 ClearCoatContrib = vec3(0);
-
-    if (isClearCoat) {
-      pbrInputs.clearCoatFactor = GetClearcoatFactor(tc, mat);
-      pbrInputs.clearCoatRoughness = clamp(GetClearcoatRoughnessFactor(tc, mat), 0.0, 1.0);
-      pbrInputs.clearCoatF0 = vec3(pow((pbrInputs.ior - 1.0) / (pbrInputs.ior + 1.0), 2.0));
-      pbrInputs.clearCoatF90 = vec3(1.0);
-
-      if (mat.clearCoat.NormalUV > -1) {
-          pbrInputs.clearCoatNormal = mat3(pbrInputs.t, pbrInputs.b, pbrInputs.ng) * SampleClearcoatNormal(tc, mat).rgb;
-      } else {
-          pbrInputs.clearCoatNormal = pbrInputs.ng;
-      }
-
-      ClearCoatContrib = getIBLRadianceGGX(pbrInputs.clearCoatNormal, pbrInputs.v, 
-                                           pbrInputs.clearCoatRoughness, pbrInputs.clearCoatF0);
-    }
-
     vec3 ClearCoatFresnel = vec3(0);
+
     if (isClearCoat) {
+        ClearCoatContrib = CalcClearCoat(pbrInputs, mat, tc);
+
         ClearCoatFresnel = F_Schlick(pbrInputs.clearCoatF0, pbrInputs.clearCoatF90, 
                                      ClampedDot(pbrInputs.clearCoatNormal, pbrInputs.v));
     }
-
+   
     float Occlusion = AmbientOcclusion.r < 0.01 ? 1.0 : AmbientOcclusion.r;
     float OcclusionStrength = GetOcclusionFactor(mat);
     vec3 SpecularColor = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, 
@@ -691,7 +699,8 @@ void main()
 
     vec3 LightContribution = calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
 
-    vec3 Color = SpecularColor + DiffuseColor + LightContribution + EmissiveColor.rgb;
+    //vec3 Color = SpecularColor + DiffuseColor + LightContribution + EmissiveColor.rgb;
+    vec3 Color = SpecularColor + DiffuseColor + EmissiveColor.rgb;
     Color = Color * (1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel) + ClearCoatContrib;
 
     // convert to sRGB
