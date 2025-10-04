@@ -212,7 +212,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{F65533
 		..\..\Common\glut_backend.cpp = ..\..\Common\glut_backend.cpp
 		..\..\Common\io_buffer.cpp = ..\..\Common\io_buffer.cpp
 		..\..\Common\math_3d.cpp = ..\..\Common\math_3d.cpp
-		..\..\Common\ogldev_all.cpp = ..\..\Common\ogldev_all.cpp
 		..\..\Common\ogldev_app.cpp = ..\..\Common\ogldev_app.cpp
 		..\..\Common\ogldev_atb.cpp = ..\..\Common\ogldev_atb.cpp
 		..\..\Common\ogldev_backend.cpp = ..\..\Common\ogldev_backend.cpp
