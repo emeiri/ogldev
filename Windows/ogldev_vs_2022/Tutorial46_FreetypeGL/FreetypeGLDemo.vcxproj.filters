@@ -24,7 +24,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\tutorial46_youtube\FreetypeGL_demo.cpp">
+    <ClCompile Include="..\..\..\tutorial46_youtube\tutorial46.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

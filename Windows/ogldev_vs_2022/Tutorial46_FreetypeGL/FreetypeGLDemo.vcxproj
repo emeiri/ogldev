@@ -139,7 +139,7 @@
     <ClCompile Include="..\..\..\Common\FreetypeGL\freetypeGL.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_glfw.cpp" />
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
-    <ClCompile Include="..\..\..\tutorial46_youtube\FreetypeGL_demo.cpp" />
+    <ClCompile Include="..\..\..\tutorial46_youtube\tutorial46.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\FreetypeGL\freetypeGL.h" />

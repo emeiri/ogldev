@@ -7,7 +7,7 @@ MeshFileHeader LoadMeshData(const char* pMeshFile, MeshData& out)
 {
     FILE* f = NULL;
 
-#ifdef WIN64
+#ifdef _WIN64
     errno_t err = fopen_s(&f, pMeshFile, "rb");
 #else
     f = fopen(pMeshFile, "rb");
@@ -97,7 +97,7 @@ void SaveMeshData(const char* pfileName, const MeshData& m)
 {
     FILE* f = NULL;
     
-#ifdef WIN64
+#ifdef _WIN64
     errno_t err = fopen_s(&f, pfileName, "wb");
 #else
     f = fopen(pfileName, "wb");
