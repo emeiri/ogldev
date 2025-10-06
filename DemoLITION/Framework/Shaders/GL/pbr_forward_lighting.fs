@@ -44,6 +44,15 @@ vec2 TexCoord;
 #define LIGHT_TYPE_POINT 1
 #define LIGHT_TYPE_SPOT  2
 
+#define MaterialType_Invalid            0
+#define MaterialType_MetallicRoughness  0x1
+#define MaterialType_SpecularGlossiness 0x2
+#define MaterialType_Sheen              0x4
+#define MaterialType_ClearCoat          0x8
+#define MaterialType_Specular           0x10
+#define MaterialType_Transmission       0x20
+#define MaterialType_Volume             0x40
+#define MaterialType_Unlit              0x80
 
 struct LightSource {
     vec3 Color;                    // offset 0
@@ -424,7 +433,7 @@ vec4 sampleEnvMapLod(vec3 tc, float lod, EnvironmentMapDataGPU map)
 
 bool isMaterialTypeClearCoat(MetallicRoughnessDataGPU mat) 
 {
-    return (mat.materialType & 0x8) != 0;
+    return (mat.materialType & MaterialType_ClearCoat) != 0;
 }
 
 
@@ -686,8 +695,8 @@ void main()
     vec3 SpecularColor = getIBLRadianceGGX(pbrInputs.n, pbrInputs.v, 
                                            pbrInputs.perceptualRoughness, pbrInputs.reflectance0);
     vec3 DiffuseColor = getIBLRadianceLambertian(pbrInputs);
-    DiffuseColor = /*lights_diffuse + */ mix(DiffuseColor, DiffuseColor * Occlusion, OcclusionStrength);
-    SpecularColor = /*lights_specular +*/ mix(SpecularColor, SpecularColor * Occlusion, OcclusionStrength);
+    DiffuseColor = mix(DiffuseColor, DiffuseColor * Occlusion, OcclusionStrength);
+    SpecularColor = mix(SpecularColor, SpecularColor * Occlusion, OcclusionStrength);
 
     vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
     vec3 LightColor = vec3(1.0);
@@ -699,8 +708,7 @@ void main()
 
     vec3 LightContribution = calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
 
-    //vec3 Color = SpecularColor + DiffuseColor + LightContribution + EmissiveColor.rgb;
-    vec3 Color = SpecularColor + DiffuseColor + EmissiveColor.rgb;
+    vec3 Color = SpecularColor + DiffuseColor + LightContribution + EmissiveColor.rgb;
     Color = Color * (1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel) + ClearCoatContrib;
 
     // convert to sRGB

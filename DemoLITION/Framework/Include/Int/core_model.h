@@ -57,7 +57,7 @@ public:
 
     CoreModel(CoreRenderingSystem* pCoreRenderingSystem) { m_pCoreRenderingSystem = pCoreRenderingSystem; }
 
-    bool IsPBR() const { return m_shadingModel == aiShadingMode_PBR_BRDF; }
+    bool IsPBR() const;
 
     void DestroyModel();
 
@@ -275,7 +275,6 @@ private:
     void LoadColors(const aiMaterial* pMaterial, int index);
     void ProcessClearCoat(int index, const aiMaterial* pMaterial, CoreMaterial& material);
     void LoadColor(const aiMaterial* pMaterial, Vector4f& Color, const char* pAiMatKey, int AiMatType, int AiMatIdx, const char* pName);
-    void DetectShadingModel(const aiMaterial* pMaterial);
 
     void InitCameras(const aiScene* pScene);
 
@@ -283,7 +282,6 @@ private:
 
     const aiScene* m_pScene = NULL;
 
-    aiShadingMode m_shadingModel = aiShadingMode_NoShading;
     Matrix4f m_GlobalInverseTransform;
 
     Assimp::Importer m_Importer;

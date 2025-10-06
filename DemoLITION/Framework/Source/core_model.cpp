@@ -40,19 +40,6 @@ static bool UseMeshOptimizer = false;
 //aiProcess_MakeLeftHanded | \
 //aiProcess_FlipWindingOrder | \
 
-enum MaterialType {
-    MaterialType_Invalid = 0,
-    MaterialType_Unlit = 0x80,
-    MaterialType_MetallicRoughness = 0x1,
-    MaterialType_SpecularGlossiness = 0x2,
-    MaterialType_Sheen = 0x4,
-    MaterialType_ClearCoat = 0x8,
-    MaterialType_Specular = 0x10,
-    MaterialType_Transmission = 0x20,
-    MaterialType_Volume = 0x40,
-};
-
-
 Texture* s_pMissingTexture = NULL;
 
 static void traverse(int depth, aiNode* pNode);
@@ -90,21 +77,31 @@ static std::string GetFullPath(const string& Dir, const aiString& Path)
 }
 
 
-static MaterialType GetMaterialType(const aiMaterial* pMaterial, aiShadingMode ShadingMode)
+static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMaterial)
 {
+    int ShadingModel = 0;
+
+    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, ShadingModel) != AI_SUCCESS) {
+        printf("Cannot get the shading model\n");
+        assert(0);
+    }
+
     MaterialType mt = MaterialType_Invalid;
 
-    switch (ShadingMode) {
+    switch (ShadingModel) {
         case aiShadingMode_Unlit:
+            printf("Shading model Unlit\n");
             mt = MaterialType_Unlit;
             break;
 
         case aiShadingMode_PBR_BRDF:
         {
+            printf("Shading model PBR BRDF\n");
+
+            MyMaterial.m_isPBR = true;            
+            
             float factor = 0;
-            if (pMaterial->Get(AI_MATKEY_GLOSSINESS_FACTOR, factor) == AI_SUCCESS) {
-                mt = MaterialType_SpecularGlossiness;
-            } else if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
+            if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, factor) == AI_SUCCESS) {
                 mt = MaterialType_MetallicRoughness;
             }
         }
@@ -114,9 +111,21 @@ static MaterialType GetMaterialType(const aiMaterial* pMaterial, aiShadingMode S
             assert(0);
     }
 
-    return mt;
+    MyMaterial.m_materialType = mt;
 }
 
+
+bool CoreModel::IsPBR() const
+{
+    bool ret = false;
+
+    if (m_Materials.size() > 0) {
+        // Currently checking only the first material
+        ret = m_Materials[0].m_isPBR;
+    }
+        
+    return ret;
+}
 
 void CoreModel::DestroyModel()
 {
@@ -604,7 +613,7 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
 
         printf("Loading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
 
-        DetectShadingModel(pMaterial);
+        SetMaterialType(pMaterial, m_Materials[i]);
 
         LoadTextures(Dir, pMaterial, i);
 
@@ -823,24 +832,6 @@ void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int
 }
 
 
-void CoreModel::DetectShadingModel(const aiMaterial* pMaterial)
-{
-    if (pMaterial->Get(AI_MATKEY_SHADING_MODEL, m_shadingModel) == AI_SUCCESS) {
-        switch (m_shadingModel) {
-        case aiShadingMode_PBR_BRDF:
-            printf("Shading model PBR BRDF\n");
-            break;
-
-        default:
-            printf("Shading model %d\n", m_shadingModel);
-        }
-        
-    } else {
-        printf("Cannot get the shading model\n");
-        assert(0);
-    }
-}
-
 void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
 {
     CoreMaterial& material = m_Materials[index];
@@ -877,8 +868,6 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     if (pMaterial->Get(AI_MATKEY_EMISSIVE_INTENSITY, EmissiveStrength) == AI_SUCCESS) {
         material.EmissiveColor = material.EmissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
     }
-
-    material.m_materialType = GetMaterialType(pMaterial, m_shadingModel);
 
     if (material.m_materialType && MaterialType_MetallicRoughness) {
         float MetallicFactor;

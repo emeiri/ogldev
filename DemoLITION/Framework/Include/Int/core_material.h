@@ -42,12 +42,27 @@ enum TEXTURE_TYPE {
     TEX_TYPE_NUM = 12
 };
 
+
+enum MaterialType {
+    MaterialType_Invalid = 0,
+    MaterialType_MetallicRoughness = 0x1,
+    MaterialType_SpecularGlossiness = 0x2,
+    MaterialType_Sheen = 0x4,
+    MaterialType_ClearCoat = 0x8,
+    MaterialType_Specular = 0x10,
+    MaterialType_Transmission = 0x20,
+    MaterialType_Volume = 0x40,
+    MaterialType_Unlit = 0x80,
+};
+
+
 class CoreMaterial {
 
  public:
 
     std::string m_name;
-    int m_materialType = 0;
+    bool m_isPBR = false;
+    int m_materialType = MaterialType_Invalid;
 
     Vector4f AmbientColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f DiffuseColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
