@@ -1,11 +1,16 @@
 #!/bin/bash
 
+source ../build.sh
+
+check_vulkan_sdk
+
 CC=g++
 CPPFLAGS="-I../../Include/assimp5 -I../../Common -I../../DemoLITION/Framework/Include/ -I../VulkanCore/Include -I../../Include  -I$VULKAN_SDK/include -DOGLDEV_VULKAN -ggdb3 -std=c++20"
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
-LDFLAGS="$LDFLAGS -L../../Lib -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect ../../Lib/libspirv-reflect-static.a ../../Lib/libmeshoptimizer.a"
+LDFLAGS="$LDFLAGS -L../../Lib -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect ../../Lib/libmeshoptimizer.a"
 $CC tutorial20.cpp \
     ../VulkanCore/Source/core.cpp \
+    ../VulkanCore/Source/spirv_reflect.c \
     ../VulkanCore/Source/util.cpp \
     ../VulkanCore/Source/device.cpp \
     ../VulkanCore/Source/queue.cpp \

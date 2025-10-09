@@ -2,7 +2,7 @@
 
 CC=g++
 CPPFLAGS=`pkg-config --cflags glew ImageMagick++ assimp`
-CPPFLAGS="$CPPFLAGS -I../Include -I../Common/FreetypeGL -I/usr/include/freetype2 -ggdb3"
+CPPFLAGS="$CPPFLAGS -I../Include -I../Common/FreetypeGL -I/usr/include/freetype2 -ggdb3 -std=c++20"
 LDFLAGS=`pkg-config --libs glew assimp`
 LDFLAGS="$LDFLAGS -lglut -lX11"
 

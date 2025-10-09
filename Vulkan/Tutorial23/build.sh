@@ -1,5 +1,9 @@
 #!/bin/bash
 
+source ../build.sh
+
+check_vulkan_sdk
+
 CC=g++
 CPPFLAGS="-I../../Common/3rdparty/ImGui/imGuIZMO.quat \
           -I../../Common/3rdparty/ImGui/GLFW \
@@ -16,10 +20,11 @@ CPPFLAGS="-I../../Common/3rdparty/ImGui/imGuIZMO.quat \
 
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
 
-LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect ../../Lib/libspirv-reflect-static.a ../../Lib/libmeshoptimizer.a"
+LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect ../../Lib/libmeshoptimizer.a"
 
 $CC tutorial23.cpp \
     ../VulkanCore/Source/core.cpp \
+    ../VulkanCore/Source/spirv_reflect.c \
     ../VulkanCore/Source/util.cpp \
     ../VulkanCore/Source/device.cpp \
     ../VulkanCore/Source/queue.cpp \

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+source ../build.sh
+
+check_vulkan_sdk
+
 CC=g++
 CPPFLAGS="-I../VulkanCore/Include -I../../Include -DVULKAN -ggdb3 -std=c++20"
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
