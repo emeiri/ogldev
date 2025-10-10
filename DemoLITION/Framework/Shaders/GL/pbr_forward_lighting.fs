@@ -21,9 +21,6 @@
 
 #extension GL_ARB_bindless_texture : require
 
-const int MAX_POINT_LIGHTS = 2;
-const int MAX_SPOT_LIGHTS = 2;
-
 in vec2 TexCoord0;
 in vec2 TexCoord1;
 in vec3 Normal0;
@@ -178,11 +175,9 @@ vec3 F_Schlick(vec3 f0, vec3 f90, float VdotH)
 
 // http://www.thetenthplanet.de/archives/1180
 // modified to fix handedness of the resulting cotangent frame
-// http://www.thetenthplanet.de/archives/1180
-// modified to fix handedness of the resulting cotangent frame
 mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv, inout PBRInfo pbrInputs ) 
 {
-  // get edge vectors of the pixel triangle
+  // Get screen space derivatives to compute the tangent/bitangent
   vec3 dp1 = dFdx( p );
   vec3 dp2 = dFdy( p );
   vec2 duv1 = dFdx( uv );
@@ -211,6 +206,7 @@ mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv, inout PBRInfo pbrInputs )
   // adjust tangent if needed
   T = T * w;
 
+  // flip the frame for backfaces to prevent artifacts on double sided geometry
   if (gl_FrontFacing == false) {
     N *= -1.0f;
     T *= -1.0f;
@@ -462,7 +458,6 @@ vec3 getIBLRadianceLambertian(PBRInfo pbrInputs)
 // See our README.md on Environment Maps [3] for additional discussion.
 vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0) 
 {
-    float NdotV = ClampedDot(n, v);
     EnvironmentMapDataGPU envMap = getEnvironment(getEnvironmentId());       
     float mipCount = float(textureQueryLevels(envMap.envMapTextureSampler));
     float lod = roughness * (mipCount - 1);
@@ -471,6 +466,7 @@ vec3 getIBLRadianceGGX(vec3 n, vec3 v, float roughness, vec3 F0)
     // HDR envmaps are already linear
     vec3 specularLight = sampleEnvMapLod(reflection.xyz, lod, envMap).rgb;
 
+    float NdotV = ClampedDot(n, v);
     vec2 brdfSamplePoint = clamp(vec2(NdotV, roughness), vec2(0.0, 0.0), vec2(1.0, 1.0));
     vec3 f_ab = sampleBRDF_LUT(brdfSamplePoint, envMap).rgb;
 
@@ -743,5 +739,9 @@ void main()
 
   //out_FragColor = vec4(pbrInputs.FssEss, 1.0);
  // out_FragColor = vec4(pbrInputs.clearCoatNormal, 1.0);
- // out_FragColor = vec4(ClearCoatContrib, 1.0);
+  //out_FragColor = vec4(pbrInputs.clearCoatFactor);
+ // out_FragColor = vec4(ClearCoatFresnel, 1.0);
+ //out_FragColor = vec4(ClearCoatContrib, 1.0);
+ //out_FragColor = vec4(1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel, 1.0);
+ //out_FragColor = vec4(pbrInputs.b, 1.0); 
 }
