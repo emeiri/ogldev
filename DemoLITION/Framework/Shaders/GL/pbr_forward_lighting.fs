@@ -375,8 +375,12 @@ float GetClearcoatFactor(InputAttributes tc, MetallicRoughnessDataGPU mat)
 
 float GetClearcoatRoughnessFactor(InputAttributes tc, MetallicRoughnessDataGPU mat) 
 {
-    return texture(mat.clearCoat.RoughnessSampler, 
-                   tc.uv[mat.clearCoat.RoughnessUV]).g * mat.clearCoat.TransmissionThickness.y;
+    float Roughness = texture(mat.clearCoat.RoughnessSampler, 
+                              tc.uv[mat.clearCoat.RoughnessUV]).g * mat.clearCoat.TransmissionThickness.y;
+
+    Roughness = clamp(Roughness, 0.0, 1.0);
+
+    return Roughness;
 }
 
 
@@ -402,7 +406,6 @@ vec4 sampleNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) {
 }
 
 
-vec4 SampleClearcoatNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) 
 {
     return texture(mat.clearCoat.NormalSampler, tc.uv[mat.clearCoat.NormalUV]);
 }
