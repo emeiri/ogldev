@@ -6,7 +6,7 @@ orbs:
 executors:
   ubuntu-executor:
     docker:
-      - image: ubuntu-2204:2025.09.1
+      - image: ubuntu:22.04
 
 jobs:
   build-linux:
