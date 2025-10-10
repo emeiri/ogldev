@@ -96,7 +96,6 @@ struct PBRInfo {
     vec3 clearCoatF90;
     float clearCoatFactor;
     vec3 clearCoatNormal;
-    float clearCoatRoughness;
 
     float ior;
 
@@ -634,7 +633,7 @@ vec3 CalcClearCoat(inout PBRInfo pbrInputs, MetallicRoughnessDataGPU mat, InputA
     vec3 ClearCoatContrib = vec3(0);
 
     pbrInputs.clearCoatFactor = GetClearcoatFactor(tc, mat);
-    pbrInputs.clearCoatRoughness = clamp(GetClearcoatRoughnessFactor(tc, mat), 0.0, 1.0);
+    float ClearCoatRoughness = GetClearcoatRoughnessFactor(tc, mat);
     pbrInputs.clearCoatF0 = vec3(pow((pbrInputs.ior - 1.0) / (pbrInputs.ior + 1.0), 2.0));
     pbrInputs.clearCoatF90 = vec3(1.0);
 
@@ -645,7 +644,7 @@ vec3 CalcClearCoat(inout PBRInfo pbrInputs, MetallicRoughnessDataGPU mat, InputA
     }
 
     ClearCoatContrib = getIBLRadianceGGX(pbrInputs.clearCoatNormal, pbrInputs.v, 
-                                         pbrInputs.clearCoatRoughness, pbrInputs.clearCoatF0);
+                                         ClearCoatRoughness, pbrInputs.clearCoatF0);
 
     return ClearCoatContrib;
 }
