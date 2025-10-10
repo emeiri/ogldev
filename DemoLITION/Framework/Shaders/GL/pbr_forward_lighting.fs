@@ -640,11 +640,7 @@ vec3 CalcClearCoat(inout PBRInfo pbrInputs, MetallicRoughnessDataGPU mat, InputA
     pbrInputs.clearCoatF0 = vec3(pow((pbrInputs.ior - 1.0) / (pbrInputs.ior + 1.0), 2.0));
     pbrInputs.clearCoatF90 = vec3(1.0);
 
-    if (mat.clearCoat.NormalUV > -1) {
-        pbrInputs.clearCoatNormal = mat3(pbrInputs.t, pbrInputs.b, pbrInputs.ng) * SampleClearcoatNormal(tc, mat).rgb;
-    } else {
-        pbrInputs.clearCoatNormal = pbrInputs.ng;
-    }
+    pbrInputs.clearCoatNormal = normalize(mat3(pbrInputs.t, pbrInputs.b, pbrInputs.ng) * SampleClearCoatNormal(tc, mat));
 
     ClearCoatContrib = getIBLRadianceGGX(pbrInputs.clearCoatNormal, pbrInputs.v, 
                                          ClearCoatRoughness, pbrInputs.clearCoatF0);
