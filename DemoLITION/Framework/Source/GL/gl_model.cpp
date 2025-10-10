@@ -36,21 +36,33 @@ bool UseIndirectRender = false;
 #define BONE_WEIGHT_LOCATION 8
 
 static GLuint sWhiteTexture = -1;
+static GLuint sWhiteNormalTexture = -1;
 
-
-static void CreateWhiteTexture()
+static void CreateDummyTexture(GLuint& Tex, unsigned char r, unsigned char g, unsigned char b)
 {
-    if (sWhiteTexture == -1) {
-        glGenTextures(1, &sWhiteTexture);
-        glBindTexture(GL_TEXTURE_2D, sWhiteTexture);
+    if (Tex == -1) {
+        glGenTextures(1, &Tex);
+        glBindTexture(GL_TEXTURE_2D, Tex);
 
-        unsigned char WhitePixel[3] = { 255, 255, 255 };
+        unsigned char DummyPixel[3] = { r, g, b };
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, WhitePixel);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, DummyPixel);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
+}
+
+
+static void CreateWhiteTexture()
+{
+    CreateDummyTexture(sWhiteTexture, 255, 255, 255);
+}
+
+
+static void CreateWhiteNormalTexture()
+{
+    CreateDummyTexture(sWhiteNormalTexture, 127, 127, 255);
 }
 
 
@@ -67,15 +79,30 @@ static void BindWhiteTexture(GLenum TextureUnit)
 }
 
 
+static void BindWhiteNormalTexture(GLenum TextureUnit)
+{
+    assert(sWhiteNormalTexture != -1);
+
+    if (IsGLVersionHigher(4, 5)) {
+        glBindTextureUnit(TextureUnit - GL_TEXTURE0, sWhiteNormalTexture);
+    } else {
+        glActiveTexture(TextureUnit);
+        glBindTexture(GL_TEXTURE_2D, sWhiteNormalTexture);
+    }
+}
+
+
 GLModel::GLModel()
 {
     CreateWhiteTexture();
+    CreateWhiteNormalTexture();
 }
 
 
 GLModel::GLModel(CoreRenderingSystem* pCoreRenderingSystem) : CoreModel(pCoreRenderingSystem) 
 {
     CreateWhiteTexture();
+    CreateWhiteNormalTexture();
 }
 
 
@@ -456,7 +483,7 @@ void GLModel::BindTextures(int MaterialIndex)
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_NORMAL]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_CLEARCOAT_NORMAL]->Bind(CLEARCOAT_NORMAL_TEXTURE_UNIT);
     } else {
-        BindWhiteTexture(CLEARCOAT_NORMAL_TEXTURE_UNIT);
+        BindWhiteNormalTexture(CLEARCOAT_NORMAL_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_NORMAL]) {
