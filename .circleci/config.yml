@@ -16,7 +16,7 @@ jobs:
           name: Install OpenGL and GLFW
           command: |
             apt-get update
-            apt-get install -y git freeglut3 freeglut3-dev libglew-dev libmagick++-dev libassimp-dev libglfw3 libglfw3-dev vulkan-tools vulkan-validationlayers vulkan-validationlayers-dev glslang-dev glslang-tools
+            apt-get install -y g++ git freeglut3 freeglut3-dev libglew-dev libmagick++-dev libassimp-dev libglfw3 libglfw3-dev vulkan-tools vulkan-validationlayers vulkan-validationlayers-dev glslang-dev glslang-tools
       - run:
           name: Authenticate with GitHub
           command: |
