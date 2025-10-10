@@ -212,9 +212,9 @@ mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv, inout PBRInfo pbrInputs )
     B *= -1.0f;
   }
 
-  pbrInputs.t = T * invmax;
-  pbrInputs.b = B * invmax;
-  pbrInputs.ng = N;
+  pbrInputs.t = normalize(T * invmax);
+  pbrInputs.b = normalize(B * invmax);
+  pbrInputs.ng = normalize(N);
 
   return mat3( pbrInputs.t, pbrInputs.b, N );
 }
