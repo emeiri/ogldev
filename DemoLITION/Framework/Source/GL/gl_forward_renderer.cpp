@@ -1129,7 +1129,7 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPassDir(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
+    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * ObjectMatrix * World;
     m_shadowMapTech.SetWVP(WVP);
 }
 
@@ -1142,7 +1142,7 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPassSpot(const Matrix4f& World)
     m_lightViewMatrix.Print();
     m_lightPersProjMatrix.Print();
     exit(0);*/
-    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * ObjectMatrix * World;
     m_shadowMapTech.SetWVP(WVP);
 }
 
@@ -1150,7 +1150,7 @@ void ForwardRenderer::SetWorldMatrix_CB_ShadowPassSpot(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * World * ObjectMatrix;
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * ObjectMatrix * World;
     m_shadowMapPointLightTech.SetWorld(World);
     m_shadowMapPointLightTech.SetWVP(WVP);
 }
@@ -1169,7 +1169,7 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
     // TODO: use GetWVP instead
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f FinalWorldMatrix = World * ObjectMatrix;
+    Matrix4f FinalWorldMatrix = ObjectMatrix * World;
     m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
     Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
@@ -1211,7 +1211,7 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
 {
     // TODO: use GetWVP instead
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f FinalWorldMatrix = World * ObjectMatrix;
+    Matrix4f FinalWorldMatrix = ObjectMatrix * World;
 
     Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
     Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
@@ -1234,7 +1234,7 @@ void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f ProjView = GetViewProjectionMatrix();
-    Matrix4f WVP = ProjView * World * ObjectMatrix;
+    Matrix4f WVP = ProjView * ObjectMatrix * World;
    // printf("Picking pass\n"); WVP.Print();
 
     m_pickingTech.SetWVP(WVP);
