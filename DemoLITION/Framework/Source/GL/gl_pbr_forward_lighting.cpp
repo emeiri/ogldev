@@ -44,7 +44,13 @@ bool PBRForwardLightingTechnique::Init()
         return false;
     }
 
-    if (!BaseLightingTechnique::Init()) {
+    return InitUniforms();
+}
+
+
+bool PBRForwardLightingTechnique::InitUniforms()
+{
+    if (!BaseLightingTechnique::InitUniforms()) {
         return false;
     }
 

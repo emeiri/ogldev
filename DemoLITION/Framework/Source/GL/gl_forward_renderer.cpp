@@ -185,7 +185,7 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
-
+    
     if (!m_pbrLightingTech.Init()) {
         printf("Error initializing the PBR lighting technique\n");
         exit(1);
@@ -203,6 +203,24 @@ void ForwardRenderer::InitTechniques()
     m_pbrLightingTech.SetClearCoatTextureUnit(CLEARCOAT_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetClearCoatRoughnessTextureUnit(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT_INDEX);
     m_pbrLightingTech.SetClearCoatNormalTextureUnit(CLEARCOAT_NORMAL_TEXTURE_UNIT_INDEX);
+
+    if (!m_pbrSkinnedTech.Init()) {
+        printf("Error initializing the PBR lighting technique\n");
+        exit(1);
+    }
+
+    m_pbrSkinnedTech.Enable();
+    m_pbrSkinnedTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetAmbientOcclusionTextureUnit(AO_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetNormalTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetEnvmapTextureUnit(ENVMAP_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetBRDF_LUTTextureUnit(BRDF_LUT_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetIrradianceTextureUnit(IRRADIANCE_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetClearCoatTextureUnit(CLEARCOAT_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetClearCoatRoughnessTextureUnit(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT_INDEX);
+    m_pbrSkinnedTech.SetClearCoatNormalTextureUnit(CLEARCOAT_NORMAL_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
@@ -299,6 +317,10 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE TechId)
             m_pCurLightingTech = &m_pbrLightingTech;
             break;
 
+        case PBR_GLTF2_SKINNING:
+            m_pCurLightingTech = &m_pbrSkinnedTech;
+            break;
+
         default:
             assert(0);
         }        
@@ -315,7 +337,11 @@ LIGHTING_TECHNIQUE ForwardRenderer::GetLightingTech(CoreModel* pModel)
     LIGHTING_TECHNIQUE LightingTech = UNDEFINED_TECHNIQUE;
 
     if (pModel->IsAnimated()) {
-        LightingTech = FORWARD_SKINNING;
+        if (pModel->IsPBR()) {
+            LightingTech = PBR_GLTF2_SKINNING;
+        } else {
+            LightingTech = FORWARD_SKINNING;
+        }        
     } else {
         if (pModel->IsPBR()) {
             LightingTech = PBR_GLTF2_LIGHTING;
@@ -864,7 +890,11 @@ void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, l
         pSceneObject->GetModel()->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);
 
         for (uint i = 0; i < Transforms.size(); i++) {
-            m_skinningTech.SetBoneTransform(i, Transforms[i]);
+            if (LightingTech == PBR_GLTF2_SKINNING) {
+                m_pbrSkinnedTech.SetBoneTransform(i, Transforms[i]);
+            } else {
+                m_skinningTech.SetBoneTransform(i, Transforms[i]);
+            }            
         }
     }
 

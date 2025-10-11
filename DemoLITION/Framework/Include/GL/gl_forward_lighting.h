@@ -75,7 +75,7 @@ public:
 
 protected:
 
-    bool InitCommon();
+    bool InitUniforms();
 
 private:
     void SetExpFogCommon(float FogEnd, float FogDensity);

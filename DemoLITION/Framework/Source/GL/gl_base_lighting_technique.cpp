@@ -26,7 +26,7 @@ BaseLightingTechnique::BaseLightingTechnique()
 }
 
 
-bool BaseLightingTechnique::Init()
+bool BaseLightingTechnique::InitUniforms()
 {
     GET_UNIFORM_AND_CHECK(WVPLoc, "gWVP");
     GET_UNIFORM_AND_CHECK(WorldMatrixLoc, "gWorld");

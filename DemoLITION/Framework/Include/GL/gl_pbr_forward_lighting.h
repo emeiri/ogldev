@@ -32,7 +32,7 @@ public:
 
     PBRForwardLightingTechnique();
 
-    virtual bool Init();
+    virtual bool Init();    
 
     virtual void SetMaterial(const CoreMaterial& material);
 
@@ -56,8 +56,12 @@ public:
     void SetClearCoatRoughnessTextureUnit(int TextureUnit);
     void SetClearCoatNormalTextureUnit(int TextureUnit);
 
+protected:
+
+    bool InitUniforms();
 
 private:
+
     DEF_LOC(m_aoUnitLoc);
     DEF_LOC(m_emissiveUnitLoc);
     DEF_LOC(m_albedoUnitLoc);

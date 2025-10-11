@@ -31,8 +31,6 @@ public:
 
     BaseLightingTechnique();
 
-    virtual bool Init();
-
     virtual void SetMaterial(const CoreMaterial& material) = 0;
     virtual void ControlRefRefract(bool Enable) {}
     virtual void ControlSpecularExponent(bool IsEnabled) {}
@@ -59,7 +57,7 @@ public:
 
 protected:
 
-    bool InitCommon();
+    bool InitUniforms();
 
 private:
 

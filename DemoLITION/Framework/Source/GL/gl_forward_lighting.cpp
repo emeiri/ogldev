@@ -43,15 +43,15 @@ bool ForwardLightingTechnique::Init()
         return false;
     }
 
-    if (!BaseLightingTechnique::Init()) {
+    return InitUniforms();
+}
+
+bool ForwardLightingTechnique::InitUniforms()
+{
+    if (!BaseLightingTechnique::InitUniforms()) {
         return false;
     }
 
-    return InitCommon();
-}
-
-bool ForwardLightingTechnique::InitCommon()
-{
     GET_UNIFORM_AND_CHECK(LightWVPLoc, "gLightWVP");
     GET_UNIFORM_AND_CHECK(HasNormalMapLoc, "gHasNormalMap");
     samplerLoc = GetUniformLocation("gSampler");

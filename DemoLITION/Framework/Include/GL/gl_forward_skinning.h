@@ -15,12 +15,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OGLDEV_FORWARD_SKINNING_H
-#define OGLDEV_FORWARD_SKINNING_H
+#pragma once
 
 #include "technique.h"
 #include "ogldev_math_3d.h"
 #include "GL/gl_forward_lighting.h"
+#include "GL/gl_pbr_forward_lighting.h"
 
 
 class ForwardSkinningTechnique : public ForwardLightingTechnique
@@ -34,9 +34,21 @@ public:
     void SetBoneTransform(uint Index, const Matrix4f& Transform);
 
 private:
-
     GLuint m_boneLocation[MAX_BONES];
 };
 
 
-#endif  /* OGLDEV_FORWARD_TECHNIQUE_H */
+class PBRSkinningTechnique : public PBRForwardLightingTechnique
+{
+public:
+
+    PBRSkinningTechnique();
+
+    virtual bool Init();
+
+    void SetBoneTransform(uint Index, const Matrix4f& Transform);
+
+private:
+    GLuint m_boneLocation[MAX_BONES];
+};
+

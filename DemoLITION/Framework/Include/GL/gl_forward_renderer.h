@@ -60,6 +60,7 @@ enum LIGHTING_TECHNIQUE {
     FORWARD_LIGHTING,
     FORWARD_SKINNING,
     PBR_GLTF2_LIGHTING,
+    PBR_GLTF2_SKINNING,
     UNDEFINED_TECHNIQUE
 };
 
@@ -209,6 +210,7 @@ private:
     ShadowMappingPointLightTechnique m_shadowMapPointLightTech;
     PickingTechnique m_pickingTech;
     PBRForwardLightingTechnique m_pbrLightingTech;
+    PBRSkinningTechnique m_pbrSkinnedTech;
     PickingTexture m_pickingTexture;
     FullScreenQuadTechnique m_fullScreenQuadTech;
     SSAOTechnique m_ssaoTech;

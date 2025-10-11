@@ -42,12 +42,7 @@ bool ForwardSkinningTechnique::Init()
         return false;
     }
 
-    if (!InitCommon()) {
-        return false;
-    }
-
-    // Ugly
-    if (!BaseLightingTechnique::Init()) {
+    if (!ForwardLightingTechnique::InitUniforms()) {
         return false;
     }
 
@@ -63,6 +58,55 @@ bool ForwardSkinningTechnique::Init()
 
 
 void ForwardSkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
+{
+    //assert(Index < MAX_BONES);
+    if (Index >= MAX_BONES) {
+        return;
+    }
+    //Transform.Print();
+    glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, Transform.data());
+}
+
+///////////////////////////////////////////
+
+PBRSkinningTechnique::PBRSkinningTechnique()
+{
+}
+
+bool PBRSkinningTechnique::Init()
+{
+    if (!Technique::Init()) {
+        return false;
+    }
+
+    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/forward_skinning.vs")) {
+        return false;
+    }
+
+    if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/pbr_forward_lighting.fs")) {
+        return false;
+    }
+
+    if (!Finalize()) {
+        return false;
+    }
+ 
+    if (!PBRForwardLightingTechnique::InitUniforms()) {
+        return false;
+    }
+
+    for (unsigned int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation); i++) {
+        char Name[128];
+        memset(Name, 0, sizeof(Name));
+        SNPRINTF(Name, sizeof(Name), "gBones[%d]", i);
+        m_boneLocation[i] = GetUniformLocation(Name);
+    }
+
+    return true;
+}
+
+
+void PBRSkinningTechnique::SetBoneTransform(uint Index, const Matrix4f& Transform)
 {
     //assert(Index < MAX_BONES);
     if (Index >= MAX_BONES) {
