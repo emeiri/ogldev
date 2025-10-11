@@ -322,10 +322,10 @@ void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNo
             int MeshIndex = pNode->mMeshes[i];
             printf("%d ", MeshIndex);
             m_Meshes[MeshIndex].Transformation = CombinedTransformation;
-            std::string NodeName = std::string(pNode->mName.C_Str());
+            std::string NodeName(pNode->mName.C_Str());
             if (m_meshNameToMeshIndex.find(NodeName) == m_meshNameToMeshIndex.end()) {
-                m_meshNameToMeshIndex[NodeName] = i;
-                printf("Mesh '%s' mapped to mesh index %d\n", NodeName.c_str(), i);
+                m_meshNameToMeshIndex[NodeName] = MeshIndex;
+                printf("Mesh '%s' mapped to mesh index %d\n", NodeName.c_str(), MeshIndex);
             } else {
                 printf("Warning: node name '%s' already found in the meshNameToMeshIndex map\n", NodeName.c_str());
                // assert(0);
