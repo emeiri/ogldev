@@ -90,13 +90,13 @@ static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMateria
 
     switch (ShadingModel) {
         case aiShadingMode_Unlit:
-            printf("Shading model Unlit\n");
+            printf("Shading model: Unlit\n");
             mt = MaterialType_Unlit;
             break;
 
         case aiShadingMode_PBR_BRDF:
         {
-            printf("Shading model PBR BRDF\n");
+            printf("Shading model: PBR BRDF\n");
 
             MyMaterial.m_isPBR = true;            
             
@@ -105,6 +105,14 @@ static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMateria
                 mt = MaterialType_MetallicRoughness;
             }
         }
+            break;
+
+        case aiShadingMode_Gouraud:
+            printf("Shading model: Gouraud\n");
+            break;
+
+        case aiShadingMode_Phong:
+            printf("Shading model: Phong\n");
             break;
 
         default:
