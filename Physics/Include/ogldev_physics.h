@@ -56,8 +56,6 @@ public:
 
     ForceRegistry& GetRegistry() { return m_forceRegistry; }    
 
-    void RunPhysics(float dt);
-
     void StartFrame();
 
     void AddContactGenerator(ParticleContactGenerator* pContact);

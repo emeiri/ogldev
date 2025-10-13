@@ -31,19 +31,20 @@
 class SceneObject : public Object {
 public:
     void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
-    void SetRotation(float x, float y, float z);
-    void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }    
-
     void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
     void SetPosition(const SceneObject* pOtherObject) { m_pos = pOtherObject->GetPosition(); }
-    const Vector3f& GetPosition() const { return m_pos; }
+    void TranslateBy(float x, float y, float z) { m_pos.x += x; m_pos.y += y; m_pos.z += z; }
+
+    void SetRotation(float x, float y, float z);
     void SetRotation(const Vector3f& Rot);
     void PushRotation(const Vector3f& Rot);
     void ResetRotations() { m_numRotations = 0; }
-    void SetScale(const Vector3f& Scale) { m_scale = Scale; }
-
     void RotateBy(float x, float y, float z);
 
+    void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }    
+    void SetScale(const Vector3f& Scale) { m_scale = Scale; }
+    
+    const Vector3f& GetPosition() const { return m_pos; }        
     Matrix4f GetMatrix() const;
 
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
