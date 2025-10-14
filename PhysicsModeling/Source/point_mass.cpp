@@ -31,21 +31,21 @@ void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& For
 }
 
 
-    void PointMass::Update(int DeltaTimeMillis, UpdateListener pUpdateListener)
+void PointMass::Update(int DeltaTimeMillis, UpdateListener pUpdateListener)
 {
-    if (pUpdateListener) {
-        (*pUpdateListener)(m_pTarget, m_centerOfMass);
-    }
-
     assert(m_mass != 0.0f);
 
     m_linearAccel = m_sumForces / m_mass;
 
     float DeltaTime = (float)DeltaTimeMillis / 1000.0f;
 
-    m_linearVelocity += m_linearVelocity * DeltaTime;
+    m_linearVelocity += m_linearAccel * DeltaTime;
 
     m_centerOfMass += m_linearVelocity * DeltaTime;
+
+    if (pUpdateListener) {
+        (*pUpdateListener)(m_pTarget, m_centerOfMass);
+    }
 }
 
 }
