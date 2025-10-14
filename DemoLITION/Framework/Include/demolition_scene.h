@@ -45,6 +45,7 @@ public:
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
     
     const Vector3f& GetPosition() const { return m_pos; }        
+    const glm::vec3 GetGLMPos() const { return glm::vec3(m_pos.x, m_pos.y, m_pos.z); }
     Matrix4f GetMatrix() const;
 
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
