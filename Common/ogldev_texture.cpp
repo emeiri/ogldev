@@ -145,12 +145,12 @@ void Texture::LoadInternalNonDSA(const void* pImageData, bool IsSRGB)
 
         case 3:
             InternalFormat = IsSRGB ? GL_SRGB8 : GL_RGB8;
-            glTexImage2D(m_textureTarget, 0, GL_RGB, m_imageWidth, m_imageHeight, 0, InternalFormat, GL_UNSIGNED_BYTE, pImageData);
+            glTexImage2D(m_textureTarget, 0, InternalFormat, m_imageWidth, m_imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, pImageData);
             break;
 
         case 4:
             InternalFormat = IsSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-            glTexImage2D(m_textureTarget, 0, GL_RGBA, m_imageWidth, m_imageHeight, 0, InternalFormat, GL_UNSIGNED_BYTE, pImageData);
+            glTexImage2D(m_textureTarget, 0, InternalFormat, m_imageWidth, m_imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pImageData);
             break;
 
         default:
