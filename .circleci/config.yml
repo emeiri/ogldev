@@ -29,7 +29,7 @@ jobs:
           name: Run Linux Build Script
           command: |
             cd ogldev
-            source ~/1.4.321.1/setup-env.sh
+            source ~/1.4.328.1/setup-env.sh
             chmod +x ./build_all.sh            
             ./build_all.sh
 
