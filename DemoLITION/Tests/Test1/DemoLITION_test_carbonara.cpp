@@ -41,6 +41,17 @@
 
 #define NUM_PSOs 1000
 
+// TODO: code duplication with ogldev_imgui.cpp in vulkan. need to share.
+bool IsMouseControlledByImGUI()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    bool ret = io.WantCaptureMouse;
+
+    return ret;
+}
+
+
 struct PhysicsSceneObject {
     SceneObject* pSceneObject = NULL;
     OgldevPhysics::Particle* pParticle = NULL;
@@ -66,7 +77,7 @@ public:
     Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Carbonara")
     {
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        m_dirLight[0].Color = Vector3f(0.0f, 1.0f, 0.0f);
+        m_dirLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight[0].DiffuseIntensity = 1.0f;
         m_dirLight[0].AmbientIntensity = 0.0f;
@@ -112,11 +123,11 @@ public:
         
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
         
-      //  m_pScene->SetCameraSpeed(0.1f);
+        m_pScene->SetCameraSpeed(0.1f);
 
-        //m_pScene->GetDirLights().push_back(m_dirLight[0]);
-        //m_pScene->GetDirLights().push_back(m_dirLight[1]);
-        m_pScene->GetPointLights().push_back(m_pointLight[0]);
+      //  m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+     //   m_pScene->GetDirLights().push_back(m_dirLight[0]);
+        //m_pScene->GetPointLights().push_back(m_pointLight[0]);
         //m_pScene->GetPointLights().push_back(m_pointLight[1]);
         //m_pScene->GetSpotLights().push_back(m_spotLight);
 
@@ -421,7 +432,13 @@ public:
 
     bool OnMouseMove(int x, int y)
     {
-        return !m_leftMousePressed;
+        bool ret = false;
+
+        if (!IsMouseControlledByImGUI()) {
+            ret = !m_leftMousePressed;
+        }
+
+        return ret;
     }
 
 
@@ -906,6 +923,8 @@ public:
         pConfig->ControlShadowMapping(false);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
+        //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
+        
         m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
 
@@ -931,7 +950,7 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {
-        m_pSceneObject->RotateBy(0.0f, 0.0f, 0.25f);
+        m_pSceneObject->RotateBy(0.0f, 0.0f, DeltaTimeMillis / 25.0f);
     }
 
 private:
@@ -1010,6 +1029,33 @@ public:
 };
 
 
+class HeliGame : public Carbonara {
+
+public:
+
+    HeliGame()
+    {
+    }
+
+    void InitChild()
+    {
+        delete m_pScene;
+
+        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
+
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        m_pRenderingSystem->SetScene(m_pScene);
+
+       // SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+       // pSceneObject->SetScale(0.01f);
+      //  m_pScene->AddToRenderList(pSceneObject);
+
+     //   m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));
+    }
+};
+
+
 
 void carbonara()
 {
@@ -1017,10 +1063,11 @@ void carbonara()
     //FireworksDemo demo;
     //AnimationDemo demo;
     //BridgeDemo demo;
-    //AmazonBistroDemo demo;
+    AmazonBistroDemo demo;
     //SkyboxDemo demo;
-    GLTFPBRDemo demo;
+    //GLTFPBRDemo demo;
     //MeshConvertDemo demo;
+    //HeliGame demo;
 
     demo.Start();
 }

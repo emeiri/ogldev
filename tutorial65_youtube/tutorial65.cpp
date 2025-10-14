@@ -48,15 +48,22 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         m_pRenderingSystem->SetScene(m_pScene);
-        m_pScene->SetClearColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
+        m_pScene->SetClearColor(Vector4f(0.5f));
 
         SceneConfig* pConfig = m_pScene->GetConfig();
 
-        pConfig->GetInfiniteGrid().Enabled = false;
+        pConfig->GetInfiniteGrid().Enabled = true;
         pConfig->ControlShadowMapping(false);
 
         m_pScene->GetDirLights().push_back(m_dirLight);
   
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/old_kings_head/scene.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/venice_well_head/scene.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/porsche/scene.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/santa_conga_freebiexmass/scene.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ClearCoatCarPaint/glTF/ClearCoatCarPaint.gltf");
+       // Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/CesiumMan/glTF/CesiumMan.gltf");
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ClearcoatWicker/glTF/ClearcoatWicker.gltf");
         int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
         pModel->SetAmbientOcclusionMap(AOMap);
@@ -72,9 +79,11 @@ public:
         pConfig->SetEnvMap(EnvMap);
 
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+       // m_pSceneObject->SetScale(0.1f);
         m_pScene->AddToRenderList(m_pSceneObject);
+      //  m_pSceneObject->SetRotation(180.0f, 0.0f, 0.0f);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -3.0f), Vector3f(0.0f, 0.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
 
         m_pRenderingSystem->Execute();
     }
@@ -83,6 +92,7 @@ public:
     void OnFrameChild(long long DeltaTimeMillis)
     {        
         m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
+      //  m_pSceneObject->TranslateBy(-0.7f * (float)DeltaTimeMillis/1000.0f, 0.0f, 0.0f);
     }
 
 protected:
