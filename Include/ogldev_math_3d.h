@@ -829,11 +829,11 @@ public:
     }
 
     float MinX = FLT_MAX;
-    float MaxX = FLT_MIN;
+    float MaxX = -FLT_MAX;
     float MinY = FLT_MAX;
-    float MaxY = FLT_MIN;
+    float MaxY = -FLT_MAX;
     float MinZ = FLT_MAX;
-    float MaxZ = FLT_MIN;
+    float MaxZ = -FLT_MAX;
 
     void Print()
     {
