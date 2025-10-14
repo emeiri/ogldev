@@ -20,14 +20,15 @@
 
 namespace Physics {
 
-    void PointMass::Init(float Mass, const glm::vec3& Force, void* pTarget)
-    {
-        assert(Mass != 0.0f);
+void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
+{
+    assert(Mass != 0.0f);
 
-        m_mass = Mass;
-        m_sumForces = Force;
-        m_pTarget = pTarget;
-    }
+    m_mass = Mass;
+    m_centerOfMass = StartPos;
+    m_sumForces = Force;
+    m_pTarget = pTarget;
+}
 
 
     void PointMass::Update(int DeltaTimeMillis, UpdateListener pUpdateListener)

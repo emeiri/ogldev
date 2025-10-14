@@ -29,9 +29,11 @@ class PointMass {
 
 public:
 
-    void Init(float Mass, const glm::vec3& Force, void* pTarget);
+    void Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget);
 
     void Update(int DeltaTimeMillis, UpdateListener pUpdateListener);
+
+    void ResetSumForces() { m_sumForces = glm::vec3(0.0f); }
 
     glm::vec3 m_centerOfMass = glm::vec3(0.0f);
     glm::vec3 m_linearVelocity = glm::vec3(0.0f);

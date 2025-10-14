@@ -21,7 +21,7 @@ TEST(TestCaseName, TestName)
 	Physics::PointMass* pm = PhysicsSystem.AllocPointMass();
 
 	glm::vec3 Force(1.0f, 0.0f, 0.0f);
-	pm->Init(1.0f, Force, &foo);
+	pm->Init(1.0f, glm::vec3(0.0f), Force, &foo);
 
 	PhysicsSystem.Update(1);
 	
