@@ -31,6 +31,14 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
+static void PhysicsUpdateListener(void* pObject, const glm::vec3& Pos)
+{
+    //GLM_PRINT_VEC3("", Pos);
+    SceneObject* pSceneObject = (SceneObject*)pObject;
+
+    pSceneObject->SetPosition(Pos);
+}
+
 
 class ClearCoat : public BaseGLApp {
 public:
@@ -57,8 +65,8 @@ public:
 
         m_pScene->GetDirLights().push_back(m_dirLight);
   
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/porsche/porsche_no_ground.gltf");
-        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/santa_conga_freebiexmass/scene.gltf");
+       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/porsche/porsche_no_ground.gltf");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
         //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ClearCoatCarPaint/glTF/ClearCoatCarPaint.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/CesiumMan/glTF/CesiumMan.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ClearcoatWicker/glTF/ClearcoatWicker.gltf");
@@ -75,21 +83,38 @@ public:
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);
 
-        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-       // m_pSceneObject->SetScale(0.1f);
-        m_pScene->AddToRenderList(m_pSceneObject);
-        m_pSceneObject->SetRotation(0.0f, -90.0f, 0.0f);
+        m_pCarSceneObject1 = m_pScene->CreateSceneObject(pModel);
+        m_pScene->AddToRenderList(m_pCarSceneObject1);
+
+        m_pCarSceneObject2 = m_pScene->CreateSceneObject(pModel);
+        m_pCarSceneObject2->SetPosition(0.0f, 0.0f, 3.0);
+        m_pScene->AddToRenderList(m_pCarSceneObject2);
+
+        m_pCarSceneObject1->SetRotation(0.0f, -90.0f, 0.0f);
 
         m_pScene->SetCamera(Vector3f(0.0f, 4.0f, -8.0f), Vector3f(0.0f, -0.3f, 1.0f));
+
+        m_physicsSystem.Init(100, PhysicsUpdateListener);
+
+        m_pPointMass1 = m_physicsSystem.AllocPointMass();
+        m_pPointMass1->Init(1.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
+
+        m_pPointMass2 = m_physicsSystem.AllocPointMass();
+        m_pPointMass2->Init(1.0f, m_pCarSceneObject2->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject2);
 
         m_pRenderingSystem->Execute();
     }
 
 
     void OnFrameChild(long long DeltaTimeMillis)
-    {        
-      //  m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
-      //  m_pSceneObject->TranslateBy(-0.7f * (float)DeltaTimeMillis/1000.0f, 0.0f, 0.0f);
+    {  
+        m_physicsSystem.Update((int)DeltaTimeMillis);
+        if (glm::length(m_pPointMass2->m_linearVelocity) > 1.0f) {
+            m_pPointMass2->ResetSumForces();
+        }
+      //  m_pCarSceneObject1->RotateBy(0.0f, 0.5f, 0.0f);
+      //  m_pCarSceneObject1->TranslateBy(-0.7f * (float)DeltaTimeMillis/1000.0f, 0.0f, 0.0f);
+        m_frameCount++;
     }
 
 protected:
@@ -119,7 +144,12 @@ private:
 
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLight;
-    SceneObject* m_pSceneObject = NULL;
+    SceneObject* m_pCarSceneObject1 = NULL;
+    SceneObject* m_pCarSceneObject2 = NULL;
+    Physics::System m_physicsSystem;
+    Physics::PointMass* m_pPointMass1 = NULL;
+    Physics::PointMass* m_pPointMass2 = NULL;
+    int m_frameCount = 0;
 };
 
 
