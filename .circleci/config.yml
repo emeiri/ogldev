@@ -31,7 +31,7 @@ jobs:
           command: |
             cd ogldev
             ls -l ~/
-            source ~/1.4.328.1/setup-env.sh
+            source ~/project/1.4.328.1/setup-env.sh
             chmod +x ./build_all.sh            
             ./build_all.sh
 
