@@ -163,7 +163,7 @@ public:
 
 private:
 
-    bool m_shadowMappingEnabled = true;
+    bool m_shadowMappingEnabled = false;
     bool m_pickingEnabled = false;
     bool m_skyboxEnabled = false;
     InfiniteGridConfig m_infiniteGridConfig;
