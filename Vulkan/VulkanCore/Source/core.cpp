@@ -1089,7 +1089,7 @@ void VulkanCore::CreateDepthResources()
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, false);
+		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1);
 
 		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
 												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false);
