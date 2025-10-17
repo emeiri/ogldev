@@ -452,6 +452,8 @@ void GLModel::BindTextures(int MaterialIndex)
 {
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
         m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Bind(COLOR_TEXTURE_UNIT);
+    } else {
+        BindWhiteTexture(COLOR_TEXTURE_UNIT);
     }
 
     if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_SPECULAR]) {
