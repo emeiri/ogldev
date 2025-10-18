@@ -379,8 +379,8 @@ void GraphicsPipelineV2::CreateDescriptorSetLayoutTextures()
 	// set binding flags to allow update-after-bind and partially bound entries (optional, recommended)
 	std::vector<VkDescriptorBindingFlagsEXT> BindingFlags(2);
 
-	BindingFlags[0] = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT |
-					  VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
+	BindingFlags[0] = 0;// VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT |
+					  //VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
 
 	BindingFlags[1] = 0;
 
