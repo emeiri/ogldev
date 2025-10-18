@@ -26,20 +26,20 @@ namespace OgldevVK {
 
 #define UNIFORM_BUFFER_SIZE sizeof(glm::mat4)
 
-//#if defined(_MSC_VER)
-//#pragma pack(push,1)
-//#endif
+#if defined(_MSC_VER)
+#pragma pack(push,1)
+#endif
 
 struct SubmeshMetaData {
-	u32 DescriptorIndex;   // index into bindless descriptor array (material id)
+	u32 MaterialIndex;     // index into bindless descriptor array
 	u32 IndexOffset;       // offset into IndexSSBO (in indices)
 	u32 IndexCount;        // number of indices for this submesh
 	i32 VertexOffset;      // base vertex applied in shader
 };
 
-//#if defined(_MSC_VER)
-//#pragma pack(pop)
-//#endif
+#if defined(_MSC_VER)
+#pragma pack(pop)
+#endif
 
 
 
@@ -165,7 +165,7 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		MetaData[SubmeshIndex].DescriptorIndex = SubmeshIndex;
+		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
 		MetaData[SubmeshIndex].IndexCount = m_Meshes[SubmeshIndex].NumIndices;
 		MetaData[SubmeshIndex].IndexOffset = m_Meshes[SubmeshIndex].BaseIndex;
 		MetaData[SubmeshIndex].VertexOffset = m_Meshes[SubmeshIndex].BaseVertex;
@@ -242,20 +242,21 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pi
 	u32 InstanceCount = 1;
 	u32 BaseVertex = 0;
 
+	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+							Pipeline.GetPipelineLayout(),
+							1,  // firstSet
+							1,  // descriptorSetCount						
+							&m_texturesDescriptorSet,
+							0,	// dynamicOffsetCount
+							NULL);	// pDynamicOffsets
+
+
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
 		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, 
 								Pipeline.GetPipelineLayout(),
 								0,  // firstSet
 								1,  // descriptorSetCount
 								&m_descriptorSets[ImageIndex][SubmeshIndex],
-								0,	// dynamicOffsetCount
-								NULL);	// pDynamicOffsets
-
-		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, 
-								Pipeline.GetPipelineLayout(),
-								1,  // firstSet
-								1,  // descriptorSetCount						
-								&m_texturesDescriptorSet,
 								0,	// dynamicOffsetCount
 								NULL);	// pDynamicOffsets
 
