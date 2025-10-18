@@ -33,29 +33,34 @@ struct VertexData
     float color_r, color_g, color_b, color_a;
 };
 
-layout (std430, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
+layout (std430, set = 0, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
-layout (binding = 1) readonly buffer Indices { int i[]; } in_Indices;
+layout (set = 0, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
 
-layout (binding = 2) readonly uniform UniformBuffer { mat4 WVP; } ubo;
+layout (set = 0, binding = 2) readonly uniform UniformBuffer { mat4 WVP; } ubo;
 
-struct Meta { 
-    uint DescriptorIndex; 
+struct MetaData { 
+    uint MaterialIndex; 
     uint IndexOffset; 
     uint IndexCount; 
     int VertexOffset; 
 };
 
-layout(std430, binding = 3) readonly buffer MetaSSBO {
-    Meta metas[];
+layout(std430, set = 1, binding = 1) readonly buffer MetaSSBO {
+    MetaData metas[];
 } MetaBuf;
 
+
 layout(location = 0) out vec2 texCoord;
+layout(location = 1) flat out uint MaterialIndex;
 
 void main() 
-{
+{    
+    uint DrawId = uint(gl_BaseInstance);
 
-    uint DrawId = uint(gl_InstanceIndex) + uint(gl_BaseInstance);
+    MetaData md = MetaBuf.metas[DrawId];
+
+    MaterialIndex = md.MaterialIndex;
 
     int Index = in_Indices.i[gl_VertexIndex];
 

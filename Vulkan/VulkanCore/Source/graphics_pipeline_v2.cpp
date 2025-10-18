@@ -66,6 +66,7 @@ GraphicsPipelineV2::GraphicsPipelineV2(const PipelineDesc& pd)
 GraphicsPipelineV2::~GraphicsPipelineV2()
 {
 	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
+	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayoutTextures, NULL);
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
