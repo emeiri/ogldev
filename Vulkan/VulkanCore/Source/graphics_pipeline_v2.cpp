@@ -355,39 +355,50 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 void GraphicsPipelineV2::CreateDescriptorSetLayoutTextures()
 {
-	const uint32_t MAX_TEXTURES = 4096; // choose according to limits and memory
+	const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
 
-	// layout binding for combined image sampler array at binding = 0
-	VkDescriptorSetLayoutBinding texBinding{};
-	texBinding.binding = 0;
-	texBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	texBinding.descriptorCount = MAX_TEXTURES; // fixed large array size
-	texBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-	texBinding.pImmutableSamplers = nullptr;
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings(2);
+
+	LayoutBindings[0] = {
+		.binding = 0,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = MAX_TEXTURES,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.pImmutableSamplers = NULL
+	};
+
+	LayoutBindings[1] = {
+		.binding = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		.pImmutableSamplers = NULL
+	};
 
 	// set binding flags to allow update-after-bind and partially bound entries (optional, recommended)
-	VkDescriptorBindingFlagsEXT BindingFlags =
-		VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT |
-	//	VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT |
-		VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT; // or add VARIABLE_DESCRIPTOR_COUNT if using that flow
+	std::vector<VkDescriptorBindingFlagsEXT> BindingFlags(2);
+
+	BindingFlags[0] = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT |
+					  VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
+
+	BindingFlags[1] = 0;
 
 	VkDescriptorSetLayoutBindingFlagsCreateInfoEXT BindingFlagsInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT,
 		.pNext = NULL,
-		.bindingCount = 1,
-		.pBindingFlags = &BindingFlags
+		.bindingCount = (u32)BindingFlags.size(),
+		.pBindingFlags = BindingFlags.data()
 	};
 
-	// Create descriptor set layout with bindingFlagsInfo in pNext
-	VkDescriptorSetLayoutCreateInfo layoutCI = {
+	VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.pNext = &BindingFlagsInfo,
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
-		.bindingCount = 1,
-		.pBindings = &texBinding,		
+		.bindingCount = (u32)LayoutBindings.size(),
+		.pBindings = LayoutBindings.data()
 	};
 
-	VkResult res = vkCreateDescriptorSetLayout(m_device, &layoutCI, nullptr, &m_descriptorSetLayoutTextures);
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL, &m_descriptorSetLayoutTextures);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
 }
 
@@ -398,7 +409,7 @@ void GraphicsPipelineV2::AllocateDescriptorSets(int NumSubmeshes,
 {
 	u32 TextureCount = 2048;
 	u32 UniformBufferCount = m_numImages;
-	u32 StorageBufferCount = m_numImages;
+	u32 StorageBufferCount = 3;	// IB, VB, MetaData
 	u32 MaxSets = NumSubmeshes * m_numImages + 1;
 	CreateDescriptorPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
 	AllocateDescriptorSetsInternal(NumSubmeshes, DescriptorSets);

@@ -24,14 +24,34 @@
 
 namespace OgldevVK {
 
-
 #define UNIFORM_BUFFER_SIZE sizeof(glm::mat4)
+
+//#if defined(_MSC_VER)
+//#pragma pack(push,1)
+//#endif
+
+struct SubmeshMetaData {
+	u32 DescriptorIndex;   // index into bindless descriptor array (material id)
+	u32 IndexOffset;       // offset into IndexSSBO (in indices)
+	u32 IndexCount;        // number of indices for this submesh
+	i32 VertexOffset;      // base vertex applied in shader
+};
+
+//#if defined(_MSC_VER)
+//#pragma pack(pop)
+//#endif
+
+
+
+// Matches the GLSL std430 layout (tight packing)
+static_assert(sizeof(SubmeshMetaData) % 16 == 0, "Align Meta to 16 bytes for safety.");
 
 
 void VkModel::Destroy()
 {
 	m_vb.Destroy(m_pVulkanCore->GetDevice());
 	m_ib.Destroy(m_pVulkanCore->GetDevice());
+	m_metaData.Destroy(m_pVulkanCore->GetDevice());
 
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
 		m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
@@ -141,6 +161,17 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	m_ib = m_pVulkanCore->CreateVertexBuffer(m_alignedIndices.pMem, IndexBufferSize);
 
 	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
+
+	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
+
+	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+		MetaData[SubmeshIndex].DescriptorIndex = SubmeshIndex;
+		MetaData[SubmeshIndex].IndexCount = m_Meshes[SubmeshIndex].NumIndices;
+		MetaData[SubmeshIndex].IndexOffset = m_Meshes[SubmeshIndex].BaseIndex;
+		MetaData[SubmeshIndex].VertexOffset = m_Meshes[SubmeshIndex].BaseVertex;
+	}
+
+	m_metaData = m_pVulkanCore->CreateVertexBuffer(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));
 }
 
 
@@ -161,6 +192,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 {
 	md.m_vb = m_vb.m_buffer;
 	md.m_ib = m_ib.m_buffer;
+	md.m_metaData = m_metaData.m_buffer;
 
 	md.m_uniforms.resize(m_pVulkanCore->GetNumImages());
 
@@ -208,7 +240,6 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pipeline, int ImageIndex)
 {
 	u32 InstanceCount = 1;
-	u32 FirstInstance = 0;
 	u32 BaseVertex = 0;
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
@@ -229,7 +260,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pi
 								NULL);	// pDynamicOffsets
 
 		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices, 
-			      InstanceCount, BaseVertex, FirstInstance);
+			      InstanceCount, BaseVertex, SubmeshIndex);
 	}
 }
 
