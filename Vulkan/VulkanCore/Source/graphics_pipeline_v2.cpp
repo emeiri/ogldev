@@ -445,8 +445,11 @@ void GraphicsPipelineV2::AllocateTextureDescriptorSet(VkDescriptorSet& TexturesD
 
 
 void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
-											  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+											  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets,
+											  VkDescriptorSet& TexturesDescriptorSet)
 {
+	UpdateTexturesDescriptorSet(ModelDesc, TexturesDescriptorSet);
+
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
 	int NumBindings = 3; // VB, IB, Uniform
@@ -526,6 +529,36 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 	}
 
 	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
+}
+
+
+void GraphicsPipelineV2::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc, 
+													 VkDescriptorSet& TexturesDescriptorSet)
+{
+	u32 TextureCount = (u32)ModelDesc.m_materials.size();
+	std::vector<VkDescriptorImageInfo> ImageInfos;
+	ImageInfos.resize(TextureCount);
+
+	for (u32 i = 0; i < TextureCount; ++i) {
+		ImageInfos[i].sampler = ModelDesc.m_materials[i].m_sampler;
+		ImageInfos[i].imageView = ModelDesc.m_materials[i].m_imageView;
+		ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	}
+
+	VkWriteDescriptorSet wds = {
+		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+		.pNext = NULL,
+		.dstSet = TexturesDescriptorSet,
+		.dstBinding = 0,
+		.dstArrayElement = 0,
+		.descriptorCount = TextureCount,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.pImageInfo = ImageInfos.data(),
+		.pBufferInfo = NULL,
+		.pTexelBufferView = NULL
+	};
+
+	vkUpdateDescriptorSets(m_device, 1, &wds, 0, NULL);
 }
 
 }

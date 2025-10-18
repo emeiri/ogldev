@@ -153,7 +153,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 
 	UpdateModelDesc(md);
 
-	Pipeline.UpdateDescriptorSets(md, m_descriptorSets);
+	Pipeline.UpdateDescriptorSets(md, m_descriptorSets, m_texturesDescriptorSet);
 }
 
 
@@ -168,23 +168,24 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 		md.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
 	}
 
-	md.m_materials.resize(m_Meshes.size());
+	md.m_materials.resize(m_Materials.size());
+
+	for (int MaterialIndex = 0; MaterialIndex < m_Materials.size(); MaterialIndex++) {
+		if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+			Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
+			md.m_materials[MaterialIndex].m_sampler = pDiffuse->m_sampler;
+			md.m_materials[MaterialIndex].m_imageView = pDiffuse->m_view;
+		} else {
+			printf("No diffuse texture in material %d\n", MaterialIndex);
+			exit(0);
+		}
+	}
+
 	md.m_ranges.resize(m_Meshes.size());
 
 	int NumSubmeshes = (int)m_Meshes.size();
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
-
-		if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE])) {
-			Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
-			md.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
-			md.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
-		}
-		else {
-			printf("No diffuse texture in material %d\n", MaterialIndex);
-			exit(0);
-		}
 
 		size_t offset = m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 		size_t range  = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
