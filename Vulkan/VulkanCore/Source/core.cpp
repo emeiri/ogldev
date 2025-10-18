@@ -333,9 +333,17 @@ void VulkanCore::CreateDevice()
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;
 
+	VkPhysicalDeviceDescriptorIndexingFeatures DescriptorSetIndexingFeatures{};
+
+	DescriptorSetIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+	DescriptorSetIndexingFeatures.descriptorBindingPartiallyBound = VK_TRUE;
+	DescriptorSetIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+	DescriptorSetIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
+	DescriptorSetIndexingFeatures.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+
 	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingFeature = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR,
-		.pNext = NULL,
+		.pNext = &DescriptorSetIndexingFeatures,
 		.dynamicRendering = VK_TRUE
 	};
 
