@@ -73,7 +73,7 @@ public:
 			
 		m_model.Destroy();
 
-		m_skybox.Destroy();
+	//	m_skybox.Destroy();
 
 		m_imGUIRenderer.Destroy();
 	}
@@ -88,7 +88,7 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
-		m_skybox.Init(&m_vkCore, "../../Content/textures/piazza_bologni_1k.hdr");
+	//	m_skybox.Init(&m_vkCore, "../../Content/textures/piazza_bologni_1k.hdr");
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -252,9 +252,9 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-		//m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
-		m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
+	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
 
@@ -316,7 +316,7 @@ private:
 			m_pPipeline->Bind(CmdBuf);
 			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
 			
-			m_skybox.RecordCommandBuffer(CmdBuf, i);
+		//	m_skybox.RecordCommandBuffer(CmdBuf, i);
 
 			vkCmdEndRendering(CmdBuf);
 
@@ -440,7 +440,7 @@ private:
 		m_pGameCamera->SetTarget(r);*/
 
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
-		m_skybox.Update(ImageIndex, VPNoTranslate);
+	//	m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -456,7 +456,7 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;	
-	OgldevVK::Skybox m_skybox;
+//	OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
