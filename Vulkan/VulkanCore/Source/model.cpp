@@ -147,7 +147,7 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
 	int NumSubmeshes = (int)m_Meshes.size();
-	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
+	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets, m_texturesDescriptorSet);
 
 	ModelDesc md;
 
@@ -216,6 +216,14 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& Pi
 								0,  // firstSet
 								1,  // descriptorSetCount
 								&m_descriptorSets[ImageIndex][SubmeshIndex],
+								0,	// dynamicOffsetCount
+								NULL);	// pDynamicOffsets
+
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, 
+								Pipeline.GetPipelineLayout(),
+								1,  // firstSet
+								1,  // descriptorSetCount						
+								&m_texturesDescriptorSet,
 								0,	// dynamicOffsetCount
 								NULL);	// pDynamicOffsets
 
