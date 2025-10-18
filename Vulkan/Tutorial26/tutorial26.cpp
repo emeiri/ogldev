@@ -40,7 +40,6 @@
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
 #include "ogldev_vulkan_graphics_pipeline_v3.h"
-#include "ogldev_vulkan_simple_mesh.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
 #include "ogldev_vulkan_skybox.h"
