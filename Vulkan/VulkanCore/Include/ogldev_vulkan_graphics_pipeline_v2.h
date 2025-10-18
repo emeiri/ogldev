@@ -71,7 +71,9 @@ public:
 
 	void Bind(VkCommandBuffer CmdBuf);
 
-	void AllocateDescriptorSets(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
+	void AllocateDescriptorSets(int NumSubmeshes,
+								std::vector< std::vector<VkDescriptorSet> >& DescriptorSets,
+								VkDescriptorSet& TexturesDescriptorSet);
 
 	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
 							  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets);
@@ -85,14 +87,19 @@ private:
 					VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp);
 
 	void AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
-	void CreateDescriptorPool(int MaxSets);
-	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex2D, bool IsUniform, bool IsCubemap);
+	void AllocateTextureDescriptorSet(VkDescriptorSet& TexturesDescriptorSet);
+	void CreateDescriptorPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount,	u32 MaxSets);
+	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform, bool IsCubemap);
+
+	void CreateDescriptorPoolTextures(int MaxSets);
+	void CreateDescriptorSetLayoutTextures();
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
+	VkDescriptorSetLayout m_descriptorSetLayoutTextures = VK_NULL_HANDLE;
 	int m_numImages = 0;
 };
 

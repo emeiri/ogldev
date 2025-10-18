@@ -77,6 +77,8 @@ private:
 	BufferAndMemory m_ib;
 	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
+	VkDescriptorSet m_texturesDescriptorSet;
+
 	size_t m_vertexSize = 0;	// sizeof(Vertex) OR sizeof(SkinnedVertex)
 
 	struct VulkanMeshEntry {
