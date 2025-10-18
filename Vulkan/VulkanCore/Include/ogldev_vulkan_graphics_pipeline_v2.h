@@ -76,7 +76,8 @@ public:
 								VkDescriptorSet& TexturesDescriptorSet);
 
 	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
-							  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets);
+							  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets,
+							  VkDescriptorSet& TexturesDescriptorSet);
 
 	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
 
@@ -93,6 +94,8 @@ private:
 
 	void CreateDescriptorPoolTextures(int MaxSets);
 	void CreateDescriptorSetLayoutTextures();
+
+	void UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc, VkDescriptorSet& TexturesDescriptorSet);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
