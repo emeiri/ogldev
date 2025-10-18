@@ -556,7 +556,9 @@ void GraphicsPipelineV2::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
-	VkWriteDescriptorSet wds = {
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(2);
+
+	WriteDescriptorSet[0] = {
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 		.pNext = NULL,
 		.dstSet = TexturesDescriptorSet,
@@ -569,7 +571,26 @@ void GraphicsPipelineV2::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		.pTexelBufferView = NULL
 	};
 
-	vkUpdateDescriptorSets(m_device, 1, &wds, 0, NULL);
+	VkDescriptorBufferInfo BufferInfo = {
+		.buffer = ModelDesc.m_metaData,
+		.offset = 0,
+		.range = VK_WHOLE_SIZE
+	};
+
+	WriteDescriptorSet[1] = {
+		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+		.pNext = NULL,
+		.dstSet = TexturesDescriptorSet,
+		.dstBinding = 1,
+		.dstArrayElement = 0,
+		.descriptorCount = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.pImageInfo = NULL,
+		.pBufferInfo = &BufferInfo,
+		.pTexelBufferView = NULL
+	};
+
+	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 }
 
 }
