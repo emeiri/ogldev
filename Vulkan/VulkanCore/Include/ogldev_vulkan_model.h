@@ -33,7 +33,7 @@ class VkModel : public CoreModel
 {
 public:
 
-	VkModel() {}
+	VkModel(bool IsDescriptorIndexing) { m_isDescriptorIndexing = IsDescriptorIndexing; }
 
 	void Destroy();
 
@@ -76,7 +76,11 @@ private:
 
 	void CreateBuffers(std::vector<Vertex>& Vertices);
 
+	void CreateMetaData();
+
 	VulkanCore* m_pVulkanCore = NULL;
+
+	bool m_isDescriptorIndexing = false;
 
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
