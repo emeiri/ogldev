@@ -19,6 +19,9 @@
 
 #version 460
 
+#extension GL_EXT_nonuniform_qualifier : require
+
+
 struct VertexData
 {
     float pos_x, pos_y, pos_z;
@@ -36,10 +39,24 @@ layout (binding = 1) readonly buffer Indices { int i[]; } in_Indices;
 
 layout (binding = 2) readonly uniform UniformBuffer { mat4 WVP; } ubo;
 
+struct Meta { 
+    uint DescriptorIndex; 
+    uint IndexOffset; 
+    uint IndexCount; 
+    int VertexOffset; 
+};
+
+layout(std430, binding = 3) readonly buffer MetaSSBO {
+    Meta metas[];
+} MetaBuf;
+
 layout(location = 0) out vec2 texCoord;
 
 void main() 
 {
+
+    uint DrawId = uint(gl_InstanceIndex) + uint(gl_BaseInstance);
+
     int Index = in_Indices.i[gl_VertexIndex];
 
     VertexData vtx = in_Vertices.v[Index];
