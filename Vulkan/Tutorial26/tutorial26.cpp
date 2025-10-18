@@ -39,7 +39,7 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_graphics_pipeline_v2.h"
+#include "ogldev_vulkan_graphics_pipeline_v3.h"
 #include "ogldev_vulkan_simple_mesh.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
@@ -287,7 +287,7 @@ private:
 		pd.IsTex2D = true;
 		pd.IsUniform = true;
 
-		m_pPipeline = new OgldevVK::GraphicsPipelineV2(pd);
+		m_pPipeline = new OgldevVK::GraphicsPipelineV3(pd);
 	}
 
 
@@ -455,7 +455,7 @@ private:
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV2* m_pPipeline = NULL;	
+	OgldevVK::GraphicsPipelineV3* m_pPipeline = NULL;	
 //	OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;

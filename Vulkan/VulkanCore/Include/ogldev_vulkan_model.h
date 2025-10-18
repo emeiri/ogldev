@@ -21,6 +21,7 @@
 
 #include "ogldev_vulkan_texture.h"
 #include "ogldev_vulkan_graphics_pipeline_v2.h"
+#include "ogldev_vulkan_graphics_pipeline_v3.h"
 #include "Int/core_model.h"
 #include "Int/model_desc.h"
 
@@ -42,7 +43,11 @@ public:
 
 	void CreateDescriptorSets(GraphicsPipelineV2& Pipeline);
 
+	void CreateDescriptorSets(GraphicsPipelineV3& Pipeline);
+
 	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& pPipeline, int ImageIndex);
+
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& pPipeline, int ImageIndex);
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
