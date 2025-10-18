@@ -55,7 +55,7 @@ class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp(int WindowWidth, int WindowHeight)
+	VulkanApp(int WindowWidth, int WindowHeight) : m_model(false)
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;

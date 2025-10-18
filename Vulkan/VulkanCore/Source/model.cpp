@@ -41,11 +41,8 @@ struct SubmeshMetaData {
 #pragma pack(pop)
 #endif
 
-
-
 // Matches the GLSL std430 layout (tight packing)
 static_assert(sizeof(SubmeshMetaData) % 16 == 0, "Align Meta to 16 bytes for safety.");
-
 
 void VkModel::Destroy()
 {
@@ -162,6 +159,16 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 
 	m_uniformBuffers = m_pVulkanCore->CreateUniformBuffers(UNIFORM_BUFFER_SIZE * m_Meshes.size());
 
+	if (m_isDescriptorIndexing) {
+		CreateMetaData();
+	}
+}
+
+
+void VkModel::CreateMetaData()
+{
+	size_t NumSubmeshes = m_alignedMeshes.size();
+
 	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
@@ -177,6 +184,8 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 
 void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
+	assert(!m_isDescriptorIndexing);
+
 	int NumSubmeshes = (int)m_Meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets);
 
@@ -190,6 +199,8 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 
 void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 {
+	assert(m_isDescriptorIndexing);
+
 	int NumSubmeshes = (int)m_Meshes.size();
 	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets, m_texturesDescriptorSet);
 
@@ -213,17 +224,21 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 		md.m_uniforms[ImageIndex] = m_uniformBuffers[ImageIndex].m_buffer;
 	}
 
-	md.m_materials.resize(m_Materials.size());
+	if (m_isDescriptorIndexing) {
+		md.m_materials.resize(m_Materials.size());
 
-	for (int MaterialIndex = 0; MaterialIndex < m_Materials.size(); MaterialIndex++) {
-		if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
-			Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
-			md.m_materials[MaterialIndex].m_sampler = pDiffuse->m_sampler;
-			md.m_materials[MaterialIndex].m_imageView = pDiffuse->m_view;
-		} else {
-			printf("No diffuse texture in material %d\n", MaterialIndex);
-			exit(0);
+		for (int MaterialIndex = 0; MaterialIndex < m_Materials.size(); MaterialIndex++) {
+			if (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]) {
+				Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
+				md.m_materials[MaterialIndex].m_sampler = pDiffuse->m_sampler;
+				md.m_materials[MaterialIndex].m_imageView = pDiffuse->m_view;
+			} else {
+				printf("No diffuse texture in material %d\n", MaterialIndex);
+				exit(0);
+			}
 		}
+	} else {
+		md.m_materials.resize(m_Meshes.size());	
 	}
 
 	md.m_ranges.resize(m_Meshes.size());
@@ -231,7 +246,19 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 	int NumSubmeshes = (int)m_Meshes.size();
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
+		if (!m_isDescriptorIndexing) {
+			int MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
 
+			if ((MaterialIndex >= 0) && (m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE])) {
+				Texture* pDiffuse = m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE];
+				md.m_materials[SubmeshIndex].m_sampler = pDiffuse->m_sampler;
+				md.m_materials[SubmeshIndex].m_imageView = pDiffuse->m_view;
+			}
+			else {
+				printf("No diffuse texture in material %d\n", MaterialIndex);
+				exit(0);
+			}		
+		}
 		size_t offset = m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 		size_t range  = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 

@@ -55,7 +55,7 @@ class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp(int WindowWidth, int WindowHeight)
+	VulkanApp(int WindowWidth, int WindowHeight) : m_model(true)
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
@@ -72,7 +72,7 @@ public:
 			
 		m_model.Destroy();
 
-	//	m_skybox.Destroy();
+		m_skybox.Destroy();
 
 		m_imGUIRenderer.Destroy();
 	}
@@ -87,7 +87,7 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
-	//	m_skybox.Init(&m_vkCore, "../../Content/textures/piazza_bologni_1k.hdr");
+		m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -315,7 +315,7 @@ private:
 			m_pPipeline->Bind(CmdBuf);
 			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
 			
-		//	m_skybox.RecordCommandBuffer(CmdBuf, i);
+			m_skybox.RecordCommandBuffer(CmdBuf, i);
 
 			vkCmdEndRendering(CmdBuf);
 
@@ -417,7 +417,7 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
-		glm::mat4 Scale = glm::scale(glm::mat4(0.1f), glm::vec3(m_scale));
+		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
 
 		glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
 		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
@@ -439,7 +439,7 @@ private:
 		m_pGameCamera->SetTarget(r);*/
 
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
-	//	m_skybox.Update(ImageIndex, VPNoTranslate);
+		m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -455,7 +455,7 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV3* m_pPipeline = NULL;	
-//	OgldevVK::Skybox m_skybox;
+	OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
