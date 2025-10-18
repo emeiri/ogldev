@@ -376,24 +376,9 @@ void GraphicsPipelineV2::CreateDescriptorSetLayoutTextures()
 		.pImmutableSamplers = NULL
 	};
 
-	// set binding flags to allow update-after-bind and partially bound entries (optional, recommended)
-	std::vector<VkDescriptorBindingFlagsEXT> BindingFlags(2);
-
-	BindingFlags[0] = 0;// VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT_EXT |
-					  //VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT_EXT;
-
-	BindingFlags[1] = 0;
-
-	VkDescriptorSetLayoutBindingFlagsCreateInfoEXT BindingFlagsInfo = {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT,
-		.pNext = NULL,
-		.bindingCount = (u32)BindingFlags.size(),
-		.pBindingFlags = BindingFlags.data()
-	};
-
 	VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		.pNext = &BindingFlagsInfo,
+		.pNext = NULL,
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
 		.bindingCount = (u32)LayoutBindings.size(),
 		.pBindings = LayoutBindings.data()
