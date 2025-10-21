@@ -20,7 +20,7 @@ CPPFLAGS="-I../../Common/3rdparty/ImGui/imGuIZMO.quat \
 
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
 
-LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect ../../Lib/libmeshoptimizer.a"
+LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer"
 
 $CC tutorial23.cpp \
     ../VulkanCore/Source/core.cpp \
