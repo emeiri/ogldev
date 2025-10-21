@@ -20,7 +20,7 @@ struct OutputPatch
     vec2 TexCoord[3];                                                                           
 };                                                                                              
                                                                                                 
-in patch OutputPatch oPatch;                                                                    
+patch in OutputPatch oPatch;                                                                    
                                                                                                 
 out vec3 WorldPos_FS_in;                                                                        
 out vec2 TexCoord_FS_in;                                                                        
