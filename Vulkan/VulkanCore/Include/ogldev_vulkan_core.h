@@ -92,6 +92,8 @@ public:
 
 	BufferAndMemory CreateVertexBuffer(const void* pVertices, size_t Size);
 
+	BufferAndMemory CreateSSBO(const void* pVertices, size_t Size);
+
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 	
 	void CreateTexture(const char* pFilename, VulkanTexture& Tex);

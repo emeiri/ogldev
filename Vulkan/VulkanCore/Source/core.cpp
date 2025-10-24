@@ -627,7 +627,7 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 }
 
 
-BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateSSBO(const void* pVertices, size_t Size)
 {
 	// Step 1: create the staging buffer
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
@@ -661,6 +661,13 @@ BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Siz
 	StagingVB.Destroy(m_device);
 
 	return VB;
+}
+
+
+BufferAndMemory VulkanCore::CreateVertexBuffer(const void* pVertices, size_t Size)
+{
+	// The vertex buffers are actually SSBOs since we pull the vertices from them
+	return CreateSSBO(pVertices, Size);
 }
 
 
