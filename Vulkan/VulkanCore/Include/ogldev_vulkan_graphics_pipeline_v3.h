@@ -24,10 +24,17 @@
 #include "ogldev_types.h"
 #include "ogldev_vulkan_core.h"
 #include "Int/model_desc.h"
-#include "ogldev_vulkan_graphics_pipeline_v2.h"		// required for Binding and ModelDesc
+#include "Int/pipeline_desc.h"
 
 namespace OgldevVK {
 
+enum V3_Binding {
+	V3_BindingVB = 0,
+	V3_BindingIB = 1,
+	V3_BindingUniform = 2,
+	V3_BindingTexture2D = 0,
+	V3_BindingMetaData = 1
+};
 
 // This version support descriptor indexing
 class GraphicsPipelineV3 {

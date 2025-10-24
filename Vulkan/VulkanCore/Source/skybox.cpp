@@ -105,7 +105,7 @@ void Skybox::CreateDescriptorSets()
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = BindingUniform,
+			.dstBinding = V2_BindingUniform,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -118,7 +118,7 @@ void Skybox::CreateDescriptorSets()
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = BindingTextureCube,
+			.dstBinding = V2_BindingTextureCube,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
