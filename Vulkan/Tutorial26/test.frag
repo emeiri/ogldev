@@ -28,13 +28,13 @@ layout(location = 0) out vec4 out_Color;
 
 layout(set = 1, binding = 0) uniform sampler2D Textures[];
 
-vec4 TextureBindless2D(uint TextureIndex, vec2 uv) 
+vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
-     return texture(Textures[TextureIndex], uv);
+     return texture(Textures[nonuniformEXT(MaterialIndex)], uv);
 }
 
 
 void main() 
 {
-    out_Color = TextureBindless2D(nonuniformEXT(MaterialIndex), texCoord);
+    out_Color = TextureBindless2D(MaterialIndex, texCoord);
 }
