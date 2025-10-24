@@ -50,6 +50,11 @@ GraphicsPipelineV3::GraphicsPipelineV3(VkDevice Device,
 
 GraphicsPipelineV3::GraphicsPipelineV3(const PipelineDesc& pd)
 {
+	if (pd.IsTexCube) {
+		printf("GraphicsPipelineV3 doesn't support texcubes. Use GraphicsPipelineV2 instead.");
+		exit(1);
+	}
+
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;
 
@@ -288,7 +293,7 @@ void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsVB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-			.binding = BindingVB,
+			.binding = V3_BindingVB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -299,7 +304,7 @@ void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsIB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
-			.binding = BindingIB,
+			.binding = V3_BindingIB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -310,7 +315,7 @@ void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsUniform) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-			.binding = BindingUniform,
+			.binding = V3_BindingUniform,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -329,17 +334,6 @@ void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 		LayoutBindings.push_back(FragmentShaderLayoutBinding_Tex);
 	}*/
-
-	if (IsCubemap) {
-		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_TexCube = {
-			.binding = BindingTextureCube,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		};
-
-		LayoutBindings.push_back(FragmentShaderLayoutBinding_TexCube);
-	}
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -487,7 +481,7 @@ void GraphicsPipelineV3::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			VkWriteDescriptorSet wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingVB,
+				.dstBinding = V3_BindingVB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -500,7 +494,7 @@ void GraphicsPipelineV3::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingIB,
+				.dstBinding = V3_BindingIB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -513,7 +507,7 @@ void GraphicsPipelineV3::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingUniform,
+				.dstBinding = V3_BindingUniform,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

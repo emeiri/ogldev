@@ -244,7 +244,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsVB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-			.binding = BindingVB,
+			.binding = V2_BindingVB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -255,7 +255,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsIB) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
-			.binding = BindingIB,
+			.binding = V2_BindingIB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -266,7 +266,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsUniform) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-			.binding = BindingUniform,
+			.binding = V2_BindingUniform,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -277,7 +277,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsTex2D) { 
 		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
-			.binding = BindingTexture2D,
+			.binding = V2_BindingTexture2D,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -288,7 +288,7 @@ void GraphicsPipelineV2::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 	if (IsCubemap) {
 		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_TexCube = {
-			.binding = BindingTextureCube,
+			.binding = V2_BindingTextureCube,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -388,7 +388,7 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			VkWriteDescriptorSet wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingVB,
+				.dstBinding = V2_BindingVB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -401,7 +401,7 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingIB,
+				.dstBinding = V2_BindingIB,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -414,7 +414,7 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingUniform,
+				.dstBinding = V2_BindingUniform,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -427,7 +427,7 @@ void GraphicsPipelineV2::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = BindingTexture2D,
+				.dstBinding = V2_BindingTexture2D,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,

@@ -24,33 +24,18 @@
 #include "ogldev_types.h"
 #include "ogldev_vulkan_core.h"
 #include "Int/model_desc.h"
+#include "Int/pipeline_desc.h"
 
 namespace OgldevVK {
 
-enum Binding {
-	BindingVB = 0,
-	BindingIB = 1,
-	BindingUniform = 2,
-	BindingTexture2D = 3,
-	BindingTextureCube = 4
+enum V2_Binding {
+	V2_BindingVB = 0,
+	V2_BindingIB = 1,
+	V2_BindingUniform = 2,
+	V2_BindingTexture2D = 3,
+	V2_BindingTextureCube = 4
 };
 
-
-struct PipelineDesc {
-	VkDevice Device = NULL;
-	GLFWwindow* pWindow = NULL;
-	VkShaderModule vs = NULL;
-	VkShaderModule fs = NULL;
-	int NumImages = 0;
-	VkFormat ColorFormat = VK_FORMAT_UNDEFINED;
-	VkFormat DepthFormat = VK_FORMAT_UNDEFINED;
-	VkCompareOp DepthCompareOp = VK_COMPARE_OP_LESS;
-	bool IsVB = false;
-	bool IsIB = false;
-	bool IsUniform = false;
-	bool IsTex2D = false;
-	bool IsTexCube = false;
-};
 
 class GraphicsPipelineV2 {
 
