@@ -19,9 +19,6 @@
 
 #version 460
 
-#extension GL_EXT_nonuniform_qualifier : require
-
-
 struct VertexData
 {
     float pos_x, pos_y, pos_z;
@@ -46,9 +43,7 @@ struct MetaData {
     int VertexOffset; 
 };
 
-layout(std430, set = 1, binding = 1) readonly buffer MetaSSBO {
-    MetaData metas[];
-} MetaBuf;
+layout(std430, set = 1, binding = 1) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
 
 
 layout(location = 0) out vec2 texCoord;

@@ -32,9 +32,9 @@ namespace OgldevVK {
 
 struct SubmeshMetaData {
 	u32 MaterialIndex;     // index into bindless descriptor array
-	u32 IndexOffset;       // offset into IndexSSBO (in indices)
-	u32 IndexCount;        // number of indices for this submesh
-	i32 VertexOffset;      // base vertex applied in shader
+	u32 BaseIndex;         // offset into IndexSSBO (in indices)
+	u32 NumIndices;        // number of indices for this submesh
+	i32 BaseVertex;        // base vertex applied in shader
 };
 
 #if defined(_MSC_VER)
@@ -172,13 +172,13 @@ void VkModel::CreateMetaData()
 	std::vector<SubmeshMetaData> MetaData(NumSubmeshes);
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;
-		MetaData[SubmeshIndex].IndexCount = m_Meshes[SubmeshIndex].NumIndices;
-		MetaData[SubmeshIndex].IndexOffset = m_Meshes[SubmeshIndex].BaseIndex;
-		MetaData[SubmeshIndex].VertexOffset = m_Meshes[SubmeshIndex].BaseVertex;
+		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;		
+		MetaData[SubmeshIndex].BaseIndex = m_Meshes[SubmeshIndex].BaseIndex;
+		MetaData[SubmeshIndex].NumIndices = m_Meshes[SubmeshIndex].NumIndices;
+		MetaData[SubmeshIndex].BaseVertex = m_Meshes[SubmeshIndex].BaseVertex;
 	}
 
-	m_metaData = m_pVulkanCore->CreateVertexBuffer(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));
+	m_metaData = m_pVulkanCore->CreateSSBO(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));
 }
 
 
@@ -322,7 +322,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 								NULL);	// pDynamicOffsets
 
 		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices,
-			InstanceCount, BaseVertex, SubmeshIndex);
+			      InstanceCount, BaseVertex, SubmeshIndex);
 	}
 }
 
