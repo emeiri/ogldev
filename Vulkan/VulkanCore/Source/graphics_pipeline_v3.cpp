@@ -25,27 +25,16 @@
 
 namespace OgldevVK {
 
-GraphicsPipelineV3::GraphicsPipelineV3(VkDevice Device,
-									   GLFWwindow* pWindow,
-									   VkRenderPass RenderPass,
-									   VkShaderModule vs,
-									   VkShaderModule fs,
-									   int NumImages,
-									   VkFormat ColorFormat, 
-									   VkFormat DepthFormat)
-{
-	m_device = Device;
-	m_numImages = NumImages;
+const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
 
-	bool IsVB = true;
-	bool IsIB = true;
-	bool IsUniform = true;
-	bool IsTex = true;
-	bool IsCubemap = false;
-	CreateDescriptorSetLayout(IsVB, IsIB, IsUniform, IsCubemap);
+enum V3_Binding {
+	V3_BindingVB = 0,
+	V3_BindingIB = 1,
+	V3_BindingUniform = 2,
 
-	InitCommon(pWindow, RenderPass, vs, fs, ColorFormat, DepthFormat, VK_COMPARE_OP_LESS);
-}
+	V3_BindingTexture2D = 0,
+	V3_BindingMetaData = 1
+};
 
 
 GraphicsPipelineV3::GraphicsPipelineV3(const PipelineDesc& pd)
@@ -58,7 +47,7 @@ GraphicsPipelineV3::GraphicsPipelineV3(const PipelineDesc& pd)
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;
 
-	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsUniform, pd.IsTexCube);
+	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsUniform);
 
 	if (pd.IsTex2D) {
 		CreateDescriptorSetLayoutTextures();
@@ -274,8 +263,7 @@ void GraphicsPipelineV3::CreateDescriptorPool(u32 TextureCount,
 	VkDescriptorPoolCreateInfo PoolCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.pNext = NULL,
-		.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | 
-				 VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT, 
+		.flags = 0, 
 		.maxSets = MaxSets,
 		.poolSizeCount = (u32)PoolSizes.size(),
 		.pPoolSizes = PoolSizes.empty() ? NULL : PoolSizes.data()
@@ -287,7 +275,7 @@ void GraphicsPipelineV3::CreateDescriptorPool(u32 TextureCount,
 
 
 
-void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform, bool IsCubemap)
+void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -324,16 +312,6 @@ void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
 
-/*	if (IsTex2D) {
-		VkDescriptorSetLayoutBinding FragmentShaderLayoutBinding_Tex = {
-			.binding = BindingTexture2D,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		};
-
-		LayoutBindings.push_back(FragmentShaderLayoutBinding_Tex);
-	}*/
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -350,20 +328,20 @@ void GraphicsPipelineV3::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 void GraphicsPipelineV3::CreateDescriptorSetLayoutTextures()
 {
-	const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
-
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings(2);
 
+	// Textures
 	LayoutBindings[0] = {
-		.binding = 0,
+		.binding = V3_BindingTexture2D,
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = MAX_TEXTURES,
 		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 		.pImmutableSamplers = NULL
 	};
 
+	// Meta data
 	LayoutBindings[1] = {
-		.binding = 1,
+		.binding = V3_BindingMetaData,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -373,12 +351,13 @@ void GraphicsPipelineV3::CreateDescriptorSetLayoutTextures()
 	VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.pNext = NULL,
-		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
+		.flags = 0,
 		.bindingCount = (u32)LayoutBindings.size(),
 		.pBindings = LayoutBindings.data()
 	};
 
-	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL, &m_descriptorSetLayoutTextures);
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL, 
+		                                       &m_descriptorSetLayoutTextures);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
 }
 
@@ -387,17 +366,21 @@ void GraphicsPipelineV3::AllocateDescriptorSets(int NumSubmeshes,
 											    std::vector<std::vector<VkDescriptorSet>>& DescriptorSets,
 												VkDescriptorSet& TexturesDescriptorSet)
 {
-	u32 TextureCount = 2048;
+	u32 TextureCount = MAX_TEXTURES;
 	u32 UniformBufferCount = m_numImages;
 	u32 StorageBufferCount = 3;	// IB, VB, MetaData
-	u32 MaxSets = NumSubmeshes * m_numImages + 1;
+	u32 MaxSets = NumSubmeshes * m_numImages + 1;		// + 1 is for the textures set
+
 	CreateDescriptorPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+
 	AllocateDescriptorSetsInternal(NumSubmeshes, DescriptorSets);
+
 	AllocateTextureDescriptorSet(TexturesDescriptorSet);
 }
 
 
-void GraphicsPipelineV3::AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+void GraphicsPipelineV3::AllocateDescriptorSetsInternal(int NumSubmeshes, 
+														std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
 {
 	std::vector<VkDescriptorSetLayout> Layouts(NumSubmeshes, m_descriptorSetLayout);
 
@@ -542,7 +525,7 @@ void GraphicsPipelineV3::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 		.pNext = NULL,
 		.dstSet = TexturesDescriptorSet,
-		.dstBinding = 0,
+		.dstBinding = V3_BindingTexture2D,
 		.dstArrayElement = 0,
 		.descriptorCount = TextureCount,
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -561,7 +544,7 @@ void GraphicsPipelineV3::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 		.pNext = NULL,
 		.dstSet = TexturesDescriptorSet,
-		.dstBinding = 1,
+		.dstBinding = V3_BindingMetaData,
 		.dstArrayElement = 0,
 		.descriptorCount = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,

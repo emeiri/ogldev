@@ -305,20 +305,20 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
 							Pipeline.GetPipelineLayout(),
-							1,  // firstSet
-							1,  // descriptorSetCount						
+							1,      // firstSet
+							1,      // descriptorSetCount						
 							&m_texturesDescriptorSet,
-							0,	// dynamicOffsetCount
+							0,	    // dynamicOffsetCount
 							NULL);	// pDynamicOffsets
 
 
 	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
 		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
 								Pipeline.GetPipelineLayout(),
-								0,  // firstSet
-								1,  // descriptorSetCount
+								0,      // firstSet
+								1,      // descriptorSetCount
 								&m_descriptorSets[ImageIndex][SubmeshIndex],
-								0,	// dynamicOffsetCount
+								0,	    // dynamicOffsetCount
 								NULL);	// pDynamicOffsets
 
 		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices,

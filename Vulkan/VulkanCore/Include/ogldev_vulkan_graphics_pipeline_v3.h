@@ -28,27 +28,10 @@
 
 namespace OgldevVK {
 
-enum V3_Binding {
-	V3_BindingVB = 0,
-	V3_BindingIB = 1,
-	V3_BindingUniform = 2,
-	V3_BindingTexture2D = 0,
-	V3_BindingMetaData = 1
-};
-
 // This version support descriptor indexing
 class GraphicsPipelineV3 {
 
 public:
-
-	GraphicsPipelineV3(VkDevice Device,
-					 GLFWwindow* pWindow,
-					 VkRenderPass RenderPass,
-					 VkShaderModule vs,
-					 VkShaderModule fs,
-					 int NumImages,
-					 VkFormat ColorFormat, 
-					 VkFormat DepthFormat);
 
 	GraphicsPipelineV3(const PipelineDesc& pd);
 
@@ -72,10 +55,11 @@ private:
 					VkShaderModule vs, VkShaderModule fs,
 					VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp);
 
-	void AllocateDescriptorSetsInternal(int NumSubmeshes, std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
+	void AllocateDescriptorSetsInternal(int NumSubmeshes, 
+		                                std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
 	void AllocateTextureDescriptorSet(VkDescriptorSet& TexturesDescriptorSet);
 	void CreateDescriptorPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount,	u32 MaxSets);
-	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform, bool IsCubemap);
+	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform);
 
 	void CreateDescriptorPoolTextures(int MaxSets);
 	void CreateDescriptorSetLayoutTextures();

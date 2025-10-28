@@ -87,7 +87,7 @@ private:
 	BufferAndMemory m_metaData;
 	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
-	VkDescriptorSet m_texturesDescriptorSet;
+	VkDescriptorSet m_texturesDescriptorSet = NULL;
 
 	size_t m_vertexSize = 0;	// sizeof(Vertex) OR sizeof(SkinnedVertex)
 
