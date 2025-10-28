@@ -370,7 +370,7 @@ private:
 			ImGui::DragFloat("##Scale", &m_scale, 0.001f, 0.001f, 2.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::SameLine();
 			if (ImGui::Button("Reset##Scale")) {
-				m_scale = 1.0f;
+				m_scale = 0.1f;
 			}
 		}
 
