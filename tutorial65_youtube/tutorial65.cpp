@@ -83,7 +83,7 @@ public:
         m_pScene->AddToRenderList(m_pSceneObject);
       //  m_pSceneObject->SetRotation(180.0f, 0.0f, 0.0f);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 0.8f, -2.0f), Vector3f(0.0f, -0.25f, 1.0f));
 
         m_pRenderingSystem->Execute();
     }
