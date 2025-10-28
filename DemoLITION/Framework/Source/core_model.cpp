@@ -335,8 +335,12 @@ void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNo
                 m_meshNameToMeshIndex[NodeName] = MeshIndex;
                 printf("Mesh '%s' mapped to mesh index %d\n", NodeName.c_str(), MeshIndex);
             } else {
-                printf("Warning: node name '%s' already found in the meshNameToMeshIndex map\n", NodeName.c_str());
-               // assert(0);
+                int OldMeshIndex = m_meshNameToMeshIndex[NodeName];
+                if (MeshIndex != OldMeshIndex) {
+                    printf("Warning: node name '%s' already mapped to index %d, new index %d\n", 
+                            NodeName.c_str(), OldMeshIndex, MeshIndex);
+                  //  assert(0);
+                }
             }                        
         }
         printf("\n");
@@ -619,7 +623,7 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
     for (unsigned int i = 0 ; i < pScene->mNumMaterials; i++) {
         const aiMaterial* pMaterial = pScene->mMaterials[i];
 
-        printf("Loading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
+        printf("\nLoading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
 
         SetMaterialType(pMaterial, m_Materials[i]);
 
@@ -730,7 +734,7 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 #endif
         }
 
-        m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = s_pMissingTexture;
+       m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = s_pMissingTexture;
     }
 }
 
