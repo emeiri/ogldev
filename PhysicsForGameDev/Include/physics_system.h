@@ -44,7 +44,7 @@ private:
 
     std::vector<PointMass> m_pointMasses;
     UpdateListener m_pUpdateListener = NULL;
-    int m_numPointMasses = 0;
+    int m_numActivePointMasses = 0;
 };
 
 }

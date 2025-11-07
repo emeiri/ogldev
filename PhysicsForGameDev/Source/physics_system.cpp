@@ -40,14 +40,14 @@ void System::Update(int DeltaTimeMillis)
 
 PointMass* System::AllocPointMass()
 {
-    if (m_numPointMasses == (int)m_pointMasses.size()) {
+    if (m_numActivePointMasses == (int)m_pointMasses.size()) {
         printf("Out of point masses\n");
         assert(0);
     }
 
-    PointMass* pm = &m_pointMasses[m_numPointMasses];
+    PointMass* pm = &m_pointMasses[m_numActivePointMasses];
 
-    m_numPointMasses++;
+    m_numActivePointMasses++;
 
     return pm;
 }

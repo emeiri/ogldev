@@ -32,9 +32,7 @@ void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& For
 
 
 void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
-{
-    assert(m_mass != 0.0f);
-
+{    
     m_linearAccel = m_sumForces / m_mass;
 
     m_linearVelocity += m_linearAccel * DeltaTime;

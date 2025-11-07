@@ -97,7 +97,7 @@ public:
         m_physicsSystem.Init(100, PhysicsUpdateListener);
 
         m_pPointMass1 = m_physicsSystem.AllocPointMass();
-        m_pPointMass1->Init(1.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
+        m_pPointMass1->Init(5.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
 
         m_pPointMass2 = m_physicsSystem.AllocPointMass();
         m_pPointMass2->Init(1.0f, m_pCarSceneObject2->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject2);
@@ -111,7 +111,7 @@ public:
         m_physicsSystem.Update((int)DeltaTimeMillis);
 
         if (glm::length(m_pPointMass2->GetLinearVelocity()) > 1.0f) {
-            m_pPointMass2->ResetSumForces();
+          //  m_pPointMass2->ResetSumForces();
         }
       //  m_pCarSceneObject1->RotateBy(0.0f, 0.5f, 0.0f);
       //  m_pCarSceneObject1->TranslateBy(-0.7f * (float)DeltaTimeMillis/1000.0f, 0.0f, 0.0f);
