@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\3rdparty;$(ProjectDir)\..\..\..\PhysicsModeling\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\3rdparty;$(ProjectDir)\..\..\..\PhysicsForGameDev\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -132,7 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Common\3rdparty\gtest\gtest-all.cc" />
-    <ClCompile Include="..\..\..\PhysicsModeling\Source\physics_test.cpp" />
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\Tests\physics_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

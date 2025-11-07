@@ -6,7 +6,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\PhysicsModeling\Tutorial01_1D_Kinematics\tutorial01.cpp">
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Tutorial01_ParticleDynamics\tutorial01.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -31,17 +31,22 @@ public:
 
     void Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget);
 
-    void Update(int DeltaTimeMillis, UpdateListener pUpdateListener);
+    // DeltaTime - 1.0f is 1 second.
+    void Update(float DeltaTime, UpdateListener pUpdateListener);
 
     void ResetSumForces() { m_sumForces = glm::vec3(0.0f); }
 
+    const glm::vec3 GetLinearVelocity() const { return m_linearVelocity; }
+
+private:
+    // Physics stuff
     glm::vec3 m_centerOfMass = glm::vec3(0.0f);
     glm::vec3 m_linearVelocity = glm::vec3(0.0f);
     glm::vec3 m_sumForces = glm::vec3(0.0f);
-    void* m_pTarget = NULL;
-    float m_mass = 0.0f;     
-
-private:
     glm::vec3 m_linearAccel = glm::vec3(0.0f);
+    float m_mass = 0.0f;
+
+    // Client interface
+    void* m_pTarget = NULL;
 };
 }

@@ -16,36 +16,40 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "point_mass.h"
+
+#include "physics_system.h"
 
 namespace Physics {
 
-void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
+void System::Init(int NumPointMasses, UpdateListener pUpdateListener)
 {
-    assert(Mass != 0.0f);
-
-    m_mass = Mass;
-    m_centerOfMass = StartPos;
-    m_sumForces = Force;
-    m_pTarget = pTarget;
+    m_pUpdateListener = pUpdateListener;
+    m_pointMasses.resize(NumPointMasses);
 }
 
 
-void PointMass::Update(int DeltaTimeMillis, UpdateListener pUpdateListener)
+void System::Update(int DeltaTimeMillis)
 {
-    assert(m_mass != 0.0f);
+    float DeltaTime = DeltaTimeMillis / 1000.f;
 
-    m_linearAccel = m_sumForces / m_mass;
-
-    float DeltaTime = (float)DeltaTimeMillis / 1000.0f;
-
-    m_linearVelocity += m_linearAccel * DeltaTime;
-
-    m_centerOfMass += m_linearVelocity * DeltaTime;
-
-    if (pUpdateListener) {
-        (*pUpdateListener)(m_pTarget, m_centerOfMass);
+    for (int i = 0 ; i < m_numPointMasses ; i++) {
+        m_pointMasses[i].Update(DeltaTime, m_pUpdateListener);
     }
 }
 
+
+PointMass* System::AllocPointMass()
+{
+    if (m_numPointMasses == (int)m_pointMasses.size()) {
+        printf("Out of point masses\n");
+        assert(0);
+    }
+
+    PointMass* pm = &m_pointMasses[m_numPointMasses];
+
+    m_numPointMasses++;
+
+    return pm;
+}
+ 
 }

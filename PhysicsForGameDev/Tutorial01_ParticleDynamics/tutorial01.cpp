@@ -26,7 +26,7 @@
 
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
-#include "physics_modeling.h"
+#include "physics_system.h"
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -40,9 +40,9 @@ static void PhysicsUpdateListener(void* pObject, const glm::vec3& Pos)
 }
 
 
-class ClearCoat : public BaseGLApp {
+class ParticleDynamics : public BaseGLApp {
 public:
-    ClearCoat() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Physics Tutorial 01 - 1D Kinematics")
+    ParticleDynamics() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Physics Tutorial 01 - Particle Dynamics")
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -50,7 +50,7 @@ public:
         m_dirLight.AmbientIntensity = 0.1f;
     }
 
-    ~ClearCoat() {}
+    ~ParticleDynamics() {}
 
 
     void Start()
@@ -67,9 +67,9 @@ public:
   
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/porsche/porsche_no_ground.gltf");
         Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
-        //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ClearCoatCarPaint/glTF/ClearCoatCarPaint.gltf");
+        //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ParticleDynamicsCarPaint/glTF/ParticleDynamicsCarPaint.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/CesiumMan/glTF/CesiumMan.gltf");
-       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ClearcoatWicker/glTF/ClearcoatWicker.gltf");
+       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ParticleDynamicsWicker/glTF/ParticleDynamicsWicker.gltf");
         int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
         pModel->SetAmbientOcclusionMap(AOMap);
 
@@ -109,7 +109,8 @@ public:
     void OnFrameChild(long long DeltaTimeMillis)
     {  
         m_physicsSystem.Update((int)DeltaTimeMillis);
-        if (glm::length(m_pPointMass2->m_linearVelocity) > 1.0f) {
+
+        if (glm::length(m_pPointMass2->GetLinearVelocity()) > 1.0f) {
             m_pPointMass2->ResetSumForces();
         }
       //  m_pCarSceneObject1->RotateBy(0.0f, 0.5f, 0.0f);
@@ -156,6 +157,6 @@ private:
 
 int main(int argc, char* arg[])
 {
-    ClearCoat demo;
+    ParticleDynamics demo;
     demo.Start();
 }

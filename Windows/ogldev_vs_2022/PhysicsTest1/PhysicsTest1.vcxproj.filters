@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\PhysicsModeling\Source\physics_test.cpp">
+    <ClCompile Include="..\..\..\Common\3rdparty\gtest\gtest-all.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Common\3rdparty\gtest\gtest-all.cc">
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\Tests\physics_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\PhysicsModeling\Include\physics_modeling.h" />
-    <ClInclude Include="..\..\..\PhysicsModeling\Include\point_mass.h" />
+    <ClInclude Include="..\..\..\PhysicsForGameDev\Include\physics_system.h" />
+    <ClInclude Include="..\..\..\PhysicsForGameDev\Include\point_mass.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\PhysicsModeling\Source\physics_modeling.cpp" />
-    <ClCompile Include="..\..\..\PhysicsModeling\Source\point_mass.cpp" />
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\physics_system.cpp" />
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\point_mass.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -32,6 +32,7 @@
     <ProjectGuid>{3af5dfbe-8a5c-47d0-b421-1cb3e7c4a0e8}</ProjectGuid>
     <RootNamespace>Framework</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>PhysicsSystem</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -125,7 +126,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\PhysicsModeling\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\PhysicsForGameDev\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>

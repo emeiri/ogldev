@@ -15,18 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\PhysicsModeling\Include\physics_modeling.h">
+    <ClInclude Include="..\..\..\PhysicsForGameDev\Include\physics_system.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsModeling\Include\point_mass.h">
+    <ClInclude Include="..\..\..\PhysicsForGameDev\Include\point_mass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\PhysicsModeling\Source\physics_modeling.cpp">
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\physics_system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsModeling\Source\point_mass.cpp">
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\point_mass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

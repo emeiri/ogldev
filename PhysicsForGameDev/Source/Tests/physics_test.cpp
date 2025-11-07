@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "physics_modeling.h"
+#include "physics_system.h"
 
 static bool ListenerCalled = false;
 
