@@ -32,7 +32,7 @@ void System::Update(int DeltaTimeMillis)
 {
     float DeltaTime = DeltaTimeMillis / 1000.f;
 
-    for (int i = 0 ; i < m_numPointMasses ; i++) {
+    for (int i = 0 ; i < m_numActivePointMasses; i++) {
         m_pointMasses[i].Update(DeltaTime, m_pUpdateListener);
     }
 }
