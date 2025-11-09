@@ -47,5 +47,6 @@ private:
 
     SkyboxTechnique m_skyboxTechnique;
     GLenum m_textureUnit = 0;
+    GLuint m_dummyVAO = INVALID_OGL_VALUE;
 };
 

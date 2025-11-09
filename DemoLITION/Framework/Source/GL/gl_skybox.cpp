@@ -59,6 +59,8 @@ void SkyBox::Init(GLenum TextureUnit, int TextureUnitIndex)
 
     m_skyboxTechnique.Enable();
     m_skyboxTechnique.SetTextureUnitIndex(TextureUnitIndex);
+
+    glGenVertexArrays(1, &m_dummyVAO);
 }
 
 
@@ -85,7 +87,9 @@ void SkyBox::Render(BaseCubmapTexture* pSkyboxTex, const Matrix4f& VP)
 
     pSkyboxTex->Bind(m_textureUnit);
 
+    glBindVertexArray(m_dummyVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
 
     glCullFace(OldCullFaceMode);
 
