@@ -83,6 +83,9 @@ public:
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);
 
+        m_pScene->GetConfig()->ControlSkybox(true);
+        m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
+
         m_pCarSceneObject1 = m_pScene->CreateSceneObject(pModel);
         m_pScene->AddToRenderList(m_pCarSceneObject1);
 
