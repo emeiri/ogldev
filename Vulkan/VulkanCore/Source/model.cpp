@@ -123,12 +123,17 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 {
 	size_t NumSubmeshes = m_alignedMeshes.size();
 
+	// The size of the buffer can be calculated by taking the offset of the last segment
+	// and adding its size.
 	size_t VertexBufferSize = m_alignedMeshes[NumSubmeshes - 1].VertexBufferOffset +
 		                      m_alignedMeshes[NumSubmeshes - 1].VertexBufferRange;
 
 	size_t IndexBufferSize = m_alignedMeshes[NumSubmeshes - 1].IndexBufferOffset +
 		                     m_alignedMeshes[NumSubmeshes - 1].IndexBufferRange;
 
+	// Allocate a temporary buffer to which the segments will
+	// be copied in an aligned fashion and use that to create the actual 
+	// vertex buffer. Remember to deallocate the temp buffer at the end.
 	assert(m_alignedVertices.pMem == NULL);
 	m_alignedVertices.Size = VertexBufferSize;
 	m_alignedVertices.pMem = (char*)malloc(VertexBufferSize);
@@ -139,6 +144,8 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 	m_alignedIndices.pMem = (char*)malloc(IndexBufferSize);
 	char* pSrcIndices = (char*)m_Indices.data();
 
+	// Copy the segments from the non aligned offsets to the aligned offsets
+	// in the temporary buffer.
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		size_t SrcOffset = m_Meshes[SubmeshIndex].BaseVertex * m_vertexSize;
 		char* pSrc = pSrcVertices + SrcOffset;
