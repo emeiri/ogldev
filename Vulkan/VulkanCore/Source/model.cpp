@@ -173,9 +173,9 @@ void VkModel::CreateMetaData()
 
 	for (int SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
 		MetaData[SubmeshIndex].MaterialIndex = m_Meshes[SubmeshIndex].MaterialIndex;		
-		MetaData[SubmeshIndex].BaseIndex = m_Meshes[SubmeshIndex].BaseIndex;
-		MetaData[SubmeshIndex].NumIndices = m_Meshes[SubmeshIndex].NumIndices;
-		MetaData[SubmeshIndex].BaseVertex = m_Meshes[SubmeshIndex].BaseVertex;
+		MetaData[SubmeshIndex].BaseIndex     = (u32)m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
+		MetaData[SubmeshIndex].NumIndices    = m_Meshes[SubmeshIndex].NumIndices;
+		MetaData[SubmeshIndex].BaseVertex    = (u32)m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
 	}
 
 	m_metaData = m_pVulkanCore->CreateSSBO(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));
@@ -264,7 +264,7 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 
 		md.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
 
-		offset = m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
+		offset = 0;//m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
 		range  = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
 
 		md.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };

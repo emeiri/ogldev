@@ -57,7 +57,8 @@ void main()
 
     MaterialIndex = md.MaterialIndex;
 
-    int Index = in_Indices.i[gl_VertexIndex];
+    uint BaseIndex = md.IndexOffset / 4;
+    int Index = in_Indices.i[BaseIndex + gl_VertexIndex];
 
     VertexData vtx = in_Vertices.v[Index];
 
