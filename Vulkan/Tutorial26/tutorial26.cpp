@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #26: Push constants
+		Tutorial #26: Descriptor Indexing
 */
 
 #include <array>
