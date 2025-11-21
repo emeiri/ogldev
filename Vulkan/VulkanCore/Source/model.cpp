@@ -34,7 +34,7 @@ struct SubmeshMetaData {
 	u32 MaterialIndex;     // index into bindless descriptor array
 	u32 BaseIndex;         // offset into IndexSSBO (in indices)
 	u32 NumIndices;        // number of indices for this submesh
-	i32 BaseVertex;        // base vertex applied in shader
+	u32 BaseVertex;        // base vertex applied in shader
 };
 
 #if defined(_MSC_VER)

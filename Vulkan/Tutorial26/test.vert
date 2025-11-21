@@ -19,6 +19,7 @@
 
 #version 460
 
+// Any change here must be reflected in NUM_FLOATS_IN_VERTEX_DATA!
 struct VertexData
 {
     float pos_x, pos_y, pos_z;
@@ -30,6 +31,9 @@ struct VertexData
     float color_r, color_g, color_b, color_a;
 };
 
+const int NUM_FLOATS_IN_VERTEX_DATA = 20;
+const int FLOAT_SIZE_IN_BYTES = 4;
+
 layout (std430, set = 0, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
 layout (set = 0, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
@@ -40,14 +44,15 @@ struct MetaData {
     uint MaterialIndex; 
     uint IndexOffset; 
     uint IndexCount; 
-    int VertexOffset; 
+    uint VertexOffset; 
 };
 
 layout(std430, set = 1, binding = 1) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
 
-
 layout(location = 0) out vec2 texCoord;
 layout(location = 1) flat out uint MaterialIndex;
+
+const int INDEX_SIZE_IN_BYTES = 4;
 
 void main() 
 {    
@@ -57,10 +62,11 @@ void main()
 
     MaterialIndex = md.MaterialIndex;
 
-    uint BaseIndex = md.IndexOffset / 4;
+    uint BaseIndex = md.IndexOffset / INDEX_SIZE_IN_BYTES;
     int Index = in_Indices.i[BaseIndex + gl_VertexIndex];
 
-    VertexData vtx = in_Vertices.v[Index];
+    uint BaseVertex = md.VertexOffset / (NUM_FLOATS_IN_VERTEX_DATA * FLOAT_SIZE_IN_BYTES);
+    VertexData vtx = in_Vertices.v[BaseVertex + Index];
 
     vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
 
