@@ -28,12 +28,12 @@ namespace OgldevVK {
 const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
 
 enum V4_Binding {
-	V4_BindingUniform = 0,
-
 	V4_BindingVB = 0,
 	V4_BindingIB = 1,
 	V4_BindingTexture2D = 2,
-	V4_BindingMetaData = 3
+	V4_BindingUniform = 3,
+	V4_BindingMetaData = 4,
+	V4_NumBindings = 5
 };
 
 
@@ -47,9 +47,7 @@ GraphicsPipelineV4::GraphicsPipelineV4(const PipelineDesc& pd)
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;
 
-	CreateDescriptorSetLayout(pd.IsUniform);
-
-	CreateDescriptorSetLayoutTextures(pd.IsVB, pd.IsIB, pd.IsTex2D);
+	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsTex2D, pd.IsUniform);
 
 	InitCommon(pd.pWindow, NULL, pd.vs, pd.fs, pd.ColorFormat, pd.DepthFormat, pd.DepthCompareOp);
 }
@@ -58,7 +56,6 @@ GraphicsPipelineV4::GraphicsPipelineV4(const PipelineDesc& pd)
 GraphicsPipelineV4::~GraphicsPipelineV4()
 {
 	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
-	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayoutTextures, NULL);
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
@@ -182,7 +179,7 @@ void GraphicsPipelineV4::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 	};
 
-	std::vector<VkDescriptorSetLayout> SetLayouts = { m_descriptorSetLayout, m_descriptorSetLayoutTextures };
+	std::vector<VkDescriptorSetLayout> SetLayouts = { m_descriptorSetLayout };
 	VkPipelineLayoutCreateInfo LayoutInfo = {};
 
 	LayoutInfo = {
@@ -273,35 +270,7 @@ void GraphicsPipelineV4::CreateDescriptorPool(u32 TextureCount,
 
 
 
-void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsUniform)
-{
-	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
-
-	if (IsUniform) {
-		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-			.binding = V4_BindingUniform,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		};
-
-		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
-	}
-
-	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,			// reserved - must be zero
-		.bindingCount = (u32)LayoutBindings.size(),
-		.pBindings = LayoutBindings.data()
-	};
-
-	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
-	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
-}
-
-
-void GraphicsPipelineV4::CreateDescriptorSetLayoutTextures(bool IsVB, bool IsIB, bool IsTex)
+void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
@@ -339,6 +308,17 @@ void GraphicsPipelineV4::CreateDescriptorSetLayoutTextures(bool IsVB, bool IsIB,
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Tex);
 	}
 
+	if (IsUniform) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
+			.binding = V4_BindingUniform,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		};
+
+		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
+	}
+
 	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_MetaData = {
 		.binding = V4_BindingMetaData,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -349,41 +329,35 @@ void GraphicsPipelineV4::CreateDescriptorSetLayoutTextures(bool IsVB, bool IsIB,
 
 	LayoutBindings.push_back(VertexShaderLayoutBinding_MetaData);
 
-	VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
+	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.pNext = NULL,
-		.flags = 0,
+		.flags = 0,			// reserved - must be zero
 		.bindingCount = (u32)LayoutBindings.size(),
 		.pBindings = LayoutBindings.data()
 	};
 
-	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL, 
-		                                       &m_descriptorSetLayoutTextures);
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &m_descriptorSetLayout);
 	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
 }
 
 
-void GraphicsPipelineV4::AllocateDescriptorSets(int NumSubmeshes, 
-											    std::vector<std::vector<VkDescriptorSet>>& DescriptorSets,
-												VkDescriptorSet& TexturesDescriptorSet)
+void GraphicsPipelineV4::AllocateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets)
 {
 	u32 TextureCount = MAX_TEXTURES;
-	u32 UniformBufferCount = m_numImages;
-	u32 StorageBufferCount = 3;	// IB, VB, MetaData
-	u32 MaxSets = NumSubmeshes * m_numImages + 1;		// + 1 is for the textures set
+	u32 UniformBufferCount = 0;
+	u32 StorageBufferCount = 4;	// IB, VB, Uniforms, MetaData
+	u32 MaxSets = m_numImages;
 
 	CreateDescriptorPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
 
-	AllocateDescriptorSetsInternal(NumSubmeshes, DescriptorSets);
-
-	AllocateTextureDescriptorSet(TexturesDescriptorSet);
+	AllocateDescriptorSetsInternal(DescriptorSets);
 }
 
 
-void GraphicsPipelineV4::AllocateDescriptorSetsInternal(int NumSubmeshes, 
-														std::vector<std::vector<VkDescriptorSet>>& DescriptorSets)
+void GraphicsPipelineV4::AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet>& DescriptorSets)
 {
-	std::vector<VkDescriptorSetLayout> Layouts(NumSubmeshes, m_descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
@@ -395,83 +369,26 @@ void GraphicsPipelineV4::AllocateDescriptorSetsInternal(int NumSubmeshes,
 
 	DescriptorSets.resize(m_numImages);
 
-	for (int ImageIndex = 0; ImageIndex < DescriptorSets.size(); ImageIndex++) {
-		DescriptorSets[ImageIndex].resize(NumSubmeshes);
-
-		VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets[ImageIndex].data());
-		CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
-	}
-}
-
-
-void GraphicsPipelineV4::AllocateTextureDescriptorSet(VkDescriptorSet& TexturesDescriptorSet)
-{
-	VkDescriptorSetAllocateInfo AllocInfo = {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-		.pNext = NULL,
-		.descriptorPool = m_descriptorPool,
-		.descriptorSetCount = 1,
-		.pSetLayouts = &m_descriptorSetLayoutTextures
-	};
-
-	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, &TexturesDescriptorSet);
-	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+    VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
+	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");	
 }
 
 
 void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
-											  std::vector<std::vector<VkDescriptorSet>>& DescriptorSets,
-											  VkDescriptorSet& TexturesDescriptorSet)
+											  std::vector<VkDescriptorSet>& DescriptorSets)
 {
-	UpdateTexturesDescriptorSet(ModelDesc, TexturesDescriptorSet);
+	int NumBindings = V4_NumBindings;
 
-	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumBindings);
 
-	int NumBindings = 1; // Uniform
+	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * NumBindings);
-
-	std::vector<std::vector<VkDescriptorBufferInfo>> BufferInfo_Uniforms(m_numImages);
-
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		
-		BufferInfo_Uniforms[ImageIndex].resize(NumSubmeshes);
-
-		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].buffer = ModelDesc.m_uniforms[ImageIndex];
-			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_offset;
-			BufferInfo_Uniforms[ImageIndex][SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_uniformRange.m_range;
-		}
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {		
+		BufferInfo_Uniforms[ImageIndex].buffer = ModelDesc.m_uniforms[ImageIndex];
+		BufferInfo_Uniforms[ImageIndex].offset = 0;
+		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
 	}
 
-	u32 WdsIndex = 0;
-
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		for (u32 SubmeshIndex = 0; SubmeshIndex < NumSubmeshes; SubmeshIndex++) {
-			VkDescriptorSet DstSet = DescriptorSets[ImageIndex][SubmeshIndex];
-
-			VkWriteDescriptorSet wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = V4_BindingUniform,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				.pBufferInfo = &BufferInfo_Uniforms[ImageIndex][SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-		}
-	}
-
-	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
-}
-
-
-void GraphicsPipelineV4::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc, 
-													 VkDescriptorSet& TexturesDescriptorSet)
-{
 	u32 TextureCount = (u32)ModelDesc.m_materials.size();
 	std::vector<VkDescriptorImageInfo> ImageInfos;
 	ImageInfos.resize(TextureCount);
@@ -482,22 +399,10 @@ void GraphicsPipelineV4::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(4);
-
 	VkDescriptorBufferInfo BufferInfo_VB = {
 		.buffer = ModelDesc.m_vb,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
-	};
-
-	WriteDescriptorSet[0] = {
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.dstSet = TexturesDescriptorSet,
-		.dstBinding = V4_BindingVB,
-		.dstArrayElement = 0,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-		.pBufferInfo = &BufferInfo_VB
 	};
 
 	VkDescriptorBufferInfo BufferInfo_IB = {
@@ -505,50 +410,92 @@ void GraphicsPipelineV4::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};
-
-	WriteDescriptorSet[1] = { 
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.dstSet = TexturesDescriptorSet,
-		.dstBinding = V4_BindingIB,
-		.dstArrayElement = 0,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-		.pBufferInfo = &BufferInfo_IB
-	};
-
-	WriteDescriptorSet[2] = {
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.pNext = NULL,
-		.dstSet = TexturesDescriptorSet,
-		.dstBinding = V4_BindingTexture2D,
-		.dstArrayElement = 0,
-		.descriptorCount = TextureCount,
-		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.pImageInfo = ImageInfos.data(),
-		.pBufferInfo = NULL,
-		.pTexelBufferView = NULL
-	};
-
+	
 	VkDescriptorBufferInfo MetaDataBufferInfo = {
 		.buffer = ModelDesc.m_metaData,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};
 
-	WriteDescriptorSet[3] = {
-		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-		.pNext = NULL,
-		.dstSet = TexturesDescriptorSet,
-		.dstBinding = V4_BindingMetaData,
-		.dstArrayElement = 0,
-		.descriptorCount = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-		.pImageInfo = NULL,
-		.pBufferInfo = &MetaDataBufferInfo,
-		.pTexelBufferView = NULL
-	};
+	u32 WdsIndex = 0;
 
-	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+		VkDescriptorSet& DstSet = DescriptorSets[ImageIndex];
+
+		VkWriteDescriptorSet wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = V4_BindingVB,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pBufferInfo = &BufferInfo_VB
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = V4_BindingIB,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pBufferInfo = &BufferInfo_IB
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = NULL,
+			.dstSet = DstSet,
+			.dstBinding = V4_BindingTexture2D,
+			.dstArrayElement = 0,
+			.descriptorCount = TextureCount,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = ImageInfos.data(),
+			.pBufferInfo = NULL,
+			.pTexelBufferView = NULL
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = V4_BindingUniform,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = NULL,
+			.dstSet = DstSet,
+			.dstBinding = V4_BindingMetaData,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.pImageInfo = NULL,
+			.pBufferInfo = &MetaDataBufferInfo,
+			.pTexelBufferView = NULL
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+	}
+
+	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
 }
+
 
 }

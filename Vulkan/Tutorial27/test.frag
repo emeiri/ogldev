@@ -26,7 +26,7 @@ layout(location = 1) flat in uint MaterialIndex;
 
 layout(location = 0) out vec4 out_Color;
 
-layout(set = 1, binding = 2) uniform sampler2D Textures[];
+layout(set = 0, binding = 2) uniform sampler2D Textures[];
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
