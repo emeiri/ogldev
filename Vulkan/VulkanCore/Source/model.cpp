@@ -219,6 +219,21 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 }
 
 
+void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
+{
+	assert(m_isDescriptorIndexing);
+
+	int NumSubmeshes = (int)m_Meshes.size();
+	Pipeline.AllocateDescriptorSets(NumSubmeshes, m_descriptorSets, m_texturesDescriptorSet);
+
+	ModelDesc md;
+
+	UpdateModelDesc(md);
+
+	Pipeline.UpdateDescriptorSets(md, m_descriptorSets, m_texturesDescriptorSet);
+}
+
+
 void VkModel::UpdateModelDesc(ModelDesc& md)
 {
 	md.m_vb = m_vb.m_buffer;
@@ -266,12 +281,13 @@ void VkModel::UpdateModelDesc(ModelDesc& md)
 				exit(0);
 			}		
 		}
+
 		size_t offset = m_alignedMeshes[SubmeshIndex].VertexBufferOffset;
-		size_t range  = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
+		size_t range = m_alignedMeshes[SubmeshIndex].VertexBufferRange;
 
 		md.m_ranges[SubmeshIndex].m_vbRange = { .m_offset = offset, .m_range = range };
 
-		offset = 0;//m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
+		offset = m_alignedMeshes[SubmeshIndex].IndexBufferOffset;
 		range  = m_alignedMeshes[SubmeshIndex].IndexBufferRange;
 
 		md.m_ranges[SubmeshIndex].m_ibRange = { .m_offset = offset, .m_range = range };
@@ -330,6 +346,35 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 
 		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices,
 			      InstanceCount, BaseVertex, SubmeshIndex);
+	}
+}
+
+
+void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV4& Pipeline, int ImageIndex)
+{
+	u32 InstanceCount = 1;
+	u32 BaseVertex = 0;
+
+	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+		Pipeline.GetPipelineLayout(),
+		1,      // firstSet
+		1,      // descriptorSetCount						
+		&m_texturesDescriptorSet,
+		0,	    // dynamicOffsetCount
+		NULL);	// pDynamicOffsets
+
+
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+		vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+			Pipeline.GetPipelineLayout(),
+			0,      // firstSet
+			1,      // descriptorSetCount
+			&m_descriptorSets[ImageIndex][SubmeshIndex],
+			0,	    // dynamicOffsetCount
+			NULL);	// pDynamicOffsets
+
+		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices,
+			InstanceCount, BaseVertex, SubmeshIndex);
 	}
 }
 

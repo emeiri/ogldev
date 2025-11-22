@@ -59,10 +59,10 @@ private:
 		                                std::vector< std::vector<VkDescriptorSet> >& DescriptorSets);
 	void AllocateTextureDescriptorSet(VkDescriptorSet& TexturesDescriptorSet);
 	void CreateDescriptorPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount,	u32 MaxSets);
-	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform);
+	void CreateDescriptorSetLayout(bool IsUniform);
 
 	void CreateDescriptorPoolTextures(int MaxSets);
-	void CreateDescriptorSetLayoutTextures();
+	void CreateDescriptorSetLayoutTextures(bool IsVB, bool IsIB, bool IsTex);
 
 	void UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc, VkDescriptorSet& TexturesDescriptorSet);
 

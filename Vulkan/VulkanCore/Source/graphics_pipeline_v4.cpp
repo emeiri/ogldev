@@ -27,13 +27,13 @@ namespace OgldevVK {
 
 const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
 
-enum V3_Binding {
-	V3_BindingVB = 0,
-	V3_BindingIB = 1,
-	V3_BindingUniform = 2,
+enum V4_Binding {
+	V4_BindingUniform = 0,
 
-	V3_BindingTexture2D = 0,
-	V3_BindingMetaData = 1
+	V4_BindingVB = 0,
+	V4_BindingIB = 1,
+	V4_BindingTexture2D = 2,
+	V4_BindingMetaData = 3
 };
 
 
@@ -47,11 +47,9 @@ GraphicsPipelineV4::GraphicsPipelineV4(const PipelineDesc& pd)
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;
 
-	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsUniform);
+	CreateDescriptorSetLayout(pd.IsUniform);
 
-	if (pd.IsTex2D) {
-		CreateDescriptorSetLayoutTextures();
-	}
+	CreateDescriptorSetLayoutTextures(pd.IsVB, pd.IsIB, pd.IsTex2D);
 
 	InitCommon(pd.pWindow, NULL, pd.vs, pd.fs, pd.ColorFormat, pd.DepthFormat, pd.DepthCompareOp);
 }
@@ -275,35 +273,13 @@ void GraphicsPipelineV4::CreateDescriptorPool(u32 TextureCount,
 
 
 
-void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsUniform)
+void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsUniform)
 {
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	if (IsVB) {
-		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
-			.binding = V3_BindingVB,
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		};
-
-		LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
-	}
-
-	if (IsIB) {
-		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
-			.binding = V3_BindingIB,
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-		};
-
-		LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
-	}
-
 	if (IsUniform) {
 		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Uniform = {
-			.binding = V3_BindingUniform,
+			.binding = V4_BindingUniform,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
@@ -311,7 +287,6 @@ void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 
 		LayoutBindings.push_back(VertexShaderLayoutBinding_Uniform);
 	}
-
 
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -326,27 +301,53 @@ void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 }
 
 
-void GraphicsPipelineV4::CreateDescriptorSetLayoutTextures()
+void GraphicsPipelineV4::CreateDescriptorSetLayoutTextures(bool IsVB, bool IsIB, bool IsTex)
 {
-	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings(2);
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
-	// Textures
-	LayoutBindings[0] = {
-		.binding = V3_BindingTexture2D,
-		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-		.descriptorCount = MAX_TEXTURES,
-		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-		.pImmutableSamplers = NULL
-	};
+	if (IsVB) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_VB = {
+			.binding = V4_BindingVB,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		};
 
-	// Meta data
-	LayoutBindings[1] = {
-		.binding = V3_BindingMetaData,
+		LayoutBindings.push_back(VertexShaderLayoutBinding_VB);
+	}
+
+	if (IsIB) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_IB = {
+			.binding = V4_BindingIB,
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		};
+
+		LayoutBindings.push_back(VertexShaderLayoutBinding_IB);
+	}
+
+	if (IsTex) {
+		VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_Tex = {
+			.binding = V4_BindingTexture2D,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = MAX_TEXTURES,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		};
+
+		LayoutBindings.push_back(VertexShaderLayoutBinding_Tex);
+	}
+
+	VkDescriptorSetLayoutBinding VertexShaderLayoutBinding_MetaData = {
+		.binding = V4_BindingMetaData,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 		.pImmutableSamplers = NULL
 	};
+
+	LayoutBindings.push_back(VertexShaderLayoutBinding_MetaData);
 
 	VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -426,23 +427,11 @@ void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 	u32 NumSubmeshes = (u32)DescriptorSets[0].size();
 
-	int NumBindings = 3; // VB, IB, Uniform
+	int NumBindings = 1; // Uniform
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumSubmeshes * NumBindings);
 
-	std::vector<VkDescriptorBufferInfo> BufferInfo_VBs(NumSubmeshes);
-	std::vector<VkDescriptorBufferInfo> BufferInfo_IBs(NumSubmeshes);
 	std::vector<std::vector<VkDescriptorBufferInfo>> BufferInfo_Uniforms(m_numImages);
-
-	for (u32 SubmeshIndex = 0 ; SubmeshIndex < NumSubmeshes ; SubmeshIndex++) {
-		BufferInfo_VBs[SubmeshIndex].buffer = ModelDesc.m_vb;
-		BufferInfo_VBs[SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_offset;
-		BufferInfo_VBs[SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_vbRange.m_range;
-
-		BufferInfo_IBs[SubmeshIndex].buffer = ModelDesc.m_ib;
-		BufferInfo_IBs[SubmeshIndex].offset = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_offset;
-		BufferInfo_IBs[SubmeshIndex].range = ModelDesc.m_ranges[SubmeshIndex].m_ibRange.m_range;
-	}
 
 	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
 		
@@ -464,33 +453,7 @@ void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			VkWriteDescriptorSet wds = {
 				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 				.dstSet = DstSet,
-				.dstBinding = V3_BindingVB,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_VBs[SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-
-			wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = V3_BindingIB,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-				.pBufferInfo = &BufferInfo_IBs[SubmeshIndex]
-			};
-
-			assert(WdsIndex < WriteDescriptorSet.size());
-			WriteDescriptorSet[WdsIndex++] = wds;
-
-			wds = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.dstSet = DstSet,
-				.dstBinding = V3_BindingUniform,
+				.dstBinding = V4_BindingUniform,
 				.dstArrayElement = 0,
 				.descriptorCount = 1,
 				.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -519,13 +482,45 @@ void GraphicsPipelineV4::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(2);
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(4);
+
+	VkDescriptorBufferInfo BufferInfo_VB = {
+		.buffer = ModelDesc.m_vb,
+		.offset = 0,
+		.range = VK_WHOLE_SIZE
+	};
 
 	WriteDescriptorSet[0] = {
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+		.dstSet = TexturesDescriptorSet,
+		.dstBinding = V4_BindingVB,
+		.dstArrayElement = 0,
+		.descriptorCount = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.pBufferInfo = &BufferInfo_VB
+	};
+
+	VkDescriptorBufferInfo BufferInfo_IB = {
+		.buffer = ModelDesc.m_ib,
+		.offset = 0,
+		.range = VK_WHOLE_SIZE
+	};
+
+	WriteDescriptorSet[1] = { 
+		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+		.dstSet = TexturesDescriptorSet,
+		.dstBinding = V4_BindingIB,
+		.dstArrayElement = 0,
+		.descriptorCount = 1,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+		.pBufferInfo = &BufferInfo_IB
+	};
+
+	WriteDescriptorSet[2] = {
+		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 		.pNext = NULL,
 		.dstSet = TexturesDescriptorSet,
-		.dstBinding = V3_BindingTexture2D,
+		.dstBinding = V4_BindingTexture2D,
 		.dstArrayElement = 0,
 		.descriptorCount = TextureCount,
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -534,22 +529,22 @@ void GraphicsPipelineV4::UpdateTexturesDescriptorSet(const ModelDesc& ModelDesc,
 		.pTexelBufferView = NULL
 	};
 
-	VkDescriptorBufferInfo BufferInfo = {
+	VkDescriptorBufferInfo MetaDataBufferInfo = {
 		.buffer = ModelDesc.m_metaData,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};
 
-	WriteDescriptorSet[1] = {
+	WriteDescriptorSet[3] = {
 		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 		.pNext = NULL,
 		.dstSet = TexturesDescriptorSet,
-		.dstBinding = V3_BindingMetaData,
+		.dstBinding = V4_BindingMetaData,
 		.dstArrayElement = 0,
 		.descriptorCount = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 		.pImageInfo = NULL,
-		.pBufferInfo = &BufferInfo,
+		.pBufferInfo = &MetaDataBufferInfo,
 		.pTexelBufferView = NULL
 	};
 
