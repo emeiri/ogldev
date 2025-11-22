@@ -332,6 +332,7 @@ void VulkanCore::CreateDevice()
 	VkPhysicalDeviceFeatures DeviceFeatures = { 0 };
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;
+	DeviceFeatures.multiDrawIndirect = VK_TRUE;
 
 	VkPhysicalDeviceDescriptorIndexingFeatures DescriptorSetIndexingFeatures{};
 

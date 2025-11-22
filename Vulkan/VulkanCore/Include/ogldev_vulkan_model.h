@@ -90,6 +90,7 @@ private:
 	BufferAndMemory m_vb;
 	BufferAndMemory m_ib;
 	BufferAndMemory m_metaData;
+	BufferAndMemory m_indirectBuffer;
 	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
 	VkDescriptorSet m_texturesDescriptorSet = NULL;

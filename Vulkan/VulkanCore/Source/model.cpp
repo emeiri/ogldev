@@ -49,6 +49,7 @@ void VkModel::Destroy()
 	m_vb.Destroy(m_pVulkanCore->GetDevice());
 	m_ib.Destroy(m_pVulkanCore->GetDevice());
 	m_metaData.Destroy(m_pVulkanCore->GetDevice());
+	m_indirectBuffer.Destroy(m_pVulkanCore->GetDevice());
 
 	for (int i = 0; i < m_uniformBuffers.size(); i++) {
 		m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
@@ -168,6 +169,21 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 
 	if (m_isDescriptorIndexing) {
 		CreateMetaData();
+
+		std::vector<VkDrawIndirectCommand> DrawCommands(m_Meshes.size());
+
+		for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+			VkDrawIndirectCommand cmd = {
+				.vertexCount = m_Meshes[SubmeshIndex].NumIndices,
+				.instanceCount = 1,
+				.firstVertex = 0,
+				.firstInstance = SubmeshIndex
+			};
+
+			DrawCommands[SubmeshIndex] = cmd;
+		}
+
+		m_indirectBuffer = m_pVulkanCore->CreateIndirectBuffer(DrawCommands.data(), ARRAY_SIZE_IN_BYTES(DrawCommands));
 	}
 }
 
@@ -363,11 +379,11 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV4& Pi
 		0,	    // dynamicOffsetCount
 		NULL);	// pDynamicOffsets
 
-
-	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-		vkCmdDraw(CmdBuf, m_Meshes[SubmeshIndex].NumIndices,
-   			      InstanceCount, BaseVertex, SubmeshIndex);
-	}
+	vkCmdDrawIndirect(CmdBuf,
+					  m_indirectBuffer.m_buffer, 
+					  0,              
+					  (u32)m_Meshes.size(),
+					  sizeof(VkDrawIndirectCommand));
 }
 
 
