@@ -94,6 +94,8 @@ public:
 
 	BufferAndMemory CreateSSBO(const void* pVertices, size_t Size);
 
+	BufferAndMemory CreateIndirectBuffer(const void* pVertices, size_t Size);
+
 	std::vector<BufferAndMemory> CreateUniformBuffers(size_t Size);
 	
 	void CreateTexture(const char* pFilename, VulkanTexture& Tex);
@@ -130,6 +132,7 @@ private:
 	void CreateCommandBufferPool();	
 	BufferAndMemory CreateUniformBuffer(size_t Size);
 	void CreateDepthResources();
+	BufferAndMemory CreateBufferInternal(VkBufferUsageFlagBits Usage, const void* pVertices, size_t Size);
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 

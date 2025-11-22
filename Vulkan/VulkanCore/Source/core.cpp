@@ -625,6 +625,18 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 
 BufferAndMemory VulkanCore::CreateSSBO(const void* pVertices, size_t Size)
 {
+	return CreateBufferInternal(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, pVertices, Size);
+}
+
+
+BufferAndMemory VulkanCore::CreateIndirectBuffer(const void* pVertices, size_t Size)
+{
+	return CreateBufferInternal(VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, pVertices, Size);
+}
+
+
+BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlagBits RequestedUsage, const void* pVertices, size_t Size)
+{
 	// Step 1: create the staging buffer
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	VkMemoryPropertyFlags MemProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -646,7 +658,7 @@ BufferAndMemory VulkanCore::CreateSSBO(const void* pVertices, size_t Size)
 	vkUnmapMemory(m_device, StagingVB.m_mem);
 
 	// Step 5: create the final buffer
-	Usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+	Usage = RequestedUsage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	MemProps = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 	BufferAndMemory VB = CreateBuffer(Size, Usage, MemProps);
 
