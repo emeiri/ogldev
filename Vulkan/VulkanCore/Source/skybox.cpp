@@ -61,16 +61,18 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 
 void Skybox::Destroy()
 {
-	for (int i = 0; i < m_uniformBuffers.size(); i++) {
-		m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
+	if (m_pVulkanCore) {		// In case the object was never initialized
+		for (int i = 0; i < m_uniformBuffers.size(); i++) {
+			m_uniformBuffers[i].Destroy(m_pVulkanCore->GetDevice());
+		}
+
+		vkDestroyShaderModule(m_pVulkanCore->GetDevice(), m_vs, NULL);
+		vkDestroyShaderModule(m_pVulkanCore->GetDevice(), m_fs, NULL);
+
+		m_cubemapTex.Destroy(m_pVulkanCore->GetDevice());
+
+		delete m_pPipeline;
 	}
-
-	vkDestroyShaderModule(m_pVulkanCore->GetDevice(), m_vs, NULL);
-	vkDestroyShaderModule(m_pVulkanCore->GetDevice(), m_fs, NULL);
-
-	m_cubemapTex.Destroy(m_pVulkanCore->GetDevice());
-
-	delete m_pPipeline;
 }
 	
 
