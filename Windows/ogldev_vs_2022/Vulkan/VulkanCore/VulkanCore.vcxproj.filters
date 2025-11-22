@@ -123,6 +123,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v3.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v4.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -202,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\pipeline_desc.h">
       <Filter>Header Files\Int</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline_v4.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
