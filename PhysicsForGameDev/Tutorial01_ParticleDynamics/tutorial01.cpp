@@ -36,7 +36,9 @@ static void PhysicsUpdateListener(void* pObject, const glm::vec3& Pos)
     //GLM_PRINT_VEC3("", Pos);
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
-    pSceneObject->SetPosition(Pos);
+    if (Pos.y >= 0.5f) {
+        pSceneObject->SetPosition(Pos);
+    }
 }
 
 
@@ -83,19 +85,20 @@ public:
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);
 
-        m_pScene->GetConfig()->ControlSkybox(true);
-        m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
+       // m_pScene->GetConfig()->ControlSkybox(true);
+       // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
 
         m_pCarSceneObject1 = m_pScene->CreateSceneObject(pModel);
+        m_pCarSceneObject1->SetPosition(0.0f, 0.5f, 0.0);
         m_pScene->AddToRenderList(m_pCarSceneObject1);
 
         m_pCarSceneObject2 = m_pScene->CreateSceneObject(pModel);
-        m_pCarSceneObject2->SetPosition(0.0f, 0.0f, 3.0);
+        m_pCarSceneObject2->SetPosition(0.0f, 150.0f, 3.0);
         m_pScene->AddToRenderList(m_pCarSceneObject2);
 
         m_pCarSceneObject1->SetRotation(0.0f, -90.0f, 0.0f);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 4.0f, -8.0f), Vector3f(0.0f, -0.3f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 60.0f, -100.0f), Vector3f(0.0f, -0.3f, 1.0f));
 
         m_physicsSystem.Init(100, PhysicsUpdateListener);
 
@@ -103,7 +106,7 @@ public:
         m_pPointMass1->Init(5.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
 
         m_pPointMass2 = m_physicsSystem.AllocPointMass();
-        m_pPointMass2->Init(1.0f, m_pCarSceneObject2->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject2);
+        m_pPointMass2->Init(1.0f, m_pCarSceneObject2->GetGLMPos(), Physics::GRAVITY, m_pCarSceneObject2);
 
         m_pRenderingSystem->Execute();
     }
