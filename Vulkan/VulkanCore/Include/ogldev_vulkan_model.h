@@ -83,6 +83,8 @@ private:
 
 	void CreateMetaData();
 
+	void CreateIndirectBuffer();
+
 	VulkanCore* m_pVulkanCore = NULL;
 
 	bool m_isDescriptorIndexing = false;

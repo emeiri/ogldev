@@ -169,21 +169,7 @@ void VkModel::CreateBuffers(std::vector<Vertex>& Vertices)
 
 	if (m_isDescriptorIndexing) {
 		CreateMetaData();
-
-		std::vector<VkDrawIndirectCommand> DrawCommands(m_Meshes.size());
-
-		for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
-			VkDrawIndirectCommand cmd = {
-				.vertexCount = m_Meshes[SubmeshIndex].NumIndices,
-				.instanceCount = 1,
-				.firstVertex = 0,
-				.firstInstance = SubmeshIndex
-			};
-
-			DrawCommands[SubmeshIndex] = cmd;
-		}
-
-		m_indirectBuffer = m_pVulkanCore->CreateIndirectBuffer(DrawCommands.data(), ARRAY_SIZE_IN_BYTES(DrawCommands));
+		CreateIndirectBuffer();
 	}
 }
 
@@ -204,6 +190,25 @@ void VkModel::CreateMetaData()
 	m_metaData = m_pVulkanCore->CreateSSBO(MetaData.data(), ARRAY_SIZE_IN_BYTES(MetaData));
 }
 
+
+void VkModel::CreateIndirectBuffer()
+{
+	std::vector<VkDrawIndirectCommand> DrawCommands(m_Meshes.size());
+
+	for (u32 SubmeshIndex = 0; SubmeshIndex < m_Meshes.size(); SubmeshIndex++) {
+		VkDrawIndirectCommand cmd = {
+			.vertexCount = m_Meshes[SubmeshIndex].NumIndices,
+			.instanceCount = 1,
+			.firstVertex = 0,
+			.firstInstance = SubmeshIndex
+		};
+
+		DrawCommands[SubmeshIndex] = cmd;
+	}
+
+	m_indirectBuffer = m_pVulkanCore->CreateIndirectBuffer(DrawCommands.data(), ARRAY_SIZE_IN_BYTES(DrawCommands));
+
+}
 
 void VkModel::CreateDescriptorSets(GraphicsPipelineV2& Pipeline)
 {
