@@ -371,7 +371,7 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 }
 
 
-void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV4& Pipeline, int ImageIndex)
+void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, GraphicsPipelineV4& Pipeline, int ImageIndex)
 {
 	u32 InstanceCount = 1;
 	u32 BaseVertex = 0;

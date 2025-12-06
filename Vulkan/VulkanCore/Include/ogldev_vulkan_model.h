@@ -52,7 +52,7 @@ public:
 
 	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& pPipeline, int ImageIndex);
 
-	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV4& pPipeline, int ImageIndex);
+	void RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, GraphicsPipelineV4& pPipeline, int ImageIndex);
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 

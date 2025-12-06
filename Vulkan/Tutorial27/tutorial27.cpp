@@ -313,7 +313,7 @@ private:
 			BeginRendering(CmdBuf, i);
 		
 			m_pPipeline->Bind(CmdBuf);
-			m_model.RecordCommandBuffer(CmdBuf, *m_pPipeline, i);
+			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pPipeline, i);
 			
 		//	m_skybox.RecordCommandBuffer(CmdBuf, i);
 
