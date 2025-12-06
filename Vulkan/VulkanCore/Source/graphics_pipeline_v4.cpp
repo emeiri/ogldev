@@ -345,8 +345,8 @@ void GraphicsPipelineV4::CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool Is
 void GraphicsPipelineV4::AllocateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets)
 {
 	u32 TextureCount = MAX_TEXTURES;
-	u32 UniformBufferCount = 0;
-	u32 StorageBufferCount = 4;	// IB, VB, Uniforms, MetaData
+	u32 UniformBufferCount = m_numImages;
+	u32 StorageBufferCount = 3;	// IB, VB, MetaData
 	u32 MaxSets = m_numImages;
 
 	CreateDescriptorPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
