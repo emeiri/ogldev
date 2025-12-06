@@ -28,6 +28,9 @@ void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& For
     m_centerOfMass = StartPos;
     m_sumForces = Force;
     m_pTarget = pTarget;
+
+    m_linearAccel = glm::vec3(0.0f);
+    m_linearVelocity = glm::vec3(0.0f);
 }
 
 
