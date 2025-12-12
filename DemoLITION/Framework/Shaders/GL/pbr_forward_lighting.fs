@@ -406,8 +406,11 @@ vec4 sampleNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) {
 }
 
 
+vec3 SampleClearCoatNormal(InputAttributes tc, MetallicRoughnessDataGPU mat) 
 {
-    return texture(mat.clearCoat.NormalSampler, tc.uv[mat.clearCoat.NormalUV]);
+    vec3 Normal = texture(mat.clearCoat.NormalSampler, tc.uv[mat.clearCoat.NormalUV]).rgb;
+    vec3 tangentNormal = normalize(Normal * 2.0 - 1.0);
+    return tangentNormal;
 }
 
 
