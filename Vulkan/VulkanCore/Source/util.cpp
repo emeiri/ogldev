@@ -73,6 +73,8 @@ const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type)
 }
 
 
+// Use vkuGetFormatInfo from vulkan\utility\vk_format_utils.h
+// instead of the following function
 int GetBytesPerTexFormat(VkFormat Format)
 {
 	switch (Format)

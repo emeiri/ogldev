@@ -37,7 +37,8 @@ const char* GetDebugSeverityStr(VkDebugUtilsMessageSeverityFlagBitsEXT Severity)
 
 const char* GetDebugType(VkDebugUtilsMessageTypeFlagsEXT Type);
 
-int GetBytesPerTexFormat(VkFormat Format);
+// Deprecated
+//int GetBytesPerTexFormat(VkFormat Format);
 
 bool HasStencilComponent(VkFormat Format);
 
