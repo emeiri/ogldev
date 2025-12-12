@@ -32,8 +32,26 @@ void System::Update(int DeltaTimeMillis)
 {
     float DeltaTime = DeltaTimeMillis / 1000.f;
 
-    for (int i = 0 ; i < m_numActivePointMasses; i++) {
+    UpdateInternal(DeltaTime);
+    HandleCollisions(DeltaTime);
+}
+
+
+void System::UpdateInternal(float DeltaTime)
+{    
+    for (int i = 0; i < m_numActivePointMasses; i++) {
         m_pointMasses[i].Update(DeltaTime, m_pUpdateListener);
+    }
+}
+
+
+void System::HandleCollisions(float DeltaTime)
+{
+    for (int i = 0; i < m_numActivePointMasses; i++) {
+        for (int j = i + 1; j < m_numActivePointMasses; j++) {
+            PointMass& OtherParticle = m_pointMasses[j];
+            m_pointMasses[i].HandleCollision(OtherParticle, DeltaTime);
+        }
     }
 }
 
@@ -51,5 +69,6 @@ PointMass* System::AllocPointMass()
 
     return pm;
 }
+
  
 }

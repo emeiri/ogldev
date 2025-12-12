@@ -44,6 +44,10 @@ public:
 
 private:
 
+    void UpdateInternal(float DeltaTime);
+
+    void HandleCollisions(float DeltaTime);
+
     std::vector<PointMass> m_pointMasses;
     UpdateListener m_pUpdateListener = NULL;
     int m_numActivePointMasses = 0;

@@ -98,17 +98,19 @@ public:
         m_pSphere2->SetPosition(0.0f, 1.0f, 5.0);
         m_pScene->AddToRenderList(m_pSphere2);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 4.0f, 0.0f), Vector3f(0.0f, -0.3f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 20.0f, 1.0f), Vector3f(0.0f, -0.9f, 0.3f));
 
         m_physicsSystem.Init(100, PhysicsUpdateListener);
 
         m_pPointMass1 = m_physicsSystem.AllocPointMass();
-        float RandomX = RandomFloatRange(1.0f, 5.0f);
-        float RandomZ = RandomFloatRange(-0.5f, 0.5f);
+        float RandomX = 1.0f;//RandomFloatRange(1.0f, 5.0f);
+        float RandomZ = 0.0f;//RandomFloatRange(-0.5f, 0.5f);
         m_pPointMass1->Init(1.0f, m_pSphere1->GetGLMPos(), glm::vec3(RandomX, 0.0f, RandomZ), m_pSphere1);
+        m_pPointMass1->SetBoundingRadius(1.0f);
 
         m_pPointMass2 = m_physicsSystem.AllocPointMass();
         m_pPointMass2->Init(1.0f, m_pSphere2->GetGLMPos(), glm::vec3(0.0f, 0.0f, 0.0f), m_pSphere2);
+        m_pPointMass2->SetBoundingRadius(1.0f);
 
         m_pRenderingSystem->Execute();
     }
@@ -118,9 +120,10 @@ public:
     {  
         m_physicsSystem.Update((int)DeltaTimeMillis);
 
-        if (m_pSphere1->GetPosition().x >= 5.0f) {
-            float RandomX = RandomFloatRange(1.0f, 5.0f);
-            float RandomZ = RandomFloatRange(-0.5f, 0.5f);
+        if ((m_pSphere1->GetPosition().x >= 10.0f) ||
+            (m_pSphere1->GetPosition().z >= 40.0f)) {
+            float RandomX = 1.0f;//RandomFloatRange(1.0f, 5.0f);
+            float RandomZ = 0.0f;//RandomFloatRange(-0.5f, 0.5f);
             m_pPointMass1->Init(1.0f, glm::vec3(-10.0f, 1.0f, 15.0), glm::vec3(RandomX, 0.0f, RandomZ), m_pSphere1);
         }
 
