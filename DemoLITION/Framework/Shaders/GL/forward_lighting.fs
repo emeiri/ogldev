@@ -907,4 +907,6 @@ void main()
   //  FragColor = GetMaterialAmbientColor();
   //FragColor = vec4(Normal0, 1.0);
   // FragColor = vec4(Lights[1].DiffuseIntensity);
+
+  //  FragColor = texture(gNormalMap, TexCoord);
 }
