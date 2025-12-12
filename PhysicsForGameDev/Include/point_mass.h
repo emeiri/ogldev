@@ -38,13 +38,24 @@ public:
 
     const glm::vec3 GetLinearVelocity() const { return m_linearVelocity; }
 
+    void SetBoundingRadius(float r);
+
+    void HandleCollision(PointMass& OtherParticle, float DeltaTime);
+
 private:
+
+    bool CheckCollision(PointMass& OtherParticle);
+
     // Physics stuff
     glm::vec3 m_centerOfMass = glm::vec3(0.0f);
     glm::vec3 m_linearVelocity = glm::vec3(0.0f);
     glm::vec3 m_sumForces = glm::vec3(0.0f);
     glm::vec3 m_linearAccel = glm::vec3(0.0f);
     float m_mass = 0.0f;
+
+    float m_boundingRadius = 0.0f;
+
+    float m_coeffOfRest = 1.0f;
 
     // Client interface
     void* m_pTarget = NULL;

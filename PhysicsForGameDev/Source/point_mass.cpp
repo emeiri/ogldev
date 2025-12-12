@@ -16,7 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/norm.hpp>
+
 #include "point_mass.h"
+#include "ogldev_util.h"
 
 namespace Physics {
 
@@ -45,6 +49,72 @@ void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
     if (pUpdateListener) {
         (*pUpdateListener)(m_pTarget, m_centerOfMass);
     }
+}
+
+void PointMass::SetBoundingRadius(float r)
+{
+    if (r < 0.0f) {
+        OGLDEV_ERROR0("Bounding radius must be >= 0");
+        assert(0);
+    }
+
+    m_boundingRadius = r;
+}
+
+
+void PointMass::HandleCollision(PointMass& OtherParticle, float DeltaTime)
+{
+    DeltaTime = 1.0f;
+    if ((m_boundingRadius > 0.0f) && (OtherParticle.m_boundingRadius)) {
+        bool CollisionOccured = CheckCollision(OtherParticle);
+
+        if (CollisionOccured) {
+            printf("Collision\n");
+
+            glm::vec3 DistanceNorm = glm::normalize(m_centerOfMass - OtherParticle.m_centerOfMass);
+
+            float Velocity1 = glm::dot(m_linearVelocity, DistanceNorm);
+            float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, DistanceNorm);
+
+            float AvgCoeffRest = (m_coeffOfRest + OtherParticle.m_coeffOfRest) / 2.0f;
+
+            float SumOfMass = m_mass + OtherParticle.m_mass;
+            float AvgCoeffRestPlusOne = (1.0f + AvgCoeffRest);
+
+            float Nom = ((m_mass - AvgCoeffRest * OtherParticle.m_mass) * Velocity1) +
+                           (AvgCoeffRestPlusOne * OtherParticle.m_mass  * Velocity2);
+            
+            float FinalVelocity1 = Nom / SumOfMass;
+
+            Nom = ((OtherParticle.m_mass - AvgCoeffRest * m_mass) * Velocity2) +
+                                   (AvgCoeffRestPlusOne * m_mass  * Velocity1);
+
+            float FinalVelocity2 = Nom / SumOfMass;
+
+            m_linearVelocity += (FinalVelocity1 - Velocity1) * DistanceNorm;
+            OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * DistanceNorm;
+
+            m_linearAccel = m_linearVelocity / DeltaTime;
+            OtherParticle.m_linearAccel = OtherParticle.m_linearVelocity / DeltaTime;
+
+            m_sumForces = m_linearAccel * m_mass;
+            OtherParticle.m_sumForces = OtherParticle.m_linearAccel * OtherParticle.m_mass;
+        }
+    }
+    
+}
+
+
+bool PointMass::CheckCollision(PointMass& OtherParticle)
+{
+    float DistSquared = glm::length2(m_centerOfMass - OtherParticle.m_centerOfMass);
+
+    float MinDistanceSquared = m_boundingRadius + OtherParticle.m_boundingRadius;
+    MinDistanceSquared *= MinDistanceSquared;
+
+    bool CollisionOccured = MinDistanceSquared >= DistSquared;
+
+    return CollisionOccured;
 }
 
 }
