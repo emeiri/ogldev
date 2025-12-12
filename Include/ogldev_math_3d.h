@@ -16,8 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MATH_3D_H
-#define MATH_3D_H
+#pragma once
 
 #ifdef _WIN64
 #ifndef _USE_MATH_DEFINES
@@ -996,4 +995,3 @@ glm::quat RotationBetweenVectors(glm::vec3& start, glm::vec3& dest);
 
 #define GLM_PRINT_VEC3(s, v) printf("%s (%f,%f,%f)\n", s, v.x, v.y, v.z)
 
-#endif  /* MATH_3D_H */
