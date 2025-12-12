@@ -1,0 +1,9 @@
+# Blender 4.3.2 MTL File: 'None'
+# www.blender.org
+
+newmtl sphere1
+Ka 0.200000 0.200000 0.200000
+Kd 0.827451 0.792157 0.772549
+Ks 0.000000 0.000000 0.000000
+Ns 0.000000
+map_Kd .\white.png
