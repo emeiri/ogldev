@@ -1,0 +1,1 @@
+For the sources of the youtube series "Physics For Game Dev" check out the directory ogldev/PhysicsForGameDev.
