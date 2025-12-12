@@ -263,12 +263,22 @@ struct Vector3f
 
     float Distance(const Vector3f& v) const
     {
+        float DistSquared = DistanceSquared(v);
+        float distance = sqrtf(DistSquared);
+        return distance;
+    }
+
+    float DistanceSquared(const Vector3f& v) const
+    {
         float delta_x = x - v.x;
         float delta_y = y - v.y;
         float delta_z = z - v.z;
-        float distance = sqrtf(delta_x * delta_x + delta_y * delta_y + delta_z * delta_z);
-        return distance;
+
+        float DistanceSquared = delta_x * delta_x + delta_y * delta_y + delta_z * delta_z;
+
+        return DistanceSquared;
     }
+
 
     float Length() const
     {
