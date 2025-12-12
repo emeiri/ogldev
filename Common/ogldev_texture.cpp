@@ -183,6 +183,7 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
     glCreateTextures(m_textureTarget, 1, &m_textureObj);
 
     int Levels = std::min(5, (int)log2f((float)std::max(m_imageWidth, m_imageHeight)));
+    Levels = std::max(1, Levels);   // must be 1 or greater else the GL call will fail
 
     GLenum InternalFormat = GL_NONE;
 
