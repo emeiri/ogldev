@@ -82,11 +82,10 @@ void PointMass::HandleCollision(PointMass& OtherParticle, float DeltaTime)
                 m_linearVelocity = sharedVelocity;
                 OtherParticle.m_linearVelocity = sharedVelocity;
             } else {
+                glm::vec3 CollisionNormal = glm::normalize(m_centerOfMass - OtherParticle.m_centerOfMass);
 
-                glm::vec3 DistanceNorm = glm::normalize(m_centerOfMass - OtherParticle.m_centerOfMass);
-
-                float Velocity1 = glm::dot(m_linearVelocity, DistanceNorm);
-                float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, DistanceNorm);
+                float Velocity1 = glm::dot(m_linearVelocity, CollisionNormal);
+                float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, CollisionNormal);
 
                 float SumOfMass = m_mass + OtherParticle.m_mass;
                 float AvgCoeffRestPlusOne = (1.0f + AvgCoeffRest);
@@ -101,13 +100,13 @@ void PointMass::HandleCollision(PointMass& OtherParticle, float DeltaTime)
 
                 float FinalVelocity2 = Nom / SumOfMass;
 
-                m_linearVelocity += (FinalVelocity1 - Velocity1) * DistanceNorm;
-                OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * DistanceNorm;
+                m_linearVelocity               += (FinalVelocity1 - Velocity1) * CollisionNormal;
+                OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * CollisionNormal;
 
-                m_linearAccel = m_linearVelocity / DeltaTime;
+                m_linearAccel               = m_linearVelocity / DeltaTime;
                 OtherParticle.m_linearAccel = OtherParticle.m_linearVelocity / DeltaTime;
 
-                m_sumForces = m_linearAccel * m_mass;
+                m_sumForces               = m_linearAccel * m_mass;
                 OtherParticle.m_sumForces = OtherParticle.m_linearAccel * OtherParticle.m_mass;
             }
         }
