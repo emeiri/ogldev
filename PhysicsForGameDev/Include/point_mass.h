@@ -44,7 +44,7 @@ public:
 
 private:
 
-    bool CheckCollision(PointMass& OtherParticle);
+    bool CheckCollision(const PointMass& OtherParticle) const;
 
     // Physics stuff
     glm::vec3 m_centerOfMass = glm::vec3(0.0f);
