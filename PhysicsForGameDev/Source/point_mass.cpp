@@ -70,7 +70,7 @@ void PointMass::HandleCollision(PointMass& OtherParticle)
         if (CollisionOccured) {
             printf("Collision\n");
 
-            float AvgCoeffRest = (m_coeffOfRest + OtherParticle.m_coeffOfRest) / 2.0f;
+            float AvgCoeffRest = (m_coeffOfRest + OtherParticle.m_coeffOfRest) * 0.5f;
 
             if (AvgCoeffRest == 0.0f) {
                 glm::vec3 totalMomentum = m_mass * m_linearVelocity +
