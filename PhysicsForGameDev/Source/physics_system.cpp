@@ -33,7 +33,7 @@ void System::Update(int DeltaTimeMillis)
     float DeltaTime = DeltaTimeMillis / 1000.f;
 
     UpdateInternal(DeltaTime);
-    HandleCollisions(DeltaTime);
+    HandleCollisions();
 }
 
 
@@ -45,12 +45,12 @@ void System::UpdateInternal(float DeltaTime)
 }
 
 
-void System::HandleCollisions(float DeltaTime)
+void System::HandleCollisions()
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
         for (int j = i + 1; j < m_numActivePointMasses; j++) {
             PointMass& OtherParticle = m_pointMasses[j];
-            m_pointMasses[i].HandleCollision(OtherParticle, DeltaTime);
+            m_pointMasses[i].HandleCollision(OtherParticle);
         }
     }
 }

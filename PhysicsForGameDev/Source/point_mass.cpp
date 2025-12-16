@@ -62,9 +62,8 @@ void PointMass::SetBoundingRadius(float r)
 }
 
 
-void PointMass::HandleCollision(PointMass& OtherParticle, float DeltaTime)
+void PointMass::HandleCollision(PointMass& OtherParticle)
 {
-    DeltaTime = 1.0f;
     if ((m_boundingRadius > 0.0f) && (OtherParticle.m_boundingRadius)) {
         bool CollisionOccured = CheckCollision(OtherParticle);
 

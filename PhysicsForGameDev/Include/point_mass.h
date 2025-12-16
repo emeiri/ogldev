@@ -40,7 +40,7 @@ public:
 
     void SetBoundingRadius(float r);
 
-    void HandleCollision(PointMass& OtherParticle, float DeltaTime);
+    void HandleCollision(PointMass& OtherParticle);
 
 private:
 
