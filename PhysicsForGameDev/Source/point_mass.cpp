@@ -81,32 +81,39 @@ void PointMass::HandleCollision(PointMass& OtherParticle)
                 m_linearVelocity = sharedVelocity;
                 OtherParticle.m_linearVelocity = sharedVelocity;
             } else {
-                glm::vec3 CollisionNormal = glm::normalize(m_centerOfMass - OtherParticle.m_centerOfMass);
+                glm::vec3 CollisionNormal = m_centerOfMass - OtherParticle.m_centerOfMass;
 
-                float Velocity1 = glm::dot(m_linearVelocity, CollisionNormal);
-                float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, CollisionNormal);
+                float Distance = glm::length(CollisionNormal);
 
-                float SumOfMass = m_mass + OtherParticle.m_mass;
-                float AvgCoeffRestPlusOne = (1.0f + AvgCoeffRest);
+                if (Distance > 0.0) {
+                    CollisionNormal /= Distance;    // Normalize
 
-                float Nom = ((m_mass - AvgCoeffRest * OtherParticle.m_mass) * Velocity1) +
-                               (AvgCoeffRestPlusOne * OtherParticle.m_mass  * Velocity2);
+                    // 4. Check if objects are moving toward each other
+                    glm::vec3 RelVelocity = m_linearVelocity - OtherParticle.m_linearVelocity;
+                    float RelNormalVel = glm::dot(RelVelocity, CollisionNormal);
 
-                float FinalVelocity1 = Nom / SumOfMass;
+                    if (RelNormalVel <= 0.0f) { // Skip if they are already separating
 
-                Nom = ((OtherParticle.m_mass - AvgCoeffRest * m_mass) * Velocity2) +
-                                       (AvgCoeffRestPlusOne * m_mass  * Velocity1);
+                        float Velocity1 = glm::dot(m_linearVelocity, CollisionNormal);
+                        float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, CollisionNormal);
 
-                float FinalVelocity2 = Nom / SumOfMass;
+                        float SumOfMass = m_mass + OtherParticle.m_mass;
+                        float AvgCoeffRestPlusOne = (1.0f + AvgCoeffRest);
 
-                m_linearVelocity               += (FinalVelocity1 - Velocity1) * CollisionNormal;
-                OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * CollisionNormal;
+                        float Nom = ((m_mass - AvgCoeffRest * OtherParticle.m_mass) * Velocity1) +
+                                       (AvgCoeffRestPlusOne * OtherParticle.m_mass * Velocity2);
 
-                m_linearAccel               = m_linearVelocity / DeltaTime;
-                OtherParticle.m_linearAccel = OtherParticle.m_linearVelocity / DeltaTime;
+                        float FinalVelocity1 = Nom / SumOfMass;
 
-                m_sumForces               = m_linearAccel * m_mass;
-                OtherParticle.m_sumForces = OtherParticle.m_linearAccel * OtherParticle.m_mass;
+                        Nom = ((OtherParticle.m_mass - AvgCoeffRest * m_mass) * Velocity2) +
+                                                (AvgCoeffRestPlusOne * m_mass * Velocity1);
+
+                        float FinalVelocity2 = Nom / SumOfMass;
+
+                        m_linearVelocity += (FinalVelocity1 - Velocity1) * CollisionNormal;
+                        OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * CollisionNormal;
+                    }
+                }
             }
         }
     }    
