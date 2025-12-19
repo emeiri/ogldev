@@ -73,13 +73,13 @@ void PointMass::HandleCollision(PointMass& OtherParticle)
             float AvgCoeffRest = (m_coeffOfRest + OtherParticle.m_coeffOfRest) * 0.5f;
 
             if (AvgCoeffRest == 0.0f) {
-                glm::vec3 totalMomentum = m_mass * m_linearVelocity +
+                glm::vec3 TotalMomentum = m_mass * m_linearVelocity +
                                           OtherParticle.m_mass * OtherParticle.m_linearVelocity;
 
-                glm::vec3 sharedVelocity = totalMomentum / (m_mass + OtherParticle.m_mass);
+                glm::vec3 SharedVelocity = TotalMomentum / (m_mass + OtherParticle.m_mass);
 
-                m_linearVelocity = sharedVelocity;
-                OtherParticle.m_linearVelocity = sharedVelocity;
+                m_linearVelocity = SharedVelocity;
+                OtherParticle.m_linearVelocity = SharedVelocity;
             } else {
                 glm::vec3 CollisionNormal = m_centerOfMass - OtherParticle.m_centerOfMass;
 
