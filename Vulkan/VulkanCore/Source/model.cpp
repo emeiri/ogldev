@@ -385,10 +385,10 @@ void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, GraphicsPipeli
 		NULL);	// pDynamicOffsets
 
 	vkCmdDrawIndirect(CmdBuf,
-					  m_indirectBuffer.m_buffer, 
-					  0,              
-					  (u32)m_Meshes.size(),
-					  sizeof(VkDrawIndirectCommand));
+					m_indirectBuffer.m_buffer, 
+					0,  // offset inside the indirect buffer            
+					(u32)m_Meshes.size(), // number of VkDrawIndirectCommand elements
+					sizeof(VkDrawIndirectCommand)); // stride between VkDrawIndirectCommand elements
 }
 
 

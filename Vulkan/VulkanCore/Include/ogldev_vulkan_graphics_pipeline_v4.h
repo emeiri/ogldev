@@ -28,7 +28,7 @@
 
 namespace OgldevVK {
 
-// This version support descriptor indexing
+// This version support descriptor indexing and indirect rendering
 class GraphicsPipelineV4 {
 
 public:
