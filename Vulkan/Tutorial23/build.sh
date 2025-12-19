@@ -36,6 +36,7 @@ $CC tutorial23.cpp \
     ../VulkanCore/Source/ogldev_imgui.cpp \
     ../VulkanCore/Source/graphics_pipeline_v2.cpp \
     ../VulkanCore/Source/graphics_pipeline_v3.cpp \
+    ../VulkanCore/Source/graphics_pipeline_v4.cpp \
     ../../Common/ogldev_util.cpp  \
     ../../Common/math_3d.cpp  \
     ../../Common/ogldev_glm_camera.cpp  \
