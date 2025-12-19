@@ -18,8 +18,6 @@
 #include <vector>
 #include <assert.h>
 
-#include <vulkan/utility/vk_format_utils.h>
-
 #include "3rdparty/stb_image.h"
 
 #include "ogldev_ect_cubemap.h"
@@ -825,7 +823,7 @@ void VulkanCore::CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex)
 	// Hack...
 	int NumFaces = 6;
 	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;
-	int BytesPerPixel = vkuGetFormatInfo(Format).block_size;
+	int BytesPerPixel = GetBytesPerTexFormat(Format);
 	size_t SingleFaceNumBytes = FaceSize * FaceSize * BytesPerPixel;
 	size_t TotalBytes = NumFaces * SingleFaceNumBytes;
 	char* p = (char*)malloc(TotalBytes);
@@ -939,7 +937,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, 
 								    VkFormat TexFormat, int LayerCount, const void* pPixels, bool IsCubemap)
 {
-	int BytesPerPixel = vkuGetFormatInfo(TexFormat).block_size;
+	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
 	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;	 
 	VkDeviceSize ImageSize = LayerCount * LayerSize;
