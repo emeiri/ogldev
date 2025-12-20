@@ -109,13 +109,13 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_skybox.Init(SKYBOX_TEXTURE_UNIT, SKYBOX_TEXTURE_UNIT_INDEX);
 
-    m_lightingFBO.Init(m_windowWidth, m_windowHeight, 4, false, true);
+    m_lightingFBO.Init(m_windowWidth, m_windowHeight, 4, false, true, false);
 
-    m_normalFBO.Init(m_windowWidth, m_windowHeight, 3, false, true);
+    m_normalFBO.Init(m_windowWidth, m_windowHeight, 3, false, true, false);
 
-    m_ssaoFBO.Init(m_windowWidth, m_windowHeight, 3, false, false);
+    m_ssaoFBO.Init(m_windowWidth, m_windowHeight, 3, false, false, false);
 
-    m_hdrFBO.Init(m_windowWidth, m_windowHeight, 3, true, true);
+    m_hdrFBO.Init(m_windowWidth, m_windowHeight, 3, true, true, false);
 
     int Size = m_windowWidth * m_windowHeight;
     m_hdrData.resize(Size * 3);

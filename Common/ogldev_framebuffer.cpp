@@ -24,39 +24,46 @@ Framebuffer::~Framebuffer()
 }
 
 
-void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled)
+void Framebuffer::Init(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled, bool NormalEnabled)
 {
     if (IsGLVersionHigher(4, 5)) {
-        InitDSA(Width, Height, NumFormatComponents, IsFloat, DepthEnabled);
+        InitDSA(Width, Height, NumFormatComponents, IsFloat, DepthEnabled, NormalEnabled);
     } else {
-        InitNonDSA(Width, Height, NumFormatComponents, IsFloat, DepthEnabled);
+        InitNonDSA(Width, Height, NumFormatComponents, IsFloat, DepthEnabled, NormalEnabled);
     }
 }
 
 
-void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled)
+void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled, bool NormalEnabled)
 {
     m_width = Width;
     m_height = Height;
 
     glCreateFramebuffers(1, &m_fbo);
 
-    GenerateColorBuffer(Width, Height, NumFormatComponents, IsFloat);
-
-    if (DepthEnabled) {
-        GenerateDepthBuffer(Width, Height);
-    }
-
+    GenerateBuffer(m_colorBuffer, Width, Height, NumFormatComponents, IsFloat);
     glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, m_colorBuffer, 0);
 
     if (DepthEnabled) {
+        GenerateDepthBuffer(Width, Height);
         glNamedFramebufferTexture(m_fbo, GL_DEPTH_ATTACHMENT, m_depthBuffer, 0);
     }
 
-    GLenum drawBuf = GL_COLOR_ATTACHMENT0;
-    glNamedFramebufferDrawBuffer(m_fbo, drawBuf);
-    glNamedFramebufferReadBuffer(m_fbo, drawBuf);
+    if (NormalEnabled) {
+        GenerateBuffer(m_normalBuffer, Width, Height, 4, true);
+        glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT1, m_normalBuffer, 0);
+    }
 
+    std::vector<GLenum> DrawBuffers;
+
+    DrawBuffers.push_back(GL_COLOR_ATTACHMENT0);
+
+    if (NormalEnabled) {
+        DrawBuffers.push_back(GL_COLOR_ATTACHMENT1);
+    }
+
+    glNamedFramebufferDrawBuffers(m_fbo, (GLsizei)DrawBuffers.size(), DrawBuffers.data());
+    
     GLenum Status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER);
 
     if (Status != GL_FRAMEBUFFER_COMPLETE) {
@@ -66,14 +73,14 @@ void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool I
 }
 
 
-void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled)
+void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled, bool NormalEnabled)
 {
     m_width = Width;
     m_height = Height;
 
     glGenFramebuffers(1, &m_fbo);
 
-    GenerateColorBuffer(Width, Height, NumFormatComponents, IsFloat);
+    GenerateBuffer(m_colorBuffer, Width, Height, NumFormatComponents, IsFloat);
 
     if (DepthEnabled) {
         GenerateDepthBuffer(Width, Height);
@@ -124,18 +131,18 @@ void Framebuffer::GenerateDepthBuffer(int Width, int Height)
 }
 
 
-void Framebuffer::GenerateColorBuffer(int Width, int Height, int NumFormatComponents, bool IsFloat)
+void Framebuffer::GenerateBuffer(GLuint& Buffer, int Width, int Height, int NumFormatComponents, bool IsFloat)
 {
     if (IsGLVersionHigher(4, 5)) {
-        GenerateColorBufferDSA(NumFormatComponents, IsFloat, Width, Height);
+        GenerateBufferDSA(Buffer, NumFormatComponents, IsFloat, Width, Height);
     }
     else {
-        GenerateColorBufferNonDSA(NumFormatComponents, IsFloat, Width, Height);
+        GenerateBufferNonDSA(Buffer, NumFormatComponents, IsFloat, Width, Height);
     }
 }
 
 
-void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, bool IsFloat, int Width, int Height)
+void Framebuffer::GenerateBufferDSA(GLuint& Buffer, int NumFormatComponents, bool IsFloat, int Width, int Height)
 {
     GLenum InternalFormat = 0;
 
@@ -166,20 +173,20 @@ void Framebuffer::GenerateColorBufferDSA(int NumFormatComponents, bool IsFloat, 
         assert(0);
     }
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_colorBuffer);
-    glTextureStorage2D(m_colorBuffer, 1, InternalFormat, Width, Height);
-    glTextureParameteri(m_colorBuffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(m_colorBuffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTextureParameteri(m_colorBuffer, GL_TEXTURE_BASE_LEVEL, 0);
-    glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_colorBuffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glCreateTextures(GL_TEXTURE_2D, 1, &Buffer);
+    glTextureStorage2D(Buffer, 1, InternalFormat, Width, Height);
+    glTextureParameteri(Buffer, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(Buffer, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(Buffer, GL_TEXTURE_BASE_LEVEL, 0);
+    glTextureParameteri(Buffer, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(Buffer, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 
-void Framebuffer::GenerateColorBufferNonDSA(int NumFormatComponents, bool IsFloat, int Width, int Height)
+void Framebuffer::GenerateBufferNonDSA(GLuint& Buffer, int NumFormatComponents, bool IsFloat, int Width, int Height)
 {
-    glGenTextures(1, &m_colorBuffer);
-    glBindTexture(GL_TEXTURE_2D, m_colorBuffer);
+    glGenTextures(1, &Buffer);
+    glBindTexture(GL_TEXTURE_2D, Buffer);
     switch (NumFormatComponents) {
     case 4:
         assert(!IsFloat);
@@ -281,6 +288,7 @@ void Framebuffer::ClearColorBuffer(const Vector4f& Color)
 void Framebuffer::BlitToWindow()
 {
     if (IsGLVersionHigher(4, 5)) {
+        glNamedFramebufferReadBuffer(m_fbo, GL_COLOR_ATTACHMENT0);
         glBlitNamedFramebuffer(m_fbo, 0, 0, 0, m_width, m_height, 0, 0, m_width, m_height, 
                                GL_COLOR_BUFFER_BIT, GL_LINEAR);
     }

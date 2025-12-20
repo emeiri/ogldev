@@ -31,7 +31,7 @@ public:
 
     ~Framebuffer();
 
-    void Init(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled);
+    void Init(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled, bool NormalEnabled);
 
     void BindForWriting();
 
@@ -56,15 +56,15 @@ public:
     int GetHeight() const { return m_height; }
 
 private:
-    void InitDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled);
+    void InitDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled, bool NormalEnabled);
 
-    void InitNonDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled);
+    void InitNonDSA(int Width, int Height, int NumFormatComponents, bool IsFloat, bool DepthEnabled, bool NormalEnabled);
 
-    void GenerateColorBuffer(int Width, int Height, int NumFormatComponents, bool IsFloat);
+    void GenerateBuffer(GLuint& Buffer, int Width, int Height, int NumFormatComponents, bool IsFloat);
 
-    void GenerateColorBufferNonDSA(int NumFormatComponents, bool IsFloat, int Width, int Height);
+    void GenerateBufferNonDSA(GLuint& Buffer, int NumFormatComponents, bool IsFloat, int Width, int Height);
 
-    void GenerateColorBufferDSA(int NumFormatComponents, bool IsFloat, int Width, int Height);
+    void GenerateBufferDSA(GLuint& Buffer, int NumFormatComponents, bool IsFloat, int Width, int Height);
 
     void GenerateDepthBuffer(int Width, int Height);
 
@@ -73,5 +73,6 @@ private:
     GLuint m_fbo = -1;
     GLuint m_colorBuffer = -1;
     GLuint m_depthBuffer = -1;
+    GLuint m_normalBuffer = -1;
     SaveViewport m_saveViewport;
 };
