@@ -213,6 +213,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_combine_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssbo_db.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssgi_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_tone_map_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_material.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_mesh.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_skybox.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_skybox_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_ssao_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_ssgi_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_tone_map_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
   </ItemGroup>
@@ -282,6 +284,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_skinning.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\full_screen_quad.vs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\full_screen_tri.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\geometry.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\geometry.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\hdr.cs" />
@@ -297,6 +300,7 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\skybox.vs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssao.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssao_combine.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssgi.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tex.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map.fs" />
   </ItemGroup>

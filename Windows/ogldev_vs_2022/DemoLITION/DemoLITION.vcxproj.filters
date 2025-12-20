@@ -157,6 +157,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_geometry_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_ssgi_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -327,6 +330,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_geometry_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssgi_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -431,6 +437,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\geometry.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\full_screen_tri.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\ssgi.fs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

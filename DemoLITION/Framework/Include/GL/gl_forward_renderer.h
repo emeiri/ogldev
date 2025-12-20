@@ -42,6 +42,7 @@
 #include "GL/gl_tone_map_technique.h"
 #include "GL/gl_hdr_technique.h"
 #include "GL/gl_geometry_technique.h"
+#include "GL/gl_ssgi_technique.h"
 
 
 enum RENDER_PASS {
@@ -155,6 +156,7 @@ private:
     void SSAOCombinePass();
     void ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
     void GBufferPass(GLScene* pScene);
+    void SSGIPass(GLScene* pScene);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
@@ -224,6 +226,7 @@ private:
     ToneMapTechnique m_toneMapTech;
     HDRTechnique m_hdrTech;
     GeometryTechnique m_geometryTech;
+    SSGITechnique m_ssgiTech;
     int m_hdrNumGroupsX = 0;
     int m_hdrNumGroupsY = 0;
 

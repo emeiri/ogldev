@@ -224,14 +224,6 @@ void ForwardRenderer::InitTechniques()
     m_pbrSkinnedTech.SetClearCoatRoughnessTextureUnit(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT_INDEX);
     m_pbrSkinnedTech.SetClearCoatNormalTextureUnit(CLEARCOAT_NORMAL_TEXTURE_UNIT_INDEX);
 
-    if (!m_geometryTech.Init()) {
-        printf("Error initializing the PBR lighting technique\n");
-        exit(1);
-    }
-
-    m_geometryTech.Enable();
-    m_geometryTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
         exit(1);
@@ -279,6 +271,24 @@ void ForwardRenderer::InitTechniques()
         printf("Error initializing the HDR technique\n");
         exit(1);
     }
+
+    if (!m_geometryTech.Init()) {
+        printf("Error initializing the geometry technique\n");
+        exit(1);
+    }
+
+    m_geometryTech.Enable();
+    m_geometryTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+
+    if (!m_ssgiTech.Init()) {
+        printf("Error initializing the SSGI technique\n");
+        exit(1);
+    }
+
+    m_ssgiTech.Enable();
+    m_ssgiTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
+    m_ssgiTech.SetNormalTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
+    m_ssgiTech.SetDepthTextureUnit(DEPTH_TEXTURE_UNIT_INDEX);
 }
 
 
@@ -402,8 +412,9 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
 {
     bool IsHDR = pScene->GetConfig()->IsHDREnabled();
+    bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();
 
-    if (pScene->GetConfig()->IsSSGIEnabled()) {
+    if (IsSSGI) {
         GBufferPass(pScene);    // Must be before the shadow map pass...
     }
 
@@ -424,7 +435,9 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
 
-    if (pScene->GetConfig()->IsSSAOEnabled()) {
+    if (IsSSGI) {
+        SSGIPass(pScene);
+    } else if (pScene->GetConfig()->IsSSAOEnabled()) {
         NormalPass(pScene);
         SSAOPass(pScene);
         SSAOCombinePass();
@@ -439,8 +452,6 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         } else {
             FullScreenQuadBlit(pScene);
         }*/
-    } else {
-        // Do nothing?
     }
 }
 
@@ -1021,16 +1032,55 @@ void ForwardRenderer::SSAOPass(GLScene* pScene)
     Params.zFar = m_pCurCamera->GetPersProjInfo().zFar;
     Params.OutputHeight = (float)m_ssaoFBO.GetHeight();
     Params.OutputWidth = (float)m_ssaoFBO.GetWidth();
-    
+
     m_ssaoParams.Update(&Params, sizeof(SSAOParamsInternal));
 
     m_lightingFBO.BindDepthForReading(GL_TEXTURE0);
     m_ssaoRotTexture.Bind(GL_TEXTURE1);
-    m_normalFBO.BindForReading(GL_TEXTURE2);    
+    m_normalFBO.BindForReading(GL_TEXTURE2);
 
     m_ssaoTech.Enable();
 
     m_ssaoTech.Render();
+
+    glEnable(GL_DEPTH_TEST);
+}
+
+
+void ForwardRenderer::SSGIPass(GLScene* pScene)
+{
+    glDisable(GL_DEPTH_TEST);
+
+   // m_ssaoFBO.BindForWriting();
+    SetRenderToDefaultFB();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f));
+
+    ///m_ssaoParams.BindUBO(SSAO_UBO_INDEX);
+
+//    SSAOParamsInternal Params;
+  //  Params.params = pScene->GetConfig()->GetSSAOParams();
+  //  Params.zNear = m_pCurCamera->GetPersProjInfo().zNear;
+   // Params.zFar = m_pCurCamera->GetPersProjInfo().zFar;
+   // Params.OutputHeight = (float)m_ssaoFBO.GetHeight();
+   // Params.OutputWidth = (float)m_ssaoFBO.GetWidth();
+    
+  //  m_ssaoParams.Update(&Params, sizeof(SSAOParamsInternal));
+
+    m_ssgiFBO.BindForReading(COLOR_TEXTURE_UNIT);
+    m_ssgiFBO.BindNormalForReading(NORMAL_TEXTURE_UNIT);
+    m_ssgiFBO.BindDepthForReading(DEPTH_TEXTURE_UNIT);
+    
+    m_ssgiTech.Enable();
+
+    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
+    Matrix4f InvProj = Projection.Inverse();
+
+    m_ssgiTech.SetInverseProj(InvProj);
+
+    m_ssgiTech.Render();
 
     glEnable(GL_DEPTH_TEST);
 }

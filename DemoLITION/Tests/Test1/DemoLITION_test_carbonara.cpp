@@ -555,9 +555,16 @@ public:
     void InitChild()
     {
         m_pScene->SetCamera(Vector3f(0.0f, 0.25f, -0.4f), Vector3f(0.0, -0.4f, 1.0f));
-        PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 1.0f);
-        CObject.pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
+       // PhysicsSceneObject CObject = LoadAndAddModel("../Content/ThrillerPart3.fbx", false, 0.01f);
+        PhysicsSceneObject CObject = LoadAndAddModel("../Content/iclone-7-raptoid-mascot/scene.gltf", false, 0.01f);
+        CObject.pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
+		
+        //PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 1.0f);
+        //CObject.pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
+
+        CObject.pSceneObject->SetPosition(0.0f, 0.5f, 0.0f);
         m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
     }
 };
 
@@ -925,8 +932,10 @@ public:
 
         //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
         
-        m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
 
         m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
         m_pTexAO->Load();
@@ -942,6 +951,12 @@ public:
         int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
         pConfig->SetEnvMap(EnvMap);
 
+        int t = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_diffuse.png");
+        m_pModel->SetColorTexture(t);
+
+        int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
+        m_pModel->SetNormalMap(n);
+
         m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
         m_pScene->AddToRenderList(m_pSceneObject);
 
@@ -950,7 +965,7 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {
-        m_pSceneObject->RotateBy(0.0f, 0.0f, DeltaTimeMillis / 25.0f);
+        m_pSceneObject->RotateBy(0.0f, DeltaTimeMillis / 25.0f, 0.0f);
     }
 
 private:
@@ -1056,6 +1071,72 @@ public:
 };
 
 
+class SSGIDemo : public Carbonara {
+
+public:
+
+    SSGIDemo()
+    {
+    }
+
+    void InitChild()
+    {
+        SceneConfig* pConfig = m_pScene->GetConfig();
+
+        pConfig->GetInfiniteGrid().Enabled = false;
+        pConfig->ControlShadowMapping(false);
+        pConfig->ControlSSGI(true);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+
+        //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
+       // m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+
+        m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
+        m_pTexAO->Load();
+        //m_pModel->GetPBRMaterial().pAO = m_pTexAO;
+
+        m_pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
+        m_pBRDF_LUT->Load();
+        pConfig->pBRDF_LUT = m_pBRDF_LUT;
+
+        int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
+        pConfig->SetIrradianceMap(IrrdianceMap);
+
+        int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
+        pConfig->SetEnvMap(EnvMap);
+
+        int t = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_diffuse.png");
+        m_pModel->SetColorTexture(t);
+
+        int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
+        m_pModel->SetNormalMap(n);
+
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pScene->AddToRenderList(m_pSceneObject);
+        m_pSceneObject->SetScale(0.1f);
+
+        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+    }
+
+    void OnFrameChild(long long DeltaTimeMillis)
+    {
+        //m_pSceneObject->RotateBy(0.0f, DeltaTimeMillis / 25.0f, 0.0f);
+    }
+
+private:
+
+    Model* m_pModel = NULL;
+    SceneObject* m_pSceneObject = NULL;
+
+    Texture* m_pTexAO = NULL;
+    Texture* m_pBRDF_LUT = NULL;
+};
+
+
 
 void carbonara()
 {
@@ -1063,11 +1144,12 @@ void carbonara()
     //FireworksDemo demo;
     //AnimationDemo demo;
     //BridgeDemo demo;
-    AmazonBistroDemo demo;
+    //AmazonBistroDemo demo;
     //SkyboxDemo demo;
     //GLTFPBRDemo demo;
     //MeshConvertDemo demo;
     //HeliGame demo;
+    SSGIDemo demo;
 
     demo.Start();
 }
