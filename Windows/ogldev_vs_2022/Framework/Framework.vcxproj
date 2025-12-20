@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\..\PhysicsForGameDev\Include\point_mass.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\PhysicsForGameDev\Source\physics_system.cpp" />
     <ClCompile Include="..\..\..\PhysicsForGameDev\Source\point_mass.cpp" />
   </ItemGroup>

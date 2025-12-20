@@ -29,5 +29,8 @@
     <ClCompile Include="..\..\..\PhysicsForGameDev\Source\point_mass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Common\ogldev_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
