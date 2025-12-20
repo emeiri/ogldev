@@ -242,6 +242,13 @@ void Framebuffer::BindForReading(GLenum TextureUnit)
 }
 
 
+void Framebuffer::BindNormalForReading(GLenum TextureUnit)
+{
+    glActiveTexture(TextureUnit);
+    glBindTexture(GL_TEXTURE_2D, m_normalBuffer);
+}
+
+
 void Framebuffer::BindDepthForReading(GLenum TextureUnit)
 {
     if (m_depthBuffer == -1) {

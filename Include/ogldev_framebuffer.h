@@ -37,7 +37,9 @@ public:
 
     void UnbindWriting();
 
-    void BindForReading(GLenum TextureUnit);
+    void BindForReading(GLenum TextureUnit);    // TODO: rename to BindColorForReading
+
+    void BindNormalForReading(GLenum TextureUnit);
 
     void BindDepthForReading(GLenum TextureUnit);
 
