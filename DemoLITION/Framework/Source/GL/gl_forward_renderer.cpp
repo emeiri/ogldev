@@ -117,6 +117,8 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_hdrFBO.Init(m_windowWidth, m_windowHeight, 3, true, true, false);
 
+    m_ssgiFBO.Init(m_windowWidth, m_windowHeight, 4, false, true, true);
+
     int Size = m_windowWidth * m_windowHeight;
     m_hdrData.resize(Size * 3);
 
@@ -221,6 +223,14 @@ void ForwardRenderer::InitTechniques()
     m_pbrSkinnedTech.SetClearCoatTextureUnit(CLEARCOAT_TEXTURE_UNIT_INDEX);
     m_pbrSkinnedTech.SetClearCoatRoughnessTextureUnit(CLEARCOAT_ROUGHNESS_TEXTURE_UNIT_INDEX);
     m_pbrSkinnedTech.SetClearCoatNormalTextureUnit(CLEARCOAT_NORMAL_TEXTURE_UNIT_INDEX);
+
+    if (!m_geometryTech.Init()) {
+        printf("Error initializing the PBR lighting technique\n");
+        exit(1);
+    }
+
+    m_geometryTech.Enable();
+    m_geometryTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
 
     if (!m_shadowMapTech.Init()) {
         printf("Error initializing the shadow mapping technique\n");
@@ -392,6 +402,10 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
 {
     bool IsHDR = pScene->GetConfig()->IsHDREnabled();
+
+    if (pScene->GetConfig()->IsSSGIEnabled()) {
+        GBufferPass(pScene);    // Must be before the shadow map pass...
+    }
 
     ShadowMapPass(pScene);
 
@@ -685,6 +699,28 @@ void ForwardRenderer::ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>&
 }
 
 
+void ForwardRenderer::GBufferPass(GLScene* pScene)
+{
+    m_curRenderPass = RENDER_PASS_GBUFFER;
+
+    m_ssgiFBO.BindForWriting();
+
+    m_ssgiFBO.Clear();
+
+    m_geometryTech.Enable();
+
+    if (UseIndirectRender) {
+        Matrix4f VP = m_pCurCamera->GetVPMatrix();
+        m_geometryTech.SetVP(VP);
+    }
+
+    m_geometryTech.ControlIndirectRender(UseIndirectRender);
+    m_geometryTech.ControlPVP(UsePVP);
+
+    RenderEntireRenderList(pScene->GetRenderList());
+}
+
+
 void ForwardRenderer::RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList)
 {
     for (std::list<CoreSceneObject*>::const_iterator it = RenderList.begin(); it != RenderList.end(); it++) {
@@ -741,9 +777,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
 
 void ForwardRenderer::LightingPassFBOSetup(GLScene* pScene)
 {
-    if (pScene->GetConfig()->IsSSGIEnabled()) {
-
-    } else if (pScene->GetConfig()->IsSSAOEnabled()) {
+    if (pScene->GetConfig()->IsSSAOEnabled()) {
         if (pScene->GetConfig()->IsHDREnabled()) {
             NOT_IMPLEMENTED;
         } else {
@@ -1155,6 +1189,10 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
         SetWorldMatrix_CB_NormalPass(World);
         break;
 
+    case RENDER_PASS_GBUFFER:
+        SetWorldMatrix_CB_GBufferPass(World);
+        break;
+
     default:
         printf("%s:%d - Unknown render pass %d\n", __FILE__, __LINE__, m_curRenderPass);
         exit(1);
@@ -1253,7 +1291,7 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
     Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
     Matrix4f WVP = Projection * View * FinalWorldMatrix;
 
-    //  printf("Lighting pass\n"); WVP.Print(); exit(1);
+    //  printf("Normal pass\n"); WVP.Print(); exit(1);
 
     m_normalTech.SetWVP(WVP);
 
@@ -1265,6 +1303,28 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
     m_normalTech.SetNormalMatrix(ViewNormalMatrix);
 }
 
+
+void ForwardRenderer::SetWorldMatrix_CB_GBufferPass(const Matrix4f& World)
+{
+    // TODO: use GetWVP instead
+    Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+    Matrix4f FinalWorldMatrix = ObjectMatrix * World;
+
+    Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
+    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
+    Matrix4f WVP = Projection * View * FinalWorldMatrix;
+
+    //  printf("Geometry pass\n"); WVP.Print(); exit(1);
+
+    m_geometryTech.SetWVP(WVP);
+
+    Matrix3f NormalMatrix = CalcNormalMatrix(FinalWorldMatrix);
+    Matrix4f ViewNormalMatrix4D = View * Matrix4f(NormalMatrix);
+    Matrix3f ViewNormalMatrix(ViewNormalMatrix4D);
+    //NormalMatrix.Print();
+   // exit(1);
+    m_geometryTech.SetNormalMatrix(ViewNormalMatrix);
+}
 
 void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 {

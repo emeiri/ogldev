@@ -41,6 +41,7 @@
 #include "GL/gl_buffer.h"
 #include "GL/gl_tone_map_technique.h"
 #include "GL/gl_hdr_technique.h"
+#include "GL/gl_geometry_technique.h"
 
 
 enum RENDER_PASS {
@@ -52,7 +53,8 @@ enum RENDER_PASS {
     RENDER_PASS_SHADOW_SPOT = 5,
     RENDER_PASS_SHADOW_POINT = 6,
     RENDER_PASS_PICKING = 7,
-    RENDER_PASS_NORMAL = 8
+    RENDER_PASS_NORMAL = 8,
+    RENDER_PASS_GBUFFER = 9,
 };
 
 
@@ -88,7 +90,7 @@ struct LightSource {
     // Offset 48
     float Atten_Constant;           // Spot and point     4 bytes
     float Atten_Linear;             // Spot and point     4 bytes
-    float Atten_Exp;             // Spot and point     4 bytes
+    float Atten_Exp;                // Spot and point     4 bytes
     float Cutoff;                   // spot               4 bytes
 };
 
@@ -152,6 +154,7 @@ private:
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
     void ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
+    void GBufferPass(GLScene* pScene);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
@@ -169,7 +172,8 @@ private:
     void SetWorldMatrix_CB_ShadowPassPoint(const Matrix4f& World);
     void SetWorldMatrix_CB_LightingPass(const Matrix4f& World);
     void SetWorldMatrix_CB_PickingPass(const Matrix4f& World);
-    void SetWorldMatrix_CB_NormalPass(const Matrix4f& World);
+    void SetWorldMatrix_CB_NormalPass(const Matrix4f& World);	
+    void SetWorldMatrix_CB_GBufferPass(const Matrix4f& World);
     void RenderEntireRenderList(const std::list<CoreSceneObject*>& RenderList);
     Matrix4f GetViewProjectionMatrix();
     void RenderSingleObject(CoreSceneObject* pSceneObject);
@@ -188,6 +192,7 @@ private:
     Framebuffer m_normalFBO;
     Framebuffer m_ssaoFBO;
     Framebuffer m_hdrFBO;
+    Framebuffer m_ssgiFBO;
     GLBuffer m_ssaoParams;
     Texture m_ssaoRotTexture;
     GLBuffer m_lightParams;
@@ -218,6 +223,7 @@ private:
     SSAOCombineTechnique m_ssaoCombineTech;
     ToneMapTechnique m_toneMapTech;
     HDRTechnique m_hdrTech;
+    GeometryTechnique m_geometryTech;
     int m_hdrNumGroupsX = 0;
     int m_hdrNumGroupsY = 0;
 
