@@ -253,29 +253,36 @@ void Framebuffer::BindDepthForReading(GLenum TextureUnit)
     glBindTexture(GL_TEXTURE_2D, m_depthBuffer);
 }
 
-void Framebuffer::Clear(bool ColorBuffer, bool DepthBuffer)
-{
-    assert(ColorBuffer || DepthBuffer);
 
+void Framebuffer::Clear()
+{
     Vector4f Color(0.0f);
     float Depth = 1.0f;
 
     if (IsGLVersionHigher(4, 5)) {
-        if (ColorBuffer) {
+        if (m_colorBuffer != -1) {
             glClearNamedFramebufferfv(m_fbo, GL_COLOR, 0, (GLfloat*)Color.data());
         }
 
-        if (DepthBuffer) {
+        if (m_depthBuffer != -1) {
             glClearNamedFramebufferfv(m_fbo, GL_DEPTH, 0, &Depth);
-        }               
+        }    
+
+        if (m_normalBuffer != -1) {
+            glClearNamedFramebufferfv(m_fbo, GL_COLOR, 1, (GLfloat*)Color.data());
+        }
     }
     else {
-        if (ColorBuffer) {
+        if (m_colorBuffer) {
             glClearBufferfv(GL_COLOR, 0, (GLfloat*)Color.data());
         }
          
-        if (DepthBuffer) {
+        if (m_depthBuffer != -1) {
             glClearBufferfv(GL_DEPTH, 0, &Depth);
+        }
+
+        if (m_normalBuffer != -1) {
+            glClearBufferfv(GL_COLOR, 1, (GLfloat*)Color.data());
         }
     }
 }
