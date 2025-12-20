@@ -79,21 +79,28 @@ void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, boo
     m_height = Height;
 
     glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     GenerateBuffer(m_colorBuffer, Width, Height, NumFormatComponents, IsFloat);
-
-    if (DepthEnabled) {
-        GenerateDepthBuffer(Width, Height);
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorBuffer, 0);
 
     if (DepthEnabled) {
+        GenerateDepthBuffer(Width, Height);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0);
+    }       
+
+    if (NormalEnabled) {
+        GenerateBuffer(m_normalBuffer, Width, Height, NumFormatComponents, IsFloat);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalBuffer, 0);
     }
 
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    std::vector<GLenum> DrawBuffers;
+    DrawBuffers.push_back(GL_COLOR_ATTACHMENT0);
+
+    if (NormalEnabled) {
+        glDrawBuffers((GLsizei)DrawBuffers.size(), DrawBuffers.data());
+    }
+
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
     GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
