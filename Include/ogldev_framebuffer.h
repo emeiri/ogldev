@@ -41,7 +41,7 @@ public:
 
     void BindDepthForReading(GLenum TextureUnit);
 
-    void Clear(bool ColorBuffer, bool DepthBuffer);
+    void Clear();
 
     void ClearColorBuffer(const Vector4f& Color);
 

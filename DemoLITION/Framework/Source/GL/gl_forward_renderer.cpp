@@ -700,9 +700,7 @@ void ForwardRenderer::NormalPass(GLScene* pScene)
 
     m_normalFBO.BindForWriting();
 
-    bool ClearColor = true;
-    bool ClearDepth = true;    
-    m_normalFBO.Clear(ClearColor, ClearDepth);
+    m_normalFBO.Clear();
 
     m_normalTech.Enable();
 
