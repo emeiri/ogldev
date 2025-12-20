@@ -148,6 +148,9 @@ public:
     void ControlHDR(bool Enable) { m_hdrEnabled = Enable; }
     bool IsHDREnabled() const { return m_hdrEnabled; }
 
+    void ControlSSGI(bool Enable) { m_ssgiEnabled = Enable; }
+    bool IsSSGIEnabled() const { return m_ssgiEnabled; }
+
     void SetHDRParams(float AverageLuminance, float Exposure) { m_hdrAverageLuminance = AverageLuminance; m_hdrExposure = Exposure; }
 
     void GetHDRParams(float& AverageLuminance, float& Exposure) { AverageLuminance = m_hdrAverageLuminance; Exposure = m_hdrExposure; }
@@ -182,6 +185,7 @@ private:
     float m_hdrExposure = 0.0f;
     TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_WITH_EXPOSURE;
     bool m_enableGamma = false;
+    bool m_ssgiEnabled = false;
 };
 
 
