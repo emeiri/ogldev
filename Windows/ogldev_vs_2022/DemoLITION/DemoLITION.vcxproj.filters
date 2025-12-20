@@ -154,6 +154,9 @@
     <ClCompile Include="..\..\..\Common\ogldev_ect_cubemap.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_geometry_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -321,6 +324,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_material.h">
       <Filter>Include\Int</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_geometry_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -419,6 +425,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\hdr.cs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\geometry.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\geometry.fs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>
