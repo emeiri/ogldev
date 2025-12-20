@@ -721,17 +721,7 @@ void ForwardRenderer::NormalPass(GLScene* pScene)
 
 void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis)
 {
-    if (pScene->GetConfig()->IsSSAOEnabled()) {
-        if (pScene->GetConfig()->IsHDREnabled()) {
-            NOT_IMPLEMENTED;
-        } else {
-            m_lightingFBO.BindForWriting();
-        }
-    } else if (pScene->GetConfig()->IsHDREnabled()) {
-        m_hdrFBO.BindForWriting();
-    } else {
-        SetRenderToDefaultFB();
-    }
+    LightingPassFBOSetup(pScene);
     
     if (pScene->IsClearFrame()) {
         const Vector4f& ClearColor = pScene->GetClearColor();
@@ -748,6 +738,24 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
     }
 
     RenderObjectList(pScene, TotalRuntimeMillis);
+}
+
+
+void ForwardRenderer::LightingPassFBOSetup(GLScene* pScene)
+{
+    if (pScene->GetConfig()->IsSSGIEnabled()) {
+
+    } else if (pScene->GetConfig()->IsSSAOEnabled()) {
+        if (pScene->GetConfig()->IsHDREnabled()) {
+            NOT_IMPLEMENTED;
+        } else {
+            m_lightingFBO.BindForWriting();
+        }
+    } else if (pScene->GetConfig()->IsHDREnabled()) {
+        m_hdrFBO.BindForWriting();
+    } else {
+        SetRenderToDefaultFB();
+    }
 }
 
 
