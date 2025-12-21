@@ -127,8 +127,8 @@ void rayMarch(
     hit = false;
     traveled = 0.0;
 
-    const float STEP_SIZE = 0.1;
-    const float THICKNESS = 1.0;
+    const float STEP_SIZE = 0.15;
+    const float THICKNESS = 0.75;
     const float MAX_DISTANCE = 20.0;
     const int   NUM_STEPS = 32;
 
@@ -204,11 +204,29 @@ void main()
 
         rayMarch(Pview, rayDir, hit, hitUV, traveled);
 
-        if (hit)
-        {
+        if (hit) {
             vec3 hitAlbedo = texture(gAlbedoTex, hitUV).rgb;
+            //vec3 Nhit = normalize(texture(gNormalTex, hitUV).rgb);
+           // Nhit = normalize(View3x3 * Nhit);
+
+            // cosine term
             float nDotL = max(dot(Nview, rayDir), 0.0);
-            indirect += hitAlbedo * nDotL;
+
+            // horizon occlusion (prevents over-brightening)
+            float horizon = max(dot(Nview, rayDir), 0.0);
+            horizon = pow(horizon, 0.5);
+
+            // normal-facing term (prevents light leaking)
+          //  float facing = max(dot(Nhit, -rayDir), 0.0);            
+
+            // distance falloff
+            float falloff = 1.0 / (1.0 + traveled * traveled);
+
+            float weight = nDotL * horizon * falloff;
+
+            const float SSGI_INTENSITY = 2.0; 
+
+            indirect += hitAlbedo * weight * SSGI_INTENSITY;
         }
     }
 
@@ -221,9 +239,9 @@ void main()
     // We'll turn this into GI after we confirm reconstruction is correct.
 
     // Example: visualize linear depth
-    float LinearDepth = Pview.z;  // view space: camera looks down -Z
-    float DepthVis = LinearDepth / 200.0; // adjust 50.0 to your scene range
-    DepthVis = clamp(DepthVis, 0.0, 1.0);
+  //  float LinearDepth = Pview.z;  // view space: camera looks down -Z
+ //   float DepthVis = LinearDepth / 200.0; // adjust 50.0 to your scene range
+ //   DepthVis = clamp(DepthVis, 0.0, 1.0);
 
    // OutIndirect = vec4(1.0, 0.0, 0.0, 0.0);
 
