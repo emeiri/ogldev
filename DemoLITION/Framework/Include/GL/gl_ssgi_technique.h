@@ -32,6 +32,7 @@ public:
     void SetNormalTextureUnit(unsigned int TextureUnit);
     void SetDepthTextureUnit(unsigned int TextureUnit);
     void SetInverseProj(const Matrix4f& InvProj);
+    void SetViewTransform(const Matrix4f& View);
 
     void Render();
 
@@ -43,5 +44,7 @@ private:
     DEF_LOC(m_normalSamplerLoc);
     DEF_LOC(m_depthSamplerLoc);
     DEF_LOC(m_invProjLoc);
+    DEF_LOC(m_viewLoc);
+
 };
 

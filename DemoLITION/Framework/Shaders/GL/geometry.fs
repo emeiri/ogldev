@@ -29,5 +29,5 @@ in vec2 TexCoord0;
 void main()
 {
     AlbedoColor = texture(gAlbedoSampler, TexCoord0.xy);
-    Normal = vec4(Normal0, 0.0);
+    Normal = vec4(normalize(Normal0), 0.0);
 }

@@ -1080,6 +1080,10 @@ void ForwardRenderer::SSGIPass(GLScene* pScene)
 
     m_ssgiTech.SetInverseProj(InvProj);
 
+    Matrix4f View(m_pCurCamera->GetViewMatrix());
+
+    m_ssgiTech.SetViewTransform(View);
+
     m_ssgiTech.Render();
 
     glEnable(GL_DEPTH_TEST);

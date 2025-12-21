@@ -29,6 +29,8 @@ layout(binding = 2) uniform sampler2D gDepthTex;    // depth buffer
 
 // Inverse projection matrix (of the projection used to render the G-Buffer)
 uniform mat4 gInvProj;
+
+uniform mat4 gView;
 // If you want world-space later, add uInvView as well
 
 // Helper: reconstruct view-space position from depth + UV
@@ -65,8 +67,9 @@ void main()
     }
 
     vec3 Albedo = texture(gAlbedoTex, TexCoords).rgb;
-    vec3 Normal = texture(gNormalTex, TexCoords).rgb;
- //   vec3 N = DecodeNormal(normalEnc);
+    vec3 Nworld = normalize(texture(gNormalTex, TexCoords).rgb);
+    mat3 View3x3 = transpose(inverse(mat3(gView)));     // TODO: move to C++
+    vec3 Nview = normalize(View3x3 * Nworld);
 
     // 2) Reconstruct view-space position
     vec3 Pview = ReconstructViewPos(TexCoords, Depth);
@@ -85,7 +88,9 @@ void main()
     //OutIndirect = vec4(vec3(Normal), 1.0);
    // OutIndirect = vec4(vec3(Depth), 1.0);      
 
-    OutIndirect = vec4(DepthVis);
+    //OutIndirect = vec4(DepthVis);
     // R = depth, G = normal.y, B = normal.z
    // OutIndirect = vec4(DepthVis, Normal.y * 0.5 + 0.5, Normal.z * 0.5 + 0.5, 1.0);
+
+   OutIndirect = vec4(Nview * 0.5 + 0.5, 1.0);
 }
