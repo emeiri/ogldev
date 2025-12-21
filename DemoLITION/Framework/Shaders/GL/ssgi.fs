@@ -17,7 +17,7 @@
 */
 
 
-#version 450 core
+#version 460 core
 
 in vec2 TexCoords;
 
@@ -27,10 +27,11 @@ layout(binding = 0) uniform sampler2D gAlbedoTex;   // G-Buffer albedo
 layout(binding = 1) uniform sampler2D gNormalTex;   // G-Buffer normal
 layout(binding = 2) uniform sampler2D gDepthTex;    // depth buffer
 
-// Inverse projection matrix (of the projection used to render the G-Buffer)
-uniform mat4 gInvProj;
 
+uniform mat4 gProj;
+uniform mat4 gInvProj;  // Inverse projection matrix (of the projection used to render the G-Buffer)
 uniform mat4 gView;
+uniform vec2 gScreenSize = vec2(1920, 1080);
 // If you want world-space later, add uInvView as well
 
 // Helper: reconstruct view-space position from depth + UV
@@ -49,10 +50,122 @@ vec3 ReconstructViewPos(vec2 TexCoords, float depth)
     return view.xyz; // view-space position
 }
 
-// Helper: decode normal from 0–1 back to -1..1
-vec3 DecodeNormal(vec3 enc)
+
+mat3 buildTangentBasis(vec3 N)
 {
-    return normalize(enc * 2.0 - 1.0);
+    vec3 up = (abs(N.z) < 0.999) ? vec3(0, 0, 1) : vec3(1, 0, 0);
+    vec3 T = normalize(cross(up, N));
+    vec3 B = cross(N, T);
+    return mat3(T, B, N); // columns: T, B, N
+}
+
+
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);
+}
+
+vec3 sampleHemisphereSimple(vec2 uv)
+{
+    float r1 = hash(uv);
+    float r2 = hash(uv.yx + 13.37);
+
+    float phi = r1 * 6.2831853; // 2 * PI
+    float cosTheta = r2;
+    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+    vec3 local = vec3(cos(phi) * sinTheta,
+                      sin(phi) * sinTheta,
+                      cosTheta); // hemisphere around +Z
+    return local;
+}
+
+
+uint hash_u(uint x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352dU;
+    x ^= x >> 15;
+    x *= 0x846ca68bU;
+    x ^= x >> 16;
+    return x;
+}
+
+float rand_u32(uint x)
+{
+    return float(hash_u(x)) / 4294967295.0;
+}
+
+vec3 sampleHemisphere(vec2 uv, int rayIndex)
+{
+    // Convert to integer pixel coords
+    ivec2 pixel = ivec2(uv * gScreenSize);
+
+    uint seed1 = uint(pixel.x) ^ (uint(pixel.y) << 16) ^ uint(rayIndex * 977);
+    uint seed2 = uint(pixel.y) ^ (uint(pixel.x) << 16) ^ uint(rayIndex * 1319);
+
+    float r1 = rand_u32(seed1);
+    float r2 = rand_u32(seed2);
+
+    float phi = r1 * 6.2831853; // 
+
+    // Better: cosine-weighted sampling
+    float cosTheta = sqrt(1.0 - r2);
+    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+    return vec3(cos(phi) * sinTheta,
+                sin(phi) * sinTheta,
+                cosTheta);
+}
+
+void rayMarch(
+    vec3 Pview,
+    vec3 rayDir,
+    out bool hit,
+    out vec2 hitUV,
+    out float traveled)
+{
+    hit = false;
+    traveled = 0.0;
+
+    const float STEP_SIZE = 0.1;
+    const float THICKNESS = 1.0;
+    const float MAX_DISTANCE = 20.0;
+    const int   NUM_STEPS = 32;
+
+    vec3 marchPos = Pview;
+
+    for (int i = 0; i < NUM_STEPS; i++)
+    {
+        marchPos += rayDir * STEP_SIZE;
+        traveled += STEP_SIZE;
+
+        if (traveled > MAX_DISTANCE)
+            return;
+
+        // project to screen
+        vec4 clip = gProj * vec4(marchPos, 1.0);
+        vec3 ndc  = clip.xyz / clip.w;
+        vec2 suv  = ndc.xy * 0.5 + 0.5;
+
+        if (suv.x < 0.0 || suv.x > 1.0 || suv.y < 0.0 || suv.y > 1.0)
+            return;
+
+        float sceneDepth = texture(gDepthTex, suv).r;
+        if (sceneDepth == 1.0)
+            continue;
+
+        vec3 scenePos = ReconstructViewPos(suv, sceneDepth);
+
+        // left-handed: +Z forward
+        float dz = marchPos.z - scenePos.z;
+
+        if (abs(dz) < THICKNESS)
+        {
+            hit = true;
+            hitUV = suv;
+            return;
+        }
+    }
 }
 
 void main()
@@ -74,6 +187,36 @@ void main()
     // 2) Reconstruct view-space position
     vec3 Pview = ReconstructViewPos(TexCoords, Depth);
 
+    mat3 TBN = buildTangentBasis(Nview);
+
+    vec3 indirect = vec3(0.0);
+
+    const int NUM_RAYS = 8;   // try 4, then 8, then 16
+
+    for (int r = 0; r < NUM_RAYS; r++)
+    {
+        vec3 dirLocal = sampleHemisphere(TexCoords, r);
+        vec3 rayDir   = normalize(TBN * dirLocal);
+
+        bool hit;
+        vec2 hitUV;
+        float traveled;
+
+        rayMarch(Pview, rayDir, hit, hitUV, traveled);
+
+        if (hit)
+        {
+            vec3 hitAlbedo = texture(gAlbedoTex, hitUV).rgb;
+            float nDotL = max(dot(Nview, rayDir), 0.0);
+            indirect += hitAlbedo * nDotL;
+        }
+    }
+
+    indirect /= float(NUM_RAYS);
+    OutIndirect = vec4(indirect, 1.0);
+
+    //---------------------------------------------------------------------
+
     // DEBUG STAGE: For now, just visualize things instead of doing GI
     // We'll turn this into GI after we confirm reconstruction is correct.
 
@@ -92,5 +235,31 @@ void main()
     // R = depth, G = normal.y, B = normal.z
    // OutIndirect = vec4(DepthVis, Normal.y * 0.5 + 0.5, Normal.z * 0.5 + 0.5, 1.0);
 
-   OutIndirect = vec4(Nview * 0.5 + 0.5, 1.0);
+  // OutIndirect = vec4(Nview, 1.0);
+
+  //OutIndirect = vec4(rayDir, 1.0);
+
+  //if (hit)
+    //OutIndirect = vec4(1.0, 0.0, 0.0, 1.0);  // red = hit
+//else
+    //OutIndirect = vec4(0.0, 0.0, 0.0, 1.0);  // black = miss
+
+   // float distVis = traveled / MAX_DISTANCE;
+   // OutIndirect = vec4(distVis, distVis, distVis, 1.0);
+
+   //vec3 indirect = vec3(0.0);
+
+   // if (hit)
+   // {
+        // 1. Sample the albedo at the hit point
+     //   vec3 hitAlbedo = texture(gAlbedoTex, hitUV).rgb;
+
+        // 2. Cosine weighting (Lambertian BRDF)
+     //  float nDotL = max(dot(Nview, rayDir), 0.0);
+
+        // 3. Final indirect contribution for this ray
+      //  indirect = hitAlbedo * nDotL;
+  //  }
+
+   // OutIndirect = vec4(indirect, 1.0);
 }

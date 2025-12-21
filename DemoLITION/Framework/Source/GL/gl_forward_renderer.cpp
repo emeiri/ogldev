@@ -1075,10 +1075,9 @@ void ForwardRenderer::SSGIPass(GLScene* pScene)
     
     m_ssgiTech.Enable();
 
-    Matrix4f Projection = m_pCurCamera->GetProjectionMat();
-    Matrix4f InvProj = Projection.Inverse();
+    Matrix4f Proj = m_pCurCamera->GetProjectionMat();    
 
-    m_ssgiTech.SetInverseProj(InvProj);
+    m_ssgiTech.SetProj(Proj);
 
     Matrix4f View(m_pCurCamera->GetViewMatrix());
 

@@ -31,7 +31,7 @@ public:
     void SetAlbedoTextureUnit(unsigned int TextureUnit);
     void SetNormalTextureUnit(unsigned int TextureUnit);
     void SetDepthTextureUnit(unsigned int TextureUnit);
-    void SetInverseProj(const Matrix4f& InvProj);
+    void SetProj(const Matrix4f& Proj);
     void SetViewTransform(const Matrix4f& View);
 
     void Render();
@@ -43,6 +43,7 @@ private:
     DEF_LOC(m_albedoSamplerLoc);
     DEF_LOC(m_normalSamplerLoc);
     DEF_LOC(m_depthSamplerLoc);
+    DEF_LOC(m_projLoc);
     DEF_LOC(m_invProjLoc);
     DEF_LOC(m_viewLoc);
 

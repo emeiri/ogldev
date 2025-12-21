@@ -39,6 +39,7 @@ bool SSGITechnique::Init()
     GET_UNIFORM_AND_CHECK(m_albedoSamplerLoc, "gAlbedoTex");
     GET_UNIFORM_AND_CHECK(m_normalSamplerLoc, "gNormalTex");
     GET_UNIFORM_AND_CHECK(m_depthSamplerLoc, "gDepthTex");
+    GET_UNIFORM_AND_CHECK(m_projLoc, "gProj");
     GET_UNIFORM_AND_CHECK(m_invProjLoc, "gInvProj");
     GET_UNIFORM_AND_CHECK(m_viewLoc, "gView");
 
@@ -73,8 +74,11 @@ void SSGITechnique::SetDepthTextureUnit(unsigned int TextureUnit)
 }
 
 
-void SSGITechnique::SetInverseProj(const Matrix4f& InvProj)
+void SSGITechnique::SetProj(const Matrix4f& Proj)
 {
+    glUniformMatrix4fv(m_projLoc, 1, GL_TRUE, (const GLfloat*)Proj.m);
+
+    Matrix4f InvProj = Proj.Inverse();
     glUniformMatrix4fv(m_invProjLoc, 1, GL_TRUE, (const GLfloat*)InvProj.m);
 }
 
