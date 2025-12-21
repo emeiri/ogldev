@@ -40,6 +40,7 @@ bool SSGITechnique::Init()
     GET_UNIFORM_AND_CHECK(m_normalSamplerLoc, "gNormalTex");
     GET_UNIFORM_AND_CHECK(m_depthSamplerLoc, "gDepthTex");
     GET_UNIFORM_AND_CHECK(m_invProjLoc, "gInvProj");
+    GET_UNIFORM_AND_CHECK(m_viewLoc, "gView");
 
     glGenVertexArrays(1, &m_dummyVAO);
 
@@ -75,4 +76,10 @@ void SSGITechnique::SetDepthTextureUnit(unsigned int TextureUnit)
 void SSGITechnique::SetInverseProj(const Matrix4f& InvProj)
 {
     glUniformMatrix4fv(m_invProjLoc, 1, GL_TRUE, (const GLfloat*)InvProj.m);
+}
+
+
+void SSGITechnique::SetViewTransform(const Matrix4f& View)
+{
+    glUniformMatrix4fv(m_viewLoc, 1, GL_TRUE, (const GLfloat*)View.m);
 }
