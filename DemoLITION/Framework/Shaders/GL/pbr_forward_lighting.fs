@@ -222,9 +222,16 @@ mat3 cotangentFrame( vec3 N, vec3 p, vec2 uv, inout PBRInfo pbrInputs )
 
 void perturbNormal(vec3 n, vec3 v, vec3 normalSample, vec2 uv, inout PBRInfo pbrInputs) 
 {
-    vec3 map = normalize( 2.0 * normalSample - vec3(1.0) );
-    mat3 TBN = cotangentFrame(n, v, uv, pbrInputs);
-    pbrInputs.n = normalize(TBN * map);
+    vec3 N_mapped = normalize( 2.0 * normalSample - vec3(1.0) );
+    //mat3 TBN = cotangentFrame(n, v, uv, pbrInputs);
+
+    pbrInputs.t = normalize(normalize(Tangent0));
+    pbrInputs.b = normalize(normalize(Bitangent0));
+    pbrInputs.ng = normalize(normalize(n));
+
+    mat3 TBN = mat3(pbrInputs.t, pbrInputs.b, pbrInputs.ng);
+
+    pbrInputs.n = normalize(TBN * N_mapped);
 }
 
 
@@ -674,7 +681,7 @@ void main()
     perturbNormal(n, WorldPos0, normalSample, GetNormalUV(tc, mat), pbrInputs);
 
    // if (!gl_FrontFacing) n *= -1.0f;    
-    
+  
     bool isClearCoat = isMaterialTypeClearCoat(mat);
 
     vec3 ClearCoatContrib = vec3(0);
@@ -745,4 +752,5 @@ void main()
  //out_FragColor = vec4(ClearCoatContrib, 1.0);
  //out_FragColor = vec4(1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel, 1.0);
  //out_FragColor = vec4(pbrInputs.b, 1.0); 
+ //out_FragColor = vec4(1.0);
 }
