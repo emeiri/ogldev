@@ -87,7 +87,7 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
-		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
+		m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipeline();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -226,7 +226,7 @@ private:
 									  zNear, zFar };
 		
 		glm::vec3 Pos(0.0f, 0.0f, -0.33f);
-		glm::vec3 Target(0.0f, 0.0f, 1.0f);
+		glm::vec3 Target(-1.0f, -0.1f, 0.0f);
 		glm::vec3 Up(0.0, 1.0f, 0.0f);
 
 		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
@@ -315,7 +315,7 @@ private:
 			m_pPipeline->Bind(CmdBuf);
 			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pPipeline, i);
 			
-		//	m_skybox.RecordCommandBuffer(CmdBuf, i);
+			m_skybox.RecordCommandBuffer(CmdBuf, i);
 
 			vkCmdEndRendering(CmdBuf);
 
@@ -439,7 +439,7 @@ private:
 		m_pGameCamera->SetTarget(r);*/
 
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
-		//m_skybox.Update(ImageIndex, VPNoTranslate);
+		m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
 
 	GLFWwindow* m_pWindow = NULL;
