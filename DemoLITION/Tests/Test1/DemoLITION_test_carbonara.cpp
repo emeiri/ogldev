@@ -76,11 +76,10 @@ class Carbonara : public BaseGLApp {
 public:
     Carbonara() : BaseGLApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Carbonara")
     {
-      //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_dirLight[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
+        m_dirLight[0].WorldDirection = Vector3f(0.0f, 0.0f, 1.0f);
         m_dirLight[0].DiffuseIntensity = 1.0f;
-        m_dirLight[0].AmbientIntensity = 0.0f;
+        m_dirLight[0].AmbientIntensity = 0.1f;
 
         m_dirLight[1].Color = Vector3f(1.0f, 0.0f, 0.0f);
         m_dirLight[1].WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
@@ -88,9 +87,9 @@ public:
         m_dirLight[1].AmbientIntensity = 0.0f;
 
         m_pointLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-        m_pointLight[0].WorldPosition = Vector3f(-10.0f, 10.0f, 0.0f);
+        m_pointLight[0].WorldPosition = Vector3f(0.0f, 10.0f, 0.0f);
         m_pointLight[0].DiffuseIntensity = 1.0f;
-        m_pointLight[0].AmbientIntensity = 0.0f;
+        m_pointLight[0].AmbientIntensity = 0.1f;
         m_pointLight[0].Attenuation.Constant = 0.25f;
 
         m_pointLight[1].Color = Vector3f(0.0f, 0.0f, 1.0f);
@@ -470,14 +469,14 @@ protected:
     Scene* m_pScene = NULL;
     std::list<PhysicsSceneObject> m_sceneObjects;
     OgldevPhysics::PhysicsSystem m_physicsSystem;
+    DirectionalLight m_dirLight[2];
+    PointLight m_pointLight[2];
+    SpotLight m_spotLight;
 
 private:
 
     float m_count = 0.0f;
 
-    DirectionalLight m_dirLight[2];
-    PointLight m_pointLight[2];
-    SpotLight m_spotLight;
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
     SceneObject* m_pickedObject = NULL;
@@ -1088,14 +1087,18 @@ public:
         pConfig->ControlSSGI(true);
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
 
+       // m_pScene->GetDirLights().push_back(m_dirLight[0]);
+        m_pScene->GetPointLights().push_back(m_pointLight[0]);
+
         //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
-        m_pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
+        //m_pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");
         //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
        // m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+        m_pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/CornellBox/CornellBox-Original.obj");
 
-        m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
+     /*   m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
         m_pTexAO->Load();
         //m_pModel->GetPBRMaterial().pAO = m_pTexAO;
 
@@ -1113,18 +1116,23 @@ public:
         m_pModel->SetColorTexture(t);
 
         int n = m_pRenderingSystem->LoadTexture2D("../Content/OpenGameArt/crate1/crate1_normal.png");
-        m_pModel->SetNormalMap(n);
+        m_pModel->SetNormalMap(n);*/
 
         m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pSceneObject->RotateBy(0.0f, 180.0f, 0.0f);
         m_pScene->AddToRenderList(m_pSceneObject);
-        m_pSceneObject->SetScale(0.1f);
+      //  m_pSceneObject->SetScale(0.1f);
 
         m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+      //  m_pScene->SetCamera(Vector3f(43.0f, 15.5f, -3.5f), Vector3f(-1.0f, 0.0f, 0.05f));
     }
 
     void OnFrameChild(long long DeltaTimeMillis)
     {
-        //m_pSceneObject->RotateBy(0.0f, DeltaTimeMillis / 25.0f, 0.0f);
+      //  static float f = 0.0f;
+        //m_dirLight[0].WorldDirection =
+      //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(1.0f + sinf((float)DeltaTimeMillis / 100.0f), -1.0f, 0.0f);
+      //  m_pSceneObject->RotateBy(0.0f, DeltaTimeMillis / 25.0f, 0.0f);
     }
 
 private:

@@ -412,11 +412,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
 {
     bool IsHDR = pScene->GetConfig()->IsHDREnabled();
-    bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();
-
-    if (IsSSGI) {
-        GBufferPass(pScene);    // Must be before the shadow map pass...
-    }
+    bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();        
 
     ShadowMapPass(pScene);
 
@@ -436,7 +432,9 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
     }
 
     if (IsSSGI) {
+        GBufferPass(pScene);
         SSGIPass(pScene);
+        SSAOCombinePass();
     } else if (pScene->GetConfig()->IsSSAOEnabled()) {
         NormalPass(pScene);
         SSAOPass(pScene);
@@ -788,7 +786,8 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
 
 void ForwardRenderer::LightingPassFBOSetup(GLScene* pScene)
 {
-    if (pScene->GetConfig()->IsSSAOEnabled()) {
+    if (pScene->GetConfig()->IsSSAOEnabled() ||
+        pScene->GetConfig()->IsSSGIEnabled()) {
         if (pScene->GetConfig()->IsHDREnabled()) {
             NOT_IMPLEMENTED;
         } else {
@@ -1051,23 +1050,11 @@ void ForwardRenderer::SSGIPass(GLScene* pScene)
 {
     glDisable(GL_DEPTH_TEST);
 
-   // m_ssaoFBO.BindForWriting();
-    SetRenderToDefaultFB();
+//    SetRenderToDefaultFB();
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f));
-
-    ///m_ssaoParams.BindUBO(SSAO_UBO_INDEX);
-
-//    SSAOParamsInternal Params;
-  //  Params.params = pScene->GetConfig()->GetSSAOParams();
-  //  Params.zNear = m_pCurCamera->GetPersProjInfo().zNear;
-   // Params.zFar = m_pCurCamera->GetPersProjInfo().zFar;
-   // Params.OutputHeight = (float)m_ssaoFBO.GetHeight();
-   // Params.OutputWidth = (float)m_ssaoFBO.GetWidth();
-    
-  //  m_ssaoParams.Update(&Params, sizeof(SSAOParamsInternal));
+    m_ssaoFBO.BindForWriting();
+    m_ssaoFBO.ClearColorBuffer(Vector4f(0.0f));
 
     m_ssgiFBO.BindForReading(COLOR_TEXTURE_UNIT);
     m_ssgiFBO.BindNormalForReading(NORMAL_TEXTURE_UNIT);

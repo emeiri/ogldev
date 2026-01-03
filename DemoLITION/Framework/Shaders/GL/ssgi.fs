@@ -191,47 +191,39 @@ void main()
 
     vec3 indirect = vec3(0.0);
 
-    const int NUM_RAYS = 8;   // try 4, then 8, then 16
+   const int NUM_RAYS = 8;
+float occlusion = 0.0;
 
-    for (int r = 0; r < NUM_RAYS; r++)
+for (int r = 0; r < NUM_RAYS; r++)
+{
+    vec3 dirLocal = sampleHemisphere(TexCoords, r);
+    vec3 rayDir   = normalize(TBN * dirLocal);
+
+    // start slightly above the surface to avoid self-hit
+    vec3 startPos = Pview + Nview * 0.05;
+
+    bool hit;
+    vec2 hitUV;
+    float traveled;
+
+    rayMarch(startPos, rayDir, hit, hitUV, traveled);
+
+    if (hit)
     {
-        vec3 dirLocal = sampleHemisphere(TexCoords, r);
-        vec3 rayDir   = normalize(TBN * dirLocal);
-
-        bool hit;
-        vec2 hitUV;
-        float traveled;
-
-        rayMarch(Pview, rayDir, hit, hitUV, traveled);
-
-        if (hit) {
-            vec3 hitAlbedo = texture(gAlbedoTex, hitUV).rgb;
-            //vec3 Nhit = normalize(texture(gNormalTex, hitUV).rgb);
-           // Nhit = normalize(View3x3 * Nhit);
-
-            // cosine term
-            float nDotL = max(dot(Nview, rayDir), 0.0);
-
-            // horizon occlusion (prevents over-brightening)
-            float horizon = max(dot(Nview, rayDir), 0.0);
-            horizon = pow(horizon, 0.5);
-
-            // normal-facing term (prevents light leaking)
-          //  float facing = max(dot(Nhit, -rayDir), 0.0);            
-
-            // distance falloff
-            float falloff = 1.0 / (1.0 + traveled * traveled);
-
-            float weight = nDotL * horizon * falloff;
-
-            const float SSGI_INTENSITY = 2.0; 
-
-            indirect += hitAlbedo * weight * SSGI_INTENSITY;
-        }
+        // weight close hits more, distant hits less
+        float w = 1.0 / (1.0 + traveled * 0.5);
+        occlusion += w;
     }
+}
 
-    indirect /= float(NUM_RAYS);
-    OutIndirect = vec4(indirect, 1.0);
+// normalize and remap
+occlusion /= float(NUM_RAYS);
+
+// remap so “fully occluded” isn’t black but maybe 0.3
+float minAO = 0.3;
+float ao = mix(1.0, minAO, clamp(occlusion, 0.0, 1.0));
+
+OutIndirect = vec4(vec3(ao), 1.0);
 
     //---------------------------------------------------------------------
 

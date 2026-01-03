@@ -14,13 +14,16 @@ layout(std140, binding = 0) uniform SSAOParams
 	float Bias;
 };
 
+// composite pass
+uniform int gDebugMode = 1; // 0 = normal, 1 = SSGI only
+uniform float gSSGIIntensity = 0.5;
+
 void main()
 {
-	vec4 Color = texture(texScene, TexCoords);
+    vec3 direct   = texture(texScene, TexCoords).rgb;
+    vec3 indirect = texture(texSSAO, TexCoords).rgb * gSSGIIntensity;
 
-	float SSAOFactor = texture(texSSAO, TexCoords).x;
-
-	SSAOFactor = clamp(SSAOFactor + Bias, 0.0, 1.0);
-
-	FragColor = vec4(mix(Color, Color * SSAOFactor, Scale).rgb, 1.0);
+    vec3 color = (gDebugMode == 1) ? indirect : (direct * 0.5 + indirect);
+    FragColor = vec4(color, 1.0);
+  //  FragColor = vec4(direct, 1.0);
 }
