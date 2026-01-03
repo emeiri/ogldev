@@ -42,9 +42,12 @@ public:
 
     void HandleCollision(PointMass& OtherParticle);
 
+    void HandleCollisionElastic(Physics::PointMass& OtherParticle, float AvgCoeffRest);
+
 private:
 
     bool CheckCollision(const PointMass& OtherParticle) const;
+    void HandleCollisionInelastic(Physics::PointMass& OtherParticle);
 
     // Physics stuff
     glm::vec3 m_centerOfMass = glm::vec3(0.0f);

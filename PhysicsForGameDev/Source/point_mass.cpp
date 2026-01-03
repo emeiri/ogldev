@@ -73,50 +73,62 @@ void PointMass::HandleCollision(PointMass& OtherParticle)
             float AvgCoeffRest = (m_coeffOfRest + OtherParticle.m_coeffOfRest) * 0.5f;
 
             if (AvgCoeffRest == 0.0f) {
-                glm::vec3 TotalMomentum = m_mass * m_linearVelocity +
-                                          OtherParticle.m_mass * OtherParticle.m_linearVelocity;
-
-                glm::vec3 SharedVelocity = TotalMomentum / (m_mass + OtherParticle.m_mass);
-
-                m_linearVelocity = SharedVelocity;
-                OtherParticle.m_linearVelocity = SharedVelocity;
+                HandleCollisionInelastic(OtherParticle);
             } else {
-                glm::vec3 CollisionNormal = m_centerOfMass - OtherParticle.m_centerOfMass;
-
-                float Distance = glm::length(CollisionNormal);
-
-                if (Distance > 0.0) {
-                    CollisionNormal /= Distance;    // Normalize
-
-                    // 4. Check if objects are moving toward each other
-                    glm::vec3 RelVelocity = m_linearVelocity - OtherParticle.m_linearVelocity;
-                    float RelNormalVel = glm::dot(RelVelocity, CollisionNormal);
-
-                    if (RelNormalVel <= 0.0f) { // Skip if they are already separating
-
-                        float Velocity1 = glm::dot(m_linearVelocity, CollisionNormal);
-                        float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, CollisionNormal);
-
-                        float SumOfMass = m_mass + OtherParticle.m_mass;
-                        float AvgCoeffRestPlusOne = (1.0f + AvgCoeffRest);
-
-                        float Nom = ((m_mass - AvgCoeffRest * OtherParticle.m_mass) * Velocity1) +
-                                       (AvgCoeffRestPlusOne * OtherParticle.m_mass * Velocity2);
-
-                        float FinalVelocity1 = Nom / SumOfMass;
-
-                        Nom = ((OtherParticle.m_mass - AvgCoeffRest * m_mass) * Velocity2) +
-                                                (AvgCoeffRestPlusOne * m_mass * Velocity1);
-
-                        float FinalVelocity2 = Nom / SumOfMass;
-
-                        m_linearVelocity += (FinalVelocity1 - Velocity1) * CollisionNormal;
-                        OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * CollisionNormal;
-                    }
-                }
+                HandleCollisionElastic(OtherParticle, AvgCoeffRest);
             }
         }
     }    
+}
+
+
+void PointMass::HandleCollisionElastic(Physics::PointMass& OtherParticle, float AvgCoeffRest)
+{
+    glm::vec3 CollisionNormal = m_centerOfMass - OtherParticle.m_centerOfMass;
+
+    float Distance = glm::length(CollisionNormal);
+
+    if (Distance > 0.0) {
+        CollisionNormal /= Distance;    // Normalize
+
+        // 4. Check if objects are moving toward each other
+        glm::vec3 RelVelocity = m_linearVelocity - OtherParticle.m_linearVelocity;
+        float RelNormalVel = glm::dot(RelVelocity, CollisionNormal);
+
+        if (RelNormalVel <= 0.0f) { // Skip if they are already separating
+
+            float Velocity1 = glm::dot(m_linearVelocity, CollisionNormal);
+            float Velocity2 = glm::dot(OtherParticle.m_linearVelocity, CollisionNormal);
+
+            float SumOfMass = m_mass + OtherParticle.m_mass;
+            float AvgCoeffRestPlusOne = (1.0f + AvgCoeffRest);
+
+            float Nom = ((m_mass - AvgCoeffRest * OtherParticle.m_mass) * Velocity1) +
+                (AvgCoeffRestPlusOne * OtherParticle.m_mass * Velocity2);
+
+            float FinalVelocity1 = Nom / SumOfMass;
+
+            Nom = ((OtherParticle.m_mass - AvgCoeffRest * m_mass) * Velocity2) +
+                (AvgCoeffRestPlusOne * m_mass * Velocity1);
+
+            float FinalVelocity2 = Nom / SumOfMass;
+
+            m_linearVelocity += (FinalVelocity1 - Velocity1) * CollisionNormal;
+            OtherParticle.m_linearVelocity += (FinalVelocity2 - Velocity2) * CollisionNormal;
+        }
+    }
+}
+
+
+void PointMass::HandleCollisionInelastic(Physics::PointMass& OtherParticle)
+{
+    glm::vec3 TotalMomentum = m_mass * m_linearVelocity +
+        OtherParticle.m_mass * OtherParticle.m_linearVelocity;
+
+    glm::vec3 SharedVelocity = TotalMomentum / (m_mass + OtherParticle.m_mass);
+
+    m_linearVelocity = SharedVelocity;
+    OtherParticle.m_linearVelocity = SharedVelocity;
 }
 
 
