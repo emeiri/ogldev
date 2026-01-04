@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Physics Tutorial 01 - Particle Dynamics
+    Physics Tutorial 02 - Particle Collision
 */
 
 #include <stdio.h>
@@ -67,26 +67,9 @@ public:
 
         m_pScene->GetDirLights().push_back(m_dirLight);
   
-       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/porsche/porsche_no_ground.gltf");
         Model* pSphere1 = m_pRenderingSystem->LoadModel("../PhysicsForGameDev/Tutorial02_ParticleCollision/sphere1.obj");
         Model* pSphere2 = m_pRenderingSystem->LoadModel("../PhysicsForGameDev/Tutorial02_ParticleCollision/sphere2.obj");
-        //Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/ParticleDynamicsCarPaint/glTF/ParticleDynamicsCarPaint.gltf");
-       // Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/glTF-Sample-Assets/Models/CesiumMan/glTF/CesiumMan.gltf");
-       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/glTF-Sample-Assets/ParticleDynamicsWicker/glTF/ParticleDynamicsWicker.gltf");
         
-        /*int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
-        pModel->SetAmbientOcclusionMap(AOMap);
-
-        Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
-        pBRDF_LUT->Load();
-        pConfig->pBRDF_LUT = pBRDF_LUT;
-
-        int IrrdianceMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_irradiance.ktx");
-        pConfig->SetIrradianceMap(IrrdianceMap);
-
-        int EnvMap = m_pRenderingSystem->LoadCubemapTexture("../Content/textures/piazza_bologni_1k_prefilter.ktx");
-        pConfig->SetEnvMap(EnvMap);*/
-
        // m_pScene->GetConfig()->ControlSkybox(true);
        // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
 
@@ -98,7 +81,7 @@ public:
         m_pSphere2->SetPosition(0.0f, 1.0f, 5.0);
         m_pScene->AddToRenderList(m_pSphere2);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 20.0f, 1.0f), Vector3f(0.0f, -0.9f, 0.3f));
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, 1.0f), Vector3f(0.0f, -0.9f, 0.3f));
 
         m_physicsSystem.Init(100, PhysicsUpdateListener);
 
