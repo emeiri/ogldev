@@ -79,11 +79,6 @@ public:
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
-
-		m_meshCenters.resize(NumMeshes);
-		for (glm::vec4& p : m_meshCenters) {
-			p = glm::vec4(glm::linearRand(-glm::vec3(500.0f), glm::vec3(500.0f)), glm::linearRand(0.0f, 3.14159f));
-		}
 	}
 
 	~VulkanApp()
@@ -301,7 +296,13 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 
-		m_posAndAngle = m_vkCore.CreateSSBO(m_meshCenters.data(), ARRAY_SIZE_IN_BYTES(m_meshCenters));
+		std::vector<glm::vec4> MeshCenters;
+		MeshCenters.resize(NumMeshes);
+		for (glm::vec4& p : MeshCenters) {
+			p = glm::vec4(glm::linearRand(-glm::vec3(500.0f), glm::vec3(500.0f)), glm::linearRand(0.0f, 3.14159f));
+		}
+
+		m_posAndAngle = m_vkCore.CreateSSBO(MeshCenters.data(), ARRAY_SIZE_IN_BYTES(MeshCenters));
 
 		m_matrices[0] = m_vkCore.CreateSSBO(NULL, sizeof(glm::vec4) * NumMeshes);
 		m_matrices[1] = m_vkCore.CreateSSBO(NULL, sizeof(glm::vec4) * NumMeshes);
@@ -477,7 +478,7 @@ private:
 
 		static int counter = 0;
 
-		if (ImGui::Button("Button")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)
+		if (ImGui::Button("Button")) {  // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
 		}
 
@@ -518,11 +519,6 @@ private:
 
 		m_ubos[ImageIndex].Update(m_device, &ud, sizeof(ud));
 
-		/*static float foo = 0.0f;
-		foo += 0.000075f;
-		glm::vec3 r(sinf(foo), sinf(foo) * 0.4f, cosf(foo));
-		m_pGameCamera->SetTarget(r);*/
-
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -552,8 +548,7 @@ private:
 	glm::vec3 m_clearColor = glm::vec3(1.0f);
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
-	float m_scale = 0.1f;
-	std::vector<glm::vec4> m_meshCenters;
+	float m_scale = 0.1f;	
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 	OgldevVK::BufferAndMemory m_posAndAngle;
 	OgldevVK::BufferAndMemory m_matrices[2];

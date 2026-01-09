@@ -56,10 +56,6 @@ public:
 
 	void Update(int ImageIndex, const glm::mat4& Transformation);
 
-	const BufferAndMemory* GetVB() const { return &m_vb; }
-
-	const BufferAndMemory* GetIB() const { return &m_ib; }
-
 protected:
 
 	virtual void AllocBuffers() { /* Nothing to do here */ }

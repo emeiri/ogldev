@@ -55,8 +55,10 @@ mat4 rotate(mat4 m, float angle, vec3 v) {
 	return res;
 }
 
-void main() {
-   uint idx = gl_GlobalInvocationID.x;
+
+void main() 
+{
+	uint idx = gl_GlobalInvocationID.x;
 
 	vec4 center = Positions(ubo.bufPosAngleId).pos[idx];
 	mat4 model = rotate(translate(mat4(1.0f), center.xyz), ubo.time + center.w, vec3(1.0f, 1.0f, 1.0f));
