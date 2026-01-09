@@ -48,7 +48,7 @@ GraphicsPipelineV2::GraphicsPipelineV2(VkDevice Device,
 }
 
 
-GraphicsPipelineV2::GraphicsPipelineV2(const PipelineDesc& pd)
+GraphicsPipelineV2::GraphicsPipelineV2(const GraphicsPipelineDesc& pd)
 {
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;

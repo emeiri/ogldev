@@ -50,7 +50,7 @@ public:
 					 VkFormat ColorFormat, 
 					 VkFormat DepthFormat);
 
-	GraphicsPipelineV2(const PipelineDesc& pd);
+	GraphicsPipelineV2(const GraphicsPipelineDesc& pd);
 
 	~GraphicsPipelineV2();
 

@@ -33,7 +33,7 @@ class GraphicsPipelineV4 {
 
 public:
 
-	GraphicsPipelineV4(const PipelineDesc& pd);
+	GraphicsPipelineV4(const GraphicsPipelineDesc& pd);
 
 	~GraphicsPipelineV4();
 

@@ -37,7 +37,7 @@ enum V4_Binding {
 };
 
 
-GraphicsPipelineV4::GraphicsPipelineV4(const PipelineDesc& pd)
+GraphicsPipelineV4::GraphicsPipelineV4(const GraphicsPipelineDesc& pd)
 {
 	if (pd.IsTexCube) {
 		printf("GraphicsPipelineV4 doesn't support texcubes. Use GraphicsPipelineV2 instead.");

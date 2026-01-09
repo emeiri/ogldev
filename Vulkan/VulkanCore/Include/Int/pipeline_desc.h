@@ -24,7 +24,7 @@
 
 namespace OgldevVK {
 
-struct PipelineDesc {
+struct GraphicsPipelineDesc {
 	VkDevice Device = NULL;
 	GLFWwindow* pWindow = NULL;
 	VkShaderModule vs = NULL;
@@ -38,6 +38,13 @@ struct PipelineDesc {
 	bool IsUniform = false;
 	bool IsTex2D = false;
 	bool IsTexCube = false;
+};
+
+
+struct ComputePipelineDesc {
+	VkDevice Device = NULL;
+	GLFWwindow* pWindow = NULL;
+	VkShaderModule cs = NULL;
 };
 
 }
