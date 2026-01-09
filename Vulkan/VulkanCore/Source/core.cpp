@@ -329,24 +329,26 @@ void VulkanCore::CreateDevice()
 		OGLDEV_ERROR0("The Tessellation Shader is not supported!\n");
 	}
 
-	VkPhysicalDeviceFeatures DeviceFeatures = { 0 };
+	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingFeature{};
+	DynamicRenderingFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
+	DynamicRenderingFeature.dynamicRendering = VK_TRUE;
+
+	// Chain dynamic rendering AFTER Vulkan 1.2 features
+	VkPhysicalDeviceVulkan12Features Features12{};
+	Features12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+	Features12.pNext = &DynamicRenderingFeature;
+	Features12.runtimeDescriptorArray = VK_TRUE;
+	Features12.descriptorIndexing = VK_TRUE;
+	Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+	
+	VkPhysicalDeviceFeatures DeviceFeatures{};
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;
 	DeviceFeatures.multiDrawIndirect = VK_TRUE;
 
-	VkPhysicalDeviceDescriptorIndexingFeatures DescriptorSetIndexingFeatures{};
-
-	DescriptorSetIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-
-	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingFeature = {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR,
-		.pNext = &DescriptorSetIndexingFeatures,
-		.dynamicRendering = VK_TRUE
-	};
-
 	VkDeviceCreateInfo DeviceCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = &DynamicRenderingFeature,
+		.pNext = &Features12,
 		.flags = 0,
 		.queueCreateInfoCount = 1,
 		.pQueueCreateInfos = &qInfo,
