@@ -652,32 +652,38 @@ BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsa
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	VkMemoryPropertyFlags MemProps = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 									 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-	BufferAndMemory StagingVB = CreateBuffer(Size, Usage, MemProps);
+	BufferAndMemory StagingVB;
 
-	// Step 2: map the memory of the stage buffer
-	void* pMem = NULL;
-	VkDeviceSize Offset = 0;
-	VkMemoryMapFlags Flags = 0;
-	VkResult res = vkMapMemory(m_device, StagingVB.m_mem, Offset, 
-		                       StagingVB.m_allocationSize, Flags, &pMem);
-	CHECK_VK_RESULT(res, "vkMapMemory\n");
+	if (pVertices) {
+		StagingVB = CreateBuffer(Size, Usage, MemProps);
 
-	// Step 3: copy the vertices to the staging buffer
-	memcpy(pMem, pVertices, Size);
+		// Step 2: map the memory of the stage buffer
+		void* pMem = NULL;
+		VkDeviceSize Offset = 0;
+		VkMemoryMapFlags Flags = 0;
+		VkResult res = vkMapMemory(m_device, StagingVB.m_mem, Offset,
+			                       StagingVB.m_allocationSize, Flags, &pMem);
+		CHECK_VK_RESULT(res, "vkMapMemory\n");
 
-	// Step 4: unmap/release the mapped memory
-	vkUnmapMemory(m_device, StagingVB.m_mem);
+		// Step 3: copy the vertices to the staging buffer
+		memcpy(pMem, pVertices, Size);
+
+		// Step 4: unmap/release the mapped memory
+		vkUnmapMemory(m_device, StagingVB.m_mem);
+	}
 
 	// Step 5: create the final buffer
 	Usage = RequestedUsage | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 	MemProps = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 	BufferAndMemory VB = CreateBuffer(Size, Usage, MemProps);
 
-	// Step 6: copy the staging buffer to the final buffer
-	CopyBufferToBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
+	if (pVertices) {
+		// Step 6: copy the staging buffer to the final buffer
+		CopyBufferToBuffer(VB.m_buffer, StagingVB.m_buffer, Size);
 
-	// Step 7: release the resources of the staging buffer
-	StagingVB.Destroy(m_device);
+		// Step 7: release the resources of the staging buffer
+		StagingVB.Destroy(m_device);
+	}
 
 	return VB;
 }
