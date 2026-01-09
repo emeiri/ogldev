@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\..\..\Common\ogldev_glm_camera.cpp" />
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp" />
     <ClCompile Include="..\..\..\..\DemoLITION\Framework\Source\core_model.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\compute_pipeline.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\core.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\device.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\glfw_vulkan.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="..\..\..\..\Common\3rdparty\SPIRV-Reflect\spirv_reflect.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\model_desc.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Int\pipeline_desc.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_compute_pipeline.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_device.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_glfw.h" />
