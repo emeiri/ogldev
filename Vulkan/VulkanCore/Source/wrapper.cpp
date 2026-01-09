@@ -199,6 +199,40 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 
 	vkCmdPipelineBarrier(CmdBuf, sourceStage, destinationStage, 
 		                 0, 0, NULL, 0, NULL, 1, &barrier);
+// Copied from the "3D Graphics Rendering Cookbook"
+void BufferMemBarrier(VkCommandBuffer CmdBuf, VkBuffer Buffer, VkPipelineStageFlags SrcStage, VkPipelineStageFlags DstStage)
+{
+	VkBufferMemoryBarrier Barrier = {
+		.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+		.srcAccessMask = 0,
+		.dstAccessMask = 0,
+		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+		.buffer = Buffer,
+		.offset = 0,
+		.size = VK_WHOLE_SIZE,
+	};
+
+	if (SrcStage & VK_PIPELINE_STAGE_TRANSFER_BIT) {
+		Barrier.srcAccessMask |= VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+	} else {
+		Barrier.srcAccessMask |= VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+	}
+
+	if (DstStage & VK_PIPELINE_STAGE_TRANSFER_BIT) {
+		Barrier.dstAccessMask |= VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+	} else {
+		Barrier.dstAccessMask |= VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+	}
+	if (DstStage & VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT) {
+		Barrier.dstAccessMask |= VK_ACCESS_INDIRECT_COMMAND_READ_BIT;
+	}
+	
+	//if (buf->vkUsageFlags_ & VK_BUFFER_USAGE_INDEX_BUFFER_BIT) {
+	//	Barrier.dstAccessMask |= VK_ACCESS_INDEX_READ_BIT;
+	//}
+
+	vkCmdPipelineBarrier(CmdBuf, SrcStage, DstStage, VkDependencyFlags{}, 0, NULL, 1, &Barrier, 0, NULL);
 }
 
 
