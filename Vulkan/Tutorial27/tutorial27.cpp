@@ -16,7 +16,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 	Vulkan For Beginners - 
-		Tutorial #27: Descriptor Indexing
+		Tutorial #27: Indirect Rendering
 */
 
 #include <array>
@@ -81,7 +81,7 @@ public:
 	{
 		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
 
-		m_vkCore.Init(pAppName, m_pWindow, true);
+		m_vkCore.Init(pAppName, m_pWindow, true, false);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();

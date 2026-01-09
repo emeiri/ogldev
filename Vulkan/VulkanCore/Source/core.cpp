@@ -109,7 +109,7 @@ VulkanCore::~VulkanCore()
 }
 
 
-void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled)
+void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled, bool WithCompute)
 {
 	m_pWindow = pWindow;
 	m_depthEnabled = DepthEnabled;
@@ -122,7 +122,13 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabl
 	}
 	CreateSurface();
 	m_physDevices.Init(m_instance, m_surface);
-	m_queueFamily = m_physDevices.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
+
+	VkQueueFlags QueueFlags = VK_QUEUE_GRAPHICS_BIT;
+	if (WithCompute) {
+		QueueFlags |= VK_QUEUE_COMPUTE_BIT;
+	}
+	m_queueFamily = m_physDevices.SelectDevice(QueueFlags, true);
+	
 	CreateDevice();
 	CreateSwapChain();
 	CreateCommandBufferPool();

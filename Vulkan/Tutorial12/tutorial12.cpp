@@ -59,7 +59,7 @@ public:
 
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
-		m_vkCore.Init(pAppName, pWindow, false);
+		m_vkCore.Init(pAppName, pWindow, false, false);
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		m_renderPass = m_vkCore.CreateSimpleRenderPass();

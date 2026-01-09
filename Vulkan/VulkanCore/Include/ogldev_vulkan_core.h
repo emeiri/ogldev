@@ -62,7 +62,7 @@ public:
 
 	~VulkanCore();
 
-	void Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled);
+	void Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled, bool WithCompute);
 
 	VkRenderPass CreateSimpleRenderPass();
 

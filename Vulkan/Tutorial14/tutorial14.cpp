@@ -65,7 +65,7 @@ public:
 	void Init(const char* pAppName, GLFWwindow* pWindow)
 	{
 		m_pWindow = pWindow;
-		m_vkCore.Init(pAppName, pWindow, false);
+		m_vkCore.Init(pAppName, pWindow, false, false);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();

@@ -66,7 +66,7 @@ public:
 	{
 		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
 
-		m_vkCore.Init(pAppName, m_pWindow, true);
+		m_vkCore.Init(pAppName, m_pWindow, true, false);
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();

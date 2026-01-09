@@ -55,7 +55,7 @@ public:
 
 	void Init(const char* pAppName)
 	{
-		m_vkCore.Init(pAppName, NULL, false);  // The NULL is for forward compatibility with the following tutorials
+		m_vkCore.Init(pAppName, NULL, false, false);  // The NULL is for forward compatibility with the following tutorials
 	}
 
 	void RenderScene()
