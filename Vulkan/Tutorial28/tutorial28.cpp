@@ -54,11 +54,20 @@
 
 const u32 NumMeshes = 32 * 1024;
 
+#if defined(_MSC_VER)
+#pragma pack(push,1)
+#endif
+
 struct UniformData {
 	u64 bufPosAngleId;
 	u64 bufMatricesId;
 	float time;
 };
+
+#if defined(_MSC_VER)
+#pragma pack(pop)
+#endif
+
 
 static int frame = 0;
 
