@@ -1,0 +1,65 @@
+﻿#version 460
+
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+
+layout(push_constant) uniform PerFrameData {
+	mat4 viewproj;
+	uint textureId;
+	uvec2 bufPosAngleId;
+	uvec2 bufMatricesId;
+	uvec2 bufVerticesId;
+	float time;
+};
+
+layout(std430, buffer_reference) readonly buffer Positions {
+  vec4 pos[]; // pos, initialAngle
+};
+
+
+layout(std430, buffer_reference) writeonly buffer Matrices {
+	mat4 mtx[];
+};
+
+mat4 translate(mat4 m, vec3 v) {
+	mat4 Result = m;
+	Result[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
+	return Result;
+}
+
+mat4 rotate(mat4 m, float angle, vec3 v) {
+	float a = angle;
+	float c = cos(a);
+	float s = sin(a);
+
+	vec3 axis = normalize(v);
+	vec3 temp = (float(1.0) - c) * axis;
+
+	mat4 r;
+	r[0][0] = c + temp[0] * axis[0];
+	r[0][1] = temp[0] * axis[1] + s * axis[2];
+	r[0][2] = temp[0] * axis[2] - s * axis[1];
+
+	r[1][0] = temp[1] * axis[0] - s * axis[2];
+	r[1][1] = c + temp[1] * axis[1];
+	r[1][2] = temp[1] * axis[2] + s * axis[0];
+
+	r[2][0] = temp[2] * axis[0] + s * axis[1];
+	r[2][1] = temp[2] * axis[1] - s * axis[0];
+	r[2][2] = c + temp[2] * axis[2];
+
+	mat4 res;
+	res[0] = m[0] * r[0][0] + m[1] * r[0][1] + m[2] * r[0][2];
+	res[1] = m[0] * r[1][0] + m[1] * r[1][1] + m[2] * r[1][2];
+	res[2] = m[0] * r[2][0] + m[1] * r[2][1] + m[2] * r[2][2];
+	res[3] = m[3];
+	return res;
+}
+
+void main() {
+   uint idx = gl_GlobalInvocationID.x;
+
+	vec4 center = Positions(bufPosAngleId).pos[idx];
+	mat4 model = rotate(translate(mat4(1.0f), center.xyz), time + center.w, vec3(1.0f, 1.0f, 1.0f));
+
+	Matrices(bufMatricesId).mtx[idx] = model;
+}
