@@ -1,15 +1,15 @@
-﻿#version 460
+#version 460
+
+#extension GL_EXT_buffer_reference: require
+#extension GL_EXT_buffer_reference_uvec2: require
 
 layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 
-layout(push_constant) uniform PerFrameData {
-	mat4 viewproj;
-	uint textureId;
+layout (binding = 0) uniform UniformData {
 	uvec2 bufPosAngleId;
 	uvec2 bufMatricesId;
-	uvec2 bufVerticesId;
 	float time;
-};
+} ubo;
 
 layout(std430, buffer_reference) readonly buffer Positions {
   vec4 pos[]; // pos, initialAngle
@@ -58,8 +58,8 @@ mat4 rotate(mat4 m, float angle, vec3 v) {
 void main() {
    uint idx = gl_GlobalInvocationID.x;
 
-	vec4 center = Positions(bufPosAngleId).pos[idx];
-	mat4 model = rotate(translate(mat4(1.0f), center.xyz), time + center.w, vec3(1.0f, 1.0f, 1.0f));
+	vec4 center = Positions(ubo.bufPosAngleId).pos[idx];
+	mat4 model = rotate(translate(mat4(1.0f), center.xyz), ubo.time + center.w, vec3(1.0f, 1.0f, 1.0f));
 
-	Matrices(bufMatricesId).mtx[idx] = model;
+	Matrices(ubo.bufMatricesId).mtx[idx] = model;
 }

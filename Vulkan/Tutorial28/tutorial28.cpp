@@ -40,6 +40,7 @@
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
 #include "ogldev_vulkan_graphics_pipeline_v4.h"
+#include "ogldev_vulkan_compute_pipeline.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
 #include "ogldev_vulkan_skybox.h"
@@ -51,6 +52,16 @@
 
 #define APP_NAME "Tutorial 28"
 
+const u32 NumMeshes = 32 * 1024;
+
+struct UniformData {
+	u64 bufPosAngleId;
+	u64 bufMatricesId;
+	float time;
+};
+
+static int frame = 0;
+
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
@@ -59,19 +70,38 @@ public:
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
+
+		m_meshCenters.resize(NumMeshes);
+		for (glm::vec4& p : m_meshCenters) {
+			p = glm::vec4(glm::linearRand(-glm::vec3(500.0f), glm::vec3(500.0f)), glm::linearRand(0.0f, 3.14159f));
+		}
 	}
 
 	~VulkanApp()
 	{
-		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
-		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
+		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
+			m_vkCore.FreeCommandBuffers((u32)m_cmdBufs[i].WithGUI.size(), m_cmdBufs[i].WithGUI.data());
+			m_vkCore.FreeCommandBuffers((u32)m_cmdBufs[i].WithoutGUI.size(), m_cmdBufs[i].WithoutGUI.data());
+		}
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		vkDestroyShaderModule(m_device, m_cs, NULL);
 
-		delete m_pPipeline;
+		delete m_pGraphicsPipeline;
+
+		delete m_pComputePipeline;
 			
 		m_model.Destroy();
+
+		m_posAndAngle.Destroy(m_device);
+
+		for (OgldevVK::BufferAndMemory& b : m_matrices) {
+			b.Destroy(m_device);
+		}
+
+		for (OgldevVK::BufferAndMemory& ubo : m_ubos) {
+			ubo.Destroy(m_device);
+		}
 
 		//m_skybox.Destroy();
 
@@ -89,7 +119,7 @@ public:
 		CreateShaders();
 		CreateMesh();
 		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
-		CreatePipeline();
+		CreatePipelines();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 		DefaultCreateCameraPers();
@@ -110,14 +140,16 @@ public:
 
 			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], ImGUICmdBuf };
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs[frame].WithGUI[ImageIndex], ImGUICmdBuf};
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
-			m_pQueue->SubmitAsync(m_cmdBufs.WithoutGUI[ImageIndex]);
+			m_pQueue->SubmitAsync(m_cmdBufs[frame].WithoutGUI[ImageIndex]);
 		}
 
 		m_pQueue->Present(ImageIndex);
+
+		frame = (frame + 1) % 2;
 	}
 
 	
@@ -236,11 +268,13 @@ private:
 
 	void CreateCommandBuffers()
 	{
-		m_cmdBufs.WithGUI.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithGUI.data());
+		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
+			m_cmdBufs[i].WithGUI.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs[i].WithGUI.data());
 
-		m_cmdBufs.WithoutGUI.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithoutGUI.data());
+			m_cmdBufs[i].WithoutGUI.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs[i].WithoutGUI.data());
+		}
 
 		printf("Created command buffers\n");
 	}
@@ -249,19 +283,22 @@ private:
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
+		m_model.LoadAssimpModel("../../Content/box.obj");
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+	//	m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
+
+		m_posAndAngle = m_vkCore.CreateSSBO(m_meshCenters.data(), ARRAY_SIZE_IN_BYTES(m_meshCenters));
+
+		m_matrices[0] = m_vkCore.CreateSSBO(NULL, sizeof(glm::vec4) * NumMeshes);
+		m_matrices[1] = m_vkCore.CreateSSBO(NULL, sizeof(glm::vec4) * NumMeshes);
+
+		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 	}
-
-
-	struct UniformData {
-		glm::mat4 WVP;
-	};
 
 
 	void CreateShaders()
@@ -273,8 +310,15 @@ private:
 		m_cs = OgldevVK::CreateShaderModuleFromText(m_device, "test.comp");
 	}
 
+	
+	void CreatePipelines()
+	{
+		CreateGraphicsPipeline();
+		CreateComputePipeline();
+	}
 
-	void CreatePipeline()
+
+	void CreateGraphicsPipeline()
 	{
 		OgldevVK::GraphicsPipelineDesc pd;
 		pd.Device = m_device;
@@ -289,34 +333,55 @@ private:
 		pd.IsTex2D = true;
 		pd.IsUniform = true;
 
-		m_pPipeline = new OgldevVK::GraphicsPipelineV4(pd);
+		m_pGraphicsPipeline = new OgldevVK::GraphicsPipelineV4(pd);
+	}
+
+
+	void CreateComputePipeline()
+	{
+		OgldevVK::ComputePipelineDesc pd;
+		pd.Device = m_device;
+		pd.pWindow = m_pWindow;
+		pd.cs = m_cs;
+		pd.NumImages = m_numImages;
+
+		m_pComputePipeline = new OgldevVK::ComputePipeline(pd);
+
+		m_pComputePipeline->UpdateDescriptorSets(m_ubos);
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		m_model.CreateDescriptorSets(*m_pPipeline);
+		m_model.CreateDescriptorSets(*m_pGraphicsPipeline);
 
-		RecordCommandBuffersInternal(true, m_cmdBufs.WithoutGUI);
+		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
+			RecordCommandBuffersInternal(true, m_cmdBufs[i].WithoutGUI, i);
 
-		RecordCommandBuffersInternal(false, m_cmdBufs.WithGUI);
+			RecordCommandBuffersInternal(false, m_cmdBufs[i].WithGUI, i);
+		}
 	}
 
 
-	void RecordCommandBuffersInternal(bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
+	void RecordCommandBuffersInternal(bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs, int Frame)
 	{
 		for (uint i = 0; i < CmdBufs.size(); i++) {
-			VkCommandBuffer& CmdBuf = CmdBufs[i];
+			VkCommandBuffer& CmdBuf = CmdBufs[i];			
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf);
+
+			VkPipelineStageFlags DstStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+			OgldevVK::BufferMemBarrier(CmdBuf, m_matrices[Frame].m_buffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, DstStageFlags);
 
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pPipeline->Bind(CmdBuf);
-			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pPipeline, i);
+			m_pGraphicsPipeline->Bind(CmdBuf);
+			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pGraphicsPipeline, i);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -436,6 +501,14 @@ private:
 
 		m_model.Update(ImageIndex, WVP);
 
+		UniformData ud = {
+			.bufPosAngleId = m_posAndAngle.m_devAddr,
+			.bufMatricesId = m_matrices[frame].m_devAddr,
+			.time = (float)glfwGetTime()
+		};
+
+		m_ubos[ImageIndex].Update(m_device, &ud, sizeof(ud));
+
 		/*static float foo = 0.0f;
 		foo += 0.000075f;
 		glm::vec3 r(sinf(foo), sinf(foo) * 0.4f, cosf(foo));
@@ -453,12 +526,13 @@ private:
 	struct {
 		std::vector<VkCommandBuffer> WithGUI;
 		std::vector<VkCommandBuffer> WithoutGUI;
-	} m_cmdBufs;
+	} m_cmdBufs[2];
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	VkShaderModule m_cs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV4* m_pPipeline = NULL;	
+	OgldevVK::GraphicsPipelineV4* m_pGraphicsPipeline = NULL;
+	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
 	OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
@@ -470,6 +544,10 @@ private:
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
+	std::vector<glm::vec4> m_meshCenters;
+	std::vector<OgldevVK::BufferAndMemory> m_ubos;
+	OgldevVK::BufferAndMemory m_posAndAngle;
+	OgldevVK::BufferAndMemory m_matrices[2];
 };
 
 

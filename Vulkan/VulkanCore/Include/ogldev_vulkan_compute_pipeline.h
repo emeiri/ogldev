@@ -37,30 +37,22 @@ public:
 
 	~ComputePipeline();
 
-	void Bind(VkCommandBuffer CmdBuf);
+	void UpdateDescriptorSets(const std::vector<BufferAndMemory>& UBOs);
 
-	void AllocateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets);
-
-	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
-							  std::vector<VkDescriptorSet>& DescriptorSets);
-
-	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
+	void RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf);
 
 private:
 
-	void InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass, 
-					VkShaderModule vs, VkShaderModule fs,
-					VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp);
-
+	void AllocateDescriptorSets();
 	void AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet>& DescriptorSets);
 	void CreateDescriptorPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount,	u32 MaxSets);
-	void CreateDescriptorSetLayout(bool IsVB, bool IsIB, bool IsTex, bool IsUniform);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
+	std::vector<VkDescriptorSet> m_descriptorSets;
 	int m_numImages = 0;
 };
 

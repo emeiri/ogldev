@@ -15,6 +15,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include "ogldev_vulkan_compute_pipeline.h"
 
 namespace OgldevVK {
@@ -24,7 +26,37 @@ ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;
 
-//	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsTex2D, pd.IsUniform);
+	VkDescriptorSetLayoutBinding Binding = {
+		.binding = 0,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.pImmutableSamplers = NULL
+	};
+
+	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.bindingCount = 1,
+		.pBindings = &Binding
+	};
+
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, nullptr, &m_descriptorSetLayout);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout\n");
+
+	VkPipelineLayoutCreateInfo PipelineLayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.setLayoutCount = 1,
+		.pSetLayouts = &m_descriptorSetLayout,
+		.pushConstantRangeCount = 0,
+		.pPushConstantRanges = NULL
+	};
+
+	res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, nullptr, &m_pipelineLayout);
+	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -45,8 +77,150 @@ ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 		.basePipelineIndex = -1,
 	};
 
-	VkResult res = vkCreateComputePipelines(m_device, NULL, 1, &ci, NULL, &m_pipeline);
+	res = vkCreateComputePipelines(m_device, NULL, 1, &ci, NULL, &m_pipeline);
 	CHECK_VK_RESULT(res, "vkCreateComputePipelines\n");
+
+	AllocateDescriptorSets();
+}
+
+
+ComputePipeline::~ComputePipeline()
+{
+	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
+	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
+	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
+	vkDestroyPipeline(m_device, m_pipeline, NULL);
+}
+
+
+void ComputePipeline::RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf)
+{
+	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
+	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE,
+							m_pipelineLayout, 0, 1, &m_descriptorSets[Image], 0, NULL);
+
+	vkCmdDispatch(CmdBuf, 256, 1, 1);
+}
+
+
+void ComputePipeline::CreateDescriptorPool(u32 TextureCount,
+										   u32 UniformBufferCount, 
+										   u32 StorageBufferCount, 
+										   u32 MaxSets)
+{
+	// Pool sizes: each entry specifies how many descriptors of that type the pool can allocate.
+	std::vector<VkDescriptorPoolSize> PoolSizes;
+
+	if (TextureCount > 0) {
+		VkDescriptorPoolSize TexSize = {
+			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = TextureCount
+		};
+
+		PoolSizes.push_back(TexSize);
+	}
+
+	if (UniformBufferCount > 0) {
+		VkDescriptorPoolSize UboSize = {
+			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = UniformBufferCount
+		};
+
+		PoolSizes.push_back(UboSize);
+	}
+
+	if (StorageBufferCount > 0) {
+		VkDescriptorPoolSize SsboSize = {
+			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = StorageBufferCount
+		};
+
+		PoolSizes.push_back(SsboSize);
+	}
+
+	// Optionally include VK_DESCRIPTOR_TYPE_SAMPLER or VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE
+	// if you use separate sampler/image bindings instead of combined descriptors.
+
+	VkDescriptorPoolCreateInfo PoolCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0, 
+		.maxSets = MaxSets,
+		.poolSizeCount = (u32)PoolSizes.size(),
+		.pPoolSizes = PoolSizes.empty() ? NULL : PoolSizes.data()
+	};
+
+	VkResult res = vkCreateDescriptorPool(m_device, &PoolCreateInfo, NULL, &m_descriptorPool);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+}
+
+
+void ComputePipeline::AllocateDescriptorSets()
+{
+	u32 TextureCount = 0;
+	u32 UniformBufferCount = m_numImages;
+	u32 StorageBufferCount = 0;	// IB, VB, MetaData
+	u32 MaxSets = m_numImages;
+
+	m_descriptorSets.resize(m_numImages);
+
+	CreateDescriptorPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+
+	AllocateDescriptorSetsInternal(m_descriptorSets);
+}
+
+
+void ComputePipeline::AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet>& DescriptorSets)
+{
+	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
+
+	VkDescriptorSetAllocateInfo AllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.pNext = NULL,
+		.descriptorPool = m_descriptorPool,
+		.descriptorSetCount = (u32)Layouts.size(),
+		.pSetLayouts = Layouts.data()
+	};
+
+	DescriptorSets.resize(m_numImages);
+
+    VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
+	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");	
+}
+
+
+void ComputePipeline::UpdateDescriptorSets(const std::vector<BufferAndMemory>& UBOs)
+{
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages);
+
+	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
+
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {		
+		BufferInfo_Uniforms[ImageIndex].buffer = UBOs[ImageIndex].m_buffer;
+		BufferInfo_Uniforms[ImageIndex].offset = 0;
+		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
+	}
+
+	u32 WdsIndex = 0;
+
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+		VkDescriptorSet& DstSet = m_descriptorSets[ImageIndex];
+
+		VkWriteDescriptorSet wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = 0,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+	}
+
+	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
 }
 
 }
