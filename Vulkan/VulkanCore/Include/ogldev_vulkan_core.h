@@ -38,6 +38,7 @@ public:
 	VkBuffer m_buffer = NULL;
 	VkDeviceMemory m_mem = NULL;
 	VkDeviceSize m_allocationSize = 0;
+	VkDeviceAddress m_devAddr = 0;
 
 	void Update(VkDevice Device, const void* pData, size_t Size);
 

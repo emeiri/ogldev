@@ -346,6 +346,7 @@ void VulkanCore::CreateDevice()
 	Features12.runtimeDescriptorArray = VK_TRUE;
 	Features12.descriptorIndexing = VK_TRUE;
 	Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+	Features12.bufferDeviceAddress = VK_TRUE;
 	
 	VkPhysicalDeviceFeatures DeviceFeatures{};
 	DeviceFeatures.geometryShader = VK_TRUE;
@@ -731,6 +732,13 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 	//printf("Memory type index %d\n", MemoryTypeIndex);
 
 	// Step 4: allocate memory
+	VkMemoryAllocateFlagsInfo FlagsInfo = {
+		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO,
+		.pNext = NULL,
+		.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT,
+		.deviceMask = 0
+	};
+
 	VkMemoryAllocateInfo MemAllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 		.pNext = NULL,
@@ -738,12 +746,26 @@ BufferAndMemory VulkanCore::CreateBuffer(VkDeviceSize Size, VkBufferUsageFlags U
 		.memoryTypeIndex = MemoryTypeIndex
 	};
 
+	if (Usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
+		MemAllocInfo.pNext = &FlagsInfo;
+	}
+
 	res = vkAllocateMemory(m_device, &MemAllocInfo, NULL, &Buf.m_mem);
 	CHECK_VK_RESULT(res, "vkAllocateMemory error %d\n");
 
 	// Step 5: bind memory
 	res = vkBindBufferMemory(m_device, Buf.m_buffer, Buf.m_mem, 0);
 	CHECK_VK_RESULT(res, "vkBindBufferMemory error %d\n");
+
+	if (Usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
+		const VkBufferDeviceAddressInfo ai = {
+			.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO,
+			.buffer = Buf.m_buffer,
+		};
+
+		Buf.m_devAddr = vkGetBufferDeviceAddress(m_device, &ai);
+		assert(Buf.m_devAddr);
+	}
 
 	return Buf;
 }
