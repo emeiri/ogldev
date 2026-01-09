@@ -45,6 +45,7 @@ struct ComputePipelineDesc {
 	VkDevice Device = NULL;
 	GLFWwindow* pWindow = NULL;
 	VkShaderModule cs = NULL;
+	int NumImages = 0;
 };
 
 }

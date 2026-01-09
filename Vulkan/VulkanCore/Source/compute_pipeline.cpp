@@ -22,6 +22,7 @@ namespace OgldevVK {
 ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 {
 	m_device = pd.Device;
+	m_numImages = pd.NumImages;
 
 //	CreateDescriptorSetLayout(pd.IsVB, pd.IsIB, pd.IsTex2D, pd.IsUniform);
 
