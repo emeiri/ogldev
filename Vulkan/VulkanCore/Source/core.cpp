@@ -635,7 +635,8 @@ void VulkanCore::DestroyFramebuffers(std::vector<VkFramebuffer>& Framebuffers)
 
 BufferAndMemory VulkanCore::CreateSSBO(const void* pVertices, size_t Size)
 {
-	return CreateBufferInternal(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, pVertices, Size);
+	return CreateBufferInternal(VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | 
+		                        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT_KHR, pVertices, Size);
 }
 
 
@@ -645,7 +646,7 @@ BufferAndMemory VulkanCore::CreateIndirectBuffer(const void* pVertices, size_t S
 }
 
 
-BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlagBits RequestedUsage, const void* pVertices, size_t Size)
+BufferAndMemory VulkanCore::CreateBufferInternal(VkBufferUsageFlags RequestedUsage, const void* pVertices, size_t Size)
 {
 	// Step 1: create the staging buffer
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;

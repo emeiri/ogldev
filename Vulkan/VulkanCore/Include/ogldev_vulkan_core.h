@@ -133,7 +133,7 @@ private:
 	void CreateCommandBufferPool();	
 	BufferAndMemory CreateUniformBuffer(size_t Size);
 	void CreateDepthResources();
-	BufferAndMemory CreateBufferInternal(VkBufferUsageFlagBits Usage, const void* pVertices, size_t Size);
+	BufferAndMemory CreateBufferInternal(VkBufferUsageFlags Usage, const void* pVertices, size_t Size);
 
 	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
 
