@@ -27,8 +27,8 @@ ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 	m_numImages = pd.NumImages;
 
 	VkDescriptorSetLayoutBinding Binding = {
-		.binding = 0,
-		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
 		.pImmutableSamplers = NULL
@@ -99,7 +99,7 @@ void ComputePipeline::RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf)
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE,
 							m_pipelineLayout, 0, 1, &m_descriptorSets[Image], 0, NULL);
 
-	vkCmdDispatch(CmdBuf, 256, 1, 1);
+	vkCmdDispatch(CmdBuf, 1280 / 16, 720 / 16, 1);
 }
 
 
@@ -157,8 +157,8 @@ void ComputePipeline::CreateDescriptorPool(u32 TextureCount,
 
 void ComputePipeline::AllocateDescriptorSets()
 {
-	u32 TextureCount = 0;
-	u32 UniformBufferCount = m_numImages;
+	u32 TextureCount = 1;
+	u32 UniformBufferCount = 0;
 	u32 StorageBufferCount = 0;	// IB, VB, MetaData
 	u32 MaxSets = m_numImages;
 
@@ -189,19 +189,17 @@ void ComputePipeline::AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet
 }
 
 
-void ComputePipeline::UpdateDescriptorSets(const std::vector<BufferAndMemory>& UBOs)
+void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture)
 {
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages);
 
-	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
-
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {		
-		BufferInfo_Uniforms[ImageIndex].buffer = UBOs[ImageIndex].m_buffer;
-		BufferInfo_Uniforms[ImageIndex].offset = 0;
-		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
-	}
-
 	u32 WdsIndex = 0;
+
+	VkDescriptorImageInfo ImageInfo = {
+		.sampler = Texture.m_sampler,
+		.imageView = Texture.m_view,
+		.imageLayout = VK_IMAGE_LAYOUT_GENERAL
+	};
 
 	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
 		VkDescriptorSet& DstSet = m_descriptorSets[ImageIndex];
@@ -209,11 +207,11 @@ void ComputePipeline::UpdateDescriptorSets(const std::vector<BufferAndMemory>& U
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = 0,
+			.dstBinding = 2,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
+			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+			.pImageInfo = &ImageInfo
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());

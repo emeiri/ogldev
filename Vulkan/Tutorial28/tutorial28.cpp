@@ -59,8 +59,6 @@ const u32 NumMeshes = 32 * 1024;
 #endif
 
 struct UniformData {
-	u64 bufPosAngleId;
-	u64 bufMatricesId;
 	float time;
 };
 
@@ -97,11 +95,7 @@ public:
 			
 		m_model.Destroy();
 
-		m_posAndAngle.Destroy(m_device);
-
-		for (OgldevVK::BufferAndMemory& b : m_matrices) {
-			b.Destroy(m_device);
-		}
+		m_csOutput.Destroy(m_device);
 
 		for (OgldevVK::BufferAndMemory& ubo : m_ubos) {
 			ubo.Destroy(m_device);
@@ -302,11 +296,6 @@ private:
 			p = glm::vec4(glm::linearRand(-glm::vec3(500.0f), glm::vec3(500.0f)), glm::linearRand(0.0f, 3.14159f));
 		}
 
-		m_posAndAngle = m_vkCore.CreateSSBO(MeshCenters.data(), ARRAY_SIZE_IN_BYTES(MeshCenters));
-
-		m_matrices[0] = m_vkCore.CreateSSBO(NULL, sizeof(glm::vec4) * NumMeshes);
-		m_matrices[1] = m_vkCore.CreateSSBO(NULL, sizeof(glm::vec4) * NumMeshes);
-
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 	}
 
@@ -349,6 +338,7 @@ private:
 
 	void CreateComputePipeline()
 	{
+		m_vkCore.CreateTexture(m_csOutput);
 		OgldevVK::ComputePipelineDesc pd;
 		pd.Device = m_device;
 		pd.pWindow = m_pWindow;
@@ -357,7 +347,7 @@ private:
 
 		m_pComputePipeline = new OgldevVK::ComputePipeline(pd);
 
-		m_pComputePipeline->UpdateDescriptorSets(m_ubos);
+		m_pComputePipeline->UpdateDescriptorSets(m_csOutput);
 	}
 
 
@@ -380,10 +370,27 @@ private:
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
+			m_csOutput.ImageMemoryBarrier(
+				CmdBuf,
+				VK_IMAGE_LAYOUT_GENERAL,                 // new layout
+				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,   // srcStage: last use was sampling
+				VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,    // dstStage: next use is compute write
+				VkImageSubresourceRange{
+					VK_IMAGE_ASPECT_COLOR_BIT,
+					0, VK_REMAINING_MIP_LEVELS,
+					0, VK_REMAINING_ARRAY_LAYERS
+				}
+			);
+
 			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf);
 
 			VkPipelineStageFlags DstStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-			OgldevVK::BufferMemBarrier(CmdBuf, m_matrices[Frame].m_buffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, DstStageFlags);
+
+			m_csOutput.ImageMemoryBarrier(CmdBuf,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+				VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, VK_REMAINING_MIP_LEVELS, 0, VK_REMAINING_ARRAY_LAYERS });
 
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
@@ -401,6 +408,18 @@ private:
 				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1);
 			}
+
+			m_csOutput.ImageMemoryBarrier(
+				CmdBuf,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, // new layout
+				VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,     // srcStage: compute wrote
+				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,    // dstStage: fragment shader will sample
+				VkImageSubresourceRange{
+					VK_IMAGE_ASPECT_COLOR_BIT,
+					0, VK_REMAINING_MIP_LEVELS,
+					0, VK_REMAINING_ARRAY_LAYERS
+				}
+			);
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 
@@ -512,12 +531,10 @@ private:
 		m_model.Update(ImageIndex, WVP);
 
 		UniformData ud = {
-			.bufPosAngleId = m_posAndAngle.m_devAddr,
-			.bufMatricesId = m_matrices[frame].m_devAddr,
 			.time = (float)glfwGetTime()
 		};
 
-		m_ubos[ImageIndex].Update(m_device, &ud, sizeof(ud));
+	//	m_ubos[ImageIndex].Update(m_device, &ud, sizeof(ud));
 
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
@@ -550,8 +567,7 @@ private:
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;	
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
-	OgldevVK::BufferAndMemory m_posAndAngle;
-	OgldevVK::BufferAndMemory m_matrices[2];
+	OgldevVK::VulkanTexture m_csOutput;
 };
 
 

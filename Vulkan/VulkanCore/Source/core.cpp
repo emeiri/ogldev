@@ -812,6 +812,31 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	printf("Texture from '%s' created\n", pFilename);
 }
 
+void VulkanCore::CreateTexture(VulkanTexture& Tex)
+{
+	VkImageUsageFlags Usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+							  VK_IMAGE_USAGE_SAMPLED_BIT | 
+							  VK_IMAGE_USAGE_STORAGE_BIT | 
+							  VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	int ImageWidth = 1280;
+	int ImageHeight = 720;
+	VkFormat TexFormat = VK_FORMAT_R8G8B8A8_UNORM;
+	bool IsCubemap = false;
+	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap);
+
+	// Step #2: create the image view
+	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, TexFormat, AspectFlags, IsCubemap);
+
+	VkFilter MinFilter = VK_FILTER_LINEAR;
+	VkFilter MaxFilter = VK_FILTER_LINEAR;
+	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+	// Step #3: create the texture sampler
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
+}
+
 void VulkanCore::Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
 {
 	VkFormat Format = VK_FORMAT_R8G8B8A8_SRGB;

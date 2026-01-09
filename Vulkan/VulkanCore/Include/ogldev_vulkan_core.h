@@ -101,6 +101,8 @@ public:
 	
 	void CreateTexture(const char* pFilename, VulkanTexture& Tex);
 
+	void CreateTexture(VulkanTexture& Tex);
+
 	void Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
 
 	void CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex);

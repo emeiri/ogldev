@@ -38,6 +38,7 @@ public:
 	VkDeviceMemory m_mem = VK_NULL_HANDLE;
 	VkImageView m_view = VK_NULL_HANDLE;
 	VkSampler m_sampler = VK_NULL_HANDLE;
+	VkImageLayout vkImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
 
 	void Destroy(VkDevice Device);
 
@@ -46,6 +47,12 @@ public:
 	void Load(unsigned int BufferSize, void* pImageData, bool IsRGB);
 
 	void LoadEctCubemap(const std::string& Filename, bool IsRGB);
+
+	void ImageMemoryBarrier(VkCommandBuffer commandBuffer,
+		VkImageLayout newImageLayout,
+		VkPipelineStageFlags srcStageMask,
+		VkPipelineStageFlags dstStageMask,
+		const VkImageSubresourceRange& subresourceRange);
 
 private:
 

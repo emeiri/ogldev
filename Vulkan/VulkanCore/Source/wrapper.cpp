@@ -16,8 +16,11 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
+#include "ogldev_vulkan_texture.h"
 
 namespace OgldevVK {
 
@@ -200,6 +203,108 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 	vkCmdPipelineBarrier(CmdBuf, sourceStage, destinationStage, 
 		                 0, 0, NULL, 0, NULL, 1, &Barrier);
 }
+
+
+void VulkanTexture::ImageMemoryBarrier(
+	VkCommandBuffer cmd,
+	VkImageLayout newLayout,
+	VkPipelineStageFlags srcStageMask,
+	VkPipelineStageFlags dstStageMask,
+	const VkImageSubresourceRange& range)
+{
+	VkAccessFlags srcAccessMask = 0;
+	VkAccessFlags dstAccessMask = 0;
+
+	// ------------------------------------------------------------
+	// 1. Derive srcAccessMask from srcStageMask
+	// ------------------------------------------------------------
+
+	// Any shader stage may read or write storage images
+	if (srcStageMask & (VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
+		VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT |
+		VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT |
+		VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT |
+		VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT |
+		VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR))
+	{
+		srcAccessMask |= VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+	}
+
+	if (srcStageMask & VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT)
+		srcAccessMask |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	if (srcStageMask & VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT)
+		srcAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+		VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+	if (srcStageMask & VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT)
+		srcAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+	if (srcStageMask & VK_PIPELINE_STAGE_TRANSFER_BIT)
+		srcAccessMask |= VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+
+	// ------------------------------------------------------------
+	// 2. Derive dstAccessMask from dstStageMask
+	// ------------------------------------------------------------
+
+	if (dstStageMask & (VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
+		VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT |
+		VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT |
+		VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT |
+		VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT |
+		VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR))
+	{
+		dstAccessMask |= VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
+	}
+
+	if (dstStageMask & VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT)
+		dstAccessMask |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	if (dstStageMask & VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT)
+		dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+		VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+	if (dstStageMask & VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT)
+		dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+	if (dstStageMask & VK_PIPELINE_STAGE_TRANSFER_BIT)
+		dstAccessMask |= VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+
+	// ------------------------------------------------------------
+	// 3. Build the barrier
+	// ------------------------------------------------------------
+
+	VkImageMemoryBarrier barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = vkImageLayout_;
+	barrier.newLayout = newLayout;
+	barrier.srcAccessMask = srcAccessMask;
+	barrier.dstAccessMask = dstAccessMask;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = m_image;
+	barrier.subresourceRange = range;
+
+	// ------------------------------------------------------------
+	// 4. Issue the barrier
+	// ------------------------------------------------------------
+
+	vkCmdPipelineBarrier(
+		cmd,
+		srcStageMask,
+		dstStageMask,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &barrier
+	);
+
+	// Track new layout
+	vkImageLayout_ = newLayout;
+}
+
 
 
 // Copied from the "3D Graphics Rendering Cookbook"
