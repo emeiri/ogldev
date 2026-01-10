@@ -38,7 +38,7 @@ public:
 	VkDeviceMemory m_mem = VK_NULL_HANDLE;
 	VkImageView m_view = VK_NULL_HANDLE;
 	VkSampler m_sampler = VK_NULL_HANDLE;
-	VkImageLayout vkImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+	VkImageLayout m_layout = VK_IMAGE_LAYOUT_UNDEFINED;
 
 	void Destroy(VkDevice Device);
 
