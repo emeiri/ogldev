@@ -131,7 +131,7 @@ void GraphicsPipelineV4::InitCommon(GLFWwindow* pWindow, VkRenderPass RenderPass
 	VkPipelineRasterizationStateCreateInfo RastCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 		.polygonMode = VK_POLYGON_MODE_FILL,
-		.cullMode = VK_CULL_MODE_FRONT_BIT,
+		.cullMode = VK_CULL_MODE_BACK_BIT,
 		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 		.lineWidth = 1.0f
 	};
@@ -377,16 +377,16 @@ void GraphicsPipelineV4::AllocateDescriptorSetsInternal(std::vector<VkDescriptor
 void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 											  std::vector<VkDescriptorSet>& DescriptorSets)
 {
-	int NumBindings = 1;//V4_NumBindings;
+	int NumBindings = V4_NumBindings;
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * NumBindings);
 
 	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
 
 	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {		
-	//	BufferInfo_Uniforms[ImageIndex].buffer = ModelDesc.m_uniforms[ImageIndex];
-	//	BufferInfo_Uniforms[ImageIndex].offset = 0;
-	//	BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
+		BufferInfo_Uniforms[ImageIndex].buffer = ModelDesc.m_uniforms[ImageIndex];
+		BufferInfo_Uniforms[ImageIndex].offset = 0;
+		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
 	}
 
 	u32 TextureCount = (u32)ModelDesc.m_materials.size();
@@ -432,8 +432,8 @@ void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.pBufferInfo = &BufferInfo_VB
 		};
 
-	//	assert(WdsIndex < WriteDescriptorSet.size());
-	//	WriteDescriptorSet[WdsIndex++] = wds;
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
 
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -445,8 +445,8 @@ void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.pBufferInfo = &BufferInfo_IB
 		};
 
-	//	assert(WdsIndex < WriteDescriptorSet.size());
-	//	WriteDescriptorSet[WdsIndex++] = wds;
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
 
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -474,8 +474,8 @@ void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
 		};
 
-		//assert(WdsIndex < WriteDescriptorSet.size());
-	//	WriteDescriptorSet[WdsIndex++] = wds;
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
 
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -490,8 +490,8 @@ void GraphicsPipelineV4::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.pTexelBufferView = NULL
 		};
 
-	//	assert(WdsIndex < WriteDescriptorSet.size());
-	//	WriteDescriptorSet[WdsIndex++] = wds;
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
 	}
 
 	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
