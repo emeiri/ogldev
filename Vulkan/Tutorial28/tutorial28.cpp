@@ -110,6 +110,7 @@ public:
 								NULL);	// pDynamicOffsets
 	}
 
+
 	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets)
 	{
 		std::vector<VkDescriptorSetLayout> Layouts(DescCount, m_descSetLayout);
@@ -337,6 +338,17 @@ public:
 		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
 	}
 
+
+	void RecordCommandBuffer(VkCommandBuffer CmdBuf)
+	{
+		u32 VertexCount = 3;
+		u32 InstanceCount = 1;
+		u32 FirstVertex = 0;
+		u32 FirstInstance = 0;
+
+		vkCmdDraw(CmdBuf, VertexCount, InstanceCount, FirstVertex, FirstInstance);
+	}
+
 protected:
 
 	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
@@ -356,7 +368,6 @@ protected:
 	{
 		return VK_CULL_MODE_FRONT_BIT;
 	}
-
 };
 
 
@@ -622,12 +633,7 @@ private:
 		
 			m_fsQuadProgram.Bind(CmdBuf, m_descSets[i]);
 
-			u32 VertexCount = 3;
-			u32 InstanceCount = 1;
-			u32 FirstVertex = 0;
-			u32 FirstInstance = 0;
-
-			vkCmdDraw(CmdBuf, VertexCount, InstanceCount, FirstVertex, FirstInstance);
+			m_fsQuadProgram.RecordCommandBuffer(CmdBuf);
 
 			vkCmdEndRendering(CmdBuf);
 
