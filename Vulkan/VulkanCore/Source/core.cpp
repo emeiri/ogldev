@@ -1127,6 +1127,77 @@ u32 VulkanCore::GetInstanceVersion() const
 	return Version;
 }
 
+VkDescriptorSetLayout VulkanCore::CreateDescSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& Bindings)
+{
+	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,			// reserved - must be zero
+		.bindingCount = (u32)Bindings.size(),
+		.pBindings = Bindings.data()
+	};
+
+	VkDescriptorSetLayout DescSetLayout = VK_NULL_HANDLE;
+
+	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, NULL, &DescSetLayout);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+
+	return DescSetLayout;
+}
+
+
+VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount, u32 MaxSets)
+{
+	// Pool sizes: each entry specifies how many descriptors of that type the pool can allocate.
+	std::vector<VkDescriptorPoolSize> PoolSizes;
+
+	if (TextureCount > 0) {
+		VkDescriptorPoolSize TexSize = {
+			.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = TextureCount
+		};
+
+		PoolSizes.push_back(TexSize);
+	}
+
+	if (UniformBufferCount > 0) {
+		VkDescriptorPoolSize UboSize = {
+			.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = UniformBufferCount
+		};
+
+		PoolSizes.push_back(UboSize);
+	}
+
+	if (StorageBufferCount > 0) {
+		VkDescriptorPoolSize SsboSize = {
+			.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			.descriptorCount = StorageBufferCount
+		};
+
+		PoolSizes.push_back(SsboSize);
+	}
+
+	// Optionally include VK_DESCRIPTOR_TYPE_SAMPLER or VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE
+	// if you use separate sampler/image bindings instead of combined descriptors.
+
+	VkDescriptorPoolCreateInfo PoolCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.maxSets = MaxSets,
+		.poolSizeCount = (u32)PoolSizes.size(),
+		.pPoolSizes = PoolSizes.empty() ? NULL : PoolSizes.data()
+	};
+
+	VkDescriptorPool DescPool;
+
+	VkResult res = vkCreateDescriptorPool(m_device, &PoolCreateInfo, NULL, &DescPool);
+	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+
+	return DescPool;
+}
+
 
 std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size)
 {

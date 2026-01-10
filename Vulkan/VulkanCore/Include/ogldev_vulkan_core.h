@@ -124,6 +124,10 @@ public:
 
 	u32 GetInstanceVersion() const;
 
+	VkDescriptorSetLayout CreateDescSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& Bindings);
+
+	VkDescriptorPool CreateDescPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount, u32 MaxSets);
+
 private:
 
 	void UpdateInstanceVersion();
