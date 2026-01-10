@@ -521,15 +521,6 @@ private:
 
 	void CreateGraphicsPipeline()
 	{
-		OgldevVK::GraphicsPipelineDesc pd;
-		pd.Device = m_device;
-		pd.pWindow = m_pWindow;
-		pd.vs = m_vs;
-		pd.fs = m_fs;
-		pd.NumImages = m_numImages;
-		pd.ColorFormat = m_vkCore.GetSwapChainFormat();
-		pd.DepthFormat = m_vkCore.GetDepthFormat();
-
 		m_pipeline = CreatePipeline(m_device, m_pWindow, m_vs, m_fs,
 			m_vkCore.GetSwapChainFormat(), m_vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS,
 			m_descSetLayout, m_pipelineLayout);
@@ -538,13 +529,7 @@ private:
 
 	void CreateComputePipeline()
 	{
-		OgldevVK::ComputePipelineDesc pd;
-		pd.Device = m_device;
-		pd.pWindow = m_pWindow;
-		pd.cs = m_cs;
-		pd.NumImages = m_numImages;
-
-		m_pComputePipeline = new OgldevVK::ComputePipeline(pd);
+		m_pComputePipeline = new OgldevVK::ComputePipeline(m_vkCore, m_cs);
 
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 

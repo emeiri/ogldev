@@ -21,10 +21,10 @@
 
 namespace OgldevVK {
 
-ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
+ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 {
-	m_device = pd.Device;
-	m_numImages = pd.NumImages;
+	m_device = vkCore.GetDevice();
+	m_numImages = vkCore.GetNumImages();
 
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;	
 
@@ -76,7 +76,7 @@ ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 		.pNext = NULL,
 		.flags = 0,
 		.stage = VK_SHADER_STAGE_COMPUTE_BIT,
-		.module = pd.cs,
+		.module = cs,
 		.pName = "main",
 		.pSpecializationInfo = NULL
 	};

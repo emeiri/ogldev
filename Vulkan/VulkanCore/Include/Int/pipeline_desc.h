@@ -40,12 +40,4 @@ struct GraphicsPipelineDesc {
 	bool IsTexCube = false;
 };
 
-
-struct ComputePipelineDesc {
-	VkDevice Device = NULL;
-	GLFWwindow* pWindow = NULL;
-	VkShaderModule cs = NULL;
-	int NumImages = 0;
-};
-
 }

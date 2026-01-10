@@ -33,7 +33,7 @@ class ComputePipeline {
 
 public:
 
-	ComputePipeline(const ComputePipelineDesc& pd);
+	ComputePipeline(VulkanCore& vkCore, VkShaderModule cs);
 
 	~ComputePipeline();
 
