@@ -51,7 +51,8 @@
 
 #define APP_NAME "Tutorial 28"
 
-const u32 NumMeshes = 32 * 1024;
+static int CS_OUTPUT_WIDTH = 1280;
+static int CS_OUTPUT_HEIGHT = 720;
 
 #if defined(_MSC_VER)
 #pragma pack(push,1)
@@ -325,7 +326,13 @@ private:
 
 	void CreateComputePipeline()
 	{
-		m_vkCore.CreateTexture(m_csOutput);
+		VkImageUsageFlags Usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+			VK_IMAGE_USAGE_SAMPLED_BIT |
+			VK_IMAGE_USAGE_STORAGE_BIT |
+			VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+		VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
+
+		m_vkCore.CreateTexture(m_csOutput, CS_OUTPUT_WIDTH, CS_OUTPUT_HEIGHT, Usage, Format);
 		OgldevVK::ComputePipelineDesc pd;
 		pd.Device = m_device;
 		pd.pWindow = m_pWindow;
@@ -362,7 +369,7 @@ private:
 										  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,   // srcStage: last use was sampling
 										  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);     // dstStage: next use is compute write
 
-			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf, 1280 / 16, 720 / 16, 1);
+			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf, CS_OUTPUT_WIDTH / 16, CS_OUTPUT_HEIGHT / 16, 1);
 
 			m_csOutput.ImageMemoryBarrier(CmdBuf,
 										  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,  // new layout
