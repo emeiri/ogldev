@@ -351,8 +351,6 @@ public:
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
 		
-		vkDestroyShaderModule(m_device, m_cs, NULL);
-
 		delete m_pComputePipeline;
 
 		m_fsQuadProgram.Destroy();
@@ -558,8 +556,7 @@ private:
 
 	void CreateComputePipeline()
 	{
-		m_cs = OgldevVK::CreateShaderModuleFromText(m_device, "test.comp");
-		m_pComputePipeline = new OgldevVK::ComputePipeline(m_vkCore, m_cs);
+		m_pComputePipeline = new OgldevVK::ComputePipeline(m_vkCore, "test.comp");
 
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 
@@ -724,7 +721,6 @@ private:
 		std::vector<VkCommandBuffer> WithoutGUI;
 	} m_cmdBufs;
 	
-	VkShaderModule m_cs = VK_NULL_HANDLE;
 	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;

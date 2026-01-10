@@ -33,7 +33,7 @@ class ComputePipeline {
 
 public:
 
-	ComputePipeline(VulkanCore& vkCore, VkShaderModule cs);
+	ComputePipeline(VulkanCore& vkCore, const char* pCSFilename);
 
 	~ComputePipeline();
 
@@ -50,6 +50,7 @@ private:
 	void AllocateDescriptorSetsInternal();
 
 	VkDevice m_device = VK_NULL_HANDLE;
+	VkShaderModule m_cs = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;

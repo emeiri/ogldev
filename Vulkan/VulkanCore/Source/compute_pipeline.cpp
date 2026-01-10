@@ -18,10 +18,11 @@
 #include <assert.h>
 
 #include "ogldev_vulkan_compute_pipeline.h"
+#include "ogldev_vulkan_shader.h"
 
 namespace OgldevVK {
 
-ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
+ComputePipeline::ComputePipeline(VulkanCore& vkCore, const char* pCSFilename)
 {
 	m_device = vkCore.GetDevice();
 	m_numImages = vkCore.GetNumImages();
@@ -30,7 +31,9 @@ ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 
 	CreatePipelineLayout();
 
-	CreatePipeline(cs);
+	m_cs = CreateShaderModuleFromText(m_device, pCSFilename);
+
+	CreatePipeline(m_cs);
 
 	AllocateDescriptorSets(vkCore);
 }
@@ -106,6 +109,7 @@ void ComputePipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 
 ComputePipeline::~ComputePipeline()
 {
+	vkDestroyShaderModule(m_device, m_cs, NULL);
 	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
