@@ -26,37 +26,7 @@ ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 	m_device = vkCore.GetDevice();
 	m_numImages = vkCore.GetNumImages();
 
-	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;	
-
-	VkDescriptorSetLayoutBinding Binding = {
-		.binding = 2,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-		.pImmutableSamplers = NULL
-	};
-
-	LayoutBindings.push_back(Binding);
-
-	VkDescriptorSetLayoutBinding Binding_Uniform = {
-		.binding = 3,
-		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-	};
-
-	LayoutBindings.push_back(Binding_Uniform);
-
-	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.bindingCount = (u32)LayoutBindings.size(),
-		.pBindings = LayoutBindings.data()
-	};
-
-	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, nullptr, &m_descriptorSetLayout);
-	CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout\n");
+	CreateDescSetLayout(vkCore);
 
 	VkPipelineLayoutCreateInfo PipelineLayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -68,7 +38,7 @@ ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 		.pPushConstantRanges = NULL
 	};
 
-	res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, nullptr, &m_pipelineLayout);
+	VkResult res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, nullptr, &m_pipelineLayout);
 	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
 
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo = {
@@ -94,6 +64,33 @@ ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 	CHECK_VK_RESULT(res, "vkCreateComputePipelines\n");
 
 	AllocateDescriptorSets();
+}
+
+
+void ComputePipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+{
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
+
+	VkDescriptorSetLayoutBinding Binding = {
+		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+		.pImmutableSamplers = NULL
+	};
+
+	LayoutBindings.push_back(Binding);
+
+	VkDescriptorSetLayoutBinding Binding_Uniform = {
+		.binding = 3,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+	};
+
+	LayoutBindings.push_back(Binding_Uniform);
+
+	m_descriptorSetLayout = vkCore.CreateDescSetLayout(LayoutBindings);
 }
 
 
