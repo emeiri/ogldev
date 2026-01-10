@@ -328,8 +328,6 @@ private:
 };
 
 
-static int frame = 0;
-
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
@@ -342,10 +340,9 @@ public:
 
 	~VulkanApp()
 	{
-		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
-			m_vkCore.FreeCommandBuffers((u32)m_cmdBufs[i].WithGUI.size(), m_cmdBufs[i].WithGUI.data());
-			m_vkCore.FreeCommandBuffers((u32)m_cmdBufs[i].WithoutGUI.size(), m_cmdBufs[i].WithoutGUI.data());
-		}
+		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
+		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
+		
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		vkDestroyShaderModule(m_device, m_cs, NULL);
@@ -403,16 +400,14 @@ public:
 
 			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs[frame].WithGUI[ImageIndex], ImGUICmdBuf};
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], ImGUICmdBuf};
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
-			m_pQueue->SubmitAsync(m_cmdBufs[frame].WithoutGUI[ImageIndex]);
+			m_pQueue->SubmitAsync(m_cmdBufs.WithoutGUI[ImageIndex]);
 		}
 
 		m_pQueue->Present(ImageIndex);
-
-		frame = (frame + 1) % 2;
 	}
 
 	
@@ -531,13 +526,11 @@ private:
 
 	void CreateCommandBuffers()
 	{
-		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
-			m_cmdBufs[i].WithGUI.resize(m_numImages);
-			m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs[i].WithGUI.data());
+		m_cmdBufs.WithGUI.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithGUI.data());
 
-			m_cmdBufs[i].WithoutGUI.resize(m_numImages);
-			m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs[i].WithoutGUI.data());
-		}
+		m_cmdBufs.WithoutGUI.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithoutGUI.data());
 
 		printf("Created command buffers\n");
 	}
@@ -580,17 +573,13 @@ private:
 
 	void RecordCommandBuffers()
 	{
-		//m_model.CreateDescriptorSets(*m_pGraphicsPipeline, m_csOutput);
+		RecordCommandBuffersInternal(true, m_cmdBufs.WithoutGUI);
 
-		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
-			RecordCommandBuffersInternal(true, m_cmdBufs[i].WithoutGUI, i);
-
-			RecordCommandBuffersInternal(false, m_cmdBufs[i].WithGUI, i);
-		}
+		RecordCommandBuffersInternal(false, m_cmdBufs.WithGUI);
 	}
 
 
-	void RecordCommandBuffersInternal(bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs, int Frame)
+	void RecordCommandBuffersInternal(bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
 	{
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];			
@@ -737,7 +726,7 @@ private:
 	struct {
 		std::vector<VkCommandBuffer> WithGUI;
 		std::vector<VkCommandBuffer> WithoutGUI;
-	} m_cmdBufs[2];
+	} m_cmdBufs;
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
