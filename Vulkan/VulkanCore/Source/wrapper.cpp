@@ -16,8 +16,6 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
 
