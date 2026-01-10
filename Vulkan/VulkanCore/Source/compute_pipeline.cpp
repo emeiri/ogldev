@@ -106,13 +106,14 @@ ComputePipeline::~ComputePipeline()
 }
 
 
-void ComputePipeline::RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf)
+void ComputePipeline::RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf, 
+										  u32 GroupCountX, u32 GroupCountY, u32 GroupCountZ)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE,
 							m_pipelineLayout, 0, 1, &m_descriptorSets[Image], 0, NULL);
 
-	vkCmdDispatch(CmdBuf, 1280 / 16, 720 / 16, 1);
+	vkCmdDispatch(CmdBuf, GroupCountX, GroupCountY, GroupCountZ);
 }
 
 

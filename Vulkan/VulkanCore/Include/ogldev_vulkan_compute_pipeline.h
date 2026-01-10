@@ -39,7 +39,7 @@ public:
 
 	void UpdateDescriptorSets(const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs);
 
-	void RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf);
+	void RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf, u32 GroupCountX, u32 GroupCountY, u32 GroupCountZ);
 
 private:
 

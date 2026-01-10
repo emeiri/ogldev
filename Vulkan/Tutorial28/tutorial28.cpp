@@ -369,7 +369,7 @@ private:
 				}
 			);
 
-			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf);
+			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf, 1280 / 16, 720 / 16, 1);
 
 			VkPipelineStageFlags DstStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
