@@ -48,13 +48,13 @@ layout(set = 0, binding = 2, rgba8) uniform writeonly image2D kTextures2DOut;
 // fiery stuff tends to stand out more, so that's the default. :)
 #define WARM
 
-//layout (binding = 0) uniform UniformData {
-  //float time;
-//}
-//pc;
+layout (binding = 3) uniform UniformData {
+  float time;
+}
+pc;
 
 vec2 iResolution = vec2(1280.0, 720.0);
-float iTime      = 0;//pc.time;
+float iTime      = pc.time;
 
 // 2D rotation. Always handy. Angle vector, courtesy of Fabrice.
 mat2 rot(float th)

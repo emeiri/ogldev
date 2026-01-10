@@ -37,7 +37,7 @@ public:
 
 	~ComputePipeline();
 
-	void UpdateDescriptorSets(const VulkanTexture& Texture);
+	void UpdateDescriptorSets(const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs);
 
 	void RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf);
 

@@ -19,22 +19,13 @@
 
 #version 460
 
-#extension GL_EXT_nonuniform_qualifier : require
-
-layout(location = 0) in vec2 texCoord;
-layout(location = 1) flat in uint MaterialIndex;
+layout(location = 0) in vec2 uv;
 
 layout(location = 0) out vec4 out_Color;
 
-layout(set = 0, binding = 2) uniform sampler2D Textures[];
-
-vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
-{
-     return texture(Textures[nonuniformEXT(MaterialIndex)], uv);
-}
-
+layout(set = 0, binding = 2) uniform sampler2D Texture;
 
 void main() 
 {
-    out_Color = TextureBindless2D(MaterialIndex, texCoord);
+    out_Color = texture(Texture, uv);
 }

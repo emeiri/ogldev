@@ -25,6 +25,7 @@
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.comp" />
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.frag" />
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.vert" />
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

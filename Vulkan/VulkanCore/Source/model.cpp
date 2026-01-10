@@ -240,7 +240,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV3& Pipeline)
 }
 
 
-void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
+void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline, const VulkanTexture& Tex)
 {
 	assert(m_isDescriptorIndexing);
 
@@ -249,7 +249,8 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 
 	ModelDesc md;
 
-	UpdateModelDesc(md);
+	md.m_materials.resize(1);
+	md.m_materials[0] = { Tex.m_sampler, Tex.m_view };
 
 	Pipeline.UpdateDescriptorSets(md, m_descriptorSets[0]);
 }
@@ -384,6 +385,7 @@ void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, GraphicsPipeli
 		0,	    // dynamicOffsetCount
 		NULL);	// pDynamicOffsets
 
+	return;
 	vkCmdDrawIndirect(CmdBuf,
 					m_indirectBuffer.m_buffer, 
 					0,  // offset inside the indirect buffer            

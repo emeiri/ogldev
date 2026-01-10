@@ -32,5 +32,8 @@
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.comp">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

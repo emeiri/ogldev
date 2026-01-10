@@ -46,7 +46,7 @@ public:
 
 	void CreateDescriptorSets(GraphicsPipelineV3& Pipeline);
 
-	void CreateDescriptorSets(GraphicsPipelineV4& Pipeline);
+	void CreateDescriptorSets(GraphicsPipelineV4& Pipeline, const VulkanTexture& Tex);
 
 	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& pPipeline, int ImageIndex);
 

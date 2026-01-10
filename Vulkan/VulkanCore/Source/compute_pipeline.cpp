@@ -26,6 +26,8 @@ ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 	m_device = pd.Device;
 	m_numImages = pd.NumImages;
 
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;	
+
 	VkDescriptorSetLayoutBinding Binding = {
 		.binding = 2,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
@@ -34,12 +36,23 @@ ComputePipeline::ComputePipeline(const ComputePipelineDesc& pd)
 		.pImmutableSamplers = NULL
 	};
 
+	LayoutBindings.push_back(Binding);
+
+	VkDescriptorSetLayoutBinding Binding_Uniform = {
+		.binding = 3,
+		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+	};
+
+	LayoutBindings.push_back(Binding_Uniform);
+
 	VkDescriptorSetLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
 		.pNext = NULL,
 		.flags = 0,
-		.bindingCount = 1,
-		.pBindings = &Binding
+		.bindingCount = (u32)LayoutBindings.size(),
+		.pBindings = LayoutBindings.data()
 	};
 
 	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutInfo, nullptr, &m_descriptorSetLayout);
@@ -158,7 +171,7 @@ void ComputePipeline::CreateDescriptorPool(u32 TextureCount,
 void ComputePipeline::AllocateDescriptorSets()
 {
 	u32 TextureCount = 1;
-	u32 UniformBufferCount = 0;
+	u32 UniformBufferCount = 3;
 	u32 StorageBufferCount = 0;	// IB, VB, MetaData
 	u32 MaxSets = m_numImages;
 
@@ -189,9 +202,17 @@ void ComputePipeline::AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet
 }
 
 
-void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture)
+void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs)
 {
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages);
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * 2);
+
+	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
+
+	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+		BufferInfo_Uniforms[ImageIndex].buffer = UBOs[ImageIndex].m_buffer;
+		BufferInfo_Uniforms[ImageIndex].offset = 0;
+		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
+	}
 
 	u32 WdsIndex = 0;
 
@@ -212,6 +233,19 @@ void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture)
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
 			.pImageInfo = &ImageInfo
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = 3,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());

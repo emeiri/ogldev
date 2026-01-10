@@ -43,7 +43,6 @@
 #include "ogldev_vulkan_compute_pipeline.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
-#include "ogldev_vulkan_skybox.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
 
@@ -101,8 +100,6 @@ public:
 			ubo.Destroy(m_device);
 		}
 
-		//m_skybox.Destroy();
-
 		m_imGUIRenderer.Destroy();
 	}
 
@@ -116,7 +113,6 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
-		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipelines();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -281,7 +277,7 @@ private:
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
-		m_model.LoadAssimpModel("../../Content/box.obj");
+		//m_model.LoadAssimpModel("../../Content/box.obj");
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
@@ -290,19 +286,13 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 
-		std::vector<glm::vec4> MeshCenters;
-		MeshCenters.resize(NumMeshes);
-		for (glm::vec4& p : MeshCenters) {
-			p = glm::vec4(glm::linearRand(-glm::vec3(500.0f), glm::vec3(500.0f)), glm::linearRand(0.0f, 3.14159f));
-		}
-
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 	}
 
 
 	void CreateShaders()
 	{
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "../VulkanCore/Shaders/FSQuad.vert");
 
 		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
 
@@ -327,10 +317,7 @@ private:
 		pd.NumImages = m_numImages;
 		pd.ColorFormat = m_vkCore.GetSwapChainFormat();
 		pd.DepthFormat = m_vkCore.GetDepthFormat();
-		pd.IsIB = true;
-		pd.IsVB = true;
 		pd.IsTex2D = true;
-		pd.IsUniform = true;
 
 		m_pGraphicsPipeline = new OgldevVK::GraphicsPipelineV4(pd);
 	}
@@ -347,13 +334,13 @@ private:
 
 		m_pComputePipeline = new OgldevVK::ComputePipeline(pd);
 
-		m_pComputePipeline->UpdateDescriptorSets(m_csOutput);
+		m_pComputePipeline->UpdateDescriptorSets(m_csOutput, m_ubos);
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		m_model.CreateDescriptorSets(*m_pGraphicsPipeline);
+		m_model.CreateDescriptorSets(*m_pGraphicsPipeline, m_csOutput);
 
 		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
 			RecordCommandBuffersInternal(true, m_cmdBufs[i].WithoutGUI, i);
@@ -400,8 +387,12 @@ private:
 			m_pGraphicsPipeline->Bind(CmdBuf);
 			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pGraphicsPipeline, i);
 			
-			//m_skybox.RecordCommandBuffer(CmdBuf, i);
+			u32 VertexCount = 3;
+			u32 InstanceCount = 1;
+			u32 FirstVertex = 0;
+			u32 FirstInstance = 0;
 
+			vkCmdDraw(CmdBuf, VertexCount, InstanceCount, FirstVertex, FirstInstance);
 			vkCmdEndRendering(CmdBuf);
 
 			if (WithSecondBarrier) {
@@ -514,30 +505,11 @@ private:
 
 	void UpdateUniformBuffers(uint32_t ImageIndex)
 	{		
-		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
-
-		glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
-		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
-		glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0, 0, 1));
-		glm::mat4 Rotate = rotX * rotY * rotZ;
-		glm::mat4 Rotate2 = glm::rotate(Rotate, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
-
-		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
-
-		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
-
-		glm::mat4 WVP = VP * Translate * Rotate2 * Scale;
-
-		m_model.Update(ImageIndex, WVP);
-
 		UniformData ud = {
 			.time = (float)glfwGetTime()
 		};
 
-	//	m_ubos[ImageIndex].Update(m_device, &ud, sizeof(ud));
-
-		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
-		//m_skybox.Update(ImageIndex, VPNoTranslate);
+		m_ubos[ImageIndex].Update(m_device, &ud, sizeof(ud));
 	}
 
 	GLFWwindow* m_pWindow = NULL;
@@ -555,7 +527,6 @@ private:
 	VkShaderModule m_cs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV4* m_pGraphicsPipeline = NULL;
 	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
-	OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
