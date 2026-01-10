@@ -28,19 +28,15 @@ ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 
 	CreateDescSetLayout(vkCore);
 
-	VkPipelineLayoutCreateInfo PipelineLayoutInfo = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.pNext = NULL,
-		.flags = 0,
-		.setLayoutCount = 1,
-		.pSetLayouts = &m_descriptorSetLayout,
-		.pushConstantRangeCount = 0,
-		.pPushConstantRanges = NULL
-	};
+	CreatePipelineLayout();
 
-	VkResult res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, nullptr, &m_pipelineLayout);
-	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
+	CreatePipeline(cs);
 
+	AllocateDescriptorSets();
+}
+
+void ComputePipeline::CreatePipeline(VkShaderModule cs)
+{
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 		.pNext = NULL,
@@ -60,10 +56,24 @@ ComputePipeline::ComputePipeline(VulkanCore& vkCore, VkShaderModule cs)
 		.basePipelineIndex = -1,
 	};
 
-	res = vkCreateComputePipelines(m_device, NULL, 1, &ci, NULL, &m_pipeline);
-	CHECK_VK_RESULT(res, "vkCreateComputePipelines\n");
+	VkResult res1 = vkCreateComputePipelines(m_device, NULL, 1, &ci, NULL, &m_pipeline);
+	CHECK_VK_RESULT(res1, "vkCreateComputePipelines\n");
+}
 
-	AllocateDescriptorSets();
+void ComputePipeline::CreatePipelineLayout()
+{
+	VkPipelineLayoutCreateInfo PipelineLayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.pNext = NULL,
+		.flags = 0,
+		.setLayoutCount = 1,
+		.pSetLayouts = &m_descriptorSetLayout,
+		.pushConstantRangeCount = 0,
+		.pPushConstantRanges = NULL
+	};
+
+	VkResult res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, nullptr, &m_pipelineLayout);
+	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
 }
 
 

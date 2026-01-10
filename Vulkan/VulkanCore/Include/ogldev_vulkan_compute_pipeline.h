@@ -33,7 +33,7 @@ class ComputePipeline {
 
 public:
 
-	ComputePipeline(VulkanCore& vkCore, VkShaderModule cs);	
+	ComputePipeline(VulkanCore& vkCore, VkShaderModule cs);
 
 	~ComputePipeline();
 
@@ -44,6 +44,8 @@ public:
 private:
 
 	void CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
+	void CreatePipelineLayout();
+	void CreatePipeline(VkShaderModule cs);
 	void AllocateDescriptorSets();
 	void AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet>& DescriptorSets);
 	void CreateDescriptorPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount,	u32 MaxSets);
