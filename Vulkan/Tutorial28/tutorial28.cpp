@@ -41,7 +41,6 @@
 #include "ogldev_vulkan_shader.h"
 #include "ogldev_vulkan_compute_pipeline.h"
 #include "ogldev_vulkan_glfw.h"
-#include "ogldev_vulkan_model.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
 
@@ -293,7 +292,7 @@ class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp(int WindowWidth, int WindowHeight) : m_model(true)
+	VulkanApp(int WindowWidth, int WindowHeight)
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
@@ -309,12 +308,8 @@ public:
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		vkDestroyShaderModule(m_device, m_cs, NULL);
 
-		//delete m_pGraphicsPipeline;
-
 		delete m_pComputePipeline;
 			
-		m_model.Destroy();
-
 		m_csOutput.Destroy(m_device);
 
 		for (OgldevVK::BufferAndMemory& ubo : m_ubos) {
@@ -333,7 +328,6 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
-		CreateMesh();
 
 		VkImageUsageFlags Usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
 			VK_IMAGE_USAGE_SAMPLED_BIT |
@@ -508,12 +502,6 @@ private:
 		}
 
 		printf("Created command buffers\n");
-	}
-
-
-	void CreateMesh()
-	{
-		m_model.Init(&m_vkCore);
 	}
 
 
@@ -740,7 +728,6 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	VkShaderModule m_cs = VK_NULL_HANDLE;
 	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
-	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
