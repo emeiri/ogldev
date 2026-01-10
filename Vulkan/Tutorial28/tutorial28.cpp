@@ -70,21 +70,27 @@ public:
 	PipelineProgram() {}
 
 
-	void Init(OgldevVK::VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs)
+	void Init(OgldevVK::VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename)
 	{
 		m_descPool = DescPool;
 
 		m_device = vkCore.GetDevice();
+
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, pVSFilename);
+
+		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, pFSFilename);
 		
 		m_descSetLayout = CreateDescSetLayout(vkCore);
 		
-		m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs,
+		m_pipeline = CreatePipeline(vkCore.GetWindow(), m_vs, m_fs,
 						vkCore.GetSwapChainFormat(), vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS);
 	}
 
 
 	void Destroy()
 	{
+		vkDestroyShaderModule(m_device, m_vs, NULL);
+		vkDestroyShaderModule(m_device, m_fs, NULL);
 		vkDestroyDescriptorSetLayout(m_device, m_descSetLayout, NULL);
 		vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);		
 		vkDestroyPipeline(m_device, m_pipeline, NULL);
@@ -325,6 +331,8 @@ private:
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
+	VkShaderModule m_vs = VK_NULL_HANDLE;
+	VkShaderModule m_fs = VK_NULL_HANDLE;
 };
 
 
@@ -343,8 +351,6 @@ public:
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
 		
-		vkDestroyShaderModule(m_device, m_vs, NULL);
-		vkDestroyShaderModule(m_device, m_fs, NULL);
 		vkDestroyShaderModule(m_device, m_cs, NULL);
 
 		delete m_pComputePipeline;
@@ -369,7 +375,6 @@ public:
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
-		CreateShaders();
 
 		VkImageUsageFlags Usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
 		VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
@@ -535,16 +540,6 @@ private:
 		printf("Created command buffers\n");
 	}
 
-
-	void CreateShaders()
-	{
-		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "../VulkanCore/Shaders/FSQuad.vert");
-
-		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
-
-		m_cs = OgldevVK::CreateShaderModuleFromText(m_device, "test.comp");
-	}
-
 	
 	void CreatePipelines()
 	{
@@ -555,7 +550,7 @@ private:
 
 	void CreateGraphicsPipeline()
 	{
-		m_fsQuadProgram.Init(m_vkCore, m_descPool, m_vs, m_fs);
+		m_fsQuadProgram.Init(m_vkCore, m_descPool, "../VulkanCore/Shaders/FSQuad.vert", "test.frag");
 		m_fsQuadProgram.AllocDescSets(m_numImages, m_descSets);
 		m_fsQuadProgram.UpdateDescSets(m_descSets, m_csOutput);		
 	}
@@ -563,6 +558,7 @@ private:
 
 	void CreateComputePipeline()
 	{
+		m_cs = OgldevVK::CreateShaderModuleFromText(m_device, "test.comp");
 		m_pComputePipeline = new OgldevVK::ComputePipeline(m_vkCore, m_cs);
 
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
@@ -728,8 +724,6 @@ private:
 		std::vector<VkCommandBuffer> WithoutGUI;
 	} m_cmdBufs;
 	
-	VkShaderModule m_vs = VK_NULL_HANDLE;
-	VkShaderModule m_fs = VK_NULL_HANDLE;
 	VkShaderModule m_cs = VK_NULL_HANDLE;
 	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
