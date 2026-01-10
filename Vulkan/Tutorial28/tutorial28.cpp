@@ -129,52 +129,19 @@ public:
 	}
 
 
-	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex)
+protected:
+
+	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;	
+
+	// Default but deriving class may override
+	virtual VkCullModeFlags GetCullMode()
 	{
-		std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size());
-
-		VkDescriptorImageInfo ImageInfo = {
-			.sampler = Tex.m_sampler,
-			.imageView = Tex.m_view,
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-		};
-
-		for (int i = 0; i < (int)DescriptorSets.size(); i++) {
-			VkDescriptorSet& DstSet = DescriptorSets[i];
-
-			WriteDescriptorSet[i] = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = NULL,
-				.dstSet = DstSet,
-				.dstBinding = 2,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = &ImageInfo,
-				.pBufferInfo = NULL,
-				.pTexelBufferView = NULL
-			};
-		}
-
-		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+		return VK_CULL_MODE_BACK_BIT;
 	}
 
+	VkDevice m_device = VK_NULL_HANDLE;
 
 private:
-
-	VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
-	{
-		VkDescriptorSetLayoutBinding Binding = {
-			.binding = 2,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.pImmutableSamplers = NULL
-		};
-
-		return vkCore.CreateDescSetLayout({ Binding });
-	}
-
 
 	VkPipeline CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
 							  VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp)
@@ -238,7 +205,7 @@ private:
 		VkPipelineRasterizationStateCreateInfo RastCreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 			.polygonMode = VK_POLYGON_MODE_FILL,
-			.cullMode = VK_CULL_MODE_FRONT_BIT,
+			.cullMode = GetCullMode(),
 			.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
 			.lineWidth = 1.0f
 		};
@@ -326,13 +293,70 @@ private:
 		return Pipeline;
 	}
 
-	VkDevice m_device = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
+};
+
+
+class FullScreenQuadProgram : public PipelineProgram {
+public:
+
+	FullScreenQuadProgram() {}
+
+	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex)
+	{
+		std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size());
+
+		VkDescriptorImageInfo ImageInfo = {
+			.sampler = Tex.m_sampler,
+			.imageView = Tex.m_view,
+			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+		};
+
+		for (int i = 0; i < (int)DescriptorSets.size(); i++) {
+			VkDescriptorSet& DstSet = DescriptorSets[i];
+
+			WriteDescriptorSet[i] = {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.pNext = NULL,
+				.dstSet = DstSet,
+				.dstBinding = 2,
+				.dstArrayElement = 0,
+				.descriptorCount = 1,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = &ImageInfo,
+				.pBufferInfo = NULL,
+				.pTexelBufferView = NULL
+			};
+		}
+
+		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	}
+
+protected:
+
+	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+	{
+		VkDescriptorSetLayoutBinding Binding = {
+			.binding = 2,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		};
+
+		return vkCore.CreateDescSetLayout({ Binding });
+	}
+
+	virtual VkCullModeFlags GetCullMode()
+	{
+		return VK_CULL_MODE_FRONT_BIT;
+	}
+
 };
 
 
@@ -604,6 +628,7 @@ private:
 			u32 FirstInstance = 0;
 
 			vkCmdDraw(CmdBuf, VertexCount, InstanceCount, FirstVertex, FirstInstance);
+
 			vkCmdEndRendering(CmdBuf);
 
 			if (WithSecondBarrier) {
@@ -733,7 +758,7 @@ private:
 	float m_scale = 0.1f;	
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 	OgldevVK::VulkanTexture m_csOutput;
-	PipelineProgram m_fsQuadProgram;
+	FullScreenQuadProgram m_fsQuadProgram;
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descSets;	
 };
