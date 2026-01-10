@@ -62,8 +62,7 @@ void VulkanTexture::ImageMemoryBarrier(
 	VkCommandBuffer cmd,
 	VkImageLayout newLayout,
 	VkPipelineStageFlags srcStageMask,
-	VkPipelineStageFlags dstStageMask,
-	const VkImageSubresourceRange& range)
+	VkPipelineStageFlags dstStageMask)
 {
 	VkAccessFlags srcAccessMask = 0;
 	VkAccessFlags dstAccessMask = 0;
@@ -129,6 +128,14 @@ void VulkanTexture::ImageMemoryBarrier(
 	// 3. Build the barrier
 	// ------------------------------------------------------------
 
+	VkImageSubresourceRange Range = {
+		.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+		.baseMipLevel = 0,
+		.levelCount = VK_REMAINING_MIP_LEVELS,
+		.baseArrayLayer = 0,
+		.layerCount = VK_REMAINING_ARRAY_LAYERS
+	};
+
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	barrier.oldLayout = m_layout;
@@ -138,7 +145,7 @@ void VulkanTexture::ImageMemoryBarrier(
 	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	barrier.image = m_image;
-	barrier.subresourceRange = range;
+	barrier.subresourceRange = Range;
 
 	// ------------------------------------------------------------
 	// 4. Issue the barrier

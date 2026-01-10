@@ -49,10 +49,9 @@ public:
 	void LoadEctCubemap(const std::string& Filename, bool IsRGB);
 
 	void ImageMemoryBarrier(VkCommandBuffer commandBuffer,
-		VkImageLayout newImageLayout,
-		VkPipelineStageFlags srcStageMask,
-		VkPipelineStageFlags dstStageMask,
-		const VkImageSubresourceRange& subresourceRange);
+							VkImageLayout newImageLayout,
+							VkPipelineStageFlags srcStageMask,
+							VkPipelineStageFlags dstStageMask);
 
 private:
 
