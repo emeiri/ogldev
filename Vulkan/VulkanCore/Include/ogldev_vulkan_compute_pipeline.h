@@ -46,9 +46,8 @@ private:
 	void CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 	void CreatePipelineLayout();
 	void CreatePipeline(VkShaderModule cs);
-	void AllocateDescriptorSets();
-	void AllocateDescriptorSetsInternal(std::vector<VkDescriptorSet>& DescriptorSets);
-	void CreateDescriptorPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount,	u32 MaxSets);
+	void AllocateDescriptorSets(VulkanCore& vkCore);
+	void AllocateDescriptorSetsInternal();
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
