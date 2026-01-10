@@ -39,7 +39,6 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_graphics_pipeline_v4.h"
 #include "ogldev_vulkan_compute_pipeline.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
@@ -69,6 +68,227 @@ struct UniformData {
 
 static int frame = 0;
 
+VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+{
+	VkDescriptorSetLayoutBinding Binding = {
+		.binding = 2,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.descriptorCount = 1,
+		.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.pImmutableSamplers = NULL
+	};
+
+	return vkCore.CreateDescSetLayout({ Binding });
+}
+
+
+void AllocDescSets(VkDevice Device,
+				   int DescCount,
+				   std::vector<VkDescriptorSet>& DescriptorSets, 
+			  	   VkDescriptorSetLayout DescSetLayout,
+				   VkDescriptorPool DescPool)
+{
+	std::vector<VkDescriptorSetLayout> Layouts(DescCount, DescSetLayout);
+
+	VkDescriptorSetAllocateInfo AllocInfo = {
+		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+		.pNext = NULL,
+		.descriptorPool = DescPool,
+		.descriptorSetCount = (u32)Layouts.size(),
+		.pSetLayouts = Layouts.data()
+	};
+
+	DescriptorSets.resize(DescCount);
+
+	VkResult res = vkAllocateDescriptorSets(Device, &AllocInfo, DescriptorSets.data());
+	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+}
+
+
+void UpdateDescSets(VkDevice Device, std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex)
+{
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size());
+
+	VkDescriptorImageInfo ImageInfo = {
+		.sampler = Tex.m_sampler,
+		.imageView = Tex.m_view,
+		.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+	};
+
+	for (int i = 0; i < (int)DescriptorSets.size(); i++) {
+		VkDescriptorSet& DstSet = DescriptorSets[i];
+
+		WriteDescriptorSet[i] = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.pNext = NULL,
+			.dstSet = DstSet,
+			.dstBinding = 2,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.pImageInfo = &ImageInfo,
+			.pBufferInfo = NULL,
+			.pTexelBufferView = NULL
+		};
+	}
+
+	vkUpdateDescriptorSets(Device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+}
+
+
+VkPipeline CreatePipeline(VkDevice Device, GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
+								  VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
+								  VkDescriptorSetLayout DescSetLayout, VkPipelineLayout& PipelineLayout)
+{
+	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
+		{
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+			.stage = VK_SHADER_STAGE_VERTEX_BIT,
+			.module = vs,
+			.pName = "main",
+		},
+		{
+			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.module = fs,
+			.pName = "main"
+		}
+	};
+
+	VkPipelineVertexInputStateCreateInfo VertexInputInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
+	};
+
+	VkPipelineInputAssemblyStateCreateInfo PipelineIACreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+		.primitiveRestartEnable = VK_FALSE
+	};
+
+	int WindowWidth, WindowHeight;
+	glfwGetWindowSize(pWindow, &WindowWidth, &WindowHeight);
+
+	VkViewport VP = {
+		.x = 0.0f,
+		.y = 0.0f,
+		.width = (float)WindowWidth,
+		.height = (float)WindowHeight,
+		.minDepth = 0.0f,
+		.maxDepth = 1.0f
+	};
+
+	VkRect2D Scissor = {
+		.offset = {
+			.x = 0,
+			.y = 0,
+		},
+		.extent = {
+			.width = (u32)WindowWidth,
+			.height = (u32)WindowHeight
+		}
+	};
+
+	VkPipelineViewportStateCreateInfo VPCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+		.viewportCount = 1,
+		.pViewports = &VP,
+		.scissorCount = 1,
+		.pScissors = &Scissor
+	};
+
+	VkPipelineRasterizationStateCreateInfo RastCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+		.polygonMode = VK_POLYGON_MODE_FILL,
+		.cullMode = VK_CULL_MODE_FRONT_BIT,
+		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+		.lineWidth = 1.0f
+	};
+
+	VkPipelineMultisampleStateCreateInfo PipelineMSCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+		.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+		.sampleShadingEnable = VK_FALSE,
+		.minSampleShading = 1.0f
+	};
+
+	VkPipelineDepthStencilStateCreateInfo DepthStencilState = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+		.depthTestEnable = VK_TRUE,
+		.depthWriteEnable = VK_TRUE,
+		.depthCompareOp = DepthCompareOp,
+		.depthBoundsTestEnable = VK_FALSE,
+		.stencilTestEnable = VK_FALSE,
+		.front = {},
+		.back = {},
+		.minDepthBounds = 0.0f,
+		.maxDepthBounds = 1.0f
+	};
+
+	VkPipelineColorBlendAttachmentState BlendAttachState = {
+		.blendEnable = VK_FALSE,
+		.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT
+	};
+
+	VkPipelineColorBlendStateCreateInfo BlendCreateInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+		.logicOpEnable = VK_FALSE,
+		.logicOp = VK_LOGIC_OP_COPY,
+		.attachmentCount = 1,
+		.pAttachments = &BlendAttachState
+	};
+
+	VkPipelineRenderingCreateInfo RenderingInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+		.pNext = NULL,
+		.viewMask = 0,
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &ColorFormat,
+		.depthAttachmentFormat = DepthFormat,
+		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
+	};
+
+	std::vector<VkDescriptorSetLayout> SetLayouts = { DescSetLayout };
+	VkPipelineLayoutCreateInfo LayoutInfo = {};
+
+	LayoutInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.setLayoutCount = (u32)SetLayouts.size(),
+		.pSetLayouts = SetLayouts.data()
+	};
+
+	VkResult res = vkCreatePipelineLayout(Device, &LayoutInfo, NULL, &PipelineLayout);
+	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
+
+	VkGraphicsPipelineCreateInfo PipelineInfo = {
+		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+		.pNext = &RenderingInfo,
+		.stageCount = ARRAY_SIZE_IN_ELEMENTS(ShaderStageCreateInfo),
+		.pStages = &ShaderStageCreateInfo[0],
+		.pVertexInputState = &VertexInputInfo,
+		.pInputAssemblyState = &PipelineIACreateInfo,
+		.pViewportState = &VPCreateInfo,
+		.pRasterizationState = &RastCreateInfo,
+		.pMultisampleState = &PipelineMSCreateInfo,
+		.pDepthStencilState = &DepthStencilState,
+		.pColorBlendState = &BlendCreateInfo,
+		.layout = PipelineLayout,
+		.renderPass = VK_NULL_HANDLE,
+		.subpass = 0,
+		.basePipelineHandle = VK_NULL_HANDLE,
+		.basePipelineIndex = -1
+	};
+
+	VkPipeline Pipeline = VK_NULL_HANDLE;
+	res = vkCreateGraphicsPipelines(Device, VK_NULL_HANDLE, 1, &PipelineInfo, NULL, &Pipeline);
+	CHECK_VK_RESULT(res, "vkCreateGraphicsPipelineV3s\n");
+
+	printf("Graphics pipeline created\n");
+
+	return Pipeline;
+}
+
+
+
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
@@ -89,7 +309,7 @@ public:
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 		vkDestroyShaderModule(m_device, m_cs, NULL);
 
-		delete m_pGraphicsPipeline;
+		//delete m_pGraphicsPipeline;
 
 		delete m_pComputePipeline;
 			
@@ -114,10 +334,26 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateMesh();
+
+		VkImageUsageFlags Usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+			VK_IMAGE_USAGE_SAMPLED_BIT |
+			VK_IMAGE_USAGE_STORAGE_BIT |
+			VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+		VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
+
+		m_vkCore.CreateTexture(m_csOutput, CS_OUTPUT_WIDTH, CS_OUTPUT_HEIGHT, Usage, Format);
+
+		m_descSetLayout = CreateDescSetLayout(m_vkCore);
+		m_descPool = m_vkCore.CreateDescPool(1, 0, 0, m_numImages);
+		AllocDescSets(m_device, m_numImages, m_descSets, m_descSetLayout, m_descPool);
+		UpdateDescSets(m_device, m_descSets, m_csOutput);
+
+
 		CreatePipelines();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 		DefaultCreateCameraPers();
+
 		// The object is ready to receive callbacks
 		OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
 		m_imGUIRenderer.Init(&m_vkCore);
@@ -278,16 +514,6 @@ private:
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
-		//m_model.LoadAssimpModel("../../Content/box.obj");
-	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
-	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
-	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
-	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
-	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
-
-		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 	}
 
 
@@ -318,21 +544,15 @@ private:
 		pd.NumImages = m_numImages;
 		pd.ColorFormat = m_vkCore.GetSwapChainFormat();
 		pd.DepthFormat = m_vkCore.GetDepthFormat();
-		pd.IsTex2D = true;
 
-		m_pGraphicsPipeline = new OgldevVK::GraphicsPipelineV4(pd);
+		m_pipeline = CreatePipeline(m_device, m_pWindow, m_vs, m_fs,
+			m_vkCore.GetSwapChainFormat(), m_vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS,
+			m_descSetLayout, m_pipelineLayout);
 	}
 
 
 	void CreateComputePipeline()
 	{
-		VkImageUsageFlags Usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-			VK_IMAGE_USAGE_SAMPLED_BIT |
-			VK_IMAGE_USAGE_STORAGE_BIT |
-			VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-		VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
-
-		m_vkCore.CreateTexture(m_csOutput, CS_OUTPUT_WIDTH, CS_OUTPUT_HEIGHT, Usage, Format);
 		OgldevVK::ComputePipelineDesc pd;
 		pd.Device = m_device;
 		pd.pWindow = m_pWindow;
@@ -341,13 +561,15 @@ private:
 
 		m_pComputePipeline = new OgldevVK::ComputePipeline(pd);
 
+		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
+
 		m_pComputePipeline->UpdateDescriptorSets(m_csOutput, m_ubos);
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		m_model.CreateDescriptorSets(*m_pGraphicsPipeline, m_csOutput);
+		//m_model.CreateDescriptorSets(*m_pGraphicsPipeline, m_csOutput);
 
 		for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_cmdBufs); i++) {
 			RecordCommandBuffersInternal(true, m_cmdBufs[i].WithoutGUI, i);
@@ -381,9 +603,16 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pGraphicsPipeline->Bind(CmdBuf);
-			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pGraphicsPipeline, i);
-			
+			vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+			vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+				m_pipelineLayout,
+				0,      // firstSet
+				1,      // descriptorSetCount						
+				&m_descSets[i],
+				0,	    // dynamicOffsetCount
+				NULL);	// pDynamicOffsets
+		
 			u32 VertexCount = 3;
 			u32 InstanceCount = 1;
 			u32 FirstVertex = 0;
@@ -510,7 +739,6 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	VkShaderModule m_cs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV4* m_pGraphicsPipeline = NULL;
 	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
@@ -524,6 +752,12 @@ private:
 	float m_scale = 0.1f;	
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 	OgldevVK::VulkanTexture m_csOutput;
+
+	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
+	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
+	std::vector<VkDescriptorSet> m_descSets;
+	VkPipeline m_pipeline = VK_NULL_HANDLE;
+	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 };
 
 
