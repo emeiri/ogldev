@@ -371,13 +371,17 @@ private:
 
 			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf, 1280 / 16, 720 / 16, 1);
 
-			VkPipelineStageFlags DstStageFlags = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-
-			m_csOutput.ImageMemoryBarrier(CmdBuf,
-				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-				VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, VK_REMAINING_MIP_LEVELS, 0, VK_REMAINING_ARRAY_LAYERS });
+			m_csOutput.ImageMemoryBarrier(
+				CmdBuf,
+				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,                 // new layout
+				VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,   // srcStage: last use was sampling
+				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,    // dstStage: next use is compute write
+				VkImageSubresourceRange{
+					VK_IMAGE_ASPECT_COLOR_BIT,
+					0, VK_REMAINING_MIP_LEVELS,
+					0, VK_REMAINING_ARRAY_LAYERS
+				}
+			);
 
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
@@ -399,18 +403,6 @@ private:
 				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1);
 			}
-
-			m_csOutput.ImageMemoryBarrier(
-				CmdBuf,
-				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, // new layout
-				VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,     // srcStage: compute wrote
-				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,    // dstStage: fragment shader will sample
-				VkImageSubresourceRange{
-					VK_IMAGE_ASPECT_COLOR_BIT,
-					0, VK_REMAINING_MIP_LEVELS,
-					0, VK_REMAINING_ARRAY_LAYERS
-				}
-			);
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 
