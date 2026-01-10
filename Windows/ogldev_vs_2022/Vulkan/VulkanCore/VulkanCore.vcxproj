@@ -44,6 +44,7 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v4.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\model.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\pipeline_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\queue.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\skybox.cpp" />
@@ -73,6 +74,7 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline_v4.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_imgui.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_model.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_pipeline_program.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_queue.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_shader.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_simple_mesh.h" />
