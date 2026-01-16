@@ -85,7 +85,8 @@ void ComputePipeline::CreatePipelineLayout()
 		.pPushConstantRanges = NULL
 	};
 
-	VkResult res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, nullptr, &m_pipelineLayout);
+	VkResult res = vkCreatePipelineLayout(m_device, &PipelineLayoutInfo, 
+		                                  NULL, &m_pipelineLayout);
 	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");
 }
 
@@ -94,6 +95,7 @@ void ComputePipeline::RecordCommandBuffer(VkDescriptorSet DescSet, VkCommandBuff
 										  u32 GroupCountX, u32 GroupCountY, u32 GroupCountZ)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
+
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE,
 							m_pipelineLayout, 0, 1, &DescSet, 0, NULL);
 

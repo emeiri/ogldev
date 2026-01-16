@@ -297,7 +297,7 @@ private:
 
 	void CreateComputePipeline()
 	{
-		m_texGenComputePipeline.Init(m_vkCore, m_descPool, "test.comp");
+		m_texGenComputePipeline.Init(m_vkCore, m_descPool, "star_nest.comp");
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 		m_texGenComputePipeline.AllocDescSets(m_numImages, m_texGenDescSets);
 		m_texGenComputePipeline.UpdateDescSets(m_texGenDescSets, m_csOutput, m_ubos);
@@ -328,8 +328,8 @@ private:
 
 			m_csOutput.ImageMemoryBarrier(CmdBuf,
 										  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,  // new layout
-										  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,      // srcStage: last use was sampling
-										  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);    // dstStage: next use is compute write
+										  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,      // srcStage: last use was compute write
+										  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);    // dstStage: next use is sampling
 
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);

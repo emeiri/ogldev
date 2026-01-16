@@ -28,7 +28,9 @@ public:
 
 	TexGenComputePipeline() {}
 
-	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs);
+	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, 
+						const VulkanTexture& Texture, 
+		                const std::vector<BufferAndMemory>& UBOs);
 
 protected:
 

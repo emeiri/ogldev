@@ -22,9 +22,10 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial28\tutorial28.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial28\test.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\cine_shader_lava.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\industrial_complex.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\seascape.comp" />
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.frag" />
-    <None Include="..\..\..\..\Vulkan\Tutorial28\test.vert" />
     <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
