@@ -22,7 +22,7 @@
 
 namespace OgldevVK {
 
-VkDescriptorSetLayout FullScreenQuadProgram::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+VkDescriptorSetLayout FullScreenQuadPipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 {
 	VkDescriptorSetLayoutBinding Binding = {
 		.binding = SamplerBinding,
@@ -36,7 +36,7 @@ VkDescriptorSetLayout FullScreenQuadProgram::CreateDescSetLayout(OgldevVK::Vulka
 }
 
 
-void FullScreenQuadProgram::UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex)
+void FullScreenQuadPipeline::UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex)
 {
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size());
 
@@ -67,7 +67,7 @@ void FullScreenQuadProgram::UpdateDescSets(std::vector<VkDescriptorSet>& Descrip
 }
 
 
-void FullScreenQuadProgram::RecordCommandBuffer(VkCommandBuffer CmdBuf)
+void FullScreenQuadPipeline::RecordCommandBuffer(VkCommandBuffer CmdBuf)
 {
 	u32 VertexCount = 3;
 	u32 InstanceCount = 1;

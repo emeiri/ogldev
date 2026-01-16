@@ -17,31 +17,23 @@
 
 #pragma once
 
-#include "ogldev_vulkan_pipeline_program.h"
+#include "ogldev_vulkan_compute_pipeline.h"
 
 namespace OgldevVK {
 
 
-class FullScreenQuadPipeline : public GraphicsPipeline {
+class TexGenComputePipeline : public ComputePipeline {
 
 public:
 
-	FullScreenQuadPipeline() {}
+	TexGenComputePipeline() {}
 
-	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex);
-
-	void RecordCommandBuffer(VkCommandBuffer CmdBuf);
+	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs);
 
 protected:
 
 	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 
-	virtual VkCullModeFlags GetCullMode() const
-	{
-		return VK_CULL_MODE_FRONT_BIT;
-	}
-
-	u32 SamplerBinding = 0;
 };
 
 }

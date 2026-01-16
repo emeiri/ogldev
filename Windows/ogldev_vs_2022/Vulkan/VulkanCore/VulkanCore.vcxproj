@@ -44,8 +44,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v4.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\model.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\ogldev_imgui.cpp" />
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\ogldev_vulkan_fsquad_pipeline.cpp" />
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\pipeline_program.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\fsquad_pipeline.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\texgen_pipeline.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\gfx_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\queue.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\shader.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\skybox.cpp" />
@@ -84,6 +85,7 @@
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_util.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_wrapper.h" />
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_fsquad_pipeline.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_texgen_pipeline.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

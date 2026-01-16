@@ -38,7 +38,7 @@
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
-#include "ogldev_vulkan_compute_pipeline.h"
+#include "Pipelines/ogldev_vulkan_texgen_pipeline.h"
 #include "Pipelines/ogldev_vulkan_fsquad_pipeline.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_glm_camera.h"
@@ -82,9 +82,9 @@ public:
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
 		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
 		
-		delete m_pComputePipeline;
+		m_texGenComputePipeline.Destroy();
 
-		m_fsQuadProgram.Destroy();
+		m_fsQuadPipeline.Destroy();
 		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
 			
 		m_csOutput.Destroy(m_device);
@@ -110,8 +110,7 @@ public:
 
 		m_vkCore.CreateTexture(m_csOutput, CS_OUTPUT_WIDTH, CS_OUTPUT_HEIGHT, Usage, Format);
 		
-		m_descPool = m_vkCore.CreateDescPool(1, 0, 0, m_numImages);
-
+		CreateDescriptorPool();
 		CreatePipelines();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
@@ -269,6 +268,17 @@ private:
 		printf("Created command buffers\n");
 	}
 
+
+	void CreateDescriptorPool()
+	{
+		u32 TextureCount = 50;
+		u32 UniformBufferCount = 50;
+		u32 StorageBufferCount = 50;
+		u32 MaxSets = m_numImages * 2;	// TexGen program and FS quad program
+
+		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+	}
+
 	
 	void CreatePipelines()
 	{
@@ -279,19 +289,18 @@ private:
 
 	void CreateGraphicsPipeline()
 	{
-		m_fsQuadProgram.Init(m_vkCore, m_descPool, "../VulkanCore/Shaders/FSQuad.vert", "test.frag");
-		m_fsQuadProgram.AllocDescSets(m_numImages, m_descSets);
-		m_fsQuadProgram.UpdateDescSets(m_descSets, m_csOutput);		
+		m_fsQuadPipeline.Init(m_vkCore, m_descPool, "../VulkanCore/Shaders/FSQuad.vert", "test.frag");
+		m_fsQuadPipeline.AllocDescSets(m_numImages, m_fsQuadDescSets);
+		m_fsQuadPipeline.UpdateDescSets(m_fsQuadDescSets, m_csOutput);
 	}
 
 
 	void CreateComputePipeline()
 	{
-		m_pComputePipeline = new OgldevVK::ComputePipeline(m_vkCore, "test.comp");
-
+		m_texGenComputePipeline.Init(m_vkCore, m_descPool, "test.comp");
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
-
-		m_pComputePipeline->UpdateDescriptorSets(m_csOutput, m_ubos);
+		m_texGenComputePipeline.AllocDescSets(m_numImages, m_texGenDescSets);
+		m_texGenComputePipeline.UpdateDescSets(m_texGenDescSets, m_csOutput, m_ubos);
 	}
 
 
@@ -315,7 +324,7 @@ private:
 										  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,     // srcStage: last use was sampling
 										  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);     // dstStage: next use is compute write
 
-			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf, CS_OUTPUT_WIDTH / 16, CS_OUTPUT_HEIGHT / 16, 1);
+			m_texGenComputePipeline.RecordCommandBuffer(m_texGenDescSets[i], CmdBuf, CS_OUTPUT_WIDTH / 16, CS_OUTPUT_HEIGHT / 16, 1);
 
 			m_csOutput.ImageMemoryBarrier(CmdBuf,
 										  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,  // new layout
@@ -327,9 +336,9 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_fsQuadProgram.Bind(CmdBuf, m_descSets[i]);
+			m_fsQuadPipeline.Bind(CmdBuf, m_fsQuadDescSets[i]);
 
-			m_fsQuadProgram.RecordCommandBuffer(CmdBuf);
+			m_fsQuadPipeline.RecordCommandBuffer(CmdBuf);
 
 			vkCmdEndRendering(CmdBuf);
 
@@ -440,6 +449,7 @@ private:
 
 	GLFWwindow* m_pWindow = NULL;
 	OgldevVK::VulkanCore m_vkCore;
+	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
@@ -448,7 +458,6 @@ private:
 		std::vector<VkCommandBuffer> WithoutGUI;
 	} m_cmdBufs;
 	
-	OgldevVK::ComputePipeline* m_pComputePipeline = NULL;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
@@ -458,11 +467,14 @@ private:
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;	
+
+	OgldevVK::TexGenComputePipeline m_texGenComputePipeline;
+	std::vector<VkDescriptorSet> m_texGenDescSets;
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 	OgldevVK::VulkanTexture m_csOutput;
-	OgldevVK::FullScreenQuadProgram m_fsQuadProgram;
-	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> m_descSets;	
+	
+	OgldevVK::FullScreenQuadPipeline m_fsQuadPipeline;	
+	std::vector<VkDescriptorSet> m_fsQuadDescSets;
 };
 
 

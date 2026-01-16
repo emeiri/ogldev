@@ -21,7 +21,7 @@
 
 namespace OgldevVK {
 
-void PipelineProgram::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename)
+void GraphicsPipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename)
 {
 	m_descPool = DescPool;
 
@@ -38,7 +38,7 @@ void PipelineProgram::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const 
 }
 
 
-void PipelineProgram::Destroy()
+void GraphicsPipeline::Destroy()
 {
 	vkDestroyShaderModule(m_device, m_vs, NULL);
 	vkDestroyShaderModule(m_device, m_fs, NULL);
@@ -48,7 +48,7 @@ void PipelineProgram::Destroy()
 }
 
 
-void PipelineProgram::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
+void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
@@ -62,8 +62,10 @@ void PipelineProgram::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
 }
 
 
-void PipelineProgram::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets)
+void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets)
 {
+	assert(DescriptorSets.size() == 0);
+
 	std::vector<VkDescriptorSetLayout> Layouts(DescCount, m_descSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
@@ -82,7 +84,7 @@ void PipelineProgram::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>&
 
 
 
-VkPipeline PipelineProgram::CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
+VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
 	                                       VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp)
 {
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {

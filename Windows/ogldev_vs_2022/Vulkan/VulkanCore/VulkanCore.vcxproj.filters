@@ -135,10 +135,13 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\compute_pipeline.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\pipeline_program.cpp">
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\gfx_program.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\ogldev_vulkan_fsquad_pipeline.cpp">
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\fsquad_pipeline.cpp">
+      <Filter>Source Files\Vulkan\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\texgen_pipeline.cpp">
       <Filter>Source Files\Vulkan\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
@@ -231,6 +234,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_fsquad_pipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_texgen_pipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>

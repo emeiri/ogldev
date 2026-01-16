@@ -21,9 +21,10 @@
 
 namespace OgldevVK {
 
-class PipelineProgram {
+class GraphicsPipeline {
+
 public:
-	PipelineProgram() {}
+	GraphicsPipeline() {}
 
 	void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename);
 

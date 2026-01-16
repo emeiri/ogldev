@@ -33,30 +33,34 @@ class ComputePipeline {
 
 public:
 
-	ComputePipeline(VulkanCore& vkCore, const char* pCSFilename);
+	ComputePipeline() {}
 
-	~ComputePipeline();
+	void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pCSFilename);
 
-	void UpdateDescriptorSets(const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs);
+	void Destroy();
 
-	void RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf, u32 GroupCountX, u32 GroupCountY, u32 GroupCountZ);
+	void RecordCommandBuffer(VkDescriptorSet DescSet, VkCommandBuffer CmdBuf, 
+		                     u32 GroupCountX, u32 GroupCountY, u32 GroupCountZ);
 
-private:
+	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets);
 
-	void CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
-	void CreatePipelineLayout();
-	void CreatePipeline(VkShaderModule cs);
-	void AllocateDescriptorSets(VulkanCore& vkCore);
-	void AllocateDescriptorSetsInternal();
+protected:
+
+	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;
 
 	VkDevice m_device = VK_NULL_HANDLE;
+	int m_numImages = 0;
+
+private:
+	
+	void CreatePipelineLayout();
+	void CreatePipeline(VkShaderModule cs);
+
 	VkShaderModule m_cs = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descriptorSetLayout = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> m_descriptorSets;
-	int m_numImages = 0;
 };
 
 }

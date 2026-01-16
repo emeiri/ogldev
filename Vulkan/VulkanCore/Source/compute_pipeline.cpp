@@ -22,21 +22,30 @@
 
 namespace OgldevVK {
 
-ComputePipeline::ComputePipeline(VulkanCore& vkCore, const char* pCSFilename)
+void ComputePipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pCSFilename)
 {
 	m_device = vkCore.GetDevice();
 	m_numImages = vkCore.GetNumImages();
+	m_descriptorPool = DescPool;
 
-	CreateDescSetLayout(vkCore);
+	m_descriptorSetLayout = CreateDescSetLayout(vkCore);
 
 	CreatePipelineLayout();
 
 	m_cs = CreateShaderModuleFromText(m_device, pCSFilename);
 
 	CreatePipeline(m_cs);
-
-	AllocateDescriptorSets(vkCore);
 }
+
+
+void ComputePipeline::Destroy()
+{
+	vkDestroyShaderModule(m_device, m_cs, NULL);
+	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
+	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
+	vkDestroyPipeline(m_device, m_pipeline, NULL);
+}
+
 
 void ComputePipeline::CreatePipeline(VkShaderModule cs)
 {
@@ -63,6 +72,7 @@ void ComputePipeline::CreatePipeline(VkShaderModule cs)
 	CHECK_VK_RESULT(res, "vkCreateComputePipelines\n");
 }
 
+
 void ComputePipeline::CreatePipelineLayout()
 {
 	VkPipelineLayoutCreateInfo PipelineLayoutInfo = {
@@ -80,71 +90,21 @@ void ComputePipeline::CreatePipelineLayout()
 }
 
 
-void ComputePipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
-{
-	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
-
-	VkDescriptorSetLayoutBinding Binding = {
-		.binding = 0,
-		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-		.pImmutableSamplers = NULL
-	};
-
-	LayoutBindings.push_back(Binding);
-
-	VkDescriptorSetLayoutBinding Binding_Uniform = {
-		.binding = 1,
-		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-		.descriptorCount = 1,
-		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-	};
-
-	LayoutBindings.push_back(Binding_Uniform);
-
-	m_descriptorSetLayout = vkCore.CreateDescSetLayout(LayoutBindings);
-}
-
-
-ComputePipeline::~ComputePipeline()
-{
-	vkDestroyShaderModule(m_device, m_cs, NULL);
-	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
-	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
-	vkDestroyDescriptorPool(m_device, m_descriptorPool, NULL);
-	vkDestroyPipeline(m_device, m_pipeline, NULL);
-}
-
-
-void ComputePipeline::RecordCommandBuffer(int Image, VkCommandBuffer CmdBuf, 
+void ComputePipeline::RecordCommandBuffer(VkDescriptorSet DescSet, VkCommandBuffer CmdBuf,
 										  u32 GroupCountX, u32 GroupCountY, u32 GroupCountZ)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_COMPUTE,
-							m_pipelineLayout, 0, 1, &m_descriptorSets[Image], 0, NULL);
+							m_pipelineLayout, 0, 1, &DescSet, 0, NULL);
 
 	vkCmdDispatch(CmdBuf, GroupCountX, GroupCountY, GroupCountZ);
 }
 
 
-void ComputePipeline::AllocateDescriptorSets(VulkanCore& vkCore)
+void ComputePipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets)
 {
-	u32 TextureCount = 1;
-	u32 UniformBufferCount = 3;
-	u32 StorageBufferCount = 0;	// IB, VB, MetaData
-	u32 MaxSets = m_numImages;
+	assert(DescriptorSets.size() == 0);
 
-	m_descriptorSets.resize(m_numImages);
-
-	m_descriptorPool = vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
-
-	AllocateDescriptorSetsInternal();
-}
-
-
-void ComputePipeline::AllocateDescriptorSetsInternal()
-{
 	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
@@ -155,64 +115,11 @@ void ComputePipeline::AllocateDescriptorSetsInternal()
 		.pSetLayouts = Layouts.data()
 	};
 
-	m_descriptorSets.resize(m_numImages);
+	DescriptorSets.resize(m_numImages);
 
-    VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descriptorSets.data());
+    VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");	
 }
 
-
-void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs)
-{
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * 2);
-
-	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
-
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		BufferInfo_Uniforms[ImageIndex].buffer = UBOs[ImageIndex].m_buffer;
-		BufferInfo_Uniforms[ImageIndex].offset = 0;
-		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
-	}
-
-	u32 WdsIndex = 0;
-
-	VkDescriptorImageInfo ImageInfo = {
-		.sampler = Texture.m_sampler,
-		.imageView = Texture.m_view,
-		.imageLayout = VK_IMAGE_LAYOUT_GENERAL
-	};
-
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		VkDescriptorSet& DstSet = m_descriptorSets[ImageIndex];
-
-		VkWriteDescriptorSet wds = {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = DstSet,
-			.dstBinding = 0,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-			.pImageInfo = &ImageInfo
-		};
-
-		assert(WdsIndex < WriteDescriptorSet.size());
-		WriteDescriptorSet[WdsIndex++] = wds;
-
-		wds = {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.dstSet = DstSet,
-			.dstBinding = 1,
-			.dstArrayElement = 0,
-			.descriptorCount = 1,
-			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
-		};
-
-		assert(WdsIndex < WriteDescriptorSet.size());
-		WriteDescriptorSet[WdsIndex++] = wds;
-	}
-
-	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
-}
 
 }
