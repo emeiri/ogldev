@@ -41,7 +41,7 @@ void Skybox::Init(VulkanCore* pVulkanCore, const char* pFilename)
 	m_vs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.vert");
 	m_fs = CreateShaderModuleFromText(pVulkanCore->GetDevice(), "../VulkanCore/Shaders/skybox.frag");
 	
-	GraphicsPipelineDesc pd;
+	PipelineDesc pd;
 	pd.Device = pVulkanCore->GetDevice();
 	pd.pWindow = pVulkanCore->GetWindow();
 	pd.vs = m_vs;

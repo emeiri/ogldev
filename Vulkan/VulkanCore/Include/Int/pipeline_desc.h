@@ -24,7 +24,7 @@
 
 namespace OgldevVK {
 
-struct GraphicsPipelineDesc {
+struct PipelineDesc {
 	VkDevice Device = NULL;
 	GLFWwindow* pWindow = NULL;
 	VkShaderModule vs = NULL;

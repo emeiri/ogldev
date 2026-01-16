@@ -273,7 +273,7 @@ private:
 
 	void CreatePipeline()
 	{
-		OgldevVK::GraphicsPipelineDesc pd;
+		OgldevVK::PipelineDesc pd;
 		pd.Device = m_device;
 		pd.pWindow = m_pWindow;
 		pd.vs = m_vs;
