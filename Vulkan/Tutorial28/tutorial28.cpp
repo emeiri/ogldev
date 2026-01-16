@@ -39,7 +39,7 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_compute_pipeline.h"
-#include "ogldev_vulkan_pipeline_program.h"
+#include "Pipelines/ogldev_vulkan_fsquad_pipeline.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
@@ -65,74 +65,6 @@ struct UniformData {
 #endif
 
 
-
-class FullScreenQuadProgram : public OgldevVK::PipelineProgram {
-
-public:
-
-	FullScreenQuadProgram() {}
-
-	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, const OgldevVK::VulkanTexture& Tex)
-	{
-		std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size());
-
-		VkDescriptorImageInfo ImageInfo = {
-			.sampler = Tex.m_sampler,
-			.imageView = Tex.m_view,
-			.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-		};
-
-		for (int i = 0; i < (int)DescriptorSets.size(); i++) {
-			VkDescriptorSet& DstSet = DescriptorSets[i];
-
-			WriteDescriptorSet[i] = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = NULL,
-				.dstSet = DstSet,
-				.dstBinding = 2,
-				.dstArrayElement = 0,
-				.descriptorCount = 1,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = &ImageInfo,
-				.pBufferInfo = NULL,
-				.pTexelBufferView = NULL
-			};
-		}
-
-		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
-	}
-
-
-	void RecordCommandBuffer(VkCommandBuffer CmdBuf)
-	{
-		u32 VertexCount = 3;
-		u32 InstanceCount = 1;
-		u32 FirstVertex = 0;
-		u32 FirstInstance = 0;
-
-		vkCmdDraw(CmdBuf, VertexCount, InstanceCount, FirstVertex, FirstInstance);
-	}
-
-protected:
-
-	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
-	{
-		VkDescriptorSetLayoutBinding Binding = {
-			.binding = 2,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = 1,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.pImmutableSamplers = NULL
-		};
-
-		return vkCore.CreateDescSetLayout({ Binding });
-	}
-
-	virtual VkCullModeFlags GetCullMode()
-	{
-		return VK_CULL_MODE_FRONT_BIT;
-	}
-};
 
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
@@ -379,8 +311,8 @@ private:
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
 			m_csOutput.ImageMemoryBarrier(CmdBuf,
-										  VK_IMAGE_LAYOUT_GENERAL,                 // new layout
-										  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,   // srcStage: last use was sampling
+										  VK_IMAGE_LAYOUT_GENERAL,                   // new layout
+										  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,     // srcStage: last use was sampling
 										  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);     // dstStage: next use is compute write
 
 			m_pComputePipeline->RecordCommandBuffer(i, CmdBuf, CS_OUTPUT_WIDTH / 16, CS_OUTPUT_HEIGHT / 16, 1);
@@ -528,7 +460,7 @@ private:
 	float m_scale = 0.1f;	
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 	OgldevVK::VulkanTexture m_csOutput;
-	FullScreenQuadProgram m_fsQuadProgram;
+	OgldevVK::FullScreenQuadProgram m_fsQuadProgram;
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descSets;	
 };

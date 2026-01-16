@@ -34,6 +34,12 @@
     <Filter Include="Source Files\ImGUIZMOQuat">
       <UniqueIdentifier>{f893b59f-da2a-4145-b8f1-6f35a162acb0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Pipelines">
+      <UniqueIdentifier>{41486e70-6be9-4072-9d56-15f793102793}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vulkan\Pipelines">
+      <UniqueIdentifier>{e9a4855a-af94-4cb2-a38c-3a5f477511a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\ogldev_util.cpp">
@@ -132,6 +138,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\pipeline_program.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\ogldev_vulkan_fsquad_pipeline.cpp">
+      <Filter>Source Files\Vulkan\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -220,6 +229,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_pipeline_program.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_fsquad_pipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

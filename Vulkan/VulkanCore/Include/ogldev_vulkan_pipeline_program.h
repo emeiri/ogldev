@@ -38,7 +38,7 @@ protected:
 	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;
 
 	// Default but deriving class may override
-	virtual VkCullModeFlags GetCullMode()
+	virtual VkCullModeFlags GetCullMode() const
 	{
 		return VK_CULL_MODE_BACK_BIT;
 	}
