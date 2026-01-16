@@ -36,7 +36,13 @@
 
 layout(local_size_x = 16, local_size_y = 16) in;
 
-layout(set = 0, binding = 2, rgba8) uniform writeonly image2D kTextures2DOut;
+layout(set = 0, binding = 0, rgba8) uniform writeonly image2D kTextures2DOut;
+
+layout (binding = 1) uniform UniformData {
+  float time;
+}
+ud;
+
 
 // Maximum ray distance.
 #define FAR 100.
@@ -48,10 +54,6 @@ layout(set = 0, binding = 2, rgba8) uniform writeonly image2D kTextures2DOut;
 // fiery stuff tends to stand out more, so that's the default. :)
 #define WARM
 
-layout (binding = 3) uniform UniformData {
-  float time;
-}
-ud;
 
 vec2 iResolution = vec2(1280.0, 720.0);
 float iTime      = ud.time;

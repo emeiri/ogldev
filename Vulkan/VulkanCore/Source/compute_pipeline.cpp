@@ -85,7 +85,7 @@ void ComputePipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 	std::vector<VkDescriptorSetLayoutBinding> LayoutBindings;
 
 	VkDescriptorSetLayoutBinding Binding = {
-		.binding = 2,
+		.binding = 0,
 		.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -95,7 +95,7 @@ void ComputePipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 	LayoutBindings.push_back(Binding);
 
 	VkDescriptorSetLayoutBinding Binding_Uniform = {
-		.binding = 3,
+		.binding = 1,
 		.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 		.descriptorCount = 1,
 		.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -188,7 +188,7 @@ void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture, const s
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = 2,
+			.dstBinding = 0,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
@@ -201,7 +201,7 @@ void ComputePipeline::UpdateDescriptorSets(const VulkanTexture& Texture, const s
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = 3,
+			.dstBinding = 1,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
