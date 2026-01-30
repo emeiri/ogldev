@@ -23,7 +23,7 @@
 
 namespace Physics {
 
-typedef void (*UpdateListener)(void* pObject, const glm::vec3& Pos);
+typedef void (*UpdateListener)(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation);
 
 class PointMass {
 
@@ -44,6 +44,11 @@ public:
 
     void HandleCollisionElastic(Physics::PointMass& OtherParticle, float AvgCoeffRest);
 
+    void SetForce(const glm::vec3& F) { m_sumForces = F; }
+
+    const glm::vec3& GetCenterOfMass() { return m_centerOfMass; }
+
+    const void* GetTarget() const { return m_pTarget; }
 private:
 
     bool CheckCollision(const PointMass& OtherParticle) const;
@@ -61,6 +66,6 @@ private:
     float m_coeffOfRest = 1.0f;
 
     // Client interface
-    void* m_pTarget = NULL;
+    const void* m_pTarget = NULL;
 };
 }

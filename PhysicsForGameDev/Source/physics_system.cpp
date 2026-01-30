@@ -22,10 +22,11 @@
 
 namespace Physics {
 
-void System::Init(int NumPointMasses, UpdateListener pUpdateListener)
+void System::Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdateListener)
 {
     m_pUpdateListener = pUpdateListener;
     m_pointMasses.resize(NumPointMasses);
+    m_rigidBodies.resize(NumRigidBodies);
 }
 
 
@@ -40,8 +41,23 @@ void System::Update(int DeltaTimeMillis)
 
 void System::UpdateInternal(float DeltaTime)
 {    
+    UpdatePointMasses(DeltaTime);
+    UpdateRigidBodies(DeltaTime);
+}
+
+
+void System::UpdatePointMasses(float DeltaTime)
+{
     for (int i = 0; i < m_numActivePointMasses; i++) {
         m_pointMasses[i].Update(DeltaTime, m_pUpdateListener);
+    }
+}
+
+
+void System::UpdateRigidBodies(float DeltaTime)
+{
+    for (int i = 0; i < m_numActiveRigidBodies; i++) {
+        m_rigidBodies[i].Update(DeltaTime, m_pUpdateListener);
     }
 }
 
@@ -69,6 +85,21 @@ PointMass* System::AllocPointMass()
     m_numActivePointMasses++;
 
     return pm;
+}
+
+
+RigidBody* System::AllocRigidBody()
+{
+    if (m_numActiveRigidBodies == (int)m_rigidBodies.size()) {
+        printf("Out of rigid bodies\n");
+        assert(0);
+    }
+
+    RigidBody* rb = &m_rigidBodies[m_numActiveRigidBodies];
+
+    m_numActiveRigidBodies++;
+
+    return rb;
 }
 
  

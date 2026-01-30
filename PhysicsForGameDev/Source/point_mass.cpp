@@ -47,7 +47,8 @@ void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
     m_centerOfMass += m_linearVelocity * DeltaTime;
 
     if (pUpdateListener) {
-        (*pUpdateListener)(m_pTarget, m_centerOfMass);
+        glm::quat t(0.0f, 0.0f, 0.0f, 0.0f);
+        (*pUpdateListener)(m_pTarget, m_centerOfMass, t);
     }
 }
 

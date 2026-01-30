@@ -100,7 +100,7 @@ public:
 
         m_pScene->SetCamera(Vector3f(0.0f, 60.0f, -100.0f), Vector3f(0.0f, -0.3f, 1.0f));
 
-        m_physicsSystem.Init(100, PhysicsUpdateListener);
+        m_physicsSystem.Init(100, 0, PhysicsUpdateListener);
 
         m_pPointMass1 = m_physicsSystem.AllocPointMass();
         m_pPointMass1->Init(5.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);

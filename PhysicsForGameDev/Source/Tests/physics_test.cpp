@@ -14,7 +14,7 @@ TEST(TestCaseName, TestName)
 {
 	Physics::System PhysicsSystem;
 
-	PhysicsSystem.Init(10, UpdateListener);
+	PhysicsSystem.Init(10, 0, UpdateListener);
 
 	int foo;
 

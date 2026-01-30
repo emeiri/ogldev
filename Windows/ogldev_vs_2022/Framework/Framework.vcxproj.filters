@@ -21,6 +21,9 @@
     <ClInclude Include="..\..\..\PhysicsForGameDev\Include\point_mass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsForGameDev\Include\rigid_body.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\PhysicsForGameDev\Source\physics_system.cpp">
@@ -30,6 +33,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Common\ogldev_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsForGameDev\Source\rigid_body.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

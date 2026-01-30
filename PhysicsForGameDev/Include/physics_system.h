@@ -21,6 +21,7 @@
 
 #include <vector>
 #include "point_mass.h"
+#include "rigid_body.h"
 
 namespace Physics {
 
@@ -34,7 +35,7 @@ public:
 
     ~System() {}
 
-    void Init(int NumPointMasses, UpdateListener pUpdateListener);
+    void Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdateListener);
 
     void SetListener(UpdateListener pUpdateListener) { m_pUpdateListener = pUpdateListener; }
 
@@ -42,15 +43,23 @@ public:
 
     PointMass* AllocPointMass();
 
+    RigidBody* AllocRigidBody();
+
 private:
 
     void UpdateInternal(float DeltaTime);
 
+    void UpdatePointMasses(float DeltaTime);
+
+    void UpdateRigidBodies(float DeltaTime);
+
     void HandleCollisions();
 
     std::vector<PointMass> m_pointMasses;
+    std::vector<RigidBody> m_rigidBodies;
     UpdateListener m_pUpdateListener = NULL;
     int m_numActivePointMasses = 0;
+    int m_numActiveRigidBodies = 0;
 };
 
 }
