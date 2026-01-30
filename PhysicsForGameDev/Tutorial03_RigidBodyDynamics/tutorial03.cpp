@@ -69,21 +69,23 @@ public:
 
         m_pScene->GetDirLights().push_back(m_dirLight);
   
-        Model* pSphere1 = m_pRenderingSystem->LoadModel("../Content/box.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
         
        // m_pScene->GetConfig()->ControlSkybox(true);
        // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
 
-        m_pSphere1 = m_pScene->CreateSceneObject(pSphere1);
-        m_pSphere1->SetPosition(-10.0f, 1.0f, 15.0);
-        m_pScene->AddToRenderList(m_pSphere1);
+        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
+        m_pSceneObject->SetPosition(-10.0f, 1.0f, 15.0);
+        m_pScene->AddToRenderList(m_pSceneObject);
 
         m_pScene->SetCamera(Vector3f(0.0f, 5.0f, -15.0f), Vector3f(0.0f, -0.1f, 1.0f));
 
         m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
-        m_pRigidBody->Init(1.0f, m_pSphere1->GetGLMPos(), glm::vec3(0.0f, 0.0f, 0.0f), m_pSphere1);
+        glm::vec3 ForceVec(1.0f, 0.0f, 0.0f);
+        glm::vec3 ForcePoint(0.0f, 5.0f, 0.0f);
+        m_pRigidBody->Init(1.0f, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
 
         m_pRenderingSystem->Execute();
     }
@@ -92,13 +94,6 @@ public:
     void OnFrameChild(long long DeltaTimeMillis)
     {  
         m_physicsSystem.Update((int)DeltaTimeMillis);
-
-        if ((m_pSphere1->GetPosition().x >= 10.0f) ||
-            (m_pSphere1->GetPosition().z >= 40.0f)) {
-            float RandomX = 1.0f;//RandomFloatRange(1.0f, 5.0f);
-            float RandomZ = 0.0f;//RandomFloatRange(-0.5f, 0.5f);
-      //      m_pPointMass1->Init(1.0f, glm::vec3(-10.0f, 1.0f, 15.0), glm::vec3(RandomX, 0.0f, RandomZ), m_pSphere1);
-        }
 
         m_frameCount++;
     }
@@ -145,7 +140,7 @@ private:
 
     Scene* m_pScene = NULL;
     DirectionalLight m_dirLight;
-    SceneObject* m_pSphere1 = NULL;
+    SceneObject* m_pSceneObject = NULL;
     Physics::System m_physicsSystem;
     Physics::RigidBody* m_pRigidBody = NULL;
     int m_frameCount = 0;

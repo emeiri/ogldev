@@ -24,9 +24,13 @@
 
 namespace Physics {
 
-void RigidBody::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
+void RigidBody::Init(float Mass, 
+                     const glm::vec3& StartPos, 
+                     const glm::vec3& ForceVec, 
+                     const glm::vec3& ForcePoint,
+                     void* pTarget)
 {
-    m_linear.Init(Mass, StartPos, Force, pTarget);
+    m_linear.Init(Mass, StartPos, ForceVec, pTarget);
 
     // Set inertia tensor for a box (example)
     float w = 1.0f, h = 1.0f, d = 0.5f;
@@ -43,15 +47,12 @@ void RigidBody::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& For
 
     m_orientation = glm::quat(1, 0, 0, 0);
 
-    glm::vec3 force(0.5, 0, 0);
-    glm::vec3 point(1, 0, 0); // world-space point
-    ApplyForceAtPoint(force, point);
+    ApplyForceAtPoint(ForceVec, ForcePoint);
 }
 
 
 void RigidBody::ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& worldPoint)
 {
-    m_linear.SetForce(F);
     glm::vec3 r = worldPoint - m_linear.GetCenterOfMass();
     m_torqueAccum += glm::cross(r, F);
 }

@@ -31,8 +31,11 @@ namespace Physics {
 class RigidBody {
 public:
 
-    void Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget);
-
+    void Init(float Mass,
+              const glm::vec3& StartPos,
+              const glm::vec3& ForceVec,
+              const glm::vec3& ForcePoint,
+              void* pTarget);
    // void SetForce(const glm::vec3& F);
 
     void ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& worldPoint);
