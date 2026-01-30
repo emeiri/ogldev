@@ -26,16 +26,22 @@
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\Vulkan\Tutorial28\industrial_complex.comp">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\Vulkan\Tutorial28\seascape.comp">
+    <None Include="..\..\..\..\Vulkan\Tutorial28\star_nest.comp">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\Vulkan\Tutorial28\cine_shader_lava.comp">
+    <None Include="..\..\..\..\Vulkan\Tutorial28\lets_self_reflect.comp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\Tutorial28\battered_alien_planet.comp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\Tutorial28\spiral_galaxy.comp">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\..\Vulkan\Tutorial28\flux_core.comp">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -297,7 +297,11 @@ private:
 
 	void CreateComputePipeline()
 	{
-		m_texGenComputePipeline.Init(m_vkCore, m_descPool, "star_nest.comp");
+		//m_texGenComputePipeline.Init(m_vkCore, m_descPool, "star_nest.comp");
+		//m_texGenComputePipeline.Init(m_vkCore, m_descPool, "lets_self_reflect.comp");
+		//m_texGenComputePipeline.Init(m_vkCore, m_descPool, "battered_alien_planet.comp");
+		//m_texGenComputePipeline.Init(m_vkCore, m_descPool, "spiral_galaxy.comp");
+		m_texGenComputePipeline.Init(m_vkCore, m_descPool, "flux_core.comp");
 		m_ubos = m_vkCore.CreateUniformBuffers(sizeof(UniformData));
 		m_texGenComputePipeline.AllocDescSets(m_numImages, m_texGenDescSets);
 		m_texGenComputePipeline.UpdateDescSets(m_texGenDescSets, m_csOutput, m_ubos);

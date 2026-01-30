@@ -22,9 +22,11 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial28\tutorial28.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\Vulkan\Tutorial28\cine_shader_lava.comp" />
-    <None Include="..\..\..\..\Vulkan\Tutorial28\industrial_complex.comp" />
-    <None Include="..\..\..\..\Vulkan\Tutorial28\seascape.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\battered_alien_planet.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\flux_core.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\lets_self_reflect.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\spiral_galaxy.comp" />
+    <None Include="..\..\..\..\Vulkan\Tutorial28\star_nest.comp" />
     <None Include="..\..\..\..\Vulkan\Tutorial28\test.frag" />
     <None Include="..\..\..\..\Vulkan\VulkanCore\Shaders\FSQuad.vert" />
   </ItemGroup>
