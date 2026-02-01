@@ -24,12 +24,14 @@
 
 namespace Physics {
 
-void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
+void PointMass::Init(float Mass, const glm::vec3& CenterOfMass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
 {
     assert(Mass != 0.0f);
 
+    m_pos = StartPos;
+
     m_mass = Mass;
-    m_centerOfMass = StartPos;
+    m_centerOfMass = CenterOfMass;
     m_sumForces = Force;
     m_pTarget = pTarget;
 
@@ -44,11 +46,11 @@ void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
 
     m_linearVelocity += m_linearAccel * DeltaTime;
 
-    m_centerOfMass += m_linearVelocity * DeltaTime;
+    m_pos += m_linearVelocity * DeltaTime;
 
     if (pUpdateListener) {
         glm::quat t(0.0f, 0.0f, 0.0f, 0.0f);
-        (*pUpdateListener)(m_pTarget, m_centerOfMass, t);
+        (*pUpdateListener)(m_pTarget, m_pos, t);
     }
 }
 
@@ -85,7 +87,7 @@ void PointMass::HandleCollision(PointMass& OtherParticle)
 
 void PointMass::HandleCollisionElastic(Physics::PointMass& OtherParticle, float AvgCoeffRest)
 {
-    glm::vec3 CollisionNormal = m_centerOfMass - OtherParticle.m_centerOfMass;
+    glm::vec3 CollisionNormal = m_pos - OtherParticle.m_pos;
 
     float Distance = glm::length(CollisionNormal);
 
@@ -135,7 +137,7 @@ void PointMass::HandleCollisionInelastic(Physics::PointMass& OtherParticle)
 
 bool PointMass::CheckCollision(const PointMass& OtherParticle) const
 {
-    float DistSquared = glm::length2(m_centerOfMass - OtherParticle.m_centerOfMass);
+    float DistSquared = glm::length2(m_pos - OtherParticle.m_pos);
 
     float MinDistanceSquared = m_boundingRadius + OtherParticle.m_boundingRadius;
     MinDistanceSquared *= MinDistanceSquared;

@@ -25,35 +25,40 @@
 namespace Physics {
 
 void RigidBody::Init(float Mass, 
+                     const glm::vec3& CenterOfMass,
                      const glm::vec3& StartPos, 
                      const glm::vec3& ForceVec, 
                      const glm::vec3& ForcePoint,
                      void* pTarget)
 {
-    m_linear.Init(Mass, StartPos, ForceVec, pTarget);
-
-    // Set inertia tensor for a box (example)
-    float w = 1.0f, h = 1.0f, d = 0.5f;
-    float m = 5.0f;
-
-    glm::mat3 Ibody = glm::mat3(
-        (1.0f / 12.0f) * m * (h * h + d * d), 0, 0,
-        0, (1.0f / 12.0f) * m * (w * w + d * d), 0,
-        0, 0, (1.0f / 12.0f) * m * (w * w + h * h)
-    );
-
-    m_inertiaBody = Ibody;
-    m_inertiaBodyInv = glm::inverse(m_inertiaBody);
-
-    m_orientation = glm::quat(1, 0, 0, 0);
+    m_linear.Init(Mass, CenterOfMass, StartPos, ForceVec, pTarget);    
 
     ApplyForceAtPoint(ForceVec, ForcePoint);
 }
 
-
-void RigidBody::ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& worldPoint)
+void RigidBody::SetShapeBox(float Width, float Height, float Depth)
 {
-    glm::vec3 r = worldPoint - m_linear.GetCenterOfMass();
+    m_shape = RIGID_BODY_SHAPE_BOX;
+
+    float hh = Height * Height;
+    float ww = Width * Width;
+    float dd = Depth * Depth;
+    float o12m = 1.0f / 12.0f * m_linear.GetMass();
+
+    glm::mat3 Ibody = glm::mat3(
+        o12m * (hh + dd), 0,                0,
+        0,                o12m * (ww + dd), 0,
+        0,                0,                o12m * (ww + hh)
+    );
+
+    m_inertiaBody = Ibody;
+    m_inertiaBodyInv = glm::inverse(m_inertiaBody);
+}
+
+
+void RigidBody::ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& ForcePoint)
+{
+    glm::vec3 r = ForcePoint - m_linear.GetCenterOfMass();
     m_torqueAccum += glm::cross(r, F);
 }
 
@@ -65,6 +70,11 @@ void GLMPrintQuat(const glm::quat& q)
 
 void RigidBody::Update(float dt, UpdateListener pUpdateListener)
 {
+    if (m_shape == RIGID_BODY_SHAPE_NONE) {
+        printf("Rigid body shape not initialized\n");
+        assert(0);
+    }
+
     m_linear.Update(dt, NULL);
 
     UpdateInertiaWorldInv();
@@ -85,7 +95,7 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
   //  GLMPrintQuat(m_orientation);
 
     if (pUpdateListener) {
-        pUpdateListener(m_linear.GetTarget(), m_linear.GetCenterOfMass(), m_orientation);
+        pUpdateListener(m_linear.GetTarget(), m_linear.GetPos(), m_orientation);
     }
 }
 

@@ -33,13 +33,10 @@
 
 static void PhysicsUpdateListener(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation)
 {
-    //GLM_PRINT_VEC3("", Pos);
+  //  GLM_PRINT_VEC3("", Pos);
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
-    if (Pos.y >= 0.5f) {
-        pSceneObject->SetPosition(Pos);
-    }
-
+    pSceneObject->SetPosition(Pos);
     pSceneObject->SetQuaternion(Orientation);
 }
 
@@ -84,8 +81,13 @@ public:
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
         glm::vec3 ForceVec(1.0f, 0.0f, 0.0f);
-        glm::vec3 ForcePoint(0.0f, 5.0f, 0.0f);
-        m_pRigidBody->Init(1.0f, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
+        glm::vec3 ForcePoint(0.0f, 10.0f, 0.0f);
+        glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
+        m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
+        float Width = 2.0f;
+        float Height = 2.0f;
+        float Depth = 2.0f;
+        m_pRigidBody->SetShapeBox(Width, Height, Depth);
 
         m_pRenderingSystem->Execute();
     }

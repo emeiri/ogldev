@@ -28,31 +28,41 @@
 
 namespace Physics {
 
+enum RIGID_BODY_SHAPE {
+    RIGID_BODY_SHAPE_NONE,
+    RIGID_BODY_SHAPE_BOX
+};
+
 class RigidBody {
 public:
 
     void Init(float Mass,
+              const glm::vec3& CenterOfMass,
               const glm::vec3& StartPos,
               const glm::vec3& ForceVec,
               const glm::vec3& ForcePoint,
               void* pTarget);
-   // void SetForce(const glm::vec3& F);
 
-    void ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& worldPoint);
-
+    void SetShapeBox(float Width, float Height, float Depth);
+       
     void Update(float dt, UpdateListener pUpdateListener);
 
 private:
+
+    void ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& ForcePoint);
+
     void UpdateInertiaWorldInv();
 
     PointMass m_linear;        // handles mass, position, velocity, forces
 
-    glm::quat m_orientation;
+    glm::quat m_orientation = glm::quat(1, 0, 0, 0);
     glm::vec3 m_angularVelocity;
     glm::vec3 m_torqueAccum;
 
     glm::mat3 m_inertiaBody;
     glm::mat3 m_inertiaBodyInv;
     glm::mat3 m_inertiaWorldInv;
+
+    RIGID_BODY_SHAPE m_shape = RIGID_BODY_SHAPE_NONE;
 };
 }
