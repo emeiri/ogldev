@@ -20,6 +20,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "ogldev_math_3d.h"
 #include "rigid_body.h"
 
 namespace Physics {
@@ -36,6 +37,7 @@ void RigidBody::Init(float Mass,
     ApplyForceAtPoint(ForceVec, ForcePoint);
 }
 
+
 void RigidBody::SetShapeBox(float Width, float Height, float Depth)
 {
     m_shape = RIGID_BODY_SHAPE_BOX;
@@ -43,28 +45,22 @@ void RigidBody::SetShapeBox(float Width, float Height, float Depth)
     float hh = Height * Height;
     float ww = Width * Width;
     float dd = Depth * Depth;
-    float o12m = 1.0f / 12.0f * m_linear.GetMass();
+    float MassDiv12 = 1.0f / 12.0f * m_linear.GetMass();
 
-    glm::mat3 Ibody = glm::mat3(
-        o12m * (hh + dd), 0,                0,
-        0,                o12m * (ww + dd), 0,
-        0,                0,                o12m * (ww + hh)
+    glm::mat3 InertiaLocal = glm::mat3(
+        MassDiv12 * (hh + dd), 0,                     0,
+        0,                     MassDiv12 * (ww + dd), 0,
+        0,                     0,                     MassDiv12 * (ww + hh)
     );
 
-    m_inertiaBody = Ibody;
-    m_inertiaBodyInv = glm::inverse(m_inertiaBody);
+    m_inertiaLocalInv = glm::inverse(InertiaLocal);
 }
 
 
-void RigidBody::ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& ForcePoint)
+void RigidBody::ApplyForceAtPoint(const glm::vec3& Force, const glm::vec3& AtPoint)
 {
-    glm::vec3 r = ForcePoint - m_linear.GetCenterOfMass();
-    m_torqueAccum += glm::cross(r, F);
-}
-
-void GLMPrintQuat(const glm::quat& q) 
-{
-    printf("quat = (%f, %f, %f : %f)\n", q.x, q.y, q.z, q.w);
+    glm::vec3 Radius = AtPoint - m_linear.GetCenterOfMass();
+    m_torqueAccum += glm::cross(Radius, Force);
 }
 
 
@@ -92,7 +88,7 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
         m_torqueAccum = glm::vec3(0);
     }
 
-  //  GLMPrintQuat(m_orientation);
+    //GLM_PRINT_QUAT("Orientation: ", m_orientation);
 
     if (pUpdateListener) {
         pUpdateListener(m_linear.GetTarget(), m_linear.GetPos(), m_orientation);
@@ -103,7 +99,7 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
 void RigidBody::UpdateInertiaWorldInv() 
 {
     glm::mat3 R = glm::toMat3(m_orientation);
-    m_inertiaWorldInv = R * m_inertiaBodyInv * glm::transpose(R);
+    m_inertiaWorldInv = R * m_inertiaLocalInv * glm::transpose(R);
 }
 
 }

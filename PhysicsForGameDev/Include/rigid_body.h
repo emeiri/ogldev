@@ -59,8 +59,7 @@ private:
     glm::vec3 m_angularVelocity;
     glm::vec3 m_torqueAccum;
 
-    glm::mat3 m_inertiaBody;
-    glm::mat3 m_inertiaBodyInv;
+    glm::mat3 m_inertiaLocalInv;
     glm::mat3 m_inertiaWorldInv;
 
     RIGID_BODY_SHAPE m_shape = RIGID_BODY_SHAPE_NONE;
