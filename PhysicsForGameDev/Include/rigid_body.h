@@ -47,9 +47,9 @@ public:
        
     void Update(float dt, UpdateListener pUpdateListener);
 
-private:
+    void ApplyForceAtPoint(const glm::vec3& Force, const glm::vec3& AtPoint);
 
-    void ApplyForceAtPoint(const glm::vec3& F, const glm::vec3& ForcePoint);
+private:    
 
     void UpdateInertiaWorldInv();
 
