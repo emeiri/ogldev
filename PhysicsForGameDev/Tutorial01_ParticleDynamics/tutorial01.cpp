@@ -31,7 +31,7 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-static void PhysicsUpdateListener(void* pObject, const glm::vec3& Pos)
+static void PhysicsUpdateListener(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation)
 {
     //GLM_PRINT_VEC3("", Pos);
     SceneObject* pSceneObject = (SceneObject*)pObject;
@@ -103,10 +103,10 @@ public:
         m_physicsSystem.Init(100, 0, PhysicsUpdateListener);
 
         m_pPointMass1 = m_physicsSystem.AllocPointMass();
-        m_pPointMass1->Init(5.0f, m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
+        m_pPointMass1->Init(5.0f, glm::vec3(0.0f), m_pCarSceneObject1->GetGLMPos(), glm::vec3(0.1f, 0.0f, 0.0f), m_pCarSceneObject1);
 
         m_pPointMass2 = m_physicsSystem.AllocPointMass();
-        m_pPointMass2->Init(1.0f, m_pCarSceneObject2->GetGLMPos(), Physics::GRAVITY, m_pCarSceneObject2);
+        m_pPointMass2->Init(1.0f, glm::vec3(0.0f), m_pCarSceneObject2->GetGLMPos(), Physics::GRAVITY, m_pCarSceneObject2);
 
         m_pRenderingSystem->Execute();
     }
