@@ -129,7 +129,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\PhysicsForGameDev\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\Include;$(ProjectDir)\..\..\..\Include\assimp5;$(ProjectDir)\..\..\..\PhysicsForGameDev\Include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
