@@ -75,8 +75,8 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
 
     UpdateInertiaWorldInv();
 
-    glm::vec3 alpha = m_inertiaWorldInv * m_torqueAccum;
-    m_angularVelocity += alpha * dt;
+    glm::vec3 AngularAccel = m_inertiaWorldInv * m_torqueAccum;
+    m_angularVelocity += AngularAccel * dt;
 
     glm::quat wq(0, m_angularVelocity.x, m_angularVelocity.y, m_angularVelocity.z);
     glm::quat qdot = 0.5f * (m_orientation * wq);
