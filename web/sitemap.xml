@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <!-- Homepage -->
+    <url>
+        <loc>https://ogldev.org/</loc>
+        <priority>1.0</priority>
+        <changefreq>weekly</changefreq>
+    </url>
+
+    <!-- Root-level pages -->
+    <url><loc>https://ogldev.org/instructions.html</loc></url>
+    <url><loc>https://ogldev.org/faq.html</loc></url>
+    <url><loc>https://ogldev.org/news.html</loc></url>
+    <url><loc>https://ogldev.org/books.html</loc></url>
+    <url><loc>https://ogldev.org/donate.html</loc></url>
+    <url><loc>https://ogldev.org/contact.html</loc></url>
+
+    <!-- Tutorials 01–10 -->
+    <url><loc>https://ogldev.org/tutorial01/tutorial01.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial02/tutorial02.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial03/tutorial03.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial04/tutorial04.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial05/tutorial05.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial06/tutorial06.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial07/tutorial07.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial08/tutorial08.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial09/tutorial09.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial10/tutorial10.html</loc></url>
+
+    <!-- Tutorials 11–20 -->
+    <url><loc>https://ogldev.org/tutorial11/tutorial11.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial12/tutorial12.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial13/tutorial13.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial14/tutorial14.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial15/tutorial15.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial16/tutorial16.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial17/tutorial17.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial18/tutorial18.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial19/tutorial19.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial20/tutorial20.html</loc></url>
+
+    <!-- Tutorials 21–30 -->
+    <url><loc>https://ogldev.org/tutorial21/tutorial21.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial22/tutorial22.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial23/tutorial23.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial24/tutorial24.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial25/tutorial25.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial26/tutorial26.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial27/tutorial27.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial28/tutorial28.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial29/tutorial29.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial30/tutorial30.html</loc></url>
+
+    <!-- Tutorials 31–40 -->
+    <url><loc>https://ogldev.org/tutorial31/tutorial31.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial32/tutorial32.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial33/tutorial33.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial34/tutorial34.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial35/tutorial35.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial36/tutorial36.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial37/tutorial37.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial38/tutorial38.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial39/tutorial39.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial40/tutorial40.html</loc></url>
+
+    <!-- Tutorials 41–53 -->
+    <url><loc>https://ogldev.org/tutorial41/tutorial41.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial42/tutorial42.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial43/tutorial43.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial44/tutorial44.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial45/tutorial45.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial46/tutorial46.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial47/tutorial47.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial48/tutorial48.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial49/tutorial49.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial50/tutorial50.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial51/tutorial51.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial52/tutorial52.html</loc></url>
+    <url><loc>https://ogldev.org/tutorial53/tutorial53.html</loc></url>
+
+</urlset>
