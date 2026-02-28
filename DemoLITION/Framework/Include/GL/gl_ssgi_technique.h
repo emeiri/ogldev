@@ -40,12 +40,12 @@ private:
 
     GLuint m_dummyVAO;
 
-    DEF_LOC(m_albedoSamplerLoc);
-    DEF_LOC(m_normalSamplerLoc);
-    DEF_LOC(m_depthSamplerLoc);
-    DEF_LOC(m_projLoc);
-    DEF_LOC(m_invProjLoc);
-    DEF_LOC(m_viewLoc);
+    DEF_LOC_OLD(m_albedoSamplerLoc);
+    DEF_LOC_OLD(m_normalSamplerLoc);
+    DEF_LOC_OLD(m_depthSamplerLoc);
+    DEF_LOC_OLD(m_projLoc);
+    DEF_LOC_OLD(m_invProjLoc);
+    DEF_LOC_OLD(m_viewLoc);
 
 };
 

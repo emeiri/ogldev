@@ -63,6 +63,6 @@ private:
     loc = GetUniformLocation(name);         
 #endif
 
-#define DEF_LOC(name) GLuint name = INVALID_UNIFORM_LOCATION
+#define DEF_LOC_OLD(name) GLuint name = INVALID_UNIFORM_LOCATION
 
 

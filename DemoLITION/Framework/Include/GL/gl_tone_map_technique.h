@@ -45,10 +45,10 @@ private:
 
     GLuint m_dummyVAO;
 
-    DEF_LOC(m_avgLumLoc);
-    DEF_LOC(m_hdrSamplerLoc);
-    DEF_LOC(m_exposure);
-    DEF_LOC(m_methodTypeLoc);
-    DEF_LOC(m_enableGammaLoc);
+    DEF_LOC_OLD(m_avgLumLoc);
+    DEF_LOC_OLD(m_hdrSamplerLoc);
+    DEF_LOC_OLD(m_exposure);
+    DEF_LOC_OLD(m_methodTypeLoc);
+    DEF_LOC_OLD(m_enableGammaLoc);
 };
 

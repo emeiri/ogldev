@@ -62,22 +62,22 @@ protected:
 
 private:
 
-    DEF_LOC(m_aoUnitLoc);
-    DEF_LOC(m_emissiveUnitLoc);
-    DEF_LOC(m_albedoUnitLoc);
-    DEF_LOC(m_roughnessUnitLoc);
-    DEF_LOC(m_normalUnitLoc);
-    DEF_LOC(m_envmapUnitLoc);
-    DEF_LOC(m_brdfLUTUnitLoc);
-    DEF_LOC(m_irradianceUnitLoc);
-    DEF_LOC(m_baseColorLoc);
-    DEF_LOC(m_emissiveColorLoc);
-    DEF_LOC(m_metallicRoughnessNormalOcclusionLoc);
-    DEF_LOC(m_clearCoatLoc);
-    DEF_LOC(m_clearCoatRoughnessLoc);
-    DEF_LOC(m_clearCoatNormalLoc);
-    DEF_LOC(m_clearCoatTransmissionThicknessLoc);
-    DEF_LOC(m_iorLoc);
-    DEF_LOC(m_materialTypeLoc);
+    DEF_LOC_OLD(m_aoUnitLoc);
+    DEF_LOC_OLD(m_emissiveUnitLoc);
+    DEF_LOC_OLD(m_albedoUnitLoc);
+    DEF_LOC_OLD(m_roughnessUnitLoc);
+    DEF_LOC_OLD(m_normalUnitLoc);
+    DEF_LOC_OLD(m_envmapUnitLoc);
+    DEF_LOC_OLD(m_brdfLUTUnitLoc);
+    DEF_LOC_OLD(m_irradianceUnitLoc);
+    DEF_LOC_OLD(m_baseColorLoc);
+    DEF_LOC_OLD(m_emissiveColorLoc);
+    DEF_LOC_OLD(m_metallicRoughnessNormalOcclusionLoc);
+    DEF_LOC_OLD(m_clearCoatLoc);
+    DEF_LOC_OLD(m_clearCoatRoughnessLoc);
+    DEF_LOC_OLD(m_clearCoatNormalLoc);
+    DEF_LOC_OLD(m_clearCoatTransmissionThicknessLoc);
+    DEF_LOC_OLD(m_iorLoc);
+    DEF_LOC_OLD(m_materialTypeLoc);
 };
 

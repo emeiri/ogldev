@@ -39,11 +39,11 @@ class GeometryTechnique : public Technique
 
  private:
 
-    DEF_LOC(m_WVPLoc);
-    DEF_LOC(m_normalMatrixLoc);
-    DEF_LOC(m_VPLoc);
-    DEF_LOC(m_isIndirectRenderLoc);
-    DEF_LOC(m_isPVPLoc);
-    DEF_LOC(m_albedoSamplerLoc);
+    DEF_LOC_OLD(m_WVPLoc);
+    DEF_LOC_OLD(m_normalMatrixLoc);
+    DEF_LOC_OLD(m_VPLoc);
+    DEF_LOC_OLD(m_isIndirectRenderLoc);
+    DEF_LOC_OLD(m_isPVPLoc);
+    DEF_LOC_OLD(m_albedoSamplerLoc);
 };
 
