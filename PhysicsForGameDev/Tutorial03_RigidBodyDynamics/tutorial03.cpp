@@ -31,13 +31,20 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
+bool reset = false;
+
 static void PhysicsUpdateListener(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation)
 {
   //  GLM_PRINT_VEC3("", Pos);
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
-    pSceneObject->SetPosition(Pos);
-    pSceneObject->SetQuaternion(Orientation);
+    if (Pos.y >= 3.0f) {
+    	pSceneObject->SetPosition(Pos);
+	    pSceneObject->SetQuaternion(Orientation);		
+    } else {
+        pSceneObject->SetPosition(0.0f, 3.0f, 0.0);
+        reset = true;
+    }
 }
 
 
@@ -66,28 +73,30 @@ public:
 
         m_pScene->GetDirLights().push_back(m_dirLight);
   
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/futuristic-cyberpunk-axe/source/model.glb");
         
        // m_pScene->GetConfig()->ControlSkybox(true);
        // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
 
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pSceneObject->SetPosition(-10.0f, 1.0f, 15.0);
+        m_pSceneObject->SetPosition(0.0f, 3.0f, 0.0);
         m_pScene->AddToRenderList(m_pSceneObject);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 5.0f, -15.0f), Vector3f(0.0f, -0.1f, 1.0f));
+        m_pScene->SetCamera(Vector3f(-13.0f, 12.0f, -20.0f), Vector3f(0.85f, -0.2f, 0.5f));
 
         m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
-        glm::vec3 ForceVec(1.0f, 0.0f, 0.0f);
-        glm::vec3 ForcePoint(0.0f, 10.0f, 0.0f);
+        glm::vec3 ForceVec(glm::vec3(200.0f, 150.0f, 0.0f));
+        glm::vec3 ForcePoint(0.0f, 4.0f, 0.0f);
         glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
         m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
         float Width = 2.0f;
         float Height = 2.0f;
         float Depth = 2.0f;
         m_pRigidBody->SetShapeBox(Width, Height, Depth);
+        m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
 
         m_pRenderingSystem->Execute();
     }
@@ -98,6 +107,23 @@ public:
         m_physicsSystem.Update((int)DeltaTimeMillis);
 
         m_frameCount++;
+        
+        if (m_frameCount > 5) {
+            m_pRigidBody->ResetSumForces();
+            m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
+        }
+		
+  	    if (reset) {
+            reset = false;
+            m_frameCount = 0;
+            glm::vec3 ForcePoint(0.0f, 4.0f, 0.0f);
+            glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
+            m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), 
+                glm::vec3(RandomFloatRange(150.0f, 250.f),
+                          RandomFloatRange(100.0f, 200.0f), 
+                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, m_pSceneObject);
+            m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
+        }
     }
 
 
