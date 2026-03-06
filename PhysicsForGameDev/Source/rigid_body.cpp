@@ -1,4 +1,4 @@
-/*
+﻿/*
 
         Copyright 2026 Etay Meiri
 
@@ -25,16 +25,42 @@
 
 namespace Physics {
 
-void RigidBody::Init(float Mass, 
-                     const glm::vec3& CenterOfMass,
-                     const glm::vec3& StartPos, 
-                     const glm::vec3& ForceVec, 
-                     const glm::vec3& ForcePoint,
+void RigidBody::Init(float Mass,
+                     const glm::vec3& CenterOfMassLocal,
+                     const glm::vec3& StartPosWorld,
+                     const glm::vec3& ForceVecWorld,
+                     const glm::vec3& ForcePointLocal,
                      void* pTarget)
 {
-    m_linear.Init(Mass, CenterOfMass, StartPos, ForceVec, pTarget);    
+    m_orientation = glm::quat(1, 0, 0, 0);
+	m_angularVelocity = glm::vec3(0);
+	m_torqueAccum = glm::vec3(0);
 
-    ApplyForceAtPoint(ForceVec, ForcePoint);
+    m_linear.Init(Mass, CenterOfMassLocal, StartPosWorld, ForceVecWorld, pTarget);
+
+    ApplyForceAtPoint(ForceVecWorld, ForcePointLocal);
+}
+
+
+void RigidBody::ApplyForceAtPoint(const glm::vec3& ForceWorld,
+                                  const glm::vec3& PointLocal)
+{
+    glm::vec3 PointWorld = LocalToWorld(PointLocal);
+
+    glm::vec3 CenterOfMassWorld = LocalToWorld(m_linear.GetCenterOfMass());
+
+    // Lever arm in world space
+    glm::vec3 Radius = PointWorld - CenterOfMassWorld;
+
+    // Torque in world space
+    m_torqueAccum += glm::cross(Radius, ForceWorld);
+}
+
+
+glm::vec3 RigidBody::LocalToWorld(const glm::vec3& p) const
+{
+    glm::mat3 R = glm::toMat3(m_orientation);
+    return R * p + m_linear.GetPos();
 }
 
 
@@ -48,19 +74,12 @@ void RigidBody::SetShapeBox(float Width, float Height, float Depth)
     float MassDiv12 = 1.0f / 12.0f * m_linear.GetMass();
 
     glm::mat3 InertiaLocal = glm::mat3(
-        MassDiv12 * (hh + dd), 0,                     0,
-        0,                     MassDiv12 * (ww + dd), 0,
-        0,                     0,                     MassDiv12 * (ww + hh)
+        MassDiv12 * (hh + dd), 0, 0,
+        0, MassDiv12 * (ww + dd), 0,
+        0, 0, MassDiv12 * (ww + hh)
     );
 
     m_inertiaLocalInv = glm::inverse(InertiaLocal);
-}
-
-
-void RigidBody::ApplyForceAtPoint(const glm::vec3& Force, const glm::vec3& AtPoint)
-{
-    glm::vec3 Radius = AtPoint - m_linear.GetCenterOfMass();
-    m_torqueAccum += glm::cross(Radius, Force);
 }
 
 
@@ -88,19 +107,24 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
         m_torqueAccum = glm::vec3(0);
     }
 
-    //GLM_PRINT_QUAT("Orientation: ", m_orientation);
-
     if (pUpdateListener) {
         pUpdateListener(m_linear.GetTarget(), m_linear.GetPos(), m_orientation);
     }
 }
 
 
-void RigidBody::UpdateInertiaWorldInv() 
+void RigidBody::UpdateInertiaWorldInv()
 {
     glm::mat3 R = glm::toMat3(m_orientation);
     m_inertiaWorldInv = R * m_inertiaLocalInv * glm::transpose(R);
 }
 
+
+void RigidBody::ResetSumForces()
+{
+	m_linear.ResetSumForces();
+	m_torqueAccum = glm::vec3(0);
 }
 
+
+}

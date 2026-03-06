@@ -49,9 +49,14 @@ public:
 
     void ApplyForceAtPoint(const glm::vec3& Force, const glm::vec3& AtPoint);
 
+    void ResetSumForces();
+
+    void AddForce(const glm::vec3& Force) { m_linear.AddForce(Force); }
+
 private:    
 
     void UpdateInertiaWorldInv();
+    glm::vec3 LocalToWorld(const glm::vec3& p) const;
 
     PointMass m_linear;        // handles mass, position, velocity, forces
 

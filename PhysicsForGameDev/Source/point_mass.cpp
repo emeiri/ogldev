@@ -22,6 +22,8 @@
 #include "point_mass.h"
 #include "ogldev_util.h"
 
+#define GLM_PRINT_VEC3(s, v) printf("%s (%f,%f,%f)\n", s, v.x, v.y, v.z)
+
 namespace Physics {
 
 void PointMass::Init(float Mass, const glm::vec3& CenterOfMass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
@@ -52,6 +54,10 @@ void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
         glm::quat t(0.0f, 0.0f, 0.0f, 0.0f);
         (*pUpdateListener)(m_pTarget, m_pos, t);
     }
+
+	if (DeltaTime > 0.0f) {
+		m_sumForces = glm::vec3(0.0f);
+	}
 }
 
 void PointMass::SetBoundingRadius(float r)

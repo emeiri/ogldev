@@ -34,17 +34,18 @@
 bool reset = false;
 
 static void PhysicsUpdateListener(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation)
-{
-  //  GLM_PRINT_VEC3("", Pos);
+{    
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
-    if (Pos.y >= 3.0f) {
-    	pSceneObject->SetPosition(Pos);
-	    pSceneObject->SetQuaternion(Orientation);		
-    } else {
+   // GLM_PRINT_VEC3("", Pos);
+
+    if (Pos.y <= 0.0) {
         pSceneObject->SetPosition(0.0f, 3.0f, 0.0);
         reset = true;
-    }
+    } else {
+    	pSceneObject->SetPosition(Pos);
+	    pSceneObject->SetQuaternion(Orientation);		
+    } 
 }
 
 
@@ -88,15 +89,14 @@ public:
         m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
-        glm::vec3 ForceVec(glm::vec3(200.0f, 150.0f, 0.0f));
-        glm::vec3 ForcePoint(0.0f, 4.0f, 0.0f);
+        glm::vec3 ForceVec(glm::vec3(800.0f, 800.0f, 0.0f));
+        glm::vec3 ForcePoint(0.0f, 1.0f, 0.0f);
         glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
         m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
         float Width = 2.0f;
         float Height = 2.0f;
         float Depth = 2.0f;
         m_pRigidBody->SetShapeBox(Width, Height, Depth);
-        m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
 
         m_pRenderingSystem->Execute();
     }
@@ -104,25 +104,18 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {  
-        m_physicsSystem.Update((int)DeltaTimeMillis);
+        m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
 
-        m_frameCount++;
-        
-        if (m_frameCount > 5) {
-            m_pRigidBody->ResetSumForces();
-            m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
-        }
-		
+        m_physicsSystem.Update((int)DeltaTimeMillis);
+      
   	    if (reset) {
             reset = false;
-            m_frameCount = 0;
-            glm::vec3 ForcePoint(0.0f, 4.0f, 0.0f);
+            glm::vec3 ForcePoint(0.0f, 1.0f, 0.0f);
             glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
             m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), 
-                glm::vec3(RandomFloatRange(150.0f, 250.f),
-                          RandomFloatRange(100.0f, 200.0f), 
-                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, m_pSceneObject);
-            m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
+                glm::vec3(RandomFloatRange(700.0f, 900.f),
+                          RandomFloatRange(700.0f, 900.0f), 
+                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, m_pSceneObject);            
         }
     }
 
@@ -171,7 +164,6 @@ private:
     SceneObject* m_pSceneObject = NULL;
     Physics::System m_physicsSystem;
     Physics::RigidBody* m_pRigidBody = NULL;
-    int m_frameCount = 0;
 };
 
 
