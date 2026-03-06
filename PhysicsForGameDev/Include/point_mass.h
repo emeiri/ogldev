@@ -44,7 +44,7 @@ public:
 
     void HandleCollisionElastic(Physics::PointMass& OtherParticle, float AvgCoeffRest);
 
-    void SetForce(const glm::vec3& F) { m_sumForces = F; }
+    void AddForce(const glm::vec3& Force) { m_sumForces += Force; }
 
     const glm::vec3& GetCenterOfMass() const { return m_centerOfMass; }
 
