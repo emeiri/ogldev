@@ -430,6 +430,8 @@ private:
 
 		m_model.Update(ImageIndex, WVP);
 
+		glm::vec4 AmbientLight = glm::vec4(0.1f);
+		m_pipeline.UpdateUniformBuffers(ImageIndex, AmbientLight);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}

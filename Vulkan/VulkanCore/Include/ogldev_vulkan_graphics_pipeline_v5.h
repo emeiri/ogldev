@@ -21,6 +21,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 #include "ogldev_types.h"
 #include "ogldev_vulkan_core.h"
 #include "Int/model_desc.h"
@@ -36,12 +39,21 @@ public:
 
 	GraphicsPipelineV5() {}
 
-    void UpdateDescriptorSets(const ModelDesc& ModelDesc,
-							  std::vector<VkDescriptorSet>& DescriptorSets);	
+	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename);
+
+	virtual void Destroy();
+
+    void UpdateDescriptorSets(const ModelDesc& ModelDesc, std::vector<VkDescriptorSet>& DescriptorSets);	
+
+	void UpdateUniformBuffers(int ImageIndex, const glm::vec4& AmbientLight);
 
 protected:
 
 	VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
+
+private:
+
+	std::vector<BufferAndMemory> m_uniformBuffers;
 };
 
 }

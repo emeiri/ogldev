@@ -37,6 +37,28 @@ enum V5_Binding {
 	V5_NumBindings = 6
 };
 
+struct UniformData {
+	glm::vec4 AmbientLight;
+};
+
+
+void GraphicsPipelineV5::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename)
+{
+	GraphicsPipeline::Init(vkCore, DescPool, pVSFilename, pFSFilename);
+
+	m_uniformBuffers = vkCore.CreateUniformBuffers(sizeof(UniformData));
+}
+
+
+void GraphicsPipelineV5::Destroy()
+{
+	GraphicsPipeline::Destroy();
+
+	for (int i = 0; i < m_uniformBuffers.size(); i++) {
+		m_uniformBuffers[i].Destroy(m_device);
+	}
+}
+
 
 VkDescriptorSetLayout GraphicsPipelineV5::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 {
@@ -91,16 +113,20 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 {
 	assert(DescriptorSets.size() != 0);
 
-	int NumBindings = V5_NumBindings;
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescriptorSets.size());
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size() * NumBindings);
+	for (int i = 0; i < (int)BufferInfoUniformsVS.size(); i++) {
+		BufferInfoUniformsVS[i].buffer = ModelDesc.m_uniforms[i];
+		BufferInfoUniformsVS[i].offset = 0;
+		BufferInfoUniformsVS[i].range = VK_WHOLE_SIZE;
+	}
 
-	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(DescriptorSets.size());
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsFS(DescriptorSets.size());
 
-	for (int i = 0; i < (int)BufferInfo_Uniforms.size(); i++) {
-		BufferInfo_Uniforms[i].buffer = ModelDesc.m_uniforms[i];
-		BufferInfo_Uniforms[i].offset = 0;
-		BufferInfo_Uniforms[i].range = VK_WHOLE_SIZE;
+	for (int i = 0; i < (int)BufferInfoUniformsFS.size(); i++) {
+		BufferInfoUniformsFS[i].buffer = m_uniformBuffers[i].m_buffer;
+		BufferInfoUniformsFS[i].offset = 0;
+		BufferInfoUniformsFS[i].range = VK_WHOLE_SIZE;
 	}
 
 	u32 TextureCount = (u32)ModelDesc.m_materials.size();
@@ -130,6 +156,8 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		.offset = 0,
 		.range = VK_WHOLE_SIZE
 	};
+
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size() * V5_NumBindings);
 
 	u32 WdsIndex = 0;
 
@@ -185,7 +213,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pBufferInfo = &BufferInfo_Uniforms[i]
+			.pBufferInfo = &BufferInfoUniformsVS[i]
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());
@@ -214,7 +242,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pBufferInfo = &BufferInfo_Uniforms[i]
+			.pBufferInfo = &BufferInfoUniformsFS[i]
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());
@@ -222,6 +250,15 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 	}
 
 	vkUpdateDescriptorSets(m_device, WdsIndex, WriteDescriptorSet.data(), 0, NULL);
+}
+
+void GraphicsPipelineV5::UpdateUniformBuffers(int ImageIndex, const glm::vec4& AmbientLight)
+{
+	UniformData UboData = {
+		.AmbientLight = AmbientLight
+	};
+
+	m_uniformBuffers[ImageIndex].Update(m_device, &UboData, sizeof(UboData));
 }
 
 
