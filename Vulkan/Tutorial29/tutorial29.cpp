@@ -39,7 +39,7 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_graphics_pipeline_v4.h"
+#include "ogldev_vulkan_graphics_pipeline_v5.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
 #include "ogldev_vulkan_skybox.h"
@@ -281,7 +281,7 @@ private:
 		pd.IsTex2D = true;
 		pd.IsUniform = true;
 
-		m_pPipeline = new OgldevVK::GraphicsPipelineV4(pd);
+		m_pPipeline = new OgldevVK::GraphicsPipelineV5(pd);
 	}
 
 
@@ -308,7 +308,7 @@ private:
 			BeginRendering(CmdBuf, i);
 		
 			m_pPipeline->Bind(CmdBuf);
-			m_model.RecordCommandBufferIndirect(CmdBuf, *m_pPipeline, i);
+			m_model.RecordCommandBufferIndirect(CmdBuf, m_pPipeline->GetPipelineLayout(), i);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -414,24 +414,15 @@ private:
 	{		
 		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
 
-		glm::mat4 rotX = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.x), glm::vec3(1, 0, 0));
-		glm::mat4 rotY = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.y), glm::vec3(0, 1, 0));
-		glm::mat4 rotZ = glm::rotate(glm::mat4(1.0f), glm::radians(m_rotation.z), glm::vec3(0, 0, 1));
-		glm::mat4 Rotate = rotX * rotY * rotZ;
-		glm::mat4 Rotate2 = glm::rotate(Rotate, glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
+		glm::mat4 Rotate = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
 
 		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-		glm::mat4 WVP = VP * Translate * Rotate2 * Scale;
+		glm::mat4 WVP = VP * Translate * Rotate * Scale;
 
 		m_model.Update(ImageIndex, WVP);
-
-		/*static float foo = 0.0f;
-		foo += 0.000075f;
-		glm::vec3 r(sinf(foo), sinf(foo) * 0.4f, cosf(foo));
-		m_pGameCamera->SetTarget(r);*/
 
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
@@ -449,7 +440,7 @@ private:
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV4* m_pPipeline = NULL;	
+	OgldevVK::GraphicsPipelineV5* m_pPipeline = NULL;	
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
@@ -461,6 +452,7 @@ private:
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
+	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 };
 
 

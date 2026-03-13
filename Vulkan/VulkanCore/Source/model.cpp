@@ -255,6 +255,21 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 }
 
 
+void VkModel::CreateDescriptorSets(GraphicsPipelineV5& Pipeline)
+{
+	assert(m_isDescriptorIndexing);
+
+	m_descriptorSets.resize(1);
+	Pipeline.AllocateDescriptorSets(m_descriptorSets[0]);
+
+	ModelDesc md;
+
+	UpdateModelDesc(md);
+
+	Pipeline.UpdateDescriptorSets(md, m_descriptorSets[0]);
+}
+
+
 void VkModel::UpdateModelDesc(ModelDesc& md)
 {
 	md.m_vb = m_vb.m_buffer;

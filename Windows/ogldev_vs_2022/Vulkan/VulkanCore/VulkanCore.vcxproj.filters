@@ -144,6 +144,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\Pipelines\texgen_pipeline.cpp">
       <Filter>Source Files\Vulkan\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\VulkanCore\Source\graphics_pipeline_v5.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_core.h">
@@ -238,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\Pipelines\ogldev_vulkan_texgen_pipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\VulkanCore\Include\ogldev_vulkan_graphics_pipeline_v5.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
