@@ -69,7 +69,7 @@ protected:
 
 	virtual void DestroyTexture(Texture* pTexture);
 
-	virtual void InitGeometryPost() { /* Nothing to do here */ }
+	virtual void InitGeometryPost();
 
 	virtual void PopulateBuffersSkinned(std::vector<SkinnedVertex>& Vertices) { assert(0); }
 
@@ -96,6 +96,7 @@ private:
 	std::vector<BufferAndMemory> m_uniformBuffers;
 	std::vector<std::vector<VkDescriptorSet>> m_descriptorSets;
 	VkDescriptorSet m_texturesDescriptorSet = NULL;
+	std::vector<glm::mat4> m_transformations;
 
 	size_t m_vertexSize = 0;	// sizeof(Vertex) OR sizeof(SkinnedVertex)
 
