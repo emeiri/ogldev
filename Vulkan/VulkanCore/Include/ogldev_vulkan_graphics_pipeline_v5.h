@@ -34,7 +34,7 @@ class GraphicsPipelineV5 : public GraphicsPipeline {
 
 public:
 
-	GraphicsPipelineV5() {};
+	GraphicsPipelineV5() {}
 
     void UpdateDescriptorSets(const ModelDesc& ModelDesc,
 							  std::vector<VkDescriptorSet>& DescriptorSets);	

@@ -27,13 +27,14 @@ namespace OgldevVK {
 
 const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
 
-enum V4_Binding {
-	V4_BindingVB = 0,
-	V4_BindingIB = 1,
-	V4_BindingTexture2D = 2,
-	V4_BindingUniform = 3,
-	V4_BindingMetaData = 4,
-	V4_NumBindings = 5
+enum V5_Binding {
+	V5_BindingVB = 0,
+	V5_BindingIB = 1,
+	V5_BindingTexture2D = 2,
+	V5_BindingUniformVS = 3,
+	V5_BindingMetaData = 4,
+	V5_BindingUniformFS = 5,
+	V5_NumBindings = 6
 };
 
 
@@ -41,34 +42,40 @@ VkDescriptorSetLayout GraphicsPipelineV5::CreateDescSetLayout(OgldevVK::VulkanCo
 {
 	std::vector<VkDescriptorSetLayoutBinding> Bindings{
 		{.
-		     binding = V4_BindingVB,
+		     binding = V5_BindingVB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V4_BindingIB,
+			.binding = V5_BindingIB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V4_BindingTexture2D,
+			.binding = V5_BindingTexture2D,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = MAX_TEXTURES,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V4_BindingUniform,
+			.binding = V5_BindingUniformVS,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V4_BindingMetaData,
+			.binding = V5_BindingMetaData,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+			.pImmutableSamplers = NULL
+		}, {
+			.binding = V5_BindingUniformFS,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = 1,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}
 	};
@@ -84,7 +91,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 {
 	assert(DescriptorSets.size() != 0);
 
-	int NumBindings = V4_NumBindings;
+	int NumBindings = V5_NumBindings;
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size() * NumBindings);
 
@@ -132,7 +139,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V4_BindingVB,
+			.dstBinding = V5_BindingVB,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -145,7 +152,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V4_BindingIB,
+			.dstBinding = V5_BindingIB,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -159,7 +166,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.pNext = NULL,
 			.dstSet = DstSet,
-			.dstBinding = V4_BindingTexture2D,
+			.dstBinding = V5_BindingTexture2D,
 			.dstArrayElement = 0,
 			.descriptorCount = TextureCount,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -174,7 +181,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V4_BindingUniform,
+			.dstBinding = V5_BindingUniformVS,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -188,13 +195,26 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.pNext = NULL,
 			.dstSet = DstSet,
-			.dstBinding = V4_BindingMetaData,
+			.dstBinding = V5_BindingMetaData,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.pImageInfo = NULL,
 			.pBufferInfo = &MetaDataBufferInfo,
 			.pTexelBufferView = NULL
+		};
+
+		assert(WdsIndex < WriteDescriptorSet.size());
+		WriteDescriptorSet[WdsIndex++] = wds;
+
+		wds = {
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = DstSet,
+			.dstBinding = V5_BindingUniformFS,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pBufferInfo = &BufferInfo_Uniforms[i]
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());
