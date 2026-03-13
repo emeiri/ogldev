@@ -49,15 +49,17 @@ public:
 
 	void CreateDescriptorSets(GraphicsPipelineV4& Pipeline);
 
-	void CreateDescriptorSets(GraphicsPipelineV5& Pipeline);
-
 	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV2& pPipeline, int ImageIndex);
 
 	void RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& pPipeline, int ImageIndex);
 
 	void RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, VkPipelineLayout PipelineLayout, int ImageIndex);
 
+	void RecordCommandBufferIndirect(VkCommandBuffer CmdBuf);
+
 	void Update(int ImageIndex, const glm::mat4& Transformation);
+
+	void UpdateModelDesc(ModelDesc& md);
 
 protected:
 
@@ -73,8 +75,7 @@ protected:
 
 	virtual void PopulateBuffers(std::vector<Vertex>& Vertices);
 
-private:
-	void UpdateModelDesc(ModelDesc& md);
+private:	
 
 	void UpdateAlignedMeshesArray();
 

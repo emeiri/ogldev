@@ -255,21 +255,6 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV4& Pipeline)
 }
 
 
-void VkModel::CreateDescriptorSets(GraphicsPipelineV5& Pipeline)
-{
-	assert(m_isDescriptorIndexing);
-
-	m_descriptorSets.resize(1);
-	Pipeline.AllocDescSets(m_pVulkanCore->GetNumImages(), m_descriptorSets[0]);
-
-	ModelDesc md;
-
-	UpdateModelDesc(md);
-
-	Pipeline.UpdateDescriptorSets(md, m_descriptorSets[0]);
-}
-
-
 void VkModel::UpdateModelDesc(ModelDesc& md)
 {
 	md.m_vb = m_vb.m_buffer;
@@ -399,11 +384,17 @@ void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, VkPipelineLayo
 		0,	    // dynamicOffsetCount
 		NULL);	// pDynamicOffsets
 
+	RecordCommandBufferIndirect(CmdBuf);
+}
+
+
+void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf)
+{
 	vkCmdDrawIndirect(CmdBuf,
-					m_indirectBuffer.m_buffer, 
-					0,  // offset inside the indirect buffer            
-					(u32)m_Meshes.size(), // number of VkDrawIndirectCommand elements
-					sizeof(VkDrawIndirectCommand)); // stride between VkDrawIndirectCommand elements
+					  m_indirectBuffer.m_buffer,
+					  0,  // offset inside the indirect buffer            
+					  (u32)m_Meshes.size(), // number of VkDrawIndirectCommand elements
+					  sizeof(VkDrawIndirectCommand)); // stride between VkDrawIndirectCommand elements
 }
 
 

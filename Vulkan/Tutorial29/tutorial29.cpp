@@ -45,6 +45,7 @@
 #include "ogldev_vulkan_skybox.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
+#include "Int/model_desc.h"
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
@@ -282,13 +283,18 @@ private:
 	void CreatePipeline()
 	{	
 		m_pipeline.Init(m_vkCore, m_descPool, "test.vert", "test.frag");
+		m_pipeline.AllocDescSets(m_numImages, m_descSets);
+
+		OgldevVK::ModelDesc md;
+
+		m_model.UpdateModelDesc(md);
+
+		m_pipeline.UpdateDescriptorSets(md, m_descSets);
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		m_model.CreateDescriptorSets(m_pipeline);
-
 		RecordCommandBuffersInternal(true, m_cmdBufs.WithoutGUI);
 
 		RecordCommandBuffersInternal(false, m_cmdBufs.WithGUI);
@@ -307,8 +313,8 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pipeline.Bind(CmdBuf);
-			m_model.RecordCommandBufferIndirect(CmdBuf, m_pipeline.GetPipelineLayout(), i);
+			m_pipeline.Bind(CmdBuf, m_descSets[i]);
+			m_model.RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -442,6 +448,7 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV5 m_pipeline;
+	std::vector<VkDescriptorSet> m_descSets;
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
