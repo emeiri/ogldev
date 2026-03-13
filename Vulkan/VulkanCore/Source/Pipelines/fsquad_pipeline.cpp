@@ -32,7 +32,9 @@ VkDescriptorSetLayout FullScreenQuadPipeline::CreateDescSetLayout(OgldevVK::Vulk
 		.pImmutableSamplers = NULL
 	};
 
-	return vkCore.CreateDescSetLayout({ Binding });
+	VkDescriptorSetLayout l = vkCore.CreateDescSetLayout({ Binding });
+
+	return l;
 }
 
 

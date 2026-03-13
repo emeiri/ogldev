@@ -68,7 +68,8 @@ public:
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 
-		delete m_pPipeline;
+		m_pipeline.Destroy();
+		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
 			
 		m_model.Destroy();
 
@@ -86,6 +87,7 @@ public:
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
+		CreateDescriptorPool();
 		CreateMesh();
 		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipeline();
@@ -245,6 +247,17 @@ private:
 	}
 
 
+	void CreateDescriptorPool()
+	{
+		u32 TextureCount = 50;
+		u32 UniformBufferCount = 50;
+		u32 StorageBufferCount = 50;
+		u32 MaxSets = m_numImages * 2;	// Two pipeline programs
+
+		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+	}
+
+
 	void CreateMesh()
 	{
 		m_model.Init(&m_vkCore);
@@ -267,27 +280,14 @@ private:
 
 
 	void CreatePipeline()
-	{
-		OgldevVK::PipelineDesc pd;
-		pd.Device = m_device;
-		pd.pWindow = m_pWindow;
-		pd.vs = m_vs;
-		pd.fs = m_fs;
-		pd.NumImages = m_numImages;
-		pd.ColorFormat = m_vkCore.GetSwapChainFormat();
-		pd.DepthFormat = m_vkCore.GetDepthFormat();
-		pd.IsIB = true;
-		pd.IsVB = true;
-		pd.IsTex2D = true;
-		pd.IsUniform = true;
-
-		m_pPipeline = new OgldevVK::GraphicsPipelineV5(pd);
+	{	
+		m_pipeline.Init(m_vkCore, m_descPool, "test.vert", "test.frag");
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		m_model.CreateDescriptorSets(*m_pPipeline);
+		m_model.CreateDescriptorSets(m_pipeline);
 
 		RecordCommandBuffersInternal(true, m_cmdBufs.WithoutGUI);
 
@@ -307,8 +307,8 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pPipeline->Bind(CmdBuf);
-			m_model.RecordCommandBufferIndirect(CmdBuf, m_pPipeline->GetPipelineLayout(), i);
+			m_pipeline.Bind(CmdBuf);
+			m_model.RecordCommandBufferIndirect(CmdBuf, m_pipeline.GetPipelineLayout(), i);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -430,6 +430,7 @@ private:
 
 	GLFWwindow* m_pWindow = NULL;
 	OgldevVK::VulkanCore m_vkCore;
+	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
@@ -440,7 +441,7 @@ private:
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV5* m_pPipeline = NULL;	
+	OgldevVK::GraphicsPipelineV5 m_pipeline;
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;

@@ -28,6 +28,8 @@ layout(location = 0) out vec4 out_Color;
 
 layout(set = 0, binding = 2) uniform sampler2D Textures[];
 
+//layout(set = 0, binding = 4) readonly uniform UniformBuffer { vec4 AmbientLight; } ubo;
+
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
      return texture(Textures[nonuniformEXT(MaterialIndex)], uv);
@@ -36,5 +38,5 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 
 void main() 
 {
-    out_Color = TextureBindless2D(MaterialIndex, texCoord);
+   out_Color = TextureBindless2D(MaterialIndex, texCoord);
 }

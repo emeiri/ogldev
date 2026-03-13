@@ -32,7 +32,11 @@ public:
 
 	void Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet);
 
+	void Bind(VkCommandBuffer CmdBuf);
+
 	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets);
+
+	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
 
 protected:
 

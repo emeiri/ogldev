@@ -260,7 +260,7 @@ void VkModel::CreateDescriptorSets(GraphicsPipelineV5& Pipeline)
 	assert(m_isDescriptorIndexing);
 
 	m_descriptorSets.resize(1);
-	Pipeline.AllocateDescriptorSets(m_descriptorSets[0]);
+	Pipeline.AllocDescSets(m_pVulkanCore->GetNumImages(), m_descriptorSets[0]);
 
 	ModelDesc md;
 

@@ -62,6 +62,12 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
 }
 
 
+void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf)
+{
+	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+}
+
+
 void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets)
 {
 	assert(DescriptorSets.size() == 0);
