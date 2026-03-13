@@ -254,11 +254,6 @@ private:
 	}
 
 
-	struct UniformData {
-		glm::mat4 WVP;
-	};
-
-
 	void CreateShaders()
 	{
 		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
