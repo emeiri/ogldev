@@ -596,7 +596,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial28", "Vulkan\Tutori
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial03_RigidBodyDynamics", "Physics3\Physics3.vcxproj", "{F8DABF06-DDC0-4AF1-A741-4A9E6FD99666}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial03_RigidBodyRotation", "Physics3\Physics3.vcxproj", "{F8DABF06-DDC0-4AF1-A741-4A9E6FD99666}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3AF5DFBE-8A5C-47D0-B421-1CB3E7C4A0E8} = {3AF5DFBE-8A5C-47D0-B421-1CB3E7C4A0E8}
 	EndProjectSection

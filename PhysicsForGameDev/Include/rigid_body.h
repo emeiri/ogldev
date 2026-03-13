@@ -34,22 +34,21 @@ enum RIGID_BODY_SHAPE {
 };
 
 class RigidBody {
+
 public:
 
     void Init(float Mass,
-              const glm::vec3& CenterOfMass,
-              const glm::vec3& StartPos,
-              const glm::vec3& ForceVec,
-              const glm::vec3& ForcePoint,
+              const glm::vec3& CenterOfMassLocal,
+              const glm::vec3& StartPosWorld,
+              const glm::vec3& ForceVecWorld,
+              const glm::vec3& ForcePointLocal,
               void* pTarget);
 
     void SetShapeBox(float Width, float Height, float Depth);
        
     void Update(float dt, UpdateListener pUpdateListener);
 
-    void ApplyForceAtPoint(const glm::vec3& Force, const glm::vec3& AtPoint);
-
-    void ResetSumForces();
+    void ApplyForceAtPoint(const glm::vec3& ForceWorld, const glm::vec3& PointLocal);
 
     void AddForce(const glm::vec3& Force) { m_linear.AddForce(Force); }
 
@@ -58,8 +57,10 @@ private:
     void UpdateInertiaWorldInv();
     glm::vec3 LocalToWorld(const glm::vec3& p) const;
 
-    PointMass m_linear;        // handles mass, position, velocity, forces
+	// Handles the translational motion of the rigid body
+    PointMass m_linear;
 
+    // Handles the rotational motion
     glm::quat m_orientation = glm::quat(1, 0, 0, 0);
     glm::vec3 m_angularVelocity;
     glm::vec3 m_torqueAccum;

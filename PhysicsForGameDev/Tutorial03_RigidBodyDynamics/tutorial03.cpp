@@ -33,7 +33,12 @@
 
 bool reset = false;
 
-static void PhysicsUpdateListener(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation)
+glm::vec3 ForcePoint(0.0f, 0.1f, 0.0f);
+glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
+
+static void PhysicsUpdateListener(const void* pObject, 
+                                  const glm::vec3& Pos, 
+                                  const glm::quat& Orientation)
 {    
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
@@ -75,7 +80,7 @@ public:
         m_pScene->GetDirLights().push_back(m_dirLight);
   
         //Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/futuristic-cyberpunk-axe/source/model.glb");
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/futuristic-cyberpunk-axe/source/model2.glb");
         
        // m_pScene->GetConfig()->ControlSkybox(true);
        // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
@@ -90,12 +95,10 @@ public:
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
         glm::vec3 ForceVec(glm::vec3(800.0f, 800.0f, 0.0f));
-        glm::vec3 ForcePoint(0.0f, 1.0f, 0.0f);
-        glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
         m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
-        float Width = 2.0f;
-        float Height = 2.0f;
-        float Depth = 2.0f;
+        float Width = 1.0f;
+        float Height = 2.25f;
+        float Depth = 0.3f;
         m_pRigidBody->SetShapeBox(Width, Height, Depth);
 
         m_pRenderingSystem->Execute();
@@ -110,12 +113,10 @@ public:
       
   	    if (reset) {
             reset = false;
-            glm::vec3 ForcePoint(0.0f, 1.0f, 0.0f);
-            glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
             m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), 
                 glm::vec3(RandomFloatRange(700.0f, 900.f),
                           RandomFloatRange(700.0f, 900.0f), 
-                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, m_pSceneObject);            
+                          RandomFloatRange(-20.0f, 20.0f)), ForcePoint, m_pSceneObject);            
         }
     }
 

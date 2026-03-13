@@ -50,10 +50,10 @@ void RigidBody::ApplyForceAtPoint(const glm::vec3& ForceWorld,
     glm::vec3 CenterOfMassWorld = LocalToWorld(m_linear.GetCenterOfMass());
 
     // Lever arm in world space
-    glm::vec3 Radius = PointWorld - CenterOfMassWorld;
+    glm::vec3 RadiusWorld = PointWorld - CenterOfMassWorld;
 
     // Torque in world space
-    m_torqueAccum += glm::cross(Radius, ForceWorld);
+    m_torqueAccum += glm::cross(RadiusWorld, ForceWorld);
 }
 
 
@@ -74,9 +74,9 @@ void RigidBody::SetShapeBox(float Width, float Height, float Depth)
     float MassDiv12 = 1.0f / 12.0f * m_linear.GetMass();
 
     glm::mat3 InertiaLocal = glm::mat3(
-        MassDiv12 * (hh + dd), 0, 0,
-        0, MassDiv12 * (ww + dd), 0,
-        0, 0, MassDiv12 * (ww + hh)
+        MassDiv12 * (hh + dd), 0,                     0,
+        0,                     MassDiv12 * (ww + dd), 0,
+        0,                     0,                     MassDiv12 * (ww + hh)
     );
 
     m_inertiaLocalInv = glm::inverse(InertiaLocal);
@@ -103,6 +103,11 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
     m_orientation += qdot * dt;
     m_orientation = glm::normalize(m_orientation);
 
+	// We reset the torque accumulator after the update. We cannot assume that the force 
+    // is still in effect in the next frame, so we need to reset it. We also need to reset 
+    // it after the first update, because the initial force is only applied once.
+	// The check for dt > 0 is to avoid resetting the torque accumulator before the 
+    // first update, which would cause the initial force to be ignored.
     if (dt > 0.0f) {
         m_torqueAccum = glm::vec3(0);
     }
@@ -117,13 +122,6 @@ void RigidBody::UpdateInertiaWorldInv()
 {
     glm::mat3 R = glm::toMat3(m_orientation);
     m_inertiaWorldInv = R * m_inertiaLocalInv * glm::transpose(R);
-}
-
-
-void RigidBody::ResetSumForces()
-{
-	m_linear.ResetSumForces();
-	m_torqueAccum = glm::vec3(0);
 }
 
 
