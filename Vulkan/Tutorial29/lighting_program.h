@@ -29,13 +29,6 @@
 #include "Int/model_desc.h"
 #include "ogldev_vulkan_pipeline_program.h"
 
-struct UniformDataVS {
-	glm::mat4 WVP;
-	glm::mat4 NormalMatrix;
-};
-
-#define MAX_NUM_MESHES (64 * 1024 / sizeof(UniformDataVS))
-
 namespace OgldevVK {
 
 enum LIGHTING_MODE {
@@ -56,6 +49,11 @@ public:
 		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
 		glm::vec4 LightDirection;    // .xyz = direction
 		glm::vec4 LightColor;        // .rgb = color, .w = intensity
+	};
+
+	struct UniformDataVS {
+		glm::mat4 WVP;
+		glm::mat4 NormalMatrix;
 	};
 
 	LightingProgram() {}

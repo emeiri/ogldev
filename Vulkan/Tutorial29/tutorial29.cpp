@@ -297,7 +297,12 @@ private:
 
 	void CreatePipeline()
 	{	
-		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(MAX_NUM_MESHES * sizeof(UniformDataVS));
+		size_t MaxUniformBufferSize = m_vkCore.GetMaxUniformBufferSize();
+		int MaxNumMeshes = (int)(MaxUniformBufferSize / sizeof(OgldevVK::LightingProgram::UniformDataVS));
+		assert(m_model.GetNumMeshes() <= MaxNumMeshes);
+
+		size_t UniformBufferSizeVS = m_model.GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
+		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
 		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
 
 		OgldevVK::ModelDesc md;
