@@ -29,6 +29,12 @@
 #include "Int/model_desc.h"
 #include "ogldev_vulkan_pipeline_program.h"
 
+struct UniformDataVS {
+	glm::mat4 WVP;
+	glm::mat4 NormalMatrix;
+};
+
+#define MAX_NUM_MESHES (64 * 1024 / sizeof(UniformDataVS))
 
 namespace OgldevVK {
 
@@ -41,6 +47,13 @@ enum LIGHTING_MODE {
 };
 
 
+struct UniformDataFS {
+	glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
+	glm::vec4 LightDirection;    // .xyz = direction
+	glm::vec4 LightColor;        // .rgb = color, .w = intensity
+};
+
+
 // This version support descriptor indexing and indirect rendering
 class GraphicsPipelineV5 : public GraphicsPipeline {
 
@@ -48,26 +61,29 @@ public:
 
 	GraphicsPipelineV5() {}
 
-	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs, LIGHTING_MODE LightingMode);
+	virtual void Init(VulkanCore& vkCore,
+		VkDescriptorPool DescPool,
+		VkShaderModule vs,
+		VkShaderModule fs,
+		LIGHTING_MODE LightingMode);
 
 	virtual void Destroy();
 
-    void UpdateDescriptorSets(const ModelDesc& ModelDesc, std::vector<VkDescriptorSet>& DescriptorSets);	
+	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
+							  const ModelDesc& ModelDesc,
+							  std::vector<BufferAndMemory>& UniformBuffersVS,
+							  std::vector<BufferAndMemory>& UniformBuffersFS);
 
 	void UpdateUniformBuffers(int ImageIndex,
 							  const glm::mat4& WVP,
 							  const glm::mat4& World,
 							  const std::vector<glm::mat4>& SubmeshTransformations,
-							  const glm::vec4& AmbientLight);
-
+							  const glm::vec4& AmbientLight,
+							  std::vector<BufferAndMemory>& UniformBuffersVS,
+							  std::vector<BufferAndMemory>& UniformBuffersFS);
 protected:
 
 	VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
-
-private:
-
-	std::vector<BufferAndMemory> m_uniformBuffersVS;
-	std::vector<BufferAndMemory> m_uniformBuffersFS;
 };
 
 }

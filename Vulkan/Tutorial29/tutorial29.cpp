@@ -64,8 +64,16 @@ public:
 
 	~VulkanApp()
 	{
-		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithGUI.size(), m_cmdBufs.WithGUI.data());
-		m_vkCore.FreeCommandBuffers((u32)m_cmdBufs.WithoutGUI.size(), m_cmdBufs.WithoutGUI.data());
+		for (CommandBuffersVecs& v : m_cmdBufs) {
+			m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
+			m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
+		}
+
+		for (int i = 0; i < m_uniformBuffersVS.size(); i++) {
+			m_uniformBuffersVS[i].Destroy(m_device);
+			m_uniformBuffersFS[i].Destroy(m_device);
+		}
+
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 
@@ -115,11 +123,11 @@ public:
 
 			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs.WithGUI[ImageIndex], ImGUICmdBuf };
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs[m_lightingMode].WithGUI[ImageIndex], ImGUICmdBuf};
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
-			m_pQueue->SubmitAsync(m_cmdBufs.WithoutGUI[ImageIndex]);
+			m_pQueue->SubmitAsync(m_cmdBufs[m_lightingMode].WithoutGUI[ImageIndex]);
 		}
 
 		m_pQueue->Present(ImageIndex);
@@ -241,11 +249,15 @@ private:
 
 	void CreateCommandBuffers()
 	{
-		m_cmdBufs.WithGUI.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithGUI.data());
+		m_cmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
 
-		m_cmdBufs.WithoutGUI.resize(m_numImages);
-		m_vkCore.CreateCommandBuffers(m_numImages, m_cmdBufs.WithoutGUI.data());
+		for (CommandBuffersVecs& v : m_cmdBufs) {
+			v.WithGUI.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, v.WithGUI.data());
+
+			v.WithoutGUI.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, v.WithoutGUI.data());
+		}
 
 		printf("Created command buffers\n");
 	}
@@ -256,7 +268,7 @@ private:
 		u32 TextureCount = 50;
 		u32 UniformBufferCount = 50;
 		u32 StorageBufferCount = 50;
-		u32 MaxSets = m_numImages * 2;	// Two pipeline programs
+		u32 MaxSets = m_numImages * 4;
 
 		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
 	}
@@ -285,26 +297,32 @@ private:
 
 	void CreatePipeline()
 	{	
-		m_pipelines[0].Init(m_vkCore, m_descPool, m_vs, m_fs, OgldevVK::LIGHTING_MODE_AMBIENT_ONLY);
-		m_pipelines[0].AllocDescSets(m_numImages, m_descSets);
+		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(MAX_NUM_MESHES * sizeof(UniformDataVS));
+		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::UniformDataFS));
 
 		OgldevVK::ModelDesc md;
 
 		m_model.UpdateModelDesc(md);
 
-		m_pipelines[0].UpdateDescriptorSets(md, m_descSets);
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
+			m_pipelines[i].Init(m_vkCore, m_descPool, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+			m_pipelines[i].AllocDescSets(m_numImages, m_descSets[i]);
+			m_pipelines[i].UpdateDescriptorSets(m_descSets[i], md, m_uniformBuffersVS, m_uniformBuffersFS);
+		}		
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		RecordCommandBuffersInternal(true, m_cmdBufs.WithoutGUI);
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
+			RecordCommandBuffersInternal(i, true, m_cmdBufs[i].WithoutGUI);
 
-		RecordCommandBuffersInternal(false, m_cmdBufs.WithGUI);
+			RecordCommandBuffersInternal(i, false, m_cmdBufs[i].WithGUI);
+		}
 	}
 
 
-	void RecordCommandBuffersInternal(bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
+	void RecordCommandBuffersInternal(int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
 	{
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
@@ -316,7 +334,7 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pipelines[0].Bind(CmdBuf, m_descSets[i]);
+			m_pipelines[LightingMode].Bind(CmdBuf, m_descSets[LightingMode][i]);
 			m_model.RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
@@ -434,7 +452,8 @@ private:
 		m_model.Update(ImageIndex, WVP);
 
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
-		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight);
+		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight, 
+										    m_uniformBuffersVS, m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -445,15 +464,16 @@ private:
 	OgldevVK::VulkanQueue* m_pQueue = NULL;
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
-	struct {
+	struct CommandBuffersVecs {
 		std::vector<VkCommandBuffer> WithGUI;
 		std::vector<VkCommandBuffer> WithoutGUI;
-	} m_cmdBufs;
+	};
+	std::vector<CommandBuffersVecs> m_cmdBufs;
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV5 m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
-	std::vector<VkDescriptorSet> m_descSets;
+	std::vector<VkDescriptorSet> m_descSets[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
@@ -466,6 +486,9 @@ private:
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
 	std::vector<OgldevVK::BufferAndMemory> m_ubos;
+	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_AMBIENT_ONLY;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
 };
 
 

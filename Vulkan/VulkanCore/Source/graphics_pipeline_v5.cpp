@@ -38,22 +38,11 @@ enum V5_Binding {
 };
 
 
-struct UniformDataFS {
-	glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
-	glm::vec4 LightDirection;    // .xyz = direction
-	glm::vec4 LightColor;        // .rgb = color, .w = intensity
-};
-
-
-struct UniformDataVS {
-	glm::mat4 WVP;
-	glm::mat4 NormalMatrix;
-};
-
-
-#define MAX_NUM_MESHES (64 * 1024 / sizeof(UniformDataVS))
-
-void GraphicsPipelineV5::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs, LIGHTING_MODE LightingMode)
+void GraphicsPipelineV5::Init(VulkanCore& vkCore, 
+	VkDescriptorPool DescPool, 
+	VkShaderModule vs, 
+	VkShaderModule fs,
+	LIGHTING_MODE LightingMode)
 {
 	VkSpecializationMapEntry SpecMapEntry = {
 		.constantID = 0,
@@ -69,20 +58,12 @@ void GraphicsPipelineV5::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkS
 	};
 
 	GraphicsPipeline::Init(vkCore, DescPool, vs, fs, NULL, &SpecInfo);
-
-	m_uniformBuffersVS = vkCore.CreateUniformBuffers(MAX_NUM_MESHES * sizeof(UniformDataVS));
-	m_uniformBuffersFS = vkCore.CreateUniformBuffers(sizeof(UniformDataFS));
 }
 
 
 void GraphicsPipelineV5::Destroy()
 {
 	GraphicsPipeline::Destroy();
-
-	for (int i = 0; i < m_uniformBuffersVS.size(); i++) {
-		m_uniformBuffersVS[i].Destroy(m_device);
-		m_uniformBuffersFS[i].Destroy(m_device);
-	}
 }
 
 
@@ -134,15 +115,17 @@ VkDescriptorSetLayout GraphicsPipelineV5::CreateDescSetLayout(OgldevVK::VulkanCo
 }
 
 
-void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
-											  std::vector<VkDescriptorSet>& DescriptorSets)
+void GraphicsPipelineV5::UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
+											  const ModelDesc& ModelDesc,
+											  std::vector<BufferAndMemory>& UniformBuffersVS,
+											  std::vector<BufferAndMemory>& UniformBuffersFS)
 {
 	assert(DescriptorSets.size() != 0);
 
 	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescriptorSets.size());
 
 	for (int i = 0; i < (int)BufferInfoUniformsVS.size(); i++) {
-		BufferInfoUniformsVS[i].buffer = m_uniformBuffersVS[i].m_buffer;
+		BufferInfoUniformsVS[i].buffer = UniformBuffersVS[i].m_buffer;
 		BufferInfoUniformsVS[i].offset = 0;
 		BufferInfoUniformsVS[i].range = VK_WHOLE_SIZE;
 	}
@@ -150,7 +133,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsFS(DescriptorSets.size());
 
 	for (int i = 0; i < (int)BufferInfoUniformsFS.size(); i++) {
-		BufferInfoUniformsFS[i].buffer = m_uniformBuffersFS[i].m_buffer;
+		BufferInfoUniformsFS[i].buffer = UniformBuffersFS[i].m_buffer;
 		BufferInfoUniformsFS[i].offset = 0;
 		BufferInfoUniformsFS[i].range = VK_WHOLE_SIZE;
 	}
@@ -283,7 +266,9 @@ void GraphicsPipelineV5::UpdateUniformBuffers(int ImageIndex,
 											  const glm::mat4& WVP, 
 											  const glm::mat4& World,				
 											  const std::vector<glm::mat4>& SubmeshTransformations,
-											  const glm::vec4& AmbientLight)
+											  const glm::vec4& AmbientLight,
+											  std::vector<BufferAndMemory>& UniformBuffersVS,
+										      std::vector<BufferAndMemory>& UniformBuffersFS)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 
@@ -296,7 +281,7 @@ void GraphicsPipelineV5::UpdateUniformBuffers(int ImageIndex,
 		UboDataVS[i].NormalMatrix = NormalMatrix;
 	}
 
-	m_uniformBuffersVS[ImageIndex].Update(m_device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
+	UniformBuffersVS[ImageIndex].Update(m_device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
 
 	UniformDataFS UboDataFS = {
 		.AmbientLight = AmbientLight,
@@ -304,7 +289,7 @@ void GraphicsPipelineV5::UpdateUniformBuffers(int ImageIndex,
 		.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
 	};
 
-	m_uniformBuffersFS[ImageIndex].Update(m_device, &UboDataFS, sizeof(UboDataFS));	
+	UniformBuffersFS[ImageIndex].Update(m_device, &UboDataFS, sizeof(UboDataFS));	
 }
 
 
