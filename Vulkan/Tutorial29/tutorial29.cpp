@@ -263,8 +263,8 @@ private:
 	{
 		m_model.Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
-	//	m_model.LoadAssimpModel("../../Content/stanford_dragon_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/stanford_armadillo_pbr/scene.gltf");
+	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
+	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");
 		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
