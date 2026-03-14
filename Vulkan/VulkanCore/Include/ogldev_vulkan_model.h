@@ -61,6 +61,8 @@ public:
 
 	void UpdateModelDesc(ModelDesc& md);
 
+	const std::vector<glm::mat4>& GetTransformations() const { return m_transformations; }
+
 protected:
 
 	virtual void AllocBuffers() { /* Nothing to do here */ }
