@@ -467,8 +467,7 @@ private:
 		std::vector<VkCommandBuffer> WithGUI;
 		std::vector<VkCommandBuffer> WithoutGUI;
 	};
-	std::vector<CommandBuffersVecs> m_cmdBufs;
-	
+	std::vector<CommandBuffersVecs> m_cmdBufs;	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV5 m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
@@ -483,7 +482,6 @@ private:
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
-	std::vector<OgldevVK::BufferAndMemory> m_ubos;
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_AMBIENT_ONLY;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
