@@ -39,7 +39,9 @@ enum V5_Binding {
 
 
 struct UniformDataFS {
-	glm::vec4 AmbientLight;
+	glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
+	glm::vec4 LightDirection;    // .xyz = direction
+	glm::vec4 LightColor;        // .rgb = color, .w = intensity
 };
 
 
@@ -284,7 +286,9 @@ void GraphicsPipelineV5::UpdateUniformBuffers(int ImageIndex,
 	m_uniformBuffersVS[ImageIndex].Update(m_device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
 
 	UniformDataFS UboDataFS = {
-		.AmbientLight = AmbientLight
+		.AmbientLight = AmbientLight,
+		.LightDirection = glm::vec4(1.0f, -1.0f, 0.0f, 0.0f),
+		.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
 	};
 
 	m_uniformBuffersFS[ImageIndex].Update(m_device, &UboDataFS, sizeof(UboDataFS));	

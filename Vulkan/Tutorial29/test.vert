@@ -56,7 +56,7 @@ struct MetaData {
 
 layout(std430, set = 0, binding = 4) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
 
-layout(location = 0) out vec2 texCoord;
+layout(location = 0) out vec2 TexCoord;
 layout(location = 1) flat out uint MaterialIndex;
 layout(location = 2) out vec3 Normal;
 
@@ -80,7 +80,7 @@ void main()
 
     gl_Position = ubo.Data[DrawId].WVP * vec4(pos, 1.0);
     
-    texCoord = vec2(vtx.u0, vtx.v0);
+    TexCoord = vec2(vtx.u0, vtx.v0);
 
     vec3 OrigNorm = vec3(vtx.normal_x, vtx.normal_y, vtx.normal_z);
 

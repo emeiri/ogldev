@@ -21,15 +21,20 @@
 
 #extension GL_EXT_nonuniform_qualifier : require
 
-layout(location = 0) in vec2 texCoord;
+layout(location = 0) in vec2 TexCoord;
 layout(location = 1) flat in uint MaterialIndex;
 layout(location = 2) in vec3 Normal;
 
-layout(location = 0) out vec4 out_Color;
+layout(location = 0) out vec4 OutColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Textures[];
 
-layout(set = 0, binding = 5) readonly uniform UniformBuffer { vec4 AmbientLight; } ubo;
+layout(set = 0, binding = 5) readonly uniform UniformBuffer { 
+    vec4 AmbientLight;      // .rgb = color, .w = intensity
+    vec4 LightDirection;    // .xyz = direction
+    vec4 LightColor;        // .rgb = color, .w = intensity
+} ubo;
+
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
@@ -39,16 +44,25 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 
 void main() 
 {
+   // 1. Normalize Vectors
     vec3 N = normalize(Normal);
-    vec3 LightDir = normalize(vec3(0.5, 1.0, 0.3)); // Example: light from above
+    
+    // We negate the Direction so L points TOWARD the light source for the dot product
+    vec3 L = normalize(-ubo.LightDirection.xyz); 
 
-    float NdotL = max(dot(N, LightDir), 0.0);
+    // 2. Diffuse (Lambertian) Calculation
+    float NdotL = max(dot(N, L), 0.0);
 
-    vec4 BaseColor = TextureBindless2D(MaterialIndex, texCoord);
+    // 3. Sample Base Texture
+    vec4 BaseColor = TextureBindless2D(MaterialIndex, TexCoord);
 
-    vec3 Ambient = ubo.AmbientLight.rgb * BaseColor.rgb * 20.0;
+    // 4. Calculate Lighting Components
+    // Ambient: Base Texture * Ambient Color * Ambient Intensity
+    vec3 Ambient = BaseColor.rgb * ubo.AmbientLight.rgb * ubo.AmbientLight.w;
 
-    vec3 Diffuse = BaseColor.rgb * NdotL;
+    // Diffuse: Base Texture * Light Color * Light Intensity * NdotL
+    vec3 Diffuse = BaseColor.rgb * ubo.LightColor.rgb * ubo.LightColor.w * NdotL;
 
-    out_Color = vec4(Ambient + Diffuse, BaseColor.a);
+    // 5. Final Output
+    OutColor = vec4(Ambient + Diffuse, BaseColor.a);
 }
