@@ -39,7 +39,16 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 
 void main() 
 {
-    //out_Color = TextureBindless2D(MaterialIndex, texCoord) * ubo.AmbientLight;
-    out_Color = vec4(normalize(Normal), 1.0);
-  //  out_Color = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
+    vec3 N = normalize(Normal);
+    vec3 LightDir = normalize(vec3(0.5, 1.0, 0.3)); // Example: light from above
+
+    float NdotL = max(dot(N, LightDir), 0.0);
+
+    vec4 BaseColor = TextureBindless2D(MaterialIndex, texCoord);
+
+    vec3 Ambient = ubo.AmbientLight.rgb * BaseColor.rgb * 20.0;
+
+    vec3 Diffuse = BaseColor.rgb * NdotL;
+
+    out_Color = vec4(Ambient + Diffuse, BaseColor.a);
 }
