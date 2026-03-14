@@ -69,8 +69,9 @@ public:
 
 	virtual void Destroy();
 
-	void UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-							  const ModelDesc& ModelDesc,
+	void Bind(int ImageIndex, VkCommandBuffer CmdBuf);
+
+	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 
@@ -84,6 +85,8 @@ public:
 protected:
 
 	VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
+
+	std::vector<VkDescriptorSet> m_descSets;
 };
 
 }

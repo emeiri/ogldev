@@ -58,12 +58,20 @@ void GraphicsPipelineV5::Init(VulkanCore& vkCore,
 	};
 
 	GraphicsPipeline::Init(vkCore, DescPool, vs, fs, NULL, &SpecInfo);
+
+	AllocDescSets(vkCore.GetNumImages(), m_descSets);
 }
 
 
 void GraphicsPipelineV5::Destroy()
 {
 	GraphicsPipeline::Destroy();
+}
+
+
+void GraphicsPipelineV5::Bind(int ImageIndex, VkCommandBuffer CmdBuf)
+{
+	GraphicsPipeline::Bind(CmdBuf, m_descSets[ImageIndex]); // bind set 0 which contains the vertex/index buffers and meta data. The texture array is bound in the model's command buffer
 }
 
 
@@ -115,14 +123,11 @@ VkDescriptorSetLayout GraphicsPipelineV5::CreateDescSetLayout(OgldevVK::VulkanCo
 }
 
 
-void GraphicsPipelineV5::UpdateDescriptorSets(std::vector<VkDescriptorSet>& DescriptorSets,
-											  const ModelDesc& ModelDesc,
+void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 											  std::vector<BufferAndMemory>& UniformBuffersVS,
 											  std::vector<BufferAndMemory>& UniformBuffersFS)
 {
-	assert(DescriptorSets.size() != 0);
-
-	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescriptorSets.size());
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(m_descSets.size());
 
 	for (int i = 0; i < (int)BufferInfoUniformsVS.size(); i++) {
 		BufferInfoUniformsVS[i].buffer = UniformBuffersVS[i].m_buffer;
@@ -130,7 +135,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Desc
 		BufferInfoUniformsVS[i].range = VK_WHOLE_SIZE;
 	}
 
-	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsFS(DescriptorSets.size());
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsFS(m_descSets.size());
 
 	for (int i = 0; i < (int)BufferInfoUniformsFS.size(); i++) {
 		BufferInfoUniformsFS[i].buffer = UniformBuffersFS[i].m_buffer;
@@ -166,12 +171,12 @@ void GraphicsPipelineV5::UpdateDescriptorSets(std::vector<VkDescriptorSet>& Desc
 		.range = VK_WHOLE_SIZE
 	};
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescriptorSets.size() * V5_NumBindings);
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size() * V5_NumBindings);
 
 	u32 WdsIndex = 0;
 
-	for (int i = 0; i < (int)DescriptorSets.size(); i++) {
-		VkDescriptorSet& DstSet = DescriptorSets[i];
+	for (int i = 0; i < (int)m_descSets.size(); i++) {
+		VkDescriptorSet& DstSet = m_descSets[i];
 
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,

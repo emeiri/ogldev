@@ -306,8 +306,7 @@ private:
 
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 			m_pipelines[i].Init(m_vkCore, m_descPool, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
-			m_pipelines[i].AllocDescSets(m_numImages, m_descSets[i]);
-			m_pipelines[i].UpdateDescriptorSets(m_descSets[i], md, m_uniformBuffersVS, m_uniformBuffersFS);
+			m_pipelines[i].UpdateDescriptorSets(md, m_uniformBuffersVS, m_uniformBuffersFS);
 		}		
 	}
 
@@ -334,7 +333,7 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pipelines[LightingMode].Bind(CmdBuf, m_descSets[LightingMode][i]);
+			m_pipelines[LightingMode].Bind(i, CmdBuf);
 			m_model.RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
@@ -473,7 +472,6 @@ private:
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::GraphicsPipelineV5 m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
-	std::vector<VkDescriptorSet> m_descSets[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
