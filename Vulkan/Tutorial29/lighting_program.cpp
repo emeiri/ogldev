@@ -38,7 +38,7 @@ enum V5_Binding {
 };
 
 
-void GraphicsPipelineV5::Init(VulkanCore& vkCore, 
+void LightingProgram::Init(VulkanCore& vkCore, 
 	VkDescriptorPool DescPool, 
 	VkShaderModule vs, 
 	VkShaderModule fs,
@@ -63,19 +63,19 @@ void GraphicsPipelineV5::Init(VulkanCore& vkCore,
 }
 
 
-void GraphicsPipelineV5::Destroy()
+void LightingProgram::Destroy()
 {
 	GraphicsPipeline::Destroy();
 }
 
 
-void GraphicsPipelineV5::Bind(int ImageIndex, VkCommandBuffer CmdBuf)
+void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf)
 {
 	GraphicsPipeline::Bind(CmdBuf, m_descSets[ImageIndex]); // bind set 0 which contains the vertex/index buffers and meta data. The texture array is bound in the model's command buffer
 }
 
 
-VkDescriptorSetLayout GraphicsPipelineV5::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+VkDescriptorSetLayout LightingProgram::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 {
 	std::vector<VkDescriptorSetLayoutBinding> Bindings{
 		{.
@@ -123,7 +123,7 @@ VkDescriptorSetLayout GraphicsPipelineV5::CreateDescSetLayout(OgldevVK::VulkanCo
 }
 
 
-void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
+void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 											  std::vector<BufferAndMemory>& UniformBuffersVS,
 											  std::vector<BufferAndMemory>& UniformBuffersFS)
 {
@@ -267,7 +267,7 @@ void GraphicsPipelineV5::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 }
 
 
-void GraphicsPipelineV5::UpdateUniformBuffers(int ImageIndex, 
+void LightingProgram::UpdateUniformBuffers(int ImageIndex, 
 											  const glm::mat4& WVP, 
 											  const glm::mat4& World,				
 											  const std::vector<glm::mat4>& SubmeshTransformations,

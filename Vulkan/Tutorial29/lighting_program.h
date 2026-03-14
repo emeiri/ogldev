@@ -47,19 +47,18 @@ enum LIGHTING_MODE {
 };
 
 
-struct UniformDataFS {
-	glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
-	glm::vec4 LightDirection;    // .xyz = direction
-	glm::vec4 LightColor;        // .rgb = color, .w = intensity
-};
-
-
 // This version support descriptor indexing and indirect rendering
-class GraphicsPipelineV5 : public GraphicsPipeline {
+class LightingProgram : public GraphicsPipeline {
 
 public:
 
-	GraphicsPipelineV5() {}
+	struct UniformDataFS {
+		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
+		glm::vec4 LightDirection;    // .xyz = direction
+		glm::vec4 LightColor;        // .rgb = color, .w = intensity
+	};
+
+	LightingProgram() {}
 
 	virtual void Init(VulkanCore& vkCore,
 		VkDescriptorPool DescPool,

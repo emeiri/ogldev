@@ -77,7 +77,7 @@ public:
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 
-		for (OgldevVK::GraphicsPipelineV5& p : m_pipelines) {
+		for (OgldevVK::LightingProgram& p : m_pipelines) {
 			p.Destroy();
 		}
 
@@ -298,7 +298,7 @@ private:
 	void CreatePipeline()
 	{	
 		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(MAX_NUM_MESHES * sizeof(UniformDataVS));
-		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::UniformDataFS));
+		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
 
 		OgldevVK::ModelDesc md;
 
@@ -470,7 +470,7 @@ private:
 	std::vector<CommandBuffersVecs> m_cmdBufs;	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV5 m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
+	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
