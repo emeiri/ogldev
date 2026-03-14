@@ -20,7 +20,7 @@
 #include "ogldev_types.h"
 #include "ogldev_util.h"
 #include "ogldev_vulkan_util.h"
-#include "ogldev_vulkan_graphics_pipeline_v5.h"
+#include "lighting_program.h"
 
 
 namespace OgldevVK {

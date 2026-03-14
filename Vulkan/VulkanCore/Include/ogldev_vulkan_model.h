@@ -23,7 +23,6 @@
 #include "ogldev_vulkan_graphics_pipeline_v2.h"
 #include "ogldev_vulkan_graphics_pipeline_v3.h"
 #include "ogldev_vulkan_graphics_pipeline_v4.h"
-#include "ogldev_vulkan_graphics_pipeline_v5.h"
 #include "Int/core_model.h"
 #include "Int/model_desc.h"
 

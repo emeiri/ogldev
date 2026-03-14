@@ -39,13 +39,13 @@
 #include "ogldev_vulkan_core.h"
 #include "ogldev_vulkan_wrapper.h"
 #include "ogldev_vulkan_shader.h"
-#include "ogldev_vulkan_graphics_pipeline_v5.h"
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
 #include "ogldev_vulkan_skybox.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
 #include "Int/model_desc.h"
+#include "lighting_program.h"
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440

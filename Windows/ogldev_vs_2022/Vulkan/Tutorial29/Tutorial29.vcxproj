@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial29\lighting_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial29\tutorial29.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Vulkan\Tutorial29\test.frag" />
     <None Include="..\..\..\..\Vulkan\Tutorial29\test.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\Tutorial29\lighting_program.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

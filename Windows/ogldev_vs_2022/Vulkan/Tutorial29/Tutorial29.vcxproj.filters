@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial29\tutorial29.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial29\lighting_program.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\Vulkan\Tutorial29\test.vert">
@@ -29,5 +32,10 @@
     <None Include="..\..\..\..\Vulkan\Tutorial29\test.frag">
       <Filter>Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\Tutorial29\lighting_program.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
