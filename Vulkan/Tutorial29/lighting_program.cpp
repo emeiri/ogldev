@@ -268,12 +268,13 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 
 
 void LightingProgram::UpdateUniformBuffers(int ImageIndex, 
-											  const glm::mat4& WVP, 
-											  const glm::mat4& World,				
-											  const std::vector<glm::mat4>& SubmeshTransformations,
-											  const glm::vec4& AmbientLight,
-											  std::vector<BufferAndMemory>& UniformBuffersVS,
-										      std::vector<BufferAndMemory>& UniformBuffersFS)
+                                            const glm::mat4& WVP, 
+                                            const glm::mat4& World,				
+                                            const std::vector<glm::mat4>& SubmeshTransformations,
+                                            const glm::vec4& AmbientLight,
+                                            const glm::vec3& LightDirection,
+                                            std::vector<BufferAndMemory>& UniformBuffersVS,
+                                            std::vector<BufferAndMemory>& UniformBuffersFS)
 {
 	std::vector<UniformDataVS> UboDataVS(SubmeshTransformations.size());
 
@@ -290,7 +291,7 @@ void LightingProgram::UpdateUniformBuffers(int ImageIndex,
 
 	UniformDataFS UboDataFS = {
 		.AmbientLight = AmbientLight,
-		.LightDirection = glm::vec4(1.0f, -1.0f, 0.0f, 0.0f),
+		.LightDirection = glm::vec4(LightDirection, 0.0f),
 		.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)
 	};
 

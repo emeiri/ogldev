@@ -386,12 +386,6 @@ private:
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 
-		static float f = 0.0f;
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("Clear color", (float*)&m_clearColor); // Edit 3 floats representing a color
-
-		ImGui::Begin("Transform");
-
 		if (ImGui::CollapsingHeader("Position")) {
 			ImGui::DragFloat3("##Position", &m_position.x, 0.01f);
 			ImGui::SameLine();
@@ -416,13 +410,18 @@ private:
 			}
 		}
 
-		// For imGuIZMO, declare static or global variable or member class quaternion
-		static quat qRot1 = quat(1.f, 0.f, 0.f, 0.f);
-		static quat qRot2 = quat(1.f, 0.f, 0.f, 0.f);
-		ImGui::gizmo3D("##gizmo1", qRot1, 200.0f/*, mode */);
+		static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
+			ImGui::RadioButton(lightingModeNames[i], (int*)&m_lightingMode, i);
+		}
 
-		static vec4 dir(1.0f, 0.0f, 0.0f, 0.0f);
-		ImGui::gizmo3D("##Dir1", dir, 200.0f, imguiGizmo::modeDirection);
+		// For imGuIZMO, declare static or global variable or member class quaternion
+		//static quat qRot1 = quat(1.f, 0.f, 0.f, 0.f);
+		//static quat qRot2 = quat(1.f, 0.f, 0.f, 0.f);
+	//	ImGui::gizmo3D("##gizmo1", qRot1, 200.0f/*, mode */);
+
+		//m_lightDir = normalize(m_lightDir);
+		ImGui::gizmo3D("##Dir1", m_lightDir, 200.0f, imguiGizmo::modeDirection);
 
 		static int counter = 0;
 
@@ -434,7 +433,6 @@ private:
 		ImGui::Text("counter = %d", counter);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-		ImGui::End();
 		ImGui::End();
 
 		ImGui::Render();
@@ -456,8 +454,10 @@ private:
 		m_model.Update(ImageIndex, WVP);
 
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
+		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
+		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
 		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight, 
-										    m_uniformBuffersVS, m_uniformBuffersFS);
+			                                LightDirection,	m_uniformBuffersVS, m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -482,14 +482,16 @@ private:
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
+
+	// GUI state
 	bool m_showGui = false;
-	glm::vec3 m_clearColor = glm::vec3(1.0f);
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
-	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_AMBIENT_ONLY;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
+	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
+	vec3 m_lightDir = vec3(0.0f, 0.0f, 0.0f);
 };
 
 

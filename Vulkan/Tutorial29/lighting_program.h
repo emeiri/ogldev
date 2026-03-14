@@ -77,6 +77,7 @@ public:
 							  const glm::mat4& World,
 							  const std::vector<glm::mat4>& SubmeshTransformations,
 							  const glm::vec4& AmbientLight,
+							  const glm::vec3& LightDirection,
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 protected:
