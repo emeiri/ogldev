@@ -32,6 +32,15 @@
 
 namespace OgldevVK {
 
+enum LIGHTING_MODE {
+	LIGHTING_MODE_UNLIT        = 0,
+	LIGHTING_MODE_NORMALS      = 1,
+	LIGHTING_MODE_AMBIENT_ONLY = 2,
+	LIGHTING_MODE_FULL         = 3,
+	NUM_LIGHTING_MODES         = 4
+};
+
+
 // This version support descriptor indexing and indirect rendering
 class GraphicsPipelineV5 : public GraphicsPipeline {
 
@@ -39,7 +48,7 @@ public:
 
 	GraphicsPipelineV5() {}
 
-	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs);
+	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs, LIGHTING_MODE LightingMode);
 
 	virtual void Destroy();
 

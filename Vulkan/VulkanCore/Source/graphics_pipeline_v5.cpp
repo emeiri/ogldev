@@ -53,10 +53,8 @@ struct UniformDataVS {
 
 #define MAX_NUM_MESHES (64 * 1024 / sizeof(UniformDataVS))
 
-void GraphicsPipelineV5::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs)
+void GraphicsPipelineV5::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs, LIGHTING_MODE LightingMode)
 {
-	u32 renderModeValue = 1;
-
 	VkSpecializationMapEntry SpecMapEntry = {
 		.constantID = 0,
 		.offset = 0,
@@ -67,7 +65,7 @@ void GraphicsPipelineV5::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkS
 		.mapEntryCount = 1,
 		.pMapEntries = &SpecMapEntry,
 		.dataSize = sizeof(u32),
-		.pData = &renderModeValue
+		.pData = &LightingMode
 	};
 
 	GraphicsPipeline::Init(vkCore, DescPool, vs, fs, NULL, &SpecInfo);

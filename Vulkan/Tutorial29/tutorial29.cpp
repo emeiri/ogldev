@@ -69,7 +69,10 @@ public:
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 
-		m_pipeline.Destroy();
+		for (OgldevVK::GraphicsPipelineV5& p : m_pipelines) {
+			p.Destroy();
+		}
+
 		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
 			
 		m_model.Destroy();
@@ -282,14 +285,14 @@ private:
 
 	void CreatePipeline()
 	{	
-		m_pipeline.Init(m_vkCore, m_descPool, m_vs, m_fs);
-		m_pipeline.AllocDescSets(m_numImages, m_descSets);
+		m_pipelines[0].Init(m_vkCore, m_descPool, m_vs, m_fs, OgldevVK::LIGHTING_MODE_AMBIENT_ONLY);
+		m_pipelines[0].AllocDescSets(m_numImages, m_descSets);
 
 		OgldevVK::ModelDesc md;
 
 		m_model.UpdateModelDesc(md);
 
-		m_pipeline.UpdateDescriptorSets(md, m_descSets);
+		m_pipelines[0].UpdateDescriptorSets(md, m_descSets);
 	}
 
 
@@ -313,7 +316,7 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pipeline.Bind(CmdBuf, m_descSets[i]);
+			m_pipelines[0].Bind(CmdBuf, m_descSets[i]);
 			m_model.RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
@@ -431,7 +434,7 @@ private:
 		m_model.Update(ImageIndex, WVP);
 
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
-		m_pipeline.UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight);
+		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -449,7 +452,7 @@ private:
 	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
-	OgldevVK::GraphicsPipelineV5 m_pipeline;
+	OgldevVK::GraphicsPipelineV5 m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	std::vector<VkDescriptorSet> m_descSets;
 	//OgldevVK::Skybox m_skybox;
 	OgldevVK::VkModel m_model;
