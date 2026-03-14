@@ -38,7 +38,14 @@ layout (std430, set = 0, binding = 0) readonly buffer Vertices { VertexData v[];
 
 layout (set = 0, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
 
-layout (set = 0, binding = 3) readonly uniform UniformBuffer { mat4 WVP[1024]; } ubo;
+struct UniformData {
+    mat4 WVP; 
+    mat4 NormalMatrix;
+};
+
+layout (set = 0, binding = 3) readonly uniform UniformBuffer { 
+    UniformData Data[512];
+} ubo;
 
 struct MetaData { 
     uint MaterialIndex; 
@@ -51,6 +58,7 @@ layout(std430, set = 0, binding = 4) readonly buffer MetaSSBO { MetaData metas[]
 
 layout(location = 0) out vec2 texCoord;
 layout(location = 1) flat out uint MaterialIndex;
+layout(location = 2) out vec3 Normal;
 
 const int INDEX_SIZE_IN_BYTES = 4;
 
@@ -70,8 +78,15 @@ void main()
 
     vec3 pos = vec3(vtx.pos_x, vtx.pos_y, vtx.pos_z);
 
-    gl_Position = ubo.WVP[DrawId] * vec4(pos, 1.0);
+    gl_Position = ubo.Data[DrawId].WVP * vec4(pos, 1.0);
     
     texCoord = vec2(vtx.u0, vtx.v0);
+
+    vec3 OrigNorm = vec3(vtx.normal_x, vtx.normal_y, vtx.normal_z);
+
+    Normal = mat3(ubo.Data[DrawId].NormalMatrix) * OrigNorm;
+
+    // DEBUGGING
+    //Normal = OrigNorm;  
 }
 

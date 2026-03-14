@@ -45,7 +45,11 @@ public:
 
     void UpdateDescriptorSets(const ModelDesc& ModelDesc, std::vector<VkDescriptorSet>& DescriptorSets);	
 
-	void UpdateUniformBuffers(int ImageIndex, const glm::vec4& AmbientLight);
+	void UpdateUniformBuffers(int ImageIndex,
+							  const glm::mat4& WVP,
+							  const glm::mat4& World,
+							  const std::vector<glm::mat4>& SubmeshTransformations,
+							  const glm::vec4& AmbientLight);
 
 protected:
 
@@ -53,7 +57,8 @@ protected:
 
 private:
 
-	std::vector<BufferAndMemory> m_uniformBuffers;
+	std::vector<BufferAndMemory> m_uniformBuffersVS;
+	std::vector<BufferAndMemory> m_uniformBuffersFS;
 };
 
 }

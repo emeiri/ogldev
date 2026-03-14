@@ -229,7 +229,7 @@ private:
 									  zNear, zFar };
 		
 		glm::vec3 Pos(0.0f, 0.0f, -0.33f);
-		glm::vec3 Target(-1.0f, -0.1f, 0.0f);
+		glm::vec3 Target(0.0f, 0.0f, 1.0f);
 		glm::vec3 Up(0.0, 1.0f, 0.0f);
 
 		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
@@ -420,18 +420,18 @@ private:
 	{		
 		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
 
-		glm::mat4 Rotate = glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 0.0f)));	// hack
-
 		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
+
+		glm::mat4 World = Translate * Scale;
 
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
-		glm::mat4 WVP = VP * Translate * Rotate * Scale;
+		glm::mat4 WVP = VP * World;
 
 		m_model.Update(ImageIndex, WVP);
 
 		glm::vec4 AmbientLight = glm::vec4(0.1f);
-		m_pipeline.UpdateUniformBuffers(ImageIndex, AmbientLight);
+		m_pipeline.UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}

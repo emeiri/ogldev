@@ -123,9 +123,9 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 
 	VkViewport VP = {
 		.x = 0.0f,
-		.y = 0.0f,
+		.y = (float)WindowHeight,
 		.width = (float)WindowWidth,
-		.height = (float)WindowHeight,
+		.height = -(float)WindowHeight,
 		.minDepth = 0.0f,
 		.maxDepth = 1.0f
 	};

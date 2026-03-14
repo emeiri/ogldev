@@ -23,12 +23,13 @@
 
 layout(location = 0) in vec2 texCoord;
 layout(location = 1) flat in uint MaterialIndex;
+layout(location = 2) in vec3 Normal;
 
 layout(location = 0) out vec4 out_Color;
 
 layout(set = 0, binding = 2) uniform sampler2D Textures[];
 
-//layout(set = 0, binding = 4) readonly uniform UniformBuffer { vec4 AmbientLight; } ubo;
+layout(set = 0, binding = 5) readonly uniform UniformBuffer { vec4 AmbientLight; } ubo;
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
@@ -38,5 +39,7 @@ vec4 TextureBindless2D(uint MaterialIndex, vec2 uv)
 
 void main() 
 {
-   out_Color = TextureBindless2D(MaterialIndex, texCoord);
+    //out_Color = TextureBindless2D(MaterialIndex, texCoord) * ubo.AmbientLight;
+    out_Color = vec4(normalize(Normal), 1.0);
+  //  out_Color = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
 }
