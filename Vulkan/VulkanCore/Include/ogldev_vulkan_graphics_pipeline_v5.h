@@ -39,7 +39,7 @@ public:
 
 	GraphicsPipelineV5() {}
 
-	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename);
+	virtual void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, VkShaderModule vs, VkShaderModule fs);
 
 	virtual void Destroy();
 

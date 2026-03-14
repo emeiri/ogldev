@@ -26,7 +26,17 @@ class GraphicsPipeline {
 public:
 	GraphicsPipeline() {}
 
-	void Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pVSFilename, const char* pFSFilename);
+	void Init(VulkanCore& vkCore, 
+			  VkDescriptorPool DescPool, 
+		      const char* pVSFilename, 
+			  const char* pFSFilename);
+
+	void Init(VulkanCore& vkCore,
+			  VkDescriptorPool DescPool,
+			  VkShaderModule vs,
+			  VkShaderModule fs,
+			  VkSpecializationInfo* pSpecInfoVS,
+			  VkSpecializationInfo* pSpecInfoFS);
 
 	void Destroy();
 
@@ -53,7 +63,8 @@ protected:
 private:
 
 	VkPipeline CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
-		VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp);
+		VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
+		VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS);
 
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;

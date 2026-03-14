@@ -33,8 +33,25 @@ void GraphicsPipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const
 
 	m_descSetLayout = CreateDescSetLayout(vkCore);
 
-	m_pipeline = CreatePipeline(vkCore.GetWindow(), m_vs, m_fs,
-		vkCore.GetSwapChainFormat(), vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS);
+	m_pipeline = CreatePipeline(vkCore.GetWindow(), m_vs, m_fs, vkCore.GetSwapChainFormat(), 
+		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, NULL, NULL);
+}
+
+void GraphicsPipeline::Init(VulkanCore& vkCore, 
+							VkDescriptorPool DescPool, 
+							VkShaderModule vs, 
+							VkShaderModule fs, 
+							VkSpecializationInfo* pSpecInfoVS,
+							VkSpecializationInfo* pSpecInfoFS)
+{
+	m_descPool = DescPool;
+
+	m_device = vkCore.GetDevice();
+
+	m_descSetLayout = CreateDescSetLayout(vkCore);
+
+	m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs,	vkCore.GetSwapChainFormat(), 
+		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, pSpecInfoVS, pSpecInfoFS);
 }
 
 
@@ -91,7 +108,8 @@ void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>
 
 
 VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
-	                                       VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp)
+	                                        VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
+										    VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS)
 {
 	VkPipelineShaderStageCreateInfo ShaderStageCreateInfo[2] = {
 		{
@@ -99,12 +117,14 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 			.stage = VK_SHADER_STAGE_VERTEX_BIT,
 			.module = vs,
 			.pName = "main",
+			.pSpecializationInfo = pSpecInfoVS
 		},
 		{
 			.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
 			.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.module = fs,
-			.pName = "main"
+			.pName = "main",
+			.pSpecializationInfo = pSpecInfoFS
 		}
 	};
 

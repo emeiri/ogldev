@@ -282,7 +282,7 @@ private:
 
 	void CreatePipeline()
 	{	
-		m_pipeline.Init(m_vkCore, m_descPool, "test.vert", "test.frag");
+		m_pipeline.Init(m_vkCore, m_descPool, m_vs, m_fs);
 		m_pipeline.AllocDescSets(m_numImages, m_descSets);
 
 		OgldevVK::ModelDesc md;
