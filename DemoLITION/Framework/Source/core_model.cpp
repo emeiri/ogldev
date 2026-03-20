@@ -50,8 +50,6 @@ aiProcess_GenSmoothNormals |    \
 aiProcess_CalcTangentSpace |    \
 aiProcess_JoinIdenticalVertices |   \
 aiProcess_SortByPType |              \
-aiProcess_FlipUVs | \
-aiProcess_FlipWindingOrder |     \
 aiProcess_GenUVCoords | \
 aiProcess_ValidateDataStructure | \
 aiProcess_RemoveRedundantMaterials | \
