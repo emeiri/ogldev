@@ -57,8 +57,14 @@ void GraphicsPipeline::Init(VulkanCore& vkCore,
 
 void GraphicsPipeline::Destroy()
 {
-	vkDestroyShaderModule(m_device, m_vs, NULL);
-	vkDestroyShaderModule(m_device, m_fs, NULL);
+	if (m_vs != VK_NULL_HANDLE) {	// In case the object was provided externally and not created by this class
+		vkDestroyShaderModule(m_device, m_vs, NULL);
+	}
+
+	if (m_fs != VK_NULL_HANDLE) {	// In case the object was provided externally and not created by this class
+		vkDestroyShaderModule(m_device, m_fs, NULL);
+	}
+
 	vkDestroyDescriptorSetLayout(m_device, m_descSetLayout, NULL);
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
