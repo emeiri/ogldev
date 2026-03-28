@@ -34,7 +34,7 @@
 #include "GL/gl_pbr_forward_lighting.h"
 #include "GL/gl_infinite_grid.h"
 #include "GL/gl_skybox.h"
-#include "GL/gl_full_screen_quad_technique.h"
+#include "GL/gl_full_screen_technique.h"
 #include "GL/gl_ssao_technique.h"
 #include "GL/gl_ssao_combine_technique.h"
 #include "GL/gl_normal_technique.h"
@@ -222,7 +222,7 @@ private:
     PBRForwardLightingTechnique m_pbrLightingTech;
     PBRSkinningTechnique m_pbrSkinnedTech;
     PickingTexture m_pickingTexture;
-    FullScreenQuadTechnique m_fullScreenQuadTech;
+    FullScreenTechnique m_fullScreenTech;
     SSAOTechnique m_ssaoTech;
     SSAOCombineTechnique m_ssaoCombineTech;
     ToneMapTechnique m_toneMapTech;

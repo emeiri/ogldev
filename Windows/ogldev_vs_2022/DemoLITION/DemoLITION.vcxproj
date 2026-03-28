@@ -193,7 +193,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_lighting.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_renderer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_forward_skinning.h" />
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_full_screen_quad_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_full_screen_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_geometry_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_hdr_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_indirect_render.h" />
@@ -256,7 +256,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_lighting.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_renderer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_forward_skinning.cpp" />
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_full_screen_quad_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_full_screen_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_geometry_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_hdr_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_indirect_render.cpp" />

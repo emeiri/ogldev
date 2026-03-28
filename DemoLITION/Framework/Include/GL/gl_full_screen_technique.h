@@ -20,13 +20,13 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 
-class FullScreenQuadTechnique : public Technique
+class FullScreenTechnique : public Technique
 {
 public:
 
-    FullScreenQuadTechnique();
+    FullScreenTechnique();
 
-    virtual bool Init();
+    bool Init(const char* pFragmentShaderFile);
 
     void Render();
 

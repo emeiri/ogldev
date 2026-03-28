@@ -15,24 +15,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "GL/gl_full_screen_quad_technique.h"
+#include "GL/gl_full_screen_technique.h"
 
 
-FullScreenQuadTechnique::FullScreenQuadTechnique()
+FullScreenTechnique::FullScreenTechnique()
 {
 }
 
-bool FullScreenQuadTechnique::Init()
+
+bool FullScreenTechnique::Init(const char* pFragmentShaderFile)
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/full_screen_quad.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/full_screen_tri.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/tex.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, pFragmentShaderFile)) { 
         return false;
     }
 
@@ -46,8 +47,9 @@ bool FullScreenQuadTechnique::Init()
 }
 
 
-void FullScreenQuadTechnique::Render()
+void FullScreenTechnique::Render()
 {    
+    Enable();
     glBindVertexArray(m_dummyVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }

@@ -127,7 +127,7 @@
     <ClCompile Include="..\..\..\Common\ogldev_framebuffer.cpp">
       <Filter>Source\GL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_full_screen_quad_technique.cpp">
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_full_screen_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_ssao_technique.cpp">
@@ -300,7 +300,7 @@
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h">
       <Filter>Include\GL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_full_screen_quad_technique.h">
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_full_screen_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_ssao_technique.h">

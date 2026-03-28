@@ -239,7 +239,7 @@ void ForwardRenderer::InitTechniques()
         exit(1);
     }
 
-    if (!m_fullScreenQuadTech.Init()) {
+    if (!m_fullScreenTech.Init("Framework/Shaders/GL/tex.fs")) {
         printf("Error initializing the full screen quad technique\n");
         exit(1);
     }
@@ -1150,9 +1150,7 @@ void ForwardRenderer::FullScreenQuadBlit(GLScene* pScene)
         m_lightingFBO.BindForReading(GL_TEXTURE0);
     }
     
-    m_fullScreenQuadTech.Enable();
-
-    m_fullScreenQuadTech.Render();
+    m_fullScreenTech.Render();
 }
 
 
