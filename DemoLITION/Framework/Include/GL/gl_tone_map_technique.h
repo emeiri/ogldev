@@ -43,7 +43,7 @@ public:
 
 private:
 
-    GLuint m_dummyVAO;
+    GLuint m_dummyVAO = -1;
 
     DEF_LOC_OLD(m_avgLumLoc);
     DEF_LOC_OLD(m_hdrSamplerLoc);

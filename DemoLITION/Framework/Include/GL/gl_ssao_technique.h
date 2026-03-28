@@ -32,6 +32,6 @@ public:
 
 private:
 
-    GLuint m_dummyVAO;
+    GLuint m_dummyVAO = -1;
 };
 

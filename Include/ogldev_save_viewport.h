@@ -34,5 +34,5 @@ public:
     }
 
 private:
-    GLint m_viewport[4];
+    GLint m_viewport[4] = { 0 };
 };
