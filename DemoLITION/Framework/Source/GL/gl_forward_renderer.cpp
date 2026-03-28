@@ -411,16 +411,32 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
 void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
 {
-    bool IsHDR = pScene->GetConfig()->IsHDREnabled();
+    PrePass(pScene);
+
+    ShadowMapPass(pScene);
+
+    LightingPass(pScene, TotalRuntimeMillis);
+
+    PostProcessPass(pScene);
+};
+
+
+
+
+void ForwardRenderer::PrePass(GLScene* pScene)
+{
     bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();
 
     if (IsSSGI) {
         GBufferPass(pScene);    // Must be before the shadow map pass...
     }
+}
 
-    ShadowMapPass(pScene);
 
-    LightingPass(pScene, TotalRuntimeMillis);
+void ForwardRenderer::PostProcessPass(GLScene* pScene)
+{
+    bool IsHDR = pScene->GetConfig()->IsHDREnabled();
+    bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();
 
     float AverageLuminance = 0.0f;
     float Exposure = 0.0f;
@@ -442,9 +458,9 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         SSAOPass(pScene);
         SSAOCombinePass();
     } else if (IsHDR) {
-        ToneMappingPass(AverageLuminance, Exposure, 
-                        pScene->GetConfig()->GetToneMapMethod(),
-                        pScene->GetConfig()->IsGammaCorrectionEnabled());
+        ToneMappingPass(AverageLuminance, Exposure,
+            pScene->GetConfig()->GetToneMapMethod(),
+            pScene->GetConfig()->IsGammaCorrectionEnabled());
 
         /*if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -454,6 +470,7 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntime
         }*/
     }
 }
+
 
 void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
 {

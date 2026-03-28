@@ -142,9 +142,11 @@ private:
     int GetPickedObjectIndex(void* pWindow, GLScene* pScene);
     void PostPickingPass(void* pWindow, GLScene* pScene);
     void SavePickedObject(GLScene* pScene, int ObjectIndex);
+    void PrePass(GLScene* pScene);
     void ShadowMapPass(GLScene* pScene);
     void ShadowMapPassPoint(const std::list<CoreSceneObject*>& RenderList, const std::vector<PointLight>& PointLights);
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
+    void PostProcessPass(GLScene* pScene);
     void NormalPass(GLScene* pScene);
     void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
     void LightingPassFBOSetup(GLScene* pScene);
