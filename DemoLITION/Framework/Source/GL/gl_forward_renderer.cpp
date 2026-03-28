@@ -119,6 +119,9 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_ssgiFBO.Init(m_windowWidth, m_windowHeight, 4, false, true, true);
 
+    m_brightFilterFBO[0].Init(m_windowWidth / 4, m_windowHeight / 4, 3, true, false, false);
+    m_brightFilterFBO[1].Init(m_windowWidth / 4, m_windowHeight / 4, 3, true, false, false);
+
     int Size = m_windowWidth * m_windowHeight;
     m_hdrData.resize(Size * 3);
 
@@ -289,6 +292,11 @@ void ForwardRenderer::InitTechniques()
     m_ssgiTech.SetAlbedoTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     m_ssgiTech.SetNormalTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_ssgiTech.SetDepthTextureUnit(DEPTH_TEXTURE_UNIT_INDEX);
+
+    if (!m_brightFilterTech.Init()) {
+        printf("Error initializing the full screen quad technique\n");
+        exit(1);
+    }
 }
 
 
@@ -437,6 +445,11 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
 {
     bool IsHDR = pScene->GetConfig()->IsHDREnabled();
     bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();
+	bool IsBloom = pScene->GetConfig()->IsBloomEnabled();
+
+    if (IsBloom) {
+		BrightPass(pScene);
+    }
 
     float AverageLuminance = 0.0f;
     float Exposure = 0.0f;
@@ -746,6 +759,21 @@ void ForwardRenderer::GBufferPass(GLScene* pScene)
     m_geometryTech.ControlPVP(UsePVP);
 
     RenderEntireRenderList(pScene->GetRenderList());
+}
+
+
+void ForwardRenderer::BrightPass(GLScene* pScene)
+{
+    glDisable(GL_DEPTH_TEST);
+
+    m_brightFilterFBO[0].BindForWriting();
+    m_brightFilterFBO[0].Clear();
+
+    m_hdrFBO.BindForReading(GL_TEXTURE0);
+
+    m_brightFilterTech.Render();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 

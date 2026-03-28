@@ -1,5 +1,5 @@
 /*
-    Copyright 2024 Etay Meiri
+    Copyright 2026 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,42 +15,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "GL/gl_full_screen_technique.h"
+#include "GL/gl_bright_filter_technique.h"
 
 
-FullScreenTechnique::FullScreenTechnique()
+bool BrightFilterTechnique::Init()
 {
-}
-
-
-bool FullScreenTechnique::Init(const char* pFragmentShaderFile)
-{
-    if (!Technique::Init()) {
+    if (!FullScreenTechnique::Init("Framework/Shaders/GL/bright_filter.fs")) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/full_screen_tri.vs")) {
-        return false;
-    }
+    GET_UNIFORM(gLuminanceThreshold);
+    GET_UNIFORM(gSampler);
 
-    if (!AddShader(GL_FRAGMENT_SHADER, pFragmentShaderFile)) { 
-        return false;
-    }
+    Enable();
 
-    if (!Finalize()) {
-        return false;
-    }
-
-    glGenVertexArrays(1, &m_dummyVAO);
+    glUniform1i(m_gSamplerLoc, 0);
 
     return true;
 }
-
-
-void FullScreenTechnique::Render()
-{    
-    Enable();
-    glBindVertexArray(m_dummyVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-

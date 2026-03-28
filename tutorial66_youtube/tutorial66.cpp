@@ -72,11 +72,12 @@ public:
         m_pScene->GetPointLights().push_back(m_pointLight);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
-        m_pScene->GetConfig()->ControlHDR(true);
+        m_pScene->GetConfig()->ControlBloom(true);
         m_pScene->GetConfig()->ControlGammaCorrection(true);
 
         m_pRenderingSystem->SetScene(m_pScene);
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
+      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
         m_pScene->SetCamera(Vector3f(59.0f, 9.0f, -1.6f), Vector3f(-1.0f, 0.05f, 0.07f)); // for Sponze
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
         m_pSceneObject->SetScale(0.05f);
@@ -89,7 +90,7 @@ public:
         
         //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));        
 
-       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
+       
    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
     //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");

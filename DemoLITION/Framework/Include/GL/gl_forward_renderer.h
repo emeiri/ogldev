@@ -43,6 +43,7 @@
 #include "GL/gl_hdr_technique.h"
 #include "GL/gl_geometry_technique.h"
 #include "GL/gl_ssgi_technique.h"
+#include "GL/gl_bright_filter_technique.h"
 
 
 enum RENDER_PASS {
@@ -158,6 +159,7 @@ private:
     void SSAOCombinePass();
     void ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
     void GBufferPass(GLScene* pScene);
+    void BrightPass(GLScene* pScene);
     void SSGIPass(GLScene* pScene);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
@@ -197,6 +199,7 @@ private:
     Framebuffer m_ssaoFBO;
     Framebuffer m_hdrFBO;
     Framebuffer m_ssgiFBO;
+	Framebuffer m_brightFilterFBO[2];
     GLBuffer m_ssaoParams;
     Texture m_ssaoRotTexture;
     GLBuffer m_lightParams;
@@ -223,6 +226,7 @@ private:
     PBRSkinningTechnique m_pbrSkinnedTech;
     PickingTexture m_pickingTexture;
     FullScreenTechnique m_fullScreenTech;
+    BrightFilterTechnique m_brightFilterTech;
     SSAOTechnique m_ssaoTech;
     SSAOCombineTechnique m_ssaoCombineTech;
     ToneMapTechnique m_toneMapTech;

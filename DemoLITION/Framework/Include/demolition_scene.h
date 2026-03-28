@@ -151,6 +151,16 @@ public:
     void ControlSSGI(bool Enable) { m_ssgiEnabled = Enable; }
     bool IsSSGIEnabled() const { return m_ssgiEnabled; }
 
+    void ControlBloom(bool Enable) { 
+        m_bloomEnabled = Enable; 
+
+        if (Enable) {
+			m_hdrEnabled = true;    // bloom requires HDR
+        }
+    }
+
+    bool IsBloomEnabled() const { return m_bloomEnabled; }
+
     void SetHDRParams(float AverageLuminance, float Exposure) { m_hdrAverageLuminance = AverageLuminance; m_hdrExposure = Exposure; }
 
     void GetHDRParams(float& AverageLuminance, float& Exposure) { AverageLuminance = m_hdrAverageLuminance; Exposure = m_hdrExposure; }
@@ -186,6 +196,7 @@ private:
     TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_WITH_EXPOSURE;
     bool m_enableGamma = false;
     bool m_ssgiEnabled = false;
+	bool m_bloomEnabled = false;
 };
 
 
