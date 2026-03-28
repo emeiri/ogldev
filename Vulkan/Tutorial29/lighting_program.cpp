@@ -27,14 +27,14 @@ namespace OgldevVK {
 
 const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
 
-enum V5_Binding {
-	V5_BindingVB = 0,
-	V5_BindingIB = 1,
-	V5_BindingTexture2D = 2,
-	V5_BindingUniformVS = 3,
-	V5_BindingMetaData = 4,
-	V5_BindingUniformFS = 5,
-	V5_NumBindings = 6
+enum Binding {
+	BindingVB = 0,
+	BindingIB = 1,
+	BindingTexture2D = 2,
+	BindingUniformVS = 3,
+	BindingMetaData = 4,
+	BindingUniformFS = 5,
+	NumBindings = 6
 };
 
 
@@ -79,37 +79,37 @@ VkDescriptorSetLayout LightingProgram::CreateDescSetLayout(OgldevVK::VulkanCore&
 {
 	std::vector<VkDescriptorSetLayoutBinding> Bindings{
 		{.
-		     binding = V5_BindingVB,
+		     binding = BindingVB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V5_BindingIB,
+			.binding = BindingIB,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V5_BindingTexture2D,
+			.binding = BindingTexture2D,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			.descriptorCount = MAX_TEXTURES,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V5_BindingUniformVS,
+			.binding = BindingUniformVS,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V5_BindingMetaData,
+			.binding = BindingMetaData,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
 			.pImmutableSamplers = NULL
 		}, {
-			.binding = V5_BindingUniformFS,
+			.binding = BindingUniformFS,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -171,7 +171,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		.range = VK_WHOLE_SIZE
 	};
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size() * V5_NumBindings);
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size() * NumBindings);
 
 	u32 WdsIndex = 0;
 
@@ -181,7 +181,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V5_BindingVB,
+			.dstBinding = BindingVB,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -194,7 +194,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V5_BindingIB,
+			.dstBinding = BindingIB,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -208,7 +208,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.pNext = NULL,
 			.dstSet = DstSet,
-			.dstBinding = V5_BindingTexture2D,
+			.dstBinding = BindingTexture2D,
 			.dstArrayElement = 0,
 			.descriptorCount = TextureCount,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -223,7 +223,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V5_BindingUniformVS,
+			.dstBinding = BindingUniformVS,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -237,7 +237,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.pNext = NULL,
 			.dstSet = DstSet,
-			.dstBinding = V5_BindingMetaData,
+			.dstBinding = BindingMetaData,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -252,7 +252,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = DstSet,
-			.dstBinding = V5_BindingUniformFS,
+			.dstBinding = BindingUniformFS,
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,

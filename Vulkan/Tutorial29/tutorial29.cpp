@@ -415,12 +415,6 @@ private:
 			ImGui::RadioButton(lightingModeNames[i], (int*)&m_lightingMode, i);
 		}
 
-		// For imGuIZMO, declare static or global variable or member class quaternion
-		//static quat qRot1 = quat(1.f, 0.f, 0.f, 0.f);
-		//static quat qRot2 = quat(1.f, 0.f, 0.f, 0.f);
-	//	ImGui::gizmo3D("##gizmo1", qRot1, 200.0f/*, mode */);
-
-		//m_lightDir = normalize(m_lightDir);
 		ImGui::gizmo3D("##Dir1", m_lightDir, 200.0f, imguiGizmo::modeDirection);
 
 		static int counter = 0;
@@ -450,8 +444,6 @@ private:
 		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
 
 		glm::mat4 WVP = VP * World;
-
-		m_model.Update(ImageIndex, WVP);
 
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);

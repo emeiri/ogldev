@@ -40,7 +40,6 @@ enum LIGHTING_MODE {
 };
 
 
-// This version support descriptor indexing and indirect rendering
 class LightingProgram : public GraphicsPipeline {
 
 public:
