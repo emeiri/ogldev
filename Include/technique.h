@@ -69,12 +69,10 @@ private:
 // NEW
 #ifdef FAIL_ON_MISSING_LOC                  
 #define GET_UNIFORM(name)    \
-    m_##name##Loc = GetUniformLocation(#name);         \
-    if (m_##name##Loc == INVALID_UNIFORM_LOCATION)    \
-        return false;                       
+    m_##name##Loc = GetUniformLocation(#name); if (m_##name##Loc == INVALID_UNIFORM_LOCATION) return false
 #else
 #define GET_UNIFORM(name)    \
-    m_##name##Loc = GetUniformLocation(name);         
+    m_##name##Loc = GetUniformLocation(#name)         
 #endif
 
 #define DEF_LOC(name) GLuint m_##name##Loc = -1
