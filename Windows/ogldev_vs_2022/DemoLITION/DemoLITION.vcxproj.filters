@@ -163,6 +163,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_bright_filter_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_blur_filter1_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -339,6 +342,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_bright_filter_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_blur_filter1_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -452,6 +458,9 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\bright_filter.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter1.fs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

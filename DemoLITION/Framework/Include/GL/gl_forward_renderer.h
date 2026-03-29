@@ -44,6 +44,7 @@
 #include "GL/gl_geometry_technique.h"
 #include "GL/gl_ssgi_technique.h"
 #include "GL/gl_bright_filter_technique.h"
+#include "GL/gl_blur_filter1_technique.h"
 
 
 enum RENDER_PASS {
@@ -160,6 +161,7 @@ private:
     void ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
     void GBufferPass(GLScene* pScene);
     void BrightPass(GLScene* pScene);
+    void BlurFilter1Pass(GLScene* pScene);
     void SSGIPass(GLScene* pScene);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
@@ -233,6 +235,7 @@ private:
     HDRTechnique m_hdrTech;
     GeometryTechnique m_geometryTech;
     SSGITechnique m_ssgiTech;
+    BlurFilter1Technique m_blurFilter1Tech;
     int m_hdrNumGroupsX = 0;
     int m_hdrNumGroupsY = 0;
 

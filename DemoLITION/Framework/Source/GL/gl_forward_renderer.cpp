@@ -294,7 +294,12 @@ void ForwardRenderer::InitTechniques()
     m_ssgiTech.SetDepthTextureUnit(DEPTH_TEXTURE_UNIT_INDEX);
 
     if (!m_brightFilterTech.Init()) {
-        printf("Error initializing the full screen quad technique\n");
+        printf("Error initializing the bright filter technique\n");
+        exit(1);
+    }
+
+    if (!m_blurFilter1Tech.Init()) {
+        printf("Error initializing the blur filter 1 technique\n");
         exit(1);
     }
 }
@@ -449,6 +454,7 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
 
     if (IsBloom) {
 		BrightPass(pScene);
+        BlurFilter1Pass(pScene);
     }
 
     float AverageLuminance = 0.0f;
@@ -764,16 +770,23 @@ void ForwardRenderer::GBufferPass(GLScene* pScene)
 
 void ForwardRenderer::BrightPass(GLScene* pScene)
 {
-    glDisable(GL_DEPTH_TEST);
-
-    m_brightFilterFBO[0].BindForWriting();
-    m_brightFilterFBO[0].Clear();
-
     m_hdrFBO.BindForReading(GL_TEXTURE0);
 
-    m_brightFilterTech.Render();
+    m_brightFilterFBO[0].BindForWriting();
+    m_brightFilterFBO[0].Clear();    
 
-    glEnable(GL_DEPTH_TEST);
+    m_brightFilterTech.Render();
+}
+
+
+void ForwardRenderer::BlurFilter1Pass(GLScene* pScene)
+{
+    m_brightFilterFBO[0].BindForReading(GL_TEXTURE0);
+
+    m_brightFilterFBO[1].BindForWriting();
+    m_brightFilterFBO[1].Clear();
+   
+    m_blurFilter1Tech.Render();
 }
 
 
