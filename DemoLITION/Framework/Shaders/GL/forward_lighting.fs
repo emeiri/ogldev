@@ -87,10 +87,6 @@ layout(binding = 2) uniform sampler2D gShadowMap;        // required only for sh
 layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for shadow mapping (point light)
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gNormalMap;
-layout(binding = 6) uniform sampler2D gHeightMap;
-layout(binding = 7) uniform sampler2D gAlbedo;
-layout(binding = 8) uniform sampler2D gRoughness;
-layout(binding = 9) uniform sampler2D gMetallic;
 layout(binding = 12) uniform samplerCube gCubemapTexture;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
@@ -740,7 +736,6 @@ void main()
   //  FragColor = vec4(gDirectionalLight.Base.AmbientIntensity);
 //    FragColor = texture(gSampler, TexCoord.xy);
    //   FragColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
-    //FragColor = texture(gHeightMap, TexCoord0);
 
   //  FragColor = GetMaterialAmbientColor();
   //FragColor = vec4(Normal0, 1.0);
