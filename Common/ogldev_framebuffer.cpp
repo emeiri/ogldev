@@ -78,6 +78,9 @@ void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, boo
     m_width = Width;
     m_height = Height;
 
+    std::vector<GLenum> DrawBuffers;
+    DrawBuffers.push_back(GL_COLOR_ATTACHMENT0);
+
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -92,14 +95,10 @@ void Framebuffer::InitNonDSA(int Width, int Height, int NumFormatComponents, boo
     if (NormalEnabled) {
         GenerateBuffer(m_normalBuffer, Width, Height, NumFormatComponents, IsFloat);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalBuffer, 0);
+        DrawBuffers.push_back(GL_COLOR_ATTACHMENT1);
     }
 
-    std::vector<GLenum> DrawBuffers;
-    DrawBuffers.push_back(GL_COLOR_ATTACHMENT0);
-
-    if (NormalEnabled) {
-        glDrawBuffers((GLsizei)DrawBuffers.size(), DrawBuffers.data());
-    }
+    glDrawBuffers((GLsizei)DrawBuffers.size(), DrawBuffers.data());
 
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
@@ -280,7 +279,7 @@ void Framebuffer::Clear()
         }
     }
     else {
-        if (m_colorBuffer) {
+        if (m_colorBuffer != -1) {
             glClearBufferfv(GL_COLOR, 0, (GLfloat*)Color.data());
         }
          
