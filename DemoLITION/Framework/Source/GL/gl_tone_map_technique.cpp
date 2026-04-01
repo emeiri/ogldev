@@ -52,6 +52,7 @@ bool ToneMapTechnique::Init()
 
     if (m_withBloom) {
         GET_UNIFORM(gBlurSampler);
+        GET_UNIFORM(gBloomStrength);
     }
 
     return true;
@@ -98,5 +99,11 @@ void ToneMapTechnique::SetToneMapMethod(TONE_MAP_METHOD Method)
 void ToneMapTechnique::ControlGammaCorrection(bool Enable)
 {
     glUniform1i(m_gEnableGammaCorrectionLoc, Enable);
+}
+
+
+void ToneMapTechnique::SetBloomStrength(float Strength)
+{
+    glUniform1f(m_gBloomStrengthLoc, Strength);
 }
 

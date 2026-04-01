@@ -41,6 +41,7 @@ uniform float gExposure = 0.4457;
 uniform float White = 1.0;
 uniform int gMethodType = 0;
 uniform bool gEnableGammaCorrection = true;
+uniform float gBloomStrength = 1.0;
 
 // XYZ/RGB conversion matrices from:
 // http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html
@@ -301,7 +302,7 @@ void main()
 
     vec4 BloomColor = texture(gBlurSampler, TexCoords);
 
-    Color += BloomColor;
+    Color += BloomColor * gBloomStrength;
 
     if (gEnableGammaCorrection) {
         FragColor = toGamma(Color);

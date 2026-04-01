@@ -483,9 +483,7 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
         SSAOPass(pScene);
         SSAOCombinePass();
     } else if (IsHDR) {
-        ToneMappingPass(IsBloom, AverageLuminance, Exposure,
-                        pScene->GetConfig()->GetToneMapMethod(),
-                        pScene->GetConfig()->IsGammaCorrectionEnabled());
+        ToneMappingPass(pScene, AverageLuminance, Exposure);
 
         /*if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1178,8 +1176,7 @@ void ForwardRenderer::SSAOCombinePass()
 }
 
 
-void ForwardRenderer::ToneMappingPass(bool IsBloom, float AverageLuminance, float Exposure, 
-                                      TONE_MAP_METHOD ToneMapMethod, bool EnableGamma)
+void ForwardRenderer::ToneMappingPass(GLScene* pScene, float AverageLuminance, float Exposure)
 {
     SetRenderToDefaultFB();
 
@@ -1187,6 +1184,10 @@ void ForwardRenderer::ToneMappingPass(bool IsBloom, float AverageLuminance, floa
 
     m_luminanceBuffer.BindSSBO(1);
 
+    bool IsBloom = pScene->GetConfig()->IsBloomEnabled();
+    TONE_MAP_METHOD ToneMapMethod = pScene->GetConfig()->GetToneMapMethod();
+    bool EnableGamma = pScene->GetConfig()->IsGammaCorrectionEnabled();
+    
     if (IsBloom) {
         m_brightFilterFBO[0].BindForReading(GL_TEXTURE1);
 
@@ -1196,6 +1197,8 @@ void ForwardRenderer::ToneMappingPass(bool IsBloom, float AverageLuminance, floa
         m_toneMapTechWithBloom.SetExposure(Exposure);
         m_toneMapTechWithBloom.SetToneMapMethod(ToneMapMethod);
         m_toneMapTechWithBloom.ControlGammaCorrection(EnableGamma);
+        float BloomStrength = pScene->GetConfig()->GetBloomStrength();
+        m_toneMapTechWithBloom.SetBloomStrength(BloomStrength);
 
         m_toneMapTechWithBloom.Render();
     } else {

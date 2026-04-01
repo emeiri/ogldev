@@ -152,14 +152,14 @@ public:
     bool IsSSGIEnabled() const { return m_ssgiEnabled; }
 
     void ControlBloom(bool Enable) { 
-        m_bloomEnabled = Enable; 
+        m_bloom.Enabled = Enable; 
 
         if (Enable) {
 			m_hdrEnabled = true;    // bloom requires HDR
         }
     }
 
-    bool IsBloomEnabled() const { return m_bloomEnabled; }
+    bool IsBloomEnabled() const { return m_bloom.Enabled; }
 
     void SetHDRParams(float AverageLuminance, float Exposure) { m_hdrAverageLuminance = AverageLuminance; m_hdrExposure = Exposure; }
 
@@ -172,6 +172,9 @@ public:
     void ControlGammaCorrection(bool Enable) { m_enableGamma = Enable; }
 
     bool IsGammaCorrectionEnabled() const { return m_enableGamma; }
+
+    void SetBloomStrength(float Strength) { m_bloom.Strength = Strength; }
+    float GetBloomStrength() const { return m_bloom.Strength; }
 
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
@@ -196,7 +199,10 @@ private:
     TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_WITH_EXPOSURE;
     bool m_enableGamma = false;
     bool m_ssgiEnabled = false;
-	bool m_bloomEnabled = false;
+    struct {
+        bool Enabled = false;
+        float Strength = 1.0f;
+    } m_bloom;       
 };
 
 

@@ -43,6 +43,8 @@ public:
 
     void ControlGammaCorrection(bool Enable);
 
+    void SetBloomStrength(float Strength);
+
 private:
 
     bool m_withBloom = false;
@@ -55,5 +57,6 @@ private:
     DEF_LOC(gMethodType);
     DEF_LOC(gEnableGammaCorrection);
     DEF_LOC(gBlurSampler);
+    DEF_LOC(gBloomStrength);
 };
 

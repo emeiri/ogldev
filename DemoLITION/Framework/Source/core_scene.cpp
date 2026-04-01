@@ -290,14 +290,14 @@ void CoreScene::HDRAndToneMappingGui()
 {
     if (ImGui::TreeNode("HDR & Tone Mapping")) {
         bool EnableHDR = m_config.IsHDREnabled();
-        ImGui::Checkbox("HDR Enable", &EnableHDR);
+        ImGui::Checkbox("HDR Enabled", &EnableHDR);
         m_config.ControlHDR(EnableHDR);
 
         float AverageLuminance = 0.0f;
         float Exposure = 0.0f;
         m_config.GetHDRParams(AverageLuminance, Exposure);
-        ImGui::Text("HDR average luminance %.3f", AverageLuminance);
-        ImGui::Text("HDR exposure %.3f", Exposure);
+        ImGui::Text("HDR average luminance %.4f", AverageLuminance);
+        ImGui::Text("HDR exposure %.4f", Exposure);
 
         ImGui::Text("Tone mapping method:");
         TONE_MAP_METHOD ToneMappingMethod = m_config.GetToneMapMethod();
@@ -313,6 +313,16 @@ void CoreScene::HDRAndToneMappingGui()
         bool EnableGamma = m_config.IsGammaCorrectionEnabled();
         ImGui::Checkbox("Enable Gamma correction", &EnableGamma);
         m_config.ControlGammaCorrection(EnableGamma);
+
+        bool EnableBloom = m_config.IsBloomEnabled();
+        ImGui::Checkbox("Bloom Enabled", &EnableBloom);
+        m_config.ControlBloom(EnableBloom);
+
+        if (EnableBloom) {
+            float BloomStrength = m_config.GetBloomStrength();
+            ImGui::SliderFloat("Bloom strength", &BloomStrength, 0.0f, 1.0f);
+            m_config.SetBloomStrength(BloomStrength);
+        }
 
         ImGui::TreePop();
     }
