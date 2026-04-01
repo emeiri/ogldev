@@ -202,7 +202,7 @@ private:
     bool m_hdrEnabled = false;
     float m_hdrAverageLuminance = 0.0f;
     float m_hdrExposure = 0.0f;
-    TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_WITH_EXPOSURE;
+    TONE_MAP_METHOD m_toneMapMethod = TONE_MAP_METHOD_REINHARD;
     bool m_enableGamma = false;
     bool m_ssgiEnabled = false;
     struct {
