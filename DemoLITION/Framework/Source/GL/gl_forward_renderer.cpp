@@ -120,8 +120,8 @@ void ForwardRenderer::InitForwardRenderer(RenderingSystemGL* pRenderingSystemGL)
 
     m_ssgiFBO.Init(m_windowWidth, m_windowHeight, 4, false, true, true);
 
-    m_brightFilterFBO[0].Init(m_windowWidth / 4, m_windowHeight / 4, 3, true, false, false);
-    m_brightFilterFBO[1].Init(m_windowWidth / 4, m_windowHeight / 4, 3, true, false, false);
+    m_brightFilterFBO[0].Init(m_windowWidth / 8, m_windowHeight / 8, 3, true, false, false);
+    m_brightFilterFBO[1].Init(m_windowWidth / 8, m_windowHeight / 8, 3, true, false, false);
 
     int Size = m_windowWidth * m_windowHeight;
     m_hdrData.resize(Size * 3);
