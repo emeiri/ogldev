@@ -45,6 +45,7 @@
 #include "GL/gl_ssgi_technique.h"
 #include "GL/gl_bright_filter_technique.h"
 #include "GL/gl_blur_filter1_technique.h"
+#include "GL/gl_blur_filter2_technique.h"
 
 
 enum RENDER_PASS {
@@ -162,6 +163,7 @@ private:
     void GBufferPass(GLScene* pScene);
     void BrightPass(GLScene* pScene);
     void BlurFilter1Pass(GLScene* pScene);
+    void BlurFilter2Pass(GLScene* pScene);
     void SSGIPass(GLScene* pScene);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
@@ -236,6 +238,7 @@ private:
     GeometryTechnique m_geometryTech;
     SSGITechnique m_ssgiTech;
     BlurFilter1Technique m_blurFilter1Tech;
+    BlurFilter2Technique m_blurFilter2Tech;
     int m_hdrNumGroupsX = 0;
     int m_hdrNumGroupsY = 0;
 

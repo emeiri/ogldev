@@ -30,13 +30,13 @@ uniform float Weights[10];
 
 void main()
 {
-    float dy = 1.0 / (textureSize(gSampler, 0)).y;
+    float dx = 1.0 / (textureSize(gSampler, 0)).x;
 
     vec4 sum = texture(gSampler, TexCoords) * Weights[0];
 
-    for ( int i = 1; i < 10; i++ ) {
-        sum += texture(gSampler, TexCoords + vec2(0.0,PixOffset[i]) * dy ) * Weights[i];
-        sum += texture(gSampler, TexCoords - vec2(0.0,PixOffset[i]) * dy ) * Weights[i];
+    for( int i = 1; i < 10; i++ ) {
+        sum += texture(gSampler, TexCoord + vec2(PixOffset[i],0.0) * dx ) * Weights[i];
+        sum += texture(gSampler, TexCoords - vec2(PixOffset[i],0.0) * dx ) * Weights[i];
     }
 
     FragColor = sum;

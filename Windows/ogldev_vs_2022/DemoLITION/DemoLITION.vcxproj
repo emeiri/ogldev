@@ -189,6 +189,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_base_lighting_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_basic_mesh_entry.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_blur_filter1_technique.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_blur_filter2_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_bright_filter_technique.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_buffer.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_engine_common.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\flat_color_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_base_lighting_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_blur_filter1_technique.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_blur_filter2_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_bright_filter_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_buffer.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_combine_ssao_technique.cpp" />
@@ -283,6 +285,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter1.fs" />
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter2.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\bright_filter.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.fs" />
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\flat_color.vs" />

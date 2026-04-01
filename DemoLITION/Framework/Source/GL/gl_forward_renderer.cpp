@@ -302,6 +302,11 @@ void ForwardRenderer::InitTechniques()
         printf("Error initializing the blur filter 1 technique\n");
         exit(1);
     }
+
+    if (!m_blurFilter2Tech.Init()) {
+        printf("Error initializing the blur filter 2 technique\n");
+        exit(1);
+    }
 }
 
 
@@ -455,6 +460,7 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
     if (IsBloom) {
 		BrightPass(pScene);
         BlurFilter1Pass(pScene);
+        BlurFilter2Pass(pScene);
     }
 
     float AverageLuminance = 0.0f;
@@ -787,6 +793,17 @@ void ForwardRenderer::BlurFilter1Pass(GLScene* pScene)
     m_brightFilterFBO[1].Clear();
    
     m_blurFilter1Tech.Render();
+}
+
+
+void ForwardRenderer::BlurFilter2Pass(GLScene* pScene)
+{
+    m_brightFilterFBO[1].BindForReading(GL_TEXTURE0);
+
+    m_brightFilterFBO[0].BindForWriting();
+    m_brightFilterFBO[0].Clear();
+
+    m_blurFilter2Tech.Render();
 }
 
 

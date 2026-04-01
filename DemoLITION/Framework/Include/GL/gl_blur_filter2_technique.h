@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2025 Etay Meiri
+        Copyright 2026 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,28 +16,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#version 420
+#pragma once
 
+#include "gl_full_screen_technique.h"
 
-layout(location = 0) out vec4 FragColor;
-
-layout(binding = 0) uniform sampler2D gSampler;
-
-in vec2 TexCoords;
-
-uniform float PixOffset[10] = float[](0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0);
-uniform float Weights[10];
-
-void main()
+class BlurFilter2Technique : public FullScreenTechnique
 {
-    float dy = 1.0 / (textureSize(gSampler, 0)).y;
+public:
+    BlurFilter2Technique() {};
 
-    vec4 sum = texture(gSampler, TexCoords) * Weights[0];
+    bool Init();
 
-    for ( int i = 1; i < 10; i++ ) {
-        sum += texture(gSampler, TexCoords + vec2(0.0,PixOffset[i]) * dy ) * Weights[i];
-        sum += texture(gSampler, TexCoords - vec2(0.0,PixOffset[i]) * dy ) * Weights[i];
-    }
+    void SetWeight(uint Index, float Weight);
 
-    FragColor = sum;
-}
+private:
+
+    DEF_LOC(gSampler);
+
+#define NUM_WEIGHTS 10
+
+    GLuint m_weights[NUM_WEIGHTS] = { (GLuint) - 1};
+};
