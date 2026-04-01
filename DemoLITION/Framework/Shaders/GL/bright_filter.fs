@@ -25,7 +25,7 @@ layout(binding = 0) uniform sampler2D gSampler;
 
 in vec2 TexCoords;
 
-uniform float gLuminanceThreshold = 1.7;
+uniform float gLuminanceThreshold = 0.3;
 
 float luminance(vec3 color)
 {
@@ -35,11 +35,13 @@ float luminance(vec3 color)
 
 void main()
 {
-    vec4 val = texture(gSampler, TexCoords.xy);
+   vec4 val = texture(gSampler, TexCoords);
+    float lum = luminance(val.rgb);
 
-    if (luminance(val.rgb) <= gLuminanceThreshold) {
-        val = vec4(0.0);
+    // Only output the "excess" above the threshold (soft-knee)
+    if (lum > gLuminanceThreshold) {
+        FragColor = vec4(val.rgb - gLuminanceThreshold, val.a);
+    } else {
+        FragColor = vec4(0.0);
     }
-
-    FragColor = val;
 }

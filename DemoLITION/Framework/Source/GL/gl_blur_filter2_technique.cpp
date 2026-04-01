@@ -56,9 +56,15 @@ bool BlurFilter2Technique::Init()
         Sum += 2 * Weights[i];
     }
 
+    float ValSum = 0.0f;
+
     // Normalize the weights and set the uniform
     for (int i = 0; i < NUM_WEIGHTS; i++) {
         float Val = Weights[i] / Sum;
+        if (i == 0)
+            ValSum += Val;
+        else
+            ValSum += 2.0f * Val;
         SetWeight(i, Val);
     }
 
