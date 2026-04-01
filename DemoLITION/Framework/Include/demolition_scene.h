@@ -173,8 +173,14 @@ public:
 
     bool IsGammaCorrectionEnabled() const { return m_enableGamma; }
 
+    void SetLuminanceThreshold(float Scale) { m_bloom.LuminanceThreshold = Scale; }
+    float GetLuminanceThreshold() const { return m_bloom.LuminanceThreshold; }
+
     void SetBloomStrength(float Strength) { m_bloom.Strength = Strength; }
     float GetBloomStrength() const { return m_bloom.Strength; }
+
+    void SetBloomBlurScale(float Scale) { m_bloom.BlurScale = Scale; }
+    float GetBloomBlurScale() const { return m_bloom.BlurScale; }
 
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
@@ -202,6 +208,8 @@ private:
     struct {
         bool Enabled = false;
         float Strength = 1.0f;
+        float LuminanceThreshold = 1.0f;
+        float BlurScale = 1.0f;
     } m_bloom;       
 };
 

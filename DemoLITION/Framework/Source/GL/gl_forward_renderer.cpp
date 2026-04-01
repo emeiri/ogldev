@@ -457,12 +457,6 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
     bool IsSSGI = pScene->GetConfig()->IsSSGIEnabled();
 	bool IsBloom = pScene->GetConfig()->IsBloomEnabled();
 
-    if (IsBloom) {
-		BrightPass(pScene);
-        BlurFilter1Pass(pScene);
-        BlurFilter2Pass(pScene);
-    }
-
     float AverageLuminance = 0.0f;
     float Exposure = 0.0f;
 
@@ -470,6 +464,12 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
         //HDRPassCPU(AverageLuminance, Exposure);
         HDRPassGPU(AverageLuminance, Exposure);
         pScene->GetConfig()->SetHDRParams(AverageLuminance, Exposure);
+
+        if (IsBloom) {
+            BrightPass(pScene, AverageLuminance);
+            BlurFilter1Pass(pScene);
+            BlurFilter2Pass(pScene);
+        }
     }
 
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
@@ -772,13 +772,16 @@ void ForwardRenderer::GBufferPass(GLScene* pScene)
 }
 
 
-void ForwardRenderer::BrightPass(GLScene* pScene)
+void ForwardRenderer::BrightPass(GLScene* pScene, float AverageLuminance)
 {
     m_hdrFBO.BindForReading(GL_TEXTURE0);
 
     m_brightFilterFBO[0].BindForWriting();
     m_brightFilterFBO[0].Clear();    
 
+    m_brightFilterTech.Enable();
+    float LuminanceThreshold = pScene->GetConfig()->GetLuminanceThreshold();
+    m_brightFilterTech.SetLuminanceThreshold(LuminanceThreshold);
     m_brightFilterTech.Render();
 }
 
@@ -800,6 +803,9 @@ void ForwardRenderer::BlurFilter2Pass(GLScene* pScene)
 
     m_brightFilterFBO[0].BindForWriting();
     m_brightFilterFBO[0].Clear();
+
+    m_blurFilter2Tech.Enable();
+    m_blurFilter2Tech.SetBlurScale(pScene->GetConfig()->GetBloomBlurScale());
 
     m_blurFilter2Tech.Render();
 }

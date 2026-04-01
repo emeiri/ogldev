@@ -29,6 +29,8 @@ public:
 
     bool Init();
 
+    void SetLuminanceThreshold(float Threshold);
+
 private:
 
     DEF_LOC(gSampler);

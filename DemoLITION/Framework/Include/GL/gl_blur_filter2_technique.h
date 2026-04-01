@@ -29,9 +29,12 @@ public:
 
     void SetWeight(uint Index, float Weight);
 
+    void SetBlurScale(float BlurScale);
+
 private:
 
     DEF_LOC(gSampler);
+    DEF_LOC(gBlurScale);
 
 #define NUM_WEIGHTS 10
 

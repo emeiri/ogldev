@@ -161,7 +161,7 @@ private:
     void SSAOCombinePass();
     void ToneMappingPass(GLScene* pScene, float AverageLuminance, float Exposure);
     void GBufferPass(GLScene* pScene);
-    void BrightPass(GLScene* pScene);
+    void BrightPass(GLScene* pScene, float AverageLuminance);
     void BlurFilter1Pass(GLScene* pScene);
     void BlurFilter2Pass(GLScene* pScene);
     void SSGIPass(GLScene* pScene);

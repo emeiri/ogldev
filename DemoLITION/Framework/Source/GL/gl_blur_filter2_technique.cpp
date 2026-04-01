@@ -28,6 +28,7 @@ bool BlurFilter2Technique::Init()
     }
 
     GET_UNIFORM(gSampler);
+    GET_UNIFORM(gBlurScale);
 
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_weights); i++) {
         char Name[128] = { 0 };
@@ -80,4 +81,10 @@ void BlurFilter2Technique::SetWeight(uint Index, float Weight)
     }
 
     glUniform1f(m_weights[Index], Weight);
+}
+
+
+void BlurFilter2Technique::SetBlurScale(float Scale)
+{
+    glUniform1f(m_gBlurScaleLoc, Scale);
 }

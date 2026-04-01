@@ -33,3 +33,10 @@ bool BrightFilterTechnique::Init()
 
     return true;
 }
+
+
+void BrightFilterTechnique::SetLuminanceThreshold(float Threshold)
+{
+    //printf("Luminance threshold: %f\n", Threshold);
+    glUniform1f(m_gLuminanceThresholdLoc, Threshold);
+}

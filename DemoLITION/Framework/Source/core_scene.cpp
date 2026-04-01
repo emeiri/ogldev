@@ -319,9 +319,17 @@ void CoreScene::HDRAndToneMappingGui()
         m_config.ControlBloom(EnableBloom);
 
         if (EnableBloom) {
+            float LuminanceThreshold = m_config.GetLuminanceThreshold();
+            ImGui::SliderFloat("Luminance threshold", &LuminanceThreshold, 0.01f, 15.0f);
+            m_config.SetLuminanceThreshold(LuminanceThreshold);
+
             float BloomStrength = m_config.GetBloomStrength();
             ImGui::SliderFloat("Bloom strength", &BloomStrength, 0.0f, 1.0f);
             m_config.SetBloomStrength(BloomStrength);
+
+            float BloomBlurScale = m_config.GetBloomBlurScale();
+            ImGui::SliderFloat("Bloom blur scale", &BloomBlurScale, 0.0f, 1.0f);
+            m_config.SetBloomBlurScale(BloomBlurScale);
         }
 
         ImGui::TreePop();
