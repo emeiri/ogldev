@@ -77,7 +77,8 @@ static bool IsLightingPass(RENDER_PASS RenderPass)
 }
 
 
-ForwardRenderer::ForwardRenderer() : m_ssaoRotTexture(GL_TEXTURE_2D)
+ForwardRenderer::ForwardRenderer() : m_ssaoRotTexture(GL_TEXTURE_2D),
+                                     m_toneMapTech(false), m_toneMapTechWithBloom(true)
 {
 
 }
@@ -269,6 +270,15 @@ void ForwardRenderer::InitTechniques()
 
     m_toneMapTech.Enable();
     m_toneMapTech.SetHDRSampler(0);
+
+    if (!m_toneMapTechWithBloom.Init()) {
+        printf("Error initializing the tone mapping technique\n");
+        exit(1);
+    }
+
+    m_toneMapTechWithBloom.Enable();
+    m_toneMapTechWithBloom.SetHDRSampler(0);
+    m_toneMapTechWithBloom.SetBlurSampler(1);
 
     if (!m_hdrTech.Init()) {
         printf("Error initializing the HDR technique\n");
@@ -483,9 +493,9 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
         SSAOPass(pScene);
         SSAOCombinePass();
     } else if (IsHDR) {
-        ToneMappingPass(AverageLuminance, Exposure,
-            pScene->GetConfig()->GetToneMapMethod(),
-            pScene->GetConfig()->IsGammaCorrectionEnabled());
+        ToneMappingPass(IsBloom, AverageLuminance, Exposure,
+                        pScene->GetConfig()->GetToneMapMethod(),
+                        pScene->GetConfig()->IsGammaCorrectionEnabled());
 
         /*if (UseBlitForFinalCopy) {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1178,21 +1188,36 @@ void ForwardRenderer::SSAOCombinePass()
 }
 
 
-void ForwardRenderer::ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma)
+void ForwardRenderer::ToneMappingPass(bool IsBloom, float AverageLuminance, float Exposure, 
+                                      TONE_MAP_METHOD ToneMapMethod, bool EnableGamma)
 {
     SetRenderToDefaultFB();
 
     m_hdrFBO.BindForReading(GL_TEXTURE0);
+
     m_luminanceBuffer.BindSSBO(1);
 
-    m_toneMapTech.Enable();
+    if (IsBloom) {
+        m_brightFilterFBO[1].BindForReading(GL_TEXTURE1);
 
-    m_toneMapTech.SetAverageLuminance(AverageLuminance);
-    m_toneMapTech.SetExposure(Exposure);
-    m_toneMapTech.SetToneMapMethod(ToneMapMethod);
-    m_toneMapTech.ControlGammaCorrection(EnableGamma);
+        m_toneMapTechWithBloom.Enable();
 
-    m_toneMapTech.Render();
+        m_toneMapTechWithBloom.SetAverageLuminance(AverageLuminance);
+        m_toneMapTechWithBloom.SetExposure(Exposure);
+        m_toneMapTechWithBloom.SetToneMapMethod(ToneMapMethod);
+        m_toneMapTechWithBloom.ControlGammaCorrection(EnableGamma);
+
+        m_toneMapTechWithBloom.Render();
+    } else {
+        m_toneMapTech.Enable();
+
+        m_toneMapTech.SetAverageLuminance(AverageLuminance);
+        m_toneMapTech.SetExposure(Exposure);
+        m_toneMapTech.SetToneMapMethod(ToneMapMethod);
+        m_toneMapTech.ControlGammaCorrection(EnableGamma);
+
+        m_toneMapTech.Render();
+    }
 }
 
 

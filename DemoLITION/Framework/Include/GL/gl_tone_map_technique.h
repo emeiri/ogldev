@@ -25,7 +25,7 @@ class ToneMapTechnique : public Technique
 {
 public:
 
-    ToneMapTechnique() {}
+    ToneMapTechnique(bool WithBloom) { m_withBloom = WithBloom; }
 
     virtual bool Init();
 
@@ -35,6 +35,8 @@ public:
 
     void SetHDRSampler(unsigned int TextureUnit);
 
+    void SetBlurSampler(unsigned int TextureUnit);
+
     void SetExposure(float Exposure);
 
     void SetToneMapMethod(TONE_MAP_METHOD Method);
@@ -43,12 +45,15 @@ public:
 
 private:
 
+    bool m_withBloom = false;
+
     GLuint m_dummyVAO = -1;
 
-    DEF_LOC_OLD(m_avgLumLoc);
-    DEF_LOC_OLD(m_hdrSamplerLoc);
-    DEF_LOC_OLD(m_exposure);
-    DEF_LOC_OLD(m_methodTypeLoc);
-    DEF_LOC_OLD(m_enableGammaLoc);
+    DEF_LOC(gAvgLum);
+    DEF_LOC(gHDRSampler);
+    DEF_LOC(gExposure);
+    DEF_LOC(gMethodType);
+    DEF_LOC(gEnableGammaCorrection);
+    DEF_LOC(gBlurSampler);
 };
 

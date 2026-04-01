@@ -159,7 +159,8 @@ private:
     void SetupLightSourcesArray(GLScene* pScene);
     void SSAOPass(GLScene* pScene);
     void SSAOCombinePass();
-    void ToneMappingPass(float AverageLuminance, float Exposure, TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
+    void ToneMappingPass(bool IsBloom, float AverageLuminance, float Exposure, 
+                         TONE_MAP_METHOD ToneMapMethod, bool EnableGamma);
     void GBufferPass(GLScene* pScene);
     void BrightPass(GLScene* pScene);
     void BlurFilter1Pass(GLScene* pScene);
@@ -234,6 +235,7 @@ private:
     SSAOTechnique m_ssaoTech;
     SSAOCombineTechnique m_ssaoCombineTech;
     ToneMapTechnique m_toneMapTech;
+    ToneMapTechnique m_toneMapTechWithBloom;
     HDRTechnique m_hdrTech;
     GeometryTechnique m_geometryTech;
     SSGITechnique m_ssgiTech;

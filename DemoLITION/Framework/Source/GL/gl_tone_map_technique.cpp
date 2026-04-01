@@ -28,8 +28,14 @@ bool ToneMapTechnique::Init()
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/tone_map.fs")) {
-        return false;
+    if (m_withBloom) {
+        if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/tone_map_with_bloom.fs")) {
+            return false;
+        }
+    } else {
+        if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/tone_map.fs")) {
+            return false;
+        }
     }
 
     if (!Finalize()) {
@@ -38,11 +44,15 @@ bool ToneMapTechnique::Init()
 
     glGenVertexArrays(1, &m_dummyVAO);
 
-    GET_UNIFORM_AND_CHECK(m_avgLumLoc, "gAvgLum");
-    GET_UNIFORM_AND_CHECK(m_hdrSamplerLoc, "gHDRSampler");
-    GET_UNIFORM_AND_CHECK(m_exposure, "gExposure");
-    GET_UNIFORM_AND_CHECK(m_methodTypeLoc, "gMethodType");
-    GET_UNIFORM_AND_CHECK(m_enableGammaLoc, "gEnableGammaCorrection");
+    GET_UNIFORM(gAvgLum);
+    GET_UNIFORM(gHDRSampler);
+    GET_UNIFORM(gExposure);
+    GET_UNIFORM(gMethodType);
+    GET_UNIFORM(gEnableGammaCorrection);
+
+    if (m_withBloom) {
+        GET_UNIFORM(gBlurSampler);
+    }
 
     return true;
 }
@@ -57,30 +67,36 @@ void ToneMapTechnique::Render()
 
 void ToneMapTechnique::SetAverageLuminance(float AvgLum)
 {
-    glUniform1f(m_avgLumLoc, AvgLum);
+    glUniform1f(m_gAvgLumLoc, AvgLum);
 }
 
 
 void ToneMapTechnique::SetHDRSampler(unsigned int TextureUnit)
 {
-    glUniform1i(m_hdrSamplerLoc, TextureUnit);
+    glUniform1i(m_gHDRSamplerLoc, TextureUnit);
+}
+
+
+void ToneMapTechnique::SetBlurSampler(unsigned int TextureUnit)
+{
+    glUniform1i(m_gBlurSamplerLoc, TextureUnit);
 }
 
 
 void ToneMapTechnique::SetExposure(float Exposure)
 {
-    glUniform1f(m_exposure, Exposure);
+    glUniform1f(m_gExposureLoc, Exposure);
 }
 
 
 void ToneMapTechnique::SetToneMapMethod(TONE_MAP_METHOD Method)
 {
-    glUniform1i(m_methodTypeLoc, Method);
+    glUniform1i(m_gMethodTypeLoc, Method);
 }
 
 
 void ToneMapTechnique::ControlGammaCorrection(bool Enable)
 {
-    glUniform1i(m_enableGammaLoc, Enable);
+    glUniform1i(m_gEnableGammaCorrectionLoc, Enable);
 }
 

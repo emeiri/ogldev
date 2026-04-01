@@ -472,5 +472,8 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter2.fs">
       <Filter>Shaders\GL</Filter>
     </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map_with_bloom.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
   </ItemGroup>
 </Project>
