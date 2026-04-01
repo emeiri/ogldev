@@ -1198,7 +1198,7 @@ void ForwardRenderer::ToneMappingPass(bool IsBloom, float AverageLuminance, floa
     m_luminanceBuffer.BindSSBO(1);
 
     if (IsBloom) {
-        m_brightFilterFBO[1].BindForReading(GL_TEXTURE1);
+        m_brightFilterFBO[0].BindForReading(GL_TEXTURE1);
 
         m_toneMapTechWithBloom.Enable();
 

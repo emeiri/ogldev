@@ -23,7 +23,7 @@ float Gauss(float x, float sigma2);
 
 bool BlurFilter2Technique::Init()
 {
-    if (!FullScreenTechnique::Init("Framework/Shaders/GL/blur_filter1.fs")) {
+    if (!FullScreenTechnique::Init("Framework/Shaders/GL/blur_filter2.fs")) {
         return false;
     }
 
