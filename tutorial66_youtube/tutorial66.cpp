@@ -49,11 +49,11 @@ public:
         //m_pointLight.Color = Vector3f(1.0f, 0.0f, 0.0f);
         m_pointLight.Color = Vector3f(1.0f);
         m_pointLight.AmbientIntensity = 0.2f;
-        m_pointLight.DiffuseIntensity = 5.0f;
+        m_pointLight.DiffuseIntensity = 0.8f;
         m_pointLight.Attenuation.Constant = 0.1f;
         m_pointLight.Attenuation.Linear = 0.01f;
         m_pointLight.Attenuation.Exp = 0.001f;
-        m_pointLight.WorldPosition = Vector3f(0.0f, 0.5f, -1.6f);
+        m_pointLight.WorldPosition = Vector3f(0.0f, 0.5f, -5.0f);
     }
 
     ~Bloom() {}
@@ -63,9 +63,7 @@ public:
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        m_pScene->SetClearColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
-
-        //  m_pScene->SetCameraSpeed(0.1f);
+        m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
        // m_pScene->GetDirLights().push_back(m_dirLights[0]);
        // m_pScene->GetDirLights().push_back(m_dirLights[1]);
@@ -74,35 +72,39 @@ public:
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->GetConfig()->ControlBloom(true);
         m_pScene->GetConfig()->ControlGammaCorrection(true);
+      //  m_pScene->GetConfig()->ControlSkybox(true);
+
+       // m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
 
         m_pRenderingSystem->SetScene(m_pScene);
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/teapot/teapot.obj");
-      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
-        m_pScene->SetCamera(Vector3f(59.0f, 9.0f, -1.6f), Vector3f(-1.0f, 0.05f, 0.07f)); // for Sponze
+
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
+        //m_pScene->SetCamera(Vector3f(59.0f, 9.0f, -1.6f), Vector3f(-1.0f, 0.05f, 0.07f)); // for Sponze
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/sphere.obj");
+        int ColorTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/rock02_2.jpg");
+        pModel->SetColorTexture(ColorTexture);
+       // m_pScene->SetCamera(Vector3f(3.5f, 0.5f, -0.33f), Vector3f(-1.0f, -0.13f, 0.11f)); // for sphere
+        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/energy_sphere_game_prop.glb");
+
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pSceneObject->SetScale(0.05f);
+        m_pSceneObject->SetPosition(0.0f, 0.0f, 5.0f);
+      // m_pSceneObject->SetScale(0.2f);
         m_pScene->AddToRenderList(m_pSceneObject);
 
         Model* pSphere = m_pRenderingSystem->LoadModel("../Content/sphere/scene.glb");
-        //m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.0f), Vector3f(0.0, 0.0f, 1.0f));
-
-        //m_pScene->SetCamera(Vector3f(20.888552f, 16.027384f, -1.917199f), Vector3f(-0.898551f, -0.423240f, 0.116076f));
-        
-        //m_pScene->SetCamera(Vector3f(0.0f, 70.0f, -200.0f), Vector3f(0.0, -0.2f, 1.0f));        
-
-       
+      
    //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
        // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
     //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");
          
     //    Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
 
-        m_pLightObject = m_pScene->CreateSceneObject(pSphere);
-        m_pLightObject->SetScale(1.0f);
-        m_pScene->AddToRenderList(m_pLightObject);
+      //  m_pLightObject = m_pScene->CreateSceneObject(pSphere);
+      //  m_pLightObject->SetScale(0.1f);
+     //   m_pScene->AddToRenderList(m_pLightObject);
 
       //  m_pBallObject = m_pScene->CreateSceneObject(pSphere);
-       // m_pBallObject->SetScale(0.1f);
+      //  m_pBallObject->SetScale(0.1f);
       //  m_pScene->AddToRenderList(m_pBallObject);        
 
         m_pRenderingSystem->Execute();
@@ -115,7 +117,7 @@ public:
         //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         //  }
 
-     //   m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
+        m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
         
         m_count += 0.01f;
 
@@ -130,22 +132,17 @@ public:
             }
         }
 
-      //  m_pSceneObject->RotateBy(0.0f, 0.1f, 0.0f);
-        //m_pSceneObject->ResetRotations();
-      //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
-     //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
+        m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count) * 15.0f;
+        m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count) * 15.0f;
+//        m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f; // sponza
 
-        //m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
-        m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f; // sponza
-
-        const Vector3f& LightPos = m_pScene->GetPointLights()[0].WorldPosition;
-        m_pLightObject->SetPosition(LightPos.x, -LightPos.y, -LightPos.z);
+        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);
+        //m_pLightObject->SetPosition(LightPos.x, -LightPos.y, -LightPos.z);
         //m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
 
-        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);        
+        
             //m_pScene->GetPointLights()[0].WorldPosition = LightPos;
        // 
-       // m_pBallObject->SetPosition(LightPos.x, LightPos.y, LightPos.z * -1.0f);
     }
 
 
