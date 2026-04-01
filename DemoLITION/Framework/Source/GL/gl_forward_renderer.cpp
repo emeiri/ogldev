@@ -168,11 +168,6 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-    m_lightingTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
-    m_lightingTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
-    m_lightingTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
-    m_lightingTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
-    m_lightingTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -186,11 +181,6 @@ void ForwardRenderer::InitTechniques()
     m_skinningTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     m_skinningTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
-    m_skinningTech.SetRoughnessTextureUnit(ROUGHNESS_TEXTURE_UNIT_INDEX);
-    m_skinningTech.SetMetallicTextureUnit(METALLIC_TEXTURE_UNIT_INDEX);
-    m_skinningTech.SetAOTextureUnit(AO_TEXTURE_UNIT_INDEX);
-    m_skinningTech.SetEmissiveTextureUnit(EMISSIVE_TEXTURE_UNIT_INDEX);
-    m_skinningTech.SetSkyboxTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
     
     if (!m_pbrLightingTech.Init()) {
         printf("Error initializing the PBR lighting technique\n");

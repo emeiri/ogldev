@@ -78,21 +78,6 @@ layout(std430, binding = 2) readonly buffer Materials {
 };
 
 
-struct PBRLight {
-    vec4 PosDir;   // if w == 1 position, else direction
-    vec3 Intensity;
-};
-
-
-struct PBRMaterial
-{
-    float Roughness;
-    bool IsMetal;
-    vec3 Color;
-    bool IsAlbedo;
-};
-
-
 uniform int gNumLights = 0;
 uniform MaterialColor gMaterial;
 uniform bool gHasSampler = false;
@@ -122,8 +107,6 @@ uniform float gRimLightPower = 2.0;
 uniform bool gRimLightEnabled = false;
 uniform bool gCellShadingEnabled = false;
 uniform bool gEnableSpecularExponent = false;
-uniform bool gIsPBR = false;
-uniform PBRMaterial gPBRmaterial;
 uniform bool gShadowsEnabled = true;
 uniform bool gIsIndirectRender = false;
 uniform bool gRefRefractEnabled = true;
@@ -703,53 +686,9 @@ vec4 CalcPhongLighting(vec3 Normal)
         FinalColor = ApplyRefRefract(FinalColor, Normal);
     }  
 
-    return FinalColor;
-}
 
+    FinalColor = vec4(pow(FinalColor.rgb, vec3(1.0/2.2)), 1.0);
 
-vec3 schlickFresnel(float vDotH, vec3 Albedo)
-{
-    vec3 F0 = vec3(0.04);    
-    
-    if (gPBRmaterial.IsAlbedo) {
-        float Metallic = texture(gMetallic, TexCoord0.xy).x;
-        F0 = mix(F0, Albedo, Metallic);
-    } else {
-        if (gPBRmaterial.IsMetal) {
-	        F0 = gPBRmaterial.Color;
-	    }
-    }
-
-    vec3 ret = F0 + (1 - F0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);
-
-    return ret;
-}
-
-
-float GetRoughness()
-{
-    if (gPBRmaterial.IsAlbedo) {
-        return texture(gRoughness, TexCoord0.xy).x;
-    } else {
-        return gPBRmaterial.Roughness;
-    }
-}
-
-
-float geomSmith(float dp, float Roughness)
-{
-    float k = (Roughness + 1.0) * (Roughness + 1.0) / 8.0;
-    float denom = dp * (1 - k) + k;
-    return dp / denom;
-}
-
-
-float ggxDistribution(float nDotH, float Roughness)
-{
-    float alpha2 = Roughness * Roughness * Roughness * Roughness;
-    float d = nDotH * nDotH * (alpha2 - 1) + 1;
-    float ggxdistrib = alpha2 / (PI * d * d);
-    return ggxdistrib;
 }
 
 
@@ -772,102 +711,6 @@ vec3 getNormalFromMap()
 }
 
 
-
-vec3 CalcPBRLighting(int Index, vec3 PosDir, bool IsDirLight, vec3 Normal)
-{
-    vec3 LightIntensity = Lights[Index].Color * Lights[Index].DiffuseIntensity;
-
-    vec3 l = vec3(0.0);
-
-    if (IsDirLight) {
-        l = -PosDir.xyz;
-    } else {
-        l = PosDir - WorldPos0;
-        float LightToPixelDist = length(l);
-        l = normalize(l);
-        LightIntensity /= (LightToPixelDist * LightToPixelDist);
-    }
-
-    vec3 n = Normal;
-    vec3 v = normalize(gCameraWorldPos - WorldPos0);
-    vec3 h = normalize(v + l);
-
-    float nDotH = max(dot(n, h), 0.0);
-    float vDotH = max(dot(v, h), 0.0);
-    float nDotL = max(dot(n, l), 0.0);
-    float nDotV = max(dot(n, v), 0.0);
-
-    vec3 fLambert = vec3(0.0);
-
-    if (!gPBRmaterial.IsMetal) {
-        if (gPBRmaterial.IsAlbedo) {
-            fLambert = pow(texture(gAlbedo, TexCoord0.xy).xyz, vec3(2.2));
-        } else {
-            fLambert = gPBRmaterial.Color;
-        }
-    }
-
-    vec3 F = schlickFresnel(vDotH, fLambert);
-
-    vec3 kS = F;
-    vec3 kD = 1.0 - kS;
-
-    float Roughness = GetRoughness();
-
-    vec3 SpecBRDF_nom  = ggxDistribution(nDotH, Roughness) *
-                         F *
-                         geomSmith(nDotL, Roughness) *
-                         geomSmith(nDotV, Roughness);
-
-    float SpecBRDF_denom = 4.0 * nDotV * nDotL + 0.0001;
-
-    vec3 SpecBRDF = SpecBRDF_nom / SpecBRDF_denom;
-
-    vec3 DiffuseBRDF = kD * fLambert / PI;
-
-    vec3 FinalColor = (DiffuseBRDF + SpecBRDF) * LightIntensity * nDotL;
-
-    return FinalColor;
-}
-
-
-vec3 CalcPBRDirectionalLight(int Index, vec3 Normal)
-{
-    return CalcPBRLighting(Index, Lights[Index].Direction, true, Normal);
-}
-
-
-vec3 CalcPBRPointLight(int Index, vec3 Normal)
-{
-    return CalcPBRLighting(Index, Lights[Index].WorldPos, false, Normal);
-}
-
-
-vec4 CalcTotalPBRLighting(vec3 Normal)
-{
-    vec3 TotalLight = vec3(0.0);
-
-    for (int i = 0 ; i < gNumLights ; i++) {
-        switch (Lights[i].LightType) {
-            case LIGHT_TYPE_DIR:
-                TotalLight += CalcPBRDirectionalLight(i, Normal);
-                break;
-            case LIGHT_TYPE_POINT:
-                TotalLight += CalcPBRPointLight(i, Normal);
-                break;
-        }
-    }
-
-    // HDR tone mapping
-    TotalLight = TotalLight / (TotalLight + vec3(1.0));
-
-    // Gamma correction
-    vec4 FinalLight = vec4(pow(TotalLight, vec3(1.0/2.2)), 1.0);
-
-    return FinalLight;
-}
-
-
 void main()
 {
     TexCoord = TexCoord0;
@@ -876,12 +719,7 @@ void main()
     //FragColor = vec4(TexCoord, 0.0, 0.0);
     //return;
     
-    if (gIsPBR) {
-        FragColor = CalcTotalPBRLighting(Normal);
-      //  FragColor = texture(gRoughness, TexCoord0.xy);
-    } else {
-        FragColor = CalcPhongLighting(Normal);
-    }
+    FragColor = CalcPhongLighting(Normal);
 
     vec4 TempColor = vec4(0.0);
 

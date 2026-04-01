@@ -54,14 +54,8 @@ public:
     void SetShadowMapOffsetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapOffsetTextureParams(float TextureSize, float FilterSize, float Radius);
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
-    void SetAlbedoTextureUnit(unsigned int TextureUnit);
-    void SetRoughnessTextureUnit(unsigned int TextureUnit);
-    void SetMetallicTextureUnit(unsigned int TextureUnit);
-    void SetAOTextureUnit(unsigned int TextureUnit);
-    void SetEmissiveTextureUnit(unsigned int TextureUnit);
     void SetNormalMapTextureUnit(unsigned int TextureUnit);
     void SetHeightMapTextureUnit(unsigned int TextureUnit);
-    void SetSkyboxTextureUnit(unsigned int TextureUnit);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
     void SetLinearFog(float FogStart, float FogEnd);
@@ -71,7 +65,6 @@ public:
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
     void SetFogTime(float Time);
-    void SetPBR(bool IsPBR);
 
 protected:
 
@@ -111,13 +104,6 @@ private:
     GLuint ExpSquaredFogEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint LayeredFogTopLoc = INVALID_UNIFORM_LOCATION;
     GLuint FogTimeLoc = INVALID_UNIFORM_LOCATION;
-    GLuint IsPBRLoc = INVALID_UNIFORM_LOCATION;
-    GLuint AlbedoLoc = INVALID_UNIFORM_LOCATION;
-    GLuint RoughnessLoc = INVALID_UNIFORM_LOCATION;
-    GLuint MetallicLoc = INVALID_UNIFORM_LOCATION;
-    GLuint AOLoc = INVALID_UNIFORM_LOCATION;
-    GLuint EmissiveLoc = INVALID_UNIFORM_LOCATION;
-    GLuint SkyboxLoc = INVALID_UNIFORM_LOCATION;
     GLuint RefRefractEnabledLoc = INVALID_UNIFORM_LOCATION;
     GLuint ReflectionFactorLoc = INVALID_UNIFORM_LOCATION;
     GLuint MaterialToRefRefractFactorLoc = INVALID_UNIFORM_LOCATION;
@@ -129,12 +115,5 @@ private:
         GLuint DiffuseColor = INVALID_UNIFORM_LOCATION;
         GLuint SpecularColor = INVALID_UNIFORM_LOCATION;
     } materialLoc;
-
-    struct {
-        GLuint Roughness;
-        GLuint IsMetal;
-        GLuint Color;
-        GLuint IsAlbedo;
-    } PBRMaterialLoc;
 };
 
