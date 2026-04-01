@@ -121,6 +121,7 @@ protected:
 private:
     void CreateDefaultCamera();
     CoreSceneObject* CreateSceneObjectInternal(CoreModel* pModel);
+    void SceneObjectGUI();
     void SSAOGUI();
     void HDRAndToneMappingGui();
 

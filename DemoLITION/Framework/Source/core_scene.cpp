@@ -231,6 +231,22 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
 }
 
 
+void CoreScene::SceneObjectGUI()
+{
+    if (ImGui::TreeNode("Scene Object")) {
+        if (m_renderList.size() > 0) {
+            CoreSceneObject* pSceneObject = m_renderList.front();
+            Vector3f Pos = pSceneObject->GetPosition();
+            ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
+            ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
+            pSceneObject->SetPosition(Vector3f(Pos.x, Pos.y, Pos.z));
+        }
+
+        ImGui::TreePop();
+    }
+}
+
+
 void CoreScene::SSAOGUI()
 {
     bool my_tool_active = false;
@@ -260,6 +276,8 @@ void CoreScene::ShowSceneGUI()
     ImGui::Begin("Scene Config", &my_tool_active);
     
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+    SceneObjectGUI();
 
     SSAOGUI();
 
