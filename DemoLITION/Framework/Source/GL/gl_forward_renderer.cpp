@@ -792,6 +792,10 @@ void ForwardRenderer::BlurFilter1Pass(GLScene* pScene)
 
     m_brightFilterFBO[1].BindForWriting();
     m_brightFilterFBO[1].Clear();
+
+    m_blurFilter1Tech.Enable();
+    float SigmaV = pScene->GetConfig()->GetBloomSigmaV();
+    m_blurFilter1Tech.SetSigmaV(SigmaV);
    
     m_blurFilter1Tech.Render();
 }
@@ -805,7 +809,9 @@ void ForwardRenderer::BlurFilter2Pass(GLScene* pScene)
     m_brightFilterFBO[0].Clear();
 
     m_blurFilter2Tech.Enable();
-    m_blurFilter2Tech.SetBlurScale(pScene->GetConfig()->GetBloomBlurScale());
+    //m_blurFilter2Tech.SetBlurScale(pScene->GetConfig()->GetBloomBlurScale());
+    float SigmaH = pScene->GetConfig()->GetBloomSigmaH();
+    m_blurFilter2Tech.SetSigmaH(SigmaH);
 
     m_blurFilter2Tech.Render();
 }

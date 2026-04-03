@@ -17,11 +17,13 @@
 
 #include "GL/gl_blur_filter1_technique.h"
 
+#define SIGMA_V 25.0f
 
-float Gauss(float x, float sigma2)
+
+float Gauss(float x, float sigma)
 {
-    double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
-    double expon = -(x * x) / (2.0 * sigma2);
+    double coeff = 1.0 / (glm::two_pi<double>() * sigma);
+    double expon = -(x * x) / (2.0 * sigma);
     return (float)(coeff * exp(expon));
 }
 
@@ -34,6 +36,20 @@ bool BlurFilter1Technique::Init()
 
     GET_UNIFORM(gSampler);
 
+    GetWeightsLocations();
+
+    Enable();
+
+    glUniform1i(m_gSamplerLoc, 0);
+
+    SetSigmaV(SIGMA_V);
+
+    return true;
+}
+
+
+void BlurFilter1Technique::GetWeightsLocations()
+{
     for (int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_weights); i++) {
         char Name[128] = { 0 };
         SNPRINTF(Name, sizeof(Name), "Weights[%d]", i);
@@ -45,19 +61,19 @@ bool BlurFilter1Technique::Init()
             exit(1);
         }
     }
+}
 
-    Enable();
 
-    glUniform1i(m_gSamplerLoc, 0);
-
-    float Weights[NUM_WEIGHTS], Sum = 0.0f, Sigma2 = 25.0f;
+void BlurFilter1Technique::SetSigmaV(float Sigma)
+{
+    float Weights[NUM_WEIGHTS] = { 0.0f }, Sum = 0.0f;
 
     // Compute and sum the weights
-    Weights[0] = Gauss(0, Sigma2);
+    Weights[0] = Gauss(0, Sigma);
     Sum = Weights[0];
 
     for (int i = 1; i < NUM_WEIGHTS; i++) {
-        Weights[i] = Gauss(float(i), Sigma2);
+        Weights[i] = Gauss(float(i), Sigma);
         Sum += 2 * Weights[i];
     }
 
@@ -66,8 +82,6 @@ bool BlurFilter1Technique::Init()
         float Val = Weights[i] / Sum;
         SetWeight(i, Val);
     }
-
-    return true;
 }
 
 

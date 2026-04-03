@@ -27,11 +27,12 @@ public:
 
     bool Init();
 
-    void SetWeight(uint Index, float Weight);
-
-    void SetBlurScale(float BlurScale);
+    void SetSigmaH(float Sigma);
 
 private:
+
+    void SetWeight(uint Index, float Weight);
+    void GetWeightsLocations();
 
     DEF_LOC(gSampler);
     DEF_LOC(gBlurScale);

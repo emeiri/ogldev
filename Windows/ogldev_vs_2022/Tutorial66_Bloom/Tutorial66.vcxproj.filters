@@ -64,10 +64,22 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\pbr_forward_lighting.fs">
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.vs">
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\forward_lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter1.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter2.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\bright_filter.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map_with_bloom.fs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

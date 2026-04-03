@@ -27,9 +27,12 @@ public:
 
     bool Init();
 
-    void SetWeight(uint Index, float Weight);
+    void SetSigmaV(float Sigma);
 
 private:
+
+    void SetWeight(uint Index, float Weight);
+    void GetWeightsLocations();
 
     DEF_LOC(gSampler);
 

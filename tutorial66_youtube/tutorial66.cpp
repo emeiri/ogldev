@@ -139,10 +139,6 @@ public:
         //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);
         //m_pLightObject->SetPosition(LightPos.x, -LightPos.y, -LightPos.z);
         //m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
-
-        
-            //m_pScene->GetPointLights()[0].WorldPosition = LightPos;
-       // 
     }
 
 

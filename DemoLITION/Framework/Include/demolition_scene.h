@@ -182,6 +182,12 @@ public:
     void SetBloomBlurScale(float Scale) { m_bloom.BlurScale = Scale; }
     float GetBloomBlurScale() const { return m_bloom.BlurScale; }
 
+    void SetBloomSigmaV(float SigmaV) { m_bloom.SigmaV = SigmaV; }
+    float GetBloomSigmaV() const { return m_bloom.SigmaV; }
+
+    void SetBloomSigmaH(float SigmaH) { m_bloom.SigmaH = SigmaH; }
+    float GetBloomSigmaH() const { return m_bloom.SigmaH; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -210,6 +216,8 @@ private:
         float Strength = 1.0f;
         float LuminanceThreshold = 1.0f;
         float BlurScale = 1.0f;
+        float SigmaV = 25.0f;
+        float SigmaH = 25.0f;
     } m_bloom;       
 };
 

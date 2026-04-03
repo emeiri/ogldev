@@ -330,6 +330,14 @@ void CoreScene::HDRAndToneMappingGui()
             float BloomBlurScale = m_config.GetBloomBlurScale();
             ImGui::SliderFloat("Bloom blur scale", &BloomBlurScale, 0.0f, 1.0f);
             m_config.SetBloomBlurScale(BloomBlurScale);
+
+            float SigmaH = m_config.GetBloomSigmaH();
+            ImGui::SliderFloat("Bloom Sigma H", &SigmaH, 0.0f, 100.0f);
+            m_config.SetBloomSigmaH(SigmaH);
+
+            float SigmaV = m_config.GetBloomSigmaV();
+            ImGui::SliderFloat("Bloom Sigma V", &SigmaV, 0.0f, 100.0f);
+            m_config.SetBloomSigmaV(SigmaV);
         }
 
         ImGui::TreePop();
