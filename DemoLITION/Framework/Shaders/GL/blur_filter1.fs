@@ -25,8 +25,7 @@ layout(binding = 0) uniform sampler2D gSampler;
 
 in vec2 TexCoords;
 
-uniform float PixOffset[10] = float[](0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0);
-uniform float Weights[10]; // TODO: set constants
+uniform float Weights[10];
 
 void main()
 {
@@ -34,9 +33,11 @@ void main()
 
     vec4 sum = texture(gSampler, TexCoords) * Weights[0];
 
-    for ( int i = 1; i < 10; i++ ) {
-        sum += texture(gSampler, TexCoords + vec2(0.0,PixOffset[i]) * dy ) * Weights[i];
-        sum += texture(gSampler, TexCoords - vec2(0.0,PixOffset[i]) * dy ) * Weights[i];
+    for (int i = 1; i < 10; i++) {
+        vec2 Offset = vec2(0.0, i * dy);
+        float w = Weights[i];
+        sum += texture(gSampler, TexCoords + Offset ) * w;  // above
+        sum += texture(gSampler, TexCoords - Offset ) * w;  // below
     }
 
     FragColor = sum;
