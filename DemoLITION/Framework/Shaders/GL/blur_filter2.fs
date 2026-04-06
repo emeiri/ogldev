@@ -27,7 +27,6 @@ in vec2 TexCoords;
 
 uniform float PixOffset[10] = float[](0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0);
 uniform float Weights[10]; // TODO: set constants
-uniform float gBlurScale = 1.0;
 
 void main()
 {
@@ -40,5 +39,5 @@ void main()
         sum += texture(gSampler, TexCoords - vec2(PixOffset[i],0.0) * dx ) * Weights[i];
     }
 
-    FragColor = sum * gBlurScale;
+    FragColor = sum;
 }

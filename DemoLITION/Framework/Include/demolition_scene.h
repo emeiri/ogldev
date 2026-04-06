@@ -179,9 +179,6 @@ public:
     void SetBloomStrength(float Strength) { m_bloom.Strength = Strength; }
     float GetBloomStrength() const { return m_bloom.Strength; }
 
-    void SetBloomBlurScale(float Scale) { m_bloom.BlurScale = Scale; }
-    float GetBloomBlurScale() const { return m_bloom.BlurScale; }
-
     void SetBloomSigmaV(float SigmaV) { m_bloom.SigmaV = SigmaV; }
     float GetBloomSigmaV() const { return m_bloom.SigmaV; }
 
@@ -215,7 +212,6 @@ private:
         bool Enabled = false;
         float Strength = 1.0f;
         float LuminanceThreshold = 1.0f;
-        float BlurScale = 1.0f;
         float SigmaV = 25.0f;
         float SigmaH = 25.0f;
     } m_bloom;       

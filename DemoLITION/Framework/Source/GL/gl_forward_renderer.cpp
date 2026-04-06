@@ -809,7 +809,6 @@ void ForwardRenderer::BlurFilter2Pass(GLScene* pScene)
     m_brightFilterFBO[0].Clear();
 
     m_blurFilter2Tech.Enable();
-    //m_blurFilter2Tech.SetBlurScale(pScene->GetConfig()->GetBloomBlurScale());
     float SigmaH = pScene->GetConfig()->GetBloomSigmaH();
     m_blurFilter2Tech.SetSigmaH(SigmaH);
 
