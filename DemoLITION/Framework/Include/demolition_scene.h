@@ -48,6 +48,7 @@ public:
     const glm::vec3 GetGLMPos() const { return glm::vec3(m_pos.x, m_pos.y, m_pos.z); }
     Matrix4f GetMatrix() const;
 
+    void SetFlatColor(float r, float g, float b) { m_flatColor.r = r; m_flatColor.g = g; m_flatColor.b = b; m_flatColor.a = 1.0; }
     void SetFlatColor(const Vector4f Col) { m_flatColor = Col; }
     const Vector4f& GetFlatColor() const { return m_flatColor; }
 
