@@ -181,8 +181,10 @@ void CoreModel::DestroyModel()
     }
 }
 
-bool CoreModel::LoadAssimpModel(const string& Filename)
+bool CoreModel::LoadAssimpModel(const std::string& Filename)
 {
+    m_fileName = Filename;
+
     AllocBuffers();
 
     bool Ret = false;

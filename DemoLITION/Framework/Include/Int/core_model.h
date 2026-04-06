@@ -204,6 +204,8 @@ protected:
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
 
+    std::string m_fileName;
+
 private:
 
     template<typename VertexType>
