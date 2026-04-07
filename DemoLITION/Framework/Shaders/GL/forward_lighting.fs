@@ -414,7 +414,7 @@ vec4 CalcPointLight(int Index, vec3 Normal, bool IsPoint)
                          Lights[Index].Atten_Linear * Distance +
                          Lights[Index].Atten_Exp * Distance * Distance;
 
-    return Color / Attenuation;
+    return Color / (1.0 + Attenuation);
 }
 
 
