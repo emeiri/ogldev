@@ -186,6 +186,9 @@ public:
     void SetBloomSigmaH(float SigmaH) { m_bloom.SigmaH = SigmaH; }
     float GetBloomSigmaH() const { return m_bloom.SigmaH; }
 
+    void ForcePBRDisabled(bool Disabled) { m_disablePBR = Disabled; }
+    bool IsPBRDisabled() const { return m_disablePBR; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -215,7 +218,8 @@ private:
         float LuminanceThreshold = 1.0f;
         float SigmaV = 25.0f;
         float SigmaH = 25.0f;
-    } m_bloom;       
+    } m_bloom;  
+    bool m_disablePBR = false;
 };
 
 

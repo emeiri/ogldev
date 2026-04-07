@@ -370,18 +370,24 @@ void ForwardRenderer::SwitchToLightingTech(LIGHTING_TECHNIQUE TechId)
 }
 
 
-LIGHTING_TECHNIQUE ForwardRenderer::GetLightingTech(CoreModel* pModel)
+LIGHTING_TECHNIQUE ForwardRenderer::GetLightingTech(GLScene* pScene, CoreModel* pModel)
 {
     LIGHTING_TECHNIQUE LightingTech = UNDEFINED_TECHNIQUE;
 
+    bool IsPBR = pModel->IsPBR();
+
+    if (pScene->GetConfig()->IsPBRDisabled()) {
+        IsPBR = false;
+    }
+
     if (pModel->IsAnimated()) {
-        if (pModel->IsPBR()) {
+        if (IsPBR) {
             LightingTech = PBR_GLTF2_SKINNING;
         } else {
             LightingTech = FORWARD_SKINNING;
         }        
     } else {
-        if (pModel->IsPBR()) {
+        if (IsPBR) {
             LightingTech = PBR_GLTF2_LIGHTING;
         } else {
             LightingTech = FORWARD_LIGHTING;
@@ -984,14 +990,14 @@ void ForwardRenderer::RenderObjectList(GLScene* pScene, long long TotalRuntimeMi
             StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
             //  FirstTimeForwardLighting = false; TODO: currently disabled
         }
-        RenderWithForwardLighting(m_pcurSceneObject, TotalRuntimeMillis);
+        RenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
     }
 }
 
 
 void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
 {
-    LIGHTING_TECHNIQUE LightingTech = GetLightingTech(pSceneObject->GetModel());
+    LIGHTING_TECHNIQUE LightingTech = GetLightingTech(pScene, pSceneObject->GetModel());
 
     SwitchToLightingTech(LightingTech);
 
@@ -1012,9 +1018,9 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 }
 
 
-void ForwardRenderer::RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
+void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
 {
-    LIGHTING_TECHNIQUE LightingTech = GetLightingTech(pSceneObject->GetModel());
+    LIGHTING_TECHNIQUE LightingTech = GetLightingTech(pScene, pSceneObject->GetModel());
 
     SwitchToLightingTech(LightingTech);
 

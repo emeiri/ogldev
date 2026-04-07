@@ -168,12 +168,12 @@ private:
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
     void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
-    void RenderWithForwardLighting(CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
+    void RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
     void RenderInfiniteGrid(GLScene* pScene);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);
-    LIGHTING_TECHNIQUE GetLightingTech(CoreModel* pModel);
+    LIGHTING_TECHNIQUE GetLightingTech(GLScene* pScene, CoreModel* pModel);
     void ApplySceneConfig(GLScene* pScene);
     void InitShadowMapping();
     void InitTechniques();
