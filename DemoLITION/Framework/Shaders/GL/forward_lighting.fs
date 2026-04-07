@@ -683,10 +683,10 @@ vec4 CalcPhongLighting(vec3 Normal)
     }  
 
     // HDR tone mapping
-    FinalColor.rgb = FinalColor.rgb / (FinalColor.rgb + vec3(1.0));
+ //   FinalColor.rgb = FinalColor.rgb / (FinalColor.rgb + vec3(1.0));
 
     // Gamma correction
-    FinalColor = vec4(pow(FinalColor.rgb, vec3(1.0/2.2)), 1.0);
+   // FinalColor = vec4(pow(FinalColor.rgb, vec3(1.0/2.2)), 1.0);
 
     return FinalColor;
 }
