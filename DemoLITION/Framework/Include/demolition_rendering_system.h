@@ -74,7 +74,16 @@ public:
 
     virtual Scene* CreateEmptyScene() = 0;
 
-    virtual Scene* CreateScene(const std::string& Filename) = 0;
+    Scene* CreateScene(const std::string& Filename) 
+    {
+        ModelLoadFlags DefaultFlags;
+        return CreateSceneInternal(Filename, DefaultFlags);
+    }
+
+    Scene* CreateScene(const std::string& Filename, const ModelLoadFlags& Flags)
+    {
+        return CreateSceneInternal(Filename, Flags);
+    }
 
     virtual Scene* CreateDefaultScene() = 0;
 
@@ -97,4 +106,8 @@ public:
     virtual long long GetElapsedTimeMillis() const = 0;
 
     virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
+
+protected:
+
+    virtual Scene* CreateSceneInternal(const std::string& Filename, const ModelLoadFlags& Flags) = 0;
 };

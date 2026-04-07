@@ -131,9 +131,9 @@ CoreScene::CoreScene(CoreRenderingSystem* pRenderingSystem)
     m_sceneObjects.resize(NUM_SCENE_OBJECTS);
 }
 
-void CoreScene::LoadScene(const std::string& Filename)
+void CoreScene::LoadScene(const std::string& Filename, const ModelLoadFlags& Flags)
 {
-    CoreModel* pModel = (CoreModel*)m_pCoreRenderingSystem->LoadModel(Filename.c_str());
+    CoreModel* pModel = (CoreModel*)m_pCoreRenderingSystem->LoadModel(Filename.c_str(), Flags);
     SceneObject* pSceneObject = CreateSceneObject(pModel);
     AddToRenderList(pSceneObject);
 

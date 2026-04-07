@@ -70,7 +70,6 @@ aiProcess_ImproveCacheLocality)
                                       aiProcess_RemoveRedundantMaterials | \
                                       aiProcess_FindDegenerates | \
                                       aiProcess_FindInvalidData | \
-aiProcess_ConvertToLeftHanded |\
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
 #endif
@@ -181,7 +180,7 @@ void CoreModel::DestroyModel()
     }
 }
 
-bool CoreModel::LoadAssimpModel(const std::string& Filename)
+bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
 {
     m_fileName = Filename;
 
@@ -189,7 +188,13 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename)
 
     bool Ret = false;
 
-    m_pScene = m_Importer.ReadFile(Filename.c_str(), DEMOLITION_ASSIMP_LOAD_FLAGS);
+    uint LoadFlags = DEMOLITION_ASSIMP_LOAD_FLAGS;
+
+    if (Flags.ConvertToLeftHanded) {
+        LoadFlags |= aiProcess_ConvertToLeftHanded;
+    }
+
+    m_pScene = m_Importer.ReadFile(Filename.c_str(), LoadFlags);
 
     if (m_pScene) {
         printf("--- START Node Hierarchy ---\n");

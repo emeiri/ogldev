@@ -31,13 +31,13 @@ class CoreRenderingSystem : public RenderingSystem
 {
  public:
 
-    virtual Scene* CreateScene(const std::string& Filename);
-
     virtual Scene* CreateDefaultScene();
 
     virtual void* CreateWindow(int Width, int Height, const char* pWindowName);
 
     virtual Model* LoadModel(const std::string& Filename);
+
+    Model* LoadModel(const std::string& Filename, const ModelLoadFlags& Flags);
 
     virtual Model* LoadMesh(const std::string& Filename);
 
@@ -61,13 +61,15 @@ class CoreRenderingSystem : public RenderingSystem
 
  protected:
 
+    virtual Scene* CreateSceneInternal(const std::string& Filename, const ModelLoadFlags& Flags);
+
     CoreRenderingSystem(GameCallbacks* pGameCallbacks, bool LoadBasicShapes);
 
     ~CoreRenderingSystem();
 
     virtual void* CreateWindowInternal(const char* pWindowName) = 0;
 
-    virtual CoreModel* LoadModelInternal(const std::string& Filename) = 0;
+    virtual CoreModel* LoadModelInternal(const std::string& Filename, const ModelLoadFlags& Flags) = 0;
 
     virtual CoreModel* LoadMeshInternal(const std::string& Filename) = 0;
 

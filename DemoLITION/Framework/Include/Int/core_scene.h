@@ -74,7 +74,7 @@ public:
 
     virtual ~CoreScene() {}
 
-    virtual void LoadScene(const std::string& Filename);
+    virtual void LoadScene(const std::string& Filename, const ModelLoadFlags& Flags);
 
     virtual SceneObject* CreateSceneObject(Model* pModel);
 

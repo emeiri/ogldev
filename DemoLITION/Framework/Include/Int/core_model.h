@@ -28,6 +28,7 @@
 #include "Int/core_material.h"
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
+#include "demolition_scene.h"
 #include "demolition_model.h"
 #include "Int/core_mesh.h"
 #include "GL/gl_basic_mesh_entry.h"
@@ -61,7 +62,13 @@ public:
 
     void DestroyModel();
 
-    bool LoadAssimpModel(const std::string& Filename);
+    bool LoadAssimpModel(const std::string& Filename)
+    {
+        ModelLoadFlags DefaultFlags;
+        return LoadAssimpModel(Filename, DefaultFlags);
+    }
+
+    bool LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags);
 
     const std::vector<GLMCameraFirstPerson>& GetCameras() const { return m_cameras; }
 

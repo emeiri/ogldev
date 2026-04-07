@@ -41,7 +41,7 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual Scene* CreateEmptyScene();
 
-    virtual CoreModel* LoadModelInternal(const std::string& Filename);
+    virtual CoreModel* LoadModelInternal(const std::string& Filename, const ModelLoadFlags& Flags);
 
     virtual CoreModel* LoadMeshInternal(const std::string& Filename);
 

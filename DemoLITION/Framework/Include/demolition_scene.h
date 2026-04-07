@@ -103,6 +103,11 @@ enum TONE_MAP_METHOD {
 };
 
 
+struct ModelLoadFlags {
+    bool ConvertToLeftHanded = false;
+};
+
+
 class SceneConfig
 {
 public:

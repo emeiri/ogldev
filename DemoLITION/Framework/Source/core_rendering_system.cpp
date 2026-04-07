@@ -85,21 +85,23 @@ void* CoreRenderingSystem::CreateWindow(int Width, int Height, const char* pWind
 
 void CoreRenderingSystem::InitializeBasicShapes()
 {
-    CoreModel* pModel = LoadModelInternal("../Content/sphere.obj");
+    ModelLoadFlags DefaultFlags;
+
+    CoreModel* pModel = LoadModelInternal("../Content/sphere.obj", DefaultFlags);
     m_shapeToModel["sphere"] = pModel;
     
-    pModel = LoadModelInternal("../Content/box.obj");
+    pModel = LoadModelInternal("../Content/box.obj", DefaultFlags);
     m_shapeToModel["cube"] = pModel;
 
-    pModel = LoadModelInternal("../Content/quad.obj");
+    pModel = LoadModelInternal("../Content/quad.obj", DefaultFlags);
     m_shapeToModel["square"] = pModel;
 }
 
 
-Scene* CoreRenderingSystem::CreateScene(const std::string& Filename)
+Scene* CoreRenderingSystem::CreateSceneInternal(const std::string& Filename, const ModelLoadFlags& Flags)
 {
     CoreScene* pScene = (CoreScene*)CreateEmptyScene();
-    pScene->LoadScene(Filename);
+    pScene->LoadScene(Filename, Flags);
     return pScene;
 }
 
@@ -128,12 +130,19 @@ Scene* CoreRenderingSystem::GetScene()
 
 Model* CoreRenderingSystem::LoadModel(const std::string& Filename)
 {
+    ModelLoadFlags DefaultFlags;
+    return LoadModel(Filename, DefaultFlags);
+}
+
+
+Model* CoreRenderingSystem::LoadModel(const std::string& Filename, const ModelLoadFlags& Flags)
+{
     if (m_numModels == m_models.size()) {
         printf("%s:%d: out of models space\n", __FILE__, __LINE__);
         exit(0);
     }
 
-    CoreModel* pModel = LoadModelInternal(Filename);
+    CoreModel* pModel = LoadModelInternal(Filename, Flags);
 
     if (pModel) {
         m_models[m_numModels] = pModel;

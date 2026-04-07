@@ -108,11 +108,11 @@ Scene* RenderingSystemGL::CreateEmptyScene()
 }
 
 
-CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename)
+CoreModel* RenderingSystemGL::LoadModelInternal(const std::string& Filename, const ModelLoadFlags& Flags)
 {
     GLModel* pModel = new GLModel(this);
 
-    if (!pModel->LoadAssimpModel(Filename)) {
+    if (!pModel->LoadAssimpModel(Filename, Flags)) {
         delete pModel;
         pModel = NULL;
     }
