@@ -676,6 +676,8 @@ vec4 CalcPhongLighting(vec3 Normal)
 
     vec4 TexColor = GetTexColor();
 
+    TexColor = TexColor * gColorMod + gColorAdd;
+
     vec4 FinalColor = TexColor * TotalLight;
 
     if (gRefRefractEnabled) {
@@ -732,7 +734,6 @@ void main()
     
     // I'm using gColorMod and gColorAdd to enhance the color in
     // my youtube thumbnails. They are not an integral part of the lighting equation.
-     FragColor = TempColor * gColorMod + gColorAdd;
 
    // FragColor = vec4(1.0);  
  // FragColor = GetTexColor();
