@@ -277,6 +277,10 @@ void CoreScene::ShowSceneGUI()
     
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
+    GeneralGUI();
+
+    LightingGUI();
+
     SceneObjectGUI();
 
     SSAOGUI();
@@ -284,6 +288,41 @@ void CoreScene::ShowSceneGUI()
     HDRAndToneMappingGui();    
 
     ImGui::End();    
+}
+
+
+void CoreScene::LightingGUI()
+{
+    if (ImGui::TreeNode("Lighting")) {
+        if (m_renderList.size() > 0) {
+            CoreSceneObject* pSceneObject = m_renderList.front();
+            const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
+            if (PointLights.size() > 0) {
+                PointLight l = PointLights[0];
+                Vector3f& Pos = l.WorldPosition;
+                ImGui::Text("First point light position: %.3f, %.3f, %.3f", Pos.x, Pos.y, Pos.z);
+                ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
+                pSceneObject->GetModel()->SetPointLight(0, l);
+            }
+
+        }
+//        ImGui::Text("Directional lights: %d", (int)m_dirLights.size());
+  //      ImGui::Text("Point lights: %d", (int)m_pointLights.size());
+    //    ImGui::Text("Spot lights: %d", (int)m_spotLights.size());
+
+        ImGui::TreePop();
+    }
+}
+
+
+void CoreScene::GeneralGUI()
+{
+    if (ImGui::TreeNode("General")) {
+        bool DisablePBR = m_config.IsPBRDisabled();
+        ImGui::Checkbox("Disable PBR", &DisablePBR);
+        m_config.ForcePBRDisabled(DisablePBR);
+        ImGui::TreePop();
+    }
 }
 
 void CoreScene::HDRAndToneMappingGui()

@@ -76,7 +76,7 @@ aiProcess_ConvertToLeftHanded |\
 //aiProcess_MakeLeftHanded | \
 
 
-Texture* s_pMissingTexture = NULL;
+//Texture* s_pMissingTexture = NULL;
 
 static void traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
@@ -459,10 +459,11 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
             v.Color = Vector4f(1.0f);
         }
 
-     /*   printf("Pos %d: ", i); v.Position.Print();
-        printf("Normal: "); v.Normal.Print();
-        printf("Tangent: "); v.Tangent.Print();
-        printf("Bitangent: "); v.Bitangent.Print();*/
+      //  printf("Pos %d: ", i); v.Position.Print();
+      //  printf("Normal: "); v.Normal.Print();
+      //  printf("Tangent: "); v.Tangent.Print();
+      //  printf("Bitangent: "); v.Bitangent.Print();
+     //   printf("Color: "); v.Color.Print();
 
         Vertices.push_back(v);
     }
@@ -760,7 +761,8 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
         LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, 0, TEX_TYPE_BASE);
     } else {
         printf("Warning! no diffuse texture\n");
-
+ 
+#if 0
         if (!s_pMissingTexture) {
             printf("Loading default texture\n");
             s_pMissingTexture = AllocTexture2D();
@@ -768,11 +770,21 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 #ifdef OGLDEV_VULKAN   // hack due to different local dirs
             s_pMissingTexture->Load("../../Content/textures/no_texture.png", IsSRGB);            
 #else
-            s_pMissingTexture->Load("../Content/textures/no_texture.png", IsSRGB);
+          //  s_pMissingTexture->Load("../Content/textures/no_texture.png", IsSRGB);
 #endif
         }
+#endif
 
-       m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = s_pMissingTexture;
+        aiString Path("no_texture.png");
+#ifdef OGLDEV_VULKAN
+        std::string Dir("../../Content/textures/");
+#else
+        std::string Dir("../Content/textures/");
+#endif
+
+        LoadTextureFromFile(Dir, Path, MaterialIndex, TEX_TYPE_BASE, false);
+
+     //  m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = s_pMissingTexture;
     }
 }
 
@@ -1123,6 +1135,7 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
 
     printf("Final Pos: "); FinalPos.Print();
     printf("Final Dir: "); FinalTargetDir.Print();
+    printf("Final Up: "); FinalUp.Print();
 }
 
 
@@ -1223,6 +1236,7 @@ void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
 {
     PointLight l;
     l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
+    printf("Point light color [%f %f %f]\n", l.Color.x, l.Color.y, l.Color.z);
     //l.Color = Vector3f(1.0f);
     l.DiffuseIntensity = 1.0f; // TODO
 
@@ -1236,7 +1250,7 @@ void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
     Vector4f Pos4D(Position, 1.0f);
     Pos4D = Transformation * Pos4D;
     Vector3f WorldPosition = Pos4D;
-    printf("World Position: "); WorldPosition.Print();
+    printf("Final Position: "); WorldPosition.Print();
     l.WorldPosition = WorldPosition;
 
     l.Attenuation.Constant = light.mAttenuationConstant;
