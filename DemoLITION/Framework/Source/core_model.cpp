@@ -69,6 +69,7 @@ aiProcess_ImproveCacheLocality)
                                       aiProcess_RemoveRedundantMaterials | \
                                       aiProcess_FindDegenerates | \
                                       aiProcess_FindInvalidData | \
+aiProcess_ConvertToLeftHanded |\
                                       aiProcess_GenUVCoords | \
                                       aiProcess_CalcTangentSpace)
 #endif
@@ -1051,16 +1052,12 @@ void CoreModel::InitCameras(const aiScene* pScene)
 void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
 {
     const aiCamera* pCamera = pScene->mCameras[Index];
-    printf("Camera name: '%s'\n", pCamera->mName.C_Str());
+    printf("Loading Camera: '%s'\n", pCamera->mName.C_Str());
 
+    // 1. Get the hierarchy matrix (Order: Parent * Child)
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
 
-    /*aiNode* cameraNode = pScene->mRootNode->FindNode(pCamera->mName);
-    aiMatrix4x4 nodeTransform = cameraNode->mTransformation;
-    aiVector3D worldPosition = nodeTransform * pCamera->mPosition;
-    aiVector3D worldLookAt = nodeTransform * (pCamera->mPosition + pCamera->mLookAt);
-    aiVector3D worldUp = nodeTransform * pCamera->mUp;*/
 
     aiMatrix4x4 aiCameraMatrix;
     pCamera->GetCameraMatrix(aiCameraMatrix);
@@ -1068,53 +1065,64 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     printf("Camera internal transformation:\n");
     CameraMatrix.Print();
 
-    Matrix4f ChangeSystem;
-    ChangeSystem.InitIdentity();
-    ChangeSystem.m[2][2] = -1;
+    // 2. CONVERSION: Convert Blender (Z-Up) to Engine (Y-Up)
+    // x' = x, y' = z, z' = -y
+    Matrix4f BasisChange;
+    BasisChange.InitIdentity();
+    // New X = Old X (m[0][0] is already 1)
 
+    // New Y = Old Z (Blender Height becomes Engine Height)
+    BasisChange.m[1][1] = 0.0f;
+    BasisChange.m[1][2] = 1.0f;
+
+    // New Z = -Old Y (Blender Depth becomes Engine Depth)
+    BasisChange.m[2][1] = -1.0f;
+    BasisChange.m[2][2] = 0.0f;
+
+    Matrix4f FinalWorld = Transformation;
+    
     printf("Final camera transformation:\n");
-    //Transformation = Transformation * ChangeSystem * CameraMatrix;
-    Transformation.Print();
+    FinalWorld.Print();
 
-  //  Transformation =  CameraMatrix * Transformation;
+    // 3. Extract World Position
+    Vector4f Pos4D(0.0f, 0.0f, 0.0f, 1.0f);
+    Pos4D = FinalWorld * Pos4D;
+    Vector3f FinalPos(Pos4D.x, Pos4D.y, Pos4D.z);
 
-    Vector3f Pos = VectorFromAssimpVector(pCamera->mPosition);
-    Vector3f Target = VectorFromAssimpVector(pCamera->mLookAt);
-    Vector3f Up = VectorFromAssimpVector(pCamera->mUp);
+    // 4. Extract World Direction (Blender Camera Forward is -Z)
+    Vector4f Target4D(0.0f, 0.0f, 1.0f, 0.0f);
+    Target4D = FinalWorld * Target4D;
+    Vector3f FinalTargetDir = Vector3f(Target4D.x, Target4D.y, Target4D.z).Normalize();
 
-    printf("Original pos: "); Pos.Print();
-    printf("Original target: "); Target.Print();
-    printf("Original up: "); Up.Print();
+    // 5. Extract World Up (Blender Camera Up is +Y)
+    Vector4f Up4D(0.0f, 1.0f, 0.0f, 0.0f);
+    Up4D = FinalWorld * Up4D;
+    Vector3f FinalUp = Vector3f(Up4D.x, Up4D.y, Up4D.z).Normalize();
 
-    Vector4f Pos4D(Pos, 1.0f);
-    Pos4D = Transformation * Pos4D;
-    Vector3f FinalPos = Pos4D;
-
-    Vector4f Target4D(Target, 0.0f);
-    Target4D = Transformation * Target4D;
-    Vector3f FinalTarget = Target4D;
-
-    Vector4f Up4D(Up, 0.0f);
-    Up4D = Transformation * Up4D;
-    Vector3f FinalUp = Up4D;
-
-    printf("Final pos: "); FinalPos.Print();
-    printf("Final target: "); FinalTarget.Print();
-    printf("Final up: "); FinalUp.Print();
-
+    // 6. Setup Perspective Projection
     PersProjInfo persProjInfo;
     persProjInfo.zNear = pCamera->mClipPlaneNear;
     persProjInfo.zFar = pCamera->mClipPlaneFar;
+
     int WindowWidth, WindowHeight;
     m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
     persProjInfo.Width = (float)WindowWidth;
     persProjInfo.Height = (float)WindowHeight;
+
+    // Blender FOV is horizontal; your Init usually wants half the field of view
     persProjInfo.FOV = ToDegree(pCamera->mHorizontalFOV) / 2.0f;
 
-    //exit(0);*/
+    // 7. Initialize Camera
+    // Your Init calls: glm::lookAt(Pos, Pos + Target, Up)
+    m_cameras[Index].Init(
+        FinalPos.ToGLM(),
+        FinalTargetDir.ToGLM(),
+        FinalUp.ToGLM(),
+        persProjInfo
+    );
 
-    //Vector3f Center = FinalPos + FinalTarget;
-    m_cameras[Index].Init(Pos.ToGLM(), FinalTarget.ToGLM(), FinalUp.ToGLM(), persProjInfo);
+    printf("Final Pos: "); FinalPos.Print();
+    printf("Final Dir: "); FinalTargetDir.Print();
 }
 
 
@@ -1175,7 +1183,7 @@ static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Ma
 
     while (pNode) {
         Matrix4f CurTransformation(pNode->mTransformation);
-        Transformation = Transformation * CurTransformation;
+        Transformation = CurTransformation * Transformation;
         pNode = pNode->mParent;
     }
 
