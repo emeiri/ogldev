@@ -24,6 +24,7 @@
 
 // config flags
 static bool UseMeshOptimizer = false;
+static bool MissingTextureDetection = false;
 
 #ifdef OGLDEV_VULKAN
 
@@ -75,8 +76,6 @@ aiProcess_ConvertToLeftHanded |\
 #endif
 //aiProcess_MakeLeftHanded | \
 
-
-//Texture* s_pMissingTexture = NULL;
 
 static void traverse(int depth, aiNode* pNode);
 static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Matrix4f& Transformation);
@@ -761,21 +760,15 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
         LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, 0, TEX_TYPE_BASE);
     } else {
         printf("Warning! no diffuse texture\n");
- 
-#if 0
-        if (!s_pMissingTexture) {
-            printf("Loading default texture\n");
-            s_pMissingTexture = AllocTexture2D();
-            bool IsSRGB = true;
-#ifdef OGLDEV_VULKAN   // hack due to different local dirs
-            s_pMissingTexture->Load("../../Content/textures/no_texture.png", IsSRGB);            
-#else
-          //  s_pMissingTexture->Load("../Content/textures/no_texture.png", IsSRGB);
-#endif
-        }
-#endif
 
-        aiString Path("no_texture.png");
+        aiString Path;
+
+        if (MissingTextureDetection) {
+            Path = ("no_texture.png");  // Big red texture with the text "no texture" to make it obvious when a texture is missing
+        } else {
+            Path = ("white.png");   // Single pixel texture to minimize the performance impact of missing textures
+        }
+        
 #ifdef OGLDEV_VULKAN
         std::string Dir("../../Content/textures/");
 #else
@@ -783,8 +776,6 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 #endif
 
         LoadTextureFromFile(Dir, Path, MaterialIndex, TEX_TYPE_BASE, false);
-
-     //  m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = s_pMissingTexture;
     }
 }
 
