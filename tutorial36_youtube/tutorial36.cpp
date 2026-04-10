@@ -31,7 +31,7 @@
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
 #include "ogldev_world_transform.h"
-#include "ogldev_framebuffer_object.h"
+#include "ogldev_framebuffer.h"
 #include "ogldev_new_lighting.h"
 #include "ogldev_shadow_mapping_technique.h"
 
@@ -162,7 +162,7 @@ public:
 
         m_lightingTech.Enable();
 
-        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_shadowMapFBO.BindDepthForReading(SHADOW_TEXTURE_UNIT);
 
         m_pGameCamera->OnRender();
 
@@ -300,9 +300,7 @@ private:
 
     void CreateShadowMap()
     {
-        if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
-            exit(1);
-        }
+        m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, false, true, false);
     }
 
 
@@ -384,7 +382,7 @@ private:
     Matrix4f m_lightOrthoProjMatrix;
     Matrix4f m_cameraOrthoProjMatrix;
     DirectionalLight m_dirLight;
-    FramebufferObject m_shadowMapFBO;
+    Framebuffer m_shadowMapFBO;
     Vector3f m_cameraPos;
     Vector3f m_cameraTarget;
     bool m_cameraOnLight = false;
