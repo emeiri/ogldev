@@ -61,51 +61,24 @@ public:
 
     void Start()
     {
-        m_pScene = m_pRenderingSystem->CreateEmptyScene();
+        ModelLoadFlags flags;
+        flags.ConvertToLeftHanded = true;
+        m_pScene = m_pRenderingSystem->CreateScene("../Tutorial66_youtube/bloom_scene.glb", flags);
+        m_pScene->SetCamera(Vector3f(0.0f, 3.0f, -18.0f), Vector3f(0.0f, -0.08f, 1.0f));
+        m_pScene->GetConfig()->SetLuminanceThreshold(0.5f);
 
         m_pScene->SetClearColor(Vector4f(0.0f, 0.0f, 0.0f, 1.0f));
 
        // m_pScene->GetDirLights().push_back(m_dirLights[0]);
        // m_pScene->GetDirLights().push_back(m_dirLights[1]);
-        m_pScene->GetPointLights().push_back(m_pointLight);
+      //  m_pScene->GetPointLights().push_back(m_pointLight);
+        m_pScene->GetConfig()->ForcePBRDisabled(true);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->GetConfig()->ControlBloom(true);
         m_pScene->GetConfig()->ControlGammaCorrection(true);
-      //  m_pScene->GetConfig()->ControlSkybox(true);
-
-       // m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
 
         m_pRenderingSystem->SetScene(m_pScene);
-
-        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/crytek_sponza/sponza.obj");        
-        //m_pScene->SetCamera(Vector3f(59.0f, 9.0f, -1.6f), Vector3f(-1.0f, 0.05f, 0.07f)); // for Sponze
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/sphere.obj");
-        int ColorTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/rock02_2.jpg");
-        pModel->SetColorTexture(ColorTexture);
-       // m_pScene->SetCamera(Vector3f(3.5f, 0.5f, -0.33f), Vector3f(-1.0f, -0.13f, 0.11f)); // for sphere
-        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/energy_sphere_game_prop.glb");
-
-        m_pSceneObject = m_pScene->CreateSceneObject(pModel);
-        m_pSceneObject->SetPosition(0.0f, 0.0f, 5.0f);
-      // m_pSceneObject->SetScale(0.2f);
-        m_pScene->AddToRenderList(m_pSceneObject);
-
-        Model* pSphere = m_pRenderingSystem->LoadModel("../Content/sphere/scene.glb");
-      
-   //     Model* pModel = m_pRenderingSystem->LoadModel("../Content/stanford_armadillo_pbr/scene.gltf");
-       // Model* pModel = m_pRenderingSystem->LoadModel("../Content/rubber_duck/scene.gltf");
-    //    Model* pModel = m_pRenderingSystem->LoadModel("../Content/jeep.obj");
-         
-    //    Model* pModel = m_pRenderingSystem->LoadModel("G:/Models/McGuire/bistro/Exterior/exterior.obj");
-
-      //  m_pLightObject = m_pScene->CreateSceneObject(pSphere);
-      //  m_pLightObject->SetScale(0.1f);
-     //   m_pScene->AddToRenderList(m_pLightObject);
-
-      //  m_pBallObject = m_pScene->CreateSceneObject(pSphere);
-      //  m_pBallObject->SetScale(0.1f);
-      //  m_pScene->AddToRenderList(m_pBallObject);        
 
         m_pRenderingSystem->Execute();
     }
@@ -113,12 +86,6 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {        
-        //  if (m_pScene->GetDirLights().size() > 0) {
-        //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
-        //  }
-
-        m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
-        
         m_count += 0.01f;
 
         if (m_pScene->GetPickedSceneObject()) {
@@ -132,13 +99,8 @@ public:
             }
         }
 
-        m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count) * 15.0f;
-        m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count) * 15.0f;
-//        m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f; // sponza
-
-        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);
-        //m_pLightObject->SetPosition(LightPos.x, -LightPos.y, -LightPos.z);
-        //m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
+        m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
+        m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
     }
 
 

@@ -308,9 +308,5 @@ void main()
         FragColor = toGamma(Color);
     } else {
         FragColor = Color;
-    }
-    
-    //
-    //
-    //FragColor = with_exposure_tiled();        
+    }      
 }
