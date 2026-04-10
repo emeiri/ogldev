@@ -142,6 +142,10 @@ void CoreScene::LoadScene(const std::string& Filename, const ModelLoadFlags& Fla
     } else {
         m_defaultCamera = pModel->GetCameras()[0];
     }    
+
+    m_pointLights = pModel->GetPointLights();
+    m_spotLights = pModel->GetSpotLights();
+    m_dirLights = pModel->GetDirLights();
 }
 
 
