@@ -39,10 +39,18 @@ void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool I
     m_width = Width;
     m_height = Height;
 
+    if ((NumFormatComponents == 0) && NormalEnabled) {
+        printf("Error: normal buffer cannot be enabled when color buffer is not enabled\n");
+        assert(0);
+        exit(0);
+    }
+
     glCreateFramebuffers(1, &m_fbo);
 
-    GenerateBuffer(m_colorBuffer, Width, Height, NumFormatComponents, IsFloat);
-    glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, m_colorBuffer, 0);
+    if (NumFormatComponents > 0) {
+        GenerateBuffer(m_colorBuffer, Width, Height, NumFormatComponents, IsFloat);
+        glNamedFramebufferTexture(m_fbo, GL_COLOR_ATTACHMENT0, m_colorBuffer, 0);
+    }
 
     if (DepthEnabled) {
         GenerateDepthBuffer(Width, Height);
@@ -56,13 +64,18 @@ void Framebuffer::InitDSA(int Width, int Height, int NumFormatComponents, bool I
 
     std::vector<GLenum> DrawBuffers;
 
-    DrawBuffers.push_back(GL_COLOR_ATTACHMENT0);
+    if (NumFormatComponents > 0) {
+        DrawBuffers.push_back(GL_COLOR_ATTACHMENT0);
 
-    if (NormalEnabled) {
-        DrawBuffers.push_back(GL_COLOR_ATTACHMENT1);
+        if (NormalEnabled) {
+            DrawBuffers.push_back(GL_COLOR_ATTACHMENT1);
+        }
+
+        glNamedFramebufferDrawBuffers(m_fbo, (GLsizei)DrawBuffers.size(), DrawBuffers.data());
+    } else {
+        glNamedFramebufferReadBuffer(m_fbo, GL_NONE);
+        glNamedFramebufferDrawBuffer(m_fbo, GL_NONE);
     }
-
-    glNamedFramebufferDrawBuffers(m_fbo, (GLsizei)DrawBuffers.size(), DrawBuffers.data());
     
     GLenum Status = glCheckNamedFramebufferStatus(m_fbo, GL_FRAMEBUFFER);
 
