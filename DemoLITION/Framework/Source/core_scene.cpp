@@ -363,7 +363,7 @@ void CoreScene::HDRAndToneMappingGui()
 
         if (EnableBloom) {
             float LuminanceThreshold = m_config.GetLuminanceThreshold();
-            ImGui::SliderFloat("Luminance threshold", &LuminanceThreshold, 0.01f, 15.0f);
+            ImGui::SliderFloat("Luminance threshold", &LuminanceThreshold, 0.01f, 5.0f);
             m_config.SetLuminanceThreshold(LuminanceThreshold);
 
             float BloomStrength = m_config.GetBloomStrength();
