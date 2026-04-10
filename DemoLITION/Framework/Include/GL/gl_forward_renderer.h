@@ -20,7 +20,6 @@
 
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique_point_light.h"
-#include "ogldev_framebuffer_object.h"
 #include "ogldev_shadow_cube_map_fbo.h"
 #include "ogldev_framebuffer.h"
 #include "demolition_rendering_system.h"
@@ -212,7 +211,7 @@ private:
     GLBuffer m_luminanceBuffer;
 
     // Shadow stuff
-    FramebufferObject m_shadowMapFBO;           // TODO: switch to Framebuffer class
+    Framebuffer m_shadowMapFBO;
     ShadowCubeMapFBO m_shadowCubeMapFBO;
     Matrix4f m_lightPersProjMatrix;
     Matrix4f m_lightOrthoProjMatrix;

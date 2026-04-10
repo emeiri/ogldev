@@ -329,9 +329,7 @@ void ForwardRenderer::InitShadowMapping()
 
     m_lightOrthoProjMatrix.InitOrthoProjTransform(shadowOrthoProjInfo);
 
-    if (!m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT)) {
-        exit(1);
-    }
+    m_shadowMapFBO.Init(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 0, false, true, false);
 
     if (!m_shadowCubeMapFBO.Init(SHADOW_MAP_WIDTH)) {
         exit(1);
@@ -956,12 +954,12 @@ void ForwardRenderer::BindShadowMaps()
 {
     switch (m_curRenderPass) {
     case RENDER_PASS_SHADOW_DIR:
-        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_shadowMapFBO.BindDepthForReading(SHADOW_TEXTURE_UNIT);
         m_curRenderPass = RENDER_PASS_LIGHTING_DIR;
         break;
 
     case RENDER_PASS_SHADOW_SPOT:
-        m_shadowMapFBO.BindForReading(SHADOW_TEXTURE_UNIT);
+        m_shadowMapFBO.BindDepthForReading(SHADOW_TEXTURE_UNIT);
         m_curRenderPass = RENDER_PASS_LIGHTING_SPOT;
         break;
 
