@@ -36,12 +36,12 @@ float luminance(vec3 color)
 void main()
 {
    vec4 val = texture(gSampler, TexCoords);
-    float lum = luminance(val.rgb);
+   float lum = luminance(val.rgb);
 
-    // Only output the "excess" above the threshold (soft-knee)
-    if (lum > gLuminanceThreshold) {
-        FragColor = vec4(val.rgb - gLuminanceThreshold, val.a);
-    } else {
-        FragColor = vec4(0.0);
-    }
+   // Only output the "excess" above the threshold (soft-knee)
+   if (lum > gLuminanceThreshold) {
+       FragColor = vec4(val.rgb - gLuminanceThreshold, val.a);
+   } else {
+       FragColor = vec4(0.0);
+   }
 }
