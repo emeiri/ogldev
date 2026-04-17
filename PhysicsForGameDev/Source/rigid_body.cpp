@@ -73,13 +73,17 @@ void RigidBody::SetShapeBox(float Width, float Height, float Depth)
     float dd = Depth * Depth;
     float MassDiv12 = 1.0f / 12.0f * m_linear.GetMass();
 
-    glm::mat3 InertiaLocal = glm::mat3(
-        MassDiv12 * (hh + dd), 0,                     0,
-        0,                     MassDiv12 * (ww + dd), 0,
-        0,                     0,                     MassDiv12 * (ww + hh)
-    );
+    m_inertiaLocal = glm::vec3(MassDiv12 * (hh + dd), 
+                               MassDiv12 * (ww + dd), 
+                               MassDiv12 * (ww + hh));
 
-    m_inertiaLocalInv = glm::inverse(InertiaLocal);
+    glm::mat3 InertiaLocalMat = glm::mat3(
+        m_inertiaLocal[0], 0,                 0,
+        0,                 m_inertiaLocal[1], 0,
+        0,                 0,                 m_inertiaLocal[2]
+    );    
+
+    m_inertiaLocalInv = glm::inverse(InertiaLocalMat);
 }
 
 
@@ -124,5 +128,48 @@ void RigidBody::UpdateInertiaWorldInv()
     m_inertiaWorldInv = R * m_inertiaLocalInv * glm::transpose(R);
 }
 
+
+void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
+{
+    float AvgCoeffRest = (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest()) * 0.5f;
+
+    glm::vec3 RelAngVelocity = m_angularVelocity - OtherBody.m_angularVelocity;
+    
+    glm::vec3 Numerator = -1 * RelAngVelocity * (AvgCoeffRest + 1.0f);
+    
+    glm::vec3 UnitNormal = glm::normalize((m_linear.GetPos() - OtherBody.m_linear.GetPos()));
+    
+    ////
+    glm::vec3 ForceLoc2 = UnitNormal * OtherBody.GetLinear().GetBoundingRadius();
+
+    glm::vec3 TempVec = glm::cross(ForceLoc2, UnitNormal);
+
+    TempVec /= OtherBody.m_inertiaLocal;
+
+    TempVec = glm::cross(TempVec, ForceLoc2);
+
+    float Part1 = glm::dot(TempVec, UnitNormal);
+
+    ////
+    UnitNormal *= -1;
+
+    glm::vec3 ForceLoc1 = UnitNormal * m_linear.GetBoundingRadius();
+
+    TempVec = glm::cross(ForceLoc1, UnitNormal);
+
+    TempVec /= m_inertiaLocal;
+
+    float Part2 = glm::dot(TempVec, UnitNormal);
+
+    float Denominator = 1 / m_linear.GetMass() + 1 / OtherBody.m_linear.GetMass() + Part1 + Part2;
+
+    glm::vec3 Impulse = Numerator / Denominator;
+
+    ApplyForceAtPoint(Impulse, ForceLoc1);
+    m_linear.AddForce(Impulse);
+
+    OtherBody.ApplyForceAtPoint(-Impulse, ForceLoc2);
+    OtherBody.m_linear.AddForce(-Impulse);
+}
 
 }

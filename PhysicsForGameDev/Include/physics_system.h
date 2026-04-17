@@ -53,7 +53,7 @@ private:
 
     void UpdateRigidBodies(float DeltaTime);
 
-    void HandleCollisions();
+    void HandlePointMassCollisions();
 
     std::vector<PointMass> m_pointMasses;
     std::vector<RigidBody> m_rigidBodies;

@@ -52,6 +52,14 @@ public:
 
     void AddForce(const glm::vec3& Force) { m_linear.AddForce(Force); }
 
+    void CalcCollisionReactions(RigidBody& OtherBody);
+
+    const PointMass& GetLinear() { return m_linear; }
+
+   // const glm::vec3& GetAngularVelocity() const { return m_angularVelocity; }
+
+  //  const glm::vec3& GetInertiaLocal() const { return m_inertiaLocal; }
+
 private:    
 
     void UpdateInertiaWorldInv();
@@ -64,9 +72,10 @@ private:
     glm::quat m_orientation = glm::quat(1, 0, 0, 0);
     glm::vec3 m_angularVelocity;
     glm::vec3 m_torqueAccum;
-
-    glm::mat3 m_inertiaLocalInv;
-    glm::mat3 m_inertiaWorldInv;
+    
+    glm::mat3 m_inertiaLocalInv = glm::mat3(0.0f);
+    glm::mat3 m_inertiaWorldInv = glm::mat3(0.0f);
+    glm::vec3 m_inertiaLocal = glm::vec3(0.0f);
 
     RIGID_BODY_SHAPE m_shape = RIGID_BODY_SHAPE_NONE;
 };

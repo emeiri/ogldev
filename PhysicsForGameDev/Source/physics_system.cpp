@@ -35,7 +35,7 @@ void System::Update(int DeltaTimeMillis)
     float DeltaTime = DeltaTimeMillis / 1000.f;
 
     UpdateInternal(DeltaTime);
-    HandleCollisions();
+    HandlePointMassCollisions();
 }
 
 
@@ -62,7 +62,7 @@ void System::UpdateRigidBodies(float DeltaTime)
 }
 
 
-void System::HandleCollisions()
+void System::HandlePointMassCollisions()
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
         for (int j = i + 1; j < m_numActivePointMasses; j++) {

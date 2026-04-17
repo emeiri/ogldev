@@ -23,6 +23,12 @@
 
 namespace Physics {
 
+enum COLLISION_STATUS {
+    COLLISION_STATUS_NONE,
+    COLLISION_STATUS_TOUCHING,
+    COLLISION_STATUS_OVERLAPPING
+};
+
 typedef void (*UpdateListener)(const void* pObject, const glm::vec3& Pos, const glm::quat& Orientation);
 
 class PointMass {
@@ -53,9 +59,15 @@ public:
     const void* GetTarget() const { return m_pTarget; }
 
     float GetMass() const { return m_mass; }
+
+    float GetCoeffOfRest() const { return m_coeffOfRest; }
+
+    float GetBoundingRadius() const { return m_boundingRadius; }
+
 private:
 
     bool CheckCollision(const PointMass& OtherParticle) const;
+    COLLISION_STATUS GetCollisionStatus(const PointMass& OtherParticle) const;
     void HandleCollisionInelastic(Physics::PointMass& OtherParticle);
 
     glm::vec3 m_pos = glm::vec3(0.0f);

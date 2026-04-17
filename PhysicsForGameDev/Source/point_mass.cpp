@@ -43,7 +43,7 @@ void PointMass::Init(float Mass, const glm::vec3& CenterOfMass, const glm::vec3&
 
 
 void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
-{    
+{
     m_linearAccel = m_sumForces / m_mass;
 
     m_linearVelocity += m_linearAccel * DeltaTime;
@@ -55,9 +55,9 @@ void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
         (*pUpdateListener)(m_pTarget, m_pos, t);
     }
 
-	if (DeltaTime > 0.0f) {
-		m_sumForces = glm::vec3(0.0f);
-	}
+    if (DeltaTime > 0.0f) {
+        m_sumForces = glm::vec3(0.0f);
+    }
 }
 
 void PointMass::SetBoundingRadius(float r)
@@ -87,7 +87,7 @@ void PointMass::HandleCollision(PointMass& OtherParticle)
                 HandleCollisionElastic(OtherParticle, AvgCoeffRest);
             }
         }
-    }    
+    }
 }
 
 
@@ -143,14 +143,31 @@ void PointMass::HandleCollisionInelastic(Physics::PointMass& OtherParticle)
 
 bool PointMass::CheckCollision(const PointMass& OtherParticle) const
 {
-    float DistSquared = glm::length2(m_pos - OtherParticle.m_pos);
+    COLLISION_STATUS Status = GetCollisionStatus(OtherParticle);
+ 
+    bool CollisionOccured = Status != COLLISION_STATUS_NONE;
 
+    return CollisionOccured;
+}
+
+
+COLLISION_STATUS PointMass::GetCollisionStatus(const PointMass& OtherParticle) const
+{
+    float DistSquared = glm::length2(m_pos - OtherParticle.m_pos);
     float MinDistanceSquared = m_boundingRadius + OtherParticle.m_boundingRadius;
     MinDistanceSquared *= MinDistanceSquared;
 
-    bool CollisionOccured = DistSquared <= MinDistanceSquared;
+    COLLISION_STATUS Status = COLLISION_STATUS_NONE;
 
-    return CollisionOccured;
+    const float Epsilon = 1e-5f;
+
+    if (DistSquared < MinDistanceSquared) {
+        Status = COLLISION_STATUS_OVERLAPPING;
+    } else if (fabsf(DistSquared - MinDistanceSquared) < Epsilon) {
+        Status = COLLISION_STATUS_TOUCHING;
+    }
+
+    return Status;
 }
 
 }
