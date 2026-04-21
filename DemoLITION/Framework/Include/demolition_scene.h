@@ -57,6 +57,8 @@ public:
 
     void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
 
+    const glm::quat& GetQuaternion() const { return m_quaternion; }
+
 protected:
     SceneObject();
     void CalcRotationStack(Matrix4f& Rot) const;
