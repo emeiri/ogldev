@@ -95,7 +95,7 @@ public:
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
         glm::vec3 ForceVec(glm::vec3(800.0f, 800.0f, 0.0f));
-        m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, m_pSceneObject);
+        m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, GLM_DEFAULT_QUAT, m_pSceneObject);
         float Width = 1.0f;
         float Height = 2.25f;
         float Depth = 0.3f;
@@ -116,7 +116,7 @@ public:
             m_pRigidBody->Init(1.0f, CenterOfMass, m_pSceneObject->GetGLMPos(), 
                 glm::vec3(RandomFloatRange(700.0f, 900.f),
                           RandomFloatRange(700.0f, 900.0f), 
-                          RandomFloatRange(-20.0f, 20.0f)), ForcePoint, m_pSceneObject);            
+                          RandomFloatRange(-20.0f, 20.0f)), ForcePoint, GLM_DEFAULT_QUAT, m_pSceneObject);            
         }
     }
 

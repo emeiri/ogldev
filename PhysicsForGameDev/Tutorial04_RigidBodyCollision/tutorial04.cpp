@@ -32,6 +32,7 @@
 #define WINDOW_HEIGHT 1440
 
 glm::vec3 ForcePoint(0.0f, 0.1f, 0.0f);
+glm::vec3 ForcePoint2(0.0f, -0.1f, 0.0f);
 glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
 
 SceneObject* s_pSceneObject = NULL;
@@ -39,6 +40,8 @@ SceneObject* s_pSceneObject2 = NULL;
 
 glm::vec3 s_Pos = glm::vec3(0.0f, 3.0f, 0.0f);
 glm::vec3 s_Pos2 = glm::vec3(20.0f, 3.0f, -20.0f);
+glm::vec3 EulerAngles = glm::radians(glm::vec3(0.0f, 90.0f, 0.0f));
+glm::quat Orientation = glm::quat(EulerAngles);
 
 bool reset = false;
 bool reset2 = false;
@@ -68,6 +71,7 @@ static void PhysicsUpdateListener(const void* pObject,
   //          reset2 = true;
          //   printf("Resetting 2\n");
         //} else {
+        printf("%p ", pSceneObject); GLM_PRINT_QUAT("physics quat ", Orientation);
             pSceneObject->SetPosition(Pos);
             pSceneObject->SetQuaternion(Orientation);
      //  }
@@ -116,7 +120,6 @@ public:
 
         s_pSceneObject2 = m_pScene->CreateSceneObject(pModel);
         s_pSceneObject2->SetPosition(s_Pos2);
-        s_pSceneObject2->SetRotation(Vector3f(0.0f, 90.0f, 0.0f));
         m_pScene->AddToRenderList(s_pSceneObject2);
 
         m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
@@ -124,23 +127,24 @@ public:
         {
             m_pRigidBody = m_physicsSystem.AllocRigidBody();
             glm::vec3 ForceVec(glm::vec3(800.0f, 800.0f, 0.0f));
-            m_pRigidBody->Init(1.0f, CenterOfMass, s_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, s_pSceneObject);
+            m_pRigidBody->Init(1.0f, CenterOfMass, s_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, GLM_DEFAULT_QUAT, s_pSceneObject);
             float Width = 1.0f;
             float Height = 2.25f;
             float Depth = 0.3f;
             m_pRigidBody->SetShapeBox(Width, Height, Depth);
-            m_pRigidBody->GetLinear().SetBoundingRadius(3.0f);
+            m_pRigidBody->GetLinear().SetBoundingRadius(2.5f);
         }
 
         {
             m_pRigidBody2 = m_physicsSystem.AllocRigidBody();
             glm::vec3 ForceVec(glm::vec3(0.0f, 800.0f, 800.0f));
-            m_pRigidBody2->Init(1.0f, CenterOfMass, s_pSceneObject2->GetGLMPos(), ForceVec, ForcePoint, s_pSceneObject2);
+            m_pRigidBody2->Init(1.0f, CenterOfMass, s_pSceneObject2->GetGLMPos(), ForceVec, ForcePoint2, Orientation, s_pSceneObject2);
             float Width = 1.0f;
             float Height = 2.25f;
             float Depth = 0.3f;
             m_pRigidBody2->SetShapeBox(Width, Height, Depth);
-            m_pRigidBody2->GetLinear().SetBoundingRadius(3.0f);
+            m_pRigidBody2->GetLinear().SetBoundingRadius(2.5f);
+          //  m_pRigidBody2->SetOrientation(s_pSceneObject2->GetQuaternion());
         }
 
         m_pRenderingSystem->Execute();
@@ -155,18 +159,16 @@ public:
             m_pRigidBody->Init(1.0f, CenterOfMass, s_Pos, 
                 glm::vec3(RandomFloatRange(780.0f, 820.f),
                           RandomFloatRange(780.0f, 820.0f), 
-                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, s_pSceneObject);            
+                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, GLM_DEFAULT_QUAT, s_pSceneObject);            
         } 
         
         if (reset2) {
             reset2 = false;
-          //  printf("Initializing\n");
+            //  printf("Initializing\n");
             m_pRigidBody2->Init(1.0f, CenterOfMass, s_Pos2,
                 glm::vec3(RandomFloatRange(-10.0f, 10.f),
                           RandomFloatRange(780.0f, 820.0f),
-                          RandomFloatRange(780.0f, 820.0f)), ForcePoint, s_pSceneObject2);
-            s_pSceneObject2->SetRotation(Vector3f(0.0f, 90.0f, 0.0f));
-            m_pRigidBody2->SetOrientation(s_pSceneObject2->GetQuaternion());
+                          RandomFloatRange(780.0f, 820.0f)), ForcePoint2, Orientation, s_pSceneObject2);
         }
 
         if (m_pRigidBody->GetLinear().GetPos().y > 0.0f) {
@@ -188,8 +190,8 @@ public:
         if ((key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
             m_pRigidBody2->Init(1.0f, CenterOfMass, s_Pos2,
                 glm::vec3(RandomFloatRange(-10.0f, 10.f),
-                    RandomFloatRange(780.0f, 820.0f),
-                    RandomFloatRange(780.0f, 820.0f)), ForcePoint, s_pSceneObject2);
+                          RandomFloatRange(780.0f, 820.0f),
+                          RandomFloatRange(780.0f, 820.0f)), ForcePoint2, Orientation, s_pSceneObject2);
             reset2 = true;
             ret = true;
         } else {

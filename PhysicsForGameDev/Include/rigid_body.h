@@ -44,6 +44,7 @@ public:
               const glm::vec3& StartPosWorld,
               const glm::vec3& ForceVecWorld,
               const glm::vec3& ForcePointLocal,
+              const glm::quat& StartOrientation,
               void* pTarget);
 
     void SetShapeBox(float Width, float Height, float Depth);

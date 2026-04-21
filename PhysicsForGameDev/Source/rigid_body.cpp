@@ -30,9 +30,10 @@ void RigidBody::Init(float Mass,
                      const glm::vec3& StartPosWorld,
                      const glm::vec3& ForceVecWorld,
                      const glm::vec3& ForcePointLocal,
+                     const glm::quat& StartOrientation,
                      void* pTarget)
 {
-    m_orientation = glm::quat(1, 0, 0, 0);
+    m_orientation = StartOrientation;
 	m_angularVelocity = glm::vec3(0);
 	m_torqueAccum = glm::vec3(0);
 
@@ -54,6 +55,7 @@ void RigidBody::ApplyForceAtPoint(const glm::vec3& ForceWorld,
 
     // Torque in world space
     m_torqueAccum += glm::cross(RadiusWorld, ForceWorld);
+   // printf("%p Applying force at point: ", this); GLM_PRINT_VEC3("", m_torqueAccum);
 }
 
 
