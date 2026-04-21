@@ -133,47 +133,46 @@ void RigidBody::UpdateInertiaWorldInv()
 
 void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
 {
-    float AvgCoeffRest = (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest()) * 0.5f;
+    // 1. Compute contact point and normal (for spheres, use centers and radii)
+    glm::vec3 normal = glm::normalize(m_linear.GetPos() - OtherBody.m_linear.GetPos());
+    glm::vec3 contactPoint = m_linear.GetPos() - normal * m_linear.GetBoundingRadius();
 
-    glm::vec3 RelAngVelocity = m_angularVelocity - OtherBody.m_angularVelocity;
-    
-    glm::vec3 Numerator = -1 * RelAngVelocity * (AvgCoeffRest + 1.0f);
-    
-    glm::vec3 UnitNormal = glm::normalize((m_linear.GetPos() - OtherBody.m_linear.GetPos()));
-    
-    ////
-    glm::vec3 ForceLoc2 = UnitNormal * OtherBody.GetLinear().GetBoundingRadius();
+    // 2. Relative positions from centers to contact
+    glm::vec3 rA = contactPoint - m_linear.GetPos();
+    glm::vec3 rB = contactPoint - OtherBody.m_linear.GetPos();
 
-    glm::vec3 TempVec = glm::cross(ForceLoc2, UnitNormal);
+    // 3. Velocities at contact
+    glm::vec3 vA = m_linear.GetLinearVelocity() + glm::cross(m_angularVelocity, rA);
+    glm::vec3 vB = OtherBody.m_linear.GetLinearVelocity() + glm::cross(OtherBody.m_angularVelocity, rB);
+    glm::vec3 relVel = vA - vB;
+    float relVelAlongNormal = glm::dot(relVel, normal);
 
-    TempVec /= OtherBody.m_inertiaLocal;
+    // 4. Restitution
+    float restitution = 0.5f * (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest());
 
-    TempVec = glm::cross(TempVec, ForceLoc2);
+    // 5. Inverse mass and inertia
+    float invMassA = 1.0f / m_linear.GetMass();
+    float invMassB = 1.0f / OtherBody.m_linear.GetMass();
+    glm::mat3 invInertiaA = m_inertiaWorldInv;
+    glm::mat3 invInertiaB = OtherBody.m_inertiaWorldInv;
 
-    float Part1 = glm::dot(TempVec, UnitNormal);
+    // 6. Impulse denominator
+    float denom = invMassA + invMassB +
+        glm::dot(normal,
+            glm::cross(invInertiaA * glm::cross(rA, normal), rA) +
+            glm::cross(invInertiaB * glm::cross(rB, normal), rB));
 
-    ////
-    UnitNormal *= -1;
+    // 7. Impulse scalar
+    float j = -(1.0f + restitution) * relVelAlongNormal / denom;
 
-    glm::vec3 ForceLoc1 = UnitNormal * m_linear.GetBoundingRadius();
+    // 8. Apply impulse
+    glm::vec3 impulse = j * normal;
+    m_linear.AddForce(impulse);
+    m_angularVelocity += invInertiaA * glm::cross(rA, impulse);
 
-    TempVec = glm::cross(ForceLoc1, UnitNormal);
-
-    TempVec /= m_inertiaLocal;
-
-    float Part2 = glm::dot(TempVec, UnitNormal);
-
-    float Denominator = 1 / m_linear.GetMass() + 1 / OtherBody.m_linear.GetMass() + Part1 + Part2;
-
-    glm::vec3 Impulse = Numerator / Denominator;
-
-    ApplyForceAtPoint(Impulse, ForceLoc1);
-    m_linear.AddForce(Impulse);
-
-    OtherBody.ApplyForceAtPoint(-Impulse, ForceLoc2);
-    OtherBody.m_linear.AddForce(-Impulse);
+    OtherBody.m_linear.AddForce(-impulse);
+    OtherBody.m_angularVelocity -= invInertiaB * glm::cross(rB, impulse);
 }
-
 
 static void ReverseBody(RigidBody& Body)
 {
