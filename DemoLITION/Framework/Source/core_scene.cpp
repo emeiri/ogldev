@@ -79,7 +79,9 @@ Matrix4f SceneObject::GetMatrix() const
 
     if (QuaternionIsZero(m_quaternion)) {
         CalcRotationStack(Rotation);
+       // printf("%p GetMatrix \n", this);// Rotation.Print();
     } else {
+       // printf("%p ", this); GLM_PRINT_QUAT("rendering quat: ", m_quaternion);
         Rotation.InitRotateTransform(m_quaternion);
     }
 
