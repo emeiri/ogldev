@@ -21,6 +21,8 @@
 
 #include <glm/glm.hpp>
 
+#include "ogldev_math_3d.h"
+
 namespace Physics {
 
 enum COLLISION_STATUS {
@@ -40,9 +42,11 @@ public:
     // DeltaTime - 1.0f is 1 second.
     void Update(float DeltaTime, UpdateListener pUpdateListener);
 
-    void ResetSumForces() { m_sumForces = glm::vec3(0.0f); }
+    void ResetForces() { m_sumForces = glm::vec3(0.0f); }
 
     const glm::vec3 GetLinearVelocity() const { return m_linearVelocity; }
+
+    void SetLinearVelocity(const glm::vec3& Vel) { m_linearVelocity = Vel; }
 
     void SetBoundingRadius(float r);
 
@@ -50,11 +54,17 @@ public:
 
     void HandleCollisionElastic(Physics::PointMass& OtherParticle, float AvgCoeffRest);
 
-    void AddForce(const glm::vec3& Force) { m_sumForces += Force; }
+    void AddForce(const glm::vec3& Force) { 
+   //     printf("%p ", this); GLM_PRINT_VEC3("Adding force ", Force);
+        m_sumForces += Force; 
+    //    GLM_PRINT_VEC3("Sum forces ", m_sumForces);
+    }
 
     const glm::vec3& GetCenterOfMass() const { return m_centerOfMass; }
 
-    const glm::vec3 GetPos() const { return m_pos; }
+    const glm::vec3& GetPos() const { return m_pos; }
+
+    void SetPos(const glm::vec3& Pos) { m_pos = Pos; }
 
     const void* GetTarget() const { return m_pTarget; }
 
@@ -64,10 +74,11 @@ public:
 
     float GetBoundingRadius() const { return m_boundingRadius; }
 
+    COLLISION_STATUS GetCollisionStatus(const PointMass& OtherParticle) const;
+
 private:
 
-    bool CheckCollision(const PointMass& OtherParticle) const;
-    COLLISION_STATUS GetCollisionStatus(const PointMass& OtherParticle) const;
+    bool CheckCollision(const PointMass& OtherParticle) const;    
     void HandleCollisionInelastic(Physics::PointMass& OtherParticle);
 
     glm::vec3 m_pos = glm::vec3(0.0f);

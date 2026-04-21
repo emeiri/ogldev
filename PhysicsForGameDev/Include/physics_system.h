@@ -55,6 +55,8 @@ private:
 
     void HandlePointMassCollisions();
 
+    void HandleRigidBodyCollisions(float DeltaTime);
+
     std::vector<PointMass> m_pointMasses;
     std::vector<RigidBody> m_rigidBodies;
     UpdateListener m_pUpdateListener = NULL;

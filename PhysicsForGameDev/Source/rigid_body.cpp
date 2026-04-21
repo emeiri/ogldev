@@ -172,4 +172,104 @@ void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
     OtherBody.m_linear.AddForce(-Impulse);
 }
 
+
+static void ReverseBody(RigidBody& Body)
+{
+    glm::vec3 t = Body.GetAngularVelocity();
+    t *= -1.0f;
+    Body.SetAngularVelocity(t);
+
+    t = Body.GetLinear().GetLinearVelocity();
+    t *= -1.0f;
+    Body.GetLinear().SetLinearVelocity(t);
+
+    Body.ReverseTorque();
 }
+
+
+bool CloseToZero(float value, float epsilon = 1e-6f)
+{
+    return fabsf(value) < epsilon;
+}
+
+
+void HandleOverlappingBodies2(float DeltaTime, RigidBody& Body1, RigidBody& Body2)
+{
+    bool Done = false;
+    COLLISION_STATUS cs = COLLISION_STATUS_OVERLAPPING;
+
+    while (!Done && !CloseToZero(DeltaTime)) {
+
+        switch (cs) {
+
+        case COLLISION_STATUS_OVERLAPPING:
+            printf("HandleOverlappingBodies: Overlapping delta time %f\n", DeltaTime);
+            ReverseBody(Body1);
+            ReverseBody(Body2);
+            Body1.Update(DeltaTime, NULL);
+            Body2.Update(DeltaTime, NULL);
+
+            DeltaTime *= 0.5f;
+
+            ReverseBody(Body1);
+            ReverseBody(Body2);
+            Body1.Update(DeltaTime, NULL);
+            Body2.Update(DeltaTime, NULL);
+
+            cs = Body1.GetLinear().GetCollisionStatus(Body2.GetLinear());
+            break;
+
+        case COLLISION_STATUS_TOUCHING:
+            printf("HandleOverlappingBodies: touching\n");
+            Body1.CalcCollisionReactions(Body2);
+            Done = true;
+            break;
+
+        case COLLISION_STATUS_NONE:
+            printf("HandleOverlappingBodies: none\n");
+            Body1.Update(DeltaTime, NULL);
+            Body2.Update(DeltaTime, NULL);
+            Done = true;
+            break;
+        }
+    }
+}
+
+
+void ResolvePenetration(RigidBody& Body1, RigidBody& Body2)
+{
+    glm::vec3 delta = Body1.GetLinear().GetPos() - Body2.GetLinear().GetPos();
+    float dist = glm::length(delta);
+    float minDist = Body1.GetLinear().GetBoundingRadius() + Body2.GetLinear().GetBoundingRadius();
+    if (dist < minDist && dist > 0.0f) {
+        glm::vec3 correction = (minDist - dist) * (delta / dist) * 0.5f;
+        glm::vec3 NewPos1 = Body1.GetLinear().GetPos() + correction;
+        Body1.GetLinear().SetPos(NewPos1);
+        glm::vec3 NewPos2 = Body2.GetLinear().GetPos() - correction;
+        Body2.GetLinear().SetPos(NewPos2);
+    }
+}
+
+
+void HandleOverlappingBodies(float DeltaTime, RigidBody& Body1, RigidBody& Body2)
+{
+    COLLISION_STATUS cs = Body1.GetLinear().GetCollisionStatus(Body2.GetLinear());
+
+    if (cs == COLLISION_STATUS_OVERLAPPING) {
+        // 1. Move objects apart
+        ResolvePenetration(Body1, Body2);
+
+        // 2. Update velocities based on collision
+        Body1.CalcCollisionReactions(Body2);
+    } else if (cs == COLLISION_STATUS_TOUCHING) {
+        Body1.CalcCollisionReactions(Body2);
+    }
+
+    // 3. Update both bodies for this time step
+    Body1.Update(DeltaTime, NULL);
+    Body2.Update(DeltaTime, NULL);
+}
+
+
+}
+

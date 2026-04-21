@@ -73,6 +73,46 @@ void System::HandlePointMassCollisions()
 }
 
 
+void System::HandleRigidBodyCollisions(float DeltaTime)
+{
+    static bool ForceApplied = false;
+
+    for (int i = 0; i < m_numActiveRigidBodies; i++) {
+        RigidBody& CurBody = m_rigidBodies[i];
+        for (int j = i + 1; j < m_numActiveRigidBodies; j++) {
+            RigidBody& OtherBody = m_rigidBodies[j];
+            COLLISION_STATUS cs = CurBody.GetLinear().GetCollisionStatus(OtherBody.GetLinear());
+
+            switch (cs) {
+            case COLLISION_STATUS_TOUCHING:
+           //     printf("Collision\n");
+                m_rigidBodies[i].CalcCollisionReactions(OtherBody);
+                ForceApplied = false;
+                break;
+
+            case COLLISION_STATUS_OVERLAPPING:
+           //     printf("Overlapping\n");
+                HandleOverlappingBodies(DeltaTime, CurBody, OtherBody);
+                ForceApplied = false;
+                break;
+
+            case COLLISION_STATUS_NONE:
+                // Nothing here
+                break;
+            }
+        }
+    }
+
+    if (ForceApplied) {
+        for (int i = 0; i < m_numActiveRigidBodies; i++) {
+            m_rigidBodies[i].ResetForces();
+        }
+    } else {
+        ForceApplied = true;
+    }
+}
+
+
 PointMass* System::AllocPointMass()
 {
     if (m_numActivePointMasses == (int)m_pointMasses.size()) {

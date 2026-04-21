@@ -37,6 +37,8 @@ class RigidBody {
 
 public:
 
+    RigidBody() {}
+
     void Init(float Mass,
               const glm::vec3& CenterOfMassLocal,
               const glm::vec3& StartPosWorld,
@@ -52,11 +54,19 @@ public:
 
     void AddForce(const glm::vec3& Force) { m_linear.AddForce(Force); }
 
+    void ResetForces() { m_linear.ResetForces(); m_torqueAccum = glm::vec3(0); }
+
     void CalcCollisionReactions(RigidBody& OtherBody);
 
-    const PointMass& GetLinear() { return m_linear; }
+    PointMass& GetLinear() { return m_linear; }
 
-   // const glm::vec3& GetAngularVelocity() const { return m_angularVelocity; }
+    const glm::vec3& GetAngularVelocity() const { return m_angularVelocity; }
+
+    void SetAngularVelocity(const glm::vec3& AngularVelocity) { m_angularVelocity = AngularVelocity; }
+
+    void ReverseTorque() { m_torqueAccum *= -1.0f; }
+
+    void SetOrientation(const glm::quat& Orientation) { m_orientation = Orientation; }
 
   //  const glm::vec3& GetInertiaLocal() const { return m_inertiaLocal; }
 
@@ -70,8 +80,8 @@ private:
 
     // Handles the rotational motion
     glm::quat m_orientation = glm::quat(1, 0, 0, 0);
-    glm::vec3 m_angularVelocity;
-    glm::vec3 m_torqueAccum;
+    glm::vec3 m_angularVelocity = glm::vec3(0.0f);
+    glm::vec3 m_torqueAccum = glm::vec3(0.0f);
     
     glm::mat3 m_inertiaLocalInv = glm::mat3(0.0f);
     glm::mat3 m_inertiaWorldInv = glm::mat3(0.0f);
@@ -79,4 +89,8 @@ private:
 
     RIGID_BODY_SHAPE m_shape = RIGID_BODY_SHAPE_NONE;
 };
+
+
+void HandleOverlappingBodies(float DeltaTime, RigidBody& Body1, RigidBody& Body2);
+
 }
