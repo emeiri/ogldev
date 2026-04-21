@@ -55,9 +55,7 @@ void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
         (*pUpdateListener)(m_pTarget, m_pos, t);
     }
 
-    if (DeltaTime > 0.0f) {
-        m_sumForces = glm::vec3(0.0f);
-    }
+    m_sumForces = glm::vec3(0.0f);   
 }
 
 void PointMass::SetBoundingRadius(float r)
