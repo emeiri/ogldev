@@ -1005,4 +1005,4 @@ glm::quat RotationBetweenVectors(glm::vec3& start, glm::vec3& dest);
 
 #define GLM_PRINT_VEC3(s, v) printf("%s (%f,%f,%f)\n", s, v.x, v.y, v.z)
 #define GLM_PRINT_QUAT(s, q) printf("%s (%f, %f, %f : %f)\n", s, q.x, q.y, q.z, q.w)
-
+#define GLM_DEFAULT_QUAT glm::quat(1.0f, 0.0f, 0.0f, 0.0f)
