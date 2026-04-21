@@ -50,26 +50,27 @@ static void PhysicsUpdateListener(const void* pObject,
     SceneObject* pSceneObject = (SceneObject*)pObject;
 
    // printf("%p\n", pObject);
-    GLM_PRINT_VEC3("", Pos);
+   // GLM_PRINT_VEC3("", Pos);
 
     if (pSceneObject == s_pSceneObject) {
-        if (Pos.y <= 0.0) {
+        if (Pos.y < -0.01f) {
             pSceneObject->SetPosition(s_Pos);
             reset = true;
          //  printf("Resetting 1\n");
+            //exit(0);
         } else {
             pSceneObject->SetPosition(Pos);
             pSceneObject->SetQuaternion(Orientation);
         }
     } else if (pSceneObject == s_pSceneObject2) {
-        if (Pos.y <= 0.0) {
-            pSceneObject->SetPosition(s_Pos2);
-            reset2 = true;
+        //if (Pos.y <= .0) {
+//            pSceneObject->SetPosition(s_Pos2);
+  //          reset2 = true;
          //   printf("Resetting 2\n");
-        } else {
+        //} else {
             pSceneObject->SetPosition(Pos);
             pSceneObject->SetQuaternion(Orientation);
-        }
+     //  }
     } else {
         printf("Unknown object\n");
         assert(0);
@@ -95,7 +96,7 @@ public:
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         m_pRenderingSystem->SetScene(m_pScene);
         m_pScene->SetClearColor(Vector4f(0.5f));
-        m_pScene->SetCamera(Vector3f(-13.0f, 12.0f, -20.0f), Vector3f(0.85f, -0.2f, 0.5f));
+        m_pScene->SetCamera(Vector3f(20.0f, 4.0f, -34.0f), Vector3f(0.0f, 0.05f, 1.0f));
 
         SceneConfig* pConfig = m_pScene->GetConfig();
 
@@ -115,6 +116,7 @@ public:
 
         s_pSceneObject2 = m_pScene->CreateSceneObject(pModel);
         s_pSceneObject2->SetPosition(s_Pos2);
+        s_pSceneObject2->SetRotation(Vector3f(0.0f, 90.0f, 0.0f));
         m_pScene->AddToRenderList(s_pSceneObject2);
 
         m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
@@ -127,6 +129,7 @@ public:
             float Height = 2.25f;
             float Depth = 0.3f;
             m_pRigidBody->SetShapeBox(Width, Height, Depth);
+            m_pRigidBody->GetLinear().SetBoundingRadius(3.0f);
         }
 
         {
@@ -137,6 +140,7 @@ public:
             float Height = 2.25f;
             float Depth = 0.3f;
             m_pRigidBody2->SetShapeBox(Width, Height, Depth);
+            m_pRigidBody2->GetLinear().SetBoundingRadius(3.0f);
         }
 
         m_pRenderingSystem->Execute();
@@ -145,27 +149,35 @@ public:
 
     void OnFrameChild(long long DeltaTimeMillis)
     {  
-        m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
-        m_pRigidBody2->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
-
-        m_physicsSystem.Update((int)DeltaTimeMillis);
-      
   	    if (reset) {
             reset = false;
            // printf("Initializing\n");
-            m_pRigidBody->Init(1.0f, CenterOfMass, s_pSceneObject->GetGLMPos(), 
-                glm::vec3(RandomFloatRange(750.0f, 850.f),
-                          RandomFloatRange(750.0f, 850.0f), 
-                          RandomFloatRange(-20.0f, 20.0f)), ForcePoint, s_pSceneObject);            
-        } else if (reset2) {
+            m_pRigidBody->Init(1.0f, CenterOfMass, s_Pos, 
+                glm::vec3(RandomFloatRange(780.0f, 820.f),
+                          RandomFloatRange(780.0f, 820.0f), 
+                          RandomFloatRange(-10.0f, 10.0f)), ForcePoint, s_pSceneObject);            
+        } 
+        
+        if (reset2) {
             reset2 = false;
           //  printf("Initializing\n");
-            m_pRigidBody2->Init(1.0f, CenterOfMass, s_pSceneObject2->GetGLMPos(),
+            m_pRigidBody2->Init(1.0f, CenterOfMass, s_Pos2,
                 glm::vec3(RandomFloatRange(-10.0f, 10.f),
-                    RandomFloatRange(750.0f, 850.0f),
-                    RandomFloatRange(850.0f, 850.0f)), ForcePoint, s_pSceneObject2);
+                          RandomFloatRange(780.0f, 820.0f),
+                          RandomFloatRange(780.0f, 820.0f)), ForcePoint, s_pSceneObject2);
+            s_pSceneObject2->SetRotation(Vector3f(0.0f, 90.0f, 0.0f));
+            m_pRigidBody2->SetOrientation(s_pSceneObject2->GetQuaternion());
         }
 
+        if (m_pRigidBody->GetLinear().GetPos().y > 0.0f) {
+            m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
+        }
+        
+        if (m_pRigidBody2->GetLinear().GetPos().y > 0.0f) {
+            m_pRigidBody2->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
+        }
+
+        m_physicsSystem.Update((int)DeltaTimeMillis);
     }
 
 
@@ -174,7 +186,11 @@ public:
         bool ret = false;
 
         if ((key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
-            //m_pPointMass2->Init(1.0f, glm::vec3(0.0f, 1.0f, 5.0), glm::vec3(0.0f, 0.0f, 3.0f), m_pSphere2);
+            m_pRigidBody2->Init(1.0f, CenterOfMass, s_Pos2,
+                glm::vec3(RandomFloatRange(-10.0f, 10.f),
+                    RandomFloatRange(780.0f, 820.0f),
+                    RandomFloatRange(780.0f, 820.0f)), ForcePoint, s_pSceneObject2);
+            reset2 = true;
             ret = true;
         } else {
             ret = BaseGLApp::OnKeyboard(key, action);
