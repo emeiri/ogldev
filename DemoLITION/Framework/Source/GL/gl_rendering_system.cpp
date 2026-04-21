@@ -234,9 +234,17 @@ void RenderingSystemGL::Execute()
 
     long long StartTimeMillis = GetCurrentTimeMillis();
     long long CurTimeMillis = StartTimeMillis;
+    long long PrevTimeMillis = CurTimeMillis;
+
+    // Skip a few frames to avoid instability with zero or too large delta time at the start of the application
+    for (int i = 0; i < 3; i++) {
+        CurTimeMillis = GetCurrentTimeMillis();
+        glfwSwapBuffers(m_pWindow);
+        glfwPollEvents();
+    }
 
     while (!glfwWindowShouldClose(m_pWindow)) {
-        long long PrevTimeMillis = CurTimeMillis;
+        PrevTimeMillis = CurTimeMillis;
         CurTimeMillis = GetCurrentTimeMillis();
         long long DeltaTimeMillis = CurTimeMillis - PrevTimeMillis;
         long long TotalRuntimeMillis = CurTimeMillis - StartTimeMillis;
