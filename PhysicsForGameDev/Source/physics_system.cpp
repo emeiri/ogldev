@@ -32,10 +32,29 @@ void System::Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdate
 
 void System::Update(int DeltaTimeMillis)
 {
+//    if (DeltaTimeMillis == 0) {
+  //      return;
+  //  }
     float DeltaTime = DeltaTimeMillis / 1000.f;
 
-    UpdateInternal(DeltaTime);
-    HandlePointMassCollisions();
+    if (DeltaTime > 0.25f) {
+        DeltaTime = 0.25;
+    }
+
+    static float accumulator = 0.0f;
+    accumulator += DeltaTime;
+
+    //printf("DeltaTime = %f\n", DeltaTime);
+    // 2. Consume accumulated time in fixed dt chunks
+    const float FixedDT = 1.0f / 60.0f;
+
+    while (accumulator >= 1.0f/60.0f) {
+        // Pass the FIXED dt (1/60), NOT the variable frameTime
+        UpdateInternal(FixedDT);
+        HandlePointMassCollisions();
+        HandleRigidBodyCollisions(FixedDT);
+        accumulator -= FixedDT;       
+    }
 }
 
 
