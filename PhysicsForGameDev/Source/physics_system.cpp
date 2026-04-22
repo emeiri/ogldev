@@ -53,6 +53,11 @@ void System::Update(int DeltaTimeMillis)
         UpdateInternal(FixedDT);
         HandlePointMassCollisions();
         HandleRigidBodyCollisions(FixedDT);
+
+        for (int i = 0; i < m_numActiveRigidBodies; i++) {
+            m_rigidBodies[i].ResetForces();
+        }
+
         accumulator -= FixedDT;       
     }
 }
@@ -94,8 +99,6 @@ void System::HandlePointMassCollisions()
 
 void System::HandleRigidBodyCollisions(float DeltaTime)
 {
-    static bool ForceApplied = false;
-
     for (int i = 0; i < m_numActiveRigidBodies; i++) {
         RigidBody& CurBody = m_rigidBodies[i];
         for (int j = i + 1; j < m_numActiveRigidBodies; j++) {
@@ -106,13 +109,11 @@ void System::HandleRigidBodyCollisions(float DeltaTime)
             case COLLISION_STATUS_TOUCHING:
            //     printf("Collision\n");
                 m_rigidBodies[i].CalcCollisionReactions(OtherBody);
-                ForceApplied = false;
                 break;
 
             case COLLISION_STATUS_OVERLAPPING:
            //     printf("Overlapping\n");
                 HandleOverlappingBodies(DeltaTime, CurBody, OtherBody);
-                ForceApplied = false;
                 break;
 
             case COLLISION_STATUS_NONE:
@@ -120,14 +121,6 @@ void System::HandleRigidBodyCollisions(float DeltaTime)
                 break;
             }
         }
-    }
-
-    if (ForceApplied) {
-        for (int i = 0; i < m_numActiveRigidBodies; i++) {
-            m_rigidBodies[i].ResetForces();
-        }
-    } else {
-        ForceApplied = true;
     }
 }
 
