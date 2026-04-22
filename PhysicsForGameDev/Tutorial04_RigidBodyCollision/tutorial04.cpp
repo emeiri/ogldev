@@ -31,8 +31,8 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-glm::vec3 ForcePoint(0.0f, 0.1f, 0.0f);
-glm::vec3 ForcePoint2(0.0f, -0.1f, 0.0f);
+glm::vec3 ForcePoint(0.0f, 0.5f, 0.0f);
+glm::vec3 ForcePoint2(0.0f, 1.0f, 0.0f);
 glm::vec3 CenterOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
 
 SceneObject* s_pSceneObject = NULL;
@@ -40,8 +40,7 @@ SceneObject* s_pSceneObject2 = NULL;
 
 glm::vec3 s_Pos = glm::vec3(0.0f, 3.0f, 0.0f);
 glm::vec3 s_Pos2 = glm::vec3(20.0f, 3.0f, -20.0f);
-glm::vec3 EulerAngles = glm::radians(glm::vec3(0.0f, 90.0f, 0.0f));
-glm::quat Orientation = glm::quat(EulerAngles);
+glm::quat Orientation = GLM_DEFAULT_QUAT;//  glm::angleAxis(glm::radians(0.0f), glm::vec3(1, 0, 0));
 
 bool reset = false;
 bool reset2 = false;
@@ -66,15 +65,9 @@ static void PhysicsUpdateListener(const void* pObject,
             pSceneObject->SetQuaternion(Orientation);
         }
     } else if (pSceneObject == s_pSceneObject2) {
-        //if (Pos.y <= .0) {
-//            pSceneObject->SetPosition(s_Pos2);
-  //          reset2 = true;
-         //   printf("Resetting 2\n");
-        //} else {
         printf("%p ", pSceneObject); GLM_PRINT_QUAT("physics quat ", Orientation);
-            pSceneObject->SetPosition(Pos);
-            pSceneObject->SetQuaternion(Orientation);
-     //  }
+        pSceneObject->SetPosition(Pos);
+        pSceneObject->SetQuaternion(Orientation);
     } else {
         printf("Unknown object\n");
         assert(0);
@@ -108,8 +101,8 @@ public:
 
         m_pScene->GetDirLights().push_back(m_dirLight);
   
-        //Model* pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
-        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/futuristic-cyberpunk-axe/source/model2.glb");
+        Model* pModel = m_pRenderingSystem->LoadModel("../PhysicsForGameDev/Tutorial04_RigidBodyCollision/box.obj");
+      //  Model* pModel = m_pRenderingSystem->LoadModel("../Content/Sketchfab/futuristic-cyberpunk-axe/source/model2.glb");
         
        // m_pScene->GetConfig()->ControlSkybox(true);
        // m_pScene->LoadSkybox("../Content/textures/143_hdrmaps_com_free_10K_small.jpg");
@@ -128,22 +121,22 @@ public:
             m_pRigidBody = m_physicsSystem.AllocRigidBody();
             glm::vec3 ForceVec(glm::vec3(800.0f, 800.0f, 0.0f));
             m_pRigidBody->Init(1.0f, CenterOfMass, s_pSceneObject->GetGLMPos(), ForceVec, ForcePoint, GLM_DEFAULT_QUAT, s_pSceneObject);
-            float Width = 1.0f;
-            float Height = 2.25f;
-            float Depth = 0.3f;
+            float Width = 2.0f;
+            float Height = 6.0f;
+            float Depth = 4.0f;
             m_pRigidBody->SetShapeBox(Width, Height, Depth);
-            m_pRigidBody->GetLinear().SetBoundingRadius(2.5f);
+            m_pRigidBody->GetLinear().SetBoundingRadius(3.0f);
         }
 
         {
             m_pRigidBody2 = m_physicsSystem.AllocRigidBody();
             glm::vec3 ForceVec(glm::vec3(0.0f, 800.0f, 800.0f));
             m_pRigidBody2->Init(1.0f, CenterOfMass, s_pSceneObject2->GetGLMPos(), ForceVec, ForcePoint2, Orientation, s_pSceneObject2);
-            float Width = 1.0f;
-            float Height = 2.25f;
-            float Depth = 0.3f;
+            float Width = 4.0f;
+            float Height = 6.0f;
+            float Depth = 2.0f;
             m_pRigidBody2->SetShapeBox(Width, Height, Depth);
-            m_pRigidBody2->GetLinear().SetBoundingRadius(2.5f);
+            m_pRigidBody2->GetLinear().SetBoundingRadius(3.0f);
           //  m_pRigidBody2->SetOrientation(s_pSceneObject2->GetQuaternion());
         }
 
@@ -169,14 +162,6 @@ public:
                 glm::vec3(RandomFloatRange(-10.0f, 10.f),
                           RandomFloatRange(780.0f, 820.0f),
                           RandomFloatRange(780.0f, 820.0f)), ForcePoint2, Orientation, s_pSceneObject2);
-        }
-
-        if (m_pRigidBody->GetLinear().GetPos().y > 0.0f) {
-            m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
-        }
-        
-        if (m_pRigidBody2->GetLinear().GetPos().y > 0.0f) {
-            m_pRigidBody2->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
         }
 
         m_physicsSystem.Update((int)DeltaTimeMillis);
