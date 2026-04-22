@@ -122,7 +122,7 @@ public:
         s_pSceneObject2->SetPosition(s_Pos2);
         m_pScene->AddToRenderList(s_pSceneObject2);
 
-        m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
+        m_physicsSystem.Init(100, 100, PhysicsUpdateListener, Physics::GRAVITY);
 
         {
             m_pRigidBody = m_physicsSystem.AllocRigidBody();

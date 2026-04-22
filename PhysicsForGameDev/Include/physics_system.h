@@ -35,7 +35,7 @@ public:
 
     ~System() {}
 
-    void Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdateListener);
+    void Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdateListener, const glm::vec3& GlobalForce);
 
     void SetListener(UpdateListener pUpdateListener) { m_pUpdateListener = pUpdateListener; }
 
@@ -62,6 +62,7 @@ private:
     UpdateListener m_pUpdateListener = NULL;
     int m_numActivePointMasses = 0;
     int m_numActiveRigidBodies = 0;
+    glm::vec3 m_globalForce = glm::vec3(0.0f);
 };
 
 }

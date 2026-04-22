@@ -14,7 +14,7 @@ TEST(TestCaseName, TestName)
 {
 	Physics::System PhysicsSystem;
 
-	PhysicsSystem.Init(10, 0, UpdateListener);
+	PhysicsSystem.Init(10, 0, UpdateListener, glm::vec3(0.0f));
 
 	int foo;
 

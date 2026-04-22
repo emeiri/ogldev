@@ -22,9 +22,10 @@
 
 namespace Physics {
 
-void System::Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdateListener)
+void System::Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdateListener, const glm::vec3& GlobalForce)
 {
     m_pUpdateListener = pUpdateListener;
+    m_globalForce = GlobalForce;
     m_pointMasses.resize(NumPointMasses);
     m_rigidBodies.resize(NumRigidBodies);
 }

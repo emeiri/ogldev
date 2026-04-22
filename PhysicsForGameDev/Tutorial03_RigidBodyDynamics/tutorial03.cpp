@@ -91,7 +91,7 @@ public:
 
         m_pScene->SetCamera(Vector3f(-13.0f, 12.0f, -20.0f), Vector3f(0.85f, -0.2f, 0.5f));
 
-        m_physicsSystem.Init(100, 100, PhysicsUpdateListener);
+        m_physicsSystem.Init(100, 100, PhysicsUpdateListener, glm::vec3(0.0f));
 
         m_pRigidBody = m_physicsSystem.AllocRigidBody();
         glm::vec3 ForceVec(glm::vec3(800.0f, 800.0f, 0.0f));

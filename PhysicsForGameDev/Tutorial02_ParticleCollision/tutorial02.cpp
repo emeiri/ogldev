@@ -83,7 +83,7 @@ public:
 
         m_pScene->SetCamera(Vector3f(0.0f, 1.0f, 1.0f), Vector3f(0.0f, -0.9f, 0.3f));
 
-        m_physicsSystem.Init(100, 0, PhysicsUpdateListener);
+        m_physicsSystem.Init(100, 0, PhysicsUpdateListener, glm::vec3(0.0f));
 
         m_pPointMass1 = m_physicsSystem.AllocPointMass();
         float RandomX = 1.0f;//RandomFloatRange(1.0f, 5.0f);
