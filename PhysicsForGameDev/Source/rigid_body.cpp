@@ -147,6 +147,10 @@ void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
     glm::vec3 relVel = vA - vB;
     float relVelAlongNormal = glm::dot(relVel, normal);
 
+    if (relVelAlongNormal > 0) {
+        return; // Already separating
+    }
+
     // 4. Restitution
     float restitution = 0.5f * (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest());
 
@@ -167,10 +171,10 @@ void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
 
     // 8. Apply impulse
     glm::vec3 impulse = j * normal;
-    m_linear.AddForce(impulse);
+    m_linear.SetLinearVelocity(m_linear.GetLinearVelocity() + (impulse * invMassA));
     m_angularVelocity += invInertiaA * glm::cross(rA, impulse);
 
-    OtherBody.m_linear.AddForce(-impulse);
+    OtherBody.m_linear.SetLinearVelocity(OtherBody.m_linear.GetLinearVelocity() - (impulse * invMassB));
     OtherBody.m_angularVelocity -= invInertiaB * glm::cross(rB, impulse);
 }
 
@@ -254,21 +258,11 @@ void ResolvePenetration(RigidBody& Body1, RigidBody& Body2)
 
 void HandleOverlappingBodies(float DeltaTime, RigidBody& Body1, RigidBody& Body2)
 {
-    COLLISION_STATUS cs = Body1.GetLinear().GetCollisionStatus(Body2.GetLinear());
+    // 1. Move objects apart
+    ResolvePenetration(Body1, Body2);
 
-    if (cs == COLLISION_STATUS_OVERLAPPING) {
-        // 1. Move objects apart
-        ResolvePenetration(Body1, Body2);
-
-        // 2. Update velocities based on collision
-        Body1.CalcCollisionReactions(Body2);
-    } else if (cs == COLLISION_STATUS_TOUCHING) {
-        Body1.CalcCollisionReactions(Body2);
-    }
-
-    // 3. Update both bodies for this time step
-    Body1.Update(DeltaTime, NULL);
-    Body2.Update(DeltaTime, NULL);
+    // 2. Update velocities based on collision
+    Body1.CalcCollisionReactions(Body2);
 }
 
 
