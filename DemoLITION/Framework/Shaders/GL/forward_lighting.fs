@@ -676,6 +676,9 @@ vec4 CalcPhongLighting(vec3 Normal)
 
     vec4 TexColor = GetTexColor();
 
+    // I'm using gColorMod and gColorAdd to enhance the color in
+    // my youtube thumbnails. They are not an integral part of the lighting equation.
+
     TexColor = TexColor * gColorMod + gColorAdd;
 
     vec4 FinalColor = TexColor * TotalLight;
@@ -731,10 +734,9 @@ void main()
         float FogFactor = CalcFogFactor();
         TempColor = mix(vec4(gFogColor, 1.0), FragColor, FogFactor);
     }
-    
-    // I'm using gColorMod and gColorAdd to enhance the color in
-    // my youtube thumbnails. They are not an integral part of the lighting equation.
 
+    FragColor = TempColor;
+    
    // FragColor = vec4(1.0);  
  // FragColor = GetTexColor();
   //  FragColor = GetTotalLight(Normal);
