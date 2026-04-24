@@ -109,15 +109,6 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
     m_orientation += qdot * dt;
     m_orientation = glm::normalize(m_orientation);
 
-	// We reset the torque accumulator after the update. We cannot assume that the force 
-    // is still in effect in the next frame, so we need to reset it. We also need to reset 
-    // it after the first update, because the initial force is only applied once.
-	// The check for dt > 0 is to avoid resetting the torque accumulator before the 
-    // first update, which would cause the initial force to be ignored.
-    if (dt > 0.0f) {
-        m_torqueAccum = glm::vec3(0);
-    }
-
     if (pUpdateListener) {
         pUpdateListener(m_linear.GetTarget(), m_linear.GetPos(), m_orientation);
     }
