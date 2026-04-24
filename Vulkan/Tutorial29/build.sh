@@ -20,9 +20,10 @@ CPPFLAGS="-I../../Common/3rdparty/ImGui/imGuIZMO.quat \
 
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
 
-LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer"
+LDFLAGS="$LDFLAGS -L../../Lib -L$VULKAN_SDK/lib -lassimp -lglslang -lglslang-default-resource-limits -lSPIRV -lOSDependent -lSPVRemapper -lspirv-cross-reflect -lmeshoptimizer"
 
-$CC tutorial27.cpp \
+$CC tutorial29.cpp \
+    lighting_program.cpp \
     ../VulkanCore/Source/core.cpp \
     ../VulkanCore/Source/spirv_reflect.c \
     ../VulkanCore/Source/util.cpp \
@@ -38,6 +39,10 @@ $CC tutorial27.cpp \
     ../VulkanCore/Source/graphics_pipeline_v3.cpp \
     ../VulkanCore/Source/graphics_pipeline_v4.cpp \
     ../VulkanCore/Source/skybox.cpp \
+    ../VulkanCore/Source/gfx_program.cpp \
+    ../VulkanCore/Source/compute_pipeline.cpp \
+    ../VulkanCore/Source/Pipelines/texgen_pipeline.cpp \
+    ../VulkanCore/Source/Pipelines/fsquad_pipeline.cpp \
     ../../Common/ogldev_util.cpp  \
     ../../Common/math_3d.cpp  \
     ../../Common/ogldev_glm_camera.cpp  \
@@ -52,4 +57,4 @@ $CC tutorial27.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_tables.cpp \
     ../../Common/3rdparty/ImGui/GLFW/imgui_widgets.cpp \
     ../../Common/3rdparty/ImGui/imGuIZMO.quat/imguizmo_quat.cpp \
-    $CPPFLAGS $LDFLAGS -o tutorial27
+    $CPPFLAGS $LDFLAGS -o tutorial29

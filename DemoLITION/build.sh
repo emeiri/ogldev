@@ -2,7 +2,7 @@
 
 TARGET="../Lib/libdemolition.a"
 
-if [[ ! -e "$TARGET" || $(($(date +%s) - $(stat -c %Y "$TARGET"))) -le 3600 ]]; then
+if [[ -e "$TARGET" && $(($(date +%s) - $(stat -c %Y "$TARGET"))) -le 3600 ]]; then
 	echo "No need to rebuild library"
 	exit 0
 fi

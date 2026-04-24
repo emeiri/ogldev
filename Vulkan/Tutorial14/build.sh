@@ -7,7 +7,7 @@ check_vulkan_sdk
 CC=g++
 CPPFLAGS="-I../VulkanCore/Include -I../../Include  -I$VULKAN_SDK/include -DVULKAN -ggdb3 -std=c++20"
 LDFLAGS=`pkg-config --libs glfw3 vulkan`
-LDFLAGS="$LDFLAGS -L$VULKAN_SDK/lib -lglslang -lglslang-default-resource-limits -lSPIRV -lOGLCompiler -lOSDependent -lSPVRemapper \
+LDFLAGS="$LDFLAGS -L$VULKAN_SDK/lib -lglslang -lglslang-default-resource-limits -lSPIRV -lOSDependent -lSPVRemapper \
 	-lspirv-cross-reflect"
 $CC tutorial14.cpp \
     ../VulkanCore/Source/core.cpp \

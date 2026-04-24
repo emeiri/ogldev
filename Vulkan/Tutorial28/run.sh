@@ -2,4 +2,4 @@
 
 export LD_LIBRARY_PATH=../../Lib:$VULKAN_SDK/lib
 
-./tutorial25
+./tutorial28
