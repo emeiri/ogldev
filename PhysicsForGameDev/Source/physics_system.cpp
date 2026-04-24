@@ -50,6 +50,9 @@ void System::Update(int DeltaTimeMillis)
     const float FixedDT = 1.0f / 60.0f;
 
     while (accumulator >= 1.0f/60.0f) {
+
+        ApplyGlobalForces();
+
         // Pass the FIXED dt (1/60), NOT the variable frameTime
         UpdateInternal(FixedDT);
         HandlePointMassCollisions();
@@ -58,8 +61,33 @@ void System::Update(int DeltaTimeMillis)
         for (int i = 0; i < m_numActiveRigidBodies; i++) {
             m_rigidBodies[i].ResetForces();
         }
+        ResetAllForces();
 
         accumulator -= FixedDT;       
+    }
+}
+
+
+void System::ApplyGlobalForces()
+{
+    for (int i = 0; i < m_numActivePointMasses; i++) {
+        m_pointMasses[i].AddForce(m_globalForce);
+    }
+
+    for (int i = 0; i < m_numActiveRigidBodies; i++) {
+        m_rigidBodies[i].AddForce(m_globalForce);
+    }
+}
+
+
+void System::ResetAllForces()
+{
+    for (int i = 0; i < m_numActivePointMasses; i++) {
+        m_pointMasses[i].ResetForces();
+    }
+
+    for (int i = 0; i < m_numActiveRigidBodies; i++) {
+        m_rigidBodies[i].ResetForces();
     }
 }
 

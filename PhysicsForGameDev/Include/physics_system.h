@@ -41,6 +41,7 @@ public:
 
     void Update(int DeltaTimeMillis);
 
+
     PointMass* AllocPointMass();
 
     RigidBody* AllocRigidBody();
@@ -56,6 +57,10 @@ private:
     void HandlePointMassCollisions();
 
     void HandleRigidBodyCollisions(float DeltaTime);
+
+    void ApplyGlobalForces();
+
+    void ResetAllForces();
 
     std::vector<PointMass> m_pointMasses;
     std::vector<RigidBody> m_rigidBodies;
