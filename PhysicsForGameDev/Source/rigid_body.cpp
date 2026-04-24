@@ -142,20 +142,20 @@ void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
         return; // Already separating
     }
 
-    // 4. Restitution
-    float restitution = 0.5f * (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest());
-
-    // 5. Inverse mass and inertia
+    // 4. Inverse mass and inertia
     float invMassA = 1.0f / m_linear.GetMass();
     float invMassB = 1.0f / OtherBody.m_linear.GetMass();
     glm::mat3 invInertiaA = m_inertiaWorldInv;
     glm::mat3 invInertiaB = OtherBody.m_inertiaWorldInv;
 
-    // 6. Impulse denominator
+    // 5. Impulse denominator
     float denom = invMassA + invMassB +
         glm::dot(normal,
             glm::cross(invInertiaA * glm::cross(rA, normal), rA) +
             glm::cross(invInertiaB * glm::cross(rB, normal), rB));
+
+    // 6. Restitution
+    float restitution = 0.5f * (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest());
 
     // 7. Impulse scalar
     float j = -(1.0f + restitution) * relVelAlongNormal / denom;
