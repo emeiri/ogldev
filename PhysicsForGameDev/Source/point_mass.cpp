@@ -44,11 +44,14 @@ void PointMass::Init(float Mass, const glm::vec3& CenterOfMass, const glm::vec3&
 
 void PointMass::Update(float DeltaTime, UpdateListener pUpdateListener)
 {
+  //  GLM_PRINT_VEC3("Sum forces ", m_sumForces);
     m_linearAccel = m_sumForces / m_mass;
-
-    m_linearVelocity += m_linearAccel * DeltaTime;
-
+ //   GLM_PRINT_VEC3("Linear accel ", m_linearAccel);
+    //m_pos += (m_linearVelocity * DeltaTime) + (0.5f * m_linearAccel * DeltaTime * DeltaTime);
     m_pos += m_linearVelocity * DeltaTime;
+  //  printf("PointMass %p position delta time %f ", this, DeltaTime); GLM_PRINT_VEC3("", m_pos);
+    m_linearVelocity += m_linearAccel * DeltaTime;
+  //  GLM_PRINT_VEC3("Linear velocity ", m_linearVelocity);    
 
     if (pUpdateListener) {
         glm::quat t(0.0f, 0.0f, 0.0f, 0.0f);
