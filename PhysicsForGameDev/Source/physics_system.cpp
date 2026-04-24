@@ -43,7 +43,6 @@ void System::Update(int DeltaTimeMillis)
     accumulator += DeltaTime;
 
     //printf("DeltaTime = %f\n", DeltaTime);
-    // 2. Consume accumulated time in fixed dt chunks
     const float FixedDT = 1.0f / 60.0f;
 
     while (accumulator >= 1.0f/60.0f) {
@@ -51,13 +50,11 @@ void System::Update(int DeltaTimeMillis)
         ApplyGlobalForces();
 
         // Pass the FIXED dt (1/60), NOT the variable frameTime
-        UpdateInternal(FixedDT);
         HandlePointMassCollisions();
         HandleRigidBodyCollisions(FixedDT);
 
-        for (int i = 0; i < m_numActiveRigidBodies; i++) {
-            m_rigidBodies[i].ResetForces();
-        }
+        UpdateInternal(FixedDT);
+
         ResetAllForces();
 
         accumulator -= FixedDT;       
