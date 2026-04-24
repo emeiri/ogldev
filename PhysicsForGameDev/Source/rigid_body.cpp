@@ -237,8 +237,9 @@ void ResolvePenetration(RigidBody& Body1, RigidBody& Body2)
     glm::vec3 delta = Body1.GetLinear().GetPos() - Body2.GetLinear().GetPos();
     float dist = glm::length(delta);
     float minDist = Body1.GetLinear().GetBoundingRadius() + Body2.GetLinear().GetBoundingRadius();
+    glm::vec3 DeltaNormalized = delta / dist;
     if (dist < minDist && dist > 0.0f) {
-        glm::vec3 correction = (minDist - dist) * (delta / dist) * 0.5f;
+        glm::vec3 correction = (minDist - dist) * DeltaNormalized * 0.5f;
         glm::vec3 NewPos1 = Body1.GetLinear().GetPos() + correction;
         Body1.GetLinear().SetPos(NewPos1);
         glm::vec3 NewPos2 = Body2.GetLinear().GetPos() - correction;
