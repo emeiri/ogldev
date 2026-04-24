@@ -33,13 +33,10 @@ void System::Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdate
 
 void System::Update(int DeltaTimeMillis)
 {
-//    if (DeltaTimeMillis == 0) {
-  //      return;
-  //  }
     float DeltaTime = DeltaTimeMillis / 1000.f;
 
-    if (DeltaTime > 0.25f) {
-        DeltaTime = 0.25;
+    if (DeltaTime > 0.1f) {
+        DeltaTime = 0.1f;
     }
 
     static float accumulator = 0.0f;
