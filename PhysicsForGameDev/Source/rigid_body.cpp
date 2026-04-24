@@ -249,11 +249,11 @@ void ResolvePenetration(RigidBody& Body1, RigidBody& Body2)
 
 void HandleOverlappingBodies(float DeltaTime, RigidBody& Body1, RigidBody& Body2)
 {
-    // 1. Move objects apart
-    ResolvePenetration(Body1, Body2);
-
-    // 2. Update velocities based on collision
+    // 1. Update velocities based on collision
     Body1.CalcCollisionReactions(Body2);
+
+    // 2. Move objects apart
+    ResolvePenetration(Body1, Body2);
 }
 
 
