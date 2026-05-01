@@ -69,8 +69,6 @@ public:
 
     void SetOrientation(const glm::quat& Orientation) { m_orientation = Orientation; }
 
-  //  const glm::vec3& GetInertiaLocal() const { return m_inertiaLocal; }
-
 private:    
 
     void UpdateInertiaWorldInv();
