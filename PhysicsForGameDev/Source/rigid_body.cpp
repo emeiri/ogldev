@@ -128,43 +128,51 @@ void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
     glm::vec3 normal = glm::normalize(m_linear.GetPos() - OtherBody.m_linear.GetPos());
     glm::vec3 contactPoint = m_linear.GetPos() - normal * m_linear.GetBoundingRadius();
 
-    // 2. Relative positions from centers to contact
-    glm::vec3 rA = contactPoint - m_linear.GetPos();
-    glm::vec3 rB = contactPoint - OtherBody.m_linear.GetPos();
+    // 2. Transform the center of mass from local to world space
+    glm::vec3 CoMA_World = LocalToWorld(m_linear.GetCenterOfMass());
+    glm::vec3 CoMB_World = OtherBody.LocalToWorld(OtherBody.m_linear.GetCenterOfMass());
 
-    // 3. Velocities at contact
+    // 3. The radius from the center of mass to the contact point in world space
+    glm::vec3 rA = contactPoint - CoMA_World;
+    glm::vec3 rB = contactPoint - CoMB_World;
+
+    // 4. Velocities at contact
     glm::vec3 vA = m_linear.GetLinearVelocity() + glm::cross(m_angularVelocity, rA);
     glm::vec3 vB = OtherBody.m_linear.GetLinearVelocity() + glm::cross(OtherBody.m_angularVelocity, rB);
     glm::vec3 relVel = vA - vB;
     float relVelAlongNormal = glm::dot(relVel, normal);
 
+    // 5. Early exit if objects are moving apart
     if (relVelAlongNormal > 0) {
-        return; // Already separating
+        return;
     }
 
-    // 4. Inverse mass and inertia
+    // 6. Inverse mass and inertia
     float invMassA = 1.0f / m_linear.GetMass();
     float invMassB = 1.0f / OtherBody.m_linear.GetMass();
     glm::mat3 invInertiaA = m_inertiaWorldInv;
     glm::mat3 invInertiaB = OtherBody.m_inertiaWorldInv;
 
-    // 5. Impulse denominator
-    float denom = invMassA + invMassB +
-        glm::dot(normal,
+    GLM_PRINT_VEC3("Normal ", glm::cross(rA, normal));
+
+    float denom = invMassA + invMassB + glm::dot(normal,
             glm::cross(invInertiaA * glm::cross(rA, normal), rA) +
             glm::cross(invInertiaB * glm::cross(rB, normal), rB));
 
-    // 6. Restitution
+    // 7. Average restitution
     float restitution = 0.5f * (m_linear.GetCoeffOfRest() + OtherBody.m_linear.GetCoeffOfRest());
 
-    // 7. Impulse scalar
+    // 8. Impulse scalar
     float j = -(1.0f + restitution) * relVelAlongNormal / denom;
 
-    // 8. Apply impulse
+    // 9. Impulse scalar to vector
     glm::vec3 impulse = j * normal;
+
+    // 10. Apply impulse
     m_linear.SetLinearVelocity(m_linear.GetLinearVelocity() + (impulse * invMassA));
     m_angularVelocity += invInertiaA * glm::cross(rA, impulse);
 
+    // 11. And on the other one...
     OtherBody.m_linear.SetLinearVelocity(OtherBody.m_linear.GetLinearVelocity() - (impulse * invMassB));
     OtherBody.m_angularVelocity -= invInertiaB * glm::cross(rB, impulse);
 }

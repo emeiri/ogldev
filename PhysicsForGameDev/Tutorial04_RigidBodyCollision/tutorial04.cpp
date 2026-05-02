@@ -186,9 +186,9 @@ private:
     Physics::RigidBody* m_pRigidBody = NULL;
     Physics::RigidBody* m_pRigidBody2 = NULL;
 
-    glm::vec3 m_forcePoint = glm::vec3(0.0f, 0.5f, 0.0f);
+    glm::vec3 m_forcePoint = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 m_forcePoint2 = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 m_centerOfMass = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 m_centerOfMass = glm::vec3(0.0f, 0.5f, 0.0f);
 
     glm::vec3 m_Pos = glm::vec3(40.0f, 3.0f, -30.0f);
     glm::vec3 m_Pos2 = glm::vec3(20.0f, 3.0f, -20.0f);
