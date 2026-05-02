@@ -59,10 +59,10 @@ void RigidBody::ApplyForceAtPoint(const glm::vec3& ForceWorld,
 }
 
 
-glm::vec3 RigidBody::LocalToWorld(const glm::vec3& p) const
+glm::vec3 RigidBody::LocalToWorld(const glm::vec3& LocalPos) const
 {
     glm::mat3 R = glm::toMat3(m_orientation);
-    return R * p + m_linear.GetPos();
+    return R * LocalPos + m_linear.GetPos();
 }
 
 
