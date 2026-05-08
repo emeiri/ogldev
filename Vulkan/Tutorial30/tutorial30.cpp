@@ -127,11 +127,9 @@ public:
 		CreateDescriptorPool();
 		CreateTexturesDescSetLayout();
 		AllocTextureDescSet();
-		CreateMeshes();
-		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipeline();
-        CreateUniformBuffers();
-		CreateDescriptorSets();
+		CreateMeshes();
+		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");		
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 		DefaultCreateCameraPers();
@@ -370,18 +368,25 @@ private:
 
 	void CreateMeshes()
 	{
-        m_models.resize(1);
-        m_models[0].m_pModel = new OgldevVK::VkModel(true);
-		m_models[0].m_pModel->Init(&m_vkCore);
+        m_models.resize(2);
+
+        std::string ModelFiles[] = {
+            "../../Content/crytek_sponza/sponza.obj",
+            "../../Content/box.obj"
+        };
+
+		for (int i = 0; i < (int)m_models.size(); i++) {
+			m_models[i].m_pModel = new OgldevVK::VkModel(true);
+			m_models[i].m_pModel->Init(&m_vkCore);
+			m_models[i].m_pModel->LoadAssimpModel(ModelFiles[i]);
+            CreateUniformBuffers(i);
+            CreateDescriptorSets(i);
+		}
+        
+		
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");
-		m_models[0].m_pModel->LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
-
-	//	m_models[1].m_pModel = new OgldevVK::VkModel(true);
-	//	m_models[1].m_pModel->Init(&m_vkCore);
-	//	m_models[1].m_pModel->LoadAssimpModel("../../Content/box.obj");
-
+	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");			
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
@@ -404,26 +409,28 @@ private:
 	}
 
 
-	void CreateUniformBuffers()
+	void CreateUniformBuffers(int MeshIndex)
 	{
 		size_t MaxUniformBufferSize = m_vkCore.GetMaxUniformBufferSize();
 		int MaxNumMeshes = (int)(MaxUniformBufferSize / sizeof(OgldevVK::LightingProgram::UniformDataVS));
-		assert(m_models[0].m_pModel->GetNumMeshes() <= MaxNumMeshes);
+		assert(m_models[MeshIndex].m_pModel->GetNumMeshes() <= MaxNumMeshes);
 
-		size_t UniformBufferSizeVS = m_models[0].m_pModel->GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
-		m_models[0].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
-		m_models[0].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
+		size_t UniformBufferSizeVS = m_models[MeshIndex].m_pModel->GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
+		m_models[MeshIndex].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
+		m_models[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
 	}
 
 
-	void CreateDescriptorSets()
+	void CreateDescriptorSets(int MeshIndex)
 	{
 		OgldevVK::ModelDesc md;
 
-		m_models[0].m_pModel->UpdateModelDesc(md);
+		m_models[MeshIndex].m_pModel->UpdateModelDesc(md);
 
-		m_pipelines[0].AllocDescSets(m_models[0].m_descSets);
-		m_pipelines[0].UpdateDescriptorSets(md, m_models[0].m_descSets, m_models[0].m_uniformBuffersVS, m_models[0].m_uniformBuffersFS);
+		m_pipelines[MeshIndex].AllocDescSets(m_models[MeshIndex].m_descSets);
+		m_pipelines[MeshIndex].UpdateDescriptorSets(md, m_models[MeshIndex].m_descSets,
+														m_models[MeshIndex].m_uniformBuffersVS, 
+														m_models[MeshIndex].m_uniformBuffersFS);
 
 		CreateGlobalTextureArray(md);
 	}
