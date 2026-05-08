@@ -81,7 +81,7 @@ public:
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 protected:
 
-	VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
+	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 
 	std::vector<VkDescriptorSet> m_descSets;
 };

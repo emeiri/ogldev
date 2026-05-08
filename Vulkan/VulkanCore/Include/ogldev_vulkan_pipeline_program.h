@@ -44,13 +44,13 @@ public:
 
 	void Bind(VkCommandBuffer CmdBuf);
 
-	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets);
+	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets, int DescSetLayoutIndex = 0);
 
 	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
 
 protected:
 
-	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;
+	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;
 
 	// Default but deriving class may override
 	virtual VkCullModeFlags GetCullMode() const
@@ -66,7 +66,7 @@ private:
 		VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
 		VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS);
 
-	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
+	std::vector<VkDescriptorSetLayout> m_descSetLayouts;
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;

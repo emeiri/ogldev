@@ -21,7 +21,7 @@
 
 namespace OgldevVK {
 
-VkDescriptorSetLayout FullScreenQuadPipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+std::vector<VkDescriptorSetLayout> FullScreenQuadPipeline::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 {
 	VkDescriptorSetLayoutBinding Binding = {
 		.binding = SamplerBinding,
@@ -33,7 +33,9 @@ VkDescriptorSetLayout FullScreenQuadPipeline::CreateDescSetLayout(OgldevVK::Vulk
 
 	VkDescriptorSetLayout l = vkCore.CreateDescSetLayout({ Binding });
 
-	return l;
+	std::vector<VkDescriptorSetLayout> ret = { l };
+
+	return ret;
 }
 
 

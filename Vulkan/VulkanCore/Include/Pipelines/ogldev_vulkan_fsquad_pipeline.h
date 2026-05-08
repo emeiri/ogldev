@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "ogldev_vulkan_pipeline_program.h"
 
 namespace OgldevVK {
@@ -34,7 +36,7 @@ public:
 
 protected:
 
-	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
+	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 
 	virtual VkCullModeFlags GetCullMode() const
 	{

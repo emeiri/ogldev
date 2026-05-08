@@ -31,7 +31,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const
 
 	m_fs = CreateShaderModuleFromText(m_device, pFSFilename);
 
-	m_descSetLayout = CreateDescSetLayout(vkCore);
+	m_descSetLayouts = CreateDescSetLayout(vkCore);
 
 	m_pipeline = CreatePipeline(vkCore.GetWindow(), m_vs, m_fs, vkCore.GetSwapChainFormat(), 
 		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, NULL, NULL);
@@ -48,7 +48,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore,
 
 	m_device = vkCore.GetDevice();
 
-	m_descSetLayout = CreateDescSetLayout(vkCore);
+	m_descSetLayouts = CreateDescSetLayout(vkCore);
 
 	m_pipeline = CreatePipeline(vkCore.GetWindow(), vs, fs,	vkCore.GetSwapChainFormat(), 
 		                        vkCore.GetDepthFormat(), VK_COMPARE_OP_LESS, pSpecInfoVS, pSpecInfoFS);
@@ -65,7 +65,10 @@ void GraphicsPipeline::Destroy()
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 	}
 
-	vkDestroyDescriptorSetLayout(m_device, m_descSetLayout, NULL);
+    for (VkDescriptorSetLayout& l : m_descSetLayouts) {
+        vkDestroyDescriptorSetLayout(m_device, l, NULL);
+    }
+	
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
 }
@@ -91,11 +94,11 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf)
 }
 
 
-void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets)
+void GraphicsPipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets, int DescSetLayoutIndex)
 {
 	assert(DescriptorSets.size() == 0);
 
-	std::vector<VkDescriptorSetLayout> Layouts(DescCount, m_descSetLayout);
+	std::vector<VkDescriptorSetLayout> Layouts(DescCount, m_descSetLayouts[DescSetLayoutIndex]);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
@@ -226,13 +229,12 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 	};
 
-	std::vector<VkDescriptorSetLayout> SetLayouts = { m_descSetLayout };
 	VkPipelineLayoutCreateInfo LayoutInfo = {};
 
 	LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.setLayoutCount = (u32)SetLayouts.size(),
-		.pSetLayouts = SetLayouts.data()
+		.setLayoutCount = (u32)m_descSetLayouts.size(),
+		.pSetLayouts = m_descSetLayouts.data()
 	};
 
 	VkResult res = vkCreatePipelineLayout(m_device, &LayoutInfo, NULL, &m_pipelineLayout);

@@ -75,7 +75,7 @@ void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf)
 }
 
 
-VkDescriptorSetLayout LightingProgram::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
+std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK::VulkanCore& vkCore)
 {
 	std::vector<VkDescriptorSetLayoutBinding> Bindings{
 		{.
@@ -119,7 +119,9 @@ VkDescriptorSetLayout LightingProgram::CreateDescSetLayout(OgldevVK::VulkanCore&
 
 	VkDescriptorSetLayout l = vkCore.CreateDescSetLayout({ Bindings });
 
-	return l;
+	std::vector<VkDescriptorSetLayout> ret = { l };
+
+	return ret;
 }
 
 
