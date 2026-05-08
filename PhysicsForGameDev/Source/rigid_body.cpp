@@ -104,7 +104,7 @@ void RigidBody::Update(float dt, UpdateListener pUpdateListener)
     m_angularVelocity += AngularAccel * dt;
 
     glm::quat wq(0, m_angularVelocity.x, m_angularVelocity.y, m_angularVelocity.z);
-    glm::quat qdot = 0.5f * (m_orientation * wq);
+    glm::quat qdot = 0.5f * wq * m_orientation;
 
     m_orientation += qdot * dt;
     m_orientation = glm::normalize(m_orientation);
