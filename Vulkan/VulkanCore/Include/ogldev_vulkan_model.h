@@ -36,6 +36,8 @@ public:
 
 	VkModel(bool IsDescriptorIndexing) { m_isDescriptorIndexing = IsDescriptorIndexing; }
 
+    ~VkModel() { Destroy(); }
+
 	void Destroy();
 
 	void Init(VulkanCore* pVulkanCore) { m_pVulkanCore = pVulkanCore; }
