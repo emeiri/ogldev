@@ -1,0 +1,532 @@
+/*
+
+		Copyright 2026 Etay Meiri
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+	Vulkan For Beginners - 
+		Tutorial #30: Push Constants
+*/
+
+#include <array>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+#include "imGuIZMOquat.h"			// optional
+
+#include "ogldev_vulkan_util.h"
+#include "ogldev_vulkan_core.h"
+#include "ogldev_vulkan_wrapper.h"
+#include "ogldev_vulkan_shader.h"
+#include "ogldev_vulkan_glfw.h"
+#include "ogldev_vulkan_model.h"
+#include "ogldev_vulkan_skybox.h"
+#include "ogldev_glm_camera.h"
+#include "ogldev_vulkan_imgui.h"
+#include "Int/model_desc.h"
+#include "lighting_program.h"
+
+#define WINDOW_WIDTH 2560
+#define WINDOW_HEIGHT 1440
+
+#define MAX_TEXTURES 4096
+
+#define BIG_TEXTURE_ARRAY_BINDING 0
+
+#define APP_NAME "Tutorial 30"
+
+class VulkanApp : public OgldevVK::GLFWCallbacks
+{
+public:
+
+	VulkanApp(int WindowWidth, int WindowHeight) : m_model(true)
+	{
+		m_windowWidth = WindowWidth;
+		m_windowHeight = WindowHeight;
+	}
+
+	~VulkanApp()
+	{
+		for (CommandBuffersVecs& v : m_cmdBufs) {
+			m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
+			m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
+		}
+
+		for (int i = 0; i < m_uniformBuffersVS.size(); i++) {
+			m_uniformBuffersVS[i].Destroy(m_device);
+			m_uniformBuffersFS[i].Destroy(m_device);
+		}
+
+		vkDestroyShaderModule(m_device, m_vs, NULL);
+		vkDestroyShaderModule(m_device, m_fs, NULL);
+
+		for (OgldevVK::LightingProgram& p : m_pipelines) {
+			p.Destroy();
+		}
+
+		vkDestroyDescriptorSetLayout(m_device, m_descSetLayoutTextures, NULL);
+
+		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
+			
+		m_model.Destroy();
+
+		//m_skybox.Destroy();
+
+		m_imGUIRenderer.Destroy();
+	}
+
+	void Init(const char* pAppName)
+	{
+		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
+
+		m_vkCore.Init(pAppName, m_pWindow, true, false);
+		m_device = m_vkCore.GetDevice();
+		m_numImages = m_vkCore.GetNumImages();
+		m_pQueue = m_vkCore.GetQueue();
+		CreateShaders();
+		CreateDescriptorPool();
+		CreateTexturesDescSetLayout();
+		CreateMesh();
+		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
+		CreatePipeline();
+		CreateCommandBuffers();
+		RecordCommandBuffers();
+		DefaultCreateCameraPers();
+		// The object is ready to receive callbacks
+		OgldevVK::glfw_vulkan_set_callbacks(m_pWindow, this);
+		m_imGUIRenderer.Init(&m_vkCore);
+	}
+
+
+	void RenderScene()
+	{
+		u32 ImageIndex = m_pQueue->AcquireNextImage();
+
+		UpdateUniformBuffers(ImageIndex);
+
+		if (m_showGui) {		
+			UpdateGUI();
+
+			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
+
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs[m_lightingMode].WithGUI[ImageIndex], ImGUICmdBuf};
+
+			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
+		} else {
+			m_pQueue->SubmitAsync(m_cmdBufs[m_lightingMode].WithoutGUI[ImageIndex]);
+		}
+
+		m_pQueue->Present(ImageIndex);
+	}
+
+	
+	void Key(GLFWwindow* pWindow, int Key, int Scancode, int Action, int Mods)
+	{
+		bool Handled = true;
+		bool Press = Action != GLFW_RELEASE;
+
+		switch (Key) {
+	    case GLFW_KEY_SPACE:
+	        if (Press) {
+	            m_showGui = !m_showGui;
+	        }
+	        break;
+		
+		case GLFW_KEY_ESCAPE:
+		case GLFW_KEY_Q:
+			if (Press) {
+				glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
+			}
+			break;
+
+		case GLFW_KEY_C:
+			m_pGameCamera->Print();
+			break;
+
+		default:
+			Handled = false;
+		}
+
+		if (!Handled) {
+			Handled = GLFWCameraHandler(m_pGameCamera->m_movement, Key, Action, Mods);
+		}
+	}
+	
+	
+	void MouseMove(GLFWwindow* pWindow, double x, double y)
+	{
+		m_pGameCamera->SetMousePos((float)x, (float)y);
+	}
+
+
+	void MouseButton(GLFWwindow* pWindow, int Button, int Action, int Mods)
+	{
+		if (!IsMouseControlledByImGUI()) {
+			m_pGameCamera->HandleMouseButton(Button, Action, Mods);
+		}		
+	}
+	
+	
+	void Execute()
+	{
+		float CurTime = (float)glfwGetTime();
+
+		int Frames = 0;
+		float FPSTime = 0.0f;
+		while (!glfwWindowShouldClose(m_pWindow)) {
+			float Time = (float)glfwGetTime();
+			float dt = Time - CurTime;
+			m_pGameCamera->Update(dt);
+			RenderScene();
+			CurTime = Time;
+			glfwPollEvents();
+
+			Frames++;
+			FPSTime += dt;
+
+			if (FPSTime >= 1.0f) {
+				//printf("%d\n", Frames);
+				char Title[256];
+				snprintf(Title, sizeof(Title), "%s : FPS %d\n", APP_NAME, Frames);
+				glfwSetWindowTitle(m_pWindow, Title);
+				FPSTime = 0.0f;
+				Frames = 0;
+			}
+		}
+
+		glfwTerminate();
+	}
+
+
+private:
+
+	void DefaultCreateCameraPers()
+	{
+		float FOV = 45.0f;
+		float zNear = 0.1f;
+		float zFar = 1500.0f;
+
+		DefaultCreateCameraPers(FOV, zNear, zFar);
+	}
+
+
+	void DefaultCreateCameraPers(float FOV, float zNear, float zFar)
+	{
+		if ((m_windowWidth == 0) || (m_windowHeight == 0)) {
+			printf("Invalid window dims: width %d height %d\n", m_windowWidth, m_windowHeight);
+			exit(1);
+		}
+
+		if (m_pGameCamera) {
+			printf("Camera already initialized\n");
+			exit(1);
+		}
+
+		PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
+									  zNear, zFar };
+		
+		glm::vec3 Pos(0.0f, 0.0f, -0.33f);
+		glm::vec3 Target(0.0f, 0.0f, 1.0f);
+		glm::vec3 Up(0.0, 1.0f, 0.0f);
+
+		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
+	}
+
+
+	void CreateCommandBuffers()
+	{
+		m_cmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
+
+		for (CommandBuffersVecs& v : m_cmdBufs) {
+			v.WithGUI.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, v.WithGUI.data());
+
+			v.WithoutGUI.resize(m_numImages);
+			m_vkCore.CreateCommandBuffers(m_numImages, v.WithoutGUI.data());
+		}
+
+		printf("Created command buffers\n");
+	}
+
+
+	void CreateDescriptorPool()
+	{
+		u32 TextureCount = 50;
+		u32 UniformBufferCount = 50;
+		u32 StorageBufferCount = 50;
+		u32 MaxSets = m_numImages * 4;
+
+		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+	}
+
+
+	void CreateTexturesDescSetLayout()
+	{
+		VkDescriptorSetLayoutBinding LayoutBindings = {
+			.binding = BIG_TEXTURE_ARRAY_BINDING,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = MAX_TEXTURES,
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.pImmutableSamplers = NULL
+		};
+
+		VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.pNext = NULL,
+			.flags = 0,
+			.bindingCount = 1,
+			.pBindings = &LayoutBindings
+		};
+
+		VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL,
+												   &m_descSetLayoutTextures);
+		CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
+	}
+
+
+
+	void CreateMesh()
+	{
+		m_model.Init(&m_vkCore);
+	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
+	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
+	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");
+		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
+	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
+	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
+	}
+
+
+	void CreateShaders()
+	{
+		m_vs = OgldevVK::CreateShaderModuleFromText(m_device, "test.vert");
+
+		m_fs = OgldevVK::CreateShaderModuleFromText(m_device, "test.frag");
+	}
+
+
+	void CreatePipeline()
+	{	
+		size_t MaxUniformBufferSize = m_vkCore.GetMaxUniformBufferSize();
+		int MaxNumMeshes = (int)(MaxUniformBufferSize / sizeof(OgldevVK::LightingProgram::UniformDataVS));
+		assert(m_model.GetNumMeshes() <= MaxNumMeshes);
+
+		size_t UniformBufferSizeVS = m_model.GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
+		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
+		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
+
+		OgldevVK::ModelDesc md;
+
+		m_model.UpdateModelDesc(md);
+
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
+			m_pipelines[i].Init(m_vkCore, m_descPool, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+			m_pipelines[i].UpdateDescriptorSets(md, m_uniformBuffersVS, m_uniformBuffersFS);
+		}		
+	}
+
+
+	void RecordCommandBuffers()
+	{
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
+			RecordCommandBuffersInternal(i, true, m_cmdBufs[i].WithoutGUI);
+
+			RecordCommandBuffersInternal(i, false, m_cmdBufs[i].WithGUI);
+		}
+	}
+
+
+	void RecordCommandBuffersInternal(int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
+	{
+		for (uint i = 0; i < CmdBufs.size(); i++) {
+			VkCommandBuffer& CmdBuf = CmdBufs[i];
+
+			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
+				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
+
+			BeginRendering(CmdBuf, i);
+		
+			m_pipelines[LightingMode].Bind(i, CmdBuf);
+			m_model.RecordCommandBufferIndirect(CmdBuf);
+			
+			//m_skybox.RecordCommandBuffer(CmdBuf, i);
+
+			vkCmdEndRendering(CmdBuf);
+
+			if (WithSecondBarrier) {
+				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
+					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1);
+			}
+
+			VkResult res = vkEndCommandBuffer(CmdBuf);
+
+			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
+		}
+
+		printf("Command buffers recorded\n");
+	}
+
+
+	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
+	{
+		VkClearValue ClearColor = {
+			.color = {1.0f, 0.0f, 0.0f, 1.0f},
+		};
+
+		VkClearValue DepthValue = {
+			.depthStencil = {.depth = 1.0f, .stencil = 0 }
+		};
+
+		m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, &ClearColor, &DepthValue);
+	}
+
+
+	void UpdateGUI()
+	{		
+		ImGuiIO& io = ImGui::GetIO();
+
+		ImGui_ImplVulkan_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+
+		ImGui::NewFrame();
+
+		ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);   // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+
+		if (ImGui::CollapsingHeader("Position")) {
+			ImGui::DragFloat3("##Position", &m_position.x, 0.01f);
+			ImGui::SameLine();
+			if (ImGui::Button("Reset##Pos")) {
+				m_position = glm::vec3(0.0f);
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Rotation")) {
+			ImGui::DragFloat3("##Rotation", &m_rotation.x, 1.0f); // Degrees
+			ImGui::SameLine();
+			if (ImGui::Button("Reset##Rot")) {
+				m_rotation = glm::vec3(0.0f);
+			}
+		}
+
+		if (ImGui::CollapsingHeader("Scale")) {
+			ImGui::DragFloat("##Scale", &m_scale, 0.001f, 0.001f, 2.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::SameLine();
+			if (ImGui::Button("Reset##Scale")) {
+				m_scale = 1.0f;
+			}
+		}
+
+		static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
+			ImGui::RadioButton(lightingModeNames[i], (int*)&m_lightingMode, i);
+		}
+
+		ImGui::gizmo3D("##Dir1", m_lightDir, 200.0f, imguiGizmo::modeDirection);
+
+		static int counter = 0;
+
+		if (ImGui::Button("Button")) {                           // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		}
+
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::End();
+
+		ImGui::Render();
+	}
+
+
+	void UpdateUniformBuffers(uint32_t ImageIndex)
+	{		
+		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
+
+		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
+
+		glm::mat4 World = Translate * Scale;
+
+		glm::mat4 VP = m_pGameCamera->GetVPMatrix();
+
+		glm::mat4 WVP = VP * World;
+
+		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
+		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
+		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
+		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight, 
+			                                LightDirection,	m_uniformBuffersVS, m_uniformBuffersFS);
+		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
+		//m_skybox.Update(ImageIndex, VPNoTranslate);
+	}
+
+	GLFWwindow* m_pWindow = NULL;
+	OgldevVK::VulkanCore m_vkCore;
+	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
+	OgldevVK::VulkanQueue* m_pQueue = NULL;
+	VkDevice m_device = NULL;
+	int m_numImages = 0;
+	struct CommandBuffersVecs {
+		std::vector<VkCommandBuffer> WithGUI;
+		std::vector<VkCommandBuffer> WithoutGUI;
+	};
+	std::vector<CommandBuffersVecs> m_cmdBufs;	
+	VkShaderModule m_vs = VK_NULL_HANDLE;
+	VkShaderModule m_fs = VK_NULL_HANDLE;
+	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
+	//OgldevVK::Skybox m_skybox;
+	OgldevVK::VkModel m_model;
+	GLMCameraFirstPerson* m_pGameCamera = NULL;
+	OgldevVK::ImGUIRenderer m_imGUIRenderer;
+	int m_windowWidth = 0;
+	int m_windowHeight = 0;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
+	VkDescriptorSetLayout m_descSetLayoutTextures = VK_NULL_HANDLE;
+
+	// GUI state
+	bool m_showGui = false;
+	glm::vec3 m_position = glm::vec3(0.0f);
+	glm::vec3 m_rotation = glm::vec3(0.0f);
+	float m_scale = 0.1f;
+	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
+	vec3 m_lightDir = vec3(0.0f, 0.0f, 0.0f);
+};
+
+
+int main(int argc, char* argv[])
+{
+	VulkanApp App(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	App.Init(APP_NAME);
+
+	App.Execute();
+
+	return 0;
+}
