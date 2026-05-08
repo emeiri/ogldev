@@ -76,6 +76,16 @@ struct ModelInfo {
 	}
 };
 
+struct ModelConfig {
+	std::string Path;
+    float Scale;
+};
+
+static ModelConfig Models[] = {
+	{ "../../Content/crytek_sponza/sponza.obj", 0.01f },
+	{ "../../Content/box.obj", 0.1f }
+//	{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", 0.01f }
+};
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -384,15 +394,10 @@ private:
 	{
         m_models.resize(2);
 
-        std::string ModelFiles[] = {
-            "../../Content/crytek_sponza/sponza.obj",
-            "../../Content/box.obj"
-        };
-
 		for (int i = 0; i < (int)m_models.size(); i++) {
 			m_models[i].m_pModel = new OgldevVK::VkModel(true);
 			m_models[i].m_pModel->Init(&m_vkCore);
-			m_models[i].m_pModel->LoadAssimpModel(ModelFiles[i]);
+			m_models[i].m_pModel->LoadAssimpModel(Models[i].Path);
             CreateUniformBuffers(i);
             CreateDescriptorSets(i);
 		}
@@ -614,7 +619,9 @@ private:
 
 	void UpdateUniformBuffers(int MeshIndex, int ImageIndex)
 	{		
-		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
+		glm::mat4 ScaleMatrix = glm::mat4(1.0f);
+
+		glm::mat4 Scale = m_scale * glm::scale(ScaleMatrix, glm::vec3(Models[MeshIndex].Scale));
 
 		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
 
