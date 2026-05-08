@@ -74,11 +74,6 @@ public:
 			m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
 		}
 
-		for (int i = 0; i < m_uniformBuffersVS.size(); i++) {
-			m_uniformBuffersVS[i].Destroy(m_device);
-			m_uniformBuffersFS[i].Destroy(m_device);
-		}
-
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 
@@ -91,7 +86,7 @@ public:
 		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
 			
 		for (int i = 0; i < (int)m_models.size(); i++) {
-			delete m_models[i].m_pModel;
+            m_models[i].Destroy(m_device);
 		}
 
 		//m_skybox.Destroy();
@@ -352,13 +347,18 @@ private:
 
 	void CreateMesh()
 	{
-        m_models.resize(1);
+        m_models.resize(2);
         m_models[0].m_pModel = new OgldevVK::VkModel(true);
 		m_models[0].m_pModel->Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");
 		m_models[0].m_pModel->LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+
+		m_models[1].m_pModel = new OgldevVK::VkModel(true);
+		m_models[1].m_pModel->Init(&m_vkCore);
+		m_models[1].m_pModel->LoadAssimpModel("../../Content/box.obj");
+
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
@@ -380,8 +380,8 @@ private:
 		assert(m_models[0].m_pModel->GetNumMeshes() <= MaxNumMeshes);
 
 		size_t UniformBufferSizeVS = m_models[0].m_pModel->GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
-		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
-		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
+		m_models[0].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
+		m_models[0].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
 
 		OgldevVK::ModelDesc md;
 
@@ -392,7 +392,7 @@ private:
 		}	
 
 		m_pipelines[0].AllocDescSets(m_models[0].m_descSets);
-		m_pipelines[0].UpdateDescriptorSets(md, m_models[0].m_descSets, m_uniformBuffersVS, m_uniformBuffersFS);
+		m_pipelines[0].UpdateDescriptorSets(md, m_models[0].m_descSets, m_models[0].m_uniformBuffersVS, m_models[0].m_uniformBuffersFS);
 
 		CreateGlobalTextureArray(md);
 	}
@@ -567,7 +567,7 @@ private:
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
 		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_models[0].m_pModel->GetTransformations(), AmbientLight,
-			                                LightDirection,	m_uniformBuffersVS, m_uniformBuffersFS);
+			                                LightDirection, m_models[0].m_uniformBuffersVS, m_models[0].m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -587,17 +587,28 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
-	struct ModelAndDescSets {
+	struct ModelInfo {
 		OgldevVK::VkModel* m_pModel = NULL;
 		std::vector<VkDescriptorSet> m_descSets;
+		std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
+		std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
+
+        void Destroy(VkDevice Device)
+        {
+            for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersVS) {
+                ub.Destroy(Device);
+            }
+
+            for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersFS) {
+                ub.Destroy(Device);
+            }
+        }
 	};
-	std::vector<ModelAndDescSets> m_models;
+	std::vector<ModelInfo> m_models;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
-	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
 	VkDescriptorSetLayout m_descSetLayoutTextures = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet> m_descSetsTextures;
 
