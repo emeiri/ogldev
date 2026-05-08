@@ -56,11 +56,12 @@
 
 #define APP_NAME "Tutorial 30"
 
+
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
 public:
 
-	VulkanApp(int WindowWidth, int WindowHeight) : m_model(true)
+	VulkanApp(int WindowWidth, int WindowHeight)
 	{
 		m_windowWidth = WindowWidth;
 		m_windowHeight = WindowHeight;
@@ -89,7 +90,9 @@ public:
 
 		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
 			
-		m_model.Destroy();
+		for (int i = 0; i < (int)m_models.size(); i++) {
+			delete m_models[i].m_pModel;
+		}
 
 		//m_skybox.Destroy();
 
@@ -349,11 +352,13 @@ private:
 
 	void CreateMesh()
 	{
-		m_model.Init(&m_vkCore);
+        m_models.resize(1);
+        m_models[0].m_pModel = new OgldevVK::VkModel(true);
+		m_models[0].m_pModel->Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");
-		m_model.LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
+		m_models[0].m_pModel->LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
@@ -372,15 +377,15 @@ private:
 	{	
 		size_t MaxUniformBufferSize = m_vkCore.GetMaxUniformBufferSize();
 		int MaxNumMeshes = (int)(MaxUniformBufferSize / sizeof(OgldevVK::LightingProgram::UniformDataVS));
-		assert(m_model.GetNumMeshes() <= MaxNumMeshes);
+		assert(m_models[0].m_pModel->GetNumMeshes() <= MaxNumMeshes);
 
-		size_t UniformBufferSizeVS = m_model.GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
+		size_t UniformBufferSizeVS = m_models[0].m_pModel->GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
 		m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
 		m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
 
 		OgldevVK::ModelDesc md;
 
-		m_model.UpdateModelDesc(md);
+		m_models[0].m_pModel->UpdateModelDesc(md);
 
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 			m_pipelines[i].Init(m_vkCore, m_descPool, m_descSetLayoutTextures, &m_descSetsTextures, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
@@ -450,7 +455,7 @@ private:
 			BeginRendering(CmdBuf, i);
 		
 			m_pipelines[LightingMode].Bind(i, CmdBuf);
-			m_model.RecordCommandBufferIndirect(CmdBuf);
+			m_models[0].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -559,7 +564,7 @@ private:
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
-		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_model.GetTransformations(), AmbientLight, 
+		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_models[0].m_pModel->GetTransformations(), AmbientLight,
 			                                LightDirection,	m_uniformBuffersVS, m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
@@ -580,7 +585,11 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
-	OgldevVK::VkModel m_model;
+	struct ModelAndDescSets {
+		OgldevVK::VkModel* m_pModel;
+		std::vector<VkDescriptorSet> m_descSets;
+	};
+	std::vector<ModelAndDescSets> m_models;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
