@@ -41,9 +41,9 @@ struct TextureInfo {
 };
 
 struct ModelDesc {
-	VkBuffer m_vb;
-	VkBuffer m_ib;
-	VkBuffer m_metaData;
+	VkBuffer m_vb = VK_NULL_HANDLE;
+	VkBuffer m_ib = VK_NULL_HANDLE;
+	VkBuffer m_metaData = VK_NULL_HANDLE;
 	std::vector<VkBuffer> m_uniforms;
 	std::vector<TextureInfo> m_materials;
 	std::vector<SubmeshRanges> m_ranges;

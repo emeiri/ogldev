@@ -207,7 +207,6 @@ void VkModel::CreateIndirectBuffer()
 	}
 
 	m_indirectBuffer = m_pVulkanCore->CreateIndirectBuffer(DrawCommands.data(), ARRAY_SIZE_IN_BYTES(DrawCommands));
-
 }
 
 
