@@ -145,7 +145,9 @@ public:
 	{
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
-		UpdateUniformBuffers(ImageIndex);
+        for (int MeshIndex = 0; MeshIndex < m_models.size(); MeshIndex++) {
+			UpdateUniformBuffers(MeshIndex, ImageIndex);
+        }		
 
 		if (m_showGui) {		
 			UpdateGUI();
@@ -156,7 +158,13 @@ public:
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
-			m_pQueue->SubmitAsync(m_cmdBufs[0][m_lightingMode].WithoutGUI[ImageIndex]);
+            std::vector<VkCommandBuffer> CmdBufs(m_models.size());
+
+            for (int MeshIndex = 0; MeshIndex < m_models.size(); MeshIndex++) {
+                CmdBufs[MeshIndex] = m_cmdBufs[MeshIndex][m_lightingMode].WithoutGUI[ImageIndex];
+            }			
+
+			m_pQueue->SubmitAsync(CmdBufs);
 		}
 
 		m_pQueue->Present(ImageIndex);
@@ -492,6 +500,8 @@ private:
 
 	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
 	{
+		bool FirstCommandBuffer = (MeshIndex == 0);
+
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
 
@@ -500,10 +510,10 @@ private:
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
 
-			BeginRendering(CmdBuf, i);
+			BeginRendering(CmdBuf, i, FirstCommandBuffer);
 		
-			m_pipelines[LightingMode].Bind(i, CmdBuf, m_models[0].m_descSets[i]);
-			m_models[0].m_pModel->RecordCommandBufferIndirect(CmdBuf);
+			m_pipelines[LightingMode].Bind(i, CmdBuf, m_models[MeshIndex].m_descSets[i]);
+			m_models[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -523,17 +533,22 @@ private:
 	}
 
 
-	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex)
+	void BeginRendering(VkCommandBuffer CmdBuf, int ImageIndex, bool FirstCommandBuffer)
 	{
-		VkClearValue ClearColor = {
-			.color = {1.0f, 0.0f, 0.0f, 1.0f},
-		};
+        if (FirstCommandBuffer) {
+			VkClearValue ClearColor = {
+				.color = {1.0f, 0.0f, 0.0f, 1.0f},
+			};
 
-		VkClearValue DepthValue = {
-			.depthStencil = {.depth = 1.0f, .stencil = 0 }
-		};
+			VkClearValue DepthValue = {
+				.depthStencil = {.depth = 1.0f, .stencil = 0 }
+			};
 
-		m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, &ClearColor, &DepthValue);
+			m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, &ClearColor, &DepthValue);
+
+		} else {
+			m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, NULL, NULL);
+		}		
 	}
 
 
@@ -597,7 +612,7 @@ private:
 	}
 
 
-	void UpdateUniformBuffers(uint32_t ImageIndex)
+	void UpdateUniformBuffers(int MeshIndex, int ImageIndex)
 	{		
 		glm::mat4 Scale = glm::scale(glm::mat4(0.01f), glm::vec3(m_scale));
 
@@ -612,8 +627,12 @@ private:
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
-		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, m_models[0].m_pModel->GetTransformations(), AmbientLight,
-			                                LightDirection, m_models[0].m_uniformBuffersVS, m_models[0].m_uniformBuffersFS);
+		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, 
+											m_models[MeshIndex].m_pModel->GetTransformations(), 
+											AmbientLight,
+			                                LightDirection, 
+											m_models[MeshIndex].m_uniformBuffersVS, 
+											m_models[MeshIndex].m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
