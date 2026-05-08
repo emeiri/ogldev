@@ -276,7 +276,7 @@ private:
 		u32 TextureCount = MAX_TEXTURES * 4;
 		u32 UniformBufferCount = 50;
 		u32 StorageBufferCount = 50;
-		u32 MaxSets = m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1);
+        u32 MaxSets = m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1);	// +1 for the global texture array descriptor set
 
 		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
 	}
@@ -284,6 +284,17 @@ private:
 
 	void CreateTexturesDescSetLayout()
 	{
+		VkDescriptorBindingFlags BindingFlags =
+			VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT |
+			VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT |
+			VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT;
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo BindingFlagsInfo = {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
+			.bindingCount = 1,         // Matches number of bindings in layout
+			.pBindingFlags = &BindingFlags
+		};
+
 		VkDescriptorSetLayoutBinding LayoutBindings = {
 			.binding = BIG_TEXTURE_ARRAY_BINDING,
 			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -294,8 +305,8 @@ private:
 
 		VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = NULL,
-			.flags = 0,
+			.pNext = &BindingFlagsInfo,
+			.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
 			.bindingCount = 1,
 			.pBindings = &LayoutBindings
 		};
@@ -312,9 +323,18 @@ private:
 
 		std::vector<VkDescriptorSetLayout> Layouts(NumDescSets, m_descSetLayoutTextures);
 
+		std::vector<u32> TextureCounts(NumDescSets, MAX_TEXTURES);
+
+		VkDescriptorSetVariableDescriptorCountAllocateInfo VariableCountInfo = {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO,
+			.pNext = NULL,
+			.descriptorSetCount = (u32)NumDescSets,
+			.pDescriptorCounts = TextureCounts.data()
+		};
+
 		VkDescriptorSetAllocateInfo AllocInfo = {
 			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = NULL,
+			.pNext = &VariableCountInfo,
 			.descriptorPool = m_descPool,
 			.descriptorSetCount = (u32)Layouts.size(),
 			.pSetLayouts = Layouts.data()

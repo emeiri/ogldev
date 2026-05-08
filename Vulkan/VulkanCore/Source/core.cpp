@@ -347,6 +347,8 @@ void VulkanCore::CreateDevice()
 	Features12.descriptorIndexing = VK_TRUE;
 	Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
 	Features12.bufferDeviceAddress = VK_TRUE;
+	Features12.descriptorBindingPartiallyBound = VK_TRUE;
+	Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
 	
 	VkPhysicalDeviceFeatures DeviceFeatures{};
 	DeviceFeatures.geometryShader = VK_TRUE;
