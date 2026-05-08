@@ -38,9 +38,19 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 								const glm::vec3& Up, PersProjInfo& persProjInfo)
 {
 	m_cameraPos = Pos;
-	m_up = Up;
+	m_up = glm::normalize(Up);
 	m_persProjInfo = persProjInfo;
 	m_oldMousePos = m_mouseState.m_pos;
+
+	glm::vec3 senseDir = (glm::abs(m_up.y) > 0.9f) ? glm::vec3(0, 0, 1) : glm::vec3(0, 1, 0);
+
+	if (CAMERA_LEFT_HANDED) {
+		// LH: Cross(Up, Forward-Sense)
+		m_worldRight = glm::normalize(glm::cross(m_up, senseDir));
+	} else {
+		// RH: Cross(Forward-Sense, Up)
+		m_worldRight = glm::normalize(glm::cross(senseDir, m_up));
+	}
 
 	// 1. Calculate Initial Yaw and Pitch from Target direction
 	glm::vec3 Dir = glm::normalize(Target);
@@ -115,19 +125,17 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 {
 	glm::vec2 DeltaMouse = m_mouseState.m_pos - m_oldMousePos;
 
-	// 1. Accumulate total rotation
+	// 1. Update angles (Standard FPS logic)
 	m_yaw += DeltaMouse.x * m_mouseSpeed;
 	m_pitch += DeltaMouse.y * m_mouseSpeed;
 
-	// 2. Clamp Pitch to prevent the "Apex Snap" and flipping upside down
-	// 1.5 radians is roughly 89 degrees
+	// 2. Clamp Pitch to 89 degrees (avoids the "sticky" apex lock)
 	if (m_pitch > 1.5f) m_pitch = 1.5f;
 	if (m_pitch < -1.5f) m_pitch = -1.5f;
 
-	// 3. Build quaternions using FIXED world axes
-	   // This is the "FPS Secret": Always use the global unit vectors
-	glm::quat qYaw = glm::angleAxis(m_yaw, glm::vec3(0, 1, 0)); // World Up
-	glm::quat qPitch = glm::angleAxis(m_pitch, glm::vec3(1, 0, 0)); // World Right
+	// 3. Calculate the direction vector from angles
+	glm::quat qYaw = glm::angleAxis(m_yaw, m_up);
+	glm::quat qPitch = glm::angleAxis(m_pitch, m_worldRight);
 
 	// 4. Combine - Yaw first, then Pitch
 	m_cameraOrientation = qPitch * qYaw;

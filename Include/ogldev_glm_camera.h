@@ -111,6 +111,8 @@ private:
 	glm::vec3 m_velocity = glm::vec3(0.0f);
 	glm::vec2 m_oldMousePos = glm::vec2(0.0f);
 	glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 m_worldRight = glm::vec3(1.0f, 0.0f, 0.0f);
+
 	MouseState m_mouseState;
 	PersProjInfo m_persProjInfo;
 };
