@@ -1,5 +1,5 @@
 /*
-		Copyright 2024 Etay Meiri
+		Copyright 2026 Etay Meiri
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -25,25 +25,27 @@
 
 namespace OgldevVK {
 
-const u32 MAX_TEXTURES = 4096; // choose according to limits and memory
-
 enum Binding {
 	BindingVB = 0,
 	BindingIB = 1,
-	BindingTexture2D = 2,
-	BindingUniformVS = 3,
-	BindingMetaData = 4,
-	BindingUniformFS = 5,
-	NumBindings = 6
+	BindingUniformVS = 2,
+	BindingMetaData = 3,
+	BindingUniformFS = 4,
+	NumBindings = 5
 };
 
 
 void LightingProgram::Init(VulkanCore& vkCore, 
 	VkDescriptorPool DescPool, 
+    VkDescriptorSetLayout TextureDescSetLayout,
+    std::vector<VkDescriptorSet>* pTextureDescSets,
 	VkShaderModule vs, 
 	VkShaderModule fs,
 	LIGHTING_MODE LightingMode)
 {
+	m_textureDescSetLayout = TextureDescSetLayout;
+    m_pTextureDescSets = pTextureDescSets;
+
 	VkSpecializationMapEntry SpecMapEntry = {
 		.constantID = 0,
 		.offset = 0,
@@ -68,13 +70,18 @@ void LightingProgram::Init(VulkanCore& vkCore,
 
 void LightingProgram::Destroy()
 {
-	GraphicsPipeline::Destroy();
+	GraphicsPipeline::Destroy(false);
+
+    // The first layout was created externally and belongs to the global texture array, so we don't destroy it here. 
+	// The second layout was created by this class, so we destroy it.
+	vkDestroyDescriptorSetLayout(m_device, m_descSetLayouts[1], NULL);
 }
 
 
 void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf)
 {
-	GraphicsPipeline::Bind(CmdBuf, m_descSets[ImageIndex]); // bind set 0 which contains the vertex/index buffers and meta data. The texture array is bound in the model's command buffer
+	std::vector<VkDescriptorSet> DescSets = { (*m_pTextureDescSets)[ImageIndex], m_descSets[ImageIndex] };
+	GraphicsPipeline::Bind(CmdBuf, DescSets); 
 }
 
 
@@ -92,12 +99,6 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.descriptorCount = 1,
 			.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
-			.pImmutableSamplers = NULL
-		}, {
-			.binding = BindingTexture2D,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
 			.pImmutableSamplers = NULL
 		}, {
 			.binding = BindingUniformVS,
@@ -122,7 +123,7 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 
 	VkDescriptorSetLayout l = vkCore.CreateDescSetLayout({ Bindings });
 
-	std::vector<VkDescriptorSetLayout> ret = { l };
+	std::vector<VkDescriptorSetLayout> ret = { m_textureDescSetLayout, l };
 
 	return ret;
 }
@@ -146,16 +147,6 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		BufferInfoUniformsFS[i].buffer = UniformBuffersFS[i].m_buffer;
 		BufferInfoUniformsFS[i].offset = 0;
 		BufferInfoUniformsFS[i].range = VK_WHOLE_SIZE;
-	}
-
-	u32 TextureCount = (u32)ModelDesc.m_materials.size();
-	std::vector<VkDescriptorImageInfo> ImageInfos;
-	ImageInfos.resize(TextureCount);
-
-	for (u32 i = 0; i < TextureCount; ++i) {
-		ImageInfos[i].sampler = ModelDesc.m_materials[i].m_sampler;
-		ImageInfos[i].imageView = ModelDesc.m_materials[i].m_imageView;
-		ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 
 	VkDescriptorBufferInfo BufferInfo_VB = {
@@ -204,22 +195,6 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
 			.pBufferInfo = &BufferInfo_IB
-		};
-
-		assert(WdsIndex < WriteDescriptorSet.size());
-		WriteDescriptorSet[WdsIndex++] = wds;
-
-		wds = {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = NULL,
-			.dstSet = DstSet,
-			.dstBinding = BindingTexture2D,
-			.dstArrayElement = 0,
-			.descriptorCount = TextureCount,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.pImageInfo = ImageInfos.data(),
-			.pBufferInfo = NULL,
-			.pTexelBufferView = NULL
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());

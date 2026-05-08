@@ -55,7 +55,7 @@ void GraphicsPipeline::Init(VulkanCore& vkCore,
 }
 
 
-void GraphicsPipeline::Destroy()
+void GraphicsPipeline::Destroy(bool DestroyLayouts)
 {
 	if (m_vs != VK_NULL_HANDLE) {	// In case the object was provided externally and not created by this class
 		vkDestroyShaderModule(m_device, m_vs, NULL);
@@ -65,9 +65,11 @@ void GraphicsPipeline::Destroy()
 		vkDestroyShaderModule(m_device, m_fs, NULL);
 	}
 
-    for (VkDescriptorSetLayout& l : m_descSetLayouts) {
-        vkDestroyDescriptorSetLayout(m_device, l, NULL);
-    }
+	if (DestroyLayouts) {
+		for (VkDescriptorSetLayout& l : m_descSetLayouts) {
+			vkDestroyDescriptorSetLayout(m_device, l, NULL);
+		}
+	}
 	
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
@@ -85,6 +87,21 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
 		&DescSet,
 		0,	    // dynamicOffsetCount
 		NULL);	// pDynamicOffsets
+}
+
+
+void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, std::vector<VkDescriptorSet>& DescSets)
+{
+	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+
+	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+		m_pipelineLayout,
+		0,               // firstSet
+		(u32)DescSets.size(), // descriptorSetCount						
+		DescSets.data(),
+		0,	             // dynamicOffsetCount
+		NULL);	         // pDynamicOffsets
+
 }
 
 

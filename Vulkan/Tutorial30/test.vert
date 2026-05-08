@@ -1,6 +1,6 @@
 /*
 
-        Copyright 2024 Etay Meiri
+        Copyright 2026 Etay Meiri
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,16 +34,16 @@ struct VertexData
 const int NUM_FLOATS_IN_VERTEX_DATA = 20;
 const int FLOAT_SIZE_IN_BYTES = 4;
 
-layout (std430, set = 0, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
+layout (std430, set = 1, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
-layout (set = 0, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
+layout (set = 1, binding = 1) readonly buffer Indices { int i[]; } in_Indices;
 
 struct UniformData {
     mat4 WVP; 
     mat4 NormalMatrix;
 };
 
-layout (set = 0, binding = 3) readonly uniform UniformBuffer { 
+layout (set = 1, binding = 2) readonly uniform UniformBuffer { 
     UniformData Data[512];
 } ubo;
 
@@ -54,7 +54,7 @@ struct MetaData {
     uint VertexOffset; 
 };
 
-layout(std430, set = 0, binding = 4) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
+layout(std430, set = 1, binding = 3) readonly buffer MetaSSBO { MetaData metas[]; } MetaBuf;
 
 layout(location = 0) out vec2 TexCoord;
 layout(location = 1) flat out uint MaterialIndex;

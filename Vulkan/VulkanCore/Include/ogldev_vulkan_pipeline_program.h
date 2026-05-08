@@ -38,9 +38,11 @@ public:
 			  VkSpecializationInfo* pSpecInfoVS,
 			  VkSpecializationInfo* pSpecInfoFS);
 
-	void Destroy();
+	void Destroy(bool DestroyLayouts = true);
 
 	void Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet);
+
+	void Bind(VkCommandBuffer CmdBuf, std::vector<VkDescriptorSet>& DescSets);
 
 	void Bind(VkCommandBuffer CmdBuf);
 
@@ -60,13 +62,16 @@ protected:
 
 	VkDevice m_device = VK_NULL_HANDLE;
 
+protected:
+
+	std::vector<VkDescriptorSetLayout> m_descSetLayouts;
+
 private:
 
 	VkPipeline CreatePipeline(GLFWwindow* pWindow, VkShaderModule vs, VkShaderModule fs,
 		VkFormat ColorFormat, VkFormat DepthFormat, VkCompareOp DepthCompareOp,
 		VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS);
 
-	std::vector<VkDescriptorSetLayout> m_descSetLayouts;
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
 	VkPipeline m_pipeline = VK_NULL_HANDLE;
 	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;

@@ -107,6 +107,7 @@ public:
 		CreateShaders();
 		CreateDescriptorPool();
 		CreateTexturesDescSetLayout();
+		AllocTextureDescSet();
 		CreateMesh();
 		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipeline();
@@ -272,10 +273,10 @@ private:
 
 	void CreateDescriptorPool()
 	{
-		u32 TextureCount = 50;
+		u32 TextureCount = MAX_TEXTURES * 4;
 		u32 UniformBufferCount = 50;
 		u32 StorageBufferCount = 50;
-		u32 MaxSets = m_numImages * 4;
+		u32 MaxSets = m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1);
 
 		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
 	}
@@ -304,6 +305,26 @@ private:
 		CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
 	}
 
+
+	void AllocTextureDescSet()
+	{
+        size_t NumDescSets = m_vkCore.GetNumImages();
+
+		std::vector<VkDescriptorSetLayout> Layouts(NumDescSets, m_descSetLayoutTextures);
+
+		VkDescriptorSetAllocateInfo AllocInfo = {
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+			.pNext = NULL,
+			.descriptorPool = m_descPool,
+			.descriptorSetCount = (u32)Layouts.size(),
+			.pSetLayouts = Layouts.data()
+		};
+
+		m_descSetsTextures.resize(NumDescSets);
+
+		VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descSetsTextures.data());
+		CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+	}
 
 
 	void CreateMesh()
@@ -342,10 +363,48 @@ private:
 		m_model.UpdateModelDesc(md);
 
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
-			m_pipelines[i].Init(m_vkCore, m_descPool, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+			m_pipelines[i].Init(m_vkCore, m_descPool, m_descSetLayoutTextures, &m_descSetsTextures, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 			m_pipelines[i].UpdateDescriptorSets(md, m_uniformBuffersVS, m_uniformBuffersFS);
-		}		
+		}	
+
+		CreateGlobalTextureArray(md);
 	}
+
+
+	void CreateGlobalTextureArray(const OgldevVK::ModelDesc& md)
+	{
+		u32 TextureCount = (u32)md.m_materials.size();
+		std::vector<VkDescriptorImageInfo> ImageInfos;
+		ImageInfos.resize(TextureCount);
+
+		for (u32 i = 0; i < TextureCount; ++i) {
+			ImageInfos[i].sampler = md.m_materials[i].m_sampler;
+			ImageInfos[i].imageView = md.m_materials[i].m_imageView;
+			ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		}
+
+		std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSetsTextures.size());
+
+		for (int i = 0; i < (int)m_descSetsTextures.size(); i++) {
+			VkDescriptorSet& DstSet = m_descSetsTextures[i];
+
+			WriteDescriptorSet[i] = {
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.pNext = NULL,
+				.dstSet = DstSet,
+				.dstBinding = BIG_TEXTURE_ARRAY_BINDING,
+				.dstArrayElement = 0,
+				.descriptorCount = TextureCount,
+				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				.pImageInfo = ImageInfos.data(),
+				.pBufferInfo = NULL,
+				.pTexelBufferView = NULL
+			};
+		}
+
+		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	}
+
 
 
 	void RecordCommandBuffers()
@@ -509,6 +568,7 @@ private:
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
 	VkDescriptorSetLayout m_descSetLayoutTextures = VK_NULL_HANDLE;
+	std::vector<VkDescriptorSet> m_descSetsTextures;
 
 	// GUI state
 	bool m_showGui = false;

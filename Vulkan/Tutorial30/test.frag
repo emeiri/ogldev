@@ -34,9 +34,9 @@ layout(location = 2) in vec3 Normal;
 
 layout(location = 0) out vec4 OutColor;
 
-layout(set = 0, binding = 2) uniform sampler2D Textures[];
+layout(set = 0, binding = 0) uniform sampler2D Textures[];
 
-layout(set = 0, binding = 5) readonly uniform UniformBuffer { 
+layout(set = 1, binding = 4) readonly uniform UniformBuffer { 
     vec4 AmbientLight;      // .rgb = color, .w = intensity
     vec4 LightDirection;    // .xyz = direction
     vec4 LightColor;        // .rgb = color, .w = intensity
