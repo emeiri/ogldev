@@ -40,35 +40,45 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 	m_cameraPos = Pos;
 	m_up = Up;
 	m_persProjInfo = persProjInfo;
-	
+	m_oldMousePos = m_mouseState.m_pos;
+
+	// 1. Calculate Initial Yaw and Pitch from Target direction
+	glm::vec3 Dir = glm::normalize(Target);
+	m_pitch = glm::asin(Dir.y);
+
+	if (CAMERA_LEFT_HANDED) {
+		m_yaw = glm::atan2(Dir.x, Dir.z);
+	} else {
+		m_yaw = glm::atan2(Dir.x, -Dir.z);
+	}
+
+	// 2. Build the initial m_cameraOrientation quaternion
+	CalcCameraOrientation();
+
+	// 3. Set up Projection Matrix	
 	float ar = (float)persProjInfo.Width / (float)persProjInfo.Height;
 
 	if (CAMERA_LEFT_HANDED) {
-		m_cameraOrientation = glm::lookAtLH(Pos, Pos + Target, Up);
 #ifdef OGLDEV_VULKAN
 		m_persProjection = glm::perspectiveLH_ZO(glm::radians(persProjInfo.FOV), ar,
-			                                  persProjInfo.zNear, persProjInfo.zFar);
+			persProjInfo.zNear, persProjInfo.zFar);
 #else
 		m_persProjection = glm::perspectiveLH(glm::radians(persProjInfo.FOV), ar,
-			                                  persProjInfo.zNear, persProjInfo.zFar);
+			persProjInfo.zNear, persProjInfo.zFar);
 #endif
-	}
-	else {
-		m_cameraOrientation = glm::lookAtRH(Pos, Pos + Target, Up);
+	} else {
 #ifdef OGLDEV_VULKAN
 		m_persProjection = glm::perspectiveRH_ZO(glm::radians(persProjInfo.FOV), ar,
-			                                  persProjInfo.zNear, persProjInfo.zFar);
+			persProjInfo.zNear, persProjInfo.zFar);
 #else
 		m_persProjection = glm::perspectiveRH(glm::radians(persProjInfo.FOV), ar,
-			                                  persProjInfo.zNear, persProjInfo.zFar);
+			persProjInfo.zNear, persProjInfo.zFar);
 #endif
-	}	
-
+	}
 
 #ifdef OGLDEV_VULKAN
 	//m_persProjection[1][1] *= -1; // Flip the Y-axis for Vulkan - currently disabled because it flips the entire world
 #endif
-
 }
 
 
@@ -105,12 +115,25 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 {
 	glm::vec2 DeltaMouse = m_mouseState.m_pos - m_oldMousePos;
 
-	glm::quat DeltaQuat = glm::quat(glm::vec3(m_mouseSpeed * DeltaMouse.y, 
-		                                      m_mouseSpeed * DeltaMouse.x, 0.0f));
+	// 1. Accumulate total rotation
+	m_yaw += DeltaMouse.x * m_mouseSpeed;
+	m_pitch += DeltaMouse.y * m_mouseSpeed;
 
-	m_cameraOrientation = glm::normalize(DeltaQuat * m_cameraOrientation);
+	// 2. Clamp Pitch to prevent the "Apex Snap" and flipping upside down
+	// 1.5 radians is roughly 89 degrees
+	if (m_pitch > 1.5f) m_pitch = 1.5f;
+	if (m_pitch < -1.5f) m_pitch = -1.5f;
 
-	SetUpVector();
+	// 3. Build quaternions using FIXED world axes
+	   // This is the "FPS Secret": Always use the global unit vectors
+	glm::quat qYaw = glm::angleAxis(m_yaw, glm::vec3(0, 1, 0)); // World Up
+	glm::quat qPitch = glm::angleAxis(m_pitch, glm::vec3(1, 0, 0)); // World Right
+
+	// 4. Combine - Yaw first, then Pitch
+	m_cameraOrientation = qPitch * qYaw;
+
+	// Important: Normalize to prevent float drift
+	m_cameraOrientation = glm::normalize(m_cameraOrientation);
 }
 
 
@@ -233,22 +256,6 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrixNoTranslate() const
 	glm::mat4 VP = m_persProjection * View;
 
 	return VP;
-}
-
-
-void GLMCameraFirstPerson::SetUpVector()
-{
-	// TODO: reuse GetTarget here
-	glm::mat4 View = GetViewMatrix();
-
-	glm::vec3 Forward = glm::vec3(View[0][2], View[1][2], View[2][2]);
-
-	if (CAMERA_LEFT_HANDED) {
-		m_cameraOrientation = glm::lookAtLH(m_cameraPos, m_cameraPos + Forward, m_up);
-	}
-	else {
-		m_cameraOrientation = glm::lookAtRH(m_cameraPos, m_cameraPos - Forward, m_up);
-	}
 }
 
 

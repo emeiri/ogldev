@@ -101,14 +101,16 @@ private:
 	glm::vec3 CalcAcceleration();
 	void CalcVelocity(float dt);
 	void CalcCameraOrientation();
-	void SetUpVector();	
+
+	float m_yaw = 0.0f;
+	float m_pitch = 0.0f;
 
 	glm::mat4 m_persProjection = glm::mat4(0.0);
 	glm::vec3 m_cameraPos = glm::vec3(0.0f);
 	glm::quat m_cameraOrientation = glm::quat(glm::vec3(0.0f));
 	glm::vec3 m_velocity = glm::vec3(0.0f);
 	glm::vec2 m_oldMousePos = glm::vec2(0.0f);
-	glm::vec3 m_up = glm::vec3(0.0f);
+	glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 	MouseState m_mouseState;
 	PersProjInfo m_persProjInfo;
 };
