@@ -56,6 +56,26 @@
 
 #define APP_NAME "Tutorial 30"
 
+struct ModelInfo {
+	OgldevVK::VkModel* m_pModel = NULL;
+	std::vector<VkDescriptorSet> m_descSets;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
+	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
+
+	void Destroy(VkDevice Device)
+	{
+		for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersVS) {
+			ub.Destroy(Device);
+		}
+
+		for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersFS) {
+			ub.Destroy(Device);
+		}
+
+		delete m_pModel;
+	}
+};
+
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
 {
@@ -73,6 +93,10 @@ public:
 			m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
 			m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
 		}
+        
+		for (int i = 0; i < (int)m_models.size(); i++) {
+            m_models[i].Destroy(m_device);
+		}
 
 		vkDestroyShaderModule(m_device, m_vs, NULL);
 		vkDestroyShaderModule(m_device, m_fs, NULL);
@@ -83,16 +107,13 @@ public:
 
 		vkDestroyDescriptorSetLayout(m_device, m_descSetLayoutTextures, NULL);
 
-		vkDestroyDescriptorPool(m_device, m_descPool, NULL);
-			
-		for (int i = 0; i < (int)m_models.size(); i++) {
-            m_models[i].Destroy(m_device);
-		}
+		vkDestroyDescriptorPool(m_device, m_descPool, NULL);			
 
 		//m_skybox.Destroy();
 
 		m_imGUIRenderer.Destroy();
 	}
+
 
 	void Init(const char* pAppName)
 	{
@@ -106,9 +127,11 @@ public:
 		CreateDescriptorPool();
 		CreateTexturesDescSetLayout();
 		AllocTextureDescSet();
-		CreateMesh();
+		CreateMeshes();
 		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");
 		CreatePipeline();
+        CreateUniformBuffers();
+		CreateDescriptorSets();
 		CreateCommandBuffers();
 		RecordCommandBuffers();
 		DefaultCreateCameraPers();
@@ -345,9 +368,9 @@ private:
 	}
 
 
-	void CreateMesh()
+	void CreateMeshes()
 	{
-        m_models.resize(2);
+        m_models.resize(1);
         m_models[0].m_pModel = new OgldevVK::VkModel(true);
 		m_models[0].m_pModel->Init(&m_vkCore);
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
@@ -355,9 +378,9 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");
 		m_models[0].m_pModel->LoadAssimpModel("../../Content/crytek_sponza/sponza.obj");
 
-		m_models[1].m_pModel = new OgldevVK::VkModel(true);
-		m_models[1].m_pModel->Init(&m_vkCore);
-		m_models[1].m_pModel->LoadAssimpModel("../../Content/box.obj");
+	//	m_models[1].m_pModel = new OgldevVK::VkModel(true);
+	//	m_models[1].m_pModel->Init(&m_vkCore);
+	//	m_models[1].m_pModel->LoadAssimpModel("../../Content/box.obj");
 
 	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
@@ -374,7 +397,15 @@ private:
 
 
 	void CreatePipeline()
-	{	
+	{
+		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
+			m_pipelines[i].Init(m_vkCore, m_descPool, m_descSetLayoutTextures, &m_descSetsTextures, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+		}
+	}
+
+
+	void CreateUniformBuffers()
+	{
 		size_t MaxUniformBufferSize = m_vkCore.GetMaxUniformBufferSize();
 		int MaxNumMeshes = (int)(MaxUniformBufferSize / sizeof(OgldevVK::LightingProgram::UniformDataVS));
 		assert(m_models[0].m_pModel->GetNumMeshes() <= MaxNumMeshes);
@@ -382,14 +413,14 @@ private:
 		size_t UniformBufferSizeVS = m_models[0].m_pModel->GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
 		m_models[0].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
 		m_models[0].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
+	}
 
+
+	void CreateDescriptorSets()
+	{
 		OgldevVK::ModelDesc md;
 
 		m_models[0].m_pModel->UpdateModelDesc(md);
-
-		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
-			m_pipelines[i].Init(m_vkCore, m_descPool, m_descSetLayoutTextures, &m_descSetsTextures, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
-		}	
 
 		m_pipelines[0].AllocDescSets(m_models[0].m_descSets);
 		m_pipelines[0].UpdateDescriptorSets(md, m_models[0].m_descSets, m_models[0].m_uniformBuffersVS, m_models[0].m_uniformBuffersFS);
@@ -587,23 +618,6 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
-	struct ModelInfo {
-		OgldevVK::VkModel* m_pModel = NULL;
-		std::vector<VkDescriptorSet> m_descSets;
-		std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
-		std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
-
-        void Destroy(VkDevice Device)
-        {
-            for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersVS) {
-                ub.Destroy(Device);
-            }
-
-            for (OgldevVK::BufferAndMemory& ub : m_uniformBuffersFS) {
-                ub.Destroy(Device);
-            }
-        }
-	};
 	std::vector<ModelInfo> m_models;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
