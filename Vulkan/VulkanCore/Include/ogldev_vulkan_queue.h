@@ -43,6 +43,8 @@ public:
 
 	void SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs);
 
+	void SubmitAsync(std::vector<VkCommandBuffer>& CmdBufs);
+
 	void Present(u32 ImageIndex);
 
 	void WaitIdle();

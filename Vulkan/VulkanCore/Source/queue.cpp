@@ -135,6 +135,13 @@ void VulkanQueue::SubmitAsync(VkCommandBuffer CmdBuf)
 	SubmitAsync(&CmdBuf, 1);
 }
 
+
+void VulkanQueue::SubmitAsync(std::vector<VkCommandBuffer>& CmdBufs)
+{ 
+	SubmitAsync(CmdBufs.data(), (int)CmdBufs.size()); 
+}
+
+
 void VulkanQueue::SubmitAsync(VkCommandBuffer* pCmdBufs, int NumCmdBufs)
 {
 	VkPipelineStageFlags WaitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };

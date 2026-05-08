@@ -89,10 +89,12 @@ public:
 
 	~VulkanApp()
 	{
-		for (CommandBuffersVecs& v : m_cmdBufs) {
-			m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
-			m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
-		}
+        for (int MeshIndex = 0; MeshIndex < m_models.size(); MeshIndex++) {
+			for (CommandBuffersVecs& v : m_cmdBufs[MeshIndex]) {
+				m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
+				m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
+			}
+        }
         
 		for (int i = 0; i < (int)m_models.size(); i++) {
             m_models[i].Destroy(m_device);
@@ -150,11 +152,11 @@ public:
 
 			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
 
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs[m_lightingMode].WithGUI[ImageIndex], ImGUICmdBuf};
+			VkCommandBuffer CmdBufs[] = { m_cmdBufs[0][m_lightingMode].WithGUI[ImageIndex], ImGUICmdBuf};
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
-			m_pQueue->SubmitAsync(m_cmdBufs[m_lightingMode].WithoutGUI[ImageIndex]);
+			m_pQueue->SubmitAsync(m_cmdBufs[0][m_lightingMode].WithoutGUI[ImageIndex]);
 		}
 
 		m_pQueue->Present(ImageIndex);
@@ -275,16 +277,20 @@ private:
 
 
 	void CreateCommandBuffers()
-	{
-		m_cmdBufs.resize(OgldevVK::NUM_LIGHTING_MODES);
+	{		
+        m_cmdBufs.resize(m_models.size());
 
-		for (CommandBuffersVecs& v : m_cmdBufs) {
-			v.WithGUI.resize(m_numImages);
-			m_vkCore.CreateCommandBuffers(m_numImages, v.WithGUI.data());
+        for (int i = 0; i < m_models.size(); i++) {
+			m_cmdBufs[i].resize(OgldevVK::NUM_LIGHTING_MODES);
 
-			v.WithoutGUI.resize(m_numImages);
-			m_vkCore.CreateCommandBuffers(m_numImages, v.WithoutGUI.data());
-		}
+			for (CommandBuffersVecs& v : m_cmdBufs[i]) {
+				v.WithGUI.resize(m_numImages);
+				m_vkCore.CreateCommandBuffers(m_numImages, v.WithGUI.data());
+
+				v.WithoutGUI.resize(m_numImages);
+				m_vkCore.CreateCommandBuffers(m_numImages, v.WithoutGUI.data());
+			}
+        }
 
 		printf("Created command buffers\n");
 	}
@@ -474,15 +480,17 @@ private:
 
 	void RecordCommandBuffers()
 	{
-		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
-			RecordCommandBuffersInternal(i, true, m_cmdBufs[i].WithoutGUI);
+		for (int MeshIndex = 0; MeshIndex < (int)m_models.size(); MeshIndex++) {
+			for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
+				RecordCommandBuffersInternal(MeshIndex, LightMode, true, m_cmdBufs[MeshIndex][LightMode].WithoutGUI);
 
-			RecordCommandBuffersInternal(i, false, m_cmdBufs[i].WithGUI);
+				RecordCommandBuffersInternal(MeshIndex, LightMode, false, m_cmdBufs[MeshIndex][LightMode].WithGUI);
+			}
 		}
 	}
 
 
-	void RecordCommandBuffersInternal(int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
+	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
 	{
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
@@ -620,7 +628,7 @@ private:
 		std::vector<VkCommandBuffer> WithGUI;
 		std::vector<VkCommandBuffer> WithoutGUI;
 	};
-	std::vector<CommandBuffersVecs> m_cmdBufs;	
+    std::vector<std::vector<CommandBuffersVecs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
