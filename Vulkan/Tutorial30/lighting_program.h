@@ -67,9 +67,12 @@ public:
 
 	virtual void Destroy();
 
-	void Bind(int ImageIndex, VkCommandBuffer CmdBuf);
+	void Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet);
+
+    void AllocDescSets(std::vector<VkDescriptorSet>& DescSets);
 
 	void UpdateDescriptorSets(const ModelDesc& ModelDesc,
+							  std::vector<VkDescriptorSet>& DescSets,
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 
@@ -83,9 +86,9 @@ public:
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
 protected:
 
-	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
+	int m_numImages = 0;
 
-	std::vector<VkDescriptorSet> m_descSets;
+	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 
     VkDescriptorSetLayout m_textureDescSetLayout = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSet>* m_pTextureDescSets = NULL;

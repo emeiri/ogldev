@@ -35,16 +35,17 @@ enum Binding {
 };
 
 
-void LightingProgram::Init(VulkanCore& vkCore, 
-	VkDescriptorPool DescPool, 
-    VkDescriptorSetLayout TextureDescSetLayout,
-    std::vector<VkDescriptorSet>* pTextureDescSets,
-	VkShaderModule vs, 
+void LightingProgram::Init(VulkanCore& vkCore,
+	VkDescriptorPool DescPool,
+	VkDescriptorSetLayout TextureDescSetLayout,
+	std::vector<VkDescriptorSet>* pTextureDescSets,
+	VkShaderModule vs,
 	VkShaderModule fs,
 	LIGHTING_MODE LightingMode)
 {
 	m_textureDescSetLayout = TextureDescSetLayout;
-    m_pTextureDescSets = pTextureDescSets;
+	m_pTextureDescSets = pTextureDescSets;
+    m_numImages = vkCore.GetNumImages();
 
 	VkSpecializationMapEntry SpecMapEntry = {
 		.constantID = 0,
@@ -60,11 +61,15 @@ void LightingProgram::Init(VulkanCore& vkCore,
 	};
 
 	GraphicsPipeline::Init(vkCore, DescPool, vs, fs, NULL, &SpecInfo);
+}
 
+
+void LightingProgram::AllocDescSets(std::vector<VkDescriptorSet>& DescSets)
+{
 	// The first descriptor set layout belongs to the global texture array.
     // The second descriptor set layout belongs to the per-model data (vertex/index buffers, uniforms, etc). Here
     // we allocate descriptor sets for the second layout, hence the index 1 in the call below.
-	AllocDescSets(vkCore.GetNumImages(), m_descSets, 1);	
+	GraphicsPipeline::AllocDescSets(m_numImages, DescSets, 1);
 }
 
 
@@ -78,9 +83,9 @@ void LightingProgram::Destroy()
 }
 
 
-void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf)
+void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet)
 {
-	std::vector<VkDescriptorSet> DescSets = { (*m_pTextureDescSets)[ImageIndex], m_descSets[ImageIndex] };
+	std::vector<VkDescriptorSet> DescSets = { (*m_pTextureDescSets)[ImageIndex], DescSet };
 	GraphicsPipeline::Bind(CmdBuf, DescSets); 
 }
 
@@ -130,10 +135,11 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 
 
 void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
-											  std::vector<BufferAndMemory>& UniformBuffersVS,
-											  std::vector<BufferAndMemory>& UniformBuffersFS)
+										   std::vector<VkDescriptorSet>& DescSets,
+										   std::vector<BufferAndMemory>& UniformBuffersVS,
+										   std::vector<BufferAndMemory>& UniformBuffersFS)
 {
-	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(m_descSets.size());
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsVS(DescSets.size());
 
 	for (int i = 0; i < (int)BufferInfoUniformsVS.size(); i++) {
 		BufferInfoUniformsVS[i].buffer = UniformBuffersVS[i].m_buffer;
@@ -141,7 +147,7 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		BufferInfoUniformsVS[i].range = VK_WHOLE_SIZE;
 	}
 
-	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsFS(m_descSets.size());
+	std::vector<VkDescriptorBufferInfo> BufferInfoUniformsFS(DescSets.size());
 
 	for (int i = 0; i < (int)BufferInfoUniformsFS.size(); i++) {
 		BufferInfoUniformsFS[i].buffer = UniformBuffersFS[i].m_buffer;
@@ -167,12 +173,12 @@ void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
 		.range = VK_WHOLE_SIZE
 	};
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size() * NumBindings);
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescSets.size() * NumBindings);
 
 	u32 WdsIndex = 0;
 
-	for (int i = 0; i < (int)m_descSets.size(); i++) {
-		VkDescriptorSet& DstSet = m_descSets[i];
+	for (int i = 0; i < (int)DescSets.size(); i++) {
+		VkDescriptorSet& DstSet = DescSets[i];
 
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,

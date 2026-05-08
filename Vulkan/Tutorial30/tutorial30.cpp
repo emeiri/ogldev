@@ -389,8 +389,10 @@ private:
 
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 			m_pipelines[i].Init(m_vkCore, m_descPool, m_descSetLayoutTextures, &m_descSetsTextures, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
-			m_pipelines[i].UpdateDescriptorSets(md, m_uniformBuffersVS, m_uniformBuffersFS);
 		}	
+
+		m_pipelines[0].AllocDescSets(m_models[0].m_descSets);
+		m_pipelines[0].UpdateDescriptorSets(md, m_models[0].m_descSets, m_uniformBuffersVS, m_uniformBuffersFS);
 
 		CreateGlobalTextureArray(md);
 	}
@@ -454,7 +456,7 @@ private:
 
 			BeginRendering(CmdBuf, i);
 		
-			m_pipelines[LightingMode].Bind(i, CmdBuf);
+			m_pipelines[LightingMode].Bind(i, CmdBuf, m_models[0].m_descSets[i]);
 			m_models[0].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
@@ -586,7 +588,7 @@ private:
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
 	struct ModelAndDescSets {
-		OgldevVK::VkModel* m_pModel;
+		OgldevVK::VkModel* m_pModel = NULL;
 		std::vector<VkDescriptorSet> m_descSets;
 	};
 	std::vector<ModelAndDescSets> m_models;
