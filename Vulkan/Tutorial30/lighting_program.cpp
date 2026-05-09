@@ -83,10 +83,17 @@ void LightingProgram::Destroy()
 }
 
 
-void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet)
+void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet, u32 BaseTextureIndex)
 {
 	std::vector<VkDescriptorSet> DescSets = { (*m_pTextureDescSets)[ImageIndex], DescSet };
 	GraphicsPipeline::Bind(CmdBuf, DescSets); 
+
+	vkCmdPushConstants(CmdBuf,
+        m_pipelineLayout,
+		VK_SHADER_STAGE_FRAGMENT_BIT, // Must match shader stage
+		0,                            // Offset in push constant block
+		sizeof(u32),             // Size of data
+		&BaseTextureIndex);
 }
 
 

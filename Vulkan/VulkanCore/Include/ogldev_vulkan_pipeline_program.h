@@ -68,6 +68,7 @@ protected:
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	std::vector<VkDescriptorSetLayout> m_descSetLayouts;
+	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 
 private:
 
@@ -76,8 +77,7 @@ private:
 		VkSpecializationInfo* pSpecInfoVS, VkSpecializationInfo* pSpecInfoFS);
 
 	VkDescriptorPool m_descPool = VK_NULL_HANDLE;
-	VkPipeline m_pipeline = VK_NULL_HANDLE;
-	VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
+	VkPipeline m_pipeline = VK_NULL_HANDLE;	
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 };

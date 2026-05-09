@@ -436,14 +436,8 @@ private:
 
 			BeginRendering(CmdBuf, i, FirstCommandBuffer);
 		
-			m_pipelines[LightingMode].Bind(i, CmdBuf, m_models[MeshIndex].m_descSets[i]);
-
-			vkCmdPushConstants(CmdBuf,
-				m_pipelines[LightingMode].GetPipelineLayout(),
-				VK_SHADER_STAGE_FRAGMENT_BIT, // Must match shader stage
-				0,                            // Offset in push constant block
-				sizeof(u32),             // Size of data
-				&(m_models[MeshIndex].m_baseTextureIndex));
+			m_pipelines[LightingMode].Bind(i, CmdBuf, 
+				m_models[MeshIndex].m_descSets[i], m_models[MeshIndex].m_baseTextureIndex);
 
 			m_models[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			

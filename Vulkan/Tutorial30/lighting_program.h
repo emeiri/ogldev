@@ -67,7 +67,7 @@ public:
 
 	virtual void Destroy();
 
-	void Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet);
+	void Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet, u32 BaseTextureIndex);
 
     void AllocDescSets(std::vector<VkDescriptorSet>& DescSets);
 
