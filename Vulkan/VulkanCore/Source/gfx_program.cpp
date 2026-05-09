@@ -78,15 +78,8 @@ void GraphicsPipeline::Destroy(bool DestroyLayouts)
 
 void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
 {
-	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-
-	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
-		m_pipelineLayout,
-		0,      // firstSet
-		1,      // descriptorSetCount						
-		&DescSet,
-		0,	    // dynamicOffsetCount
-		NULL);	// pDynamicOffsets
+    std::vector<VkDescriptorSet> DescSets = { DescSet };
+    Bind(CmdBuf, DescSets);
 }
 
 
@@ -249,7 +242,7 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 	std::vector<VkPushConstantRange> PushConstantRange = GetPushConstantRange();
 
 	VkPipelineLayoutCreateInfo LayoutInfo = {
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 		.setLayoutCount = (u32)m_descSetLayouts.size(),
 		.pSetLayouts = m_descSetLayouts.data()
 	};
