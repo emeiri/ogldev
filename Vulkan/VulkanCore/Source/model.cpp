@@ -385,9 +385,6 @@ void VkModel::RecordCommandBuffer(VkCommandBuffer CmdBuf, GraphicsPipelineV3& Pi
 
 void VkModel::RecordCommandBufferIndirect(VkCommandBuffer CmdBuf, VkPipelineLayout PipelineLayout, int ImageIndex)
 {
-	u32 InstanceCount = 1;
-	u32 BaseVertex = 0;
-
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
 		PipelineLayout,
 		0,      // firstSet
