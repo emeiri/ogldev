@@ -246,13 +246,18 @@ VkPipeline GraphicsPipeline::CreatePipeline(GLFWwindow* pWindow, VkShaderModule 
 		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
 	};
 
-	VkPipelineLayoutCreateInfo LayoutInfo = {};
+	std::vector<VkPushConstantRange> PushConstantRange = GetPushConstantRange();
 
-	LayoutInfo = {
+	VkPipelineLayoutCreateInfo LayoutInfo = {
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
 		.setLayoutCount = (u32)m_descSetLayouts.size(),
 		.pSetLayouts = m_descSetLayouts.data()
 	};
+
+    if (PushConstantRange.size() > 0) {
+        LayoutInfo.pushConstantRangeCount = (u32)PushConstantRange.size();
+        LayoutInfo.pPushConstantRanges = PushConstantRange.data();
+    }
 
 	VkResult res = vkCreatePipelineLayout(m_device, &LayoutInfo, NULL, &m_pipelineLayout);
 	CHECK_VK_RESULT(res, "vkCreatePipelineLayout\n");

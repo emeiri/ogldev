@@ -60,10 +60,13 @@ protected:
 		return VK_CULL_MODE_BACK_BIT;
 	}
 
+	virtual std::vector<VkPushConstantRange> GetPushConstantRange()
+	{
+		std::vector<VkPushConstantRange> PushConstantRanges;
+		return PushConstantRanges;
+	}
+
 	VkDevice m_device = VK_NULL_HANDLE;
-
-protected:
-
 	std::vector<VkDescriptorSetLayout> m_descSetLayouts;
 
 private:

@@ -60,7 +60,7 @@ public:
 	virtual void Init(VulkanCore& vkCore,
 		VkDescriptorPool DescPool,
 		VkDescriptorSetLayout TextureDescSetLayout,
-		std::vector<VkDescriptorSet>* pTextureDescSets,
+		const std::vector<VkDescriptorSet>* pTextureDescSets,
 		VkShaderModule vs,
 		VkShaderModule fs,
 		LIGHTING_MODE LightingMode);
@@ -90,8 +90,10 @@ protected:
 
 	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 
+	virtual std::vector<VkPushConstantRange> GetPushConstantRange();
+
     VkDescriptorSetLayout m_textureDescSetLayout = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet>* m_pTextureDescSets = NULL;
+	const std::vector<VkDescriptorSet>* m_pTextureDescSets = NULL;
 };
 
 }

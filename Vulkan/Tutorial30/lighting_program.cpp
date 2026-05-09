@@ -38,7 +38,7 @@ enum Binding {
 void LightingProgram::Init(VulkanCore& vkCore,
 	VkDescriptorPool DescPool,
 	VkDescriptorSetLayout TextureDescSetLayout,
-	std::vector<VkDescriptorSet>* pTextureDescSets,
+	const std::vector<VkDescriptorSet>* pTextureDescSets,
 	VkShaderModule vs,
 	VkShaderModule fs,
 	LIGHTING_MODE LightingMode)
@@ -132,6 +132,23 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 
 	return ret;
 }
+
+
+std::vector<VkPushConstantRange> LightingProgram::GetPushConstantRange()
+{
+	//VkPushConstantRange PushConstantRange =
+
+	std::vector<VkPushConstantRange> PushConstantRanges = {
+		{
+			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
+			.offset = 0,
+			.size = sizeof(u32)
+		}
+	};
+
+	return PushConstantRanges;
+}
+
 
 
 void LightingProgram::UpdateDescriptorSets(const ModelDesc& ModelDesc,
