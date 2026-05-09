@@ -32,9 +32,15 @@
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial30\tutorial30.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial30\big_texture_array.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial30\lighting_program.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Vulkan\Tutorial30\big_texture_array.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

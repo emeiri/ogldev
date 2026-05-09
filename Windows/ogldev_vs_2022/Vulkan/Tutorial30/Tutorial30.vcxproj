@@ -23,10 +23,12 @@
     <None Include="..\..\..\..\Vulkan\Tutorial30\test.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial30\big_texture_array.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial30\lighting_program.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial30\tutorial30.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Vulkan\Tutorial30\big_texture_array.h" />
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial30\lighting_program.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

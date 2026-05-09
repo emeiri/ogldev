@@ -46,6 +46,7 @@
 #include "ogldev_vulkan_imgui.h"
 #include "Int/model_desc.h"
 #include "lighting_program.h"
+#include "big_texture_array.h"
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
@@ -56,11 +57,12 @@
 
 #define APP_NAME "Tutorial 30"
 
-struct ModelInfo {
+struct ModelContext {
 	OgldevVK::VkModel* m_pModel = NULL;
 	std::vector<VkDescriptorSet> m_descSets;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersVS;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffersFS;
+    int m_baseTextureIndex = -1;
 
 	void Destroy(VkDevice Device)
 	{
@@ -81,7 +83,7 @@ struct ModelConfig {
     float Scale;
 };
 
-static ModelConfig Models[] = {
+static std::vector<ModelConfig> Models = {
 	{ "../../Content/crytek_sponza/sponza.obj", 0.01f },
 	{ "../../Content/box.obj", 0.1f }
 //	{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", 0.01f }
@@ -117,7 +119,7 @@ public:
 			p.Destroy();
 		}
 
-		vkDestroyDescriptorSetLayout(m_device, m_descSetLayoutTextures, NULL);
+        m_bigTextureArray.Destroy();		
 
 		vkDestroyDescriptorPool(m_device, m_descPool, NULL);			
 
@@ -137,8 +139,7 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateDescriptorPool();
-		CreateTexturesDescSetLayout();
-		AllocTextureDescSet();
+		CreateBigTextureArray();
 		CreatePipeline();
 		CreateMeshes();
 		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");		
@@ -325,84 +326,30 @@ private:
 	}
 
 
-	void CreateTexturesDescSetLayout()
+	void CreateBigTextureArray()
 	{
-		VkDescriptorBindingFlags BindingFlags =
-			VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT |
-			VK_DESCRIPTOR_BINDING_VARIABLE_DESCRIPTOR_COUNT_BIT |
-			VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT;
-
-		VkDescriptorSetLayoutBindingFlagsCreateInfo BindingFlagsInfo = {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO,
-			.bindingCount = 1,         // Matches number of bindings in layout
-			.pBindingFlags = &BindingFlags
-		};
-
-		VkDescriptorSetLayoutBinding LayoutBindings = {
-			.binding = BIG_TEXTURE_ARRAY_BINDING,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.descriptorCount = MAX_TEXTURES,
-			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
-			.pImmutableSamplers = NULL
-		};
-
-		VkDescriptorSetLayoutCreateInfo LayoutCreateInfo = {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-			.pNext = &BindingFlagsInfo,
-			.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
-			.bindingCount = 1,
-			.pBindings = &LayoutBindings
-		};
-
-		VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL,
-												   &m_descSetLayoutTextures);
-		CHECK_VK_RESULT(res, "vkCreateDescriptorSetLayout");
-	}
-
-
-	void AllocTextureDescSet()
-	{
-        size_t NumDescSets = m_vkCore.GetNumImages();
-
-		std::vector<VkDescriptorSetLayout> Layouts(NumDescSets, m_descSetLayoutTextures);
-
-		std::vector<u32> TextureCounts(NumDescSets, MAX_TEXTURES);
-
-		VkDescriptorSetVariableDescriptorCountAllocateInfo VariableCountInfo = {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO,
-			.pNext = NULL,
-			.descriptorSetCount = (u32)NumDescSets,
-			.pDescriptorCounts = TextureCounts.data()
-		};
-
-		VkDescriptorSetAllocateInfo AllocInfo = {
-			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-			.pNext = &VariableCountInfo,
-			.descriptorPool = m_descPool,
-			.descriptorSetCount = (u32)Layouts.size(),
-			.pSetLayouts = Layouts.data()
-		};
-
-		m_descSetsTextures.resize(NumDescSets);
-
-		VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descSetsTextures.data());
-		CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
+        m_bigTextureArray.Init(m_vkCore.GetDevice(), m_descPool, m_vkCore.GetNumImages(), MAX_TEXTURES, BIG_TEXTURE_ARRAY_BINDING);
 	}
 
 
 	void CreateMeshes()
 	{
-        m_models.resize(2);
+        m_models.resize(Models.size());
 
+        std::vector<OgldevVK::ModelDesc> ModelDescs(m_models.size());
+		
 		for (int i = 0; i < (int)m_models.size(); i++) {
 			m_models[i].m_pModel = new OgldevVK::VkModel(true);
 			m_models[i].m_pModel->Init(&m_vkCore);
 			m_models[i].m_pModel->LoadAssimpModel(Models[i].Path);
             CreateUniformBuffers(i);
-            CreateDescriptorSets(i);
+            CreateDescriptorSets(i, ModelDescs[i]);
 		}
-        
-		
+
+        UpdateBaseTextureIndices(ModelDescs);
+
+		m_bigTextureArray.CreateTextureArray(ModelDescs);
+        		
 	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
 	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");			
@@ -410,6 +357,17 @@ private:
 	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
 	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
+
+
+    void UpdateBaseTextureIndices(std::vector<OgldevVK::ModelDesc>& ModelDescs)
+    {
+        u32 TotalTextureCount = 0;
+        for (int i = 0; i < (int)m_models.size(); i++) {
+            m_models[i].m_baseTextureIndex = TotalTextureCount;
+			const OgldevVK::ModelDesc& md = ModelDescs[i];
+			TotalTextureCount += (u32)md.m_materials.size();
+        }
+    }
 
 
 	void CreateShaders()
@@ -423,7 +381,8 @@ private:
 	void CreatePipeline()
 	{
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
-			m_pipelines[i].Init(m_vkCore, m_descPool, m_descSetLayoutTextures, &m_descSetsTextures, m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+			m_pipelines[i].Init(m_vkCore, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
+				&m_bigTextureArray.GetDescSets(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 		}
 	}
 
@@ -440,55 +399,15 @@ private:
 	}
 
 
-	void CreateDescriptorSets(int MeshIndex)
-	{
-		OgldevVK::ModelDesc md;
-
+	void CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& md)
+	{		
 		m_models[MeshIndex].m_pModel->UpdateModelDesc(md);
 
 		m_pipelines[MeshIndex].AllocDescSets(m_models[MeshIndex].m_descSets);
 		m_pipelines[MeshIndex].UpdateDescriptorSets(md, m_models[MeshIndex].m_descSets,
 														m_models[MeshIndex].m_uniformBuffersVS, 
 														m_models[MeshIndex].m_uniformBuffersFS);
-
-		CreateGlobalTextureArray(md);
 	}
-
-
-	void CreateGlobalTextureArray(const OgldevVK::ModelDesc& md)
-	{
-		u32 TextureCount = (u32)md.m_materials.size();
-		std::vector<VkDescriptorImageInfo> ImageInfos;
-		ImageInfos.resize(TextureCount);
-
-		for (u32 i = 0; i < TextureCount; ++i) {
-			ImageInfos[i].sampler = md.m_materials[i].m_sampler;
-			ImageInfos[i].imageView = md.m_materials[i].m_imageView;
-			ImageInfos[i].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		}
-
-		std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSetsTextures.size());
-
-		for (int i = 0; i < (int)m_descSetsTextures.size(); i++) {
-			VkDescriptorSet& DstSet = m_descSetsTextures[i];
-
-			WriteDescriptorSet[i] = {
-				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-				.pNext = NULL,
-				.dstSet = DstSet,
-				.dstBinding = BIG_TEXTURE_ARRAY_BINDING,
-				.dstArrayElement = 0,
-				.descriptorCount = TextureCount,
-				.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				.pImageInfo = ImageInfos.data(),
-				.pBufferInfo = NULL,
-				.pTexelBufferView = NULL
-			};
-		}
-
-		vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
-	}
-
 
 
 	void RecordCommandBuffers()
@@ -518,6 +437,14 @@ private:
 			BeginRendering(CmdBuf, i, FirstCommandBuffer);
 		
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_models[MeshIndex].m_descSets[i]);
+
+			vkCmdPushConstants(CmdBuf,
+				m_pipelines[LightingMode].GetPipelineLayout(),
+				VK_SHADER_STAGE_FRAGMENT_BIT, // Must match shader stage
+				0,                            // Offset in push constant block
+				sizeof(u32),             // Size of data
+				&(m_models[MeshIndex].m_baseTextureIndex));
+
 			m_models[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
@@ -619,9 +546,9 @@ private:
 
 	void UpdateUniformBuffers(int MeshIndex, int ImageIndex)
 	{		
-		glm::mat4 ScaleMatrix = glm::mat4(1.0f);
+		glm::mat4 IndentityMatrix = glm::mat4(1.0f);
 
-		glm::mat4 Scale = m_scale * glm::scale(ScaleMatrix, glm::vec3(Models[MeshIndex].Scale));
+		glm::mat4 Scale = m_scale * glm::scale(IndentityMatrix, glm::vec3(Models[MeshIndex].Scale));
 
 		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
 
@@ -659,13 +586,12 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
-	std::vector<ModelInfo> m_models;
+	std::vector<ModelContext> m_models;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
-	VkDescriptorSetLayout m_descSetLayoutTextures = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> m_descSetsTextures;
+	BigTextureArray m_bigTextureArray;
 
 	// GUI state
 	bool m_showGui = false;
