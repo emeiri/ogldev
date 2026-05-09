@@ -27,7 +27,7 @@
 #define LIGHTING_MODE_FULL 3
 
 layout(push_constant) uniform Constants {
-    uint TextureBaseIndex; 
+    uint BaseTextureIndex; 
 } push;
 
 layout(constant_id = 0) const uint LIGHTING_MODE = LIGHTING_MODE_FULL;
@@ -49,7 +49,7 @@ layout(set = 1, binding = 4) readonly uniform UniformBuffer {
 
 vec4 TextureBindless2D(uint MaterialIndex, vec2 uv) 
 {
-    uint Index = push.TextureBaseIndex + MaterialIndex;
+    uint Index = push.BaseTextureIndex + MaterialIndex;
     return texture(Textures[nonuniformEXT(Index)], uv);
 }
 
