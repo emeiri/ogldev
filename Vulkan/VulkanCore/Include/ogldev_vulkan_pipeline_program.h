@@ -48,8 +48,6 @@ public:
 
 	void AllocDescSets(int DescCount, std::vector<VkDescriptorSet>& DescriptorSets, int DescSetLayoutIndex = 0);
 
-	VkPipelineLayout GetPipelineLayout() const { return m_pipelineLayout; }
-
 protected:
 
 	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;
