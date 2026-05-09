@@ -16,6 +16,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include "ogldev_types.h"
 #include "ogldev_vulkan_util.h"
 #include "big_texture_array.h"
@@ -43,7 +45,7 @@ void BigTextureArray::CreateDescSetLayout(u32 MaxTextures)
 		.pBindingFlags = &BindingFlags
 	};
 
-	VkDescriptorSetLayoutBinding LayoutBindings = {
+	VkDescriptorSetLayoutBinding LayoutBinding = {
 		.binding = m_bindingPoint,
 		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		.descriptorCount = MaxTextures,
@@ -56,7 +58,7 @@ void BigTextureArray::CreateDescSetLayout(u32 MaxTextures)
 		.pNext = &BindingFlagsInfo,
 		.flags = VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT,
 		.bindingCount = 1,
-		.pBindings = &LayoutBindings
+		.pBindings = &LayoutBinding
 	};
 
 	VkResult res = vkCreateDescriptorSetLayout(m_device, &LayoutCreateInfo, NULL, &m_descSetLayout);
@@ -117,6 +119,8 @@ void BigTextureArray::CreateTextureArray(const std::vector<OgldevVK::ModelDesc>&
 			Index++;
 		}
 	}
+
+    assert(Index == TotalTextureCount);
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size());
 

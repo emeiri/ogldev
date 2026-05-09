@@ -49,6 +49,6 @@ private:
 
 	VkDevice m_device;
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> m_descSets;
+    std::vector<VkDescriptorSet> m_descSets;	// one set per swapchain image
     u32 m_bindingPoint = 0;
 };

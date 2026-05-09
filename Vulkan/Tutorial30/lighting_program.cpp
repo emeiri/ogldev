@@ -143,8 +143,6 @@ std::vector<VkDescriptorSetLayout> LightingProgram::CreateDescSetLayout(OgldevVK
 
 std::vector<VkPushConstantRange> LightingProgram::GetPushConstantRange()
 {
-	//VkPushConstantRange PushConstantRange =
-
 	std::vector<VkPushConstantRange> PushConstantRanges = {
 		{
 			.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT,
