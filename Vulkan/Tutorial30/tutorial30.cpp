@@ -403,10 +403,10 @@ private:
 	{		
 		m_models[MeshIndex].m_pModel->UpdateModelDesc(md);
 
-		m_pipelines[MeshIndex].AllocDescSets(m_models[MeshIndex].m_descSets);
-		m_pipelines[MeshIndex].UpdateDescriptorSets(md, m_models[MeshIndex].m_descSets,
-														m_models[MeshIndex].m_uniformBuffersVS, 
-														m_models[MeshIndex].m_uniformBuffersFS);
+		m_pipelines[0].AllocDescSets(m_models[MeshIndex].m_descSets);
+		m_pipelines[0].UpdateDescriptorSets(md, m_models[MeshIndex].m_descSets,
+												m_models[MeshIndex].m_uniformBuffersVS, 
+												m_models[MeshIndex].m_uniformBuffersFS);
 	}
 
 
