@@ -44,17 +44,6 @@ class LightingProgram : public GraphicsPipeline {
 
 public:
 
-	struct UniformDataFS {
-		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
-		glm::vec4 LightDirection;    // .xyz = direction
-		glm::vec4 LightColor;        // .rgb = color, .w = intensity
-	};
-
-	struct UniformDataVS {
-		glm::mat4 WVP;
-		glm::mat4 NormalMatrix;
-	};
-
 	LightingProgram() {}
 
 	virtual void Init(VulkanCore& vkCore,
@@ -84,14 +73,31 @@ public:
 							  const glm::vec3& LightDirection,
 							  std::vector<BufferAndMemory>& UniformBuffersVS,
 							  std::vector<BufferAndMemory>& UniformBuffersFS);
-protected:
 
-	int m_numImages = 0;
+	static size_t GetUniformBufferSizeVS(size_t NumSubmeshes) { return NumSubmeshes * sizeof(UniformDataVS); }
+
+    static size_t GetUniformBufferSizeFS() { return sizeof(UniformDataFS); }
+
+protected:
 
 	virtual std::vector<VkDescriptorSetLayout> CreateDescSetLayout(OgldevVK::VulkanCore& vkCore);
 
 	virtual std::vector<VkPushConstantRange> GetPushConstantRange();
 
+private:
+
+	struct UniformDataFS {
+		glm::vec4 AmbientLight;      // .rgb = color, .w = intensity
+		glm::vec4 LightDirection;    // .xyz = direction
+		glm::vec4 LightColor;        // .rgb = color, .w = intensity
+	};
+
+	struct UniformDataVS {
+		glm::mat4 WVP;
+		glm::mat4 NormalMatrix;
+	};
+
+	int m_numImages = 0;
     VkDescriptorSetLayout m_textureDescSetLayout = VK_NULL_HANDLE;
 	const std::vector<VkDescriptorSet>* m_pTextureDescSets = NULL;
 };

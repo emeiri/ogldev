@@ -326,7 +326,7 @@ private:
 	}
 
 
-	void CreateBigTextureArray()
+	void InitBigTextureArray()
 	{
         m_bigTextureArray.Init(m_vkCore.GetDevice(), m_descPool, m_vkCore.GetNumImages(), MAX_TEXTURES, BIG_TEXTURE_ARRAY_BINDING);
 	}
@@ -388,14 +388,12 @@ private:
 
 
 	void CreateUniformBuffers(int MeshIndex)
-	{
-		size_t MaxUniformBufferSize = m_vkCore.GetMaxUniformBufferSize();
-		int MaxNumMeshes = (int)(MaxUniformBufferSize / sizeof(OgldevVK::LightingProgram::UniformDataVS));
-		assert(m_models[MeshIndex].m_pModel->GetNumMeshes() <= MaxNumMeshes);
-
-		size_t UniformBufferSizeVS = m_models[MeshIndex].m_pModel->GetNumMeshes() * sizeof(OgldevVK::LightingProgram::UniformDataVS);
+	{		
+        size_t UniformBufferSizeVS = OgldevVK::LightingProgram::GetUniformBufferSizeVS(m_models[MeshIndex].m_pModel->GetNumMeshes());
 		m_models[MeshIndex].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
-		m_models[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(sizeof(OgldevVK::LightingProgram::UniformDataFS));
+
+        size_t UniformBufferSizeFS = OgldevVK::LightingProgram::GetUniformBufferSizeFS();
+		m_models[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
 	}
 
 
