@@ -47,7 +47,7 @@ private:
 
 	void AllocDescSets(VkDescriptorPool DescPool, u32 MaxTextures, int NumImages);
 
-	VkDevice m_device;
+	VkDevice m_device = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
     std::vector<VkDescriptorSet> m_descSets;	// one set per swapchain image
     u32 m_bindingPoint = 0;
