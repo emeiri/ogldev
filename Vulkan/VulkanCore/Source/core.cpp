@@ -1203,6 +1203,13 @@ VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount, u32 UniformBufferC
 
 std::vector<BufferAndMemory> VulkanCore::CreateUniformBuffers(size_t Size)
 {
+    if (Size >= GetPhysicalDeviceLimits().maxUniformBufferRange) {
+        printf("Requested uniform buffer size %d exceeds device limit %d\n", 
+			(int)Size, (int)GetPhysicalDeviceLimits().maxUniformBufferRange);
+		assert(0);
+        exit(1);
+    }
+
 	std::vector<BufferAndMemory> UniformBuffers;
 
 	UniformBuffers.resize(m_images.size());
