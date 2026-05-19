@@ -80,13 +80,16 @@ struct ModelContext {
 
 struct ModelConfig {
 	std::string Path;
-    float Scale;
+	glm::vec3 Pos = glm::vec3(0.0);
+    float Scale = 1.0f;
 };
 
 static std::vector<ModelConfig> Models = {
-	{ "../../Content/crytek_sponza/sponza.obj", 0.01f },
-	{ "../../Content/box.obj", 0.1f }
-//	{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", 0.01f }
+	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f },
+	{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f},
+	{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f},
+	{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f},
+	{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
 };
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
@@ -101,15 +104,15 @@ public:
 
 	~VulkanApp()
 	{
-        for (int MeshIndex = 0; MeshIndex < m_models.size(); MeshIndex++) {
+        for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			for (CommandBuffersVecs& v : m_cmdBufs[MeshIndex]) {
 				m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
 				m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
 			}
         }
         
-		for (int i = 0; i < (int)m_models.size(); i++) {
-            m_models[i].Destroy(m_device);
+		for (int i = 0; i < (int)m_modelContexts.size(); i++) {
+            m_modelContexts[i].Destroy(m_device);
 		}
 
 		vkDestroyShaderModule(m_device, m_vs, NULL);
@@ -139,7 +142,7 @@ public:
 		m_pQueue = m_vkCore.GetQueue();
 		CreateShaders();
 		CreateDescriptorPool();
-		CreateBigTextureArray();
+		InitBigTextureArray();
 		CreatePipeline();
 		CreateMeshes();
 		//m_skybox.Init(&m_vkCore, "../../Content/textures/evening_road_01_puresky_8k_2.jpg");		
@@ -156,7 +159,7 @@ public:
 	{
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
-        for (int MeshIndex = 0; MeshIndex < m_models.size(); MeshIndex++) {
+        for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			UpdateUniformBuffers(MeshIndex, ImageIndex);
         }		
 
@@ -169,9 +172,9 @@ public:
 
 			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
 		} else {
-            std::vector<VkCommandBuffer> CmdBufs(m_models.size());
+            std::vector<VkCommandBuffer> CmdBufs(m_modelContexts.size());
 
-            for (int MeshIndex = 0; MeshIndex < m_models.size(); MeshIndex++) {
+            for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
                 CmdBufs[MeshIndex] = m_cmdBufs[MeshIndex][m_lightingMode].WithoutGUI[ImageIndex];
             }			
 
@@ -297,9 +300,9 @@ private:
 
 	void CreateCommandBuffers()
 	{		
-        m_cmdBufs.resize(m_models.size());
+        m_cmdBufs.resize(m_modelContexts.size());
 
-        for (int i = 0; i < m_models.size(); i++) {
+        for (int i = 0; i < m_modelContexts.size(); i++) {
 			m_cmdBufs[i].resize(OgldevVK::NUM_LIGHTING_MODES);
 
 			for (CommandBuffersVecs& v : m_cmdBufs[i]) {
@@ -320,7 +323,7 @@ private:
 		u32 TextureCount = MAX_TEXTURES * 4;
 		u32 UniformBufferCount = 50;
 		u32 StorageBufferCount = 50;
-        u32 MaxSets = m_numImages * (OgldevVK::NUM_LIGHTING_MODES + 1);	// +1 for the global texture array descriptor set
+        u32 MaxSets = m_numImages * (u32)Models.size() * (OgldevVK::NUM_LIGHTING_MODES + 1);	// +1 for the global texture array descriptor set
 
 		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
 	}
@@ -334,14 +337,14 @@ private:
 
 	void CreateMeshes()
 	{
-        m_models.resize(Models.size());
+        m_modelContexts.resize(Models.size());
 
-        std::vector<OgldevVK::ModelDesc> ModelDescs(m_models.size());
+        std::vector<OgldevVK::ModelDesc> ModelDescs(m_modelContexts.size());
 		
-		for (int i = 0; i < (int)m_models.size(); i++) {
-			m_models[i].m_pModel = new OgldevVK::VkModel(true);
-			m_models[i].m_pModel->Init(&m_vkCore);
-			m_models[i].m_pModel->LoadAssimpModel(Models[i].Path);
+		for (int i = 0; i < (int)m_modelContexts.size(); i++) {
+			m_modelContexts[i].m_pModel = new OgldevVK::VkModel(true);
+			m_modelContexts[i].m_pModel->Init(&m_vkCore);
+			m_modelContexts[i].m_pModel->LoadAssimpModel(Models[i].Path);
             CreateUniformBuffers(i);
             CreateDescriptorSets(i, ModelDescs[i]);
 		}
@@ -362,8 +365,8 @@ private:
     void UpdateBaseTextureIndices(std::vector<OgldevVK::ModelDesc>& ModelDescs)
     {
         u32 TotalTextureCount = 0;
-        for (int i = 0; i < (int)m_models.size(); i++) {
-            m_models[i].m_baseTextureIndex = TotalTextureCount;
+        for (int i = 0; i < (int)m_modelContexts.size(); i++) {
+            m_modelContexts[i].m_baseTextureIndex = TotalTextureCount;
 			const OgldevVK::ModelDesc& md = ModelDescs[i];
 			TotalTextureCount += (u32)md.m_materials.size();
         }
@@ -389,28 +392,28 @@ private:
 
 	void CreateUniformBuffers(int MeshIndex)
 	{		
-        size_t UniformBufferSizeVS = OgldevVK::LightingProgram::GetUniformBufferSizeVS(m_models[MeshIndex].m_pModel->GetNumMeshes());
-		m_models[MeshIndex].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
+        size_t UniformBufferSizeVS = OgldevVK::LightingProgram::GetUniformBufferSizeVS(m_modelContexts[MeshIndex].m_pModel->GetNumMeshes());
+		m_modelContexts[MeshIndex].m_uniformBuffersVS = m_vkCore.CreateUniformBuffers(UniformBufferSizeVS);
 
         size_t UniformBufferSizeFS = OgldevVK::LightingProgram::GetUniformBufferSizeFS();
-		m_models[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
+		m_modelContexts[MeshIndex].m_uniformBuffersFS = m_vkCore.CreateUniformBuffers(UniformBufferSizeFS);
 	}
 
 
 	void CreateDescriptorSets(int MeshIndex, OgldevVK::ModelDesc& md)
 	{		
-		m_models[MeshIndex].m_pModel->UpdateModelDesc(md);
+		m_modelContexts[MeshIndex].m_pModel->UpdateModelDesc(md);
 
-		m_pipelines[0].AllocDescSets(m_models[MeshIndex].m_descSets);
-		m_pipelines[0].UpdateDescriptorSets(md, m_models[MeshIndex].m_descSets,
-												m_models[MeshIndex].m_uniformBuffersVS, 
-												m_models[MeshIndex].m_uniformBuffersFS);
+		m_pipelines[0].AllocDescSets(m_modelContexts[MeshIndex].m_descSets);
+		m_pipelines[0].UpdateDescriptorSets(md, m_modelContexts[MeshIndex].m_descSets,
+												m_modelContexts[MeshIndex].m_uniformBuffersVS, 
+												m_modelContexts[MeshIndex].m_uniformBuffersFS);
 	}
 
 
 	void RecordCommandBuffers()
 	{
-		for (int MeshIndex = 0; MeshIndex < (int)m_models.size(); MeshIndex++) {
+		for (int MeshIndex = 0; MeshIndex < (int)m_modelContexts.size(); MeshIndex++) {
 			for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
 				RecordCommandBuffersInternal(MeshIndex, LightMode, true, m_cmdBufs[MeshIndex][LightMode].WithoutGUI);
 
@@ -435,9 +438,9 @@ private:
 			BeginRendering(CmdBuf, i, FirstCommandBuffer);
 		
 			m_pipelines[LightingMode].Bind(i, CmdBuf, 
-				m_models[MeshIndex].m_descSets[i], m_models[MeshIndex].m_baseTextureIndex);
+				m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 
-			m_models[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
+			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			
 			//m_skybox.RecordCommandBuffer(CmdBuf, i);
 
@@ -542,7 +545,7 @@ private:
 
 		glm::mat4 Scale = m_scale * glm::scale(IndentityMatrix, glm::vec3(Models[MeshIndex].Scale));
 
-		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position);
+		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position + Models[MeshIndex].Pos);
 
 		glm::mat4 World = Translate * Scale;
 
@@ -554,11 +557,11 @@ private:
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
 		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, 
-											m_models[MeshIndex].m_pModel->GetTransformations(), 
+											m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
 											AmbientLight,
 			                                LightDirection, 
-											m_models[MeshIndex].m_uniformBuffersVS, 
-											m_models[MeshIndex].m_uniformBuffersFS);
+											m_modelContexts[MeshIndex].m_uniformBuffersVS, 
+											m_modelContexts[MeshIndex].m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -578,7 +581,7 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	//OgldevVK::Skybox m_skybox;
-	std::vector<ModelContext> m_models;
+	std::vector<ModelContext> m_modelContexts;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;

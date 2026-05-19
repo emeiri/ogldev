@@ -77,7 +77,8 @@ void LightingProgram::Destroy()
 {
 	GraphicsPipeline::Destroy(false);
 
-    // The first layout was created externally and belongs to the global texture array, so we don't destroy it here. 
+    // The first layout was created externally and belongs to the global texture array, 
+	// so we don't destroy it here. 
 	// The second layout was created by this class, so we destroy it.
 	vkDestroyDescriptorSetLayout(m_device, m_descSetLayouts[1], NULL);
 }
@@ -92,7 +93,7 @@ void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorS
         m_pipelineLayout,
 		VK_SHADER_STAGE_FRAGMENT_BIT, // Must match shader stage
 		0,                            // Offset in push constant block
-		sizeof(u32),             // Size of data
+		sizeof(u32),				  // Size of data
 		&BaseTextureIndex);
 }
 
