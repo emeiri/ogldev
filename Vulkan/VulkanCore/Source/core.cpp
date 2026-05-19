@@ -349,6 +349,7 @@ void VulkanCore::CreateDevice()
 	Features12.bufferDeviceAddress = VK_TRUE;
 	Features12.descriptorBindingPartiallyBound = VK_TRUE;
 	Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+    Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
 	
 	VkPhysicalDeviceFeatures DeviceFeatures{};
 	DeviceFeatures.geometryShader = VK_TRUE;
@@ -1186,7 +1187,7 @@ VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount, u32 UniformBufferC
 	VkDescriptorPoolCreateInfo PoolCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 		.pNext = NULL,
-		.flags = 0,
+		.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT,
 		.maxSets = MaxSets,
 		.poolSizeCount = (u32)PoolSizes.size(),
 		.pPoolSizes = PoolSizes.empty() ? NULL : PoolSizes.data()
