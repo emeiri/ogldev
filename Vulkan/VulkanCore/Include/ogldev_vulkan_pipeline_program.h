@@ -42,7 +42,7 @@ public:
 
 	void Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet);
 
-	void Bind(VkCommandBuffer CmdBuf, std::vector<VkDescriptorSet>& DescSets);
+	void Bind(VkCommandBuffer CmdBuf, const std::vector<VkDescriptorSet>& DescSets);
 
 	void Bind(VkCommandBuffer CmdBuf);
 

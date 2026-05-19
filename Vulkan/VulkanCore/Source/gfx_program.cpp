@@ -83,17 +83,17 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, VkDescriptorSet DescSet)
 }
 
 
-void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, std::vector<VkDescriptorSet>& DescSets)
+void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, const std::vector<VkDescriptorSet>& DescSets)
 {
 	vkCmdBindPipeline(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 	vkCmdBindDescriptorSets(CmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
 		m_pipelineLayout,
-		0,               // firstSet
-		(u32)DescSets.size(), // descriptorSetCount						
-		DescSets.data(),
-		0,	             // dynamicOffsetCount
-		NULL);	         // pDynamicOffsets
+		0,                    // firstSet
+		(u32)DescSets.size(), // Number of descriptor sets to bind
+		DescSets.data(),	  // Base address of the array of descriptor sets
+		0,	                  // dynamicOffsetCount
+		NULL);	              // pDynamicOffsets
 
 }
 
