@@ -180,8 +180,8 @@ void main()
         Tangent_ = GetTangent(gl_VertexID);
         Bitangent_ = GetBitangent(gl_VertexID);
         Color_ = GetColor(gl_VertexID);	
-	BoneIDs_ = GetBoneIDs(gl_VertexID);
-	Weights_ = GetWeights(gl_VertexID);
+	    BoneIDs_ = GetBoneIDs(gl_VertexID);
+	    Weights_ = GetWeights(gl_VertexID);
     } else {
         Position_ = Position;
         TexCoord0_ = TexCoord0;
@@ -190,8 +190,8 @@ void main()
         Tangent_ = Tangent;
         Bitangent_ = Bitangent;
         Color_ = Color;	
-	BoneIDs_ = BoneIDs;
-	Weights_ = Weights;
+	    BoneIDs_ = BoneIDs;
+	    Weights_ = Weights;
     }
 
     mat4 BoneTransform = gBones[BoneIDs_[0]] * Weights_[0];
