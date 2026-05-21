@@ -1052,16 +1052,14 @@ void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject
     m_pCurLightingTech->ControlNormalMap(NormalMapEnabled);
     m_pCurLightingTech->ControlParallaxMap(HeightMapEnabled);
 
-    if (m_pCurLightingTech) {
-        const Vector4f& FlatColor = m_pcurSceneObject->GetFlatColor();
+    const Vector4f& FlatColor = m_pcurSceneObject->GetFlatColor();
 
-        if (FlatColor.x == -1.0f) {
-            m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));            
-        } else {
-            m_pCurLightingTech->SetColorMod(Vector4f(0.0f));
-            m_pCurLightingTech->SetColorAdd(FlatColor);
-        }        
-    }
+    if (FlatColor.x == -1.0f) {
+        m_pCurLightingTech->SetColorMod(Vector4f(pSceneObject->GetColorMod(), 1.0f));            
+    } else {
+        m_pCurLightingTech->SetColorMod(Vector4f(0.0f));
+        m_pCurLightingTech->SetColorAdd(FlatColor);
+    }      
 
     bool IsCubeMapping = pSceneObject->IsCubeMapping();
     m_pCurLightingTech->ControlCubemapping(IsCubeMapping);
