@@ -34,6 +34,7 @@ public:
     void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
     void SetPosition(const SceneObject* pOtherObject) { m_pos = pOtherObject->GetPosition(); }
     void TranslateBy(float x, float y, float z) { m_pos.x += x; m_pos.y += y; m_pos.z += z; }
+    void TranslateBy(const Vector3f& v) { m_pos.x += v.x; m_pos.y += v.y; m_pos.z += v.z; }
 
     void SetRotation(float x, float y, float z);
     void SetRotation(const Vector3f& Rot);
@@ -58,6 +59,8 @@ public:
     void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
 
     const glm::quat& GetQuaternion() const { return m_quaternion; }
+
+    Vector3f GetForwardDir() const;
 
     void SetCubeMapping(bool Enable) { m_isCubemapping = Enable; }
     bool IsCubeMapping() const { return m_isCubemapping; }

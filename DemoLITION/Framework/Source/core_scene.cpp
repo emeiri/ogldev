@@ -49,6 +49,7 @@ void SceneObject::RotateBy(float x, float y, float z)
     m_rotations[0].y += y;
     m_rotations[0].z += z;
     m_numRotations = 1;
+   // m_rotations[0].Print();
 }
 
 
@@ -113,6 +114,38 @@ void SceneObject::CalcRotationStack(Matrix4f& Rot) const
     }    
 }
 
+Vector3f SceneObject::GetForwardDir() const
+{
+    Vector3f Ret;
+
+    if (QuaternionIsZero(m_quaternion)) {
+        if (m_numRotations == 0) {
+            Ret = Vector3f(0.0f, 0.0f, 1.0f);
+        } else {
+            if (m_numRotations > 1) {
+                printf("Getting the forward direction with multiple rotations is unimplemented\n");
+                assert(0);
+                exit(1);
+            }
+
+            Ret.x = -sinf(ToRadian(m_rotations[0].y));
+            Ret.y = 0.0f;
+            Ret.z = cosf(ToRadian(m_rotations[0].y));
+        }
+    } else {
+        // printf("%p ", this); GLM_PRINT_QUAT("rendering quat: ", m_quaternion);
+        glm::vec3 DefaultForward(0.0f, 0.0f, 1.0f);
+        glm::vec3 Forward = m_quaternion * DefaultForward;
+        Ret = Forward;
+    }
+
+    if (!Ret.IsZero()) {
+        Ret = Ret.Normalize();
+    }
+
+    return Ret;
+}
+
 
 SceneConfig::SceneConfig()
 {
@@ -168,8 +201,8 @@ void CoreScene::CreateDefaultCamera()
     Vector3f Up(0.0, 1.0f, 0.0f);
 
     float FOV = 45.0f;
-    float zNear = 0.1f;
-    float zFar = 150.0f;
+    float zNear = 0.2f;
+    float zFar = 200.0f;
     int WindowWidth = 0;
     int WindowHeight = 0;
     m_pCoreRenderingSystem->GetWindowSize(WindowWidth, WindowHeight);
@@ -239,13 +272,20 @@ std::list<SceneObject*> CoreScene::GetSceneObjectsList()
 
 void CoreScene::SceneObjectGUI()
 {
-    if (ImGui::TreeNode("Scene Object")) {
-        if (m_renderList.size() > 0) {
-            CoreSceneObject* pSceneObject = m_renderList.front();
-            Vector3f Pos = pSceneObject->GetPosition();
-            ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
-            ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
-            pSceneObject->SetPosition(Vector3f(Pos.x, Pos.y, Pos.z));
+    if (ImGui::TreeNode("Scene Objects")) {
+
+        for (std::list<CoreSceneObject*>::const_iterator it = m_renderList.begin(); it != m_renderList.end(); it++) {            
+            if (ImGui::TreeNode((*it)->GetName().c_str())) {
+                int CubeMipmapLevel = (*it)->GetCubeMipmapLevel();
+                int MaxMipampLevels = GetSkyboxMipmapLevels();
+                ImGui::SliderInt("Cube mipmap level", &CubeMipmapLevel, 0, MaxMipampLevels, "", 0);
+                (*it)->SetCubeMipmapLevel(CubeMipmapLevel);
+                Vector3f Pos = (*it)->GetPosition();
+                ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
+                ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
+                (*it)->SetPosition(Vector3f(Pos.x, Pos.y, Pos.z));
+                ImGui::TreePop();
+            }
         }
 
         ImGui::TreePop();
@@ -255,8 +295,6 @@ void CoreScene::SceneObjectGUI()
 
 void CoreScene::SSAOGUI()
 {
-    bool my_tool_active = false;
-
     if (ImGui::TreeNode("SSAO")) {
         SSAOParams& ssoaParams = m_config.GetSSAOParams();
 
