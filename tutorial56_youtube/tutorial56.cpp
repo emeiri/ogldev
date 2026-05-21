@@ -24,9 +24,7 @@
 #include <GL/glew.h>
 
 #include "ogldev_util.h"
-#include "ogldev_vertex_buffer.h"
 #include "ogldev_base_app2.h"
-#include "ogldev_infinite_grid.h"
 #include "ogldev_skybox.h"
 
 #define WINDOW_WIDTH  1920

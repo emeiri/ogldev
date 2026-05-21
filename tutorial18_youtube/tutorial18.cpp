@@ -26,7 +26,6 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_math_3d.h"
-#include "ogldev_texture.h"
 #include "ogldev_world_transform.h"
 #include "ogldev_basic_mesh.h"
 #include "camera.h"
