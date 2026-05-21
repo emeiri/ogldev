@@ -323,6 +323,16 @@ void RenderingSystemGL::OnCursorPosCallback(GLFWwindow* pWindow, double x, doubl
     m_pCamera->SetMousePos((float)x, (float)y);
 }
 
+// Code dupplication with two other places
+static bool IsMouseControlledByImGUI()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    bool ret = io.WantCaptureMouse;
+
+    return ret;
+}
+
 
 void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* pWindow, int Button, int Action, int Mode)
 {
@@ -330,9 +340,9 @@ void RenderingSystemGL::OnMouseButtonCallback(GLFWwindow* pWindow, int Button, i
     GetMousePos(pWindow, MousePosX, MousePosY);
     bool HandledByGame = m_pGameCallbacks->OnMouseButton(Button, Action, Mode, MousePosX, MousePosY);
 
-    if (!HandledByGame) {
+    if (!HandledByGame && !IsMouseControlledByImGUI()) {
         m_pCamera->HandleMouseButton(Button, Action, Mode);
-    }    
+    }
 }
 
 
