@@ -190,12 +190,17 @@ void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, 0);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, 0);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);    
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTextureStorage2D(m_textureObj, 1, GL_RGB32F, Cubemap[0].w_, Cubemap[0].h_);
+
+    int Width = Cubemap[0].w_;
+    int Height = Cubemap[0].h_;
+    int MipMapLevels = 1 + std::floor(std::log2(std::max(Width, Height)));
+
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, MipMapLevels - 1);
+
+    glTextureStorage2D(m_textureObj, MipMapLevels, GL_RGB32F, Width, Height);
 
     for (int i = 0; i < CUBEMAP_NUM_FACES; i++) {
         const void* pSrc = Cubemap[i].data_.data();
@@ -204,12 +209,14 @@ void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
                             0,      // xOffset
                             0,      // yOffset
                             i,      // zOffset (layer in the case of a cubemap)
-                            Cubemap[0].w_, Cubemap[0].h_,   // 2D image dimensions
+                            Width, Height,   // 2D image dimensions
                             1,          // depth
                             GL_RGB,     // format
                             GL_FLOAT,   // data type
                             pSrc);
     }
+
+    glGenerateTextureMipmap(m_textureObj);
 }
 
 
