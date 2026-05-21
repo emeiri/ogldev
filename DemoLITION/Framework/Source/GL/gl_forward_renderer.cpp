@@ -168,6 +168,7 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetNormalMapTextureUnit(NORMAL_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
+    m_lightingTech.SetCubeMapTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -870,6 +871,13 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         RenderInfiniteGrid(pScene);
     }
 
+    if (pScene->GetConfig()->IsSkyboxEnabled()) {
+        BaseCubmapTexture* pCubeMapTex = pScene->GetSkyboxTex();
+        if (pCubeMapTex) {
+            pCubeMapTex->Bind(SKYBOX_TEXTURE_UNIT);
+        }
+    }
+
     RenderObjectList(pScene, TotalRuntimeMillis);
 }
 
@@ -1054,6 +1062,11 @@ void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject
             m_pCurLightingTech->SetColorAdd(FlatColor);
         }        
     }
+
+    bool IsCubeMapping = pSceneObject->IsCubeMapping();
+    m_pCurLightingTech->ControlCubemapping(IsCubeMapping);
+    int CubeMipmapLevel = pSceneObject->GetCubeMipmapLevel();
+    m_pCurLightingTech->SetCubeMipmapLevel(CubeMipmapLevel);
 
     RenderSingleObject(pSceneObject);
 }

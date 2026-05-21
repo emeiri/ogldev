@@ -1137,19 +1137,51 @@ private:
 };
 
 
+class CubeMappingDemo : public Carbonara {
+
+public:
+
+    CubeMappingDemo()
+    {
+
+    }
+
+    void InitChild()
+    {
+        m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->ControlSkybox(true);
+        m_pScene->GetConfig()->ForcePBRDisabled(true);
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+
+        Model* pModel = m_pRenderingSystem->LoadModel("../Content/Pixabay/arunangshubanerjee-pool-ball-3-2026.glb");
+
+        SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        pSceneObject->SetScale(20.0f);
+        pSceneObject->SetCubeMapping(true);
+        m_pScene->AddToRenderList(pSceneObject);
+        //   pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+
+        m_pScene->LoadSkybox("../Content/textures/ahornsteig_4k.jpg");
+    }
+};
+
+
 
 void carbonara()
 {
     //BallisticsDemo demo;
     //FireworksDemo demo;
-    //AnimationDemo demo;
+   // AnimationDemo demo;
     //BridgeDemo demo;
     //AmazonBistroDemo demo;
     //SkyboxDemo demo;
     //GLTFPBRDemo demo;
     //MeshConvertDemo demo;
     //HeliGame demo;
-    SSGIDemo demo;
+    //SSGIDemo demo;
+    CubeMappingDemo demo;
 
     demo.Start();
 }

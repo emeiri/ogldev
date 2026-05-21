@@ -110,6 +110,8 @@ uniform float gReflectionFactor = 1.0;
 uniform float gMatToRefRefractFactor = 0.5;
 uniform float gETA = 1.0;
 uniform float gFresnelPower = 1.0;
+uniform bool gIsCubemapping = false;
+uniform int gCubeMipmapLevel = 0;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -650,7 +652,11 @@ vec4 GetTexColor()
 {
     vec4 TexColor;
 
-    if (gIsIndirectRender) {
+    if (gIsCubemapping) {
+        vec3 CameraToPixel = normalize(WorldPos0 - gCameraWorldPos);
+        vec3 ReflectionDir = normalize(reflect(CameraToPixel, Normal0));
+        TexColor = vec4(textureLod(gCubemapTexture, ReflectionDir, gCubeMipmapLevel).rgb, 1.0);
+    } else if (gIsIndirectRender) {
         TexColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
     } else if (gHasSampler) {
         TexColor = texture(gSampler, TexCoord.xy);

@@ -59,6 +59,12 @@ public:
 
     const glm::quat& GetQuaternion() const { return m_quaternion; }
 
+    void SetCubeMapping(bool Enable) { m_isCubemapping = Enable; }
+    bool IsCubeMapping() const { return m_isCubemapping; }
+
+    void SetCubeMipmapLevel(int Level) { m_cubeMipmapLevel = Level; }
+    int GetCubeMipmapLevel() const { return m_cubeMipmapLevel; }
+
 protected:
     SceneObject();
     void CalcRotationStack(Matrix4f& Rot) const;
@@ -73,6 +79,8 @@ private:
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
     Vector3f m_colorMod = Vector3f(1.0f, 1.0f, 1.0f);
     glm::quat m_quaternion = glm::quat(0.0f, 0.0f, 0.0f, 0.0f);
+    bool m_isCubemapping = false;
+    int m_cubeMipmapLevel = 0;
 };
 
 

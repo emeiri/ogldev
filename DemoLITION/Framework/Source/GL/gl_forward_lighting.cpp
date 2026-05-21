@@ -50,7 +50,7 @@ bool ForwardLightingTechnique::InitUniforms()
 {
     if (!BaseLightingTechnique::InitUniforms()) {
         return false;
-    }
+    }    
 
     GET_UNIFORM_AND_CHECK(LightWVPLoc, "gLightWVP");
     GET_UNIFORM_AND_CHECK(HasNormalMapLoc, "gHasNormalMap");
@@ -91,7 +91,11 @@ bool ForwardLightingTechnique::InitUniforms()
   //  GET_UNIFORM_AND_CHECK(ReflectionFactorLoc, "gReflectionFactor");
     GET_UNIFORM_AND_CHECK(MaterialToRefRefractFactorLoc, "gMatToRefRefractFactor");
     GET_UNIFORM_AND_CHECK(ETALoc, "gETA");
-    GET_UNIFORM_AND_CHECK(FresnelPowerLoc, "gFresnelPower");
+    GET_UNIFORM_AND_CHECK(FresnelPowerLoc, "gFresnelPower");    
+
+    GET_UNIFORM(gCubemapTexture);
+    GET_UNIFORM(gIsCubemapping);
+    GET_UNIFORM(gCubeMipmapLevel);
 
     if (samplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
@@ -206,6 +210,12 @@ void ForwardLightingTechnique::SetShadowMapOffsetTextureParams(float TextureSize
 void ForwardLightingTechnique::SetSpecularExponentTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(samplerSpecularExponentLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetCubeMapTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_gCubemapTextureLoc, TextureUnit);
 }
 
 
@@ -396,4 +406,20 @@ void ForwardLightingTechnique::SetRefractETA(float eta)
 void ForwardLightingTechnique::SetFresnelPower(float f)
 {
     glUniform1f(FresnelPowerLoc, f);
+}
+
+
+void ForwardLightingTechnique::ControlCubemapping(bool IsEnabled)
+{
+    if (IsEnabled) {
+        glUniform1i(m_gIsCubemappingLoc, 1);
+    } else {
+        glUniform1i(m_gIsCubemappingLoc, 0);
+    }
+}
+
+
+void ForwardLightingTechnique::SetCubeMipmapLevel(int Level)
+{
+    glUniform1i(m_gCubeMipmapLevelLoc, Level);
 }

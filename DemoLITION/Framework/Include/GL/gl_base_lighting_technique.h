@@ -42,6 +42,8 @@ public:
     virtual void SetFresnelPower(float f) {}
     virtual void SetLightWVP(const Matrix4f& LightWVP) {} // required only for shadow mapping
     virtual void ControlNormalMap(bool Enable) {};
+    virtual void ControlCubemapping(bool Enable) {};
+    virtual void SetCubeMipmapLevel(int Level) {};
 
     void SetWVP(const Matrix4f& WVP);
     void SetWorldMatrix(const Matrix4f& WVP);

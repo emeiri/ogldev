@@ -21,9 +21,6 @@
 #include "technique.h"
 #include "ogldev_math_3d.h"
 #include "Int/core_material.h"
-#include "ogldev_world_transform.h"
-#include "demolition_lights.h"
-#include "Int/core_model.h"
 #include "GL/gl_base_lighting_technique.h"
 
 class ForwardLightingTechnique : public BaseLightingTechnique
@@ -45,6 +42,8 @@ public:
     virtual void SetFresnelPower(float f);
     virtual void SetLightWVP(const Matrix4f& LightWVP); // required only for shadow mapping
     virtual void ControlNormalMap(bool Enable);
+    virtual void ControlCubemapping(bool IsEnabled);
+    virtual void SetCubeMipmapLevel(int Level);
 
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -56,6 +55,7 @@ public:
     void SetSpecularExponentTextureUnit(unsigned int TextureUnit);
     void SetNormalMapTextureUnit(unsigned int TextureUnit);
     void SetHeightMapTextureUnit(unsigned int TextureUnit);
+    void SetCubeMapTextureUnit(unsigned int TextureUnit);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
     void SetLinearFog(float FogStart, float FogEnd);
@@ -64,7 +64,7 @@ public:
     void SetLayeredFog(float FogTop, float FogEnd);
     void SetFogColor(const Vector3f& FogColor);
     void SetAnimatedFog(float FogEnd, float FogDensity);
-    void SetFogTime(float Time);
+    void SetFogTime(float Time);    
 
 protected:
 
@@ -109,6 +109,9 @@ private:
     GLuint MaterialToRefRefractFactorLoc = INVALID_UNIFORM_LOCATION;
     GLuint ETALoc = INVALID_UNIFORM_LOCATION;
     GLuint FresnelPowerLoc = INVALID_UNIFORM_LOCATION;
+    DEF_LOC(gCubemapTexture);
+    DEF_LOC(gIsCubemapping);
+    DEF_LOC(gCubeMipmapLevel);
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;
