@@ -81,7 +81,7 @@ public:
         m_pSphere2->SetPosition(0.0f, 1.0f, 5.0);
         m_pScene->AddToRenderList(m_pSphere2);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 1.0f, 1.0f), Vector3f(0.0f, -0.9f, 0.3f));
+        m_pScene->SetCamera(Vector3f(0.0f, 8.0f, -4.5f), Vector3f(0.0f, -0.4f, 1.0f));
 
         m_physicsSystem.Init(100, 0, PhysicsUpdateListener, glm::vec3(0.0f));
 
