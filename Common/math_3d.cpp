@@ -160,6 +160,7 @@ void Matrix4f::InitRotateTransformZYX(float RotateX, float RotateY, float Rotate
 
 void Matrix4f::InitRotateTransform(const Vector3f& Rotate)
 {
+   // Rotate.Print();
     InitRotateTransform(Rotate.x, Rotate.y, Rotate.z);
 }
 

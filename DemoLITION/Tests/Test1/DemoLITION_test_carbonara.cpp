@@ -41,8 +41,8 @@
 
 #define NUM_PSOs 1000
 
-// TODO: code duplication with ogldev_imgui.cpp in vulkan. need to share.
-bool IsMouseControlledByImGUI()
+// TODO: code duplication with ogldev_imgui.cpp in vulkan and gl_rendering_system. need to share.
+static bool IsMouseControlledByImGUI()
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -444,8 +444,6 @@ public:
 
     bool OnMouseButton(int Button, int Action, int Mode, int x, int y)
     {
-        bool HandledByMe = true;
-
         switch (Button) {
         case GLFW_MOUSE_BUTTON_LEFT:
             m_leftMousePressed = (Action == GLFW_PRESS);
@@ -455,9 +453,6 @@ public:
             m_midMousePressed = (Action == GLFW_PRESS);
             m_pScene->GetConfig()->ControlPicking(m_midMousePressed);
             break;
-
-        default:
-            HandledByMe = false;
         }
 
         return false;
