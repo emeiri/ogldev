@@ -549,18 +549,63 @@ public:
 
     void InitChild()
     {
-        m_pScene->SetCamera(Vector3f(0.0f, 0.25f, -0.4f), Vector3f(0.0, -0.4f, 1.0f));
-       // PhysicsSceneObject CObject = LoadAndAddModel("../Content/ThrillerPart3.fbx", false, 0.01f);
-        PhysicsSceneObject CObject = LoadAndAddModel("../Content/iclone-7-raptoid-mascot/scene.gltf", false, 0.01f);
-        CObject.pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
-		
-        //PhysicsSceneObject CObject = LoadAndAddModel("../Content/Jump/Jump.dae", false, 1.0f);
-        //CObject.pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
-
-        CObject.pSceneObject->SetPosition(0.0f, 0.5f, 0.0f);
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
+
+        m_pScene->SetCamera(Vector3f(0.0f, 4.0f, 0.0f), Vector3f(0.0, -0.4f, 1.0f));
+       // PhysicsSceneObject CObject = LoadAndAddModel("../Content/ThrillerPart3.fbx", false, 0.01f);
+       // PhysicsSceneObject CObject = LoadAndAddModel("../Content/iclone-7-raptoid-mascot/scene.gltf", false, 0.01f);
+      //  CObject.pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
+		
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/Mixamo/Running/Running.dae");
+      // m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+        m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+      //  m_pSceneObject->SetScale(0.1f);
+     //   m_pSceneObject->SetRotation(0.0f, 180.0f, 0.0f);
+        m_pSceneObject->SetPosition(0.0f, 0.0f, 10.0f);
+
+        m_pScene->AddToRenderList(m_pSceneObject);
     }
+
+
+    bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = true;
+
+        switch (key) {
+        case GLFW_KEY_LEFT:  
+            m_pSceneObject->RotateBy(0.0f, 4.0f, 0.0f);
+            break;
+
+        case GLFW_KEY_RIGHT:
+            m_pSceneObject->RotateBy(0.0f, -4.0f, 0.0f);
+            break;
+
+        case GLFW_KEY_UP:
+            {
+            Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+            m_pSceneObject->TranslateBy(ForwardDir * 0.4f);
+            }
+            break;
+
+        case GLFW_KEY_DOWN:
+            {
+            Vector3f BackwardDir = m_pSceneObject->GetForwardDir() * -1.0f;
+            m_pSceneObject->TranslateBy(BackwardDir * 0.4f);
+            }
+            break;
+
+        default:
+            HandledByMe = false;
+        }
+
+        return HandledByMe;
+    }
+
+private:
+
+    Model* m_pModel = NULL;
+    SceneObject* m_pSceneObject = NULL;
 };
 
 
