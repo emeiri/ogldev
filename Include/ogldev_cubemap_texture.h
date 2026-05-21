@@ -32,6 +32,11 @@ public:
     virtual void Load() = 0;
 
     virtual void Bind(GLenum TextureUnit) = 0;
+
+    int GetMipmapLevels() const { return m_mipmapLevels; }
+
+protected:
+    int m_mipmapLevels = 0;
 };
 
 

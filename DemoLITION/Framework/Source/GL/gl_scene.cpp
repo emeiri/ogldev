@@ -38,3 +38,15 @@ void GLScene::LoadSkybox(const char* pFilename)
     m_pSkyboxTex->Load();
 }
 
+
+int GLScene::GetSkyboxMipmapLevels() const
+{
+    int MipmapLevels = 1;
+
+    if (m_pSkyboxTex) {
+        MipmapLevels = m_pSkyboxTex->GetMipmapLevels();
+    }
+
+    return MipmapLevels;
+}
+

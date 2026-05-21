@@ -35,6 +35,8 @@ public:
 
     BaseCubmapTexture* GetSkyboxTex() const { return m_pSkyboxTex; }
 
+    virtual int GetSkyboxMipmapLevels() const;
+
 private:
     BaseCubmapTexture* m_pSkyboxTex = NULL;
 };

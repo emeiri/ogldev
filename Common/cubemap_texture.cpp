@@ -196,11 +196,11 @@ void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
 
     int Width = Cubemap[0].w_;
     int Height = Cubemap[0].h_;
-    int MipMapLevels = 1 + std::floor(std::log2(std::max(Width, Height)));
+    m_mipmapLevels = 1 + (int)std::floor(std::log2(std::max(Width, Height)));
 
-    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, MipMapLevels - 1);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, m_mipmapLevels - 1);
 
-    glTextureStorage2D(m_textureObj, MipMapLevels, GL_RGB32F, Width, Height);
+    glTextureStorage2D(m_textureObj, m_mipmapLevels, GL_RGB32F, Width, Height);
 
     for (int i = 0; i < CUBEMAP_NUM_FACES; i++) {
         const void* pSrc = Cubemap[i].data_.data();

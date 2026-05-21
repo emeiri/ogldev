@@ -115,6 +115,9 @@ public:
     SceneConfig* GetConfig() { return &m_config; }
 
 protected:
+
+    virtual int GetSkyboxMipmapLevels() const { return 1; };
+
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;
 
