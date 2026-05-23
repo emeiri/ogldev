@@ -21,8 +21,7 @@
 
 #include <list>
 
-#include "demolition_scene.h"
-#include "demolition_object.h"
+#include "demolition.h"
 #include "Int/core_model.h"
 
 
@@ -62,12 +61,6 @@ private:
 
 class CoreRenderingSystem;
 
-/*class CoreSceneConfig : public SceneConfig()
-{
-public:
-    CoreSceneConfig() {}
-}*/
-
 class CoreScene : public Scene, public Object {
 public:
     CoreScene(CoreRenderingSystem* pRenderingSystem);
@@ -83,6 +76,10 @@ public:
     virtual std::list<SceneObject*> GetSceneObjectsList();
 
     virtual void ShowSceneGUI();
+
+    virtual const InputState& GetInputState() { return m_inputState; }
+
+    virtual InputState& GetInputStateInternal() { return m_inputState; }
 
     const std::vector<PointLight>& GetPointLights();
 
@@ -112,7 +109,7 @@ public:
 
     SceneObject* GetPickedSceneObject() const { return m_pPickedSceneObject; }
 
-    SceneConfig* GetConfig() { return &m_config; }
+    SceneConfig* GetConfig() { return &m_config; }    
 
 protected:
 
@@ -120,6 +117,7 @@ protected:
 
     CoreRenderingSystem* m_pCoreRenderingSystem = NULL;
     std::list<CoreSceneObject*> m_renderList;
+    InputState m_inputState;
 
 private:
     void CreateDefaultCamera();

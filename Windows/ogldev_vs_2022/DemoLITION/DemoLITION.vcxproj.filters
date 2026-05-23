@@ -351,6 +351,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_blur_filter2_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_keys.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

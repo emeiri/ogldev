@@ -24,6 +24,7 @@
 #include "ogldev_glm_camera.h"
 #include "demolition_lights.h"
 #include "demolition_model.h"
+#include "demolition_keys.h"
 
 // Nobody needs more than 640k
 #define MAX_NUM_ROTATIONS 8
@@ -241,9 +242,15 @@ private:
 };
 
 
-struct CameraState {
-
+struct Key {
+    u64 Pressed = 0;
+    u64 Released = 0;
 };
+
+struct InputState {
+    Key Keys[KEY_LAST];
+};
+
 
 class Scene {
 public:
@@ -274,6 +281,8 @@ public:
     virtual void LoadSkybox(const char* pFilename) = 0;
 
     virtual void ShowSceneGUI() = 0;
+
+    virtual const InputState& GetInputState() = 0;
 
     std::vector<PointLight>& GetPointLights() { return m_pointLights; }
 

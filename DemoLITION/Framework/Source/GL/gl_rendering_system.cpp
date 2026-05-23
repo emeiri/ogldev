@@ -290,6 +290,22 @@ void RenderingSystemGL::InitCallbacks()
 
 void RenderingSystemGL::OnKeyCallback(GLFWwindow* pWindow, int key, int scancode, int action, int mods)
 {
+    if (m_pScene) {
+        if (action != GLFW_REPEAT) {
+          //  printf("key %d action %d\n", key, action);
+
+            InputState& is = m_pScene->GetInputStateInternal();
+
+            if (action == GLFW_RELEASE) {
+                is.Keys[key].Released = is.Keys[key].Pressed;
+            //    printf("released reset to %lld\n", is.Keys[key].Released);
+            } else {
+                is.Keys[key].Pressed++;
+           //     printf("pressed incremented to %lld\n", is.Keys[key].Pressed);
+            }
+        }
+    }
+
     bool HandledByGame = m_pGameCallbacks->OnKeyboard(key, action);
     bool HandledByCamera = false;
 

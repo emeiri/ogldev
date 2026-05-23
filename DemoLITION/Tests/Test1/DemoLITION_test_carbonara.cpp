@@ -581,17 +581,8 @@ public:
             m_pSceneObject->RotateBy(0.0f, -4.0f, 0.0f);
             break;
 
-        case GLFW_KEY_UP:
-            {
-            Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
-            m_pSceneObject->TranslateBy(ForwardDir * 0.4f);
-            }
-            break;
-
         case GLFW_KEY_DOWN:
             {
-            Vector3f BackwardDir = m_pSceneObject->GetForwardDir() * -1.0f;
-            m_pSceneObject->TranslateBy(BackwardDir * 0.4f);
             }
             break;
 
@@ -599,13 +590,50 @@ public:
             HandledByMe = false;
         }
 
+        if (!HandledByMe) {
+            HandledByMe = Carbonara::OnKeyboard(key, action);
+        }
+
         return HandledByMe;
+    }
+
+protected:
+
+    virtual void OnFrameChild(double dt)
+    {
+        printf("%f\n", dt);
+
+        const InputState& is = m_pScene->GetInputState();
+
+        if (is.Keys[KEY_UP].Pressed > is.Keys[KEY_UP].Released) {
+            Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+            m_pSceneObject->TranslateBy(ForwardDir * m_speed * (float)dt);
+           // printf("move forward\n");
+            //m_oldUpPressed = m_pScene->GetInputState().Keys[KEY_UP].Pressed;
+        } //else printf("stop\n");
+
+                
+        if (is.Keys[KEY_DOWN].Pressed > is.Keys[KEY_DOWN].Released) {
+            Vector3f BackwardDir = m_pSceneObject->GetForwardDir() * -1.0f;
+            m_pSceneObject->TranslateBy(BackwardDir * m_speed * (float)dt);
+            //  m_oldDownPressed = m_pScene->GetInputState().Keys[KEY_DOWN].Pressed;
+        }
+        
+        m_pScene->GetCurrentCamera()->SetAbsTarget(m_pSceneObject->GetGLMPos());
+        Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+        Vector3f ModelPos = m_pSceneObject->GetPosition();
+        Vector3f CameraPos = ModelPos - ForwardDir * 10.0f;
+        CameraPos.y = ModelPos.y + 5.0f;
+        m_pScene->GetCurrentCamera()->SetPos(CameraPos);
     }
 
 private:
 
     Model* m_pModel = NULL;
     SceneObject* m_pSceneObject = NULL;
+    float m_speed = 3.0f;
+    u64 m_oldUpPressed = 0;
+    u64 m_oldDownPressed = 0;
 };
 
 

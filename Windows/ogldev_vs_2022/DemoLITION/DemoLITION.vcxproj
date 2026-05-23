@@ -180,6 +180,7 @@
     <ClInclude Include="..\..\..\Common\3rdparty\ImGui\imGuIZMO.quat\vgMath.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_base_gl_app.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_keys.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_lights.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_object.h" />
