@@ -196,6 +196,7 @@ void CubemapEctTexture::LoadCubemapData(const std::vector<Bitmap>& Cubemap)
 
     int Width = Cubemap[0].w_;
     int Height = Cubemap[0].h_;
+
     m_mipmapLevels = 1 + (int)std::floor(std::log2(std::max(Width, Height)));
 
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, m_mipmapLevels - 1);

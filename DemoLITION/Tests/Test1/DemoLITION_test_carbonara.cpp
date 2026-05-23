@@ -36,8 +36,8 @@
 //#include <glm/glm.hpp>
 //#include <glm/ext.hpp>
 
-#define WINDOW_WIDTH  1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH  2560
+#define WINDOW_HEIGHT 1440
 
 #define NUM_PSOs 1000
 
@@ -79,8 +79,8 @@ public:
       //  m_dirLight.WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_dirLight[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
         m_dirLight[0].WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight[0].DiffuseIntensity = 1.0f;
-        m_dirLight[0].AmbientIntensity = 0.0f;
+        m_dirLight[0].DiffuseIntensity = 0.8f;
+        m_dirLight[0].AmbientIntensity = 0.2f;
 
         m_dirLight[1].Color = Vector3f(1.0f, 0.0f, 0.0f);
         m_dirLight[1].WorldDirection = Vector3f(-1.0f, -1.0f, 0.0f);
@@ -126,7 +126,7 @@ public:
         m_pScene->SetCameraSpeed(0.1f);
 
       //  m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
-     //   m_pScene->GetDirLights().push_back(m_dirLight[0]);
+        m_pScene->GetDirLights().push_back(m_dirLight[0]);
         //m_pScene->GetPointLights().push_back(m_pointLight[0]);
         //m_pScene->GetPointLights().push_back(m_pointLight[1]);
         //m_pScene->GetSpotLights().push_back(m_spotLight);
@@ -1127,6 +1127,7 @@ public:
         m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
 
         m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pScene->GetConfig()->ControlShadowMapping(false);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -1240,12 +1241,12 @@ public:
 void carbonara()
 {
     //BallisticsDemo demo;
-    //FireworksDemo demo;
-   // AnimationDemo demo;
-    //BridgeDemo demo;
-    //AmazonBistroDemo demo;
-    //SkyboxDemo demo;
-    //GLTFPBRDemo demo;
+   // FireworksDemo demo;
+  //  AnimationDemo demo;
+  //  BridgeDemo demo;
+  // AmazonBistroDemo demo;
+  //  SkyboxDemo demo;
+  //  GLTFPBRDemo demo;
     //MeshConvertDemo demo;
     //HeliGame demo;
     //SSGIDemo demo;

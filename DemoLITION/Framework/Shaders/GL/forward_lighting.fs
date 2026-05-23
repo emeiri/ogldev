@@ -647,6 +647,12 @@ vec4 ApplyRefRefract(vec4 FinalColor, vec3 Normal)
     return FinalColor;
 }
 
+vec3 toGamma(vec3 _rgb)
+{
+    const float gamma = 2.2;
+    return pow(abs(_rgb), vec3(1.0/gamma) );
+}
+
 
 vec4 GetTexColor()
 {
