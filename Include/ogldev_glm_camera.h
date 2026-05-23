@@ -77,6 +77,8 @@ public:
 
 	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
 
+	void SetPos(const Vector3f& Pos) { m_cameraPos.x = Pos.x; m_cameraPos.y = Pos.y; m_cameraPos.z = Pos.z; }
+
 	void SetUp(const glm::vec3& Up) { m_up = Up; }
 
 	void SetTarget(const glm::vec3& Target);
