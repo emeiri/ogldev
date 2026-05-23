@@ -53,7 +53,7 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual void GetWindowSize(int& Width, int& Height) const { Width = m_windowWidth; Height = m_windowHeight; }
 
-    virtual long long GetElapsedTimeMillis() const { return m_elapsedTimeMillis; }
+    virtual double GetElapsedTime() const { return m_elapsedTime; }
 
     virtual GLMCameraFirstPerson* GetCurrentCamera() { return m_pCamera; }
 
@@ -77,7 +77,7 @@ class CoreRenderingSystem : public RenderingSystem
 
     virtual void SetCamera(GLMCameraFirstPerson* pCamera) = 0;
 
-    long long m_elapsedTimeMillis = 0;
+    double m_elapsedTime = 0;
     int m_windowWidth = 0;
     int m_windowHeight = 0;
     GLMCameraFirstPerson* m_pCamera = NULL;

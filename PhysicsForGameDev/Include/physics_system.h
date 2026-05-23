@@ -39,7 +39,7 @@ public:
 
     void SetListener(UpdateListener pUpdateListener) { m_pUpdateListener = pUpdateListener; }
 
-    void Update(int DeltaTimeMillis);
+    void Update(double DeltaTime);
 
 
     PointMass* AllocPointMass();

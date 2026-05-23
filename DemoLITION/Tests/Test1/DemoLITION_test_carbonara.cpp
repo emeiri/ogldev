@@ -190,9 +190,9 @@ public:
     }
 
 
-    void OnFrame(long long DeltaTimeMillis)
+    void OnFrame(double DeltaTime)
     {
-        OnFrameChild(DeltaTimeMillis);
+        OnFrameChild(DeltaTime);
 
         if (m_pScene->GetPointLights().size() > 0) {
             m_pScene->GetPointLights()[0].WorldPosition = Vector3f(sinf(m_count) * 10.0f, 1.0f, cosf(m_count) * 10.0f);
@@ -214,7 +214,7 @@ public:
             }
         }
 
-        m_physicsSystem.Update(DeltaTimeMillis);
+        m_physicsSystem.Update(DeltaTime);
 
         UpdateParticlePositions();
         
@@ -460,7 +460,7 @@ public:
 
 protected:
 
-    virtual void OnFrameChild(long long DeltaTimeMillis) {}
+    virtual void OnFrameChild(double DeltaTime) {}
 
     Scene* m_pScene = NULL;
     std::list<PhysicsSceneObject> m_sceneObjects;
@@ -714,7 +714,7 @@ public:
 
 protected:
 
-    virtual void OnFrameChild(long long DeltaTimeMillis)
+    virtual void OnFrameChild(double DeltaTime)
     {
         // Links from above
         for (int i = 0; i < NUM_SPHERES; i++) {
@@ -1003,9 +1003,9 @@ public:
         m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
     }
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     {
-        m_pSceneObject->RotateBy(0.0f, DeltaTimeMillis / 25.0f, 0.0f);
+        m_pSceneObject->RotateBy(0.0f, (float)DeltaTime / 25.0f, 0.0f);
     }
 
 private:
@@ -1162,9 +1162,9 @@ public:
         m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
     }
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     {
-        //m_pSceneObject->RotateBy(0.0f, DeltaTimeMillis / 25.0f, 0.0f);
+        //m_pSceneObject->RotateBy(0.0f, DeltaTime / 25.0f, 0.0f);
     }
 
 private:

@@ -127,7 +127,7 @@ public:
     }
 
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     { 
         if (m_pRigidBody->GetLinear().GetPos().y < -0.01f) {
            // printf("Initializing\n");
@@ -137,7 +137,7 @@ public:
                           RandomFloatRange(-40.0f, 40.0f)), m_forcePoint, GLM_DEFAULT_QUAT, m_pSceneObject);            
         } 
         
-        m_physicsSystem.Update((int)DeltaTimeMillis);
+        m_physicsSystem.Update(DeltaTime);
     }
 
 

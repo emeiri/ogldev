@@ -232,27 +232,27 @@ void RenderingSystemGL::Execute()
         return;
     }
 
-    long long StartTimeMillis = GetCurrentTimeMillis();
-    long long CurTimeMillis = StartTimeMillis;
-    long long PrevTimeMillis = CurTimeMillis;
+    double StartTime = glfwGetTime();
+    double CurTime = glfwGetTime();
+    double PrevTime = CurTime;
 
     // Skip a few frames to avoid instability with zero or too large delta time at the start of the application
     for (int i = 0; i < 3; i++) {
-        CurTimeMillis = GetCurrentTimeMillis();
+        CurTime = glfwGetTime();
         glfwSwapBuffers(m_pWindow);
         glfwPollEvents();
     }
 
     while (!glfwWindowShouldClose(m_pWindow)) {
-        PrevTimeMillis = CurTimeMillis;
-        CurTimeMillis = GetCurrentTimeMillis();
-        long long DeltaTimeMillis = CurTimeMillis - PrevTimeMillis;
-        long long TotalRuntimeMillis = CurTimeMillis - StartTimeMillis;
-       // printf("Total runtime %I64d delta %I64d\n", TotalRuntimeMillis, DeltaTimeMillis);
-        m_elapsedTimeMillis = CurTimeMillis - StartTimeMillis;
-        m_pCamera->Update((float)DeltaTimeMillis / 1000.0f);
+        PrevTime = CurTime;
+        CurTime = glfwGetTime();
+        double DeltaTime = CurTime - PrevTime;
+        double TotalRuntime = CurTime - StartTime;
+
+        m_elapsedTime = CurTime - StartTime;
+        m_pCamera->Update((float)DeltaTime);
         if (m_pScene) {
-            m_forwardRenderer.Render(m_pWindow, (GLScene*)m_pScene, m_pGameCallbacks, TotalRuntimeMillis, DeltaTimeMillis);
+            m_forwardRenderer.Render(m_pWindow, (GLScene*)m_pScene, m_pGameCallbacks, TotalRuntime, DeltaTime);
         } else {
             printf("Warning! no scene is set in the rendering subsystem\n");
         }

@@ -99,9 +99,9 @@ public:
     }
 
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     {  
-        m_physicsSystem.Update((int)DeltaTimeMillis);
+        m_physicsSystem.Update(DeltaTime);
 
         if ((m_pSphere1->GetPosition().x >= 10.0f) ||
             (m_pSphere1->GetPosition().z >= 40.0f)) {

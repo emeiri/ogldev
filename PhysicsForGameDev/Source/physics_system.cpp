@@ -31,21 +31,19 @@ void System::Init(int NumPointMasses, int NumRigidBodies, UpdateListener pUpdate
 }
 
 
-void System::Update(int DeltaTimeMillis)
+void System::Update(double DeltaTime)
 {
-    float DeltaTime = DeltaTimeMillis / 1000.f;
-
     if (DeltaTime > 0.1f) {
         DeltaTime = 0.1f;
     }
 
-    static float accumulator = 0.0f;
+    static double accumulator = 0.0;
     accumulator += DeltaTime;
 
     //printf("DeltaTime = %f\n", DeltaTime);
     const float FixedDT = 1.0f / 60.0f;
 
-    while (accumulator >= 1.0f/60.0f) {
+    while (accumulator >= 1.0/60.0) {
 
         ApplyGlobalForces();
 

@@ -397,7 +397,8 @@ LIGHTING_TECHNIQUE ForwardRenderer::GetLightingTech(GLScene* pScene, CoreModel* 
 }
 
 
-void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis)
+void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, 
+                             double TotalRuntime, double DeltaTime)
 {
     // TODO: can be removed? happens also at the start of the LightingPass
     if (pScene->IsClearFrame()) {
@@ -406,7 +407,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    pGameCallbacks->OnFrame(DeltaTimeMillis);
+    pGameCallbacks->OnFrame(DeltaTime);
 
     if (!m_pCurCamera) {
         printf("ForwardRenderer: camera not initialized\n");
@@ -425,20 +426,20 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
         pScene->GetConfig()->ControlPicking(false);
     }
 
-    ExecuteRenderGraph(pScene, TotalRuntimeMillis);
+    ExecuteRenderGraph(pScene, TotalRuntime);
 
     pGameCallbacks->OnFrameEnd();
 
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
 
-void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis)
+void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, double TotalRuntime)
 {
     PrePass(pScene);
 
     ShadowMapPass(pScene);
 
-    LightingPass(pScene, TotalRuntimeMillis);
+    LightingPass(pScene, TotalRuntime);
 
     PostProcessPass(pScene);
 };
@@ -853,7 +854,7 @@ void ForwardRenderer::NormalPass(GLScene* pScene)
 
 
 
-void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis)
+void ForwardRenderer::LightingPass(GLScene* pScene, double TotalRuntime)
 {
     LightingPassFBOSetup(pScene);
     
@@ -878,7 +879,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, long long TotalRuntimeMillis
         }
     }
 
-    RenderObjectList(pScene, TotalRuntimeMillis);
+    RenderObjectList(pScene, TotalRuntime);
 }
 
 
@@ -983,7 +984,7 @@ void ForwardRenderer::BindShadowMaps()
 }
 
 
-void ForwardRenderer::RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis)
+void ForwardRenderer::RenderObjectList(GLScene* pScene, double TotalRuntime)
 {
     bool FirstTimeForwardLighting = true;
 
@@ -993,15 +994,15 @@ void ForwardRenderer::RenderObjectList(GLScene* pScene, long long TotalRuntimeMi
         m_pcurSceneObject = *it;
 
         if (FirstTimeForwardLighting) {
-            StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
+            StartRenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntime);
             //  FirstTimeForwardLighting = false; TODO: currently disabled
         }
-        RenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntimeMillis);
+        RenderWithForwardLighting(pScene, m_pcurSceneObject, TotalRuntime);
     }
 }
 
 
-void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
+void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, double TotalRuntime)
 {
     LIGHTING_TECHNIQUE LightingTech = GetLightingTech(pScene, pSceneObject->GetModel());
 
@@ -1024,14 +1025,14 @@ void ForwardRenderer::StartRenderWithForwardLighting(GLScene* pScene, CoreSceneO
 }
 
 
-void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis)
+void ForwardRenderer::RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, double TotalRuntime)
 {
     LIGHTING_TECHNIQUE LightingTech = GetLightingTech(pScene, pSceneObject->GetModel());
 
     SwitchToLightingTech(LightingTech);
 
     if (pSceneObject->GetModel()->IsAnimated()) {
-        float AnimationTimeSec = (float)TotalRuntimeMillis / 1000.0f;
+        float AnimationTimeSec = (float)TotalRuntime;
         int AnimationIndex = 0;
         vector<Matrix4f> Transforms;
         pSceneObject->GetModel()->GetBoneTransforms(AnimationTimeSec, Transforms, AnimationIndex);

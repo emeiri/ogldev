@@ -105,11 +105,11 @@ public:
     }
 
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     {  
         m_pRigidBody->AddForce(glm::vec3(0.0f, -9.81f, 0.0f));
 
-        m_physicsSystem.Update((int)DeltaTimeMillis);
+        m_physicsSystem.Update(DeltaTime);
       
   	    if (reset) {
             reset = false;

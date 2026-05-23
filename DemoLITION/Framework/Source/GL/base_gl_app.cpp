@@ -45,9 +45,9 @@ void BaseGLApp::InitGUI()
 
 
 
-void BaseGLApp::OnFrame(long long DeltaTimeMillis)
+void BaseGLApp::OnFrame(double DeltaTime)
 {
-    OnFrameChild(DeltaTimeMillis);
+    OnFrameChild(DeltaTime);
 }
 
 

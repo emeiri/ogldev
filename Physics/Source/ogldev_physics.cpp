@@ -71,11 +71,11 @@ Firework* PhysicsSystem::AllocFirework()
 }
 
 
-void PhysicsSystem::Update(long long DeltaTimeMillis)
+void PhysicsSystem::Update(double DeltaTime)
 {
-    assert(DeltaTimeMillis >= 0.0f);
+    assert(DeltaTime >= 0.0f);
 
-    float dt = (float)DeltaTimeMillis / 1000.0f;
+    float dt = (float)DeltaTime;
 
     StartFrame();
 

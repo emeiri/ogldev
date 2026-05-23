@@ -120,7 +120,8 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
         m_pCurCamera = pCamera; 
     }
 
-    void Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, long long TotalRuntimeMillis, long long DeltaTimeMillis);
+    void Render(void* pWindow, GLScene* pScene, GameCallbacks* pGameCallbacks, 
+                double TotalRuntime, double DeltaTime);
 
     //
     // Implementation of DemolitionRenderCallbacks interface
@@ -138,7 +139,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 private:
 
     void HandleEmptyRenderList(GLScene* pScene);
-    void ExecuteRenderGraph(GLScene* pScene, long long TotalRuntimeMillis);
+    void ExecuteRenderGraph(GLScene* pScene, double TotalRuntime);
     void PickingPass(void* pWindow, GLScene* pScene);
     void PickingRenderScene(GLScene* pScene);
     int GetPickedObjectIndex(void* pWindow, GLScene* pScene);
@@ -150,7 +151,7 @@ private:
     void ShadowMapPassDirAndSpot(const std::list<CoreSceneObject*>& RenderList);
     void PostProcessPass(GLScene* pScene);
     void NormalPass(GLScene* pScene);
-    void LightingPass(GLScene* pScene, long long TotalRuntimeMillis);
+    void LightingPass(GLScene* pScene, double TotalRuntime);
     void LightingPassFBOSetup(GLScene* pScene);
     void HDRPassGPU(float& AvgLogLum, float& Exposure);
     void HDRPassCPU(float& AvgLogLum, float& Exposure);
@@ -166,9 +167,9 @@ private:
     void SSGIPass(GLScene* pScene);
     void FullScreenQuadBlit(GLScene* pScene);
     void BindShadowMaps();
-    void RenderObjectList(GLScene* pScene, long long TotalRuntimeMillis);
-    void RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
-    void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, long long TotalRuntimeMillis);
+    void RenderObjectList(GLScene* pScene, double TotalRuntime);
+    void RenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, double TotalRuntime);
+    void StartRenderWithForwardLighting(GLScene* pScene, CoreSceneObject* pSceneObject, double TotalRuntime);
     void RenderInfiniteGrid(GLScene* pScene);
     void GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP);
     void SwitchToLightingTech(LIGHTING_TECHNIQUE Tech);

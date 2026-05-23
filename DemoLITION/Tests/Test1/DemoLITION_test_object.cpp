@@ -59,7 +59,7 @@ public:
         m_pRenderingSystem->Execute();
     }
 
-    void OnFrame(long long DeltaTimeMillis)
+    void OnFrame(double DeltaTime)
     {
         m_counter += 0.1f;
 

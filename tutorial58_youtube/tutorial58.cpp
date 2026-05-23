@@ -74,7 +74,7 @@ public:
     }
 
 
-    void OnFrame(long long DeltaTimeMillis)
+    void OnFrame(double DeltaTime)
     {        
         //  if (m_pScene->GetDirLights().size() > 0) {
         //      m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));

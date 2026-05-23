@@ -86,7 +86,7 @@ public:
     }
 
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     {        
         m_pSceneObject->RotateBy(0.0f, 0.0f, 0.5f);
     }

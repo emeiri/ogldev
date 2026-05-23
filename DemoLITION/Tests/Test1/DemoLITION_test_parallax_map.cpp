@@ -96,9 +96,9 @@ public:
     }
 
 
-    void OnFrame(long long DeltaTimeMillis)
+    void OnFrame(double DeltaTime)
     {
-        BaseGLApp::OnFrame(DeltaTimeMillis);
+        BaseGLApp::OnFrame(DeltaTime);
       //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;
         m_pSceneObject->ResetRotations();

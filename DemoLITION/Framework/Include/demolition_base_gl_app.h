@@ -36,7 +36,7 @@ public:
 
     ~BaseGLApp() {}
 
-    virtual void OnFrame(long long DeltaTimeMillis);
+    virtual void OnFrame(double DeltaTime);
 
     virtual void OnFrameEnd();
 
@@ -48,7 +48,7 @@ public:
 
 protected:
 
-    virtual void OnFrameChild(long long DeltaTimeMillis) {};
+    virtual void OnFrameChild(double DeltaTime) {};
 
     virtual void OnFrameGUI();
 

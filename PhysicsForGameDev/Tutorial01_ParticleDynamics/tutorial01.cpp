@@ -112,15 +112,15 @@ public:
     }
 
 
-    void OnFrameChild(long long DeltaTimeMillis)
+    void OnFrameChild(double DeltaTime)
     {  
-        m_physicsSystem.Update((int)DeltaTimeMillis);
+        m_physicsSystem.Update(DeltaTime);
 
         if (glm::length(m_pPointMass2->GetLinearVelocity()) > 1.0f) {
           //  m_pPointMass2->ResetSumForces();
         }
       //  m_pCarSceneObject1->RotateBy(0.0f, 0.5f, 0.0f);
-      //  m_pCarSceneObject1->TranslateBy(-0.7f * (float)DeltaTimeMillis/1000.0f, 0.0f, 0.0f);
+      //  m_pCarSceneObject1->TranslateBy(-0.7f * (float)DeltaTime, 0.0f, 0.0f);
         m_frameCount++;
     }
 

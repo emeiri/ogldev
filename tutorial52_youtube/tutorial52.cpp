@@ -74,9 +74,9 @@ public:
     }
 
 
-    void OnFrame(long long DeltaTimeMillis)
+    void OnFrame(double DeltaTime)
     {
-        BaseGLApp::OnFrame(DeltaTimeMillis);      
+        BaseGLApp::OnFrame(DeltaTime);      
         m_count += 0.01f;
         m_pSceneObject->ResetRotations();
         m_pSceneObject->PushRotation(Vector3f(0.0f, m_count * 5.0f, 0.0f));

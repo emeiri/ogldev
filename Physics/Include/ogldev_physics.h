@@ -52,7 +52,7 @@ public:
 
     Firework* AllocFirework();
 
-    void Update(long long DeltaTimeMillis);
+    void Update(double DeltaTime);
 
     ForceRegistry& GetRegistry() { return m_forceRegistry; }    
 

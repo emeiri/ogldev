@@ -29,7 +29,7 @@ class GameCallbacks
 {
  public:
 
-    virtual void OnFrame(long long DeltaTimeMillis) {}
+    virtual void OnFrame(double DeltaTime) {}
 
     virtual void OnFrameEnd() {}
 
@@ -103,7 +103,7 @@ public:
 
     virtual void GetWindowSize(int& Width, int& Height) const = 0;
 
-    virtual long long GetElapsedTimeMillis() const = 0;
+    virtual double GetElapsedTime() const = 0;
 
     virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
 
