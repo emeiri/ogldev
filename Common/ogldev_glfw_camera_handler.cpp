@@ -69,5 +69,9 @@ bool GLFWCameraHandler(CameraMovement& Movement, int Key, int Action, int Mods)
         Movement.FastSpeed = Press;
     }
 
+    if (Mods & GLFW_MOD_CONTROL) {
+        Movement.Ctrl = Press;
+    }
+
     return Handled;
 }

@@ -183,10 +183,16 @@ glm::vec3 GLMCameraFirstPerson::CalcAcceleration()
 	glm::vec3 Acceleration = glm::vec3(0.0f);
 
 	if (m_movement.Forward) { 
+		if (m_movement.Ctrl) {
+			Forward.y = 0;
+		}
 		Acceleration += Forward; 
 	}
 
 	if (m_movement.Backward) { 
+		if (m_movement.Ctrl) {
+			Forward.y = 0;
+		}
 		Acceleration += -Forward; 
 	}
 

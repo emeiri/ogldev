@@ -28,6 +28,7 @@ struct CameraMovement {
     bool FastSpeed = false;
     bool Plus = false;
     bool Minus = false;
+    bool Ctrl = false;
 };
 
 
