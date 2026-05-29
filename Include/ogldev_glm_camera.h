@@ -75,6 +75,8 @@ public:
 
 	const PersProjInfo& GetPersProjInfo() const { return m_persProjInfo; }
 
+	const glm::vec3& GetVelocity() const { return m_velocity; }
+
 	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
 
 	void SetPos(const Vector3f& Pos) { m_cameraPos.x = Pos.x; m_cameraPos.y = Pos.y; m_cameraPos.z = Pos.z; }
