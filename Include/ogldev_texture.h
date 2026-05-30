@@ -24,6 +24,10 @@
 #include <GL/glew.h>
 #include "gli/gli.hpp"
 
+struct GLTextureConfig {
+    GLenum m_wrapMode = GL_REPEAT;
+};
+
 
 class BaseTexture
 {
@@ -34,13 +38,13 @@ protected:
     GLuint m_textureObj = 0;
 
     bool m_isKTX = false;
-    gli::gl::format m_ktxFormat;
+    gli::gl::format m_ktxFormat;    
 };
 
 class Texture : public BaseTexture
 {
 public:
-    Texture(GLenum TextureTarget, const std::string& FileName);
+    Texture(GLenum TextureTarget, const std::string& FileName, GLTextureConfig* pConfig = NULL);
 
     Texture(GLenum TextureTarget);
 
@@ -81,6 +85,7 @@ private:
     int m_imageWidth = 0;
     int m_imageHeight = 0;
     int m_imageBPP = 0;
+    GLenum m_wrapMode = GL_REPEAT;
 };
 
 

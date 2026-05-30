@@ -34,10 +34,14 @@ static int GetNumMipMapLevels2D(int w, int h)
 }
 
 
-Texture::Texture(GLenum TextureTarget, const std::string& FileName)
+Texture::Texture(GLenum TextureTarget, const std::string& FileName, GLTextureConfig* pConfig)
 {
     m_textureTarget = TextureTarget;
     m_fileName      = FileName;
+
+    if (pConfig) {
+        m_wrapMode = pConfig->m_wrapMode;
+    }
 }
 
 
@@ -169,9 +173,9 @@ void Texture::LoadInternalNonDSA(const void* pImageData, bool IsSRGB)
     glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(m_textureTarget, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    //glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, m_wrapMode);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, m_wrapMode);
+    //glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_R, m_wrapMode);
 
     glGenerateMipmap(m_textureTarget);
 
@@ -234,8 +238,8 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, Levels - 1);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_wrapMode);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_wrapMode);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, 16);
 
     glGenerateTextureMipmap(m_textureObj);
@@ -261,8 +265,8 @@ void Texture::LoadF32(int Width, int Height, const float* pImageData)
     glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameterf(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_wrapMode);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_wrapMode);
 }
 
 

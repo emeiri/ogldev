@@ -58,6 +58,20 @@ enum RENDERING_SYSTEM {
 };
 
 
+enum TEXTURE_WRAP_MODE {
+    WRAP_MODE_CLAMP_TO_EDGE,
+    WRAP_MODE_MIRRORED_REPEAT, 
+    WRAP_MODE_REPEAT, 
+    WRAP_MODE_CLAMP_TO_BORDER,
+    NUM_WRAP_MODE
+};
+
+
+struct TextureConfig {
+    TEXTURE_WRAP_MODE m_wrapMode = WRAP_MODE_REPEAT;
+};
+
+
 class RenderingSystem
 {
 public:
@@ -97,7 +111,7 @@ public:
 
     virtual Grid* CreateGrid(int Width, int Depth) = 0;
 
-    virtual int LoadTexture2D(const std::string& Filename) = 0;
+    virtual int LoadTexture2D(const std::string& Filename, TextureConfig* pConfig = NULL) = 0;
 
     virtual int LoadCubemapTexture(const std::string& Filename) = 0;
 

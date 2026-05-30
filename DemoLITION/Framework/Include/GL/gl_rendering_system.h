@@ -47,7 +47,7 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual Grid* CreateGridInternal(int Width, int Depth);
 
-    virtual int LoadTexture2D(const std::string& Filename);
+    virtual int LoadTexture2D(const std::string& Filename, TextureConfig* pConfig);
 
     virtual int LoadCubemapTexture(const std::string& Filename);
 

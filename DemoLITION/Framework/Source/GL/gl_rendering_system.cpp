@@ -33,6 +33,14 @@
 
 extern CoreRenderingSystem* g_pRenderingSystem;
 
+static GLenum WrapModeToGLWrapMode[NUM_WRAP_MODE] = {
+    GL_CLAMP_TO_EDGE,
+    GL_MIRRORED_REPEAT,
+    GL_REPEAT,
+    GL_CLAMP_TO_BORDER
+};
+
+
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     ((RenderingSystemGL*)g_pRenderingSystem)->OnKeyCallback(window, key, scancode, action, mods);
@@ -141,14 +149,20 @@ Grid* RenderingSystemGL::CreateGridInternal(int Width, int Depth)
 }
 
 
-int RenderingSystemGL::LoadTexture2D(const std::string& Filename)
+int RenderingSystemGL::LoadTexture2D(const std::string& Filename, TextureConfig* pConfig)
 {
     if (m_numTextures == m_textures.size()) {
         printf("%s:%d: out of texture space\n", __FILE__, __LINE__);
         exit(0);
     }
 
-    Texture* pTexture = new Texture(GL_TEXTURE_2D, Filename);
+    GLTextureConfig TexConfig;
+
+    if (pConfig) {
+        TexConfig.m_wrapMode = WrapModeToGLWrapMode[pConfig->m_wrapMode];
+    }
+
+    Texture* pTexture = new Texture(GL_TEXTURE_2D, Filename, &TexConfig);
     pTexture->Load();
 
     m_textures[m_numTextures] = pTexture;
