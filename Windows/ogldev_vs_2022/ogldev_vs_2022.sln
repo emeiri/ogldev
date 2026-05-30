@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32319.34
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11819.183 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial01_Window", "Tutorial01\Tutorial01.vcxproj", "{0FD6DB85-049D-4E43-8F50-369A91E5DB31}"
 EndProject
@@ -622,6 +622,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30", "Vulkan\Tutori
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial67_ProjectedTexture", "Tutorial67_ProjectedTexture\Tutorial67.vcxproj", "{5B778195-1371-480E-BB0A-44791994AB2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1663,6 +1665,14 @@ Global
 		{5F1B0F44-AEFC-44CE-9D4F-1647F739DDFB}.Release|x64.Build.0 = Release|x64
 		{5F1B0F44-AEFC-44CE-9D4F-1647F739DDFB}.Release|x86.ActiveCfg = Release|Win32
 		{5F1B0F44-AEFC-44CE-9D4F-1647F739DDFB}.Release|x86.Build.0 = Release|Win32
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Debug|x64.ActiveCfg = Debug|x64
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Debug|x64.Build.0 = Debug|x64
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Debug|x86.ActiveCfg = Debug|Win32
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Debug|x86.Build.0 = Debug|Win32
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Release|x64.ActiveCfg = Release|x64
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Release|x64.Build.0 = Release|x64
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Release|x86.ActiveCfg = Release|Win32
+		{5B778195-1371-480E-BB0A-44791994AB2A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1806,6 +1816,7 @@ Global
 		{CAD892C0-03B1-4484-B9B5-47D0F6A6F1CC} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 		{533D37A9-F5EB-4C59-A360-CFFE9E38CB28} = {BC4CFCB8-1DAA-4728-9F58-2F9C67CD7A63}
 		{5F1B0F44-AEFC-44CE-9D4F-1647F739DDFB} = {149FCEB8-0F84-4480-984E-334A6B2C5A81}
+		{5B778195-1371-480E-BB0A-44791994AB2A} = {AA79194F-A6EF-4133-A624-C4CE94275552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690F8FBC-BD4E-482C-BBD9-5CB7D2D801AC}
