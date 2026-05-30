@@ -1066,7 +1066,6 @@ void CoreModel::InitSingleCamera(int Index, const aiScene* pScene)
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, pCamera->mName.C_Str(), Transformation);
 
-
     aiMatrix4x4 aiCameraMatrix;
     pCamera->GetCameraMatrix(aiCameraMatrix);
     Matrix4f CameraMatrix(aiCameraMatrix);
@@ -1215,7 +1214,19 @@ void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light
     Vector4f Dir4D(Direction, 0.0f);
     Dir4D = Transformation * Dir4D;
     l.WorldDirection = Dir4D;
-    printf("Final direction: "); l.WorldDirection.Print();
+    printf("Transformed direction: "); l.WorldDirection.Print();
+
+    // Extract the components directly from your row-major matrix layout
+// to bypass Blender's embedded glTF offset rotation
+    Vector3f TrueDirection;
+    TrueDirection.x = Transformation.m[0][2];
+    TrueDirection.y = Transformation.m[1][2];
+    TrueDirection.z = Transformation.m[2][2];
+
+    // Normalize to preserve clean calculations for your lighting equations
+    l.WorldDirection = TrueDirection.Normalize();
+
+    printf("Adjusted World Direction: "); l.WorldDirection.Print();
 
     Vector3f Up = VectorFromAssimpVector(light.mUp);
     printf("Original up: "); Up.Print();
