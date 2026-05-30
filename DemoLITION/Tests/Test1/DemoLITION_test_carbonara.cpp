@@ -541,11 +541,56 @@ public:
 };
 
 
+class AccelorObject
+{
+public:
+
+    AccelorObject(float MaxSpeed, float Acceleration, float Deceleration)
+    {
+        m_maxSpeed = MaxSpeed;
+        m_acceleration = Acceleration;
+        m_deceleration = Deceleration;
+    }
+
+
+    float Update(bool IsMoving, float dt)
+    {
+        if (IsMoving) {
+            // Accelerate gradually up to max speed
+            m_currentSpeed += m_acceleration * dt;
+            if (m_currentSpeed > m_maxSpeed) {
+                m_currentSpeed = m_maxSpeed;
+            }
+        } else {
+            // Decelerate gradually down to zero
+            m_currentSpeed -= m_deceleration * dt;
+            if (m_currentSpeed < 0.0f) {
+                m_currentSpeed = 0.0f;
+            }
+        }
+
+        return m_currentSpeed * dt;
+    }
+
+    float GetCurrentSpeed() const { return m_currentSpeed; }
+
+    void SetMaxSpeed(float MaxSpeed) { m_maxSpeed = MaxSpeed; }
+    void SetAcceleration(float Acceleration) { m_acceleration = Acceleration; }
+    void SetDeceleration(float Deceleration) { m_deceleration = Deceleration; }
+
+private:
+
+    float m_currentSpeed = 0.0f;
+    float m_maxSpeed = 6.0f;
+    float m_acceleration = 3.0f;
+    float m_deceleration = 5.0f;
+};
+
 class AnimationDemo : public Carbonara {
 
 public:
 
-    AnimationDemo() {}
+    AnimationDemo() : m_accelorObject(6.0f, 4.0f, 5.0f) {}
 
     void InitChild()
     {
@@ -570,29 +615,7 @@ public:
 
     bool OnKeyboard(int key, int action)
     {
-        bool HandledByMe = true;
-
-        switch (key) {
-        case GLFW_KEY_LEFT:  
-            m_pSceneObject->RotateBy(0.0f, 4.0f, 0.0f);
-            break;
-
-        case GLFW_KEY_RIGHT:
-            m_pSceneObject->RotateBy(0.0f, -4.0f, 0.0f);
-            break;
-
-        case GLFW_KEY_DOWN:
-            {
-            }
-            break;
-
-        default:
-            HandledByMe = false;
-        }
-
-        if (!HandledByMe) {
-            HandledByMe = Carbonara::OnKeyboard(key, action);
-        }
+        bool HandledByMe = Carbonara::OnKeyboard(key, action);
 
         return HandledByMe;
     }
@@ -601,39 +624,95 @@ protected:
 
     virtual void OnFrameChild(double dt)
     {
-        printf("%f\n", dt);
+       // printf("%f\n", dt);
 
         const InputState& is = m_pScene->GetInputState();
 
-        if (is.Keys[KEY_UP].Pressed > is.Keys[KEY_UP].Released) {
+        bool isMovingForward = (is.Keys[KEY_UP].Pressed > is.Keys[KEY_UP].Released);
+
+        float Speed = m_accelorObject.Update(isMovingForward, (float)dt);
+
+        // Move the character using the calculated current speed
+        if (Speed > 0.0f) {
+            Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
+            m_pSceneObject->TranslateBy(ForwardDir * Speed);
+        }
+
+
+      /*  if (is.Keys[KEY_UP].Pressed > is.Keys[KEY_UP].Released) {
             Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
             m_pSceneObject->TranslateBy(ForwardDir * m_speed * (float)dt);
            // printf("move forward\n");
             //m_oldUpPressed = m_pScene->GetInputState().Keys[KEY_UP].Pressed;
-        } //else printf("stop\n");
-
-                
+        } //else printf("stop\n");*/
+               
         if (is.Keys[KEY_DOWN].Pressed > is.Keys[KEY_DOWN].Released) {
             Vector3f BackwardDir = m_pSceneObject->GetForwardDir() * -1.0f;
-            m_pSceneObject->TranslateBy(BackwardDir * m_speed * (float)dt);
+         //   m_pSceneObject->TranslateBy(BackwardDir * m_speed * (float)dt);
             //  m_oldDownPressed = m_pScene->GetInputState().Keys[KEY_DOWN].Pressed;
         }
-        
-        m_pScene->GetCurrentCamera()->SetAbsTarget(m_pSceneObject->GetGLMPos());
+
+        if (is.Keys[KEY_LEFT].Pressed > is.Keys[KEY_LEFT].Released) {
+          //  Speed = std::min(Speed, 1.0f);
+            m_pSceneObject->RotateBy(0.0f, 2.0f * Speed, 0.0f);
+        }
+
+        if (is.Keys[KEY_RIGHT].Pressed > is.Keys[KEY_RIGHT].Released) {
+        //    Speed = std::min(Speed, 1.0f);
+            m_pSceneObject->RotateBy(0.0f, -2.0f * Speed, 0.0f);
+        }
+
+        GLMCameraFirstPerson* pCamera = m_pScene->GetCurrentCamera();
+        pCamera->SetAbsTarget(m_pSceneObject->GetGLMPos());
         Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
         Vector3f ModelPos = m_pSceneObject->GetPosition();
-        Vector3f CameraPos = ModelPos - ForwardDir * 10.0f;
-        CameraPos.y = ModelPos.y + 5.0f;
-        m_pScene->GetCurrentCamera()->SetPos(CameraPos);
+        Vector3f CameraPosCenter = ModelPos - ForwardDir * 10.0f;
+        CameraPosCenter.y = ModelPos.y + 5.0f;
+        pCamera->SetPos(CameraPosCenter);
+#if 0
+        static float x = 0.0f;
+        if (isMovingForward) {
+            m_curCameraPos = CameraPosCenter;
+        } else {
+            if (m_curCameraPos.IsZero()) {
+                m_curCameraPos = m_endCameraPos = CameraPosCenter;
+            } else {
+                float CurDistance = m_endCameraPos.Distance(m_curCameraPos);
+                printf("CurDistance %f\n", CurDistance);
+                if (CurDistance >= 10.0f) {
+                    m_curCameraPos = CameraPosCenter;
+                } else if (CurDistance < 0.001f) {
+                    float x = RandomFloatRange(-1.0f, 1.0f);
+                    float y = RandomFloatRange(-1.0f, 1.0f);
+                    float z = RandomFloatRange(-1.0f, 1.0f);
+                    Vector3f v(x, y, z);
+                    float SwayRange = RandomFloatRange(0.0f, 1.0f) * m_maxAmbientSwayRange;
+                    m_endCameraPos = CameraPosCenter + v.Normalize() * SwayRange;
+                    m_cameraTargetDistance = m_endCameraPos.Distance(m_curCameraPos);
+                } else {
+                    Vector3f Dir = (m_endCameraPos - m_curCameraPos).Normalize();
+                    m_curCameraPos += Dir * m_ambientSwaySpeed;
+                }
+            }
+        }
+
+//        m_curCameraPos.Print();
+        pCamera->SetPos(m_curCameraPos);
+#endif
     }
 
 private:
 
     Model* m_pModel = NULL;
     SceneObject* m_pSceneObject = NULL;
-    float m_speed = 3.0f;
+    AccelorObject m_accelorObject;
     u64 m_oldUpPressed = 0;
     u64 m_oldDownPressed = 0;
+    Vector3f m_curCameraPos = Vector3f(0.0f);
+    Vector3f m_endCameraPos = Vector3f(0.0f);
+    float m_cameraTargetDistance = 0.0f;
+    float m_maxAmbientSwayRange = 1.0f;
+    float m_ambientSwaySpeed = 0.004f;
 };
 
 
@@ -1242,7 +1321,7 @@ void carbonara()
 {
     //BallisticsDemo demo;
    // FireworksDemo demo;
-  //  AnimationDemo demo;
+    AnimationDemo demo;
   //  BridgeDemo demo;
   // AmazonBistroDemo demo;
   //  SkyboxDemo demo;
@@ -1250,7 +1329,7 @@ void carbonara()
     //MeshConvertDemo demo;
     //HeliGame demo;
     //SSGIDemo demo;
-    CubeMappingDemo demo;
+ //   CubeMappingDemo demo;
 
     demo.Start();
 }
