@@ -28,6 +28,7 @@ in vec4 LightSpacePos0;
 in vec3 Tangent0;
 in vec3 Bitangent0;
 in flat int MaterialIndex;
+in vec4 ProjectedTexCoord;
 
 out vec4 FragColor;
 
@@ -88,6 +89,7 @@ layout(binding = 3) uniform samplerCube gShadowCubeMap;  // required only for sh
 layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gNormalMap;
 layout(binding = 12) uniform samplerCube gCubemapTexture;
+layout(binding = 18) uniform sampler2D gProjectedTexture;
 uniform bool gHasNormalMap = false;
 uniform bool gHasHeightMap = false;
 uniform int gShadowMapWidth = 0;
@@ -745,6 +747,13 @@ void main()
     } else {
         float FogFactor = CalcFogFactor();
         TempColor = mix(vec4(gFogColor, 1.0), FragColor, FogFactor);
+    }
+
+    float projDepth = ProjectedTexCoord.z / ProjectedTexCoord.w;
+
+    if (ProjectedTexCoord.z > 0.0 && projDepth <= 1.0 ) {
+        vec4 projTexColor = textureProj(gProjectedTexture, ProjectedTexCoord);
+        TempColor += projTexColor * 0.5;
     }
 
     FragColor = TempColor;

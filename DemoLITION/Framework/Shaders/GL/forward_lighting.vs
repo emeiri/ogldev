@@ -70,6 +70,7 @@ out vec3 Tangent0;
 out vec3 Bitangent0;
 out flat int MaterialIndex;
 out vec4 Color0;
+out vec4 ProjectedTexCoord;
 
 
 uniform mat4 gWVP;
@@ -78,6 +79,7 @@ uniform mat4 gLightWVP;
 uniform mat4 gLightVP;
 uniform mat4 gWorld;
 uniform mat3 gNormalMatrix;
+uniform mat4 gProjectionMatrix;
 uniform bool gIsPVP = false;
 uniform bool gIsIndirectRender = false;
 
@@ -174,6 +176,7 @@ void main()
         WorldPos0 = (o[gl_DrawID].WorldMatrix * Pos4).xyz;
         LightSpacePos0 = (gLightVP * o[gl_DrawID].WorldMatrix * Pos4);
         MaterialIndex = o[gl_DrawID].MaterialIndex.x;
+        ProjectedTexCoord = gProjectionMatrix * o[gl_DrawID].WorldMatrix * Pos4;
     } else {
         gl_Position = gWVP * Pos4;
         Normal0 = gNormalMatrix * Normal_;
@@ -181,9 +184,10 @@ void main()
         Bitangent0 = gNormalMatrix * Bitangent_;
         WorldPos0 = (gWorld * Pos4).xyz;
         LightSpacePos0 = gLightWVP * Pos4;
+        ProjectedTexCoord = gProjectionMatrix * gWorld * Pos4;
     }
 
     TexCoord0 = TexCoord0_;
     TexCoord1 = TexCoord1_;
-    Color0 = Color_;
+    Color0 = Color_;    
 }

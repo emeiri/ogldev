@@ -169,6 +169,7 @@ void ForwardRenderer::InitTechniques()
     m_lightingTech.SetHeightMapTextureUnit(HEIGHT_TEXTURE_UNIT_INDEX);
     m_lightingTech.SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
     m_lightingTech.SetCubeMapTextureUnit(SKYBOX_TEXTURE_UNIT_INDEX);
+    m_lightingTech.SetProjectedTextureUnit(PROJECTED_TEXTURE_UNIT_INDEX);
 
     if (!m_skinningTech.Init()) {
         printf("Error initializing the skinning technique\n");
@@ -522,6 +523,14 @@ void ForwardRenderer::ApplySceneConfig(GLScene* pScene)
     m_pCurLightingTech->SetMaterialToRefRefractFactor(pConfig->GetMatRefRefractFactor());
     m_pCurLightingTech->SetRefractETA(1.0f / pConfig->GetIndexOfRefraction());
     m_pCurLightingTech->SetFresnelPower(pConfig->GetFresnelPower());
+
+    int ProjectedTex = pConfig->GetProjectedTexture();
+    
+    if (ProjectedTex!= -1) {
+        m_pCurLightingTech->SetProjectionMatrix(pConfig->GetProjectionMatrix());
+        Texture* pProjectedTexture = (Texture*)m_pRenderingSystemGL->GetTexture(ProjectedTex);
+        pProjectedTexture->Bind(PROJECTED_TEXTURE_UNIT);
+    }
 
     int EnvMap = pConfig->GetEnvMap();
 

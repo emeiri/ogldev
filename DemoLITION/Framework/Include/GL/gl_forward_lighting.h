@@ -44,6 +44,7 @@ public:
     virtual void ControlNormalMap(bool Enable);
     virtual void ControlCubemapping(bool IsEnabled);
     virtual void SetCubeMipmapLevel(int Level);
+    virtual void SetProjectionMatrix(const Matrix4f& m);
 
     void SetTextureUnit(unsigned int TextureUnit);
     void SetShadowMapTextureUnit(unsigned int TextureUnit);
@@ -56,6 +57,7 @@ public:
     void SetNormalMapTextureUnit(unsigned int TextureUnit);
     void SetHeightMapTextureUnit(unsigned int TextureUnit);
     void SetCubeMapTextureUnit(unsigned int TextureUnit);
+    void SetProjectedTextureUnit(unsigned int TextureUnit);
     void ControlRimLight(bool IsEnabled);
     void ControlCellShading(bool IsEnabled);
     void SetLinearFog(float FogStart, float FogEnd);
@@ -112,6 +114,8 @@ private:
     DEF_LOC(gCubemapTexture);
     DEF_LOC(gIsCubemapping);
     DEF_LOC(gCubeMipmapLevel);
+    DEF_LOC(gProjectedTexture);
+    DEF_LOC(gProjectionMatrix);
 
     struct {
         GLuint AmbientColor = INVALID_UNIFORM_LOCATION;

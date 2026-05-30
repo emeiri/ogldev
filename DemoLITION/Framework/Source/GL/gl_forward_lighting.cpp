@@ -96,6 +96,8 @@ bool ForwardLightingTechnique::InitUniforms()
     GET_UNIFORM(gCubemapTexture);
     GET_UNIFORM(gIsCubemapping);
     GET_UNIFORM(gCubeMipmapLevel);
+    GET_UNIFORM(gProjectedTexture);
+    GET_UNIFORM(gProjectionMatrix);
 
     if (samplerLoc == INVALID_UNIFORM_LOCATION ||
         shadowMapLoc == INVALID_UNIFORM_LOCATION ||
@@ -216,6 +218,12 @@ void ForwardLightingTechnique::SetSpecularExponentTextureUnit(unsigned int Textu
 void ForwardLightingTechnique::SetCubeMapTextureUnit(unsigned int TextureUnit)
 {
     glUniform1i(m_gCubemapTextureLoc, TextureUnit);
+}
+
+
+void ForwardLightingTechnique::SetProjectedTextureUnit(unsigned int TextureUnit)
+{
+    glUniform1i(m_gProjectedTextureLoc, TextureUnit);
 }
 
 
@@ -422,4 +430,10 @@ void ForwardLightingTechnique::ControlCubemapping(bool IsEnabled)
 void ForwardLightingTechnique::SetCubeMipmapLevel(int Level)
 {
     glUniform1i(m_gCubeMipmapLevelLoc, Level);
+}
+
+
+void ForwardLightingTechnique::SetProjectionMatrix(const Matrix4f& m)
+{
+    glUniformMatrix4fv(m_gProjectionMatrixLoc, 1, GL_TRUE, (const GLfloat*)m.m);
 }

@@ -74,6 +74,7 @@ out vec3 Tangent0;
 out vec3 Bitangent0;
 out flat int MaterialIndex;
 out vec4 Color0;
+out vec4 ProjectedTexCoord;
 
 const int MAX_BONES = 200;
 
@@ -86,6 +87,7 @@ uniform mat3 gNormalMatrix;
 uniform mat4 gBones[MAX_BONES];
 uniform bool gIsPVP = false;
 uniform bool gIsIndirectRender = false;
+uniform mat4 gProjectionMatrix;
 
 vec3 GetPosition(int i)
 {
@@ -222,4 +224,6 @@ void main()
     TexCoord0 = TexCoord0_;
     TexCoord1 = TexCoord1_;
     Color0 = Color_;
+    ProjectedTexCoord = gProjectionMatrix * Pos4;
+    ProjectedTexCoord.z = 0.0;
 }

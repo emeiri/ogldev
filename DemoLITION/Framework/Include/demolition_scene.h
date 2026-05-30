@@ -208,6 +208,12 @@ public:
     void ForcePBRDisabled(bool Disabled) { m_disablePBR = Disabled; }
     bool IsPBRDisabled() const { return m_disablePBR; }
 
+    void SetProjectedTexture(int Texture) { m_projectedTexture = Texture; }
+    int GetProjectedTexture() const { return m_projectedTexture; }
+
+    void SetProjectionMatrix(const Matrix4f& m) { m_projectionMat = m; }
+    const Matrix4f& GetProjectionMatrix() const { return m_projectionMat; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -239,6 +245,8 @@ private:
         float SigmaH = 25.0f;
     } m_bloom;  
     bool m_disablePBR = false;
+    int m_projectedTexture = -1;
+    Matrix4f m_projectionMat;
 };
 
 
