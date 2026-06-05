@@ -92,11 +92,20 @@ public:
     const std::vector<DirectionalLight>& GetDirLights() const { return m_dirLights; }
     const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
     const std::vector<PointLight>& GetPointLights() const { return m_pointLights; }
+
     void SetPointLight(int i, const PointLight& Light) 
     { 
         if (i < m_pointLights.size()) { 
             m_pointLights[i] = Light; 
         } 
+    }
+
+    void SetDirLight(int i, const DirectionalLight& Light)
+    {
+        if (i < m_dirLights.size()) {
+            printf("%f\n", Light.AmbientIntensity);
+            m_dirLights[i] = Light;
+        }
     }
 
     void SetTextureScale(float Scale) { m_textureScale = Scale; }
