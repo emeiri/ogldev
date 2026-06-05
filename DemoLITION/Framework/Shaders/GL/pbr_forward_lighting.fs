@@ -702,17 +702,8 @@ void main()
     DiffuseColor = mix(DiffuseColor, DiffuseColor * Occlusion, OcclusionStrength);
     SpecularColor = mix(SpecularColor, SpecularColor * Occlusion, OcclusionStrength);
 
-    //vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
-    //vec3 LightColor = vec3(1.0);
-
-    //if (gNumLights > 0) {
-     //   LightDirection = normalize(Lights[0].WorldPos - WorldPos0);
-     //   LightColor = Lights[0].Color;
-    //}
 
     vec3 LightContribution = vec3(0.0);//calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
-
-    //vec3 LightContribution = vec3(0.0);
 
     for (int i = 0; i < gNumLights; ++i) {
         vec3 lightDir;
@@ -767,14 +758,14 @@ void main()
     out_FragColor = vec4(Color, 1.0);
 
 // Uncomment to debug:
-//  out_FragColor = vec4((n + vec3(1.0))*0.5, 1.0);
+ // out_FragColor = vec4((n + vec3(1.0))*0.5, 1.0);
  // out_FragColor = AmbientOcclusion;
   //out_FragColor = EmissiveColor;
   //out_FragColor = AlbedoColor;
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
- // out_FragColor = vec4(DiffuseColor, 1.0);
- // out_FragColor = vec4(SpecularColor, 1.0);
+//  out_FragColor = vec4(DiffuseColor, 1.0);
+//out_FragColor = vec4(SpecularColor, 1.0);
  // out_FragColor = vec4(LightContribution, 1.0);
 //  MeR.x *= GetMetallicFactor(mat);
 //  MeR.y *= GetRoughnessFactor(mat);
