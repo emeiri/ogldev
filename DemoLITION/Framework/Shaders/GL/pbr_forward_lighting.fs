@@ -702,12 +702,60 @@ void main()
     DiffuseColor = mix(DiffuseColor, DiffuseColor * Occlusion, OcclusionStrength);
     SpecularColor = mix(SpecularColor, SpecularColor * Occlusion, OcclusionStrength);
 
-    vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
-    vec3 LightColor = vec3(1.0);
+    //vec3 LightDirection = vec3(1.0, -1.0, 0.0); // default light if none defined
+    //vec3 LightColor = vec3(1.0);
 
-    if (gNumLights > 0) {
-        LightDirection = normalize(Lights[0].WorldPos - WorldPos0);
-        LightColor = Lights[0].Color;
+    //if (gNumLights > 0) {
+     //   LightDirection = normalize(Lights[0].WorldPos - WorldPos0);
+     //   LightColor = Lights[0].Color;
+    //}
+
+    vec3 LightContribution = vec3(0.0);//calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
+
+    //vec3 LightContribution = vec3(0.0);
+
+    for (int i = 0; i < gNumLights; ++i) {
+        vec3 lightDir;
+        float attenuation = 1.0;
+        vec3 lightColor = Lights[i].Color * Lights[i].DiffuseIntensity;
+
+        if (Lights[i].LightType == LIGHT_TYPE_DIR) {
+            // Directional light: direction is fixed
+            lightDir = -normalize(Lights[i].Direction);
+            // No attenuation for directional lights
+        } else if (Lights[i].LightType == LIGHT_TYPE_POINT) {
+            // Point light: direction from fragment to light
+            vec3 toLight = Lights[i].WorldPos - WorldPos0;
+            float dist = length(toLight);
+            lightDir = normalize(toLight);
+            // Standard attenuation
+            attenuation = 1.0 / (Lights[i].Atten_Constant +
+                                 Lights[i].Atten_Linear * dist +
+                                 Lights[i].Atten_Exp * dist * dist);
+        } else {
+            // Spot light: direction from fragment to light
+            vec3 toLight = Lights[i].WorldPos - WorldPos0;
+            float dist = length(toLight);
+            lightDir = normalize(toLight);
+
+            // Spotlight cone
+            float spotCos = dot(lightDir, -normalize(Lights[i].Direction));
+            float cutoff = Lights[i].Cutoff; // Cosine of cutoff angle
+
+            if (spotCos > cutoff) {
+                // Optional: smooth edge (soft falloff)
+                float epsilon = 0.01; // or a user parameter for softness
+                float intensity = clamp((spotCos - cutoff) / epsilon, 0.0, 1.0);
+
+                attenuation = intensity / (Lights[i].Atten_Constant +
+                                           Lights[i].Atten_Linear * dist +
+                                           Lights[i].Atten_Exp * dist * dist);
+            } else {
+                attenuation = 0.0;
+            }        
+        }
+
+        LightContribution += calculatePBRLightContribution(pbrInputs, lightDir, lightColor) * attenuation;
     }
 
     vec3 LightContribution = calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
