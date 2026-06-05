@@ -980,6 +980,12 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     }
 
     ProcessClearCoat(index, pMaterial, material);
+
+    if ((material.AmbientColor.r == 0.0f) && (material.AmbientColor.g == 0.0f) && (material.AmbientColor.b == 0.0f)) {
+        // THE MIXAMO FALLBACK: If the DAE file provides a zero ambient vector,
+        // match the diffuse color property so the ambient light works.
+        material.AmbientColor = material.DiffuseColor;
+    }
 }
 
 
