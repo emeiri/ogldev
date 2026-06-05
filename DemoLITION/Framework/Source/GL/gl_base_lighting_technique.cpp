@@ -39,6 +39,8 @@ bool BaseLightingTechnique::InitUniforms()
     GET_UNIFORM_AND_CHECK(LightVPLoc, "gLightVP");
     GET_UNIFORM_AND_CHECK(NumLightsLoc, "gNumLights");
 
+    GET_UNIFORM(gRenderMode);
+
     return true;
 }
 
@@ -109,4 +111,9 @@ void BaseLightingTechnique::SetNumLights(int NumLights)
     glUniform1i(NumLightsLoc, NumLights);
 }
 
+
+void BaseLightingTechnique::SetRenderMode(RENDER_MODE mode)
+{
+    glUniform1i(m_gRenderModeLoc, mode);
+}
 

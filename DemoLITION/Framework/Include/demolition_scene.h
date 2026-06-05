@@ -117,6 +117,13 @@ enum TONE_MAP_METHOD {
     TONE_MAP_METHOD_WITH_EXPOSURE = 3
 };
 
+enum RENDER_MODE {
+    RENDER_MODE_FULL = 0,
+    RENDER_MODE_TEXTURE_ONLY = 1,
+    RENDER_MODE_LIGHTING_ONLY = 2,
+    RENDER_MODE_NORMALS = 3
+};
+
 
 struct ModelLoadFlags {
     bool ConvertToLeftHanded = false;
@@ -215,6 +222,9 @@ public:
     void SetProjectionMatrix(const Matrix4f& m) { m_projectionMat = m; }
     const Matrix4f& GetProjectionMatrix() const { return m_projectionMat; }
 
+    RENDER_MODE GetRenderMode() const { return m_renderMode; }
+    void SetRenderMode(RENDER_MODE mode) { m_renderMode = mode; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -248,6 +258,7 @@ private:
     bool m_disablePBR = false;
     int m_projectedTexture = -1;
     Matrix4f m_projectionMat;
+    RENDER_MODE m_renderMode;
 };
 
 

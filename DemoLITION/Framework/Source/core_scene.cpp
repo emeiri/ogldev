@@ -365,6 +365,17 @@ void CoreScene::GeneralGUI()
         bool DisablePBR = m_config.IsPBRDisabled();
         ImGui::Checkbox("Disable PBR", &DisablePBR);
         m_config.ForcePBRDisabled(DisablePBR);
+        ImGui::Text("Render Mode:");
+        RENDER_MODE RenderMode = m_config.GetRenderMode();
+        ImGui::RadioButton("Full", (int*)&RenderMode, RENDER_MODE_FULL);
+        ImGui::SameLine();
+        ImGui::RadioButton("Texture only", (int*)&RenderMode, RENDER_MODE_TEXTURE_ONLY);
+        ImGui::SameLine();
+        ImGui::RadioButton("Lighting only", (int*)&RenderMode, RENDER_MODE_LIGHTING_ONLY);
+        ImGui::SameLine();
+        ImGui::RadioButton("Normals", (int*)&RenderMode, RENDER_MODE_NORMALS);
+        m_config.SetRenderMode(RenderMode);
+
         ImGui::TreePop();
     }
 }

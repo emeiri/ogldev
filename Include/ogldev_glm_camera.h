@@ -91,10 +91,6 @@ public:
 
 	void SetZ(float NearZ, float FarZ) { m_persProjInfo.zNear = NearZ; m_persProjInfo.zFar = FarZ; }
 
-	void SetZ(float NearZ, float FarZ) { m_persProjInfo.zNear = NearZ; m_persProjInfo.zFar = FarZ; }
-
-	void SetZ(float NearZ, float FarZ) { m_persProjInfo.zNear = NearZ; m_persProjInfo.zFar = FarZ; }
-
 	void Print() const;
 
 	// Implementation of CameraAPI

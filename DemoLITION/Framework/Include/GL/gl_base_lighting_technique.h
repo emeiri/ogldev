@@ -57,6 +57,7 @@ public:
     void ControlIndirectRender(bool IsRenderIndirect);
     void ControlPVP(bool IsPVP);
     void SetNumLights(int NumLights);
+    void SetRenderMode(RENDER_MODE mode);
 
 protected:
 
@@ -75,5 +76,6 @@ private:
     GLuint IsPVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint VPLoc = INVALID_UNIFORM_LOCATION;
     GLuint NumLightsLoc = INVALID_UNIFORM_LOCATION;
+    DEF_LOC(gRenderMode);
 };
 

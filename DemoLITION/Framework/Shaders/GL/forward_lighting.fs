@@ -40,6 +40,10 @@ vec2 TexCoord;
 #define LIGHT_TYPE_POINT 1
 #define LIGHT_TYPE_SPOT  2
 
+#define RENDER_MODE_FULL 0
+#define RENDER_MODE_TEXTURE_ONLY 1
+#define RENDER_MODE_LIGHTING_ONLY 2
+#define RENDER_MODE_NORMALS 3
 
 struct LightSource {
     vec3 Color;                    // offset 0
@@ -114,6 +118,7 @@ uniform float gETA = 1.0;
 uniform float gFresnelPower = 1.0;
 uniform bool gIsCubemapping = false;
 uniform int gCubeMipmapLevel = 0;
+uniform int gRenderMode = RENDER_MODE_FULL;
 
 // Fog
 uniform float gExpFogDensity = 1.0;
@@ -762,5 +767,31 @@ void main()
         }
     }
 
-    FragColor = TempColor;
+    switch (gRenderMode) {
+        case RENDER_MODE_FULL:
+            FragColor = TempColor;
+            break;
+
+        case RENDER_MODE_TEXTURE_ONLY:
+            FragColor = GetTexColor();
+            break;
+
+        case RENDER_MODE_LIGHTING_ONLY:
+            FragColor = GetTotalLight(Normal);    
+            break;
+
+        case RENDER_MODE_NORMALS:
+            FragColor = vec4(Normal0, 1.0);
+            break;
+    }
+   // FragColor = vec4(1.0);  
+
+//    FragColor = texture(gSampler, TexCoord.xy);
+   //   FragColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
+
+   // FragColor = GetMaterialAmbientColor();
+ 
+  // FragColor = vec4(Lights[1].DiffuseIntensity);
+
+  //  FragColor = texture(gNormalMap, TexCoord);
 }
