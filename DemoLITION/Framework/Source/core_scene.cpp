@@ -276,14 +276,17 @@ void CoreScene::SceneObjectGUI()
 
         for (std::list<CoreSceneObject*>::const_iterator it = m_renderList.begin(); it != m_renderList.end(); it++) {            
             if (ImGui::TreeNode((*it)->GetName().c_str())) {
-                int CubeMipmapLevel = (*it)->GetCubeMipmapLevel();
-                int MaxMipampLevels = GetSkyboxMipmapLevels();
-                ImGui::SliderInt("Cube mipmap level", &CubeMipmapLevel, 0, MaxMipampLevels, "", 0);
-                (*it)->SetCubeMipmapLevel(CubeMipmapLevel);
                 Vector3f Pos = (*it)->GetPosition();
                 ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
                 ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
                 (*it)->SetPosition(Vector3f(Pos.x, Pos.y, Pos.z));
+                Vector3f ColorMod = (*it)->GetColorMod();
+                ImGui::SliderFloat3("Color Mod", &ColorMod.x, 0.0f, 10.0f);
+                (*it)->SetColorMod(ColorMod);
+                int CubeMipmapLevel = (*it)->GetCubeMipmapLevel();
+                int MaxMipampLevels = GetSkyboxMipmapLevels();
+                ImGui::SliderInt("Cube mipmap level", &CubeMipmapLevel, 0, MaxMipampLevels, "", 0);
+                (*it)->SetCubeMipmapLevel(CubeMipmapLevel);
                 ImGui::TreePop();
             }
         }
