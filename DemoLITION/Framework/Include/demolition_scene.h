@@ -55,6 +55,7 @@ public:
     const Vector4f& GetFlatColor() const { return m_flatColor; }
 
     void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
+    void SetColorMod(float m) { m_colorMod = Vector3f(m); }
     Vector3f GetColorMod() const { return m_colorMod; }
 
     void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
