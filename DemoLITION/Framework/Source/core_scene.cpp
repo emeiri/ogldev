@@ -347,17 +347,64 @@ void CoreScene::ShowSceneGUI()
 void CoreScene::LightingGUI()
 {
     if (ImGui::TreeNode("Lighting")) {
-        if (m_renderList.size() > 0) {
-            CoreSceneObject* pSceneObject = m_renderList.front();
-            const std::vector<PointLight>& PointLights = pSceneObject->GetModel()->GetPointLights();
-            if (PointLights.size() > 0) {
-                PointLight l = PointLights[0];
-                Vector3f& Pos = l.WorldPosition;
-                ImGui::Text("First point light position: %.3f, %.3f, %.3f", Pos.x, Pos.y, Pos.z);
-                ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
-                pSceneObject->GetModel()->SetPointLight(0, l);
-            }
+        if (m_pointLights.size() > 0) {
+            if (ImGui::TreeNode("Point Lights")) {
+                for (int i = 0; i < m_pointLights.size(); i++) {
+                    PointLight& l = m_pointLights[i];
+                    ImGui::ColorEdit3("Color", &l.Color.x);
+                    ImGui::SliderFloat("Ambient Intensity", &l.AmbientIntensity, 0.0f, 10.0f);
+                    ImGui::SliderFloat("Diffuse Intensity", &l.DiffuseIntensity, 0.0f, 10.0f);
+                    Vector3f& Pos = l.WorldPosition;
+                    ImGui::Text("Position: %.3f, %.3f, %.3f", Pos.x, Pos.y, Pos.z);
+                    ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
+                }
 
+                ImGui::TreePop();
+            }
+        }
+
+        if (m_dirLights.size() > 0) {
+            if (ImGui::TreeNode("Dir Lights")) {
+                for (int i = 0; i < m_dirLights.size(); i++) {
+                    std::string str = "[" + std::to_string(i) + "]";
+                    if (ImGui::TreeNode(str.c_str())) {
+                        DirectionalLight& l = m_dirLights[i];
+                        ImGui::ColorEdit3("Color", &l.Color.x);
+                        ImGui::SliderFloat("Ambient Intensity", &l.AmbientIntensity, 0.0f, 10.0f);
+                        ImGui::SliderFloat("Diffuse Intensity", &l.DiffuseIntensity, 0.0f, 10.0f);
+                        Vector3f& Dir = l.WorldDirection;
+                        ImGui::Text("Direction: %.3f, %.3f, %.3f", Dir.x, Dir.y, Dir.z);
+                        ImGui::SliderFloat3("Direction", &Dir.x, -50.0f, 50.0f);
+                        ImGui::TreePop();
+                    }
+                }
+
+                ImGui::TreePop();
+            }
+        }
+
+        if (m_spotLights.size() > 0) {
+            if (ImGui::TreeNode("Spot Lights")) {
+                for (int i = 0; i < m_spotLights.size(); i++) {
+                    std::string str = "[" + std::to_string(i) + "]";
+                    if (ImGui::TreeNode(str.c_str())) {
+                        SpotLight& l = m_spotLights[i];
+                        ImGui::ColorEdit3("Color", &l.Color.x);
+                        ImGui::SliderFloat("Ambient Intensity", &l.AmbientIntensity, 0.0f, 10.0f);
+                        ImGui::SliderFloat("Diffuse Intensity", &l.DiffuseIntensity, 0.0f, 10.0f);
+                        Vector3f& Pos = l.WorldPosition;
+                        ImGui::Text("Position: %.3f, %.3f, %.3f", Pos.x, Pos.y, Pos.z);
+                        ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
+                        Vector3f& Dir = l.WorldDirection;
+                        ImGui::Text("Direction: %.3f, %.3f, %.3f", Dir.x, Dir.y, Dir.z);
+                        ImGui::SliderFloat3("Direction", &Dir.x, -1.0f, 1.0f);
+                        Dir = Dir.Normalize();
+                        ImGui::TreePop();
+                    }
+                }
+
+                ImGui::TreePop();
+            }
         }
 //        ImGui::Text("Directional lights: %d", (int)m_dirLights.size());
   //      ImGui::Text("Point lights: %d", (int)m_pointLights.size());
