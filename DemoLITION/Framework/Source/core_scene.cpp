@@ -216,9 +216,7 @@ void CoreScene::CreateDefaultCamera()
 
 void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
 {
-    m_defaultCamera.SetPos(Pos.ToGLM());
-    m_defaultCamera.SetTarget(Target.ToGLM());
-    m_defaultCamera.SetUp(glm::vec3(0.0f, 1.0f, 0.0f));
+    m_defaultCamera.Init(Pos.ToGLM(), Target.ToGLM());
 }
 
 
@@ -278,8 +276,16 @@ void CoreScene::SceneObjectGUI()
             if (ImGui::TreeNode((*it)->GetName().c_str())) {
                 Vector3f Pos = (*it)->GetPosition();
                 ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
-                ImGui::SliderFloat3("Position", &Pos.x, -50.0f, 50.0f);
+                ImGui::SliderFloat3("Position", &Pos.x, -5.0f, 5.0f);
                 (*it)->SetPosition(Vector3f(Pos.x, Pos.y, Pos.z));
+                float Scale = (*it)->GetScale();
+                //ImGui::Text("Scale %.3f", Scale);
+                ImGui::SliderFloat("Scale", &Scale, 0.0f, 10.0f);
+                (*it)->SetScale(Scale);
+                Vector3f Rot = (*it)->GetRotation();
+                ImGui::Text("Rotation %.3f,%.3f,%.3f", Rot.x, Rot.y, Rot.z);
+                ImGui::SliderFloat3("Rotation", &Rot.x, -180.0f, 180.0f);
+                (*it)->SetRotation(Rot);
                 Vector3f ColorMod = (*it)->GetColorMod();
                 ImGui::SliderFloat3("Color Mod", &ColorMod.x, 0.0f, 10.0f);
                 (*it)->SetColorMod(ColorMod);
