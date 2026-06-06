@@ -31,23 +31,30 @@
 
 class SceneObject : public Object {
 public:
+    // Position
     void SetPosition(float x, float y, float z) { m_pos.x = x; m_pos.y = y; m_pos.z = z; }
     void SetPosition(const Vector3f& Pos) { m_pos = Pos; }
     void SetPosition(const SceneObject* pOtherObject) { m_pos = pOtherObject->GetPosition(); }
     void TranslateBy(float x, float y, float z) { m_pos.x += x; m_pos.y += y; m_pos.z += z; }
     void TranslateBy(const Vector3f& v) { m_pos.x += v.x; m_pos.y += v.y; m_pos.z += v.z; }
+    const Vector3f& GetPosition() const { return m_pos; }
+    const glm::vec3 GetGLMPos() const { return glm::vec3(m_pos.x, m_pos.y, m_pos.z); }
 
+    // Rotation
     void SetRotation(float x, float y, float z);
     void SetRotation(const Vector3f& Rot);
     void PushRotation(const Vector3f& Rot);
     void ResetRotations() { m_numRotations = 0; }
     void RotateBy(float x, float y, float z);
+    void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
+    const glm::quat& GetQuaternion() const { return m_quaternion; }
+    const Vector3f& GetRotation() const { return m_rotations[0]; }
 
+    // Scale
     void SetScale(float x, float y, float z) { m_scale.x = x; m_scale.y = y; m_scale.z = z; }    
     void SetScale(const Vector3f& Scale) { m_scale = Scale; }
+    float GetScale() const { return m_scale.x; }
     
-    const Vector3f& GetPosition() const { return m_pos; }        
-    const glm::vec3 GetGLMPos() const { return glm::vec3(m_pos.x, m_pos.y, m_pos.z); }
     Matrix4f GetMatrix() const;
 
     void SetFlatColor(float r, float g, float b) { m_flatColor.r = r; m_flatColor.g = g; m_flatColor.b = b; m_flatColor.a = 1.0; }
@@ -57,10 +64,6 @@ public:
     void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
     void SetColorMod(float m) { m_colorMod = Vector3f(m); }
     Vector3f GetColorMod() const { return m_colorMod; }
-
-    void SetQuaternion(const glm::quat& q) { m_quaternion = q; }
-
-    const glm::quat& GetQuaternion() const { return m_quaternion; }
 
     Vector3f GetForwardDir() const;
 
@@ -79,7 +82,7 @@ protected:
 
 private:
    
-    Vector3f m_rotations[MAX_NUM_ROTATIONS];
+    Vector3f m_rotations[MAX_NUM_ROTATIONS] = {};
     int m_numRotations = 0;
     Vector4f m_flatColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
     Vector3f m_colorMod = Vector3f(1.0f, 1.0f, 1.0f);
