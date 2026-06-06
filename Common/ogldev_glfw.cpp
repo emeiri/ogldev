@@ -85,30 +85,42 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
 {
     glfw_lib_init();
 
-    GLFWmonitor* monitor = is_full_screen ? glfwGetPrimaryMonitor() : NULL;
+    GLFWmonitor* pMonitor = is_full_screen ? glfwGetPrimaryMonitor() : NULL;
 
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (major_ver > 0) {
+    GLFWwindow* pWindow = NULL;
+
+    if ((major_ver == 0) && (minor_ver == 0)) {
+        int versions[][2] = { {4,6}, {4,3}, {3,3} };
+
+        for (int (&ver)[2] : versions) {
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, ver[0]);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, ver[1]);
+            pWindow = glfwCreateWindow(width, height, title, pMonitor, NULL);
+
+            if (pWindow) {
+                break;
+            }
+        }
+    } else {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major_ver);
-    }
-
-    if (minor_ver > 0) {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor_ver);
+
+        pWindow = glfwCreateWindow(width, height, title, pMonitor, NULL);
     }
 
-    GLFWwindow* window = glfwCreateWindow(width, height, title, monitor, NULL);
-
-    if (!window) {
+    if (!pWindow) {
         const char* pDesc = NULL;
         int error_code = glfwGetError(&pDesc);
 
-        OGLDEV_ERROR("Error creating window: %s", pDesc);
+        OGLDEV_ERROR("Error creating pWindow: %s", pDesc);
         assert(0);
         exit(1);
     }
 
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(pWindow);
 
     // The following functions must be called after the context is made current
     glGetIntegerv(GL_MAJOR_VERSION, &glMajorVersion);
@@ -137,7 +149,7 @@ GLFWwindow* glfw_init(int major_ver, int minor_ver, int width, int height, bool 
 
     glfwSwapInterval(1);
 
-    return window;
+    return pWindow;
 }
 
 
