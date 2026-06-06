@@ -1215,15 +1215,15 @@ void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
 
-    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+   /* Vector3f Direction = VectorFromAssimpVector(light.mDirection);
     printf("Original direction: "); Direction.Print();
     Vector4f Dir4D(Direction, 0.0f);
     Dir4D = Transformation * Dir4D;
     l.WorldDirection = Dir4D;
-    printf("Transformed direction: "); l.WorldDirection.Print();
+    printf("Transformed direction: "); l.WorldDirection.Print();*/
 
     // Extract the components directly from your row-major matrix layout
-// to bypass Blender's embedded glTF offset rotation
+    // to bypass Blender's embedded glTF offset rotation
     Vector3f TrueDirection;
     TrueDirection.x = Transformation.m[0][2];
     TrueDirection.y = Transformation.m[1][2];
@@ -1286,18 +1286,26 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     Matrix4f Transformation;
     GetFullTransformation(pScene->mRootNode, light.mName.C_Str(), Transformation);
 
-    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
+/*    Vector3f Direction = VectorFromAssimpVector(light.mDirection);
     printf("Original direction: "); Direction.Print();
     Vector4f Dir4D(Direction, 0.0f);
     Dir4D = Transformation * Dir4D;
     l.WorldDirection = Dir4D;
-    printf("Final direction: "); l.WorldDirection.Print();
+    printf("Final direction: "); l.WorldDirection.Print();*/
+
+    Vector3f TrueDirection;
+    TrueDirection.x = Transformation.m[0][2];
+    TrueDirection.y = Transformation.m[1][2];
+    TrueDirection.z = Transformation.m[2][2];
+
+    // Normalize to preserve clean calculations for your lighting equations
+    l.WorldDirection = TrueDirection.Normalize();
 
     Vector3f Up = VectorFromAssimpVector(light.mUp);
     printf("Original up: "); Up.Print();
     if (Up.Length() == 0) {
         printf("Overiding a zero up vector\n");
-        if ((Dir4D == Vector4f(0.0f, 1.0f, 0.0f, 0.0f)) || (Dir4D == Vector4f(0.0f, -1.0f, 0.0f, 0.0f))) {
+        if ((l.WorldDirection == Vector4f(0.0f, 1.0f, 0.0f, 0.0f)) || (l.WorldDirection == Vector4f(0.0f, -1.0f, 0.0f, 0.0f))) {
             l.Up = Vector3f(1.0f, 0.0f, 0.0f);
         } else {
             l.Up = Vector3f(0.0f, 1.0f, 0.0f);
