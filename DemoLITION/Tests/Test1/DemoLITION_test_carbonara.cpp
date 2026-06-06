@@ -663,7 +663,7 @@ protected:
         }
 
         GLMCameraFirstPerson* pCamera = m_pScene->GetCurrentCamera();
-        //pCamera->SetAbsTarget(m_pSceneObject->GetGLMPos());
+        pCamera->SetCenter(m_pSceneObject->GetGLMPos());
         Vector3f ForwardDir = m_pSceneObject->GetForwardDir();
         Vector3f ModelPos = m_pSceneObject->GetPosition();
         Vector3f CameraPosCenter = ModelPos - ForwardDir * 10.0f;

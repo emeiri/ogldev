@@ -110,6 +110,7 @@ private:
 	void CalcVelocity(float dt);
 	void CalcCameraOrientation();
 
+    bool m_initialized = false;
 	bool m_isFirstClick = true;
 
 	float m_yaw = 0.0f;

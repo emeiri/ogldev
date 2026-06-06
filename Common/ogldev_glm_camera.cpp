@@ -35,6 +35,12 @@ GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3
 
 void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target)
 {
+	if (!m_initialized) {
+        printf("Error: GLMCameraFirstPerson::Init(Pos, Target) called before full initialization. Call the other Init() method first.\n");
+		assert(0);
+		exit(1);
+	}
+
     Init(Pos, Target, m_up, m_persProjInfo);
 }
 
@@ -96,6 +102,8 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 #ifdef OGLDEV_VULKAN
 	//m_persProjection[1][1] *= -1; // Flip the Y-axis for Vulkan - currently disabled because it flips the entire world
 #endif
+
+    m_initialized = true;
 }
 
 
@@ -323,12 +331,6 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrixNoTranslate() const
 void GLMCameraFirstPerson::SetTarget(const glm::vec3& Target)
 {
     Init(m_cameraPos, Target, m_up, m_persProjInfo);
-}
-
-
-void GLMCameraFirstPerson::SetUp(const glm::vec3& Up)
-{
-	Init(m_cameraPos, GetTarget(), Up, m_persProjInfo);
 }
 
 
