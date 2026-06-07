@@ -22,6 +22,12 @@
 #include "Int/core_model.h"
 #include "3rdparty/meshoptimizer/src/meshoptimizer.h"
 
+//#define DEBUG_COLORS
+//#define DEBUG_MATERIALS
+//#define DEBUG_TEXTURES
+//#define DEBUG_BONES
+//#define DEBUG_SCENE_HIERARCHY
+
 // config flags
 static bool UseMeshOptimizer = false;
 static bool MissingTextureDetection = false;
@@ -124,14 +130,17 @@ static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMateria
 
     switch (ShadingModel) {
         case aiShadingMode_Unlit:
+#ifdef DEBUG_MATERIALS
             printf("Shading model: Unlit\n");
+#endif
             mt = MaterialType_Unlit;
             break;
 
         case aiShadingMode_PBR_BRDF:
         {
+#ifdef DEBUG_MATERIALS
             printf("Shading model: PBR BRDF\n");
-
+#endif
             MyMaterial.m_isPBR = true;            
             
             float factor = 0;
@@ -142,11 +151,15 @@ static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMateria
             break;
 
         case aiShadingMode_Gouraud:
+#ifdef DEBUG_MATERIALS
             printf("Shading model: Gouraud\n");
+#endif
             break;
 
         case aiShadingMode_Phong:
+#ifdef DEBUG_MATERIALS
             printf("Shading model: Phong\n");
+#endif
             break;
 
         default:
@@ -358,37 +371,53 @@ void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
 
 void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode)
 {
+#ifdef DEBUG_SCENE_HIERARCHY
     printf("Traversing node '%s'\n", pNode->mName.C_Str());
+#endif
     Matrix4f NodeTransformation(pNode->mTransformation);
 
     Matrix4f CombinedTransformation = ParentTransformation * NodeTransformation;
 
+#ifdef DEBUG_SCENE_HIERARCHY
     printf("Combined transformation:\n");
     CombinedTransformation.Print();
+#endif
     
     if (pNode->mNumMeshes > 0) {
+#ifdef DEBUG_SCENE_HIERARCHY
         printf("Num meshes: %d - ", pNode->mNumMeshes);
+#endif
         for (int i = 0; i < (int)pNode->mNumMeshes; i++) {
             int MeshIndex = pNode->mMeshes[i];
+#ifdef DEBUG_SCENE_HIERARCHY
             printf("%d ", MeshIndex);
+#endif
             m_Meshes[MeshIndex].Transformation = CombinedTransformation;
             std::string NodeName(pNode->mName.C_Str());
             if (m_meshNameToMeshIndex.find(NodeName) == m_meshNameToMeshIndex.end()) {
                 m_meshNameToMeshIndex[NodeName] = MeshIndex;
+#ifdef DEBUG_SCENE_HIERARCHY
                 printf("Mesh '%s' mapped to mesh index %d\n", NodeName.c_str(), MeshIndex);
+#endif
             } else {
                 int OldMeshIndex = m_meshNameToMeshIndex[NodeName];
                 if (MeshIndex != OldMeshIndex) {
+#ifdef DEBUG_SCENE_HIERARCHY
                     printf("Warning: node name '%s' already mapped to index %d, new index %d\n", 
                             NodeName.c_str(), OldMeshIndex, MeshIndex);
+#endif
                   //  assert(0);
                 }
             }                        
         }
+#ifdef DEBUG_SCENE_HIERARCHY
         printf("\n");
+#endif
     }
     else {
+#ifdef DEBUG_SCENE_HIERARCHY
         printf("No meshes\n");
+#endif
     }
 
     for (uint i = 0; i < pNode->mNumChildren; i++) {
@@ -403,7 +432,7 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-    printf("Mesh %d %s\n", MeshIndex, paiMesh->mName.C_Str());
+    printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
     // Populate the vertex attribute vectors
     VertexType v;
 
@@ -666,8 +695,9 @@ bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
     for (unsigned int i = 0 ; i < pScene->mNumMaterials; i++) {
         const aiMaterial* pMaterial = pScene->mMaterials[i];
 
+#ifdef DEBUG_MATERIALS
         printf("\nLoading material %d: '%s'\n", i, pMaterial->GetName().C_Str());
-
+#endif
         SetMaterialType(pMaterial, m_Materials[i]);
 
         LoadTextures(Dir, pMaterial, i);
@@ -727,11 +757,13 @@ static int GetTextureCount(const aiMaterial* pMaterial)
         int Count = pMaterial->GetTextureCount(ttype);
         TextureCount += Count;
 
+#ifdef DEBUG_MATERIALS
         if (Count > 0) {
 #ifdef _WIN64
             printf("Found texture %s\n", aiTextureTypeToString(ttype));
 #endif
         }
+#endif
     }
 
     return TextureCount;
@@ -742,7 +774,9 @@ void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 {
     int TextureCount = GetTextureCount(pMaterial);
 
+#ifdef DEBUG_MATERIALS
     printf("Number of textures %d\n", TextureCount);
+#endif
 
     LoadDiffuseTexture(Dir, pMaterial, index);
     LoadSpecularTexture(Dir, pMaterial, index);
@@ -872,7 +906,9 @@ void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int 
 
 void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB)
 {
+#ifdef DEBUG_MATERIALS
     printf("Loaded embeddeded texture type '%s'\n", paiTexture->achFormatHint);
+#endif
     m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
     int buffer_size = paiTexture->mWidth;   // TODO: just the width???
     m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData, IsSRGB);
@@ -886,7 +922,9 @@ void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int
     m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
     m_Materials[MaterialIndex].pTextures[MyType]->Load(FullPath.c_str(), IsSRGB);
 
+#ifdef DEBUG_MATERIALS
     printf("Loaded texture type %d from '%s'\n", MyType, FullPath.c_str());
+#endif
 }
 
 
@@ -903,7 +941,9 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     aiColor4D EmissiveColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     if (pMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, EmissiveColor) == AI_SUCCESS) {
+#ifdef DEBUG_COLORS
         printf("Loaded emissive color [%f %f %f]\n", EmissiveColor.r, EmissiveColor.g, EmissiveColor.b);
+#endif
         material.AmbientColor.r += EmissiveColor.r;
         material.AmbientColor.g += EmissiveColor.g;
         material.AmbientColor.b += EmissiveColor.b;
@@ -1019,7 +1059,9 @@ void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
     aiColor4D AiColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     if (pMaterial->Get(pAiMatKey, AiMatType, AiMatIdx, AiColor) == AI_SUCCESS) {
+#ifdef DEBUG_COLORS
         printf("Loaded %s color [%f %f %f]\n", pName, AiColor.r, AiColor.g, AiColor.b);
+#endif
         Color.r = AiColor.r;
         Color.g = AiColor.g;
         Color.b = AiColor.b;
@@ -1035,14 +1077,18 @@ void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
 
 static void traverse(int depth, aiNode* pNode)
 {
-    for (int i = 0 ; i < depth ; i++) {
+#ifdef DEBUG_SCENE_HIERARCHY
+    for (int i = 0; i < depth; i++) {
         printf(" ");
     }
 
     printf("%s\n", pNode->mName.C_Str());
+#endif
 
     Matrix4f NodeTransformation(pNode->mTransformation);
+#ifdef DEBUG_SCENE_HIERARCHY
     NodeTransformation.Print(); 
+#endif
 
     for (uint i = 0; i < pNode->mNumChildren; i++) {
         traverse(depth + 1, pNode->mChildren[i]);
