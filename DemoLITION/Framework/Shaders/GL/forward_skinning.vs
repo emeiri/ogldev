@@ -212,6 +212,7 @@ void main()
         WorldPos0 = (o[gl_DrawID].WorldMatrix * PosL).xyz;
         LightSpacePos0 = (gLightVP * o[gl_DrawID].WorldMatrix * Pos4);
         MaterialIndex = o[gl_DrawID].MaterialIndex.x;	
+        ProjectedTexCoord = gProjectionMatrix * o[gl_DrawID].WorldMatrix * Pos4;
     } else {
         gl_Position = gWVP * PosL;
         Normal0 = gNormalMatrix * Normal_;
@@ -219,11 +220,10 @@ void main()
         Bitangent0 = gNormalMatrix * Bitangent_;
         WorldPos0 = (gWorld * PosL).xyz;
         LightSpacePos0 = gLightWVP * Pos4;
+        ProjectedTexCoord = gProjectionMatrix * gWorld * Pos4;
     }
     
     TexCoord0 = TexCoord0_;
     TexCoord1 = TexCoord1_;
     Color0 = Color_;
-    ProjectedTexCoord = gProjectionMatrix * Pos4;
-    ProjectedTexCoord.z = 0.0;
 }
