@@ -46,7 +46,7 @@ public:
         flags.ConvertToLeftHanded = true;
         m_pScene = m_pRenderingSystem->CreateScene("../Tutorial67_youtube/projected_texture_scene.glb", flags);
         m_pScene->SetCamera(Vector3f(0.0f, 15.0f, -50.0f), Vector3f(0.0f, -0.28f, 1.0f));
-       // m_pScene->GetCurrentCamera()->SetZ(0.1f, 1000.0f);
+        m_pScene->GetCurrentCamera()->SetZ(0.1f, 1000.0f);
       //  m_pScene->GetDirLights()[0].AmbientIntensity = 1.0f;
         SceneConfig* pSceneConfig = m_pScene->GetConfig();
         
@@ -78,7 +78,8 @@ public:
 
         glm::mat4 projView = glm::lookAt(projPos, projAt, projUp);
 
-        glm::mat4 projProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 100.0f);
+        glm::mat4 projProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 30.0f);
+
         glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f));
         bias = glm::scale(bias, glm::vec3(0.5f));
 
