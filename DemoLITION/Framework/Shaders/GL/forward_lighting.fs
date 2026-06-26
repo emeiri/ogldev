@@ -734,9 +734,6 @@ void main()
 {
     TexCoord = TexCoord0;
     vec3 Normal = GetNormal();
-    //FragColor = vec4(GetNormal(), 0.0);
-    //FragColor = vec4(TexCoord, 0.0, 0.0);
-    //return;
     
     FragColor = CalcPhongLighting(Normal);
 
@@ -749,24 +746,16 @@ void main()
         TempColor = mix(vec4(gFogColor, 1.0), FragColor, FogFactor);
     }
 
-    float projDepth = ProjectedTexCoord.z / ProjectedTexCoord.w;
+    // vec2 ProjectionUVs = ProjectedTexCoord.xy / ProjectedTexCoord.w; Method #1: divide the texture coordinates by w
 
-    vec4 projTexColor = texture(gProjectedTexture, ProjectedTexCoord.xy);
+    // vec4 projTexColor = texture(gProjectedTexture, ProjectionUVs);
 
-    TempColor.xy += fract( (ProjectedTexCoord.xy / ProjectedTexCoord.w) * 0.5 + 0.5) ;
+    vec2 ProjectionUVs = ProjectedTexCoord.xy / ProjectedTexCoord.w;
+
+    if (abs(ProjectionUVs).x <= 1.0 && abs(ProjectionUVs.y) <= 1.0) {
+        vec4 projTexColor = textureProj(gProjectedTexture, ProjectedTexCoord); // Method #2: use textureProj
+        TempColor += projTexColor * 0.5;
+    }           
 
     FragColor = TempColor;
-    
-   // FragColor = vec4(1.0);  
- // FragColor = GetTexColor();
-  //  FragColor = GetTotalLight(Normal);
-  //  FragColor = vec4(gDirectionalLight.Base.AmbientIntensity);
-//    FragColor = texture(gSampler, TexCoord.xy);
-   //   FragColor = texture(materials[MaterialIndex].DiffuseMap, TexCoord.xy);
-
-  //  FragColor = GetMaterialAmbientColor();
-  //FragColor = vec4(Normal0, 1.0);
-  // FragColor = vec4(Lights[1].DiffuseIntensity);
-
-  //  FragColor = texture(gNormalMap, TexCoord);
 }
