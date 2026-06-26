@@ -46,7 +46,7 @@ public:
         flags.ConvertToLeftHanded = true;
         m_pScene = m_pRenderingSystem->CreateScene("../Tutorial67_youtube/projected_texture_scene.glb", flags);
         m_pScene->SetCamera(Vector3f(0.0f, 15.0f, -50.0f), Vector3f(0.0f, -0.28f, 1.0f));
-        m_pScene->GetCurrentCamera()->SetZ(0.1f, 1000.0f);
+      //  m_pScene->GetCurrentCamera()->SetZ(0.1f, 1000.0f);
 
         SceneConfig* pSceneConfig = m_pScene->GetConfig();
         
@@ -71,19 +71,18 @@ public:
 
     void OnFrameChild(double DeltaTime)
     {        
-        m_count += 0.01f;
-
-        static float f = 0.0f;
         glm::vec3 projPos = glm::vec3(15.0f, 10.0f, 0.0f);
-      //  f += 0.005f;
-        glm::vec3 projAt = glm::vec3(0.0f, 0.0f, sinf(f));
+
+        glm::vec3 projAt = glm::vec3(0.0f, 0.0f, 0.0f);
+
         glm::vec3 projUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
         glm::mat4 projView = glm::lookAt(projPos, projAt, projUp);
+
         glm::mat4 projProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.01f, 100.0f);
-        glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f));
-        bias = glm::scale(bias, glm::vec3(0.5f));
-     
-        glm::mat4 ProjectionMatrix = /*bias **/ projProj * projView;
+
+        glm::mat4 ProjectionMatrix = projProj * projView;
+
         m_pScene->GetConfig()->SetProjectionMatrix(ProjectionMatrix);
 
         m_pScene->GetDirLights()[0].AmbientIntensity = 0.4f;
