@@ -50,6 +50,8 @@ public:
 	GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3& Target,
 		                 const glm::vec3& Up, PersProjInfo& persProjInfo);
 
+	void Init(const glm::vec3& Pos, const glm::vec3& Target);
+
 	void Init(const glm::vec3& Pos, const glm::vec3& Target,
 			  const glm::vec3& Up, PersProjInfo& persProjInfo);
 
@@ -81,11 +83,13 @@ public:
 
 	void SetPos(const Vector3f& Pos) { m_cameraPos.x = Pos.x; m_cameraPos.y = Pos.y; m_cameraPos.z = Pos.z; }
 
-	void SetUp(const glm::vec3& Up) { m_up = Up; }
+	void SetUp(const glm::vec3& Up);
 
 	void SetTarget(const glm::vec3& Target);
 
-	void SetAbsTarget(const glm::vec3& Target);
+	void SetCenter(const glm::vec3& Target);
+
+	void SetZ(float NearZ, float FarZ) { m_persProjInfo.zNear = NearZ; m_persProjInfo.zFar = FarZ; }
 
 	void Print() const;
 
@@ -105,6 +109,9 @@ private:
 	glm::vec3 CalcAcceleration();
 	void CalcVelocity(float dt);
 	void CalcCameraOrientation();
+
+    bool m_initialized = false;
+	bool m_isFirstClick = true;
 
 	float m_yaw = 0.0f;
 	float m_pitch = 0.0f;

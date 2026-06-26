@@ -33,6 +33,17 @@ GLMCameraFirstPerson::GLMCameraFirstPerson(const glm::vec3& Pos, const glm::vec3
 	Init(Pos, Target, Up, persProjInfo);
 }
 
+void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target)
+{
+	if (!m_initialized) {
+        printf("Error: GLMCameraFirstPerson::Init(Pos, Target) called before full initialization. Call the other Init() method first.\n");
+		assert(0);
+		exit(1);
+	}
+
+    Init(Pos, Target, m_up, m_persProjInfo);
+}
+
 
 void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 								const glm::vec3& Up, PersProjInfo& persProjInfo)
@@ -62,6 +73,8 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 		m_yaw = glm::atan2(Dir.x, -Dir.z);
 	}
 
+//	printf("Yaw: %f, Pitch: %f\n", m_yaw, m_pitch);
+
 	// 2. Build the initial m_cameraOrientation quaternion
 	CalcCameraOrientation();
 
@@ -89,6 +102,8 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 #ifdef OGLDEV_VULKAN
 	//m_persProjection[1][1] *= -1; // Flip the Y-axis for Vulkan - currently disabled because it flips the entire world
 #endif
+
+    m_initialized = true;
 }
 
 
@@ -110,38 +125,78 @@ void GLMCameraFirstPerson::SetMousePos(float x, float y)
 {
 	m_mouseState.m_pos.x = x / (float)m_persProjInfo.Width;
 	m_mouseState.m_pos.y = y / (float)m_persProjInfo.Height;
+
+    //printf("MousePos: %f, %f\n", m_mouseState.m_pos.x, m_mouseState.m_pos.y);
 }
 
 
 void GLMCameraFirstPerson::HandleMouseButton(int Button, int Action, int Mods)
 {
 	if (Button == GLFW_MOUSE_BUTTON_LEFT) {
-		m_mouseState.m_buttonPressed = (Action == GLFW_PRESS);
+		if (Action == GLFW_PRESS) {
+			m_mouseState.m_buttonPressed = true;
+			m_isFirstClick = true;
+		} else if (Action == GLFW_RELEASE) {
+			m_mouseState.m_buttonPressed = false;			
+		}
 	}
 }
 
 
 void GLMCameraFirstPerson::CalcCameraOrientation()
 {
+	if (m_isFirstClick) {
+		m_oldMousePos = m_mouseState.m_pos;
+		m_isFirstClick = false;
+	}
+
 	glm::vec2 DeltaMouse = m_mouseState.m_pos - m_oldMousePos;
 
-	// 1. Update angles (Standard FPS logic)
-	m_yaw += DeltaMouse.x * m_mouseSpeed;
+//    printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
+
+	// 1. Update angles dynamically based on Handedness
+	if (CAMERA_LEFT_HANDED) {
+		// In Left-Handed space, dragging right should decrease the yaw angle
+		m_yaw -= DeltaMouse.x * m_mouseSpeed;
+	} else {
+		// In Right-Handed space, dragging right should increase the yaw angle
+		m_yaw += DeltaMouse.x * m_mouseSpeed;
+	}
+
 	m_pitch += DeltaMouse.y * m_mouseSpeed;
+
+//    printf("Yaw: %f, Pitch: %f\n", m_yaw, m_pitch);
 
 	// 2. Clamp Pitch to 89 degrees (avoids the "sticky" apex lock)
 	if (m_pitch > 1.5f) m_pitch = 1.5f;
 	if (m_pitch < -1.5f) m_pitch = -1.5f;
 
+	glm::quat qYaw;
+	glm::quat qPitch;
+
 	// 3. Calculate the direction vector from angles
-	glm::quat qYaw = glm::angleAxis(m_yaw, m_up);
-	glm::quat qPitch = glm::angleAxis(m_pitch, m_worldRight);
+	if (CAMERA_LEFT_HANDED) {
+		// Left-handed: Invert yaw angle application to match standard LH space
+		qYaw = glm::angleAxis(-m_yaw, m_up);
+		qPitch = glm::angleAxis(m_pitch, m_worldRight);
+	} else {
+		// Right-handed: Standard Euler tracking
+		qYaw = glm::angleAxis(m_yaw, m_up);
+		qPitch = glm::angleAxis(m_pitch, m_worldRight);
+	}
+
+//	GLM_PRINT_QUAT("Yaw Quaternion: ", qYaw);
+//	GLM_PRINT_QUAT("Pitch Quaternion: ", qPitch);
+
+//	GLM_PRINT_QUAT("Camera Orientation before: ", m_cameraOrientation);
 
 	// 4. Combine - Yaw first, then Pitch
 	m_cameraOrientation = qPitch * qYaw;
-
+	
 	// Important: Normalize to prevent float drift
 	m_cameraOrientation = glm::normalize(m_cameraOrientation);
+
+ //   GLM_PRINT_QUAT("Camera Orientation after: ", m_cameraOrientation);
 }
 
 
@@ -275,18 +330,20 @@ glm::mat4 GLMCameraFirstPerson::GetVPMatrixNoTranslate() const
 
 void GLMCameraFirstPerson::SetTarget(const glm::vec3& Target)
 {
-	SetAbsTarget(m_cameraPos + Target);
+    Init(m_cameraPos, Target, m_up, m_persProjInfo);
 }
 
 
-void GLMCameraFirstPerson::SetAbsTarget(const glm::vec3& Target)
+void GLMCameraFirstPerson::SetUp(const glm::vec3& Up)
 {
-	if (CAMERA_LEFT_HANDED) {
-		m_cameraOrientation = glm::lookAtLH(m_cameraPos, Target, m_up);
-	}
-	else {
-		m_cameraOrientation = glm::lookAtRH(m_cameraPos, Target, m_up);
-	}
+	Init(m_cameraPos, GetTarget(), Up, m_persProjInfo);
+}
+
+
+void GLMCameraFirstPerson::SetCenter(const glm::vec3& Center)
+{
+    glm::vec3 Target = Center - m_cameraPos;
+    Init(m_cameraPos, Target, m_up, m_persProjInfo);
 }
 
 
