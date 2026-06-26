@@ -758,8 +758,6 @@ void main()
         LightContribution += calculatePBRLightContribution(pbrInputs, lightDir, lightColor) * attenuation;
     }
 
-    vec3 LightContribution = calculatePBRLightContribution(pbrInputs, LightDirection, LightColor);
-
     vec3 Color = SpecularColor + DiffuseColor + LightContribution + EmissiveColor.rgb;
     Color = Color * (1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel) + ClearCoatContrib;
 
