@@ -82,7 +82,7 @@ public:
         glm::mat4 bias = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f));
         bias = glm::scale(bias, glm::vec3(0.5f));
 
-        glm::mat4 ProjectionMatrix = /*bias * */ projProj * projView;
+        glm::mat4 ProjectionMatrix = bias * projProj * projView;
 
         m_pScene->GetConfig()->SetProjectionMatrix(ProjectionMatrix);
     }

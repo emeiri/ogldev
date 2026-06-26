@@ -750,12 +750,8 @@ void main()
 
     // vec4 projTexColor = texture(gProjectedTexture, ProjectionUVs);
 
-    vec2 ProjectionUVs = ProjectedTexCoord.xy / ProjectedTexCoord.w;
-
-    if (abs(ProjectionUVs).x <= 1.0 && abs(ProjectionUVs.y) <= 1.0) {
-        vec4 projTexColor = textureProj(gProjectedTexture, ProjectedTexCoord); // Method #2: use textureProj
-        TempColor += projTexColor * 0.5;
-    }           
+    vec4 projTexColor = textureProj(gProjectedTexture, ProjectedTexCoord); // Method #2: use textureProj
+    TempColor += projTexColor * 0.5;
 
     FragColor = TempColor;
 }
