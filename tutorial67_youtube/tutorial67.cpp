@@ -114,15 +114,7 @@ protected:
 
 private:
 
-    float m_count = 0.0f;
     Scene* m_pScene = NULL;
-    DirectionalLight m_dirLights[2];
-    PointLight m_pointLight;
-    SceneObject* m_pickedObject = NULL;
-    SceneObject* m_pSceneObject = NULL;    
-    SceneObject* m_pLightObject = NULL;
-    SceneObject* m_pBallObject = NULL;
-    int m_enableShadowMapping = 1;
 };
 
 
