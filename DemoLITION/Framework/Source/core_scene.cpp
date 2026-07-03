@@ -406,9 +406,6 @@ void CoreScene::LightingGUI()
                 ImGui::TreePop();
             }
         }
-//        ImGui::Text("Directional lights: %d", (int)m_dirLights.size());
-  //      ImGui::Text("Point lights: %d", (int)m_pointLights.size());
-    //    ImGui::Text("Spot lights: %d", (int)m_spotLights.size());
 
         ImGui::TreePop();
     }
