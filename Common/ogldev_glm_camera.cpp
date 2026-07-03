@@ -334,6 +334,12 @@ void GLMCameraFirstPerson::SetTarget(const glm::vec3& Target)
 }
 
 
+void GLMCameraFirstPerson::SetUp(const glm::vec3& Up)
+{
+	Init(m_cameraPos, GetTarget(), Up, m_persProjInfo);
+}
+
+
 void GLMCameraFirstPerson::SetCenter(const glm::vec3& Center)
 {
     glm::vec3 Target = Center - m_cameraPos;
