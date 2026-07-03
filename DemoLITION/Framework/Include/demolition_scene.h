@@ -63,6 +63,7 @@ public:
 
     void SetColorMod(float r, float g, float b) { m_colorMod.r = r; m_colorMod.g = g; m_colorMod.b = b; }
     void SetColorMod(float m) { m_colorMod = Vector3f(m); }
+    void SetColorMod(const Vector3f& Col) { m_colorMod = Col; }
     Vector3f GetColorMod() const { return m_colorMod; }
 
     Vector3f GetForwardDir() const;
