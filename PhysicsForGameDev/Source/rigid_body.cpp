@@ -33,11 +33,12 @@ void RigidBody::Init(float Mass,
                      const glm::quat& StartOrientation,
                      void* pTarget)
 {
+    m_centerOfMassLocal = CenterOfMassLocal;
     m_orientation = StartOrientation;
 	m_angularVelocity = glm::vec3(0);
 	m_torqueAccum = glm::vec3(0);
 
-    m_linear.Init(Mass, CenterOfMassLocal, StartPosWorld, ForceVecWorld, pTarget);
+    m_linear.Init(Mass, StartPosWorld, ForceVecWorld, pTarget);
 
     ApplyForceAtPoint(ForceVecWorld, ForcePointLocal);
 }
@@ -48,7 +49,7 @@ void RigidBody::ApplyForceAtPoint(const glm::vec3& ForceWorld,
 {
     glm::vec3 PointWorld = LocalToWorld(PointLocal);
 
-    glm::vec3 CenterOfMassWorld = LocalToWorld(m_linear.GetCenterOfMass());
+    glm::vec3 CenterOfMassWorld = LocalToWorld(m_centerOfMassLocal);
 
     // Lever arm in world space
     glm::vec3 RadiusWorld = PointWorld - CenterOfMassWorld;
@@ -129,8 +130,8 @@ void RigidBody::CalcCollisionReactions(RigidBody& OtherBody)
     glm::vec3 contactPoint = m_linear.GetPos() - normal * m_linear.GetBoundingRadius();
 
     // 2. Transform the center of mass from local to world space
-    glm::vec3 CoMA_World = LocalToWorld(m_linear.GetCenterOfMass());
-    glm::vec3 CoMB_World = OtherBody.LocalToWorld(OtherBody.m_linear.GetCenterOfMass());
+    glm::vec3 CoMA_World = LocalToWorld(m_centerOfMassLocal);
+    glm::vec3 CoMB_World = OtherBody.LocalToWorld(OtherBody.m_centerOfMassLocal);
 
     // 3. The radius from the center of mass to the contact point in world space
     glm::vec3 rA = contactPoint - CoMA_World;

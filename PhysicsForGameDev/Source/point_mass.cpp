@@ -26,14 +26,13 @@
 
 namespace Physics {
 
-void PointMass::Init(float Mass, const glm::vec3& CenterOfMass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
+void PointMass::Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget)
 {
     assert(Mass != 0.0f);
 
     m_pos = StartPos;
 
-    m_mass = Mass;
-    m_centerOfMass = CenterOfMass;
+    m_mass = Mass;    
     m_sumForces = Force;
     m_pTarget = pTarget;
 

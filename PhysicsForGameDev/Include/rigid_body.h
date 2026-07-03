@@ -77,6 +77,8 @@ private:
 	// Handles the translational motion of the rigid body
     PointMass m_linear;
 
+    glm::vec3 m_centerOfMassLocal = glm::vec3(0.0f);
+
     // Handles the rotational motion
     glm::quat m_orientation = glm::quat(1, 0, 0, 0);
     glm::vec3 m_angularVelocity = glm::vec3(0.0f);

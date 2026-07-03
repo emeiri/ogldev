@@ -37,7 +37,7 @@ class PointMass {
 
 public:
 
-    void Init(float Mass, const glm::vec3& CenterOfMass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget);
+    void Init(float Mass, const glm::vec3& StartPos, const glm::vec3& Force, void* pTarget);
 
     // DeltaTime - 1.0f is 1 second.
     void Update(float DeltaTime, UpdateListener pUpdateListener);
@@ -60,8 +60,6 @@ public:
     //    GLM_PRINT_VEC3("Sum forces ", m_sumForces);
     }
 
-    const glm::vec3& GetCenterOfMass() const { return m_centerOfMass; }
-
     const glm::vec3& GetPos() const { return m_pos; }
 
     void SetPos(const glm::vec3& Pos) { m_pos = Pos; }
@@ -83,8 +81,7 @@ private:
 
     glm::vec3 m_pos = glm::vec3(0.0f);
 
-    // Physics stuff
-    glm::vec3 m_centerOfMass = glm::vec3(0.0f);
+    // Physics stuff    
     glm::vec3 m_linearVelocity = glm::vec3(0.0f);
     glm::vec3 m_sumForces = glm::vec3(0.0f);
     glm::vec3 m_linearAccel = glm::vec3(0.0f);
