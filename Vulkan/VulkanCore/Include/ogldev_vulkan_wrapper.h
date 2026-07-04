@@ -31,7 +31,7 @@ void BeginCommandBuffer(VkCommandBuffer CommandBuffer, VkCommandBufferUsageFlags
 VkSemaphore CreateSemaphore(VkDevice Device);
 
 void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
-					 VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount, u32 MipLevels);
+					 VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount, u32 MipLevels, u32 BaseMipLevel);
 
 void BufferMemBarrier(VkCommandBuffer CmdBuf, VkBuffer Buffer, VkPipelineStageFlags SrcStage, VkPipelineStageFlags DstStage);
 

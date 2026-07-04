@@ -1027,7 +1027,7 @@ void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format,
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
+	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels, 0);
 
 	SubmitCopyCommand();
 }
