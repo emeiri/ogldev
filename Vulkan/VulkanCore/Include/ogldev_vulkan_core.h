@@ -152,15 +152,16 @@ private:
 	void CreateTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VkFormat Format, 
 							   bool IsCubemap, VulkanTexture& Tex);
 
-	void CreateImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight, 
-								    VkFormat TexFormat, bool IsCubemap);
-	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
-		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap);
+	u32 CreateImageFromData(VulkanTexture& Tex, const void* pPixels, u32 ImageWidth, u32 ImageHeight, 
+							VkFormat TexFormat, bool IsCubemap);
+	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, VkImageUsageFlags UsageFlags, 
+					VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap, u32 MipLevels);
 	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
 							int LayerCount, const void* pPixels, bool IsCubemap, u32 MipLevels);
 	void CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, VkDeviceSize LayerSize, int NumLayers);
 	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, 
 							   VkImageLayout NewLayout, int NumLayers, u32 MipLevels);
+	void GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight, VkFormat Format, int LayerCount, u32 MipLevels);
 
 	void SubmitCopyCommand();
 

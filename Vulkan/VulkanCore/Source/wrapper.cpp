@@ -52,7 +52,7 @@ VkSemaphore CreateSemaphore(VkDevice Device)
 
 // Copied from the "3D Graphics Rendering Cookbook"
 void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
-					 VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount, u32 MipLevels, u32 BaseMipLevel)
+	VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount, u32 MipLevels, u32 BaseMipLevel)
 {
 	VkImageMemoryBarrier Barrier = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
@@ -100,8 +100,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 
 		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-	else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
+	} else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
 		Barrier.srcAccessMask = 0;
 		Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
@@ -109,7 +108,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	}
 
-	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && 
+	if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
 		NewLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
 		Barrier.srcAccessMask = 0;
 		Barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -124,8 +123,8 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 	} /* Convert from updateable texture to shader read-only */
-	else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && 
-		     NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+	else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+		NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
 		Barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 		Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
@@ -177,34 +176,37 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 
 		sourceStage = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	}
-	else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+	} else if (OldLayout == VK_IMAGE_LAYOUT_UNDEFINED && NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
 		Barrier.srcAccessMask = 0;
 		Barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 		destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	} 
-	else if (OldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
+	} else if (OldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR) {
 		Barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 		Barrier.dstAccessMask = 0;
 
 		sourceStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		destinationStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-	}
-	else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
-		Barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		Barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+	} else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
+		Barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		Barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
 		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	} else if (OldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		Barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		Barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	} else {
 		printf("Unknown Barrier case\n");
 		exit(1);
 	}
 
-	vkCmdPipelineBarrier(CmdBuf, sourceStage, destinationStage, 
-		                 0, 0, NULL, 0, NULL, 1, &Barrier);
+	vkCmdPipelineBarrier(CmdBuf, sourceStage, destinationStage,
+		0, 0, NULL, 0, NULL, 1, &Barrier);
 }
 
 

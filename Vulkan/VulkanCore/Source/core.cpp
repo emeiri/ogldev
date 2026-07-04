@@ -819,11 +819,12 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 {
 	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 	bool IsCubemap = false;
-	CreateImage(Tex, Width, Height, Format, Usage, PropertyFlags, IsCubemap);
+	u32 MipLevels = 1;
+	CreateImage(Tex, Width, Height, Format, Usage, PropertyFlags, IsCubemap, MipLevels);
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, 1);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, MipLevels);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
@@ -844,7 +845,7 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 									   VkFormat Format, bool IsCubemap, VulkanTexture& Tex)
 {
 	// Step #1: create the image object and populate it with pixels
-	CreateImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, IsCubemap);
+	u32 MipLevels = CreateImageFromData(Tex, pPixels, ImageWidth, ImageHeight, Format, IsCubemap);
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -918,21 +919,26 @@ void VulkanTexture::Destroy(VkDevice Device)
 }
 
 
-void VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels, 
+u32 VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels, 
 									 u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, bool IsCubemap)
 {
-	VkImageUsageFlagBits Usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
+	VkImageUsageFlagBits Usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+														VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
 														VK_IMAGE_USAGE_SAMPLED_BIT);
 	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap);
+	u32 MipLevels = (u32)(std::floor(std::log2(std::max(ImageWidth, ImageHeight))) + 1);
+	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap, MipLevels);
 
 	int LayerCount = IsCubemap ? 6 : 1;
-	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, IsCubemap, 1);
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, IsCubemap, MipLevels);
+
+    return MipLevels;
 }
 
 
 void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat,
-	                         VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap)
+	                        VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, 
+							bool IsCubemap, u32 MipLevels)
 {
 
 	/*VkImageFormatProperties imageFormatProperties;
@@ -951,7 +957,7 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 		.imageType = VK_IMAGE_TYPE_2D,
 		.format = TexFormat,
 		.extent = VkExtent3D {.width = ImageWidth, .height = ImageHeight, .depth = 1 },
-		.mipLevels = 1,
+		.mipLevels = MipLevels,
 		.arrayLayers = IsCubemap ? 6u : 1u,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.tiling = VK_IMAGE_TILING_OPTIMAL,
@@ -992,29 +998,39 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 }
 
 
-void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
-									int LayerCount, const void* pPixels, bool IsCubemap, u32 MipLevels)
+void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat,
+	int LayerCount, const void* pPixels, bool IsCubemap, u32 MipLevels)
 {
 	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
-	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;	 
+	// pPixels only contains Level 0 data, so the size matches the base level dimensions.
+	VkDeviceSize LayerSize = ImageWidth * ImageHeight * BytesPerPixel;
 	VkDeviceSize ImageSize = LayerCount * LayerSize;
 
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	VkMemoryPropertyFlags Properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | 
-									   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+	VkMemoryPropertyFlags Properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 	BufferAndMemory StagingTex = CreateBuffer(ImageSize, Usage, Properties);
 
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
-	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, MipLevels);
-	
+	// 1. Transition the ENTIRE image (all layers, all mip levels) to TRANSFER_DST_OPTIMAL.
+	// This prepares Mip 0 to receive the copy and higher mips to be written to during vkCmdBlitImage.
+	TransitionImageLayout(Tex.m_image, TexFormat,
+		VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		LayerCount, MipLevels);
+
+	// 2. Copy the staging buffer into Mip Level 0 ONLY.
+	// Inside CopyBufferToImage, ensure the VkBufferImageCopy subresource has mipLevel = 0.
 	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, LayerSize, LayerCount);
-	
-	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
+
+	// 3. Keep this commented out! GenerateMipmaps handles the transitions to SHADER_READ_ONLY_OPTIMAL.
+	//TransitionImageLayout(Tex.m_image, TexFormat, 
+	//					  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
+
+	// 4. Generate mips. This will sequentially move mips to TRANSFER_SRC_OPTIMAL and finally to SHADER_READ_ONLY_OPTIMAL.
+	GenerateMipmaps(Tex.m_image, ImageWidth, ImageHeight, TexFormat, LayerCount, MipLevels);
 
 	StagingTex.Destroy(m_device);
 }
@@ -1080,6 +1096,76 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src,
 	SubmitCopyCommand();
 }
 
+
+void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight, VkFormat Format, int LayerCount, u32 MipLevels)
+{
+	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+	int MipWidth = ImageWidth;
+	int MipHeight = ImageHeight;
+
+    VkImageLayout OldLayout, NewLayout;
+
+	for (uint32_t i = 1; i < MipLevels; i++) {
+		OldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+		NewLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, 1, i - 1);
+
+        int DstMipWidth = 1 < MipWidth ? MipWidth / 2 : 1;
+        int DstMipHeight = 1 < MipHeight ? MipHeight / 2 : 1;
+
+		VkImageBlit Blit = {
+			.srcSubresource = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = i - 1,
+				.layerCount = 1
+			},
+
+			.srcOffsets = {
+				{0, 0, 0},                  // Minimum offset (0,0,0)
+				{MipWidth, MipHeight, 1}    // Maximum offset
+			},
+
+			.dstSubresource = {
+				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.mipLevel = i,
+				.layerCount = 1
+			},
+
+			.dstOffsets = {
+				{0, 0, 0},                  // Minimum offset (0,0,0)
+				{DstMipWidth, DstMipHeight, 1} // Maximum offset
+			}
+		};
+
+		vkCmdBlitImage(m_copyCmdBuf, 
+					   Image,
+					   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,		// old layout
+					   Image,
+					   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,		// new layout
+					   1,
+					   &Blit,
+					   VK_FILTER_LINEAR);
+
+		OldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+		NewLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, 1, i - 1);
+
+		if (MipWidth > 1) {
+			MipWidth /= 2;
+		}
+
+		if (MipHeight > 1) {
+			MipHeight /= 2;
+		}
+	}
+
+	OldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	NewLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, 1, MipLevels - 1);
+
+	SubmitCopyCommand();
+}
 
 
 u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags ReqMemPropFlags)
@@ -1244,15 +1330,16 @@ void VulkanCore::CreateDepthResources()
 	for (int i = 0; i < NumSwapChainImages; i++) {
 		VkImageUsageFlagBits Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 		VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+		u32 MipLevels = 1;
 		CreateImage(m_depthImages[i], m_windowWidth, m_windowHeight, DepthFormat, 
-					Usage, PropertyFlags, false);
+					Usage, PropertyFlags, false, MipLevels);
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1, 1);
+		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1, MipLevels);
 
 		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
-												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false, 1);
+												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false, MipLevels);
 	}
 }
 
