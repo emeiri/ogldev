@@ -355,6 +355,7 @@ void VulkanCore::CreateDevice()
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;
 	DeviceFeatures.multiDrawIndirect = VK_TRUE;
+    DeviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	VkDeviceCreateInfo DeviceCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -831,7 +832,8 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #3: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
+    float MaxAnisotropy = m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy;
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
 }
 
 void VulkanCore::Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
@@ -856,7 +858,8 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #3: create the texture sampler
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode);
+    float MaxAnisotropy = m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy;
+	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
 
 	printf("Texture from data created\n");
 }

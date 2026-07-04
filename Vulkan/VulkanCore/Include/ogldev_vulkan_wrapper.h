@@ -39,5 +39,5 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 						    VkImageAspectFlags AspectFlags, bool IsCubemap, u32 MipLevels);
 
 VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter,
-							   VkSamplerAddressMode AddressMode);
+							   VkSamplerAddressMode AddressMode, float MaxAnisotropy);
 }

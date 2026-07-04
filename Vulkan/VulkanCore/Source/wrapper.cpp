@@ -281,7 +281,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 
 
 VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter, 
-							   VkSamplerAddressMode AddressMode)
+							   VkSamplerAddressMode AddressMode, float MaxAnisotropy)
 {
 	VkSamplerCreateInfo SamplerInfo = {
 		.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
@@ -294,8 +294,8 @@ VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter Max
 		.addressModeV = AddressMode,
 		.addressModeW = AddressMode,
 		.mipLodBias = 0.0f,
-		.anisotropyEnable = VK_FALSE,
-		.maxAnisotropy = 1,
+		.anisotropyEnable = VK_TRUE,
+		.maxAnisotropy = MaxAnisotropy,
 		.compareEnable = VK_FALSE,
 		.compareOp = VK_COMPARE_OP_ALWAYS,
 		.minLod = 0.0f,
