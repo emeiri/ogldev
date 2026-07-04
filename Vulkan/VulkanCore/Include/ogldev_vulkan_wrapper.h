@@ -36,7 +36,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 void BufferMemBarrier(VkCommandBuffer CmdBuf, VkBuffer Buffer, VkPipelineStageFlags SrcStage, VkPipelineStageFlags DstStage);
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
-						    VkImageAspectFlags AspectFlags, bool IsCubemap);
+						    VkImageAspectFlags AspectFlags, bool IsCubemap, u32 MipLevels);
 
 VkSampler CreateTextureSampler(VkDevice Device, VkFilter MinFilter, VkFilter MaxFilter,
 							   VkSamplerAddressMode AddressMode);

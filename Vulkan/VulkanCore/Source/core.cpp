@@ -470,7 +470,7 @@ void VulkanCore::CreateSwapChain()
 	m_imageViews.resize(NumSwapChainImages);
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
 		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format, 
-										  VK_IMAGE_ASPECT_COLOR_BIT, false);
+										  VK_IMAGE_ASPECT_COLOR_BIT, false, 1);
 	}
 }
 
@@ -823,7 +823,7 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, 1);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
@@ -848,7 +848,7 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, 1);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
@@ -1252,7 +1252,7 @@ void VulkanCore::CreateDepthResources()
 		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1);
 
 		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
-												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false);
+												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false, 1);
 	}
 }
 

@@ -240,7 +240,7 @@ void BufferMemBarrier(VkCommandBuffer CmdBuf, VkBuffer Buffer, VkPipelineStageFl
 
 
 VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format, 
-							VkImageAspectFlags AspectFlags, bool IsCubemap)
+							VkImageAspectFlags AspectFlags, bool IsCubemap, u32 MipLevels)
 {
 	VkImageViewCreateInfo ViewInfo =
 	{
@@ -259,7 +259,7 @@ VkImageView CreateImageView(VkDevice Device, VkImage Image, VkFormat Format,
 		.subresourceRange = {
 			.aspectMask = AspectFlags,
 			.baseMipLevel = 0,
-			.levelCount = 1,
+			.levelCount = MipLevels,
 			.baseArrayLayer = 0,
 			.layerCount = IsCubemap ? 6u : 1u
 		}
