@@ -45,6 +45,13 @@ struct PhysicalDevice {
 	std::vector<VkExtensionProperties> m_extensions;
 
 	bool IsExtensionSupported(const char* pExt) const;
+
+	VkFormatProperties GetFormatProperties(VkFormat Format) const 
+	{
+		VkFormatProperties Props;
+		vkGetPhysicalDeviceFormatProperties(m_physDevice, Format, &Props);
+		return Props;
+	}
 };
 
 

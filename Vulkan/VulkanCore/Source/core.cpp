@@ -926,7 +926,9 @@ u32 VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels,
 														VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
 														VK_IMAGE_USAGE_SAMPLED_BIT);
 	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-	u32 MipLevels = (u32)(std::floor(std::log2(std::max(ImageWidth, ImageHeight))) + 1);
+
+    u32 MipLevels = CalcNumMipLevels(TexFormat, ImageWidth, ImageHeight);
+    
 	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap, MipLevels);
 
 	int LayerCount = IsCubemap ? 6 : 1;
@@ -936,20 +938,24 @@ u32 VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels,
 }
 
 
+u32 VulkanCore::CalcNumMipLevels(VkFormat TexFormat, u32 ImageWidth, u32 ImageHeight) const
+{
+    VkFormatProperties FormatProps = m_physDevices.Selected().GetFormatProperties(TexFormat);
+
+    u32 MipLevels = 1;
+    
+	if (FormatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT) {
+		MipLevels = (u32)(std::floor(std::log2(std::max(ImageWidth, ImageHeight))) + 1);
+	}
+
+    return MipLevels;
+}
+
+
 void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat,
 	                        VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, 
 							bool IsCubemap, u32 MipLevels)
 {
-
-	/*VkImageFormatProperties imageFormatProperties;
-	vkGetPhysicalDeviceImageFormatProperties(m_physDevices.Selected().m_physDevice,
-		TexFormat,
-		VK_IMAGE_TYPE_2D,
-		VK_IMAGE_TILING_OPTIMAL,
-		UsageFlags,
-		VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
-		&imageFormatProperties);*/
-
 	VkImageCreateInfo ImageInfo = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 		.pNext = NULL,
@@ -1009,7 +1015,7 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 	VkBufferUsageFlags Usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 	VkMemoryPropertyFlags Properties = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+		                               VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 	BufferAndMemory StagingTex = CreateBuffer(ImageSize, Usage, Properties);
 
@@ -1017,20 +1023,17 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 	// 1. Transition the ENTIRE image (all layers, all mip levels) to TRANSFER_DST_OPTIMAL.
 	// This prepares Mip 0 to receive the copy and higher mips to be written to during vkCmdBlitImage.
-	TransitionImageLayout(Tex.m_image, TexFormat,
-		VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-		LayerCount, MipLevels);
+	TransitionImageLayout(Tex.m_image, TexFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+						  LayerCount, MipLevels);
 
 	// 2. Copy the staging buffer into Mip Level 0 ONLY.
 	// Inside CopyBufferToImage, ensure the VkBufferImageCopy subresource has mipLevel = 0.
 	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, LayerSize, LayerCount);
 
-	// 3. Keep this commented out! GenerateMipmaps handles the transitions to SHADER_READ_ONLY_OPTIMAL.
-	//TransitionImageLayout(Tex.m_image, TexFormat, 
-	//					  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
-
-	// 4. Generate mips. This will sequentially move mips to TRANSFER_SRC_OPTIMAL and finally to SHADER_READ_ONLY_OPTIMAL.
-	GenerateMipmaps(Tex.m_image, ImageWidth, ImageHeight, TexFormat, LayerCount, MipLevels);
+	// 3. Generate mips. This will sequentially move mips to TRANSFER_SRC_OPTIMAL and finally to SHADER_READ_ONLY_OPTIMAL.
+	if (MipLevels > 1) {
+		GenerateMipmaps(Tex.m_image, ImageWidth, ImageHeight, TexFormat, LayerCount, MipLevels);
+	}	
 
 	StagingTex.Destroy(m_device);
 }

@@ -165,6 +165,8 @@ private:
 
 	void SubmitCopyCommand();
 
+    u32 CalcNumMipLevels(VkFormat TexFormat, u32 ImageWidth, u32 ImageHeight) const;
+
 	VkInstance m_instance = VK_NULL_HANDLE;
 	VkDebugUtilsMessengerEXT m_debugMessenger = VK_NULL_HANDLE;
 	GLFWwindow* m_pWindow = NULL;
