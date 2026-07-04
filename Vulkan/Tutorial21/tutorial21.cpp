@@ -245,7 +245,7 @@ private:
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), 
 				                      m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_UNDEFINED, 
-				                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1);
+				                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1);
 
 			BeginRendering(CmdBuf, i);
 
@@ -258,7 +258,7 @@ private:
 			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), 
 				                      m_vkCore.GetSwapChainFormat(),
 				                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
-				                      VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1);
+				                      VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1);
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 

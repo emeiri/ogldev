@@ -157,9 +157,11 @@ private:
 	void CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
 		             VkImageUsageFlags UsageFlags, VkMemoryPropertyFlagBits PropertyFlags, bool IsCubemap);
 	void UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
-							int LayerCount, const void* pPixels, bool IsCubemap);
+							int LayerCount, const void* pPixels, bool IsCubemap, u32 MipLevels);
 	void CopyBufferToImage(VkImage Dst, VkBuffer Src, u32 ImageWidth, u32 ImageHeight, VkDeviceSize LayerSize, int NumLayers);
-	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, int NumLayers);
+	void TransitionImageLayout(VkImage& Image, VkFormat Format, VkImageLayout OldLayout, 
+							   VkImageLayout NewLayout, int NumLayers, u32 MipLevels);
+
 	void SubmitCopyCommand();
 
 	VkInstance m_instance = VK_NULL_HANDLE;

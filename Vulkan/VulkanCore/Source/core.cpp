@@ -927,7 +927,7 @@ void VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels,
 	CreateImage(Tex, ImageWidth, ImageHeight, TexFormat, Usage, PropertyFlags, IsCubemap);
 
 	int LayerCount = IsCubemap ? 6 : 1;
-	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, IsCubemap);
+	UpdateTextureImage(Tex, ImageWidth, ImageHeight, TexFormat, LayerCount, pPixels, IsCubemap, 1);
 }
 
 
@@ -992,8 +992,8 @@ void VulkanCore::CreateImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight
 }
 
 
-void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, 
-								    VkFormat TexFormat, int LayerCount, const void* pPixels, bool IsCubemap)
+void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, 
+									int LayerCount, const void* pPixels, bool IsCubemap, u32 MipLevels)
 {
 	int BytesPerPixel = GetBytesPerTexFormat(TexFormat);
 
@@ -1009,12 +1009,12 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	StagingTex.Update(m_device, pPixels, ImageSize);
 
 	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount);
+						  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, LayerCount, MipLevels);
 	
 	CopyBufferToImage(Tex.m_image, StagingTex.m_buffer, ImageWidth, ImageHeight, LayerSize, LayerCount);
 	
 	TransitionImageLayout(Tex.m_image, TexFormat, 
-						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount);
+						  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
 
 	StagingTex.Destroy(m_device);
 }
@@ -1023,11 +1023,11 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 
-									   VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount)
+									   VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount, u32 MipLevels)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount);
+	ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, MipLevels);
 
 	SubmitCopyCommand();
 }
@@ -1249,7 +1249,7 @@ void VulkanCore::CreateDepthResources()
 
 		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1);
+		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1, 1);
 
 		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
 												  DepthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, false, 1);
