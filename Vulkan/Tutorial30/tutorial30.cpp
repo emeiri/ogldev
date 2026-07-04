@@ -352,13 +352,6 @@ private:
         UpdateBaseTextureIndices(ModelDescs);
 
 		m_bigTextureArray.CreateTextureArray(ModelDescs);
-        		
-	//	m_model.LoadAssimpModel("../../Content/bs_ears.obj");
-	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_dragon_pbr/scene.gltf");
-	//	m_model.LoadAssimpModel("../../Content/Stanford/stanford_armadillo_pbr/scene.gltf");			
-	//	m_model.LoadAssimpModel("../../Content/demolition/box_and_sphere.obj");
-	//	m_model.LoadAssimpModel("../../Content/DamagedHelmet/DamagedHelmet.gltf");
-	//	m_model.LoadAssimpModel("G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/glTF-Sample-Models/2.0/WaterBottle/glTF/WaterBottle.gltf");
 	}
 
 
