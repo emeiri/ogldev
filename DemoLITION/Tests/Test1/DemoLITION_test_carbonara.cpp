@@ -1079,10 +1079,11 @@ public:
 
         //m_pModel = m_pRenderingSystem->LoadModel("C:/Users/Etay Meiri/Documents/BuildArea/glTF-Sample-Assets/Models/StainedGlassLamp/glTF/StainedGlassLamp.gltf");
         
+        m_pModel = m_pRenderingSystem->LoadModel("../Content/Mixamo/StandingIdle02/StandingIdle02.dae");
         //m_pModel = m_pRenderingSystem->LoadModel("../Content/DamagedHelmet/glTF/DamagedHelmet.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../../BuildArea/glTF-Sample-Assets/Models/BoomBox/glTF/BoomBox.gltf");
         //m_pModel = m_pRenderingSystem->LoadModel("../Content/baker_and_the_bridge/scene.gltf");
-        m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
+     //   m_pModel = m_pRenderingSystem->LoadModel("../Content/box.obj");
 
         m_pTexAO = new Texture(GL_TEXTURE_2D, "../Content/DamagedHelmet/glTF/Default_AO.jpg");
         m_pTexAO->Load();
@@ -1105,9 +1106,10 @@ public:
         m_pModel->SetNormalMap(n);
 
         m_pSceneObject = m_pScene->CreateSceneObject(m_pModel);
+        m_pSceneObject->RotateBy(0.0f, 100.0f, 0.0f);
         m_pScene->AddToRenderList(m_pSceneObject);
 
-        m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -2.5f), Vector3f(0.0f, 0.0f, 1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 2.0f, -2.5f), Vector3f(0.0f, -0.5f, 1.0f));
     }
 
     void OnFrameChild(double DeltaTime)
