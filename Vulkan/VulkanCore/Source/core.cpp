@@ -923,7 +923,7 @@ void VulkanTexture::Destroy(VkDevice Device)
 
 
 u32 VulkanCore::CreateImageFromData(VulkanTexture& Tex, const void* pPixels, 
-									 u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, bool IsCubemap)
+									u32 ImageWidth, u32 ImageHeight, VkFormat TexFormat, bool IsCubemap)
 {
 	VkImageUsageFlagBits Usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
 														VK_IMAGE_USAGE_TRANSFER_DST_BIT | 
@@ -1112,8 +1112,8 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	int MipWidth = ImageWidth;
-	int MipHeight = ImageHeight;
+	int SrcMipWidth = ImageWidth;
+	int SrcMipHeight = ImageHeight;
 
     VkImageLayout OldLayout, NewLayout;
 
@@ -1122,8 +1122,8 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 		NewLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 		ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, 1, i - 1);
 
-        int DstMipWidth = 1 < MipWidth ? MipWidth / 2 : 1;
-        int DstMipHeight = 1 < MipHeight ? MipHeight / 2 : 1;
+        int DstMipWidth = 1 < SrcMipWidth ? SrcMipWidth / 2 : 1;
+        int DstMipHeight = 1 < SrcMipHeight ? SrcMipHeight / 2 : 1;
 
 		VkImageBlit Blit = {
 			.srcSubresource = {
@@ -1134,7 +1134,7 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 
 			.srcOffsets = {
 				{0, 0, 0},                  // Minimum offset (0,0,0)
-				{MipWidth, MipHeight, 1}    // Maximum offset
+				{SrcMipWidth, SrcMipHeight, 1}    // Maximum offset
 			},
 
 			.dstSubresource = {
@@ -1162,13 +1162,8 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 		NewLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		ImageMemBarrier(m_copyCmdBuf, Image, Format, OldLayout, NewLayout, LayerCount, 1, i - 1);
 
-		if (MipWidth > 1) {
-			MipWidth /= 2;
-		}
-
-		if (MipHeight > 1) {
-			MipHeight /= 2;
-		}
+        SrcMipWidth = DstMipWidth;
+        SrcMipHeight = DstMipHeight;
 	}
 
 	OldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
