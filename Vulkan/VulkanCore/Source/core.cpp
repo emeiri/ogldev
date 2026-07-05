@@ -1038,7 +1038,10 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 	// 3. Generate mips. This will sequentially move mips to TRANSFER_SRC_OPTIMAL and finally to SHADER_READ_ONLY_OPTIMAL.
 	if (MipLevels > 1) {
 		GenerateMipmaps(Tex.m_image, ImageWidth, ImageHeight, TexFormat, LayerCount, MipLevels);
-	}	
+	} else {
+    	TransitionImageLayout(Tex.m_image, TexFormat, 
+		                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
+    }	
 
 	StagingTex.Destroy(m_device);
 }
