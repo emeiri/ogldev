@@ -949,6 +949,8 @@ u32 VulkanCore::CalcNumMipLevels(VkFormat TexFormat, u32 ImageWidth, u32 ImageHe
     
 	if (FormatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT) {
 		MipLevels = (u32)(std::floor(std::log2(std::max(ImageWidth, ImageHeight))) + 1);
+	} else {
+        printf("Warning: The format %d doesn't support linear filtering, so no mipmaps will be generated\n", TexFormat);
 	}
 
     return MipLevels;
