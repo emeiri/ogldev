@@ -91,6 +91,8 @@ private:
 
     float m_coeffOfRest = 1.0f;
 
+    float m_damping = 1.0f;
+
     // Client interface
     const void* m_pTarget = NULL;
 };
