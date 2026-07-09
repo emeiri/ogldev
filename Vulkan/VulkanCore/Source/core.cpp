@@ -1040,7 +1040,8 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 		GenerateMipmaps(Tex.m_image, ImageWidth, ImageHeight, TexFormat, LayerCount, MipLevels);
 	} else {
     	TransitionImageLayout(Tex.m_image, TexFormat, 
-		                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, LayerCount, MipLevels);
+		                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+							  LayerCount, MipLevels);
     }	
 
 	StagingTex.Destroy(m_device);
