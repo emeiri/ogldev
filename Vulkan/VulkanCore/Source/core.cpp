@@ -852,7 +852,7 @@ void VulkanCore::CreateTextureFromData(const void* pPixels, int ImageWidth, int 
 
 	// Step #2: create the image view
 	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
-	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, 1);
+	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, MipLevels);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
