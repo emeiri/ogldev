@@ -290,8 +290,8 @@ private:
 		PersProjInfo persProjInfo = { FOV, (float)m_windowWidth, (float)m_windowHeight,
 									  zNear, zFar };
 		
-		glm::vec3 Pos(0.0f, 0.0f, -0.33f);
-		glm::vec3 Target(0.0f, 0.0f, 1.0f);
+		glm::vec3 Pos(10.0f, 2.4f, -0.17f);
+		glm::vec3 Target(-1.0f, -0.025f, 0.05f);
 		glm::vec3 Up(0.0, 1.0f, 0.0f);
 
 		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
@@ -397,6 +397,7 @@ private:
 	{		
 		m_modelContexts[MeshIndex].m_pModel->UpdateModelDesc(md);
 
+        // We don't care which pipeline we use to create the desc sets
 		m_pipelines[0].AllocDescSets(m_modelContexts[MeshIndex].m_descSets);
 		m_pipelines[0].UpdateDescriptorSets(md, m_modelContexts[MeshIndex].m_descSets,
 												m_modelContexts[MeshIndex].m_uniformBuffersVS, 
@@ -549,12 +550,13 @@ private:
 		glm::vec4 AmbientLight = glm::vec4(0.1, 0.12, 0.15, 1.0);
 		glm::vec3 LightDirection = glm::vec3(-m_lightDir.x, -m_lightDir.y, -m_lightDir.z);
 		//printf("Light dir: %f %f %f\n", LightDirection.x, LightDirection.y, LightDirection.z);
+        // We don't care which pipeline is used to update the uniform buffers
 		m_pipelines[0].UpdateUniformBuffers(ImageIndex, WVP, World, 
-											m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
-											AmbientLight,
-			                                LightDirection, 
-											m_modelContexts[MeshIndex].m_uniformBuffersVS, 
-											m_modelContexts[MeshIndex].m_uniformBuffersFS);
+									m_modelContexts[MeshIndex].m_pModel->GetTransformations(), 
+									AmbientLight,
+	                                LightDirection, 
+									m_modelContexts[MeshIndex].m_uniformBuffersVS, 
+									m_modelContexts[MeshIndex].m_uniformBuffersFS);
 		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 		//m_skybox.Update(ImageIndex, VPNoTranslate);
 	}
@@ -587,7 +589,7 @@ private:
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
 	OgldevVK::LIGHTING_MODE m_lightingMode = OgldevVK::LIGHTING_MODE_FULL;
-	vec3 m_lightDir = vec3(0.0f, 0.0f, 0.0f);
+	vec3 m_lightDir = vec3(0.0f, 0.14f, 1.0f);
 };
 
 
