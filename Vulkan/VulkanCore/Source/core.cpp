@@ -468,10 +468,11 @@ void VulkanCore::CreateSwapChain()
 	res = vkGetSwapchainImagesKHR(m_device, m_swapChain, &NumSwapChainImages, m_images.data());
 	CHECK_VK_RESULT(res, "vkGetSwapchainImagesKHR\n");
 
+	u32 MipLevels = 1;
 	m_imageViews.resize(NumSwapChainImages);
 	for (u32 i = 0; i < NumSwapChainImages; i++) {
 		m_imageViews[i] = CreateImageView(m_device, m_images[i], m_swapChainSurfaceFormat.format, 
-										  VK_IMAGE_ASPECT_COLOR_BIT, false, 1);
+										  VK_IMAGE_ASPECT_COLOR_BIT, false, MipLevels);
 	}
 }
 
@@ -1109,7 +1110,8 @@ void VulkanCore::CopyBufferToImage(VkImage Dst, VkBuffer Src,
 }
 
 
-void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight, VkFormat Format, int LayerCount, u32 MipLevels)
+void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight, VkFormat Format, 
+								 int LayerCount, u32 MipLevels)
 {
 	BeginCommandBuffer(m_copyCmdBuf, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
@@ -1134,7 +1136,7 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 			},
 
 			.srcOffsets = {
-				{0, 0, 0},                  // Minimum offset (0,0,0)
+				{0, 0, 0},                        // Minimum offset (0,0,0)
 				{SrcMipWidth, SrcMipHeight, 1}    // Maximum offset
 			},
 
@@ -1145,8 +1147,8 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 			},
 
 			.dstOffsets = {
-				{0, 0, 0},                  // Minimum offset (0,0,0)
-				{DstMipWidth, DstMipHeight, 1} // Maximum offset
+				{0, 0, 0},                        // Minimum offset (0,0,0)
+				{DstMipWidth, DstMipHeight, 1}    // Maximum offset
 			}
 		};
 
