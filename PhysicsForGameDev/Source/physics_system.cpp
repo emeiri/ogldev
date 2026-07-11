@@ -63,10 +63,14 @@ void System::Update(double DeltaTime)
 void System::ApplyGlobalForces()
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
-        m_pointMasses[i].AddForce(m_globalForce);
+        float Mass = m_pointMasses[i].GetMass();
+        glm::vec3 Force = m_globalForce * Mass;
+        m_pointMasses[i].AddForce(Force);
     }
 
     for (int i = 0; i < m_numActiveRigidBodies; i++) {
+        float Mass = m_pointMasses[i].GetMass();
+        glm::vec3 Force = m_globalForce * Mass;
         m_rigidBodies[i].AddForce(m_globalForce);
     }
 }
