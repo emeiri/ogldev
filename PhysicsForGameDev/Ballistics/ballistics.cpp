@@ -45,6 +45,22 @@ static void PhysicsUpdateListener(const void* pObject,
     pSceneObject->SetQuaternion(Orientation);
 }
 
+enum BallisticType {
+    BALLISTIC_PISTOL,
+    BALLISTIC_ARTILLERY,
+    BALLISTIC_FIREBALL,
+    BALLISTIC_RIFLE
+};
+
+float PistolMass = 0.01f;
+glm::vec3 PistolForce = glm::vec3(20.0f, 3.0f, 0.0f);
+
+float ArtilleryMass = 1.0f;
+glm::vec3 ArtilleryForce = glm::vec3(800.0f, 800.0f, 0.0f);
+
+float FireballMass = 0.5f;
+glm::vec3 FireballForce = glm::vec3(200.0f, 100.0f, 0.0f);
+glm::vec3 FireballAccel = glm::vec3(0.0f, 4.0f, 0.0f);
 
 class ParticleDynamics : public BaseGLApp {
 
@@ -100,7 +116,7 @@ public:
     void CreatePointMasses()
     {
         m_pPointMass = m_physicsSystem.AllocPointMass();
-        m_pPointMass->Init(m_pistolMass, m_pSceneObject->GetGLMPos(), m_pistolForce, m_pSceneObject);
+        m_pPointMass->Init(PistolMass, m_pSceneObject->GetGLMPos(), PistolForce, m_pSceneObject);
     }
 
 
@@ -108,8 +124,27 @@ public:
     { 
         if (m_pPointMass->GetPos().y < 0.0f) {
            // printf("Initializing\n");
-            m_pPointMass->Init(m_pistolMass, m_pos, m_pistolForce, m_pSceneObject);
+            switch (m_ballisticType) {
+            case BALLISTIC_PISTOL:
+                m_pPointMass->Init(PistolMass, m_pos, PistolForce, m_pSceneObject);
+                m_fireballStarted = false;
+                break;
+
+            case BALLISTIC_ARTILLERY:
+                m_pPointMass->Init(ArtilleryMass, m_pos, ArtilleryForce, m_pSceneObject);
+                m_fireballStarted = false;
+                break;
+
+            case BALLISTIC_FIREBALL:
+                m_pPointMass->Init(FireballMass, m_pos, FireballForce, m_pSceneObject);
+                m_fireballStarted = true;
+                break;
+            }      
         } 
+
+        if ((m_ballisticType == BALLISTIC_FIREBALL) && m_fireballStarted) {
+            m_pPointMass->AddForce(FireballAccel);
+        }
         
         m_physicsSystem.Update(DeltaTime);
     }
@@ -119,11 +154,31 @@ public:
     {
         bool ret = false;
 
-        if ((key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
-            m_pPointMass->Init(1.0f, m_pSceneObject->GetGLMPos(), m_pistolForce, m_pSceneObject);
-            ret = true;
-        } else {
-            ret = BaseGLApp::OnKeyboard(key, action);
+        if (action == GLFW_PRESS) {
+            switch (key) {
+            case GLFW_KEY_SPACE:
+                m_pPointMass->Init(1.0f, m_pSceneObject->GetGLMPos(), PistolForce, m_pSceneObject);
+                ret = true;
+                break;
+
+            case GLFW_KEY_1:
+                m_ballisticType = BALLISTIC_PISTOL;
+                ret = true;
+                break;
+
+            case GLFW_KEY_2:
+                m_ballisticType = BALLISTIC_ARTILLERY;
+                ret = true;
+                break;
+
+            case GLFW_KEY_3:
+                m_ballisticType = BALLISTIC_FIREBALL;
+                ret = true;
+                break;
+
+            default:
+                ret = BaseGLApp::OnKeyboard(key, action);
+            }
         }
 
         return ret;
@@ -156,8 +211,8 @@ private:
     Physics::PointMass* m_pPointMass = NULL;
 
     glm::vec3 m_pos = glm::vec3(-20.0f, 1.5f, 40.0f);
-    float m_pistolMass = 0.01f;
-    glm::vec3 m_pistolForce = glm::vec3(20.0f, 3.0f, 0.0f);
+    BallisticType m_ballisticType = BALLISTIC_PISTOL;
+    bool m_fireballStarted = false;
 };
 
 
