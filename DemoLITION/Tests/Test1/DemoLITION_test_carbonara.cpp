@@ -1321,6 +1321,15 @@ public:
 };
 
 
+struct TerrainConfig {
+    int width = 2049;        // Power-of-two plus one (ideal for tessellation patches)
+    int height = 2049;
+    int octaves = 6;         // How many detail layers to stack
+    float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
+    float gain = 0.5f;       // Amplitude multiplier per octave (persistence)
+    float scale = 0.005f;    // Initial zoom scale for the coordinate space
+};
+
 class PerlinDemo : public Carbonara {
 
 public:
@@ -1333,7 +1342,9 @@ public:
     {
         delete m_pScene;
 
-        CreateHeightMap();
+        TerrainConfig Config;
+
+        CreateHeightMap(Config);
         exit(1);
         m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
 
@@ -1351,66 +1362,63 @@ public:
 
 private:
 
-    void CreateHeightMap()
+    void CreateHeightMap(const TerrainConfig& Config)
     {
-        int Width = 1024;
-        int Height = 1024;
-        float Persistence = 0.5f;
-        float BaseFreq = 4.0f;
-        int NumOctaves = 4;
+        // Allocate exactly 4 bytes per pixel for high-fidelity 32-bit float data
+        std::vector<float> HeightMap(Config.width * Config.height);
 
-        // Fix 1: Allocate exactly 1 byte per pixel for a true single-channel grayscale heightmap
-        std::vector<u8> HeightMap(Width * Height);
-
-        float xFactor = 1.0f / (Width - 1);
-        float yFactor = 1.0f / (Height - 1);
-
-        for (int row = 0; row < Height; row++) {
-            for (int col = 0; col < Width; col++) {
-                float x = ((float)col + 0.5f) * xFactor;
-                float y = ((float)row + 0.5f) * yFactor;
+        for (int row = 0; row < Config.height; row++) {
+            if (row % 100 == 0) {
+                printf("Generating row %d of %d\n", row, Config.height);
+            }
+            for (int col = 0; col < Config.width; col++) {
 
                 float Sum = 0.0f;
-                float Freq = BaseFreq;
-                float Amplitude = 1.0f; // Start amplitude at full weight
-                float MaxPossibleHeight = 0.0f; // Track total possible weight for clean normalization
+                float Amplitude = 1.0f;
+                float MaxPossibleHeight = 0.0f;
 
-                // Loop and combine all octaves together BEFORE packing into memory
-                for (int Oct = 0; Oct < NumOctaves; Oct++) {
-                    glm::vec2 p(x * Freq, y * Freq);
+                // Start frequency at your initial zoom scale (0.005f)
+                float Freq = Config.scale;
 
-                    // Fix 2: Multiply by Amplitude (Scale), not the raw static Persistence value
+                // Loop using your exact octave count (6)
+                for (int Oct = 0; Oct < Config.octaves; Oct++) {
+                    // Pass raw pixel indices multiplied by frequency
+                    // First octave at edge: 2048 * 0.005 = 10.24 (Beautiful scale)
+                    glm::vec2 p((float)col * Freq, (float)row * Freq);
+
                     float Val = glm::perlin(p) * Amplitude;
                     Sum += Val;
 
-                    MaxPossibleHeight += Amplitude; // Accumulate maximum scale ceiling
-                    Freq *= 2.0f;
-                    Amplitude *= Persistence; // Scale down weight for higher frequencies
+                    MaxPossibleHeight += Amplitude;
+
+                    // Scale frequency and amplitude using your explicit struct multipliers
+                    Freq *= Config.lacunarity; // Multiplies frequency by 2.0f each step
+                    Amplitude *= Config.gain;  // Diminishes amplitude by 0.5f each step
                 }
 
-                // Fix 3: Normalize cleanly from Perlin's [-Max, +Max] range directly to [0.0, 1.0]
+                // Normalize from Perlin's [-Max, +Max] directly to standard [0.0, 1.0] range
                 float Result = (Sum / MaxPossibleHeight + 1.0f) * 0.5f;
 
-                // Clamp protection boundaries safely
+                // Safety boundary clamp
                 if (Result > 1.0f) Result = 1.0f;
                 if (Result < 0.0f) Result = 0.0f;
 
-                // Map directly to our 1-byte-per-pixel array index layout
-                HeightMap[row * Width + col] = (u8)(Result * 255.0f);
+                // Map directly to our 32-bit float array buffer
+                HeightMap[row * Config.width + col] = Result;
             }
         }
 
-        // Fix 4: Corrected channels to 1, and fixed stride to match Width * 1 byte
-        stbi_write_png("heightmap.png", Width, Height, 1, HeightMap.data(), Width * 1);
+        // Save as a high-precision Single-Channel (1) HDR file
+        stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, HeightMap.data());
+        printf("Heightmap successfully saved as 32-bit HDR format.\n");
     }
-
 };
 
 
 void carbonara()
 {
     //BallisticsDemo demo;
-   // FireworksDemo demo;
+  //  FireworksDemo demo;
 //    AnimationDemo demo;
   //  BridgeDemo demo;
   // AmazonBistroDemo demo;
