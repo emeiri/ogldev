@@ -115,6 +115,8 @@ public:
 
     virtual int LoadCubemapTexture(const std::string& Filename) = 0;
 
+    virtual void* CreateTerrainGrid(int Width, int Height) = 0;
+
     virtual void GetWindowSize(int& Width, int& Height) const = 0;
 
     virtual double GetElapsedTime() const = 0;

@@ -28,6 +28,19 @@
 #include "gl_forward_renderer.h"
 #include "GL/gl_scene.h"
 
+class TerrainGrid
+{
+public:
+    TerrainGrid() {}
+
+    void Render();
+
+    GLuint m_vao = 0;
+    GLuint m_vbo;
+    GLuint m_ebo;
+    u32 m_indexCount;
+};
+
 class RenderingSystemGL : public CoreRenderingSystem
 {
  public:
@@ -54,6 +67,8 @@ class RenderingSystemGL : public CoreRenderingSystem
     virtual void Execute();
 
     virtual void ImGuiTextureWindow(const char* pTitle);
+
+    virtual void* CreateTerrainGrid(int Width, int Height);
 
     BaseTexture* GetTexture(int TextureHandle);
 

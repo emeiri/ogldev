@@ -309,6 +309,11 @@ void ForwardRenderer::InitTechniques()
         printf("Error initializing the blur filter 2 technique\n");
         exit(1);
     }
+
+    if (!m_heightmapTech.Init()) {
+        printf("Error initializing the heightmap technique\n");
+        exit(1);
+    }   
 }
 
 
@@ -507,8 +512,18 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
     if (pScene->GetConfig()->IsSkyboxEnabled()) {
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
-    else {
-        printf("Warning! render list is empty and no main model or skybox\n");
+    // TODO: duplicate code with the one in LightingPass, can be refactored
+    else if (pScene->GetConfig()->GetTerrainGrid()) {
+        TerrainGrid* pTerrainGrid = (TerrainGrid*)pScene->GetConfig()->GetTerrainGrid();
+        m_heightmapTech.Enable();
+        Matrix4f WVP = m_pCurCamera->GetMatrix();
+        m_heightmapTech.SetWVP(WVP);
+      //  glDisable(GL_CULL_FACE);
+        pTerrainGrid->Render();
+    } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+        RenderInfiniteGrid(pScene);
+    } else {
+            printf("Warning! render list is empty and no main model or skybox\n");
     }
 }
 
@@ -777,7 +792,7 @@ void ForwardRenderer::GBufferPass(GLScene* pScene)
     m_geometryTech.Enable();
 
     if (UseIndirectRender) {
-        Matrix4f VP = m_pCurCamera->GetVPMatrix();
+        Matrix4f VP = m_pCurCamera->GetMatrix();
         m_geometryTech.SetVP(VP);
     }
 
@@ -877,8 +892,13 @@ void ForwardRenderer::LightingPass(GLScene* pScene, double TotalRuntime)
     BindShadowMaps();
 
     m_lightParams.BindUBO(LIGHT_UBO_INDEX);
-  
-    if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+
+    // TODO: duplicate code
+    if (pScene->GetConfig()->GetTerrainGrid()) {
+        TerrainGrid* pTerrainGrid = (TerrainGrid*)pScene->GetConfig()->GetTerrainGrid();
+        m_heightmapTech.Enable();
+        pTerrainGrid->Render();
+    } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
     }
 

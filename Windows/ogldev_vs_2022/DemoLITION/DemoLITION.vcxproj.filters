@@ -169,6 +169,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_blur_filter2_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_heightmap_technique.cpp">
+      <Filter>Source\GL\Techniques</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -354,6 +357,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_keys.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_heightmap_technique.h">
+      <Filter>Include\GL\Techniques</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -476,6 +482,12 @@
       <Filter>Shaders\GL</Filter>
     </None>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map_with_bloom.fs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\heightmap.vs">
+      <Filter>Shaders\GL</Filter>
+    </None>
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\heightmap.fs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>

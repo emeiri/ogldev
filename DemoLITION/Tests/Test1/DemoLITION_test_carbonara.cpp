@@ -1322,8 +1322,8 @@ public:
 
 
 struct TerrainConfig {
-    int width = 2049;        // Power-of-two plus one (ideal for tessellation patches)
-    int height = 2049;
+    int width = 129;        // Power-of-two plus one (ideal for tessellation patches)
+    int height = 129;
     int octaves = 6;         // How many detail layers to stack
     float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
     float gain = 0.5f;       // Amplitude multiplier per octave (persistence)
@@ -1345,11 +1345,15 @@ public:
         TerrainConfig Config;
 
         CreateHeightMap(Config);
-        exit(1);
-        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
 
-        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        void* pTerrain = m_pRenderingSystem->CreateTerrainGrid(Config.width, Config.height);
+        
+       // m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
+        m_pScene = m_pRenderingSystem->CreateEmptyScene();
+
+        m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
         m_pScene->GetConfig()->ControlShadowMapping(false);
+        m_pScene->GetConfig()->SetTerrainGrid(pTerrain);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -1357,7 +1361,7 @@ public:
         // pSceneObject->SetScale(0.01f);
        //  m_pScene->AddToRenderList(pSceneObject);
 
-      //   m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));
+         m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));
     }
 
 private:

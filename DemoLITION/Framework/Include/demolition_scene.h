@@ -229,6 +229,9 @@ public:
     RENDER_MODE GetRenderMode() const { return m_renderMode; }
     void SetRenderMode(RENDER_MODE mode) { m_renderMode = mode; }
 
+    void SetTerrainGrid(void* pGrid) { pTerrainGrid = pGrid; }
+    void* GetTerrainGrid() const { return pTerrainGrid; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -263,6 +266,7 @@ private:
     int m_projectedTexture = -1;
     Matrix4f m_projectionMat;
     RENDER_MODE m_renderMode;
+    void* pTerrainGrid = NULL;
 };
 
 
