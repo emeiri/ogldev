@@ -31,10 +31,13 @@
 #include "demolition.h"
 #include "demolition_base_gl_app.h"
 #include "ogldev_physics.h"
+#include "3rdparty/stb_image_write.h"
 
 //#define GLM_ENABLE_EXPERIMENTAL
 //#include <glm/glm.hpp>
 //#include <glm/ext.hpp>
+
+#include <glm/gtc/noise.hpp>
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -1318,12 +1321,97 @@ public:
 };
 
 
+class PerlinDemo : public Carbonara {
+
+public:
+
+    PerlinDemo()
+    {
+    }
+
+    void InitChild()
+    {
+        delete m_pScene;
+
+        CreateHeightMap();
+        exit(1);
+        m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
+
+        m_pScene->SetClearColor(Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+        m_pScene->GetConfig()->ControlShadowMapping(false);
+
+        m_pRenderingSystem->SetScene(m_pScene);
+
+        // SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
+        // pSceneObject->SetScale(0.01f);
+       //  m_pScene->AddToRenderList(pSceneObject);
+
+      //   m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));
+    }
+
+private:
+
+    void CreateHeightMap()
+    {
+        int Width = 1024;
+        int Height = 1024;
+        float Persistence = 0.5f;
+        float BaseFreq = 4.0f;
+        int NumOctaves = 4;
+
+        // Fix 1: Allocate exactly 1 byte per pixel for a true single-channel grayscale heightmap
+        std::vector<u8> HeightMap(Width * Height);
+
+        float xFactor = 1.0f / (Width - 1);
+        float yFactor = 1.0f / (Height - 1);
+
+        for (int row = 0; row < Height; row++) {
+            for (int col = 0; col < Width; col++) {
+                float x = ((float)col + 0.5f) * xFactor;
+                float y = ((float)row + 0.5f) * yFactor;
+
+                float Sum = 0.0f;
+                float Freq = BaseFreq;
+                float Amplitude = 1.0f; // Start amplitude at full weight
+                float MaxPossibleHeight = 0.0f; // Track total possible weight for clean normalization
+
+                // Loop and combine all octaves together BEFORE packing into memory
+                for (int Oct = 0; Oct < NumOctaves; Oct++) {
+                    glm::vec2 p(x * Freq, y * Freq);
+
+                    // Fix 2: Multiply by Amplitude (Scale), not the raw static Persistence value
+                    float Val = glm::perlin(p) * Amplitude;
+                    Sum += Val;
+
+                    MaxPossibleHeight += Amplitude; // Accumulate maximum scale ceiling
+                    Freq *= 2.0f;
+                    Amplitude *= Persistence; // Scale down weight for higher frequencies
+                }
+
+                // Fix 3: Normalize cleanly from Perlin's [-Max, +Max] range directly to [0.0, 1.0]
+                float Result = (Sum / MaxPossibleHeight + 1.0f) * 0.5f;
+
+                // Clamp protection boundaries safely
+                if (Result > 1.0f) Result = 1.0f;
+                if (Result < 0.0f) Result = 0.0f;
+
+                // Map directly to our 1-byte-per-pixel array index layout
+                HeightMap[row * Width + col] = (u8)(Result * 255.0f);
+            }
+        }
+
+        // Fix 4: Corrected channels to 1, and fixed stride to match Width * 1 byte
+        stbi_write_png("heightmap.png", Width, Height, 1, HeightMap.data(), Width * 1);
+    }
+
+};
+
 
 void carbonara()
 {
     //BallisticsDemo demo;
    // FireworksDemo demo;
-    AnimationDemo demo;
+//    AnimationDemo demo;
   //  BridgeDemo demo;
   // AmazonBistroDemo demo;
   //  SkyboxDemo demo;
@@ -1332,6 +1420,7 @@ void carbonara()
     //HeliGame demo;
     //SSGIDemo demo;
  //   CubeMappingDemo demo;
+    PerlinDemo demo;
 
     demo.Start();
 }
