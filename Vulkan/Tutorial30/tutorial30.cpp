@@ -291,10 +291,11 @@ private:
 									  zNear, zFar };
 		
 		glm::vec3 Pos(10.0f, 2.4f, -0.17f);
-		glm::vec3 Target(-1.0f, -0.025f, 0.05f);
+		glm::vec3 Target(-1.0f, -0.025f, 0.0f);
 		glm::vec3 Up(0.0, 1.0f, 0.0f);
 
 		m_pGameCamera = new GLMCameraFirstPerson(Pos, Target, Up, persProjInfo);
+		m_pGameCamera->m_maxSpeed = 1.5f;
 	}
 
 
