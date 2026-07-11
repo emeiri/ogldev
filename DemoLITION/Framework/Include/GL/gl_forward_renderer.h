@@ -45,6 +45,7 @@
 #include "GL/gl_bright_filter_technique.h"
 #include "GL/gl_blur_filter1_technique.h"
 #include "GL/gl_blur_filter2_technique.h"
+#include "GL/gl_heightmap_technique.h"
 
 
 enum RENDER_PASS {
@@ -240,6 +241,8 @@ private:
     SSGITechnique m_ssgiTech;
     BlurFilter1Technique m_blurFilter1Tech;
     BlurFilter2Technique m_blurFilter2Tech;
+    HeightmapTechnique m_heightmapTech;
+
     int m_hdrNumGroupsX = 0;
     int m_hdrNumGroupsY = 0;
 
