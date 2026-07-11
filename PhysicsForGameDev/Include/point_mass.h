@@ -60,6 +60,11 @@ public:
     //    GLM_PRINT_VEC3("Sum forces ", m_sumForces);
     }
 
+    void Activate() { m_isActive = true; }
+    void Deativate() { m_isActive = false; }
+
+    bool IsActive() const { return m_isActive; }
+
     const glm::vec3& GetPos() const { return m_pos; }
 
     void SetPos(const glm::vec3& Pos) { m_pos = Pos; }
@@ -78,6 +83,8 @@ private:
 
     bool CheckCollision(const PointMass& OtherParticle) const;    
     void HandleCollisionInelastic(Physics::PointMass& OtherParticle);
+
+    bool m_isActive = false;
 
     glm::vec3 m_pos = glm::vec3(0.0f);
 
