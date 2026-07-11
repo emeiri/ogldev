@@ -66,7 +66,7 @@ public:
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         m_pRenderingSystem->SetScene(m_pScene);
         m_pScene->SetClearColor(Vector4f(0.5f));
-        m_pScene->SetCamera(Vector3f(20.0f, 4.0f, 0.0f), Vector3f(0.0f, 0.05f, -1.0f));
+        m_pScene->SetCamera(Vector3f(0.0f, 4.0f, 0.0f), Vector3f(0.0f, 0.05f, 1.0f));
 
         SceneConfig* pConfig = m_pScene->GetConfig();
         pConfig->GetInfiniteGrid().Enabled = true;
@@ -92,6 +92,7 @@ public:
     {
         m_pSceneObject = m_pScene->CreateSceneObject(pModel);
         m_pSceneObject->SetPosition(m_pos);
+        m_pSceneObject->SetScale(0.2f);
         m_pScene->AddToRenderList(m_pSceneObject);
     }
 
@@ -99,8 +100,7 @@ public:
     void CreatePointMasses()
     {
         m_pPointMass = m_physicsSystem.AllocPointMass();
-        glm::vec3 ForceVec(glm::vec3(-800.0f, 800.0f, 0.0f));
-        m_pPointMass->Init(1.0f, m_pSceneObject->GetGLMPos(), ForceVec, m_pSceneObject);
+        m_pPointMass->Init(m_pistolMass, m_pSceneObject->GetGLMPos(), m_pistolForce, m_pSceneObject);
     }
 
 
@@ -108,8 +108,7 @@ public:
     { 
         if (m_pPointMass->GetPos().y < 0.0f) {
            // printf("Initializing\n");
-            glm::vec3 ForceVec(glm::vec3(-800.0f, 800.0f, 0.0f));
-            m_pPointMass->Init(1.0f, m_pSceneObject->GetGLMPos(), ForceVec, m_pSceneObject);
+            m_pPointMass->Init(m_pistolMass, m_pos, m_pistolForce, m_pSceneObject);
         } 
         
         m_physicsSystem.Update(DeltaTime);
@@ -121,8 +120,7 @@ public:
         bool ret = false;
 
         if ((key == GLFW_KEY_SPACE) && (action == GLFW_PRESS)) {
-            glm::vec3 ForceVec(glm::vec3(-800.0f, 800.0f, 0.0f));
-            m_pPointMass->Init(1.0f, m_pSceneObject->GetGLMPos(), ForceVec, m_pSceneObject);
+            m_pPointMass->Init(1.0f, m_pSceneObject->GetGLMPos(), m_pistolForce, m_pSceneObject);
             ret = true;
         } else {
             ret = BaseGLApp::OnKeyboard(key, action);
@@ -157,7 +155,9 @@ private:
     SceneObject* m_pSceneObject = NULL;
     Physics::PointMass* m_pPointMass = NULL;
 
-    glm::vec3 m_pos = glm::vec3(40.0f, 3.0f, -30.0f);
+    glm::vec3 m_pos = glm::vec3(-20.0f, 1.5f, 40.0f);
+    float m_pistolMass = 0.01f;
+    glm::vec3 m_pistolForce = glm::vec3(20.0f, 3.0f, 0.0f);
 };
 
 
