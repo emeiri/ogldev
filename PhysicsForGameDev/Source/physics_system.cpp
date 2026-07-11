@@ -63,9 +63,11 @@ void System::Update(double DeltaTime)
 void System::ApplyGlobalForces()
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
-        float Mass = m_pointMasses[i].GetMass();
-        glm::vec3 Force = m_globalForce * Mass;
-        m_pointMasses[i].AddForce(Force);
+        if (m_pointMasses[i].IsActive()) {
+            float Mass = m_pointMasses[i].GetMass();
+            glm::vec3 Force = m_globalForce * Mass;
+            m_pointMasses[i].AddForce(Force);
+        }
     }
 
     for (int i = 0; i < m_numActiveRigidBodies; i++) {
@@ -79,7 +81,9 @@ void System::ApplyGlobalForces()
 void System::ResetAllForces()
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
-        m_pointMasses[i].ResetForces();
+        if (m_pointMasses[i].IsActive()) {
+            m_pointMasses[i].ResetForces();
+        }
     }
 
     for (int i = 0; i < m_numActiveRigidBodies; i++) {
@@ -98,7 +102,9 @@ void System::UpdateInternal(float DeltaTime)
 void System::UpdatePointMasses(float DeltaTime)
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
-        m_pointMasses[i].Update(DeltaTime, m_pUpdateListener);
+        if (m_pointMasses[i].IsActive()) {
+            m_pointMasses[i].Update(DeltaTime, m_pUpdateListener);
+        }
     }
 }
 
@@ -114,9 +120,13 @@ void System::UpdateRigidBodies(float DeltaTime)
 void System::HandlePointMassCollisions()
 {
     for (int i = 0; i < m_numActivePointMasses; i++) {
-        for (int j = i + 1; j < m_numActivePointMasses; j++) {
-            PointMass& OtherParticle = m_pointMasses[j];
-            m_pointMasses[i].HandleCollision(OtherParticle);
+        if (m_pointMasses[i].IsActive()) {
+            for (int j = i + 1; j < m_numActivePointMasses; j++) {
+                PointMass& OtherParticle = m_pointMasses[j];
+                if (OtherParticle.IsActive()) {
+                    m_pointMasses[i].HandleCollision(OtherParticle);
+                }
+            }
         }
     }
 }
@@ -158,10 +168,37 @@ PointMass* System::AllocPointMass()
     }
 
     PointMass* pm = &m_pointMasses[m_numActivePointMasses];
+    pm->Activate();
 
     m_numActivePointMasses++;
 
     return pm;
+}
+
+
+void System::DeallocPointMass(PointMass* pPointMass)
+{
+    if (pPointMass < m_pointMasses.data() || pPointMass >= &m_pointMasses[m_numActivePointMasses]) {
+        printf("Invalid point mass deallocation %p\n", pPointMass);
+        printf("Valid range is %p - %p\n", m_pointMasses.data(), &m_pointMasses[m_numActivePointMasses]);
+        printf("Num active point masses = %d\n", m_numActivePointMasses);
+        assert(0);
+    }
+
+    int Index = (int)(pPointMass - m_pointMasses.data());
+
+    if (m_pointMasses[Index].IsActive() == false) {
+        printf("Point mass %p is already deallocated\n", pPointMass);
+        assert(0);
+    }
+
+    m_pointMasses[Index].Deativate();
+
+    if (Index == m_numActivePointMasses - 1) {
+        // Last point mass, just decrement the count
+        m_numActivePointMasses--;
+        assert(m_numActivePointMasses >= 0);
+    }
 }
 
 

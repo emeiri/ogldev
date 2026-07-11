@@ -43,6 +43,7 @@ public:
 
 
     PointMass* AllocPointMass();
+    void DeallocPointMass(PointMass* pPointMass);
 
     RigidBody* AllocRigidBody();
 
