@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="../style.css">
         <link rel="stylesheet" href="../print.css" media="print">
     </head>
-    <body>
+    <body class="tutorial-page">
         <header id="header">
             <div>
                 <h2> Tutorial 8: </h2>
@@ -25,7 +25,9 @@
 
         <article id="content" class="breakpoint">
             <section>
-			<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/pLFXNmbDZk8?si=vEHHher4eWcDb6OY" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div class="video-embed">
+				<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/pLFXNmbDZk8?si=vEHHher4eWcDb6OY" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
                 <h3> Background </h3>
 
                 <p>The scaling transformation is very simple. Its purpose is to
@@ -67,7 +69,9 @@
 
             <p>For more information on this subject check out the following <a href="https://www.youtube.com/watch?v=aJRrgka4dpU&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=10">video tutorial by Frahaan Hussain</a>.</p>
 
-            <a href="../tutorial09/tutorial09.html" class="next highlight"> Next tutorial </a>
+            <nav class="tutorial-nav">
+                <a href="../tutorial09/tutorial09.html" class="next highlight"> Next tutorial </a>
+            </nav>
         </article>
 
         <script src="../html5shiv.min.js"></script>

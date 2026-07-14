@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="../style.css">
         <link rel="stylesheet" href="../print.css" media="print">
     </head>
-    <body>
+    <body class="tutorial-page">
         <header id="header">
             <div>
                 <h2> Tutorial 5: </h2>
@@ -25,7 +25,9 @@
 
         <article id="content" class="breakpoint">
             <section>
-                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/mat3uvF33O0" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div class="video-embed">
+                    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/mat3uvF33O0" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
                 <h3> Background </h3>
 
                 <p>In this tutorial we meet a new type of shader variables -
@@ -121,7 +123,9 @@
                     the triangle is upside down half of the loop?</p>
             </section>
 
-            <a href="../tutorial06/tutorial06.html" class="next highlight"> Next tutorial </a>
+            <nav class="tutorial-nav">
+                <a href="../tutorial06/tutorial06.html" class="next highlight"> Next tutorial </a>
+            </nav>
         </article>
         <script src="../html5shiv.min.js"></script>
         <script src="../html5shiv-printshiv.min.js"></script>
