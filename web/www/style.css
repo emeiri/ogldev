@@ -237,6 +237,123 @@ img {
 	}
 }
 
+#hero {
+	display: flex;
+	align-items: stretch;
+	gap: var(--space-6);
+	margin-bottom: var(--space-6);
+	padding: var(--space-4) 0 var(--space-6);
+	border-top: 1px solid var(--color-border);
+	border-bottom: 1px solid var(--color-border);
+}
+
+#hero .hero-copy,
+#hero .featured-video {
+	width: calc(50% - (var(--space-6) / 2));
+}
+
+#hero .hero-copy {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: var(--space-4);
+}
+
+.eyebrow {
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--color-text-muted);
+}
+
+#hero h1 {
+	font-size: 48px;
+	line-height: 1.05;
+	color: var(--color-heading);
+}
+
+#hero .hero-intro,
+#hero .featured-video p {
+	font-size: 18px;
+	line-height: 1.6;
+	color: var(--color-text-muted);
+}
+
+#hero .hero-actions,
+#hero .video-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-3);
+	align-items: center;
+}
+
+#hero .hero-actions a,
+#hero .video-links a {
+	padding: 10px 16px;
+	border-radius: var(--radius-md);
+}
+
+#hero .featured-video {
+	padding: var(--space-4);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	box-sizing: border-box;
+}
+
+#hero .featured-video h2 {
+	font-size: 28px;
+	line-height: 1.2;
+	margin: var(--space-2) 0 var(--space-3);
+	color: var(--color-heading);
+}
+
+#hero .video-frame {
+	margin: var(--space-4) 0;
+	background: #111;
+	border-radius: var(--radius-md);
+	overflow: hidden;
+}
+
+#hero .video-frame iframe {
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	height: auto;
+	max-width: 100%;
+	border: 0;
+}
+
+.section-title {
+	margin-bottom: var(--space-5);
+}
+
+@media all and (max-width: 1099px) {
+	#hero {
+		display: block;
+		padding-top: 0;
+	}
+
+	#hero .hero-copy,
+	#hero .featured-video {
+		width: 100%;
+	}
+
+	#hero .hero-copy {
+		margin-bottom: var(--space-5);
+	}
+
+	#hero h1 {
+		font-size: 38px;
+	}
+
+	.section-title {
+		margin-bottom: var(--space-4);
+	}
+}
+
 /* homepage */
 #homepage {
 	margin-bottom: 20px;
