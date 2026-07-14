@@ -356,28 +356,39 @@ img {
 
 /* homepage */
 #homepage {
-	margin-bottom: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: var(--space-5);
+	align-items: start;
+	margin-bottom: var(--space-6);
 }
 
 #homepage article {
-	float: left;
-	width: 300px;
-	display: block;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: var(--space-3);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	box-sizing: border-box;
 }
 
 #homepage article + article {
-	margin-left: 60px;
+	margin-left: 0;
 }
 
 /* > animation */
 #homepage article .preview {
-	padding: 0px;
+	padding: 0;
 	position: relative;
-    display: inline-block;
-    text-decoration: none;
-    overflow: hidden;
-    background: #111;
-    max-width: 100%;
+	display: block;
+	text-decoration: none;
+	overflow: hidden;
+	background: #111;
+	max-width: 100%;
+	border-radius: var(--radius-sm);
 }
 
 #homepage article .preview:before,
@@ -391,9 +402,11 @@ img {
 }
 
 #homepage article .preview img {
-    display: block;
-    transition: all .6s ease-in-out;
-    width: 100%;
+	display: block;
+	transition: all .6s ease-in-out;
+	width: 100%;
+	aspect-ratio: 16 / 10;
+	object-fit: cover;
 }
 
 #homepage article .preview:before {
@@ -429,39 +442,38 @@ img {
 }
 
 #homepage article h3 {
-	margin-top: 5px;
-	margin-right: 10px;
-	text-align: right;
+	margin: var(--space-3) 0 var(--space-2);
+	text-align: left;
 	font-size: 14px;
-	color: #686868;
+	color: var(--color-text-muted);
 }
 
 #homepage article h2 {
-	margin-bottom: 5px;
-	margin-right: 10px;
-	text-align: right;
-	line-height: 160%;
-	font-size: 16px;
+	margin-bottom: 0;
+	text-align: left;
+	line-height: 1.5;
+	font-size: 20px;
+	color: var(--color-heading);
 }
 
-#homepage .breakpoint {
-	margin: 30px 0;
+#homepage > .breakpoint {
+	display: none;
 }
 
 @media all and (max-width: 1099px) {
+	#homepage {
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: var(--space-4);
+	}
+
 	#homepage article {
-		width: 100%;
-		max-width: 300px;
-		margin: 15px auto;
-		float: none;
+		width: auto;
+		max-width: none;
+		margin: 0;
 	}
 
 	#homepage article + article {
-		margin: 30px auto 15px;
-	}
-
-	#homepage .breakpoint {
-		margin: 15px;
+		margin: 0;
 	}
 }
 
