@@ -3,11 +3,45 @@
 	padding: 0;
 }
 
+:root {
+	--font-sans: 'Open Sans', Arial, sans-serif;
+
+	--page-max-width: 1100px;
+	--page-padding-x: 15px;
+	--content-max-width: 760px;
+
+	--color-text: #363636;
+	--color-text-muted: #686868;
+	--color-text-subtle: #b3b3b3;
+	--color-heading: #191919;
+	--color-background: #f4f4f4;
+	--color-surface: #ffffff;
+	--color-border: #dcdcdc;
+	--color-accent: #1e5abc;
+	--color-accent-strong: #004876;
+
+	--radius-sm: 4px;
+	--radius-md: 8px;
+
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+	--shadow-md: 0 6px 18px rgba(0, 0, 0, 0.12);
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 20px;
+	--space-5: 30px;
+	--space-6: 40px;
+
+	--transition-fast: 0.2s;
+	--transition-base: 0.3s;
+}
+
 body {
 	font-size: 20px;
-	font-family: 'Open Sans', Arial;
-	color: #363636;
-	background: #f4f4f4;
+	font-family: var(--font-sans);
+	color: var(--color-text);
+	background: var(--color-background);
 	margin: 0 auto;
 	width: 1100px;
 	margin-left: auto;
@@ -25,17 +59,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-	color: #363636;
+	color: var(--color-text);
 	text-decoration: none;
 	font-weight: 600;
 	display: inline-block;
 	padding: 6px 12px;
-	transition: all 0.3s;
+	transition: all var(--transition-base);
 }
 
 a.highlight {
 	color: white;
-	background: #1e5abc;
+	background: var(--color-accent);
 }
 
 a:hover {
@@ -154,7 +188,7 @@ img {
 
 #header h2 {
 	padding-top: 30px;
-	color: #686868;
+	color: var(--color-text-muted);
 	font-size: 16px;
 }
 
@@ -288,7 +322,7 @@ img {
 
 /* page */
 #content {
-	border-top: 1px solid #dcdcdc;
+	border-top: 1px solid var(--color-border);
 	margin-bottom: 20px;
 	padding-top: 40px;
 }
@@ -299,7 +333,7 @@ img {
 
 #content h3 {
 	font-size: 18px;
-	color: #191919;
+	color: var(--color-heading);
 	padding-bottom: 12px;
 }
 
@@ -308,13 +342,13 @@ img {
 	font-family: monospace, Courier, Webdings;
 	padding-bottom: 12px;
 	line-height: 140%;
-	color: #004876;
+	color: var(--color-accent-strong);
 }
 
 #content p {
 	display: block;
 	text-align: justify;
-	color: #191919;
+	color: var(--color-heading);
 	padding-bottom: 12px;
 	line-height: 160%;
 }
@@ -345,7 +379,7 @@ img {
 #footer {
 	text-align: right;
 	font-size: 11px;
-	color: #b3b3b3;
+	color: var(--color-text-subtle);
 	padding: 10px 0 20px;
 }
 
