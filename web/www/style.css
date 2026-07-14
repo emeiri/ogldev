@@ -577,7 +577,7 @@ img {
 }
 
 .tutorial-page #content {
-	max-width: var(--content-max-width);
+	max-width: 860px;
 	margin: 0 auto var(--space-6);
 	padding-top: 0;
 	border-top: 0;
