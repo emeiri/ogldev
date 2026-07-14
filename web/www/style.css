@@ -43,14 +43,17 @@ body {
 	color: var(--color-text);
 	background: var(--color-background);
 	margin: 0 auto;
-	width: 1100px;
+	width: 100%;
+	max-width: calc(var(--page-max-width) + (var(--page-padding-x) * 2));
+	padding: 0 var(--page-padding-x);
+	box-sizing: border-box;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 @media all and (max-width: 1099px) {
 	body {
-		margin: 0 15px;
+		padding: 0 var(--page-padding-x);
 	}
 }
 
