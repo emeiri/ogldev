@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="../style.css">
         <link rel="stylesheet" href="../print.css" media="print">
 </head>
-<body>
+<body class="tutorial-page">
         <header id="header">
                 <div>
                         <h2> Tutorial 1: </h2>
@@ -25,9 +25,10 @@
 
         <article id="content" class="breakpoint">
             <section>
-                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/DYuLHRsvZwk" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div class="video-embed">
+                        <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/DYuLHRsvZwk" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
 
-                <br>
                         <h3> Background </h3>
 
                         <p> Thanks to Mariano Suligoy you can read this tutorial in <a href='tutorial1_spanish.html'>Spanish</a>.</p>
@@ -65,7 +66,9 @@
                         <p> The only thing we do in our render function is to clear the framebuffer (using the color specified above - try changing it). The second call tells GLUT to swap the roles of the backbuffer and the frontbuffer. In the next round through the render callback we will render into the current frames front buffer and the current backbuffer will be displayed. </p>
                 </section>
 
-                <a href="../tutorial02/tutorial02.html" class="next highlight"> Next tutorial </a>
+                <nav class="tutorial-nav">
+                        <a href="../tutorial02/tutorial02.html" class="next highlight"> Next tutorial </a>
+                </nav>
         </article>
 
         <script src="../html5shiv.min.js"></script>
@@ -85,8 +88,5 @@
          })();
         </script>
         <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-</body>
-</html>
-
 </body>
 </html>
