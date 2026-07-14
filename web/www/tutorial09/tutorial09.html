@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="../style.css">
         <link rel="stylesheet" href="../print.css" media="print">
 </head>
-<body>
+<body class="tutorial-page">
         <header id="header">
                 <div>
                         <h2> Tutorial 9: </h2>
@@ -25,7 +25,9 @@
 
         <article id="content" class="breakpoint">
             <section>
-                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/ZVgf_W-X8eM" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div class="video-embed">
+                        <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/ZVgf_W-X8eM" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
                         <h3> Background </h3>
 
                         <p>This tutorial demonstrates
@@ -124,7 +126,9 @@
                         changes and this completes this tutorial.</p>
                 </section>
 
-                <a href="../tutorial10/tutorial10.html" class="next highlight"> Next tutorial </a>
+                <nav class="tutorial-nav">
+                        <a href="../tutorial10/tutorial10.html" class="next highlight"> Next tutorial </a>
+                </nav>
         </article>
 
         <script src="../html5shiv.min.js"></script>
