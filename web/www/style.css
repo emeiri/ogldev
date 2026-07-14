@@ -532,6 +532,138 @@ img {
 	padding: 6px 12px;
 }
 
+/* tutorial shell prototype */
+.tutorial-page #header {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: var(--space-5);
+	padding: var(--space-5) 0;
+	margin-bottom: var(--space-5);
+	border-bottom: 1px solid var(--color-border);
+}
+
+.tutorial-page #header > div {
+	width: auto;
+	padding-right: 0;
+}
+
+.tutorial-page #header h2 {
+	padding-top: 0;
+	padding-bottom: var(--space-2);
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--color-text-muted);
+}
+
+.tutorial-page #header h1 {
+	padding-bottom: 0;
+	font-size: 42px;
+	line-height: 1.1;
+	color: var(--color-heading);
+}
+
+.tutorial-page #header > #logo {
+	display: block;
+	padding: 0;
+	flex-shrink: 0;
+}
+
+.tutorial-page #header > #logo img {
+	max-width: 170px;
+	height: auto;
+}
+
+.tutorial-page #content {
+	max-width: var(--content-max-width);
+	margin: 0 auto var(--space-6);
+	padding-top: 0;
+	border-top: 0;
+}
+
+.tutorial-page #content section {
+	padding: var(--space-4);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface);
+	box-shadow: var(--shadow-sm);
+}
+
+.tutorial-page #content section + section {
+	margin-top: var(--space-4);
+}
+
+.tutorial-page #content h3 {
+	font-size: 22px;
+	padding-bottom: var(--space-3);
+}
+
+.tutorial-page #content p {
+	text-align: left;
+	line-height: 1.7;
+	padding-bottom: var(--space-3);
+}
+
+.tutorial-page #content code {
+	padding: var(--space-2) var(--space-3);
+	margin-bottom: var(--space-3);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	background: #f8fafc;
+	line-height: 1.6;
+	overflow-x: auto;
+	box-sizing: border-box;
+}
+
+.tutorial-page .video-embed {
+	margin-bottom: var(--space-4);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	box-shadow: var(--shadow-sm);
+	background: #111;
+}
+
+.tutorial-page .video-embed iframe {
+	display: block;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	height: auto;
+	border: 0;
+}
+
+.tutorial-page .tutorial-nav {
+	margin-top: var(--space-4);
+	display: flex;
+	justify-content: flex-end;
+}
+
+.tutorial-page .tutorial-nav a {
+	padding: 10px 14px;
+	border-radius: var(--radius-md);
+}
+
+@media all and (max-width: 1099px) {
+	.tutorial-page #header {
+		display: block;
+		padding: var(--space-4) 0;
+	}
+
+	.tutorial-page #header h1 {
+		font-size: 34px;
+	}
+
+	.tutorial-page #header > #logo {
+		display: none;
+	}
+
+	.tutorial-page #content section {
+		padding: var(--space-3);
+	}
+}
+
 /* credit */
 #footer {
 	text-align: right;
