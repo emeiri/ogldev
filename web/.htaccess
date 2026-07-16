@@ -1,0 +1,14 @@
+RewriteEngine On
+
+# Redirect legacy/retired pages to canonical destinations.
+RewriteRule ^Introduction\.html$ /instructions.html [L,R=301,NC]
+RewriteRule ^test\.html$ /index.html [L,R=301,NC]
+RewriteRule ^faq/faq\.html$ /faq.html [L,R=301,NC]
+
+# Redirect anything that is NOT ogldev.org to ogldev.org
+RewriteCond %{HTTP_HOST} !^ogldev\.org$ [NC]
+RewriteRule ^(.*)$ https://ogldev.org/$1 [L,R=301]
+
+# Force HTTPS (Atspace rule)
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
