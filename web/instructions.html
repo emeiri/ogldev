@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0B8SXQJEDD"></script>
@@ -11,8 +11,9 @@
   gtag('config', 'G-0B8SXQJEDD');
 </script>
 
-  <meta content="text/html; charset=ISO-8859-1"
- http-equiv="Content-Type">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Instructions</title>
   		<meta name="description" content="Instructions for setting up and building the OGLDEV OpenGL tutorial source code.">
   		<link rel="canonical" href="https://ogldev.org/instructions.html" />
@@ -26,48 +27,71 @@
         <meta name="twitter:description" content="Instructions for setting up and building the OGLDEV OpenGL tutorial source code.">
         <meta name="twitter:image" content="https://ogldev.org/www/logo_hdpi.png">
           <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
-        <link rel="stylesheet" href="https://ogldev.org/www/style.css">
+        <link rel="stylesheet" href="www/style.css">
         <link rel="stylesheet" href="www/print.css" media="print">
 
 </head>
-<body>
-<h1 style="text-align: center;">Instructions</h1>
-<div style="text-align: justify;"><big><big>
-<p>The tutorials are written
-in C++. My assumption is that the reader is experienced in that
-    language and in software development in general.</p>
-	<br>
-<p>
-The primary requirement for running the tutorials is a GPU
-that supports version 3.3 of the OpenGL spec at least (though some of
-the tutorials, e.g. Tessellation, require 4.x support). The code is maintained on github and you can get using:
-</p>
-<br>
-<p>
-    git clone --recurse-submodules https://github.com/emeiri/ogldev.git
-</p>
-<br>
-<p>Then execute the following in order to install the dependencies:</p>
-<br>
-<p>
-    cd ogldev && sudo ./install_requirements_ubuntu.sh
-</p>
-<br>
-<p>
-    A video tutorial on setting up Ubuntu for OpenGL development is available on my youtube channel:
-</p>
-<br>
-<iframe loading="lazy" width="560" height="315" src="https://www.youtube-nocookie.com/embed/h2cP6sQYdf0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-<p>
-    If you are on Windows you can watch the following video:
-</p>
-<br>
-    <iframe loading="lazy" width="560" height="315" src="https://www.youtube-nocookie.com/embed/WMTxY14aJJE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    <p>For more information on setting up OpenGL check out the following video tutorials by Frahaan Hussain on <a href=https://www.youtube.com/watch?v=mGC4T9AG4nc&index=2&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8>Windows</a> and
-        on the <a href="https://www.youtube.com/watch?v=Tz0dq2krCW8&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=1">Mac</a>.</p>
-    <h2>Arch Linux</h2>
-    <p>
-        Neils Heidbrook has created a similar script for installing on Arch Linux. You can get it <a href="https://github.com/nielsbiene/opengl">at this github link.</a>
-    </p>
+    <body class="setup-page">
+        <header id="navigation">
+            <a id="logo" href="index.html" title="Homepage">
+                <img src="www/logo_hdpi.png" alt="OGLDEV logo">
+            </a>
+
+            <div class="nav-links no-print">
+                <ul class="primary-links">
+                    <li><a href="https://www.youtube.com/channel/UC7Z1FTCdSln_qFKK95AWplw"> Youtube </a></li>
+                    <li><a href="instructions.html" class="highlight"> Instructions </a></li>
+                    <li><a href="books.html" class="featured-link"> Books (new!) </a></li>
+                    <li><a href="faq.html"> FAQ </a></li>
+                    <li><a href="news.html"> News </a></li>
+                    <li><a href="contact.html"> Contact </a></li>
+                    <li><a href="donate.html"> Donate </a></li>
+                </ul>
+
+                <ul class="utility-links">
+                    <li><a href="https://github.com/emeiri/ogldev"> Get the source </a></li>
+                    <li><a href="http://jeux.developpez.com/tutoriels/OpenGL-ogldev/"> Français </a></li>
+                    <li><a href="http://triplepointfive.github.io/ogltutor/"> Pусский </a></li>
+                    <li><a href="https://www.zhihu.com/column/c_1375900139991678976"> 中文 </a></li>
+                </ul>
+            </div>
+        </header>
+
+        <main id="content">
+            <section class="setup-intro">
+                <h3>Instructions</h3>
+                <p>The tutorials are written in C++. The expectation is that readers already have experience with C++ and general software development practices.</p>
+                <p>The primary requirement is a GPU that supports at least OpenGL 3.3 (some tutorials, such as tessellation, require OpenGL 4.x).</p>
+            </section>
+
+            <section>
+                <h4>Get the source</h4>
+                <p>The code is maintained on GitHub and can be cloned with submodules:</p>
+                <code>git clone --recurse-submodules https://github.com/emeiri/ogldev.git</code>
+
+                <p>Then install Ubuntu dependencies:</p>
+                <code>cd ogldev && sudo ./install_requirements_ubuntu.sh</code>
+            </section>
+
+            <section>
+                <h4>Setup videos</h4>
+                <p>A video tutorial for setting up Ubuntu for OpenGL development:</p>
+                <div class="video-embed">
+                    <iframe loading="lazy" width="560" height="315" src="https://www.youtube-nocookie.com/embed/h2cP6sQYdf0" title="Ubuntu OpenGL setup" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+
+                <p>If you are on Windows, watch this setup guide:</p>
+                <div class="video-embed">
+                    <iframe loading="lazy" width="560" height="315" src="https://www.youtube-nocookie.com/embed/WMTxY14aJJE" title="Windows OpenGL setup" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+
+                <p>For additional setup walkthroughs by Frahaan Hussain, check tutorials for <a href="https://www.youtube.com/watch?v=mGC4T9AG4nc&index=2&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8">Windows</a> and <a href="https://www.youtube.com/watch?v=Tz0dq2krCW8&list=PLRtjMdoYXLf6zUMDJVRZYV-6g6n62vet8&index=1">Mac</a>.</p>
+            </section>
+
+            <section>
+                <h4>Arch Linux</h4>
+                <p>Neils Heidbrook has created a similar installation script for Arch Linux. It is available <a href="https://github.com/nielsbiene/opengl">on GitHub</a>.</p>
+            </section>
+        </main>
 </body>
 </html>
