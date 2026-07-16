@@ -1,4 +1,5 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0B8SXQJEDD"></script>
@@ -9,6 +10,10 @@
 
   gtag('config', 'G-0B8SXQJEDD');
 </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 <title>
 Frequently Asked Questions
@@ -25,26 +30,57 @@ Frequently Asked Questions
         <meta name="twitter:description" content="Frequently asked questions about the OGLDEV OpenGL tutorial series.">
         <meta name="twitter:image" content="https://ogldev.org/www/logo_hdpi.png">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600">
-        <link rel="stylesheet" href="https://ogldev.org/www/style.css">
+        <link rel="stylesheet" href="www/style.css">
         <link rel="stylesheet" href="www/print.css" media="print">
 
 </head>
-<body>
-<p> <h1><a name"top">FREQUENTLY ASKED QUESTIONS</a></h1></p>
-<p><a href ="#Question1">1. What's the best way to learn from OGLDEV?</a></p>
-<p><a href ="#Question2">2. Why doesn't tutorials 2 and 3 work?</a> </p>
-<p><a href ="#Question3">3. Can I translate your tutorials to my native language?</a> </p>
-<p><a href ="#Question4">4. Is there a translation to Russian?</a> </p>
-<p><a href ="#Question5">5. Is there a translation to French?</a> </p>
-<p><a href ="#Question6">6. Is there a port to Java?</a> </p>
-<p><a href ="#Question7">7. I'm unable to load my model file</a></p>
-<p><a href ="#Question8">8. I'm getting errors on a missing MeshOptimizer library</a></p>
-<p><a href ="#Question9">9. Can you help me with my project or provide any sort of support services?</a></a>
-    
-<hr/>
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-</p>
-<p><strong> Answers </strong></p>
+<body class="faq-page">
+<a id="top"></a>
+  <header id="navigation">
+    <a id="logo" href="index.html" title="Homepage">
+      <img src="www/logo_hdpi.png" alt="OGLDEV logo">
+    </a>
+
+    <div class="nav-links no-print">
+      <ul class="primary-links">
+        <li><a href="https://www.youtube.com/channel/UC7Z1FTCdSln_qFKK95AWplw"> Youtube </a></li>
+        <li><a href="instructions.html"> Instructions </a></li>
+        <li><a href="books.html" class="featured-link"> Books (new!) </a></li>
+        <li><a href="faq.html" class="highlight"> FAQ </a></li>
+        <li><a href="news.html"> News </a></li>
+        <li><a href="contact.html"> Contact </a></li>
+        <li><a href="donate.html"> Donate </a></li>
+      </ul>
+
+      <ul class="utility-links">
+        <li><a href="https://github.com/emeiri/ogldev"> Get the source </a></li>
+        <li><a href="http://jeux.developpez.com/tutoriels/OpenGL-ogldev/"> Français </a></li>
+        <li><a href="http://triplepointfive.github.io/ogltutor/"> Pусский </a></li>
+        <li><a href="https://www.zhihu.com/column/c_1375900139991678976"> 中文 </a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="faq-intro">
+      <h3>Frequently Asked Questions</h3>
+      <p>Quick links to common questions about learning path, translations, and tutorial support.</p>
+    </section>
+
+    <section class="faq-toc" aria-label="FAQ table of contents">
+      <p><a href="#Question1">1. What's the best way to learn from OGLDEV?</a></p>
+      <p><a href="#Question2">2. Why doesn't tutorials 2 and 3 work?</a></p>
+      <p><a href="#Question3">3. Can I translate your tutorials to my native language?</a></p>
+      <p><a href="#Question4">4. Is there a translation to Russian?</a></p>
+      <p><a href="#Question5">5. Is there a translation to French?</a></p>
+      <p><a href="#Question6">6. Is there a port to Java?</a></p>
+      <p><a href="#Question7">7. I'm unable to load my model file</a></p>
+      <p><a href="#Question8">8. I'm getting errors on a missing MeshOptimizer library</a></p>
+      <p><a href="#Question9">9. Can you help me with my project or provide any sort of support services?</a></p>
+    </section>
+
+    <section class="faq-answers">
+<p><strong>Answers</strong></p>
 
 <p><a name="Question1">1.</a></p><p>I started OGLDEV as a website on late 2010 and created the youtube channel on Mar-2021.
 The plan was to create a series of video tutorials that roughly corresponds to the articles on the website and continue creating videos for new material.
@@ -86,7 +122,7 @@ study the theory and continue to tutorial 4. From there on it is all shaders.</p
 <p><a name="Question6">6.</a></p><p> Yes: <a href="https://github.com/elect86/oglDevTutorials">https://github.com/elect86/oglDevTutorials</a></p>
 <br>
 <p><a name="Question7">7.</a></p><p> We use Assimp to load models (see tutorial 22). If you are unable to load your model
-    try to load it with the <a href="http://assimp.sourceforge.net/main_viewer.html"</a>Assimp Viewer</a>.
+  try to load it with the <a href="http://assimp.sourceforge.net/main_viewer.html">Assimp Viewer</a>.
 This will tell you whether the problem is with the file or with my code (and let me know...).</p>
 <br>
 <p><a name="Question8">8.</a></p><p> MeshOptimizer is a library I use to (surprise!) optimize meshes. It is described in <a href="https://youtu.be/9HO1dl0zcxg">this video</a>. 
@@ -100,7 +136,10 @@ git clone --recurse-submodules https://github.com/emeiri/ogldev.git</li>
 <p><a name="Question9">9.</a></p><p> Unfortunately, I have a full time job and between work and family I have very little time left
 to work on my youtube channel. Therefore, I can't provide such services. The most that I can offer is to answer specific questions. If you send me an email, I'll do my
 best to answer.</p>
-<a href="#top">Top</a>
+<p class="faq-top-link"><a href="#top">Back to top</a></p>
+</section>
+
+                <section>
 <div id="disqus_thread"></div>
 <script type="text/javascript">
 /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
@@ -115,6 +154,8 @@ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
 })();
 </script>
 <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </section>
+  </main>
 
 </body>
 </html>
