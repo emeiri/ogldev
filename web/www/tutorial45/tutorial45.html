@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../print.css" media="print">
 </head>
-<body>
+<body class="tutorial-page">
     <header id="header">
         <div>
             <h2> Tutorial 45: </h2>
@@ -25,7 +25,9 @@
 
     <article id="content" class="breakpoint">
         <section>
-		<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/xq5hD4RGcYw?si=TpHPBstQqwsCMGqK" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+		<div class="video-embed">
+		    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/xq5hD4RGcYw?si=TpHPBstQqwsCMGqK" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+		</div>
 		<br>
             <h3> Background </h3>
             <h4> Credits: <a href="http://john-chapman-graphics.blogspot.co.il/2013/01/ssao-tutorial.html">SSAO tutorial by John Chapman</a> </h4><br>
@@ -488,7 +490,9 @@ is a user controlled variable that helps us switch from SSAO to no-SSAO and only
 display. Play with the 'a' key to see how it goes.
 </p>
         </section>
-        <a href="../tutorial46/tutorial46.html" class="next highlight"> Next tutorial </a>
+        <nav class="tutorial-nav">
+            <a href="../tutorial46/tutorial46.html" class="next highlight"> Next tutorial </a>
+        </nav>
     </article>
 
     <script src="../html5shiv.min.js"></script>
@@ -511,3 +515,4 @@ display. Play with the 'a' key to see how it goes.
 
 </body>
 </html>
+

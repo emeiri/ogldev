@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../print.css" media="print">
 </head>
-<body>
+<body class="tutorial-page">
     <header id="header">
         <div>
             <h2> Tutorial 50: </h2>
@@ -23,7 +23,11 @@
         </a>
     </header>
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/g7Jlyk4Xp4o?si=dU6CN4afM_kZ0uRC" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<div class="video-embed">
+
+    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/g7Jlyk4Xp4o?si=dU6CN4afM_kZ0uRC" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+</div>
 
 <article id="content" class="breakpoint">
 <section>
@@ -1075,7 +1079,9 @@ void Win32Control::Init(uint Width, uint Height)
 </article>    
 
 </section>
-        <a href="../tutorial51/tutorial51.html" class="next highlight"> Next tutorial </a>
+        <nav class="tutorial-nav">
+            <a href="../tutorial51/tutorial51.html" class="next highlight"> Next tutorial </a>
+        </nav>
 </article>    
 
 
@@ -1099,3 +1105,4 @@ dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
 
 </body>
 </html>
+

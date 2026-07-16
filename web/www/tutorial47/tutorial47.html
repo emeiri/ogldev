@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="../style.css">
         <link rel="stylesheet" href="../print.css" media="print">
     </head>
-    <body>
+    <body class="tutorial-page">
         <header id="header">
             <div>
                 <h2> Tutorial 47: </h2>
@@ -28,7 +28,9 @@
                 and <a href="http://www.cliparthut.com">ClipArtHut</a>
             </p>
             <section>
-                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/JiudfB4z1DM" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <div class="video-embed">
+                    <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/JiudfB4z1DM" title="YouTube video player" frameborder="0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
                 <h3> Background </h3>
                 <p>
                     The Shadow Mapping algorithm that we explored in <a href="../tutorial23/tutorial23.html">tutorial 23</a> and
@@ -253,7 +255,9 @@ void main()                                                                     
                     for the directional light as well.
                 </p>
             </section>
-            <a href="../tutorial48/tutorial48.html" class="next highlight"> Next tutorial </a>
+            <nav class="tutorial-nav">
+                <a href="../tutorial48/tutorial48.html" class="next highlight"> Next tutorial </a>
+            </nav>
         </article>
 
         <script src="../html5shiv.min.js"></script>
@@ -274,3 +278,4 @@ void main()                                                                     
         <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 </body>
 </html>
+
