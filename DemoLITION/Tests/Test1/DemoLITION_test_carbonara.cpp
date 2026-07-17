@@ -1385,47 +1385,33 @@ private:
         // Allocate exactly 4 bytes per pixel for high-fidelity 32-bit float data
         std::vector<float> HeightMap(Config.width * Config.height);
 
-        for (int row = 0; row < Config.height; row++) {
-            if (row % 100 == 0) {
-                printf("Generating row %d of %d\n", row, Config.height);
-            }
-            for (int col = 0; col < Config.width; col++) {
+        float MinValue = 1000.0f;
+        float MaxValue = -1000.0f;
 
+        for (int row = 0; row < Config.height; row++) {
+            for (int col = 0; col < Config.width; col++) {
                 float Sum = 0.0f;
                 float Amplitude = 1.0f;
-                float MaxPossibleHeight = 0.0f;
-
-                // Start frequency at your initial zoom scale (0.005f)
                 float Freq = Config.scale;
 
-                // Loop using your exact octave count (6)
                 for (int Oct = 0; Oct < Config.octaves; Oct++) {
-                    // Pass raw pixel indices multiplied by frequency
-                    // First octave at edge: 2048 * 0.005 = 10.24 (Beautiful scale)
                     glm::vec2 p((float)col * Freq, (float)row * Freq);
-
-                    float Val = glm::perlin(p) * Amplitude;
-                    Sum += Val;
-
-                    MaxPossibleHeight += Amplitude;
-
-                    // Scale frequency and amplitude using your explicit struct multipliers
-                    Freq *= Config.lacunarity; // Multiplies frequency by 2.0f each step
-                    Amplitude *= Config.gain;  // Diminishes amplitude by 0.5f each step
+                    Sum += glm::perlin(p) * Amplitude;
+                    Freq *= Config.lacunarity;
+                    Amplitude *= Config.gain;
                 }
 
-                // Normalize from Perlin's [-Max, +Max] directly to standard [0.0, 1.0] range
-                float Result = (Sum / MaxPossibleHeight + 1.0f) * 0.5f;
-
-                // Safety boundary clamp
-                if (Result > 1.0f) Result = 1.0f;
-                if (Result < 0.0f) Result = 0.0f;
-
-                // Map directly to our 32-bit float array buffer
-                HeightMap[row * Config.width + col] = Result;
+                HeightMap[row * Config.width + col] = Sum;
+                if (Sum < MinValue) MinValue = Sum;
+                if (Sum > MaxValue) MaxValue = Sum;
             }
         }
 
+        // 2. Second Pass: Normalize to the EXACT range
+        for (int i = 0; i < HeightMap.size(); ++i) {
+            // Remap from [MinValue, MaxValue] to
+            HeightMap[i] = (HeightMap[i] - MinValue) / (MaxValue - MinValue);
+        }
         // Save as a high-precision Single-Channel (1) HDR file
         stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, HeightMap.data());
         printf("Heightmap successfully saved as 32-bit HDR format.\n");
