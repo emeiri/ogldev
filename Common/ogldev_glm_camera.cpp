@@ -45,6 +45,15 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target)
 }
 
 
+void GLMCameraFirstPerson::Init(float zNear, float zFar)
+{
+	m_persProjInfo.zNear = zNear;
+	m_persProjInfo.zFar = zFar;
+
+	Init(m_cameraPos, GetTarget(), m_up, m_persProjInfo);
+}
+
+
 void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 								const glm::vec3& Up, PersProjInfo& persProjInfo)
 {

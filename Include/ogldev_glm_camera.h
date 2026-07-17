@@ -56,6 +56,8 @@ public:
 	void Init(const glm::vec3& Pos, const glm::vec3& Target,
 			  const glm::vec3& Up, PersProjInfo& persProjInfo);
 
+	void Init(float zNear, float zFar);
+
 	void Update(float dt);
 
 	void SetMousePos(float x, float y);
