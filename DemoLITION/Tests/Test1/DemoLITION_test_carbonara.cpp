@@ -1376,6 +1376,7 @@ public:
        //  m_pScene->AddToRenderList(pSceneObject);
 
          m_pScene->SetCamera(Vector3f(60.0f, 65.0f, 0.0f), Vector3f(0.0f, -0.1f, 1.0f));
+         m_pScene->SetCameraZRange(0.5f, 8000.0f);
     }
 
 private:
