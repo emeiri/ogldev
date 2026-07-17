@@ -26,6 +26,10 @@
 
 struct GLTextureConfig {
     GLenum m_wrapMode = GL_REPEAT;
+    int m_numChannels = 0;
+    bool m_isFloat = false;
+    bool m_genMipmaps = true;
+   // GLenum m_internalFormat = GL_RGBA;
 };
 
 
@@ -85,7 +89,7 @@ private:
     int m_imageWidth = 0;
     int m_imageHeight = 0;
     int m_imageBPP = 0;
-    GLenum m_wrapMode = GL_REPEAT;
+    GLTextureConfig m_config;
 };
 
 

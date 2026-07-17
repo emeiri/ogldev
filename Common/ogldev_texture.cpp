@@ -40,7 +40,7 @@ Texture::Texture(GLenum TextureTarget, const std::string& FileName, GLTextureCon
     m_fileName      = FileName;
 
     if (pConfig) {
-        m_wrapMode = pConfig->m_wrapMode;
+        m_config = *pConfig;
     }
 }
 
@@ -66,7 +66,7 @@ bool Texture::Load(bool IsSRGB)
 
     m_isKTX = pExt && !strcmp(pExt, ".ktx");
 
-    unsigned char* pImageData = NULL;
+    void* pImageData = NULL;
 
     gli::texture gliTex;
     if (m_isKTX) {
@@ -77,11 +77,24 @@ bool Texture::Load(bool IsSRGB)
         m_imageWidth = extent.x;
         m_imageHeight = extent.y;
         m_imageBPP = extent.z;        
-        pImageData = (unsigned char*)gliTex.data();
+        pImageData = gliTex.data();
     } else {
         stbi_set_flip_vertically_on_load(1);
 
-        pImageData = stbi_load(m_fileName.c_str(), &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
+        if (m_config.m_numChannels == 1) {
+            if (m_config.m_isFloat) {
+                pImageData = stbi_loadf(m_fileName.c_str(), &m_imageWidth, &m_imageHeight, &m_imageBPP, 1);
+                // When you tell stbi_write_hdr to save data with 1 channel, STB fulfills the command by 
+                // duplicating your monochrome grayscale data across 3 distinct color channels(RGB) in the 
+                // physical file header to ensure compliance with the.hdr format
+                assert(m_imageBPP == 3);
+                m_imageBPP = 1; // Reset to 1 channel for our internal representation
+            } else {
+                NOT_IMPLEMENTED;
+            }
+        } else {
+            pImageData = stbi_load(m_fileName.c_str(), &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
+        }        
     }
 
     if (!pImageData) {
@@ -145,8 +158,8 @@ void Texture::LoadInternalNonDSA(const void* pImageData, bool IsSRGB)
             glTexImage2D(m_textureTarget, 0, GL_RED, m_imageWidth, m_imageHeight, 0, GL_RED, GL_UNSIGNED_BYTE, pImageData);
             GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
             glTexParameteriv(m_textureTarget, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
-        }
-                break;
+            break;
+            }            
 
         case 2:
             glTexImage2D(m_textureTarget, 0, GL_RG, m_imageWidth, m_imageHeight, 0, GL_RG, GL_UNSIGNED_BYTE, pImageData);
@@ -178,9 +191,9 @@ void Texture::LoadInternalNonDSA(const void* pImageData, bool IsSRGB)
 
     glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(m_textureTarget, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, m_wrapMode);
-    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, m_wrapMode);
-    //glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_R, m_wrapMode);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, m_config.m_wrapMode);
+    glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, m_config.m_wrapMode);
+    //glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_R, m_config.m_wrapMode);
 
     if (pImageData) {
         glGenerateMipmap(m_textureTarget);
@@ -195,10 +208,15 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
 {
     glCreateTextures(m_textureTarget, 1, &m_textureObj);
 
-    int Levels = std::min(5, (int)log2f((float)std::max(m_imageWidth, m_imageHeight)));
-    Levels = std::max(1, Levels);   // must be 1 or greater else the GL call will fail
+    int Levels = 1;
+    
+    if (m_config.m_genMipmaps) {
+        Levels = std::min(5, (int)log2f((float)std::max(m_imageWidth, m_imageHeight)));
+        Levels = std::max(1, Levels);   // must be 1 or greater else the GL call will fail
+    }    
 
     GLenum InternalFormat = GL_NONE;
+    GLenum FormatType = m_config.m_isFloat ? GL_FLOAT : GL_UNSIGNED_BYTE;
 
     if (m_textureTarget == GL_TEXTURE_2D) {
         if (m_isKTX) {
@@ -209,28 +227,29 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
         } else {
             switch (m_imageBPP) {
             case 1: {
-                glTextureStorage2D(m_textureObj, Levels, GL_R8, m_imageWidth, m_imageHeight);
-                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_UNSIGNED_BYTE, pImageData);
+                InternalFormat = m_config.m_isFloat ? GL_R32F : GL_R8;
+                glTextureStorage2D(m_textureObj, Levels, InternalFormat, m_imageWidth, m_imageHeight);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, FormatType, pImageData);
                 GLint SwizzleMask[] = { GL_RED, GL_RED, GL_RED, GL_RED };
                 glTextureParameteriv(m_textureObj, GL_TEXTURE_SWIZZLE_RGBA, SwizzleMask);
-            }
                 break;
+                }
 
             case 2:
                 glTextureStorage2D(m_textureObj, Levels, GL_RG8, m_imageWidth, m_imageHeight);
-                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RG, GL_UNSIGNED_BYTE, pImageData);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RG, FormatType, pImageData);
                 break;
 
             case 3:
                 InternalFormat = IsSRGB ? GL_SRGB8 : GL_RGB8;
                 glTextureStorage2D(m_textureObj, Levels, InternalFormat, m_imageWidth, m_imageHeight);
-                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGB, GL_UNSIGNED_BYTE, pImageData);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGB, FormatType, pImageData);
                 break;
 
             case 4:
                 InternalFormat = IsSRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8;
                 glTextureStorage2D(m_textureObj, Levels, InternalFormat, m_imageWidth, m_imageHeight);
-                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGBA, GL_UNSIGNED_BYTE, pImageData);
+                glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RGBA, FormatType, pImageData);
                 break;
 
             default:
@@ -247,8 +266,8 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, Levels - 1);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_wrapMode);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_wrapMode);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_config.m_wrapMode);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_config.m_wrapMode);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, 16);
 
     glGenerateTextureMipmap(m_textureObj);
@@ -274,8 +293,8 @@ void Texture::LoadF32(int Width, int Height, const float* pImageData)
     glTextureParameteri(m_textureObj, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameterf(m_textureObj, GL_TEXTURE_BASE_LEVEL, 0);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_wrapMode);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_wrapMode);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_config.m_wrapMode);
+    glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_config.m_wrapMode);
 }
 
 
