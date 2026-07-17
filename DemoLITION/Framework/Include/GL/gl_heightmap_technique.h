@@ -31,10 +31,13 @@ public:
     virtual bool Init();
 
     void SetWVP(const Matrix4f& WVP);
-    void SetColor(const Vector4f& Col);
+    void SetMaxTerrainHeight(float MaxHeight);
+    void SetHorizontalScale(float HorizontalScale);
 
 private:
     bool InitCommon();
 
     DEF_LOC(gWVP);
+    DEF_LOC(gMaxTerrainHeight);
+    DEF_LOC(gHorizontalScale);
 };

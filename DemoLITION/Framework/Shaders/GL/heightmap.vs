@@ -26,18 +26,16 @@ out vec2 TexCoords;
 out vec3 WorldPos;
 out vec3 Normal;
 
-layout (location = 0) uniform mat4 gWVP;
-
 layout (binding = 0) uniform sampler2D gHeightMap; 
-layout (location = 3) uniform float gMaxTerrainHeight = 150.0f;
-layout (location = 4) uniform float gHorizontalScale = 4.0f;
+layout (location = 0) uniform mat4 gWVP;
+layout (location = 1) uniform float gMaxTerrainHeight = 100.0f;
+layout (location = 2) uniform float gHorizontalScale = 4.0f;
 
 
 void main()
 {
     TexCoords = aTexCoords;
 
-    // Fetch from your 32-bit R32F floating-point texture
     float HeightSample = texture(gHeightMap, aTexCoords).r;
 
     // Displace the vertex position vertically in metric space

@@ -45,6 +45,8 @@ bool HeightmapTechnique::Init()
 bool HeightmapTechnique::InitCommon()
 {
     GET_UNIFORM(gWVP);
+    GET_UNIFORM(gMaxTerrainHeight);
+    GET_UNIFORM(gHorizontalScale);
 
     return true;
 }
@@ -53,6 +55,18 @@ bool HeightmapTechnique::InitCommon()
 void HeightmapTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_gWVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
+}
+
+
+void HeightmapTechnique::SetMaxTerrainHeight(float MaxHeight)
+{
+    glUniform1f(m_gMaxTerrainHeightLoc, MaxHeight);
+}
+
+
+void HeightmapTechnique::SetHorizontalScale(float HorizontalScale)
+{
+    glUniform1f(m_gHorizontalScaleLoc, HorizontalScale);
 }
 
 

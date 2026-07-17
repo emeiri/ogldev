@@ -1406,12 +1406,16 @@ public:
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
         m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
-        m_pScene->GetConfig()->ControlShadowMapping(false);
-        m_pScene->GetConfig()->SetTerrainGrid(pTerrain);
-        m_pScene->GetConfig()->SetTerrainHeightMap(TerrainTexHeightMap);
-        m_pScene->GetConfig()->SetTerrainTexture(0, SandTexture);
-        m_pScene->GetConfig()->SetTerrainTexture(1, GrassTexture);
-        m_pScene->GetConfig()->SetTerrainTexture(2, SnowTexture);
+
+        SceneConfig* pConfig = m_pScene->GetConfig();
+        pConfig->ControlShadowMapping(false);
+        pConfig->SetTerrainGrid(pTerrain);
+        pConfig->SetTerrainHeightMap(TerrainTexHeightMap);
+        pConfig->SetTerrainHorizontalScale(m_terrainConfig.horizontalScale);
+        pConfig->SetTerrainMaxHeight(m_terrainConfig.maxHeight);
+        pConfig->SetTerrainTexture(0, SandTexture);
+        pConfig->SetTerrainTexture(1, GrassTexture);
+        pConfig->SetTerrainTexture(2, SnowTexture);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -1434,9 +1438,13 @@ public:
         glm::vec3 PlayerPosition = m_pScene->GetCurrentCamera()->GetPosition();
 
         // Get the exact ground height in meters directly underneath the player's boots
-        TerrainConfig Config;
 
-        float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, Config) * 150.0f;
+        float TerrainMaxHeight = m_pScene->GetConfig()->GetTerrainMaxHeight();
+        m_terrainConfig.maxHeight = TerrainMaxHeight;
+        float TerrainHorizontalScale = m_pScene->GetConfig()->GetTerrainHorizontalScale();
+        m_terrainConfig.horizontalScale = TerrainHorizontalScale;
+
+        float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
 
         // Set camera eye level: Ground elevation + 1.7 meters human height factor
         PlayerPosition.y = GroundHeight + 1.7f;

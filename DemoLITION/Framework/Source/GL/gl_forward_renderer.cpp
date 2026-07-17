@@ -422,17 +422,17 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
 
     if (pScene->GetRenderList().size() == 0) {
         HandleEmptyRenderList(pScene);        
-        return;
-    }
+    } else {
 
-    if (pScene->GetConfig()->IsPickingEnabled()) {
-        PickingPass(pWindow, pScene);
-        // The render loop may be called multiple time before picking
-        // is again disabled so we do it explicitly
-        pScene->GetConfig()->ControlPicking(false);
-    }
+        if (pScene->GetConfig()->IsPickingEnabled()) {
+            PickingPass(pWindow, pScene);
+            // The render loop may be called multiple time before picking
+            // is again disabled so we do it explicitly
+            pScene->GetConfig()->ControlPicking(false);
+        }
 
-    ExecuteRenderGraph(pScene, TotalRuntime);
+        ExecuteRenderGraph(pScene, TotalRuntime);
+    }
 
     pGameCallbacks->OnFrameEnd();
 
@@ -540,6 +540,9 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
             Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
             pTex2->Bind(GL_TEXTURE3);
         }
+
+        m_heightmapTech.SetMaxTerrainHeight(pScene->GetConfig()->GetTerrainMaxHeight());
+        m_heightmapTech.SetHorizontalScale(pScene->GetConfig()->GetTerrainHorizontalScale());
 
         pTerrainGrid->Render();
     } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {

@@ -344,7 +344,19 @@ void CoreScene::ShowSceneGUI()
 
     SSAOGUI();
 
-    HDRAndToneMappingGui();    
+    HDRAndToneMappingGui();
+
+    if (m_config.GetTerrainGrid()) {
+        if (ImGui::TreeNode("Terrain")) {
+            float MaxHeight = m_config.GetTerrainMaxHeight();
+            ImGui::SliderFloat("Max Height", &MaxHeight, 1.0f, 1000.0f);
+            m_config.SetTerrainMaxHeight(MaxHeight);
+            float HorizontalScale = m_config.GetTerrainHorizontalScale();
+            ImGui::SliderFloat("Horizontal Scale", &HorizontalScale, 1.0f, 10.0f);
+            m_config.SetTerrainHorizontalScale(HorizontalScale);
+            ImGui::TreePop();
+        }
+    }
 
     ImGui::End();    
 }

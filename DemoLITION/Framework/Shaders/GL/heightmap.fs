@@ -28,7 +28,7 @@ layout (binding = 1) uniform sampler2D gTexture0; // Low Elevation (e.g. Sand)
 layout (binding = 2) uniform sampler2D gTexture1; // Flat Ground / Mid Elevation (e.g. Grass)
 layout (binding = 3) uniform sampler2D gTexture2; // Steep Slopes / High Elevation (e.g. Rock)
 
-layout (location = 3) uniform float gMaxTerrainHeight = 150.0f;
+layout (location = 1) uniform float gMaxTerrainHeight = 100.0f;
 
 const float gLowHeight = gMaxTerrainHeight * 0.25;     
 const float gHighHeight = gMaxTerrainHeight * 0.7; 
