@@ -220,6 +220,12 @@ void CoreScene::SetCamera(const Vector3f& Pos, const Vector3f& Target)
 }
 
 
+void CoreScene::SetCameraZRange(float Near, float Far)
+{
+    m_defaultCamera.Init(Near, Far);
+}
+
+
 void CoreScene::SetCameraSpeed(float Speed)
 {
     printf("Warning! SetCameraSpeed is not implemented!!!\n");

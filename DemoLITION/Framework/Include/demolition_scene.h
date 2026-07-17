@@ -325,6 +325,8 @@ public:
 
     virtual void SetCamera(const Vector3f& Pos, const Vector3f& Target) = 0;
 
+    virtual void SetCameraZRange(float Near, float Far) = 0;
+
     virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
     
     virtual void SetCameraSpeed(float Speed) = 0;

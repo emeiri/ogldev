@@ -103,6 +103,8 @@ public:
 
     void SetCamera(const Vector3f& Pos, const Vector3f& Target);
 
+    void SetCameraZRange(float Near, float Far);
+
     void SetCameraSpeed(float Speed);
 
     void SetPickedSceneObject(CoreSceneObject* pSceneObject) { m_pPickedSceneObject = pSceneObject; }
