@@ -547,6 +547,8 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
         m_heightmapTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
         m_heightmapTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
                                           pConfig->GetTerrainHighHeightPercent());
+        m_heightmapTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
+        m_heightmapTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
         pTerrainGrid->Render();
     } else if (pConfig->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);

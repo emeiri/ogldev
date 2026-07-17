@@ -267,6 +267,12 @@ public:
     void SetTerrainHighHeightPercent(float Percent) { m_terrain.m_highHeightPercent = Percent; }
     float GetTerrainHighHeightPercent() const { return m_terrain.m_highHeightPercent; }
 
+    void SetTerrainSunlightDir(const glm::vec3& Dir) { m_terrain.m_sunlightDir = Dir; }
+    const glm::vec3& GetTerrainSunlightDir() const { return m_terrain.m_sunlightDir; }
+
+    void SetTerrainAmbientFactor(float Factor) { m_terrain.m_ambientFactor = Factor; }
+    float GetTerrainAmbientFactor() const { return m_terrain.m_ambientFactor; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -309,6 +315,8 @@ private:
         float m_horizontalScale = 1.0f;
         float m_lowHeightPercent = 0.2f;
         float m_highHeightPercent = 0.8f;
+        glm::vec3 m_sunlightDir = glm::vec3(0.0f, 1.0f, 0.0f);
+        float m_ambientFactor = 0.2f;
     } m_terrain;
 };
 

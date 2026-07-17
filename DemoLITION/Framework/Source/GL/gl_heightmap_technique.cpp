@@ -49,6 +49,8 @@ bool HeightmapTechnique::InitCommon()
     GET_UNIFORM(gHorizontalScale);
     GET_UNIFORM(gLowHeightPercent);
     GET_UNIFORM(gHighHeightPercent);
+    GET_UNIFORM(gSunlightDir);
+    GET_UNIFORM(gAmbientFactor);
 
     return true;
 }
@@ -76,6 +78,19 @@ void HeightmapTechnique::SetHeightPercents(float LowPercent, float HighPercent)
 {
     glUniform1f(m_gLowHeightPercentLoc, LowPercent);
     glUniform1f(m_gHighHeightPercentLoc, HighPercent);
+}
+
+
+void HeightmapTechnique::SetSunlightDir(const Vector3f& SunlightDir)
+{
+    // Flipping the Z is a hack - ImGui uses a right handed system
+    glUniform3f(m_gSunlightDirLoc, SunlightDir.x, SunlightDir.y, -SunlightDir.z);
+}
+
+
+void HeightmapTechnique::SetAmbientLightFactor(float AmbientLightFactor)
+{
+    glUniform1f(m_gAmbientFactorLoc, AmbientLightFactor);
 }
 
 

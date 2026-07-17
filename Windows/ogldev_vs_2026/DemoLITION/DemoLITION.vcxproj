@@ -115,12 +115,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_WIN64;_USE_MATH_DEFINES;IMGUIZMO_IMGUI_FOLDER=GLFW/</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;_USE_MATH_DEFINES;IMGUIZMO_IMGUI_FOLDER=$(SolutionDir)..\..\Common\3rdparty\ImGui\GLFW\</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Physics\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\DemoLITION\Framework\Include;..\..\..\Physics\Include;..\..\..\Include;..\..\..\Include\assimp5;..\..\..\Common;..\..\..\Common\3rdparty\ImGui\;..\..\..\Common\3rdparty\ImGui\GLFW;$(SolutionDir)\..\..\Common\3rdparty\ImGui\imGuIZMO.quat</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

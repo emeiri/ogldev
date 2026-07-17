@@ -31,7 +31,8 @@ layout (binding = 3) uniform sampler2D gTexture2; // Steep Slopes / High Elevati
 uniform float gMaxTerrainHeight = 100.0f;
 uniform float gLowHeightPercent = 0.25;
 uniform float gHighHeightPercent = 0.75;
-uniform vec3 u_SunDirection = normalize(vec3(0.5, 1.0, 0.3)); 
+uniform vec3 gSunlightDir = normalize(vec3(0.0, 1.0, 0.0)); 
+uniform float gAmbientFactor = 0.2f;
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal, float scale) 
 {
@@ -76,9 +77,8 @@ void main()
     vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
     vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);
 
-    float DiffuseFactor = max(dot(N, u_SunDirection), 0.0);
-    float AmbientFactor = 0.25; // Stop shadows from being completely pitch black
-    vec3 LightingFactor = vec3(AmbientFactor + DiffuseFactor);
+    float DiffuseFactor = max(dot(N, gSunlightDir), 0.0);
+    float LightingFactor = min(gAmbientFactor + DiffuseFactor, 1.0);
 
     // Final color multiplication
     FragColor = vec4(FinalColor.rgb * LightingFactor, 1.0);

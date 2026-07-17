@@ -34,6 +34,8 @@ public:
     void SetMaxTerrainHeight(float MaxHeight);
     void SetHorizontalScale(float HorizontalScale);
     void SetHeightPercents(float LowPercent, float HighPercent);
+    void SetSunlightDir(const Vector3f& SunlightDir);
+    void SetAmbientLightFactor(float AmbientLightFactor);
 
 private:
     bool InitCommon();
@@ -43,4 +45,6 @@ private:
     DEF_LOC(gHorizontalScale);
     DEF_LOC(gLowHeightPercent);
     DEF_LOC(gHighHeightPercent);
+    DEF_LOC(gSunlightDir);
+    DEF_LOC(gAmbientFactor);
 };

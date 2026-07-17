@@ -16,7 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "imGuIZMOquat.h"
 
 #include "Int/core_scene.h"
 #include "Int/core_rendering_system.h"
@@ -370,6 +372,17 @@ void CoreScene::ShowSceneGUI()
                 HighHeightPercent = LowHeightPercent;
             }
             m_config.SetTerrainHighHeightPercent(HighHeightPercent);
+
+            glm::vec3 dir = m_config.GetTerrainSunlightDir();
+            vec3 SunlightDir(dir.x, dir.y, dir.z);
+            ImGui::gizmo3D("##Dir1", SunlightDir, 200.0f, imguiGizmo::modeDirection);
+            glm::vec3 LightDirection = glm::vec3(SunlightDir.x, SunlightDir.y, SunlightDir.z);
+            m_config.SetTerrainSunlightDir(LightDirection);
+
+            float AmbientFactor = m_config.GetTerrainAmbientFactor();
+            ImGui::SliderFloat("Ambient Factor", &AmbientFactor, 0.0f, 1.0f);
+            m_config.SetTerrainAmbientFactor(AmbientFactor);
+
             ImGui::TreePop();
         }
     }
