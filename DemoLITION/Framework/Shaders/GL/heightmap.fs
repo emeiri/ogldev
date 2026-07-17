@@ -18,11 +18,16 @@
 
 #version 330
 
+in vec2 TexCoords;
+//out vec3 FragPos;
+in vec3 Normal;
+
+
 layout(location = 0) out vec4 FragColor;
 
 uniform vec4 gColor;
 
 void main()
 {
-    FragColor = vec4(1.0);//gColor;
+    FragColor = vec4(Normal * 0.5 + 0.5, 1.0);//gColor;
 }

@@ -23,7 +23,8 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoords; 
 
 out vec2 TexCoords;
-out vec3 FragPos;
+//out vec3 FragPos;
+out vec3 Normal;
 
 layout (location = 0) uniform mat4 gWVP;
 
@@ -40,6 +41,17 @@ void main()
     // Displace the vertex position vertically in metric space
     vec3 displacedPosition = aPos;
     displacedPosition.y = heightSample * gMaxTerrainHeight;
+
+    ivec2 TexSize = textureSize(gHeightMap, 0);
+    float TexelSize = 1.0 / float(TexSize.x);
+    float hL = textureOffset(gHeightMap, aTexCoords, ivec2(-1,  0)).r;
+    float hR = textureOffset(gHeightMap, aTexCoords, ivec2( 1,  0)).r;
+    float hD = textureOffset(gHeightMap, aTexCoords, ivec2( 0, -1)).r;
+    float hU = textureOffset(gHeightMap, aTexCoords, ivec2( 0,  1)).r;
+    
+    Normal = normalize(normalize(vec3((hL - hR) * gMaxTerrainHeight, 2.0, (hD - hU) * gMaxTerrainHeight)));
+
+    //Normal = normalize(vec3((hL - hR) * 100.0, 1.0, (hD - hU) * 100.0));
 
     //FragPos = vec3(model * vec4(displacedPosition, 1.0));
     gl_Position = gWVP * vec4(displacedPosition, 1.0);
