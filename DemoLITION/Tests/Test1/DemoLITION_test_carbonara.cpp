@@ -1368,7 +1368,7 @@ public:
         // pSceneObject->SetScale(0.01f);
        //  m_pScene->AddToRenderList(pSceneObject);
 
-         m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));
+         m_pScene->SetCamera(Vector3f(60.0f, 65.0f, 0.0f), Vector3f(0.0f, -0.1f, 1.0f));
     }
 
 private:
