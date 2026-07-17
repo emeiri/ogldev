@@ -232,6 +232,9 @@ public:
     void SetTerrainGrid(void* pGrid) { pTerrainGrid = pGrid; }
     void* GetTerrainGrid() const { return pTerrainGrid; }
 
+    void SetTerrainHeightMap(int Tex) { m_terrainTexHeightMap = Tex; }
+    int GetTerrainHeightMap() const { return m_terrainTexHeightMap; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -267,6 +270,7 @@ private:
     Matrix4f m_projectionMat;
     RENDER_MODE m_renderMode;
     void* pTerrainGrid = NULL;
+    int m_terrainTexHeightMap = -1;
 };
 
 

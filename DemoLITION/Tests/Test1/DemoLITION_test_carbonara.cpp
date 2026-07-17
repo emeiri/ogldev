@@ -1348,12 +1348,19 @@ public:
 
         void* pTerrain = m_pRenderingSystem->CreateTerrainGrid(Config.width, Config.height);
         
-       // m_pScene = m_pRenderingSystem->CreateScene("../Content/demolition/dir_light.glb");
+        TextureConfig TexConfig;
+        TexConfig.m_wrapMode = WRAP_MODE_CLAMP_TO_EDGE;
+        TexConfig.m_numChannels = 1;
+        TexConfig.m_isFloat = true;
+        TexConfig.m_genMipmaps = false;
+        int TerrainTexHeightMap = m_pRenderingSystem->LoadTexture2D("heightmap.hdr", &TexConfig);
+
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
         m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->GetConfig()->SetTerrainGrid(pTerrain);
+        m_pScene->GetConfig()->SetTerrainHeightMap(TerrainTexHeightMap);
 
         m_pRenderingSystem->SetScene(m_pScene);
 

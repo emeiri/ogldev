@@ -518,12 +518,17 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
         m_heightmapTech.Enable();
         Matrix4f WVP = m_pCurCamera->GetMatrix();
         m_heightmapTech.SetWVP(WVP);
-      //  glDisable(GL_CULL_FACE);
+        int HeightMap = pScene->GetConfig()->GetTerrainHeightMap();
+        if (HeightMap != -1) {
+            //m_heightmapTech.SetProjectionMatrix(pScene->GetConfig()->GetProjectionMatrix());
+            Texture* pHeightMap = (Texture*)m_pRenderingSystemGL->GetTexture(HeightMap);
+            pHeightMap->Bind(GL_TEXTURE0);
+        }
         pTerrainGrid->Render();
     } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
     } else {
-            printf("Warning! render list is empty and no main model or skybox\n");
+        printf("Warning! render list is empty and no main model or skybox\n");
     }
 }
 

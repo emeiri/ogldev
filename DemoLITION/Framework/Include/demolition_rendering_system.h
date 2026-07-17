@@ -69,6 +69,10 @@ enum TEXTURE_WRAP_MODE {
 
 struct TextureConfig {
     TEXTURE_WRAP_MODE m_wrapMode = WRAP_MODE_REPEAT;
+    int m_numChannels = 0;
+    bool m_isFloat = false;
+   // bool m_isSRGB = false;
+    bool m_genMipmaps = true;    
 };
 
 
