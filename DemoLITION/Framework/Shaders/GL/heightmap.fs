@@ -24,9 +24,9 @@ in vec3 Normal;
 
 layout(location = 0) out vec4 FragColor;
 
-layout (binding = 1) uniform sampler2D gTexture0; // Meaning: Low Elevation (e.g. Sand)
-layout (binding = 2) uniform sampler2D gTexture1; // Meaning: Flat Ground / Mid Elevation (e.g. Grass)
-layout (binding = 3) uniform sampler2D gTexture2; // Meaning: Steep Slopes / High Elevation (e.g. Rock)
+layout (binding = 1) uniform sampler2D gTexture0; // Low Elevation (e.g. Sand)
+layout (binding = 2) uniform sampler2D gTexture1; // Flat Ground / Mid Elevation (e.g. Grass)
+layout (binding = 3) uniform sampler2D gTexture2; // Steep Slopes / High Elevation (e.g. Rock)
 
 layout (location = 3) uniform float gMaxTerrainHeight = 50.0f;
 
@@ -50,7 +50,12 @@ void main()
     vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
     vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);
 
-    FragColor = FinalColor;
+    float DiffuseFactor = max(dot(N, u_SunDirection), 0.0);
+    float AmbientFactor = 0.25; // Stop shadows from being completely pitch black
+    vec3 LightingFactor = vec3(AmbientFactor + DiffuseFactor);
+
+    // Final color multiplication
+    FragColor = vec4(FinalColor.rgb * LightingFactor, 1.0);
 
    //FragColor = vec4(vec3(WorldPos.y / gMaxTerrainHeight.0), 1.0);   
 }
