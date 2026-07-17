@@ -351,9 +351,25 @@ void CoreScene::ShowSceneGUI()
             float MaxHeight = m_config.GetTerrainMaxHeight();
             ImGui::SliderFloat("Max Height", &MaxHeight, 1.0f, 1000.0f);
             m_config.SetTerrainMaxHeight(MaxHeight);
+
             float HorizontalScale = m_config.GetTerrainHorizontalScale();
             ImGui::SliderFloat("Horizontal Scale", &HorizontalScale, 1.0f, 10.0f);
             m_config.SetTerrainHorizontalScale(HorizontalScale);
+
+            float LowHeightPercent = m_config.GetTerrainLowHeightPercent();
+            float HighHeightPercent = m_config.GetTerrainHighHeightPercent();
+            ImGui::SliderFloat("Low Height Percent", &LowHeightPercent, 0.0f, 1.0f);
+            // Prevent Low from crossing High
+            if (LowHeightPercent > HighHeightPercent) {
+                LowHeightPercent = HighHeightPercent;
+            }
+            m_config.SetTerrainLowHeightPercent(LowHeightPercent);                     
+            ImGui::SliderFloat("High Height Percent", &HighHeightPercent, 0.0f, 1.0f);
+            // Prevent High from dropping below Low
+            if (HighHeightPercent < LowHeightPercent) {
+                HighHeightPercent = LowHeightPercent;
+            }
+            m_config.SetTerrainHighHeightPercent(HighHeightPercent);
             ImGui::TreePop();
         }
     }

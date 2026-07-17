@@ -28,10 +28,9 @@ layout (binding = 1) uniform sampler2D gTexture0; // Low Elevation (e.g. Sand)
 layout (binding = 2) uniform sampler2D gTexture1; // Flat Ground / Mid Elevation (e.g. Grass)
 layout (binding = 3) uniform sampler2D gTexture2; // Steep Slopes / High Elevation (e.g. Rock)
 
-layout (location = 1) uniform float gMaxTerrainHeight = 100.0f;
-
-const float gLowHeight = gMaxTerrainHeight * 0.25;     
-const float gHighHeight = gMaxTerrainHeight * 0.7; 
+uniform float gMaxTerrainHeight = 100.0f;
+uniform float gLowHeightPercent = 0.25;
+uniform float gHighHeightPercent = 0.75;
 uniform vec3 u_SunDirection = normalize(vec3(0.5, 1.0, 0.3)); 
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal, float scale) 
@@ -61,6 +60,9 @@ void main()
 {
     vec2 DetailUV = TexCoords * 8; 
     float tiling = 0.1; // Adjust for your world scale
+
+    float gLowHeight = gMaxTerrainHeight * gLowHeightPercent;
+    float gHighHeight = gMaxTerrainHeight * gHighHeightPercent;
 
     vec3 N = normalize(Normal);
     float SlopeFactor = smoothstep(0.65, 0.85, N.y); 

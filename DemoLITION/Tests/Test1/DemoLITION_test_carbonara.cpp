@@ -1329,6 +1329,7 @@ struct TerrainConfig {
     float gain = 0.5f;       // Amplitude multiplier per octave (persistence)
     float scale = 0.005f;    // Initial zoom scale for the coordinate space
     float horizontalScale = 4.0f; // Horizontal scaling factor for the terrain
+    float maxHeight = 100.0f; // Maximum height of the terrain in world units
 };
 
 
@@ -1339,10 +1340,10 @@ float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& H
     float UnscaledZ = WorldZ / Config.horizontalScale;
 
     // 2. Find the integer base corner of the current quad cell
-    int CellX = static_cast<int>(std::floor(UnscaledX));
+    int CellX = (int)(std::floor(UnscaledX));
 
     // THE MIRROR FIX: Invert the Z tracker to align the CPU layout with OpenGL's native internal memory packing
-    int CellZ = (Config.height - 1) - static_cast<int>(std::floor(UnscaledZ));
+    int CellZ = (Config.height - 1) - (int)(std::floor(UnscaledZ));
 
     // 3. Strict Map Boundary Safety Protection
     if (CellX < 0 || CellX >= Config.width - 1 || CellZ < 1 || CellZ >= Config.height) {
@@ -1357,8 +1358,8 @@ float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& H
     float H_11 = HeightMapData[(CellZ - 1) * Config.width + (CellX + 1)]; // Far-Right
 
     // 5. Get local fractional distance coordinates inside this 1x1 meter grid cell
-    float FracX = UnscaledX - static_cast<float>(CellX);
-    float FracZ = UnscaledZ - static_cast<float>(static_cast<int>(std::floor(WorldZ / Config.horizontalScale))); // Keep fractional Z moving forward
+    float FracX = UnscaledX - (float)(CellX);
+    float FracZ = UnscaledZ - (float)((int)(std::floor(WorldZ / Config.horizontalScale))); // Keep fractional Z moving forward
 
     float FinalNormalizedHeight = 0.0f;
 
@@ -1386,11 +1387,9 @@ public:
     {
         delete m_pScene;
 
-        TerrainConfig Config;
+        CreateHeightMap(m_terrainConfig);
 
-        CreateHeightMap(Config);
-
-        void* pTerrain = m_pRenderingSystem->CreateTerrainGrid(Config.width, Config.height);
+        void* pTerrain = m_pRenderingSystem->CreateTerrainGrid(m_terrainConfig.width, m_terrainConfig.height);
         
         TextureConfig TexConfig;
         TexConfig.m_wrapMode = WRAP_MODE_CLAMP_TO_EDGE;
@@ -1423,10 +1422,10 @@ public:
         // pSceneObject->SetScale(0.01f);
        //  m_pScene->AddToRenderList(pSceneObject);
 
-        float CameraX = Config.width * Config.horizontalScale / 2.0f;
-        float CameraZ = Config.height * Config.horizontalScale / 2.0f;
+        float CameraX = m_terrainConfig.width * m_terrainConfig.horizontalScale / 2.0f;
+        float CameraZ = m_terrainConfig.height * m_terrainConfig.horizontalScale / 2.0f;
 
-        float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, Config) * 150.0f;
+        float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, m_terrainConfig) * m_terrainConfig.maxHeight;
 
         m_pScene->SetCamera(Vector3f(CameraX, GroundHeight + 1.7f, CameraZ), Vector3f(0.0f, -0.1f, 1.0f));
         m_pScene->SetCameraZRange(0.5f, 8000.0f);
@@ -1494,6 +1493,8 @@ private:
     }
 
     std::vector<float> m_heightMap;
+
+    TerrainConfig m_terrainConfig;
 };
 
 

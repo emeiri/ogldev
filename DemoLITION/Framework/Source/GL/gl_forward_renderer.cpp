@@ -509,43 +509,46 @@ void ForwardRenderer::PostProcessPass(GLScene* pScene)
 
 void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
 {
-    if (pScene->GetConfig()->IsSkyboxEnabled()) {
+    SceneConfig* pConfig = pScene->GetConfig();
+
+    if (pConfig->IsSkyboxEnabled()) {
         m_skybox.Render(pScene->GetSkyboxTex(), m_pCurCamera->GetVPMatrixNoTranslate());
     }
     // TODO: duplicate code with the one in LightingPass, can be refactored
-    else if (pScene->GetConfig()->GetTerrainGrid()) {
-        TerrainGrid* pTerrainGrid = (TerrainGrid*)pScene->GetConfig()->GetTerrainGrid();
+    else if (pConfig->GetTerrainGrid()) {
+        TerrainGrid* pTerrainGrid = (TerrainGrid*)pConfig->GetTerrainGrid();
         m_heightmapTech.Enable();
         Matrix4f WVP = m_pCurCamera->GetMatrix();
         m_heightmapTech.SetWVP(WVP);
-        int HeightMap = pScene->GetConfig()->GetTerrainHeightMap();
+        int HeightMap = pConfig->GetTerrainHeightMap();
         if (HeightMap != -1) {
-            //m_heightmapTech.SetProjectionMatrix(pScene->GetConfig()->GetProjectionMatrix());
+            //m_heightmapTech.SetProjectionMatrix(pConfig->GetProjectionMatrix());
             Texture* pHeightMap = (Texture*)m_pRenderingSystemGL->GetTexture(HeightMap);
             pHeightMap->Bind(GL_TEXTURE0);
         }
 
-        int TextureMap0 = pScene->GetConfig()->GetTerrainTexture(0);
+        int TextureMap0 = pConfig->GetTerrainTexture(0);
         if (TextureMap0 != -1) {
             Texture* pTex0 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap0);
             pTex0->Bind(GL_TEXTURE1);
         }
-        int TextureMap1 = pScene->GetConfig()->GetTerrainTexture(1);
+        int TextureMap1 = pConfig->GetTerrainTexture(1);
         if (TextureMap1 != -1) {
             Texture* pTex1 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap1);
             pTex1->Bind(GL_TEXTURE2);
         }
-        int TextureMap2 = pScene->GetConfig()->GetTerrainTexture(2);
+        int TextureMap2 = pConfig->GetTerrainTexture(2);
         if (TextureMap2 != -1) {
             Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
             pTex2->Bind(GL_TEXTURE3);
         }
 
-        m_heightmapTech.SetMaxTerrainHeight(pScene->GetConfig()->GetTerrainMaxHeight());
-        m_heightmapTech.SetHorizontalScale(pScene->GetConfig()->GetTerrainHorizontalScale());
-
+        m_heightmapTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
+        m_heightmapTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
+        m_heightmapTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
+                                          pConfig->GetTerrainHighHeightPercent());
         pTerrainGrid->Render();
-    } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
+    } else if (pConfig->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
     } else {
         printf("Warning! render list is empty and no main model or skybox\n");

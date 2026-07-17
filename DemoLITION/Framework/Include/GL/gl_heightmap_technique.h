@@ -33,6 +33,7 @@ public:
     void SetWVP(const Matrix4f& WVP);
     void SetMaxTerrainHeight(float MaxHeight);
     void SetHorizontalScale(float HorizontalScale);
+    void SetHeightPercents(float LowPercent, float HighPercent);
 
 private:
     bool InitCommon();
@@ -40,4 +41,6 @@ private:
     DEF_LOC(gWVP);
     DEF_LOC(gMaxTerrainHeight);
     DEF_LOC(gHorizontalScale);
+    DEF_LOC(gLowHeightPercent);
+    DEF_LOC(gHighHeightPercent);
 };

@@ -27,9 +27,9 @@ out vec3 WorldPos;
 out vec3 Normal;
 
 layout (binding = 0) uniform sampler2D gHeightMap; 
-layout (location = 0) uniform mat4 gWVP;
-layout (location = 1) uniform float gMaxTerrainHeight = 100.0f;
-layout (location = 2) uniform float gHorizontalScale = 4.0f;
+uniform mat4 gWVP;
+uniform float gMaxTerrainHeight = 100.0f;
+uniform float gHorizontalScale = 4.0f;
 
 
 void main()

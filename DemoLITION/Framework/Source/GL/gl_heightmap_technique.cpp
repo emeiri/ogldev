@@ -47,6 +47,8 @@ bool HeightmapTechnique::InitCommon()
     GET_UNIFORM(gWVP);
     GET_UNIFORM(gMaxTerrainHeight);
     GET_UNIFORM(gHorizontalScale);
+    GET_UNIFORM(gLowHeightPercent);
+    GET_UNIFORM(gHighHeightPercent);
 
     return true;
 }
@@ -67,6 +69,13 @@ void HeightmapTechnique::SetMaxTerrainHeight(float MaxHeight)
 void HeightmapTechnique::SetHorizontalScale(float HorizontalScale)
 {
     glUniform1f(m_gHorizontalScaleLoc, HorizontalScale);
+}
+
+
+void HeightmapTechnique::SetHeightPercents(float LowPercent, float HighPercent)
+{
+    glUniform1f(m_gLowHeightPercentLoc, LowPercent);
+    glUniform1f(m_gHighHeightPercentLoc, HighPercent);
 }
 
 

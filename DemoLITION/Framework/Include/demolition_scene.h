@@ -255,12 +255,17 @@ public:
         }
     }
 
-
     void SetTerrainMaxHeight(float MaxHeight) { m_terrain.m_maxHeight = MaxHeight; }
     float GetTerrainMaxHeight() const { return m_terrain.m_maxHeight; }
 
     void SetTerrainHorizontalScale(float Scale) { m_terrain.m_horizontalScale = Scale; }
     float GetTerrainHorizontalScale() const { return m_terrain.m_horizontalScale; }
+
+    void SetTerrainLowHeightPercent(float Percent) { m_terrain.m_lowHeightPercent = Percent; }
+    float GetTerrainLowHeightPercent() const { return m_terrain.m_lowHeightPercent; }
+
+    void SetTerrainHighHeightPercent(float Percent) { m_terrain.m_highHeightPercent = Percent; }
+    float GetTerrainHighHeightPercent() const { return m_terrain.m_highHeightPercent; }
 
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
@@ -302,6 +307,8 @@ private:
         int m_textures[3] = {-1, -1, -1};
         float m_maxHeight = 100.0f;
         float m_horizontalScale = 1.0f;
+        float m_lowHeightPercent = 0.2f;
+        float m_highHeightPercent = 0.8f;
     } m_terrain;
 };
 
