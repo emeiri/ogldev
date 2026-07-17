@@ -524,6 +524,23 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
             Texture* pHeightMap = (Texture*)m_pRenderingSystemGL->GetTexture(HeightMap);
             pHeightMap->Bind(GL_TEXTURE0);
         }
+
+        int TextureMap0 = pScene->GetConfig()->GetTerrainTexture(0);
+        if (TextureMap0 != -1) {
+            Texture* pTex0 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap0);
+            pTex0->Bind(GL_TEXTURE1);
+        }
+        int TextureMap1 = pScene->GetConfig()->GetTerrainTexture(1);
+        if (TextureMap1 != -1) {
+            Texture* pTex1 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap1);
+            pTex1->Bind(GL_TEXTURE2);
+        }
+        int TextureMap2 = pScene->GetConfig()->GetTerrainTexture(2);
+        if (TextureMap2 != -1) {
+            Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
+            pTex2->Bind(GL_TEXTURE3);
+        }
+
         pTerrainGrid->Render();
     } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);

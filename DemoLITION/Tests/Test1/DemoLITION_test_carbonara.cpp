@@ -1355,12 +1355,19 @@ public:
         TexConfig.m_genMipmaps = false;
         int TerrainTexHeightMap = m_pRenderingSystem->LoadTexture2D("heightmap.hdr", &TexConfig);
 
+        int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
+        int GrassTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/rocky_terrain_02_diff_2k.jpg");
+        int SnowTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/snow_03_diff_2k.jpg");
+
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
         m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
         m_pScene->GetConfig()->ControlShadowMapping(false);
         m_pScene->GetConfig()->SetTerrainGrid(pTerrain);
         m_pScene->GetConfig()->SetTerrainHeightMap(TerrainTexHeightMap);
+        m_pScene->GetConfig()->SetTerrainTexture(0, SandTexture);
+        m_pScene->GetConfig()->SetTerrainTexture(1, GrassTexture);
+        m_pScene->GetConfig()->SetTerrainTexture(2, SnowTexture);
 
         m_pRenderingSystem->SetScene(m_pScene);
 

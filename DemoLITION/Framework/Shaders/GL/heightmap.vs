@@ -23,24 +23,24 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoords; 
 
 out vec2 TexCoords;
-//out vec3 FragPos;
+out vec3 WorldPos;
 out vec3 Normal;
 
 layout (location = 0) uniform mat4 gWVP;
 
 layout (binding = 0) uniform sampler2D gHeightMap; 
-layout (location = 3) uniform float gMaxTerrainHeight = 100.0f;
+layout (location = 3) uniform float gMaxTerrainHeight = 50.0f;
 
 void main()
 {
     TexCoords = aTexCoords;
 
     // Fetch from your 32-bit R32F floating-point texture
-    float heightSample = texture(gHeightMap, aTexCoords).r;
+    float HeightSample = texture(gHeightMap, aTexCoords).r;
 
     // Displace the vertex position vertically in metric space
-    vec3 displacedPosition = aPos;
-    displacedPosition.y = heightSample * gMaxTerrainHeight;
+    vec3 DisplacedPos = aPos;
+    DisplacedPos.y = HeightSample * gMaxTerrainHeight;
 
     ivec2 TexSize = textureSize(gHeightMap, 0);
     float TexelSize = 1.0 / float(TexSize.x);
@@ -53,6 +53,6 @@ void main()
 
     //Normal = normalize(vec3((hL - hR) * 100.0, 1.0, (hD - hU) * 100.0));
 
-    //FragPos = vec3(model * vec4(displacedPosition, 1.0));
-    gl_Position = gWVP * vec4(displacedPosition, 1.0);
+    WorldPos = DisplacedPos;
+    gl_Position = gWVP * vec4(DisplacedPos, 1.0);
 }

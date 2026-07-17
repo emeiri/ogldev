@@ -229,11 +229,31 @@ public:
     RENDER_MODE GetRenderMode() const { return m_renderMode; }
     void SetRenderMode(RENDER_MODE mode) { m_renderMode = mode; }
 
-    void SetTerrainGrid(void* pGrid) { pTerrainGrid = pGrid; }
-    void* GetTerrainGrid() const { return pTerrainGrid; }
+    void SetTerrainGrid(void* pGrid) { m_terrain.pGrid = pGrid; }
+    void* GetTerrainGrid() const { return m_terrain.pGrid; }
 
-    void SetTerrainHeightMap(int Tex) { m_terrainTexHeightMap = Tex; }
-    int GetTerrainHeightMap() const { return m_terrainTexHeightMap; }
+    void SetTerrainHeightMap(int Tex) { m_terrain.m_heightMap = Tex; }
+    int GetTerrainHeightMap() const { return m_terrain.m_heightMap; }
+
+    void SetTerrainTexture(int Index, int Tex) {
+        if (Index >= 0 && Index < ARRAY_SIZE_IN_ELEMENTS(m_terrain.m_textures)) {
+            m_terrain.m_textures[Index] = Tex;
+        } else {
+            printf("Error! invalid terrain texture index %d\n", Index);
+            assert(0);
+            exit(0);
+        }
+    }
+
+    int GetTerrainTexture(int Index) const {
+        if (Index >= 0 && Index < ARRAY_SIZE_IN_ELEMENTS(m_terrain.m_textures)) {
+            return m_terrain.m_textures[Index];
+        } else {
+            printf("Error! invalid terrain texture index %d\n", Index);
+            assert(0);
+            exit(0);
+        }
+    }
 
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
@@ -269,8 +289,11 @@ private:
     int m_projectedTexture = -1;
     Matrix4f m_projectionMat;
     RENDER_MODE m_renderMode;
-    void* pTerrainGrid = NULL;
-    int m_terrainTexHeightMap = -1;
+    struct {
+        void* pGrid = NULL;
+        int m_heightMap = -1;
+        int m_textures[3] = {-1, -1, -1};
+    } m_terrain;
 };
 
 
