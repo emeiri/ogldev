@@ -28,24 +28,48 @@ layout (binding = 1) uniform sampler2D gTexture0; // Low Elevation (e.g. Sand)
 layout (binding = 2) uniform sampler2D gTexture1; // Flat Ground / Mid Elevation (e.g. Grass)
 layout (binding = 3) uniform sampler2D gTexture2; // Steep Slopes / High Elevation (e.g. Rock)
 
-layout (location = 3) uniform float gMaxTerrainHeight = 50.0f;
+layout (location = 3) uniform float gMaxTerrainHeight = 150.0f;
 
 const float gLowHeight = gMaxTerrainHeight * 0.25;     
 const float gHighHeight = gMaxTerrainHeight * 0.7; 
 uniform vec3 u_SunDirection = normalize(vec3(0.5, 1.0, 0.3)); 
 
+vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal, float scale) 
+{
+    // 1. Calculate blend weights from the absolute normal
+    // Use the absolute value because sign doesn't determine the projection axis
+    vec3 blend = abs(normal);
+    
+    // Sharpen the blend to reduce blurring on 45-degree slopes
+    blend = pow(blend, vec3(8.0)); 
+    
+    // Ensure weights sum to 1.0 to maintain consistent brightness
+    blend /= (blend.x + blend.y + blend.z);
+
+    // 2. Sample the texture from 3 directions
+    // Projection UVs are derived from the other two axes
+    vec4 xProj = texture(tex, worldPos.yz * scale); // Side
+    vec4 yProj = texture(tex, worldPos.zx * scale); // Top/Bottom
+    vec4 zProj = texture(tex, worldPos.xy * scale); // Front/Back
+
+    // 3. Blend the samples together
+    return xProj * blend.x + yProj * blend.y + zProj * blend.z;
+}
+
+
 void main()
 {
     vec2 DetailUV = TexCoords * 8; 
+    float tiling = 0.1; // Adjust for your world scale
 
     vec3 N = normalize(Normal);
     float SlopeFactor = smoothstep(0.65, 0.85, N.y); 
     float LowMask = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
     float HighMask = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
 
-    vec4 LowColor   = texture(gTexture0, DetailUV);
-    vec4 MidColor   = texture(gTexture1, DetailUV);
-    vec4 HighColor  = texture(gTexture2, DetailUV);
+    vec4 LowColor   = SampleTriplanar(gTexture0, WorldPos, N, tiling);
+    vec4 MidColor   = SampleTriplanar(gTexture1, WorldPos, N, tiling);
+    vec4 HighColor  = SampleTriplanar(gTexture2, WorldPos, N, tiling);
 
     vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
     vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);
