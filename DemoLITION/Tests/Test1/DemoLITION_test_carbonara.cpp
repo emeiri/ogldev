@@ -1,4 +1,4 @@
-/*
+﻿/*
 
         Copyright 2024 Etay Meiri
 
@@ -1328,7 +1328,51 @@ struct TerrainConfig {
     float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
     float gain = 0.5f;       // Amplitude multiplier per octave (persistence)
     float scale = 0.005f;    // Initial zoom scale for the coordinate space
+    float horizontalScale = 4.0f; // Horizontal scaling factor for the terrain
 };
+
+
+float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& HeightMapData, const TerrainConfig& Config)
+{
+    // 1. Convert world coordinates back into un-scaled grid coordinates
+    float UnscaledX = WorldX / Config.horizontalScale;
+    float UnscaledZ = WorldZ / Config.horizontalScale;
+
+    // 2. Find the integer base corner of the current quad cell
+    int CellX = static_cast<int>(std::floor(UnscaledX));
+
+    // THE MIRROR FIX: Invert the Z tracker to align the CPU layout with OpenGL's native internal memory packing
+    int CellZ = (Config.height - 1) - static_cast<int>(std::floor(UnscaledZ));
+
+    // 3. Strict Map Boundary Safety Protection
+    if (CellX < 0 || CellX >= Config.width - 1 || CellZ < 1 || CellZ >= Config.height) {
+        return 0.0f;
+    }
+
+    // 4. Fetch the 4 exact heights directly from your direct-memory CPU layout matching the Z flip
+    // Because Z moves down rows now, we adjust indices to maintain correct relative directions
+    float H_00 = HeightMapData[CellZ * Config.width + CellX];         // Close-Left
+    float H_10 = HeightMapData[CellZ * Config.width + (CellX + 1)];   // Close-Right
+    float H_01 = HeightMapData[(CellZ - 1) * Config.width + CellX];   // Far-Left
+    float H_11 = HeightMapData[(CellZ - 1) * Config.width + (CellX + 1)]; // Far-Right
+
+    // 5. Get local fractional distance coordinates inside this 1x1 meter grid cell
+    float FracX = UnscaledX - static_cast<float>(CellX);
+    float FracZ = UnscaledZ - static_cast<float>(static_cast<int>(std::floor(WorldZ / Config.horizontalScale))); // Keep fractional Z moving forward
+
+    float FinalNormalizedHeight = 0.0f;
+
+    // 6. Identify the triangle sector matching your geometric mesh structure
+    if (FracX + FracZ <= 1.0f) {
+        FinalNormalizedHeight = H_00 + FracX * (H_10 - H_00) + FracZ * (H_01 - H_00);
+    } else {
+        FinalNormalizedHeight = H_11 + (1.0f - FracX) * (H_01 - H_11) + (1.0f - FracZ) * (H_10 - H_11);
+    }
+
+    // 7. Output scaled world height in meters
+    return FinalNormalizedHeight;
+}
+
 
 class PerlinDemo : public Carbonara {
 
@@ -1375,16 +1419,38 @@ public:
         // pSceneObject->SetScale(0.01f);
        //  m_pScene->AddToRenderList(pSceneObject);
 
-         m_pScene->SetCamera(Vector3f(60.0f, 65.0f, 0.0f), Vector3f(0.0f, -0.1f, 1.0f));
-         m_pScene->SetCameraZRange(0.5f, 8000.0f);
+        float CameraX = Config.width * Config.horizontalScale / 2.0f;
+        float CameraZ = Config.height * Config.horizontalScale / 2.0f;
+
+        float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, Config) * 150.0f;
+
+        m_pScene->SetCamera(Vector3f(CameraX, GroundHeight + 1.7f, CameraZ), Vector3f(0.0f, -0.1f, 1.0f));
+        m_pScene->SetCameraZRange(0.5f, 8000.0f);
+    }
+
+
+    void OnFrameChild(double DeltaTime)
+    {
+        glm::vec3 PlayerPosition = m_pScene->GetCurrentCamera()->GetPosition();
+
+        // Get the exact ground height in meters directly underneath the player's boots
+        TerrainConfig Config;
+
+        float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, Config) * 150.0f;
+
+        // Set camera eye level: Ground elevation + 1.7 meters human height factor
+        PlayerPosition.y = GroundHeight + 1.7f;
+
+        m_pScene->GetCurrentCamera()->SetPos(PlayerPosition);
     }
 
 private:
 
+
     void CreateHeightMap(const TerrainConfig& Config)
     {
         // Allocate exactly 4 bytes per pixel for high-fidelity 32-bit float data
-        std::vector<float> HeightMap(Config.width * Config.height);
+        m_heightMap.resize(Config.width * Config.height);
 
         float MinValue = 1000.0f;
         float MaxValue = -1000.0f;
@@ -1402,21 +1468,24 @@ private:
                     Amplitude *= Config.gain;
                 }
 
-                HeightMap[row * Config.width + col] = Sum;
+                m_heightMap[row * Config.width + col] = Sum;
                 if (Sum < MinValue) MinValue = Sum;
                 if (Sum > MaxValue) MaxValue = Sum;
             }
         }
 
         // 2. Second Pass: Normalize to the EXACT range
-        for (int i = 0; i < HeightMap.size(); ++i) {
+        for (int i = 0; i < m_heightMap.size(); ++i) {
             // Remap from [MinValue, MaxValue] to
-            HeightMap[i] = (HeightMap[i] - MinValue) / (MaxValue - MinValue);
+            m_heightMap[i] = (m_heightMap[i] - MinValue) / (MaxValue - MinValue);
         }
+
         // Save as a high-precision Single-Channel (1) HDR file
-        stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, HeightMap.data());
+        stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, m_heightMap.data());
         printf("Heightmap successfully saved as 32-bit HDR format.\n");
     }
+
+    std::vector<float> m_heightMap;
 };
 
 

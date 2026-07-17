@@ -30,7 +30,7 @@ layout (location = 0) uniform mat4 gWVP;
 
 layout (binding = 0) uniform sampler2D gHeightMap; 
 layout (location = 3) uniform float gMaxTerrainHeight = 150.0f;
-layout (location = 4) uniform float gHorizontalScale = 3.0f;
+layout (location = 4) uniform float gHorizontalScale = 4.0f;
 
 
 void main()
