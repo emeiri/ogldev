@@ -29,7 +29,9 @@ out vec3 Normal;
 layout (location = 0) uniform mat4 gWVP;
 
 layout (binding = 0) uniform sampler2D gHeightMap; 
-layout (location = 3) uniform float gMaxTerrainHeight = 50.0f;
+layout (location = 3) uniform float gMaxTerrainHeight = 150.0f;
+layout (location = 4) uniform float gHorizontalScale = 3.0f;
+
 
 void main()
 {
@@ -40,7 +42,9 @@ void main()
 
     // Displace the vertex position vertically in metric space
     vec3 DisplacedPos = aPos;
+    DisplacedPos.x *= gHorizontalScale;
     DisplacedPos.y = HeightSample * gMaxTerrainHeight;
+    DisplacedPos.z *= gHorizontalScale;
 
     ivec2 TexSize = textureSize(gHeightMap, 0);
     float TexelSize = 1.0 / float(TexSize.x);
