@@ -93,7 +93,7 @@ long long GetCurrentTimeMillis();
                            aiProcess_CalcTangentSpace)
 
 
-#define NOT_IMPLEMENTED printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); exit(0);
+#define NOT_IMPLEMENTED printf("Not implemented case in %s:%d\n", __FILE__, __LINE__); assert(0); exit(0);
 
 #ifndef OGLDEV_VULKAN
 #define GLExitIfError                                                          \
