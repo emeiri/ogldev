@@ -30,8 +30,8 @@ layout (binding = 3) uniform sampler2D gTexture2; // Meaning: Steep Slopes / Hig
 
 layout (location = 3) uniform float gMaxTerrainHeight = 50.0f;
 
-const float gBeachHeight = gMaxTerrainHeight * 0.25;     
-const float gMountainHeight = gMaxTerrainHeight * 0.7; 
+const float gLowHeight = gMaxTerrainHeight * 0.25;     
+const float gHighHeight = gMaxTerrainHeight * 0.7; 
 uniform vec3 u_SunDirection = normalize(vec3(0.5, 1.0, 0.3)); 
 
 void main()
@@ -40,22 +40,17 @@ void main()
 
     vec3 N = normalize(Normal);
     float SlopeFactor = smoothstep(0.65, 0.85, N.y); 
-     float grassMask = smoothstep(gBeachHeight - 2.0, gBeachHeight + 2.0, WorldPos.y);
+    float LowMask = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
+    float HighMask = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
 
-    float snowMask = smoothstep(gMountainHeight - 5.0, gMountainHeight + 5.0, WorldPos.y);
+    vec4 LowColor   = texture(gTexture0, DetailUV);
+    vec4 MidColor   = texture(gTexture1, DetailUV);
+    vec4 HighColor  = texture(gTexture2, DetailUV);
 
-    vec4 sand   = texture(gTexture0, DetailUV);
-    vec4 grass   = texture(gTexture1, DetailUV);
-    vec4 snow  = texture(gTexture2, DetailUV);
+    vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
+    vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);
 
+    FragColor = FinalColor;
 
-   vec4 sandAndGrass = mix(sand, grass, grassMask);
-    vec4 FinalColor = mix(sandAndGrass, snow, snowMask);
-   // FragColor = vec4(Normal * 0.5 + 0.5, 1.0);//gColor;
-   FragColor = FinalColor;
-   //FragColor = vec4(vec3(WorldPos.y / 100.0), 1.0);
-   
-// Proceed with your FinalColor mix
-//vec4 FinalColor = mix(lowAndMid, LayerHigh, highWeight);
-//FragColor = vec4(WorldPos.y / 50.0);
+   //FragColor = vec4(vec3(WorldPos.y / gMaxTerrainHeight.0), 1.0);   
 }
