@@ -18,6 +18,8 @@
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "imGuIZMOquat.h"
 
 #include "Int/core_scene.h"
@@ -331,10 +333,14 @@ void CoreScene::SSAOGUI()
 }
 
 
-void CoreScene::ShowSceneGUI()
+void CoreScene::StartSceneGUI(const char* pTitle)
 {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
     bool my_tool_active = false;
-    ImGui::Begin("Scene Config", &my_tool_active);
+    ImGui::Begin(pTitle, &my_tool_active);
     
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
@@ -386,8 +392,16 @@ void CoreScene::ShowSceneGUI()
             ImGui::TreePop();
         }
     }
+}
 
-    ImGui::End();    
+
+void CoreScene::EndSceneGUI()
+{
+    ImGui::End();
+
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 
@@ -465,6 +479,11 @@ void CoreScene::GeneralGUI()
         bool DisablePBR = m_config.IsPBRDisabled();
         ImGui::Checkbox("Disable PBR", &DisablePBR);
         m_config.ForcePBRDisabled(DisablePBR);
+
+        bool EnableShadowMapping = m_config.IsShadowMappingEnabled();
+        ImGui::Checkbox("Enable Shadow Mapping", &EnableShadowMapping);
+        m_config.ControlShadowMapping(EnableShadowMapping);
+
         ImGui::Text("Render Mode:");
         RENDER_MODE RenderMode = m_config.GetRenderMode();
         ImGui::RadioButton("Full", (int*)&RenderMode, RENDER_MODE_FULL);

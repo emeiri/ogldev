@@ -75,7 +75,9 @@ public:
 
     virtual std::list<SceneObject*> GetSceneObjectsList();
 
-    virtual void ShowSceneGUI();
+    virtual void StartSceneGUI(const char* pTitle);
+
+    virtual void EndSceneGUI();
 
     virtual const InputState& GetInputState() { return m_inputState; }
 

@@ -361,7 +361,9 @@ public:
 
     virtual void LoadSkybox(const char* pFilename) = 0;
 
-    virtual void ShowSceneGUI() = 0;
+    virtual void StartSceneGUI(const char* pTitle) = 0;
+
+    virtual void EndSceneGUI() = 0;
 
     virtual const InputState& GetInputState() = 0;
 

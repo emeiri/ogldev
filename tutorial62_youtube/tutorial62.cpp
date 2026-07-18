@@ -137,21 +137,8 @@ public:
 protected:
     void OnFrameGUI()
     {
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        m_pScene->ShowSceneGUI();
-
-        // Rendering
-        ImGui::Render();
-        //   int display_w, display_h;
-    //    glfwGetFramebufferSize(window, &display_w, &display_h);
-    //    glViewport(0, 0, display_w, display_h);
-    //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        m_pScene->StartSceneGUI("Tutorial 62 - SSAO");
+        m_pScene->EndSceneGUI();
     }
 
 

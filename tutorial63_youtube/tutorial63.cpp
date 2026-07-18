@@ -134,23 +134,10 @@ public:
 protected:
     void OnFrameGUI()
     {
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         ImGui::GetStyle().FontScaleMain = 1.5f;
 
-        m_pScene->ShowSceneGUI();
-
-        // Rendering
-        ImGui::Render();
-        //   int display_w, display_h;
-    //    glfwGetFramebufferSize(window, &display_w, &display_h);
-    //    glViewport(0, 0, display_w, display_h);
-    //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        m_pScene->StartSceneGUI("Tutorial 63 - HDR Tone Mapping");
+        m_pScene->EndSceneGUI();
     }
 
 

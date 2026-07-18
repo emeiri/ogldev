@@ -234,7 +234,6 @@ public:
     {
         if (m_showGui) {
             OnFrameGUI();
-            ApplyGUIConfig();
         }
     }
 
@@ -276,43 +275,12 @@ public:
 
     void OnFrameGUI()
     {
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         Scene* pScene = m_pRenderingSystem->GetScene();
 
-        bool my_tool_active = false;
+    //    GUIMenu();
 
-        ImGui::Begin("Test", &my_tool_active, ImGuiWindowFlags_MenuBar);  // Create a window called "Hello, world!" and append into it.
-
-        GUIMenu();
-
-        GUICamera(pScene);
-
-        pScene->ShowSceneGUI();
-
-        GUIScene(pScene);
-
-        // ImGui::SliderFloat("Max height", &this->m_maxHeight, 0.0f, 1000.0f);
-        // ImGui::SliderFloat("Terrain roughness", &this->m_roughness, 0.0f, 5.0f);
-
-        // ImGui::SliderFloat("Height0", &Height0, 0.0f, 64.0f);
-        //  ImGui::SliderFloat("Height1", &Height1, 64.0f, 128.0f);
-        //   ImGui::SliderFloat("Height2", &Height2, 128.0f, 192.0f);
-        //  ImGui::SliderFloat("Height3", &Height3, 192.0f, 256.0f);
-
-        ImGui::End();
-
-        // Rendering
-        ImGui::Render();
-        //   int display_w, display_h;
-    //    glfwGetFramebufferSize(window, &display_w, &display_h);
-    //    glViewport(0, 0, display_w, display_h);
-    //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        pScene->StartSceneGUI("Scene Config");
+        pScene->EndSceneGUI();
     }
 
 
@@ -327,89 +295,6 @@ public:
             }
             ImGui::EndMenuBar();
         }
-    }
-
-
-    void GUICamera(Scene* pScene)
-    {
-        if (ImGui::TreeNode("Camera")) {
-            const GLMCameraFirstPerson* pCamera = pScene->GetCurrentCamera();
-            const Vector3f& Pos = pCamera->GetPos();
-            const Vector3f& Target = pCamera->GetTarget();
-            const Vector3f& Up = pCamera->GetUp();
-            ImGui::Text("Position %.3f,%.3f,%.3f", Pos.x, Pos.y, Pos.z);
-            ImGui::Text("Target %.3f,%.3f,%.3f", Target.x, Target.y, Target.z);
-            ImGui::Text("Up %.3f,%.3f,%.3f", Up.x, Up.y, Up.z);
-            ImGui::TreePop();
-        }
-    }
-
-
-    void GUIScene(Scene* pScene)
-    {
-        std::list<SceneObject*> SceneObjectsList = pScene->GetSceneObjectsList();
-
-        if (ImGui::TreeNode("Scene")) {
-            ImGui::CheckboxFlags("Enable Shadow Mapping", &m_enableShadowMapping, 1);
-
-            GUILighting(pScene);
-
-            for (std::list<SceneObject*>::const_iterator it = SceneObjectsList.begin(); it != SceneObjectsList.end(); it++) {
-                if (ImGui::TreeNode((*it)->GetName().c_str())) {
-                    ImGui::TreePop();
-                }
-            }
-
-            ImGui::TreePop();
-        }
-    }
-
-
-    void GUILighting(Scene* pScene)
-    {
-        GUIDirLighting(pScene);
-
-        GUIPointLighting(pScene);
-    }
-
-
-    void GUIDirLighting(Scene* pScene)
-    {
-        if (pScene->GetDirLights().size() > 0) {
-            ImGui::Text("Directional Light");
-            DirectionalLight& DirLight = pScene->GetDirLights()[0];
-            vec3 Dir(DirLight.WorldDirection.x, DirLight.WorldDirection.y, -DirLight.WorldDirection.z);
-            ImGui::gizmo3D("##Dir1", Dir /*, size,  mode */);
-            DirLight.WorldDirection = Vector3f(Dir.x, Dir.y, -Dir.z);
-            Vector3f DiffuseColor = DirLight.Color;
-            ImGui::ColorEdit4("Diffuse Color", DiffuseColor.data());
-            DirLight.Color = DiffuseColor;
-            //    Vector3f AmbientColor = DirLight.;
-             //   ImGui::ColorEdit4("Color", Color.data());
-             //   DirLight.Color = Color;
-
-        }
-    }
-
-
-    void GUIPointLighting(Scene* pScene)
-    {
-        if (pScene->GetPointLights().size() > 0) {
-            ImGui::Text("Point Light");
-            PointLight& Light = pScene->GetPointLights()[0];
-            vec3 Pos(Light.WorldPosition.x, Light.WorldPosition.y, Light.WorldPosition.z);
-            ImGui::SliderFloat3("Position", &Pos.x, -1000.0f, 1000.0f);
-            Light.WorldPosition = Vector3f(Pos.x, Pos.y, Pos.z);
-            Vector3f Color = Light.Color;
-            ImGui::ColorEdit4("Color", Color.data());
-            Light.Color = Color;
-        }
-    }
-
-
-    void ApplyGUIConfig()
-    {
-        m_pScene->GetConfig()->ControlShadowMapping(m_enableShadowMapping);
     }
 
 
@@ -1459,6 +1344,8 @@ private:
         // Allocate exactly 4 bytes per pixel for high-fidelity 32-bit float data
         m_heightMap.resize(Config.width * Config.height);
 
+        std::memset(m_heightMap.data(), 0, ARRAY_SIZE_IN_BYTES(m_heightMap));
+
         float MinValue = 1000.0f;
         float MaxValue = -1000.0f;
 
@@ -1500,10 +1387,10 @@ private:
 
 void carbonara()
 {
-    //BallisticsDemo demo;
+  //  BallisticsDemo demo;
   //  FireworksDemo demo;
 //    AnimationDemo demo;
-  //  BridgeDemo demo;
+ //   BridgeDemo demo;
   // AmazonBistroDemo demo;
   //  SkyboxDemo demo;
   //  GLTFPBRDemo demo;

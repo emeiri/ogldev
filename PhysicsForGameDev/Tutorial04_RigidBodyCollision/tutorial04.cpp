@@ -162,18 +162,10 @@ protected:
 
     void OnFrameGUI()
     {
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         ImGui::GetStyle().FontScaleMain = 1.5f;
 
-        m_pScene->ShowSceneGUI();
-
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        m_pScene->StartSceneGUI("Tutorial 04 - Rigid Body Collision");
+        m_pScene->EndSceneGUI();
     }
 
 private:
