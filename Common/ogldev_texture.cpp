@@ -337,6 +337,9 @@ void Texture::Update(const void* pImageData)
 
     if ((m_config.m_numChannels == 1) && (m_config.m_isFloat)) {
         glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_FLOAT, pImageData);
+        if (m_config.m_genMipmaps) {
+            glGenerateTextureMipmap(m_textureObj);
+        }
     } else {
         NOT_IMPLEMENTED;
     }    
