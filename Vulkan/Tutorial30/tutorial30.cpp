@@ -17,6 +17,7 @@
 
 	Vulkan For Beginners - 
 		Tutorial #30: Push Constants
+		Tutorial #31: Generating mipmaps
 */
 
 #include <array>
@@ -33,7 +34,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
-#include "imGuIZMOquat.h"			// optional
+#include "imGuIZMOquat.h"
 
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_core.h"
