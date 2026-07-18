@@ -117,6 +117,8 @@ public:
 
     virtual int LoadTexture2D(const std::string& Filename, TextureConfig* pConfig = NULL) = 0;
 
+    virtual int LoadTexture2D(const void* pData, int Width, int Height, TextureConfig* pConfig = NULL) = 0;
+
     virtual int LoadCubemapTexture(const std::string& Filename) = 0;
 
     virtual void* CreateTerrainGrid(int Width, int Height) = 0;

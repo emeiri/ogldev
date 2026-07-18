@@ -179,6 +179,36 @@ int RenderingSystemGL::LoadTexture2D(const std::string& Filename, TextureConfig*
 }
 
 
+int RenderingSystemGL::LoadTexture2D(const void* pData, int Width, int Height, TextureConfig* pConfig)
+{
+    if (m_numTextures == m_textures.size()) {
+        printf("%s:%d: out of texture space\n", __FILE__, __LINE__);
+        exit(0);
+    }
+
+    GLTextureConfig TexConfig;
+
+    if (pConfig) {
+        TexConfig.m_wrapMode = WrapModeToGLWrapMode[pConfig->m_wrapMode];
+        TexConfig.m_numChannels = pConfig->m_numChannels;
+        TexConfig.m_isFloat = pConfig->m_isFloat;
+        // TexConfig.m_isSRGB = pConfig->m_isSRGB;
+        TexConfig.m_genMipmaps = pConfig->m_genMipmaps;
+    }
+
+    Texture* pTexture = new Texture(GL_TEXTURE_2D, &TexConfig);
+    pTexture->Load(Width, Height, TexConfig.m_numChannels, pData);
+
+    m_textures[m_numTextures] = pTexture;
+    int ret = m_numTextures;
+    m_numTextures++;
+
+    printf("2D texture loaded from buffer, size %dx%d, handle %d\n", Width, Height, ret);
+
+    return ret;
+}
+
+
 int RenderingSystemGL::LoadCubemapTexture(const std::string& Filename)
 {
     if (m_numTextures == m_textures.size()) {

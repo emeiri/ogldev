@@ -1396,7 +1396,7 @@ public:
         TexConfig.m_numChannels = 1;
         TexConfig.m_isFloat = true;
         TexConfig.m_genMipmaps = false;
-        int TerrainTexHeightMap = m_pRenderingSystem->LoadTexture2D("heightmap.hdr", &TexConfig);
+        int TerrainTexHeightMap = m_pRenderingSystem->LoadTexture2D(m_heightMap.data(), m_terrainConfig.width, m_terrainConfig.height, &TexConfig);
 
         int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
         int GrassTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/rocky_terrain_02_diff_2k.jpg");
@@ -1488,7 +1488,7 @@ private:
         }
 
         // Save as a high-precision Single-Channel (1) HDR file
-        stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, m_heightMap.data());
+      //  stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, m_heightMap.data());
         printf("Heightmap successfully saved as 32-bit HDR format.\n");
     }
 
