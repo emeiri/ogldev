@@ -45,19 +45,46 @@ Texture::Texture(GLenum TextureTarget, const std::string& FileName, GLTextureCon
 }
 
 
-Texture::Texture(GLenum TextureTarget)
+Texture::Texture(GLenum TextureTarget, GLTextureConfig* pConfig)
 {
     m_textureTarget = TextureTarget;
+
+    if (pConfig) {
+        m_config = *pConfig;
+    }
 }
 
 
-void Texture::Load(u32 BufferSize, void* pData, bool IsSRGB)
+
+void Texture::Load(u32 BufferSize, const void* pData, bool IsSRGB)
 {
     void* pImageData = stbi_load_from_memory((const stbi_uc*)pData, BufferSize, &m_imageWidth, &m_imageHeight, &m_imageBPP, 0);
 
     LoadInternal(pImageData, IsSRGB);
 
     stbi_image_free(pImageData);
+}
+
+
+void Texture::Load(int Width, int Height, int BPP, const void* pData)
+{
+    const void* pImageData = NULL;
+
+    m_imageWidth = Width;
+    m_imageHeight = Height;
+
+    if (m_config.m_numChannels == 1) {
+        if (m_config.m_isFloat) {
+            pImageData = pData;
+            m_imageBPP = 1;
+        } else {
+            NOT_IMPLEMENTED;
+        }
+    } else {
+        NOT_IMPLEMENTED;
+    }
+
+    LoadInternal(pImageData, false);
 }
 
 bool Texture::Load(bool IsSRGB)
@@ -125,7 +152,7 @@ void Texture::Load(const std::string& Filename, bool IsSRGB)
 }
 
 
-void Texture::LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData, bool IsSRGB)
+void Texture::LoadRaw(int Width, int Height, int BPP, const void* pImageData, bool IsSRGB)
 {
     m_imageWidth = Width;
     m_imageHeight = Height;

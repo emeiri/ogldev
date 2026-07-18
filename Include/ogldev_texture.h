@@ -50,16 +50,18 @@ class Texture : public BaseTexture
 public:
     Texture(GLenum TextureTarget, const std::string& FileName, GLTextureConfig* pConfig = NULL);
 
-    Texture(GLenum TextureTarget);
+    Texture(GLenum TextureTarget, GLTextureConfig* pConfig = NULL);
 
     // Should be called once to load the texture
     bool Load(bool IsSRGB = false);
 
     void Load(const std::string& Filename, bool IsSRGB = false);
 
-    void Load(unsigned int BufferSize, void* pImageData, bool IsSRGB);
+    void Load(unsigned int BufferSize, const void* pImageData, bool IsSRGB);
 
-    void LoadRaw(int Width, int Height, int BPP, const unsigned char* pImageData, bool IsSRGB);
+    void Load(int Width, int Height, int BPP, const void* pImageData);
+
+    void LoadRaw(int Width, int Height, int BPP, const void* pImageData, bool IsSRGB);
 
     void LoadF32(int Width, int Height, const float* pImageData);
 
