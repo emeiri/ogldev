@@ -1265,7 +1265,7 @@ public:
         TexConfig.m_wrapMode = WRAP_MODE_CLAMP_TO_EDGE;
         TexConfig.m_numChannels = 1;
         TexConfig.m_isFloat = true;
-        TexConfig.m_genMipmaps = false;
+        TexConfig.m_genMipmaps = true;
         m_terrainTexHeightMap = m_pRenderingSystem->LoadTexture2D(m_heightMap.data(), m_terrainConfig.width, m_terrainConfig.height, &TexConfig);
 
         int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
