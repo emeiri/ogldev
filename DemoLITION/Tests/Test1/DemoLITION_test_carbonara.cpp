@@ -19,13 +19,10 @@
 */
 
 #include <stdio.h>
-#include <string.h>
 #include <math.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
 #include "imGuIZMOquat.h"
 
 #include "demolition.h"
@@ -275,27 +272,15 @@ public:
 
     void OnFrameGUI()
     {
-        Scene* pScene = m_pRenderingSystem->GetScene();
-
-    //    GUIMenu();
+        Scene* pScene = m_pRenderingSystem->GetScene();    
 
         pScene->StartSceneGUI("Scene Config");
+        ChildGui();
         pScene->EndSceneGUI();
     }
 
 
-    void GUIMenu()
-    {
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
-                if (ImGui::MenuItem("Save", "Ctrl+S")) { /* Do stuff */ }
-                if (ImGui::MenuItem("Close", "Ctrl+W")) {  }
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenuBar();
-        }
-    }
+    virtual void ChildGui() {}
 
 
     bool OnKeyboard(int key, int action)
@@ -1207,8 +1192,8 @@ public:
 
 
 struct TerrainConfig {
-    int width = 129;        // Power-of-two plus one (ideal for tessellation patches)
-    int height = 129;
+    int width = 513;        // Power-of-two plus one (ideal for tessellation patches)
+    int height = 513;
     int octaves = 6;         // How many detail layers to stack
     float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
     float gain = 0.5f;       // Amplitude multiplier per octave (persistence)
@@ -1281,7 +1266,7 @@ public:
         TexConfig.m_numChannels = 1;
         TexConfig.m_isFloat = true;
         TexConfig.m_genMipmaps = false;
-        int TerrainTexHeightMap = m_pRenderingSystem->LoadTexture2D(m_heightMap.data(), m_terrainConfig.width, m_terrainConfig.height, &TexConfig);
+        m_terrainTexHeightMap = m_pRenderingSystem->LoadTexture2D(m_heightMap.data(), m_terrainConfig.width, m_terrainConfig.height, &TexConfig);
 
         int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
         int GrassTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/rocky_terrain_02_diff_2k.jpg");
@@ -1294,7 +1279,7 @@ public:
         SceneConfig* pConfig = m_pScene->GetConfig();
         pConfig->ControlShadowMapping(false);
         pConfig->SetTerrainGrid(pTerrain);
-        pConfig->SetTerrainHeightMap(TerrainTexHeightMap);
+        pConfig->SetTerrainHeightMap(m_terrainTexHeightMap);
         pConfig->SetTerrainHorizontalScale(m_terrainConfig.horizontalScale);
         pConfig->SetTerrainMaxHeight(m_terrainConfig.maxHeight);
         pConfig->SetTerrainTexture(0, SandTexture);
@@ -1308,33 +1293,86 @@ public:
        //  m_pScene->AddToRenderList(pSceneObject);
 
         float CameraX = m_terrainConfig.width * m_terrainConfig.horizontalScale / 2.0f;
-        float CameraZ = m_terrainConfig.height * m_terrainConfig.horizontalScale / 2.0f;
+        float CameraZ = 0.0f; 
+        float CameraY = 0.0f;
+        
+        if (m_cameraOnGround) {
+            float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, m_terrainConfig) * m_terrainConfig.maxHeight;
+            CameraY = 1.7f; // Add human height factor to the ground elevation for camera eye level
+            CameraZ = m_terrainConfig.height* m_terrainConfig.horizontalScale / 2.0f;
+        } else {
+            CameraY = 1500.0f;
+        }
 
-        float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, m_terrainConfig) * m_terrainConfig.maxHeight;
-
-        m_pScene->SetCamera(Vector3f(CameraX, GroundHeight + 1.7f, CameraZ), Vector3f(0.0f, -0.1f, 1.0f));
+        m_pScene->SetCamera(Vector3f(CameraX, CameraY, CameraZ), Vector3f(0.0f, -0.1f, 1.0f));
         m_pScene->SetCameraZRange(0.5f, 8000.0f);
     }
 
 
     void OnFrameChild(double DeltaTime)
     {
-        glm::vec3 PlayerPosition = m_pScene->GetCurrentCamera()->GetPosition();
+        if (m_cameraOnGround) {
+            glm::vec3 PlayerPosition = m_pScene->GetCurrentCamera()->GetPosition();
 
-        // Get the exact ground height in meters directly underneath the player's boots
+            // Get the exact ground height in meters directly underneath the player's boots
 
-        float TerrainMaxHeight = m_pScene->GetConfig()->GetTerrainMaxHeight();
-        m_terrainConfig.maxHeight = TerrainMaxHeight;
-        float TerrainHorizontalScale = m_pScene->GetConfig()->GetTerrainHorizontalScale();
-        m_terrainConfig.horizontalScale = TerrainHorizontalScale;
+            float TerrainMaxHeight = m_pScene->GetConfig()->GetTerrainMaxHeight();
+            m_terrainConfig.maxHeight = TerrainMaxHeight;
+            float TerrainHorizontalScale = m_pScene->GetConfig()->GetTerrainHorizontalScale();
+            m_terrainConfig.horizontalScale = TerrainHorizontalScale;
 
-        float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
+            float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
 
-        // Set camera eye level: Ground elevation + 1.7 meters human height factor
-        PlayerPosition.y = GroundHeight + 1.7f;
+            // Set camera eye level: Ground elevation + 1.7 meters human height factor
+            PlayerPosition.y = GroundHeight + 1.7f;
 
-        m_pScene->GetCurrentCamera()->SetPos(PlayerPosition);
+            m_pScene->GetCurrentCamera()->SetPos(PlayerPosition);
+        }
     }
+
+    virtual void ChildGui()
+    {
+        if (ImGui::TreeNode("Perlin")) {
+            bool IsDirty = false;
+
+          //  IsDirty |= ImGui::SliderInt("Width", &m_terrainConfig.width, 1, 1024);
+          //  IsDirty |= ImGui::SliderInt("Height", &m_terrainConfig.height, 1, 1024);
+            IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 16);
+            IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 0.1f, 4.0f);
+            IsDirty |= ImGui::SliderFloat("Gain", &m_terrainConfig.gain, 0.1f, 1.0f);
+            IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 0.001f, 0.01f);
+
+            if (IsDirty) {
+                CreateHeightMap(m_terrainConfig);
+                m_pRenderingSystem->UpdateTexture2D(m_terrainTexHeightMap, m_heightMap.data());
+                //m_isTerrainConfigDirty = true;
+            }
+
+            ImGui::TreePop();
+        }
+    }
+
+
+    virtual bool OnKeyboard(int key, int action)
+    {
+        bool HandledByMe = false;
+
+        if (action == GLFW_PRESS) {
+            switch (key) {
+
+            case GLFW_KEY_G:
+                m_cameraOnGround = !m_cameraOnGround;
+                HandledByMe = true;
+                break;
+
+            default:
+                HandledByMe = Carbonara::OnKeyboard(key, action);
+            }      
+        }
+       
+        return HandledByMe;
+    }
+
 
 private:
 
@@ -1349,6 +1387,7 @@ private:
         float MinValue = 1000.0f;
         float MaxValue = -1000.0f;
 
+#pragma parallel for
         for (int row = 0; row < Config.height; row++) {
             for (int col = 0; col < Config.width; col++) {
                 float Sum = 0.0f;
@@ -1376,12 +1415,13 @@ private:
 
         // Save as a high-precision Single-Channel (1) HDR file
       //  stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, m_heightMap.data());
-        printf("Heightmap successfully saved as 32-bit HDR format.\n");
+      //  printf("Heightmap successfully saved as 32-bit HDR format.\n");
     }
 
     std::vector<float> m_heightMap;
-
     TerrainConfig m_terrainConfig;
+    int m_terrainTexHeightMap = -1;
+    bool m_cameraOnGround = false;
 };
 
 
