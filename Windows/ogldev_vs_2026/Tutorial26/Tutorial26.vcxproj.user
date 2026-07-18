@@ -5,5 +5,6 @@
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\..\..\..\Tutorial26_youtube</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerEnvironment>PATH=%PATH%;$(SolutionDir)\..\DLL</LocalDebuggerEnvironment>
+    <LocalDebuggerCommandArgumentsHistory>..\Content\boblampclean.md5mesh|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>
