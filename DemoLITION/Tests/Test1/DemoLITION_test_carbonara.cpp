@@ -1192,14 +1192,14 @@ public:
 
 
 struct TerrainConfig {
-    int width = 513;        // Power-of-two plus one (ideal for tessellation patches)
-    int height = 513;
-    int octaves = 6;         // How many detail layers to stack
-    float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
-    float gain = 0.5f;       // Amplitude multiplier per octave (persistence)
-    float scale = 0.005f;    // Initial zoom scale for the coordinate space
-    float horizontalScale = 4.0f; // Horizontal scaling factor for the terrain
-    float maxHeight = 100.0f; // Maximum height of the terrain in world units
+    int width = 257;        // Power-of-two plus one (ideal for tessellation patches)
+    int height = 257;
+    int octaves = 8;         // How many detail layers to stack
+    float lacunarity = 1.679f; // Frequency multiplier per octave (keep near 2.0)
+    float persistence = 0.619f;  // Amplitude multiplier per octave
+    float scale = 1.369f;    // Initial zoom scale for the coordinate space
+    float horizontalScale = 1.0f; // Horizontal scaling factor for the terrain
+    float maxHeight = 431; // Maximum height of the terrain in world units
 };
 
 
@@ -1299,9 +1299,9 @@ public:
         if (m_cameraOnGround) {
             float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, m_terrainConfig) * m_terrainConfig.maxHeight;
             CameraY = 1.7f; // Add human height factor to the ground elevation for camera eye level
-            CameraZ = m_terrainConfig.height* m_terrainConfig.horizontalScale / 2.0f;
+            CameraZ = m_terrainConfig.height * m_terrainConfig.horizontalScale / 2.0f;
         } else {
-            CameraY = 1500.0f;
+            CameraY = 650.0f;
         }
 
         m_pScene->SetCamera(Vector3f(CameraX, CameraY, CameraZ), Vector3f(0.0f, -0.1f, 1.0f));
@@ -1337,9 +1337,9 @@ public:
 
           //  IsDirty |= ImGui::SliderInt("Width", &m_terrainConfig.width, 1, 1024);
           //  IsDirty |= ImGui::SliderInt("Height", &m_terrainConfig.height, 1, 1024);
-            IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 16);
+            IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 8);
             IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 0.1f, 4.0f);
-            IsDirty |= ImGui::SliderFloat("Gain", &m_terrainConfig.gain, 0.1f, 1.0f);
+            IsDirty |= ImGui::SliderFloat("Persistence", &m_terrainConfig.persistence, 0.1f, 1.0f);
             IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 0.001f, 0.01f);
 
             if (IsDirty) {
@@ -1379,43 +1379,67 @@ private:
 
     void CreateHeightMap(const TerrainConfig& Config)
     {
-        // Allocate exactly 4 bytes per pixel for high-fidelity 32-bit float data
         m_heightMap.resize(Config.width * Config.height);
-
         std::memset(m_heightMap.data(), 0, ARRAY_SIZE_IN_BYTES(m_heightMap));
 
-        float MinValue = 1000.0f;
-        float MaxValue = -1000.0f;
+        // Safeguard scale to avoid division by zero errors
+        float safeScale = Config.scale;
+        if (safeScale <= 0.0f) safeScale = 0.0001f;
 
-#pragma parallel for
+        // 1. Generate unique offsets based on the seed for each layer (octave)
+        std::vector<glm::vec2> octaveOffsets(Config.octaves);
+       // srand(Config.seed);
+        srand(10);
+        for (int i = 0; i < Config.octaves; i++) {
+            float offsetX = (float)(rand() % 200000 - 100000);
+            float offsetY = (float)(rand() % 200000 - 100000);
+            octaveOffsets[i] = glm::vec2(offsetX, offsetY);
+        }
+
+        float MinValue = 10000.0f;
+        float MaxValue = -10000.0f;
+
+        // Center point of the map to ensure zooming scales outward from the middle
+        float halfWidth = Config.width / 2.0f;
+        float halfHeight = Config.height / 2.0f;
+
+        // 2. First Pass: Calculate layered noise values
         for (int row = 0; row < Config.height; row++) {
             for (int col = 0; col < Config.width; col++) {
                 float Sum = 0.0f;
                 float Amplitude = 1.0f;
-                float Freq = Config.scale;
+                float Freq = 1.0f; // Reset frequency multiplier per-pixel
+
+                float u = (float)col / (float)(Config.width - 1);
+                float v = (float)row / (float)(Config.height - 1);
 
                 for (int Oct = 0; Oct < Config.octaves; Oct++) {
-                    glm::vec2 p((float)col * Freq, (float)row * Freq);
+                    // Note the division: dividing by scale stretches the terrain out smoothly
+                    float sampleX = (u / Config.scale) * Freq + octaveOffsets[Oct].x;
+                    float sampleY = (v / Config.scale) * Freq + octaveOffsets[Oct].y;
+
+                    glm::vec2 p(sampleX, sampleY);
                     Sum += glm::perlin(p) * Amplitude;
+
                     Freq *= Config.lacunarity;
-                    Amplitude *= Config.gain;
+                    Amplitude *= Config.persistence;
                 }
 
                 m_heightMap[row * Config.width + col] = Sum;
+
                 if (Sum < MinValue) MinValue = Sum;
                 if (Sum > MaxValue) MaxValue = Sum;
             }
         }
 
-        // 2. Second Pass: Normalize to the EXACT range
+        // 3. Second Pass: Absolute Normalization and Scaling
         for (int i = 0; i < m_heightMap.size(); ++i) {
-            // Remap from [MinValue, MaxValue] to
-            m_heightMap[i] = (m_heightMap[i] - MinValue) / (MaxValue - MinValue);
-        }
+            // Remap from GLM's wild range to a clean [0.0, 1.0] spectrum
+            float normalizedHeight = (m_heightMap[i] - MinValue) / (MaxValue - MinValue);
 
-        // Save as a high-precision Single-Channel (1) HDR file
-      //  stbi_write_hdr("heightmap.hdr", Config.width, Config.height, 1, m_heightMap.data());
-      //  printf("Heightmap successfully saved as 32-bit HDR format.\n");
+            // Apply their exact peak elevation factor
+            m_heightMap[i] = normalizedHeight;
+        }
     }
 
     std::vector<float> m_heightMap;
