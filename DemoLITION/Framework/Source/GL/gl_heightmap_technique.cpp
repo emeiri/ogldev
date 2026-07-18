@@ -51,6 +51,7 @@ bool HeightmapTechnique::InitCommon()
     GET_UNIFORM(gHighHeightPercent);
     GET_UNIFORM(gSunlightDir);
     GET_UNIFORM(gAmbientFactor);
+    GET_UNIFORM(gTexCoordScale);
 
     return true;
 }
@@ -93,4 +94,9 @@ void HeightmapTechnique::SetAmbientLightFactor(float AmbientLightFactor)
     glUniform1f(m_gAmbientFactorLoc, AmbientLightFactor);
 }
 
+
+void HeightmapTechnique::SetTexTileSizeInWorldUnits(float TexTileSizeInWorldUnits)
+{
+    glUniform1f(m_gTexCoordScaleLoc, 1.0f / TexTileSizeInWorldUnits);
+}
 

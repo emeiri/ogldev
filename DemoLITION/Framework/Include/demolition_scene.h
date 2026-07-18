@@ -273,6 +273,9 @@ public:
     void SetTerrainAmbientFactor(float Factor) { m_terrain.m_ambientFactor = Factor; }
     float GetTerrainAmbientFactor() const { return m_terrain.m_ambientFactor; }
 
+    void SetTerrainTexTileSizeInWorldUnits(float Size) { m_terrain.m_texTileSizeInWorldUnits = Size; }
+    float GetTerrainTexTileSizeInWorldUnits() const { return m_terrain.m_texTileSizeInWorldUnits; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -312,6 +315,7 @@ private:
         int m_heightMap = -1;
         int m_textures[3] = {-1, -1, -1};
         float m_maxHeight = 100.0f;
+        float m_texTileSizeInWorldUnits = 20.0f;
         float m_horizontalScale = 1.0f;
         float m_lowHeightPercent = 0.2f;
         float m_highHeightPercent = 0.8f;

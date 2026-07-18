@@ -22,7 +22,6 @@
 layout (location = 0) in vec3 aPos;       
 layout (location = 1) in vec2 aTexCoords; 
 
-out vec2 TexCoords;
 out vec3 WorldPos;
 out vec3 Normal;
 
@@ -34,8 +33,6 @@ uniform float gHorizontalScale = 4.0f;
 
 void main()
 {
-    TexCoords = aTexCoords;
-
     float HeightSample = texture(gHeightMap, aTexCoords).r;
 
     // Displace the vertex position vertically in metric space
@@ -44,8 +41,6 @@ void main()
     DisplacedPos.y = HeightSample * gMaxTerrainHeight;
     DisplacedPos.z *= gHorizontalScale;
 
-    ivec2 TexSize = textureSize(gHeightMap, 0);
-    float TexelSize = 1.0 / float(TexSize.x);
     float hL = textureOffset(gHeightMap, aTexCoords, ivec2(-1,  0)).r;
     float hR = textureOffset(gHeightMap, aTexCoords, ivec2( 1,  0)).r;
     float hD = textureOffset(gHeightMap, aTexCoords, ivec2( 0, -1)).r;

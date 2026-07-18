@@ -352,46 +352,9 @@ void CoreScene::StartSceneGUI(const char* pTitle)
 
     SSAOGUI();
 
-    HDRAndToneMappingGui();
+    HDRAndToneMappingGUI();
 
-    if (m_config.GetTerrainGrid()) {
-        if (ImGui::TreeNode("Terrain")) {
-            float MaxHeight = m_config.GetTerrainMaxHeight();
-            ImGui::SliderFloat("Max Height", &MaxHeight, 1.0f, 1000.0f);
-            m_config.SetTerrainMaxHeight(MaxHeight);
-
-            float HorizontalScale = m_config.GetTerrainHorizontalScale();
-            ImGui::SliderFloat("Horizontal Scale", &HorizontalScale, 1.0f, 10.0f);
-            m_config.SetTerrainHorizontalScale(HorizontalScale);
-
-            float LowHeightPercent = m_config.GetTerrainLowHeightPercent();
-            float HighHeightPercent = m_config.GetTerrainHighHeightPercent();
-            ImGui::SliderFloat("Low Height Percent", &LowHeightPercent, 0.0f, 1.0f);
-            // Prevent Low from crossing High
-            if (LowHeightPercent > HighHeightPercent) {
-                LowHeightPercent = HighHeightPercent;
-            }
-            m_config.SetTerrainLowHeightPercent(LowHeightPercent);                     
-            ImGui::SliderFloat("High Height Percent", &HighHeightPercent, 0.0f, 1.0f);
-            // Prevent High from dropping below Low
-            if (HighHeightPercent < LowHeightPercent) {
-                HighHeightPercent = LowHeightPercent;
-            }
-            m_config.SetTerrainHighHeightPercent(HighHeightPercent);
-
-            glm::vec3 dir = m_config.GetTerrainSunlightDir();
-            vec3 SunlightDir(dir.x, dir.y, dir.z);
-            ImGui::gizmo3D("##Dir1", SunlightDir, 200.0f, imguiGizmo::modeDirection);
-            glm::vec3 LightDirection = glm::vec3(SunlightDir.x, SunlightDir.y, SunlightDir.z);
-            m_config.SetTerrainSunlightDir(LightDirection);
-
-            float AmbientFactor = m_config.GetTerrainAmbientFactor();
-            ImGui::SliderFloat("Ambient Factor", &AmbientFactor, 0.0f, 1.0f);
-            m_config.SetTerrainAmbientFactor(AmbientFactor);
-
-            ImGui::TreePop();
-        }
-    }
+    TerrainGUI();
 }
 
 
@@ -499,7 +462,7 @@ void CoreScene::GeneralGUI()
     }
 }
 
-void CoreScene::HDRAndToneMappingGui()
+void CoreScene::HDRAndToneMappingGUI()
 {
     if (ImGui::TreeNode("HDR & Tone Mapping")) {
         bool EnableHDR = m_config.IsHDREnabled();
@@ -550,6 +513,53 @@ void CoreScene::HDRAndToneMappingGui()
         }
 
         ImGui::TreePop();
+    }
+}
+
+
+void CoreScene::TerrainGUI()
+{
+    if (m_config.GetTerrainGrid()) {
+        if (ImGui::TreeNode("Terrain")) {
+            float MaxHeight = m_config.GetTerrainMaxHeight();
+            ImGui::SliderFloat("Max Height", &MaxHeight, 1.0f, 1000.0f);
+            m_config.SetTerrainMaxHeight(MaxHeight);
+
+            float TexTileSizeInWorldUnits = m_config.GetTerrainTexTileSizeInWorldUnits();
+            ImGui::SliderFloat("Texture tile size in world units", &TexTileSizeInWorldUnits, 1.0f, 200.0f);
+            m_config.SetTerrainTexTileSizeInWorldUnits(TexTileSizeInWorldUnits);
+
+            float HorizontalScale = m_config.GetTerrainHorizontalScale();
+            ImGui::SliderFloat("Horizontal Scale", &HorizontalScale, 1.0f, 10.0f);
+            m_config.SetTerrainHorizontalScale(HorizontalScale);
+
+            float LowHeightPercent = m_config.GetTerrainLowHeightPercent();
+            float HighHeightPercent = m_config.GetTerrainHighHeightPercent();
+            ImGui::SliderFloat("Low Height Percent", &LowHeightPercent, 0.0f, 1.0f);
+            // Prevent Low from crossing High
+            if (LowHeightPercent > HighHeightPercent) {
+                LowHeightPercent = HighHeightPercent;
+            }
+            m_config.SetTerrainLowHeightPercent(LowHeightPercent);
+            ImGui::SliderFloat("High Height Percent", &HighHeightPercent, 0.0f, 1.0f);
+            // Prevent High from dropping below Low
+            if (HighHeightPercent < LowHeightPercent) {
+                HighHeightPercent = LowHeightPercent;
+            }
+            m_config.SetTerrainHighHeightPercent(HighHeightPercent);
+
+            glm::vec3 dir = m_config.GetTerrainSunlightDir();
+            vec3 SunlightDir(dir.x, dir.y, dir.z);
+            ImGui::gizmo3D("##Dir1", SunlightDir, 200.0f, imguiGizmo::modeDirection);
+            glm::vec3 LightDirection = glm::vec3(SunlightDir.x, SunlightDir.y, SunlightDir.z);
+            m_config.SetTerrainSunlightDir(LightDirection);
+
+            float AmbientFactor = m_config.GetTerrainAmbientFactor();
+            ImGui::SliderFloat("Ambient Factor", &AmbientFactor, 0.0f, 1.0f);
+            m_config.SetTerrainAmbientFactor(AmbientFactor);
+
+            ImGui::TreePop();
+        }
     }
 }
 

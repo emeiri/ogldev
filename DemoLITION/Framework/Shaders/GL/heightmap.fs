@@ -18,7 +18,6 @@
 
 #version 460 core
 
-in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
 
@@ -33,35 +32,35 @@ uniform float gLowHeightPercent = 0.25;
 uniform float gHighHeightPercent = 0.75;
 uniform vec3 gSunlightDir = normalize(vec3(0.0, 1.0, 0.0)); 
 uniform float gAmbientFactor = 0.2f;
+uniform float gTexCoordScale = 1.0/20.0;
 
-vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal, float scale) 
+vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal) 
 {
-    // 1. Calculate blend weights from the absolute normal
-    // Use the absolute value because sign doesn't determine the projection axis
+   // 1. Blend weights
     vec3 blend = abs(normal);
-    
-    // Sharpen the blend to reduce blurring on 45-degree slopes
-    blend = pow(blend, vec3(8.0)); 
-    
-    // Ensure weights sum to 1.0 to maintain consistent brightness
+    blend = pow(blend, vec3(8.0));
     blend /= (blend.x + blend.y + blend.z);
 
-    // 2. Sample the texture from 3 directions
-    // Projection UVs are derived from the other two axes
-    vec4 xProj = texture(tex, worldPos.yz * scale); // Side
-    vec4 yProj = texture(tex, worldPos.zx * scale); // Top/Bottom
-    vec4 zProj = texture(tex, worldPos.xy * scale); // Front/Back
+    // 2. SCALING: Multiply world position by scale factor BEFORE derivatives
+    vec3 scaledPos = worldPos * gTexCoordScale;
 
-    // 3. Blend the samples together
+    // 3. DERIVATIVES: Calculate changes in world space 
+    // This gives the GPU the exact, smooth scale information it needs for mipmapping
+    vec3 dx = dFdx(scaledPos);
+    vec3 dy = dFdy(scaledPos);
+
+    // 4. SAMPLING: Use textureGrad to pass the custom derivatives
+    vec4 xProj = textureGrad(tex, scaledPos.yz, dx.yz, dy.yz);
+    vec4 yProj = textureGrad(tex, scaledPos.zx, dx.zx, dy.zx);
+    vec4 zProj = textureGrad(tex, scaledPos.xy, dx.xy, dy.xy);
+
+    // 5. Blend
     return xProj * blend.x + yProj * blend.y + zProj * blend.z;
 }
 
 
 void main()
 {
-    vec2 DetailUV = TexCoords * 8; 
-    float tiling = 0.1; // Adjust for your world scale
-
     float gLowHeight = gMaxTerrainHeight * gLowHeightPercent;
     float gHighHeight = gMaxTerrainHeight * gHighHeightPercent;
 
@@ -70,9 +69,9 @@ void main()
     float LowMask = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
     float HighMask = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
 
-    vec4 LowColor   = SampleTriplanar(gTexture0, WorldPos, N, tiling);
-    vec4 MidColor   = SampleTriplanar(gTexture1, WorldPos, N, tiling);
-    vec4 HighColor  = SampleTriplanar(gTexture2, WorldPos, N, tiling);
+    vec4 LowColor   = SampleTriplanar(gTexture0, WorldPos, N);
+    vec4 MidColor   = SampleTriplanar(gTexture1, WorldPos, N);
+    vec4 HighColor  = SampleTriplanar(gTexture2, WorldPos, N);
 
     vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
     vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);

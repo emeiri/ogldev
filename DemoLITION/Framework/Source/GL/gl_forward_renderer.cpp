@@ -439,6 +439,7 @@ void ForwardRenderer::Render(void* pWindow, GLScene* pScene, GameCallbacks* pGam
     m_curRenderPass = RENDER_PASS_UNINITIALIZED;
 }
 
+
 void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, double TotalRuntime)
 {
     PrePass(pScene);
@@ -449,8 +450,6 @@ void ForwardRenderer::ExecuteRenderGraph(GLScene* pScene, double TotalRuntime)
 
     PostProcessPass(pScene);
 };
-
-
 
 
 void ForwardRenderer::PrePass(GLScene* pScene)
@@ -549,6 +548,7 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
                                           pConfig->GetTerrainHighHeightPercent());
         m_heightmapTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
         m_heightmapTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
+        m_heightmapTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
         pTerrainGrid->Render();
     } else if (pConfig->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);

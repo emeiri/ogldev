@@ -77,6 +77,8 @@ public:
 
     virtual void StartSceneGUI(const char* pTitle);
 
+    void TerrainGui();
+
     virtual void EndSceneGUI();
 
     virtual const InputState& GetInputState() { return m_inputState; }
@@ -130,7 +132,8 @@ private:
     void GeneralGUI();
     void SceneObjectGUI();
     void SSAOGUI();
-    void HDRAndToneMappingGui();
+    void HDRAndToneMappingGUI();
+    void TerrainGUI();
 
     GLMCameraFirstPerson m_defaultCamera;
     std::vector<CoreSceneObject> m_sceneObjects;

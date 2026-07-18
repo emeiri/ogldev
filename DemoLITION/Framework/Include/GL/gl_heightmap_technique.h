@@ -36,6 +36,7 @@ public:
     void SetHeightPercents(float LowPercent, float HighPercent);
     void SetSunlightDir(const Vector3f& SunlightDir);
     void SetAmbientLightFactor(float AmbientLightFactor);
+    void SetTexTileSizeInWorldUnits(float TexTileSizeInWorldUnits);
 
 private:
     bool InitCommon();
@@ -47,4 +48,5 @@ private:
     DEF_LOC(gHighHeightPercent);
     DEF_LOC(gSunlightDir);
     DEF_LOC(gAmbientFactor);
+    DEF_LOC(gTexCoordScale);
 };
