@@ -439,6 +439,11 @@ void CoreScene::LightingGUI()
 void CoreScene::GeneralGUI()
 {
     if (ImGui::TreeNode("General")) {
+        glm::vec3 CameraPos = m_defaultCamera.GetPos().ToGLM();
+        ImGui::Text("Camera Position: %.3f, %.3f, %.3f", CameraPos.x, CameraPos.y, CameraPos.z);
+        ImGui::SliderFloat3("Camera Position", &CameraPos.x, -1000.0f, 1000.0f);
+        m_defaultCamera.SetPos(Vector3f(CameraPos));
+
         bool DisablePBR = m_config.IsPBRDisabled();
         ImGui::Checkbox("Disable PBR", &DisablePBR);
         m_config.ForcePBRDisabled(DisablePBR);
