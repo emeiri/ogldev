@@ -83,8 +83,6 @@ public:
 
     void OnFrame(double DeltaTime)
     {
-        BaseGLApp::OnFrame(DeltaTime);
-
       //  m_pScene->SetCamera(Vector3f(0.0f, 0.05f, -2.5f), Vector3f(0.0f, -0.1f, 1.0f));
         //  m_pScene->GetDirLights()[0].WorldDirection = Vector3f(sinf(m_count), -1.0f, cosf(m_count));
         m_count += 0.01f;

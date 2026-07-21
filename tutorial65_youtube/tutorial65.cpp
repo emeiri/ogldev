@@ -89,7 +89,7 @@ public:
     }
 
 
-    void OnFrameChild(double DeltaTime)
+    void OnFrame(double DeltaTime)
     {        
         m_pSceneObject->RotateBy(0.0f, 0.5f, 0.0f);
       //  m_pSceneObject->TranslateBy(-0.7f * (float)DeltaTime, 0.0f, 0.0f);

@@ -67,7 +67,7 @@ public:
         int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
         pModel->SetAmbientOcclusionMap(AOMap);
 
-        Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
+        Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx", NULL);
         pBRDF_LUT->Load();
         pConfig->pBRDF_LUT = pBRDF_LUT;
 
@@ -86,7 +86,7 @@ public:
     }
 
 
-    void OnFrameChild(double DeltaTime)
+    void OnFrame(double DeltaTime)
     {        
         m_pSceneObject->RotateBy(0.0f, 0.0f, 0.5f);
     }

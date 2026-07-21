@@ -68,7 +68,7 @@ public:
     }
 
 
-    void OnFrameChild(double DeltaTime)
+    void OnFrame(double DeltaTime)
     {        
         glm::vec3 projPos = glm::vec3(15.0f, 5.0f, 0.0f);
 

@@ -84,7 +84,7 @@ public:
     }
 
 
-    void OnFrameChild(double DeltaTime)
+    void OnFrame(double DeltaTime)
     {        
         m_count += 0.01f;
 
