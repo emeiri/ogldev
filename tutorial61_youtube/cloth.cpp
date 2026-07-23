@@ -71,67 +71,149 @@ void Cloth::InitBuffers()
 
 void Cloth::SetupVAO()
 {
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
+    glCreateVertexArrays(1, &m_vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_posBufs[0]);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
+    // Position
+    glVertexArrayVertexBuffer(
+        m_vao,
+        0,
+        m_posBufs[0],
+        0,
+        sizeof(glm::vec4)
+    );
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_normBuf);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(1);
+    glEnableVertexArrayAttrib(m_vao, 0);
+    glVertexArrayAttribFormat(
+        m_vao,
+        0,
+        4,
+        GL_FLOAT,
+        GL_FALSE,
+        0
+    );
+    glVertexArrayAttribBinding(m_vao, 0, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_tcBuf);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(2);
+    // Normal
+    glVertexArrayVertexBuffer(
+        m_vao,
+        1,
+        m_normBuf,
+        0,
+        sizeof(glm::vec4)
+    );
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ib);
-    glBindVertexArray(0);
-}
-
-void Cloth::BindAndUploadBuffers(int TotalParticles,
-                                 std::vector<glm::vec4>& Positions, 
-                                 std::vector<glm::vec4>& Velocities, 
-                                 std::vector<GLuint>& Indices, 
-                                 std::vector<glm::vec2>& TexCoords)
-{
-    // Positions
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Positions), Positions.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_posBufs[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Positions), NULL, GL_DYNAMIC_DRAW);
-
-    // Velocities
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_velBufs[0]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Velocities), Velocities.data(), GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_velBufs[1]);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, ARRAY_SIZE_IN_BYTES(Velocities), NULL, GL_DYNAMIC_COPY);
-
-    // Normals
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_normBuf);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, TotalParticles * 4 * sizeof(GLfloat), NULL, GL_DYNAMIC_COPY);
-
-    // Indices
-    glBindBuffer(GL_ARRAY_BUFFER, m_ib);
-    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(Indices), Indices.data(), GL_DYNAMIC_COPY);
+    glEnableVertexArrayAttrib(m_vao, 1);
+    glVertexArrayAttribFormat(
+        m_vao,
+        1,
+        4,
+        GL_FLOAT,
+        GL_FALSE,
+        0
+    );
+    glVertexArrayAttribBinding(m_vao, 1, 1);
 
     // Texture coordinates
-    glBindBuffer(GL_ARRAY_BUFFER, m_tcBuf);
-    glBufferData(GL_ARRAY_BUFFER, ARRAY_SIZE_IN_BYTES(TexCoords), TexCoords.data(), GL_STATIC_DRAW);
+    glVertexArrayVertexBuffer(
+        m_vao,
+        2,
+        m_tcBuf,
+        0,
+        sizeof(glm::vec2)
+    );
+
+    glEnableVertexArrayAttrib(m_vao, 2);
+    glVertexArrayAttribFormat(
+        m_vao,
+        2,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        0
+    );
+    glVertexArrayAttribBinding(m_vao, 2, 2);
+
+    glVertexArrayElementBuffer(m_vao, m_ib);
 }
+
+void Cloth::BindAndUploadBuffers(
+    int totalParticles,
+    std::vector<glm::vec4>& positions,
+    std::vector<glm::vec4>& velocities,
+    std::vector<GLuint>& indices,
+    std::vector<glm::vec2>& texCoords)
+{
+    glNamedBufferData(
+        m_posBufs[0],
+        ARRAY_SIZE_IN_BYTES(positions),
+        positions.data(),
+        GL_DYNAMIC_DRAW
+    );
+
+    glNamedBufferData(
+        m_posBufs[1],
+        ARRAY_SIZE_IN_BYTES(positions),
+        nullptr,
+        GL_DYNAMIC_DRAW
+    );
+
+    glNamedBufferData(
+        m_velBufs[0],
+        ARRAY_SIZE_IN_BYTES(velocities),
+        velocities.data(),
+        GL_DYNAMIC_COPY
+    );
+
+    glNamedBufferData(
+        m_velBufs[1],
+        ARRAY_SIZE_IN_BYTES(velocities),
+        nullptr,
+        GL_DYNAMIC_COPY
+    );
+
+    glNamedBufferData(
+        m_normBuf,
+        static_cast<GLsizeiptr>(
+            totalParticles * sizeof(glm::vec4)
+            ),
+        nullptr,
+        GL_DYNAMIC_COPY
+    );
+
+    glNamedBufferData(
+        m_ib,
+        ARRAY_SIZE_IN_BYTES(indices),
+        indices.data(),
+        GL_STATIC_DRAW
+    );
+
+    glNamedBufferData(
+        m_tcBuf,
+        ARRAY_SIZE_IN_BYTES(texCoords),
+        texCoords.data(),
+        GL_STATIC_DRAW
+    );
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_posBufs[0]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_posBufs[1]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_velBufs[0]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_velBufs[1]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_normBuf);
+}
+
 
 void Cloth::GenBufferHandles()
 {
-    GLuint bufs[7];
-    glGenBuffers(7, bufs);
-    m_posBufs[0] = bufs[0];
-    m_posBufs[1] = bufs[1];
-    m_velBufs[0] = bufs[2];
-    m_velBufs[1] = bufs[3];
-    m_ib = bufs[4];
-    m_tcBuf = bufs[5];
-    m_normBuf = bufs[6];
+    GLuint buffers[7]{};
+    glCreateBuffers(7, buffers);
+
+    m_posBufs[0] = buffers[0];
+    m_posBufs[1] = buffers[1];
+    m_velBufs[0] = buffers[2];
+    m_velBufs[1] = buffers[3];
+    m_ib = buffers[4];
+    m_tcBuf = buffers[5];
+    m_normBuf = buffers[6];
 }
 
 
@@ -225,23 +307,41 @@ void Cloth::RecalcNormals()
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
-void Cloth::RenderCloth(const Matrix4f& World, const Matrix4f& View, const Matrix4f& Projection)
+
+void Cloth::RenderCloth(
+    const Matrix4f& world,
+    const Matrix4f& view,
+    const Matrix4f& projection)
 {
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(PRIM_RESTART);
 
     m_renderTech.Enable();
-
-    m_renderTech.SetWorldMatrix(World);
-    m_renderTech.SetNormalMatrix(World);
-    m_renderTech.SetViewMatrix(View);
-    m_renderTech.SetProjectionMatrix(Projection);
+    m_renderTech.SetWorldMatrix(world);
+    m_renderTech.SetNormalMatrix(world);
+    m_renderTech.SetViewMatrix(view);
+    m_renderTech.SetProjectionMatrix(projection);
 
     m_tex.Bind(GL_TEXTURE0);
 
+    // The simulation ping-pongs between two position buffers.
+    glVertexArrayVertexBuffer(
+        m_vao,
+        0,
+        m_posBufs[m_curBuf],
+        0,
+        sizeof(glm::vec4)
+    );
+
     glBindVertexArray(m_vao);
-    glDrawElements(GL_TRIANGLE_STRIP, m_numIndices, GL_UNSIGNED_INT, 0);
+
+    glDrawElements(
+        GL_TRIANGLE_STRIP,
+        static_cast<GLsizei>(m_numIndices),
+        GL_UNSIGNED_INT,
+        nullptr
+    );
+
     glBindVertexArray(0);
 }
-
 
