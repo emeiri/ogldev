@@ -29,7 +29,7 @@ public:
 
     virtual bool Init();
 
-    void SetColor(float r, float g, float b);
+    void SetColor(float r, float g, float b, float a);
 
 private:
     GLuint m_colorLoc = -1;

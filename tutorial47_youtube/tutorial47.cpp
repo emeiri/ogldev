@@ -310,7 +310,7 @@ private:
 
         m_passThruTech.Enable();
 
-        m_passThruTech.SetColor(1.0f, 0.0f, 0.0f);
+        m_passThruTech.SetColor(1.0f, 0.0f, 0.0f, 1.0f);
     }
 
 

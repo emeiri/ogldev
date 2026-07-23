@@ -50,13 +50,13 @@ bool PassthruVec2Technique::Init()
     Enable();
 
     // default is white
-    SetColor(1.0f, 1.0f, 1.0f);
+    SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     return true;
 }
 
 
-void PassthruVec2Technique::SetColor(float r, float g, float b)
+void PassthruVec2Technique::SetColor(float r, float g, float b, float a)
 {
-    glUniform3f(m_colorLoc, r, g, b);
+    glUniform4f(m_colorLoc, r, g, b, a);
 }
