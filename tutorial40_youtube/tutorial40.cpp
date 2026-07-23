@@ -213,7 +213,7 @@ private:
     {
         m_pMesh = new SkinnedMesh();
         
-        if (!m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.glt")) {
+        if (!m_pMesh->LoadMesh("../Content/iclone-7-raptoid-mascot/scene.gltf")) {
             printf("Missing mesh file\n");
             printf("You can download it from %s\n", 
                 "https://sketchfab.com/3d-models/iclone-7-raptoid-mascot-free-download-56a3e10a73924843949ae7a9800c97c7");
