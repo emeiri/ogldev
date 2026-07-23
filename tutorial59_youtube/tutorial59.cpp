@@ -48,8 +48,15 @@ public:
     }
 
 
-    virtual ~Tutorial59()
+    ~Tutorial59()
     {
+        if (m_textureBuffer != 0) {
+            glDeleteBuffers(1, &m_textureBuffer);
+        }
+
+        if (m_dummyVAO != 0) {
+            glDeleteVertexArrays(1, &m_dummyVAO);
+        }
     }
 
 
@@ -58,6 +65,8 @@ public:
         InitBaseApp(WINDOW_WIDTH, WINDOW_HEIGHT, "Tutorial 59");
 
         m_bindlessTexTech.Init();
+
+        glCreateVertexArrays(1, &m_dummyVAO);
 
         InitTextures();
 
@@ -69,10 +78,11 @@ public:
     virtual void RenderSceneCB(float dt)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
         m_bindlessTexTech.Enable();
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_textureBuffer);
+        glBindVertexArray(m_dummyVAO);
 
         static int TextureIndex = 0;
         m_bindlessTexTech.SetTextureIndex(TextureIndex);
@@ -84,37 +94,38 @@ public:
         }
     }
 
-    private:
+private:
 
     void InitTextures()
     {
         std::vector<std::string> TextureFilenames(NUM_TOTAL_FILES);
         std::vector<Texture> Textures(NUM_TOTAL_FILES, GL_TEXTURE_2D);
         std::vector<GLuint64> TextureHandles(NUM_TOTAL_FILES);
-               
+
         for (uint32_t j = 0; j < NUM_DIRS; j++) {
-            for (uint32_t i = 0; i != NUM_FILES_IN_DIR; i++) {
+            for (uint32_t i = 0; i < NUM_FILES_IN_DIR; i++) {
                 char Filename[1024];
-                snprintf(Filename, sizeof(Filename), 
-                         "G://emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
+                snprintf(Filename, sizeof(Filename),
+                         "G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
                 int Index = j * NUM_FILES_IN_DIR + i;
                 TextureFilenames[Index] = Filename;
             }
         }
 
         for (int i = 0; i < NUM_TOTAL_FILES; i++) {
-            Textures[i].Load(TextureFilenames[i].c_str());
+            Textures[i].Load(TextureFilenames[i].c_str(), false);
 
             TextureHandles[i] = Textures[i].GetBindlessHandle();
         }
 
         glCreateBuffers(1, &m_textureBuffer);
-        glNamedBufferStorage(m_textureBuffer, ARRAY_SIZE_IN_BYTES(TextureHandles), 
-                             TextureHandles.data(), 0);                
+        glNamedBufferStorage(m_textureBuffer, ARRAY_SIZE_IN_BYTES(TextureHandles),
+                             TextureHandles.data(), 0);
     }
 
-    BindlessTextureTechnique m_bindlessTexTech;    
-    GLuint m_textureBuffer;
+    BindlessTextureTechnique m_bindlessTexTech;
+    GLuint m_textureBuffer = 0;
+    GLuint m_dummyVAO = 0;
 };
 
 
