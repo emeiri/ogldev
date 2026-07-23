@@ -31,8 +31,7 @@
  * policies, either expressed or implied, of Nicolas P. Rougier.
  * ========================================================================= */
 
-#ifndef FREETYPEGL_H
-#define FREETYPEGL_H
+#pragma once
 
 #include <GL/glew.h>
 #include "font-manager.h"
@@ -109,7 +108,6 @@ private:
     texture_font_t* m_pFonts[NUM_FONTS] = {};
     GLuint m_shaderProg = -1;
     mat4 m_model, m_view, m_projection;
+    GLuint m_dummyVAO = INVALID_UNIFORM_LOCATION;
 };
 
-
-#endif  /* FREETYPEGL_H */

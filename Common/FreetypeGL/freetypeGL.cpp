@@ -34,11 +34,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/glew.h>
-#include <assert.h>
 
 
 #ifdef _WIN64
 
+#include "ogldev_util.h"
 #include "freetypeGL.h"
 
 extern "C" {
@@ -114,6 +114,9 @@ FontRenderer::FontRenderer()
 
 FontRenderer::~FontRenderer()
 {
+    if (m_dummyVAO != INVALID_UNIFORM_LOCATION) {
+        glDeleteVertexArrays(1, &m_dummyVAO);
+    }
 }
 
 
@@ -137,6 +140,8 @@ void FontRenderer::InitFontRenderer(int WindowWidth, int WindowHeight)
     mat4_set_identity(&m_model);
     mat4_set_identity(&m_view);
     mat4_set_orthographic(&m_projection, 0, (float)WindowWidth, 0, (float)WindowHeight, -1, 1);
+
+    glCreateVertexArrays(1, &m_dummyVAO);
 }
 
 
@@ -187,6 +192,7 @@ void FontRenderer::RenderText(FONT_TYPE FontType,
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProg, "model"), 1, 0, m_model.data);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProg, "view"), 1, 0, m_view.data);
     glUniformMatrix4fv(glGetUniformLocation(m_shaderProg, "projection"), 1, 0, m_projection.data);
+    glBindVertexArray(m_dummyVAO);
     vertex_buffer_render(m_pBuffer, GL_TRIANGLES);
 
     glEnable(GL_DEPTH_TEST);
