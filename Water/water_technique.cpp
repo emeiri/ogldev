@@ -22,6 +22,14 @@ WaterTechnique::WaterTechnique()
 {
 }
 
+
+WaterTechnique::~WaterTechnique()
+{
+    if (m_dummyVAO != INVALID_UNIFORM_LOCATION) {
+        glDeleteVertexArrays(1, &m_dummyVAO);
+    }
+}
+
 bool WaterTechnique::Init()
 {
     if (!Technique::Init()) {
@@ -43,6 +51,8 @@ bool WaterTechnique::Init()
     GET_UNIFORM_AND_CHECK(m_WVPLoc, "gWVP");
     GET_UNIFORM_AND_CHECK(m_timeLoc, "iTime");
 
+    glCreateVertexArrays(1, &m_dummyVAO);
+
     return true;
 }
 
@@ -53,6 +63,8 @@ void WaterTechnique::Render(const Matrix4f& WVP, float Time)
 
     glUniformMatrix4fv(m_WVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
     glUniform1f(m_timeLoc, Time);
+
+    glBindVertexArray(m_dummyVAO);
 
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
 }

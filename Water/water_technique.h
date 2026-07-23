@@ -26,6 +26,8 @@ public:
 
     WaterTechnique();
 
+    ~WaterTechnique();
+
     virtual bool Init();
 
     void Render(const Matrix4f& WVP, float Time);
@@ -34,5 +36,6 @@ private:
 
     GLuint m_WVPLoc = INVALID_UNIFORM_LOCATION;
     GLuint m_timeLoc = INVALID_UNIFORM_LOCATION;
+    GLuint m_dummyVAO = INVALID_UNIFORM_LOCATION;
 };
 
