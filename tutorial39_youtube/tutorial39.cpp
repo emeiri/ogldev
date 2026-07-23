@@ -19,18 +19,14 @@
 */
 
 #include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include <GL/glew.h>
 
 
-#include "ogldev_engine_common.h"
 #include "ogldev_util.h"
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_new_lighting.h"
 #include "ogldev_glfw.h"
 #include "ogldev_basic_mesh.h"
-#include "ogldev_world_transform.h"
 #include "ogldev_phong_renderer.h"
 
 #define WINDOW_WIDTH  1920
