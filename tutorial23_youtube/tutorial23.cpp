@@ -99,14 +99,14 @@ Tutorial23::Tutorial23()
     pointLights[1].Attenuation.Linear = 0.0f;
     pointLights[1].Attenuation.Exp = 0.2f;
 
-    spotLights[0].DiffuseIntensity = 1.0f;
+    spotLights[0].DiffuseIntensity = 1.5f;
     spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
-    spotLights[0].Attenuation.Linear = 0.01f;
+    spotLights[0].Attenuation.Linear = 0.001f;
     spotLights[0].Cutoff = 20.0f;
 
-    spotLights[1].DiffuseIntensity = 1.0f;
+    spotLights[1].DiffuseIntensity = 1.5f;
     spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    spotLights[1].Attenuation.Linear = 0.01f;
+    spotLights[1].Attenuation.Linear = 0.001f;
     spotLights[1].Cutoff = 30.0f;
 }
 
@@ -158,7 +158,7 @@ bool Tutorial23::Init()
 
     pMesh2 = new BasicMesh();
 
-    if (!pMesh2->LoadMesh("/home/emeiri/diskb/emeiri/Downloads/vintage_grandfather_clock_01_4k.blend/vintage_grandfather_clock_01_4k.obj")) {
+    if (!pMesh2->LoadMesh("../Content/clock/vintage_grandfather_clock_01_2k.obj")) {
         return false;
     }
 
