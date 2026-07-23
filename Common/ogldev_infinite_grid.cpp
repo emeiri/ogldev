@@ -26,12 +26,23 @@ InfiniteGrid::InfiniteGrid()
 }
 
 
+InfiniteGrid::~InfiniteGrid()
+{
+    if (m_dummyVAO != 0) {
+        glDeleteVertexArrays(1, &m_dummyVAO);
+    }
+}
+
+
+
 void InfiniteGrid::Init()
 {
     if (!m_infiniteGridTech.Init()) {
         printf("Error initializing the infinite grid technique\n");
         exit(1);
     }
+
+    glCreateVertexArrays(1, &m_dummyVAO);
 }
 
 
@@ -46,10 +57,14 @@ void InfiniteGrid::Render(const InfiniteGridConfig& Config, const Matrix4f& VP, 
     m_infiniteGridTech.SetCameraWorldPos(CameraPos);
     m_infiniteGridTech.SetCellSize(Config.CellSize);
 
+    glBindVertexArray(m_dummyVAO);
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
     glDisable(GL_BLEND);
+
+    glBindVertexArray(0);
 
     glUseProgram(CurProg);
 }

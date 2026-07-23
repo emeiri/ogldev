@@ -36,6 +36,8 @@ class InfiniteGrid
 public:
     InfiniteGrid();
 
+    ~InfiniteGrid();
+
     void Init();
 
     void Render(const InfiniteGridConfig& Config, const Matrix4f& VP, const Vector3f& CameraPos);
@@ -43,4 +45,5 @@ public:
 private:
 
     InfiniteGridTechnique m_infiniteGridTech;
+    GLuint m_dummyVAO = 0;
 };
