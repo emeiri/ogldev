@@ -143,6 +143,7 @@ void BasicCamera::SetTarget(float x, float y, float z)
     m_target.x = x;
     m_target.y = y;
     m_target.z = z;
+    m_target.Normalize();
 
     InitInternal();
 }
