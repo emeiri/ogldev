@@ -101,7 +101,6 @@ layout(binding = 4) uniform sampler3D gShadowMapOffsetTexture;
 layout(binding = 5) uniform sampler2D gAlbedo;
 layout(binding = 6) uniform sampler2D gRoughness;
 layout(binding = 7) uniform sampler2D gMetallic;
-layout(binding = 8) uniform sampler2D gNormalMap;
 uniform int gShadowMapWidth = 0;
 uniform int gShadowMapHeight = 0;
 uniform int gShadowMapFilterSize = 0;

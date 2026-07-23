@@ -151,7 +151,6 @@ bool LightingTechnique::InitCommon()
     GET_UNIFORM_AND_CHECK(AlbedoLoc, "gAlbedo");
     GET_UNIFORM_AND_CHECK(RoughnessLoc, "gRoughness");
     GET_UNIFORM_AND_CHECK(MetallicLoc, "gMetallic");
-    GET_UNIFORM_AND_CHECK(NormalMapLoc, "gNormalMap");
 
     if (WVPLoc == INVALID_UNIFORM_LOCATION ||
         WorldMatrixLoc == INVALID_UNIFORM_LOCATION ||
@@ -697,7 +696,3 @@ void LightingTechnique::SetMetallicTextureUnit(unsigned int TextureUnit)
 }
 
 
-void LightingTechnique::SetNormalTextureUnit(unsigned int TextureUnit)
-{
-    glUniform1i(NormalMapLoc, TextureUnit);
-}
