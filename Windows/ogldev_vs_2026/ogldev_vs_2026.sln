@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.6.11819.183 stable
+VisualStudioVersion = 18.6.11819.183
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial01_Window", "Tutorial01\Tutorial01.vcxproj", "{0FD6DB85-049D-4E43-8F50-369A91E5DB31}"
 EndProject
@@ -150,6 +150,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shaders", "Shaders", "{2CAB
 		..\..\Common\Shaders\billboard.fs = ..\..\Common\Shaders\billboard.fs
 		..\..\Common\Shaders\billboard.gs = ..\..\Common\Shaders\billboard.gs
 		..\..\Common\Shaders\billboard.vs = ..\..\Common\Shaders\billboard.vs
+		..\..\Common\Shaders\color.fs = ..\..\Common\Shaders\color.fs
 		..\..\Common\Shaders\empty.fs = ..\..\Common\Shaders\empty.fs
 		..\..\Common\Shaders\flat_passthru.fs = ..\..\Common\Shaders\flat_passthru.fs
 		..\..\Common\Shaders\flat_passthru.vs = ..\..\Common\Shaders\flat_passthru.vs
@@ -618,7 +619,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial04_RigidBodyCollisi
 		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30", "Vulkan\Tutorial30\Tutorial30.vcxproj", "{5F1B0F44-AEFC-44CE-9D4F-1647F739DDFB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30-31", "Vulkan\Tutorial30\Tutorial30.vcxproj", "{5F1B0F44-AEFC-44CE-9D4F-1647F739DDFB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
 	EndProjectSection
