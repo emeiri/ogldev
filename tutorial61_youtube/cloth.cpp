@@ -45,7 +45,7 @@ void Cloth::Init()
 
     InitBuffers();
 
-    m_tex.Load("../Content/textures/me_textile.png");
+    m_tex.Load("../Content/textures/me_textile.png", false);
 }
 
 void Cloth::InitBuffers()
