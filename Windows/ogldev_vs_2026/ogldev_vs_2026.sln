@@ -621,12 +621,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial30-31", "Vulkan\Tut
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial67_ProjectedTexture", "Tutorial67_ProjectedTexture\Tutorial67.vcxproj", "{5B778195-1371-480E-BB0A-44791994AB2A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ballistics", "Physics_Ballistics\Physics_Ballistics.vcxproj", "{D264B8EB-66CD-4674-AABF-0858EAFDEF6D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3AF5DFBE-8A5C-47D0-B421-1CB3E7C4A0E8} = {3AF5DFBE-8A5C-47D0-B421-1CB3E7C4A0E8}
-		{892BD692-485D-4406-8D87-43EB0F16F290} = {892BD692-485D-4406-8D87-43EB0F16F290}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
