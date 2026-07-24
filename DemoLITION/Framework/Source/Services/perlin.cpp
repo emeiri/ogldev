@@ -30,12 +30,24 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
     
     for (int row = 0; row < Config.height; row++) {
         for (int col = 0; col < Config.width; col++) {
-            float SampleX = col / Config.scale;
-            float SampleY = row / Config.scale;
 
-            float p = glm::perlin(glm::vec2(SampleX, SampleY));
+            float Sum = 0.0f;
+            float Amplitude = 1.0f;
+            float Freq = 1.0f;
 
-            HeightMap[row * Config.width + col] = p;
+            for (int Oct = 0; Oct < Config.octaves; Oct++) {
+                float SampleX = col / Config.scale * Freq;
+                float SampleY = row / Config.scale * Freq;
+
+                float p = glm::perlin(glm::vec2(SampleX, SampleY)) * Amplitude;
+               
+                Sum += p;
+
+           //     Freq *= Config.lacunarity;
+             //   Amplitude *= Config.persistence;
+            }
+
+            HeightMap[row * Config.width + col] = Sum;
         }
     }
 }
