@@ -145,7 +145,6 @@ bool Tutorial30::Init()
     pSkinningTech->Enable();
 
     pSkinningTech->SetTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
-    pSkinningTech->SetSpecularExponentTextureUnit(SPECULAR_EXPONENT_UNIT_INDEX);
 
     StartTimeMillis = GetCurrentTimeMillis();
 
@@ -155,7 +154,11 @@ bool Tutorial30::Init()
 
 void Tutorial30::RenderSceneCB()
 {
+    glUseProgram(0);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    pSkinningTech->Enable();
 
     pGameCamera->OnRender();
 
