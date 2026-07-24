@@ -170,14 +170,23 @@ void Texture::LoadInternalNonDSA(const void* pImageData, bool IsSRGB)
         exit(1);
     }
 
-    glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    if (pImageData) {
+        glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);        
+    } else {
+        glTexParameteri(m_textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+
     glTexParameteri(m_textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(m_textureTarget, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_S, m_wrapMode);
     glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_T, m_wrapMode);
     //glTexParameteri(m_textureTarget, GL_TEXTURE_WRAP_R, m_wrapMode);
 
-    glGenerateMipmap(m_textureTarget);
+    if (pImageData) {
+        glGenerateMipmap(m_textureTarget);
+    } else {
+        glTexParameteri(m_textureTarget, GL_TEXTURE_MAX_LEVEL, 0);
+    }
 
     glBindTexture(m_textureTarget, 0);
 }
