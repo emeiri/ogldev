@@ -309,7 +309,7 @@ private:
     bool m_disablePBR = false;
     int m_projectedTexture = -1;
     Matrix4f m_projectionMat;
-    RENDER_MODE m_renderMode;
+    RENDER_MODE m_renderMode = RENDER_MODE_FULL;
     struct {
         void* pGrid = NULL;
         int m_heightMap = -1;
