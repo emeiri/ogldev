@@ -172,6 +172,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_heightmap_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\perlin.cpp">
+      <Filter>Source\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -360,6 +363,9 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_heightmap_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\perlin.h">
+      <Filter>Include\Services</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -394,6 +400,12 @@
     </Filter>
     <Filter Include="Include\GL\Techniques">
       <UniqueIdentifier>{e5d7a365-34f3-45d2-b26d-f1b7d90cf2c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\Services">
+      <UniqueIdentifier>{62f32e2c-907c-418a-908f-1bae2ea137ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Services">
+      <UniqueIdentifier>{dbcbba99-a6e1-46d6-8a43-10e136b82cf3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

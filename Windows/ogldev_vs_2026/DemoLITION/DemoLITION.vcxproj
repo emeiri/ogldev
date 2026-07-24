@@ -225,6 +225,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_model.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\perlin.h" />
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -285,6 +286,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_ssgi_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_tone_map_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\perlin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter1.fs" />

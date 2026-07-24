@@ -29,12 +29,11 @@
 #include "demolition_base_gl_app.h"
 #include "ogldev_physics.h"
 #include "3rdparty/stb_image_write.h"
+#include "Services/perlin.h"
 
 //#define GLM_ENABLE_EXPERIMENTAL
 //#include <glm/glm.hpp>
 //#include <glm/ext.hpp>
-
-#include <glm/gtc/noise.hpp>
 
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
@@ -1191,19 +1190,9 @@ public:
 };
 
 
-struct TerrainConfig {
-    int width = 257;        // Power-of-two plus one (ideal for tessellation patches)
-    int height = 257;
-    int octaves = 5;         // How many detail layers to stack
-    float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
-    float persistence = 0.5f;  // Amplitude multiplier per octave
-    float scale = 2.0f;    // Initial zoom scale for the coordinate space
-    float horizontalScale = 4.5f; // Horizontal scaling factor for the terrain
-    float maxHeight = 100; // Maximum height of the terrain in world units
-};
 
 
-float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& HeightMapData, const TerrainConfig& Config)
+float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& HeightMapData, const PerlinConfig& Config)
 {
     // 1. Convert world coordinates back into un-scaled grid coordinates
     float UnscaledX = WorldX / Config.horizontalScale;
@@ -1257,7 +1246,7 @@ public:
     {
         delete m_pScene;
 
-        CreateHeightMap(m_terrainConfig);
+        CreatePerlinMap(m_terrainConfig, m_heightMap);
 
         void* pTerrain = m_pRenderingSystem->CreateTerrainGrid(m_terrainConfig.width, m_terrainConfig.height);
         
@@ -1343,7 +1332,7 @@ public:
             IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 0.001f, 10.0f);
 
             if (IsDirty) {
-                CreateHeightMap(m_terrainConfig);
+                CreatePerlinMap(m_terrainConfig, m_heightMap);
                 m_pRenderingSystem->UpdateTexture2D(m_terrainTexHeightMap, m_heightMap.data());
                 //m_isTerrainConfigDirty = true;
             }
@@ -1376,82 +1365,8 @@ public:
 
 private:
 
-
-    void CreateHeightMap(const TerrainConfig& Config)
-    {
-        m_heightMap.resize(Config.width * Config.height);
-        std::memset(m_heightMap.data(), 0, ARRAY_SIZE_IN_BYTES(m_heightMap));
-
-        // Safeguard scale to avoid division by zero errors
-        float safeScale = Config.scale;
-        if (safeScale <= 0.0f) safeScale = 0.0001f;
-
-        // 1. Generate unique offsets based on the seed for each layer (octave)
-        std::vector<glm::vec2> octaveOffsets(Config.octaves);
-        srand(10); // Restored Config.seed parameter usage 
-
-        for (int i = 0; i < Config.octaves; i++) {
-            float offsetX = (float)(rand() % 200000 - 100000);
-            float offsetY = (float)(rand() % 200000 - 100000);
-            octaveOffsets[i] = glm::vec2(offsetX, offsetY);
-        }
-
-        float MinValue = std::numeric_limits<float>::max();
-        float MaxValue = std::numeric_limits<float>::lowest();
-
-        // Centering offsets to zoom into the center of the map instead of top-right
-        float halfWidth = (float)Config.width / 2.0f;
-        float halfHeight = (float)Config.height / 2.0f;
-
-
-        // 2. First Pass: Calculate layered noise values
-        for (int row = 0; row < Config.height; row++) {
-            for (int col = 0; col < Config.width; col++) {
-                float Sum = 0.0f;
-                float Amplitude = 1.0f;
-                float Freq = 1.0f;
-
-                float u = (float)col / (float)(Config.width - 1);
-                float v = (float)row / (float)(Config.height - 1);
-                for (int Oct = 0; Oct < Config.octaves; Oct++) {
-                    float baseSampleX = u / safeScale;
-                    float baseSampleY = v / safeScale;
-
-                    // Corrected coordinate transformation centered around the middle
-                    float sampleX = (baseSampleX + octaveOffsets[Oct].x) * Freq;
-                    float sampleY = (baseSampleY + octaveOffsets[Oct].y) * Freq;
-
-                    glm::vec2 p(sampleX, sampleY);
-
-                    // GLM outputs [-1, 1]. If attempting to exactly duplicate Unity's [0, 1] converted math,
-                    // you would treat standard output accordingly. Here we keep standard accumulator:
-                    Sum += glm::perlin(p) * Amplitude;
-
-                    Freq *= Config.lacunarity;
-                    Amplitude *= Config.persistence;
-                }
-
-                m_heightMap[row * Config.width + col] = Sum;
-
-                if (Sum < MinValue) MinValue = Sum;
-                if (Sum > MaxValue) MaxValue = Sum;
-            }
-        }
-
-        // 3. Second Pass: Absolute Normalization
-        for (int i = 0; i < m_heightMap.size(); ++i) {
-            // Prevent division-by-zero if MaxValue equals MinValue
-            if (MaxValue != MinValue) {
-                float normalizedHeight = (m_heightMap[i] - MinValue) / (MaxValue - MinValue);
-                m_heightMap[i] = normalizedHeight;
-            } else {
-                m_heightMap[i] = 0.0f;
-            }
-        }
-    }
-
     std::vector<float> m_heightMap;
-    TerrainConfig m_terrainConfig;
+    PerlinConfig m_terrainConfig;
     int m_terrainTexHeightMap = -1;
     bool m_cameraOnGround = false;
 };
