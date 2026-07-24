@@ -30,6 +30,7 @@ struct PerlinConfig {
     float scale = 50.0f;    // Initial zoom scale for the coordinate space
     float horizontalScale = 4.5f; // Horizontal scaling factor for the terrain
     float maxHeight = 100; // Maximum height of the terrain in world units
+    int seed = 0;          // Random seed for noise generation
 };
 
 
