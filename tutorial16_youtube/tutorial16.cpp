@@ -30,8 +30,8 @@
 #include "camera.h"
 #include "world_transform.h"
 
-#define WINDOW_WIDTH  2560
-#define WINDOW_HEIGHT 1440
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 GLuint VBO;
 GLuint IBO;
@@ -306,13 +306,8 @@ int main(int argc, char** argv)
 
     char game_mode_string[64];
     // Game mode string example: <Width>x<Height>@<BPP>
-    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
+    snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d:32", WINDOW_WIDTH, WINDOW_HEIGHT);
     glutGameModeString(game_mode_string);
-    if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
-        glutEnterGameMode();
-    } else {
-        fprintf(stderr, "Error: Requested game mode, '%s', not available.\n", game_mode_string);
-    }
 
     InitializeGlutCallbacks();
 
