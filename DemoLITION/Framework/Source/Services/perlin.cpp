@@ -37,6 +37,9 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
         octaveOffsets[i] = glm::vec2(offsetX, offsetY);
     }
 
+    float MinValue = std::numeric_limits<float>::max();
+    float MaxValue = std::numeric_limits<float>::lowest();
+
     for (int row = 0; row < Config.height; row++) {
         for (int col = 0; col < Config.width; col++) {
 
@@ -57,6 +60,19 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
             }
 
             HeightMap[row * Config.width + col] = Sum;
+
+            MinValue = std::min(MinValue, Sum);
+            MaxValue = std::max(MaxValue, Sum);
+        }
+    }
+
+    for (int i = 0; i < HeightMap.size(); ++i) {
+        if (MaxValue != MinValue) {
+            float NormalizedHeight = (HeightMap[i] - MinValue) / (MaxValue - MinValue);
+
+            HeightMap[i] = NormalizedHeight;
+        } else {
+            HeightMap[i] = 0.0f;
         }
     }
 }
