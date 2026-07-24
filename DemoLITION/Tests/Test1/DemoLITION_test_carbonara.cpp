@@ -1329,7 +1329,7 @@ public:
             IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 8);
             IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 0.1f, 4.0f);
             IsDirty |= ImGui::SliderFloat("Persistence", &m_terrainConfig.persistence, 0.1f, 1.0f);
-            IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 0.001f, 10.0f);
+            IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 5.0, 200.0f);
 
             if (IsDirty) {
                 CreatePerlinMap(m_terrainConfig, m_heightMap);
