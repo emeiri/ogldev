@@ -325,6 +325,24 @@ void Texture::LoadF32(int Width, int Height, const float* pImageData)
 }
 
 
+void Texture::Update(const void* pImageData)
+{
+    if (!IsGLVersionHigher(4, 5)) {
+        OGLDEV_ERROR0("Non DSA version is not implemented\n");
+    }
+
+    if (m_imageWidth <= 0 || m_imageHeight <= 0) {
+        OGLDEV_ERROR0("Image was not initialized\n");
+    }
+
+    if ((m_config.m_numChannels == 1) && (m_config.m_isFloat)) {
+        glTextureSubImage2D(m_textureObj, 0, 0, 0, m_imageWidth, m_imageHeight, GL_RED, GL_FLOAT, pImageData);
+    } else {
+        NOT_IMPLEMENTED;
+    }    
+}
+
+
 void Texture::Bind(GLenum TextureUnit)
 {
     if (IsGLVersionHigher(4, 5)) {

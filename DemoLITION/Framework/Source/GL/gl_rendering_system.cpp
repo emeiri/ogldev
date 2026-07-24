@@ -209,6 +209,13 @@ int RenderingSystemGL::LoadTexture2D(const void* pData, int Width, int Height, T
 }
 
 
+void RenderingSystemGL::UpdateTexture2D(int TextureHandle, const void* pData)
+{
+    Texture* pTexture = (Texture*)GetTexture(TextureHandle);
+
+    pTexture->Update(pData);
+}
+
 int RenderingSystemGL::LoadCubemapTexture(const std::string& Filename)
 {
     if (m_numTextures == m_textures.size()) {

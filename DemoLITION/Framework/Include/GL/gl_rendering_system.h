@@ -64,6 +64,8 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual int LoadTexture2D(const void* pData, int Width, int Height, TextureConfig* pConfig = NULL);
 
+    virtual void UpdateTexture2D(int TextureHandle, const void* pData);
+
     virtual int LoadCubemapTexture(const std::string& Filename);
 
     virtual void Execute();
