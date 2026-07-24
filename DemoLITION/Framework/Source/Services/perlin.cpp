@@ -23,71 +23,17 @@
 #include "Services/perlin.h"
 
 
-void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
+// Step 1: Single-Layer Scaled Noise Pass
+void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap) 
 {
     HeightMap.resize(Config.width * Config.height);
-    std::memset(HeightMap.data(), 0, ARRAY_SIZE_IN_BYTES(HeightMap));
-
-    // Safeguard scale to avoid division by zero errors 
-    float safeScale = Config.scale;
-    if (safeScale <= 0.0f) safeScale = 0.0001f;
-
-    // 1. Generate unique offsets based on the seed for each layer (octave) 
-    std::vector<glm::vec2> octaveOffsets(Config.octaves);
-    srand(10); // Restored Config.seed parameter usage 
-
-    for (int i = 0; i < Config.octaves; i++) {
-        float offsetX = (float)(rand() % 200000 - 100000);
-        float offsetY = (float)(rand() % 200000 - 100000);
-        octaveOffsets[i] = glm::vec2(offsetX, offsetY);
-    }
-
-    float MinValue = std::numeric_limits<float>::max();
-    float MaxValue = std::numeric_limits<float>::lowest();
-
-    // 2. First Pass: Calculate layered noise values 
+    
     for (int row = 0; row < Config.height; row++) {
         for (int col = 0; col < Config.width; col++) {
-            float Sum = 0.0f;
-            float Amplitude = 1.0f;
-            float Freq = 1.0f;
 
-            float u = (float)col / (float)(Config.width - 1);
-            float v = (float)row / (float)(Config.height - 1);
+            float p = glm::perlin(glm::vec2((float)col, (float)row));
 
-            for (int Oct = 0; Oct < Config.octaves; Oct++) {
-                // RESTORED: Matches your exact base coordinate math
-                float baseSampleX = u / safeScale;
-                float baseSampleY = v / safeScale;
-
-                // FIX: Apply Freq to the base coordinates ONLY, then add the random offset
-                // This prevents your random offsets from scaling out of control as Freq grows
-                float sampleX = (baseSampleX * Freq) + octaveOffsets[Oct].x;
-                float sampleY = (baseSampleY * Freq) + octaveOffsets[Oct].y;
-
-                glm::vec2 p(sampleX, sampleY);
-                Sum += glm::perlin(p) * Amplitude;
-
-                Freq *= Config.lacunarity;
-                Amplitude *= Config.persistence;
-            }
-
-            HeightMap[row * Config.width + col] = Sum;
-
-            if (Sum < MinValue) MinValue = Sum;
-            if (Sum > MaxValue) MaxValue = Sum;
-        }
-    }
-
-    // 3. Second Pass: Absolute Normalization 
-    for (int i = 0; i < HeightMap.size(); ++i) {
-        if (MaxValue != MinValue) {
-            float normalizedHeight = (HeightMap[i] - MinValue) / (MaxValue - MinValue);
-            // RESTORED:Keeps pure [0, 1] normalization. 
-            // (If you want it to use maxHeight, multiply here, otherwise leave as-is)
-            HeightMap[i] = normalizedHeight;
-        } else {
-            HeightMap[i] = 0.0f;
+            HeightMap[row * Config.width + col] = p;
         }
     }
 }
