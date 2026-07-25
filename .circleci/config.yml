@@ -55,7 +55,7 @@ jobs:
       # Install Visual Studio 2026 Build Tools dynamically via Chocolatey
       - run:
           name: Install Visual Studio 2026 Build Tools
-          command: choco install visualstudio2026buildtools --passive --norestart --no-progress
+          command: choco install visualstudio2026buildtools --passive --norestart --no-progress --execution-timeout 3600 -y
       # Install the specific C++ Workload needed for v145
       - run:
           name: Install C++ Build Tools Workload
