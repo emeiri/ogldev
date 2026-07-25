@@ -169,6 +169,7 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 	}
 }
 
+
 void GLMCameraFirstPerson::HandleRightMouseDrag(const glm::vec2& DeltaMouse)
 {
 	float Pitch = DeltaMouse.y * m_mouseSpeed;
