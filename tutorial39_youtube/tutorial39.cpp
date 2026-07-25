@@ -273,6 +273,10 @@ int main(int argc, char** argv)
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
+    printf("------------------------------\n");
+    printf("Press 1-5 to change fog types\n");
+    printf("------------------------------\n");
+
     app->Run();
 
     delete app;
