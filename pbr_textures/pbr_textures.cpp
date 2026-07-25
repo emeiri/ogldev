@@ -198,10 +198,10 @@ private:
 
       
         if (1) {
-            m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png");
-            m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png");
-            m_metallic.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_metallic.png");
-            m_normalMap.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png");
+            m_albedo.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_albedo.png", false);
+            m_roughness.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_roughness.png", false);
+            m_metallic.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_metallic.png", false);
+            m_normalMap.Load("../Content/dry-rocky-ground-bl/dry-rocky-ground_normal-ogl.png", false);
         }
         else {
             m_albedo.Load("../Content/textures/rusted_iron/albedo.png");
