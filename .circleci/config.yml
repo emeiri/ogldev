@@ -62,7 +62,7 @@ jobs:
             cd ogldev
             cmd /c echo %VULKAN_SDK%
             cmd /c dir C:\VulkanSDK\1.4.304.0\Lib
-            MSBuild "Windows\\ogldev_vs_2022\\ogldev_vs_2022.sln" /p:Configuration=Debug /m
+            MSBuild "Windows\\ogldev_vs_2026\\ogldev_vs_2026.sln" /p:Configuration=Debug /m
 
 workflows:
   version: 2
