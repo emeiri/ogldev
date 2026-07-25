@@ -56,6 +56,7 @@ bool BillboardList::Init(const std::string& TexFilename, const std::vector<Vecto
         return false;
     }
 
+    m_technique.Enable();
     m_technique.SetColorTextureUnit(COLOR_TEXTURE_UNIT_INDEX);
     
     return true;
