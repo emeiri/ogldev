@@ -174,6 +174,8 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 	glm::quat qYaw;
 	glm::quat qPitch;
 
+    m_up = glm::vec3(0.0f, 1.0f, 0.0f); // Reset Up vector to world Up before calculating orientation
+
 	// 3. Calculate the direction vector from angles
 	if (CAMERA_LEFT_HANDED) {
 		// Left-handed: Invert yaw angle application to match standard LH space
