@@ -598,7 +598,6 @@ public:
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = true;
 
         m_pScene->SetCamera(Vector3f(0.0f, 4.0f, 0.0f), Vector3f(0.0, -0.4f, 1.0f));
-       // PhysicsSceneObject CObject = LoadAndAddModel("../Content/ThrillerPart3.fbx", false, 0.01f);
        // PhysicsSceneObject CObject = LoadAndAddModel("../Content/iclone-7-raptoid-mascot/scene.gltf", false, 0.01f);
       //  CObject.pSceneObject->SetRotation(90.0f, 0.0f, 0.0f);
 		
@@ -1216,7 +1215,8 @@ public:
        // pSceneObject->SetScale(0.01f);
       //  m_pScene->AddToRenderList(pSceneObject);
 
-     //   m_pScene->SetCamera(Vector3f(-2.5f, 3.0f, 6.0f), Vector3f(1.0f, -0.1f, 0.25f));
+        // Hack: the camera should be set up in the glTF file, but for some reason it is not working, so we set it up here
+        m_pScene->SetCamera(Vector3f(0.0f, 10.0f, -30.0f), Vector3f(0.0f, -0.3f, 1.0f));
     }
 };
 
