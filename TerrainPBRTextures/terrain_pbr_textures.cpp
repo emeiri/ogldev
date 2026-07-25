@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    Terrain Rendering - demo 14 - Terrain PBR Textures
+    Terrain Rendering - demo 14 - Perlin Noise
 */
 
 #include "imgui.h"
