@@ -31,7 +31,8 @@ static bool constexpr CAMERA_LEFT_HANDED = true;
 
 struct MouseState {
 	glm::vec2 m_pos = glm::vec2(0.0f);
-	bool m_buttonPressed = false;
+	bool m_isLeftButtonPressed = false;
+	bool m_isRightButtonPressed = false;
 };
 
 class GLMCameraFirstPerson : public CameraAPI {
@@ -79,6 +80,8 @@ public:
 
 	const glm::vec3& GetVelocity() const { return m_velocity; }
 
+    glm::mat4 GetGlobalWorldRotation() const { return glm::mat4_cast(m_globalWorldRotation); }
+
 	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
 
 	void SetPos(const Vector3f& Pos) { m_cameraPos.x = Pos.x; m_cameraPos.y = Pos.y; m_cameraPos.z = Pos.z; }
@@ -123,6 +126,8 @@ private:
 	glm::vec2 m_oldMousePos = glm::vec2(0.0f);
 	glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 m_worldRight = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    glm::quat m_globalWorldRotation = glm::quat(glm::vec3(0.0f));
 
 	MouseState m_mouseState;
 	PersProjInfo m_persProjInfo;

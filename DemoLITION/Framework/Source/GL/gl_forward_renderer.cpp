@@ -1088,6 +1088,8 @@ void ForwardRenderer::RenderSingleObject(CoreSceneObject* pSceneObject)
 
     if (UseIndirectRender) {
         Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
+        glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
+        ObjectMatrix = ObjectMatrix * Matrix4f(GlobalWorldRotation);
         pModel->RenderIndirect(ObjectMatrix);
     }
     else {
@@ -1294,7 +1296,9 @@ void ForwardRenderer::FullScreenQuadBlit(GLScene* pScene)
 
 void ForwardRenderer::GetWVP(CoreSceneObject* pSceneObject, Matrix4f& WVP)
 {
-    Matrix4f World = pSceneObject->GetMatrix();
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
+    Matrix4f ObjectMatrix = pSceneObject->GetMatrix();    
+    Matrix4f World = ObjectMatrix * Matrix4f(GlobalWorldRotation);
     Matrix4f View = m_pCurCamera->GetViewMatrix();
     Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
 
@@ -1385,20 +1389,22 @@ void ForwardRenderer::SetWorldMatrix_CB(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPassDir(const Matrix4f& World)
 {
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * ObjectMatrix * World;
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
+    Matrix4f WVP = m_lightOrthoProjMatrix * m_lightViewMatrix * ObjectMatrix * World * Matrix4f(GlobalWorldRotation);
     m_shadowMapTech.SetWVP(WVP);
 }
 
 
 void ForwardRenderer::SetWorldMatrix_CB_ShadowPassSpot(const Matrix4f& World)
 {
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     /*ObjectMatrix.Print();
     World.Print();
     m_lightViewMatrix.Print();
     m_lightPersProjMatrix.Print();
     exit(0);*/
-    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * ObjectMatrix * World;
+    Matrix4f WVP = m_lightPersProjMatrix * m_lightViewMatrix * ObjectMatrix * World * Matrix4f(GlobalWorldRotation);
     m_shadowMapTech.SetWVP(WVP);
 }
 
@@ -1424,8 +1430,9 @@ static Matrix3f CalcNormalMatrix(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
 {
     // TODO: use GetWVP instead
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f FinalWorldMatrix = ObjectMatrix * World;
+    Matrix4f FinalWorldMatrix = ObjectMatrix * World * Matrix4f(GlobalWorldRotation);
     m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
     Matrix4f ViewProj(m_pCurCamera->GetVPMatrix());
@@ -1465,7 +1472,8 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
 {
     // TODO: use GetWVP instead
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f FinalWorldMatrix = ObjectMatrix * World;
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
+    Matrix4f FinalWorldMatrix = ObjectMatrix * World * Matrix4f(GlobalWorldRotation);
 
     Matrix4f ViewProj(m_pCurCamera->GetVPMatrix());
     Matrix4f WVP = ViewProj * FinalWorldMatrix;
@@ -1487,8 +1495,9 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
 void ForwardRenderer::SetWorldMatrix_CB_GBufferPass(const Matrix4f& World)
 {
     // TODO: use GetWVP instead
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
-    Matrix4f FinalWorldMatrix = ObjectMatrix * World;
+    Matrix4f FinalWorldMatrix = ObjectMatrix * World * Matrix4f(GlobalWorldRotation);
 
     Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
     Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
@@ -1508,9 +1517,10 @@ void ForwardRenderer::SetWorldMatrix_CB_GBufferPass(const Matrix4f& World)
 
 void ForwardRenderer::SetWorldMatrix_CB_PickingPass(const Matrix4f& World)
 {
+    glm::mat4 GlobalWorldRotation = m_pCurCamera->GetGlobalWorldRotation();
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f ProjView = GetViewProjectionMatrix();
-    Matrix4f WVP = ProjView * ObjectMatrix * World;
+    Matrix4f WVP = ProjView * ObjectMatrix * World * Matrix4f(GlobalWorldRotation);
    // printf("Picking pass\n"); WVP.Print();
 
     m_pickingTech.SetWVP(WVP);

@@ -109,7 +109,7 @@ void GLMCameraFirstPerson::Init(const glm::vec3& Pos, const glm::vec3& Target,
 
 void GLMCameraFirstPerson::Update(float dt)
 {
-	if (m_mouseState.m_buttonPressed) {
+	if (m_mouseState.m_isLeftButtonPressed || m_mouseState.m_isRightButtonPressed) {
 		CalcCameraOrientation();
 	}
 
@@ -134,10 +134,19 @@ void GLMCameraFirstPerson::HandleMouseButton(int Button, int Action, int Mods)
 {
 	if (Button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (Action == GLFW_PRESS) {
-			m_mouseState.m_buttonPressed = true;
+			m_mouseState.m_isLeftButtonPressed = true;
 			m_isFirstClick = true;
 		} else if (Action == GLFW_RELEASE) {
-			m_mouseState.m_buttonPressed = false;			
+			m_mouseState.m_isLeftButtonPressed = false;			
+		}
+	}
+
+	if (Button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (Action == GLFW_PRESS) {
+			m_mouseState.m_isRightButtonPressed = true;
+			m_isFirstClick = true;
+		} else if (Action == GLFW_RELEASE) {
+			m_mouseState.m_isRightButtonPressed = false;			
 		}
 	}
 }
@@ -151,6 +160,26 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 	}
 
 	glm::vec2 DeltaMouse = m_mouseState.m_pos - m_oldMousePos;
+
+    if (m_mouseState.m_isRightButtonPressed) {
+		float Pitch = DeltaMouse.y * m_mouseSpeed;
+		float Yaw = DeltaMouse.x * m_mouseSpeed;
+        //printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
+		glm::quat qYaw = glm::angleAxis(Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+		// Use a static Right vector or the camera's current Right vector for pitch
+		//glm::quat qPitch = glm::angleAxis(Pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+      //  GLM_PRINT_QUAT("Yaw Quaternion: ", qYaw);
+       // GLM_PRINT_QUAT("Pitch Quaternion: ", qPitch);
+		// 3. Update the persistent orientation quaternion
+		// Pre-multiplying by Yaw (qYaw * m_worldRotation) uses global axes
+		// Post-multiplying (m_worldRotation * qPitch) uses local axes
+		m_globalWorldRotation = qYaw * m_globalWorldRotation;// *qPitch;
+
+		// 4. Normalize to prevent floating point drift over time
+		m_globalWorldRotation = glm::normalize(m_globalWorldRotation);
+      //  GLM_PRINT_QUAT("Camera Orientation after: ", m_globalWorldRotation);
+		return;
+    }	
 
 //    printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
 
