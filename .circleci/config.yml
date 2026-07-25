@@ -36,7 +36,7 @@ jobs:
             ./build_all.sh
 
   build-windows:
-    executor: win/default
+    executor: win/server-2025
     steps:
       - run:
           name: Download Vulkan SDK Installer
@@ -56,6 +56,15 @@ jobs:
           command: |
             git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
             git clone --recurse-submodules https://github.com/emeiri/ogldev.git
+      # Install Visual Studio 2026 Build Tools dynamically via Chocolatey
+      - run:
+          name: Install Visual Studio 2026 Build Tools
+          command: choco install visualstudio2026buildtools --passive --norestart --no-progress
+      # Install the specific C++ Workload needed for v145
+      - run:
+          name: Install C++ Build Tools Workload
+          command: |
+            choco install visualstudio2026-workload-vctools --passive --norestart --no-progress
       - run:
           name: Build Solution
           command: |
