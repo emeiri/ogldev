@@ -1,13 +1,10 @@
 version: 2.1
-
 orbs:
   win: circleci/windows@5.0
-  
 executors:
   ubuntu-executor:
     docker:
       - image: ubuntu:22.04
-
 jobs:
   build-linux:
     executor: ubuntu-executor
@@ -32,9 +29,8 @@ jobs:
             cd ogldev
             ls -l ~/
             source ~/project/1.4.328.1/setup-env.sh
-            chmod +x ./build_all.sh            
+            chmod +x ./build_all.sh
             ./build_all.sh
-
   build-windows:
     executor: win/default
     steps:
@@ -65,23 +61,19 @@ jobs:
           name: Install C++ Build Tools Workload
           command: |
             choco install visualstudio2026-workload-vctools --passive --norestart --no-progress --ignore-detected-reboot --execution-timeout 3600 -y
-            if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) {
-              exit 0
-            } else {
-              exit $LASTEXITCODE
-            }
+            if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) { exit 0 } else { exit $LASTEXITCODE }
       - run:
           name: Build Solution
           command: |
             cd ogldev
             cmd /c echo %VULKAN_SDK%
             cmd /c dir C:\VulkanSDK\1.4.304.0\Lib
-            MSBuild "Windows\\ogldev_vs_2026\\ogldev_vs_2026.sln" /p:Configuration=Debug /m
-
+            
+            # Use the explicit path to Visual Studio 2026 BuildTools to handle toolset v145
+            & "C:\Program Files (x86)\Microsoft Visual Studio\2026\BuildTools\MSBuild\Current\Bin\MSBuild.exe" "Windows\\ogldev_vs_2026\\ogldev_vs_2026.sln" /p:Configuration=Debug /m
 workflows:
   version: 2
   build_all_platforms:
     jobs:
       - build-linux
       - build-windows
-     
