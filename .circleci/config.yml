@@ -36,8 +36,7 @@ jobs:
             ./build_all.sh
 
   build-windows:
-    machine:
-      image: windows-server-2025-gui
+    executor: win/default
     steps:
       - run:
           name: Download Vulkan SDK Installer
