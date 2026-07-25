@@ -131,6 +131,8 @@ public:
 
     virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
 
+    virtual int GetTextureAPIHandle(int TextureHandle) = 0;
+
 protected:
 
     virtual Scene* CreateSceneInternal(const std::string& Filename, const ModelLoadFlags& Flags) = 0;

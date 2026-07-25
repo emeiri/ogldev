@@ -74,6 +74,8 @@ class RenderingSystemGL : public CoreRenderingSystem
 
     virtual void* CreateTerrainGrid(int Width, int Height);
 
+    virtual int GetTextureAPIHandle(int TextureHandle);
+
     BaseTexture* GetTexture(int TextureHandle);
 
     void OnKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

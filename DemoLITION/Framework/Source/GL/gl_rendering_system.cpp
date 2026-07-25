@@ -507,6 +507,15 @@ void* RenderingSystemGL::CreateTerrainGrid(int width, int height)
 }
 
 
+int RenderingSystemGL::GetTextureAPIHandle(int TextureHandle)
+{
+    Texture* pTexture = (Texture*)GetTexture(TextureHandle);
+
+    GLuint ret = pTexture->GetTexture();
+    return ret;
+}
+
+
 void TerrainGrid::Render()
 {
     glBindVertexArray(m_vao);
