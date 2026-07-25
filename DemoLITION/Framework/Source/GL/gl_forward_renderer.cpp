@@ -1428,10 +1428,8 @@ void ForwardRenderer::SetWorldMatrix_CB_LightingPass(const Matrix4f& World)
     Matrix4f FinalWorldMatrix = ObjectMatrix * World;
     m_pCurLightingTech->SetWorldMatrix(FinalWorldMatrix);
 
-    Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
-    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
-    Matrix4f WV = View * FinalWorldMatrix;
-    Matrix4f WVP = Projection * View * FinalWorldMatrix;
+    Matrix4f ViewProj(m_pCurCamera->GetVPMatrix());
+    Matrix4f WVP = ViewProj * FinalWorldMatrix;
 
   //  printf("Lighting pass\n"); WVP.Print(); exit(1);
 
@@ -1469,15 +1467,15 @@ void ForwardRenderer::SetWorldMatrix_CB_NormalPass(const Matrix4f& World)
     Matrix4f ObjectMatrix = m_pcurSceneObject->GetMatrix();
     Matrix4f FinalWorldMatrix = ObjectMatrix * World;
 
-    Matrix4f View = m_pCurCamera->GetViewMatrix();// TODO: use VP matrix from camera
-    Matrix4f Projection = m_pCurCamera->GetProjMatrixGLM();
-    Matrix4f WVP = Projection * View * FinalWorldMatrix;
+    Matrix4f ViewProj(m_pCurCamera->GetVPMatrix());
+    Matrix4f WVP = ViewProj * FinalWorldMatrix;
 
     //  printf("Normal pass\n"); WVP.Print(); exit(1);
 
     m_normalTech.SetWVP(WVP);
 
     Matrix3f NormalMatrix = CalcNormalMatrix(FinalWorldMatrix);
+    Matrix4f View = m_pCurCamera->GetViewMatrix();
     Matrix4f ViewNormalMatrix4D = View * Matrix4f(NormalMatrix);
     Matrix3f ViewNormalMatrix(ViewNormalMatrix4D);
     //NormalMatrix.Print();
