@@ -28,6 +28,9 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
 {
     HeightMap.resize(Config.width * Config.height);
 
+    float SafeScale = Config.scale;
+    if (SafeScale <= 0.0f) SafeScale = 0.0001f;
+
     std::vector<glm::vec2> octaveOffsets(Config.octaves);
     srand(Config.seed);
     
@@ -48,8 +51,8 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
             float Freq = 1.0f;
 
             for (int Oct = 0; Oct < Config.octaves; Oct++) {
-                float SampleX = col / Config.scale * Freq + octaveOffsets[Oct].x;
-                float SampleY = row / Config.scale * Freq + octaveOffsets[Oct].y;
+                float SampleX = col / SafeScale * Freq + octaveOffsets[Oct].x;
+                float SampleY = row / SafeScale * Freq + octaveOffsets[Oct].y;
 
                 float p = glm::perlin(glm::vec2(SampleX, SampleY)) * Amplitude;
                
