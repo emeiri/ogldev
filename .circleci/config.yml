@@ -65,6 +65,11 @@ jobs:
           name: Install C++ Build Tools Workload
           command: |
             choco install visualstudio2026-workload-vctools --passive --norestart --no-progress --ignore-detected-reboot --execution-timeout 3600 -y
+            if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3010) {
+              exit 0
+            } else {
+              exit $LASTEXITCODE
+            }
       - run:
           name: Build Solution
           command: |
