@@ -160,29 +160,33 @@ void GLMCameraFirstPerson::CalcCameraOrientation()
 	}
 
 	glm::vec2 DeltaMouse = m_mouseState.m_pos - m_oldMousePos;
+	//    printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
 
-    if (m_mouseState.m_isRightButtonPressed) {
-		float Pitch = DeltaMouse.y * m_mouseSpeed;
-		float Yaw = DeltaMouse.x * m_mouseSpeed;
-        //printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
-		glm::quat qYaw = glm::angleAxis(Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
-		// Use a static Right vector or the camera's current Right vector for pitch
-		//glm::quat qPitch = glm::angleAxis(Pitch, glm::vec3(1.0f, 0.0f, 0.0f));
-      //  GLM_PRINT_QUAT("Yaw Quaternion: ", qYaw);
-       // GLM_PRINT_QUAT("Pitch Quaternion: ", qPitch);
-		// 3. Update the persistent orientation quaternion
-		// Pre-multiplying by Yaw (qYaw * m_worldRotation) uses global axes
-		// Post-multiplying (m_worldRotation * qPitch) uses local axes
-		m_globalWorldRotation = qYaw * m_globalWorldRotation;// *qPitch;
+	if (m_mouseState.m_isRightButtonPressed) {
+		HandleRightMouseDrag(DeltaMouse);
+	} else {
+		HandleLeftMouseDrag(DeltaMouse);
+	}
+}
 
-		// 4. Normalize to prevent floating point drift over time
-		m_globalWorldRotation = glm::normalize(m_globalWorldRotation);
-      //  GLM_PRINT_QUAT("Camera Orientation after: ", m_globalWorldRotation);
-		return;
-    }	
+void GLMCameraFirstPerson::HandleRightMouseDrag(const glm::vec2& DeltaMouse)
+{
+	float Pitch = DeltaMouse.y * m_mouseSpeed;
+	float Yaw = DeltaMouse.x * m_mouseSpeed;
+    //printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
+	glm::quat qYaw = glm::angleAxis(Yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+	//glm::quat qPitch = glm::angleAxis(Pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+    //  GLM_PRINT_QUAT("Yaw Quaternion: ", qYaw);
+    // GLM_PRINT_QUAT("Pitch Quaternion: ", qPitch);
+	m_globalWorldRotation = qYaw * m_globalWorldRotation;// *qPitch;
 
-//    printf("DeltaMouse: %f, %f\n", DeltaMouse.x, DeltaMouse.y);
+	m_globalWorldRotation = glm::normalize(m_globalWorldRotation);
+    //  GLM_PRINT_QUAT("Camera Orientation after: ", m_globalWorldRotation);
+}	
 
+
+void GLMCameraFirstPerson::HandleLeftMouseDrag(const glm::vec2& DeltaMouse)
+{
 	// 1. Update angles dynamically based on Handedness
 	if (CAMERA_LEFT_HANDED) {
 		// In Left-Handed space, dragging right should decrease the yaw angle

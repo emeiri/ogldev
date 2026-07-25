@@ -113,6 +113,9 @@ private:
 	void CalcVelocity(float dt);
 	void CalcCameraOrientation();
 
+	void HandleLeftMouseDrag(const glm::vec2& DeltaMouse);
+	void HandleRightMouseDrag(const glm::vec2& DeltaMouse);
+
     bool m_initialized = false;
 	bool m_isFirstClick = true;
 
