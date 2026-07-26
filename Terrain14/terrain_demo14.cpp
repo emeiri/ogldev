@@ -122,8 +122,8 @@ public:
         // pSceneObject->SetScale(0.01f);
        //  m_pScene->AddToRenderList(pSceneObject);
 
-        float CameraX = m_terrainConfig.width * m_terrainConfig.horizontalScale / 2.0f;
-        float CameraZ = 0.0f;
+        float CameraX = 0.0f;
+        float CameraZ = -m_terrainConfig.height * m_terrainConfig.horizontalScale;
         float CameraY = 0.0f;
 
         if (m_cameraOnGround) {
