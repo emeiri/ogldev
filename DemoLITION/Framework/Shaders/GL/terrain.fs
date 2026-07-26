@@ -26,6 +26,7 @@
 
 in vec3 WorldPos;
 in vec3 Normal;
+in float OrigHeight;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -91,7 +92,7 @@ void main()
             FragColor = vec4(FinalColor.rgb * LightingFactor, 1.0);
             break;
         case TERRAIN_RENDER_MODE_HEIGHT:
-            FragColor = vec4(vec3(WorldPos.y / gMaxTerrainHeight), 1.0);
+            FragColor = vec4(OrigHeight, OrigHeight, OrigHeight, 1.0);
             break;
         case TERRAIN_RENDER_MODE_LIGHTING_ONLY:
             FragColor = vec4(vec3(LightingFactor), 1.0);

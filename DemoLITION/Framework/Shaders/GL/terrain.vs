@@ -24,6 +24,7 @@ layout (location = 1) in vec2 aTexCoords;
 
 out vec3 WorldPos;
 out vec3 Normal;
+out float OrigHeight;
 
 layout (binding = 0) uniform sampler2D gHeightMap; 
 
@@ -40,6 +41,7 @@ void main()
     vec3 DisplacedPos = aPos;
     DisplacedPos.x *= gHorizontalScale;
     DisplacedPos.y = HeightSample * gMaxTerrainHeight;
+    OrigHeight = HeightSample;
     DisplacedPos.z *= gHorizontalScale;
 
     float hL = textureOffset(gHeightMap, aTexCoords, ivec2(-1,  0)).r;
