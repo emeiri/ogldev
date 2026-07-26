@@ -225,6 +225,8 @@ private:
             default:
                 HandledByMe = BaseGLApp::OnKeyboard(key, action);
             }
+        } else {
+            HandledByMe = BaseGLApp::OnKeyboard(key, action);
         }
 
         return HandledByMe;
