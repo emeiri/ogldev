@@ -432,38 +432,41 @@ struct TerrainVertex {
 };
 
 
-void* RenderingSystemGL::CreateTerrainGrid(int width, int height)
+void* RenderingSystemGL::CreateTerrainGrid(int Width, int Height)
 {
     std::vector<TerrainVertex> vertices;
     std::vector<u32> indices;
 
     TerrainGrid* pGrid = new TerrainGrid();
 
+    float BaseCol = -Width / 2.0f;
+    float BaseRow = -Height / 2.0f;
+
     // 1. Generate Vertex Buffer Data
-    for (int row = 0; row < height; ++row) {
-        for (int col = 0; col < width; ++col) {
+    for (int row = 0; row < Height; ++row) {
+        for (int col = 0; col < Width; ++col) {
             TerrainVertex vertex;
 
             // X and Z represent meters. Y is kept flat for the shader to displace.
-            vertex.position.x = (float)(col);
+            vertex.position.x = BaseCol + (float)(col);
             vertex.position.y = 0.0f;
-            vertex.position.z = (float)(row);
+            vertex.position.z = BaseRow + (float)(row);
 
             // Normalize UV coordinates linearly from 0.0 to 1.0
-            vertex.texCoords.x = (float)(col) / (float)(width - 1);
-            vertex.texCoords.y = (float)(row) / (float)(height - 1);
+            vertex.texCoords.x = (float)(col) / (float)(Width - 1);
+            vertex.texCoords.y = (float)(row) / (float)(Height - 1);
 
             vertices.push_back(vertex);
         }
     }
 
     // 2. Generate Index Buffer Data (Stitching quads together into triangles)
-    for (int row = 0; row < height - 1; ++row) {
-        for (int col = 0; col < width - 1; ++col) {
+    for (int row = 0; row < Height - 1; ++row) {
+        for (int col = 0; col < Width - 1; ++col) {
             // Find index pointers for the 4 corners of the current quad
-            u32 topLeft = row * width + col;
+            u32 topLeft = row * Width + col;
             u32 topRight = topLeft + 1;
-            u32 bottomLeft = (row + 1) * width + col;
+            u32 bottomLeft = (row + 1) * Width + col;
             u32 bottomRight = bottomLeft + 1;
 
             // Triangle 1
