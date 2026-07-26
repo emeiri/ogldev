@@ -140,6 +140,7 @@ class ForwardRenderer : public DemolitionRenderCallbacks {
 private:
 
     void HandleEmptyRenderList(GLScene* pScene);
+    void RenderTerrain(SceneConfig* pConfig);
     void ExecuteRenderGraph(GLScene* pScene, double TotalRuntime);
     void PickingPass(void* pWindow, GLScene* pScene);
     void PickingRenderScene(GLScene* pScene);

@@ -515,47 +515,54 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
     }
     // TODO: duplicate code with the one in LightingPass, can be refactored
     else if (pConfig->GetTerrainGrid()) {
-        TerrainGrid* pTerrainGrid = (TerrainGrid*)pConfig->GetTerrainGrid();
-        m_terrainTech.Enable();
-        Matrix4f WVP = m_pCurCamera->GetMatrix();
-        m_terrainTech.SetWVP(WVP);
-        int HeightMap = pConfig->GetTerrainHeightMap();
-        if (HeightMap != -1) {
-            //m_terrainTech.SetProjectionMatrix(pConfig->GetProjectionMatrix());
-            Texture* pHeightMap = (Texture*)m_pRenderingSystemGL->GetTexture(HeightMap);
-            pHeightMap->Bind(GL_TEXTURE0);
-        }
-
-        int TextureMap0 = pConfig->GetTerrainTexture(0);
-        if (TextureMap0 != -1) {
-            Texture* pTex0 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap0);
-            pTex0->Bind(GL_TEXTURE1);
-        }
-        int TextureMap1 = pConfig->GetTerrainTexture(1);
-        if (TextureMap1 != -1) {
-            Texture* pTex1 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap1);
-            pTex1->Bind(GL_TEXTURE2);
-        }
-        int TextureMap2 = pConfig->GetTerrainTexture(2);
-        if (TextureMap2 != -1) {
-            Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
-            pTex2->Bind(GL_TEXTURE3);
-        }
-
-        m_terrainTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
-        m_terrainTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
-        m_terrainTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
-                                          pConfig->GetTerrainHighHeightPercent());
-        m_terrainTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
-        m_terrainTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
-        m_terrainTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
-        m_terrainTech.SetRenderMode(pConfig->GetTerrainRenderMode());
-        pTerrainGrid->Render();
+        RenderTerrain(pConfig);
     } else if (pConfig->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
     } else {
         printf("Warning! render list is empty and no main model or skybox\n");
     }
+}
+
+
+void ForwardRenderer::RenderTerrain(SceneConfig* pConfig)
+{
+    TerrainGrid* pTerrainGrid = (TerrainGrid*)pConfig->GetTerrainGrid();
+    m_terrainTech.Enable();
+    Matrix4f GlobalWorldRotation(m_pCurCamera->GetGlobalWorldRotation());
+    Matrix4f WVP = m_pCurCamera->GetMatrix() * GlobalWorldRotation;
+    m_terrainTech.SetWVP(WVP);
+    int HeightMap = pConfig->GetTerrainHeightMap();
+    if (HeightMap != -1) {
+        //m_terrainTech.SetProjectionMatrix(pConfig->GetProjectionMatrix());
+        Texture* pHeightMap = (Texture*)m_pRenderingSystemGL->GetTexture(HeightMap);
+        pHeightMap->Bind(GL_TEXTURE0);
+    }
+
+    int TextureMap0 = pConfig->GetTerrainTexture(0);
+    if (TextureMap0 != -1) {
+        Texture* pTex0 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap0);
+        pTex0->Bind(GL_TEXTURE1);
+    }
+    int TextureMap1 = pConfig->GetTerrainTexture(1);
+    if (TextureMap1 != -1) {
+        Texture* pTex1 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap1);
+        pTex1->Bind(GL_TEXTURE2);
+    }
+    int TextureMap2 = pConfig->GetTerrainTexture(2);
+    if (TextureMap2 != -1) {
+        Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
+        pTex2->Bind(GL_TEXTURE3);
+    }
+
+    m_terrainTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
+    m_terrainTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
+    m_terrainTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
+        pConfig->GetTerrainHighHeightPercent());
+    m_terrainTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
+    m_terrainTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
+    m_terrainTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
+    m_terrainTech.SetRenderMode(pConfig->GetTerrainRenderMode());
+    pTerrainGrid->Render();
 }
 
 
