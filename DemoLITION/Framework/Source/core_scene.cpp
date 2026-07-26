@@ -563,6 +563,17 @@ void CoreScene::TerrainGUI()
             ImGui::SliderFloat("Ambient Factor", &AmbientFactor, 0.0f, 1.0f);
             m_config.SetTerrainAmbientFactor(AmbientFactor);
 
+            ImGui::Text("Terrain Render Mode:");
+            TERRAIN_RENDER_MODE RenderMode = m_config.GetTerrainRenderMode();
+            ImGui::RadioButton("Full", (int*)&RenderMode, TERRAIN_RENDER_MODE_FULL);
+            ImGui::SameLine();
+            ImGui::RadioButton("Height", (int*)&RenderMode, TERRAIN_RENDER_MODE_HEIGHT);
+            ImGui::SameLine();
+            ImGui::RadioButton("Lighting only", (int*)&RenderMode, TERRAIN_RENDER_MODE_LIGHTING_ONLY);
+            ImGui::SameLine();
+            ImGui::RadioButton("Normals", (int*)&RenderMode, TERRAIN_RENDER_MODE_NORMALS);
+            m_config.SetTerrainRenderMode(RenderMode);
+
             ImGui::TreePop();
         }
     }

@@ -549,6 +549,7 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
         m_terrainTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
         m_terrainTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
         m_terrainTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
+        m_terrainTech.SetRenderMode(pConfig->GetTerrainRenderMode());
         pTerrainGrid->Render();
     } else if (pConfig->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);

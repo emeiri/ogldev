@@ -26,6 +26,7 @@
 class TerrainTechnique : public Technique
 {
 public:
+
     TerrainTechnique() {}
 
     virtual bool Init();
@@ -37,6 +38,7 @@ public:
     void SetSunlightDir(const Vector3f& SunlightDir);
     void SetAmbientLightFactor(float AmbientLightFactor);
     void SetTexTileSizeInWorldUnits(float TexTileSizeInWorldUnits);
+    void SetRenderMode(TERRAIN_RENDER_MODE RenderMode);
 
 private:
     bool InitCommon();
@@ -49,4 +51,5 @@ private:
     DEF_LOC(gSunlightDir);
     DEF_LOC(gAmbientFactor);
     DEF_LOC(gTexCoordScale);
+    DEF_LOC(gRenderMode);
 };

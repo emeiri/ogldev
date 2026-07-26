@@ -18,6 +18,12 @@
 
 #version 460 core
 
+#define TERRAIN_RENDER_MODE_FULL 0
+#define TERRAIN_RENDER_MODE_HEIGHT 1
+#define TERRAIN_RENDER_MODE_LIGHTING_ONLY 2
+#define TERRAIN_RENDER_MODE_NORMALS 3
+
+
 in vec3 WorldPos;
 in vec3 Normal;
 
@@ -33,6 +39,7 @@ uniform float gHighHeightPercent = 0.75;
 uniform vec3 gSunlightDir = normalize(vec3(0.0, 1.0, 0.0)); 
 uniform float gAmbientFactor = 0.2f;
 uniform float gTexCoordScale = 1.0/20.0;
+uniform int gRenderMode = TERRAIN_RENDER_MODE_FULL;
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal) 
 {
@@ -79,8 +86,18 @@ void main()
     float DiffuseFactor = max(dot(N, gSunlightDir), 0.0);
     float LightingFactor = min(gAmbientFactor + DiffuseFactor, 1.0);
 
-    // Final color multiplication
-    FragColor = vec4(FinalColor.rgb * LightingFactor, 1.0);
-
-   //FragColor = vec4(vec3(WorldPos.y / gMaxTerrainHeight.0), 1.0);   
+    switch (gRenderMode) {
+        case TERRAIN_RENDER_MODE_FULL:
+            FragColor = vec4(FinalColor.rgb * LightingFactor, 1.0);
+            break;
+        case TERRAIN_RENDER_MODE_HEIGHT:
+            FragColor = vec4(vec3(WorldPos.y / gMaxTerrainHeight), 1.0);
+            break;
+        case TERRAIN_RENDER_MODE_LIGHTING_ONLY:
+            FragColor = vec4(vec3(LightingFactor), 1.0);
+            break;
+        case TERRAIN_RENDER_MODE_NORMALS:
+            FragColor = vec4(N * 0.5 + 0.5, 1.0);
+            break;
+    }
 }

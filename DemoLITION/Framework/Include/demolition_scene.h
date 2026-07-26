@@ -129,6 +129,14 @@ enum RENDER_MODE {
 };
 
 
+enum TERRAIN_RENDER_MODE {
+    TERRAIN_RENDER_MODE_FULL = 0,
+    TERRAIN_RENDER_MODE_HEIGHT = 1,
+    TERRAIN_RENDER_MODE_LIGHTING_ONLY = 2,
+    TERRAIN_RENDER_MODE_NORMALS = 3,
+};
+
+
 struct ModelLoadFlags {
     bool ConvertToLeftHanded = false;
 };
@@ -276,6 +284,9 @@ public:
     void SetTerrainTexTileSizeInWorldUnits(float Size) { m_terrain.m_texTileSizeInWorldUnits = Size; }
     float GetTerrainTexTileSizeInWorldUnits() const { return m_terrain.m_texTileSizeInWorldUnits; }
 
+    void SetTerrainRenderMode(TERRAIN_RENDER_MODE Mode) { m_terrainRenderMode = Mode; }
+    TERRAIN_RENDER_MODE GetTerrainRenderMode() const { return m_terrainRenderMode; }
+
     Texture* pBRDF_LUT = NULL;      // TODO: should be in the material - for some reason crashes...
 
 private:
@@ -322,6 +333,7 @@ private:
         glm::vec3 m_sunlightDir = glm::vec3(0.0f, 1.0f, 0.0f);
         float m_ambientFactor = 0.2f;
     } m_terrain;
+    TERRAIN_RENDER_MODE m_terrainRenderMode = TERRAIN_RENDER_MODE_FULL;
 };
 
 

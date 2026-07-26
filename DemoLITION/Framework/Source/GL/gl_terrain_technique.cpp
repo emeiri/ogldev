@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include "demolition_scene.h"
 #include "GL/gl_terrain_technique.h"
 
 
@@ -52,6 +52,7 @@ bool TerrainTechnique::InitCommon()
     GET_UNIFORM(gSunlightDir);
     GET_UNIFORM(gAmbientFactor);
     GET_UNIFORM(gTexCoordScale);
+    GET_UNIFORM(gRenderMode);
 
     return true;
 }
@@ -100,3 +101,8 @@ void TerrainTechnique::SetTexTileSizeInWorldUnits(float TexTileSizeInWorldUnits)
     glUniform1f(m_gTexCoordScaleLoc, 1.0f / TexTileSizeInWorldUnits);
 }
 
+
+void TerrainTechnique::SetRenderMode(TERRAIN_RENDER_MODE RenderMode)
+{
+    glUniform1i(m_gRenderModeLoc, RenderMode);
+}
