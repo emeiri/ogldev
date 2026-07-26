@@ -527,7 +527,7 @@ void CoreScene::TerrainGUI()
     if (m_config.GetTerrainGrid()) {
         if (ImGui::TreeNode("Terrain")) {
             float MaxHeight = m_config.GetTerrainMaxHeight();
-            ImGui::SliderFloat("Max Height", &MaxHeight, 1.0f, 1000.0f);
+            ImGui::SliderFloat("Max Height", &MaxHeight, 0.0f, 1000.0f);
             m_config.SetTerrainMaxHeight(MaxHeight);
 
             float TexTileSizeInWorldUnits = m_config.GetTerrainTexTileSizeInWorldUnits();
