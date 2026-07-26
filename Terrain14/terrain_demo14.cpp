@@ -104,7 +104,7 @@ public:
 
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
-        m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
+        m_pScene->SetClearColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
 
         SceneConfig* pConfig = m_pScene->GetConfig();
         pConfig->ControlShadowMapping(false);
