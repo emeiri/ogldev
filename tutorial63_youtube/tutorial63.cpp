@@ -53,7 +53,7 @@ public:
         m_pointLight.Attenuation.Constant = 0.1f;
         m_pointLight.Attenuation.Linear = 0.01f;
         m_pointLight.Attenuation.Exp = 0.001f;
-        m_pointLight.WorldPosition = Vector3f(0.0f, 0.5f, -1.6f);
+        m_pointLight.WorldPosition = Vector3f(0.0f, 2.0f, -1.6f);
     }
 
     ~HDRToneMapping() {}
@@ -100,10 +100,6 @@ public:
         m_pLightObject->SetScale(1.0f);
         m_pScene->AddToRenderList(m_pLightObject);
 
-      //  m_pBallObject = m_pScene->CreateSceneObject(pSphere);
-       // m_pBallObject->SetScale(0.1f);
-      //  m_pScene->AddToRenderList(m_pBallObject);        
-
         m_pRenderingSystem->Execute();
     }
 
@@ -129,22 +125,9 @@ public:
             }
         }
 
-      //  m_pSceneObject->RotateBy(0.0f, 0.1f, 0.0f);
-        //m_pSceneObject->ResetRotations();
-      //  m_pSceneObject->PushRotation(Vector3f(180.0f, 0.0f, 0.0f));
-     //   m_pSceneObject->PushRotation(Vector3f(0.0f, 0.0f, m_count));
-
-        //m_pScene->GetPointLights()[0].WorldPosition.x = sinf(m_count);
         m_pScene->GetPointLights()[0].WorldPosition.x = (cosf(m_count) + 1.0f) * 65.0f - 60.0f; // sponza
-
         const Vector3f& LightPos = m_pScene->GetPointLights()[0].WorldPosition;
-        m_pLightObject->SetPosition(LightPos.x, -LightPos.y, -LightPos.z);
-        //m_pBallObject->SetPosition(m_pScene->GetPointLights()[0].WorldPosition);
-
-        //Vector3f LightPos = Vector3f(sinf(m_count) * 0.75f, 0.0f, cosf(m_count) * 0.75f);        
-            //m_pScene->GetPointLights()[0].WorldPosition = LightPos;
-       // 
-       // m_pBallObject->SetPosition(LightPos.x, LightPos.y, LightPos.z * -1.0f);
+        m_pLightObject->SetPosition(LightPos);
     }
 
 
