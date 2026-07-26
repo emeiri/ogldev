@@ -310,7 +310,7 @@ void ForwardRenderer::InitTechniques()
         exit(1);
     }
 
-    if (!m_heightmapTech.Init()) {
+    if (!m_terrainTech.Init()) {
         printf("Error initializing the heightmap technique\n");
         exit(1);
     }   
@@ -516,12 +516,12 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
     // TODO: duplicate code with the one in LightingPass, can be refactored
     else if (pConfig->GetTerrainGrid()) {
         TerrainGrid* pTerrainGrid = (TerrainGrid*)pConfig->GetTerrainGrid();
-        m_heightmapTech.Enable();
+        m_terrainTech.Enable();
         Matrix4f WVP = m_pCurCamera->GetMatrix();
-        m_heightmapTech.SetWVP(WVP);
+        m_terrainTech.SetWVP(WVP);
         int HeightMap = pConfig->GetTerrainHeightMap();
         if (HeightMap != -1) {
-            //m_heightmapTech.SetProjectionMatrix(pConfig->GetProjectionMatrix());
+            //m_terrainTech.SetProjectionMatrix(pConfig->GetProjectionMatrix());
             Texture* pHeightMap = (Texture*)m_pRenderingSystemGL->GetTexture(HeightMap);
             pHeightMap->Bind(GL_TEXTURE0);
         }
@@ -542,13 +542,13 @@ void ForwardRenderer::HandleEmptyRenderList(GLScene* pScene)
             pTex2->Bind(GL_TEXTURE3);
         }
 
-        m_heightmapTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
-        m_heightmapTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
-        m_heightmapTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
+        m_terrainTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
+        m_terrainTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
+        m_terrainTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
                                           pConfig->GetTerrainHighHeightPercent());
-        m_heightmapTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
-        m_heightmapTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
-        m_heightmapTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
+        m_terrainTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
+        m_terrainTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
+        m_terrainTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
         pTerrainGrid->Render();
     } else if (pConfig->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);
@@ -926,7 +926,7 @@ void ForwardRenderer::LightingPass(GLScene* pScene, double TotalRuntime)
     // TODO: duplicate code
     if (pScene->GetConfig()->GetTerrainGrid()) {
         TerrainGrid* pTerrainGrid = (TerrainGrid*)pScene->GetConfig()->GetTerrainGrid();
-        m_heightmapTech.Enable();
+        m_terrainTech.Enable();
         pTerrainGrid->Render();
     } else if (pScene->GetConfig()->GetInfiniteGrid().Enabled) {
         RenderInfiniteGrid(pScene);

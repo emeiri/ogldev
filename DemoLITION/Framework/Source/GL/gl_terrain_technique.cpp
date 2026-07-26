@@ -17,20 +17,20 @@
 */
 
 
-#include "GL/gl_heightmap_technique.h"
+#include "GL/gl_terrain_technique.h"
 
 
-bool HeightmapTechnique::Init()
+bool TerrainTechnique::Init()
 {
     if (!Technique::Init()) {
         return false;
     }
 
-    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/heightmap.vs")) {
+    if (!AddShader(GL_VERTEX_SHADER, "Framework/Shaders/GL/terrain.vs")) {
         return false;
     }
 
-    if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/heightmap.fs")) {
+    if (!AddShader(GL_FRAGMENT_SHADER, "Framework/Shaders/GL/terrain.fs")) {
         return false;
     }
 
@@ -42,7 +42,7 @@ bool HeightmapTechnique::Init()
 }
 
 
-bool HeightmapTechnique::InitCommon()
+bool TerrainTechnique::InitCommon()
 {
     GET_UNIFORM(gWVP);
     GET_UNIFORM(gMaxTerrainHeight);
@@ -57,45 +57,45 @@ bool HeightmapTechnique::InitCommon()
 }
 
 
-void HeightmapTechnique::SetWVP(const Matrix4f& WVP)
+void TerrainTechnique::SetWVP(const Matrix4f& WVP)
 {
     glUniformMatrix4fv(m_gWVPLoc, 1, GL_TRUE, (const GLfloat*)WVP.m);
 }
 
 
-void HeightmapTechnique::SetMaxTerrainHeight(float MaxHeight)
+void TerrainTechnique::SetMaxTerrainHeight(float MaxHeight)
 {
     glUniform1f(m_gMaxTerrainHeightLoc, MaxHeight);
 }
 
 
-void HeightmapTechnique::SetHorizontalScale(float HorizontalScale)
+void TerrainTechnique::SetHorizontalScale(float HorizontalScale)
 {
     glUniform1f(m_gHorizontalScaleLoc, HorizontalScale);
 }
 
 
-void HeightmapTechnique::SetHeightPercents(float LowPercent, float HighPercent)
+void TerrainTechnique::SetHeightPercents(float LowPercent, float HighPercent)
 {
     glUniform1f(m_gLowHeightPercentLoc, LowPercent);
     glUniform1f(m_gHighHeightPercentLoc, HighPercent);
 }
 
 
-void HeightmapTechnique::SetSunlightDir(const Vector3f& SunlightDir)
+void TerrainTechnique::SetSunlightDir(const Vector3f& SunlightDir)
 {
     // Flipping the Z is a hack - ImGui uses a right handed system
     glUniform3f(m_gSunlightDirLoc, SunlightDir.x, SunlightDir.y, -SunlightDir.z);
 }
 
 
-void HeightmapTechnique::SetAmbientLightFactor(float AmbientLightFactor)
+void TerrainTechnique::SetAmbientLightFactor(float AmbientLightFactor)
 {
     glUniform1f(m_gAmbientFactorLoc, AmbientLightFactor);
 }
 
 
-void HeightmapTechnique::SetTexTileSizeInWorldUnits(float TexTileSizeInWorldUnits)
+void TerrainTechnique::SetTexTileSizeInWorldUnits(float TexTileSizeInWorldUnits)
 {
     glUniform1f(m_gTexCoordScaleLoc, 1.0f / TexTileSizeInWorldUnits);
 }

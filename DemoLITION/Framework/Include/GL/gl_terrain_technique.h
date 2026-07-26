@@ -23,10 +23,10 @@
 #include "technique.h"
 
 
-class HeightmapTechnique : public Technique
+class TerrainTechnique : public Technique
 {
 public:
-    HeightmapTechnique() {}
+    TerrainTechnique() {}
 
     virtual bool Init();
 

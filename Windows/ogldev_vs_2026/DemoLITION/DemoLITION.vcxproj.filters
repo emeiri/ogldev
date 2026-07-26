@@ -169,7 +169,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_blur_filter2_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_heightmap_technique.cpp">
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_terrain_technique.cpp">
       <Filter>Source\GL\Techniques</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\perlin.cpp">
@@ -360,7 +360,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_keys.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_heightmap_technique.h">
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\GL\gl_terrain_technique.h">
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\perlin.h">
@@ -496,10 +496,10 @@
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\tone_map_with_bloom.fs">
       <Filter>Shaders\GL</Filter>
     </None>
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\heightmap.vs">
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\terrain.vs">
       <Filter>Shaders\GL</Filter>
     </None>
-    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\heightmap.fs">
+    <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\terrain.fs">
       <Filter>Shaders\GL</Filter>
     </None>
   </ItemGroup>
