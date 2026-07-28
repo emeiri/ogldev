@@ -19,7 +19,7 @@
 
 #version 460 core
 
-layout (location = 0) in vec3 aPos;       
+layout (location = 0) in vec2 aPos;       
 layout (location = 1) in vec2 aTexCoords; 
 
 out vec3 WorldPos;
@@ -38,7 +38,7 @@ void main()
     float HeightSample = texture(gHeightMap, aTexCoords).r;
 
     // Displace the vertex position vertically in metric space
-    vec3 DisplacedPos = aPos;
+    vec3 DisplacedPos = vec3(aPos.x, 0.0, aPos.y);
     DisplacedPos.x *= gHorizontalScale;
     DisplacedPos.y = HeightSample * gMaxTerrainHeight;
     OrigHeight = HeightSample;

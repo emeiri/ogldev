@@ -427,7 +427,7 @@ void RenderingSystemGL::GetMousePos(void* pWindow, int& x, int& y)
 }
 
 struct TerrainVertex {
-    glm::vec3 position;  // Maps to layout(location = 0) -> (col, 0.0f, row)
+    glm::vec2 position;  // Maps to layout(location = 0) -> (col, 0.0f, row)
     glm::vec2 texCoords; // Maps to layout(location = 1) -> (u, v)
 };
 
@@ -449,8 +449,7 @@ void* RenderingSystemGL::CreateTerrainGrid(int Width, int Height)
 
             // X and Z represent meters. Y is kept flat for the shader to displace.
             vertex.position.x = BaseCol + (float)(col);
-            vertex.position.y = 0.0f;
-            vertex.position.z = BaseRow + (float)(row);
+            vertex.position.y = BaseRow + (float)(row);
 
             // Normalize UV coordinates linearly from 0.0 to 1.0
             vertex.texCoords.x = (float)(col) / (float)(Width - 1);
@@ -496,9 +495,9 @@ void* RenderingSystemGL::CreateTerrainGrid(int Width, int Height)
     glVertexArrayVertexBuffer(pGrid->m_vao, 0, pGrid->m_vbo, 0, sizeof(TerrainVertex));
     glVertexArrayElementBuffer(pGrid->m_vao, pGrid->m_ebo);
 
-    // Attribute 0: Position Vector (vec3)
+    // Attribute 0: Position Vector (vec2)
     glEnableVertexArrayAttrib(pGrid->m_vao, 0);
-    glVertexArrayAttribFormat(pGrid->m_vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(TerrainVertex, position));
+    glVertexArrayAttribFormat(pGrid->m_vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(TerrainVertex, position));
     glVertexArrayAttribBinding(pGrid->m_vao, 0, 0);
 
     // Attribute 1: Texture UV Coordinates (vec2)
