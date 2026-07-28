@@ -226,6 +226,7 @@
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_rendering_system.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Int\core_scene.h" />
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\perlin.h" />
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\terrain_grid.h" />
     <ClInclude Include="..\..\..\Include\ogldev_framebuffer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -287,6 +288,7 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\gl_tone_map_technique.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\GL\grid.cpp" />
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\perlin.cpp" />
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\terrain_grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\DemoLITION\Framework\Shaders\GL\blur_filter1.fs" />

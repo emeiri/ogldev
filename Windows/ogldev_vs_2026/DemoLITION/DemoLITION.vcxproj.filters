@@ -175,6 +175,9 @@
     <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\perlin.cpp">
       <Filter>Source\Services</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DemoLITION\Framework\Source\Services\terrain_grid.cpp">
+      <Filter>Source\Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\demolition_scene.h">
@@ -364,6 +367,9 @@
       <Filter>Include\GL\Techniques</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\perlin.h">
+      <Filter>Include\Services</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DemoLITION\Framework\Include\Services\terrain_grid.h">
       <Filter>Include\Services</Filter>
     </ClInclude>
   </ItemGroup>

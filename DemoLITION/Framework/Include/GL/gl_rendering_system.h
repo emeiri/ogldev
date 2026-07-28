@@ -31,15 +31,16 @@
 class TerrainGrid
 {
 public:
-    TerrainGrid() {}
+    TerrainGrid(u32 IndexCount) : m_indexCount(IndexCount) {}
 
     void Render();
 
     GLuint m_vao = 0;
     GLuint m_vbo;
-    GLuint m_ebo;
+    GLuint m_ibo;
     u32 m_indexCount;
 };
+
 
 class RenderingSystemGL : public CoreRenderingSystem
 {

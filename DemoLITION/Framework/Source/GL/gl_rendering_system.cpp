@@ -25,6 +25,7 @@
 #include "ogldev_basic_glfw_camera.h"
 #include "ogldev_glfw.h"
 #include "ogldev_cubemap_texture.h"
+#include "Services/terrain_grid.h"
 #include "GL/gl_rendering_system.h"
 #include "GL/gl_grid.h"
 #include "GL/gl_model.h"
@@ -426,74 +427,25 @@ void RenderingSystemGL::GetMousePos(void* pWindow, int& x, int& y)
     y = (int)MousePosY;
 }
 
-struct TerrainVertex {
-    glm::vec2 position;  // Maps to layout(location = 0) -> (col, 0.0f, row)
-    glm::vec2 texCoords; // Maps to layout(location = 1) -> (u, v)
-};
-
 
 void* RenderingSystemGL::CreateTerrainGrid(int Width, int Height)
 {
-    std::vector<TerrainVertex> vertices;
-    std::vector<u32> indices;
+    std::vector<TerrainVertex> Vertices;
+    std::vector<u32> Indices;
 
-    TerrainGrid* pGrid = new TerrainGrid();
+    CreateTerrainGridVectors(Width, Height, Vertices, Indices);
 
-    float BaseCol = -Width / 2.0f;
-    float BaseRow = -Height / 2.0f;
+    TerrainGrid* pGrid = new TerrainGrid((u32)Indices.size());
 
-    // 1. Generate Vertex Buffer Data
-    for (int row = 0; row < Height; ++row) {
-        for (int col = 0; col < Width; ++col) {
-            TerrainVertex vertex;
-
-            // X and Z represent meters. Y is kept flat for the shader to displace.
-            vertex.position.x = BaseCol + (float)(col);
-            vertex.position.y = BaseRow + (float)(row);
-
-            // Normalize UV coordinates linearly from 0.0 to 1.0
-            vertex.texCoords.x = (float)(col) / (float)(Width - 1);
-            vertex.texCoords.y = (float)(row) / (float)(Height - 1);
-
-            vertices.push_back(vertex);
-        }
-    }
-
-    // 2. Generate Index Buffer Data (Stitching quads together into triangles)
-    for (int row = 0; row < Height - 1; ++row) {
-        for (int col = 0; col < Width - 1; ++col) {
-            // Find index pointers for the 4 corners of the current quad
-            u32 topLeft = row * Width + col;
-            u32 topRight = topLeft + 1;
-            u32 bottomLeft = (row + 1) * Width + col;
-            u32 bottomRight = bottomLeft + 1;
-
-            // Triangle 1
-            indices.push_back(topLeft);
-            indices.push_back(bottomLeft);
-            indices.push_back(topRight);
-
-            // Triangle 2
-            indices.push_back(topRight);
-            indices.push_back(bottomLeft);
-            indices.push_back(bottomRight);
-        }
-    }
-
-    pGrid->m_indexCount = (u32)(indices.size());
-
-    // 3. Create GPU buffers utilizing modern OpenGL 4.6 DSA layout structures
     glCreateVertexArrays(1, &pGrid->m_vao);
     glCreateBuffers(1, &pGrid->m_vbo);
-    glCreateBuffers(1, &pGrid->m_ebo);
+    glCreateBuffers(1, &pGrid->m_ibo);
 
-    // Allocate immutable memory banks directly onto the graphics card hardware
-    glNamedBufferStorage(pGrid->m_vbo, vertices.size() * sizeof(TerrainVertex), vertices.data(), 0);
-    glNamedBufferStorage(pGrid->m_ebo, indices.size() * sizeof(u32), indices.data(), 0);
+    glNamedBufferStorage(pGrid->m_vbo, Vertices.size() * sizeof(TerrainVertex), Vertices.data(), 0);
+    glNamedBufferStorage(pGrid->m_ibo, Indices.size() * sizeof(u32), Indices.data(), 0);
 
-    // 4. Set up VAO bindings and formatting descriptions natively without binding the state machine
     glVertexArrayVertexBuffer(pGrid->m_vao, 0, pGrid->m_vbo, 0, sizeof(TerrainVertex));
-    glVertexArrayElementBuffer(pGrid->m_vao, pGrid->m_ebo);
+    glVertexArrayElementBuffer(pGrid->m_vao, pGrid->m_ibo);
 
     // Attribute 0: Position Vector (vec2)
     glEnableVertexArrayAttrib(pGrid->m_vao, 0);
