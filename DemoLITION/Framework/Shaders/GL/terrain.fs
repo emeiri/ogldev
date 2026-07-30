@@ -47,27 +47,47 @@ uniform int gRenderMode = TERRAIN_RENDER_MODE_FULL;
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal) 
 {
-    // 1. Calculate ultra-sharp blending weights
     vec3 blend = abs(normal);
     blend = pow(blend, vec3(24.0)); 
     blend /= (blend.x + blend.y + blend.z);
 
-    // 2. Clear, proper multi-axis projection planes
+    // 1. Close-up detailed coordinates
     vec2 uvX = worldPos.zy * gTriplanarScale;
     vec2 uvY = worldPos.xz * gTriplanarScale;
     vec2 uvZ = worldPos.xy * gTriplanarScale;
 
+    // 2. Large distance variation coordinates (10x larger tiling)
+    float macroScale = gTriplanarScale * 0.1;
+    vec2 macroUVX = worldPos.zy * macroScale;
+    vec2 macroUVY = worldPos.xz * macroScale;
+    vec2 macroUVZ = worldPos.xy * macroScale;
+
+    // 3. Screen derivatives for both detail resolutions
     vec2 dx_uvX = dFdx(uvX); vec2 dy_uvX = dFdy(uvX);
     vec2 dx_uvY = dFdx(uvY); vec2 dy_uvY = dFdy(uvY);
     vec2 dx_uvZ = dFdx(uvZ); vec2 dy_uvZ = dFdy(uvZ);
 
+    vec2 dx_mX = dFdx(macroUVX); vec2 dy_mX = dFdy(macroUVX);
+    vec2 dx_mY = dFdx(macroUVY); vec2 dy_mY = dFdy(macroUVY);
+    vec2 dx_mZ = dFdx(macroUVZ); vec2 dy_mZ = dFdy(macroUVZ);
+
     float biasFactor = 0.25;
 
-    vec4 xProj = textureGrad(tex, uvX, dx_uvX * biasFactor, dy_uvX * biasFactor);
-    vec4 yProj = textureGrad(tex, uvY, dx_uvY * biasFactor, dy_uvY * biasFactor);
-    vec4 zProj = textureGrad(tex, uvZ, dx_uvZ * biasFactor, dy_uvZ * biasFactor);
+    // 4. Sample micro pass
+    vec4 xMicro = textureGrad(tex, uvX, dx_uvX * biasFactor, dy_uvX * biasFactor);
+    vec4 yMicro = textureGrad(tex, uvY, dx_uvY * biasFactor, dy_uvY * biasFactor);
+    vec4 zMicro = textureGrad(tex, uvZ, dx_uvZ * biasFactor, dy_uvZ * biasFactor);
+    vec4 microColor = (xMicro * blend.x) + (yMicro * blend.y) + (zMicro * blend.z);
 
-    return (xProj * blend.x) + (yProj * blend.y) + (zProj * blend.z);
+    // 5. Sample macro pass
+    vec4 xMacro = textureGrad(tex, macroUVX, dx_mX * biasFactor, dy_mX * biasFactor);
+    vec4 yMacro = textureGrad(tex, macroUVY, dx_mY * biasFactor, dy_mY * biasFactor);
+    vec4 zMacro = textureGrad(tex, macroUVZ, dx_mZ * biasFactor, dy_mZ * biasFactor);
+    vec4 macroColor = (xMacro * blend.x) + (yMacro * blend.y) + (zMacro * blend.z);
+
+    // 6. FIX: Use a balanced mix ratio instead of math multiplication.
+    // 0.5 means a smooth 50/50 blend which destroys tiling without changing base lumonosity.
+    return mix(microColor, macroColor, 0.5);
 }
 
 
