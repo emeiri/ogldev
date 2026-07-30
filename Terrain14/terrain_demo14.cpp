@@ -83,6 +83,7 @@ public:
     }
 
     ~Terrain14() {}
+
     void Start()
     {
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
