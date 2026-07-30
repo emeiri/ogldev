@@ -325,7 +325,7 @@ private:
     struct {
         void* pGrid = NULL;
         int m_heightMap = -1;
-        int m_textures[3] = {-1, -1, -1};
+        int m_textures[4] = {-1, -1, -1, -1};
         float m_maxHeight = 100.0f;
         float m_texTileSizeInWorldUnits = 20.0f;
         float m_horizontalScale = 1.0f;

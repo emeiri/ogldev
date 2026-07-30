@@ -101,6 +101,7 @@ public:
 
         int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
         int GrassTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/rocky_terrain_02_diff_2k.jpg");
+        int RockTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/aerial_rocks_01_diff_2k.jpg");
         int SnowTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/snow_03_diff_2k.jpg");
 
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
@@ -115,7 +116,8 @@ public:
         pConfig->SetTerrainMaxHeight(m_terrainConfig.maxHeight);
         pConfig->SetTerrainTexture(0, SandTexture);
         pConfig->SetTerrainTexture(1, GrassTexture);
-        pConfig->SetTerrainTexture(2, SnowTexture);
+        pConfig->SetTerrainTexture(2, RockTexture);
+        pConfig->SetTerrainTexture(3, SnowTexture);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
@@ -135,7 +137,12 @@ public:
             CameraY = 650.0f;
         }
 
-        m_pScene->SetCamera(Vector3f(CameraX, CameraY, CameraZ), Vector3f(0.0f, -0.1f, 1.0f));
+        CameraX = -4.128759f;
+        CameraY = 83.083961f;
+        CameraZ = -275.711121f;
+        Vector3f Target(-0.015322f, -0.195621f, 0.980560f);
+
+        m_pScene->SetCamera(Vector3f(CameraX, CameraY, CameraZ), Target);
         m_pScene->SetCameraZRange(0.5f, 8000.0f);
         
         m_pRenderingSystem->Execute();

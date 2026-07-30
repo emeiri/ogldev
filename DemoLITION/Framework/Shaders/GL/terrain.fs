@@ -31,9 +31,11 @@ in float OrigHeight;
 
 layout(location = 0) out vec4 FragColor;
 
-layout (binding = 1) uniform sampler2D gTexture0;
-layout (binding = 2) uniform sampler2D gTexture1;
-layout (binding = 3) uniform sampler2D gTexture2;
+
+layout (binding = 1) uniform sampler2D gTexture0; // Sand
+layout (binding = 2) uniform sampler2D gTexture1; // Grass
+layout (binding = 3) uniform sampler2D gTexture2; // Pure Rock (Cliffs)
+layout (binding = 4) uniform sampler2D gTexture3; // Pure Snow (Peaks)
 
 uniform float gMaxTerrainHeight = 100.0f;
 uniform float gLowHeightPercent = 0.25;
@@ -41,7 +43,6 @@ uniform float gHighHeightPercent = 0.75;
 uniform vec3 gSunlightDir = normalize(vec3(0.0, 1.0, 0.0)); 
 uniform float gAmbientFactor = 0.2f;
 uniform float gTriplanarScale = 1.0 / 20.0; 
-
 uniform int gRenderMode = TERRAIN_RENDER_MODE_FULL;
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal) 
@@ -56,21 +57,19 @@ vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal)
     vec2 uvY = worldPos.xz * gTriplanarScale;
     vec2 uvZ = worldPos.xy * gTriplanarScale;
 
-    // 3. Calculate explicit screen-space derivatives based on the projection vectors
     vec2 dx_uvX = dFdx(uvX); vec2 dy_uvX = dFdy(uvX);
     vec2 dx_uvY = dFdx(uvY); vec2 dy_uvY = dFdy(uvY);
     vec2 dx_uvZ = dFdx(uvZ); vec2 dy_uvZ = dFdy(uvZ);
 
-    // 4. Mipmap sharpening bias factor
     float biasFactor = 0.25;
 
-    // 5. High-fidelity hardware gradient sampling
     vec4 xProj = textureGrad(tex, uvX, dx_uvX * biasFactor, dy_uvX * biasFactor);
     vec4 yProj = textureGrad(tex, uvY, dx_uvY * biasFactor, dy_uvY * biasFactor);
     vec4 zProj = textureGrad(tex, uvZ, dx_uvZ * biasFactor, dy_uvZ * biasFactor);
 
     return (xProj * blend.x) + (yProj * blend.y) + (zProj * blend.z);
 }
+
 
 void main()
 {
@@ -79,26 +78,37 @@ void main()
 
     vec3 N = normalize(Normal);
     
+    // 2. Clear Slope Mask (N.y is 1.0 when completely flat)
+    float IsFlatGround = smoothstep(0.68, 0.85, N.y); 
     float LowMask    = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
     float HighMask   = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
 
     vec4 LowColor;
-    vec4 MidColor;
-    vec4 HighColor;
+    vec4 MidColor;   // Grass
+    vec4 RockColor;  // Dedicated Rock
+    vec4 SnowColor;  // Dedicated Snow
 
-    // Clean, original height distribution logic (No rogue snow textures)
     if (gRenderMode == TERRAIN_RENDER_MODE_SIMPLE_TEXCOORDS) {
         LowColor  = texture(gTexture0, TexCoords);
         MidColor  = texture(gTexture1, TexCoords);
-        HighColor = texture(gTexture2, TexCoords);
+        RockColor = texture(gTexture2, TexCoords);
+        SnowColor = texture(gTexture3, TexCoords);
     } else {
         LowColor  = SampleTriplanar(gTexture0, WorldPos, N);
         MidColor  = SampleTriplanar(gTexture1, WorldPos, N);
-        HighColor = SampleTriplanar(gTexture2, WorldPos, N);
+        RockColor = SampleTriplanar(gTexture2, WorldPos, N);
+        SnowColor = SampleTriplanar(gTexture3, WorldPos, N);
     }
 
-    vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
-    vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);
+    // 3. CLEAN BIOME BLENDING
+    // Step A: In the middle elevation, blend between Grass and Rock based entirely on slope steepness
+    vec4 SlopedMidColor = mix(RockColor, MidColor, IsFlatGround);
+
+    // Step B: Layer sand onto low elevation valleys
+    vec4 LowAndMid = mix(LowColor, SlopedMidColor, LowMask);
+    
+    // Step C: Layer pure white snow onto mountain peaks safely
+    vec4 FinalColor = mix(LowAndMid, SnowColor, HighMask);
 
     float DiffuseFactor = max(dot(N, gSunlightDir), 0.0);
     float LightingFactor = min(gAmbientFactor + DiffuseFactor, 1.0);

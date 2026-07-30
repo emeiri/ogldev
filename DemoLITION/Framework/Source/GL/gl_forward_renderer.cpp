@@ -553,6 +553,11 @@ void ForwardRenderer::RenderTerrain(SceneConfig* pConfig)
         Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
         pTex2->Bind(GL_TEXTURE3);
     }
+    int TextureMap3 = pConfig->GetTerrainTexture(3);
+    if (TextureMap3 != -1) {
+        Texture* pTex3 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap3);
+        pTex3->Bind(GL_TEXTURE4);
+    }
 
     m_terrainTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
     m_terrainTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
