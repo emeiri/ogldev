@@ -264,6 +264,8 @@ public:
         }
     }
 
+    int GetTerrainTextureCount() const { return ARRAY_SIZE_IN_ELEMENTS(m_terrain.m_textures); }
+
     void SetTerrainMaxHeight(float MaxHeight) { m_terrain.m_maxHeight = MaxHeight; }
     float GetTerrainMaxHeight() const { return m_terrain.m_maxHeight; }
 

@@ -538,31 +538,18 @@ void ForwardRenderer::RenderTerrain(SceneConfig* pConfig)
         pHeightMap->Bind(GL_TEXTURE0);
     }
 
-    int TextureMap0 = pConfig->GetTerrainTexture(0);
-    if (TextureMap0 != -1) {
-        Texture* pTex0 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap0);
-        pTex0->Bind(GL_TEXTURE1);
-    }
-    int TextureMap1 = pConfig->GetTerrainTexture(1);
-    if (TextureMap1 != -1) {
-        Texture* pTex1 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap1);
-        pTex1->Bind(GL_TEXTURE2);
-    }
-    int TextureMap2 = pConfig->GetTerrainTexture(2);
-    if (TextureMap2 != -1) {
-        Texture* pTex2 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap2);
-        pTex2->Bind(GL_TEXTURE3);
-    }
-    int TextureMap3 = pConfig->GetTerrainTexture(3);
-    if (TextureMap3 != -1) {
-        Texture* pTex3 = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap3);
-        pTex3->Bind(GL_TEXTURE4);
+    for (int i = 0; i < pConfig->GetTerrainTextureCount(); i++) {
+        int TextureMap = pConfig->GetTerrainTexture(i);
+        if (TextureMap != -1) {
+            Texture* pTex = (Texture*)m_pRenderingSystemGL->GetTexture(TextureMap);
+            pTex->Bind(GL_TEXTURE1 + i);
+        }
     }
 
     m_terrainTech.SetMaxTerrainHeight(pConfig->GetTerrainMaxHeight());
     m_terrainTech.SetHorizontalScale(pConfig->GetTerrainHorizontalScale());
     m_terrainTech.SetHeightPercents(pConfig->GetTerrainLowHeightPercent(),
-        pConfig->GetTerrainHighHeightPercent());
+                                    pConfig->GetTerrainHighHeightPercent());
     m_terrainTech.SetSunlightDir(pConfig->GetTerrainSunlightDir());
     m_terrainTech.SetAmbientLightFactor(pConfig->GetTerrainAmbientFactor());
     m_terrainTech.SetTexTileSizeInWorldUnits(pConfig->GetTerrainTexTileSizeInWorldUnits());
