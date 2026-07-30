@@ -23,6 +23,7 @@ layout (location = 0) in vec2 aPos;
 layout (location = 1) in vec2 aTexCoords; 
 
 out vec3 WorldPos;
+out vec2 TexCoords;
 out vec3 Normal;
 out float OrigHeight;
 
@@ -54,5 +55,6 @@ void main()
     //Normal = normalize(vec3((hL - hR) * 100.0, 1.0, (hD - hU) * 100.0));
 
     WorldPos = DisplacedPos;
+    TexCoords = aTexCoords;
     gl_Position = gWVP * vec4(DisplacedPos, 1.0);
 }

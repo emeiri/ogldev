@@ -572,6 +572,8 @@ void CoreScene::TerrainGUI()
             ImGui::RadioButton("Lighting only", (int*)&RenderMode, TERRAIN_RENDER_MODE_LIGHTING_ONLY);
             ImGui::SameLine();
             ImGui::RadioButton("Normals", (int*)&RenderMode, TERRAIN_RENDER_MODE_NORMALS);
+            ImGui::SameLine();
+            ImGui::RadioButton("Simple Tex Coords", (int*)&RenderMode, TERRAIN_RENDER_MODE_SIMPLE_TEXCOORDS);
             m_config.SetTerrainRenderMode(RenderMode);
 
             ImGui::TreePop();

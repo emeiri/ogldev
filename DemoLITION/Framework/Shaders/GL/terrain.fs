@@ -22,50 +22,64 @@
 #define TERRAIN_RENDER_MODE_HEIGHT 1
 #define TERRAIN_RENDER_MODE_LIGHTING_ONLY 2
 #define TERRAIN_RENDER_MODE_NORMALS 3
-
+#define TERRAIN_RENDER_MODE_SIMPLE_TEXCOORDS 4
 
 in vec3 WorldPos;
+in vec2 TexCoords;
 in vec3 Normal;
 in float OrigHeight;
 
 layout(location = 0) out vec4 FragColor;
 
-layout (binding = 1) uniform sampler2D gTexture0; // Low Elevation (e.g. Sand)
-layout (binding = 2) uniform sampler2D gTexture1; // Flat Ground / Mid Elevation (e.g. Grass)
-layout (binding = 3) uniform sampler2D gTexture2; // Steep Slopes / High Elevation (e.g. Rock)
+layout (binding = 1) uniform sampler2D gTexture0;
+layout (binding = 2) uniform sampler2D gTexture1;
+layout (binding = 3) uniform sampler2D gTexture2;
 
 uniform float gMaxTerrainHeight = 100.0f;
 uniform float gLowHeightPercent = 0.25;
 uniform float gHighHeightPercent = 0.75;
 uniform vec3 gSunlightDir = normalize(vec3(0.0, 1.0, 0.0)); 
 uniform float gAmbientFactor = 0.2f;
-uniform float gTexCoordScale = 1.0/20.0;
+uniform float gTriplanarScale = 0.2f; 
 uniform int gRenderMode = TERRAIN_RENDER_MODE_FULL;
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal) 
 {
-   // 1. Blend weights
+    // 1. Calculate weights
     vec3 blend = abs(normal);
-    blend = pow(blend, vec3(8.0));
+    blend = pow(blend, vec3(32.0));
     blend /= (blend.x + blend.y + blend.z);
 
-    // 2. SCALING: Multiply world position by scale factor BEFORE derivatives
-    vec3 scaledPos = worldPos * gTexCoordScale;
+    // 2. Scale world position
+    vec3 scaledPos = worldPos * gTriplanarScale;
 
-    // 3. DERIVATIVES: Calculate changes in world space 
-    // This gives the GPU the exact, smooth scale information it needs for mipmapping
-    vec3 dx = dFdx(scaledPos);
-    vec3 dy = dFdy(scaledPos);
+    // 3. Fix mirroring on negative axes by checking the normal's sign
+    vec3 axisSign = sign(normal);
+    vec2 uvX = vec2(scaledPos.z * axisSign.x, scaledPos.y);
+    vec2 uvY = vec2(scaledPos.x * axisSign.y, scaledPos.z);
+    vec2 uvZ = vec2(scaledPos.x * axisSign.z, scaledPos.y);
 
-    // 4. SAMPLING: Use textureGrad to pass the custom derivatives
-    vec4 xProj = textureGrad(tex, scaledPos.yz, dx.yz, dy.yz);
-    vec4 yProj = textureGrad(tex, scaledPos.zx, dx.zx, dy.zx);
-    vec4 zProj = textureGrad(tex, scaledPos.xy, dx.xy, dy.xy);
+    // 4. FIX: Calculate explicit derivatives that precisely match the projected UV maps
+    vec2 dx_uvX = dFdx(uvX);
+    vec2 dy_uvX = dFdy(uvX);
+    
+    vec2 dx_uvY = dFdx(uvY);
+    vec2 dy_uvY = dFdy(uvY);
+    
+    vec2 dx_uvZ = dFdx(uvZ);
+    vec2 dy_uvZ = dFdy(uvZ);
 
-    // 5. Blend
+    // 5. Sample using the correct explicitly paired derivatives
+       // 5. Force a sharper mipmap selection by scaling down the gradients
+    float biasFactor = 0.25; // Lower values = sharper textures
+    
+    vec4 xProj = textureGrad(tex, uvX, dx_uvX * biasFactor, dy_uvX * biasFactor);
+    vec4 yProj = textureGrad(tex, uvY, dx_uvY * biasFactor, dy_uvY * biasFactor);
+    vec4 zProj = textureGrad(tex, uvZ, dx_uvZ * biasFactor, dy_uvZ * biasFactor);
+
+    // 6. Blend together
     return xProj * blend.x + yProj * blend.y + zProj * blend.z;
 }
-
 
 void main()
 {
@@ -73,13 +87,24 @@ void main()
     float gHighHeight = gMaxTerrainHeight * gHighHeightPercent;
 
     vec3 N = normalize(Normal);
-    float SlopeFactor = smoothstep(0.65, 0.85, N.y); 
-    float LowMask = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
-    float HighMask = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
+    
+    float SlopeFactor = smoothstep(0.65, 0.85, N.y);
+    float LowMask    = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
+    float HighMask   = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
 
-    vec4 LowColor   = SampleTriplanar(gTexture0, WorldPos, N);
-    vec4 MidColor   = SampleTriplanar(gTexture1, WorldPos, N);
-    vec4 HighColor  = SampleTriplanar(gTexture2, WorldPos, N);
+    vec4 LowColor;
+    vec4 MidColor;
+    vec4 HighColor;
+
+    if (gRenderMode == TERRAIN_RENDER_MODE_SIMPLE_TEXCOORDS) {
+        LowColor  = texture(gTexture0, TexCoords);
+        MidColor  = texture(gTexture1, TexCoords);
+        HighColor = texture(gTexture2, TexCoords);
+    } else {
+        LowColor  = SampleTriplanar(gTexture0, WorldPos, N);
+        MidColor  = SampleTriplanar(gTexture1, WorldPos, N);
+        HighColor = SampleTriplanar(gTexture2, WorldPos, N);
+    }
 
     vec4 LowAndMid = mix(LowColor, MidColor, LowMask);
     vec4 FinalColor = mix(LowAndMid, HighColor, HighMask);
@@ -89,6 +114,7 @@ void main()
 
     switch (gRenderMode) {
         case TERRAIN_RENDER_MODE_FULL:
+        case TERRAIN_RENDER_MODE_SIMPLE_TEXCOORDS:
             FragColor = vec4(FinalColor.rgb * LightingFactor, 1.0);
             break;
         case TERRAIN_RENDER_MODE_HEIGHT:
