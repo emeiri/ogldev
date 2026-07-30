@@ -40,45 +40,36 @@ uniform float gLowHeightPercent = 0.25;
 uniform float gHighHeightPercent = 0.75;
 uniform vec3 gSunlightDir = normalize(vec3(0.0, 1.0, 0.0)); 
 uniform float gAmbientFactor = 0.2f;
-uniform float gTriplanarScale = 0.2f; 
+uniform float gTriplanarScale = 1.0 / 20.0; 
+
 uniform int gRenderMode = TERRAIN_RENDER_MODE_FULL;
 
 vec4 SampleTriplanar(sampler2D tex, vec3 worldPos, vec3 normal) 
 {
-    // 1. Calculate weights
+    // 1. Calculate ultra-sharp blending weights
     vec3 blend = abs(normal);
-    blend = pow(blend, vec3(32.0));
+    blend = pow(blend, vec3(24.0)); 
     blend /= (blend.x + blend.y + blend.z);
 
-    // 2. Scale world position
-    vec3 scaledPos = worldPos * gTriplanarScale;
+    // 2. Clear, proper multi-axis projection planes
+    vec2 uvX = worldPos.zy * gTriplanarScale;
+    vec2 uvY = worldPos.xz * gTriplanarScale;
+    vec2 uvZ = worldPos.xy * gTriplanarScale;
 
-    // 3. Fix mirroring on negative axes by checking the normal's sign
-    vec3 axisSign = sign(normal);
-    vec2 uvX = vec2(scaledPos.z * axisSign.x, scaledPos.y);
-    vec2 uvY = vec2(scaledPos.x * axisSign.y, scaledPos.z);
-    vec2 uvZ = vec2(scaledPos.x * axisSign.z, scaledPos.y);
+    // 3. Calculate explicit screen-space derivatives based on the projection vectors
+    vec2 dx_uvX = dFdx(uvX); vec2 dy_uvX = dFdy(uvX);
+    vec2 dx_uvY = dFdx(uvY); vec2 dy_uvY = dFdy(uvY);
+    vec2 dx_uvZ = dFdx(uvZ); vec2 dy_uvZ = dFdy(uvZ);
 
-    // 4. FIX: Calculate explicit derivatives that precisely match the projected UV maps
-    vec2 dx_uvX = dFdx(uvX);
-    vec2 dy_uvX = dFdy(uvX);
-    
-    vec2 dx_uvY = dFdx(uvY);
-    vec2 dy_uvY = dFdy(uvY);
-    
-    vec2 dx_uvZ = dFdx(uvZ);
-    vec2 dy_uvZ = dFdy(uvZ);
+    // 4. Mipmap sharpening bias factor
+    float biasFactor = 0.25;
 
-    // 5. Sample using the correct explicitly paired derivatives
-       // 5. Force a sharper mipmap selection by scaling down the gradients
-    float biasFactor = 0.25; // Lower values = sharper textures
-    
+    // 5. High-fidelity hardware gradient sampling
     vec4 xProj = textureGrad(tex, uvX, dx_uvX * biasFactor, dy_uvX * biasFactor);
     vec4 yProj = textureGrad(tex, uvY, dx_uvY * biasFactor, dy_uvY * biasFactor);
     vec4 zProj = textureGrad(tex, uvZ, dx_uvZ * biasFactor, dy_uvZ * biasFactor);
 
-    // 6. Blend together
-    return xProj * blend.x + yProj * blend.y + zProj * blend.z;
+    return (xProj * blend.x) + (yProj * blend.y) + (zProj * blend.z);
 }
 
 void main()
@@ -88,7 +79,6 @@ void main()
 
     vec3 N = normalize(Normal);
     
-    float SlopeFactor = smoothstep(0.65, 0.85, N.y);
     float LowMask    = smoothstep(gLowHeight - 2.0, gLowHeight + 2.0, WorldPos.y);
     float HighMask   = smoothstep(gHighHeight - 5.0, gHighHeight + 5.0, WorldPos.y);
 
@@ -96,6 +86,7 @@ void main()
     vec4 MidColor;
     vec4 HighColor;
 
+    // Clean, original height distribution logic (No rogue snow textures)
     if (gRenderMode == TERRAIN_RENDER_MODE_SIMPLE_TEXCOORDS) {
         LowColor  = texture(gTexture0, TexCoords);
         MidColor  = texture(gTexture1, TexCoords);

@@ -39,22 +39,21 @@ void main()
     float HeightSample = texture(gHeightMap, aTexCoords).r;
 
     // Displace the vertex position vertically in metric space
-    vec3 DisplacedPos = vec3(aPos.x, 0.0, aPos.y);
-    DisplacedPos.x *= gHorizontalScale;
+    vec3 DisplacedPos;
+    DisplacedPos.x = aPos.x * gHorizontalScale;
     DisplacedPos.y = HeightSample * gMaxTerrainHeight;
-    OrigHeight = HeightSample;
-    DisplacedPos.z *= gHorizontalScale;
+    DisplacedPos.z = aPos.y * gHorizontalScale;
 
-    float hL = textureOffset(gHeightMap, aTexCoords, ivec2(-1,  0)).r;
-    float hR = textureOffset(gHeightMap, aTexCoords, ivec2( 1,  0)).r;
-    float hD = textureOffset(gHeightMap, aTexCoords, ivec2( 0, -1)).r;
-    float hU = textureOffset(gHeightMap, aTexCoords, ivec2( 0,  1)).r;
+    float hL = textureOffset(gHeightMap, aTexCoords, ivec2(-1, 0)).r * gMaxTerrainHeight;
+    float hR = textureOffset(gHeightMap, aTexCoords, ivec2( 1, 0)).r * gMaxTerrainHeight;
+    float hD = textureOffset(gHeightMap, aTexCoords, ivec2( 0, -1)).r * gMaxTerrainHeight;
+    float hU = textureOffset(gHeightMap, aTexCoords, ivec2( 0, 1)).r * gMaxTerrainHeight;
     
-    Normal = normalize(normalize(vec3((hL - hR) * gMaxTerrainHeight, 2.0, (hD - hU) * gMaxTerrainHeight)));
-
-    //Normal = normalize(vec3((hL - hR) * 100.0, 1.0, (hD - hU) * 100.0));
+    float stepDist = 2.0 * gHorizontalScale;
+    Normal = normalize(vec3(hL - hR, stepDist, hD - hU));
 
     WorldPos = DisplacedPos;
     TexCoords = aTexCoords;
+    OrigHeight = HeightSample;
     gl_Position = gWVP * vec4(DisplacedPos, 1.0);
 }
