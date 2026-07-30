@@ -295,7 +295,13 @@ void Texture::LoadInternalDSA(const void* pImageData, bool IsSRGB)
     glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_LEVEL, Levels - 1);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_S, m_config.m_wrapMode);
     glTextureParameteri(m_textureObj, GL_TEXTURE_WRAP_T, m_config.m_wrapMode);
-    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, 16);
+
+    GLfloat MaxAnisotropy = 0.0f;
+    if (glewIsSupported("GL_ARB_texture_filter_anisotropic") || GL_VERSION_4_6) {
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &MaxAnisotropy);
+    }
+
+    glTextureParameteri(m_textureObj, GL_TEXTURE_MAX_ANISOTROPY, (GLint)MaxAnisotropy);
 
     glGenerateTextureMipmap(m_textureObj);
 
