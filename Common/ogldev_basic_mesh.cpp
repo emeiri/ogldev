@@ -372,7 +372,7 @@ void BasicMesh::LoadDiffuseTextureFromFile(const string& Dir, const aiString& Pa
 
     m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE] = new Texture(GL_TEXTURE_2D, FullPath.c_str());
 
-    bool IsSRGB = true;
+    bool IsSRGB = false;
 
     if (!m_Materials[MaterialIndex].pTextures[TEX_TYPE_BASE]->Load(IsSRGB)) {
         printf("Error loading diffuse texture '%s'\n", FullPath.c_str());
