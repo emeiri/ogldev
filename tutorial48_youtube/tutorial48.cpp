@@ -49,7 +49,7 @@ public:
     Tutorial48()
     {
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
-        m_dirLight.DiffuseIntensity = 1.2f;
+        m_dirLight.DiffuseIntensity = 2.5f;
         m_dirLight.AmbientIntensity = 0.4f;
     }
 
