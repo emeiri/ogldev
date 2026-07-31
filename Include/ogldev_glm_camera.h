@@ -82,7 +82,7 @@ public:
 
 	const glm::vec3& GetVelocity() const { return m_velocity; }
 
-    glm::mat4 GetGlobalWorldRotation() const { return glm::mat4_cast(m_globalWorldRotation); }
+	glm::mat4 GetGlobalWorldRotation() const;
 
 	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
 

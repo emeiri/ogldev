@@ -433,3 +433,15 @@ const Matrix4f GLMCameraFirstPerson::GetProjectionMat() const
 	Matrix4f Ret(GetProjMatrixGLM());
 	return Ret;
 }
+
+
+glm::mat4 GLMCameraFirstPerson::GetGlobalWorldRotation() const
+{
+	// Uncomment this for a rotating world hack
+/*	glm::mat4 Rotate = glm::mat4(1.0f);
+	static float s_rotate = 0.0f;
+	s_rotate += 0.2f;
+	Rotate = glm::rotate(Rotate, glm::radians(s_rotate), glm::vec3(0.0f, 1.0f, 0.0f));
+	return Rotate;*/
+	return glm::mat4_cast(m_globalWorldRotation); 
+}
