@@ -25,7 +25,6 @@
 #include "Services/perlin.h"
 
 
-// Step 1: Single-Layer Scaled Noise Pass
 void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap) 
 {
     HeightMap.resize(Config.width * Config.height);
@@ -34,19 +33,20 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
         for (int col = 0; col < Config.width; col++) {
 
             float Sum = 0.0f;
+            float Freq = 1.0f;
 
             for (int Oct = 0; Oct < Config.octaves; Oct++) {
-                float SampleX = col / Config.scale;
-                float SampleY = row / Config.scale;
+                float SampleX = col / Config.scale * Freq;
+                float SampleY = row / Config.scale * Freq;
 
                 float p = glm::perlin(glm::vec2(SampleX, SampleY));
 
                 Sum += p;
+
+                Freq *= Config.lacunarity;
             }
 
             HeightMap[row * Config.width + col] = Sum;
         }
     }
-
-    stbi_write_hdr("perlin_heightmap.hdr", Config.width, Config.height, 1, HeightMap.data());
 }

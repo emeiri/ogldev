@@ -22,10 +22,11 @@
 #include <vector>
 
 struct PerlinConfig {
-    int width = 256;
-    int height = 256;
+    int width = 512;
+    int height = 512;
     float scale = 50.0f;
-    int octaves = 1;
+    int octaves = 4;
+    float lacunarity = 2.0f;    
 };
 
 
