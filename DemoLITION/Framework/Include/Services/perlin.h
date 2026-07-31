@@ -27,6 +27,7 @@ struct PerlinConfig {
     float scale = 50.0f;
     int octaves = 4;
     float lacunarity = 2.0f;    
+    float persistence = 0.5f;  // Amplitude multiplier per octave
 };
 
 
