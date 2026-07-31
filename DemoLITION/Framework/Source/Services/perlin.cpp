@@ -23,7 +23,6 @@
 #include "Services/perlin.h"
 
 
-// Step 1: Single-Layer Scaled Noise Pass
 void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap) 
 {
     HeightMap.resize(Config.width * Config.height);
