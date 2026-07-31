@@ -19,6 +19,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
 
+#include "3rdparty/stb_image_write.h"
+
 #include "ogldev_util.h"
 #include "Services/perlin.h"
 
@@ -31,12 +33,20 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
     for (int row = 0; row < Config.height; row++) {
         for (int col = 0; col < Config.width; col++) {
 
-            float SampleX = col / Config.scale;
-            float SampleY = row / Config.scale;
+            float Sum = 0.0f;
 
-            float p = glm::perlin(glm::vec2(SampleX, SampleY));
+            for (int Oct = 0; Oct < Config.octaves; Oct++) {
+                float SampleX = col / Config.scale;
+                float SampleY = row / Config.scale;
 
-            HeightMap[row * Config.width + col] = p;
+                float p = glm::perlin(glm::vec2(SampleX, SampleY));
+
+                Sum += p;
+            }
+
+            HeightMap[row * Config.width + col] = Sum;
         }
     }
+
+    stbi_write_hdr("perlin_heightmap.hdr", Config.width, Config.height, 1, HeightMap.data());
 }
