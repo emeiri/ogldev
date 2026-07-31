@@ -24,6 +24,7 @@
 struct PerlinConfig {
     int width = 256;
     int height = 256;
+    float scale = 50.0f;
 };
 
 

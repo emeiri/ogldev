@@ -31,7 +31,10 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
     for (int row = 0; row < Config.height; row++) {
         for (int col = 0; col < Config.width; col++) {
 
-            float p = glm::perlin(glm::vec2((float)col, (float)row));
+            float SampleX = col / Config.scale;
+            float SampleY = row / Config.scale;
+
+            float p = glm::perlin(glm::vec2(SampleX, SampleY));
 
             HeightMap[row * Config.width + col] = p;
         }

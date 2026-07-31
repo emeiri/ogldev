@@ -181,7 +181,7 @@ private:
 
     void ShowGUI()
     {
-        m_pScene->StartSceneGUI("Tutorial 67 - Projected Texture");
+        m_pScene->StartSceneGUI("Perlin Noise");
 
         if (ImGui::TreeNode("Perlin")) {
             bool IsDirty = false;
@@ -191,7 +191,7 @@ private:
           //  IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 8);
          //   IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 1.0f, 4.0f);
          //   IsDirty |= ImGui::SliderFloat("Persistence", &m_terrainConfig.persistence, 0.1f, 1.0f);
-         //   IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 5.0, 200.0f);
+            IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 1.0, 200.0f);
          //   IsDirty |= ImGui::SliderInt("Seed", &m_terrainConfig.seed, 0, 1000);
 
             //   ImGui::Begin("Heightmap");
