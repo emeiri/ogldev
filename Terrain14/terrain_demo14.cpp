@@ -31,7 +31,7 @@
 #define WINDOW_WIDTH  2560
 #define WINDOW_HEIGHT 1440
 
-float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& HeightMapData, const PerlinConfig& Config)
+/*float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& HeightMapData, const PerlinConfig& Config)
 {
     // 1. Convert world coordinates back into un-scaled grid coordinates
     float UnscaledX = WorldX / Config.horizontalScale;
@@ -71,7 +71,7 @@ float GetTerrainHeightAt(float WorldX, float WorldZ, const std::vector<float>& H
     // 7. Output scaled world height in meters
     return FinalNormalizedHeight;
 }
-
+*/
 
 
 class Terrain14 : public BaseGLApp {
@@ -112,8 +112,8 @@ public:
         pConfig->ControlShadowMapping(false);
         pConfig->SetTerrainGrid(pTerrain);
         pConfig->SetTerrainHeightMap(m_terrainTexHeightMap);
-        pConfig->SetTerrainHorizontalScale(m_terrainConfig.horizontalScale);
-        pConfig->SetTerrainMaxHeight(m_terrainConfig.maxHeight);
+     //   pConfig->SetTerrainHorizontalScale(m_terrainConfig.horizontalScale);
+     //   pConfig->SetTerrainMaxHeight(m_terrainConfig.maxHeight);
         pConfig->SetTerrainTexture(0, SandTexture);
         pConfig->SetTerrainTexture(1, GrassTexture);
         pConfig->SetTerrainTexture(2, RockTexture);
@@ -126,21 +126,21 @@ public:
        //  m_pScene->AddToRenderList(pSceneObject);
 
         float CameraX = 0.0f;
-        float CameraZ = -m_terrainConfig.height * m_terrainConfig.horizontalScale;
+        float CameraZ = 0.0f;//-m_terrainConfig.height * m_terrainConfig.horizontalScale;
         float CameraY = 0.0f;
 
-        if (m_cameraOnGround) {
+     /*   if (m_cameraOnGround) {
             float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, m_terrainConfig) * m_terrainConfig.maxHeight;
             CameraY = 1.7f; // Add human height factor to the ground elevation for camera eye level
             CameraZ = m_terrainConfig.height * m_terrainConfig.horizontalScale / 2.0f;
         } else {
             CameraY = 650.0f;
-        }
+        }*/
 
-        CameraX = -4.128759f;
-        CameraY = 83.083961f;
-        CameraZ = -275.711121f;
-        Vector3f Target(-0.015322f, -0.195621f, 0.980560f);
+        CameraX = 0.f;
+        CameraY = 100.0;
+        CameraZ = 0.0f;
+        Vector3f Target(0.0f, -0.99f, 0.0f);
 
         m_pScene->SetCamera(Vector3f(CameraX, CameraY, CameraZ), Target);
         m_pScene->SetCameraZRange(0.5f, 8000.0f);
@@ -157,14 +157,14 @@ public:
             // Get the exact ground height in meters directly underneath the player's boots
 
             float TerrainMaxHeight = m_pScene->GetConfig()->GetTerrainMaxHeight();
-            m_terrainConfig.maxHeight = TerrainMaxHeight;
+         //   m_terrainConfig.maxHeight = TerrainMaxHeight;
             float TerrainHorizontalScale = m_pScene->GetConfig()->GetTerrainHorizontalScale();
-            m_terrainConfig.horizontalScale = TerrainHorizontalScale;
+         //   m_terrainConfig.horizontalScale = TerrainHorizontalScale;
 
-            float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
+        //    float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
 
             // Set camera eye level: Ground elevation + 1.7 meters human height factor
-            PlayerPosition.y = GroundHeight + 1.7f;
+        //    PlayerPosition.y = GroundHeight + 1.7f;
 
             m_pScene->GetCurrentCamera()->SetPos(PlayerPosition);
         }
@@ -188,11 +188,11 @@ private:
 
             //  IsDirty |= ImGui::SliderInt("Width", &m_terrainConfig.width, 1, 1024);
             //  IsDirty |= ImGui::SliderInt("Height", &m_terrainConfig.height, 1, 1024);
-            IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 8);
-            IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 1.0f, 4.0f);
-            IsDirty |= ImGui::SliderFloat("Persistence", &m_terrainConfig.persistence, 0.1f, 1.0f);
-            IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 5.0, 200.0f);
-            IsDirty |= ImGui::SliderInt("Seed", &m_terrainConfig.seed, 0, 1000);
+          //  IsDirty |= ImGui::SliderInt("Octaves", &m_terrainConfig.octaves, 1, 8);
+         //   IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 1.0f, 4.0f);
+         //   IsDirty |= ImGui::SliderFloat("Persistence", &m_terrainConfig.persistence, 0.1f, 1.0f);
+         //   IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 5.0, 200.0f);
+         //   IsDirty |= ImGui::SliderInt("Seed", &m_terrainConfig.seed, 0, 1000);
 
             //   ImGui::Begin("Heightmap");
             int TextureID = m_pRenderingSystem->GetTextureAPIHandle(m_terrainTexHeightMap);

@@ -22,15 +22,8 @@
 #include <vector>
 
 struct PerlinConfig {
-    int width = 257;        // Power-of-two plus one (ideal for tessellation patches)
-    int height = 257;
-    int octaves = 5;         // How many detail layers to stack
-    float lacunarity = 2.0f; // Frequency multiplier per octave (keep near 2.0)
-    float persistence = 0.5f;  // Amplitude multiplier per octave
-    float scale = 50.0f;    // Initial zoom scale for the coordinate space
-    float horizontalScale = 4.5f; // Horizontal scaling factor for the terrain
-    float maxHeight = 100; // Maximum height of the terrain in world units
-    int seed = 0;          // Random seed for noise generation
+    int width = 256;
+    int height = 256;
 };
 
 
