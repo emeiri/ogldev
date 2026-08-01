@@ -22,12 +22,13 @@
 #include <vector>
 
 struct PerlinConfig {
-    int width = 512;
-    int height = 512;
+    int width = 256;
+    int height = 256;
     float scale = 50.0f;
     int octaves = 4;
     float lacunarity = 2.0f;    
-    float persistence = 0.5f;  // Amplitude multiplier per octave
+    float persistence = 0.5f;  
+    int seed = 0;
 };
 
 

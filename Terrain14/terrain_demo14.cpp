@@ -192,7 +192,7 @@ private:
             IsDirty |= ImGui::SliderFloat("Lacunarity", &m_terrainConfig.lacunarity, 1.0f, 4.0f);
             IsDirty |= ImGui::SliderFloat("Persistence", &m_terrainConfig.persistence, 0.1f, 1.0f);
             IsDirty |= ImGui::SliderFloat("Scale", &m_terrainConfig.scale, 1.0, 200.0f);
-         //   IsDirty |= ImGui::SliderInt("Seed", &m_terrainConfig.seed, 0, 1000);
+            IsDirty |= ImGui::SliderInt("Seed", &m_terrainConfig.seed, 0, 1000);
 
             //   ImGui::Begin("Heightmap");
             int TextureID = m_pRenderingSystem->GetTextureAPIHandle(m_terrainTexHeightMap);
