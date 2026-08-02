@@ -25,17 +25,21 @@
 #include "Services/perlin.h"
 
 
-void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap) 
+void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
 {
     HeightMap.resize(Config.width * Config.height);
     std::vector<glm::vec2> OctaveOffsets(Config.octaves);
     srand(Config.seed);
-    
+
     for (int i = 0; i < Config.octaves; i++) {
         float offsetX = (float)(rand() % 200000 - 100000);
         float offsetY = (float)(rand() % 200000 - 100000);
         OctaveOffsets[i] = glm::vec2(offsetX, offsetY);
     }
+
+    float MinValue = std::numeric_limits<float>::max();
+    float MaxValue = std::numeric_limits<float>::lowest();
+
     for (int row = 0; row < Config.height; row++) {
         for (int col = 0; col < Config.width; col++) {
 
@@ -56,6 +60,17 @@ void CreatePerlinMap(const PerlinConfig& Config, std::vector<float>& HeightMap)
             }
 
             HeightMap[row * Config.width + col] = Sum;
+
+            MinValue = std::min(MinValue, Sum);
+            MaxValue = std::max(MaxValue, Sum);
         }
     }
+
+    if (MaxValue != MinValue) {
+        float Range = MaxValue - MinValue;
+        for (int i = 0; i < HeightMap.size(); ++i) {
+            float NormalizedHeight = (HeightMap[i] - MinValue) / Range;
+            HeightMap[i] = NormalizedHeight;
+        }
+    }   
 }
