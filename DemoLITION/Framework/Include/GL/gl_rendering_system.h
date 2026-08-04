@@ -36,9 +36,9 @@ public:
     void Render();
 
     GLuint m_vao = 0;
-    GLuint m_vbo;
-    GLuint m_ibo;
-    u32 m_indexCount;
+    GLuint m_vbo = 0;
+    GLuint m_ibo = 0;
+    u32 m_indexCount = 0;
 };
 
 
