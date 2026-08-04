@@ -113,7 +113,9 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabl
 {
 	m_pWindow = pWindow;
 	m_depthEnabled = DepthEnabled;
-	GetFramebufferSize(m_windowWidth, m_windowHeight);
+	if (pWindow) { // The first few tutorials pass NULL here so we skip this part
+		GetFramebufferSize(m_windowWidth, m_windowHeight);
+	}
 	CreateInstance(pAppName);
 	CreateDebugCallback();
 	if (!pWindow) {
