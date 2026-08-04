@@ -99,10 +99,10 @@ public:
         TexConfig.m_genMipmaps = true;
         m_terrainTexHeightMap = m_pRenderingSystem->LoadTexture2D(m_heightMap.data(), m_terrainConfig.width, m_terrainConfig.height, &TexConfig);
 
-        int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
-        int GrassTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/rocky_terrain_02_diff_2k.jpg");
-        int RockTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/aerial_rocks_01_diff_2k.jpg");
-        int SnowTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/snow_03_diff_2k.jpg");
+      //  int SandTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/forrest_sand_01_diff_2k.jpg");
+     //   int GrassTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/rocky_terrain_02_diff_2k.jpg");
+      //  int RockTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/aerial_rocks_01_diff_2k.jpg");
+      //  int SnowTexture = m_pRenderingSystem->LoadTexture2D("../Content/textures/Polyhaven/snow_03_diff_2k.jpg");
 
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
 
@@ -113,21 +113,18 @@ public:
         pConfig->SetTerrainGrid(pTerrain);
         pConfig->SetTerrainHeightMap(m_terrainTexHeightMap);
      //   pConfig->SetTerrainHorizontalScale(m_terrainConfig.horizontalScale);
-     //   pConfig->SetTerrainMaxHeight(m_terrainConfig.maxHeight);
-        pConfig->SetTerrainTexture(0, SandTexture);
-        pConfig->SetTerrainTexture(1, GrassTexture);
-        pConfig->SetTerrainTexture(2, RockTexture);
-        pConfig->SetTerrainTexture(3, SnowTexture);
+        pConfig->SetTerrainMaxHeight(0.0f);
+        pConfig->SetTerrainRenderMode(TERRAIN_RENDER_MODE_HEIGHT);
+      //  pConfig->SetTerrainTexture(0, SandTexture);
+     //   pConfig->SetTerrainTexture(1, GrassTexture);
+      //  pConfig->SetTerrainTexture(2, RockTexture);
+     //   pConfig->SetTerrainTexture(3, SnowTexture);
 
         m_pRenderingSystem->SetScene(m_pScene);
 
-        // SceneObject* pSceneObject = m_pScene->CreateSceneObject(pModel);
-        // pSceneObject->SetScale(0.01f);
-       //  m_pScene->AddToRenderList(pSceneObject);
-
         float CameraX = 0.0f;
-        float CameraZ = 0.0f;//-m_terrainConfig.height * m_terrainConfig.horizontalScale;
-        float CameraY = 0.0f;
+        float CameraZ = (float)-m_terrainConfig.height;// *m_terrainConfig.horizontalScale;
+        float CameraY = 100.0f;
 
      /*   if (m_cameraOnGround) {
             float GroundHeight = GetTerrainHeightAt(CameraX, CameraZ, m_heightMap, m_terrainConfig) * m_terrainConfig.maxHeight;
@@ -137,10 +134,7 @@ public:
             CameraY = 650.0f;
         }*/
 
-        CameraX = 0.f;
-        CameraY = 100.0;
-        CameraZ = 0.0f;
-        Vector3f Target(0.0f, -0.99f, 0.0f);
+        Vector3f Target(0.0f, -0.4f, 1.0f);
 
         m_pScene->SetCamera(Vector3f(CameraX, CameraY, CameraZ), Target);
         m_pScene->SetCameraZRange(0.5f, 8000.0f);
@@ -151,23 +145,23 @@ public:
 
     void OnFrame(double DeltaTime)
     {
-        if (m_cameraOnGround) {
+     /*   if (m_cameraOnGround) {
             glm::vec3 PlayerPosition = m_pScene->GetCurrentCamera()->GetPosition();
 
             // Get the exact ground height in meters directly underneath the player's boots
 
             float TerrainMaxHeight = m_pScene->GetConfig()->GetTerrainMaxHeight();
-         //   m_terrainConfig.maxHeight = TerrainMaxHeight;
+            m_terrainConfig.maxHeight = TerrainMaxHeight;
             float TerrainHorizontalScale = m_pScene->GetConfig()->GetTerrainHorizontalScale();
-         //   m_terrainConfig.horizontalScale = TerrainHorizontalScale;
+            m_terrainConfig.horizontalScale = TerrainHorizontalScale;
 
-        //    float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
+            float GroundHeight = GetTerrainHeightAt(PlayerPosition.x, PlayerPosition.z, m_heightMap, m_terrainConfig) * TerrainMaxHeight;
 
             // Set camera eye level: Ground elevation + 1.7 meters human height factor
-        //    PlayerPosition.y = GroundHeight + 1.7f;
+            PlayerPosition.y = GroundHeight + 1.7f;
 
             m_pScene->GetCurrentCamera()->SetPos(PlayerPosition);
-        }
+        }*/
     }
 
     void OnFrameEnd()
