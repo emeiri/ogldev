@@ -240,7 +240,7 @@ private:
     PerlinConfig m_terrainConfig;
     int m_terrainTexHeightMap = -1;
     bool m_cameraOnGround = false;
-    bool m_showGui = false;
+    bool m_showGui = true;
 };
 
 
