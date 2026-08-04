@@ -44,8 +44,8 @@ void SimpleWater::Init(int Size, float WorldScale)
     m_waterTech.SetWaterHeight(m_waterHeight);
     m_waterTech.SetLightColor(Vector3f(1.0f, 1.0f, 1.0f));
 
-    m_dudvMap.Load("../Content/waterDUDV.png");
-    m_normalMap.Load("../Content/WaterNormalMap.png");
+    m_dudvMap.Load("../Content/waterDUDV.png", false);
+    m_normalMap.Load("../Content/WaterNormalMap.png", false);
 
     m_water.CreateTriangleList(2, 2, Size * WorldScale);
 
