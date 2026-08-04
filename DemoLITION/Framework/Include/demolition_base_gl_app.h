@@ -52,6 +52,7 @@ protected:
 
     virtual void OnFrameGUI();
 
+    bool m_showGui = false;
     RenderingSystem* m_pRenderingSystem = NULL;
     GLFWwindow* m_pWindow = NULL;
 
@@ -61,5 +62,4 @@ private:
     bool m_isWireframe = false;
     bool m_leftMousePressed = false;
     bool m_midMousePressed = false;
-    bool m_showGui = false;
 };

@@ -38,6 +38,7 @@ public:
         m_dirLight.WorldDirection = Vector3f(1.0f, -1.0f, 0.0f);
         m_dirLight.DiffuseIntensity = 0.9f;
         m_dirLight.AmbientIntensity = 0.1f;
+        m_showGui = true;
     }
 
     ~Tutorial60() {}
@@ -102,6 +103,26 @@ public:
           //  m_pScene->GetPointLights()[0].WorldPosition.z = cosf(m_count);
     }
 
+
+    void OnFrameGUI()
+    {
+        m_pScene->StartSceneGUI("Tutorial 60 - Reflection & Refraction");
+
+        ImGui::CheckboxFlags("Enable Reflection/Refraction", &m_isRefRefractEnabled, 1);
+        m_pScene->GetConfig()->ControlRefRefract(m_isRefRefractEnabled);
+        
+        ImGui::SliderFloat("Material/RefRefract Factor", &m_matRefRefractFactor, 0.0f, 1.0f);
+        m_pScene->GetConfig()->SetMatRefRefractFactor(m_matRefRefractFactor);
+        
+        ImGui::SliderFloat("Index Of Refraction", &m_indexOfRefraction, 1.0f, 3.0f);
+        m_pScene->GetConfig()->SetIndexOfRefraction(m_indexOfRefraction);
+        
+        ImGui::SliderFloat("Fresnel Power", &m_fresnelPower, 1.0f, 7.0f);
+        m_pScene->GetConfig()->SetFresnelPower(m_fresnelPower);
+        
+        m_pScene->EndSceneGUI();
+    }
+
 private:
 
     float m_count = 0.0f;
@@ -110,6 +131,11 @@ private:
     SceneObject* m_pickedObject = NULL;
     SceneObject* m_pSceneObject = NULL;    
     int m_enableShadowMapping = 1;
+    int m_isRefRefractEnabled = false;
+    float m_reflectionFactor = 0.1f;
+    float m_matRefRefractFactor = 0.5f;
+    float m_indexOfRefraction = 1.0f;
+    float m_fresnelPower = 1.0f;
 };
 
 
