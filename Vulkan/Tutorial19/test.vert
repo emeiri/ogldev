@@ -27,7 +27,7 @@ struct VertexData
 
 layout (std430, binding = 0) readonly buffer Vertices { VertexData v[]; } in_Vertices;
 
-layout (binding = 2) readonly uniform UniformBuffer { mat4 WVP; } ubo;
+layout (binding = 1) readonly uniform UniformBuffer { mat4 WVP; } ubo;
 
 layout(location = 0) out vec2 texCoord;
 
