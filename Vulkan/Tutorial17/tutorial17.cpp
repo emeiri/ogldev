@@ -315,8 +315,8 @@ private:
 	std::vector<VkCommandBuffer> m_cmdBufs;
 	VkRenderPass m_renderPass;
 	std::vector<VkFramebuffer> m_frameBuffers;
-	VkShaderModule m_vs;
-	VkShaderModule m_fs;
+	VkShaderModule m_vs = NULL;
+	VkShaderModule m_fs = NULL;
 	OgldevVK::GraphicsPipeline* m_pPipeline = NULL;
 	OgldevVK::SimpleMesh m_mesh;
 	std::vector<OgldevVK::BufferAndMemory> m_uniformBuffers;
