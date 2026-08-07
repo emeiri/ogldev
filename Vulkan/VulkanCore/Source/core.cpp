@@ -1434,12 +1434,23 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
 
 
 
-void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size)
+void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size) 
 {
 	void* pMem = NULL;
-	VkResult res = vkMapMemory(Device, m_mem, 0, Size, 0, &pMem);
+	VkResult res = vkMapMemory(Device, m_mem, 0, VK_WHOLE_SIZE, 0, &pMem);
 	CHECK_VK_RESULT(res, "vkMapMemory");
+
 	memcpy(pMem, pData, Size);
+
+	// Explicitly flush memory ranges so the GPU sees the CPU modifications
+	VkMappedMemoryRange memRange = {};
+	memRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+	memRange.memory = m_mem;
+	memRange.offset = 0;
+	memRange.size = VK_WHOLE_SIZE; // Use the aligned size, not raw Size
+
+	vkFlushMappedMemoryRanges(Device, 1, &memRange);
+
 	vkUnmapMemory(Device, m_mem);
 }
 
