@@ -160,32 +160,40 @@ public:
 	}
 
 
-	void RenderScene()
-	{
+	void RenderScene() 
+    {
 		u32 ImageIndex = m_pQueue->AcquireNextImage();
 
-        for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
+		for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			UpdateUniformBuffers(MeshIndex, ImageIndex);
-        }		
-
-		if (m_showGui) {		
-			UpdateGUI();
-
-			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
-
-			VkCommandBuffer CmdBufs[] = { m_cmdBufs[0][m_lightingMode].WithGUI[ImageIndex], ImGUICmdBuf};
-
-			m_pQueue->SubmitAsync(&CmdBufs[0], 2);
-		} else {
-            std::vector<VkCommandBuffer> CmdBufs(m_modelContexts.size());
-
-            for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
-                CmdBufs[MeshIndex] = m_cmdBufs[MeshIndex][m_lightingMode].WithoutGUI[ImageIndex];
-            }			
-
-			m_pQueue->SubmitAsync(CmdBufs);
 		}
 
+		std::vector<VkCommandBuffer> SubmissionCmdBufs;
+		SubmissionCmdBufs.reserve(m_modelContexts.size() + 1);
+
+		// 1. Gather pre-baked mesh draw calls
+		for (size_t MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
+			if (m_enablePostProcess) {
+				SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].WithGUI[ImageIndex]);
+			} else {
+				SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].WithoutGUI[ImageIndex]);
+			}
+		}
+
+		// 2. Append trailing operations based on live GUI visibility
+		if (m_showGui) {
+			UpdateGUI();
+			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
+			SubmissionCmdBufs.push_back(ImGUICmdBuf);
+			// Note: ImGui's internal system will now safely grab the canvas from 
+			// COLOR_ATTACHMENT_OPTIMAL, draw its text layers, and handle the PRESENT_SRC_KHR transition.
+		} else {
+			// If GUI is turned off, append your dedicated fallback buffer array to
+			// manually shift the layout from COLOR_ATTACHMENT_OPTIMAL -> PRESENT_SRC_KHR
+			SubmissionCmdBufs.push_back(m_transitionCmdBufs[ImageIndex]);
+		}
+
+		m_pQueue->SubmitAsync(SubmissionCmdBufs);
 		m_pQueue->Present(ImageIndex);
 	}
 
@@ -318,8 +326,34 @@ private:
 			}
         }
 
+        InitTransitionCommandBuffers();
+
 		printf("Created command buffers\n");
 	}
+
+
+	void InitTransitionCommandBuffers() 
+	{
+		m_transitionCmdBufs.resize(m_numImages);
+        m_vkCore.CreateCommandBuffers(m_numImages, m_transitionCmdBufs.data());
+
+		for (int i = 0; i < m_numImages; i++) {
+			VkCommandBuffer CmdBuf = m_transitionCmdBufs[i];
+			VkImage CurrentImage = m_vkCore.GetImage(i);
+			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+
+			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+			// Transition directly from Color Attachment back into presentation source
+			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat,
+									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+									   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+
+			VkResult res = vkEndCommandBuffer(CmdBuf);
+			CHECK_VK_RESULT(res, "Failed to record transition command buffer\n");
+		}
+	}
+
 
 
 	void CreateDescriptorPool()
@@ -415,20 +449,20 @@ private:
 	}
 
 
-	void RecordCommandBuffers()
+	void RecordCommandBuffers() 
 	{
 		for (int MeshIndex = 0; MeshIndex < (int)m_modelContexts.size(); MeshIndex++) {
 			for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
-				RecordCommandBuffersInternal(MeshIndex, LightMode, true, m_cmdBufs[MeshIndex][LightMode].WithoutGUI);
-
-				RecordCommandBuffersInternal(MeshIndex, LightMode, false, m_cmdBufs[MeshIndex][LightMode].WithGUI);
+				// Bake the pipeline WITH compute processing
+				RecordCommandBuffersInternal(MeshIndex, LightMode, true, m_cmdBufs[MeshIndex][LightMode].WithGUI);
+				// Bake the pipeline WITHOUT compute processing
+				RecordCommandBuffersInternal(MeshIndex, LightMode, false, m_cmdBufs[MeshIndex][LightMode].WithoutGUI);
 			}
 		}
 	}
 
 
-	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs) {
-		// Cache total number of meshes to find the bounds
+	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool IncludeComputePostProcess, std::vector<VkCommandBuffer>& CmdBufs) {
 		const int totalMeshes = (int)m_modelContexts.size();
 		bool IsFirstMesh = (MeshIndex == 0);
 		bool IsLastMesh = (MeshIndex == totalMeshes - 1);
@@ -440,8 +474,7 @@ private:
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// 1. FIX DATA LOSS: Only transition from UNDEFINED on the first mesh.
-			// Subsequent meshes must preserve the existing drawing content.
+			// 1. Maintain content across sequential draws
 			VkImageLayout initialLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, initialLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
@@ -451,23 +484,23 @@ private:
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
 
-			// 3. FIX OVERHEAD: Only run the Post-Process Compute shader after the LAST mesh finishes drawing
+			// 3. Conditional Compute Dispatch processing on the LAST mesh boundary
+				// 3. Conditional Compute Dispatch processing on the LAST mesh boundary
 			if (IsLastMesh) {
-				// Transition Color Attachment -> General for the Compute Post-Process step 
-				OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
+				if (IncludeComputePostProcess) {
+					// PATH A: Compute Active (WithPostProcess)
+					OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
-				// 4. Record Compute Shader Dispatch here 
-				u32 groupCountX = (WINDOW_WIDTH + 15) / 16;
-				u32 groupCountY = (WINDOW_HEIGHT + 15) / 16;
-				u32 groupCountZ = 1;
-				m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, groupCountX, groupCountY, groupCountZ);
+					u32 groupCountX = (WINDOW_WIDTH + 15) / 16;
+					u32 groupCountY = (WINDOW_HEIGHT + 15) / 16;
+					m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, groupCountX, groupCountY, 1);
 
-				if (WithSecondBarrier) {
-					// 5. Transition General -> Present Source 
-					OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+					// Bring it back to Color Attachment layout so either ImGui or Present can use it
+					OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+				} else {
+					// PATH B: Compute Skipped (WithoutPostProcess)
+					// Do nothing extra; leave it in COLOR_ATTACHMENT_OPTIMAL 
 				}
-			} else {
-				// Keep the layout as COLOR_ATTACHMENT_OPTIMAL for the next mesh's command buffer
 			}
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
@@ -593,6 +626,7 @@ private:
 		std::vector<VkCommandBuffer> WithoutGUI;
 	};
     std::vector<std::vector<CommandBuffersVecs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
+	std::vector<VkCommandBuffer> m_transitionCmdBufs;
 	VkShaderModule m_vs = VK_NULL_HANDLE;
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
