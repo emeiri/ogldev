@@ -172,8 +172,8 @@ VkCommandBuffer ImGUIRenderer::PrepareCommandBuffer(int Image)
 
 	vkCmdEndRendering(m_cmdBufs[Image]);
 
-	OgldevVK::ImageMemBarrier(m_cmdBufs[Image], m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
-		                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, false, 1, 0);
+	OgldevVK::ImageMemBarrier2(m_cmdBufs[Image], m_pvkCore->GetImage(Image), m_pvkCore->GetSwapChainFormat(),
+		                      VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
 
 	vkEndCommandBuffer(m_cmdBufs[Image]);
 
