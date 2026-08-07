@@ -110,8 +110,18 @@ void ImGUIRenderer::InitImGUI()
 	bool InstallGLFWCallbacks = true;
 	ImGui_ImplGlfw_InitForVulkan(m_pvkCore->GetWindow(), InstallGLFWCallbacks);
 
-	VkFormat ColorFormat = m_pvkCore->GetSwapChainFormat();
+	VkFormat SwapChainFormat = m_pvkCore->GetSwapChainFormat();
+	VkFormat DepthFormat = m_pvkCore->GetDepthFormat();
 
+	VkPipelineRenderingCreateInfo PipelineRenderingInfo = {
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
+		.colorAttachmentCount = 1,
+		.pColorAttachmentFormats = &SwapChainFormat,
+		.depthAttachmentFormat = DepthFormat,
+		.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
+	};
+
+	// 2. Initialize ImGui using the exact struct member ordering
 	ImGui_ImplVulkan_InitInfo InitInfo = {
 		.ApiVersion = m_pvkCore->GetInstanceVersion(),
 		.Instance = m_pvkCore->GetInstance(),
@@ -120,23 +130,17 @@ void ImGUIRenderer::InitImGUI()
 		.QueueFamily = m_pvkCore->GetQueueFamily(),
 		.Queue = m_pvkCore->GetQueue()->GetHandle(),
 		.DescriptorPool = m_descriptorPool,
-		.RenderPass = NULL,		// assume dynamic rendering
 		.MinImageCount = m_pvkCore->GetPhysicalDevice().m_surfaceCaps.minImageCount,
 		.ImageCount = (u32)m_pvkCore->GetNumImages(),
-		.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-		.PipelineCache = NULL,
-		.Subpass = 0,
-		.UseDynamicRendering = true,		
-		.PipelineRenderingCreateInfo = {
-			.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
-			.pNext = NULL,
-			.viewMask = 0,
-			.colorAttachmentCount = 1,
-			.pColorAttachmentFormats = &ColorFormat,
-			.depthAttachmentFormat = m_pvkCore->GetDepthFormat(),
-			.stencilAttachmentFormat = VK_FORMAT_UNDEFINED
-		 },
-		.Allocator = NULL,
+		.PipelineCache = VK_NULL_HANDLE,
+		// Nested struct requires its own ordered members: MSAASamples then PipelineRenderingCreateInfo
+		.PipelineInfoMain = {
+			.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+			.PipelineRenderingCreateInfo = PipelineRenderingInfo
+		},
+
+		.UseDynamicRendering = true,
+		.Allocator = nullptr,
 		.CheckVkResultFn = CheckVKResult
 	};
 
