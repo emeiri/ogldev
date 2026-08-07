@@ -16,6 +16,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <assert.h>
+
 #include "ogldev_vulkan_util.h"
 #include "ogldev_vulkan_wrapper.h"
 
@@ -213,6 +215,8 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout,
 	int LayerCount, u32 MipLevels, u32 BaseMipLevel)
 {
+    assert(LayerCount > 0);
+
 	VkImageMemoryBarrier2 Barrier = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
 		.pNext = NULL,
