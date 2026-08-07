@@ -145,7 +145,7 @@ private:
 	void CreateDepthResources();
 	BufferAndMemory CreateBufferInternal(VkBufferUsageFlags Usage, const void* pVertices, size_t Size);
 
-	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags);
+	u32 GetMemoryTypeIndex(u32 memTypeBits, VkMemoryPropertyFlags memPropFlags, bool bExactMatch = false);
 
 	void CopyBufferToBuffer(VkBuffer Dst, VkBuffer Src, VkDeviceSize Size);
 

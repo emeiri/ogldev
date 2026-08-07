@@ -1186,22 +1186,28 @@ void VulkanCore::GenerateMipmaps(VkImage Image, u32 ImageWidth, u32 ImageHeight,
 }
 
 
-u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags ReqMemPropFlags)
+u32 VulkanCore::GetMemoryTypeIndex(u32 MemTypeBitsMask, VkMemoryPropertyFlags ReqMemPropFlags, bool bExactMatch)
 {
 	const VkPhysicalDeviceMemoryProperties& MemProps = m_physDevices.Selected().m_memProps;
 
 	for (uint i = 0; i < MemProps.memoryTypeCount; i++) {
 		const VkMemoryType& MemType = MemProps.memoryTypes[i];
 		uint CurBitmask = (1 << i);
+
 		bool IsCurMemTypeSupported = (MemTypeBitsMask & CurBitmask);
-		bool HasRequiredMemProps = ((MemType.propertyFlags & ReqMemPropFlags) == ReqMemPropFlags);
+
+		// Decide between matching exactly or matching a subset of flags
+		bool HasRequiredMemProps = bExactMatch
+			? (MemType.propertyFlags == ReqMemPropFlags)
+			: ((MemType.propertyFlags & ReqMemPropFlags) == ReqMemPropFlags);
 
 		if (IsCurMemTypeSupported && HasRequiredMemProps) {
 			return i;
 		}
 	}
 
-	printf("Cannot find memory type for type %x requested mem props %x\n", MemTypeBitsMask, ReqMemPropFlags);
+	printf("Cannot find memory type for type %x requested mem props %x (Exact: %d)\n",
+		MemTypeBitsMask, ReqMemPropFlags, bExactMatch);
 	exit(1);
 	return -1;
 }
