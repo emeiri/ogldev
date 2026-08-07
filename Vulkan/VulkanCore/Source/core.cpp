@@ -434,7 +434,8 @@ void VulkanCore::CreateSwapChain()
 	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.Selected().m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
-	m_swapChainSurfaceFormat = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
+	m_swapChainSurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;// = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
+    m_swapChainSurfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 
 	VkSwapchainCreateInfoKHR SwapChainCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
