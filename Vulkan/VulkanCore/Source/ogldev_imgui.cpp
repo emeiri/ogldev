@@ -101,7 +101,7 @@ void ImGUIRenderer::InitImGUI()
 	io.DisplaySize.x = (float)m_framebufferWidth;
 	io.DisplaySize.y = (float)m_framebufferHeight;
 
-	ImGui::GetStyle().FontScaleMain = 1.5f;
+	ImGui::GetIO().FontGlobalScale = 1.5f;
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
