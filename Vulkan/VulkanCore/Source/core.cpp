@@ -320,6 +320,7 @@ void VulkanCore::CreateDevice()
 	} else if (m_instanceVersion.Minor == 2) {
 		if (DeviceSupportsDynamicRendering) {
 			DevExts.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+			DevExts.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
 		} else {
 			printf("The system doesn't support dynamic rendering\n");
 			exit(1);
@@ -337,14 +338,16 @@ void VulkanCore::CreateDevice()
 		OGLDEV_ERROR0("The Tessellation Shader is not supported!\n");
 	}
 
-	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingFeature{};
-	DynamicRenderingFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR;
-	DynamicRenderingFeature.dynamicRendering = VK_TRUE;
+	VkPhysicalDeviceVulkan13Features Features13{};
+	Features13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+	Features13.pNext = NULL;
+	Features13.synchronization2 = VK_TRUE;
+    Features13.dynamicRendering = VK_TRUE;
 
 	// Chain dynamic rendering AFTER Vulkan 1.2 features
 	VkPhysicalDeviceVulkan12Features Features12{};
 	Features12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-	Features12.pNext = &DynamicRenderingFeature;
+	Features12.pNext = &Features13;
 	Features12.runtimeDescriptorArray = VK_TRUE;
 	Features12.descriptorIndexing = VK_TRUE;
 	Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
@@ -352,7 +355,7 @@ void VulkanCore::CreateDevice()
 	Features12.descriptorBindingPartiallyBound = VK_TRUE;
 	Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
     Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
-	
+
 	VkPhysicalDeviceFeatures DeviceFeatures{};
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;

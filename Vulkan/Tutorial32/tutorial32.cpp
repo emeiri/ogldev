@@ -84,11 +84,11 @@ struct ModelConfig {
 };
 
 static std::vector<ModelConfig> Models = {
-	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f },
-	{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f},
-	{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f},
-	{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f},
-	{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
+	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
+//	,{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f}
+	,{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
+//	,{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f}
+//	,{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
 };
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
@@ -414,38 +414,46 @@ private:
 	}
 
 
-	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs)
-	{
+	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs) {
 		bool FirstCommandBuffer = (MeshIndex == 0);
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
+			VkImage currentImage = m_vkCore.GetImage(i);
+			VkFormat swapChainFormat = m_vkCore.GetSwapChainFormat();
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
-				                      VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+			// 1. Transition Undefined -> Color Attachment (Now uses Sync2)
+			OgldevVK::ImageMemBarrier2(CmdBuf, currentImage, swapChainFormat,
+				VK_IMAGE_LAYOUT_UNDEFINED,
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
+			// 2. Standard graphics pipeline rendering
 			BeginRendering(CmdBuf, i, FirstCommandBuffer);
-		
-			m_pipelines[LightingMode].Bind(i, CmdBuf, 
-				m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
-
+			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
-			
 			vkCmdEndRendering(CmdBuf);
 
+			// 3. DEMO TRANSITION: Transition Color Attachment -> General for the Compute Post-Process step
+			OgldevVK::ImageMemBarrier2(CmdBuf, currentImage, swapChainFormat,
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
+
+			// 4. Record Compute Shader Dispatch here
+			// m_postProcessComputePipeline.Bind(CmdBuf);
+			// vkCmdDispatch(CmdBuf, m_width / 16, m_height / 16, 1);
+
 			if (WithSecondBarrier) {
-				OgldevVK::ImageMemBarrier(CmdBuf, m_vkCore.GetImage(i), m_vkCore.GetSwapChainFormat(),
-					VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+				// 5. DEMO TRANSITION: Transition General -> Present Source
+				OgldevVK::ImageMemBarrier2(CmdBuf, currentImage, swapChainFormat,
+					VK_IMAGE_LAYOUT_GENERAL,
+					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
 			}
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
-
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
 		}
-
-		printf("Command buffers recorded\n");
 	}
 
 

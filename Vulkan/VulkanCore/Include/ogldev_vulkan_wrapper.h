@@ -30,8 +30,13 @@ void BeginCommandBuffer(VkCommandBuffer CommandBuffer, VkCommandBufferUsageFlags
 
 VkSemaphore CreateSemaphore(VkDevice Device);
 
+// Uses the legacy synchronization API (vkCmdPipelineBarrier) to transition image layouts
 void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 					 VkImageLayout OldLayout, VkImageLayout NewLayout, int LayerCount, u32 MipLevels, u32 BaseMipLevel);
+
+// Uses the Synchronization2 API (vkCmdPipelineBarrier2) to transition image layouts
+void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout,
+	int LayerCount, u32 MipLevels, u32 BaseMipLevel);
 
 void BufferMemBarrier(VkCommandBuffer CmdBuf, VkBuffer Buffer, VkPipelineStageFlags SrcStage, VkPipelineStageFlags DstStage);
 
