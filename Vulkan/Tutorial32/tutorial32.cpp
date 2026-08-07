@@ -506,8 +506,6 @@ private:
 
 		ImGui::Begin("Hello, world!", NULL, ImGuiWindowFlags_AlwaysAutoResize);   // Create a window called "Hello, world!" and append into it.
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-
 		if (ImGui::CollapsingHeader("Position")) {
 			ImGui::DragFloat3("##Position", &m_position.x, 0.01f);
 			ImGui::SameLine();
@@ -531,6 +529,8 @@ private:
 				m_scale = 1.0f;
 			}
 		}
+
+        ImGui::Checkbox("Enable Post-Process", &m_enablePostProcess);
 
 		static const char* lightingModeNames[] = { "Unlit", "Normals", "Ambient", "Full" };
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; ++i) {
@@ -607,6 +607,7 @@ private:
 
 	// GUI state
 	bool m_showGui = false;
+    bool m_enablePostProcess = true;
 	glm::vec3 m_position = glm::vec3(0.0f);
 	glm::vec3 m_rotation = glm::vec3(0.0f);
 	float m_scale = 0.1f;
