@@ -1391,27 +1391,32 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
 		.resolveImageView = VK_NULL_HANDLE,
 		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
 		.loadOp = pClearColor ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE		
+		.storeOp = VK_ATTACHMENT_STORE_OP_STORE
 	};
 
 	if (pClearColor) {
 		ColorAttachment.clearValue = *pClearColor;
 	}
 
-	VkRenderingAttachmentInfo DepthAttachment = {
-		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
-		.pNext = NULL,
-		.imageView = GetDepthView(ImageIndex),
-		.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-		.resolveMode = VK_RESOLVE_MODE_NONE,
-		.resolveImageView = VK_NULL_HANDLE,
-		.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.loadOp = pDepthValue ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,		
-	};
+	VkRenderingAttachmentInfo DepthAttachment = {};
+	bool UseDepth = (GetDepthView(ImageIndex) != VK_NULL_HANDLE);
 
-	if (pDepthValue) {
-		DepthAttachment.clearValue = *pDepthValue;
+	if (UseDepth) {
+		DepthAttachment = {
+			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+			.pNext = NULL,
+			.imageView = GetDepthView(ImageIndex),
+			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+			.resolveMode = VK_RESOLVE_MODE_NONE,
+			.resolveImageView = VK_NULL_HANDLE,
+			.resolveImageLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.loadOp = pDepthValue ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD,
+			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+		};
+
+		if (pDepthValue) {
+			DepthAttachment.clearValue = *pDepthValue;
+		}
 	}
 
 	VkRenderingInfoKHR RenderingInfo = {
@@ -1421,7 +1426,7 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
 		.viewMask = 0,
 		.colorAttachmentCount = 1,
 		.pColorAttachments = &ColorAttachment,
-		.pDepthAttachment = &DepthAttachment
+		.pDepthAttachment = UseDepth ? &DepthAttachment : NULL
 	};
 
 	vkCmdBeginRendering(CmdBuf, &RenderingInfo);
