@@ -81,6 +81,8 @@ public:
 
 	const VkImageView& GetImageView(int Index) const;
 
+	const std::vector<VkImageView>& GetImageViews() const { return m_imageViews; }
+
 	const VkImageView& GetDepthView(int Index) const;
 
 	VulkanQueue* GetQueue() { return &m_queue; }
