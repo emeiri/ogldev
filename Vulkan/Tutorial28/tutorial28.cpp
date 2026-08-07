@@ -276,7 +276,7 @@ private:
 		u32 StorageBufferCount = 50;
 		u32 MaxSets = m_numImages * 2;	// TexGen program and FS quad program
 
-		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, 0, MaxSets);
 	}
 
 	

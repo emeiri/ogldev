@@ -210,8 +210,8 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 }
 
 
-void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout, 
-					  int LayerCount, u32 MipLevels, u32 BaseMipLevel) 
+void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, VkImageLayout OldLayout, VkImageLayout NewLayout,
+	int LayerCount, u32 MipLevels, u32 BaseMipLevel)
 {
 	VkImageMemoryBarrier2 Barrier = {
 		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
@@ -337,6 +337,19 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 		Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT;
 		Barrier.dstStageMask = VK_PIPELINE_STAGE_2_NONE;
 		Barrier.dstAccessMask = VK_ACCESS_2_NONE;
+		// 1. ADDED FOR MULTI-MESH PRESERVATION: Color Attachment -> Color Attachment self-transition
+	} else if (OldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL && NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		Barrier.srcAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
+		Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
+	// 2. ADDED FOR PRESENTATION RESUMPTION: Present Source -> Color Attachment Optimal 
+	// (Needed if your engine loops frames using the final frame layout as the next frame's starting point)
+	} else if (OldLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR && NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+		Barrier.srcStageMask = VK_PIPELINE_STAGE_2_NONE;
+		Barrier.srcAccessMask = VK_ACCESS_2_NONE;
+		Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+		Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
 	} else {
 		printf("Unknown Barrier case\n");
 		exit(1);

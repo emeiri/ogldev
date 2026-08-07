@@ -446,7 +446,10 @@ void VulkanCore::CreateSwapChain()
 		.imageColorSpace = m_swapChainSurfaceFormat.colorSpace,
 		.imageExtent = SurfaceCaps.currentExtent,
 		.imageArrayLayers = 1,
-		.imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT),
+		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+					  VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+					  VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+					  VK_IMAGE_USAGE_STORAGE_BIT,
 		.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE,
 		.queueFamilyIndexCount = 1,
 		.pQueueFamilyIndices = &m_queueFamily,
@@ -1249,7 +1252,11 @@ VkDescriptorSetLayout VulkanCore::CreateDescSetLayout(const std::vector<VkDescri
 }
 
 
-VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount, u32 MaxSets)
+VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount, 
+											u32 UniformBufferCount, 
+											u32 StorageBufferCount, 
+											u32 StorageImageCount,
+											u32 MaxSets)
 {
 	// Pool sizes: each entry specifies how many descriptors of that type the pool can allocate.
 	std::vector<VkDescriptorPoolSize> PoolSizes;
@@ -1280,6 +1287,14 @@ VkDescriptorPool VulkanCore::CreateDescPool(u32 TextureCount, u32 UniformBufferC
 
 		PoolSizes.push_back(SsboSize);
 	}
+
+    if (StorageImageCount > 0) {
+        VkDescriptorPoolSize StorageImageSize = {
+            .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .descriptorCount = StorageImageCount
+        };
+        PoolSizes.push_back(StorageImageSize);
+    }
 
 	// Optionally include VK_DESCRIPTOR_TYPE_SAMPLER or VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE
 	// if you use separate sampler/image bindings instead of combined descriptors.

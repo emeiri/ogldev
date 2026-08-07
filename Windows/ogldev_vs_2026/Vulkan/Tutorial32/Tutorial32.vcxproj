@@ -19,17 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\Vulkan\Tutorial32\postprocess.comp" />
     <None Include="..\..\..\..\Vulkan\Tutorial32\test.frag" />
     <None Include="..\..\..\..\Vulkan\Tutorial32\test.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial32\big_texture_array.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial32\lighting_program.cpp" />
+    <ClCompile Include="..\..\..\..\Vulkan\Tutorial32\postprocess_compute_pipeline.cpp" />
     <ClCompile Include="..\..\..\..\Vulkan\Tutorial32\tutorial32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial32\big_texture_array.h" />
     <ClInclude Include="..\..\..\..\Vulkan\Tutorial32\lighting_program.h" />
+    <ClInclude Include="..\..\..\..\Vulkan\Tutorial32\postprocess_compute_pipeline.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

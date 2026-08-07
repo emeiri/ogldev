@@ -46,6 +46,7 @@
 #include "Int/model_desc.h"
 #include "lighting_program.h"
 #include "big_texture_array.h"
+#include "postprocess_compute_pipeline.h"
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
@@ -120,6 +121,8 @@ public:
 		for (OgldevVK::LightingProgram& p : m_pipelines) {
 			p.Destroy();
 		}
+
+        m_postProcessPipeline.Destroy();
 
         m_bigTextureArray.Destroy();		
 
@@ -320,9 +323,10 @@ private:
 		u32 TextureCount = MAX_TEXTURES * 4;
 		u32 UniformBufferCount = 50;
 		u32 StorageBufferCount = 50;
-        u32 MaxSets = m_numImages * (u32)Models.size() * (OgldevVK::NUM_LIGHTING_MODES + 1);	// +1 for the global texture array descriptor set
+		u32 StorageImageCount = m_numImages;
+		u32 MaxSets = (m_numImages * (u32)Models.size() * (OgldevVK::NUM_LIGHTING_MODES + 1)) + m_numImages; // +1 for the global texture array descriptor set
 
-		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, StorageImageCount, MaxSets);
 	}
 
 
@@ -345,6 +349,9 @@ private:
             CreateUniformBuffers(i);
             CreateDescriptorSets(i, ModelDescs[i]);
 		}
+
+		m_postProcessPipeline.AllocDescSets(m_numImages, m_postProcessDescSets);
+        m_postProcessPipeline.UpdateDescSets(m_postProcessDescSets, m_vkCore.GetImageViews());
 
         UpdateBaseTextureIndices(ModelDescs);
 
@@ -377,6 +384,8 @@ private:
 			m_pipelines[i].Init(m_vkCore, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
 				&m_bigTextureArray.GetDescSets(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 		}
+
+        m_postProcessPipeline.Init(m_vkCore, m_descPool, "postprocess.comp");
 	}
 
 
@@ -415,40 +424,46 @@ private:
 
 
 	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool WithSecondBarrier, std::vector<VkCommandBuffer>& CmdBufs) {
-		bool FirstCommandBuffer = (MeshIndex == 0);
+		// Cache total number of meshes to find the bounds
+		const int totalMeshes = (int)m_modelContexts.size();
+		bool IsFirstMesh = (MeshIndex == 0);
+		bool IsLastMesh = (MeshIndex == totalMeshes - 1);
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
-			VkImage currentImage = m_vkCore.GetImage(i);
-			VkFormat swapChainFormat = m_vkCore.GetSwapChainFormat();
+			VkImage CurrentImage = m_vkCore.GetImage(i);
+			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// 1. Transition Undefined -> Color Attachment (Now uses Sync2)
-			OgldevVK::ImageMemBarrier2(CmdBuf, currentImage, swapChainFormat,
-				VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+			// 1. FIX DATA LOSS: Only transition from UNDEFINED on the first mesh.
+			// Subsequent meshes must preserve the existing drawing content.
+			VkImageLayout initialLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, initialLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
-			// 2. Standard graphics pipeline rendering
-			BeginRendering(CmdBuf, i, FirstCommandBuffer);
+			// 2. Standard graphics pipeline rendering 
+			BeginRendering(CmdBuf, i, IsFirstMesh);
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
 
-			// 3. DEMO TRANSITION: Transition Color Attachment -> General for the Compute Post-Process step
-			OgldevVK::ImageMemBarrier2(CmdBuf, currentImage, swapChainFormat,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
+			// 3. FIX OVERHEAD: Only run the Post-Process Compute shader after the LAST mesh finishes drawing
+			if (IsLastMesh) {
+				// Transition Color Attachment -> General for the Compute Post-Process step 
+				OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
-			// 4. Record Compute Shader Dispatch here
-			// m_postProcessComputePipeline.Bind(CmdBuf);
-			// vkCmdDispatch(CmdBuf, m_width / 16, m_height / 16, 1);
+				// 4. Record Compute Shader Dispatch here 
+				u32 groupCountX = (WINDOW_WIDTH + 15) / 16;
+				u32 groupCountY = (WINDOW_HEIGHT + 15) / 16;
+				u32 groupCountZ = 1;
+				m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, groupCountX, groupCountY, groupCountZ);
 
-			if (WithSecondBarrier) {
-				// 5. DEMO TRANSITION: Transition General -> Present Source
-				OgldevVK::ImageMemBarrier2(CmdBuf, currentImage, swapChainFormat,
-					VK_IMAGE_LAYOUT_GENERAL,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+				if (WithSecondBarrier) {
+					// 5. Transition General -> Present Source 
+					OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+				}
+			} else {
+				// Keep the layout as COLOR_ATTACHMENT_OPTIMAL for the next mesh's command buffer
 			}
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
@@ -578,6 +593,8 @@ private:
 	VkShaderModule m_fs = VK_NULL_HANDLE;
 	OgldevVK::LightingProgram m_pipelines[OgldevVK::NUM_LIGHTING_MODES];
 	std::vector<ModelContext> m_modelContexts;
+    PostprocessComputePipeline m_postProcessPipeline;
+	std::vector<VkDescriptorSet> m_postProcessDescSets;
 	GLMCameraFirstPerson* m_pGameCamera = NULL;
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;

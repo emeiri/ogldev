@@ -624,6 +624,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Terrain14_PerlinNoise", "Terrain14\Terrain14.vcxproj", "{5A9E48BB-41F0-4994-9E28-5DA1AF25053C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial32", "Vulkan\Tutorial32\Tutorial32.vcxproj", "{3FF21EE6-A574-45FC-8B7B-5B7D09940D86}"
+	ProjectSection(ProjectDependencies) = postProject
+		{78DE46DB-5CB4-4B6C-9BE7-68D59964B639} = {78DE46DB-5CB4-4B6C-9BE7-68D59964B639}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -128,7 +128,7 @@ public:
 
 	VkDescriptorSetLayout CreateDescSetLayout(const std::vector<VkDescriptorSetLayoutBinding>& Bindings);
 
-	VkDescriptorPool CreateDescPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount, u32 MaxSets);
+	VkDescriptorPool CreateDescPool(u32 TextureCount, u32 UniformBufferCount, u32 StorageBufferCount, u32 StorageImageCount, u32 MaxSets);
 
 	size_t GetMaxUniformBufferSize() const { return m_physDevices.Selected().m_devProps.limits.maxUniformBufferRange; }
 

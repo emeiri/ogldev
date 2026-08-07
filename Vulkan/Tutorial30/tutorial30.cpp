@@ -327,7 +327,7 @@ private:
 		u32 StorageBufferCount = 50;
         u32 MaxSets = m_numImages * (u32)Models.size() * (OgldevVK::NUM_LIGHTING_MODES + 1);	// +1 for the global texture array descriptor set
 
-		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, MaxSets);
+		m_descPool = m_vkCore.CreateDescPool(TextureCount, UniformBufferCount, StorageBufferCount, 0, MaxSets);
 	}
 
 

@@ -1,0 +1,46 @@
+/*
+		Copyright 2026 Etay Meiri
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+#version 460
+
+// 16x16 thread groups is standard and efficient for modern GPUs
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+// binding 0 matches the descriptor set layout we will build below
+// rgba8 matches standard swapchain formats (adjust if using bgra8)
+layout(binding = 0, rgba8) uniform image2D screenImage;
+
+void main() 
+{
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(screenImage);
+
+    // Guard against window sizes that are not perfectly divisible by 16
+    if (texelCoord.x >= size.x || texelCoord.y >= size.y) {
+        return;
+    }
+
+    // Read the current pixel drawn by your graphics pipeline
+    vec4 color = imageLoad(screenImage, texelCoord);
+
+    // Apply a simple post-processing effect (e.g., Invert Colors)
+    vec4 processedColor = vec4(1.0 - color.rgb, color.a);
+
+    // Write the modified pixel back to the swapchain image
+    imageStore(screenImage, texelCoord, processedColor);
+}
