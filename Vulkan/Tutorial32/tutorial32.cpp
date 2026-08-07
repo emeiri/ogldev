@@ -104,6 +104,12 @@ public:
 
 	~VulkanApp()
 	{
+		if (m_vkCore.GetDevice() != VK_NULL_HANDLE) {
+			vkDeviceWaitIdle(m_vkCore.GetDevice());
+		}
+
+		m_imGUIRenderer.Destroy();
+
         for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			for (CommandBuffersVecs& v : m_cmdBufs[MeshIndex]) {
 				m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
@@ -128,7 +134,7 @@ public:
 
 		vkDestroyDescriptorPool(m_device, m_descPool, NULL);			
 
-		m_imGUIRenderer.Destroy();
+		glfwTerminate();
 	}
 
 
@@ -257,8 +263,6 @@ public:
 				Frames = 0;
 			}
 		}
-
-		glfwTerminate();
 	}
 
 
