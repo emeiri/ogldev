@@ -151,9 +151,10 @@ void ImGUIRenderer::Destroy()
 {
 	m_pvkCore->FreeCommandBuffers((u32)m_cmdBufs.size(), m_cmdBufs.data());
 
+	ImGui_ImplVulkan_Shutdown();
+
 	vkDestroyDescriptorPool(m_pvkCore->GetDevice(), m_descriptorPool, NULL);
 
-	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 }
