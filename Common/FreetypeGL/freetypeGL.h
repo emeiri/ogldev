@@ -34,12 +34,9 @@
 #pragma once
 
 #include <GL/glew.h>
-#include "font-manager.h"
-#include "markup.h"
 #include "texture-font.h"
-#include "text-buffer.h"
+#include "vertex-buffer.h"
 #include "mat4.h"
-#include "shader.h"
 
 using namespace ftgl;
 
@@ -108,6 +105,6 @@ private:
     texture_font_t* m_pFonts[NUM_FONTS] = {};
     GLuint m_shaderProg = -1;
     mat4 m_model, m_view, m_projection;
-    GLuint m_dummyVAO = INVALID_UNIFORM_LOCATION;
+    GLuint m_dummyVAO = -1;
 };
 
