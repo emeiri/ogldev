@@ -67,7 +67,7 @@ public:
         int AOMap = m_pRenderingSystem->LoadTexture2D("../Content/DamagedHelmet/glTF/Default_AO.jpg");
         pModel->SetAmbientOcclusionMap(AOMap);
 
-        Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx", NULL);
+        Texture* pBRDF_LUT = new Texture(GL_TEXTURE_2D, "../Content/textures/brdfLUT.ktx");
         pBRDF_LUT->Load();
         pConfig->pBRDF_LUT = pBRDF_LUT;
 

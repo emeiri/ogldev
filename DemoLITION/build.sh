@@ -24,15 +24,18 @@ SOURCES="$ROOTDIR/Common/ogldev_util.cpp \
 	 $ROOTDIR/Common/ogldev_ect_cubemap.cpp \
 	 $ROOTDIR/Common/ogldev_shadow_mapping_technique_point_light.cpp \
 	 Framework/Source/*.cpp \
-	 Framework/Source/GL/*.cpp"
+	 Framework/Source/GL/*.cpp \
+         Framework/Source/Services/*.cpp"
 	 
 IMGUI_SOURCES="$ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_impl_glfw.cpp \
        	       $ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui.cpp \
 	       $ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_draw.cpp \
 	       $ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_impl_opengl3.cpp \
 	       $ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_tables.cpp \
-	       $ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_widgets.cpp"
+	       $ROOTDIR/Common/3rdparty/ImGui/GLFW/imgui_widgets.cpp \
+	       $ROOTDIR/Common/3rdparty/ImGui/imGuIZMO.quat/*.cpp"
 
-$CC $IMGUI_SOURCES $SOURCES $IMGUI_SOURCES $OGL_CPPFLAGS -IFramework/Include/ -I../Common -c
+
+$CC $IMGUI_SOURCES $SOURCES $IMGUI_SOURCES $OGL_CPPFLAGS -DIMGUIZMO_IMGUI_FOLDER="3rdparty/ImGui/GLFW/" -IFramework/Include/ -I../Common -c
 
 ar rcs $TARGET *.o

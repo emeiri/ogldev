@@ -20,7 +20,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "imGuIZMOquat.h"
+#include "3rdparty/ImGui/imGuIZMO.quat/imGuIZMOquat.h"
 
 #include "Int/core_scene.h"
 #include "Int/core_rendering_system.h"

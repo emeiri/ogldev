@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd ../DemoLITION
-../tutorial66_youtube/tutorial66
+../Terrain14/terrain_demo14
 cd -
