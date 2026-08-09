@@ -78,6 +78,10 @@ public:
         InitMesh();
 
         InitRenderer();
+
+        printf("\n\n\nUsage: \n");
+        printf("Press 't' to toggle cell shading\n");
+        printf("Press 'r' to toggle rim lighting\n");
     }
 
 
@@ -136,29 +140,8 @@ public:
                 glfwTerminate();
                 exit(0);
 
-            case 'a':
-                m_pointLights[0].Attenuation.Linear += ATTEN_STEP;
-                m_pointLights[1].Attenuation.Linear += ATTEN_STEP;
-                break;
-
-            case GLFW_KEY_C:
+            case GLFW_KEY_T:
                 m_isCellShadingEnabled = !m_isCellShadingEnabled;
-                break;
-
-
-            case 'z':
-                m_pointLights[0].Attenuation.Linear -= ATTEN_STEP;
-                m_pointLights[1].Attenuation.Linear -= ATTEN_STEP;
-                break;
-
-            case 's':
-                m_pointLights[0].Attenuation.Exp += ATTEN_STEP;
-                m_pointLights[1].Attenuation.Exp += ATTEN_STEP;
-                break;
-
-            case 'x':
-                m_pointLights[0].Attenuation.Exp -= ATTEN_STEP;
-                m_pointLights[1].Attenuation.Exp -= ATTEN_STEP;
                 break;
 
             case GLFW_KEY_R:
