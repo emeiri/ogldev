@@ -372,7 +372,7 @@ public:
 
     virtual GLMCameraFirstPerson* GetCurrentCamera() = 0;
     
-    virtual void SetCameraSpeed(float Speed) = 0;
+    virtual void SetCameraAcceleration(float Acceleration) = 0;
 
     virtual SceneObject* GetPickedSceneObject() const = 0;
 

@@ -90,7 +90,6 @@ void test_normal_map()
     pScene->GetDirLights().push_back(l);*/
 
     pScene->SetCamera(Vector3f(0.0f, 0.0, -5.0f), Vector3f(0.0f, 0.0f, 1.0f));
-    pScene->SetCameraSpeed(0.1f);
     
     game.Init(pScene);
 

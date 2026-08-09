@@ -52,7 +52,6 @@ public:
         m_pScene = m_pRenderingSystem->CreateEmptyScene();
         m_pScene->SetClearColor(Vector4f(0.0f, 1.0f, 0.0f, 0.0f));
         m_pScene->SetCamera(Vector3f(0.0f, 0.0f, -4.5f), Vector3f(0.0f, 0.0f, 1.0f));
-        m_pScene->SetCameraSpeed(0.1f);
 #ifdef POINT_LIGHT
         m_pScene->GetPointLights().push_back(m_pointLight);
 #else

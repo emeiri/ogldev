@@ -109,7 +109,7 @@ public:
 
     void SetCameraZRange(float Near, float Far);
 
-    void SetCameraSpeed(float Speed);
+    void SetCameraAcceleration(float Acceleration);
 
     void SetPickedSceneObject(CoreSceneObject* pSceneObject) { m_pPickedSceneObject = pSceneObject; }
 

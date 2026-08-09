@@ -78,8 +78,6 @@ public:
 
         m_pScene->SetClearColor(Vector4f(1.0f, 0.0f, 1.0f, 1.0f));
 
-        //  m_pScene->SetCameraSpeed(0.1f);
-
         m_pScene->GetDirLights().push_back(m_dirLight);
         m_pScene->GetConfig()->GetInfiniteGrid().Enabled = false;
         m_pScene->GetConfig()->ControlShadowMapping(false);

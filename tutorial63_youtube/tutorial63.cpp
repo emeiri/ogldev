@@ -65,8 +65,6 @@ public:
 
         m_pScene->SetClearColor(Vector4f(0.5f, 0.5f, 0.5f, 1.0f));
 
-        //  m_pScene->SetCameraSpeed(0.1f);
-
        // m_pScene->GetDirLights().push_back(m_dirLights[0]);
        // m_pScene->GetDirLights().push_back(m_dirLights[1]);
         m_pScene->GetPointLights().push_back(m_pointLight);

@@ -40,7 +40,6 @@ class GLMCameraFirstPerson : public CameraAPI {
 public:
 
 	CameraMovement m_movement;
-	float m_acceleration = 40.0f;
 	float m_damping = 5.0f;
 	float m_maxSpeed = 10.0f;
 	float m_fastCoef = 10.0f;
@@ -82,6 +81,8 @@ public:
 
 	const glm::vec3& GetVelocity() const { return m_velocity; }
 
+	void SetAcceleration(float Acceleration) { m_acceleration = Acceleration; }
+
 	glm::mat4 GetGlobalWorldRotation() const;
 
 	void SetPos(const glm::vec3& Pos) { m_cameraPos = Pos; }
@@ -120,7 +121,7 @@ private:
 
     bool m_initialized = false;
 	bool m_isFirstClick = true;
-
+	float m_acceleration = 40.0f;
 	float m_yaw = 0.0f;
 	float m_pitch = 0.0f;
 

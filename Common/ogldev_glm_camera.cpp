@@ -445,3 +445,5 @@ glm::mat4 GLMCameraFirstPerson::GetGlobalWorldRotation() const
 	return Rotate;*/
 	return glm::mat4_cast(m_globalWorldRotation); 
 }
+
+

@@ -71,8 +71,6 @@ public:
    // 
    //     m_pScene->SetCamera(Vector3f(0.0f, 5.0f, 0.5f), Vector3f(-0.0f, -1.0f, 0.5f));
 
-        m_pScene->SetCameraSpeed(0.1f);
-
         //m_pScene->GetDirLights().push_back(m_dirLight);
         m_pScene->GetPointLights().push_back(m_pointLight);
 

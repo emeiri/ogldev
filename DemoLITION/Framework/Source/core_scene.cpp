@@ -230,10 +230,9 @@ void CoreScene::SetCameraZRange(float Near, float Far)
 }
 
 
-void CoreScene::SetCameraSpeed(float Speed)
+void CoreScene::SetCameraAcceleration(float Acceleration)
 {
-    printf("Warning! SetCameraSpeed is not implemented!!!\n");
- //   m_defaultCamera.SetSpeed(Speed);
+    m_defaultCamera.SetAcceleration(Acceleration);
 }
 
 
