@@ -31,6 +31,14 @@
 #include "bindless_tex_technique.h"
 #include "3rdparty/stb_image.h"
 
+
+// Download the following three files:
+// https://unity3d.com/files/labs/downloads/vfx/assets01/Explosion00/Explosion00-sequence-tga.zip 
+// https://unity3d.com/files/labs/downloads/vfx/assets01/Explosion01/Explosion01-sequence-tga.zip 
+// https://unity3d.com/files/labs/downloads/vfx/assets01/Explosion02/Explosion02-sequence-tga.zip
+// Extract them somewhere and set the path below to point to the directory where you extracted them.
+#define IMAGE_BASE_DIR "G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src"
+
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
@@ -102,11 +110,21 @@ private:
         std::vector<Texture> Textures(NUM_TOTAL_FILES, GL_TEXTURE_2D);
         std::vector<GLuint64> TextureHandles(NUM_TOTAL_FILES);
 
+        string CheckPath = IMAGE_BASE_DIR "/explosion0/explosion00-frame00.tga";
+
+        if (!IsFileExists(CheckPath.c_str())) {
+            OGLDEV_ERROR("Could not find file '%s'.\r\n"
+                         "Please set IMAGE_BASE_DIR at the start of ogldev/tutorial59_youtube/tutorial59.cpp to point\r\n"
+                         "to the directory where you extracted the explosion sequence files.\r\n"
+                         "See more details next to the definition of that macro.",
+                         CheckPath.c_str());
+        }
+
         for (uint32_t j = 0; j < NUM_DIRS; j++) {
             for (uint32_t i = 0; i < NUM_FILES_IN_DIR; i++) {
                 char Filename[1024];
                 snprintf(Filename, sizeof(Filename),
-                         "G:/emeir/Books/3D-Graphics-Rendering-Cookbook-2/deps/src/explosion%01u/explosion%02u-frame%03u.tga", j, j, i + 1);
+                         "%s/explosion%01u/explosion%02u-frame%03u.tga", IMAGE_BASE_DIR, j, j, i + 1);
                 int Index = j * NUM_FILES_IN_DIR + i;
                 TextureFilenames[Index] = Filename;
             }
