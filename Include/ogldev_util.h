@@ -128,6 +128,7 @@ void glDebugOutput(GLenum source,
 #endif
 
 string GetDirFromFilename(const string& Filename);
+bool IsFileExists(const char* filename);
 
 #define MAX_BONES (200)
 

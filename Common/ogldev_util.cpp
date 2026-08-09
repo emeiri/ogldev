@@ -374,3 +374,25 @@ string GetDirFromFilename(const string& Filename)
 
     return Dir;
 }
+
+
+#if defined(_WIN32) || defined(__WIN32__)
+#include <sys/stat.h>
+// Windows structures and functions usually have an underscore prefix
+#define STAT_STRUCT struct _stat
+#define STAT_FUNC _stat
+#else
+#include <sys/stat.h>
+#define STAT_STRUCT struct stat
+#define STAT_FUNC stat
+#endif
+
+bool IsFileExists(const char* filename) 
+{
+    STAT_STRUCT buffer;
+
+    // stat returns 0 on success (file exists)
+    bool exists = (STAT_FUNC(filename, &buffer) == 0);
+    
+    return exists;
+}
