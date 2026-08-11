@@ -124,8 +124,6 @@ public:
 
     virtual void SetAmbientOcclusionMap(int TextureHandle) { assert(0); }
 
-    virtual int GetMeshIndex(const std::string& Name);
-
     virtual size_t GetNumMeshes() const { return m_Meshes.size(); }
 
     static void GetVertexSizesInBytes(size_t& VertexSize, size_t& SkinnedVertexSize);
@@ -321,8 +319,6 @@ private:
 
     Vector3f m_minPos = Vector3f(FLT_MAX, FLT_MAX, FLT_MAX);
     Vector3f m_maxPos = Vector3f(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-
-    std::map<std::string, int> m_meshNameToMeshIndex;
 
     /////////////////////////////////////
 	// Skeletal animation stuff
