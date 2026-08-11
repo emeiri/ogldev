@@ -1660,11 +1660,9 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
         m_BoneInfo[BoneIndex].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[BoneIndex].OffsetMatrix;
     }
 
-    for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        string ChildName(pNode->mChildren[i]->mName.data);
-
-        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
-
+    for (uint i = 0; i < pNode->mNumChildren; i++) {
+        std::string ChildName(pNode->mChildren[i]->mName.data);
+        auto it = m_requiredNodeMap.find(ChildName);
         if (it == m_requiredNodeMap.end()) {
             printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
             assert(0);
