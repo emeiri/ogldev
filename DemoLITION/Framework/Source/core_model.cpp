@@ -407,13 +407,11 @@ void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNo
 template<typename VertexType>
 void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh) 
 {
-    const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
-
     printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
 
-    for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
-        const aiVector3D& Pos = paiMesh->mVertices[i];       
+    for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
         VertexType v;
+        const aiVector3D& Pos = paiMesh->mVertices[i];
         v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
 
         m_minPos.x = std::min(m_minPos.x, v.Position.x);
@@ -425,41 +423,15 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
         m_maxPos.z = std::max(m_maxPos.z, v.Position.z);
 
         if (paiMesh->mNormals) {
-            const aiVector3D& pNormal   = paiMesh->mNormals[i];
-            v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
+            v.Normal = Vector3f(paiMesh->mNormals[i].x, paiMesh->mNormals[i].y, paiMesh->mNormals[i].z);
         } else {
-            aiVector3D Normal(0.0f, 1.0f, 0.0f);
-            v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
+            v.Normal = Vector3f(0.0f, 1.0f, 0.0f);
         }
 
-        if (paiMesh->HasTextureCoords(0)) {
-            const aiVector3D& pTexCoord = paiMesh->mTextureCoords[0][i];
-            v.TexCoords0 = Vector2f(pTexCoord.x, pTexCoord.y);
-        } else {
-            v.TexCoords0 = Vector2f(0.0f);
-        }
-
-        if (paiMesh->HasTextureCoords(1)) {
-            const aiVector3D& pTexCoord = paiMesh->mTextureCoords[1][i];
-            v.TexCoords1 = Vector2f(pTexCoord.x, pTexCoord.y);
-        }
-        else {
-            v.TexCoords1 = Vector2f(0.0f);
-        }
-
-        if (paiMesh->mTangents) {
-            const aiVector3D& pTangent = paiMesh->mTangents[i];
-            v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
-        } else {
-            v.Tangent = Vector3f(0.0f);
-        }
-
-        if (paiMesh->mBitangents) {
-            const aiVector3D& pBitangent = paiMesh->mBitangents[i];
-            v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
-        } else {
-            v.Bitangent = Vector3f(0.0f);
-        }
+        v.TexCoords0 = paiMesh->HasTextureCoords(0) ? Vector2f(paiMesh->mTextureCoords[0][i].x, paiMesh->mTextureCoords[0][i].y) : Vector2f(0.0f);
+        v.TexCoords1 = paiMesh->HasTextureCoords(1) ? Vector2f(paiMesh->mTextureCoords[1][i].x, paiMesh->mTextureCoords[1][i].y) : Vector2f(0.0f);
+        v.Tangent = paiMesh->mTangents ? Vector3f(paiMesh->mTangents[i].x, paiMesh->mTangents[i].y, paiMesh->mTangents[i].z) : Vector3f(0.0f);
+        v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
 
         if (paiMesh->mColors[0]) {
             const aiColor4D& Color = *paiMesh->mColors[0];
@@ -478,7 +450,7 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
     }
 
     // Populate the index buffer
-    for (unsigned int i = 0 ; i < paiMesh->mNumFaces ; i++) {
+    for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
         const aiFace& Face = paiMesh->mFaces[i];
         //  printf("num indices %d\n", Face.mNumIndices);
         if (Face.mNumIndices != 3) {
@@ -507,9 +479,8 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
         VertexType v;
         const aiVector3D& Pos = paiMesh->mVertices[i];
-        // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
-        v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
 
+        v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
         m_minPos.x = std::min(m_minPos.x, v.Position.x);
         m_minPos.y = std::min(m_minPos.y, v.Position.y);
         m_minPos.z = std::min(m_minPos.z, v.Position.z);
@@ -521,8 +492,7 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
             const aiVector3D& pNormal = paiMesh->mNormals[i];
             v.Normal = Vector3f(pNormal.x, pNormal.y, pNormal.z);
         } else {
-            aiVector3D Normal(0.0f, 1.0f, 0.0f);
-            v.Normal = Vector3f(Normal.x, Normal.y, Normal.z);
+            v.Normal = Vector3f(0.0f, 1.0f, 0.0f);
         }
 
         const aiVector3D& pTexCoord0 = paiMesh->HasTextureCoords(0) ? paiMesh->mTextureCoords[0][i] : Zero3D;
@@ -531,21 +501,8 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
         const aiVector3D& pTexCoord1 = paiMesh->HasTextureCoords(1) ? paiMesh->mTextureCoords[1][i] : Zero3D;
         v.TexCoords1 = Vector2f(pTexCoord1.x, pTexCoord1.y);
 
-        if (paiMesh->mTangents) {
-            const aiVector3D& pTangent = paiMesh->mTangents[i];
-            v.Tangent = Vector3f(pTangent.x, pTangent.y, pTangent.z);
-        }
-        else {
-            v.Tangent = Vector3f(0.0f);
-        }
-
-        if (paiMesh->mBitangents) {
-            const aiVector3D& pBitangent = paiMesh->mBitangents[i];
-            v.Bitangent = Vector3f(pBitangent.x, pBitangent.y, pBitangent.z);
-        }
-        else {
-            v.Bitangent = Vector3f(0.0f);
-        }
+        v.Tangent = paiMesh->mTangents ? Vector3f(paiMesh->mTangents[i].x, paiMesh->mTangents[i].y, paiMesh->mTangents[i].z) : Vector3f(0.0f);
+        v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
 
         if (paiMesh->mColors[0]) {
             const aiColor4D& Color = *paiMesh->mColors[0];
