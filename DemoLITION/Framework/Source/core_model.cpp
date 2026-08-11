@@ -1607,21 +1607,27 @@ void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float En
         CalcLocalTransform(StartTransform, StartAnimationTimeTicks, pStartNodeAnim);
     }
 
-    LocalTransform EndTransform;
-
     const aiNodeAnim* pEndNodeAnim = FindNodeAnim(EndAnimation, NodeName);
-
-    if ((pStartNodeAnim && !pEndNodeAnim) || (!pStartNodeAnim && pEndNodeAnim)) {
-        printf("On the node %s there is an animation node for only one of the start/end animations.\n", NodeName.c_str());
-        printf("This case is not supported\n");
-        exit(0);
-    }
-
+    LocalTransform EndTransform;
     if (pEndNodeAnim) {
         CalcLocalTransform(EndTransform, EndAnimationTimeTicks, pEndNodeAnim);
     }
 
-    if (pStartNodeAnim && pEndNodeAnim) {
+    if (pStartNodeAnim && !pEndNodeAnim) {
+        // Fallback to start transform only
+        Matrix4f ScalingM, RotationM, TranslationM;
+        ScalingM.InitScaleTransform(StartTransform.Scaling.x, StartTransform.Scaling.y, StartTransform.Scaling.z);
+        RotationM = Matrix4f(StartTransform.Rotation.GetMatrix());
+        TranslationM.InitTranslationTransform(StartTransform.Translation.x, StartTransform.Translation.y, StartTransform.Translation.z);
+        NodeTransformation = TranslationM * RotationM * ScalingM;
+    } else if (!pStartNodeAnim && pEndNodeAnim) {
+        // Fallback to end transform only
+        Matrix4f ScalingM, RotationM, TranslationM;
+        ScalingM.InitScaleTransform(EndTransform.Scaling.x, EndTransform.Scaling.y, EndTransform.Scaling.z);
+        RotationM = Matrix4f(EndTransform.Rotation.GetMatrix());
+        TranslationM.InitTranslationTransform(EndTransform.Translation.x, EndTransform.Translation.y, EndTransform.Translation.z);
+        NodeTransformation = TranslationM * RotationM * ScalingM;
+    } else if (pStartNodeAnim && pEndNodeAnim) {
         // Interpolate scaling
         const aiVector3D& Scale0 = StartTransform.Scaling;
         const aiVector3D& Scale1 = EndTransform.Scaling;
