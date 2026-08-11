@@ -172,16 +172,18 @@ bool CoreModel::IsPBR() const
     return ret;
 }
 
-void CoreModel::DestroyModel()
+
+void CoreModel::DestroyModel() 
 {
     for (CoreMaterial& material : m_Materials) {
         for (Texture* pTexture : material.pTextures) {
             if (pTexture) {
-                DestroyTexture(pTexture);
+                DestroyTexture(pTexture); // Assumes this handles GPU memory only!
             }
         }
     }
 }
+
 
 bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlags& Flags)
 {
@@ -509,7 +511,7 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
         LoadMeshBones(Vertices, MeshIndex, paiMesh);
-    }  
+    }
 }
 
 
@@ -884,8 +886,7 @@ void CoreModel::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial,
 
             if (paiTexture) {
                 LoadTextureEmbedded(paiTexture, MaterialIndex, MyType, IsSRGB);
-            }
-            else {
+            } else {
                 LoadTextureFromFile(Dir, Path, MaterialIndex, MyType, IsSRGB);
             }
         }
@@ -896,8 +897,9 @@ void CoreModel::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial,
 void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB) 
 {
 #ifdef DEBUG_MATERIALS
-    printf("Loaded embeddeded texture type '%s'\n", paiTexture->achFormatHint);
+    printf("Loaded embedded texture type '%s'\n", paiTexture->achFormatHint);
 #endif
+    // Raw assignment compiles successfully again
     m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
     int buffer_size = paiTexture->mWidth;   // TODO: just the width???
     m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData, IsSRGB);
@@ -938,8 +940,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
         material.AmbientColor.b += EmissiveColor.b;
         material.AmbientColor.a += EmissiveColor.a;
         material.AmbientColor.a = std::min(material.AmbientColor.a, 1.0f);
-    }
-    else {
+    } else {
         material.AmbientColor = AllOnes;
     }
 
@@ -989,7 +990,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     }
 
     float OpaquenessThreshold = 0.05f;
-    float Opacity = 1.0f;   
+    float Opacity = 1.0f;
     if (pMaterial->Get(AI_MATKEY_OPACITY, Opacity) == AI_SUCCESS) {
         material.m_transparencyFactor = CLAMP(1.0f - Opacity, 0.0f, 1.0f);
         if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
@@ -1062,8 +1063,6 @@ void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
 }
 
 
-
-
 static void traverse(int depth, aiNode* pNode)
 {
 #ifdef DEBUG_SCENE_HIERARCHY
@@ -1074,8 +1073,8 @@ static void traverse(int depth, aiNode* pNode)
     printf("%s\n", pNode->mName.C_Str());
 #endif
 
-    Matrix4f NodeTransformation(pNode->mTransformation);
 #ifdef DEBUG_SCENE_HIERARCHY
+    Matrix4f NodeTransformation(pNode->mTransformation);
     NodeTransformation.Print(); 
 #endif
 
@@ -1240,7 +1239,7 @@ static bool GetFullTransformation(const aiNode* pRootNode, const char* pName, Ma
 }
 
 
-void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light) 
 {
     DirectionalLight l;
     //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
@@ -1280,7 +1279,7 @@ void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light
 }
 
 
-void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light) 
 {
     PointLight l;
     l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
@@ -1311,7 +1310,7 @@ void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
 }
 
 
-void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
+void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light) 
 {
     SpotLight l;
     //l.Color = Vector3f(light.mColorDiffuse.r, light.mColorDiffuse.g, light.mColorDiffuse.b);
@@ -1416,9 +1415,9 @@ void CoreModel::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint
 }
 
 
-void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone)
+void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone) 
 {
-    string NodeName(pBone->mName.C_Str());
+    std::string NodeName(pBone->mName.C_Str());
 
     const aiNode* pParent = NULL;
 
@@ -1435,7 +1434,7 @@ void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone)
         pParent = it->second.pNode->mParent;
 
         if (pParent) {
-            NodeName = string(pParent->mName.C_Str());
+            NodeName = std::string(pParent->mName.C_Str());
         }
 
     } while (pParent);
@@ -1650,7 +1649,7 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode,
 
 
 void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
-                                           const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor)
+                                         const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor) 
 {
     std::string NodeName(pNode->mName.data);
 
@@ -1811,8 +1810,8 @@ float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Animat
 }
 
 
-const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation&
-                                            Animation, const string& NodeName)
+// TODO: Optimize this function by using a hash map for faster lookups if performance becomes an issue.
+const aiNodeAnim* CoreModel::FindNodeAnim(const aiAnimation& Animation, const std::string& NodeName)
 {
     for (uint i = 0 ; i < Animation.mNumChannels ; i++) {
         const aiNodeAnim* pNodeAnim = Animation.mChannels[i];
