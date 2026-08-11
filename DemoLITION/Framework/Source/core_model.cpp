@@ -116,7 +116,7 @@ static void SetMaterialType(const aiMaterial* pMaterial, CoreMaterial& MyMateria
         assert(0);
     }
 
-    MaterialType mt = MaterialType_Invalid;
+    MaterialTypeFlags mt = MaterialType_Invalid;
 
     switch (ShadingModel) {
         case aiShadingMode_Unlit:

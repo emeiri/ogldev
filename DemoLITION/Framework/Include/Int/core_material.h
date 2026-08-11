@@ -43,7 +43,7 @@ enum TEXTURE_TYPE {
 };
 
 
-enum MaterialType {
+enum MaterialTypeFlags : u32 {
     MaterialType_Invalid = 0,
     MaterialType_MetallicRoughness = 0x1,
     MaterialType_SpecularGlossiness = 0x2,
