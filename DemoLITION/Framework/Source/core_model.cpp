@@ -1421,6 +1421,12 @@ void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTic
         return;
     }
 
+    float MaxTime = (float)pNodeAnim->mPositionKeys[pNodeAnim->mNumPositionKeys - 1].mTime;
+    if (AnimationTimeTicks >= MaxTime) {
+        Out = pNodeAnim->mPositionKeys[pNodeAnim->mNumPositionKeys - 1].mValue;
+        return;
+    }
+
     uint PositionIndex = FindPosition(AnimationTimeTicks, pNodeAnim);
     uint NextPositionIndex = PositionIndex + 1;
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
@@ -1460,6 +1466,12 @@ void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeT
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumRotationKeys == 1) {
         Out = pNodeAnim->mRotationKeys[0].mValue;
+        return;
+    }
+
+    float MaxTime = (float)pNodeAnim->mRotationKeys[pNodeAnim->mNumRotationKeys - 1].mTime;
+    if (AnimationTimeTicks >= MaxTime) {
+        Out = pNodeAnim->mRotationKeys[pNodeAnim->mNumRotationKeys - 1].mValue;
         return;
     }
 
