@@ -1752,9 +1752,13 @@ float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int Animat
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
     // we need to use the integral part of mDuration for the total length of the animation
     float Duration = 0.0f;
-    float fraction = modf((float)m_pScene->mAnimations[AnimationIndex]->mDuration, &Duration);
-    float AnimationTimeTicks = fmod(TimeInTicks, Duration);
-    return AnimationTimeTicks;
+    modf((float)m_pScene->mAnimations[AnimationIndex]->mDuration, &Duration);
+
+    if (Duration <= 0.0f) {
+        return 0.0f;
+    }
+
+    return std::fmod(TimeInTicks, Duration);
 }
 
 
