@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <filesystem>
 #include <assimp/GltfMaterial.h>
 
@@ -994,7 +995,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     float OpaquenessThreshold = 0.05f;
     float Opacity = 1.0f;
     if (pMaterial->Get(AI_MATKEY_OPACITY, Opacity) == AI_SUCCESS) {
-        material.m_transparencyFactor = CLAMP(1.0f - Opacity, 0.0f, 1.0f);
+        material.m_transparencyFactor = std::clamp(1.0f - Opacity, 0.0f, 1.0f);
         if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
             material.m_transparencyFactor = 0.0f;
         }
@@ -1003,7 +1004,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
     aiColor4D TransparentColor;
     if (pMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, TransparentColor) == AI_SUCCESS) {
         float Opacity = std::max(std::max(TransparentColor.r, TransparentColor.g), TransparentColor.b);
-        material.m_transparencyFactor = CLAMP(Opacity, 0.0f, 1.0f);
+        material.m_transparencyFactor = std::clamp(Opacity, 0.0f, 1.0f);
         if (material.m_transparencyFactor >= 1.0f - OpaquenessThreshold) {
             material.m_transparencyFactor = 0.0f;
         }
