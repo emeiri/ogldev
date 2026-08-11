@@ -16,6 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <filesystem>
 #include <assimp/GltfMaterial.h>
 
 #include "Int/core_rendering_system.h"
@@ -99,21 +100,10 @@ inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 
 static std::string GetFullPath(const std::string& Dir, const aiString& Path) 
 {
-    string p(Path.data);
-
-    for (int i = 0; i < p.length(); i++) {
-        if (p[i] == '\\') {
-            p[i] = '/';
-        }
-    }
-
-    if (p.substr(0, 2) == ".\\") {
-        p = p.substr(2, p.size() - 2);
-    }
-
-    string FullPath = Dir + "/" + p;
-
-    return FullPath;
+    std::filesystem::path p(Path.C_Str());
+    std::string ret = (std::filesystem::path(Dir) / p).generic_string();
+    // .generic_string() automatically converts windows \ to /
+    return ret;
 }
 
 
