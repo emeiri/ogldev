@@ -800,12 +800,12 @@ void CoreModel::LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMa
         }
         
 #ifdef OGLDEV_VULKAN
-        std::string Dir("../../Content/textures/");
+        std::string DefaultTextureDir("../../Content/textures/");
 #else
-        std::string Dir("../Content/textures/");
+        std::string DefaultTextureDir("../Content/textures/");
 #endif
 
-        LoadTextureFromFile(Dir, Path, MaterialIndex, TEX_TYPE_BASE, false);
+        LoadTextureFromFile(DefaultTextureDir, Path, MaterialIndex, TEX_TYPE_BASE, false);
     }
 }
 
