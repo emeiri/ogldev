@@ -874,6 +874,8 @@ void CoreModel::LoadClearCoatNormalTexture(const std::string& Dir, const aiMater
 void CoreModel::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
                             aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType) 
 {
+    assert(MyType < TEX_TYPE_NUM);
+
     m_Materials[MaterialIndex].pTextures[MyType] = NULL;
 
     if (pMaterial->GetTextureCount(AssimpType) > 0) {
