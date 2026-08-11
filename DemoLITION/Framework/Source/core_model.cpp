@@ -554,6 +554,7 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vec
 {
     size_t NumIndices = Indices.size();
     size_t NumVertices = Vertices.size();
+    if (NumIndices == 0 || NumVertices == 0) return;
 
     // Create a remap table
     std::vector<unsigned int> remap(NumIndices);
