@@ -1430,19 +1430,22 @@ void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTic
     uint PositionIndex = FindPosition(AnimationTimeTicks, pNodeAnim);
     uint NextPositionIndex = PositionIndex + 1;
     assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
+
     float t1 = (float)pNodeAnim->mPositionKeys[PositionIndex].mTime;
-    if (t1 > AnimationTimeTicks) {
-        Out = pNodeAnim->mPositionKeys[PositionIndex].mValue;
-    } else {
-        float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
-        float DeltaTime = t2 - t1;
-        float Factor = (AnimationTimeTicks - t1) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
-        const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
-        const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
-        aiVector3D Delta = End - Start;
-        Out = Start + Factor * Delta;
+    float t2 = (float)pNodeAnim->mPositionKeys[NextPositionIndex].mTime;
+
+    // Fix: Stripped redundant unreachable 'if (t1 > AnimationTimeTicks)' check and safe-guarded division
+    float DeltaTime = t2 - t1;
+    float Factor = 0.0f;
+    if (DeltaTime > 0.0f) {
+        Factor = (AnimationTimeTicks - t1) / DeltaTime;
     }
+
+    Factor = std::clamp(Factor, 0.0f, 1.0f);
+
+    const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
+    const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
+    Out = Start + Factor * (End - Start);
 }
 
 
@@ -1478,19 +1481,21 @@ void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeT
     uint RotationIndex = FindRotation(AnimationTimeTicks, pNodeAnim);
     uint NextRotationIndex = RotationIndex + 1;
     assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-    float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime;
-    if (t1 > AnimationTimeTicks) {
-        Out = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-    } else {
-        float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
-        float DeltaTime = t2 - t1;
-        float Factor = (AnimationTimeTicks - t1) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
-        const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-        const aiQuaternion& EndRotationQ   = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
-        aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-    }
 
+    float t1 = (float)pNodeAnim->mRotationKeys[RotationIndex].mTime;
+    float t2 = (float)pNodeAnim->mRotationKeys[NextRotationIndex].mTime;
+
+    float DeltaTime = t2 - t1;
+    float Factor = 0.0f;
+    if (DeltaTime > 0.0f) {
+        Factor = (AnimationTimeTicks - t1) / DeltaTime;
+    }
+    
+    Factor = std::clamp(Factor, 0.0f, 1.0f);
+
+    const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
+    const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
+    aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
     Out.Normalize();
 }
 
