@@ -684,8 +684,8 @@ public:
             HandledByMe = Carbonara::OnKeyboard(key, action);
         }
 
-        m_ballBasePos.x = CLAMP(m_ballBasePos.x, 0.0f, 5.0f);
-        m_ballBasePos.z = CLAMP(m_ballBasePos.z, -1.0f, 1.0f);
+        m_ballBasePos.x = std::clamp(m_ballBasePos.x, 0.0f, 5.0f);
+        m_ballBasePos.z = std::clamp(m_ballBasePos.z, -1.0f, 1.0f);
         return HandledByMe;
     }
 

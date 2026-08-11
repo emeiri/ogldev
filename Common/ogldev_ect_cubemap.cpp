@@ -112,10 +112,10 @@ int ConvertEquirectangularImageToCubemap(const Bitmap& b, std::vector<Bitmap>& C
                 float V = v * b.h_;
 
                 // 4-samples for bilinear interpolation
-                int U1 = CLAMP(int(floor(U)), 0, MaxW);
-                int V1 = CLAMP(int(floor(V)), 0, MaxH);
-                int U2 = CLAMP(U1 + 1, 0, MaxW);
-                int V2 = CLAMP(V1 + 1, 0, MaxH);
+                int U1 = std::clamp(int(floor(U)), 0, MaxW);
+                int V1 = std::clamp(int(floor(V)), 0, MaxH);
+                int U2 = std::clamp(U1 + 1, 0, MaxW);
+                int V2 = std::clamp(V1 + 1, 0, MaxH);
 
                 // Calculate the fractional part
                 float s = U - U1;

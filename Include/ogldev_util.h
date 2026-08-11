@@ -132,8 +132,6 @@ bool IsFileExists(const char* filename);
 
 #define MAX_BONES (200)
 
-#define CLAMP(Val, Start, End) std::min(std::max((Val), (Start)), (End));
-
 int GetGLMajorVersion();
 int GetGLMinorVersion();
 
