@@ -88,18 +88,17 @@ void BRDF_LUT::InitInputBuffer()
 {
 	GLuint InputBuf = 0;
 	glCreateBuffers(1, &InputBuf);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, InputBuf);
 	float f = 0.0f;
-	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float), &f, GL_DYNAMIC_DRAW);
-	glNamedBufferStorage(InputBuf, sizeof(float), &f, GL_MAP_WRITE_BIT);
+	glNamedBufferStorage(InputBuf, sizeof(float), &f, GL_DYNAMIC_STORAGE_BIT);
 }
 
 
 void BRDF_LUT::InitOutputBuffer()
 {
-	glCreateBuffers(1, &m_outputBuf);
-	glNamedBufferStorage(m_outputBuf, bufferSize, m_outputData.data(), GL_MAP_WRITE_BIT | GL_MAP_READ_BIT);
 	m_outputData.resize(bufferSize);
+	glCreateBuffers(1, &m_outputBuf);
+	GLbitfield Flags = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT | GL_CLIENT_STORAGE_BIT;
+	glNamedBufferStorage(m_outputBuf, bufferSize, m_outputData.data(), Flags);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_outputBuf);
 }
 
@@ -115,8 +114,7 @@ void BRDF_LUT::ReadResults()
 	}
 
 	memcpy(m_outputData.data(), p, bufferSize);
-
-	bool result = glUnmapNamedBuffer(m_outputBuf);
+	glUnmapNamedBuffer(m_outputBuf);
 }
 
 
