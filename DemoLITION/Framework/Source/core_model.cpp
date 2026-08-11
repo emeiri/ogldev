@@ -575,7 +575,6 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
         printf("Tangent: "); v.Tangent.Print();
         printf("Bitangent: "); v.Bitangent.Print();*/
 	
-
         Vertices[i] = v;
     }
 
@@ -602,8 +601,8 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
     }
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
-	    LoadMeshBones(Vertices, MeshIndex, paiMesh);
-	}
+        LoadMeshBones(Vertices, MeshIndex, paiMesh);
+    }
 
     OptimizeMesh(MeshIndex, Indices, Vertices, AllVertices);
 }
@@ -1420,8 +1419,7 @@ void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone)
     const aiNode* pParent = NULL;
 
     do {
-        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(NodeName);
-
+        auto it = m_requiredNodeMap.find(NodeName);
         if (it == m_requiredNodeMap.end()) {
             printf("Cannot find bone %s in the hierarchy\n", NodeName.c_str());
             assert(0);
