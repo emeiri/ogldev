@@ -464,9 +464,9 @@ private:
 
 	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool IncludeComputePostProcess, std::vector<VkCommandBuffer>& CmdBufs) 
     {
-		const int totalMeshes = (int)m_modelContexts.size();
+		int TotalMeshes = (int)m_modelContexts.size();
 		bool IsFirstMesh = (MeshIndex == 0);
-		bool IsLastMesh = (MeshIndex == totalMeshes - 1);
+		bool IsLastMesh = (MeshIndex == TotalMeshes - 1);
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
@@ -475,18 +475,14 @@ private:
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// 1. Maintain content across sequential draws
 			VkImageLayout initialLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat, initialLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
-			// 2. Standard graphics pipeline rendering 
 			BeginRendering(CmdBuf, i, IsFirstMesh);
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
 
-			// 3. Conditional Compute Dispatch processing on the LAST mesh boundary
-				// 3. Conditional Compute Dispatch processing on the LAST mesh boundary
 			if (IsLastMesh) {
 				if (IncludeComputePostProcess) {
 					// PATH A: Compute Active (WithPostProcess)
