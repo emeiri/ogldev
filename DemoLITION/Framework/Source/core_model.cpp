@@ -301,10 +301,6 @@ void CoreModel::CountVerticesAndIndices(const aiScene* pScene, uint& NumVertices
     for (unsigned int i = 0 ; i < m_Meshes.size() ; i++) {
         m_Meshes[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
         m_Meshes[i].ValidFaces = CountValidFaces(*pScene->mMeshes[i]);
-        m_Meshes[i].NumIndices = m_Meshes[i].ValidFaces * 3;
-        m_Meshes[i].NumVertices = pScene->mMeshes[i]->mNumVertices;
-        m_Meshes[i].BaseVertex = NumVertices;
-        m_Meshes[i].BaseIndex = NumIndices;
 
         NumVertices += pScene->mMeshes[i]->mNumVertices;
         NumIndices  += m_Meshes[i].NumIndices;
@@ -409,6 +405,13 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
 {
     printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
 
+    // Update exact data tracking directly from current dynamic array size to prevent offset corruption
+    m_Meshes[MeshIndex].BaseVertex = (uint)(Vertices.size());
+    m_Meshes[MeshIndex].BaseIndex = (uint)(m_Indices.size());
+
+    unsigned int AddedVertices = 0;
+    unsigned int AddedIndices = 0;
+
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
         VertexType v;
         const aiVector3D& Pos = paiMesh->mVertices[i];
@@ -447,6 +450,7 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
      //   printf("Color: "); v.Color.Print();
 
         Vertices.push_back(v);
+        AddedVertices++;
     }
 
     // Populate the index buffer
@@ -454,8 +458,7 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
         const aiFace& Face = paiMesh->mFaces[i];
         //  printf("num indices %d\n", Face.mNumIndices);
         if (Face.mNumIndices != 3) {
-            printf("Warning! face %d has %d indices\n", i, Face.mNumIndices);
-            continue;
+            continue; // Safely skip non-triangle data without corrupting pre-calculated indices
         }
      /*   printf("%d: %d\n", i * 3, Face.mIndices[0]);
         printf("%d: %d\n", i * 3 + 1, Face.mIndices[1]);
@@ -463,7 +466,12 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
         m_Indices.push_back(Face.mIndices[0]);
         m_Indices.push_back(Face.mIndices[1]);
         m_Indices.push_back(Face.mIndices[2]);
+        AddedIndices += 3;
     }
+
+    // Re-assign accurate post-parsing count figures
+    m_Meshes[MeshIndex].NumVertices = AddedVertices;
+    m_Meshes[MeshIndex].NumIndices = AddedIndices;
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
         LoadMeshBones(Vertices, MeshIndex, paiMesh);
@@ -522,10 +530,8 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
     m_Meshes[MeshIndex].BaseVertex = (uint)AllVertices.size();
     m_Meshes[MeshIndex].BaseIndex = (uint)m_Indices.size();
 
-    int NumIndices = paiMesh->mNumFaces * 3;
-
     std::vector<uint> Indices;
-    Indices.resize(NumIndices);
+    Indices.reserve(paiMesh->mNumFaces * 3);
 
     // Populate the index buffer
     for (unsigned int i = 0; i < paiMesh->mNumFaces; i++) {
@@ -536,9 +542,9 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
             continue;
         }
 
-        Indices[i * 3 + 0] = Face.mIndices[0];
-        Indices[i * 3 + 1] = Face.mIndices[1];
-        Indices[i * 3 + 2] = Face.mIndices[2];
+        Indices.push_back(Face.mIndices[0]);
+        Indices.push_back(Face.mIndices[1]);
+        Indices.push_back(Face.mIndices[2]);
     }
 
     if constexpr (std::is_same_v<VertexType, SkinnedVertex>) {
@@ -565,10 +571,8 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vec
                                                         NumVertices,     // ...and size
                                                         sizeof(VertexType)); // stride
     // Allocate a local index/vertex arrays
-    std::vector<uint> OptIndices;
-    std::vector<VertexType> OptVertices;
-    OptIndices.resize(NumIndices);
-    OptVertices.resize(OptVertexCount);
+    std::vector<uint> OptIndices(NumIndices);
+    std::vector<VertexType> OptVertices(OptVertexCount);
 
     // Optimization #1: remove duplicate vertices    
     meshopt_remapIndexBuffer(OptIndices.data(), Indices.data(), NumIndices, remap.data());
@@ -584,30 +588,24 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vec
     // Optimization #4: optimize access to the vertex buffer
     meshopt_optimizeVertexFetch(OptVertices.data(), OptIndices.data(), NumIndices, OptVertices.data(), OptVertexCount, sizeof(VertexType));
 
-    // Optimization #5: create a simplified version of the model
-    float Threshold = 1.0f;
-    size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
-    
-    float TargetError = 0.0f;
-    std::vector<unsigned int> SimplifiedIndices(OptIndices.size());
-    size_t OptIndexCount = meshopt_simplify(SimplifiedIndices.data(), OptIndices.data(), NumIndices,
-                                            &OptVertices[0].Position.x, OptVertexCount, sizeof(VertexType), TargetIndexCount, TargetError);
+    m_Meshes[MeshIndex].NumVertices = (uint)OptVertexCount;
 
-    static int num_indices = 0;
-    num_indices += (int)NumIndices;
-    static int opt_indices = 0;
-    opt_indices += (int)OptIndexCount;
-    printf("Num indices %d\n", num_indices);
-    //printf("Target num indices %d\n", TargetIndexCount);
-    printf("Optimized number of indices %d\n", opt_indices);
-    SimplifiedIndices.resize(OptIndexCount);
-    
-    // Concatenate the local arrays into the class attributes arrays
-    m_Indices.insert(m_Indices.end(), SimplifiedIndices.begin(), SimplifiedIndices.end());
+    float Threshold = 1.0f;
+    if (Threshold < 1.0f) { // Only run simplification code if reduction threshold is requested
+        size_t TargetIndexCount = (size_t)(NumIndices * Threshold);
+        float TargetError = 0.01f;
+        std::vector<unsigned int> SimplifiedIndices(OptIndices.size());
+        size_t OptIndexCount = meshopt_simplify(SimplifiedIndices.data(), OptIndices.data(), NumIndices, &OptVertices[0].Position.x, OptVertexCount, sizeof(VertexType), TargetIndexCount, TargetError);
+        SimplifiedIndices.resize(OptIndexCount);
+
+        m_Indices.insert(m_Indices.end(), SimplifiedIndices.begin(), SimplifiedIndices.end());
+        m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
+    } else {
+        m_Indices.insert(m_Indices.end(), OptIndices.begin(), OptIndices.end());
+        m_Meshes[MeshIndex].NumIndices = (uint)NumIndices;
+    }
 
     AllVertices.insert(AllVertices.end(), OptVertices.begin(), OptVertices.end());
-
-    m_Meshes[MeshIndex].NumIndices = (uint)OptIndexCount;
 }
 
 
@@ -1330,13 +1328,17 @@ void CoreModel::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint
         m_BoneInfo.push_back(bi);
     }
 
-    for (uint i = 0 ; i < pBone->mNumWeights ; i++) {
+    for (uint i = 0; i < pBone->mNumWeights; i++) {
         const aiVertexWeight& vw = pBone->mWeights[i];
-        uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + pBone->mWeights[i].mVertexId;
-        // printf("%d: %d %f\n",i, pBone->mWeights[i].mVertexId, vw.mWeight);
-        SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
-    }
 
+        // Fix: Use the isolated mesh layout offset safely.
+        // If optimizing with meshopt, ensure this logic runs BEFORE meshopt_remapVertexBuffer maps the array!
+        uint GlobalVertexID = m_Meshes[MeshIndex].BaseVertex + vw.mVertexId;
+
+        if (GlobalVertexID < SkinnedVertices.size()) {
+            SkinnedVertices[GlobalVertexID].Bones.AddBoneData(BoneId, vw.mWeight);
+        }
+    }
     MarkRequiredNodesForBone(pBone);
 }
 
