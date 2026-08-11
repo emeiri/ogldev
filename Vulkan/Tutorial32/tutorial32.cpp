@@ -112,8 +112,8 @@ public:
 
         for (int MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			for (CommandBuffersVecs& v : m_cmdBufs[MeshIndex]) {
-				m_vkCore.FreeCommandBuffers((u32)v.WithGUI.size(), v.WithGUI.data());
-				m_vkCore.FreeCommandBuffers((u32)v.WithoutGUI.size(), v.WithoutGUI.data());
+				m_vkCore.FreeCommandBuffers((u32)v.WithPostProcess.size(), v.WithPostProcess.data());
+				m_vkCore.FreeCommandBuffers((u32)v.WithoutPostProcess.size(), v.WithoutPostProcess.data());
 			}
         }
         
@@ -174,9 +174,9 @@ public:
 		// 1. Gather pre-baked mesh draw calls
 		for (size_t MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			if (m_enablePostProcess) {
-				SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].WithGUI[ImageIndex]);
+				SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].WithPostProcess[ImageIndex]);
 			} else {
-				SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].WithoutGUI[ImageIndex]);
+				SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].WithoutPostProcess[ImageIndex]);
 			}
 		}
 
@@ -318,11 +318,11 @@ private:
 			m_cmdBufs[i].resize(OgldevVK::NUM_LIGHTING_MODES);
 
 			for (CommandBuffersVecs& v : m_cmdBufs[i]) {
-				v.WithGUI.resize(m_numImages);
-				m_vkCore.CreateCommandBuffers(m_numImages, v.WithGUI.data());
+				v.WithPostProcess.resize(m_numImages);
+				m_vkCore.CreateCommandBuffers(m_numImages, v.WithPostProcess.data());
 
-				v.WithoutGUI.resize(m_numImages);
-				m_vkCore.CreateCommandBuffers(m_numImages, v.WithoutGUI.data());
+				v.WithoutPostProcess.resize(m_numImages);
+				m_vkCore.CreateCommandBuffers(m_numImages, v.WithoutPostProcess.data());
 			}
         }
 
@@ -454,9 +454,9 @@ private:
 		for (int MeshIndex = 0; MeshIndex < (int)m_modelContexts.size(); MeshIndex++) {
 			for (int LightMode = 0; LightMode < OgldevVK::NUM_LIGHTING_MODES; LightMode++) {
 				// Bake the pipeline WITH compute processing
-				RecordCommandBuffersInternal(MeshIndex, LightMode, true, m_cmdBufs[MeshIndex][LightMode].WithGUI);
+				RecordCommandBuffersInternal(MeshIndex, LightMode, true, m_cmdBufs[MeshIndex][LightMode].WithPostProcess);
 				// Bake the pipeline WITHOUT compute processing
-				RecordCommandBuffersInternal(MeshIndex, LightMode, false, m_cmdBufs[MeshIndex][LightMode].WithoutGUI);
+				RecordCommandBuffersInternal(MeshIndex, LightMode, false, m_cmdBufs[MeshIndex][LightMode].WithoutPostProcess);
 			}
 		}
 	}
@@ -619,8 +619,8 @@ private:
 	VkDevice m_device = NULL;
 	int m_numImages = 0;
 	struct CommandBuffersVecs {
-		std::vector<VkCommandBuffer> WithGUI;
-		std::vector<VkCommandBuffer> WithoutGUI;
+		std::vector<VkCommandBuffer> WithPostProcess;
+		std::vector<VkCommandBuffer> WithoutPostProcess;
 	};
     std::vector<std::vector<CommandBuffersVecs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
 	std::vector<VkCommandBuffer> m_transitionCmdBufs;
