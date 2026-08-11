@@ -275,7 +275,7 @@ private:
     void OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices);
 
     void CalculateMeshTransformations(const aiScene* pScene);
-    void TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode);
+    void TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode);
 
     bool InitMaterials(const aiScene* pScene, const std::string& Filename);
 

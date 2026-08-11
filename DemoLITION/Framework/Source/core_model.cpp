@@ -369,7 +369,7 @@ void CoreModel::CalculateMeshTransformations(const aiScene* pScene)
 }
 
 
-void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNode)
+void CoreModel::TraverseNodeHierarchy(const Matrix4f& ParentTransformation, aiNode* pNode)
 {
 #ifdef DEBUG_SCENE_HIERARCHY
     printf("Traversing node '%s'\n", pNode->mName.C_Str());
