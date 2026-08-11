@@ -462,7 +462,8 @@ private:
 	}
 
 
-	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool IncludeComputePostProcess, std::vector<VkCommandBuffer>& CmdBufs) {
+	void RecordCommandBuffersInternal(int MeshIndex, int LightingMode, bool IncludeComputePostProcess, std::vector<VkCommandBuffer>& CmdBufs) 
+    {
 		const int totalMeshes = (int)m_modelContexts.size();
 		bool IsFirstMesh = (MeshIndex == 0);
 		bool IsLastMesh = (MeshIndex == totalMeshes - 1);
