@@ -434,7 +434,7 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
         v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
 
         if (paiMesh->mColors[0]) {
-            const aiColor4D& Color = *paiMesh->mColors[0];
+            const aiColor4D& Color = paiMesh->mColors[0][i];
             v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
         } else {
             v.Color = Vector4f(1.0f);
@@ -505,7 +505,7 @@ void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint Mes
         v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
 
         if (paiMesh->mColors[0]) {
-            const aiColor4D& Color = *paiMesh->mColors[0];
+            const aiColor4D& Color = paiMesh->mColors[0][i];
             v.Color = Vector4f(Color.r, Color.g, Color.b, Color.a);
         } else {
             v.Color = Vector4f(1.0f);
