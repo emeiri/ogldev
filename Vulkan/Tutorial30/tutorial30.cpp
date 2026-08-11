@@ -43,11 +43,12 @@
 #include "ogldev_vulkan_glfw.h"
 #include "ogldev_vulkan_model.h"
 #include "ogldev_vulkan_skybox.h"
+#include "ogldev_vulkan_big_texture_array.h"
 #include "ogldev_glm_camera.h"
 #include "ogldev_vulkan_imgui.h"
 #include "Int/model_desc.h"
 #include "lighting_program.h"
-#include "big_texture_array.h"
+
 
 #define WINDOW_WIDTH 2560
 #define WINDOW_HEIGHT 1440
@@ -583,7 +584,7 @@ private:
 	OgldevVK::ImGUIRenderer m_imGUIRenderer;
 	int m_windowWidth = 0;
 	int m_windowHeight = 0;
-	BigTextureArray m_bigTextureArray;
+	OgldevVK::BigTextureArray m_bigTextureArray;
 
 	// GUI state
 	bool m_showGui = false;

@@ -20,15 +20,17 @@
 
 #include "ogldev_types.h"
 #include "ogldev_vulkan_util.h"
-#include "big_texture_array.h"
+#include "ogldev_vulkan_big_texture_array.h"
 
+
+namespace OgldevVK {
 
 void BigTextureArray::Init(VkDevice Device, VkDescriptorPool DescPool, int NumImages, u32 MaxTextures, u32 BindingPoint)
 {
-    m_device = Device;
-    m_bindingPoint = BindingPoint;
-    CreateDescSetLayout(MaxTextures);
-    AllocDescSets(DescPool, MaxTextures, NumImages);
+	m_device = Device;
+	m_bindingPoint = BindingPoint;
+	CreateDescSetLayout(MaxTextures);
+	AllocDescSets(DescPool, MaxTextures, NumImages);
 }
 
 
@@ -120,7 +122,7 @@ void BigTextureArray::CreateTextureArray(const std::vector<OgldevVK::ModelDesc>&
 		}
 	}
 
-    assert(Index == TotalTextureCount);
+	assert(Index == TotalTextureCount);
 
 	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size());
 
@@ -149,4 +151,6 @@ void BigTextureArray::CreateTextureArray(const std::vector<OgldevVK::ModelDesc>&
 void BigTextureArray::Destroy()
 {
 	vkDestroyDescriptorSetLayout(m_device, m_descSetLayout, NULL);
+}
+
 }

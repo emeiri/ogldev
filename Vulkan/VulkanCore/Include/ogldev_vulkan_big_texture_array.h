@@ -25,21 +25,23 @@
 
 #include "Int/model_desc.h"
 
+namespace OgldevVK {
+
 class BigTextureArray {
 
 public:
 
-    BigTextureArray() {}
+	BigTextureArray() {}
 
-    void Init(VkDevice Device, VkDescriptorPool DescPool, int NumImages, u32 MaxTextures, u32 BindingPoint);
+	void Init(VkDevice Device, VkDescriptorPool DescPool, int NumImages, u32 MaxTextures, u32 BindingPoint);
 
 	void CreateTextureArray(const std::vector<OgldevVK::ModelDesc>& ModelDescs);
-    
+
 	void Destroy();
 
-    VkDescriptorSetLayout GetDescSetLayout() const { return m_descSetLayout; }
+	VkDescriptorSetLayout GetDescSetLayout() const { return m_descSetLayout; }
 
-    const std::vector<VkDescriptorSet>& GetDescSets() const { return m_descSets; }
+	const std::vector<VkDescriptorSet>& GetDescSets() const { return m_descSets; }
 
 private:
 
@@ -49,6 +51,8 @@ private:
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
-    std::vector<VkDescriptorSet> m_descSets;	// one set per swapchain image
-    u32 m_bindingPoint = 0;
+	std::vector<VkDescriptorSet> m_descSets;	// one set per swapchain image
+	u32 m_bindingPoint = 0;
 };
+
+}
