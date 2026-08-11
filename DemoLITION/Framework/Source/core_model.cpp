@@ -426,11 +426,10 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
     printf("Mesh %d: %s\n", MeshIndex, paiMesh->mName.C_Str());
-    // Populate the vertex attribute vectors
-    VertexType v;
 
     for (unsigned int i = 0 ; i < paiMesh->mNumVertices ; i++) {
         const aiVector3D& Pos = paiMesh->mVertices[i];       
+        VertexType v;
         v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
 
         m_minPos.x = std::min(m_minPos.x, v.Position.x);
@@ -520,13 +519,9 @@ template<typename VertexType>
 void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint MeshIndex, const aiMesh* paiMesh) {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
-    // printf("Mesh %d\n", MeshIndex);
-    // Populate the vertex attribute vectors
-    VertexType v;
-
     std::vector<VertexType> Vertices(paiMesh->mNumVertices);
-
     for (unsigned int i = 0; i < paiMesh->mNumVertices; i++) {
+        VertexType v;
         const aiVector3D& Pos = paiMesh->mVertices[i];
         // printf("%d: ", i); Vector3f v(pPos.x, pPos.y, pPos.z); v.Print();
         v.Position = Vector3f(Pos.x, Pos.y, Pos.z);
