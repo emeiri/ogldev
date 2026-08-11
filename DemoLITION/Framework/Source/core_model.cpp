@@ -1195,7 +1195,8 @@ void CoreModel::InitDirectionalLight(const aiScene* pScene, const aiLight& light
     printf("Original up: "); Up.Print();
     Vector4f Up4D(Up, 0.0f);
     Up4D = Transformation * Up4D;
-    l.Up = Up4D;
+
+    l.Up = Vector3f(Up4D);
     printf("Final up: "); l.Up.Print();
 
     m_dirLights.push_back(l);
@@ -1219,9 +1220,9 @@ void CoreModel::InitPointLight(const aiScene* pScene, const aiLight& light)
 
     Vector4f Pos4D(Position, 1.0f);
     Pos4D = Transformation * Pos4D;
-    Vector3f WorldPosition = Pos4D;
-    printf("Final Position: "); WorldPosition.Print();
-    l.WorldPosition = WorldPosition;
+
+    l.WorldPosition = Vector3f(Pos4D);
+    printf("Final Position: "); l.WorldPosition.Print();
 
     l.Attenuation.Constant = light.mAttenuationConstant;
     l.Attenuation.Linear = light.mAttenuationLinear;
@@ -1261,8 +1262,8 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     Vector3f Up = VectorFromAssimpVector(light.mUp);
     printf("Original up: "); Up.Print();
     if (Up.Length() == 0) {
-        printf("Overiding a zero up vector\n");
-        if ((l.WorldDirection == Vector4f(0.0f, 1.0f, 0.0f, 0.0f)) || (l.WorldDirection == Vector4f(0.0f, -1.0f, 0.0f, 0.0f))) {
+        // Use clean 3D vector literal dimensions for structural comparisons
+        if ((l.WorldDirection == Vector3f(0.0f, 1.0f, 0.0f)) || (l.WorldDirection == Vector3f(0.0f, -1.0f, 0.0f))) {
             l.Up = Vector3f(1.0f, 0.0f, 0.0f);
         } else {
             l.Up = Vector3f(0.0f, 1.0f, 0.0f);
@@ -1270,7 +1271,7 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     } else {
         Vector4f Up4D(Up, 0.0f);
         Up4D = Transformation * Up4D;
-        l.Up = Up4D;
+        l.Up = Vector3f(Up4D);
     }
 
     printf("Final up: "); l.Up.Print();
@@ -1279,9 +1280,9 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
     printf("Original Position: "); Position.Print();
     Vector4f Pos4D(Position, 1.0f);
     Pos4D = Transformation * Pos4D;
-    Vector3f WorldPosition = Pos4D;
-    printf("World Position: "); WorldPosition.Print();
-    l.WorldPosition = WorldPosition;
+
+    l.WorldPosition = Vector3f(Pos4D);
+    printf("Final Position: "); l.WorldPosition.Print();
 
     l.Attenuation.Constant = light.mAttenuationConstant;
     l.Attenuation.Linear = light.mAttenuationLinear;
