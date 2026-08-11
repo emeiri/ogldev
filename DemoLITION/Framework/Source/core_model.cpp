@@ -97,7 +97,7 @@ inline Vector3f VectorFromAssimpVector(const aiVector3D& v)
 }
 
 
-static std::string GetFullPath(const string& Dir, const aiString& Path)
+static std::string GetFullPath(const std::string& Dir, const aiString& Path) 
 {
     string p(Path.data);
 
@@ -230,7 +230,7 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
 }
 
 
-bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename)
+bool CoreModel::InitFromScene(const aiScene* pScene, const std::string& Filename)
 {
     if (!InitGeometry(pScene, Filename)) {
         return false;
@@ -244,7 +244,7 @@ bool CoreModel::InitFromScene(const aiScene* pScene, const string& Filename)
 }
 
 
-bool CoreModel::InitGeometry(const aiScene* pScene, const string& Filename)
+bool CoreModel::InitGeometry(const aiScene* pScene, const std::string& Filename)
 {
     printf("\n*** Initializing geometry ***\n");
     m_numAnimations = pScene->mNumAnimations;
@@ -428,7 +428,7 @@ void CoreModel::TraverseNodeHierarchy(Matrix4f ParentTransformation, aiNode* pNo
 
 
 template<typename VertexType>
-void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh)
+void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex, const aiMesh* paiMesh) 
 {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
@@ -524,8 +524,7 @@ void CoreModel::InitSingleMesh(vector<VertexType>& Vertices, uint MeshIndex, con
 
 
 template<typename VertexType>
-void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshIndex, const aiMesh* paiMesh)
-{
+void CoreModel::InitSingleMeshOpt(std::vector<VertexType>& AllVertices, uint MeshIndex, const aiMesh* paiMesh) {
     const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
 
     // printf("Mesh %d\n", MeshIndex);
@@ -623,7 +622,7 @@ void CoreModel::InitSingleMeshOpt(vector<VertexType>& AllVertices, uint MeshInde
 
 
 template<typename VertexType>
-void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vector<VertexType>&Vertices, std::vector<VertexType>& AllVertices)
+void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>& Indices, std::vector<VertexType>& Vertices, std::vector<VertexType>& AllVertices) 
 {
     size_t NumIndices = Indices.size();
     size_t NumVertices = Vertices.size();
@@ -683,7 +682,7 @@ void CoreModel::OptimizeMesh(int MeshIndex, std::vector<uint>&Indices, std::vect
 }
 
 
-bool CoreModel::InitMaterials(const aiScene* pScene, const string& Filename)
+bool CoreModel::InitMaterials(const aiScene* pScene, const std::string& Filename)
 {
     string Dir = GetDirFromFilename(Filename);
 
@@ -770,7 +769,7 @@ static int GetTextureCount(const aiMaterial* pMaterial)
 }
 
 
-void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int index)
+void CoreModel::LoadTextures(const std::string& Dir, const aiMaterial* pMaterial, int index)
 {
     int TextureCount = GetTextureCount(pMaterial);
 
@@ -793,7 +792,7 @@ void CoreModel::LoadTextures(const string& Dir, const aiMaterial* pMaterial, int
 }
 
 
-void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadDiffuseTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
         LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE, 0, TEX_TYPE_BASE);
@@ -819,69 +818,69 @@ void CoreModel::LoadDiffuseTexture(const string& Dir, const aiMaterial* pMateria
 }
 
 
-void CoreModel::LoadSpecularTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadSpecularTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_SHININESS, 0, TEX_TYPE_SPECULAR);
 }
 
 
-void CoreModel::LoadNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMALS, 0, TEX_TYPE_NORMAL);
 }
 
 
-void CoreModel::LoadMetalnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadMetalnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_METALNESS, 0, TEX_TYPE_METALNESS);
 }
 
-void CoreModel::LoadEmissiveTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadEmissiveTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSIVE, 0, TEX_TYPE_EMISSIVE);
 }
 
-void CoreModel::LoadEmissionColorTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadEmissionColorTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_EMISSION_COLOR, 0, TEX_TYPE_EMISSION_COLOR);
 }
 
-void CoreModel::LoadNormalCameraTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadNormalCameraTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_NORMAL_CAMERA, 0, TEX_TYPE_NORMAL_CAMERA);
 }
 
-void CoreModel::LoadRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_DIFFUSE_ROUGHNESS, 0, TEX_TYPE_ROUGHNESS);
 }
 
-void CoreModel::LoadAmbientOcclusionTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadAmbientOcclusionTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_UNKNOWN, 0, TEX_TYPE_AMBIENT_OCCLUSION);
 }
 
 
-void CoreModel::LoadClearCoatTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadClearCoatTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 0, TEX_TYPE_CLEARCOAT);
 }
 
 
-void CoreModel::LoadClearCoatRoughnessTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadClearCoatRoughnessTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 1, TEX_TYPE_CLEARCOAT_ROUGHNESS);
 }
 
 
-void CoreModel::LoadClearCoatNormalTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
+void CoreModel::LoadClearCoatNormalTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex)
 {
     LoadTexture(Dir, pMaterial, MaterialIndex, aiTextureType_CLEARCOAT, 2, TEX_TYPE_CLEARCOAT_NORMAL);
 }
 
 
-void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int MaterialIndex,
-                            aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType)
+void CoreModel::LoadTexture(const std::string& Dir, const aiMaterial* pMaterial, int MaterialIndex, 
+                            aiTextureType AssimpType, int AssimpTexIndex, TEXTURE_TYPE MyType) 
 {
     m_Materials[MaterialIndex].pTextures[MyType] = NULL;
 
@@ -904,7 +903,7 @@ void CoreModel::LoadTexture(const string& Dir, const aiMaterial* pMaterial, int 
 }
 
 
-void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB)
+void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB) 
 {
 #ifdef DEBUG_MATERIALS
     printf("Loaded embeddeded texture type '%s'\n", paiTexture->achFormatHint);
@@ -915,7 +914,7 @@ void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialInd
 }
 
 
-void CoreModel::LoadTextureFromFile(const string& Dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB)
+void CoreModel::LoadTextureFromFile(const std::string& Dir, const aiString& Path, int MaterialIndex, TEXTURE_TYPE MyType, bool IsSRGB) 
 {
     std::string FullPath = GetFullPath(Dir, Path);
 
@@ -1390,7 +1389,7 @@ void CoreModel::InitSpotLight(const aiScene* pScene, const aiLight& light)
 }
 
 
-void CoreModel::LoadMeshBones(vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
+void CoreModel::LoadMeshBones(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiMesh* pMesh)
 {
     if (pMesh->mNumBones > MAX_BONES) {
         printf("The number of bones in the model (%d) is larger than the maximum supported (%d)\n", pMesh->mNumBones, MAX_BONES);
@@ -1406,7 +1405,7 @@ void CoreModel::LoadMeshBones(vector<SkinnedVertex>& SkinnedVertices, uint MeshI
 }
 
 
-void CoreModel::LoadSingleBone(vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone)
+void CoreModel::LoadSingleBone(std::vector<SkinnedVertex>& SkinnedVertices, uint MeshIndex, const aiBone* pBone) 
 {
     int BoneId = GetBoneId(pBone);
 
@@ -1455,7 +1454,7 @@ void CoreModel::MarkRequiredNodesForBone(const aiBone* pBone)
 
 void CoreModel::InitializeRequiredNodeMap(const aiNode* pNode)
 {
-    string NodeName(pNode->mName.C_Str());
+    std::string NodeName(pNode->mName.C_Str());
 
     NodeInfo info(pNode);
 
@@ -1470,7 +1469,7 @@ void CoreModel::InitializeRequiredNodeMap(const aiNode* pNode)
 int CoreModel::GetBoneId(const aiBone* pBone)
 {
     int BoneIndex = 0;
-    string BoneName(pBone->mName.C_Str());
+    std::string BoneName(pBone->mName.C_Str());
 
     if (m_BoneNameToIndexMap.find(BoneName) == m_BoneNameToIndexMap.end()) {
         // Allocate an index for a new bone
@@ -1498,7 +1497,7 @@ uint CoreModel::FindPosition(float AnimationTimeTicks, const aiNodeAnim* pNodeAn
 }
 
 
-void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim) 
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumPositionKeys == 1) {
@@ -1540,7 +1539,7 @@ uint CoreModel::FindRotation(float AnimationTimeTicks, const aiNodeAnim* pNodeAn
 }
 
 
-void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim)
+void CoreModel::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTimeTicks, const aiNodeAnim* pNodeAnim) 
 {
     // we need at least two values to interpolate...
     if (pNodeAnim->mNumRotationKeys == 1) {
@@ -1612,7 +1611,7 @@ void CoreModel::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTimeTick
 
 void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform, const aiAnimation& Animation)
 {
-    string NodeName(pNode->mName.data);
+    std::string NodeName(pNode->mName.data);
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
@@ -1644,9 +1643,9 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode,
     }
 
     for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-        string ChildName(pNode->mChildren[i]->mName.data);
+        std::string ChildName(pNode->mChildren[i]->mName.data);
 
-        map<string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
+        std::map<std::string,NodeInfo>::iterator it = m_requiredNodeMap.find(ChildName);
 
         if (it == m_requiredNodeMap.end()) {
             printf("Child %s cannot be found in the required node map\n", ChildName.c_str());
@@ -1663,7 +1662,7 @@ void CoreModel::ReadNodeHierarchy(float AnimationTimeTicks, const aiNode* pNode,
 void CoreModel::ReadNodeHierarchyBlended(float StartAnimationTimeTicks, float EndAnimationTimeTicks, const aiNode* pNode, const Matrix4f& ParentTransform,
                                            const aiAnimation& StartAnimation, const aiAnimation& EndAnimation, float BlendFactor)
 {
-    string NodeName(pNode->mName.data);
+    std::string NodeName(pNode->mName.data);
 
     Matrix4f NodeTransformation(pNode->mTransformation);
 
@@ -1771,7 +1770,7 @@ void CoreModel::GetBoneTransforms(float TimeInSeconds, vector<Matrix4f>& Transfo
 
 
 void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
-                                           vector<Matrix4f>& BlendedTransforms,
+                                           std::vector<Matrix4f>& BlendedTransforms,
                                            unsigned int StartAnimIndex,
                                            unsigned int EndAnimIndex,
                                            float BlendFactor)
@@ -1810,7 +1809,7 @@ void CoreModel::GetBoneTransformsBlended(float TimeInSeconds,
 }
 
 
-float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex)
+float CoreModel::CalcAnimationTimeTicks(float TimeInSeconds, unsigned int AnimationIndex) 
 {
     float TicksPerSecond = (float)(m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond != 0 ? m_pScene->mAnimations[AnimationIndex]->mTicksPerSecond : 25.0f);
     float TimeInTicks = TimeInSeconds * TicksPerSecond;
