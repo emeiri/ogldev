@@ -959,7 +959,7 @@ void CoreModel::LoadColors(const aiMaterial* pMaterial, int index)
         material.EmissiveColor = material.EmissiveColor * Vector4f(EmissiveStrength, EmissiveStrength, EmissiveStrength, 1.0f);
     }
 
-    if (material.m_materialType && MaterialType_MetallicRoughness) {
+    if (material.m_materialType & MaterialType_MetallicRoughness) {
         float MetallicFactor;
 
         if (pMaterial->Get(AI_MATKEY_METALLIC_FACTOR, MetallicFactor) == AI_SUCCESS) {
