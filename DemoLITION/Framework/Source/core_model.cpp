@@ -979,9 +979,8 @@ void CoreModel::LoadColor(const aiMaterial* pMaterial, Vector4f& Color,
         Color.r = AiColor.r;
         Color.g = AiColor.g;
         Color.b = AiColor.b;
-        Color.a = std::min(AiColor.a, 1.0f); // TODO: is this correct?
-    }
-    else {
+        Color.a = std::min(AiColor.a, 1.0f);
+    } else {
         Color = Vector4f(1.0f);
     }
 }
