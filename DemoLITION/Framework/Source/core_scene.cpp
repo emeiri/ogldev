@@ -460,6 +460,10 @@ void CoreScene::GeneralGUI()
         ImGui::RadioButton("Lighting only", (int*)&RenderMode, RENDER_MODE_LIGHTING_ONLY);
         ImGui::SameLine();
         ImGui::RadioButton("Normals", (int*)&RenderMode, RENDER_MODE_NORMALS);
+        ImGui::SameLine();
+        ImGui::RadioButton("Tex Coords", (int*)&RenderMode, RENDER_MODE_TEXCOORDS);
+        ImGui::SameLine();
+        ImGui::RadioButton("Base Color", (int*)&RenderMode, RENDER_MODE_BASE_COLOR);
         m_config.SetRenderMode(RenderMode);
 
         ImGui::TreePop();

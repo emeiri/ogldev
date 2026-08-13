@@ -41,6 +41,13 @@ vec2 TexCoord;
 #define LIGHT_TYPE_POINT 1
 #define LIGHT_TYPE_SPOT  2
 
+#define RENDER_MODE_FULL 0
+#define RENDER_MODE_TEXTURE_ONLY 1
+#define RENDER_MODE_LIGHTING_ONLY 2
+#define RENDER_MODE_NORMALS 3
+#define RENDER_MODE_TEXCOORDS 4
+#define RENDER_MODE_BASE_COLOR 5
+
 #define MaterialType_Invalid            0
 #define MaterialType_MetallicRoughness  0x1
 #define MaterialType_SpecularGlossiness 0x2
@@ -147,6 +154,7 @@ uniform vec4 gMetallicRoughnessNormalOcclusion;
 uniform vec4 gClearCoatTransmissionThickness;
 uniform int gMaterialType;
 uniform float gIOR;
+uniform int gRenderMode = RENDER_MODE_FULL;
 
 
 const float M_PI = 3.141592653589793;
@@ -400,7 +408,9 @@ vec4 SampleEmissive(InputAttributes tc, MetallicRoughnessDataGPU mat)
   return texture(mat.emissiveTextureSampler, tc.uv[mat.emissiveTextureUV]) * vec4(mat.emissiveFactorAlphaCutoff.xyz, 1.0f);
 }
 
-vec4 sampleAlbedo(InputAttributes tc, MetallicRoughnessDataGPU mat) {
+
+vec4 sampleAlbedo(InputAttributes tc, MetallicRoughnessDataGPU mat) 
+{
   return texture(mat.baseColorTextureSampler, tc.uv[mat.baseColorTextureUV]) * mat.baseColorFactor;
 }
 
@@ -755,13 +765,25 @@ void main()
     // convert to sRGB
     Color = pow(Color, vec3(1.0/2.2) );
 
-    out_FragColor = vec4(Color, 1.0);
+    switch (gRenderMode) {
+        case RENDER_MODE_FULL:
+            out_FragColor = vec4(Color, 1.0);
+            break;
+        case RENDER_MODE_TEXCOORDS:
+            out_FragColor = vec4(tc.uv[0], 0.0, 1.0);
+            break;
+        case RENDER_MODE_BASE_COLOR:
+            out_FragColor = pow(sampleAlbedo(tc, mat), vec4(1.0/2.2));
+            break;
+        default:
+            out_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red for unsupported modes
+    }
+    
 
 // Uncomment to debug:
  // out_FragColor = vec4((n + vec3(1.0))*0.5, 1.0);
  // out_FragColor = AmbientOcclusion;
   //out_FragColor = EmissiveColor;
-  //out_FragColor = AlbedoColor;
  // out_FragColor = mrSample;
   //vec2 MeR = mrSample.yz;
 //  out_FragColor = vec4(DiffuseColor, 1.0);

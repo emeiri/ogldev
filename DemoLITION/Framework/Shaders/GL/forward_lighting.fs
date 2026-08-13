@@ -44,6 +44,8 @@ vec2 TexCoord;
 #define RENDER_MODE_TEXTURE_ONLY 1
 #define RENDER_MODE_LIGHTING_ONLY 2
 #define RENDER_MODE_NORMALS 3
+#define RENDER_MODE_TEXCOORDS 4
+#define RENDER_MODE_BASE_COLOR 5
 
 struct LightSource {
     vec3 Color;                    // offset 0
