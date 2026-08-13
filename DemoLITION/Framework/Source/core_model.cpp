@@ -190,6 +190,11 @@ bool CoreModel::LoadAssimpModel(const std::string& Filename, const ModelLoadFlag
 {
     m_fileName = Filename;
 
+#ifndef OGLDEV_VULKAN
+    std::string FileExt = Filename.substr(Filename.find_last_of(".") + 1);
+    m_flipTexCoordV = (FileExt == "glb" || FileExt == "gltf");
+#endif
+
     AllocBuffers();
 
     bool Ret = false;
@@ -433,6 +438,12 @@ void CoreModel::InitSingleMesh(std::vector<VertexType>& Vertices, uint MeshIndex
 
         v.TexCoords0 = paiMesh->HasTextureCoords(0) ? Vector2f(paiMesh->mTextureCoords[0][i].x, paiMesh->mTextureCoords[0][i].y) : Vector2f(0.0f);
         v.TexCoords1 = paiMesh->HasTextureCoords(1) ? Vector2f(paiMesh->mTextureCoords[1][i].x, paiMesh->mTextureCoords[1][i].y) : Vector2f(0.0f);
+
+        if (m_flipTexCoordV) {
+            v.TexCoords0.y = 1.0f - v.TexCoords0.y;
+            v.TexCoords1.y = 1.0f - v.TexCoords1.y;
+        }
+
         v.Tangent = paiMesh->mTangents ? Vector3f(paiMesh->mTangents[i].x, paiMesh->mTangents[i].y, paiMesh->mTangents[i].z) : Vector3f(0.0f);
         v.Bitangent = paiMesh->mBitangents ? Vector3f(paiMesh->mBitangents[i].x, paiMesh->mBitangents[i].y, paiMesh->mBitangents[i].z) : Vector3f(0.0f);
 
