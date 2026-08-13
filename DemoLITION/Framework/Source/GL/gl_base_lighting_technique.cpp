@@ -112,8 +112,8 @@ void BaseLightingTechnique::SetNumLights(int NumLights)
 }
 
 
-void BaseLightingTechnique::SetRenderMode(RENDER_MODE mode)
+void BaseLightingTechnique::SetRenderMode(RENDER_MODE Mode)
 {
-    glUniform1i(m_gRenderModeLoc, mode);
+    glUniform1i(m_gRenderModeLoc, Mode);
 }
 
