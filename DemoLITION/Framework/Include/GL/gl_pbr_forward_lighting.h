@@ -37,21 +37,13 @@ public:
     virtual void SetMaterial(const CoreMaterial& material);
 
     void SetAmbientOcclusionTextureUnit(int TextureUnit);
-
     void SetEmissiveTextureUnit(int TextureUnit);
-
     void SetAlbedoTextureUnit(int TextureUnit);
-
     void SetRoughnessTextureUnit(int TextureUnit);    
-
     void SetNormalTextureUnit(int TextureUnit);
-
     void SetEnvmapTextureUnit(int TextureUnit);
-
     void SetBRDF_LUTTextureUnit(int TextureUnit);
-
     void SetIrradianceTextureUnit(int TextureUnit);
-
     void SetClearCoatTextureUnit(int TextureUnit);
     void SetClearCoatRoughnessTextureUnit(int TextureUnit);
     void SetClearCoatNormalTextureUnit(int TextureUnit);
