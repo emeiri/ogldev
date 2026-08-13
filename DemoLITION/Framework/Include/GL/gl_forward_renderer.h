@@ -18,7 +18,6 @@
 
 #pragma once 
 
-#include "ogldev_basic_glfw_camera.h"
 #include "ogldev_shadow_mapping_technique_point_light.h"
 #include "ogldev_shadow_cube_map_fbo.h"
 #include "ogldev_framebuffer.h"
