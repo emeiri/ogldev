@@ -836,7 +836,8 @@ void CoreModel::LoadTextureEmbedded(const aiTexture* paiTexture, int MaterialInd
 #endif
     // Raw assignment compiles successfully again
     m_Materials[MaterialIndex].pTextures[MyType] = AllocTexture2D();
-    int buffer_size = paiTexture->mWidth;   // TODO: just the width???
+    assert(paiTexture->mHeight == 0);
+    int buffer_size = paiTexture->mWidth;   
     m_Materials[MaterialIndex].pTextures[MyType]->Load(buffer_size, paiTexture->pcData, IsSRGB);
 }
 
