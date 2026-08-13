@@ -783,6 +783,9 @@ void main()
         case RENDER_MODE_NORMALS:
             FragColor = vec4(Normal0, 1.0);
             break;
+
+        default:
+            FragColor = vec4(1.0, 0.0, 0.0, 1.0); // red for error 
     }
    // FragColor = vec4(1.0);  
 
