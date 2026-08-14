@@ -208,7 +208,7 @@ void ImageMemBarrier(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format,
 	}
 
 	vkCmdPipelineBarrier(CmdBuf, sourceStage, destinationStage,
-		0, 0, NULL, 0, NULL, 1, &Barrier);
+		                 0, 0, NULL, 0, NULL, 1, &Barrier);
 }
 
 

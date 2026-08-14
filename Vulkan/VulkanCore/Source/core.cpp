@@ -441,7 +441,6 @@ static VkSurfaceFormatKHR ChooseSurfaceFormatAndColorSpace(const std::vector<VkS
 }
 
 
-
 void VulkanCore::CreateSwapChain()
 {
 	const VkSurfaceCapabilitiesKHR& SurfaceCaps = m_physDevices.Selected().m_surfaceCaps;
@@ -1077,8 +1076,6 @@ void VulkanCore::UpdateTextureImage(VulkanTexture& Tex, u32 ImageWidth, u32 Imag
 
 	StagingTex.Destroy(m_device);
 }
-
-
 
 
 void VulkanCore::TransitionImageLayout(VkImage& Image, VkFormat Format, 
