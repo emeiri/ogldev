@@ -107,6 +107,10 @@ void BigTextureArray::CreateTextureArray(const std::vector<OgldevVK::ModelDesc>&
 		TotalTextureCount += (u32)md.m_materials.size();
 	}
 
+	if (TotalTextureCount == 0) {
+		return; // Nothing to bind!
+	}
+
 	std::vector<VkDescriptorImageInfo> ImageInfos;
 	ImageInfos.resize(TotalTextureCount);
 
