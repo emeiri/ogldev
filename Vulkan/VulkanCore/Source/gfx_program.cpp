@@ -94,7 +94,6 @@ void GraphicsPipeline::Bind(VkCommandBuffer CmdBuf, const std::vector<VkDescript
 		DescSets.data(),	  // Base address of the array of descriptor sets
 		0,	                  // dynamicOffsetCount
 		NULL);	              // pDynamicOffsets
-
 }
 
 
