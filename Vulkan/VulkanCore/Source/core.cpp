@@ -293,7 +293,7 @@ void VulkanCore::CreateSurface()
 }
 
 
-void VulkanCore::CreateDevice()
+void VulkanCore::CreateDevice() 
 {
 	float qPriorities[] = { 1.0f };
 
@@ -303,7 +303,7 @@ void VulkanCore::CreateDevice()
 		.flags = 0, // must be zero
 		.queueFamilyIndex = m_queueFamily,
 		.queueCount = 1,
-		.pQueuePriorities = &qPriorities[0]
+		.pQueuePriorities = qPriorities
 	};
 
 	std::vector<const char*> DevExts = {
@@ -312,19 +312,54 @@ void VulkanCore::CreateDevice()
 	};
 
 	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
-	
-	bool Instance_is_1_3_or_more = (m_instanceVersion.Major > 1) || (m_instanceVersion.Minor >= 3);
+
+	bool Instance_is_1_3_or_more = (m_instanceVersion.Major == 1 && m_instanceVersion.Minor >= 3) || (m_instanceVersion.Major > 1);
+
+	VkPhysicalDeviceVulkan13Features Features13{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
+	VkPhysicalDeviceVulkan12Features Features12{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+
+	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingExtFeatures{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR };
+	VkPhysicalDeviceSynchronization2FeaturesKHR Sync2ExtFeatures{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR };
+
+	void* pNextChain = NULL;
 
 	if (Instance_is_1_3_or_more && DeviceSupportsDynamicRendering) {
 		printf("The Vulkan instance and device support dynamic rendering as a core feature\n");
-	} else if (m_instanceVersion.Minor == 2) {
-		if (DeviceSupportsDynamicRendering) {
-			DevExts.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
-			DevExts.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
-		} else {
-			printf("The system doesn't support dynamic rendering\n");
-			exit(1);
-		}
+
+		Features13.synchronization2 = VK_TRUE;
+		Features13.dynamicRendering = VK_TRUE;
+		Features13.pNext = NULL;
+
+		Features12.runtimeDescriptorArray = VK_TRUE;
+		Features12.descriptorIndexing = VK_TRUE;
+		Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+		Features12.bufferDeviceAddress = VK_TRUE;
+		Features12.descriptorBindingPartiallyBound = VK_TRUE;
+		Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+		Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
+		Features12.pNext = &Features13;
+
+		pNextChain = &Features12;
+	} else if (m_instanceVersion.Minor == 2 && DeviceSupportsDynamicRendering) {
+		DevExts.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+		DevExts.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
+
+		DynamicRenderingExtFeatures.dynamicRendering = VK_TRUE;
+		DynamicRenderingExtFeatures.pNext = nullptr;
+
+		Sync2ExtFeatures.synchronization2 = VK_TRUE;
+		Sync2ExtFeatures.pNext = &DynamicRenderingExtFeatures;
+
+		Features12.runtimeDescriptorArray = VK_TRUE;
+		Features12.descriptorIndexing = VK_TRUE;
+		Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+		Features12.bufferDeviceAddress = VK_TRUE;
+		Features12.descriptorBindingPartiallyBound = VK_TRUE;
+		Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
+		Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
+		Features12.pNext = &Sync2ExtFeatures;
+
+		pNextChain = &Features12;
 	} else {
 		printf("The system doesn't support dynamic rendering\n");
 		exit(1);
@@ -333,38 +368,19 @@ void VulkanCore::CreateDevice()
 	if (m_physDevices.Selected().m_features.geometryShader == VK_FALSE) {
 		OGLDEV_ERROR0("The Geometry Shader is not supported!\n");
 	}
-
 	if (m_physDevices.Selected().m_features.tessellationShader == VK_FALSE) {
 		OGLDEV_ERROR0("The Tessellation Shader is not supported!\n");
 	}
-
-	VkPhysicalDeviceVulkan13Features Features13{};
-	Features13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-	Features13.pNext = NULL;
-	Features13.synchronization2 = VK_TRUE;
-    Features13.dynamicRendering = VK_TRUE;
-
-	// Chain dynamic rendering AFTER Vulkan 1.2 features
-	VkPhysicalDeviceVulkan12Features Features12{};
-	Features12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-	Features12.pNext = &Features13;
-	Features12.runtimeDescriptorArray = VK_TRUE;
-	Features12.descriptorIndexing = VK_TRUE;
-	Features12.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
-	Features12.bufferDeviceAddress = VK_TRUE;
-	Features12.descriptorBindingPartiallyBound = VK_TRUE;
-	Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
-    Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
 
 	VkPhysicalDeviceFeatures DeviceFeatures{};
 	DeviceFeatures.geometryShader = VK_TRUE;
 	DeviceFeatures.tessellationShader = VK_TRUE;
 	DeviceFeatures.multiDrawIndirect = VK_TRUE;
-    DeviceFeatures.samplerAnisotropy = VK_TRUE;
+	DeviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	VkDeviceCreateInfo DeviceCreateInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
-		.pNext = &Features12,
+		.pNext = pNextChain,
 		.flags = 0,
 		.queueCreateInfoCount = 1,
 		.pQueueCreateInfos = &qInfo,
@@ -380,6 +396,7 @@ void VulkanCore::CreateDevice()
 
 	printf("\nDevice created\n");
 }
+
 
 static VkPresentModeKHR ChoosePresentMode(const std::vector<VkPresentModeKHR>& PresentModes)
 {
