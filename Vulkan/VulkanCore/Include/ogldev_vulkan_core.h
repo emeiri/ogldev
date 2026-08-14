@@ -132,6 +132,8 @@ public:
 
 	size_t GetMaxUniformBufferSize() const { return m_physDevices.Selected().m_devProps.limits.maxUniformBufferRange; }
 
+	VkExtent2D GetSwapChainExtent() const;
+
 private:
 
 	void UpdateInstanceVersion();

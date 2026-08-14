@@ -1458,6 +1458,12 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
 }
 
 
+VkExtent2D VulkanCore::GetSwapChainExtent() const
+{
+    VkExtent2D Extent = m_physDevices.Selected().m_surfaceCaps.currentExtent;
+    return Extent;
+}
+
 
 void BufferAndMemory::Update(VkDevice Device, const void* pData, size_t Size) 
 {
