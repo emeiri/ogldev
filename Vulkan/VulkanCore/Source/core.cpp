@@ -853,7 +853,14 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 	CreateImage(Tex, Width, Height, Format, Usage, PropertyFlags, IsCubemap, MipLevels);
 
 	// Step #2: create the image view
-	VkImageAspectFlags AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+	VkImageAspectFlags AspectFlags;
+	
+    if ((Usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0) {
+        AspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT;
+    } else {
+        AspectFlags = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+
 	Tex.m_view = CreateImageView(m_device, Tex.m_image, Format, AspectFlags, IsCubemap, MipLevels);
 
 	VkFilter MinFilter = VK_FILTER_LINEAR;
