@@ -696,9 +696,7 @@ private:
 
 	void UpdateUniformBuffers(int MeshIndex, int ImageIndex)
 	{		
-		glm::mat4 IndentityMatrix = glm::mat4(1.0f);
-
-		glm::mat4 Scale = m_scale * glm::scale(IndentityMatrix, glm::vec3(Models[MeshIndex].Scale));
+		glm::mat4 Scale = m_scale * glm::scale(glm::mat4(1.0f), glm::vec3(Models[MeshIndex].Scale));
 
 		glm::mat4 Translate = glm::translate(glm::mat4(1.0f), m_position + Models[MeshIndex].Pos);
 
@@ -718,7 +716,6 @@ private:
 	                                LightDirection, 
 									m_modelContexts[MeshIndex].m_uniformBuffersVS, 
 									m_modelContexts[MeshIndex].m_uniformBuffersFS);
-		glm::mat4 VPNoTranslate = m_pGameCamera->GetVPMatrixNoTranslate();
 	}
 
 	GLFWwindow* m_pWindow = NULL;
