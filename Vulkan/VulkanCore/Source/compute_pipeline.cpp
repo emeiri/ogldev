@@ -40,10 +40,10 @@ void ComputePipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const 
 
 void ComputePipeline::Destroy()
 {
-	vkDestroyShaderModule(m_device, m_cs, NULL);
-	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
-	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
 	vkDestroyPipeline(m_device, m_pipeline, NULL);
+	vkDestroyPipelineLayout(m_device, m_pipelineLayout, NULL);
+	vkDestroyDescriptorSetLayout(m_device, m_descriptorSetLayout, NULL);
+	vkDestroyShaderModule(m_device, m_cs, NULL);
 }
 
 
