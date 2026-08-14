@@ -345,7 +345,7 @@ void VulkanCore::CreateDevice()
 		DevExts.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
 
 		DynamicRenderingExtFeatures.dynamicRendering = VK_TRUE;
-		DynamicRenderingExtFeatures.pNext = nullptr;
+		DynamicRenderingExtFeatures.pNext = NULL;
 
 		Sync2ExtFeatures.synchronization2 = VK_TRUE;
 		Sync2ExtFeatures.pNext = &DynamicRenderingExtFeatures;
@@ -863,6 +863,7 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
     float MaxAnisotropy = EnableAnisotropy ? m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy : -1.0f;
 	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
 }
+
 
 void VulkanCore::Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex)
 {
