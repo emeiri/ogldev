@@ -843,7 +843,8 @@ void VulkanCore::CreateTexture(const char* pFilename, VulkanTexture& Tex)
 	printf("Texture from '%s' created\n", pFilename);
 }
 
-void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImageUsageFlags Usage, VkFormat Format)
+
+void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImageUsageFlags Usage, VkFormat Format, bool EnableAnisotropy)
 {
 	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 	bool IsCubemap = false;
@@ -859,7 +860,7 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #3: create the texture sampler
-    float MaxAnisotropy = m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy;
+    float MaxAnisotropy = EnableAnisotropy ? m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy : -1.0f;
 	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
 }
 

@@ -103,7 +103,7 @@ public:
 	
 	void CreateTexture(const char* pFilename, VulkanTexture& Tex);
 
-	void CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImageUsageFlags Usage, VkFormat Format);
+	void CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImageUsageFlags Usage, VkFormat Format, bool EnableAnisotropy);
 
 	void Create2DTextureFromData(const void* pPixels, int ImageWidth, int ImageHeight, VulkanTexture& Tex);
 

@@ -108,7 +108,7 @@ public:
 		VkImageUsageFlags Usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
 		VkFormat Format = VK_FORMAT_R8G8B8A8_UNORM;
 
-		m_vkCore.CreateTexture(m_csOutput, CS_OUTPUT_WIDTH, CS_OUTPUT_HEIGHT, Usage, Format);
+		m_vkCore.CreateTexture(m_csOutput, CS_OUTPUT_WIDTH, CS_OUTPUT_HEIGHT, Usage, Format, true);
 		
 		CreateDescriptorPool();
 		CreatePipelines();
