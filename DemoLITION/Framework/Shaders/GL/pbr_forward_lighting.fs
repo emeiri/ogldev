@@ -47,6 +47,9 @@ vec2 TexCoord;
 #define RENDER_MODE_NORMALS 3
 #define RENDER_MODE_TEXCOORDS 4
 #define RENDER_MODE_BASE_COLOR 5
+#define RENDER_MODE_WHITE 6
+#define RENDER_MODE_PBR_DIFFUSE_CONTRIB 7
+#define RENDER_MODE_PBR_F 8
 
 #define MaterialType_Invalid            0
 #define MaterialType_MetallicRoughness  0x1
@@ -766,15 +769,40 @@ void main()
     Color = pow(Color, vec3(1.0/2.2) );
 
     switch (gRenderMode) {
+
         case RENDER_MODE_FULL:
             out_FragColor = vec4(Color, 1.0);
             break;
+
         case RENDER_MODE_TEXCOORDS:
             out_FragColor = vec4(tc.uv[0], 0.0, 1.0);
             break;
+
+        case RENDER_MODE_NORMALS:
+            out_FragColor = vec4(n * 0.5 + 0.5, 1.0);
+            break;
+
         case RENDER_MODE_BASE_COLOR:
             out_FragColor = pow(sampleAlbedo(tc, mat), vec4(1.0/2.2));
             break;
+
+        case RENDER_MODE_WHITE:
+            out_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            break;
+
+        case RENDER_MODE_PBR_DIFFUSE_CONTRIB: {
+            vec3 F = specularReflection(pbrInputs);
+            vec3 diffuseContrib = (1.0 - F) * diffuseBurley(pbrInputs);
+            out_FragColor = vec4(diffuseContrib, 1.0);
+            break;
+        }
+
+        case RENDER_MODE_PBR_F: {
+            vec3 F = specularReflection(pbrInputs);
+            out_FragColor = vec4(F, 1.0);
+            break;
+        }
+
         default:
             out_FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red for unsupported modes
     }
@@ -811,5 +839,5 @@ void main()
  //out_FragColor = vec4(ClearCoatContrib, 1.0);
  //out_FragColor = vec4(1.0 - pbrInputs.clearCoatFactor * ClearCoatFresnel, 1.0);
  //out_FragColor = vec4(pbrInputs.b, 1.0); 
- //out_FragColor = vec4(1.0);
+ //out_FragColor = vec4(pow(vec3(microfacetDistribution(pbrInputs)), vec3(1.0/2.2)), 1.0);
 }

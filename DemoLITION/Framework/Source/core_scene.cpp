@@ -396,8 +396,9 @@ void CoreScene::LightingGUI()
                         ImGui::SliderFloat("Ambient Intensity", &l.AmbientIntensity, 0.0f, 10.0f);
                         ImGui::SliderFloat("Diffuse Intensity", &l.DiffuseIntensity, 0.0f, 10.0f);
                         Vector3f& Dir = l.WorldDirection;
-                        ImGui::Text("Direction: %.3f, %.3f, %.3f", Dir.x, Dir.y, Dir.z);
-                        ImGui::SliderFloat3("Direction", &Dir.x, -50.0f, 50.0f);
+                        ImGui::Text("Direction: %.3f, %.3f, %.3f", Dir.x, Dir.y, Dir.z);                        
+                        ImGui::SliderFloat3("Direction", &Dir.x, -1.0f, 1.0f);
+                        Dir = Dir.Normalize();
                         ImGui::TreePop();
                     }
                 }
@@ -464,6 +465,9 @@ void CoreScene::GeneralGUI()
         ImGui::RadioButton("Tex Coords", (int*)&RenderMode, RENDER_MODE_TEXCOORDS);
         ImGui::SameLine();
         ImGui::RadioButton("Base Color", (int*)&RenderMode, RENDER_MODE_BASE_COLOR);
+        ImGui::RadioButton("PBR diffuse contribution", (int*)&RenderMode, RENDER_MODE_PBR_DIFFUSE_CONTRIB);
+        ImGui::SameLine();
+        ImGui::RadioButton("PBR F", (int*)&RenderMode, RENDER_MODE_PBR_F);
         m_config.SetRenderMode(RenderMode);
 
         ImGui::TreePop();

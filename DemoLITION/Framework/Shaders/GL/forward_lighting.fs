@@ -46,6 +46,7 @@ vec2 TexCoord;
 #define RENDER_MODE_NORMALS 3
 #define RENDER_MODE_TEXCOORDS 4
 #define RENDER_MODE_BASE_COLOR 5
+#define RENDER_MODE_WHITE 6
 
 struct LightSource {
     vec3 Color;                    // offset 0
@@ -784,6 +785,10 @@ void main()
 
         case RENDER_MODE_NORMALS:
             FragColor = vec4(Normal0, 1.0);
+            break;
+
+        case RENDER_MODE_WHITE:
+            FragColor = vec4(1.0);
             break;
 
         default:
