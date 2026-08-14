@@ -109,8 +109,11 @@ public:
 
 	void CreateCubemapTexture(const char* pFilename, VulkanTexture& Tex);
 
-	void BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
-							   VkClearValue* pClearColor, VkClearValue* pDepthValue);
+	void BeginDynamicRenderingSwapChain(VkCommandBuffer CmdBuf, int ImageIndex,
+										VkClearValue* pClearColor, VkClearValue* pDepthValue);
+
+    void BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkClearValue* pClearColor, 
+							   VkImageView DepthView, VkClearValue* pDepthValue);
 
 	VkFormat GetSwapChainFormat() const { return m_swapChainSurfaceFormat.format; }
 

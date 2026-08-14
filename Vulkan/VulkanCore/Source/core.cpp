@@ -1418,13 +1418,22 @@ const VkPhysicalDeviceLimits& VulkanCore::GetPhysicalDeviceLimits() const
 }
 
 
-void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex, 
-	                                VkClearValue* pClearColor, VkClearValue* pDepthValue)
+void VulkanCore::BeginDynamicRenderingSwapChain(VkCommandBuffer CmdBuf, int ImageIndex,
+												VkClearValue* pClearColor, VkClearValue* pDepthValue)
+{
+    VkImageView ColorView = m_imageViews[ImageIndex];
+	VkImageView DepthView = m_depthImages[ImageIndex].m_view;
+    BeginDynamicRendering(CmdBuf, ColorView, pClearColor, DepthView, pDepthValue);
+}
+
+
+void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkClearValue* pClearColor,
+									   VkImageView DepthView, VkClearValue* pDepthValue)
 {
 	VkRenderingAttachmentInfoKHR ColorAttachment = {
 		.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO_KHR,
 		.pNext = NULL,
-		.imageView = GetImageView(ImageIndex),
+        .imageView = ImageView,
 		.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
 		.resolveMode = VK_RESOLVE_MODE_NONE,
 		.resolveImageView = VK_NULL_HANDLE,
@@ -1438,13 +1447,13 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, int ImageIndex,
 	}
 
 	VkRenderingAttachmentInfo DepthAttachment = {};
-	bool UseDepth = (GetDepthView(ImageIndex) != VK_NULL_HANDLE);
+	bool UseDepth = (DepthView != VK_NULL_HANDLE);
 
 	if (UseDepth) {
 		DepthAttachment = {
 			.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
 			.pNext = NULL,
-			.imageView = GetDepthView(ImageIndex),
+			.imageView = DepthView,
 			.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
 			.resolveMode = VK_RESOLVE_MODE_NONE,
 			.resolveImageView = VK_NULL_HANDLE,

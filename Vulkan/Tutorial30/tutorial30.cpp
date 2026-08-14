@@ -468,10 +468,10 @@ private:
 				.depthStencil = {.depth = 1.0f, .stencil = 0 }
 			};
 
-			m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, &ClearColor, &DepthValue);
+			m_vkCore.BeginDynamicRenderingSwapChain(CmdBuf, ImageIndex, &ClearColor, &DepthValue);
 
 		} else {
-			m_vkCore.BeginDynamicRendering(CmdBuf, ImageIndex, NULL, NULL);
+			m_vkCore.BeginDynamicRenderingSwapChain(CmdBuf, ImageIndex, NULL, NULL);
 		}		
 	}
 

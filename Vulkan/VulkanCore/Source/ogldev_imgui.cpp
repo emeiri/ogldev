@@ -169,7 +169,7 @@ VkCommandBuffer ImGUIRenderer::PrepareCommandBuffer(int Image)
 {
 	BeginCommandBuffer(m_cmdBufs[Image], VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-	m_pvkCore->BeginDynamicRendering(m_cmdBufs[Image], Image, NULL, NULL);
+	m_pvkCore->BeginDynamicRenderingSwapChain(m_cmdBufs[Image], Image, NULL, NULL);
 
 	ImDrawData* pDrawData = ImGui::GetDrawData();
 	ImGui_ImplVulkan_RenderDrawData(pDrawData, m_cmdBufs[Image]);
