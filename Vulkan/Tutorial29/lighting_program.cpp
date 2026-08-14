@@ -286,7 +286,7 @@ void LightingProgram::UpdateUniformBuffers(int ImageIndex,
 		glm::mat4 WorldAndBase = World * SubmeshTransformations[i];
 		glm::mat3 NormalMatrix = glm::transpose(glm::inverse(glm::mat3(WorldAndBase)));
 
-		UboDataVS[i].NormalMatrix = NormalMatrix;
+		UboDataVS[i].NormalMatrix = glm::mat4(NormalMatrix);
 	}
 
 	UniformBuffersVS[ImageIndex].Update(m_device, UboDataVS.data(), sizeof(UniformDataVS) * UboDataVS.size());
