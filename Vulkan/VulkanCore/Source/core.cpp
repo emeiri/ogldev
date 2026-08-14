@@ -868,8 +868,15 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
 	// Step #3: create the texture sampler
-    float MaxAnisotropy = EnableAnisotropy ? m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy : -1.0f;
-	Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
+	if ((Usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) == 0) {
+		float MaxAnisotropy = EnableAnisotropy ? m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy : -1.0f;
+		Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
+	} else {
+		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		TransitionImageLayout(Tex.m_image, Format, OldLayout, NewLayout, 1, MipLevels);
+        Tex.m_layout = NewLayout;
+	}
 }
 
 
