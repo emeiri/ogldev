@@ -334,7 +334,7 @@ private:
 
 	void InitBigTextureArray()
 	{
-        m_bigTextureArray.Init(m_vkCore.GetDevice(), m_descPool, m_vkCore.GetNumImages(), MAX_TEXTURES, BIG_TEXTURE_ARRAY_BINDING);
+        m_bigTextureArray.Init(m_vkCore.GetDevice(), m_descPool, MAX_TEXTURES, BIG_TEXTURE_ARRAY_BINDING);
 	}
 
 
@@ -381,7 +381,7 @@ private:
 	{
 		for (int i = 0; i < OgldevVK::NUM_LIGHTING_MODES; i++) {
 			m_pipelines[i].Init(m_vkCore, m_descPool, m_bigTextureArray.GetDescSetLayout(), 
-				&m_bigTextureArray.GetDescSets(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
+				m_bigTextureArray.GetDescSet(), m_vs, m_fs, (OgldevVK::LIGHTING_MODE)i);
 		}
 	}
 

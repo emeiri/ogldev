@@ -49,7 +49,7 @@ public:
 	virtual void Init(VulkanCore& vkCore,
 		VkDescriptorPool DescPool,
 		VkDescriptorSetLayout TextureDescSetLayout,
-		const std::vector<VkDescriptorSet>* pTextureDescSets,
+		VkDescriptorSet TextureDescSet,
 		VkShaderModule vs,
 		VkShaderModule fs,
 		LIGHTING_MODE LightingMode);
@@ -99,7 +99,7 @@ private:
 
 	int m_numImages = 0;
     VkDescriptorSetLayout m_textureDescSetLayout = VK_NULL_HANDLE;
-	const std::vector<VkDescriptorSet>* m_pTextureDescSets = NULL;
+	VkDescriptorSet m_textureDescSet = VK_NULL_HANDLE;
 };
 
 }

@@ -38,13 +38,13 @@ enum Binding {
 void LightingProgram::Init(VulkanCore& vkCore,
 	VkDescriptorPool DescPool,
 	VkDescriptorSetLayout TextureDescSetLayout,
-	const std::vector<VkDescriptorSet>* pTextureDescSets,
+	VkDescriptorSet TextureDescSet,
 	VkShaderModule vs,
 	VkShaderModule fs,
 	LIGHTING_MODE LightingMode)
 {
 	m_textureDescSetLayout = TextureDescSetLayout;
-	m_pTextureDescSets = pTextureDescSets;
+	m_textureDescSet = TextureDescSet;
     m_numImages = vkCore.GetNumImages();
 
 	VkSpecializationMapEntry SpecMapEntry = {
@@ -86,7 +86,7 @@ void LightingProgram::Destroy()
 
 void LightingProgram::Bind(int ImageIndex, VkCommandBuffer CmdBuf, VkDescriptorSet& DescSet, u32 BaseTextureIndex)
 {
-	std::vector<VkDescriptorSet> DescSets = { (*m_pTextureDescSets)[ImageIndex], DescSet };
+	std::vector<VkDescriptorSet> DescSets = { m_textureDescSet, DescSet };
 	GraphicsPipeline::Bind(CmdBuf, DescSets); 
 
 	vkCmdPushConstants(CmdBuf,

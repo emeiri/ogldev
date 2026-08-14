@@ -25,12 +25,12 @@
 
 namespace OgldevVK {
 
-void BigTextureArray::Init(VkDevice Device, VkDescriptorPool DescPool, int NumImages, u32 MaxTextures, u32 BindingPoint)
+void BigTextureArray::Init(VkDevice Device, VkDescriptorPool DescPool, u32 MaxTextures, u32 BindingPoint)
 {
 	m_device = Device;
 	m_bindingPoint = BindingPoint;
 	CreateDescSetLayout(MaxTextures);
-	AllocDescSets(DescPool, MaxTextures, NumImages);
+	AllocDescSet(DescPool, MaxTextures);
 }
 
 
@@ -68,32 +68,24 @@ void BigTextureArray::CreateDescSetLayout(u32 MaxTextures)
 }
 
 
-void BigTextureArray::AllocDescSets(VkDescriptorPool DescPool, u32 MaxTextures, int NumImages)
+void BigTextureArray::AllocDescSet(VkDescriptorPool DescPool, u32 MaxTextures)
 {
-	size_t NumDescSets = NumImages;
-
-	std::vector<VkDescriptorSetLayout> Layouts(NumDescSets, m_descSetLayout);
-
-	std::vector<u32> TextureCounts(NumDescSets, MaxTextures);
-
 	VkDescriptorSetVariableDescriptorCountAllocateInfo VariableCountInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO,
 		.pNext = NULL,
-		.descriptorSetCount = (u32)NumDescSets,
-		.pDescriptorCounts = TextureCounts.data()
+		.descriptorSetCount = 1,
+		.pDescriptorCounts = &MaxTextures
 	};
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
 		.pNext = &VariableCountInfo,
 		.descriptorPool = DescPool,
-		.descriptorSetCount = (u32)Layouts.size(),
-		.pSetLayouts = Layouts.data()
+		.descriptorSetCount = 1,
+		.pSetLayouts = &m_descSetLayout
 	};
 
-	m_descSets.resize(NumDescSets);
-
-	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, m_descSets.data());
+	VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, &m_descSet);
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");
 }
 
@@ -128,28 +120,21 @@ void BigTextureArray::CreateTextureArray(const std::vector<OgldevVK::ModelDesc>&
 
 	assert(Index == TotalTextureCount);
 
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_descSets.size());
+	VkWriteDescriptorSet WriteDescriptorSet = {
+		.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+		.pNext = NULL,
+		.dstSet = m_descSet,
+		.dstBinding = m_bindingPoint,
+		.dstArrayElement = 0,
+		.descriptorCount = TotalTextureCount,
+		.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		.pImageInfo = ImageInfos.data(),
+		.pBufferInfo = NULL,
+		.pTexelBufferView = NULL
+	};
 
-	for (int i = 0; i < (int)m_descSets.size(); i++) {
-		VkDescriptorSet& DstSet = m_descSets[i];
-
-		WriteDescriptorSet[i] = {
-			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-			.pNext = NULL,
-			.dstSet = DstSet,
-			.dstBinding = m_bindingPoint,
-			.dstArrayElement = 0,
-			.descriptorCount = TotalTextureCount,
-			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			.pImageInfo = ImageInfos.data(),
-			.pBufferInfo = NULL,
-			.pTexelBufferView = NULL
-		};
-	}
-
-	vkUpdateDescriptorSets(m_device, (u32)WriteDescriptorSet.size(), WriteDescriptorSet.data(), 0, NULL);
+	vkUpdateDescriptorSets(m_device, 1, &WriteDescriptorSet, 0, NULL);
 }
-
 
 
 void BigTextureArray::Destroy()

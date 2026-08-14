@@ -33,7 +33,7 @@ public:
 
 	BigTextureArray() {}
 
-	void Init(VkDevice Device, VkDescriptorPool DescPool, int NumImages, u32 MaxTextures, u32 BindingPoint);
+	void Init(VkDevice Device, VkDescriptorPool DescPool, u32 MaxTextures, u32 BindingPoint);
 
 	void CreateTextureArray(const std::vector<OgldevVK::ModelDesc>& ModelDescs);
 
@@ -41,17 +41,17 @@ public:
 
 	VkDescriptorSetLayout GetDescSetLayout() const { return m_descSetLayout; }
 
-	const std::vector<VkDescriptorSet>& GetDescSets() const { return m_descSets; }
+	VkDescriptorSet GetDescSet() const { return m_descSet; }
 
 private:
 
 	void CreateDescSetLayout(u32 MaxTextures);
 
-	void AllocDescSets(VkDescriptorPool DescPool, u32 MaxTextures, int NumImages);
+	void AllocDescSet(VkDescriptorPool DescPool, u32 MaxTextures);
 
 	VkDevice m_device = VK_NULL_HANDLE;
 	VkDescriptorSetLayout m_descSetLayout = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> m_descSets;	// one set per swapchain image
+	VkDescriptorSet m_descSet;
 	u32 m_bindingPoint = 0;
 };
 
