@@ -451,6 +451,8 @@ void VulkanCore::CreateSwapChain()
 	const std::vector<VkPresentModeKHR>& PresentModes = m_physDevices.Selected().m_presentModes;
 	VkPresentModeKHR PresentMode = ChoosePresentMode(PresentModes);
 
+    // Temporary workaround to allow a compute shader to render directly into the swapchain image. 
+	// This is not a good idea in general, but it works for this tutorial.
 	m_swapChainSurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;// = ChooseSurfaceFormatAndColorSpace(m_physDevices.Selected().m_surfaceFormats);
     m_swapChainSurfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 
