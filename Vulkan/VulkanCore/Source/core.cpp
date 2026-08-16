@@ -850,6 +850,8 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 	bool IsCubemap = false;
 	u32 MipLevels = 1;
+
+	// Step #1: create the image view
 	CreateImage(Tex, Width, Height, Format, Usage, PropertyFlags, IsCubemap, MipLevels);
 
 	// Step #2: create the image view
@@ -867,7 +869,7 @@ void VulkanCore::CreateTexture(VulkanTexture& Tex, int Width, int Height, VkImag
 	VkFilter MaxFilter = VK_FILTER_LINEAR;
 	VkSamplerAddressMode AddressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-	// Step #3: create the texture sampler
+	// Step #3: create the texture sampler (only for color)
 	if ((Usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) == 0) {
 		float MaxAnisotropy = EnableAnisotropy ? m_physDevices.Selected().m_devProps.limits.maxSamplerAnisotropy : -1.0f;
 		Tex.m_sampler = CreateTextureSampler(m_device, MinFilter, MaxFilter, AddressMode, MaxAnisotropy);
