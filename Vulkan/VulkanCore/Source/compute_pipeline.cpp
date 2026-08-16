@@ -25,7 +25,6 @@ namespace OgldevVK {
 void ComputePipeline::Init(VulkanCore& vkCore, VkDescriptorPool DescPool, const char* pCSFilename)
 {
 	m_device = vkCore.GetDevice();
-	m_numImages = vkCore.GetNumImages();
 	m_descriptorPool = DescPool;
 
 	m_descriptorSetLayout = CreateDescSetLayout(vkCore);
@@ -107,7 +106,7 @@ void ComputePipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>&
 {
 	assert(DescriptorSets.size() == 0);
 
-	std::vector<VkDescriptorSetLayout> Layouts(m_numImages, m_descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> Layouts(DescCount, m_descriptorSetLayout);
 
 	VkDescriptorSetAllocateInfo AllocInfo = {
 		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
@@ -117,7 +116,7 @@ void ComputePipeline::AllocDescSets(int DescCount, std::vector<VkDescriptorSet>&
 		.pSetLayouts = Layouts.data()
 	};
 
-	DescriptorSets.resize(m_numImages);
+	DescriptorSets.resize(DescCount);
 
     VkResult res = vkAllocateDescriptorSets(m_device, &AllocInfo, DescriptorSets.data());
 	CHECK_VK_RESULT(res, "vkAllocateDescriptorSets");	

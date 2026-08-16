@@ -49,7 +49,6 @@ protected:
 	virtual VkDescriptorSetLayout CreateDescSetLayout(OgldevVK::VulkanCore& vkCore) = 0;
 
 	VkDevice m_device = VK_NULL_HANDLE;
-	int m_numImages = 0;
 
 private:
 	

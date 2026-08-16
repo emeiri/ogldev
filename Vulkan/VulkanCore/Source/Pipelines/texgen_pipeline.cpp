@@ -51,11 +51,12 @@ VkDescriptorSetLayout TexGenComputePipeline::CreateDescSetLayout(OgldevVK::Vulka
 void TexGenComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets, 
 										   const VulkanTexture& Texture, const std::vector<BufferAndMemory>& UBOs)
 {
-	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages * 2);
+    int DescCount = (int)DescriptorSets.size();
+	std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescCount * 2);
 
-	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(m_numImages);
+	std::vector<VkDescriptorBufferInfo> BufferInfo_Uniforms(DescCount);
 
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
+	for (int ImageIndex = 0; ImageIndex < DescCount; ImageIndex++) {
 		BufferInfo_Uniforms[ImageIndex].buffer = UBOs[ImageIndex].m_buffer;
 		BufferInfo_Uniforms[ImageIndex].offset = 0;
 		BufferInfo_Uniforms[ImageIndex].range = VK_WHOLE_SIZE;
@@ -69,8 +70,8 @@ void TexGenComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& Descrip
 		.imageLayout = VK_IMAGE_LAYOUT_GENERAL
 	};
 
-	for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-		VkDescriptorSet& DstSet = DescriptorSets[ImageIndex];
+	for (int i = 0; i < DescCount; i++) {
+		VkDescriptorSet& DstSet = DescriptorSets[i];
 
 		VkWriteDescriptorSet wds = {
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -92,7 +93,7 @@ void TexGenComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& Descrip
 			.dstArrayElement = 0,
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			.pBufferInfo = &BufferInfo_Uniforms[ImageIndex]
+			.pBufferInfo = &BufferInfo_Uniforms[i]
 		};
 
 		assert(WdsIndex < WriteDescriptorSet.size());

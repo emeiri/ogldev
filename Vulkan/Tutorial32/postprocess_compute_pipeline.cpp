@@ -50,20 +50,21 @@ void PostprocessComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& De
                                                 const std::vector<VkImageView>& SwapChainImageViews)
 {
     // We only have 1 descriptor write per swapchain image now
-    std::vector<VkWriteDescriptorSet> WriteDescriptorSet(m_numImages);
+    int DescCount = (int)DescriptorSets.size();
+    std::vector<VkWriteDescriptorSet> WriteDescriptorSet(DescCount);
 
     // Allocate space for each image's layout parameters
-    std::vector<VkDescriptorImageInfo> ImageInfos(m_numImages);
+    std::vector<VkDescriptorImageInfo> ImageInfos(DescCount);
 
     u32 WdsIndex = 0;
 
-    for (int ImageIndex = 0; ImageIndex < m_numImages; ImageIndex++) {
-        VkDescriptorSet& DstSet = DescriptorSets[ImageIndex];
+    for (int i = 0; i < DescCount; i++) {
+        VkDescriptorSet& DstSet = DescriptorSets[i];
 
         // Configure the descriptor to point to this specific frame's swapchain view
-        ImageInfos[ImageIndex] = {
+        ImageInfos[i] = {
             .sampler = VK_NULL_HANDLE,           // Storage images do not use a sampler
-            .imageView = SwapChainImageViews[ImageIndex],
+            .imageView = SwapChainImageViews[i],
             .imageLayout = VK_IMAGE_LAYOUT_GENERAL // Matches your Synchronization2 barrier layout
         };
 
@@ -75,7 +76,7 @@ void PostprocessComputePipeline::UpdateDescSets(std::vector<VkDescriptorSet>& De
             .dstArrayElement = 0,
             .descriptorCount = 1,
             .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .pImageInfo = &ImageInfos[ImageIndex]
+            .pImageInfo = &ImageInfos[i]
         };
 
         assert(WdsIndex < WriteDescriptorSet.size());
