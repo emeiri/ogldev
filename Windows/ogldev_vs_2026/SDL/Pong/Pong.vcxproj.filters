@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\SDL\Clear\clear.cpp">
+    <ClCompile Include="..\..\..\..\SDL\Clear\pong.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

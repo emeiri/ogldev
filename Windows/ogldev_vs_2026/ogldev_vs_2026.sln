@@ -634,7 +634,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tutorial33", "Vulkan\Tutori
 	EndProjectSection
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SDL", "SDL", "{C9FEE38B-9C20-42B2-A871-6F365B652306}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Clear", "SDL\Clear\Clear.vcxproj", "{085D4704-A9B2-4681-8175-1698A7E246D7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "SDL\Pong\Pong.vcxproj", "{085D4704-A9B2-4681-8175-1698A7E246D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
