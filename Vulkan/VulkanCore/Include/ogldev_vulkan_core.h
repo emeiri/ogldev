@@ -46,15 +46,6 @@ public:
 };
 
 
-enum RenderPassType {
-	RenderPassTypeDefault = 0x0,
-	RenderPassTypeFirst = 0x01,
-	RenderPassTypeLast = 0x02,
-	RenderPassTypeOffscreen = 0x04,
-	RenderPassTypeOffscreenInternal = 0x08,
-};
-
-
 class VulkanCore {
 
 public:
