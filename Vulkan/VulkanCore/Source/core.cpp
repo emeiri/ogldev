@@ -109,10 +109,13 @@ VulkanCore::~VulkanCore()
 }
 
 
-void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled, bool WithCompute)
+void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, InitFlags Flags)
 {
 	m_pWindow = pWindow;
-	m_depthEnabled = DepthEnabled;
+	
+	m_depthEnabled = (Flags & OGLDEV_VK_INIT_DEPTH_ENABLED) != 0;
+	bool WithCompute = (Flags & OGLDEV_VK_INIT_COMPUTE_ENABLED) != 0;
+	
 	if (pWindow) { // The first few tutorials pass NULL here so we skip this part
 		GetFramebufferSize(m_windowWidth, m_windowHeight);
 	}
@@ -136,7 +139,7 @@ void VulkanCore::Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabl
 	CreateCommandBufferPool();
 	m_queue.Init(m_device, m_swapChain, m_queueFamily, 0);
 	CreateCommandBuffers(1, &m_copyCmdBuf);
-	if (DepthEnabled) {
+	if (m_depthEnabled) {
 		CreateDepthResources();
 	}
 }

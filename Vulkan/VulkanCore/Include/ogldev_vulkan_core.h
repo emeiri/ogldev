@@ -31,6 +31,13 @@
 namespace OgldevVK {
 
 
+enum InitFlags {
+    OGLDEV_VK_INIT_NONE = 0x0,
+    OGLDEV_VK_INIT_DEPTH_ENABLED = 0x1,
+    OGLDEV_VK_INIT_COMPUTE_ENABLED = 0x2
+};
+
+
 class BufferAndMemory {
 public:
 	BufferAndMemory() {}
@@ -54,7 +61,7 @@ public:
 
 	~VulkanCore();
 
-	void Init(const char* pAppName, GLFWwindow* pWindow, bool DepthEnabled, bool WithCompute);
+	void Init(const char* pAppName, GLFWwindow* pWindow, InitFlags Flags);
 
 	VkRenderPass CreateSimpleRenderPass();
 
