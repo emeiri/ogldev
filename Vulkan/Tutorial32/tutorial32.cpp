@@ -374,14 +374,16 @@ private:
 	{
         m_offlineImages.resize(m_numImages);
 
+		VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent();
+
         for (int i = 0; i < (int)m_offlineImages.size(); i++) {
 			VkImageUsageFlags OfflineUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
 											 VK_IMAGE_USAGE_SAMPLED_BIT |
 											 VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
 											 VK_IMAGE_USAGE_STORAGE_BIT;
-            m_vkCore.CreateTexture(m_offlineImages[i].m_color, WINDOW_WIDTH, WINDOW_HEIGHT, OfflineUsage, m_vkCore.GetSwapChainFormat(), false);
+            m_vkCore.CreateTexture(m_offlineImages[i].m_color, SwapchainExtent.width, SwapchainExtent.height, OfflineUsage, m_vkCore.GetSwapChainFormat(), false);
 			OfflineUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-            m_vkCore.CreateTexture(m_offlineImages[i].m_depth, WINDOW_WIDTH, WINDOW_HEIGHT, OfflineUsage, m_vkCore.GetDepthFormat(), false);
+            m_vkCore.CreateTexture(m_offlineImages[i].m_depth, SwapchainExtent.width, SwapchainExtent.height, OfflineUsage, m_vkCore.GetDepthFormat(), false);
         }
 	}
 
@@ -547,16 +549,16 @@ private:
 			VkImageBlit blitRegion{};
 			blitRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
 			blitRegion.srcOffsets[0] = { 0, 0, 0 };
-			blitRegion.srcOffsets[1] = { (i32)WINDOW_WIDTH, (i32)WINDOW_HEIGHT, 1 }; // From 2560x1440
+			blitRegion.srcOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 }; 
 
 			blitRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
 			blitRegion.dstOffsets[0] = { 0, 0, 0 };
-			blitRegion.dstOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 }; // To 2560x1415
-
+			blitRegion.dstOffsets[1] = { (i32)SwapchainExtent.width, (i32)SwapchainExtent.height, 1 };
+		
 			vkCmdBlitImage(CmdBuf,
 				OfflineImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 				SwapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-				1, &blitRegion, VK_FILTER_LINEAR); // Linear filtering smooths out the missing 25 pixels
+				1, &blitRegion, VK_FILTER_LINEAR); 
 
 			// 3. Transition Swapchain back to COLOR_ATTACHMENT_OPTIMAL for ImGui
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
