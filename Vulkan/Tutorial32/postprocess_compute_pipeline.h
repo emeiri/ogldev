@@ -19,6 +19,17 @@
 
 #include "ogldev_vulkan_compute_pipeline.h"
 
+struct OfflineImage {
+	OgldevVK::VulkanTexture m_color;
+	OgldevVK::VulkanTexture m_depth;
+
+	void Destroy(VkDevice Device) {
+		m_color.Destroy(Device);
+		m_depth.Destroy(Device);
+	}
+};
+
+
 class PostprocessComputePipeline : public OgldevVK::ComputePipeline {
 
 public:
@@ -26,7 +37,8 @@ public:
 	PostprocessComputePipeline() {}
 
 	void UpdateDescSets(std::vector<VkDescriptorSet>& DescriptorSets,
-					    const std::vector<VkImageView>& SwapChainImageViews);
+					    const std::vector<VkImageView>& SwapChainImageViews,
+						const std::vector<OfflineImage>& OfflineImages);
 
 protected:
 

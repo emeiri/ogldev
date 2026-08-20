@@ -87,13 +87,13 @@ struct ModelConfig {
 static std::vector<ModelConfig> Models = {
 	{ "../../Content/crytek_sponza/sponza.obj", glm::vec3(0.0f), 0.01f }
 //	,{ "../../Content/vintage_cabinet_01/vintage_cabinet_01_4k.gltf", glm::vec3(-8.0f, 0.0f, -1.5f), 1.0f}
-	,{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
+//	,{ "../../Content/box.obj", glm::vec3(2.0f, 0.5f, -1.5f), 0.25f}
 //	,{ "../../Content/antique_ceramic_vase_01_4k.blend/antique_ceramic_vase_01_4k.obj", glm::vec3(-4.0f, 0.0f, -1.5f), 2.0f}
 //	,{ "../../Content/Stanford/stanford_dragon_pbr/scene.gltf", glm::vec3(0.0f, 0.0f, -1.5f), 0.02f }
 };
 
 
-struct OfflineImage {
+/*struct OfflineImage {
     OgldevVK::VulkanTexture m_color;
     OgldevVK::VulkanTexture m_depth;
 
@@ -101,7 +101,7 @@ struct OfflineImage {
         m_color.Destroy(Device);
         m_depth.Destroy(Device);
     }
-};
+};*/
 
 
 class VulkanApp : public OgldevVK::GLFWCallbacks
@@ -157,8 +157,7 @@ public:
 	{
 		m_pWindow = OgldevVK::glfw_vulkan_init(WINDOW_WIDTH, WINDOW_HEIGHT, pAppName);
 
-        m_vkCore.Init(pAppName, m_pWindow, (OgldevVK::InitFlags)(OgldevVK::OGLDEV_VK_INIT_DEPTH_ENABLED | 
-																 OgldevVK::OGLDEV_VK_INIT_COMPUTE_ENABLED));
+        m_vkCore.Init(pAppName, m_pWindow, (OgldevVK::InitFlags)(OgldevVK::OGLDEV_VK_INIT_COMPUTE_ENABLED));
 		m_device = m_vkCore.GetDevice();
 		m_numImages = m_vkCore.GetNumImages();
 		m_pQueue = m_vkCore.GetQueue();
@@ -187,29 +186,36 @@ public:
 
 		std::vector<VkCommandBuffer> SubmissionCmdBufs;
 
-		// 1. Gather baseline offline scene draws
+		// 1. Geometry Pass
 		for (size_t MeshIndex = 0; MeshIndex < m_modelContexts.size(); MeshIndex++) {
 			SubmissionCmdBufs.push_back(m_cmdBufs[MeshIndex][m_lightingMode].BaseMeshDraw[ImageIndex]);
 		}
 
-		// 2. Resolve how the scene gets onto the swapchain canvas
+		// 2. Resolve Post-Processing and Presentation Chains
 		if (m_enablePostProcess) {
-			// Appends your compute shader pass (Transitions Offline -> Read, Swapchain -> GENERAL -> COLOR_ATTACHMENT_OPTIMAL)
 			SubmissionCmdBufs.push_back(m_computePostProcessCmdBufs[ImageIndex]);
-		} else {
-			// Appends the raw blit/copy pass (Transitions Offline -> Src, Swapchain -> DST -> COLOR_ATTACHMENT_OPTIMAL)
-			SubmissionCmdBufs.push_back(m_fallbackCopyCmdBufs[ImageIndex]);
-		}
 
-		// 3. Append trailing layout presentation elements uniformly
-		if (m_showGui) {
-			UpdateGUI();
-			// ImGui safely starts from COLOR_ATTACHMENT_OPTIMAL and finishes at PRESENT_SRC_KHR
-			VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
-			SubmissionCmdBufs.push_back(ImGUICmdBuf);
+			if (m_showGui) {
+				UpdateGUI();
+				// Since compute left the swapchain in GENERAL, tell ImGui to transition from GENERAL to COLOR_ATTACHMENT_OPTIMAL
+				VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
+				SubmissionCmdBufs.push_back(ImGUICmdBuf);
+			} else {
+				// THE FIX: Submit your specialized compute presentation barrier
+				// This links COMPUTE_SHADER_BIT directly to the presentation engine!
+				SubmissionCmdBufs.push_back(m_computeTransitionCmdBufs[ImageIndex]);
+			}
 		} else {
-			// Direct transition out of COLOR_ATTACHMENT_OPTIMAL into PRESENT_SRC_KHR since ImGui was skipped
-			SubmissionCmdBufs.push_back(m_transitionCmdBufs[ImageIndex]);
+			// Fallback Blit Path
+			SubmissionCmdBufs.push_back(m_fallbackCopyCmdBufs[ImageIndex]);
+
+			if (m_showGui) {
+				UpdateGUI();
+				VkCommandBuffer ImGUICmdBuf = m_imGUIRenderer.PrepareCommandBuffer(ImageIndex);
+				SubmissionCmdBufs.push_back(ImGUICmdBuf);
+			} else {
+				SubmissionCmdBufs.push_back(m_transitionCmdBufs[ImageIndex]);
+			}
 		}
 
 		m_pQueue->SubmitAsync(SubmissionCmdBufs);
@@ -346,30 +352,6 @@ private:
 	}
 
 
-	void InitTransitionCommandBuffers() 
-	{
-		m_transitionCmdBufs.resize(m_numImages);
-        m_vkCore.CreateCommandBuffers(m_numImages, m_transitionCmdBufs.data());
-
-		for (int i = 0; i < m_numImages; i++) {
-			VkCommandBuffer CmdBuf = m_transitionCmdBufs[i];
-			VkImage CurrentImage = m_vkCore.GetImage(i);
-			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
-
-			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-			// Transition directly from Color Attachment back into presentation source
-			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat,
-									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-									   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
-
-			VkResult res = vkEndCommandBuffer(CmdBuf);
-			CHECK_VK_RESULT(res, "Failed to record transition command buffer\n");
-		}
-	}
-
-
-
 	void CreateDescriptorPool()
 	{
 		u32 TextureCount = MAX_TEXTURES * 4;
@@ -395,7 +377,8 @@ private:
         for (int i = 0; i < (int)m_offlineImages.size(); i++) {
 			VkImageUsageFlags OfflineUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
 											 VK_IMAGE_USAGE_SAMPLED_BIT |
-											 VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+											 VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+											 VK_IMAGE_USAGE_STORAGE_BIT;
             m_vkCore.CreateTexture(m_offlineImages[i].m_color, WINDOW_WIDTH, WINDOW_HEIGHT, OfflineUsage, m_vkCore.GetSwapChainFormat(), false);
 			OfflineUsage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
             m_vkCore.CreateTexture(m_offlineImages[i].m_depth, WINDOW_WIDTH, WINDOW_HEIGHT, OfflineUsage, m_vkCore.GetDepthFormat(), false);
@@ -418,7 +401,7 @@ private:
 		}
 
 		m_postProcessPipeline.AllocDescSets(m_numImages, m_postProcessDescSets);
-        m_postProcessPipeline.UpdateDescSets(m_postProcessDescSets, m_vkCore.GetImageViews());
+        m_postProcessPipeline.UpdateDescSets(m_postProcessDescSets, m_vkCore.GetImageViews(), m_offlineImages);
 
         UpdateBaseTextureIndices(ModelDescs);
 
@@ -496,6 +479,8 @@ private:
 
 		// 4. Bake your standalone layout transition handoffs
 		InitTransitionCommandBuffers();
+
+		InitComputeTransitionCommandBuffers();
 	}
 
 
@@ -503,24 +488,32 @@ private:
 	{
 		bool IsFirstMesh = (MeshIndex == 0);
 		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+		VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			VkImageLayout SrcLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            VkImageLayout DstLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			// THE FIX: Handle the incoming layout state dynamically on the first mesh!
+			// If it's the first mesh, it could be coming back from SHADER_READ_ONLY_OPTIMAL (Compute) 
+			// or TRANSFER_SRC_OPTIMAL (Fallback Blit). Passing VK_IMAGE_LAYOUT_UNDEFINED here 
+			// is completely legal and tells Vulkan to discard the old frame's contents and reset the layout!
+			VkImageLayout SrcColorLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-			OgldevVK::ImageMemBarrier2(CmdBuf, m_offlineImages[i].m_color.m_image, SwapChainFormat, SrcLayout, DstLayout, 1, 1, 0);
+			OgldevVK::ImageMemBarrier2(CmdBuf, m_offlineImages[i].m_color.m_image, SwapChainFormat,
+				SrcColorLayout, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
+			// Depth handling (Remains untouched and safe from previous fixes)
+			VkImageLayout SrcDepthLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			OgldevVK::ImageMemBarrier2(CmdBuf, m_offlineImages[i].m_depth.m_image, DepthFormat,
+				SrcDepthLayout, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 1, 0);
+
+			// Draw Geometry
 			BeginRendering(CmdBuf, m_offlineImages[i].m_color.m_view, m_offlineImages[i].m_depth.m_view, IsFirstMesh);
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
-
-			// NOTE: We leave the offline image in COLOR_ATTACHMENT_OPTIMAL. 
-			// No conditional swapchain logic belongs inside the pre-baked mesh draws!
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 			CHECK_VK_RESULT(res, "vkEndCommandBuffer\n");
@@ -583,37 +576,97 @@ private:
 			VkCommandBuffer CmdBuf = m_computePostProcessCmdBufs[i];
 			VkImage SwapchainImage = m_vkCore.GetImage(i);
 			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
+			VkImage OfflineDepthImage = m_offlineImages[i].m_depth.m_image;
 			VkFormat Format = m_vkCore.GetSwapChainFormat();
+			VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// 1. Transition the Offline image from attachment writing to safe compute shader reading
+			// 1. Transition Offline Color from Attachment to Shader Read
 			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format,
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 1, 0);
+				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
-			// 2. Transition the Swapchain image from UNDEFINED into GENERAL so the Compute Shader can write to it
+			// 2. FIXED: Use identical layouts. Your wrapper will hit the second branch,
+			// stalling the execution of frame N+1 until frame N's writes are safely resolved.
+	//		OgldevVK::ImageMemBarrier2(CmdBuf, OfflineDepthImage, DepthFormat,
+	//			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+	//			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 1, 0);
+
+			// 3. Transition Swapchain to GENERAL for compute writes
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
 				VK_IMAGE_LAYOUT_UNDEFINED,
 				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
-			// 3. Calculate Compute Shader local group dispatches (16x16 tiles)
+			// 4. Dispatch Compute Shader
 			u32 groupCountX = (WINDOW_WIDTH + 15) / 16;
 			u32 groupCountY = (WINDOW_HEIGHT + 15) / 16;
-
-			// Execute Compute Shader Pass
 			m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, groupCountX, groupCountY, 1);
 
-			// 4. Crucial Step: Transition Swapchain image from GENERAL to COLOR_ATTACHMENT_OPTIMAL
-			// This ensures uniformity for trailing steps (ImGui or the manual presentation transition)
+			// 5. Transition Swapchain back to Color Attachment for ImGui
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+
+			// 6. Transition Offline Color back to Attachment state for next frame's 3D render pass
+		//	OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format,
+		//		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		//		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 			CHECK_VK_RESULT(res, "Failed to record compute post-process command buffer\n");
 		}
 	}
+
+
+	void InitTransitionCommandBuffers()
+	{
+		m_transitionCmdBufs.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_transitionCmdBufs.data());
+
+		for (int i = 0; i < m_numImages; i++) {
+			VkCommandBuffer CmdBuf = m_transitionCmdBufs[i];
+			VkImage CurrentImage = m_vkCore.GetImage(i);
+			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+
+			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+			// FIXED: Accept GENERAL as the incoming layout, mapping it smoothly to PRESENT_SRC_KHR
+			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat,
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+
+			VkResult res = vkEndCommandBuffer(CmdBuf);
+			CHECK_VK_RESULT(res, "Failed to record transition command buffer\n");
+		}
+	}
+
+
+
+	// Add a new vector to your class: std::vector<VkCommandBuffer> m_computeTransitionCmdBufs;
+
+	void InitComputeTransitionCommandBuffers()
+	{
+		m_computeTransitionCmdBufs.resize(m_numImages);
+		m_vkCore.CreateCommandBuffers(m_numImages, m_computeTransitionCmdBufs.data());
+
+		for (int i = 0; i < m_numImages; i++) {
+			VkCommandBuffer CmdBuf = m_computeTransitionCmdBufs[i];
+			VkImage CurrentImage = m_vkCore.GetImage(i);
+			VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
+
+			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+			// FIXED: Transition directly from GENERAL (Compute Output) back into presentation source
+			OgldevVK::ImageMemBarrier2(CmdBuf, CurrentImage, SwapChainFormat,
+				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, 1, 0);
+
+			VkResult res = vkEndCommandBuffer(CmdBuf);
+			CHECK_VK_RESULT(res, "Failed to record compute transition command buffer\n");
+		}
+	}
+
 
 
 	void BeginRendering(VkCommandBuffer CmdBuf, VkImageView ImageView, VkImageView DepthView, bool FirstCommandBuffer)
@@ -731,6 +784,7 @@ private:
 	};
     std::vector<std::vector<MeshCmdBufs>> m_cmdBufs;	// outer dim: meshes, inner dim: lighting modes
 	std::vector<VkCommandBuffer> m_transitionCmdBufs;
+	std::vector<VkCommandBuffer> m_computeTransitionCmdBufs;
 	std::vector<VkCommandBuffer> m_computePostProcessCmdBufs;
 	std::vector<VkCommandBuffer> m_fallbackCopyCmdBufs;
 	VkShaderModule m_vs = VK_NULL_HANDLE;

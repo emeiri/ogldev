@@ -1427,7 +1427,7 @@ void VulkanCore::BeginDynamicRenderingSwapChain(VkCommandBuffer CmdBuf, int Imag
 												VkClearValue* pClearColor, VkClearValue* pDepthValue)
 {
     VkImageView ColorView = m_imageViews[ImageIndex];
-	VkImageView DepthView = m_depthImages[ImageIndex].m_view;
+	VkImageView DepthView = m_depthEnabled ? m_depthImages[ImageIndex].m_view : VK_NULL_HANDLE;
     BeginDynamicRendering(CmdBuf, ColorView, pClearColor, DepthView, pDepthValue);
 }
 

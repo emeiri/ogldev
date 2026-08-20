@@ -323,6 +323,11 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 			Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
 			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
+		} else if (NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
+			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_TRANSFER_BIT;
+			Barrier.srcAccessMask = VK_ACCESS_2_TRANSFER_WRITE_BIT;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+			Barrier.dstAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
 		} else {
 			printf("Unknown Barrier case 3\n");
 			exit(1);
@@ -366,8 +371,18 @@ void ImageMemBarrier2(VkCommandBuffer CmdBuf, VkImage Image, VkFormat Format, Vk
 		} else if (NewLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
 			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
 			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT;
-			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
-			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT;
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT;
+			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
+		} else if (NewLayout == VK_IMAGE_LAYOUT_GENERAL) {
+			// THE GENERAL-TO-GENERAL FIX:
+			// SOURCE: The Compute Shader that just finished writing the post-process pass
+			Barrier.srcStageMask = VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+			Barrier.srcAccessMask = VK_ACCESS_2_SHADER_WRITE_BIT;
+
+			// DESTINATION: Open it up completely so that the next stage (ImGui drawing or fallback blits)
+			// can safely READ the pixels or WRITE text elements over it.
+			Barrier.dstStageMask = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_2_COMPUTE_SHADER_BIT;
+			Barrier.dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_2_SHADER_READ_BIT;
 		} else {
 			printf("Unknown Barrier case 5\n");
 			exit(1);
