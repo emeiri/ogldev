@@ -611,8 +611,14 @@ private:
 				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
 			// 4. Dispatch Compute Shader
-			u32 groupCountX = (WINDOW_WIDTH + 15) / 16;
-			u32 groupCountY = (WINDOW_HEIGHT + 15) / 16;
+			VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent(); // Fetch actual dimensions!
+
+			// 3. Transition Swapchain to GENERAL...
+
+			// 4. FIXED: Calculate local group tiles using the true target scale (e.g. 1415 instead of 1440)
+			u32 groupCountX = (SwapchainExtent.width + 15) / 16;
+			u32 groupCountY = (SwapchainExtent.height + 15) / 16;
+
 			m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, groupCountX, groupCountY, 1);
 
 			// 5. Transition Swapchain back to Color Attachment for ImGui
@@ -620,7 +626,6 @@ private:
 				VK_IMAGE_LAYOUT_GENERAL,
 				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
-			// 6. Transition Offline Color back to Attachment state for next frame's 3D render pass
 		//	OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format,
 		//		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
 		//		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
