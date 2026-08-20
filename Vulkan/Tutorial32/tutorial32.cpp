@@ -491,16 +491,24 @@ private:
 		bool IsFirstMesh = (MeshIndex == 0);
 		VkFormat SwapChainFormat = m_vkCore.GetSwapChainFormat();
 		VkFormat DepthFormat = m_vkCore.GetDepthFormat();
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = (float)m_vkCore.GetSwapChainExtent().width;  // Match hardware width
+		viewport.height = (float)m_vkCore.GetSwapChainExtent().height;
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D Scissor{};
+		Scissor.offset = { 0, 0 };
+		Scissor.extent.width = m_vkCore.GetSwapChainExtent().width;
+		Scissor.extent.height = m_vkCore.GetSwapChainExtent().height;
 
 		for (uint i = 0; i < CmdBufs.size(); i++) {
 			VkCommandBuffer& CmdBuf = CmdBufs[i];
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// THE FIX: Handle the incoming layout state dynamically on the first mesh!
-			// If it's the first mesh, it could be coming back from SHADER_READ_ONLY_OPTIMAL (Compute) 
-			// or TRANSFER_SRC_OPTIMAL (Fallback Blit). Passing VK_IMAGE_LAYOUT_UNDEFINED here 
-			// is completely legal and tells Vulkan to discard the old frame's contents and reset the layout!
 			VkImageLayout SrcColorLayout = IsFirstMesh ? VK_IMAGE_LAYOUT_UNDEFINED : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 			OgldevVK::ImageMemBarrier2(CmdBuf, m_offlineImages[i].m_color.m_image, SwapChainFormat,
@@ -513,6 +521,8 @@ private:
 
 			// Draw Geometry
 			BeginRendering(CmdBuf, m_offlineImages[i].m_color.m_view, m_offlineImages[i].m_depth.m_view, IsFirstMesh);
+			vkCmdSetViewport(CmdBuf, 0, 1, &viewport);
+			vkCmdSetScissor(CmdBuf, 0, 1, &Scissor);
 			m_pipelines[LightingMode].Bind(i, CmdBuf, m_modelContexts[MeshIndex].m_descSets[i], m_modelContexts[MeshIndex].m_baseTextureIndex);
 			m_modelContexts[MeshIndex].m_pModel->RecordCommandBufferIndirect(CmdBuf);
 			vkCmdEndRendering(CmdBuf);
