@@ -588,47 +588,29 @@ private:
 			VkCommandBuffer CmdBuf = m_computePostProcessCmdBufs[i];
 			VkImage SwapchainImage = m_vkCore.GetImage(i);
 			VkImage OfflineImage = m_offlineImages[i].m_color.m_image;
-			VkImage OfflineDepthImage = m_offlineImages[i].m_depth.m_image;
 			VkFormat Format = m_vkCore.GetSwapChainFormat();
 			VkFormat DepthFormat = m_vkCore.GetDepthFormat();
 
 			OgldevVK::BeginCommandBuffer(CmdBuf, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
-			// 1. Transition Offline Color from Attachment to Shader Read
-			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
-
-			// 2. FIXED: Use identical layouts. Your wrapper will hit the second branch,
-			// stalling the execution of frame N+1 until frame N's writes are safely resolved.
-	//		OgldevVK::ImageMemBarrier2(CmdBuf, OfflineDepthImage, DepthFormat,
-	//			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-	//			VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1, 1, 0);
+			OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format, 
+									   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
 			// 3. Transition Swapchain to GENERAL for compute writes
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
-				VK_IMAGE_LAYOUT_UNDEFINED,
-				VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
+									   VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL, 1, 1, 0);
 
-			// 4. Dispatch Compute Shader
 			VkExtent2D SwapchainExtent = m_vkCore.GetSwapChainExtent(); // Fetch actual dimensions!
 
-			// 3. Transition Swapchain to GENERAL...
+			u32 GroupCountX = (SwapchainExtent.width + 15) / 16;
+			u32 GroupCountY = (SwapchainExtent.height + 15) / 16;
 
-			// 4. FIXED: Calculate local group tiles using the true target scale (e.g. 1415 instead of 1440)
-			u32 groupCountX = (SwapchainExtent.width + 15) / 16;
-			u32 groupCountY = (SwapchainExtent.height + 15) / 16;
-
-			m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, groupCountX, groupCountY, 1);
+			m_postProcessPipeline.RecordCommandBuffer(m_postProcessDescSets[i], CmdBuf, GroupCountX, GroupCountY, 1);
 
 			// 5. Transition Swapchain back to Color Attachment for ImGui
 			OgldevVK::ImageMemBarrier2(CmdBuf, SwapchainImage, Format,
-				VK_IMAGE_LAYOUT_GENERAL,
-				VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
+									   VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
-		//	OgldevVK::ImageMemBarrier2(CmdBuf, OfflineImage, Format,
-		//		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-		//		VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 1, 1, 0);
 
 			VkResult res = vkEndCommandBuffer(CmdBuf);
 			CHECK_VK_RESULT(res, "Failed to record compute post-process command buffer\n");
