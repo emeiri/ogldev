@@ -1399,16 +1399,17 @@ void VulkanCore::CreateDepthResources()
 	m_depthImages.resize(NumSwapChainImages);
 
     VkFormat DepthFormat = m_physDevices.Selected().m_depthFormat;
+	VkImageUsageFlagBits Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+	u32 MipLevels = 1;
+	VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	VkExtent2D SwapChainExtent = GetSwapChainExtent();
 
 	for (int i = 0; i < NumSwapChainImages; i++) {
-		VkImageUsageFlagBits Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-		VkMemoryPropertyFlagBits PropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-		u32 MipLevels = 1;
-		CreateImage(m_depthImages[i], m_windowWidth, m_windowHeight, DepthFormat, 
+		CreateImage(m_depthImages[i], SwapChainExtent.width, SwapChainExtent.height, DepthFormat, 
 					Usage, PropertyFlags, false, MipLevels);
 
-		VkImageLayout OldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		VkImageLayout NewLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		TransitionImageLayout(m_depthImages[i].m_image, DepthFormat, OldLayout, NewLayout, 1, MipLevels);
 
 		m_depthImages[i].m_view = CreateImageView(m_device, m_depthImages[i].m_image, 
@@ -1474,7 +1475,7 @@ void VulkanCore::BeginDynamicRendering(VkCommandBuffer CmdBuf, VkImageView Image
 
 	VkRenderingInfoKHR RenderingInfo = {
 		.sType = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
-		.renderArea = { {0, 0}, {(u32)m_windowWidth, (u32)m_windowHeight} },
+		.renderArea = { {0, 0}, {(u32)GetSwapChainExtent().width, (u32)GetSwapChainExtent().height} },
 		.layerCount = 1,
 		.viewMask = 0,
 		.colorAttachmentCount = 1,
