@@ -24,6 +24,11 @@ struct Vec2
     float y = 0.0f;
 };
 
+float BallSize = 20.0f;
+Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
+Vec2 PaddlePos = { 25.0f, WINDOW_HEIGHT / 2.0f };
+float PaddleWidth = 30.0f;
+float PaddleHeight = 300.0f;
 int PaddleDirection = 0; // -1 for up, 1 for down, 0 for no movement
 Uint64 TickCount = 0;
 
@@ -81,11 +86,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
-float BallSize = 20.0f;
-Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-Vec2 PaddlePos = { 25.0f, WINDOW_HEIGHT / 2.0f };
-float PaddleWidth = 30.0f;
-float PaddleHeight = 300.0f;
 
 /* This function runs once per frame, and is the heart of the program. */
 SDL_AppResult SDL_AppIterate(void* appstate)
