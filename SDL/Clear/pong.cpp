@@ -26,7 +26,7 @@ struct Vec2
 
 float BallSize = 20.0f;
 Vec2 BallPos = { WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f };
-Vec2 PaddlePos = { 25.0f, WINDOW_HEIGHT / 2.0f };
+Vec2 PaddlePosL = { 25.0f, WINDOW_HEIGHT / 2.0f };
 float PaddleWidth = 30.0f;
 float PaddleHeight = 300.0f;
 int PaddleDirection = 0; // -1 for up, 1 for down, 0 for no movement
@@ -100,7 +100,7 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     
     if (PaddleDirection != 0) {
-        PaddlePos.y += PaddleDirection * 50.0f * DeltaTime; // Move paddle at 500 pixels per second
+        PaddlePosL.y += PaddleDirection * 50.0f * DeltaTime; // Move paddle at 500 pixels per second
 
         if (PaddleDirection > 0) {
             PaddleDirection -= 1; // Gradually reduce the direction to 0
@@ -108,16 +108,16 @@ SDL_AppResult SDL_AppIterate(void* appstate)
             PaddleDirection += 1; // Gradually reduce the direction to 0
         }
         
-        if (PaddlePos.y - PaddleHeight / 2.0f < 0) {
-            PaddlePos.y = PaddleHeight / 2.0f + 1; // Clamp to top
+        if (PaddlePosL.y - PaddleHeight / 2.0f < 0) {
+            PaddlePosL.y = PaddleHeight / 2.0f + 1; // Clamp to top
             PaddleDirection = 0; // Stop movement
-        } else if (PaddlePos.y + PaddleHeight / 2.0f > WINDOW_HEIGHT) {
-            PaddlePos.y = WINDOW_HEIGHT - PaddleHeight / 2.0f - 1; // Clamp to bottom
+        } else if (PaddlePosL.y + PaddleHeight / 2.0f > WINDOW_HEIGHT) {
+            PaddlePosL.y = WINDOW_HEIGHT - PaddleHeight / 2.0f - 1; // Clamp to bottom
             PaddleDirection = 0; // Stop movement
         }
     }
 
-    SDL_FRect Paddle(PaddlePos.x - PaddleWidth / 2.0f, PaddlePos.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
+    SDL_FRect Paddle(PaddlePosL.x - PaddleWidth / 2.0f, PaddlePosL.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
     SDL_RenderFillRect(renderer, &Paddle);
 
     BallPos.x += BallVelocity.x * DeltaTime;
@@ -131,10 +131,10 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         BallVelocity.y = -BallVelocity.y;
     }
 
-    bool CollideWithPaddle = (BallPos.x - BallSize / 2.0f <= PaddlePos.x + PaddleWidth / 2.0f) &&
-        (BallPos.x + BallSize / 2.0f >= PaddlePos.x - PaddleWidth / 2.0f) &&
-        (BallPos.y + BallSize / 2.0f >= PaddlePos.y - PaddleHeight / 2.0f) &&
-        (BallPos.y - BallSize / 2.0f <= PaddlePos.y + PaddleHeight / 2.0f);
+    bool CollideWithPaddle = (BallPos.x - BallSize / 2.0f <= PaddlePosL.x + PaddleWidth / 2.0f) &&
+        (BallPos.x + BallSize / 2.0f >= PaddlePosL.x - PaddleWidth / 2.0f) &&
+        (BallPos.y + BallSize / 2.0f >= PaddlePosL.y - PaddleHeight / 2.0f) &&
+        (BallPos.y - BallSize / 2.0f <= PaddlePosL.y + PaddleHeight / 2.0f);
 
     if (CollideWithPaddle && (BallVelocity.x < 0)) {
         BallVelocity.x = -BallVelocity.x;
