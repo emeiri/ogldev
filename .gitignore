@@ -52,3 +52,6 @@ VulkanClear/*
 *.spv
 *.cap
 .vs/
+*.obj.dt.d.json
+*.obj.dt.module.json
+*.obj.dt.module.json.command
