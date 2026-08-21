@@ -106,6 +106,14 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         } else {
             PaddleDirection += 1; // Gradually reduce the direction to 0
         }
+        
+        if (PaddlePos.y - PaddleHeight / 2.0f < 0) {
+            PaddlePos.y = PaddleHeight / 2.0f + 1; // Clamp to top
+            PaddleDirection = 0; // Stop movement
+        } else if (PaddlePos.y + PaddleHeight / 2.0f > WINDOW_HEIGHT) {
+            PaddlePos.y = WINDOW_HEIGHT - PaddleHeight / 2.0f - 1; // Clamp to bottom
+            PaddleDirection = 0; // Stop movement
+        }
     }
 
     SDL_FRect Paddle(PaddlePos.x - PaddleWidth / 2.0f, PaddlePos.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
