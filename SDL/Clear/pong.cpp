@@ -31,6 +31,7 @@ float PaddleWidth = 30.0f;
 float PaddleHeight = 300.0f;
 int PaddleDirection = 0; // -1 for up, 1 for down, 0 for no movement
 Uint64 TickCount = 0;
+Vec2 BallVelocity = { -200.0f, 235.0f }; // pixels per second
 
 
 /* This function runs once at startup. */
@@ -119,6 +120,8 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_FRect Paddle(PaddlePos.x - PaddleWidth / 2.0f, PaddlePos.y - PaddleHeight / 2.0f, PaddleWidth, PaddleHeight);
     SDL_RenderFillRect(renderer, &Paddle);
 
+    BallPos.x += BallVelocity.x * DeltaTime;
+    BallPos.y += BallVelocity.y * DeltaTime;
     SDL_FRect Ball(BallPos.x - BallSize / 2.0f, BallPos.y - BallSize / 2.0f, BallSize, BallSize);    
     SDL_RenderFillRect(renderer, &Ball);
 
