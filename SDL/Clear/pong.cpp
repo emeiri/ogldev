@@ -131,6 +131,15 @@ SDL_AppResult SDL_AppIterate(void* appstate)
         BallVelocity.y = -BallVelocity.y;
     }
 
+    bool CollideWithPaddle = (BallPos.x - BallSize / 2.0f <= PaddlePos.x + PaddleWidth / 2.0f) &&
+        (BallPos.x + BallSize / 2.0f >= PaddlePos.x - PaddleWidth / 2.0f) &&
+        (BallPos.y + BallSize / 2.0f >= PaddlePos.y - PaddleHeight / 2.0f) &&
+        (BallPos.y - BallSize / 2.0f <= PaddlePos.y + PaddleHeight / 2.0f);
+
+    if (CollideWithPaddle && (BallVelocity.x < 0)) {
+        BallVelocity.x = -BallVelocity.x;
+    }
+
     SDL_FRect Ball(BallPos.x - BallSize / 2.0f, BallPos.y - BallSize / 2.0f, BallSize, BallSize);    
     SDL_RenderFillRect(renderer, &Ball);
 
