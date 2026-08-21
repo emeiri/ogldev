@@ -44,6 +44,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
     }
     SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
+    SDL_SetRenderVSync(renderer, 1);
+
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
