@@ -314,20 +314,24 @@ void VulkanCore::CreateDevice()
 		VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
 	};
 
-	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
+	bool DeviceSupportsDynamicRendering = m_physDevices.Selected().IsExtensionSupported(
+																VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 
-	bool Instance_is_1_3_or_more = (m_instanceVersion.Major == 1 && m_instanceVersion.Minor >= 3) || (m_instanceVersion.Major > 1);
+	bool Instance_is_1_3_or_more = (m_instanceVersion.Major == 1 && m_instanceVersion.Minor >= 3) || 
+									(m_instanceVersion.Major > 1);
 
-	VkPhysicalDeviceVulkan13Features Features13{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
-	VkPhysicalDeviceVulkan12Features Features12{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+	VkPhysicalDeviceVulkan12Features Features12 { 
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES 
+	};
 
-	VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingExtFeatures{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR };
-	VkPhysicalDeviceSynchronization2FeaturesKHR Sync2ExtFeatures{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR };
-
-	void* pNextChain = NULL;
+	void* pNextChain = &Features12;
 
 	if (Instance_is_1_3_or_more && DeviceSupportsDynamicRendering) {
 		printf("The Vulkan instance and device support dynamic rendering as a core feature\n");
+
+		VkPhysicalDeviceVulkan13Features Features13{
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES
+		};
 
 		Features13.synchronization2 = VK_TRUE;
 		Features13.dynamicRendering = VK_TRUE;
@@ -341,14 +345,20 @@ void VulkanCore::CreateDevice()
 		Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
 		Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
 		Features12.pNext = &Features13;
-
-		pNextChain = &Features12;
 	} else if (m_instanceVersion.Minor == 2 && DeviceSupportsDynamicRendering) {
 		DevExts.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 		DevExts.push_back(VK_KHR_SYNCHRONIZATION_2_EXTENSION_NAME);
 
+		VkPhysicalDeviceDynamicRenderingFeaturesKHR DynamicRenderingExtFeatures{ 
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DYNAMIC_RENDERING_FEATURES_KHR 
+		};
+
 		DynamicRenderingExtFeatures.dynamicRendering = VK_TRUE;
 		DynamicRenderingExtFeatures.pNext = NULL;
+
+		VkPhysicalDeviceSynchronization2FeaturesKHR Sync2ExtFeatures { .
+			sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SYNCHRONIZATION_2_FEATURES_KHR 
+		};
 
 		Sync2ExtFeatures.synchronization2 = VK_TRUE;
 		Sync2ExtFeatures.pNext = &DynamicRenderingExtFeatures;
@@ -361,8 +371,6 @@ void VulkanCore::CreateDevice()
 		Features12.descriptorBindingSampledImageUpdateAfterBind = VK_TRUE;
 		Features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
 		Features12.pNext = &Sync2ExtFeatures;
-
-		pNextChain = &Features12;
 	} else {
 		printf("The system doesn't support dynamic rendering\n");
 		exit(1);
