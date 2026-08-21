@@ -122,6 +122,15 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     BallPos.x += BallVelocity.x * DeltaTime;
     BallPos.y += BallVelocity.y * DeltaTime;
+
+    //printf("BallPos: (%f, %f)\n", BallPos.x, BallPos.y);
+    bool CollideWithTop = (BallPos.y + BallSize / 2.0f >= WINDOW_HEIGHT);
+    bool CollideWithBottom = (BallPos.y - BallSize / 2.0f <= 0);
+    if ((CollideWithBottom && (BallVelocity.y < 0)) ||
+        (CollideWithTop && (BallVelocity.y > 0))) {
+        BallVelocity.y = -BallVelocity.y;
+    }
+
     SDL_FRect Ball(BallPos.x - BallSize / 2.0f, BallPos.y - BallSize / 2.0f, BallSize, BallSize);    
     SDL_RenderFillRect(renderer, &Ball);
 
